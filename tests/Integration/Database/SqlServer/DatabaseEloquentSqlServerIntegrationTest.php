@@ -38,7 +38,7 @@ class DatabaseEloquentSqlServerIntegrationTest extends SqlServerTestCase
             ['name' => 'Taylor Otwell']
         );
 
-        $this->assertEquals($user1->id, $user2->id);
+        $this->assertSame($user1->id, $user2->id);
         $this->assertSame('taylorotwell@gmail.com', $user2->email);
         $this->assertNull($user2->name);
 
@@ -47,7 +47,7 @@ class DatabaseEloquentSqlServerIntegrationTest extends SqlServerTestCase
             ['name' => 'Abigail Otwell']
         );
 
-        $this->assertNotEquals($user3->id, $user1->id);
+        $this->assertNotSame($user3->id, $user1->id);
         $this->assertSame('abigailotwell@gmail.com', $user3->email);
         $this->assertSame('Abigail Otwell', $user3->name);
 
@@ -69,7 +69,7 @@ class DatabaseEloquentSqlServerIntegrationTest extends SqlServerTestCase
                 ['name' => 'Taylor Otwell']
             );
 
-            $this->assertEquals($user1->id, $user2->id);
+            $this->assertSame($user1->id, $user2->id);
             $this->assertSame('taylor@laravel.com', $user2->email);
             $this->assertNull($user2->name);
         });

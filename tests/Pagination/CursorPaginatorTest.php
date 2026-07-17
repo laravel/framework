@@ -17,7 +17,7 @@ class CursorPaginatorTest extends TestCase
 
         $this->assertTrue($p->hasPages());
         $this->assertTrue($p->hasMorePages());
-        $this->assertEquals([['id' => 1], ['id' => 2]], $p->items());
+        $this->assertSame([['id' => 1], ['id' => 2]], $p->items());
 
         $pageInfo = [
             'data' => [['id' => 1], ['id' => 2]],
@@ -29,7 +29,7 @@ class CursorPaginatorTest extends TestCase
             'prev_page_url' => null,
         ];
 
-        $this->assertEquals($pageInfo, $p->toArray());
+        $this->assertSame($pageInfo, $p->toArray());
     }
 
     public function testPaginatorRemovesTrailingSlashes()

@@ -41,7 +41,7 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $query = $model->newQuery()->active();
 
         $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
-        $this->assertEquals([true], $query->getBindings());
+        $this->assertSame([true], $query->getBindings());
     }
 
     public function testDynamicLocalScopeIsApplied()
@@ -50,7 +50,7 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $query = $model->newQuery()->type('foo');
 
         $this->assertSame('select * from "table" where "type" = ?', $query->toSql());
-        $this->assertEquals(['foo'], $query->getBindings());
+        $this->assertSame(['foo'], $query->getBindings());
     }
 
     public function testLocalScopesCanChained()
@@ -59,7 +59,7 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $query = $model->newQuery()->active()->type('foo');
 
         $this->assertSame('select * from "table" where "active" = ? and "type" = ?', $query->toSql());
-        $this->assertEquals([true, 'foo'], $query->getBindings());
+        $this->assertSame([true, 'foo'], $query->getBindings());
     }
 
     public function testLocalScopeNestingDoesntDoubleFirstWhereClauseNegation()
@@ -72,7 +72,7 @@ class DatabaseEloquentLocalScopesTest extends TestCase
             ->active();
 
         $this->assertSame('select * from "table" where (not "firstWhere" = ? or "secondWhere" = ?) and "active" = ?', $query->toSql());
-        $this->assertEquals([true, true, true], $query->getBindings());
+        $this->assertSame([true, true, true], $query->getBindings());
     }
 
     public function testLocalScopeNestingGroupsOrNotWhereClause()
@@ -85,7 +85,7 @@ class DatabaseEloquentLocalScopesTest extends TestCase
             ->active();
 
         $this->assertSame('select * from "table" where ("firstWhere" = ? or not "secondWhere" = ?) and "active" = ?', $query->toSql());
-        $this->assertEquals([true, true, true], $query->getBindings());
+        $this->assertSame([true, true, true], $query->getBindings());
     }
 }
 

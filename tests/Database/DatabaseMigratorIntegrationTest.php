@@ -254,7 +254,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
             __DIR__.'/migrations/multi_path/app/2019_08_08_000008_create_table_four.php',
         ];
 
-        $this->assertEquals($expected, $migrationsFilesFullPaths);
+        $this->assertSame($expected, $migrationsFilesFullPaths);
     }
 
     public function testConnectionPriorToMigrationIsNotChangedAfterMigration()

@@ -52,7 +52,7 @@ class DynamoBatchTest extends TestCase
             new BatchJob('2'),
         ])->dispatch();
 
-        $this->assertEquals(['1', '2'], BatchRunRecorder::$results);
+        $this->assertSame(['1', '2'], BatchRunRecorder::$results);
     }
 
     public function test_retrieve_batch_by_id()
@@ -65,8 +65,8 @@ class DynamoBatchTest extends TestCase
         /** @var DynamoBatchRepository */
         $repo = app(DynamoBatchRepository::class);
         $retrieved = $repo->find($batch->id);
-        $this->assertEquals(2, $retrieved->totalJobs);
-        $this->assertEquals(0, $retrieved->failedJobs);
+        $this->assertSame(2, $retrieved->totalJobs);
+        $this->assertSame(0, $retrieved->failedJobs);
         $this->assertTrue($retrieved->finishedAt->between(Carbon::now()->subSeconds(3), Carbon::now()));
     }
 
@@ -112,8 +112,8 @@ class DynamoBatchTest extends TestCase
         /** @var DynamoBatchRepository */
         $repo = app(DynamoBatchRepository::class);
         $retrieved = $repo->find($batch->id);
-        $this->assertEquals(2, $retrieved->totalJobs);
-        $this->assertEquals(1, $retrieved->failedJobs);
+        $this->assertSame(2, $retrieved->totalJobs);
+        $this->assertSame(1, $retrieved->failedJobs);
         $this->assertTrue($retrieved->finishedAt->between(Carbon::now()->subSeconds(3), Carbon::now()));
         $this->assertTrue($retrieved->cancelledAt->between(Carbon::now()->subSeconds(3), Carbon::now()));
     }

@@ -50,7 +50,7 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
         $model->loadCount('related1');
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertEquals(2, $model->related1_count);
+        $this->assertSame(2, $model->related1_count);
     }
 
     public function testLoadCountMultipleRelations()
@@ -62,8 +62,8 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
         $model->loadCount(['related1', 'related2']);
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertEquals(2, $model->related1_count);
-        $this->assertEquals(1, $model->related2_count);
+        $this->assertSame(2, $model->related1_count);
+        $this->assertSame(1, $model->related2_count);
     }
 
     public function testLoadCountDeletedRelations()
@@ -74,7 +74,7 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
 
         $model->loadCount('deletedrelated');
 
-        $this->assertEquals(1, $model->deletedrelated_count);
+        $this->assertSame(1, $model->deletedrelated_count);
 
         DeletedRelated::first()->delete();
 
@@ -84,7 +84,7 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
 
         $model->loadCount('deletedrelated');
 
-        $this->assertEquals(0, $model->deletedrelated_count);
+        $this->assertSame(0, $model->deletedrelated_count);
     }
 }
 

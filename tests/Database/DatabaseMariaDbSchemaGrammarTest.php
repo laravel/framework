@@ -86,7 +86,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $blueprint->string('name')->from(200);
         $statements = $blueprint->toSql();
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `users` add `id` bigint unsigned not null auto_increment primary key',
             'alter table `users` add `name` varchar(255) not null',
             'alter table `users` auto_increment = 100',

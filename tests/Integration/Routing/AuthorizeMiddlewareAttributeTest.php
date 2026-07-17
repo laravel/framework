@@ -11,14 +11,14 @@ class AuthorizeMiddlewareAttributeTest extends TestCase
     public function test_attribute_is_respected(): void
     {
         $route = Route::get('/', [AuthorizeMiddlewareAttributeController::class, 'index']);
-        $this->assertEquals([
+        $this->assertSame([
             'Illuminate\Auth\Middleware\Authorize:all',
             'Illuminate\Auth\Middleware\Authorize:only-index,a',
             'Illuminate\Auth\Middleware\Authorize:also-index',
         ], $route->controllerMiddleware());
 
         $route = Route::get('/', [AuthorizeMiddlewareAttributeController::class, 'show']);
-        $this->assertEquals([
+        $this->assertSame([
             'Illuminate\Auth\Middleware\Authorize:all',
             'Illuminate\Auth\Middleware\Authorize:except-index,a,b',
         ], $route->controllerMiddleware());

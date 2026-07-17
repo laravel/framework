@@ -14,7 +14,7 @@ class SupportMessageBagTest extends TestCase
         $container->add('foo', 'bar');
         $container->add('foo', 'bar');
         $messages = $container->getMessages();
-        $this->assertEquals(['bar'], $messages['foo']);
+        $this->assertSame(['bar'], $messages['foo']);
     }
 
     public function testMessagesAreAdded()
@@ -25,8 +25,8 @@ class SupportMessageBagTest extends TestCase
         $container->add('foo', 'baz');
         $container->add('boom', 'bust');
         $messages = $container->getMessages();
-        $this->assertEquals(['bar', 'baz'], $messages['foo']);
-        $this->assertEquals(['bust'], $messages['boom']);
+        $this->assertSame(['bar', 'baz'], $messages['foo']);
+        $this->assertSame(['bust'], $messages['boom']);
     }
 
     public function testKeys()
@@ -36,14 +36,14 @@ class SupportMessageBagTest extends TestCase
         $container->add('foo', 'bar');
         $container->add('foo', 'baz');
         $container->add('boom', 'bust');
-        $this->assertEquals(['foo', 'boom'], $container->keys());
+        $this->assertSame(['foo', 'boom'], $container->keys());
     }
 
     public function testMessagesMayBeMerged()
     {
         $container = new MessageBag(['username' => ['foo']]);
         $container->merge(['username' => ['bar']]);
-        $this->assertEquals(['username' => ['foo', 'bar']], $container->getMessages());
+        $this->assertSame(['username' => ['foo', 'bar']], $container->getMessages());
     }
 
     public function testMessageBagsCanBeMerged()
@@ -51,7 +51,7 @@ class SupportMessageBagTest extends TestCase
         $container = new MessageBag(['foo' => ['bar']]);
         $otherContainer = new MessageBag(['foo' => ['baz'], 'bar' => ['foo']]);
         $container->merge($otherContainer);
-        $this->assertEquals(['foo' => ['bar', 'baz'], 'bar' => ['foo']], $container->getMessages());
+        $this->assertSame(['foo' => ['bar', 'baz'], 'bar' => ['foo']], $container->getMessages());
     }
 
     public function testMessageBagsCanConvertToArrays()
@@ -69,7 +69,7 @@ class SupportMessageBagTest extends TestCase
         $container->setFormat(':message');
         $container->add('foo', 'bar');
         $container->add('foo', 'baz');
-        $this->assertEquals(['bar', 'baz'], $container->get('foo'));
+        $this->assertSame(['bar', 'baz'], $container->get('foo'));
     }
 
     public function testGetReturnsArrayOfMessagesByImplicitKey()
@@ -78,7 +78,7 @@ class SupportMessageBagTest extends TestCase
         $container->setFormat(':message');
         $container->add('foo.1', 'bar');
         $container->add('foo.2', 'baz');
-        $this->assertEquals(['foo.1' => ['bar'], 'foo.2' => ['baz']], $container->get('foo.*'));
+        $this->assertSame(['foo.1' => ['bar'], 'foo.2' => ['baz']], $container->get('foo.*'));
     }
 
     public function testFirstReturnsSingleMessage()
@@ -205,7 +205,7 @@ class SupportMessageBagTest extends TestCase
         $container->setFormat(':message');
         $container->add('foo', 'bar');
         $container->add('boom', 'baz');
-        $this->assertEquals(['bar', 'baz'], $container->all());
+        $this->assertSame(['bar', 'baz'], $container->all());
     }
 
     public function testFormatIsRespected()
@@ -215,11 +215,11 @@ class SupportMessageBagTest extends TestCase
         $container->add('foo', 'bar');
         $container->add('boom', 'baz');
         $this->assertSame('<p>bar</p>', $container->first('foo'));
-        $this->assertEquals(['<p>bar</p>'], $container->get('foo'));
-        $this->assertEquals(['<p>bar</p>', '<p>baz</p>'], $container->all());
+        $this->assertSame(['<p>bar</p>'], $container->get('foo'));
+        $this->assertSame(['<p>bar</p>', '<p>baz</p>'], $container->all());
         $this->assertSame('bar', $container->first('foo', ':message'));
-        $this->assertEquals(['bar'], $container->get('foo', ':message'));
-        $this->assertEquals(['bar', 'baz'], $container->all(':message'));
+        $this->assertSame(['bar'], $container->get('foo', ':message'));
+        $this->assertSame(['bar', 'baz'], $container->all(':message'));
 
         $container->setFormat(':key :message');
         $this->assertSame('foo bar', $container->first('foo'));
@@ -232,7 +232,7 @@ class SupportMessageBagTest extends TestCase
         $container->add('foo', 'bar');
         $container->add('foo2', 'bar');
         $container->add('boom', 'baz');
-        $this->assertEquals([0 => 'bar', 2 => 'baz'], $container->unique());
+        $this->assertSame([0 => 'bar', 2 => 'baz'], $container->unique());
     }
 
     public function testMessageBagReturnsCorrectArray()
@@ -242,7 +242,7 @@ class SupportMessageBagTest extends TestCase
         $container->add('foo', 'bar');
         $container->add('boom', 'baz');
 
-        $this->assertEquals(['foo' => ['bar'], 'boom' => ['baz']], $container->toArray());
+        $this->assertSame(['foo' => ['bar'], 'boom' => ['baz']], $container->toArray());
     }
 
     public function testMessageBagReturnsExpectedJson()
@@ -302,7 +302,7 @@ class SupportMessageBagTest extends TestCase
     public function testConstructor()
     {
         $messageBag = new MessageBag(['country' => 'Azerbaijan', 'capital' => 'Baku']);
-        $this->assertEquals(['country' => ['Azerbaijan'], 'capital' => ['Baku']], $messageBag->getMessages());
+        $this->assertSame(['country' => ['Azerbaijan'], 'capital' => ['Baku']], $messageBag->getMessages());
     }
 
     public function testFirstFindsMessageForWildcardKey()
@@ -357,7 +357,7 @@ class SupportMessageBagTest extends TestCase
     {
         $messageBag = new MessageBag(['messages' => ['first', 'second', 'third', 'third']]);
         $messages = $messageBag->getMessages();
-        $this->assertEquals(['first', 'second', 'third'], $messages['messages']);
+        $this->assertSame(['first', 'second', 'third'], $messages['messages']);
 
         $messageBag = new MessageBag;
         $messageBag->add('messages', 'first');
@@ -365,6 +365,6 @@ class SupportMessageBagTest extends TestCase
         $messageBag->add('messages', 'third');
         $messageBag->add('messages', 'third');
         $messages = $messageBag->getMessages();
-        $this->assertEquals(['first', 'second', 'third'], $messages['messages']);
+        $this->assertSame(['first', 'second', 'third'], $messages['messages']);
     }
 }

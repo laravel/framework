@@ -43,7 +43,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['name' => 'specified'], $request->validated());
+        $this->assertSame(['name' => 'specified'], $request->validated());
     }
 
     public function testValidatedMethodReturnsTheValidatedDataNestedRules()
@@ -54,7 +54,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $request->validated());
+        $this->assertSame(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $request->validated());
     }
 
     public function testValidatedMethodReturnsTheValidatedDataNestedChildRules()
@@ -65,7 +65,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['nested' => ['foo' => 'bar']], $request->validated());
+        $this->assertSame(['nested' => ['foo' => 'bar']], $request->validated());
     }
 
     public function testValidatedMethodReturnsTheValidatedDataNestedArrayRules()
@@ -76,7 +76,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $request->validated());
+        $this->assertSame(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $request->validated());
     }
 
     public function testValidatedMethodNotValidateTwice()
@@ -88,7 +88,7 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
         $request->validated();
 
-        $this->assertEquals(1, FoundationTestFormRequestTwiceStub::$count);
+        $this->assertSame(1, FoundationTestFormRequestTwiceStub::$count);
     }
 
     public function testValidateThrowsWhenValidationFails()
@@ -145,7 +145,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['name' => 'Adam'], $request->all());
+        $this->assertSame(['name' => 'Adam'], $request->all());
     }
 
     public function testValidatedMethodReturnsOnlyRequestedValidatedData()
@@ -238,7 +238,7 @@ class FoundationFormRequestTest extends TestCase
         $request = $this->createRequest(['a' => 1], FoundationTestFormRequestWithGetRules::class);
 
         $request->validateResolved();
-        $this->assertEquals(['a' => 1], $request->all());
+        $this->assertSame(['a' => 1], $request->all());
 
         $this->expectException(ValidationException::class);
         FoundationTestFormRequestWithGetRules::$useRuleSet = 'b';
@@ -273,7 +273,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['name' => 'Taylor'], $request->validated());
+        $this->assertSame(['name' => 'Taylor'], $request->validated());
     }
 
     public function testFailOnUnknownFieldsEnabledViaFailOnUnknownFieldsStaticMethod()
@@ -322,7 +322,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['name' => 'Taylor'], $request->validated());
+        $this->assertSame(['name' => 'Taylor'], $request->validated());
     }
 
     public function testFailOnUnknownFieldsAllowsKeysMatchingWildcardRules()
@@ -530,7 +530,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['password' => 'secret123'], $request->validated());
+        $this->assertSame(['password' => 'secret123'], $request->validated());
     }
 
     // public function testFailOnUnknownFieldsRejectsConfirmationFieldsWithoutConfirmedRule()

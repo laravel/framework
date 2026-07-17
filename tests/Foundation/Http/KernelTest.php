@@ -31,7 +31,7 @@ class KernelTest extends TestCase
     {
         $kernel = new Kernel($this->getApplication(), $this->getRouter());
 
-        $this->assertEquals([
+        $this->assertSame([
             \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
@@ -58,7 +58,7 @@ class KernelTest extends TestCase
             \Illuminate\Routing\Middleware\ValidateSignature::class,
         );
 
-        $this->assertEquals([
+        $this->assertSame([
             \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
@@ -86,7 +86,7 @@ class KernelTest extends TestCase
             \Illuminate\Routing\Middleware\ValidateSignature::class,
         );
 
-        $this->assertEquals([
+        $this->assertSame([
             \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
             \Illuminate\Routing\Middleware\ValidateSignature::class,
             \Illuminate\Cookie\Middleware\EncryptCookies::class,

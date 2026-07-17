@@ -130,7 +130,7 @@ class AuthenticateMiddlewareTest extends TestCase
 
             $this->authenticate(...$expectedGuards);
         } catch (AuthenticationException $e) {
-            $this->assertEquals($expectedGuards, $e->guards());
+            $this->assertSame($expectedGuards, $e->guards());
 
             return;
         }

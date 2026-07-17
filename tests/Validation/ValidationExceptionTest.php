@@ -129,7 +129,7 @@ class ValidationExceptionTest extends TestCase
         $exception = $this->getException([], ['foo' => 'required']);
         $exception->status(500);
 
-        $this->assertEquals(500, $exception->status);
+        $this->assertSame(500, $exception->status);
     }
 
     public function testExceptionErrorBagOneError()
@@ -161,7 +161,7 @@ class ValidationExceptionTest extends TestCase
 
         $exception = $validator->getException();
 
-        $this->assertEquals(ValidationException::class, $exception);
+        $this->assertSame(ValidationException::class, $exception);
     }
 
     protected function getException($data = [], $rules = [], $translator = null)

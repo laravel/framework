@@ -24,7 +24,7 @@ class ContainerCallTest extends TestCase
     {
         $container = new Container;
         $result = $container->call(ContainerTestCallStub::class.'@work', ['foo', 'bar']);
-        $this->assertEquals(['foo', 'bar'], $result);
+        $this->assertSame(['foo', 'bar'], $result);
 
         $container = new Container;
         $result = $container->call(ContainerTestCallStub::class.'@inject');
@@ -38,7 +38,7 @@ class ContainerCallTest extends TestCase
 
         $container = new Container;
         $result = $container->call(ContainerTestCallStub::class, ['foo', 'bar'], 'work');
-        $this->assertEquals(['foo', 'bar'], $result);
+        $this->assertSame(['foo', 'bar'], $result);
     }
 
     public function testCallWithCallableArray()
@@ -46,7 +46,7 @@ class ContainerCallTest extends TestCase
         $container = new Container;
         $stub = new ContainerTestCallStub;
         $result = $container->call([$stub, 'work'], ['foo', 'bar']);
-        $this->assertEquals(['foo', 'bar'], $result);
+        $this->assertSame(['foo', 'bar'], $result);
     }
 
     public function testCallWithStaticMethodNameString()
@@ -72,14 +72,14 @@ class ContainerCallTest extends TestCase
             return $stub->unresolvable('foo', 'bar');
         });
         $result = $container->call(ContainerTestCallStub::class.'@unresolvable');
-        $this->assertEquals(['foo', 'bar'], $result);
+        $this->assertSame(['foo', 'bar'], $result);
 
         $container = new Container;
         $container->bindMethod(ContainerTestCallStub::class.'@unresolvable', function ($stub) {
             return $stub->unresolvable('foo', 'bar');
         });
         $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
-        $this->assertEquals(['foo', 'bar'], $result);
+        $this->assertSame(['foo', 'bar'], $result);
 
         $container = new Container;
         $result = $container->call([new ContainerTestCallStub, 'inject'], ['_stub' => 'foo', 'default' => 'bar']);
@@ -99,14 +99,14 @@ class ContainerCallTest extends TestCase
             return $stub->unresolvable('foo', 'bar');
         });
         $result = $container->call(ContainerTestCallStub::class.'@unresolvable');
-        $this->assertEquals(['foo', 'bar'], $result);
+        $this->assertSame(['foo', 'bar'], $result);
 
         $container = new Container;
         $container->bindMethod([ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
             return $stub->unresolvable('foo', 'bar');
         });
         $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
-        $this->assertEquals(['foo', 'bar'], $result);
+        $this->assertSame(['foo', 'bar'], $result);
     }
 
     public function testClosureCallWithInjectedDependency()

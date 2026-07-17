@@ -174,7 +174,7 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, [
             'root' => $this->tempDir.DIRECTORY_SEPARATOR,
         ]);
-        $this->assertEquals($this->tempDir.DIRECTORY_SEPARATOR.'file.txt', $filesystemAdapter->path('file.txt'));
+        $this->assertSame($this->tempDir.DIRECTORY_SEPARATOR.'file.txt', $filesystemAdapter->path('file.txt'));
     }
 
     public function testGet()
@@ -270,10 +270,10 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter->copy('/foo/foo.txt', '/foo/foo2.txt');
 
         $this->assertFileExists($this->tempDir.'/foo/foo.txt');
-        $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo.txt'));
+        $this->assertSame($data, file_get_contents($this->tempDir.'/foo/foo.txt'));
 
         $this->assertFileExists($this->tempDir.'/foo/foo2.txt');
-        $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
+        $this->assertSame($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
     }
 
     public function testMove()
@@ -288,7 +288,7 @@ class FilesystemAdapterTest extends TestCase
         Assert::assertFileDoesNotExist($this->tempDir.'/foo/foo.txt');
 
         $this->assertFileExists($this->tempDir.'/foo/foo2.txt');
-        $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
+        $this->assertSame($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
     }
 
     public function testStream()
@@ -297,7 +297,7 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $readStream = $filesystemAdapter->readStream('file.txt');
         $filesystemAdapter->writeStream('copy.txt', $readStream);
-        $this->assertEquals($original_content, $filesystemAdapter->get('copy.txt'));
+        $this->assertSame($original_content, $filesystemAdapter->get('copy.txt'));
     }
 
     public function testStreamBetweenFilesystems()
@@ -308,7 +308,7 @@ class FilesystemAdapterTest extends TestCase
         $secondFilesystemAdapter = new FilesystemAdapter($secondFilesystem, $this->adapter);
         $readStream = $filesystemAdapter->readStream('file.txt');
         $secondFilesystemAdapter->writeStream('copy.txt', $readStream);
-        $this->assertEquals($original_content, $secondFilesystemAdapter->get('copy.txt'));
+        $this->assertSame($original_content, $secondFilesystemAdapter->get('copy.txt'));
     }
 
     public function testStreamToExistingFileOverwrites()
@@ -459,7 +459,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertInstanceOf(FtpAdapter::class, $driver->getAdapter());
 
         $config = $driver->getConfig();
-        $this->assertEquals(0700, $config['permPublic']);
+        $this->assertSame(0700, $config['permPublic']);
         $this->assertSame('ftp.example.com', $config['host']);
         $this->assertSame('admin', $config['username']);
     }

@@ -109,7 +109,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->string('name')->from(300);
         $statements = $blueprint->toSql();
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table "users" add column "id" bigserial not null primary key',
             'alter table "users" add column "code" serial not null primary key',
             'alter table "users" add column "name" varchar(255) not null',

@@ -26,7 +26,7 @@ class SupportViewErrorBagTest extends TestCase
         $messageBag = new MessageBag;
         $viewErrorBag = new ViewErrorBag;
         $viewErrorBag = $viewErrorBag->put('default', $messageBag);
-        $this->assertEquals($messageBag, $viewErrorBag->getBag('default'));
+        $this->assertSame($messageBag, $viewErrorBag->getBag('default'));
     }
 
     public function testGetBagWithNew()
@@ -42,7 +42,7 @@ class SupportViewErrorBagTest extends TestCase
         $viewErrorBag = new ViewErrorBag;
         $viewErrorBag->put('default', $messageBag1);
         $viewErrorBag->put('default2', $messageBag2);
-        $this->assertEquals([
+        $this->assertSame([
             'default' => $messageBag1,
             'default2' => $messageBag2,
         ], $viewErrorBag->getBags());
@@ -53,7 +53,7 @@ class SupportViewErrorBagTest extends TestCase
         $messageBag = new MessageBag;
         $viewErrorBag = new ViewErrorBag;
         $viewErrorBag = $viewErrorBag->put('default', $messageBag);
-        $this->assertEquals(['default' => $messageBag], $viewErrorBag->getBags());
+        $this->assertSame(['default' => $messageBag], $viewErrorBag->getBags());
     }
 
     public function testAnyTrue()
@@ -100,7 +100,7 @@ class SupportViewErrorBagTest extends TestCase
     {
         $viewErrorBag = new ViewErrorBag;
         $viewErrorBag->put('default', new MessageBag(['message', 'second']));
-        $this->assertEquals(['message', 'second'], $viewErrorBag->all());
+        $this->assertSame(['message', 'second'], $viewErrorBag->all());
     }
 
     public function testDynamicallyGetBag()
@@ -108,7 +108,7 @@ class SupportViewErrorBagTest extends TestCase
         $messageBag = new MessageBag;
         $viewErrorBag = new ViewErrorBag;
         $viewErrorBag = $viewErrorBag->put('default', $messageBag);
-        $this->assertEquals($messageBag, $viewErrorBag->default);
+        $this->assertSame($messageBag, $viewErrorBag->default);
     }
 
     public function testDynamicallyPutBag()
@@ -116,7 +116,7 @@ class SupportViewErrorBagTest extends TestCase
         $messageBag = new MessageBag;
         $viewErrorBag = new ViewErrorBag;
         $viewErrorBag->default2 = $messageBag;
-        $this->assertEquals(['default2' => $messageBag], $viewErrorBag->getBags());
+        $this->assertSame(['default2' => $messageBag], $viewErrorBag->getBags());
     }
 
     public function testToString()

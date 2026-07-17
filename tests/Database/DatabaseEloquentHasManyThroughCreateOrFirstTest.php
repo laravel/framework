@@ -86,7 +86,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 
         $result = $parent->children()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 789,
             'pivot_id' => 456,
             'laravel_through_key' => 123,
@@ -161,7 +161,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 
         $result = $parent->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 789,
             'pivot_id' => 456,
             'laravel_through_key' => 123,
@@ -219,7 +219,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 
         $result = $parent->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 789,
             'pivot_id' => 456,
             'laravel_through_key' => 123,
@@ -305,7 +305,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 
         $result = $parent->children()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 789,
             'pivot_id' => 456,
             'laravel_through_key' => 123,
@@ -363,7 +363,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
 
         $result = $parent->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 789,
             'pivot_id' => 456,
             'laravel_through_key' => 123,

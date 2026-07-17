@@ -130,7 +130,7 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
 
         ModelUpsertWithUuidPrimaryKey::upsert([['email' => 'foo3', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
 
-        $this->assertEquals(3, ModelUpsertWithUuidPrimaryKey::count());
+        $this->assertSame(3, ModelUpsertWithUuidPrimaryKey::count());
     }
 }
 

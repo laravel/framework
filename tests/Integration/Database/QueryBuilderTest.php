@@ -92,7 +92,7 @@ class QueryBuilderTest extends DatabaseTestCase
             'wallet_2' => 20,
         ]);
 
-        $this->assertEquals(1, $affectedRowsCount);
+        $this->assertSame(1, $affectedRowsCount);
 
         $rows = DB::table('accounting')->get();
 
@@ -110,10 +110,10 @@ class QueryBuilderTest extends DatabaseTestCase
             'wallet_2' => '-32.5',
         ]);
 
-        $this->assertEquals(2, $affectedRowsCount);
+        $this->assertSame(2, $affectedRowsCount);
 
         $rows = DB::table('accounting')->get();
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 1,
             'wallet_1' => 100 + 31.5,
             'wallet_2' => 200 - 32.5,
@@ -121,7 +121,7 @@ class QueryBuilderTest extends DatabaseTestCase
             'name' => 'Taylor',
         ], (array) $rows[0]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 2,
             'wallet_1' => 15 + (10 + 20 + 31.5),
             'wallet_2' => 300 + (-20 + 20 - 32.5),
@@ -134,7 +134,7 @@ class QueryBuilderTest extends DatabaseTestCase
             'wallet_1' => 3000,
         ], ['wallet_1' => 1.5]);
 
-        $this->assertEquals(2, $affectedRowsCount);
+        $this->assertSame(2, $affectedRowsCount);
 
         $rows = DB::table('accounting')->get();
 

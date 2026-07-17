@@ -651,7 +651,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(2, FactoryTestUser::all());
         $this->assertCount(6, FactoryTestPost::all());
         $this->assertCount(3, FactoryTestUser::latest()->first()->posts);
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'Abigail Otwell Post 1',
                 'Abigail Otwell Post 2',
@@ -715,7 +715,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         ];
 
         foreach ($resolves as $model => $factory) {
-            $this->assertEquals($factory, Factory::resolveFactoryName($model));
+            $this->assertSame($factory, Factory::resolveFactoryName($model));
         }
     }
 
@@ -746,7 +746,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         ];
 
         foreach ($resolves as $model => $factory) {
-            $this->assertEquals($factory, Factory::resolveFactoryName($model));
+            $this->assertSame($factory, Factory::resolveFactoryName($model));
         }
     }
 
@@ -864,9 +864,9 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->create();
 
         $this->assertSame(1, FactoryTestUser::count());
-        $this->assertEquals($user->id, $post->user_id);
-        $this->assertEquals($user->id, $post->comments[0]->user_id);
-        $this->assertEquals($user->id, $post->comments[1]->user_id);
+        $this->assertSame($user->id, $post->user_id);
+        $this->assertSame($user->id, $post->comments[0]->user_id);
+        $this->assertSame($user->id, $post->comments[1]->user_id);
     }
 
     public function test_for_method_recycles_models()
@@ -1019,8 +1019,8 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_factory_model_names_correct()
     {
-        $this->assertEquals(FactoryTestUseFactoryAttribute::class, FactoryTestUseFactoryAttribute::factory()->modelName());
-        $this->assertEquals(FactoryTestGuessModel::class, FactoryTestGuessModel::factory()->modelName());
+        $this->assertSame(FactoryTestUseFactoryAttribute::class, FactoryTestUseFactoryAttribute::factory()->modelName());
+        $this->assertSame(FactoryTestGuessModel::class, FactoryTestGuessModel::factory()->modelName());
     }
 
     public function test_factory_global_model_resolver()
@@ -1029,11 +1029,11 @@ class DatabaseEloquentFactoryTest extends TestCase
             return __NAMESPACE__.'\\'.Str::replaceLast('Factory', '', class_basename($factory::class));
         });
 
-        $this->assertEquals(FactoryTestGuessModel::class, FactoryTestGuessModel::factory()->modelName());
-        $this->assertEquals(FactoryTestUseFactoryAttribute::class, FactoryTestUseFactoryAttribute::factory()->modelName());
+        $this->assertSame(FactoryTestGuessModel::class, FactoryTestGuessModel::factory()->modelName());
+        $this->assertSame(FactoryTestUseFactoryAttribute::class, FactoryTestUseFactoryAttribute::factory()->modelName());
 
-        $this->assertEquals(FactoryTestUseFactoryAttribute::class, FactoryTestUseFactoryAttributeFactory::new()->modelName());
-        $this->assertEquals(FactoryTestGuessModel::class, FactoryTestGuessModelFactory::new()->modelName());
+        $this->assertSame(FactoryTestUseFactoryAttribute::class, FactoryTestUseFactoryAttributeFactory::new()->modelName());
+        $this->assertSame(FactoryTestGuessModel::class, FactoryTestGuessModelFactory::new()->modelName());
     }
 
     public function test_factory_model_has_many_relationship_has_pending_attributes()
@@ -1103,8 +1103,8 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->state(['title' => 'hello'])
             ->insert();
         $this->assertCount(5, $posts = FactoryTestPost::query()->where('title', 'hello')->get());
-        $this->assertEquals(strtoupper($posts[0]->user->name), $posts[0]->upper_case_name);
-        $this->assertEquals(
+        $this->assertSame(strtoupper($posts[0]->user->name), $posts[0]->upper_case_name);
+        $this->assertSame(
             2,
             ($users = FactoryTestUser::query()->get())->count()
         );
@@ -1126,7 +1126,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         (new FactoryTestUserWithArrayFactory())->count(2)->insert();
         $users = DB::table('users')->get();
         foreach ($users as $user) {
-            $this->assertEquals(['rtj'], json_decode($user->options, true));
+            $this->assertSame(['rtj'], json_decode($user->options, true));
             $createdAt = Carbon::parse($user->created_at);
             $updatedAt = Carbon::parse($user->updated_at);
             $this->assertEquals($updatedAt, $createdAt);

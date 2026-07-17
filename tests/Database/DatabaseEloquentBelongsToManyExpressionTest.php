@@ -37,7 +37,7 @@ class DatabaseEloquentBelongsToManyExpressionTest extends TestCase
             ->get();
 
         $this->assertCount(1, $tags);
-        $this->assertEquals(2, $tags->first()->getKey());
+        $this->assertSame(2, $tags->first()->getKey());
     }
 
     public function testQualifiedColumnExpression(): void
@@ -50,7 +50,7 @@ class DatabaseEloquentBelongsToManyExpressionTest extends TestCase
             ->get();
 
         $this->assertCount(1, $tags);
-        $this->assertEquals(3, $tags->first()->getKey());
+        $this->assertSame(3, $tags->first()->getKey());
     }
 
     public function testGlobalScopesAreAppliedToBelongsToManyRelation(): void

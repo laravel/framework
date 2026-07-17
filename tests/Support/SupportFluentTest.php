@@ -23,8 +23,8 @@ class SupportFluentTest extends TestCase
         $refl = new ReflectionObject($fluent);
         $attributes = $refl->getProperty('attributes');
 
-        $this->assertEquals($array, $attributes->getValue($fluent));
-        $this->assertEquals($array, $fluent->getAttributes());
+        $this->assertSame($array, $attributes->getValue($fluent));
+        $this->assertSame($array, $fluent->getAttributes());
     }
 
     public function testAttributesAreSetByConstructorGivenstdClass()
@@ -35,8 +35,8 @@ class SupportFluentTest extends TestCase
         $refl = new ReflectionObject($fluent);
         $attributes = $refl->getProperty('attributes');
 
-        $this->assertEquals($array, $attributes->getValue($fluent));
-        $this->assertEquals($array, $fluent->getAttributes());
+        $this->assertSame($array, $attributes->getValue($fluent));
+        $this->assertSame($array, $fluent->getAttributes());
     }
 
     public function testAttributesAreSetByConstructorGivenArrayIterator()
@@ -47,8 +47,8 @@ class SupportFluentTest extends TestCase
         $refl = new ReflectionObject($fluent);
         $attributes = $refl->getProperty('attributes');
 
-        $this->assertEquals($array, $attributes->getValue($fluent));
-        $this->assertEquals($array, $fluent->getAttributes());
+        $this->assertSame($array, $attributes->getValue($fluent));
+        $this->assertSame($array, $fluent->getAttributes());
     }
 
     public function testGetMethodReturnsAttribute()
@@ -98,7 +98,7 @@ class SupportFluentTest extends TestCase
 
         $this->assertSame('Taylor', $fluent->name);
         $this->assertTrue($fluent->developer);
-        $this->assertEquals(25, $fluent->age);
+        $this->assertSame(25, $fluent->age);
         $this->assertInstanceOf(Fluent::class, $fluent->programmer());
     }
 
@@ -119,7 +119,7 @@ class SupportFluentTest extends TestCase
         $array = ['name' => 'Taylor', 'age' => 25];
         $fluent = new Fluent($array);
 
-        $this->assertEquals($array, $fluent->toArray());
+        $this->assertSame($array, $fluent->toArray());
     }
 
     public function testToJsonEncodesTheToArrayResult()
@@ -147,24 +147,24 @@ class SupportFluentTest extends TestCase
     public function testScope()
     {
         $fluent = new Fluent(['user' => ['name' => 'taylor']]);
-        $this->assertEquals(['taylor'], $fluent->scope('user.name')->toArray());
-        $this->assertEquals(['dayle'], $fluent->scope('user.age', 'dayle')->toArray());
+        $this->assertSame(['taylor'], $fluent->scope('user.name')->toArray());
+        $this->assertSame(['dayle'], $fluent->scope('user.age', 'dayle')->toArray());
 
         $fluent = new Fluent(['products' => ['forge', 'vapour', 'spark']]);
-        $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->scope('products')->toArray());
-        $this->assertEquals(['foo', 'bar'], $fluent->scope('missing', ['foo', 'bar'])->toArray());
+        $this->assertSame(['forge', 'vapour', 'spark'], $fluent->scope('products')->toArray());
+        $this->assertSame(['foo', 'bar'], $fluent->scope('missing', ['foo', 'bar'])->toArray());
 
         $fluent = new Fluent(['authors' => ['taylor' => ['products' => ['forge', 'vapour', 'spark']]]]);
-        $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->scope('authors.taylor.products')->toArray());
+        $this->assertSame(['forge', 'vapour', 'spark'], $fluent->scope('authors.taylor.products')->toArray());
     }
 
     public function testToCollection()
     {
         $fluent = new Fluent(['forge', 'vapour', 'spark']);
-        $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->collect()->all());
+        $this->assertSame(['forge', 'vapour', 'spark'], $fluent->collect()->all());
 
         $fluent = new Fluent(['authors' => ['taylor' => ['products' => ['forge', 'vapour', 'spark']]]]);
-        $this->assertEquals(['forge', 'vapour', 'spark'], $fluent->collect('authors.taylor.products')->all());
+        $this->assertSame(['forge', 'vapour', 'spark'], $fluent->collect('authors.taylor.products')->all());
     }
 
     public function testStringMethod()
@@ -260,14 +260,14 @@ class SupportFluentTest extends TestCase
         $fluent = new Fluent(['users' => [1, 2, 3]]);
 
         $this->assertIsArray($fluent->array('users'));
-        $this->assertEquals([1, 2, 3], $fluent->array('users'));
-        $this->assertEquals(['users' => [1, 2, 3]], $fluent->array());
+        $this->assertSame([1, 2, 3], $fluent->array('users'));
+        $this->assertSame(['users' => [1, 2, 3]], $fluent->array());
 
         $fluent = new Fluent(['text-payload']);
-        $this->assertEquals(['text-payload'], $fluent->array());
+        $this->assertSame(['text-payload'], $fluent->array());
 
         $fluent = new Fluent(['email' => 'test@example.com']);
-        $this->assertEquals(['test@example.com'], $fluent->array('email'));
+        $this->assertSame(['test@example.com'], $fluent->array('email'));
 
         $fluent = new Fluent([]);
         $this->assertIsArray($fluent->array());
@@ -276,10 +276,10 @@ class SupportFluentTest extends TestCase
         $fluent = new Fluent(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com']);
         $this->assertEmpty($fluent->array(['developers']));
         $this->assertNotEmpty($fluent->array(['roles']));
-        $this->assertEquals(['roles' => [4, 5, 6]], $fluent->array(['roles']));
-        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $fluent->array(['users', 'email']));
-        $this->assertEquals(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']], $fluent->array(['roles', 'foo']));
-        $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $fluent->array());
+        $this->assertSame(['roles' => [4, 5, 6]], $fluent->array(['roles']));
+        $this->assertSame(['users' => [1, 2, 3], 'email' => 'test@example.com'], $fluent->array(['users', 'email']));
+        $this->assertSame(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']], $fluent->array(['roles', 'foo']));
+        $this->assertSame(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $fluent->array());
     }
 
     public function testCollectMethod()
@@ -288,14 +288,14 @@ class SupportFluentTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $fluent->collect('users'));
         $this->assertTrue($fluent->collect('developers')->isEmpty());
-        $this->assertEquals([1, 2, 3], $fluent->collect('users')->all());
-        $this->assertEquals(['users' => [1, 2, 3]], $fluent->collect()->all());
+        $this->assertSame([1, 2, 3], $fluent->collect('users')->all());
+        $this->assertSame(['users' => [1, 2, 3]], $fluent->collect()->all());
 
         $fluent = new Fluent(['text-payload']);
-        $this->assertEquals(['text-payload'], $fluent->collect()->all());
+        $this->assertSame(['text-payload'], $fluent->collect()->all());
 
         $fluent = new Fluent(['email' => 'test@example.com']);
-        $this->assertEquals(['test@example.com'], $fluent->collect('email')->all());
+        $this->assertSame(['test@example.com'], $fluent->collect('email')->all());
 
         $fluent = new Fluent([]);
         $this->assertInstanceOf(Collection::class, $fluent->collect());
@@ -305,10 +305,10 @@ class SupportFluentTest extends TestCase
         $this->assertInstanceOf(Collection::class, $fluent->collect(['users']));
         $this->assertTrue($fluent->collect(['developers'])->isEmpty());
         $this->assertTrue($fluent->collect(['roles'])->isNotEmpty());
-        $this->assertEquals(['roles' => [4, 5, 6]], $fluent->collect(['roles'])->all());
-        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $fluent->collect(['users', 'email'])->all());
+        $this->assertSame(['roles' => [4, 5, 6]], $fluent->collect(['roles'])->all());
+        $this->assertSame(['users' => [1, 2, 3], 'email' => 'test@example.com'], $fluent->collect(['users', 'email'])->all());
         $this->assertEquals(collect(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']]), $fluent->collect(['roles', 'foo']));
-        $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $fluent->collect()->all());
+        $this->assertSame(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $fluent->collect()->all());
     }
 
     public function testDateMethod()
@@ -331,7 +331,7 @@ class SupportFluentTest extends TestCase
         $this->assertNull($fluent->date('doesnt_exists'));
 
         $this->assertEquals($current, $fluent->date('as_datetime'));
-        $this->assertEquals($current->format('Y-m-d H:i:s P'), $fluent->date('as_format', 'U')->format('Y-m-d H:i:s P'));
+        $this->assertSame($current->format('Y-m-d H:i:s P'), $fluent->date('as_format', 'U')->format('Y-m-d H:i:s P'));
         $this->assertEquals($current, $fluent->date('as_timezone', null, 'America/Santiago'));
 
         $this->assertTrue($fluent->date('as_date')->isSameDay($current));
@@ -380,17 +380,17 @@ class SupportFluentTest extends TestCase
 
         $this->assertNull($fluent->enum('doesnt_exist', TestEnum::class));
 
-        $this->assertEquals(TestStringBackedEnum::A, $fluent->enum('valid_enum_value', TestStringBackedEnum::class));
+        $this->assertSame(TestStringBackedEnum::A, $fluent->enum('valid_enum_value', TestStringBackedEnum::class));
 
         $this->assertNull($fluent->enum('invalid_enum_value', TestStringBackedEnum::class));
         $this->assertNull($fluent->enum('empty_value_request', TestStringBackedEnum::class));
         $this->assertNull($fluent->enum('valid_enum_value', TestEnum::class));
 
-        $this->assertEquals(TestBackedEnum::A, $fluent->enum('string.a', TestBackedEnum::class));
-        $this->assertEquals(TestBackedEnum::B, $fluent->enum('string.b', TestBackedEnum::class));
+        $this->assertSame(TestBackedEnum::A, $fluent->enum('string.a', TestBackedEnum::class));
+        $this->assertSame(TestBackedEnum::B, $fluent->enum('string.b', TestBackedEnum::class));
         $this->assertNull($fluent->enum('string.doesnt_exist', TestBackedEnum::class));
-        $this->assertEquals(TestBackedEnum::A, $fluent->enum('int.a', TestBackedEnum::class));
-        $this->assertEquals(TestBackedEnum::B, $fluent->enum('int.b', TestBackedEnum::class));
+        $this->assertSame(TestBackedEnum::A, $fluent->enum('int.a', TestBackedEnum::class));
+        $this->assertSame(TestBackedEnum::B, $fluent->enum('int.b', TestBackedEnum::class));
         $this->assertNull($fluent->enum('int.doesnt_exist', TestBackedEnum::class));
     }
 
@@ -414,18 +414,18 @@ class SupportFluentTest extends TestCase
 
         $this->assertEmpty($fluent->enums('doesnt_exist', TestEnum::class));
 
-        $this->assertEquals([TestStringBackedEnum::A, TestStringBackedEnum::B], $fluent->enums('valid_enum_values', TestStringBackedEnum::class));
+        $this->assertSame([TestStringBackedEnum::A, TestStringBackedEnum::B], $fluent->enums('valid_enum_values', TestStringBackedEnum::class));
 
         $this->assertEmpty($fluent->enums('invalid_enum_value', TestStringBackedEnum::class));
         $this->assertEmpty($fluent->enums('empty_value_request', TestStringBackedEnum::class));
         $this->assertEmpty($fluent->enums('valid_enum_value', TestEnum::class));
 
-        $this->assertEquals([TestBackedEnum::A, TestBackedEnum::B], $fluent->enums('string.a', TestBackedEnum::class));
-        $this->assertEquals([TestBackedEnum::B], $fluent->enums('string.b', TestBackedEnum::class));
+        $this->assertSame([TestBackedEnum::A, TestBackedEnum::B], $fluent->enums('string.a', TestBackedEnum::class));
+        $this->assertSame([TestBackedEnum::B], $fluent->enums('string.b', TestBackedEnum::class));
         $this->assertEmpty($fluent->enums('string.doesnt_exist', TestBackedEnum::class));
 
-        $this->assertEquals([TestBackedEnum::A, TestBackedEnum::B], $fluent->enums('int.a', TestBackedEnum::class));
-        $this->assertEquals([TestBackedEnum::B], $fluent->enums('int.b', TestBackedEnum::class));
+        $this->assertSame([TestBackedEnum::A, TestBackedEnum::B], $fluent->enums('int.a', TestBackedEnum::class));
+        $this->assertSame([TestBackedEnum::B], $fluent->enums('int.b', TestBackedEnum::class));
         $this->assertEmpty($fluent->enums('int.doesnt_exist', TestBackedEnum::class));
     }
 
@@ -438,7 +438,7 @@ class SupportFluentTest extends TestCase
             'age' => 30,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'age' => 30,

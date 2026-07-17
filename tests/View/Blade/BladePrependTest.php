@@ -15,7 +15,7 @@ bar
 bar
 <?php $__env->stopPrepend(); ?>';
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testPrependOnceIsCompiled()
@@ -29,7 +29,7 @@ $__env->startPrepend(\'foo\'); ?>
 test
 <?php $__env->stopPrepend(); endif; ?>';
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testPrependOnceIsCompiledWhenIdIsMissing()
@@ -45,6 +45,6 @@ $__env->startPrepend(\'foo\'); ?>
 test
 <?php $__env->stopPrepend(); endif; ?>';
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

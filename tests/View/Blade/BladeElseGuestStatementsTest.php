@@ -16,6 +16,6 @@ breeze
 <?php elseif(auth()->guard("standard")->guest()): ?>
 wheeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

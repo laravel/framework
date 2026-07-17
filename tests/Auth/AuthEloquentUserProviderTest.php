@@ -39,7 +39,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $provider->expects($this->once())->method('createModel')->willReturn($mock);
         $user = $provider->retrieveByToken(1, 'a');
 
-        $this->assertEquals($mockUser, $user);
+        $this->assertSame($mockUser, $user);
     }
 
     public function testRetrieveTokenWithBadIdentifierReturnsNull()

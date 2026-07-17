@@ -42,7 +42,7 @@ class CacheApcStoreTest extends TestCase
             ['baz', 'norf'],
         ]);
         $store = new ApcStore($apc);
-        $this->assertEquals([
+        $this->assertSame([
             'foo' => 'qux',
             'bar' => null,
             'baz' => 'norf',

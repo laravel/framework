@@ -58,7 +58,7 @@ class DatabaseEloquentBelongsToManyEachByIdTest extends TestCase
 
         $user->articles()->eachById(function (BelongsToManyEachByIdTestTestArticle $model) use (&$i) {
             $i++;
-            $this->assertEquals($i, $model->id);
+            $this->assertSame($i, $model->id);
         });
 
         $this->assertSame(3, $i);

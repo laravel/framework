@@ -34,7 +34,7 @@ class SupportUriTest extends TestCase
         $this->assertSame('', (string) $uri->query());
         $this->assertSame('', $uri->query()->decode());
         $this->assertNull($uri->fragment());
-        $this->assertEquals($originalUri, (string) $uri);
+        $this->assertSame($originalUri, (string) $uri);
 
         $uri = Uri::of('https://taylor:password@laravel.com/docs/installation?version=1#hello');
 
@@ -42,7 +42,7 @@ class SupportUriTest extends TestCase
         $this->assertSame('password', $uri->password());
         $this->assertSame('hello', $uri->fragment());
         $this->assertEquals(['version' => 1], $uri->query()->all());
-        $this->assertEquals(1, $uri->query()->integer('version'));
+        $this->assertSame(1, $uri->query()->integer('version'));
         $this->assertSame('taylor:password@laravel.com', $uri->authority());
     }
 
@@ -84,7 +84,7 @@ class SupportUriTest extends TestCase
     {
         $uri = Uri::of('https://example.com/users?key_1=value&key_2[sub_field]=value&key_3[]=value&key_4[9]=value&key_5[][][foo][9]=bar&key.6=value&flag_value');
 
-        $this->assertEquals([
+        $this->assertSame([
             'key_1' => 'value',
             'key_2' => [
                 'sub_field' => 'value',
@@ -125,9 +125,9 @@ class SupportUriTest extends TestCase
 
         $expected = 'https://taylor:password@laravel.com:80/docs/installation?version=1#hello';
 
-        $this->assertEquals($expected, (string) $uri);
-        $this->assertEquals($expected, $uri->value());
-        $this->assertEquals($expected, $uri->toString());
+        $this->assertSame($expected, (string) $uri);
+        $this->assertSame($expected, $uri->value());
+        $this->assertSame($expected, $uri->toString());
     }
 
     public function test_to_stringable()
@@ -165,14 +165,14 @@ class SupportUriTest extends TestCase
         // Push onto multi-value and missing items...
         $uri = Uri::of('https://laravel.com?tags[]=foo');
 
-        $this->assertEquals(['tags' => ['foo', 'bar']], $uri->pushOntoQuery('tags', 'bar')->query()->all());
-        $this->assertEquals(['tags' => ['foo', 'bar', 'baz']], $uri->pushOntoQuery('tags', ['bar', 'baz'])->query()->all());
-        $this->assertEquals(['tags' => ['foo'], 'names' => ['Taylor']], $uri->pushOntoQuery('names', 'Taylor')->query()->all());
+        $this->assertSame(['tags' => ['foo', 'bar']], $uri->pushOntoQuery('tags', 'bar')->query()->all());
+        $this->assertSame(['tags' => ['foo', 'bar', 'baz']], $uri->pushOntoQuery('tags', ['bar', 'baz'])->query()->all());
+        $this->assertSame(['tags' => ['foo'], 'names' => ['Taylor']], $uri->pushOntoQuery('names', 'Taylor')->query()->all());
 
         // Push onto single value item...
         $uri = Uri::of('https://laravel.com?tag=foo');
 
-        $this->assertEquals(['tag' => ['foo', 'bar']], $uri->pushOntoQuery('tag', 'bar')->query()->all());
+        $this->assertSame(['tag' => ['foo', 'bar']], $uri->pushOntoQuery('tag', 'bar')->query()->all());
     }
 
     public function test_query_strings_with_dots_can_be_replaced_or_merged_consistently()
@@ -249,7 +249,7 @@ class SupportUriTest extends TestCase
                 'theme' => 'dark',
             ],
         ]);
-        $this->assertEquals([
+        $this->assertSame([
             'user' => [
                 'name' => 'Taylor',
             ],
@@ -275,20 +275,20 @@ class SupportUriTest extends TestCase
 
         $uri = Uri::of('https://laravel.com/one/two/three');
 
-        $this->assertEquals(['one', 'two', 'three'], $uri->pathSegments()->toArray());
+        $this->assertSame(['one', 'two', 'three'], $uri->pathSegments()->toArray());
         $this->assertSame('one', $uri->pathSegments()->first());
 
         $uri = Uri::of('https://laravel.com/one/two/three?foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertSame(3, $uri->pathSegments()->count());
 
         $uri = Uri::of('https://laravel.com/one/two/three/?foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertSame(3, $uri->pathSegments()->count());
 
         $uri = Uri::of('https://laravel.com/one/two/three/#foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertSame(3, $uri->pathSegments()->count());
     }
 
     public function test_macroable()

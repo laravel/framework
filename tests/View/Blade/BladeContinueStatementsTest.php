@@ -14,7 +14,7 @@ test
 test
 <?php continue; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testContinueStatementsWithExpressionAreCompiled()
@@ -27,7 +27,7 @@ test
 test
 <?php if(TRUE) continue; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testContinueStatementsWithArgumentAreCompiled()
@@ -40,7 +40,7 @@ test
 test
 <?php continue 2; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testContinueStatementsWithSpacedArgumentAreCompiled()
@@ -53,7 +53,7 @@ test
 test
 <?php continue 2; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testContinueStatementsWithFaultyArgumentAreCompiled()
@@ -66,6 +66,6 @@ test
 test
 <?php continue 1; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

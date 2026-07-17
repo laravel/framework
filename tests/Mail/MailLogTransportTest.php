@@ -94,7 +94,7 @@ class MailLogTransportTest extends TestCase
 
         $transportLogger = app('mailer')->getSymfonyTransport()->logger();
 
-        $this->assertEquals($logger, $transportLogger);
+        $this->assertSame($logger, $transportLogger);
     }
 
     private function getLoggedEmailMessage(Message $message): string

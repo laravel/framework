@@ -12,7 +12,7 @@ breeze
         $expected = '<?php if(auth()->guard("api")->check()): ?>
 breeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testPlainIfStatementsAreCompiled()
@@ -23,6 +23,6 @@ breeze
         $expected = '<?php if(auth()->guard()->check()): ?>
 breeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

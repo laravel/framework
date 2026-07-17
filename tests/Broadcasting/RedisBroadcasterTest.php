@@ -114,7 +114,7 @@ class RedisBroadcasterTest extends TestCase
     {
         $request = $this->getMockRequestWithUserForChannel('private-test');
 
-        $this->assertEquals(
+        $this->assertSame(
             json_encode(true),
             $this->broadcaster->validAuthenticationResponse($request, true)
         );
@@ -124,7 +124,7 @@ class RedisBroadcasterTest extends TestCase
     {
         $request = $this->getMockRequestWithUserForChannel('presence-test');
 
-        $this->assertEquals(
+        $this->assertSame(
             json_encode([
                 'channel_data' => [
                     'user_id' => 42,

@@ -175,13 +175,13 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
 
         $store = $this->getStore();
 
-        $this->assertEquals([
+        $this->assertSame([
             'first' => 'a',
             'second' => 'b',
             'third' => null,
         ], $store->get(['first', 'second', 'third']));
 
-        $this->assertEquals([
+        $this->assertSame([
             'first' => 'a',
             'second' => 'b',
             'third' => null,
@@ -193,7 +193,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $this->insertToCacheTable('first', 'a', 0);
         $this->insertToCacheTable('second', 'b', 60);
 
-        $this->assertEquals([
+        $this->assertSame([
             'first' => null,
             'second' => 'b',
             'third' => null,
@@ -212,7 +212,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
             'third',
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'first' => 'cached',
             'second' => 'bb',
             'third' => null,
@@ -228,7 +228,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
             'second' => 'b',
         ], 60);
 
-        $this->assertEquals($data, $store->many(['first', 'second']));
+        $this->assertSame($data, $store->many(['first', 'second']));
         $this->assertDatabaseHas($this->getCacheTableName(), [
             'key' => $this->withCachePrefix('first'),
             'value' => serialize('a'),

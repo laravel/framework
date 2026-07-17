@@ -39,11 +39,11 @@ class RoutingSortedMiddlewareTest extends TestCase
             'Third',
         ];
 
-        $this->assertEquals($expected, (new SortedMiddleware($priority, $middleware))->all());
+        $this->assertSame($expected, (new SortedMiddleware($priority, $middleware))->all());
 
         $this->assertSame([], (new SortedMiddleware(['First'], []))->all());
-        $this->assertEquals(['First'], (new SortedMiddleware(['First'], ['First']))->all());
-        $this->assertEquals(['First', 'Second'], (new SortedMiddleware(['First', 'Second'], ['Second', 'First']))->all());
+        $this->assertSame(['First'], (new SortedMiddleware(['First'], ['First']))->all());
+        $this->assertSame(['First', 'Second'], (new SortedMiddleware(['First', 'Second'], ['Second', 'First']))->all());
     }
 
     public function testItDoesNotMoveNonStringValues()
@@ -56,13 +56,13 @@ class RoutingSortedMiddlewareTest extends TestCase
             return 'bar';
         };
 
-        $this->assertEquals([2, 1], (new SortedMiddleware([1, 2], [2, 1]))->all());
-        $this->assertEquals(['Second', $closure], (new SortedMiddleware(['First', 'Second'], ['Second', $closure]))->all());
-        $this->assertEquals(['a', 'b', $closure], (new SortedMiddleware(['a', 'b'], ['b', $closure, 'a']))->all());
-        $this->assertEquals([$closure2, 'a', 'b', $closure, 'foo'], (new SortedMiddleware(['a', 'b'], [$closure2, 'b', $closure, 'a', 'foo']))->all());
-        $this->assertEquals([$closure, 'a', 'b', $closure2, 'foo'], (new SortedMiddleware(['a', 'b'], [$closure, 'b', $closure2, 'foo', 'a']))->all());
-        $this->assertEquals(['a', $closure, 'b', $closure2, 'foo'], (new SortedMiddleware(['a', 'b'], ['a', $closure, 'b', $closure2, 'foo']))->all());
-        $this->assertEquals([$closure, $closure2, 'foo', 'a'], (new SortedMiddleware(['a', 'b'], [$closure, $closure2, 'foo', 'a']))->all());
+        $this->assertSame([2, 1], (new SortedMiddleware([1, 2], [2, 1]))->all());
+        $this->assertSame(['Second', $closure], (new SortedMiddleware(['First', 'Second'], ['Second', $closure]))->all());
+        $this->assertSame(['a', 'b', $closure], (new SortedMiddleware(['a', 'b'], ['b', $closure, 'a']))->all());
+        $this->assertSame([$closure2, 'a', 'b', $closure, 'foo'], (new SortedMiddleware(['a', 'b'], [$closure2, 'b', $closure, 'a', 'foo']))->all());
+        $this->assertSame([$closure, 'a', 'b', $closure2, 'foo'], (new SortedMiddleware(['a', 'b'], [$closure, 'b', $closure2, 'foo', 'a']))->all());
+        $this->assertSame(['a', $closure, 'b', $closure2, 'foo'], (new SortedMiddleware(['a', 'b'], ['a', $closure, 'b', $closure2, 'foo']))->all());
+        $this->assertSame([$closure, $closure2, 'foo', 'a'], (new SortedMiddleware(['a', 'b'], [$closure, $closure2, 'foo', 'a']))->all());
     }
 
     public function testItSortsUsingParentsAndContracts()
@@ -97,7 +97,7 @@ class RoutingSortedMiddlewareTest extends TestCase
             'Third',
         ];
 
-        $this->assertEquals($expected, (new SortedMiddleware($priority, $middleware))->all());
+        $this->assertSame($expected, (new SortedMiddleware($priority, $middleware))->all());
     }
 }
 

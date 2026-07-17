@@ -11,21 +11,21 @@ class ServeCommandLogParserTest extends TestCase
     {
         $line = '[Mon Nov 19 10:30:45 2024] :8080 Info';
 
-        $this->assertEquals(8080, ServeCommand::getRequestPortFromLine($line));
+        $this->assertSame(8080, ServeCommand::getRequestPortFromLine($line));
     }
 
     public function testExtractRequestPortWithValidLogLineAndExtraData()
     {
         $line = '[Mon Nov 19 10:30:45 2024] :3000 [Client Connected]';
 
-        $this->assertEquals(3000, ServeCommand::getRequestPortFromLine($line));
+        $this->assertSame(3000, ServeCommand::getRequestPortFromLine($line));
     }
 
     public function testExtractRequestPortWithValidLogLineWithoutDate()
     {
         $line = ':5000 [Server Started]';
 
-        $this->assertEquals(5000, ServeCommand::getRequestPortFromLine($line));
+        $this->assertSame(5000, ServeCommand::getRequestPortFromLine($line));
     }
 
     public function testExtractRequestPortWithMissingPort()

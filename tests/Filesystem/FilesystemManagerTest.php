@@ -58,7 +58,7 @@ class FilesystemManagerTest extends TestCase
 
         // read operations work
         $this->assertSame('contents', $disk->get('path.txt'));
-        $this->assertEquals(['path.txt'], $disk->files());
+        $this->assertSame(['path.txt'], $disk->files());
 
         // write operations fail
         $this->assertFalse($disk->put('path.txt', 'contents'));

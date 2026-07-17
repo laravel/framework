@@ -26,7 +26,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $parent->setDateFormat('Y-m-d H:i:s');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
 
-        $this->assertEquals(['foo' => 'bar', 'created_at' => '2015-09-12 00:00:00'], $pivot->getAttributes());
+        $this->assertSame(['foo' => 'bar', 'created_at' => '2015-09-12 00:00:00'], $pivot->getAttributes());
         $this->assertSame('connection', $pivot->getConnectionName());
         $this->assertSame('table', $pivot->getTable());
         $this->assertTrue($pivot->exists);
@@ -50,7 +50,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
         $pivot = DatabaseEloquentPivotTestJsonCastStub::fromRawAttributes($parent, ['foo' => json_encode(['name' => 'Taylor'])], 'table', true);
 
-        $this->assertEquals(['name' => 'Taylor'], $pivot->foo);
+        $this->assertSame(['name' => 'Taylor'], $pivot->foo);
     }
 
     public function testFromRawAttributesDoesNotMutate()
@@ -79,7 +79,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
         $pivot->shimy = 'changed';
 
-        $this->assertEquals(['shimy' => 'changed'], $pivot->getDirty());
+        $this->assertSame(['shimy' => 'changed'], $pivot->getDirty());
     }
 
     public function testTimestampPropertyIsSetIfCreatedAtInAttributes()
@@ -154,8 +154,8 @@ class DatabaseEloquentPivotTest extends TestCase
 
         $pivotWithoutParent = new Pivot;
 
-        $this->assertEquals($model->getCreatedAtColumn(), $pivotWithoutParent->getCreatedAtColumn());
-        $this->assertEquals($model->getUpdatedAtColumn(), $pivotWithoutParent->getUpdatedAtColumn());
+        $this->assertSame($model->getCreatedAtColumn(), $pivotWithoutParent->getCreatedAtColumn());
+        $this->assertSame($model->getUpdatedAtColumn(), $pivotWithoutParent->getUpdatedAtColumn());
     }
 
     public function testWithoutRelations()

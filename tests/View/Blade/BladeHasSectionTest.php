@@ -12,6 +12,6 @@ breeze
         $expected = '<?php if (! empty(trim($__env->yieldContent("section")))): ?>
 breeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

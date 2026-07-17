@@ -1155,7 +1155,7 @@ class AuthAccessGateTest extends TestCase
 
         $gate->resource('test', AccessGateTestResource::class, $abilitiesToSet);
 
-        $this->assertEquals($expectedHasValue, $gate->has($abilitiesToCheck));
+        $this->assertSame($expectedHasValue, $gate->has($abilitiesToCheck));
     }
 
     public static function hasAbilitiesTestDataProvider()

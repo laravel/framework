@@ -116,8 +116,8 @@ class CookieTest extends TestCase
         $cookieTwo = $cookieJar->make('foo', 'rab', 0, '/');
         $cookieJar->queue($cookieOne);
         $cookieJar->queue($cookieTwo);
-        $this->assertEquals($cookieOne, $cookieJar->queued('foo', null, '/path'));
-        $this->assertEquals($cookieTwo, $cookieJar->queued('foo', null, '/'));
+        $this->assertSame($cookieOne, $cookieJar->queued('foo', null, '/path'));
+        $this->assertSame($cookieTwo, $cookieJar->queued('foo', null, '/'));
     }
 
     public function testQueuedWithoutPath(): void
@@ -127,7 +127,7 @@ class CookieTest extends TestCase
         $cookieTwo = $cookieJar->make('foo', 'rab', 0, '/');
         $cookieJar->queue($cookieOne);
         $cookieJar->queue($cookieTwo);
-        $this->assertEquals($cookieTwo, $cookieJar->queued('foo'));
+        $this->assertSame($cookieTwo, $cookieJar->queued('foo'));
     }
 
     public function testHasQueued(): void
@@ -163,7 +163,7 @@ class CookieTest extends TestCase
 
         $cookie = $cookieJar->queued('foobar');
         $this->assertSame('foobar', $cookie->getName());
-        $this->assertEquals(null, $cookie->getValue());
+        $this->assertSame(null, $cookie->getValue());
         $this->assertSame('/path', $cookie->getPath());
         $this->assertSame('/domain', $cookie->getDomain());
         $this->assertTrue($cookie->getExpiresTime() < time());
@@ -200,7 +200,7 @@ class CookieTest extends TestCase
         $cookieJar->queue($cookieOne);
         $cookieJar->queue($cookieTwo);
         $cookieJar->unqueue('foo', '/path');
-        $this->assertEquals(['foo' => ['/' => $cookieTwo]], $this->getQueuedPropertyValue($cookieJar));
+        $this->assertSame(['foo' => ['/' => $cookieTwo]], $this->getQueuedPropertyValue($cookieJar));
     }
 
     public function testUnqueueOnlyCookieForName(): void
@@ -226,7 +226,7 @@ class CookieTest extends TestCase
         $cookieJar = $this->getCreator();
         $cookie = $cookieJar->make('foo', 'bar', 0, '/path');
         $cookieJar->queue($cookie);
-        $this->assertEquals(['foo' => ['/path' => $cookie]], $this->getQueuedPropertyValue($cookieJar));
+        $this->assertSame(['foo' => ['/path' => $cookie]], $this->getQueuedPropertyValue($cookieJar));
     }
 
     public function testQueueWithCreatingNewCookie(): void
@@ -248,7 +248,7 @@ class CookieTest extends TestCase
         $cookieJar->queue($cookieOne);
         $cookieJar->queue($cookieTwo);
         $cookieJar->queue($cookieThree);
-        $this->assertEquals(
+        $this->assertSame(
             [$cookieOne, $cookieTwo, $cookieThree],
             $cookieJar->getQueuedCookies()
         );

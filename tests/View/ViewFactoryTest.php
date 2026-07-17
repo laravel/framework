@@ -480,8 +480,8 @@ class ViewFactoryTest extends TestCase
             new ReflectionFunction($composers[0]),
             new ReflectionFunction($composers[1]),
         ];
-        $this->assertEquals(['class' => 'foo', 'method' => 'compose'], $reflections[0]->getStaticVariables());
-        $this->assertEquals(['class' => 'baz', 'method' => 'baz'], $reflections[1]->getStaticVariables());
+        $this->assertSame(['class' => 'foo', 'method' => 'compose'], $reflections[0]->getStaticVariables());
+        $this->assertSame(['class' => 'baz', 'method' => 'baz'], $reflections[1]->getStaticVariables());
     }
 
     public function testClassCallbacks()
@@ -938,7 +938,7 @@ class ViewFactoryTest extends TestCase
             'parent' => null,
         ];
 
-        $this->assertEquals([$expectedLoop], $factory->getLoopStack());
+        $this->assertSame([$expectedLoop], $factory->getLoopStack());
 
         $factory->addLoop([1, 2, 3, 4]);
 
@@ -958,7 +958,7 @@ class ViewFactoryTest extends TestCase
 
         $factory->popLoop();
 
-        $this->assertEquals([$expectedLoop], $factory->getLoopStack());
+        $this->assertSame([$expectedLoop], $factory->getLoopStack());
     }
 
     public function testAddingLoopDoesNotCloseGenerator()
@@ -978,7 +978,7 @@ class ViewFactoryTest extends TestCase
         $factory->addLoop($data);
 
         foreach ($data as $chunk) {
-            $this->assertEquals(['a', 'b'], $chunk);
+            $this->assertSame(['a', 'b'], $chunk);
         }
     }
 
@@ -1001,7 +1001,7 @@ class ViewFactoryTest extends TestCase
             'parent' => null,
         ];
 
-        $this->assertEquals([$expectedLoop], $factory->getLoopStack());
+        $this->assertSame([$expectedLoop], $factory->getLoopStack());
     }
 
     public function testAddingLazyCollection()
@@ -1025,7 +1025,7 @@ class ViewFactoryTest extends TestCase
             'parent' => null,
         ];
 
-        $this->assertEquals([$expectedLoop], $factory->getLoopStack());
+        $this->assertSame([$expectedLoop], $factory->getLoopStack());
     }
 
     public function testIncrementingLoopIndices()
@@ -1036,17 +1036,17 @@ class ViewFactoryTest extends TestCase
 
         $factory->incrementLoopIndices();
 
-        $this->assertEquals(1, $factory->getLoopStack()[0]['iteration']);
-        $this->assertEquals(0, $factory->getLoopStack()[0]['index']);
-        $this->assertEquals(3, $factory->getLoopStack()[0]['remaining']);
+        $this->assertSame(1, $factory->getLoopStack()[0]['iteration']);
+        $this->assertSame(0, $factory->getLoopStack()[0]['index']);
+        $this->assertSame(3, $factory->getLoopStack()[0]['remaining']);
         $this->assertTrue($factory->getLoopStack()[0]['odd']);
         $this->assertFalse($factory->getLoopStack()[0]['even']);
 
         $factory->incrementLoopIndices();
 
-        $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
-        $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
-        $this->assertEquals(2, $factory->getLoopStack()[0]['remaining']);
+        $this->assertSame(2, $factory->getLoopStack()[0]['iteration']);
+        $this->assertSame(1, $factory->getLoopStack()[0]['index']);
+        $this->assertSame(2, $factory->getLoopStack()[0]['remaining']);
         $this->assertFalse($factory->getLoopStack()[0]['odd']);
         $this->assertTrue($factory->getLoopStack()[0]['even']);
     }
@@ -1074,8 +1074,8 @@ class ViewFactoryTest extends TestCase
 
         $factory->incrementLoopIndices();
 
-        $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
-        $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
+        $this->assertSame(2, $factory->getLoopStack()[0]['iteration']);
+        $this->assertSame(1, $factory->getLoopStack()[0]['index']);
         $this->assertFalse($factory->getLoopStack()[0]['first']);
         $this->assertNull($factory->getLoopStack()[0]['remaining']);
         $this->assertNull($factory->getLoopStack()[0]['last']);

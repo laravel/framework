@@ -56,8 +56,8 @@ class ModelInspectorTest extends DatabaseTestCase
 
     private function assertModelInfo(ModelInfo|array $modelInfo)
     {
-        $this->assertEquals(ModelInspectorTestModel::class, $modelInfo['class']);
-        $this->assertEquals(Schema::getConnection()->getConfig()['name'], $modelInfo['database']);
+        $this->assertSame(ModelInspectorTestModel::class, $modelInfo['class']);
+        $this->assertSame(Schema::getConnection()->getConfig()['name'], $modelInfo['database']);
         $this->assertSame('model_info_extractor_test_model', $modelInfo['table']);
         $this->assertNull($modelInfo['policy']);
         $this->assertCount(8, $modelInfo['attributes']);
@@ -170,14 +170,14 @@ class ModelInspectorTest extends DatabaseTestCase
         $this->assertSame('created', $modelInfo['observers'][0]['event']);
         $this->assertCount(1, $modelInfo['observers'][0]['observer']);
         $this->assertSame("Illuminate\Tests\Integration\Database\ModelInspectorTestModelObserver@created", $modelInfo['observers'][0]['observer'][0]);
-        $this->assertEquals(ModelInspectorTestModelEloquentCollection::class, $modelInfo['collection']);
-        $this->assertEquals(ModelInspectorTestModelBuilder::class, $modelInfo['builder']);
+        $this->assertSame(ModelInspectorTestModelEloquentCollection::class, $modelInfo['collection']);
+        $this->assertSame(ModelInspectorTestModelBuilder::class, $modelInfo['builder']);
     }
 
     private function assertAttributes($expectedAttributes, $actualAttributes)
     {
         foreach (['name', 'increments', 'nullable', 'unique', 'fillable', 'hidden', 'appended', 'cast'] as $key) {
-            $this->assertEquals($expectedAttributes[$key], $actualAttributes[$key]);
+            $this->assertSame($expectedAttributes[$key], $actualAttributes[$key]);
         }
         // We ignore type because it varies from DB to DB
         $this->assertArrayHasKey('type', $actualAttributes);

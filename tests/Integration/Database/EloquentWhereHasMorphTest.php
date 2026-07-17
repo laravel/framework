@@ -59,7 +59,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
             $query->where('title', 'foo');
         })->orderBy('id')->get();
 
-        $this->assertEquals([1, 4], $comments->pluck('id')->all());
+        $this->assertSame([1, 4], $comments->pluck('id')->all());
     }
 
     public function testWhereHasMorphWithMorphMap()
@@ -73,7 +73,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
                 $query->where('title', 'foo');
             })->orderBy('id')->get();
 
-            $this->assertEquals([1, 4], $comments->pluck('id')->all());
+            $this->assertSame([1, 4], $comments->pluck('id')->all());
         } finally {
             Relation::morphMap([], false);
         }
@@ -89,7 +89,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
                 $query->where('title', 'foo');
             })->orderBy('id')->get();
 
-        $this->assertEquals([1, 4], $comments->pluck('id')->all());
+        $this->assertSame([1, 4], $comments->pluck('id')->all());
     }
 
     public function testWhereHasMorphWithWildcardAndMorphMap()
@@ -103,7 +103,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
                 $query->where('title', 'foo');
             })->orderBy('id')->get();
 
-            $this->assertEquals([1, 4], $comments->pluck('id')->all());
+            $this->assertSame([1, 4], $comments->pluck('id')->all());
         } finally {
             Relation::morphMap([], false);
         }
@@ -128,7 +128,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
             $query->where('title', 'like', 'ba%');
         })->orderBy('id')->get();
 
-        $this->assertEquals([5], $comments->pluck('id')->all());
+        $this->assertSame([5], $comments->pluck('id')->all());
     }
 
     public function testWhereHasMorphWitDifferentConstraints()
@@ -143,7 +143,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
             }
         })->orderBy('id')->get();
 
-        $this->assertEquals([1, 5], $comments->pluck('id')->all());
+        $this->assertSame([1, 5], $comments->pluck('id')->all());
     }
 
     public function testWhereHasMorphWithOwnerKey()
@@ -168,35 +168,35 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
             $query->where('title', 'foo');
         })->orderBy('id')->get();
 
-        $this->assertEquals([1], $comments->pluck('id')->all());
+        $this->assertSame([1], $comments->pluck('id')->all());
     }
 
     public function testHasMorph()
     {
         $comments = Comment::hasMorph('commentable', Post::class)->orderBy('id')->get();
 
-        $this->assertEquals([1, 2], $comments->pluck('id')->all());
+        $this->assertSame([1, 2], $comments->pluck('id')->all());
     }
 
     public function testOrHasMorph()
     {
         $comments = Comment::where('id', 1)->orHasMorph('commentable', Video::class)->orderBy('id')->get();
 
-        $this->assertEquals([1, 4, 5, 6], $comments->pluck('id')->all());
+        $this->assertSame([1, 4, 5, 6], $comments->pluck('id')->all());
     }
 
     public function testDoesntHaveMorph()
     {
         $comments = Comment::doesntHaveMorph('commentable', Post::class)->orderBy('id')->get();
 
-        $this->assertEquals([3], $comments->pluck('id')->all());
+        $this->assertSame([3], $comments->pluck('id')->all());
     }
 
     public function testOrDoesntHaveMorph()
     {
         $comments = Comment::where('id', 1)->orDoesntHaveMorph('commentable', Post::class)->orderBy('id')->get();
 
-        $this->assertEquals([1, 3], $comments->pluck('id')->all());
+        $this->assertSame([1, 3], $comments->pluck('id')->all());
     }
 
     public function testOrWhereHasMorph()
@@ -206,7 +206,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
                 $query->where('title', 'foo');
             })->orderBy('id')->get();
 
-        $this->assertEquals([1, 4], $comments->pluck('id')->all());
+        $this->assertSame([1, 4], $comments->pluck('id')->all());
     }
 
     public function testOrWhereHasMorphWithWildcardAndOnlyNullMorphTypes()
@@ -218,7 +218,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
                 $query->where('title', 'foo');
             })->orderBy('id')->get();
 
-        $this->assertEquals([7], $comments->pluck('id')->all());
+        $this->assertSame([7], $comments->pluck('id')->all());
     }
 
     public function testWhereDoesntHaveMorph()
@@ -227,7 +227,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
             $query->where('title', 'foo');
         })->orderBy('id')->get();
 
-        $this->assertEquals([2, 3], $comments->pluck('id')->all());
+        $this->assertSame([2, 3], $comments->pluck('id')->all());
     }
 
     public function testWhereDoesntHaveMorphWithWildcardAndOnlyNullMorphTypes()
@@ -238,7 +238,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
             $query->where('title', 'foo');
         })->orderBy('id')->get();
 
-        $this->assertEquals([7, 8], $comments->pluck('id')->all());
+        $this->assertSame([7, 8], $comments->pluck('id')->all());
     }
 
     public function testOrWhereDoesntHaveMorph()
@@ -248,7 +248,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
                 $query->where('title', 'foo');
             })->orderBy('id')->get();
 
-        $this->assertEquals([1, 2, 3], $comments->pluck('id')->all());
+        $this->assertSame([1, 2, 3], $comments->pluck('id')->all());
     }
 
     public function testModelScopesAreAccessible()
@@ -257,14 +257,14 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
             $query->someSharedModelScope();
         })->orderBy('id')->get();
 
-        $this->assertEquals([1, 4], $comments->pluck('id')->all());
+        $this->assertSame([1, 4], $comments->pluck('id')->all());
     }
 
     public function testWhereDoesntHaveMorphWithNullableMorph()
     {
         $comments = Comment::whereDoesntHaveMorph('commentable', '*')->orderBy('id')->get();
 
-        $this->assertEquals([3, 7, 8], $comments->pluck('id')->all());
+        $this->assertSame([3, 7, 8], $comments->pluck('id')->all());
     }
 
     public function testWhereDoesntHaveMorphWithNullableMorphAndAdditionalWhereIsLogicallyGrouped()

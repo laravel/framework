@@ -82,8 +82,8 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
             ->orderBy('id')
             ->get();
 
-        $this->assertEquals([3, 2], $users[0]->roles->pluck('id')->all());
-        $this->assertEquals([6, 5], $users[1]->roles->pluck('id')->all());
+        $this->assertSame([3, 2], $users[0]->roles->pluck('id')->all());
+        $this->assertSame([6, 5], $users[1]->roles->pluck('id')->all());
         $this->assertArrayNotHasKey('laravel_row', $users[0]->roles[0]);
         $this->assertArrayNotHasKey('@laravel_group := `user_id`', $users[0]->roles[0]);
     }
@@ -94,8 +94,8 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
             ->orderBy('id')
             ->get();
 
-        $this->assertEquals([2, 1], $users[0]->roles->pluck('id')->all());
-        $this->assertEquals([5, 4], $users[1]->roles->pluck('id')->all());
+        $this->assertSame([2, 1], $users[0]->roles->pluck('id')->all());
+        $this->assertSame([5, 4], $users[1]->roles->pluck('id')->all());
     }
 
     public function testHasMany(): void
@@ -104,8 +104,8 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
             ->orderBy('id')
             ->get();
 
-        $this->assertEquals([3, 2], $users[0]->posts->pluck('id')->all());
-        $this->assertEquals([6, 5], $users[1]->posts->pluck('id')->all());
+        $this->assertSame([3, 2], $users[0]->posts->pluck('id')->all());
+        $this->assertSame([6, 5], $users[1]->posts->pluck('id')->all());
         $this->assertArrayNotHasKey('laravel_row', $users[0]->posts[0]);
         $this->assertArrayNotHasKey('@laravel_group := `user_id`', $users[0]->posts[0]);
     }
@@ -116,8 +116,8 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
             ->orderBy('id')
             ->get();
 
-        $this->assertEquals([2, 1], $users[0]->posts->pluck('id')->all());
-        $this->assertEquals([5, 4], $users[1]->posts->pluck('id')->all());
+        $this->assertSame([2, 1], $users[0]->posts->pluck('id')->all());
+        $this->assertSame([5, 4], $users[1]->posts->pluck('id')->all());
     }
 
     public function testHasManyThrough(): void
@@ -126,8 +126,8 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
             ->orderBy('id')
             ->get();
 
-        $this->assertEquals([3, 2], $users[0]->comments->pluck('id')->all());
-        $this->assertEquals([6, 5], $users[1]->comments->pluck('id')->all());
+        $this->assertSame([3, 2], $users[0]->comments->pluck('id')->all());
+        $this->assertSame([6, 5], $users[1]->comments->pluck('id')->all());
         $this->assertArrayNotHasKey('laravel_row', $users[0]->comments[0]);
         $this->assertArrayNotHasKey('@laravel_group := `user_id`', $users[0]->comments[0]);
     }
@@ -138,8 +138,8 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
             ->orderBy('id')
             ->get();
 
-        $this->assertEquals([2, 1], $users[0]->comments->pluck('id')->all());
-        $this->assertEquals([5, 4], $users[1]->comments->pluck('id')->all());
+        $this->assertSame([2, 1], $users[0]->comments->pluck('id')->all());
+        $this->assertSame([5, 4], $users[1]->comments->pluck('id')->all());
     }
 }
 

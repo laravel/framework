@@ -16,6 +16,6 @@ breeze
 <?php elseif (app(\\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->any([\'delete\', \'approve\'], [$post])): ?>
 sneeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

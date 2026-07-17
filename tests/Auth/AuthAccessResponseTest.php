@@ -127,7 +127,7 @@ class AuthAccessResponseTest extends TestCase
         } catch (AuthorizationException $e) {
             $this->assertSame('Some message.', $e->getMessage());
             $this->assertSame('some_code', $e->getCode());
-            $this->assertEquals($response, $e->response());
+            $this->assertSame($response, $e->response());
         }
     }
 
@@ -146,7 +146,7 @@ class AuthAccessResponseTest extends TestCase
     {
         $response = Response::allow('Some message.', 'some_code');
 
-        $this->assertEquals($response, $response->authorize());
+        $this->assertSame($response, $response->authorize());
     }
 
     public function testCastingToStringReturnsMessage()
@@ -162,7 +162,7 @@ class AuthAccessResponseTest extends TestCase
     {
         $response = new Response(false, 'Not allowed.', 'some_code');
 
-        $this->assertEquals([
+        $this->assertSame([
             'allowed' => false,
             'message' => 'Not allowed.',
             'code' => 'some_code',

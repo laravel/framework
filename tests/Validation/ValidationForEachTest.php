@@ -32,7 +32,7 @@ class ValidationForEachTest extends TestCase
 
         $this->assertFalse($v->passes());
 
-        $this->assertEquals([
+        $this->assertSame([
             'items.0.discounts.0.id' => ['validation.distinct'],
             'items.0.discounts.1.id' => ['validation.distinct'],
         ], $v->getMessageBag()->toArray());
@@ -64,7 +64,7 @@ class ValidationForEachTest extends TestCase
 
         $this->assertFalse($v->passes());
 
-        $this->assertEquals([
+        $this->assertSame([
             'items.0.discounts.0.id' => ['validation.distinct'],
             'items.0.discounts.1.id' => ['validation.distinct'],
         ], $v->getMessageBag()->toArray());
@@ -111,7 +111,7 @@ class ValidationForEachTest extends TestCase
 
         $this->assertFalse($v->passes());
 
-        $this->assertEquals([
+        $this->assertSame([
             'items.0.discounts.0.id' => ['validation.distinct'],
             'items.0.discounts.1.id' => ['validation.distinct'],
             'items.0.discounts.1.percent' => ['validation.min.numeric'],
@@ -145,7 +145,7 @@ class ValidationForEachTest extends TestCase
 
         $this->assertFalse($v->passes());
 
-        $this->assertEquals([
+        $this->assertSame([
             'items.0.discounts.0.id' => ['validation.distinct'],
             'items.0.discounts.1.id' => ['validation.distinct'],
             'items.1.discounts.1.id' => ['validation.numeric'],
@@ -192,7 +192,7 @@ class ValidationForEachTest extends TestCase
 
         $this->assertFalse($v->passes());
 
-        $this->assertEquals([
+        $this->assertSame([
             'items.0.discounts.0.id' => ['validation.distinct'],
             'items.0.discounts.1.id' => ['validation.distinct'],
             'items.0.discounts.0.discount' => ['validation.max.numeric'],
@@ -220,7 +220,7 @@ class ValidationForEachTest extends TestCase
 
         $this->assertFalse($v->passes());
 
-        $this->assertEquals([
+        $this->assertSame([
             'items.0.users.1.type' => ['validation.regex'],
         ], $v->getMessageBag()->toArray());
     }
@@ -248,7 +248,7 @@ class ValidationForEachTest extends TestCase
 
         $this->assertFalse($v->passes());
 
-        $this->assertEquals([
+        $this->assertSame([
             'items.0.users.1.type' => [
                 'validation.regex',
                 'validation.notregex',
@@ -273,7 +273,7 @@ class ValidationForEachTest extends TestCase
             ]
         );
 
-        $this->assertEquals([
+        $this->assertSame([
             'foo.1.bar' => ['validation.accepted'],
         ], $v->getMessageBag()->toArray());
     }
@@ -294,7 +294,7 @@ class ValidationForEachTest extends TestCase
                 ]),
             ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'foo.1.bar' => ['validation.accepted'],
         ], $v->getMessageBag()->toArray());
     }
@@ -314,7 +314,7 @@ class ValidationForEachTest extends TestCase
                 ),
             ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'foo.1.bar' => ['validation.accepted'],
         ], $v->getMessageBag()->toArray());
     }
@@ -340,7 +340,7 @@ class ValidationForEachTest extends TestCase
 
         $v = new Validator($this->getIlluminateArrayTranslator(), $data, $rules);
         $this->assertFalse($v->passes());
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'items.0.discounts' => ['validation.required'],
                 'items.1.discounts' => ['validation.required'],

@@ -129,7 +129,7 @@ class TypeTest extends TestCase
     {
         $schema = JsonSchema::string()->nullable()->nullable(false);
 
-        $this->assertEquals([
+        $this->assertSame([
             'type' => 'string',
         ], $schema->toArray());
 

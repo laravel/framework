@@ -49,13 +49,13 @@ class SupportServiceProviderTest extends TestCase
             ServiceProviderForTestingOne::class,
             ServiceProviderForTestingTwo::class,
         ];
-        $this->assertEquals($expected, $toPublish, 'Publishable service providers do not return expected set of providers.');
+        $this->assertSame($expected, $toPublish, 'Publishable service providers do not return expected set of providers.');
     }
 
     public function testPublishableGroups()
     {
         $toPublish = ServiceProvider::publishableGroups();
-        $this->assertEquals([
+        $this->assertSame([
             'some_tag',
             'tag_one',
             'tag_two',
@@ -70,7 +70,7 @@ class SupportServiceProviderTest extends TestCase
         $toPublish = ServiceProvider::pathsToPublish(ServiceProviderForTestingOne::class);
         $this->assertArrayHasKey('source/unmarked/one', $toPublish, 'Service provider does not return expected published path key.');
         $this->assertArrayHasKey('source/tagged/one', $toPublish, 'Service provider does not return expected published path key.');
-        $this->assertEquals([
+        $this->assertSame([
             'source/unmarked/one' => 'destination/unmarked/one',
             'source/tagged/one' => 'destination/tagged/one',
             'source/tagged/multiple' => 'destination/tagged/multiple',
@@ -95,7 +95,7 @@ class SupportServiceProviderTest extends TestCase
             'source/tagged/two/a' => 'destination/tagged/two/a',
             'source/tagged/two/b' => 'destination/tagged/two/b',
         ];
-        $this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published paths.');
+        $this->assertSame($expected, $toPublish, 'Service provider does not return expected set of published paths.');
     }
 
     public function testSimpleTaggedAssetsArePublishedCorrectly()
@@ -104,7 +104,7 @@ class SupportServiceProviderTest extends TestCase
         $this->assertArrayNotHasKey('source/tagged/two/a', $toPublish, 'Service provider does return unexpected tagged path key.');
         $this->assertArrayNotHasKey('source/tagged/two/b', $toPublish, 'Service provider does return unexpected tagged path key.');
         $this->assertArrayHasKey('source/tagged/one', $toPublish, 'Service provider does not return expected tagged path key.');
-        $this->assertEquals(['source/tagged/one' => 'destination/tagged/one'], $toPublish, 'Service provider does not return expected set of published tagged paths.');
+        $this->assertSame(['source/tagged/one' => 'destination/tagged/one'], $toPublish, 'Service provider does not return expected set of published tagged paths.');
     }
 
     public function testMultipleTaggedAssetsArePublishedCorrectly()
@@ -118,7 +118,7 @@ class SupportServiceProviderTest extends TestCase
             'source/tagged/two/a' => 'destination/tagged/two/a',
             'source/tagged/two/b' => 'destination/tagged/two/b',
         ];
-        $this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published tagged paths.');
+        $this->assertSame($expected, $toPublish, 'Service provider does not return expected set of published tagged paths.');
     }
 
     public function testMultipleTaggedAssetsAreMergedCorrectly()
@@ -133,7 +133,7 @@ class SupportServiceProviderTest extends TestCase
             'source/tagged/two/a' => 'destination/tagged/two/a',
             'source/tagged/two/b' => 'destination/tagged/two/b',
         ];
-        $this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published tagged paths.');
+        $this->assertSame($expected, $toPublish, 'Service provider does not return expected set of published tagged paths.');
     }
 
     public function testPublishesMigrations()

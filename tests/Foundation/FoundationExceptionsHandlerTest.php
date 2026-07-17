@@ -387,7 +387,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $this->handler->render($request, $validationException);
 
-        $this->assertEquals($argumentExpected, $argumentActual);
+        $this->assertSame($argumentExpected, $argumentActual);
     }
 
     public function testSuspiciousOperationReturns400WithoutReporting()
@@ -397,7 +397,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $response = $this->handler->render($this->request, new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
 
-        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertSame(400, $response->getStatusCode());
         $this->assertStringContainsString('"message": "Bad request."', $response->getContent());
 
         $logger = m::mock(LoggerInterface::class);
@@ -414,7 +414,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $response = $this->handler->render($this->request, new RecordsNotFoundException);
 
-        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertSame(404, $response->getStatusCode());
         $this->assertStringContainsString('"message": "Not found."', $response->getContent());
 
         $logger = m::mock(LoggerInterface::class);

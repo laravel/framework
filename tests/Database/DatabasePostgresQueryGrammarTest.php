@@ -51,19 +51,19 @@ class DatabasePostgresQueryGrammarTest extends TestCase
         $builder = m::mock(Builder::class);
         $builder->from = 'users';
 
-        $this->assertEquals([
+        $this->assertSame([
             'truncate "users" restart identity cascade' => [],
         ], $postgres->compileTruncate($builder));
 
         PostgresGrammar::cascadeOnTruncate(false);
 
-        $this->assertEquals([
+        $this->assertSame([
             'truncate "users" restart identity' => [],
         ], $postgres->compileTruncate($builder));
 
         PostgresGrammar::cascadeOnTruncate();
 
-        $this->assertEquals([
+        $this->assertSame([
             'truncate "users" restart identity cascade' => [],
         ], $postgres->compileTruncate($builder));
     }

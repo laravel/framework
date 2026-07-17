@@ -60,7 +60,7 @@ class NotificationSendQueuedNotificationTest extends TestCase
 
         $job = new SendQueuedNotifications($notifiable, $notification);
 
-        $this->assertEquals(23, $job->maxExceptions);
+        $this->assertSame(23, $job->maxExceptions);
     }
 }
 

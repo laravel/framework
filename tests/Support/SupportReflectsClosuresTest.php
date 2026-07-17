@@ -70,7 +70,7 @@ class SupportReflectsClosuresTest extends TestCase
             //
         });
 
-        $this->assertEquals([
+        $this->assertSame([
             ExampleParameter::class,
         ], $types);
 
@@ -78,7 +78,7 @@ class SupportReflectsClosuresTest extends TestCase
 
         $types = ReflectsClosuresClass::reflectFirstAll($closure);
 
-        $this->assertEquals([
+        $this->assertSame([
             ExampleParameter::class,
             AnotherExampleParameter::class,
         ], $types);

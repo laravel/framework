@@ -17,9 +17,9 @@ class ValidationFactoryTest extends TestCase
         $translator = m::mock(TranslatorInterface::class);
         $factory = new Factory($translator);
         $validator = $factory->make(['foo' => 'bar'], ['baz' => 'boom']);
-        $this->assertEquals($translator, $validator->getTranslator());
-        $this->assertEquals(['foo' => 'bar'], $validator->getData());
-        $this->assertEquals(['baz' => ['boom']], $validator->getRules());
+        $this->assertSame($translator, $validator->getTranslator());
+        $this->assertSame(['foo' => 'bar'], $validator->getData());
+        $this->assertSame(['baz' => ['boom']], $validator->getRules());
 
         $presence = m::mock(PresenceVerifierInterface::class);
         $noop1 = function () {
@@ -37,9 +37,9 @@ class ValidationFactoryTest extends TestCase
         $factory->replacer('replacer', $noop3);
         $factory->setPresenceVerifier($presence);
         $validator = $factory->make([], []);
-        $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2, 'dependent' => $noop3], $validator->extensions);
-        $this->assertEquals(['replacer' => $noop3], $validator->replacers);
-        $this->assertEquals($presence, $validator->getPresenceVerifier());
+        $this->assertSame(['foo' => $noop1, 'implicit' => $noop2, 'dependent' => $noop3], $validator->extensions);
+        $this->assertSame(['replacer' => $noop3], $validator->replacers);
+        $this->assertSame($presence, $validator->getPresenceVerifier());
 
         $presence = m::mock(PresenceVerifierInterface::class);
         $factory->extend('foo', $noop1, 'foo!');
@@ -47,9 +47,9 @@ class ValidationFactoryTest extends TestCase
         $factory->extendImplicit('dependent', $noop3, 'dependent!');
         $factory->setPresenceVerifier($presence);
         $validator = $factory->make([], []);
-        $this->assertEquals(['foo' => $noop1, 'implicit' => $noop2, 'dependent' => $noop3], $validator->extensions);
-        $this->assertEquals(['foo' => 'foo!', 'implicit' => 'implicit!', 'dependent' => 'dependent!'], $validator->fallbackMessages);
-        $this->assertEquals($presence, $validator->getPresenceVerifier());
+        $this->assertSame(['foo' => $noop1, 'implicit' => $noop2, 'dependent' => $noop3], $validator->extensions);
+        $this->assertSame(['foo' => 'foo!', 'implicit' => 'implicit!', 'dependent' => 'dependent!'], $validator->fallbackMessages);
+        $this->assertSame($presence, $validator->getPresenceVerifier());
     }
 
     public function testValidateCallsValidateOnTheValidator()
@@ -69,7 +69,7 @@ class ValidationFactoryTest extends TestCase
             ['foo' => 'required']
         );
 
-        $this->assertEquals(['foo' => 'bar'], $validated);
+        $this->assertSame(['foo' => 'bar'], $validated);
     }
 
     public function testCustomResolverIsCalled()
@@ -85,9 +85,9 @@ class ValidationFactoryTest extends TestCase
         $validator = $factory->make(['foo' => 'bar'], ['baz' => 'boom']);
 
         $this->assertTrue($_SERVER['__validator.factory']);
-        $this->assertEquals($translator, $validator->getTranslator());
-        $this->assertEquals(['foo' => 'bar'], $validator->getData());
-        $this->assertEquals(['baz' => ['boom']], $validator->getRules());
+        $this->assertSame($translator, $validator->getTranslator());
+        $this->assertSame(['foo' => 'bar'], $validator->getData());
+        $this->assertSame(['baz' => ['boom']], $validator->getRules());
         unset($_SERVER['__validator.factory']);
     }
 

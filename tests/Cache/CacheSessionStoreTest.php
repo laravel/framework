@@ -43,7 +43,7 @@ class CacheSessionStoreTest extends TestCase
         ], 10);
         $this->assertTrue($result);
         $this->assertTrue($resultMany);
-        $this->assertEquals([
+        $this->assertSame([
             'foo' => 'bar',
             'fizz' => 'buz',
             'quz' => 'baz',
@@ -102,12 +102,12 @@ class CacheSessionStoreTest extends TestCase
         $store = new SessionStore(self::getSession());
         $store->put('foo', 1, 10);
         $result = $store->increment('foo');
-        $this->assertEquals(2, $result);
-        $this->assertEquals(2, $store->get('foo'));
+        $this->assertSame(2, $result);
+        $this->assertSame(2, $store->get('foo'));
 
         $result = $store->increment('foo', 2);
-        $this->assertEquals(4, $result);
-        $this->assertEquals(4, $store->get('foo'));
+        $this->assertSame(4, $result);
+        $this->assertSame(4, $store->get('foo'));
     }
 
     public function testValuesGetCastedByIncrementOrDecrement()
@@ -115,13 +115,13 @@ class CacheSessionStoreTest extends TestCase
         $store = new SessionStore(self::getSession());
         $store->put('foo', '1', 10);
         $result = $store->increment('foo');
-        $this->assertEquals(2, $result);
-        $this->assertEquals(2, $store->get('foo'));
+        $this->assertSame(2, $result);
+        $this->assertSame(2, $store->get('foo'));
 
         $store->put('bar', '1', 10);
         $result = $store->decrement('bar');
-        $this->assertEquals(0, $result);
-        $this->assertEquals(0, $store->get('bar'));
+        $this->assertSame(0, $result);
+        $this->assertSame(0, $store->get('bar'));
     }
 
     public function testIncrementNonNumericValues()
@@ -129,20 +129,20 @@ class CacheSessionStoreTest extends TestCase
         $store = new SessionStore(self::getSession());
         $store->put('foo', 'I am string', 10);
         $result = $store->increment('foo');
-        $this->assertEquals(1, $result);
-        $this->assertEquals(1, $store->get('foo'));
+        $this->assertSame(1, $result);
+        $this->assertSame(1, $store->get('foo'));
     }
 
     public function testNonExistingKeysCanBeIncremented()
     {
         $store = new SessionStore(self::getSession());
         $result = $store->increment('foo');
-        $this->assertEquals(1, $result);
-        $this->assertEquals(1, $store->get('foo'));
+        $this->assertSame(1, $result);
+        $this->assertSame(1, $store->get('foo'));
 
         // Will be there forever
         Carbon::setTestNow(Carbon::now()->addCentury());
-        $this->assertEquals(1, $store->get('foo'));
+        $this->assertSame(1, $store->get('foo'));
     }
 
     public function testExpiredKeysAreIncrementedLikeNonExistingKeys()
@@ -155,7 +155,7 @@ class CacheSessionStoreTest extends TestCase
         Carbon::setTestNow($now->addSeconds(10)->addSecond());
         $result = $store->increment('foo');
 
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testValuesCanBeDecremented()
@@ -163,12 +163,12 @@ class CacheSessionStoreTest extends TestCase
         $store = new SessionStore(self::getSession());
         $store->put('foo', 1, 10);
         $result = $store->decrement('foo');
-        $this->assertEquals(0, $result);
-        $this->assertEquals(0, $store->get('foo'));
+        $this->assertSame(0, $result);
+        $this->assertSame(0, $store->get('foo'));
 
         $result = $store->decrement('foo', 2);
-        $this->assertEquals(-2, $result);
-        $this->assertEquals(-2, $store->get('foo'));
+        $this->assertSame(-2, $result);
+        $this->assertSame(-2, $store->get('foo'));
     }
 
     public function testItemsCanBeRemoved()
@@ -225,7 +225,7 @@ class CacheSessionStoreTest extends TestCase
         $store = new SessionStore(self::getSession());
         $store->put('foo', 'bar', 10);
 
-        $this->assertEquals([
+        $this->assertSame([
             'foo' => ['value' => 'bar', 'expiresAt' => $now->addSeconds(10)->getPreciseTimestamp(3) / 1000],
         ], $store->all());
     }

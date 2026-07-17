@@ -46,7 +46,7 @@ class EloquentDeleteTest extends DatabaseTestCase
         // Test simple delete with limit (no join)
         Post::query()->latest('id')->limit($deleteLimit)->delete();
 
-        $this->assertEquals($totalPosts - $deleteLimit, Post::query()->count());
+        $this->assertSame($totalPosts - $deleteLimit, Post::query()->count());
     }
 
     public function testDeleteUseLimitWithJoins(): void
@@ -75,7 +75,7 @@ class EloquentDeleteTest extends DatabaseTestCase
             ->limit($deleteLimit)
             ->delete();
 
-        $this->assertEquals($totalPosts - $deleteLimit, Post::query()->count());
+        $this->assertSame($totalPosts - $deleteLimit, Post::query()->count());
     }
 
     public function testDeleteWithLimitAndJoinThrowsExceptionOnMySql(): void
@@ -111,7 +111,7 @@ class EloquentDeleteTest extends DatabaseTestCase
 
         $role->forceDelete();
 
-        $this->assertEquals($role->id, RoleObserver::$model->id);
+        $this->assertSame($role->id, RoleObserver::$model->id);
     }
 
     public function testForceDeletingEventIsFired()
@@ -122,7 +122,7 @@ class EloquentDeleteTest extends DatabaseTestCase
 
         $role->forceDelete();
 
-        $this->assertEquals($role->id, RoleObserver::$model->id);
+        $this->assertSame($role->id, RoleObserver::$model->id);
     }
 
     public function testDeleteQuietly()
@@ -168,21 +168,21 @@ class EloquentDeleteTest extends DatabaseTestCase
         $_SERVER['destroy'] = [];
         PostStringyKey::destroy(1, 2, 3, 4);
 
-        $this->assertEquals([1, 2], $_SERVER['destroy']['retrieved']);
-        $this->assertEquals([1, 2], $_SERVER['destroy']['deleting']);
-        $this->assertEquals([1, 2], $_SERVER['destroy']['deleted']);
+        $this->assertSame([1, 2], $_SERVER['destroy']['retrieved']);
+        $this->assertSame([1, 2], $_SERVER['destroy']['deleting']);
+        $this->assertSame([1, 2], $_SERVER['destroy']['deleted']);
 
         $logs = PostStringyKey::query()->getConnection()->getQueryLog();
 
-        $this->assertEquals(0, PostStringyKey::query()->count());
+        $this->assertSame(0, PostStringyKey::query()->count());
 
         $this->assertStringStartsWith('select * from "my_posts" where "my_id" in (', str_replace(['`', '[', ']'], '"', $logs[0]['query']));
 
         $this->assertStringStartsWith('delete from "my_posts" where "my_id" = ', str_replace(['`', '[', ']'], '"', $logs[1]['query']));
-        $this->assertEquals([1], $logs[1]['bindings']);
+        $this->assertSame([1], $logs[1]['bindings']);
 
         $this->assertStringStartsWith('delete from "my_posts" where "my_id" = ', str_replace(['`', '[', ']'], '"', $logs[2]['query']));
-        $this->assertEquals([2], $logs[2]['bindings']);
+        $this->assertSame([2], $logs[2]['bindings']);
 
         // Total of 3 queries.
         $this->assertCount(3, $logs);

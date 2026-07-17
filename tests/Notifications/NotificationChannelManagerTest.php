@@ -271,7 +271,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance('queue.routes', $queueRoutes);
         $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) use ($mockedMessageGroupId) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
-            $this->assertEquals($mockedMessageGroupId, $job->messageGroup);
+            $this->assertSame($mockedMessageGroupId, $job->messageGroup);
 
             return true;
         });
@@ -301,7 +301,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance('queue.routes', $queueRoutes);
         $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) use ($mockedMessageGroupId) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
-            $this->assertEquals($mockedMessageGroupId, $job->messageGroup);
+            $this->assertSame($mockedMessageGroupId, $job->messageGroup);
 
             return true;
         });
@@ -329,7 +329,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance('queue.routes', $queueRoutes);
         $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) use ($mockedMessageGroupSet) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
-            $this->assertEquals($mockedMessageGroupSet[$job->channels[0]], $job->messageGroup);
+            $this->assertSame($mockedMessageGroupSet[$job->channels[0]], $job->messageGroup);
 
             return true;
         });
@@ -355,7 +355,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance('queue.routes', $queueRoutes = m::mock());
         $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) use ($mockedMessageGroupSet) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
-            $this->assertEquals($mockedMessageGroupSet[$job->channels[0]], $job->messageGroup);
+            $this->assertSame($mockedMessageGroupSet[$job->channels[0]], $job->messageGroup);
 
             return true;
         });
@@ -381,7 +381,7 @@ class NotificationChannelManagerTest extends TestCase
         $bus->shouldReceive('dispatch')->once()->withArgs(function ($job) use ($mockedDeduplicator) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
             $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
-            $this->assertEquals($mockedDeduplicator, $job->deduplicator->getClosure());
+            $this->assertSame($mockedDeduplicator, $job->deduplicator->getClosure());
 
             return true;
         });
@@ -410,7 +410,7 @@ class NotificationChannelManagerTest extends TestCase
         $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) use ($mockedDeduplicatorSet) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
             $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
-            $this->assertEquals($mockedDeduplicatorSet[$job->channels[0]], $job->deduplicator->getClosure());
+            $this->assertSame($mockedDeduplicatorSet[$job->channels[0]], $job->deduplicator->getClosure());
 
             return true;
         });
@@ -433,7 +433,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance('queue.routes', $queueRoutes = m::mock());
         $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
-            $this->assertEquals($job->notification->deduplicatorResults[$job->channels[0]], call_user_func($job->deduplicator, '', null));
+            $this->assertSame($job->notification->deduplicatorResults[$job->channels[0]], call_user_func($job->deduplicator, '', null));
 
             return true;
         });

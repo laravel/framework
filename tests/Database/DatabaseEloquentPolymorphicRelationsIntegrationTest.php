@@ -102,8 +102,8 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
 
         $this->assertTrue($post->relationLoaded('tags'));
         $this->assertTrue($tag->relationLoaded('posts'));
-        $this->assertEquals($tag->id, $post->tags->first()->id);
-        $this->assertEquals($post->id, $tag->posts->first()->id);
+        $this->assertSame($tag->id, $post->tags->first()->id);
+        $this->assertSame($post->id, $tag->posts->first()->id);
     }
 
     public function testChunkById()
@@ -122,8 +122,8 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
             $iterations++;
         });
 
-        $this->assertEquals(2, $iterations);
-        $this->assertEquals(3, $count);
+        $this->assertSame(2, $iterations);
+        $this->assertSame(3, $count);
     }
 
     /**

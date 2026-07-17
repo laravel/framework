@@ -12,7 +12,7 @@ breeze
         $expected = '<?php if(name(foo(bar))): ?>
 breeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testSwitchstatementsAreCompiled()
@@ -51,6 +51,6 @@ foo
 <?php case (2): ?>
 bar
 <?php endswitch; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

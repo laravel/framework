@@ -43,7 +43,7 @@ class EloquentMorphCountLazyEagerLoadingTest extends DatabaseTestCase
         ]);
 
         $this->assertTrue($comment->relationLoaded('commentable'));
-        $this->assertEquals(2, $comment->commentable->likes_count);
+        $this->assertSame(2, $comment->commentable->likes_count);
     }
 }
 

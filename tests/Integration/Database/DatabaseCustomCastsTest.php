@@ -51,9 +51,9 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
 
         $model = $model->fresh();
 
-        $this->assertEquals(['name' => 'Taylor'], $model->array_object->toArray());
-        $this->assertEquals(['name' => 'Taylor'], $model->array_object_json->toArray());
-        $this->assertEquals(['name' => 'Taylor'], $model->collection->toArray());
+        $this->assertSame(['name' => 'Taylor'], $model->array_object->toArray());
+        $this->assertSame(['name' => 'Taylor'], $model->array_object_json->toArray());
+        $this->assertSame(['name' => 'Taylor'], $model->collection->toArray());
         $this->assertSame('Taylor', (string) $model->stringable);
         $this->assertTrue(Hash::check('secret', $model->password));
 
@@ -67,7 +67,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
 
         $model = $model->fresh();
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'name' => 'Taylor',
                 'age' => 34,
@@ -76,7 +76,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             $model->array_object->toArray()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'name' => 'Taylor',
                 'age' => 34,
@@ -100,9 +100,9 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
 
         $model = $model->fresh();
 
-        $this->assertEquals(['name' => 'Taylor'], $model->array_object->toArray());
-        $this->assertEquals(['name' => 'Taylor'], $model->array_object_json->toArray());
-        $this->assertEquals(['name' => 'Taylor'], $model->collection->toArray());
+        $this->assertSame(['name' => 'Taylor'], $model->array_object->toArray());
+        $this->assertSame(['name' => 'Taylor'], $model->array_object_json->toArray());
+        $this->assertSame(['name' => 'Taylor'], $model->collection->toArray());
         $this->assertSame('Taylor', (string) $model->stringable);
         $this->assertTrue(Hash::check('secret', $model->password));
     }
@@ -137,7 +137,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
 
         $model = $model->fresh();
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'name' => 'Taylor',
                 'meta' => ['title' => 'Developer'],
@@ -145,7 +145,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             $model->array_object->toArray()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'name' => 'Taylor',
                 'meta' => ['title' => 'Developer'],

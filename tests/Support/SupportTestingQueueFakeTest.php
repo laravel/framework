@@ -89,20 +89,20 @@ class SupportTestingQueueFakeTest extends TestCase
 
     public function testQueueSize()
     {
-        $this->assertEquals(0, $this->fake->size());
+        $this->assertSame(0, $this->fake->size());
 
         $this->fake->push($this->job);
 
-        $this->assertEquals(1, $this->fake->size());
+        $this->assertSame(1, $this->fake->size());
     }
 
     public function testQueueSizeAcceptsUnitEnums()
     {
         $this->fake->push($this->job, '', QueueNameEnumStub::Foo);
 
-        $this->assertEquals(1, $this->fake->size('foo'));
-        $this->assertEquals(1, $this->fake->size(QueueNameEnumStub::Foo));
-        $this->assertEquals(0, $this->fake->size(QueueNameEnumStub::Bar));
+        $this->assertSame(1, $this->fake->size('foo'));
+        $this->assertSame(1, $this->fake->size(QueueNameEnumStub::Foo));
+        $this->assertSame(0, $this->fake->size(QueueNameEnumStub::Bar));
     }
 
     public function testAssertNotPushed()

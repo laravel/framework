@@ -33,7 +33,7 @@ class CanConfigureMigrationCommandsTest extends TestCase
             '--seed' => false,
         ];
 
-        $this->assertEquals($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
+        $this->assertSame($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
     }
 
     public function testMigrateFreshUsingWithPropertySets(): void
@@ -48,7 +48,7 @@ class CanConfigureMigrationCommandsTest extends TestCase
 
         $this->traitObject->dropViews = true;
 
-        $this->assertEquals($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
+        $this->assertSame($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
 
         $expected = [
             '--drop-views' => false,
@@ -59,7 +59,7 @@ class CanConfigureMigrationCommandsTest extends TestCase
         $this->traitObject->dropViews = false;
         $this->traitObject->dropTypes = true;
 
-        $this->assertEquals($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
+        $this->assertSame($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
 
         $expected = [
             '--drop-views' => true,
@@ -70,7 +70,7 @@ class CanConfigureMigrationCommandsTest extends TestCase
         $this->traitObject->dropViews = true;
         $this->traitObject->dropTypes = true;
 
-        $this->assertEquals($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
+        $this->assertSame($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
     }
 }
 

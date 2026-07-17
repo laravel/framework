@@ -53,11 +53,11 @@ class ThrottleRequestsTest extends TestCase
             $this->withoutExceptionHandling()->get('/');
         } catch (Throwable $e) {
             $this->assertInstanceOf(ThrottleRequestsException::class, $e);
-            $this->assertEquals(429, $e->getStatusCode());
-            $this->assertEquals(2, $e->getHeaders()['X-RateLimit-Limit']);
-            $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
-            $this->assertEquals(2, $e->getHeaders()['Retry-After']);
-            $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
+            $this->assertSame(429, $e->getStatusCode());
+            $this->assertSame(2, $e->getHeaders()['X-RateLimit-Limit']);
+            $this->assertSame(0, $e->getHeaders()['X-RateLimit-Remaining']);
+            $this->assertSame(2, $e->getHeaders()['Retry-After']);
+            $this->assertSame(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
         }
     }
 
@@ -91,11 +91,11 @@ class ThrottleRequestsTest extends TestCase
             $this->withoutExceptionHandling()->get('/');
         } catch (Throwable $e) {
             $this->assertInstanceOf(ThrottleRequestsException::class, $e);
-            $this->assertEquals(429, $e->getStatusCode());
-            $this->assertEquals(2, $e->getHeaders()['X-RateLimit-Limit']);
-            $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
-            $this->assertEquals(2, $e->getHeaders()['Retry-After']);
-            $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
+            $this->assertSame(429, $e->getStatusCode());
+            $this->assertSame(2, $e->getHeaders()['X-RateLimit-Limit']);
+            $this->assertSame(0, $e->getHeaders()['X-RateLimit-Remaining']);
+            $this->assertSame(2, $e->getHeaders()['Retry-After']);
+            $this->assertSame(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
         }
     }
 
@@ -377,11 +377,11 @@ class ThrottleRequestsTest extends TestCase
             $this->withoutExceptionHandling()->actingAs($user)->get('/');
         } catch (Throwable $e) {
             $this->assertInstanceOf(ThrottleRequestsException::class, $e);
-            $this->assertEquals(429, $e->getStatusCode());
-            $this->assertEquals(1, $e->getHeaders()['X-RateLimit-Limit']);
-            $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
-            $this->assertEquals(2, $e->getHeaders()['Retry-After']);
-            $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
+            $this->assertSame(429, $e->getStatusCode());
+            $this->assertSame(1, $e->getHeaders()['X-RateLimit-Limit']);
+            $this->assertSame(0, $e->getHeaders()['X-RateLimit-Remaining']);
+            $this->assertSame(2, $e->getHeaders()['Retry-After']);
+            $this->assertSame(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
         }
     }
 
@@ -406,11 +406,11 @@ class ThrottleRequestsTest extends TestCase
             $this->withoutExceptionHandling()->actingAs($user)->get('/');
         } catch (Throwable $e) {
             $this->assertInstanceOf(ThrottleRequestsException::class, $e);
-            $this->assertEquals(429, $e->getStatusCode());
-            $this->assertEquals(1, $e->getHeaders()['X-RateLimit-Limit']);
-            $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
-            $this->assertEquals(2, $e->getHeaders()['Retry-After']);
-            $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
+            $this->assertSame(429, $e->getStatusCode());
+            $this->assertSame(1, $e->getHeaders()['X-RateLimit-Limit']);
+            $this->assertSame(0, $e->getHeaders()['X-RateLimit-Remaining']);
+            $this->assertSame(2, $e->getHeaders()['Retry-After']);
+            $this->assertSame(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
         }
     }
 

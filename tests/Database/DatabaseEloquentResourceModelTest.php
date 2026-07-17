@@ -55,7 +55,7 @@ class DatabaseEloquentResourceModelTest extends TestCase
     public function testItCanGuessResourceName()
     {
         $model = new EloquentResourceTestResourceModel();
-        $this->assertEquals([
+        $this->assertSame([
             'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModelResource',
             'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModel',
         ], $model::guessResourceName());

@@ -41,13 +41,13 @@ class BroadcasterTest extends TestCase
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', $callback);
-        $this->assertEquals(['model.1.instance', 'something'], $parameters);
+        $this->assertSame(['model.1.instance', 'something'], $parameters);
 
         $callback = function ($user, BroadcasterTestEloquentModelStub $model, BroadcasterTestEloquentModelStub $model2, $something) {
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{model2}.{nonModel}', 'asd.1.uid.something', $callback);
-        $this->assertEquals(['model.1.instance', 'model.uid.instance', 'something'], $parameters);
+        $this->assertSame(['model.1.instance', 'model.uid.instance', 'something'], $parameters);
 
         $callback = function ($user) {
             //
@@ -73,14 +73,14 @@ class BroadcasterTest extends TestCase
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('something.{model}', 'something.1', $callback);
-        $this->assertEquals(['bound'], $parameters);
+        $this->assertSame(['bound'], $parameters);
         Container::setInstance(new Container);
     }
 
     public function testCanUseChannelClasses()
     {
         $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', DummyBroadcastingChannel::class);
-        $this->assertEquals(['model.1.instance', 'something'], $parameters);
+        $this->assertSame(['model.1.instance', 'something'], $parameters);
     }
 
     public function testModelRouteBinding()
@@ -96,7 +96,7 @@ class BroadcasterTest extends TestCase
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('something.{model}', 'something.1', $callback);
-        $this->assertEquals(['model.1.instance'], $parameters);
+        $this->assertSame(['model.1.instance'], $parameters);
         Container::setInstance(new Container);
     }
 
@@ -148,7 +148,7 @@ class BroadcasterTest extends TestCase
             //
         }, $options);
 
-        $this->assertEquals(
+        $this->assertSame(
             $options,
             $this->broadcaster->retrieveChannelOptions('somechannel')
         );
@@ -161,7 +161,7 @@ class BroadcasterTest extends TestCase
             //
         }, $options);
 
-        $this->assertEquals(
+        $this->assertSame(
             $options,
             $this->broadcaster->retrieveChannelOptions('somechannel.23.test.mytext')
         );
@@ -177,7 +177,7 @@ class BroadcasterTest extends TestCase
             //
         }, $options);
 
-        $this->assertEquals(
+        $this->assertSame(
             $options,
             $this->broadcaster->retrieveChannelOptions('someotherchannel')
         );
@@ -190,7 +190,7 @@ class BroadcasterTest extends TestCase
             //
         }, $options);
 
-        $this->assertEquals(
+        $this->assertSame(
             [],
             $this->broadcaster->retrieveChannelOptions('someotherchannel')
         );

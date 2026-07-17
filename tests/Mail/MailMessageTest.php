@@ -84,7 +84,7 @@ class MailMessageTest extends TestCase
     public function testPriorityMethod(): void
     {
         $this->assertSame($this->message, $this->message->priority(1));
-        $this->assertEquals(1, $this->message->getSymfonyMessage()->getPriority());
+        $this->assertSame(1, $this->message->getSymfonyMessage()->getPriority());
     }
 
     public function testBasicAttachment(): void

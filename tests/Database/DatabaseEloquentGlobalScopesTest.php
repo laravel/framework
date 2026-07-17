@@ -33,7 +33,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentGlobalScopesTestModel;
         $query = $model->newQuery();
         $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertSame([1], $query->getBindings());
     }
 
     public function testGlobalScopeCanBeRemoved()
@@ -49,7 +49,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentClassNameGlobalScopesTestModel;
         $query = $model->newQuery();
         $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertSame([1], $query->getBindings());
     }
 
     public function testGlobalScopeInAttributeIsApplied()
@@ -57,7 +57,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentGlobalScopeInAttributeTestModel;
         $query = $model->newQuery();
         $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertSame([1], $query->getBindings());
     }
 
     public function testGlobalScopeInInheritedAttributeIsApplied()
@@ -65,7 +65,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentGlobalScopeInInheritedAttributeTestModel;
         $query = $model->newQuery();
         $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertSame([1], $query->getBindings());
     }
 
     public function testGlobalScopeInParentClassAttributeIsApplied()
@@ -73,7 +73,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentGlobalScopeInAttributeChildTestModel;
         $query = $model->newQuery();
         $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertSame([1], $query->getBindings());
     }
 
     public function testClosureGlobalScopeIsApplied()
@@ -81,7 +81,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery();
         $this->assertSame('select * from "table" where "active" = ? order by "name" asc', $query->toSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertSame([1], $query->getBindings());
     }
 
     public function testGlobalScopesCanBeRegisteredViaArray()
@@ -89,7 +89,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentGlobalScopesArrayTestModel;
         $query = $model->newQuery();
         $this->assertSame('select * from "table" where "active" = ? order by "name" asc', $query->toSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertSame([1], $query->getBindings());
     }
 
     public function testClosureGlobalScopeCanBeRemoved()
@@ -105,7 +105,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery();
         $this->assertSame('select * from "table" where "active" = ? order by "name" asc', $query->toSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertSame([1], $query->getBindings());
 
         $query->withoutGlobalScope('active_scope');
         $this->assertSame('select * from "table" order by "name" asc', $query->toSql());
@@ -129,11 +129,11 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScopesExcept(['active_scope']);
         $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertSame([1], $query->getBindings());
 
         $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopesExcept(['active_scope']);
         $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
-        $this->assertEquals([1], $query->getBindings());
+        $this->assertSame([1], $query->getBindings());
     }
 
     public function testGlobalScopesWithOrWhereConditionsAreNested()
@@ -142,11 +142,11 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
         $query = $model->newQuery();
         $this->assertSame('select "email", "password" from "table" where ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
-        $this->assertEquals(['taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
+        $this->assertSame(['taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
 
         $query = $model->newQuery()->where('col1', 'val1')->orWhere('col2', 'val2');
         $this->assertSame('select "email", "password" from "table" where ("col1" = ? or "col2" = ?) and ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());
-        $this->assertEquals(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
+        $this->assertSame(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
     }
 
     public function testRegularScopesWithOrWhereConditionsAreNested()
@@ -154,7 +154,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->orWhere('bar', 'bar')->approved();
 
         $this->assertSame('select * from "table" where ("foo" = ? or "bar" = ?) and ("approved" = ? or "should_approve" = ?)', $query->toSql());
-        $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
+        $this->assertSame(['foo', 'bar', 1, 0], $query->getBindings());
     }
 
     public function testScopesStartingWithOrBooleanArePreserved()
@@ -162,7 +162,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->orWhere('bar', 'bar')->orApproved();
 
         $this->assertSame('select * from "table" where ("foo" = ? or "bar" = ?) or ("approved" = ? or "should_approve" = ?)', $query->toSql());
-        $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
+        $this->assertSame(['foo', 'bar', 1, 0], $query->getBindings());
     }
 
     public function testHasQueryWhereBothModelsHaveGlobalScopes()
@@ -172,8 +172,8 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $subQuery = 'select * from "table" where "table2"."id" = "table"."related_id" and "foo" = ? and "active" = ?';
         $mainQuery = 'select * from "table2" where exists ('.$subQuery.') and "bar" = ? and "active" = ? order by "name" asc';
 
-        $this->assertEquals($mainQuery, $query->toSql());
-        $this->assertEquals(['bar', 1, 'baz', 1], $query->getBindings());
+        $this->assertSame($mainQuery, $query->toSql());
+        $this->assertSame(['bar', 1, 'baz', 1], $query->getBindings());
     }
 
     public function testRegularScopesThatRemoveGlobalScopes()
@@ -181,7 +181,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $query = EloquentClosureGlobalScopesTestModel::where('foo', 'foo')->approved()->notApproved();
 
         $this->assertSame('select * from "table" where "foo" = ? and ("approved" = ? or "should_approve" = ?) and ("approved" = ? or "should_approve" = ?) order by "name" asc', $query->toSql());
-        $this->assertEquals(['foo', 1, 0, 0, 1], $query->getBindings());
+        $this->assertSame(['foo', 1, 0, 0, 1], $query->getBindings());
     }
 
     public function testRegularScopesThatRemoveGlobalScopesCalledInNestedWhereCondition()
@@ -194,7 +194,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         });
 
         $this->assertSame('select * from "table" where "foo" = ? and (("approved" = ? or "should_approve" = ?) or (("approved" = ? or "should_approve" = ?))) order by "name" asc', $query->toSql());
-        $this->assertEquals(['foo', 1, 0, 0, 1], $query->getBindings());
+        $this->assertSame(['foo', 1, 0, 0, 1], $query->getBindings());
     }
 
     public function testRemovingGlobalScopeInNestedWhereCondition()
@@ -205,7 +205,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         });
 
         $this->assertSame('select * from "table" where "foo" = ? and (("approved" = ? or "should_approve" = ?)) order by "name" asc', $query->toSql());
-        $this->assertEquals(['foo', 1, 0], $query->getBindings());
+        $this->assertSame(['foo', 1, 0], $query->getBindings());
     }
 }
 

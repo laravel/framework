@@ -8,7 +8,7 @@ class BladeLangTest extends AbstractBladeTestCase
     {
         $string = "Foo @lang(function_call('foo(blah)')) bar";
         $expected = "Foo <?php echo app('translator')->get(function_call('foo(blah)')); ?> bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testLanguageAndChoicesAreCompiled()

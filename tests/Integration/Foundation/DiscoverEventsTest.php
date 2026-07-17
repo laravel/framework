@@ -32,7 +32,7 @@ class DiscoverEventsTest extends TestCase
 
         $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/Listeners', getcwd());
 
-        $this->assertEquals([
+        $this->assertSame([
             EventOne::class => [
                 Listener::class.'@handle',
                 Listener::class.'@handleEventOne',
@@ -49,7 +49,7 @@ class DiscoverEventsTest extends TestCase
 
         $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/UnionListeners', getcwd());
 
-        $this->assertEquals([
+        $this->assertSame([
             EventOne::class => [
                 UnionListener::class.'@handle',
             ],
@@ -66,7 +66,7 @@ class DiscoverEventsTest extends TestCase
             __DIR__.'/Fixtures/EventDiscovery/UnionListeners',
         ], getcwd());
 
-        $this->assertEquals([
+        $this->assertSame([
             EventOne::class => [
                 Listener::class.'@handle',
                 Listener::class.'@handleEventOne',
@@ -86,7 +86,7 @@ class DiscoverEventsTest extends TestCase
 
         $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/ShouldBeDiscoveredListeners', getcwd());
 
-        $this->assertEquals([
+        $this->assertSame([
             EventOne::class => [
                 RegisteredListener::class.'@handle',
             ],
@@ -114,7 +114,7 @@ class DiscoverEventsTest extends TestCase
 
         $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/Listeners', getcwd());
 
-        $this->assertEquals([
+        $this->assertSame([
             EventOne::class => [
                 Listener::class.'@handle',
                 Listener::class.'@handleEventOne',

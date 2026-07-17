@@ -16,7 +16,7 @@ class ViewComponentTest extends TestCase
 
         $variables = $component->data();
 
-        $this->assertEquals(10, $variables['votes']);
+        $this->assertSame(10, $variables['votes']);
         $this->assertSame('world', $variables['hello']());
         $this->assertSame('taylor', $variables['hello']('taylor'));
     }
@@ -91,18 +91,18 @@ class ViewComponentTest extends TestCase
     {
         $component = new TestSampleViewComponent;
 
-        $this->assertEquals(0, $component->counter);
-        $this->assertEquals(0, TestSampleViewComponent::$publicStaticCounter);
+        $this->assertSame(0, $component->counter);
+        $this->assertSame(0, TestSampleViewComponent::$publicStaticCounter);
         $variables = $component->data();
-        $this->assertEquals(0, $component->counter);
-        $this->assertEquals(0, TestSampleViewComponent::$publicStaticCounter);
+        $this->assertSame(0, $component->counter);
+        $this->assertSame(0, TestSampleViewComponent::$publicStaticCounter);
 
         $this->assertSame('noArgs val', $variables['noArgs']());
         $this->assertSame('noArgs val', (string) $variables['noArgs']);
-        $this->assertEquals(0, $variables['counter']);
+        $this->assertSame(0, $variables['counter']);
 
         // make sure non-public members are not invoked nor counted.
-        $this->assertEquals(2, $component->counter);
+        $this->assertSame(2, $component->counter);
         $this->assertArrayHasKey('publicHello', $variables);
         $this->assertArrayNotHasKey('protectedHello', $variables);
         $this->assertArrayNotHasKey('privateHello', $variables);
@@ -112,11 +112,11 @@ class ViewComponentTest extends TestCase
         $this->assertArrayNotHasKey('privateCounter', $variables);
 
         // test each time we invoke data(), the non-argument methods aren't invoked
-        $this->assertEquals(2, $component->counter);
+        $this->assertSame(2, $component->counter);
         $component->data();
-        $this->assertEquals(2, $component->counter);
+        $this->assertSame(2, $component->counter);
         $component->data();
-        $this->assertEquals(2, $component->counter);
+        $this->assertSame(2, $component->counter);
     }
 
     public function testItIgnoresExceptedMethodsAndProperties()

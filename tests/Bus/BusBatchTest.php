@@ -158,8 +158,8 @@ class BusBatchTest extends TestCase
 
         $batch = $batch->add([$job, $secondJob, $thirdJob]);
 
-        $this->assertEquals(3, $batch->totalJobs);
-        $this->assertEquals(3, $batch->pendingJobs);
+        $this->assertSame(3, $batch->totalJobs);
+        $this->assertSame(3, $batch->pendingJobs);
         $this->assertIsString($job->batchId);
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
     }
@@ -214,8 +214,8 @@ class BusBatchTest extends TestCase
         $batch->totalJobs = 10;
         $batch->pendingJobs = 4;
 
-        $this->assertEquals(6, $batch->processedJobs());
-        $this->assertEquals(60, $batch->progress());
+        $this->assertSame(6, $batch->processedJobs());
+        $this->assertSame(60, $batch->progress());
     }
 
     public function test_successful_jobs_can_be_recorded()
@@ -241,7 +241,7 @@ class BusBatchTest extends TestCase
         $connection->shouldReceive('bulk')->once();
 
         $batch = $batch->add([$job, $secondJob]);
-        $this->assertEquals(2, $batch->pendingJobs);
+        $this->assertSame(2, $batch->pendingJobs);
 
         $batch->recordSuccessfulJob('test-id');
         $batch->recordSuccessfulJob('test-id');
@@ -251,11 +251,11 @@ class BusBatchTest extends TestCase
         $this->assertInstanceOf(Batch::class, $_SERVER['__then.batch']);
 
         $batch = $batch->fresh();
-        $this->assertEquals(0, $batch->pendingJobs);
+        $this->assertSame(0, $batch->pendingJobs);
         $this->assertTrue($batch->finished());
-        $this->assertEquals(1, $_SERVER['__finally.count']);
-        $this->assertEquals(2, $_SERVER['__progress.count']);
-        $this->assertEquals(1, $_SERVER['__then.count']);
+        $this->assertSame(1, $_SERVER['__finally.count']);
+        $this->assertSame(2, $_SERVER['__progress.count']);
+        $this->assertSame(1, $_SERVER['__then.count']);
     }
 
     public function test_batch_finished_event_is_dispatched()
@@ -382,7 +382,7 @@ class BusBatchTest extends TestCase
         $connection->shouldReceive('bulk')->once();
 
         $batch = $batch->add([$job, $secondJob]);
-        $this->assertEquals(2, $batch->pendingJobs);
+        $this->assertSame(2, $batch->pendingJobs);
 
         $batch->recordFailedJob('test-id', new RuntimeException('Something went wrong.'));
         $batch->recordFailedJob('test-id', new RuntimeException('Something else went wrong.'));
@@ -391,13 +391,13 @@ class BusBatchTest extends TestCase
         $this->assertFalse(isset($_SERVER['__then.batch']));
 
         $batch = $batch->fresh();
-        $this->assertEquals(2, $batch->pendingJobs);
-        $this->assertEquals(2, $batch->failedJobs);
+        $this->assertSame(2, $batch->pendingJobs);
+        $this->assertSame(2, $batch->failedJobs);
         $this->assertTrue($batch->finished());
         $this->assertTrue($batch->cancelled());
-        $this->assertEquals(1, $_SERVER['__finally.count']);
-        $this->assertEquals(0, $_SERVER['__progress.count']);
-        $this->assertEquals(1, $_SERVER['__catch.count']);
+        $this->assertSame(1, $_SERVER['__finally.count']);
+        $this->assertSame(0, $_SERVER['__progress.count']);
+        $this->assertSame(1, $_SERVER['__catch.count']);
         $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
 
@@ -424,7 +424,7 @@ class BusBatchTest extends TestCase
         $connection->shouldReceive('bulk')->once();
 
         $batch = $batch->add([$job, $secondJob]);
-        $this->assertEquals(2, $batch->pendingJobs);
+        $this->assertSame(2, $batch->pendingJobs);
 
         $batch->recordFailedJob('test-id', new RuntimeException('Something went wrong.'));
         $batch->recordFailedJob('test-id', new RuntimeException('Something else went wrong.'));
@@ -433,12 +433,12 @@ class BusBatchTest extends TestCase
         $this->assertFalse(isset($_SERVER['__then.batch']));
 
         $batch = $batch->fresh();
-        $this->assertEquals(2, $batch->pendingJobs);
-        $this->assertEquals(2, $batch->failedJobs);
+        $this->assertSame(2, $batch->pendingJobs);
+        $this->assertSame(2, $batch->failedJobs);
         $this->assertFalse($batch->finished());
         $this->assertFalse($batch->cancelled());
-        $this->assertEquals(1, $_SERVER['__catch.count']);
-        $this->assertEquals(2, $_SERVER['__progress.count']);
+        $this->assertSame(1, $_SERVER['__catch.count']);
+        $this->assertSame(2, $_SERVER['__progress.count']);
         $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
 
@@ -517,7 +517,7 @@ class BusBatchTest extends TestCase
         $this->assertSame($batch->id, $_SERVER['__failure3.batch_id']);
         $this->assertSame(Batch::class, $_SERVER['__failure3.batch_class']);
         $this->assertSame(RuntimeException::class, $_SERVER['__failure3.exception_class']);
-        $this->assertEquals(2, $_SERVER['__failure3.param_count']);
+        $this->assertSame(2, $_SERVER['__failure3.param_count']);
     }
 
     public function test_batch_can_be_cancelled()
@@ -631,8 +631,8 @@ class BusBatchTest extends TestCase
             [$chainHeadJob, $secondJob, $thirdJob],
         ]);
 
-        $this->assertEquals(3, $batch->totalJobs);
-        $this->assertEquals(3, $batch->pendingJobs);
+        $this->assertSame(3, $batch->totalJobs);
+        $this->assertSame(3, $batch->pendingJobs);
         $this->assertSame('test-queue', $chainHeadJob->chainQueue);
         $this->assertIsString($chainHeadJob->batchId);
         $this->assertIsString($secondJob->batchId);

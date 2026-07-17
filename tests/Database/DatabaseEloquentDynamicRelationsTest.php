@@ -16,8 +16,8 @@ class DatabaseEloquentDynamicRelationsTest extends TestCase
     {
         DynamicRelationModel::resolveRelationUsing('dynamicRel_2', fn () => new FakeHasManyRel);
         $model = new DynamicRelationModel;
-        $this->assertEquals(['many' => 'related'], $model->dynamicRel_2);
-        $this->assertEquals(['many' => 'related'], $model->getRelationValue('dynamicRel_2'));
+        $this->assertSame(['many' => 'related'], $model->dynamicRel_2);
+        $this->assertSame(['many' => 'related'], $model->getRelationValue('dynamicRel_2'));
     }
 
     public function testBasicDynamicRelationsOverride()
@@ -28,8 +28,8 @@ class DatabaseEloquentDynamicRelationsTest extends TestCase
 
         $model = new DynamicRelationModel;
         $this->assertInstanceOf(HasMany::class, $model->dynamicRelConflict());
-        $this->assertEquals(['many' => 'related'], $model->dynamicRelConflict);
-        $this->assertEquals(['many' => 'related'], $model->getRelationValue('dynamicRelConflict'));
+        $this->assertSame(['many' => 'related'], $model->dynamicRelConflict);
+        $this->assertSame(['many' => 'related'], $model->getRelationValue('dynamicRelConflict'));
         $this->assertTrue($model->isRelation('dynamicRelConflict'));
     }
 
@@ -43,7 +43,7 @@ class DatabaseEloquentDynamicRelationsTest extends TestCase
         $this->assertTrue($model4->isRelation('inheritedDynamicRel'));
         $this->assertFalse($model2->isRelation('inheritedDynamicRel'));
         $this->assertEquals($model->inheritedDynamicRel(), $model4->inheritedDynamicRel());
-        $this->assertEquals($model->inheritedDynamicRel, $model4->inheritedDynamicRel);
+        $this->assertSame($model->inheritedDynamicRel, $model4->inheritedDynamicRel);
     }
 
     public function testInheritedDynamicRelationsOverride()
@@ -66,8 +66,8 @@ class DatabaseEloquentDynamicRelationsTest extends TestCase
         // Dynamic relations can not override hard-coded methods.
         DynamicRelationModel::resolveRelationUsing('hardCodedRelation', fn ($m) => $m->hasOne(Related::class));
         $this->assertInstanceOf(HasMany::class, $model->hardCodedRelation());
-        $this->assertEquals(['many' => 'related'], $model->hardCodedRelation);
-        $this->assertEquals(['many' => 'related'], $model->getRelationValue('hardCodedRelation'));
+        $this->assertSame(['many' => 'related'], $model->hardCodedRelation);
+        $this->assertSame(['many' => 'related'], $model->getRelationValue('hardCodedRelation'));
         $this->assertTrue($model->isRelation('hardCodedRelation'));
     }
 

@@ -147,7 +147,7 @@ class QueueSqsQueueTest extends TestCase
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'DelaySeconds' => 5])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->later($now->addSeconds(5), $this->mockedJob, $this->mockedData, $this->queueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
@@ -160,7 +160,7 @@ class QueueSqsQueueTest extends TestCase
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'DelaySeconds' => $this->mockedDelay])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->later($this->mockedDelay, $this->mockedJob, $this->mockedData, $this->queueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
@@ -172,7 +172,7 @@ class QueueSqsQueueTest extends TestCase
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($this->mockedJob, $this->mockedData, $this->queueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
@@ -198,7 +198,7 @@ class QueueSqsQueueTest extends TestCase
 
         $size = $queue->size($this->queueName);
 
-        $this->assertEquals(6, $size); // 1 + 2 + 3
+        $this->assertSame(6, $size); // 1 + 2 + 3
     }
 
     public function testPendingSizeProperlyReadsSqsQueuePendingSize()
@@ -215,7 +215,7 @@ class QueueSqsQueueTest extends TestCase
             ],
         ]));
 
-        $this->assertEquals(1, $queue->pendingSize($this->queueName));
+        $this->assertSame(1, $queue->pendingSize($this->queueName));
 
         // Test missing attribute fallback
         $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
@@ -225,7 +225,7 @@ class QueueSqsQueueTest extends TestCase
             'Attributes' => [],
         ]));
 
-        $this->assertEquals(0, $queue->pendingSize($this->queueName));
+        $this->assertSame(0, $queue->pendingSize($this->queueName));
     }
 
     public function testDelayedSizeProperlyReadsSqsQueueDelayedSize()
@@ -242,7 +242,7 @@ class QueueSqsQueueTest extends TestCase
             ],
         ]));
 
-        $this->assertEquals(2, $queue->delayedSize($this->queueName));
+        $this->assertSame(2, $queue->delayedSize($this->queueName));
 
         // Test missing attribute fallback
         $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
@@ -252,7 +252,7 @@ class QueueSqsQueueTest extends TestCase
             'Attributes' => [],
         ]));
 
-        $this->assertEquals(0, $queue->delayedSize($this->queueName));
+        $this->assertSame(0, $queue->delayedSize($this->queueName));
     }
 
     public function testReservedSizeProperlyReadsSqsQueueReservedSize()
@@ -269,7 +269,7 @@ class QueueSqsQueueTest extends TestCase
             ],
         ]));
 
-        $this->assertEquals(3, $queue->reservedSize($this->queueName));
+        $this->assertSame(3, $queue->reservedSize($this->queueName));
 
         // Test missing attribute fallback
         $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
@@ -279,15 +279,15 @@ class QueueSqsQueueTest extends TestCase
             'Attributes' => [],
         ]));
 
-        $this->assertEquals(0, $queue->reservedSize($this->queueName));
+        $this->assertSame(0, $queue->reservedSize($this->queueName));
     }
 
     public function testGetQueueProperlyResolvesUrlWithPrefix()
     {
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
-        $this->assertEquals($this->queueUrl, $queue->getQueue(null));
+        $this->assertSame($this->queueUrl, $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
-        $this->assertEquals($queueUrl, $queue->getQueue('test'));
+        $this->assertSame($queueUrl, $queue->getQueue('test'));
     }
 
     public function testGetQueueProperlyResolvesFifoUrlWithPrefix()
@@ -295,17 +295,17 @@ class QueueSqsQueueTest extends TestCase
         $this->queueName = 'emails.fifo';
         $this->queueUrl = $this->prefix.$this->queueName;
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
-        $this->assertEquals($this->queueUrl, $queue->getQueue(null));
+        $this->assertSame($this->queueUrl, $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test.fifo';
-        $this->assertEquals($queueUrl, $queue->getQueue('test.fifo'));
+        $this->assertSame($queueUrl, $queue->getQueue('test.fifo'));
     }
 
     public function testGetQueueProperlyResolvesUrlWithoutPrefix()
     {
         $queue = new SqsQueue($this->sqs, $this->queueUrl);
-        $this->assertEquals($this->queueUrl, $queue->getQueue(null));
+        $this->assertSame($this->queueUrl, $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test';
-        $this->assertEquals($queueUrl, $queue->getQueue($queueUrl));
+        $this->assertSame($queueUrl, $queue->getQueue($queueUrl));
     }
 
     public function testGetQueueProperlyResolvesFifoUrlWithoutPrefix()
@@ -313,17 +313,17 @@ class QueueSqsQueueTest extends TestCase
         $this->queueName = 'emails.fifo';
         $this->queueUrl = $this->prefix.$this->queueName;
         $queue = new SqsQueue($this->sqs, $this->queueUrl);
-        $this->assertEquals($this->queueUrl, $queue->getQueue(null));
+        $this->assertSame($this->queueUrl, $queue->getQueue(null));
         $fifoQueueUrl = $this->baseUrl.'/'.$this->account.'/test.fifo';
-        $this->assertEquals($fifoQueueUrl, $queue->getQueue($fifoQueueUrl));
+        $this->assertSame($fifoQueueUrl, $queue->getQueue($fifoQueueUrl));
     }
 
     public function testGetQueueProperlyResolvesUrlWithSuffix()
     {
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, $suffix = '-staging');
-        $this->assertEquals($this->queueUrl.$suffix, $queue->getQueue(null));
+        $this->assertSame($this->queueUrl.$suffix, $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix;
-        $this->assertEquals($queueUrl, $queue->getQueue('test'));
+        $this->assertSame($queueUrl, $queue->getQueue('test'));
     }
 
     public function testGetQueueProperlyResolvesFifoUrlWithSuffix()
@@ -332,15 +332,15 @@ class QueueSqsQueueTest extends TestCase
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, $suffix = '-staging');
         $this->assertSame("{$this->prefix}emails-staging.fifo", $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix.'.fifo';
-        $this->assertEquals($queueUrl, $queue->getQueue('test.fifo'));
+        $this->assertSame($queueUrl, $queue->getQueue('test.fifo'));
     }
 
     public function testGetQueueEnsuresTheQueueIsOnlySuffixedOnce()
     {
         $queue = new SqsQueue($this->sqs, "{$this->queueName}-staging", $this->prefix, $suffix = '-staging');
-        $this->assertEquals($this->queueUrl.$suffix, $queue->getQueue(null));
+        $this->assertSame($this->queueUrl.$suffix, $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix;
-        $this->assertEquals($queueUrl, $queue->getQueue('test-staging'));
+        $this->assertSame($queueUrl, $queue->getQueue('test-staging'));
     }
 
     public function testGetFifoQueueEnsuresTheQueueIsOnlySuffixedOnce()
@@ -348,7 +348,7 @@ class QueueSqsQueueTest extends TestCase
         $queue = new SqsQueue($this->sqs, "{$this->queueName}-staging.fifo", $this->prefix, $suffix = '-staging');
         $this->assertSame("{$this->prefix}{$this->queueName}{$suffix}.fifo", $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix.'.fifo';
-        $this->assertEquals($queueUrl, $queue->getQueue('test-staging.fifo'));
+        $this->assertSame($queueUrl, $queue->getQueue('test-staging.fifo'));
     }
 
     public function testPushProperlyPushesJobObjectOntoSqs()
@@ -361,7 +361,7 @@ class QueueSqsQueueTest extends TestCase
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->queueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
@@ -395,7 +395,7 @@ class QueueSqsQueueTest extends TestCase
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->queueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
@@ -433,7 +433,7 @@ class QueueSqsQueueTest extends TestCase
             'MessageDeduplicationId' => $this->mockedDeduplicationId,
         ])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($this->mockedJob, $this->mockedData, $this->fifoQueueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         Str::createUuidsNormally();
@@ -456,7 +456,7 @@ class QueueSqsQueueTest extends TestCase
             'MessageDeduplicationId' => $this->mockedDeduplicationId,
         ])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         Str::createUuidsNormally();
@@ -480,7 +480,7 @@ class QueueSqsQueueTest extends TestCase
             'MessageDeduplicationId' => $this->mockedDeduplicationId,
         ])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         Str::createUuidsNormally();
@@ -507,7 +507,7 @@ class QueueSqsQueueTest extends TestCase
             'MessageDeduplicationId' => $this->mockedDeduplicationId,
         ])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         Str::createUuidsNormally();
@@ -530,7 +530,7 @@ class QueueSqsQueueTest extends TestCase
             'MessageDeduplicationId' => $this->mockedDeduplicationId,
         ])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
@@ -541,8 +541,8 @@ class QueueSqsQueueTest extends TestCase
         // Ensure the deduplicationId method is not called when a deduplicator callback is provided.
         $job->expects($this->never())->method('deduplicationId')->willReturn('this-should-not-be-used');
         $job->onGroup($this->mockedMessageGroupId)->withDeduplicator(function ($payload, $queue) {
-            $this->assertEquals($this->mockedPayload, $payload);
-            $this->assertEquals($this->fifoQueueName, $queue);
+            $this->assertSame($this->mockedPayload, $payload);
+            $this->assertSame($this->fifoQueueName, $queue);
 
             return $this->mockedDeduplicationId;
         });
@@ -558,7 +558,7 @@ class QueueSqsQueueTest extends TestCase
             'MessageDeduplicationId' => $this->mockedDeduplicationId,
         ])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
@@ -627,8 +627,8 @@ class QueueSqsQueueTest extends TestCase
         });
 
         $pendingDispatch = FakeSqsJobWithDeduplication::dispatch()->onGroup($this->mockedMessageGroupId)->withDeduplicator(function ($payload, $queue) {
-            $this->assertEquals($this->mockedPayload, $payload);
-            $this->assertEquals($this->fifoQueueName, $queue);
+            $this->assertSame($this->mockedPayload, $payload);
+            $this->assertSame($this->fifoQueueName, $queue);
 
             return $this->mockedDeduplicationId;
         });
@@ -670,9 +670,9 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) {
             $this->assertIsArray($args);
             $this->assertEqualsCanonicalizing(['QueueUrl', 'MessageBody', 'MessageGroupId', 'MessageDeduplicationId'], array_keys($args));
-            $this->assertEquals($this->fifoQueueUrl, $args['QueueUrl']);
-            $this->assertEquals($this->mockedMessageGroupId, $args['MessageGroupId']);
-            $this->assertEquals($this->mockedDeduplicationId, $args['MessageDeduplicationId']);
+            $this->assertSame($this->fifoQueueUrl, $args['QueueUrl']);
+            $this->assertSame($this->mockedMessageGroupId, $args['MessageGroupId']);
+            $this->assertSame($this->mockedDeduplicationId, $args['MessageDeduplicationId']);
 
             $message = json_decode($args['MessageBody'], true);
             $command = unserialize($message['data']['command'] ?? '');
@@ -707,7 +707,7 @@ class QueueSqsQueueTest extends TestCase
             'MessageDeduplicationId' => $this->mockedDeduplicationId,
         ])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->later($this->mockedDelay, $this->mockedJob, $this->mockedData, $this->fifoQueueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         Str::createUuidsNormally();
@@ -731,7 +731,7 @@ class QueueSqsQueueTest extends TestCase
             'MessageDeduplicationId' => $this->mockedDeduplicationId,
         ])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->later($this->mockedDelay, $job, $this->mockedData, $this->fifoQueueName);
-        $this->assertEquals($this->mockedMessageId, $id);
+        $this->assertSame($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         Str::createUuidsNormally();

@@ -24,13 +24,13 @@ class DatabaseSQLiteProcessorTest extends TestCase
             ['name' => 'with/slash', 'type_name' => 'tinyint', 'type' => 'tinyint(1)', 'collation' => null, 'nullable' => false, 'default' => '1', 'auto_increment' => false, 'comment' => null, 'generation' => null],
         ];
 
-        $this->assertEquals($expected, $processor->processColumns($listing));
+        $this->assertSame($expected, $processor->processColumns($listing));
 
         // convert listing to objects to simulate PDO::FETCH_CLASS
         foreach ($listing as &$row) {
             $row = (object) $row;
         }
 
-        $this->assertEquals($expected, $processor->processColumns($listing));
+        $this->assertSame($expected, $processor->processColumns($listing));
     }
 }

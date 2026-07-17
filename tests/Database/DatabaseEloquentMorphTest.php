@@ -115,7 +115,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $instance->shouldReceive('save')->never();
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($instance);
 
-        $this->assertEquals($instance, $relation->make(['name' => 'taylor']));
+        $this->assertSame($instance, $relation->make(['name' => 'taylor']));
     }
 
     public function testCreateFunctionOnMorph()
@@ -128,7 +128,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
         $created->shouldReceive('save')->once()->andReturn(true);
 
-        $this->assertEquals($created, $relation->create(['name' => 'taylor']));
+        $this->assertSame($created, $relation->create(['name' => 'taylor']));
     }
 
     public function testFindOrNewMethodFindsModel()
@@ -376,7 +376,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
         $created->shouldReceive('save')->once()->andReturn(true);
 
-        $this->assertEquals($created, $relation->create(['name' => 'taylor']));
+        $this->assertSame($created, $relation->create(['name' => 'taylor']));
     }
 
     public function testIsNotNull()

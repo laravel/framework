@@ -27,10 +27,10 @@ class WormholeTest extends TestCase
         (new Wormhole(10))->days();
 
         // Assert we are now in the future...
-        $this->assertEquals($future->format('Y-m-d'), Date::now()->format('Y-m-d'));
+        $this->assertSame($future->format('Y-m-d'), Date::now()->format('Y-m-d'));
 
         // Assert we can go back to the present...
-        $this->assertEquals($present->format('Y-m-d'), Wormhole::back()->format('Y-m-d'));
+        $this->assertSame($present->format('Y-m-d'), Wormhole::back()->format('Y-m-d'));
     }
 
     public function testCarbonImmutableCompatibility()
@@ -46,10 +46,10 @@ class WormholeTest extends TestCase
         (new Wormhole(10))->days();
 
         // Assert that the present time didn't get mutated...
-        $this->assertNotEquals($future->format('Y-m-d'), $present->format('Y-m-d'));
+        $this->assertNotSame($future->format('Y-m-d'), $present->format('Y-m-d'));
 
         // Assert the time travel was successful...
-        $this->assertEquals($future->format('Y-m-d'), Date::now()->format('Y-m-d'));
+        $this->assertSame($future->format('Y-m-d'), Date::now()->format('Y-m-d'));
     }
 
     public function testItCanTravelByMicroseconds()

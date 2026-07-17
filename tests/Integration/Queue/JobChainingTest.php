@@ -318,7 +318,7 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertEquals(['j1', 'b1', 'b2', 'j2'], JobRunRecorder::$results);
+        $this->assertSame(['j1', 'b1', 'b2', 'j2'], JobRunRecorder::$results);
     }
 
     public function testChainJobsCanBeAppendedBatch()
@@ -330,7 +330,7 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertEquals(['j1', 'j2', 'b1', 'b2'], JobRunRecorder::$results);
+        $this->assertSame(['j1', 'j2', 'b1', 'b2'], JobRunRecorder::$results);
     }
 
     public function testChainJobsCanBeAppendedWithoutExistingChain()
@@ -350,8 +350,8 @@ class JobChainingTest extends QueueTestCase
         $chain->append($secondJob = new JobChainingNamedTestJob('j2'));
         $chain->append($thirdJob = new JobChainingNamedTestJob('j3'));
 
-        $this->assertEquals($firstJob, $chain->job);
-        $this->assertEquals([$secondJob, $thirdJob], $chain->chain);
+        $this->assertSame($firstJob, $chain->job);
+        $this->assertSame([$secondJob, $thirdJob], $chain->chain);
     }
 
     public function testChainCanBeAppendedWithInitialJob()
@@ -365,8 +365,8 @@ class JobChainingTest extends QueueTestCase
             $thirdJob = new JobChainingNamedTestJob('j3'),
         ]);
 
-        $this->assertEquals($firstJob, $chain->job);
-        $this->assertEquals([$secondJob, $thirdJob], $chain->chain);
+        $this->assertSame($firstJob, $chain->job);
+        $this->assertSame([$secondJob, $thirdJob], $chain->chain);
     }
 
     public function testChainRemovesFalsy()
@@ -380,8 +380,8 @@ class JobChainingTest extends QueueTestCase
             [],
         ]);
 
-        $this->assertEquals($firstJob, $chain->job);
-        $this->assertEquals([$secondJob], $chain->chain);
+        $this->assertSame($firstJob, $chain->job);
+        $this->assertSame([$secondJob], $chain->chain);
     }
 
     public function testChainAppendRemovesFalsy()
@@ -399,8 +399,8 @@ class JobChainingTest extends QueueTestCase
             [],
         ]);
 
-        $this->assertEquals($firstJob, $chain->job);
-        $this->assertEquals([$secondJob, $thirdJob], $chain->chain);
+        $this->assertSame($firstJob, $chain->job);
+        $this->assertSame([$secondJob, $thirdJob], $chain->chain);
     }
 
     public function testChainCanBePrepended()
@@ -411,8 +411,8 @@ class JobChainingTest extends QueueTestCase
         $chain->prepend($secondJob = new JobChainingNamedTestJob('j2'));
         $chain->prepend($thirdJob = new JobChainingNamedTestJob('j3'));
 
-        $this->assertEquals($thirdJob, $chain->job);
-        $this->assertEquals([$secondJob, $firstJob], $chain->chain);
+        $this->assertSame($thirdJob, $chain->job);
+        $this->assertSame([$secondJob, $firstJob], $chain->chain);
     }
 
     public function testChainCanBePrependedWithInitialJob()
@@ -427,8 +427,8 @@ class JobChainingTest extends QueueTestCase
             $fourthJob = new JobChainingNamedTestJob('j3'),
         ]);
 
-        $this->assertEquals($secondJob, $chain->job);
-        $this->assertEquals([$thirdJob, $fourthJob, $firstJob], $chain->chain);
+        $this->assertSame($secondJob, $chain->job);
+        $this->assertSame([$thirdJob, $fourthJob, $firstJob], $chain->chain);
     }
 
     public function testChainPrependRemovesFalsy()
@@ -447,8 +447,8 @@ class JobChainingTest extends QueueTestCase
             [],
         ]);
 
-        $this->assertEquals($secondJob, $chain->job);
-        $this->assertEquals([$thirdJob, $fourthJob, $firstJob], $chain->chain);
+        $this->assertSame($secondJob, $chain->job);
+        $this->assertSame([$thirdJob, $fourthJob, $firstJob], $chain->chain);
     }
 
     public function testBatchCanBeAddedToChain()
@@ -467,7 +467,7 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertEquals(['c1', 'c2', 'b1', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
+        $this->assertSame(['c1', 'c2', 'b1', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
     }
 
     public function testBatchInChainUsesCorrectQueue()
@@ -487,7 +487,7 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkerCommand(['--queue' => $otherQueue, '--stop-when-empty' => true]);
 
-        $this->assertEquals(['c1', 'c2', 'b1', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
+        $this->assertSame(['c1', 'c2', 'b1', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
     }
 
     public function testDynamicBatchCanBeAddedToChain()
@@ -507,11 +507,11 @@ class JobChainingTest extends QueueTestCase
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         if ($this->getQueueDriver() === 'sync') {
-            $this->assertEquals(
+            $this->assertSame(
                 ['c1', 'c2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results
             );
         } else {
-            $this->assertEquals(
+            $this->assertSame(
                 ['c1', 'c2', 'b1', 'b2', 'b3', 'b4', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'c3'], JobRunRecorder::$results
             );
         }
@@ -540,11 +540,11 @@ class JobChainingTest extends QueueTestCase
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         if ($this->getQueueDriver() === 'sync') {
-            $this->assertEquals(
+            $this->assertSame(
                 ['c1', 'c2', 'bc1', 'bc2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results
             );
         } else {
-            $this->assertEquals(
+            $this->assertSame(
                 ['c1', 'c2', 'bc1', 'b1', 'b2', 'b3', 'b4', 'bc2', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'c3'], JobRunRecorder::$results
             );
         }
@@ -577,11 +577,11 @@ class JobChainingTest extends QueueTestCase
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         if ($this->getQueueDriver() === 'sync') {
-            $this->assertEquals(
+            $this->assertSame(
                 ['c1', 'c2', 'bc1', 'bc2', 'bb1', 'bb2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results
             );
         } else {
-            $this->assertEquals(
+            $this->assertSame(
                 ['c1', 'c2', 'bc1', 'b1', 'b2', 'b3', 'b4', 'bc2', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'bb1', 'bb2', 'c3'], JobRunRecorder::$results
             );
         }
@@ -602,8 +602,8 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertEquals(['c1', 'c2'], JobRunRecorder::$results);
-        $this->assertEquals(['batch failed', 'chain failed'], JobRunRecorder::$failures);
+        $this->assertSame(['c1', 'c2'], JobRunRecorder::$results);
+        $this->assertSame(['batch failed', 'chain failed'], JobRunRecorder::$failures);
     }
 
     public function testChainBatchFailureAllowed()
@@ -621,9 +621,9 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertEquals(['c1', 'c2', 'b1', 'b3', 'c3'], JobRunRecorder::$results);
+        $this->assertSame(['c1', 'c2', 'b1', 'b3', 'c3'], JobRunRecorder::$results);
         // Only the batch failed, but the chain should keep going since the batch allows failures
-        $this->assertEquals(['batch failed'], JobRunRecorder::$failures);
+        $this->assertSame(['batch failed'], JobRunRecorder::$failures);
     }
 
     public function testChainBatchFailureNotAllowed()
@@ -641,8 +641,8 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertEquals(['c1', 'c2', 'b1', 'b3'], JobRunRecorder::$results);
-        $this->assertEquals(['batch failed', 'chain failed'], JobRunRecorder::$failures);
+        $this->assertSame(['c1', 'c2', 'b1', 'b3'], JobRunRecorder::$results);
+        $this->assertSame(['batch failed', 'chain failed'], JobRunRecorder::$failures);
     }
 
     public function testChainConditionable()

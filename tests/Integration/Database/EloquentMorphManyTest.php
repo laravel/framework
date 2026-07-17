@@ -48,7 +48,7 @@ class EloquentMorphManyTest extends DatabaseTestCase
 
         $comments = Comment::has('replies')->get();
 
-        $this->assertEquals([1], $comments->pluck('id')->all());
+        $this->assertSame([1], $comments->pluck('id')->all());
     }
 
     public function testCanMorphOne()
@@ -66,8 +66,8 @@ class EloquentMorphManyTest extends DatabaseTestCase
 
         $this->assertInstanceOf(MorphOne::class, $post->comments()->one());
 
-        $this->assertEquals($latestComment->id, $post->latestComment->id);
-        $this->assertEquals($oldestComment->id, $post->oldestComment->id);
+        $this->assertSame($latestComment->id, $post->latestComment->id);
+        $this->assertSame($oldestComment->id, $post->oldestComment->id);
     }
 }
 

@@ -25,8 +25,8 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
 
         // write and read:
         $this->assertTrue($handler->write('valid_session_id_2425', json_encode(['foo' => 'bar'])));
-        $this->assertEquals(['foo' => 'bar'], json_decode($handler->read('valid_session_id_2425'), true));
-        $this->assertEquals(1, $connection->table('sessions')->count());
+        $this->assertSame(['foo' => 'bar'], json_decode($handler->read('valid_session_id_2425'), true));
+        $this->assertSame(1, $connection->table('sessions')->count());
 
         $session = $connection->table('sessions')->first();
         $this->assertNotNull($session->user_agent);
@@ -34,16 +34,16 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
 
         // re-write and read:
         $this->assertTrue($handler->write('valid_session_id_2425', json_encode(['over' => 'ride'])));
-        $this->assertEquals(['over' => 'ride'], json_decode($handler->read('valid_session_id_2425'), true));
-        $this->assertEquals(1, $connection->table('sessions')->count());
+        $this->assertSame(['over' => 'ride'], json_decode($handler->read('valid_session_id_2425'), true));
+        $this->assertSame(1, $connection->table('sessions')->count());
 
         // handler object writes only one session id:
         $this->assertTrue($handler->write('other_id', 'data'));
-        $this->assertEquals(1, $connection->table('sessions')->count());
+        $this->assertSame(1, $connection->table('sessions')->count());
 
         $handler->setExists(false);
         $this->assertTrue($handler->write('other_id', 'data'));
-        $this->assertEquals(2, $connection->table('sessions')->count());
+        $this->assertSame(2, $connection->table('sessions')->count());
 
         // read expired:
         Carbon::setTestNow(Carbon::now()->addMinutes(2));
@@ -51,7 +51,7 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
 
         // rewriting an expired session-id, makes it live:
         $this->assertTrue($handler->write('valid_session_id_2425', json_encode(['come' => 'alive'])));
-        $this->assertEquals(['come' => 'alive'], json_decode($handler->read('valid_session_id_2425'), true));
+        $this->assertSame(['come' => 'alive'], json_decode($handler->read('valid_session_id_2425'), true));
     }
 
     public function test_garbage_collector()
@@ -61,19 +61,19 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $handler = new DatabaseSessionHandler($connection, 'sessions', 1, $this->app);
         Carbon::setTestNow($now = Carbon::now());
         $handler->write('simple_id_1', 'abcd');
-        $this->assertEquals(0, $handler->gc(1));
+        $this->assertSame(0, $handler->gc(1));
 
         Carbon::setTestNow($now->addSeconds(2));
 
         $handler = new DatabaseSessionHandler($connection, 'sessions', 1, $this->app);
         $handler->write('simple_id_2', 'abcd');
-        $this->assertEquals(1, $handler->gc(2));
-        $this->assertEquals(1, $connection->table('sessions')->count());
+        $this->assertSame(1, $handler->gc(2));
+        $this->assertSame(1, $connection->table('sessions')->count());
 
         Carbon::setTestNow($now->addSeconds(2));
 
-        $this->assertEquals(1, $handler->gc(1));
-        $this->assertEquals(0, $connection->table('sessions')->count());
+        $this->assertSame(1, $handler->gc(1));
+        $this->assertSame(0, $connection->table('sessions')->count());
     }
 
     public function test_destroy()
@@ -86,14 +86,14 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $handler2->write('id_2', 'some data');
 
         // destroy invalid session-id:
-        $this->assertEquals(true, $handler1->destroy('invalid_session_id'));
+        $this->assertSame(true, $handler1->destroy('invalid_session_id'));
         // nothing deleted:
-        $this->assertEquals(2, $connection->table('sessions')->count());
+        $this->assertSame(2, $connection->table('sessions')->count());
 
         // destroy valid session-id:
-        $this->assertEquals(true, $handler2->destroy('id_1'));
+        $this->assertSame(true, $handler2->destroy('id_1'));
         // only one row is deleted:
-        $this->assertEquals(1, $connection->table('sessions')->where('id', 'id_2')->count());
+        $this->assertSame(1, $connection->table('sessions')->where('id', 'id_2')->count());
     }
 
     public function test_it_can_work_without_container()
@@ -104,7 +104,7 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         // write and read:
         $this->assertTrue($handler->write('session_id', 'some data'));
         $this->assertSame('some data', $handler->read('session_id'));
-        $this->assertEquals(1, $connection->table('sessions')->count());
+        $this->assertSame(1, $connection->table('sessions')->count());
 
         $session = $connection->table('sessions')->first();
         $this->assertNull($session->user_agent);

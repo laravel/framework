@@ -17,7 +17,7 @@ class SupportOptionalTest extends TestCase
 
         $optional = new Optional($targetObj);
 
-        $this->assertEquals($expected, $optional->item);
+        $this->assertSame($expected, $optional->item);
     }
 
     public function testGetNotExistItemOnObject()
@@ -58,7 +58,7 @@ class SupportOptionalTest extends TestCase
 
         $optional = new Optional($targetArr);
 
-        $this->assertEquals($expected, $optional['item']);
+        $this->assertSame($expected, $optional['item']);
     }
 
     public function testGetNotExistItemOnArray()

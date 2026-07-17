@@ -30,7 +30,7 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
     {
         $comments = Comment::with('commentable:id')->get();
 
-        $this->assertEquals(['id' => 1], $comments[0]->commentable->getAttributes());
+        $this->assertSame(['id' => 1], $comments[0]->commentable->getAttributes());
     }
 
     public function testSelectRaw()
@@ -39,7 +39,7 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
             $query->selectRaw('id');
         }])->get();
 
-        $this->assertEquals(['id' => 1], $comments[0]->commentable->getAttributes());
+        $this->assertSame(['id' => 1], $comments[0]->commentable->getAttributes());
     }
 
     public function testSelectSub()
@@ -50,7 +50,7 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
             }, 'id');
         }])->get();
 
-        $this->assertEquals(['id' => 1], $comments[0]->commentable->getAttributes());
+        $this->assertSame(['id' => 1], $comments[0]->commentable->getAttributes());
     }
 
     public function testAddSelect()
@@ -59,7 +59,7 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
             $query->addSelect('id');
         }])->get();
 
-        $this->assertEquals(['id' => 1], $comments[0]->commentable->getAttributes());
+        $this->assertSame(['id' => 1], $comments[0]->commentable->getAttributes());
     }
 
     public function testLazyLoading()
@@ -67,7 +67,7 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
         $comment = Comment::first();
         $post = $comment->commentable()->select('id')->first();
 
-        $this->assertEquals(['id' => 1], $post->getAttributes());
+        $this->assertSame(['id' => 1], $post->getAttributes());
     }
 }
 

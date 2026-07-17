@@ -494,9 +494,9 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testGetTableNameFromModel()
     {
-        $this->assertEquals($this->table, $this->getTable(ProductStub::class));
-        $this->assertEquals($this->table, $this->getTable(new ProductStub));
-        $this->assertEquals($this->table, $this->getTable($this->table));
+        $this->assertSame($this->table, $this->getTable(ProductStub::class));
+        $this->assertSame($this->table, $this->getTable(new ProductStub));
+        $this->assertSame($this->table, $this->getTable($this->table));
         $this->assertSame('all_products', $this->getTable((new ProductStub)->setTable('all_products')));
     }
 

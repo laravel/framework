@@ -72,7 +72,7 @@ trait CountsEnumerations
 
         $executor($collection);
 
-        $this->assertEquals(
+        $this->assertSame(
             $count,
             $enumerated,
             $count > $enumerated ? 'Failed to enumerate in full.' : 'Enumerated more than once.'
@@ -81,7 +81,7 @@ trait CountsEnumerations
 
     protected function assertEnumerations($expected, $actual)
     {
-        $this->assertEquals(
+        $this->assertSame(
             $expected,
             $actual,
             "Failed asserting that {$actual} items that were enumerated matches expected {$expected}."

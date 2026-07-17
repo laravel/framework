@@ -8,10 +8,10 @@ class BladeStackTest extends AbstractBladeTestCase
     {
         $string = '@stack(\'foo\')';
         $expected = '<?php echo $__env->yieldPushContent(\'foo\'); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = '@stack(\'foo))\')';
         $expected = '<?php echo $__env->yieldPushContent(\'foo))\'); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

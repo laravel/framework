@@ -45,7 +45,7 @@ class EloquentModelLoadMaxTest extends DatabaseTestCase
         $model->loadMax('related1', 'number');
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertEquals(11, $model->related1_max_number);
+        $this->assertSame(11, $model->related1_max_number);
     }
 
     public function testLoadMaxMultipleRelations()
@@ -57,8 +57,8 @@ class EloquentModelLoadMaxTest extends DatabaseTestCase
         $model->loadMax(['related1', 'related2'], 'number');
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertEquals(11, $model->related1_max_number);
-        $this->assertEquals(13, $model->related2_max_number);
+        $this->assertSame(11, $model->related1_max_number);
+        $this->assertSame(13, $model->related2_max_number);
     }
 }
 

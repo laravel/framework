@@ -40,8 +40,8 @@ PHP);
 
         [$first, $second] = $response->original;
 
-        $this->assertEquals(2, $first);
-        $this->assertEquals(4, $second);
+        $this->assertSame(2, $first);
+        $this->assertSame(4, $second);
     }
 
     public function testRunHandlerProcessErrorCode()
@@ -85,8 +85,8 @@ PHP);
         // $this->assertIsArray($forkOutput);
         // $this->assertArrayHasKey('first', $forkOutput);
         // $this->assertArrayHasKey('second', $forkOutput);
-        // $this->assertEquals(2, $forkOutput['first']);
-        // $this->assertEquals(4, $forkOutput['second']);
+        // $this->assertSame(2, $forkOutput['first']);
+        // $this->assertSame(4, $forkOutput['second']);
     }
 
     public function testProcessDriverRunMayUseCustomTimeout()

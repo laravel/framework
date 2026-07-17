@@ -14,7 +14,7 @@ class UnionTypeTest extends TestCase
     {
         $type = JsonSchema::union(['string', 'number', 'boolean']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'type' => ['string', 'number', 'boolean'],
         ], $type->toArray());
     }
@@ -44,7 +44,7 @@ class UnionTypeTest extends TestCase
     {
         $type = JsonSchema::union(['string', 'number'])->nullable();
 
-        $this->assertEquals([
+        $this->assertSame([
             'type' => ['string', 'number', 'null'],
         ], $type->toArray());
     }
@@ -54,7 +54,7 @@ class UnionTypeTest extends TestCase
         $type = JsonSchema::union(['string', 'number', 'null']);
 
         $this->assertSame(['string', 'number'], $type->types());
-        $this->assertEquals([
+        $this->assertSame([
             'type' => ['string', 'number', 'null'],
         ], $type->toArray());
     }
@@ -63,7 +63,7 @@ class UnionTypeTest extends TestCase
     {
         $type = JsonSchema::union(['string', 'null'])->nullable();
 
-        $this->assertEquals([
+        $this->assertSame([
             'type' => ['string', 'null'],
         ], $type->toArray());
     }

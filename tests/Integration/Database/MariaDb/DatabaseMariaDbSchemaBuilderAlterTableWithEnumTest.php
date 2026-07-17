@@ -49,7 +49,7 @@ class DatabaseMariaDbSchemaBuilderAlterTableWithEnumTest extends MariaDbTestCase
         $tables = Schema::getTables();
 
         $this->assertCount(2, $tables);
-        $this->assertEquals(['migrations', 'users'], array_column($tables, 'name'));
+        $this->assertSame(['migrations', 'users'], array_column($tables, 'name'));
 
         $columns = Schema::getColumnListing('users');
 

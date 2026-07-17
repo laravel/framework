@@ -51,7 +51,7 @@ class SupportHelpersTest extends TestCase
 
         $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
-        $this->assertEquals($str, e($html));
+        $this->assertSame($str, e($html));
     }
 
     public function testEWithInvalidCodePoints()
@@ -211,10 +211,10 @@ class SupportHelpersTest extends TestCase
     {
         $object = new stdClass;
 
-        $this->assertEquals($object, object_get($object, null));
-        $this->assertEquals($object, object_get($object, false));
-        $this->assertEquals($object, object_get($object, ''));
-        $this->assertEquals($object, object_get($object, '  '));
+        $this->assertSame($object, object_get($object, null));
+        $this->assertSame($object, object_get($object, false));
+        $this->assertSame($object, object_get($object, ''));
+        $this->assertSame($object, object_get($object, '  '));
     }
 
     public function testDataHas()
@@ -270,7 +270,7 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('Taylor', data_get($dottedArray, ['users', 'first.name']));
         $this->assertNull(data_get($dottedArray, ['users', 'middle.name']));
         $this->assertSame('Not found', data_get($dottedArray, ['users', 'last.name'], 'Not found'));
-        $this->assertEquals(56, data_get($arrayAccess, 'price'));
+        $this->assertSame(56, data_get($arrayAccess, 'price'));
         $this->assertSame('John', data_get($arrayAccess, 'user.name'));
         $this->assertSame('void', data_get($arrayAccess, 'foo', 'void'));
         $this->assertSame('void', data_get($arrayAccess, 'user.foo', 'void'));
@@ -292,11 +292,11 @@ class SupportHelpersTest extends TestCase
             ['name' => 'dayle'],
         ]);
 
-        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
-        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
+        $this->assertSame(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
+        $this->assertSame(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
 
-        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($arrayIterable, '*.name'));
-        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($arrayIterable, '*.email', 'irrelevant'));
+        $this->assertSame(['taylor', 'abigail', 'dayle'], data_get($arrayIterable, '*.name'));
+        $this->assertSame(['taylorotwell@gmail.com', null, null], data_get($arrayIterable, '*.email', 'irrelevant'));
 
         $array = [
             'users' => [
@@ -307,8 +307,8 @@ class SupportHelpersTest extends TestCase
             'posts' => null,
         ];
 
-        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, 'users.*.first'));
-        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, 'users.*.email', 'irrelevant'));
+        $this->assertSame(['taylor', 'abigail', 'dayle'], data_get($array, 'users.*.first'));
+        $this->assertSame(['taylorotwell@gmail.com', null, null], data_get($array, 'users.*.email', 'irrelevant'));
         $this->assertSame('not found', data_get($array, 'posts.*.date', 'not found'));
         $this->assertNull(data_get($array, 'posts.*.date'));
     }
@@ -338,8 +338,8 @@ class SupportHelpersTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], data_get($array, 'posts.*.comments.*.author'));
-        $this->assertEquals([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
+        $this->assertSame(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], data_get($array, 'posts.*.comments.*.author'));
+        $this->assertSame([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
         $this->assertSame([], data_get($array, 'posts.*.users.*.name', 'irrelevant'));
         $this->assertSame([], data_get($array, 'posts.*.users.*.name'));
     }
@@ -372,11 +372,11 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('PKX', data_get($array, 'flights.{first}.segments.{last}.to'));
         $this->assertSame('LGW', data_get($array, 'flights.{last}.segments.{first}.from'));
 
-        $this->assertEquals(['LHR', 'IST'], data_get($array, 'flights.{first}.segments.*.from'));
-        $this->assertEquals(['SAW', 'PEK'], data_get($array, 'flights.{last}.segments.*.to'));
+        $this->assertSame(['LHR', 'IST'], data_get($array, 'flights.{first}.segments.*.from'));
+        $this->assertSame(['SAW', 'PEK'], data_get($array, 'flights.{last}.segments.*.to'));
 
-        $this->assertEquals(['LHR', 'LGW'], data_get($array, 'flights.*.segments.{first}.from'));
-        $this->assertEquals(['PKX', 'PEK'], data_get($array, 'flights.*.segments.{last}.to'));
+        $this->assertSame(['LHR', 'LGW'], data_get($array, 'flights.*.segments.{first}.from'));
+        $this->assertSame(['PKX', 'PEK'], data_get($array, 'flights.*.segments.{last}.to'));
 
         $this->assertSame('Not found', data_get($array, 'empty.{first}', 'Not found'));
         $this->assertSame('Not found', data_get($array, 'empty.{last}', 'Not found'));
@@ -410,11 +410,11 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('PKX', data_get($arrayAccessIterable, 'flights.{first}.segments.{last}.to'));
         $this->assertSame('LGW', data_get($arrayAccessIterable, 'flights.{last}.segments.{first}.from'));
 
-        $this->assertEquals(['LHR', 'IST'], data_get($arrayAccessIterable, 'flights.{first}.segments.*.from'));
-        $this->assertEquals(['SAW', 'PEK'], data_get($arrayAccessIterable, 'flights.{last}.segments.*.to'));
+        $this->assertSame(['LHR', 'IST'], data_get($arrayAccessIterable, 'flights.{first}.segments.*.from'));
+        $this->assertSame(['SAW', 'PEK'], data_get($arrayAccessIterable, 'flights.{last}.segments.*.to'));
 
-        $this->assertEquals(['LHR', 'LGW'], data_get($arrayAccessIterable, 'flights.*.segments.{first}.from'));
-        $this->assertEquals(['PKX', 'PEK'], data_get($arrayAccessIterable, 'flights.*.segments.{last}.to'));
+        $this->assertSame(['LHR', 'LGW'], data_get($arrayAccessIterable, 'flights.*.segments.{first}.from'));
+        $this->assertSame(['PKX', 'PEK'], data_get($arrayAccessIterable, 'flights.*.segments.{last}.to'));
 
         $this->assertSame('Not found', data_get($arrayAccessIterable, 'empty.{first}', 'Not found'));
         $this->assertSame('Not found', data_get($arrayAccessIterable, 'empty.{last}', 'Not found'));
@@ -455,7 +455,7 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('caret', data_get($array, 'symbols.\{first}.description'));
         $this->assertSame('dollar', data_get($array, 'symbols.{first}.description'));
         $this->assertSame('asterisk', data_get($array, 'symbols.\*.description'));
-        $this->assertEquals(['dollar', 'asterisk', 'caret'], data_get($array, 'symbols.*.description'));
+        $this->assertSame(['dollar', 'asterisk', 'caret'], data_get($array, 'symbols.*.description'));
         $this->assertSame('dollar', data_get($array, 'symbols.\{last}.description'));
         $this->assertSame('caret', data_get($array, 'symbols.{last}.description'));
     }
@@ -463,32 +463,32 @@ class SupportHelpersTest extends TestCase
     public function testDataGetStar()
     {
         $data = ['foo' => 'bar'];
-        $this->assertEquals(['bar'], data_get($data, '*'));
+        $this->assertSame(['bar'], data_get($data, '*'));
 
         $data = collect(['foo' => 'bar']);
-        $this->assertEquals(['bar'], data_get($data, '*'));
+        $this->assertSame(['bar'], data_get($data, '*'));
     }
 
     public function testDataGetNullKey()
     {
         $data = ['foo' => 'bar'];
 
-        $this->assertEquals(['foo' => 'bar'], data_get($data, null));
-        $this->assertEquals(['foo' => 'bar'], data_get($data, null, '42'));
-        $this->assertEquals(['foo' => 'bar'], data_get($data, [null]));
+        $this->assertSame(['foo' => 'bar'], data_get($data, null));
+        $this->assertSame(['foo' => 'bar'], data_get($data, null, '42'));
+        $this->assertSame(['foo' => 'bar'], data_get($data, [null]));
 
         $data = ['foo' => 'bar', 'baz' => 42];
-        $this->assertEquals(['foo' => 'bar', 'baz' => 42], data_get($data, [null, 'foo']));
+        $this->assertSame(['foo' => 'bar', 'baz' => 42], data_get($data, [null, 'foo']));
     }
 
     public function testDataFill()
     {
         $data = ['foo' => 'bar'];
 
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], data_fill($data, 'baz', 'boom'));
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], data_fill($data, 'baz', 'noop'));
-        $this->assertEquals(['foo' => [], 'baz' => 'boom'], data_fill($data, 'foo.*', 'noop'));
-        $this->assertEquals(
+        $this->assertSame(['foo' => 'bar', 'baz' => 'boom'], data_fill($data, 'baz', 'boom'));
+        $this->assertSame(['foo' => 'bar', 'baz' => 'boom'], data_fill($data, 'baz', 'noop'));
+        $this->assertSame(['foo' => [], 'baz' => 'boom'], data_fill($data, 'foo.*', 'noop'));
+        $this->assertSame(
             ['foo' => ['bar' => 'kaboom'], 'baz' => 'boom'],
             data_fill($data, 'foo.bar', 'kaboom')
         );
@@ -498,22 +498,22 @@ class SupportHelpersTest extends TestCase
     {
         $data = ['foo' => 'bar'];
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => []],
             data_fill($data, 'foo.*.bar', 'noop')
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => [], 'bar' => [['baz' => 'original'], []]],
             data_fill($data, 'bar', [['baz' => 'original'], []])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => [], 'bar' => [['baz' => 'original'], ['baz' => 'boom']]],
             data_fill($data, 'bar.*.baz', 'boom')
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => [], 'bar' => [['baz' => 'original'], ['baz' => 'boom']]],
             data_fill($data, 'bar.*', 'noop')
         );
@@ -562,32 +562,32 @@ class SupportHelpersTest extends TestCase
     {
         $data = ['foo' => 'bar'];
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => 'bar', 'baz' => 'boom'],
             data_set($data, 'baz', 'boom')
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => 'bar', 'baz' => 'kaboom'],
             data_set($data, 'baz', 'kaboom')
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => [], 'baz' => 'kaboom'],
             data_set($data, 'foo.*', 'noop')
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => ['bar' => 'boom'], 'baz' => 'kaboom'],
             data_set($data, 'foo.bar', 'boom')
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => ['bar' => 'boom'], 'baz' => ['bar' => 'boom']],
             data_set($data, 'baz.bar', 'boom')
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => ['bar' => 'boom'], 'baz' => ['bar' => ['boom' => ['kaboom' => 'boom']]]],
             data_set($data, 'baz.bar.boom.kaboom', 'boom')
         );
@@ -597,22 +597,22 @@ class SupportHelpersTest extends TestCase
     {
         $data = ['foo' => 'bar'];
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => []],
             data_set($data, 'foo.*.bar', 'noop')
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => [], 'bar' => [['baz' => 'original'], []]],
             data_set($data, 'bar', [['baz' => 'original'], []])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => [], 'bar' => [['baz' => 'boom'], ['baz' => 'boom']]],
             data_set($data, 'bar.*.baz', 'boom')
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => [], 'bar' => ['overwritten', 'overwritten']],
             data_set($data, 'bar.*', 'overwritten')
         );
@@ -661,21 +661,21 @@ class SupportHelpersTest extends TestCase
     {
         $data = ['foo' => 'bar', 'hello' => 'world'];
 
-        $this->assertEquals(
+        $this->assertSame(
             ['hello' => 'world'],
             data_forget($data, 'foo')
         );
 
         $data = ['foo' => 'bar', 'hello' => 'world'];
 
-        $this->assertEquals(
+        $this->assertSame(
             ['foo' => 'bar', 'hello' => 'world'],
             data_forget($data, 'nothing')
         );
 
         $data = ['one' => ['two' => ['three' => 'hello', 'four' => ['five']]]];
 
-        $this->assertEquals(
+        $this->assertSame(
             ['one' => ['two' => ['four' => ['five']]]],
             data_forget($data, 'one.two.three')
         );
@@ -693,7 +693,7 @@ class SupportHelpersTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'article' => [
                     'title' => 'Foo',
@@ -828,13 +828,13 @@ class SupportHelpersTest extends TestCase
     public function testTap()
     {
         $object = (object) ['id' => 1];
-        $this->assertEquals(2, tap($object, function ($object) {
+        $this->assertSame(2, tap($object, function ($object) {
             $object->id = 2;
         })->id);
 
         $mock = m::mock();
         $mock->shouldReceive('foo')->once()->andReturn('bar');
-        $this->assertEquals($mock, tap($mock)->foo());
+        $this->assertSame($mock, tap($mock)->foo());
     }
 
     public function testThrow()
@@ -938,7 +938,7 @@ class SupportHelpersTest extends TestCase
     {
         $this->assertNull(optional(null)->something());
 
-        $this->assertEquals(10, optional(new class
+        $this->assertSame(10, optional(new class
         {
             public function something()
             {
@@ -955,7 +955,7 @@ class SupportHelpersTest extends TestCase
             );
         }));
 
-        $this->assertEquals(10, optional(5, function ($number) {
+        $this->assertSame(10, optional(5, function ($number) {
             return $number * 2;
         }));
     }
@@ -1045,7 +1045,7 @@ class SupportHelpersTest extends TestCase
         }, 100);
 
         // Make sure we made two attempts
-        $this->assertEquals(2, $attempts);
+        $this->assertSame(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
         Sleep::assertSleptTimes(1);
@@ -1068,7 +1068,7 @@ class SupportHelpersTest extends TestCase
         }, CarbonInterval::milliseconds(100));
 
         // Make sure we made two attempts
-        $this->assertEquals(2, $attempts);
+        $this->assertSame(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
         Sleep::assertSleptTimes(1);
@@ -1095,7 +1095,7 @@ class SupportHelpersTest extends TestCase
         });
 
         // Make sure we made three attempts
-        $this->assertEquals(3, $attempts);
+        $this->assertSame(3, $attempts);
 
         // Make sure we waited 300ms for the first two attempts
         Sleep::assertSleptTimes(2);
@@ -1121,7 +1121,7 @@ class SupportHelpersTest extends TestCase
         });
 
         // Make sure we made two attempts
-        $this->assertEquals(2, $attempts);
+        $this->assertSame(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
         Sleep::assertSleptTimes(1);
@@ -1159,7 +1159,7 @@ class SupportHelpersTest extends TestCase
         });
 
         // Make sure we made four attempts
-        $this->assertEquals(4, $attempts);
+        $this->assertSame(4, $attempts);
 
         Sleep::assertSleptTimes(3);
 
@@ -1183,7 +1183,7 @@ class SupportHelpersTest extends TestCase
         }, 100);
 
         // Make sure we made two attempts
-        $this->assertEquals(2, $attempts);
+        $this->assertSame(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
         Sleep::assertSleptTimes(1);
@@ -1195,7 +1195,7 @@ class SupportHelpersTest extends TestCase
 
     public function testTransform()
     {
-        $this->assertEquals(10, transform(5, function ($value) {
+        $this->assertSame(10, transform(5, function ($value) {
             return $value * 2;
         }));
 
@@ -1219,9 +1219,9 @@ class SupportHelpersTest extends TestCase
 
     public function testWith()
     {
-        $this->assertEquals(10, with(10));
+        $this->assertSame(10, with(10));
 
-        $this->assertEquals(10, with(5, function ($five) {
+        $this->assertSame(10, with(5, function ($five) {
             return $five + 5;
         }));
     }
@@ -1573,7 +1573,7 @@ class SupportHelpersTest extends TestCase
 
     public function testLiteral(): void
     {
-        $this->assertEquals(1, literal(1));
+        $this->assertSame(1, literal(1));
         $this->assertSame('taylor', literal('taylor'));
         $this->assertEquals((object) ['name' => 'Taylor', 'role' => 'Developer'], literal(name: 'Taylor', role: 'Developer'));
     }

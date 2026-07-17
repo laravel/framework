@@ -40,7 +40,7 @@ class CacheMemcachedStoreTest extends TestCase
         ]);
         $memcache->expects($this->once())->method('getResultCode')->willReturn(0);
         $store = new MemcachedStore($memcache, 'foo:');
-        $this->assertEquals([
+        $this->assertSame([
             'foo' => 'fizz',
             'bar' => 'buzz',
             'baz' => 'norf',

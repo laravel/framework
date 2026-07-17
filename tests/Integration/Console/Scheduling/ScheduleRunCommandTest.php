@@ -272,7 +272,7 @@ class ScheduleRunCommandTest extends TestCase
 
         // startedAt should not have been mutated to end of minute
         $startedAtAfter = (new ReflectionProperty($command, 'startedAt'))->getValue($command);
-        $this->assertEquals($originalTimestamp, $startedAtAfter->getTimestamp());
-        $this->assertEquals($originalMicro, $startedAtAfter->micro);
+        $this->assertSame($originalTimestamp, $startedAtAfter->getTimestamp());
+        $this->assertSame($originalMicro, $startedAtAfter->micro);
     }
 }

@@ -12,6 +12,6 @@ breeze
         $expected = '<?php if (! $__env->isStackEmpty("stack")): ?>
 breeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

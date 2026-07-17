@@ -12,7 +12,7 @@ test
         $expected = '<?php for($i = 0; $i < 10; $i++): ?>
 test
 <?php endfor; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testNestedForStatementsAreCompiled()
@@ -27,6 +27,6 @@ test
 test
 <?php endfor; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

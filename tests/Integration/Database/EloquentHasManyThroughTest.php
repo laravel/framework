@@ -60,10 +60,10 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
         User::create(['name' => Str::random()]);
 
-        $this->assertEquals([$mate1->id, $mate2->id], $user->teamMates->pluck('id')->toArray());
-        $this->assertEquals([$mate1->id, $mate2->id], $user->teamMatesWithPendingRelation->pluck('id')->toArray());
-        $this->assertEquals([$user->id], User::has('teamMates')->pluck('id')->toArray());
-        $this->assertEquals([$user->id], User::has('teamMatesWithPendingRelation')->pluck('id')->toArray());
+        $this->assertSame([$mate1->id, $mate2->id], $user->teamMates->pluck('id')->toArray());
+        $this->assertSame([$mate1->id, $mate2->id], $user->teamMatesWithPendingRelation->pluck('id')->toArray());
+        $this->assertSame([$user->id], User::has('teamMates')->pluck('id')->toArray());
+        $this->assertSame([$user->id], User::has('teamMatesWithPendingRelation')->pluck('id')->toArray());
 
         $result = $user->teamMates()->first();
         $this->assertEquals(
@@ -99,10 +99,10 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         User::create(['name' => Str::random(), 'team_id' => $team1->id]);
 
         $teamMates = $user->teamMatesWithGlobalScope;
-        $this->assertEquals(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
+        $this->assertSame(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
 
         $teamMates = $user->teamMatesWithGlobalScopeWithPendingRelation;
-        $this->assertEquals(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
+        $this->assertSame(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
     }
 
     public function testHasSelf()
@@ -147,7 +147,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
         $categories = Category::has('subProducts')->get();
 
-        $this->assertEquals([1], $categories->pluck('id')->all());
+        $this->assertSame([1], $categories->pluck('id')->all());
     }
 
     public function testFirstOrNewOnMissingRecord()
@@ -161,7 +161,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         );
 
         $this->assertFalse($user1->exists);
-        $this->assertEquals($team->id, $user1->team_id);
+        $this->assertSame($team->id, $user1->team_id);
         $this->assertSame('tony', $user1->slug);
         $this->assertSame('Tony', $user1->name);
     }
@@ -178,7 +178,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         );
 
         $this->assertTrue($newTony->exists);
-        $this->assertEquals($team->id, $newTony->team_id);
+        $this->assertSame($team->id, $newTony->team_id);
         $this->assertSame('tony', $newTony->slug);
         $this->assertSame('Tony Messias', $newTony->name);
 
@@ -393,7 +393,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         Article::create(['user_id' => $user->id, 'title' => Str::random(), 'created_at' => Carbon::now()->subDay()]);
         $latestArticle = Article::create(['user_id' => $user->id, 'title' => Str::random(), 'created_at' => Carbon::now()]);
 
-        $this->assertEquals($latestArticle->id, $team->latestArticle->id);
+        $this->assertSame($latestArticle->id, $team->latestArticle->id);
     }
 }
 

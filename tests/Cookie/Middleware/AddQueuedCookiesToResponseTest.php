@@ -22,7 +22,7 @@ class AddQueuedCookiesToResponseTest extends TestCase
         $next = function (Request $request) {
             return new Response;
         };
-        $this->assertEquals(
+        $this->assertSame(
             [
                 '' => [
                     '/path' => [

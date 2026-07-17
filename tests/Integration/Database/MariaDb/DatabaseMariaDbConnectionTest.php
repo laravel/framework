@@ -64,7 +64,7 @@ class DatabaseMariaDbConnectionTest extends MariaDbTestCase
     {
         DB::table(self::TABLE)->insert([self::FLOAT_COL => self::FLOAT_VAL]);
 
-        $this->assertEquals(self::FLOAT_VAL, DB::table(self::TABLE)->value(self::FLOAT_COL));
+        $this->assertSame(self::FLOAT_VAL, DB::table(self::TABLE)->value(self::FLOAT_COL));
     }
 
     #[DataProvider('jsonWhereNullDataProvider')]

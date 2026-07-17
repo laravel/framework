@@ -128,17 +128,17 @@ class FilesystemTest extends TestCase
         // Test replacing non-existent file.
         $filesystem->replace($tempFile, 'Hello World');
         $this->assertStringEqualsFile($tempFile, 'Hello World');
-        $this->assertEquals($umask, 0777 - $this->getFilePermissions($tempFile));
+        $this->assertSame($umask, 0777 - $this->getFilePermissions($tempFile));
 
         // Test replacing existing file.
         $filesystem->replace($tempFile, 'Something Else');
         $this->assertStringEqualsFile($tempFile, 'Something Else');
-        $this->assertEquals($umask, 0777 - $this->getFilePermissions($tempFile));
+        $this->assertSame($umask, 0777 - $this->getFilePermissions($tempFile));
 
         // Test replacing symlinked file.
         $filesystem->replace($symlink, 'Yet Something Else Again');
         $this->assertStringEqualsFile($tempFile, 'Yet Something Else Again');
-        $this->assertEquals($umask, 0777 - $this->getFilePermissions($tempFile));
+        $this->assertSame($umask, 0777 - $this->getFilePermissions($tempFile));
 
         umask($originalUmask);
 
@@ -153,7 +153,7 @@ class FilesystemTest extends TestCase
         $files->chmod(self::$tempDir.'/file.txt', 0755);
         $filePermission = substr(sprintf('%o', fileperms(self::$tempDir.'/file.txt')), -4);
         $expectedPermissions = DIRECTORY_SEPARATOR === '\\' ? '0666' : '0755';
-        $this->assertEquals($expectedPermissions, $filePermission);
+        $this->assertSame($expectedPermissions, $filePermission);
     }
 
     public function testGetChmod()
@@ -164,7 +164,7 @@ class FilesystemTest extends TestCase
         $files = new Filesystem;
         $filePermission = $files->chmod(self::$tempDir.'/file.txt');
         $expectedPermissions = DIRECTORY_SEPARATOR === '\\' ? '0666' : '0755';
-        $this->assertEquals($expectedPermissions, $filePermission);
+        $this->assertSame($expectedPermissions, $filePermission);
     }
 
     public function testDeleteRemovesFiles()
@@ -372,7 +372,7 @@ class FilesystemTest extends TestCase
         file_put_contents(self::$tempDir.'/file.txt', 'foo');
         $files = new Filesystem;
         $bytesWritten = $files->append(self::$tempDir.'/file.txt', 'bar');
-        $this->assertEquals(mb_strlen('bar', '8bit'), $bytesWritten);
+        $this->assertSame(mb_strlen('bar', '8bit'), $bytesWritten);
         $this->assertFileExists(self::$tempDir.'/file.txt');
         $this->assertStringEqualsFile(self::$tempDir.'/file.txt', 'foobar');
     }
@@ -411,7 +411,7 @@ class FilesystemTest extends TestCase
     {
         file_put_contents(self::$tempDir.'/foo.txt', 'foo');
         $files = new Filesystem;
-        $this->assertEquals(self::$tempDir, $files->dirname(self::$tempDir.'/foo.txt'));
+        $this->assertSame(self::$tempDir, $files->dirname(self::$tempDir.'/foo.txt'));
     }
 
     public function testTypeIdentifiesFile()
@@ -432,7 +432,7 @@ class FilesystemTest extends TestCase
     {
         $size = file_put_contents(self::$tempDir.'/foo.txt', 'foo');
         $files = new Filesystem;
-        $this->assertEquals($size, $files->size(self::$tempDir.'/foo.txt'));
+        $this->assertSame($size, $files->size(self::$tempDir.'/foo.txt'));
     }
 
     #[RequiresPhpExtension('fileinfo')]
@@ -604,7 +604,7 @@ class FilesystemTest extends TestCase
         file_put_contents(self::$tempDir.'/text/foo.txt', $data);
         $filesystem->copy(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo2.txt');
         $this->assertFileExists(self::$tempDir.'/text/foo2.txt');
-        $this->assertEquals($data, file_get_contents(self::$tempDir.'/text/foo2.txt'));
+        $this->assertSame($data, file_get_contents(self::$tempDir.'/text/foo2.txt'));
     }
 
     public function testHasSameHashChecksFileHashes()
@@ -675,7 +675,7 @@ class FilesystemTest extends TestCase
 
         $this->assertIsInt($timestamp);
         $this->assertGreaterThan(0, $timestamp);
-        $this->assertEquals(filemtime($path), $timestamp);
+        $this->assertSame(filemtime($path), $timestamp);
     }
 
     /**
@@ -701,7 +701,7 @@ class FilesystemTest extends TestCase
 
         $this->assertTrue($files->exists($filePath));
         $this->assertSame($testContent, $files->get($filePath));
-        $this->assertEquals(strlen($testContent), $files->size($filePath));
+        $this->assertSame(strlen($testContent), $files->size($filePath));
     }
 
     public function testDirectoryOperationsWithSubdirectories()

@@ -22,11 +22,11 @@ class ViewTest extends TestCase
         $view = $this->getView();
         $view->with('foo', 'bar');
         $view->with(['baz' => 'boom']);
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
+        $this->assertSame(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
 
         $view = $this->getView();
         $view->withFoo('bar')->withBaz('boom');
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
+        $this->assertSame(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
     }
 
     public function testRenderProperlyRendersView()
@@ -40,7 +40,7 @@ class ViewTest extends TestCase
         $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->once();
 
         $callback = function (View $rendered, $contents) use ($view) {
-            $this->assertEquals($view, $rendered);
+            $this->assertSame($view, $rendered);
             $this->assertSame('contents', $contents);
         };
 
@@ -82,7 +82,7 @@ class ViewTest extends TestCase
 
         $view->shouldReceive('render')->with(m::type(Closure::class))->once()->andReturn($sections = ['foo' => 'bar']);
 
-        $this->assertEquals($sections, $view->renderSections());
+        $this->assertSame($sections, $view->renderSections());
     }
 
     public function testSectionsAreNotFlushedWhenNotDoneRendering()
@@ -116,7 +116,7 @@ class ViewTest extends TestCase
         $view = $this->getView($arrayable);
 
         $this->assertSame('bar', $view->foo);
-        $this->assertEquals(['qux', 'corge'], $view->baz);
+        $this->assertSame(['qux', 'corge'], $view->baz);
     }
 
     public function testViewGettersSetters()
@@ -161,7 +161,7 @@ class ViewTest extends TestCase
         $this->assertSame('bar', $view->foo);
         $view->foo = 'baz';
         $this->assertSame('baz', $view->foo);
-        $this->assertEquals($view['foo'], $view->foo);
+        $this->assertSame($view['foo'], $view->foo);
         unset($view->foo);
         $this->assertFalse(isset($view->foo));
         $this->assertFalse($view->offsetExists('foo'));

@@ -13,7 +13,7 @@ class RouteUriTest extends TestCase
     {
         $parsed = RouteUri::parse($uri);
         $this->assertSame($expectedParsedUri, $parsed->uri);
-        $this->assertEquals($expectedBindingFields, $parsed->bindingFields);
+        $this->assertSame($expectedBindingFields, $parsed->bindingFields);
     }
 
     /**

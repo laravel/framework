@@ -212,7 +212,7 @@ class DatabaseEloquentRelationTest extends TestCase
     {
         Relation::morphMap([EloquentRelationResetModelStub::class]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'reset' => EloquentRelationResetModelStub::class,
         ], Relation::morphMap());
 
@@ -223,7 +223,7 @@ class DatabaseEloquentRelationTest extends TestCase
     {
         Relation::morphMap([1 => 'App\User']);
 
-        $this->assertEquals([
+        $this->assertSame([
             1 => 'App\User',
         ], Relation::morphMap());
 

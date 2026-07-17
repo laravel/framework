@@ -39,6 +39,6 @@ class DatabaseMariaDbSchemaBuilderTest extends TestCase
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
         $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql')->andReturn([['name' => 'column']]);
 
-        $this->assertEquals(['column'], $builder->getColumnListing('table'));
+        $this->assertSame(['column'], $builder->getColumnListing('table'));
     }
 }

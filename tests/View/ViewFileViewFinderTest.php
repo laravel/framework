@@ -16,7 +16,7 @@ class ViewFileViewFinderTest extends TestCase
         $finder = $this->getFinder();
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.blade.php')->andReturn(true);
 
-        $this->assertEquals(__DIR__.'/foo.blade.php', $finder->find('foo'));
+        $this->assertSame(__DIR__.'/foo.blade.php', $finder->find('foo'));
     }
 
     public function testCascadingFileLoading()
@@ -25,7 +25,7 @@ class ViewFileViewFinderTest extends TestCase
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.blade.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.php')->andReturn(true);
 
-        $this->assertEquals(__DIR__.'/foo.php', $finder->find('foo'));
+        $this->assertSame(__DIR__.'/foo.php', $finder->find('foo'));
     }
 
     public function testDirectoryCascadingFileLoading()
@@ -38,7 +38,7 @@ class ViewFileViewFinderTest extends TestCase
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.html')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/nested/foo.blade.php')->andReturn(true);
 
-        $this->assertEquals(__DIR__.'/nested/foo.blade.php', $finder->find('foo'));
+        $this->assertSame(__DIR__.'/nested/foo.blade.php', $finder->find('foo'));
     }
 
     public function testNamespacedBasicFileLoading()
@@ -47,7 +47,7 @@ class ViewFileViewFinderTest extends TestCase
         $finder->addNamespace('foo', __DIR__.'/foo');
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.blade.php')->andReturn(true);
 
-        $this->assertEquals(__DIR__.'/foo/bar/baz.blade.php', $finder->find('foo::bar.baz'));
+        $this->assertSame(__DIR__.'/foo/bar/baz.blade.php', $finder->find('foo::bar.baz'));
     }
 
     public function testCascadingNamespacedFileLoading()
@@ -57,7 +57,7 @@ class ViewFileViewFinderTest extends TestCase
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.blade.php')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.php')->andReturn(true);
 
-        $this->assertEquals(__DIR__.'/foo/bar/baz.php', $finder->find('foo::bar.baz'));
+        $this->assertSame(__DIR__.'/foo/bar/baz.php', $finder->find('foo::bar.baz'));
     }
 
     public function testDirectoryCascadingNamespacedFileLoading()
@@ -70,7 +70,7 @@ class ViewFileViewFinderTest extends TestCase
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo/bar/baz.html')->andReturn(false);
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/bar/bar/baz.blade.php')->andReturn(true);
 
-        $this->assertEquals(__DIR__.'/bar/bar/baz.blade.php', $finder->find('foo::bar.baz'));
+        $this->assertSame(__DIR__.'/bar/bar/baz.blade.php', $finder->find('foo::bar.baz'));
     }
 
     public function testExceptionThrownWhenViewNotFound()

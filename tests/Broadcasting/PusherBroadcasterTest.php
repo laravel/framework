@@ -118,7 +118,7 @@ class PusherBroadcasterTest extends TestCase
             ->once()
             ->andReturn(json_encode($data));
 
-        $this->assertEquals(
+        $this->assertSame(
             $data,
             $this->broadcaster->validAuthenticationResponse($request, true)
         );
@@ -140,7 +140,7 @@ class PusherBroadcasterTest extends TestCase
             ->once()
             ->andReturn(json_encode($data));
 
-        $this->assertEquals(
+        $this->assertSame(
             $data,
             $this->broadcaster->validAuthenticationResponse($request, true)
         );

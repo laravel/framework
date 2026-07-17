@@ -24,13 +24,13 @@ class DatabasePostgresProcessorTest extends TestCase
             ['name' => 'birth_date', 'type_name' => 'timestamp', 'type' => 'timestamp(6) without time zone', 'collation' => '', 'nullable' => false, 'default' => '', 'auto_increment' => false, 'comment' => '', 'generation' => null],
         ];
 
-        $this->assertEquals($expected, $processor->processColumns($listing));
+        $this->assertSame($expected, $processor->processColumns($listing));
 
         // convert listing to objects to simulate PDO::FETCH_CLASS
         foreach ($listing as &$row) {
             $row = (object) $row;
         }
 
-        $this->assertEquals($expected, $processor->processColumns($listing));
+        $this->assertSame($expected, $processor->processColumns($listing));
     }
 }

@@ -224,7 +224,7 @@ class ViewComponentAttributeBagTest extends TestCase
         ]);
 
         $this->assertIsArray($bag->toArray());
-        $this->assertEquals(['name' => 'test', 'class' => 'font-bold'], $bag->toArray());
+        $this->assertSame(['name' => 'test', 'class' => 'font-bold'], $bag->toArray());
     }
 
     public function testFilled()

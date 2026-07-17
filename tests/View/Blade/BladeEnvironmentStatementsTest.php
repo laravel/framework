@@ -16,7 +16,7 @@ breeze
 <?php else: ?>
 boom
 <?php endif; ?>";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testEnvStatementsWithMultipleStringParamsAreCompiled()
@@ -31,7 +31,7 @@ breeze
 <?php else: ?>
 boom
 <?php endif; ?>";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testEnvStatementsWithArrayParamAreCompiled()
@@ -46,7 +46,7 @@ breeze
 <?php else: ?>
 boom
 <?php endif; ?>";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testProductionStatementsAreCompiled()
@@ -61,6 +61,6 @@ breeze
 <?php else: ?>
 boom
 <?php endif; ?>";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

@@ -44,7 +44,7 @@ class EloquentModelLoadSumTest extends DatabaseTestCase
         $model->loadSum('related1', 'number');
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertEquals(21, $model->related1_sum_number);
+        $this->assertSame(21, $model->related1_sum_number);
     }
 
     public function testLoadSumMultipleRelations()
@@ -56,8 +56,8 @@ class EloquentModelLoadSumTest extends DatabaseTestCase
         $model->loadSum(['related1', 'related2'], 'number');
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertEquals(21, $model->related1_sum_number);
-        $this->assertEquals(12, $model->related2_sum_number);
+        $this->assertSame(21, $model->related1_sum_number);
+        $this->assertSame(12, $model->related2_sum_number);
     }
 }
 

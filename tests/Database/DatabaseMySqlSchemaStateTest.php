@@ -28,13 +28,13 @@ class DatabaseMySqlSchemaStateTest extends TestCase
         $method = new ReflectionMethod(get_class($schemaState), 'connectionString');
         $connString = $method->invoke($schemaState, $versionInfo);
 
-        $this->assertEquals($expectedConnectionString, $connString);
+        $this->assertSame($expectedConnectionString, $connString);
 
         // test baseVariables
         $method = new ReflectionMethod(get_class($schemaState), 'baseVariables');
         $variables = $method->invoke($schemaState, $dbConfig);
 
-        $this->assertEquals($expectedVariables, $variables);
+        $this->assertSame($expectedVariables, $variables);
     }
 
     public static function provider(): Generator

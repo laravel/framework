@@ -9,10 +9,10 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = "Foo <?php use \SomeNamespace\SomeClass as Foo; ?> bar";
 
         $string = "Foo @use('SomeNamespace\SomeClass', 'Foo') bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = "Foo @use(SomeNamespace\SomeClass, Foo) bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testUseStatementsWithoutAsAreCompiled()
@@ -20,10 +20,10 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = "Foo <?php use \SomeNamespace\SomeClass; ?> bar";
 
         $string = "Foo @use('SomeNamespace\SomeClass') bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = "Foo @use(SomeNamespace\SomeClass) bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testUseStatementsWithBackslashAtBeginningAreCompiled()
@@ -31,10 +31,10 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = "Foo <?php use \SomeNamespace\SomeClass; ?> bar";
 
         $string = "Foo @use('\SomeNamespace\SomeClass') bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = "Foo @use(\SomeNamespace\SomeClass) bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testUseStatementsWithBackslashAtBeginningAndAliasedAreCompiled()
@@ -42,10 +42,10 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = "Foo <?php use \SomeNamespace\SomeClass as Foo; ?> bar";
 
         $string = "Foo @use('\SomeNamespace\SomeClass', 'Foo') bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = "Foo @use(\SomeNamespace\SomeClass, Foo) bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testUseStatementsWithBracesAreCompiledCorrectly()
@@ -53,10 +53,10 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = "Foo <?php use \SomeNamespace\{Foo, Bar}; ?> bar";
 
         $string = "Foo @use('SomeNamespace\{Foo, Bar}') bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = "Foo @use(SomeNamespace\{Foo, Bar}) bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testUseStatementWithBracesAndBackslashAreCompiledCorrectly()
@@ -64,10 +64,10 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = "Foo <?php use \SomeNamespace\{Foo, Bar}; ?> bar";
 
         $string = "Foo @use('\SomeNamespace\{Foo, Bar}') bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = "Foo @use(\SomeNamespace\{Foo, Bar}) bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testUseStatementsWithModifiersAreCompiled()
@@ -75,10 +75,10 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = 'Foo <?php use function \SomeNamespace\SomeFunction as Foo; ?> bar';
 
         $string = "Foo @use('function SomeNamespace\SomeFunction', 'Foo') bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = 'Foo @use(function SomeNamespace\SomeFunction, Foo) bar';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testUseStatementsWithModifiersWithoutAliasAreCompiled()
@@ -86,10 +86,10 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = 'Foo <?php use const \SomeNamespace\SOME_CONST; ?> bar';
 
         $string = "Foo @use('const SomeNamespace\SOME_CONST') bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = 'Foo @use(const SomeNamespace\SOME_CONST) bar';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testUseStatementsWithModifiersAndBackslashAtBeginningAreCompiled()
@@ -97,10 +97,10 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = 'Foo <?php use function \SomeNamespace\SomeFunction; ?> bar';
 
         $string = "Foo @use('function \SomeNamespace\SomeFunction') bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = 'Foo @use(function \SomeNamespace\SomeFunction) bar';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testUseStatementsWithModifiersBackslashAtBeginningAndAliasedAreCompiled()
@@ -108,10 +108,10 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = 'Foo <?php use const \SomeNamespace\SOME_CONST as Foo; ?> bar';
 
         $string = "Foo @use('const \SomeNamespace\SOME_CONST', 'Foo') bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = 'Foo @use(const \SomeNamespace\SOME_CONST, Foo) bar';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testUseStatementsWithModifiersWithBracesAreCompiledCorrectly()
@@ -119,10 +119,10 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = 'Foo <?php use function \SomeNamespace\{Foo, Bar}; ?> bar';
 
         $string = "Foo @use('function SomeNamespace\{Foo, Bar}') bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = 'Foo @use(function SomeNamespace\{Foo, Bar}) bar';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testUseFunctionStatementWithBracesAndBackslashAreCompiledCorrectly()
@@ -130,9 +130,9 @@ class BladeUseTest extends AbstractBladeTestCase
         $expected = 'Foo <?php use const \SomeNamespace\{FOO, BAR}; ?> bar';
 
         $string = "Foo @use('const \SomeNamespace\{FOO, BAR}') bar";
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
 
         $string = 'Foo @use(const \SomeNamespace\{FOO, BAR}) bar';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

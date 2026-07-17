@@ -1561,7 +1561,7 @@ class ResourceTest extends TestCase
 
         $results = $filter->work();
 
-        $this->assertEquals([
+        $this->assertSame([
             'name' => 'mohamed', 'location' => 'hurghada',
         ], $results);
     }
@@ -1600,7 +1600,7 @@ class ResourceTest extends TestCase
 
         $results = $filter->work();
 
-        $this->assertEquals([
+        $this->assertSame([
             'name' => 'mohamed', 'location' => 'hurghada',
         ], $results);
     }
@@ -1626,7 +1626,7 @@ class ResourceTest extends TestCase
 
         $results = $filter->work();
 
-        $this->assertEquals([
+        $this->assertSame([
             'First', 'Second', 'Taylor', 'Mohamed', 'Adam', 'Matt', 'Jeffrey', 'Abigail', 'Lydia',
         ], $results);
     }
@@ -1652,7 +1652,7 @@ class ResourceTest extends TestCase
 
         $results = $filter->work();
 
-        $this->assertEquals([
+        $this->assertSame([
             'First', 'Second', 'Taylor', 'Mohamed', 'Jeffrey', 'Abigail', 'Lydia',
         ], $results);
     }
@@ -1678,7 +1678,7 @@ class ResourceTest extends TestCase
 
         $results = $filter->work();
 
-        $this->assertEquals([
+        $this->assertSame([
             'Taylor', 'Mohamed', 'Adam', 'Matt', 'Jeffrey', 'Abigail', 'Lydia',
         ], $results);
     }
@@ -1706,7 +1706,7 @@ class ResourceTest extends TestCase
 
         $results = $filter->work();
 
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 1,
             'title' => 'Test Title 1',
             'custom' => true,
@@ -1736,7 +1736,7 @@ class ResourceTest extends TestCase
 
         $results = $filter->work();
 
-        $this->assertEquals([
+        $this->assertSame([
             ['id' => 1, 'title' => 'Test title 1', 'custom' => true],
             ['id' => 2, 'title' => 'Test title 2', 'custom' => true],
         ], $results);
@@ -1763,7 +1763,7 @@ class ResourceTest extends TestCase
 
         $results = $filter->work();
 
-        $this->assertEquals([
+        $this->assertSame([
             'Taylor', 'Mohamed', 'Jeffrey',
         ], $results);
     }
@@ -1786,7 +1786,7 @@ class ResourceTest extends TestCase
 
         $results = $filter->work();
 
-        $this->assertEquals([
+        $this->assertSame([
             'Taylor', 'Mohamed', 'Abigail', 'Lydia', 'Jeffrey',
         ], $results);
     }
@@ -1814,7 +1814,7 @@ class ResourceTest extends TestCase
 
         $results = $filter->work();
 
-        $this->assertEquals([
+        $this->assertSame([
             [
                 'Something',
             ],
@@ -1929,7 +1929,7 @@ class ResourceTest extends TestCase
         $response = $resource->toResponse(request());
         $content = json_decode($response->getContent(), true);
 
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 5,
             'title' => 'Test',
             'data' => 'some data',
@@ -1946,7 +1946,7 @@ class ResourceTest extends TestCase
         $response = $resource->toResponse(request());
         $content = json_decode($response->getContent(), true);
 
-        $this->assertEquals([
+        $this->assertSame([
             'data' => [
                 'id' => 5,
                 'title' => 'Test',
@@ -1967,7 +1967,7 @@ class ResourceTest extends TestCase
         $response = $resource->toResponse(request());
         $content = json_decode($response->getContent(), true);
 
-        $this->assertEquals([
+        $this->assertSame([
             'results' => [
                 'id' => 5,
                 'title' => 'Test',
@@ -1991,7 +1991,7 @@ class ResourceTest extends TestCase
         $response = $resource->toResponse(request());
         $content = json_decode($response->getContent(), true);
 
-        $this->assertEquals([
+        $this->assertSame([
             'results' => [
                 [
                     'id' => 5,
@@ -2022,7 +2022,7 @@ class ResourceTest extends TestCase
         $this->assertArrayHasKey('meta', $content);
 
         $this->assertCount(1, $content['results']);
-        $this->assertEquals([
+        $this->assertSame([
             [
                 'id' => 5,
                 'title' => 'Test',
@@ -2061,7 +2061,7 @@ class ResourceTest extends TestCase
         $response = $resource->toResponse(request());
         $content = json_decode($response->getContent(), true);
 
-        $this->assertEquals([
+        $this->assertSame([
             'data' => [
                 'id' => 5,
                 'title' => 'Test',

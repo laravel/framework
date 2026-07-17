@@ -121,11 +121,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
             }
         };
 
-        $this->assertEquals(['alter table `users` add `created` date not null default (CURDATE())'], $getSql('MySql'));
-        $this->assertEquals(['alter table `users` add `created` date not null'], $getSql('MySql', mysql57: true));
-        $this->assertEquals(['alter table "users" add column "created" date not null default CURRENT_DATE'], $getSql('Postgres'));
-        $this->assertEquals(['alter table "users" add column "created" date not null default CURRENT_DATE'], $getSql('SQLite'));
-        $this->assertEquals(['alter table "users" add "created" date not null default CAST(GETDATE() AS DATE)'], $getSql('SqlServer'));
+        $this->assertSame(['alter table `users` add `created` date not null default (CURDATE())'], $getSql('MySql'));
+        $this->assertSame(['alter table `users` add `created` date not null'], $getSql('MySql', mysql57: true));
+        $this->assertSame(['alter table "users" add column "created" date not null default CURRENT_DATE'], $getSql('Postgres'));
+        $this->assertSame(['alter table "users" add column "created" date not null default CURRENT_DATE'], $getSql('SQLite'));
+        $this->assertSame(['alter table "users" add "created" date not null default CAST(GETDATE() AS DATE)'], $getSql('SqlServer'));
     }
 
     public function testDefaultCurrentDateTime()
@@ -136,10 +136,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals(['alter table `users` add `created` datetime not null default CURRENT_TIMESTAMP'], $getSql('MySql'));
-        $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $getSql('Postgres'));
-        $this->assertEquals(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SQLite'));
-        $this->assertEquals(['alter table "users" add "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SqlServer'));
+        $this->assertSame(['alter table `users` add `created` datetime not null default CURRENT_TIMESTAMP'], $getSql('MySql'));
+        $this->assertSame(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $getSql('Postgres'));
+        $this->assertSame(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SQLite'));
+        $this->assertSame(['alter table "users" add "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SqlServer'));
     }
 
     public function testDefaultCurrentTimestamp()
@@ -150,10 +150,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals(['alter table `users` add `created` timestamp not null default CURRENT_TIMESTAMP'], $getSql('MySql'));
-        $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $getSql('Postgres'));
-        $this->assertEquals(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SQLite'));
-        $this->assertEquals(['alter table "users" add "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SqlServer'));
+        $this->assertSame(['alter table `users` add `created` timestamp not null default CURRENT_TIMESTAMP'], $getSql('MySql'));
+        $this->assertSame(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $getSql('Postgres'));
+        $this->assertSame(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SQLite'));
+        $this->assertSame(['alter table "users" add "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SqlServer'));
     }
 
     public function testDefaultCurrentYear()
@@ -174,11 +174,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
             }
         };
 
-        $this->assertEquals(['alter table `users` add `birth_year` year not null default (YEAR(CURDATE()))'], $getSql('MySql'));
-        $this->assertEquals(['alter table `users` add `birth_year` year not null'], $getSql('MySql', mysql57: true));
-        $this->assertEquals(['alter table "users" add column "birth_year" integer not null default EXTRACT(YEAR FROM CURRENT_DATE)'], $getSql('Postgres'));
-        $this->assertEquals(['alter table "users" add column "birth_year" integer not null default (CAST(strftime(\'%Y\', \'now\') AS INTEGER))'], $getSql('SQLite'));
-        $this->assertEquals(['alter table "users" add "birth_year" int not null default CAST(YEAR(GETDATE()) AS INTEGER)'], $getSql('SqlServer'));
+        $this->assertSame(['alter table `users` add `birth_year` year not null default (YEAR(CURDATE()))'], $getSql('MySql'));
+        $this->assertSame(['alter table `users` add `birth_year` year not null'], $getSql('MySql', mysql57: true));
+        $this->assertSame(['alter table "users" add column "birth_year" integer not null default EXTRACT(YEAR FROM CURRENT_DATE)'], $getSql('Postgres'));
+        $this->assertSame(['alter table "users" add column "birth_year" integer not null default (CAST(strftime(\'%Y\', \'now\') AS INTEGER))'], $getSql('SQLite'));
+        $this->assertSame(['alter table "users" add "birth_year" int not null default CAST(YEAR(GETDATE()) AS INTEGER)'], $getSql('SqlServer'));
     }
 
     public function testRemoveColumn()
@@ -191,7 +191,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals(['alter table `users` add `foo` varchar(255) not null'], $getSql('MySql'));
+        $this->assertSame(['alter table `users` add `foo` varchar(255) not null'], $getSql('MySql'));
     }
 
     public function testRenameColumn()
@@ -206,10 +206,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
             }))->toSql();
         };
 
-        $this->assertEquals(['alter table `users` rename column `foo` to `bar`'], $getSql('MySql'));
-        $this->assertEquals(['alter table "users" rename column "foo" to "bar"'], $getSql('Postgres'));
-        $this->assertEquals(['alter table "users" rename column "foo" to "bar"'], $getSql('SQLite'));
-        $this->assertEquals(['sp_rename N\'"users"."foo"\', "bar", N\'COLUMN\''], $getSql('SqlServer'));
+        $this->assertSame(['alter table `users` rename column `foo` to `bar`'], $getSql('MySql'));
+        $this->assertSame(['alter table "users" rename column "foo" to "bar"'], $getSql('Postgres'));
+        $this->assertSame(['alter table "users" rename column "foo" to "bar"'], $getSql('SQLite'));
+        $this->assertSame(['sp_rename N\'"users"."foo"\', "bar", N\'COLUMN\''], $getSql('SqlServer'));
     }
 
     public function testNativeRenameColumnOnMysql57()
@@ -229,7 +229,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             $table->renameColumn('generated', 'new_generated');
         });
 
-        $this->assertEquals([
+        $this->assertSame([
             "alter table `users` change `name` `title` varchar(255) collate 'utf8mb4_unicode_ci' null default 'foo'",
             "alter table `users` change `id` `key` bigint unsigned not null auto_increment comment 'lorem ipsum'",
             'alter table `users` change `generated` `new_generated` int as (expression) stored not null',
@@ -255,7 +255,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             $table->renameColumn('foo', 'bar');
         });
 
-        $this->assertEquals([
+        $this->assertSame([
             "alter table `users` change `name` `title` varchar(255) collate 'utf8mb4_unicode_ci' null default 'foo'",
             "alter table `users` change `id` `key` bigint unsigned not null auto_increment comment 'lorem ipsum'",
             'alter table `users` change `generated` `new_generated` int as (expression) stored not null',
@@ -271,9 +271,9 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals(['alter table `users` drop `foo`'], $getSql('MySql'));
-        $this->assertEquals(['alter table "users" drop column "foo"'], $getSql('Postgres'));
-        $this->assertEquals(['alter table "users" drop column "foo"'], $getSql('SQLite'));
+        $this->assertSame(['alter table `users` drop `foo`'], $getSql('MySql'));
+        $this->assertSame(['alter table "users" drop column "foo"'], $getSql('Postgres'));
+        $this->assertSame(['alter table "users" drop column "foo"'], $getSql('SQLite'));
         $this->assertStringContainsString('alter table "users" drop column "foo"', $getSql('SqlServer')[0]);
     }
 
@@ -288,7 +288,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             $table->bigIncrements('id')->first()->from(10)->comment('my comment')->change();
         });
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `users` modify `amount` double null invisible after `name`',
             'alter table `users` modify `added_at` timestamp(4) not null default CURRENT_TIMESTAMP(4) on update CURRENT_TIMESTAMP(4)',
             "alter table `users` modify `difficulty` enum('easy', 'hard') character set utf8mb4 collate 'unicode' not null default 'easy'",
@@ -313,7 +313,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             $table->foo();
         });
 
-        $this->assertEquals(['bar'], $blueprint->toSql());
+        $this->assertSame(['bar'], $blueprint->toSql());
     }
 
     public function testDefaultUsingIdMorph()
@@ -324,7 +324,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `comments` add `commentable_type` varchar(255) not null',
             'alter table `comments` add `commentable_id` bigint unsigned not null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
@@ -339,7 +339,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `comments` add `commentable_type` varchar(255) null',
             'alter table `comments` add `commentable_id` bigint unsigned null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
@@ -356,7 +356,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `comments` add `commentable_type` varchar(255) not null',
             'alter table `comments` add `commentable_id` char(36) not null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
@@ -373,7 +373,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `comments` add `commentable_type` varchar(255) null',
             'alter table `comments` add `commentable_id` char(36) null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
@@ -390,7 +390,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `comments` add `commentable_type` varchar(255) not null',
             'alter table `comments` add `commentable_id` char(26) not null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
@@ -407,7 +407,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `comments` add `commentable_type` varchar(255) null',
             'alter table `comments` add `commentable_id` char(26) null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
@@ -422,7 +422,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` add `user_id` bigint unsigned not null',
         ], $getSql('MySql'));
     }
@@ -435,7 +435,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` add `model_using_non_incremented_int_id` bigint unsigned not null',
         ], $getSql('MySql'));
     }
@@ -448,7 +448,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` add `model_using_uuid_id` char(36) not null',
         ], $getSql('MySql'));
     }
@@ -461,7 +461,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` add `model_using_uuid_id` char(36) not null',
         ], $getSql('MySql'));
     }
@@ -474,11 +474,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table "posts" add column "model_using_ulid_id" char(26) not null',
         ], $getSql('Postgres'));
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` add `model_using_ulid_id` char(26) not null',
         ], $getSql('MySql'));
     }
@@ -491,7 +491,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` add `user_id` bigint unsigned not null',
             'alter table `posts` add constraint `posts_user_id_foreign` foreign key (`user_id`) references `users` (`id`)',
         ], $getSql('MySql'));
@@ -505,7 +505,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` add `model_using_uuid_id` char(36) not null',
             'alter table `posts` add constraint `posts_model_using_uuid_id_foreign` foreign key (`model_using_uuid_id`) references `model` (`id`)',
         ], $getSql('MySql'));
@@ -519,7 +519,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` add `user_internal_id` bigint unsigned not null',
             'alter table `posts` add constraint `posts_user_internal_id_foreign` foreign key (`user_internal_id`) references `users` (`internal_id`)',
         ], $getSql('MySql'));
@@ -533,7 +533,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` drop `user_id`',
         ], $getSql('MySql'));
     }
@@ -546,7 +546,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` drop `model_using_uuid_id`',
         ], $getSql('MySql'));
     }
@@ -559,7 +559,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` drop foreign key `posts_user_id_foreign`',
             'alter table `posts` drop `user_id`',
         ], $getSql('MySql'));
@@ -573,7 +573,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` drop foreign key `posts_model_using_uuid_id_foreign`',
             'alter table `posts` drop `model_using_uuid_id`',
         ], $getSql('MySql'));
@@ -587,10 +587,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals(['alter table `posts` add `note` tinytext not null'], $getSql('MySql'));
-        $this->assertEquals(['alter table "posts" add column "note" text not null'], $getSql('SQLite'));
-        $this->assertEquals(['alter table "posts" add column "note" varchar(255) not null'], $getSql('Postgres'));
-        $this->assertEquals(['alter table "posts" add "note" nvarchar(255) not null'], $getSql('SqlServer'));
+        $this->assertSame(['alter table `posts` add `note` tinytext not null'], $getSql('MySql'));
+        $this->assertSame(['alter table "posts" add column "note" text not null'], $getSql('SQLite'));
+        $this->assertSame(['alter table "posts" add column "note" varchar(255) not null'], $getSql('Postgres'));
+        $this->assertSame(['alter table "posts" add "note" nvarchar(255) not null'], $getSql('SqlServer'));
     }
 
     public function testTinyTextNullableColumn()
@@ -601,10 +601,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals(['alter table `posts` add `note` tinytext null'], $getSql('MySql'));
-        $this->assertEquals(['alter table "posts" add column "note" text'], $getSql('SQLite'));
-        $this->assertEquals(['alter table "posts" add column "note" varchar(255) null'], $getSql('Postgres'));
-        $this->assertEquals(['alter table "posts" add "note" nvarchar(255) null'], $getSql('SqlServer'));
+        $this->assertSame(['alter table `posts` add `note` tinytext null'], $getSql('MySql'));
+        $this->assertSame(['alter table "posts" add column "note" text'], $getSql('SQLite'));
+        $this->assertSame(['alter table "posts" add column "note" varchar(255) null'], $getSql('Postgres'));
+        $this->assertSame(['alter table "posts" add "note" nvarchar(255) null'], $getSql('SqlServer'));
     }
 
     public function testRawColumn()
@@ -615,19 +615,19 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table `posts` add `legacy_boolean` INT(1) null',
         ], $getSql('MySql'));
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table "posts" add column "legacy_boolean" INT(1)',
         ], $getSql('SQLite'));
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table "posts" add column "legacy_boolean" INT(1) null',
         ], $getSql('Postgres'));
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table "posts" add "legacy_boolean" INT(1) null',
         ], $getSql('SqlServer'));
     }
@@ -640,8 +640,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals(['alter table `posts` comment = \'Look at my comment, it is amazing\''], $getSql('MySql'));
-        $this->assertEquals(['comment on table "posts" is \'Look at my comment, it is amazing\''], $getSql('Postgres'));
+        $this->assertSame(['alter table `posts` comment = \'Look at my comment, it is amazing\''], $getSql('MySql'));
+        $this->assertSame(['comment on table "posts" is \'Look at my comment, it is amazing\''], $getSql('Postgres'));
     }
 
     public function testColumnDefault()
@@ -653,7 +653,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this will work\''], $getSql('MySql'));
+        $this->assertSame(['alter table `posts` add `note` tinytext not null default \'this will work\''], $getSql('MySql'));
 
         // Test a string literal column default containing an apostrophe (#56124)
         $getSql = function ($grammar) {
@@ -662,7 +662,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
 
-        $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this\'\'ll work too\''], $getSql('MySql'));
+        $this->assertSame(['alter table `posts` add `note` tinytext not null default \'this\'\'ll work too\''], $getSql('MySql'));
 
         // Test a backed enumeration column default
         $getSql = function ($grammar) {
@@ -671,7 +671,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
                 $table->tinyText('note')->default($enum);
             })->toSql();
         };
-        $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this will work\''], $getSql('MySql'));
+        $this->assertSame(['alter table `posts` add `note` tinytext not null default \'this will work\''], $getSql('MySql'));
 
         // Test a backed enumeration column default containing an apostrophe (#56124)
         $getSql = function ($grammar) {
@@ -680,7 +680,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
                 $table->tinyText('note')->default($enum);
             })->toSql();
         };
-        $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this\'\'ll work too\''], $getSql('MySql'));
+        $this->assertSame(['alter table `posts` add `note` tinytext not null default \'this\'\'ll work too\''], $getSql('MySql'));
     }
 
     protected function getConnection(?string $grammar = null, string $prefix = '')

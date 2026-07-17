@@ -63,6 +63,6 @@ class TimestampTypeTest extends DatabaseTestCase
 
         $expected = ['alter table `test` modify `string_to_timestamp` timestamp null'];
 
-        $this->assertEquals($expected, $blueprint->toSql());
+        $this->assertSame($expected, $blueprint->toSql());
     }
 }

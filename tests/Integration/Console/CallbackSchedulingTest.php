@@ -122,6 +122,6 @@ class CallbackSchedulingTest extends TestCase
 
     protected function assertLogged(...$message)
     {
-        $this->assertEquals($message, $this->log);
+        $this->assertSame($message, $this->log);
     }
 }

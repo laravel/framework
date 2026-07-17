@@ -56,7 +56,7 @@ class PromptsAssertionTest extends TestCase
                 public function handle()
                 {
                     $value = pause('Press any key to continue...');
-                    $this->test->assertEquals(true, $value);
+                    $this->test->assertSame(true, $value);
                 }
             }
         );

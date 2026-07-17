@@ -382,7 +382,7 @@ class ContextualAttributeBindingTest extends TestCase
             return $integers;
         });
 
-        $this->assertEquals([1, 2], iterator_to_array($value));
+        $this->assertSame([1, 2], iterator_to_array($value));
     }
 
     public function testParameterIsPassedToContextualAttributeResolver()

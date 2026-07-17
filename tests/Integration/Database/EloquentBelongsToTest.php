@@ -44,8 +44,8 @@ class EloquentBelongsToTest extends DatabaseTestCase
 
         $parent->parent()->associate($child);
 
-        $this->assertEquals($child->id, $parent->parent_id);
-        $this->assertEquals($child->id, $parent->parent->id);
+        $this->assertSame($child->id, $parent->parent_id);
+        $this->assertSame($child->id, $parent->parent->id);
     }
 
     public function testAssociateWithId()
@@ -55,8 +55,8 @@ class EloquentBelongsToTest extends DatabaseTestCase
 
         $parent->parent()->associate($child->id);
 
-        $this->assertEquals($child->id, $parent->parent_id);
-        $this->assertEquals($child->id, $parent->parent->id);
+        $this->assertSame($child->id, $parent->parent_id);
+        $this->assertSame($child->id, $parent->parent->id);
     }
 
     public function testAssociateWithIdUnsetsLoadedRelation()
@@ -66,7 +66,7 @@ class EloquentBelongsToTest extends DatabaseTestCase
         // Overwrite the (loaded) parent relation
         $child->parent()->associate($child->id);
 
-        $this->assertEquals($child->id, $child->parent_id);
+        $this->assertSame($child->id, $child->parent_id);
         $this->assertFalse($child->relationLoaded('parent'));
     }
 

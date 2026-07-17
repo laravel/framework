@@ -79,7 +79,7 @@ class ValidationEnumRuleTest extends TestCase
         );
 
         $this->assertTrue($v->fails());
-        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+        $this->assertSame(['The selected status is invalid.'], $v->messages()->get('status'));
     }
 
     public function testValidationPassesForAllCasesUntilEitherOnlyOrExceptIsPassed()
@@ -169,7 +169,7 @@ class ValidationEnumRuleTest extends TestCase
         );
 
         $this->assertTrue($v->fails());
-        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+        $this->assertSame(['The selected status is invalid.'], $v->messages()->get('status'));
     }
 
     public function testValidationPassesWhenProvidingDifferentTypeThatIsCastableToTheEnumType()
@@ -200,7 +200,7 @@ class ValidationEnumRuleTest extends TestCase
         );
 
         $this->assertTrue($v->fails());
-        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+        $this->assertSame(['The selected status is invalid.'], $v->messages()->get('status'));
     }
 
     public function testValidationPassesWhenProvidingNullButTheFieldIsNullable()
@@ -246,7 +246,7 @@ class ValidationEnumRuleTest extends TestCase
         );
 
         $this->assertTrue($v->fails());
-        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+        $this->assertSame(['The selected status is invalid.'], $v->messages()->get('status'));
     }
 
     public function testValidationFailsWhenUsingDifferentCase()
@@ -262,7 +262,7 @@ class ValidationEnumRuleTest extends TestCase
         );
 
         $this->assertTrue($v->fails());
-        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+        $this->assertSame(['The selected status is invalid.'], $v->messages()->get('status'));
     }
 
     public static function conditionalCasesDataProvider(): array

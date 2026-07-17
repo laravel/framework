@@ -55,21 +55,21 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('many')->once()->with(['foo', 'bar'])->andReturn(['foo' => 'bar', 'bar' => 'baz']);
-        $this->assertEquals(['foo' => 'bar', 'bar' => 'baz'], $repo->get(['foo', 'bar']));
+        $this->assertSame(['foo' => 'bar', 'bar' => 'baz'], $repo->get(['foo', 'bar']));
     }
 
     public function testGetReturnsMultipleValuesFromCacheWhenGivenAnArrayWithDefaultValues()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('many')->once()->with(['foo', 'bar'])->andReturn(['foo' => null, 'bar' => 'baz']);
-        $this->assertEquals(['foo' => 'default', 'bar' => 'baz'], $repo->get(['foo' => 'default', 'bar']));
+        $this->assertSame(['foo' => 'default', 'bar' => 'baz'], $repo->get(['foo' => 'default', 'bar']));
     }
 
     public function testGetReturnsMultipleValuesFromCacheWhenGivenAnArrayOfOneTwoThree()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('many')->once()->with([1, 2, 3])->andReturn([1 => null, 2 => null, 3 => null]);
-        $this->assertEquals([1 => null, 2 => null, 3 => null], $repo->get([1, 2, 3]));
+        $this->assertSame([1 => null, 2 => null, 3 => null], $repo->get([1, 2, 3]));
     }
 
     public function testDefaultValueIsReturned()
@@ -86,7 +86,7 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->setDefaultCacheTime(10);
-        $this->assertEquals(10, $repo->getDefaultCacheTime());
+        $this->assertSame(10, $repo->getDefaultCacheTime());
     }
 
     public function testHasMethod()
@@ -371,7 +371,7 @@ class CacheRepositoryTest extends TestCase
 
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('many')->once()->with(['key1', 'key2', 'key3'])->andReturn(['key1' => 1, 'key2' => null, 'key3' => null]);
-        $this->assertEquals(['key1' => 1, 'key2' => 5, 'key3' => 5], $repo->getMultiple($keys, $default));
+        $this->assertSame(['key1' => 1, 'key2' => 5, 'key3' => 5], $repo->getMultiple($keys, $default));
     }
 
     public function testRemovingMultipleKeys()
@@ -424,13 +424,13 @@ class CacheRepositoryTest extends TestCase
         $repo = new Repository(new ArrayStore());
 
         $store = $repo->tags('foo');
-        $this->assertEquals(['foo'], $store->getTags()->getNames());
+        $this->assertSame(['foo'], $store->getTags()->getNames());
 
         $store = $repo->tags(['foo!', 'Kangaroo']);
-        $this->assertEquals(['foo!', 'Kangaroo'], $store->getTags()->getNames());
+        $this->assertSame(['foo!', 'Kangaroo'], $store->getTags()->getNames());
 
         $store = $repo->tags('r1', 'r2', 'r3');
-        $this->assertEquals(['r1', 'r2', 'r3'], $store->getTags()->getNames());
+        $this->assertSame(['r1', 'r2', 'r3'], $store->getTags()->getNames());
     }
 
     public function testEventDispatcherIsPassedToStoreFromRepository()

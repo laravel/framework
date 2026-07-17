@@ -132,38 +132,38 @@ class SupportLazyCollectionTest extends TestCase
         $a = $collection->getIterator();
         $b = $collection->getIterator();
 
-        $this->assertEquals(1, $a->current());
-        $this->assertEquals(1, $b->current());
+        $this->assertSame(1, $a->current());
+        $this->assertSame(1, $b->current());
 
         $b->next();
 
-        $this->assertEquals(1, $a->current());
-        $this->assertEquals(2, $b->current());
+        $this->assertSame(1, $a->current());
+        $this->assertSame(2, $b->current());
 
         $b->next();
 
-        $this->assertEquals(1, $a->current());
-        $this->assertEquals(3, $b->current());
+        $this->assertSame(1, $a->current());
+        $this->assertSame(3, $b->current());
 
         $a->next();
 
-        $this->assertEquals(2, $a->current());
-        $this->assertEquals(3, $b->current());
+        $this->assertSame(2, $a->current());
+        $this->assertSame(3, $b->current());
 
         $a->next();
 
-        $this->assertEquals(3, $a->current());
-        $this->assertEquals(3, $b->current());
+        $this->assertSame(3, $a->current());
+        $this->assertSame(3, $b->current());
 
         $a->next();
 
-        $this->assertEquals(4, $a->current());
-        $this->assertEquals(3, $b->current());
+        $this->assertSame(4, $a->current());
+        $this->assertSame(3, $b->current());
 
         $b->next();
 
-        $this->assertEquals(4, $a->current());
-        $this->assertEquals(4, $b->current());
+        $this->assertSame(4, $a->current());
+        $this->assertSame(4, $b->current());
     }
 
     public function testRememberWithDuplicateKeys()
@@ -344,7 +344,7 @@ class SupportLazyCollectionTest extends TestCase
         $shuffled = $data->shuffle();
 
         $this->assertCount(5, $shuffled);
-        $this->assertEquals([1, 2, 3, 4, 5], $shuffled->sort()->values()->all());
+        $this->assertSame([1, 2, 3, 4, 5], $shuffled->sort()->values()->all());
 
         // Test shuffling associative array maintains key-value pairs
         $users = new LazyCollection([
@@ -366,7 +366,7 @@ class SupportLazyCollectionTest extends TestCase
         ]);
         $collapsed = $collection->collapseWithKeys();
 
-        $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4], $collapsed->all());
+        $this->assertSame(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4], $collapsed->all());
 
         $collection = new LazyCollection([
             ['a' => 1],
@@ -374,7 +374,7 @@ class SupportLazyCollectionTest extends TestCase
         ]);
         $collapsed = $collection->collapseWithKeys();
 
-        $this->assertEquals(['a' => 1, 'b' => 2], $collapsed->all());
+        $this->assertSame(['a' => 1, 'b' => 2], $collapsed->all());
     }
 
     public function testContainsOneItem()
@@ -462,7 +462,7 @@ class SupportLazyCollectionTest extends TestCase
             'users.1.name' => 'Jeffrey',
         ];
 
-        $this->assertEquals($expected, $dotted->all());
+        $this->assertSame($expected, $dotted->all());
     }
 
     public function testWithHeartbeat()
@@ -496,7 +496,7 @@ class SupportLazyCollectionTest extends TestCase
             // Push every number onto `output` as it's enumerated...
             ->tapEach(fn ($number) => $output[] = $number)->all();
 
-        $this->assertEquals(range(1, 10), $numbers);
+        $this->assertSame(range(1, 10), $numbers);
 
         $this->assertEquals(
             [
@@ -520,7 +520,7 @@ class SupportLazyCollectionTest extends TestCase
 
         $keysWithoutPreserve = array_keys($collection->random(2)->all());
 
-        $this->assertEquals([0, 1], $keysWithoutPreserve);
+        $this->assertSame([0, 1], $keysWithoutPreserve);
 
         $keysWithPreserve = array_keys($collection->random(2, true)->all());
 

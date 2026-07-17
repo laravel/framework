@@ -37,7 +37,7 @@ class ListenerTest extends TestCase
         $this->assertSame('testing', $query['connectionName']);
         $this->assertSame(5.2, $query['time']);
         $this->assertSame('select * from users where id = ?', $query['sql']);
-        $this->assertEquals(['foo'], $query['bindings']);
+        $this->assertSame(['foo'], $query['bindings']);
     }
 
     public function test_listener_caps_at_100_queries()
@@ -128,8 +128,8 @@ class ListenerTest extends TestCase
             new QueryExecuted($sql, ['John'], 1.0, $connection)
         );
 
-        $this->assertEquals($sql, $listener->queries()[0]['sql']);
-        $this->assertEquals(['John'], $listener->queries()[0]['bindings']);
+        $this->assertSame($sql, $listener->queries()[0]['sql']);
+        $this->assertSame(['John'], $listener->queries()[0]['bindings']);
     }
 
     public function test_query_with_no_bindings_is_unchanged()
@@ -166,7 +166,7 @@ class ListenerTest extends TestCase
         $storedQuery = $listener->queries()[0];
 
         // Nothing should be modified — SQL is short and bindings match placeholders
-        $this->assertEquals($sql, $storedQuery['sql']);
-        $this->assertEquals($bindings, $storedQuery['bindings']);
+        $this->assertSame($sql, $storedQuery['sql']);
+        $this->assertSame($bindings, $storedQuery['bindings']);
     }
 }

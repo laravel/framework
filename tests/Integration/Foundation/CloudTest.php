@@ -13,7 +13,7 @@ class CloudTest extends TestCase
     {
         Cloud::configureUnpooledPostgresConnection($this->app);
 
-        $this->assertEquals([
+        $this->assertSame([
             'host' => 'test.pg.laravel.cloud',
             'username' => 'test-username',
             'password' => 'test-password',

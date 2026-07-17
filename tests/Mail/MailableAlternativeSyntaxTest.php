@@ -34,10 +34,10 @@ class MailableAlternativeSyntaxTest extends TestCase
         $method->invoke($mailable);
 
         $this->assertSame('test-view', $mailable->view);
-        $this->assertEquals(['test-data-key' => 'test-data-value'], $mailable->viewData);
-        $this->assertEquals(2, count($mailable->to));
-        $this->assertEquals(1, count($mailable->cc));
-        $this->assertEquals(1, count($mailable->bcc));
+        $this->assertSame(['test-data-key' => 'test-data-value'], $mailable->viewData);
+        $this->assertSame(2, count($mailable->to));
+        $this->assertSame(1, count($mailable->cc));
+        $this->assertSame(1, count($mailable->bcc));
     }
 
     public function testEnvelopesCanReceiveAdditionalRecipients(): void

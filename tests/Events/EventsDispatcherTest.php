@@ -20,7 +20,7 @@ class EventsDispatcherTest extends TestCase
         });
         $response = $d->dispatch('foo', ['bar']);
 
-        $this->assertEquals([null], $response);
+        $this->assertSame([null], $response);
         $this->assertSame('bar', $_SERVER['__event.test']);
 
         // we can still add listeners after the event has fired
@@ -223,7 +223,7 @@ class EventsDispatcherTest extends TestCase
         $response = $d->dispatch('foo', ['bar']);
 
         $this->assertSame('bar', $_SERVER['__event.test']);
-        $this->assertEquals(['bar'], $response);
+        $this->assertSame(['bar'], $response);
     }
 
     public function testReturningFalsyValuesContinuesPropagation()
@@ -244,7 +244,7 @@ class EventsDispatcherTest extends TestCase
 
         $response = $d->dispatch('foo', ['bar']);
 
-        $this->assertEquals([0, [], '', null], $response);
+        $this->assertSame([0, [], '', null], $response);
     }
 
     public function testContainerResolutionOfEventHandlers()
@@ -254,7 +254,7 @@ class EventsDispatcherTest extends TestCase
         $d->listen('foo', TestEventListener::class.'@onFooEvent');
         $response = $d->dispatch('foo', ['foo', 'bar']);
 
-        $this->assertEquals(['baz'], $response);
+        $this->assertSame(['baz'], $response);
     }
 
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
@@ -262,7 +262,7 @@ class EventsDispatcherTest extends TestCase
         $d = new Dispatcher(new Container);
         $d->listen('foo', TestEventListener::class);
         $response = $d->dispatch('foo', ['foo', 'bar']);
-        $this->assertEquals(['baz'], $response);
+        $this->assertSame(['baz'], $response);
     }
 
     public function testQueuedEventsAreFired()
@@ -343,7 +343,7 @@ class EventsDispatcherTest extends TestCase
 
         $response = $d->dispatch('foo.bar');
 
-        $this->assertEquals([null, null], $response);
+        $this->assertSame([null, null], $response);
         $this->assertSame('wildcard', $_SERVER['__event.test']);
     }
 
@@ -363,7 +363,7 @@ class EventsDispatcherTest extends TestCase
 
         $response = $d->dispatch('foo.bar');
 
-        $this->assertEquals(['regular', 'wildcard'], $response);
+        $this->assertSame(['regular', 'wildcard'], $response);
     }
 
     public function testWildcardListenersCacheFlushing()
@@ -467,7 +467,7 @@ class EventsDispatcherTest extends TestCase
         $d = new Dispatcher;
         $d->listen('foo.*', function ($event, $data) {
             $this->assertSame('foo.bar', $event);
-            $this->assertEquals(['first', 'second'], $data);
+            $this->assertSame(['first', 'second'], $data);
         });
         $d->dispatch('foo.bar', ['first', 'second']);
 
@@ -567,7 +567,7 @@ class EventsDispatcherTest extends TestCase
         $d->dispatch('event');
         $this->assertSame([], $_SERVER['__event.test']);
         $d->dispatch('event');
-        $this->assertEquals(['fired 1', 'fired 2'], $_SERVER['__event.test']);
+        $this->assertSame(['fired 1', 'fired 2'], $_SERVER['__event.test']);
     }
 
     public function testDuplicateListenersWillFire()
@@ -579,7 +579,7 @@ class EventsDispatcherTest extends TestCase
         $d->listen('event', TestListener::class.'@handle');
         $d->dispatch('event');
 
-        $this->assertEquals(4, TestListener::$counter);
+        $this->assertSame(4, TestListener::$counter);
         TestListener::$counter = 0;
     }
 
@@ -610,7 +610,7 @@ class EventsDispatcherTest extends TestCase
         $d->dispatch(TestEvent::class);
 
         // Dispatching event does not make an object of the event class.
-        $this->assertEquals([
+        $this->assertSame([
             'cons-1',
             'handle-1',
             'cons-2',
@@ -622,7 +622,7 @@ class EventsDispatcherTest extends TestCase
         $d->dispatch(TestEvent::class);
 
         // Event Objects are re-resolved on each dispatch. (No memoization)
-        $this->assertEquals([
+        $this->assertSame([
             'cons-1',
             'handle-1',
             'cons-2',
@@ -652,12 +652,12 @@ class EventsDispatcherTest extends TestCase
         $d->dispatch(ExampleEvent::class);
 
         // It only resolves relevant listeners not all.
-        $this->assertEquals(['cons-2', 'handle-2'], $_SERVER['__event.test']);
+        $this->assertSame(['cons-2', 'handle-2'], $_SERVER['__event.test']);
 
         $_SERVER['__event.test'] = [];
         $d->dispatch(TestEvent::class);
 
-        $this->assertEquals([
+        $this->assertSame([
             'cons-1',
             'handle-1',
             'cons-2-falser',
@@ -674,7 +674,7 @@ class EventsDispatcherTest extends TestCase
         $_SERVER['__event.test'] = [];
         $d->dispatch(TestEvent::class, halt: true);
 
-        $this->assertEquals([
+        $this->assertSame([
             'cons-1',
             'handle-1',
         ], $_SERVER['__event.test']);
@@ -689,7 +689,7 @@ class EventsDispatcherTest extends TestCase
         $d = new Dispatcher;
         $d->listen('myEvent', TestListenerInvokeyHandler::class);
         $d->dispatch('myEvent');
-        $this->assertEquals(['__construct', 'handle'], $_SERVER['__event.test']);
+        $this->assertSame(['__construct', 'handle'], $_SERVER['__event.test']);
 
         // "__invoke" is called when there is no handle.
         $_SERVER['__event.test'] = [];
@@ -697,14 +697,14 @@ class EventsDispatcherTest extends TestCase
         $d->listen('myEvent', TestListenerInvokey::class);
         $d->listen('myEvent', TestListenerInvokeyHandler::class);
         $d->dispatch('myEvent', 'somePayload');
-        $this->assertEquals(['__construct', '__invoke_somePayload'], $_SERVER['__event.test']);
+        $this->assertSame(['__construct', '__invoke_somePayload'], $_SERVER['__event.test']);
 
         // It falls back to __invoke if the referenced method is not found.
         $_SERVER['__event.test'] = [];
         $d = new Dispatcher;
         $d->listen('myEvent', [TestListenerInvokey::class, 'someAbsentMethod']);
         $d->dispatch('myEvent', 'somePayload');
-        $this->assertEquals(['__construct', '__invoke_somePayload'], $_SERVER['__event.test']);
+        $this->assertSame(['__construct', '__invoke_somePayload'], $_SERVER['__event.test']);
 
         // It throws an "Error" when there is no method to be called.
         $d = new Dispatcher;

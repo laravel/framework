@@ -157,15 +157,15 @@ class SendingMarkdownMailTest extends TestCase
         $firstClonedEmail = quoted_printable_decode((clone $originalEmail)->toString());
         [$htmlCid, $attachmentContentId] = $this->extractContentIdsFromEmail($firstClonedEmail);
 
-        $this->assertEquals($htmlCid, $attachmentContentId, 'HTML img src CID should match attachment Content-ID header');
-        $this->assertEquals($expectedContentId, $htmlCid, 'Cloned email CID should match original attachment CID');
+        $this->assertSame($htmlCid, $attachmentContentId, 'HTML img src CID should match attachment Content-ID header');
+        $this->assertSame($expectedContentId, $htmlCid, 'Cloned email CID should match original attachment CID');
 
         // Verify consistency is maintained across multiple clone operations (e.g., multiple retries).
         $secondClonedEmail = quoted_printable_decode((clone $originalEmail)->toString());
         [$htmlCid, $attachmentContentId] = $this->extractContentIdsFromEmail($secondClonedEmail);
 
-        $this->assertEquals($htmlCid, $attachmentContentId, 'HTML img src CID should match attachment Content-ID header on subsequent clone');
-        $this->assertEquals($expectedContentId, $htmlCid, 'Multiple clones should preserve original CID');
+        $this->assertSame($htmlCid, $attachmentContentId, 'HTML img src CID should match attachment Content-ID header on subsequent clone');
+        $this->assertSame($expectedContentId, $htmlCid, 'Multiple clones should preserve original CID');
     }
 
     /**

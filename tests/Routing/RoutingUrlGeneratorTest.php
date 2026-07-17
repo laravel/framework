@@ -706,9 +706,9 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.bar.com/', $url->previous());
 
         $url->getRequest()->headers->remove('referer');
-        $this->assertEquals($url->to('/'), $url->previous());
+        $this->assertSame($url->to('/'), $url->previous());
 
-        $this->assertEquals($url->to('/foo'), $url->previous('/foo'));
+        $this->assertSame($url->to('/foo'), $url->previous('/foo'));
     }
 
     public function testPreviousPath()

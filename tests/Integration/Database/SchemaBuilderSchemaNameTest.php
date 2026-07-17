@@ -201,8 +201,8 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             $table->string('name')->default('default name');
         });
 
-        $this->assertEquals(['id', 'title'], $schema->getColumnListing('my_schema.table'));
-        $this->assertEquals(['id', 'name'], $schema->getColumnListing('my_table'));
+        $this->assertSame(['id', 'title'], $schema->getColumnListing('my_schema.table'));
+        $this->assertSame(['id', 'name'], $schema->getColumnListing('my_table'));
 
         $schema->table('my_schema.table', function (Blueprint $table) {
             $table->string('name')->default('default schema name');
@@ -213,8 +213,8 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             $table->string('title')->default('default title');
         });
 
-        $this->assertEquals(['id', 'title', 'name', 'count'], $schema->getColumnListing('my_schema.table'));
-        $this->assertEquals(['id', 'name', 'count', 'title'], $schema->getColumnListing('my_table'));
+        $this->assertSame(['id', 'title', 'name', 'count'], $schema->getColumnListing('my_schema.table'));
+        $this->assertSame(['id', 'name', 'count', 'title'], $schema->getColumnListing('my_table'));
         $this->assertStringContainsString('default schema name', collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'name')['default']);
         $this->assertStringContainsString('default schema title', collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'title')['default']);
         $this->assertStringContainsString('default name', collect($schema->getColumns('my_table'))->firstWhere('name', 'name')['default']);
@@ -280,14 +280,14 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 
         $this->assertStringContainsString('default schema name', collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'name')['default']);
         $this->assertStringContainsString('default title', collect($schema->getColumns('my_table'))->firstWhere('name', 'title')['default']);
-        $this->assertEquals($this->driver === 'sqlsrv' ? 'nvarchar' : 'varchar', $schema->getColumnType('my_schema.table', 'name'));
-        $this->assertEquals($this->driver === 'sqlsrv' ? 'nvarchar' : 'varchar', $schema->getColumnType('my_table', 'title'));
-        $this->assertEquals(match ($this->driver) {
+        $this->assertSame($this->driver === 'sqlsrv' ? 'nvarchar' : 'varchar', $schema->getColumnType('my_schema.table', 'name'));
+        $this->assertSame($this->driver === 'sqlsrv' ? 'nvarchar' : 'varchar', $schema->getColumnType('my_table', 'title'));
+        $this->assertSame(match ($this->driver) {
             'pgsql' => 'int8',
             'sqlite' => 'integer',
             default => 'bigint',
         }, $schema->getColumnType('my_schema.table', 'count'));
-        $this->assertEquals(match ($this->driver) {
+        $this->assertSame(match ($this->driver) {
             'pgsql' => 'int8',
             'sqlite' => 'integer',
             default => 'bigint',

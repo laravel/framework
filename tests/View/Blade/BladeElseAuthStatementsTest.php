@@ -16,7 +16,7 @@ breeze
 <?php elseif(auth()->guard("standard")->check()): ?>
 wheeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testPlainElseAuthStatementsAreCompiled()
@@ -31,6 +31,6 @@ breeze
 <?php elseif(auth()->guard()->check()): ?>
 wheeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

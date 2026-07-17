@@ -57,7 +57,7 @@ class DatabaseEloquentBelongsToManyLazyByIdTest extends TestCase
 
         $user->articles()->lazyById(1)->each(function ($model) use (&$i) {
             $i++;
-            $this->assertEquals($i, $model->aid);
+            $this->assertSame($i, $model->aid);
         });
 
         $this->assertSame(3, $i);

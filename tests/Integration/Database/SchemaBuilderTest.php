@@ -75,7 +75,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
             $expected = ["alter table `test` modify `test_column` $uppercase not null"];
 
-            $this->assertEquals($expected, $blueprint->toSql());
+            $this->assertSame($expected, $blueprint->toSql());
         }
     }
 
@@ -95,7 +95,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
             $expected = ["alter table `test` modify `test_column` $lowercase not null"];
 
-            $this->assertEquals($expected, $blueprint->toSql());
+            $this->assertSame($expected, $blueprint->toSql());
         }
     }
 
@@ -123,7 +123,7 @@ class SchemaBuilderTest extends DatabaseTestCase
             'alter table `test` modify `nullable_column_to_not_null` text not null',
         ];
 
-        $this->assertEquals($expected, $blueprint->toSql());
+        $this->assertSame($expected, $blueprint->toSql());
     }
 
     public function testChangeNullableColumn()
@@ -173,8 +173,8 @@ class SchemaBuilderTest extends DatabaseTestCase
             $table->renameColumn('bar', 'new_bar');
         });
 
-        $this->assertEquals(collect(Schema::getColumns('test'))->firstWhere('name', 'new_foo')['default'], $defaultFoo);
-        $this->assertEquals(collect(Schema::getColumns('test'))->firstWhere('name', 'new_bar')['default'], $defaultBar);
+        $this->assertSame(collect(Schema::getColumns('test'))->firstWhere('name', 'new_foo')['default'], $defaultFoo);
+        $this->assertSame(collect(Schema::getColumns('test'))->firstWhere('name', 'new_bar')['default'], $defaultBar);
     }
 
     #[RequiresDatabase('sqlite')]
@@ -611,7 +611,7 @@ class SchemaBuilderTest extends DatabaseTestCase
             $table->integer('stored_price_changed')->storedAs('price - 7')->change();
         });
 
-        $this->assertEquals(
+        $this->assertSame(
             ['price' => 100, 'virtual_price' => 98, 'stored_price' => 96, 'virtual_price_changed' => 95, 'stored_price_changed' => 93],
             (array) DB::table('test')->first()
         );

@@ -34,7 +34,7 @@ class ValidationRuleParserTest extends TestCase
             'unless_cb_false' => Rule::unless(fn () => false, ['required'], ['nullable']),
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'name' => ['required', 'min:2'],
             'email' => [],
             'password' => ['required', 'min:2'],
@@ -61,7 +61,7 @@ class ValidationRuleParserTest extends TestCase
             'gender' => Rule::unless($isAdmin, 'required'),
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'name' => [],
             'email' => '',
             'password' => ['required', 'min:2'],
@@ -88,7 +88,7 @@ class ValidationRuleParserTest extends TestCase
             'address' => ['required', Rule::unless($isAdmin, ['min:2'], ['string', 'max:10'])],
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'name' => ['required', 'min:2'],
             'email' => ['string', 'max:10'],
             'password' => ['string', 'max:10'],
@@ -107,7 +107,7 @@ class ValidationRuleParserTest extends TestCase
             'password' => Rule::unless($isAdmin, 'required|min:2', 'string|max:10'),
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'name' => [],
             'email' => [],
             'password' => ['string', 'max:10'],
@@ -188,14 +188,14 @@ class ValidationRuleParserTest extends TestCase
                 $this->assertSame('Taylor Otwell', $value);
                 $this->assertSame('users.0.name', $attribute);
                 $this->assertSame('Taylor Otwell', $data['users.0.name']);
-                $this->assertEquals(['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com'], $context);
+                $this->assertSame(['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com'], $context);
 
                 return [Rule::requiredIf(true)];
             }),
         ]);
 
-        $this->assertEquals(['users.0.name' => ['required']], $results->rules);
-        $this->assertEquals(['users.*.name' => ['users.0.name']], $results->implicitAttributes);
+        $this->assertSame(['users.0.name' => ['required']], $results->rules);
+        $this->assertSame(['users.*.name' => ['users.0.name']], $results->implicitAttributes);
     }
 
     public function testExplodeGeneratesNestedRulesForNonNestedData()
@@ -209,14 +209,14 @@ class ValidationRuleParserTest extends TestCase
             'name' => Rule::forEach(function ($value, $attribute, $data, $context) {
                 $this->assertSame('Taylor Otwell', $value);
                 $this->assertSame('name', $attribute);
-                $this->assertEquals(['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com'], $data);
-                $this->assertEquals(['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com'], $context);
+                $this->assertSame(['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com'], $data);
+                $this->assertSame(['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com'], $context);
 
                 return 'required';
             }),
         ]);
 
-        $this->assertEquals(['name' => ['required']], $results->rules);
+        $this->assertSame(['name' => ['required']], $results->rules);
         $this->assertSame([], $results->implicitAttributes);
     }
 
@@ -234,10 +234,10 @@ class ValidationRuleParserTest extends TestCase
             'redirects.directory/subdirectory/file.*' => 'string',
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'redirects.directory/subdirectory/file.0' => ['string'],
         ], $results->rules);
-        $this->assertEquals([
+        $this->assertSame([
             'redirects.directory/subdirectory/file.*' => ['redirects.directory/subdirectory/file.0'],
         ], $results->implicitAttributes);
     }
@@ -253,7 +253,7 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode([
             'users.*.name' => Rule::forEach(function ($value, $attribute, $data) {
-                $this->assertEquals([
+                $this->assertSame([
                     'users.0.name' => 'Taylor Otwell',
                     'users.1.name' => 'Abigail Otwell',
                 ], $data);
@@ -267,12 +267,12 @@ class ValidationRuleParserTest extends TestCase
             }),
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'users.0.name' => ['required', 'in:"taylor"'],
             'users.1.name' => ['required', 'in:"abigail"'],
         ], $results->rules);
 
-        $this->assertEquals([
+        $this->assertSame([
             'users.*.name' => [
                 'users.0.name',
                 'users.1.name',
@@ -290,17 +290,17 @@ class ValidationRuleParserTest extends TestCase
             'users.*.name' => Rule::forEach(function ($value, $attribute, $data) {
                 $this->assertSame('Taylor Otwell', $value);
                 $this->assertSame('users.0.name', $attribute);
-                $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
+                $this->assertSame(['users.0.name' => 'Taylor Otwell'], $data);
 
                 return Rule::forEach(function ($value, $attribute, $data) {
                     $this->assertNull($value);
                     $this->assertSame('users.0.name', $attribute);
-                    $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
+                    $this->assertSame(['users.0.name' => 'Taylor Otwell'], $data);
 
                     return Rule::forEach(function ($value, $attribute, $data) {
                         $this->assertNull($value);
                         $this->assertSame('users.0.name', $attribute);
-                        $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
+                        $this->assertSame(['users.0.name' => 'Taylor Otwell'], $data);
 
                         return [Rule::requiredIf(true)];
                     });
@@ -308,8 +308,8 @@ class ValidationRuleParserTest extends TestCase
             }),
         ]);
 
-        $this->assertEquals(['users.0.name' => ['required']], $results->rules);
-        $this->assertEquals(['users.*.name' => ['users.0.name']], $results->implicitAttributes);
+        $this->assertSame(['users.0.name' => ['required']], $results->rules);
+        $this->assertSame(['users.*.name' => ['users.0.name']], $results->implicitAttributes);
     }
 
     public function testExplodeHandlesSegmentingNestedRules()
@@ -329,14 +329,14 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode($rules);
 
-        $this->assertEquals([
+        $this->assertSame([
             'items.0.discounts.0.id' => ['distinct'],
             'items.0.discounts.1.id' => ['distinct'],
             'items.1.discounts.0.id' => ['distinct'],
             'items.1.discounts.1.id' => ['distinct'],
         ], $results->rules);
 
-        $this->assertEquals([
+        $this->assertSame([
             'items.1.discounts.*.id' => [
                 'items.1.discounts.0.id',
                 'items.1.discounts.1.id',
@@ -364,7 +364,7 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode($rules);
 
-        $this->assertEquals([
+        $this->assertSame([
             'date' => [
                 'date',
                 'date_format:Y-m-d',
@@ -384,7 +384,7 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode($rules);
 
-        $this->assertEquals([
+        $this->assertSame([
             'date' => [
                 'date',
             ],
@@ -403,7 +403,7 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode($rules);
 
-        $this->assertEquals([
+        $this->assertSame([
             'date' => [
                 'date',
                 'after:today',
@@ -423,7 +423,7 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode($rules);
 
-        $this->assertEquals([
+        $this->assertSame([
             'number' => [
                 'numeric',
                 'max:100',
@@ -443,7 +443,7 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode($rules);
 
-        $this->assertEquals([
+        $this->assertSame([
             'number' => [
                 'numeric',
             ],
@@ -462,7 +462,7 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode($rules);
 
-        $this->assertEquals([
+        $this->assertSame([
             'number' => [
                 'numeric',
                 'max:100',

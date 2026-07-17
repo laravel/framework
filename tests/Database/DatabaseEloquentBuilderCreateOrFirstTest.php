@@ -74,7 +74,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 
         $result = $model->newQuery()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 123,
             'attr' => 'foo',
             'val' => 'bar',
@@ -103,7 +103,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 
         $result = $model->newQuery()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 123,
             'attr' => 'foo',
             'val' => 'bar',
@@ -173,7 +173,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 
         $result = $model->newQuery()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 123,
             'attr' => 'foo',
             'val' => 'bar',
@@ -210,7 +210,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 
         $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 123,
             'attr' => 'foo',
             'val' => 'baz',
@@ -288,7 +288,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 
         $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 123,
             'attr' => 'foo',
             'val' => 'baz',
@@ -330,7 +330,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 
         $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo'], 'count');
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 123,
             'attr' => 'foo',
             'count' => 2,
@@ -457,7 +457,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 
         $result = $model->newQuery()->incrementOrCreate(['attr' => 'foo']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 123,
             'attr' => 'foo',
             'count' => 2,

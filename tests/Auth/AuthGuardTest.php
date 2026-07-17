@@ -282,7 +282,7 @@ class AuthGuardTest extends TestCase
         $guard = $this->getGuard();
         $guard->setUser($user);
 
-        $this->assertEquals($user, $guard->authenticate());
+        $this->assertSame($user, $guard->authenticate());
     }
 
     public function testSetUserFiresAuthenticatedEvent()

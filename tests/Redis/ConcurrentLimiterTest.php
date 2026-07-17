@@ -49,7 +49,7 @@ class ConcurrentLimiterTest extends TestCase
             $store[] = 4;
         });
 
-        $this->assertEquals([1, 2, 4], $store);
+        $this->assertSame([1, 2, 4], $store);
     }
 
     public function testItReleasesLockAfterTaskFinishes()
@@ -62,7 +62,7 @@ class ConcurrentLimiterTest extends TestCase
             });
         }
 
-        $this->assertEquals([1, 2, 3, 4], $store);
+        $this->assertSame([1, 2, 3, 4], $store);
     }
 
     public function testItReleasesLockIfTaskTookTooLong()
@@ -89,7 +89,7 @@ class ConcurrentLimiterTest extends TestCase
             $store[] = 3;
         });
 
-        $this->assertEquals([1, 3], $store);
+        $this->assertSame([1, 3], $store);
     }
 
     public function testItFailsImmediatelyOrRetriesForAWhileBasedOnAGivenTimeout()
@@ -114,7 +114,7 @@ class ConcurrentLimiterTest extends TestCase
             $store[] = 3;
         });
 
-        $this->assertEquals([1, 3], $store);
+        $this->assertSame([1, 3], $store);
     }
 
     public function testItFailsAfterRetryTimeout()
@@ -135,7 +135,7 @@ class ConcurrentLimiterTest extends TestCase
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
-        $this->assertEquals([1], $store);
+        $this->assertSame([1], $store);
     }
 
     public function testItReleasesIfErrorIsThrown()
@@ -156,7 +156,7 @@ class ConcurrentLimiterTest extends TestCase
             $store[] = 1;
         });
 
-        $this->assertEquals([1], $store);
+        $this->assertSame([1], $store);
     }
 
     private function redis()

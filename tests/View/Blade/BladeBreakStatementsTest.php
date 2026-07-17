@@ -14,7 +14,7 @@ test
 test
 <?php break; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testBreakStatementsWithExpressionAreCompiled()
@@ -27,7 +27,7 @@ test
 test
 <?php if(TRUE) break; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testBreakStatementsWithArgumentAreCompiled()
@@ -40,7 +40,7 @@ test
 test
 <?php break 2; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testBreakStatementsWithSpacedArgumentAreCompiled()
@@ -53,7 +53,7 @@ test
 test
 <?php break 2; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testBreakStatementsWithFaultyArgumentAreCompiled()
@@ -66,6 +66,6 @@ test
 test
 <?php break 1; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

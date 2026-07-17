@@ -59,19 +59,19 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         $project = PivotEventsTestProject::forceCreate(['name' => 'Test Project']);
 
         $project->collaborators()->attach($user);
-        $this->assertEquals(['saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertSame(['saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
 
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->collaborators()->sync([$user2->id]);
-        $this->assertEquals(['deleting', 'deleted', 'saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertSame(['deleting', 'deleted', 'saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
 
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->collaborators()->sync([$user->id => ['role' => 'owner'], $user2->id => ['role' => 'contributor']]);
-        $this->assertEquals(['saving', 'creating', 'created', 'saved', 'saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertSame(['saving', 'creating', 'created', 'saved', 'saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
 
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->collaborators()->detach($user);
-        $this->assertEquals(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertSame(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
     }
 
     public function testPivotWithPivotValueWillTriggerEventsToBeFired()
@@ -81,25 +81,25 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         $project = PivotEventsTestProject::forceCreate(['name' => 'Test Project']);
 
         $project->managers()->attach($user);
-        $this->assertEquals(['saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertSame(['saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
         $project->managers()->attach($user2);
 
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->managers()->updateExistingPivot($user->id, ['permissions' => ['foo', 'bar']]);
-        $this->assertEquals(['saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertSame(['saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
         $project->managers()->detach($user2);
 
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->managers()->sync([$user2->id]);
-        $this->assertEquals(['deleting', 'deleted', 'saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertSame(['deleting', 'deleted', 'saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
 
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->managers()->sync([$user->id => ['permissions' => ['foo']], $user2->id => ['permissions' => ['bar']]]);
-        $this->assertEquals(['saving', 'creating', 'created', 'saved', 'saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertSame(['saving', 'creating', 'created', 'saved', 'saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
 
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->managers()->detach($user);
-        $this->assertEquals(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertSame(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
     }
 
     public function testPivotWithPivotCriteriaTriggerEventsToBeFiredOnCreateUpdateNoneOnDetach()
@@ -109,7 +109,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         $project = PivotEventsTestProject::forceCreate(['name' => 'Test Project']);
 
         $project->contributors()->sync([$user->id, $user2->id]);
-        $this->assertEquals(['saving', 'creating', 'created', 'saved', 'saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertSame(['saving', 'creating', 'created', 'saved', 'saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
 
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->contributors()->detach($user->id);
@@ -170,7 +170,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
 
         PivotEventsTestModelEquipment::deleting(function ($model) use ($project) {
             $this->assertInstanceOf(PivotEventsTestProject::class, $model->equipmentable);
-            $this->assertEquals($project->id, $model->equipmentable->id);
+            $this->assertSame($project->id, $model->equipmentable->id);
         });
 
         $equipment = PivotEventsTestEquipment::forceCreate([
@@ -180,12 +180,12 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         $project->equipments()->save($equipment);
         $equipment->projects()->sync([]);
 
-        $this->assertEquals(
+        $this->assertSame(
             [PivotEventsTestProject::class, PivotEventsTestProject::class, PivotEventsTestProject::class, PivotEventsTestProject::class, PivotEventsTestProject::class, PivotEventsTestProject::class],
             PivotEventsTestModelEquipment::$eventsMorphClasses
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             ['equipmentable_type', 'equipmentable_type', 'equipmentable_type', 'equipmentable_type', 'equipmentable_type', 'equipmentable_type'],
             PivotEventsTestModelEquipment::$eventsMorphTypes
         );

@@ -35,7 +35,7 @@ class DatabaseConnectionTest extends TestCase
         $mock = m::mock(stdClass::class);
         $connection->expects($this->once())->method('getDefaultQueryGrammar')->willReturn($mock);
         $connection->useDefaultQueryGrammar();
-        $this->assertEquals($mock, $connection->getQueryGrammar());
+        $this->assertSame($mock, $connection->getQueryGrammar());
     }
 
     public function testSettingDefaultCallsGetDefaultPostProcessor()
@@ -44,7 +44,7 @@ class DatabaseConnectionTest extends TestCase
         $mock = m::mock(stdClass::class);
         $connection->expects($this->once())->method('getDefaultPostProcessor')->willReturn($mock);
         $connection->useDefaultPostProcessor();
-        $this->assertEquals($mock, $connection->getPostProcessor());
+        $this->assertSame($mock, $connection->getPostProcessor());
     }
 
     public function testSelectOneCallsSelectAndReturnsSingleResult()
@@ -93,10 +93,10 @@ class DatabaseConnectionTest extends TestCase
         $mock->setReadPdo($pdo);
         $mock->expects($this->once())->method('prepareBindings')->with(['foo' => 'bar'])->willReturn(['foo' => 'bar']);
         $results = $mock->select('foo', ['foo' => 'bar']);
-        $this->assertEquals(['boom'], $results);
+        $this->assertSame(['boom'], $results);
         $log = $mock->getQueryLog();
         $this->assertSame('foo', $log[0]['query']);
-        $this->assertEquals(['foo' => 'bar'], $log[0]['bindings']);
+        $this->assertSame(['foo' => 'bar'], $log[0]['bindings']);
         $this->assertIsNumeric($log[0]['time']);
     }
 
@@ -122,10 +122,10 @@ class DatabaseConnectionTest extends TestCase
         $mock->setReadPdo($pdo);
         $mock->expects($this->once())->method('prepareBindings')->with(['foo'])->willReturn(['foo']);
         $results = $mock->selectResultsets('CALL a_procedure(?)', ['foo']);
-        $this->assertEquals([['boom'], ['boom']], $results);
+        $this->assertSame([['boom'], ['boom']], $results);
         $log = $mock->getQueryLog();
         $this->assertSame('CALL a_procedure(?)', $log[0]['query']);
-        $this->assertEquals(['foo'], $log[0]['bindings']);
+        $this->assertSame(['foo'], $log[0]['bindings']);
         $this->assertIsNumeric($log[0]['time']);
     }
 
@@ -166,7 +166,7 @@ class DatabaseConnectionTest extends TestCase
         $this->assertTrue($results);
         $log = $mock->getQueryLog();
         $this->assertSame('foo', $log[0]['query']);
-        $this->assertEquals(['bar'], $log[0]['bindings']);
+        $this->assertSame(['bar'], $log[0]['bindings']);
         $this->assertIsNumeric($log[0]['time']);
     }
 
@@ -184,7 +184,7 @@ class DatabaseConnectionTest extends TestCase
         $this->assertSame(42, $results);
         $log = $mock->getQueryLog();
         $this->assertSame('foo', $log[0]['query']);
-        $this->assertEquals(['foo' => 'bar'], $log[0]['bindings']);
+        $this->assertSame(['foo' => 'bar'], $log[0]['bindings']);
         $this->assertIsNumeric($log[0]['time']);
     }
 
@@ -196,7 +196,7 @@ class DatabaseConnectionTest extends TestCase
         try {
             $connection->beginTransaction();
         } catch (Exception) {
-            $this->assertEquals(0, $connection->transactionLevel());
+            $this->assertSame(0, $connection->transactionLevel());
         }
     }
 
@@ -208,7 +208,7 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection(['reconnect'], $pdo);
         $connection->expects($this->once())->method('reconnect');
         $connection->beginTransaction();
-        $this->assertEquals(1, $connection->transactionLevel());
+        $this->assertSame(1, $connection->transactionLevel());
     }
 
     public function testBeginTransactionMethodReconnectsMissingConnection()
@@ -220,7 +220,7 @@ class DatabaseConnectionTest extends TestCase
         });
         $connection->disconnect();
         $connection->beginTransaction();
-        $this->assertEquals(1, $connection->transactionLevel());
+        $this->assertSame(1, $connection->transactionLevel());
     }
 
     public function testBeginTransactionMethodNeverRetriesIfWithinTransaction()
@@ -235,11 +235,11 @@ class DatabaseConnectionTest extends TestCase
         $connection->setQueryGrammar($queryGrammar);
         $connection->expects($this->never())->method('reconnect');
         $connection->beginTransaction();
-        $this->assertEquals(1, $connection->transactionLevel());
+        $this->assertSame(1, $connection->transactionLevel());
         try {
             $connection->beginTransaction();
         } catch (Exception) {
-            $this->assertEquals(1, $connection->transactionLevel());
+            $this->assertSame(1, $connection->transactionLevel());
         }
     }
 
@@ -250,7 +250,7 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection([], $pdo);
         $connection->beginTransaction();
         $connection->disconnect();
-        $this->assertEquals(0, $connection->transactionLevel());
+        $this->assertSame(0, $connection->transactionLevel());
     }
 
     public function testDisconnectClearsTransactionManagerState()
@@ -335,7 +335,7 @@ class DatabaseConnectionTest extends TestCase
         $result = $mock->transaction(function ($db) {
             return $db;
         });
-        $this->assertEquals($mock, $result);
+        $this->assertSame($mock, $result);
     }
 
     public function testTransactionRetriesOnCommitDeadlockWhenPDOHasActiveTransaction()
@@ -497,7 +497,7 @@ class DatabaseConnectionTest extends TestCase
         $grammar->shouldReceive('getDateFormat')->once()->andReturn('foo');
         $conn->setQueryGrammar($grammar);
         $result = $conn->prepareBindings($bindings);
-        $this->assertEquals(['test' => 'bar'], $result);
+        $this->assertSame(['test' => 'bar'], $result);
     }
 
     public function testLogQueryFiresEventsIfSet()
@@ -540,7 +540,7 @@ class DatabaseConnectionTest extends TestCase
             $connection->select('foo bar', ['baz']);
         });
         $this->assertSame('foo bar', $queries[0]['query']);
-        $this->assertEquals(['baz'], $queries[0]['bindings']);
+        $this->assertSame(['baz'], $queries[0]['bindings']);
     }
 
     public function testSchemaBuilderCanBeCreated()

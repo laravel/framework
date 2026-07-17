@@ -125,7 +125,7 @@ class HandleExceptionsTest extends TestCase
             17
         );
 
-        $this->assertEquals([
+        $this->assertSame([
             'driver' => 'monolog',
             'handler' => NullHandler::class,
         ], $this->config->get('logging.channels.deprecations'));
@@ -232,7 +232,7 @@ class HandleExceptionsTest extends TestCase
             17
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'driver' => 'stack',
                 'channels' => ['single'],
@@ -259,7 +259,7 @@ class HandleExceptionsTest extends TestCase
             17
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             NullHandler::class,
             $this->config->get('logging.channels.deprecations.handler')
         );
@@ -282,7 +282,7 @@ class HandleExceptionsTest extends TestCase
             17
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             NullHandler::class,
             $this->config->get('logging.channels.deprecations.handler')
         );
@@ -310,7 +310,7 @@ class HandleExceptionsTest extends TestCase
             17
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             CustomNullHandler::class,
             $this->config->get('logging.channels.deprecations.handler')
         );
@@ -318,8 +318,8 @@ class HandleExceptionsTest extends TestCase
 
     public function testNoDeprecationsDriverIfNoDeprecationsHereSend()
     {
-        $this->assertEquals(null, $this->config->get('logging.deprecations'));
-        $this->assertEquals(null, $this->config->get('logging.channels.deprecations'));
+        $this->assertSame(null, $this->config->get('logging.deprecations'));
+        $this->assertSame(null, $this->config->get('logging.channels.deprecations'));
     }
 
     public function testIgnoreDeprecationIfLoggerUnresolvable()

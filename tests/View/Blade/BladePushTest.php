@@ -14,7 +14,7 @@ test
         $expected = '<?php $__env->startPush(\'foo\'); ?>
 test
 <?php $__env->stopPush(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testPushIsCompiledWithParenthesis()
@@ -25,7 +25,7 @@ test
         $expected = '<?php $__env->startPush(\'foo):))\'); ?>
 test
 <?php $__env->stopPush(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testPushOnceIsCompiled()
@@ -39,7 +39,7 @@ $__env->startPush(\'foo\'); ?>
 test
 <?php $__env->stopPush(); endif; ?>';
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testPushOnceIsCompiledWhenIdIsMissing()
@@ -55,7 +55,7 @@ $__env->startPush(\'foo\'); ?>
 test
 <?php $__env->stopPush(); endif; ?>';
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testPushIfIsCompiled()
@@ -67,7 +67,7 @@ test
 test
 <?php $__env->stopPush(); endif; ?>';
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testPushIfWithMoreThanOneCommaIsCompiled()
@@ -80,7 +80,7 @@ test
 test
 <?php $__env->stopPush(); endif; ?>';
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testPushIfWithCommaInStringIsCompiled()
@@ -93,7 +93,7 @@ test
 test
 <?php $__env->stopPush(); endif; ?>';
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testPushIfElseIsCompiled()
@@ -113,6 +113,6 @@ elseif
 else
 <?php $__env->stopPush(); endif; ?>';
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

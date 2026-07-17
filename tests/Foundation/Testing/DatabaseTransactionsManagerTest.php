@@ -17,7 +17,7 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->addCallback(fn () => $testObject->handle());
 
         $this->assertTrue($testObject->ran);
-        $this->assertEquals(1, $testObject->runs);
+        $this->assertSame(1, $testObject->runs);
     }
 
     public function testItIgnoresTheBaseTransactionForCallbackApplicableTransactions()
@@ -28,7 +28,7 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('foo', 2);
 
         $this->assertCount(1, $manager->callbackApplicableTransactions());
-        $this->assertEquals(2, $manager->callbackApplicableTransactions()[0]->level);
+        $this->assertSame(2, $manager->callbackApplicableTransactions()[0]->level);
     }
 
     public function testCommittingDoesNotRemoveTheBasePendingTransaction()
@@ -45,7 +45,7 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->begin('foo', 2);
 
         $this->assertCount(1, $manager->callbackApplicableTransactions());
-        $this->assertEquals(2, $manager->callbackApplicableTransactions()[0]->level);
+        $this->assertSame(2, $manager->callbackApplicableTransactions()[0]->level);
     }
 
     public function testItExecutesCallbacksForTheSecondTransaction()
@@ -62,7 +62,7 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->commit('foo', 2, 1);
         $manager->commit('foo', 1, 0);
         $this->assertTrue($testObject->ran);
-        $this->assertEquals(1, $testObject->runs);
+        $this->assertSame(1, $testObject->runs);
     }
 
     public function testItExecutesTransactionCallbacksAtLevelOne()

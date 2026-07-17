@@ -120,13 +120,13 @@ class QueueSqsJobTest extends TestCase
             'delete_after_processing' => true,
         ]);
 
-        $this->assertEquals($fullPayload, $job->getRawBody());
+        $this->assertSame($fullPayload, $job->getRawBody());
     }
 
     public function testGetRawBodyReturnsNormalBodyWithoutPointer()
     {
         $job = $this->getJob();
-        $this->assertEquals($this->mockedPayload, $job->getRawBody());
+        $this->assertSame($this->mockedPayload, $job->getRawBody());
     }
 
     public function testGetRawBodyReturnsPointerBodyWhenExtendedStoreIsDisabled()
@@ -138,7 +138,7 @@ class QueueSqsJobTest extends TestCase
 
         $job = new SqsJob($this->mockedContainer, $this->mockedSqsClient, $jobData, 'connection-name', $this->queueUrl);
 
-        $this->assertEquals($pointerBody, $job->getRawBody());
+        $this->assertSame($pointerBody, $job->getRawBody());
     }
 
     public function testGetRawBodyCachesResult()
@@ -167,7 +167,7 @@ class QueueSqsJobTest extends TestCase
 
         // Call twice; cache should only be hit once.
         $job->getRawBody();
-        $this->assertEquals($fullPayload, $job->getRawBody());
+        $this->assertSame($fullPayload, $job->getRawBody());
     }
 
     public function testDeleteCleansUpCacheKeyWhenCleanupEnabled()

@@ -38,7 +38,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             'alter table "users" add column "id" integer primary key autoincrement not null',
             'alter table "users" add column "email" varchar not null',
         ];
-        $this->assertEquals($expected, $statements);
+        $this->assertSame($expected, $statements);
     }
 
     public function testCreateTemporaryTable()
@@ -780,7 +780,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint->timestamps();
         $statements = $blueprint->toSql();
         $this->assertCount(2, $statements);
-        $this->assertEquals([
+        $this->assertSame([
             'alter table "users" add column "created_at" datetime',
             'alter table "users" add column "updated_at" datetime',
         ], $statements);
@@ -792,7 +792,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint->timestampsTz();
         $statements = $blueprint->toSql();
         $this->assertCount(2, $statements);
-        $this->assertEquals([
+        $this->assertSame([
             'alter table "users" add column "created_at" datetime',
             'alter table "users" add column "updated_at" datetime',
         ], $statements);
@@ -1070,7 +1070,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             $table->dropColumn('name');
         });
 
-        $this->assertEquals(['alter table "users" drop column "name"'], $blueprint->toSql());
+        $this->assertSame(['alter table "users" drop column "name"'], $blueprint->toSql());
     }
 
     public function testRenamingAndChangingColumnsWork()
@@ -1092,7 +1092,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint->renameColumn('name', 'first_name');
         $blueprint->integer('age')->change();
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table "users" rename column "name" to "first_name"',
             'create table "__temp__users" ("first_name" varchar not null, "age" integer not null)',
             'insert into "__temp__users" ("first_name", "age") select "first_name", "age" from "users"',
@@ -1120,7 +1120,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $blueprint->renameColumn('name', 'first_name');
         $blueprint->integer('age')->change();
 
-        $this->assertEquals([
+        $this->assertSame([
             'alter table "my_schema"."users" rename column "name" to "first_name"',
             'create table "my_schema"."__temp__users" ("first_name" varchar not null, "age" integer not null)',
             'insert into "my_schema"."__temp__users" ("first_name", "age") select "first_name", "age" from "my_schema"."users"',

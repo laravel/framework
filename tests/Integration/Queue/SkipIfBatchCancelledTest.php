@@ -52,7 +52,7 @@ class SkipIfBatchCancelledTest extends TestCase
             'command' => serialize($command = $class),
         ]);
 
-        $this->assertEquals($expectedHandledValue, $class::$handled);
+        $this->assertSame($expectedHandledValue, $class::$handled);
     }
 }
 

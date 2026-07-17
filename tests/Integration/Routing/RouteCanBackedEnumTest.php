@@ -17,7 +17,7 @@ class RouteCanBackedEnumTest extends TestCase
         $route = Route::get('/', function () {
             return 'Hello World';
         })->can(AbilityBackedEnum::NotAccessRoute);
-        $this->assertEquals(['can:not-access-route'], $route->middleware());
+        $this->assertSame(['can:not-access-route'], $route->middleware());
 
         $response = $this->get('/');
         $response->assertForbidden();
@@ -31,7 +31,7 @@ class RouteCanBackedEnumTest extends TestCase
         $route = Route::get('/', function () {
             return 'Hello World';
         })->can(AbilityBackedEnum::AccessRoute);
-        $this->assertEquals(['can:access-route'], $route->middleware());
+        $this->assertSame(['can:access-route'], $route->middleware());
 
         $response = $this->get('/');
         $response->assertOk();

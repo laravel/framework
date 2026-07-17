@@ -36,7 +36,7 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertTrue($user->isDirty('nullable_date'));
 
         $user->save();
-        $this->assertEquals($now->toDateString(), $user->nullable_date->toDateString());
+        $this->assertSame($now->toDateString(), $user->nullable_date->toDateString());
     }
 
     public function testAttributeChanges()
@@ -53,7 +53,7 @@ class EloquentModelTest extends DatabaseTestCase
 
         $user->name = $overrideName = Str::random();
 
-        $this->assertEquals(['name' => $overrideName], $user->getDirty());
+        $this->assertSame(['name' => $overrideName], $user->getDirty());
         $this->assertEmpty($user->getChanges());
         $this->assertEmpty($user->getPrevious());
         $this->assertTrue($user->isDirty());
@@ -62,8 +62,8 @@ class EloquentModelTest extends DatabaseTestCase
         $user->save();
 
         $this->assertEmpty($user->getDirty());
-        $this->assertEquals(['name' => $overrideName], $user->getChanges());
-        $this->assertEquals(['name' => $originalName], $user->getPrevious());
+        $this->assertSame(['name' => $overrideName], $user->getChanges());
+        $this->assertSame(['name' => $originalName], $user->getPrevious());
         $this->assertTrue($user->wasChanged());
         $this->assertTrue($user->wasChanged('name'));
     }
@@ -82,7 +82,7 @@ class EloquentModelTest extends DatabaseTestCase
 
         $user->name = $overrideName = Str::random();
 
-        $this->assertEquals(['name' => $overrideName], $user->getDirty());
+        $this->assertSame(['name' => $overrideName], $user->getDirty());
         $this->assertEmpty($user->getChanges());
         $this->assertEmpty($user->getPrevious());
         $this->assertTrue($user->isDirty());

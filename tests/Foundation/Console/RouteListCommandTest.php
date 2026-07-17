@@ -217,11 +217,11 @@ class RouteListCommandTest extends TestCase
 
         $this->assertCount(3, $routes);
         $this->assertSame('example', $routes[0]['uri']);
-        $this->assertEquals(['exampleMiddleware'], $routes[0]['middleware']);
+        $this->assertSame(['exampleMiddleware'], $routes[0]['middleware']);
         $this->assertSame('example-group', $routes[1]['uri']);
-        $this->assertEquals(['Middleware 5', 'Middleware 1', 'Middleware 4', 'Middleware 2', 'Middleware 3'], $routes[1]['middleware']);
+        $this->assertSame(['Middleware 5', 'Middleware 1', 'Middleware 4', 'Middleware 2', 'Middleware 3'], $routes[1]['middleware']);
         $this->assertSame('sub-example', $routes[2]['uri']);
-        $this->assertEquals(['exampleMiddleware'], $routes[2]['middleware']);
+        $this->assertSame(['exampleMiddleware'], $routes[2]['middleware']);
     }
 
     public function testFilterByMiddleware()
@@ -233,7 +233,7 @@ class RouteListCommandTest extends TestCase
 
         $this->assertCount(1, $routes);
         $this->assertSame('example-group', $routes[0]['uri']);
-        $this->assertEquals(['web', 'auth'], $routes[0]['middleware']);
+        $this->assertSame(['web', 'auth'], $routes[0]['middleware']);
         $this->assertStringContainsString('RouteListCommandTest.php:', $routes[0]['path']);
     }
 

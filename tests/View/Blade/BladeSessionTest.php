@@ -22,6 +22,6 @@ if (isset($__sessionPrevious) && empty($__sessionPrevious)) { unset($__sessionPr
 endif;
 unset($__sessionArgs); ?>';
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

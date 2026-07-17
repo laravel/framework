@@ -19,7 +19,7 @@ class SupportCapsuleManagerTraitTest extends TestCase
         $app = new Container;
 
         $this->setupContainer($app);
-        $this->assertEquals($app, $this->getContainer());
+        $this->assertSame($app, $this->getContainer());
         $this->assertInstanceOf(Fluent::class, $app['config']);
     }
 
@@ -30,7 +30,7 @@ class SupportCapsuleManagerTraitTest extends TestCase
         $app['config'] = m::mock(Repository::class);
 
         $this->setupContainer($app);
-        $this->assertEquals($app, $this->getContainer());
+        $this->assertSame($app, $this->getContainer());
         $this->assertInstanceOf(Repository::class, $app['config']);
     }
 }

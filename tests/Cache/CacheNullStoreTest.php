@@ -18,7 +18,7 @@ class CacheNullStoreTest extends TestCase
     {
         $store = new NullStore;
 
-        $this->assertEquals([
+        $this->assertSame([
             'foo' => null,
             'bar' => null,
         ], $store->many([

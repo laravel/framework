@@ -248,7 +248,7 @@ class TestResponseTest extends TestCase
 
         $this->assertSame('bar', $response->viewData('foo'));
 
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $response->viewData());
+        $this->assertSame(['foo' => 'bar', 'baz' => 'qux'], $response->viewData());
     }
 
     public function testAssertContent(): void
@@ -2675,7 +2675,7 @@ EOT
 
         $response = TestResponse::fromBaseResponse(new BinaryFileResponse($tempDir.'/file.txt'));
 
-        $this->assertEquals($tempDir.'/file.txt', $response->getFile()->getPathname());
+        $this->assertSame($tempDir.'/file.txt', $response->getFile()->getPathname());
 
         $files->deleteDirectory($tempDir);
     }
@@ -2685,7 +2685,7 @@ EOT
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         $this->assertSame('foo', $response->json('foobar.foobar_foo'));
-        $this->assertEquals(
+        $this->assertSame(
             json_decode($response->getContent(), true),
             $response->json()
         );
@@ -3199,8 +3199,8 @@ EOT
         $cookie = $response->getCookie($cookieName);
 
         $this->assertInstanceOf(Cookie::class, $cookie);
-        $this->assertEquals($cookieName, $cookie->getName());
-        $this->assertEquals($cookieValue, $cookie->getValue());
+        $this->assertSame($cookieName, $cookie->getName());
+        $this->assertSame($cookieValue, $cookie->getValue());
     }
 
     public function testHandledExceptionIsIncludedInAssertionFailure(): void

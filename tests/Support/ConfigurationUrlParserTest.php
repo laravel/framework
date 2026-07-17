@@ -16,7 +16,7 @@ class ConfigurationUrlParserTest extends TestCase
 
     public function testDriversAliases()
     {
-        $this->assertEquals([
+        $this->assertSame([
             'mssql' => 'sqlsrv',
             'mysql2' => 'mysql',
             'postgres' => 'pgsql',
@@ -28,7 +28,7 @@ class ConfigurationUrlParserTest extends TestCase
 
         ConfigurationUrlParser::addDriverAlias('some-particular-alias', 'mysql');
 
-        $this->assertEquals([
+        $this->assertSame([
             'mssql' => 'sqlsrv',
             'mysql2' => 'mysql',
             'postgres' => 'pgsql',
@@ -39,7 +39,7 @@ class ConfigurationUrlParserTest extends TestCase
             'some-particular-alias' => 'mysql',
         ], ConfigurationUrlParser::getDriverAliases());
 
-        $this->assertEquals([
+        $this->assertSame([
             'driver' => 'mysql',
         ], (new ConfigurationUrlParser)->parseConfiguration('some-particular-alias://null'));
     }

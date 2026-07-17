@@ -144,7 +144,7 @@ class CommandEventsTest extends TestCase
     {
         $log = trim($this->files->get($this->logfile));
 
-        $this->assertEquals(implode(PHP_EOL, $messages), $log);
+        $this->assertSame(implode(PHP_EOL, $messages), $log);
     }
 }
 

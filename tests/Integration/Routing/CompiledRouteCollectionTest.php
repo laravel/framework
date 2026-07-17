@@ -65,7 +65,7 @@ class CompiledRouteCollectionTest extends TestCase
         ]));
 
         $this->assertInstanceOf(Route::class, $outputRoute);
-        $this->assertEquals($inputRoute, $outputRoute);
+        $this->assertSame($inputRoute, $outputRoute);
     }
 
     public function testRouteCollectionCanRetrieveByName()
@@ -289,10 +289,10 @@ class CompiledRouteCollectionTest extends TestCase
         $this->routeCollection->add($routeB);
 
         // Check if the lookups of $routeA and $routeB are there.
-        $this->assertEquals($routeA, $this->routeCollection->getByName('routeA'));
-        $this->assertEquals($routeA, $this->routeCollection->getByAction('View@view'));
-        $this->assertEquals($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
-        $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
+        $this->assertSame($routeA, $this->routeCollection->getByName('routeA'));
+        $this->assertSame($routeA, $this->routeCollection->getByAction('View@view'));
+        $this->assertSame($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
+        $this->assertSame($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
 
         $routes = $this->collection();
 

@@ -17,7 +17,7 @@ class PreviousUrlTest extends TestCase
 
         $response = $this->postJson('/previous-url');
 
-        $this->assertEquals(422, $response->status());
+        $this->assertSame(422, $response->status());
     }
 
     protected function getApplicationProviders($app)

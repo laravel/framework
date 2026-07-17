@@ -12,7 +12,7 @@ test
         $expected = '<?php while($foo): ?>
 test
 <?php endwhile; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testNestedWhileStatementsAreCompiled()
@@ -27,6 +27,6 @@ test
 test
 <?php endwhile; ?>
 <?php endwhile; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

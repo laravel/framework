@@ -15,14 +15,14 @@ class DatabaseConcernsHasAttributesTest extends TestCase
     {
         $instance = new HasAttributesWithoutConstructor();
         $attributes = $instance->getMutatedAttributes();
-        $this->assertEquals(['some_attribute'], $attributes);
+        $this->assertSame(['some_attribute'], $attributes);
     }
 
     public function testWithConstructorArguments()
     {
         $instance = new HasAttributesWithConstructorArguments(null);
         $attributes = $instance->getMutatedAttributes();
-        $this->assertEquals(['some_attribute'], $attributes);
+        $this->assertSame(['some_attribute'], $attributes);
     }
 
     public function testRelationsToArray()
@@ -37,7 +37,7 @@ class DatabaseConcernsHasAttributesTest extends TestCase
             ])
             ->getMock();
 
-        $this->assertEquals([
+        $this->assertSame([
             'arrayable_relation' => ['foo' => 'bar'],
             'null_relation' => null,
         ], $mock->relationsToArray());
@@ -46,7 +46,7 @@ class DatabaseConcernsHasAttributesTest extends TestCase
     public function testCastingEmptyStringToArrayDoesNotError()
     {
         $instance = new HasAttributesWithArrayCast();
-        $this->assertEquals(['foo' => null], $instance->attributesToArray());
+        $this->assertSame(['foo' => null], $instance->attributesToArray());
 
         $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
     }

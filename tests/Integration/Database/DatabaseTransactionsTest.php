@@ -36,8 +36,8 @@ class DatabaseTransactionsTest extends DatabaseTestCase
 
         $this->assertTrue($firstObject->ran);
         $this->assertTrue($secondObject->ran);
-        $this->assertEquals(1, $firstObject->runs);
-        $this->assertEquals(1, $secondObject->runs);
+        $this->assertSame(1, $firstObject->runs);
+        $this->assertSame(1, $secondObject->runs);
         $this->assertFalse($thirdObject->ran);
     }
 
@@ -70,8 +70,8 @@ class DatabaseTransactionsTest extends DatabaseTestCase
 
         $this->assertTrue($firstObject->ran);
         $this->assertTrue($secondObject->ran);
-        $this->assertEquals(1, $firstObject->runs);
-        $this->assertEquals(1, $secondObject->runs);
+        $this->assertSame(1, $firstObject->runs);
+        $this->assertSame(1, $secondObject->runs);
         $this->assertFalse($thirdObject->ran);
     }
 

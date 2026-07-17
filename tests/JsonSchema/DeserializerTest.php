@@ -176,7 +176,7 @@ class DeserializerTest extends TestCase
 
         $array = $type->toArray();
 
-        $this->assertEquals(['1', '4'], $array['required']);
+        $this->assertSame(['1', '4'], $array['required']);
         $this->assertIsString($array['required'][0]);
     }
 
@@ -218,7 +218,7 @@ class DeserializerTest extends TestCase
         ]);
 
         $this->assertInstanceOf(StringType::class, $type);
-        $this->assertEquals([
+        $this->assertSame([
             'title' => 'Nickname',
             'minLength' => 1,
             'type' => ['string', 'null'],
@@ -235,7 +235,7 @@ class DeserializerTest extends TestCase
         ]);
 
         $this->assertInstanceOf(IntegerType::class, $type);
-        $this->assertEquals([
+        $this->assertSame([
             'minimum' => 0,
             'type' => ['integer', 'null'],
         ], $type->toArray());
@@ -556,7 +556,7 @@ class DeserializerTest extends TestCase
         ]);
 
         $this->assertInstanceOf(AnyOfType::class, $type);
-        $this->assertEquals([
+        $this->assertSame([
             'title' => 'Identifier',
             'anyOf' => [
                 ['type' => 'string'],
@@ -576,7 +576,7 @@ class DeserializerTest extends TestCase
         ]);
 
         $this->assertInstanceOf(AnyOfType::class, $type);
-        $this->assertEquals([
+        $this->assertSame([
             'anyOf' => [
                 ['type' => 'string'],
                 ['type' => 'integer'],

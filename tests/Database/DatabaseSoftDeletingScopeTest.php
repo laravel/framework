@@ -64,7 +64,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $model->shouldReceive('restore')->once()->andReturn(true);
         $result = $callback($givenBuilder, $attributes, $values);
 
-        $this->assertEquals($model, $result);
+        $this->assertSame($model, $result);
     }
 
     public function testCreateOrRestoreExtension()
@@ -86,7 +86,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $model->shouldReceive('restore')->once()->andReturn(true);
         $result = $callback($givenBuilder, $attributes, $values);
 
-        $this->assertEquals($model, $result);
+        $this->assertSame($model, $result);
     }
 
     public function testWithTrashedExtension()
@@ -104,7 +104,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $givenBuilder->shouldReceive('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
         $result = $callback($givenBuilder);
 
-        $this->assertEquals($givenBuilder, $result);
+        $this->assertSame($givenBuilder, $result);
     }
 
     public function testOnlyTrashedExtension()
@@ -127,7 +127,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $givenBuilder->shouldReceive('whereNotNull')->once()->with('table.deleted_at');
         $result = $callback($givenBuilder);
 
-        $this->assertEquals($givenBuilder, $result);
+        $this->assertSame($givenBuilder, $result);
     }
 
     public function testWithoutTrashedExtension()
@@ -150,6 +150,6 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $givenBuilder->shouldReceive('whereNull')->once()->with('table.deleted_at');
         $result = $callback($givenBuilder);
 
-        $this->assertEquals($givenBuilder, $result);
+        $this->assertSame($givenBuilder, $result);
     }
 }

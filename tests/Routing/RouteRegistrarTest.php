@@ -36,28 +36,28 @@ class RouteRegistrarTest extends TestCase
         });
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
-        $this->assertEquals(['one', 'two'], $this->getRoute()->middleware());
+        $this->assertSame(['one', 'two'], $this->getRoute()->middleware());
 
         $this->router->middleware('three', 'four')->get('users', function () {
             return 'all-users';
         });
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
-        $this->assertEquals(['three', 'four'], $this->getRoute()->middleware());
+        $this->assertSame(['three', 'four'], $this->getRoute()->middleware());
 
         $this->router->get('users', function () {
             return 'all-users';
         })->middleware('five', 'six');
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
-        $this->assertEquals(['five', 'six'], $this->getRoute()->middleware());
+        $this->assertSame(['five', 'six'], $this->getRoute()->middleware());
 
         $this->router->middleware('seven')->get('users', function () {
             return 'all-users';
         });
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
-        $this->assertEquals(['seven'], $this->getRoute()->middleware());
+        $this->assertSame(['seven'], $this->getRoute()->middleware());
     }
 
     public function testNullNamespaceIsRespected()
@@ -148,7 +148,7 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
 
-        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
+        $this->assertSame(['one'], $this->getRoute()->excludedMiddleware());
     }
 
     public function testGetRouteWithTrashed()
@@ -324,7 +324,7 @@ class RouteRegistrarTest extends TestCase
         });
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
-        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
+        $this->assertSame(['one'], $this->getRoute()->excludedMiddleware());
     }
 
     public function testCanRegisterGroupWithStringableMiddleware()
@@ -1114,7 +1114,7 @@ class RouteRegistrarTest extends TestCase
             });
         });
 
-        $this->assertEquals([
+        $this->assertSame([
             'can:access-admin',
             'can:edit,post',
         ], $this->getRoute()->middleware());
@@ -1129,13 +1129,13 @@ class RouteRegistrarTest extends TestCase
             ->middlewareFor(['edit'], ['one', 'two']);
         $this->router->getRoutes()->refreshNameLookups();
 
-        $this->assertEquals(['default', RouteRegistrarMiddlewareStub::class], $this->router->getRoutes()->getByName('users.index')->gatherMiddleware());
-        $this->assertEquals(['default', 'one'], $this->router->getRoutes()->getByName('users.create')->gatherMiddleware());
-        $this->assertEquals(['default', 'one'], $this->router->getRoutes()->getByName('users.store')->gatherMiddleware());
-        $this->assertEquals(['default'], $this->router->getRoutes()->getByName('users.show')->gatherMiddleware());
-        $this->assertEquals(['default', 'one', 'two'], $this->router->getRoutes()->getByName('users.edit')->gatherMiddleware());
-        $this->assertEquals(['default'], $this->router->getRoutes()->getByName('users.update')->gatherMiddleware());
-        $this->assertEquals(['default'], $this->router->getRoutes()->getByName('users.destroy')->gatherMiddleware());
+        $this->assertSame(['default', RouteRegistrarMiddlewareStub::class], $this->router->getRoutes()->getByName('users.index')->gatherMiddleware());
+        $this->assertSame(['default', 'one'], $this->router->getRoutes()->getByName('users.create')->gatherMiddleware());
+        $this->assertSame(['default', 'one'], $this->router->getRoutes()->getByName('users.store')->gatherMiddleware());
+        $this->assertSame(['default'], $this->router->getRoutes()->getByName('users.show')->gatherMiddleware());
+        $this->assertSame(['default', 'one', 'two'], $this->router->getRoutes()->getByName('users.edit')->gatherMiddleware());
+        $this->assertSame(['default'], $this->router->getRoutes()->getByName('users.update')->gatherMiddleware());
+        $this->assertSame(['default'], $this->router->getRoutes()->getByName('users.destroy')->gatherMiddleware());
 
         $this->router->resource('users', RouteRegistrarControllerStub::class)
             ->middlewareFor('index', RouteRegistrarMiddlewareStub::class)
@@ -1144,13 +1144,13 @@ class RouteRegistrarTest extends TestCase
             ->middleware('default');
         $this->router->getRoutes()->refreshNameLookups();
 
-        $this->assertEquals([RouteRegistrarMiddlewareStub::class, 'default'], $this->router->getRoutes()->getByName('users.index')->gatherMiddleware());
-        $this->assertEquals(['one', 'default'], $this->router->getRoutes()->getByName('users.create')->gatherMiddleware());
-        $this->assertEquals(['one', 'default'], $this->router->getRoutes()->getByName('users.store')->gatherMiddleware());
-        $this->assertEquals(['default'], $this->router->getRoutes()->getByName('users.show')->gatherMiddleware());
-        $this->assertEquals(['one', 'two', 'default'], $this->router->getRoutes()->getByName('users.edit')->gatherMiddleware());
-        $this->assertEquals(['default'], $this->router->getRoutes()->getByName('users.update')->gatherMiddleware());
-        $this->assertEquals(['default'], $this->router->getRoutes()->getByName('users.destroy')->gatherMiddleware());
+        $this->assertSame([RouteRegistrarMiddlewareStub::class, 'default'], $this->router->getRoutes()->getByName('users.index')->gatherMiddleware());
+        $this->assertSame(['one', 'default'], $this->router->getRoutes()->getByName('users.create')->gatherMiddleware());
+        $this->assertSame(['one', 'default'], $this->router->getRoutes()->getByName('users.store')->gatherMiddleware());
+        $this->assertSame(['default'], $this->router->getRoutes()->getByName('users.show')->gatherMiddleware());
+        $this->assertSame(['one', 'two', 'default'], $this->router->getRoutes()->getByName('users.edit')->gatherMiddleware());
+        $this->assertSame(['default'], $this->router->getRoutes()->getByName('users.update')->gatherMiddleware());
+        $this->assertSame(['default'], $this->router->getRoutes()->getByName('users.destroy')->gatherMiddleware());
     }
 
     public function testResourceWithoutMiddlewareRegistration()
@@ -1162,7 +1162,7 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('controller', Request::create('users', 'GET'));
 
-        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
+        $this->assertSame(['one'], $this->getRoute()->excludedMiddleware());
     }
 
     public function testCanSetExcludedMiddlewareForSpecifiedMethodsOnRegisteredResource()
@@ -1173,13 +1173,13 @@ class RouteRegistrarTest extends TestCase
             ->withoutMiddlewareFor(['create', 'store'], 'three')
             ->withoutMiddlewareFor(['edit'], ['four', 'five']);
 
-        $this->assertEquals(['one', 'two'], $this->router->getRoutes()->getByName('users.index')->excludedMiddleware());
-        $this->assertEquals(['one', 'three'], $this->router->getRoutes()->getByName('users.create')->excludedMiddleware());
-        $this->assertEquals(['one', 'three'], $this->router->getRoutes()->getByName('users.store')->excludedMiddleware());
-        $this->assertEquals(['one'], $this->router->getRoutes()->getByName('users.show')->excludedMiddleware());
-        $this->assertEquals(['one', 'four', 'five'], $this->router->getRoutes()->getByName('users.edit')->excludedMiddleware());
-        $this->assertEquals(['one'], $this->router->getRoutes()->getByName('users.update')->excludedMiddleware());
-        $this->assertEquals(['one'], $this->router->getRoutes()->getByName('users.destroy')->excludedMiddleware());
+        $this->assertSame(['one', 'two'], $this->router->getRoutes()->getByName('users.index')->excludedMiddleware());
+        $this->assertSame(['one', 'three'], $this->router->getRoutes()->getByName('users.create')->excludedMiddleware());
+        $this->assertSame(['one', 'three'], $this->router->getRoutes()->getByName('users.store')->excludedMiddleware());
+        $this->assertSame(['one'], $this->router->getRoutes()->getByName('users.show')->excludedMiddleware());
+        $this->assertSame(['one', 'four', 'five'], $this->router->getRoutes()->getByName('users.edit')->excludedMiddleware());
+        $this->assertSame(['one'], $this->router->getRoutes()->getByName('users.update')->excludedMiddleware());
+        $this->assertSame(['one'], $this->router->getRoutes()->getByName('users.destroy')->excludedMiddleware());
     }
 
     public function testResourceWithMiddlewareAsStringable()
@@ -1199,8 +1199,8 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('controller', Request::create('users', 'GET'));
 
-        $this->assertEquals(['one', 'two'], $this->getRoute()->middleware());
-        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
+        $this->assertSame(['one', 'two'], $this->getRoute()->middleware());
+        $this->assertSame(['one'], $this->getRoute()->excludedMiddleware());
     }
 
     public function testResourceWheres()
@@ -1215,7 +1215,7 @@ class RouteRegistrarTest extends TestCase
 
         /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
-            $this->assertEquals($wheres, $route->wheres);
+            $this->assertSame($wheres, $route->wheres);
         }
     }
 
@@ -1253,7 +1253,7 @@ class RouteRegistrarTest extends TestCase
 
         /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
-            $this->assertEquals($wheres, $route->wheres);
+            $this->assertSame($wheres, $route->wheres);
         }
     }
 
@@ -1329,7 +1329,7 @@ class RouteRegistrarTest extends TestCase
 
         /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
-            $this->assertEquals($wheres, $route->wheres);
+            $this->assertSame($wheres, $route->wheres);
         }
     }
 
@@ -1397,7 +1397,7 @@ class RouteRegistrarTest extends TestCase
 
         /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
-            $this->assertEquals($wheres, $route->wheres);
+            $this->assertSame($wheres, $route->wheres);
         }
     }
 
@@ -1472,14 +1472,14 @@ class RouteRegistrarTest extends TestCase
         $this->router->middlewareGroup('web', []);
         $this->router->pushMiddlewareToGroup('web', 'test-middleware');
 
-        $this->assertEquals(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
+        $this->assertSame(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
     }
 
     public function testPushMiddlewareToGroupUnregisteredGroup()
     {
         $this->router->pushMiddlewareToGroup('web', 'test-middleware');
 
-        $this->assertEquals(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
+        $this->assertSame(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
     }
 
     public function testPushMiddlewareToGroupDuplicatedMiddleware()
@@ -1487,7 +1487,7 @@ class RouteRegistrarTest extends TestCase
         $this->router->pushMiddlewareToGroup('web', 'test-middleware');
         $this->router->pushMiddlewareToGroup('web', 'test-middleware');
 
-        $this->assertEquals(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
+        $this->assertSame(['test-middleware'], $this->router->getMiddlewareGroups()['web']);
     }
 
     public function testCanRemoveMiddlewareFromGroup()
@@ -1697,12 +1697,12 @@ class RouteRegistrarTest extends TestCase
             ->middlewareFor(['edit'], ['one', 'two']);
         $this->router->getRoutes()->refreshNameLookups();
 
-        $this->assertEquals(['default', 'one'], $this->router->getRoutes()->getByName('users.create')->gatherMiddleware());
-        $this->assertEquals(['default', 'one'], $this->router->getRoutes()->getByName('users.store')->gatherMiddleware());
-        $this->assertEquals(['default', RouteRegistrarMiddlewareStub::class], $this->router->getRoutes()->getByName('users.show')->gatherMiddleware());
-        $this->assertEquals(['default', 'one', 'two'], $this->router->getRoutes()->getByName('users.edit')->gatherMiddleware());
-        $this->assertEquals(['default'], $this->router->getRoutes()->getByName('users.update')->gatherMiddleware());
-        $this->assertEquals(['default'], $this->router->getRoutes()->getByName('users.destroy')->gatherMiddleware());
+        $this->assertSame(['default', 'one'], $this->router->getRoutes()->getByName('users.create')->gatherMiddleware());
+        $this->assertSame(['default', 'one'], $this->router->getRoutes()->getByName('users.store')->gatherMiddleware());
+        $this->assertSame(['default', RouteRegistrarMiddlewareStub::class], $this->router->getRoutes()->getByName('users.show')->gatherMiddleware());
+        $this->assertSame(['default', 'one', 'two'], $this->router->getRoutes()->getByName('users.edit')->gatherMiddleware());
+        $this->assertSame(['default'], $this->router->getRoutes()->getByName('users.update')->gatherMiddleware());
+        $this->assertSame(['default'], $this->router->getRoutes()->getByName('users.destroy')->gatherMiddleware());
 
         $this->router->singleton('users', RouteRegistrarControllerStub::class)
             ->creatable()
@@ -1713,12 +1713,12 @@ class RouteRegistrarTest extends TestCase
             ->middleware('default');
         $this->router->getRoutes()->refreshNameLookups();
 
-        $this->assertEquals(['one', 'default'], $this->router->getRoutes()->getByName('users.create')->gatherMiddleware());
-        $this->assertEquals(['one', 'default'], $this->router->getRoutes()->getByName('users.store')->gatherMiddleware());
-        $this->assertEquals([RouteRegistrarMiddlewareStub::class, 'default'], $this->router->getRoutes()->getByName('users.show')->gatherMiddleware());
-        $this->assertEquals(['one', 'two', 'default'], $this->router->getRoutes()->getByName('users.edit')->gatherMiddleware());
-        $this->assertEquals(['default'], $this->router->getRoutes()->getByName('users.update')->gatherMiddleware());
-        $this->assertEquals(['default'], $this->router->getRoutes()->getByName('users.destroy')->gatherMiddleware());
+        $this->assertSame(['one', 'default'], $this->router->getRoutes()->getByName('users.create')->gatherMiddleware());
+        $this->assertSame(['one', 'default'], $this->router->getRoutes()->getByName('users.store')->gatherMiddleware());
+        $this->assertSame([RouteRegistrarMiddlewareStub::class, 'default'], $this->router->getRoutes()->getByName('users.show')->gatherMiddleware());
+        $this->assertSame(['one', 'two', 'default'], $this->router->getRoutes()->getByName('users.edit')->gatherMiddleware());
+        $this->assertSame(['default'], $this->router->getRoutes()->getByName('users.update')->gatherMiddleware());
+        $this->assertSame(['default'], $this->router->getRoutes()->getByName('users.destroy')->gatherMiddleware());
     }
 
     public function testCanSetExcludedMiddlewareForSpecifiedMethodsOnRegisteredSingletonResource()
@@ -1731,12 +1731,12 @@ class RouteRegistrarTest extends TestCase
             ->withoutMiddlewareFor(['create', 'store'], 'three')
             ->withoutMiddlewareFor(['edit'], ['four', 'five']);
 
-        $this->assertEquals(['one', 'three'], $this->router->getRoutes()->getByName('users.create')->excludedMiddleware());
-        $this->assertEquals(['one', 'three'], $this->router->getRoutes()->getByName('users.store')->excludedMiddleware());
-        $this->assertEquals(['one', 'two'], $this->router->getRoutes()->getByName('users.show')->excludedMiddleware());
-        $this->assertEquals(['one', 'four', 'five'], $this->router->getRoutes()->getByName('users.edit')->excludedMiddleware());
-        $this->assertEquals(['one'], $this->router->getRoutes()->getByName('users.update')->excludedMiddleware());
-        $this->assertEquals(['one'], $this->router->getRoutes()->getByName('users.destroy')->excludedMiddleware());
+        $this->assertSame(['one', 'three'], $this->router->getRoutes()->getByName('users.create')->excludedMiddleware());
+        $this->assertSame(['one', 'three'], $this->router->getRoutes()->getByName('users.store')->excludedMiddleware());
+        $this->assertSame(['one', 'two'], $this->router->getRoutes()->getByName('users.show')->excludedMiddleware());
+        $this->assertSame(['one', 'four', 'five'], $this->router->getRoutes()->getByName('users.edit')->excludedMiddleware());
+        $this->assertSame(['one'], $this->router->getRoutes()->getByName('users.update')->excludedMiddleware());
+        $this->assertSame(['one'], $this->router->getRoutes()->getByName('users.destroy')->excludedMiddleware());
     }
 
     /**
@@ -1757,7 +1757,7 @@ class RouteRegistrarTest extends TestCase
      */
     protected function seeMiddleware($middleware)
     {
-        $this->assertEquals($middleware, $this->getRoute()->middleware()[0]);
+        $this->assertSame($middleware, $this->getRoute()->middleware()[0]);
     }
 
     /**
@@ -1773,7 +1773,7 @@ class RouteRegistrarTest extends TestCase
 
         $this->assertTrue($route->matches($request));
 
-        $this->assertEquals($content, $route->bind($request)->run());
+        $this->assertSame($content, $route->bind($request)->run());
     }
 }
 

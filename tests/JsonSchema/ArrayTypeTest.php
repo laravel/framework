@@ -71,7 +71,7 @@ class ArrayTypeTest extends TestCase
     {
         $type = JsonSchema::array()->unique()->unique(false);
 
-        $this->assertEquals([
+        $this->assertSame([
             'type' => 'array',
         ], $type->toArray());
     }

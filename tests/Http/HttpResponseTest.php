@@ -78,7 +78,7 @@ class HttpResponseTest extends TestCase
     {
         $response = new Response;
         $this->assertCount(0, $response->headers->getCookies());
-        $this->assertEquals($response, $response->withCookie(new Cookie('foo', 'bar')));
+        $this->assertSame($response, $response->withCookie(new Cookie('foo', 'bar')));
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
         $this->assertSame('foo', $cookies[0]->getName());
@@ -89,7 +89,7 @@ class HttpResponseTest extends TestCase
     {
         $response = new Response;
         $this->assertCount(0, $response->headers->getCookies());
-        $this->assertEquals($response, $response->withCookies([
+        $this->assertSame($response, $response->withCookies([
             new Cookie('foo', 'bar'),
             new Cookie('baz', 'qux'),
         ]));

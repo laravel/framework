@@ -96,9 +96,9 @@ class ConsoleEventSchedulerTest extends TestCase
         $events = $schedule->events();
         $phpBinary = Application::phpBinary();
         $artisanBinary = Application::artisanBinary();
-        $this->assertEquals($phpBinary.' '.$artisanBinary.' queue:listen', $events[0]->command);
-        $this->assertEquals($phpBinary.' '.$artisanBinary.' queue:listen --tries=3', $events[1]->command);
-        $this->assertEquals($phpBinary.' '.$artisanBinary.' queue:listen --tries=3', $events[2]->command);
+        $this->assertSame($phpBinary.' '.$artisanBinary.' queue:listen', $events[0]->command);
+        $this->assertSame($phpBinary.' '.$artisanBinary.' queue:listen --tries=3', $events[1]->command);
+        $this->assertSame($phpBinary.' '.$artisanBinary.' queue:listen --tries=3', $events[2]->command);
     }
 
     public function testCreateNewArtisanCommandUsingCommandClass()
@@ -109,7 +109,7 @@ class ConsoleEventSchedulerTest extends TestCase
         $events = $schedule->events();
         $phpBinary = Application::phpBinary();
         $artisanBinary = Application::artisanBinary();
-        $this->assertEquals($phpBinary.' '.$artisanBinary.' foo:bar --force', $events[0]->command);
+        $this->assertSame($phpBinary.' '.$artisanBinary.' foo:bar --force', $events[0]->command);
     }
 
     public function testCreateNewArtisanCommandUsingCommandClassObject()
@@ -129,7 +129,7 @@ class ConsoleEventSchedulerTest extends TestCase
         $events = $schedule->events();
         $phpBinary = Application::phpBinary();
         $artisanBinary = Application::artisanBinary();
-        $this->assertEquals($phpBinary.' '.$artisanBinary.' foo:bar --force', $events[0]->command);
+        $this->assertSame($phpBinary.' '.$artisanBinary.' foo:bar --force', $events[0]->command);
     }
 
     public function testItUsesCommandDescriptionAsEventDescription()

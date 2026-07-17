@@ -42,7 +42,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
             'array_as_json_field' => ['key1' => 'value1'],
         ]);
 
-        $this->assertEquals(['key1' => 'value1'], $object->array_as_json_field);
+        $this->assertSame(['key1' => 'value1'], $object->array_as_json_field);
     }
 
     public function testObjectsAreCastable()

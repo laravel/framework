@@ -9,7 +9,7 @@ class BladeCheckedStatementsTest extends AbstractBladeTestCase
         $string = '<input @selected(name(foo(bar)))/>';
         $expected = "<input <?php if(name(foo(bar))): echo 'selected'; endif; ?>/>";
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCheckedStatementsAreCompiled()
@@ -17,7 +17,7 @@ class BladeCheckedStatementsTest extends AbstractBladeTestCase
         $string = '<input @checked(name(foo(bar)))/>';
         $expected = "<input <?php if(name(foo(bar))): echo 'checked'; endif; ?>/>";
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testDisabledStatementsAreCompiled()
@@ -25,7 +25,7 @@ class BladeCheckedStatementsTest extends AbstractBladeTestCase
         $string = '<button @disabled(name(foo(bar)))>Foo</button>';
         $expected = "<button <?php if(name(foo(bar))): echo 'disabled'; endif; ?>>Foo</button>";
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testRequiredStatementsAreCompiled()
@@ -33,7 +33,7 @@ class BladeCheckedStatementsTest extends AbstractBladeTestCase
         $string = '<input @required(name(foo(bar)))/>';
         $expected = "<input <?php if(name(foo(bar))): echo 'required'; endif; ?>/>";
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testReadonlyStatementsAreCompiled()
@@ -41,6 +41,6 @@ class BladeCheckedStatementsTest extends AbstractBladeTestCase
         $string = '<input @readonly(name(foo(bar)))/>';
         $expected = "<input <?php if(name(foo(bar))): echo 'readonly'; endif; ?>/>";
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

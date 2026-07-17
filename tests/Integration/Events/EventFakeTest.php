@@ -61,7 +61,7 @@ class EventFakeTest extends TestCase
             //
         });
 
-        $this->assertEquals([null, 'two', null], Event::dispatch('test'));
+        $this->assertSame([null, 'two', null], Event::dispatch('test'));
 
         Event::assertNotDispatched(NonImportantEvent::class);
     }
@@ -79,7 +79,7 @@ class EventFakeTest extends TestCase
             $this->fail('should not be called');
         });
 
-        $this->assertEquals([null], Event::dispatch('test'));
+        $this->assertSame([null], Event::dispatch('test'));
 
         Event::assertNotDispatched(NonImportantEvent::class);
     }
@@ -137,8 +137,8 @@ class EventFakeTest extends TestCase
             return 'important';
         });
 
-        $this->assertEquals(null, Event::dispatch('test'));
-        $this->assertEquals(['important'], Event::dispatch('important-event'));
+        $this->assertSame(null, Event::dispatch('test'));
+        $this->assertSame(['important'], Event::dispatch('important-event'));
     }
 
     public function testAssertListening()

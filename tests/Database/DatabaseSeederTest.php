@@ -49,14 +49,14 @@ class DatabaseSeederTest extends TestCase
     {
         $seeder = new TestSeeder;
         $container = m::mock(Container::class);
-        $this->assertEquals($seeder->setContainer($container), $seeder);
+        $this->assertSame($seeder->setContainer($container), $seeder);
     }
 
     public function testSetCommand()
     {
         $seeder = new TestSeeder;
         $command = m::mock(Command::class);
-        $this->assertEquals($seeder->setCommand($command), $seeder);
+        $this->assertSame($seeder->setCommand($command), $seeder);
     }
 
     public function testInjectDependenciesOnRunMethod()

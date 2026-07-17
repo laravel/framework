@@ -225,7 +225,7 @@ class QueueWorkerTest extends TestCase
     {
         $worker = $this->getWorker('default', ['queue' => []]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['sleep' => 5]));
-        $this->assertEquals(5, $worker->sleptFor);
+        $this->assertSame(5, $worker->sleptFor);
     }
 
     public function testJobIsReleasedOnException()
@@ -239,7 +239,7 @@ class QueueWorkerTest extends TestCase
         $worker = $this->getWorker('default', ['queue' => [$job]]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 10]));
 
-        $this->assertEquals(10, $job->releaseAfter);
+        $this->assertSame(10, $job->releaseAfter);
         $this->assertFalse($job->deleted);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobExceptionOccurred::class))->once();
@@ -267,7 +267,7 @@ class QueueWorkerTest extends TestCase
 
         $this->assertNull($job->releaseAfter);
         $this->assertTrue($job->deleted);
-        $this->assertEquals($e, $job->failedWith);
+        $this->assertSame($e, $job->failedWith);
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobReleasedAfterException::class)]);
     }
 
@@ -309,7 +309,7 @@ class QueueWorkerTest extends TestCase
 
         $this->assertNull($job->releaseAfter);
         $this->assertTrue($job->deleted);
-        $this->assertEquals($e, $job->failedWith);
+        $this->assertSame($e, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobExceptionOccurred::class))->once();
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
@@ -339,7 +339,7 @@ class QueueWorkerTest extends TestCase
 
         $this->assertNull($job->releaseAfter);
         $this->assertTrue($job->deleted);
-        $this->assertEquals($e, $job->failedWith);
+        $this->assertSame($e, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobExceptionOccurred::class))->once();
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
@@ -417,7 +417,7 @@ class QueueWorkerTest extends TestCase
         $worker = $this->getWorker('default', ['queue' => [$job]]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 3, 'maxTries' => 0]));
 
-        $this->assertEquals(10, $job->releaseAfter);
+        $this->assertSame(10, $job->releaseAfter);
     }
 
     public function testJobRunsIfAppIsNotInMaintenanceMode()

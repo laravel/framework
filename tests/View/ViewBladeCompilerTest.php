@@ -60,7 +60,7 @@ class ViewBladeCompilerTest extends TestCase
     public function testCompilePathIsProperlyCreated()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', $compiler->getCompiledPath('foo'));
+        $this->assertSame(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', $compiler->getCompiledPath('foo'));
     }
 
     public function testCompileCompilesFileAndReturnsContents()
@@ -288,22 +288,22 @@ class ViewBladeCompilerTest extends TestCase
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
         $compiler->component('App\Foo\Bar');
-        $this->assertEquals(['bar' => 'App\Foo\Bar'], $compiler->getClassComponentAliases());
+        $this->assertSame(['bar' => 'App\Foo\Bar'], $compiler->getClassComponentAliases());
 
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
         $compiler->component('App\Foo\Bar', null, 'prefix');
-        $this->assertEquals(['prefix-bar' => 'App\Foo\Bar'], $compiler->getClassComponentAliases());
+        $this->assertSame(['prefix-bar' => 'App\Foo\Bar'], $compiler->getClassComponentAliases());
 
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
         $compiler->component('App\View\Components\Forms\Input');
-        $this->assertEquals(['forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
+        $this->assertSame(['forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
 
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
         $compiler->component('App\View\Components\Forms\Input', null, 'prefix');
-        $this->assertEquals(['prefix-forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
+        $this->assertSame(['prefix-forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
     }
 
     public function testAnonymousComponentNamespacesCanBeStored()
@@ -311,29 +311,29 @@ class ViewBladeCompilerTest extends TestCase
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
         $compiler->anonymousComponentNamespace(' public/frontend ', 'frontend');
-        $this->assertEquals(['frontend' => 'public.frontend'], $compiler->getAnonymousComponentNamespaces());
+        $this->assertSame(['frontend' => 'public.frontend'], $compiler->getAnonymousComponentNamespaces());
 
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
         $compiler->anonymousComponentNamespace('public/frontend/', 'frontend');
-        $this->assertEquals(['frontend' => 'public.frontend'], $compiler->getAnonymousComponentNamespaces());
+        $this->assertSame(['frontend' => 'public.frontend'], $compiler->getAnonymousComponentNamespaces());
 
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
         $compiler->anonymousComponentNamespace('/admin/components', 'admin');
-        $this->assertEquals(['admin' => 'admin.components'], $compiler->getAnonymousComponentNamespaces());
+        $this->assertSame(['admin' => 'admin.components'], $compiler->getAnonymousComponentNamespaces());
 
         // Test directory is automatically inferred from the prefix if not given.
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
         $compiler->anonymousComponentNamespace('frontend');
-        $this->assertEquals(['frontend' => 'frontend'], $compiler->getAnonymousComponentNamespaces());
+        $this->assertSame(['frontend' => 'frontend'], $compiler->getAnonymousComponentNamespaces());
 
         // Test that the prefix can also contain dots.
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
         $compiler->anonymousComponentNamespace('frontend/auth', 'frontend.auth');
-        $this->assertEquals(['frontend.auth' => 'frontend.auth'], $compiler->getAnonymousComponentNamespaces());
+        $this->assertSame(['frontend.auth' => 'frontend.auth'], $compiler->getAnonymousComponentNamespaces());
     }
 
     protected function getFiles()

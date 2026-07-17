@@ -45,7 +45,7 @@ class EloquentThroughTest extends DatabaseTestCase
     {
         /** @var Post $post */
         $post = Post::first();
-        $this->assertEquals(2, $post->commentLikes()->count());
+        $this->assertSame(2, $post->commentLikes()->count());
     }
 }
 

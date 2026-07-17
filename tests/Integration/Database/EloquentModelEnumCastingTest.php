@@ -47,13 +47,13 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
         $model = EloquentModelEnumCastingTestModel::first();
 
-        $this->assertEquals(StringStatus::pending, $model->string_status);
-        $this->assertEquals([StringStatus::pending, StringStatus::done], $model->string_status_collection->all());
-        $this->assertEquals([StringStatus::pending, StringStatus::done], $model->string_status_array->toArray());
-        $this->assertEquals(IntegerStatus::pending, $model->integer_status);
-        $this->assertEquals([IntegerStatus::pending, IntegerStatus::done], $model->integer_status_collection->all());
-        $this->assertEquals([IntegerStatus::pending, IntegerStatus::done], $model->integer_status_array->toArray());
-        $this->assertEquals(ArrayableStatus::pending, $model->arrayable_status);
+        $this->assertSame(StringStatus::pending, $model->string_status);
+        $this->assertSame([StringStatus::pending, StringStatus::done], $model->string_status_collection->all());
+        $this->assertSame([StringStatus::pending, StringStatus::done], $model->string_status_array->toArray());
+        $this->assertSame(IntegerStatus::pending, $model->integer_status);
+        $this->assertSame([IntegerStatus::pending, IntegerStatus::done], $model->integer_status_collection->all());
+        $this->assertSame([IntegerStatus::pending, IntegerStatus::done], $model->integer_status_array->toArray());
+        $this->assertSame(ArrayableStatus::pending, $model->arrayable_status);
     }
 
     public function testEnumsReturnNullWhenNull()
@@ -70,13 +70,13 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
         $model = EloquentModelEnumCastingTestModel::first();
 
-        $this->assertEquals(null, $model->string_status);
-        $this->assertEquals(null, $model->string_status_collection);
-        $this->assertEquals(null, $model->string_status_array);
-        $this->assertEquals(null, $model->integer_status);
-        $this->assertEquals(null, $model->integer_status_collection);
-        $this->assertEquals(null, $model->integer_status_array);
-        $this->assertEquals(null, $model->arrayable_status);
+        $this->assertSame(null, $model->string_status);
+        $this->assertSame(null, $model->string_status_collection);
+        $this->assertSame(null, $model->string_status_array);
+        $this->assertSame(null, $model->integer_status);
+        $this->assertSame(null, $model->integer_status_collection);
+        $this->assertSame(null, $model->integer_status_array);
+        $this->assertSame(null, $model->arrayable_status);
     }
 
     public function testEnumsAreCastableToArray()
@@ -91,7 +91,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'arrayable_status' => ArrayableStatus::pending,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'string_status' => 'pending',
             'string_status_collection' => ['pending', 'done'],
             'string_status_array' => ['pending', 'done'],
@@ -118,7 +118,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'arrayable_status' => null,
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'string_status' => null,
             'string_status_collection' => null,
             'string_status_array' => null,
@@ -223,9 +223,9 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
         $model = EloquentModelEnumCastingTestModel::first();
 
-        $this->assertEquals(StringStatus::pending, $model->string_status);
-        $this->assertEquals(IntegerStatus::pending, $model->integer_status);
-        $this->assertEquals(ArrayableStatus::pending, $model->arrayable_status);
+        $this->assertSame(StringStatus::pending, $model->string_status);
+        $this->assertSame(IntegerStatus::pending, $model->integer_status);
+        $this->assertSame(ArrayableStatus::pending, $model->arrayable_status);
     }
 
     public function testFirstOrNew()
@@ -249,7 +249,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
         $model2->save();
 
-        $this->assertEquals(StringStatus::done, $model2->string_status);
+        $this->assertSame(StringStatus::done, $model2->string_status);
     }
 
     public function testFirstOrCreate()
@@ -267,8 +267,8 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'string_status' => StringStatus::done,
         ]);
 
-        $this->assertEquals(StringStatus::pending, $model->string_status);
-        $this->assertEquals(StringStatus::done, $model2->string_status);
+        $this->assertSame(StringStatus::pending, $model->string_status);
+        $this->assertSame(StringStatus::done, $model2->string_status);
     }
 
     public function testAttributeCastToAnEnumCanNotBeSetToAnotherEnum(): void
@@ -301,7 +301,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
         $model->non_enum_status = StringStatus::pending;
 
-        $this->assertEquals(StringStatus::pending, $model->non_enum_status);
+        $this->assertSame(StringStatus::pending, $model->non_enum_status);
     }
 
     public function testCreateOrFirst()
@@ -318,10 +318,10 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'string_status' => StringStatus::done,
         ]);
 
-        $this->assertEquals(StringStatus::pending, $model1->string_status);
-        $this->assertEquals(StringStatus::pending, $model2->string_status);
+        $this->assertSame(StringStatus::pending, $model1->string_status);
+        $this->assertSame(StringStatus::pending, $model2->string_status);
         $this->assertTrue($model1->is($model2));
-        $this->assertEquals(StringStatus::done, $model3->string_status);
+        $this->assertSame(StringStatus::done, $model3->string_status);
     }
 }
 

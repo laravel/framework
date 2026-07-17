@@ -12,17 +12,17 @@ class SupportHtmlStringTest extends TestCase
         // Check if HtmlString correctly converts a basic HTML string
         $str = '<h1>foo</h1>';
         $html = new HtmlString('<h1>foo</h1>');
-        $this->assertEquals($str, $html->toHtml());
+        $this->assertSame($str, $html->toHtml());
 
         // Check if HtmlString correctly preserves leading blank spaces in the HTML string
         $startWithBlankSpaces = '   <h1>      foo</h1>';
         $html = new HtmlString('   <h1>      foo</h1>');
-        $this->assertEquals($startWithBlankSpaces, $html->toHtml());
+        $this->assertSame($startWithBlankSpaces, $html->toHtml());
 
         // Check if HtmlString correctly preserves trailing blank spaces in the HTML string
         $endsWithBlankSpaces = '<h1>foo       </h1>   ';
         $html = new HtmlString('<h1>foo       </h1>   ');
-        $this->assertEquals($endsWithBlankSpaces, $html->toHtml());
+        $this->assertSame($endsWithBlankSpaces, $html->toHtml());
 
         // Check if HtmlString correctly handles an empty string
         $emptyHtml = new HtmlString('');
@@ -31,14 +31,14 @@ class SupportHtmlStringTest extends TestCase
         // Check if HtmlString correctly converts a plain text string
         $str = 'foo bar';
         $html = new HtmlString($str);
-        $this->assertEquals($str, $html->toHtml());
+        $this->assertSame($str, $html->toHtml());
     }
 
     public function testToString()
     {
         $str = '<h1>foo</h1>';
         $html = new HtmlString('<h1>foo</h1>');
-        $this->assertEquals($str, (string) $html);
+        $this->assertSame($str, (string) $html);
 
         // Check if HtmlString gracefully handles a null value
         $html = new HtmlString(null);

@@ -99,7 +99,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $instance->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
         $instance->expects($this->never())->method('save');
 
-        $this->assertEquals($instance, $relation->make(['name' => 'taylor']));
+        $this->assertSame($instance, $relation->make(['name' => 'taylor']));
     }
 
     public function testSaveMethodSetsForeignKeyOnModel()
@@ -110,7 +110,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $result = $relation->save($mockModel);
 
         $attributes = $result->getAttributes();
-        $this->assertEquals(1, $attributes['foreign_key']);
+        $this->assertSame(1, $attributes['foreign_key']);
     }
 
     public function testCreateMethodProperlyCreatesNewModel()
@@ -121,7 +121,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
         $created->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
 
-        $this->assertEquals($created, $relation->create(['name' => 'taylor']));
+        $this->assertSame($created, $relation->create(['name' => 'taylor']));
     }
 
     public function testForceCreateMethodProperlyCreatesNewModel()
@@ -134,8 +134,8 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $relation->getRelated()->shouldReceive('forceCreate')->once()->with($attributes)->andReturn($created);
 
-        $this->assertEquals($created, $relation->forceCreate(['name' => 'taylor']));
-        $this->assertEquals(1, $created->getAttribute('foreign_key'));
+        $this->assertSame($created, $relation->forceCreate(['name' => 'taylor']));
+        $this->assertSame(1, $created->getAttribute('foreign_key'));
     }
 
     public function testRelationIsProperlyInitialized()
@@ -145,7 +145,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $model->shouldReceive('setRelation')->once()->with('foo', null);
         $models = $relation->initRelation([$model], 'foo');
 
-        $this->assertEquals([$model], $models);
+        $this->assertSame([$model], $models);
     }
 
     public function testEagerConstraintsAreProperlyAdded()
@@ -189,8 +189,8 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $models = $relation->match([$model1, $model2, $model3, $model4], new Collection([$result1, $result2, $result3]), 'foo');
 
-        $this->assertEquals(1, $models[0]->foo->foreign_key);
-        $this->assertEquals(2, $models[1]->foo->foreign_key);
+        $this->assertSame(1, $models[0]->foo->foreign_key);
+        $this->assertSame(2, $models[1]->foo->foreign_key);
         $this->assertNull($models[2]->foo);
         $this->assertSame('4', (string) $models[3]->foo->foreign_key);
     }

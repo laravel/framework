@@ -20,13 +20,13 @@ class DatabaseMySqlProcessorTest extends TestCase
             ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar(100)', 'collation' => 'collate', 'nullable' => false, 'default' => 'foo', 'auto_increment' => false, 'comment' => null, 'generation' => null],
             ['name' => 'email', 'type_name' => 'varchar', 'type' => 'varchar(100)', 'collation' => 'collate', 'nullable' => true, 'default' => 'NULL', 'auto_increment' => false, 'comment' => 'NULL', 'generation' => null],
         ];
-        $this->assertEquals($expected, $processor->processColumns($listing));
+        $this->assertSame($expected, $processor->processColumns($listing));
 
         // convert listing to objects to simulate PDO::FETCH_CLASS
         foreach ($listing as &$row) {
             $row = (object) $row;
         }
 
-        $this->assertEquals($expected, $processor->processColumns($listing));
+        $this->assertSame($expected, $processor->processColumns($listing));
     }
 }

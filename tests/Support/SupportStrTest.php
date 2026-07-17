@@ -169,7 +169,7 @@ class SupportStrTest extends TestCase
     {
         $nbsp = chr(0xC2).chr(0xA0);
         $this->assertSame(' ', Str::words(' '));
-        $this->assertEquals($nbsp, Str::words($nbsp));
+        $this->assertSame($nbsp, Str::words($nbsp));
         $this->assertSame('   ', Str::words('   '));
         $this->assertSame("\t\t\t", Str::words("\t\t\t"));
     }
@@ -478,19 +478,19 @@ class SupportStrTest extends TestCase
     #[DataProvider('strContainsProvider')]
     public function testStrContains($haystack, $needles, $expected, $ignoreCase = false)
     {
-        $this->assertEquals($expected, Str::contains($haystack, $needles, $ignoreCase));
+        $this->assertSame($expected, Str::contains($haystack, $needles, $ignoreCase));
     }
 
     #[DataProvider('strContainsAllProvider')]
     public function testStrContainsAll($haystack, $needles, $expected, $ignoreCase = false)
     {
-        $this->assertEquals($expected, Str::containsAll($haystack, $needles, $ignoreCase));
+        $this->assertSame($expected, Str::containsAll($haystack, $needles, $ignoreCase));
     }
 
     #[DataProvider('strDoesntContainProvider')]
     public function testStrDoesntContain($haystack, $needles, $expected, $ignoreCase = false)
     {
-        $this->assertEquals($expected, Str::doesntContain($haystack, $needles, $ignoreCase));
+        $this->assertSame($expected, Str::doesntContain($haystack, $needles, $ignoreCase));
     }
 
     public function testConvertCase()
@@ -527,15 +527,15 @@ class SupportStrTest extends TestCase
 
     public function testParseCallback()
     {
-        $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method'));
-        $this->assertEquals(['Class', 'method'], Str::parseCallback('Class@method', 'foo'));
-        $this->assertEquals(['Class', 'foo'], Str::parseCallback('Class', 'foo'));
-        $this->assertEquals(['Class', null], Str::parseCallback('Class'));
+        $this->assertSame(['Class', 'method'], Str::parseCallback('Class@method'));
+        $this->assertSame(['Class', 'method'], Str::parseCallback('Class@method', 'foo'));
+        $this->assertSame(['Class', 'foo'], Str::parseCallback('Class', 'foo'));
+        $this->assertSame(['Class', null], Str::parseCallback('Class'));
 
-        $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", 'method'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec@method"));
-        $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", 'method'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec@method", 'foo'));
-        $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", 'foo'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec", 'foo'));
-        $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", null], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec"));
+        $this->assertSame(["Class@anonymous\0/laravel/382.php:8$2ec", 'method'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec@method"));
+        $this->assertSame(["Class@anonymous\0/laravel/382.php:8$2ec", 'method'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec@method", 'foo'));
+        $this->assertSame(["Class@anonymous\0/laravel/382.php:8$2ec", 'foo'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec", 'foo'));
+        $this->assertSame(["Class@anonymous\0/laravel/382.php:8$2ec", null], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec"));
     }
 
     public function testSlug()
@@ -851,8 +851,8 @@ class SupportStrTest extends TestCase
 
     public function testLength()
     {
-        $this->assertEquals(11, Str::length('foo bar baz'));
-        $this->assertEquals(11, Str::length('foo bar baz', 'UTF-8'));
+        $this->assertSame(11, Str::length('foo bar baz'));
+        $this->assertSame(11, Str::length('foo bar baz', 'UTF-8'));
     }
 
     public function testNumbers()
@@ -868,9 +868,9 @@ class SupportStrTest extends TestCase
 
     public function testRandom()
     {
-        $this->assertEquals(16, strlen(Str::random()));
+        $this->assertSame(16, strlen(Str::random()));
         $randomInteger = random_int(1, 100);
-        $this->assertEquals($randomInteger, strlen(Str::random($randomInteger)));
+        $this->assertSame($randomInteger, strlen(Str::random($randomInteger)));
         $this->assertIsString(Str::random());
     }
 
@@ -1269,9 +1269,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('bar', Str::match('/foo (.*)/', 'foo bar'));
         $this->assertEmpty(Str::match('/nothing/', 'foo bar'));
 
-        $this->assertEquals(['bar', 'bar'], Str::matchAll('/bar/', 'bar foo bar')->all());
+        $this->assertSame(['bar', 'bar'], Str::matchAll('/bar/', 'bar foo bar')->all());
 
-        $this->assertEquals(['un', 'ly'], Str::matchAll('/f(\w*)/', 'bar fun bar fly')->all());
+        $this->assertSame(['un', 'ly'], Str::matchAll('/f(\w*)/', 'bar fun bar fly')->all());
         $this->assertEmpty(Str::matchAll('/nothing/', 'bar fun bar fly'));
 
         $this->assertEmpty(Str::match('/pattern/', ''));
@@ -1479,20 +1479,20 @@ class SupportStrTest extends TestCase
 
     public function testWordCount()
     {
-        $this->assertEquals(2, Str::wordCount('Hello, world!'));
-        $this->assertEquals(10, Str::wordCount('Hi, this is my first contribution to the Laravel framework.'));
+        $this->assertSame(2, Str::wordCount('Hello, world!'));
+        $this->assertSame(10, Str::wordCount('Hi, this is my first contribution to the Laravel framework.'));
 
         // str_word_count() without $characters does not reliably handle multibyte
         // strings — results depend on the system locale's isalpha() behavior
         // (e.g. macOS 15+ changed LC_CTYPE defaults). See php/php-src#19828.
-        $this->assertEquals(str_word_count('мама'), Str::wordCount('мама'));
-        $this->assertEquals(str_word_count('мама мыла раму'), Str::wordCount('мама мыла раму'));
+        $this->assertSame(str_word_count('мама'), Str::wordCount('мама'));
+        $this->assertSame(str_word_count('мама мыла раму'), Str::wordCount('мама мыла раму'));
 
-        $this->assertEquals(1, Str::wordCount('мама', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
-        $this->assertEquals(3, Str::wordCount('мама мыла раму', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
+        $this->assertSame(1, Str::wordCount('мама', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
+        $this->assertSame(3, Str::wordCount('мама мыла раму', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
 
-        $this->assertEquals(1, Str::wordCount('МАМА', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
-        $this->assertEquals(3, Str::wordCount('МАМА МЫЛА РАМУ', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
+        $this->assertSame(1, Str::wordCount('МАМА', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
+        $this->assertSame(3, Str::wordCount('МАМА МЫЛА РАМУ', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
     }
 
     public function testWordWrap()

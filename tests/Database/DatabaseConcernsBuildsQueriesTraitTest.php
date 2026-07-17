@@ -15,7 +15,7 @@ class DatabaseConcernsBuildsQueriesTraitTest extends TestCase
         };
 
         $mock->tap(function ($builder) use ($mock) {
-            $this->assertEquals($mock, $builder);
+            $this->assertSame($mock, $builder);
         });
     }
 }

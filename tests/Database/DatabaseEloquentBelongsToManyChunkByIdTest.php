@@ -59,7 +59,7 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
 
         $user->articles()->chunkById(1, function (Collection $collection) use (&$i) {
             $i++;
-            $this->assertEquals($i, $collection->first()->id);
+            $this->assertSame($i, $collection->first()->id);
         });
 
         $this->assertSame(3, $i);
@@ -73,7 +73,7 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
         $i = 0;
 
         $user->articles()->chunkByIdDesc(1, function (Collection $collection) use (&$i) {
-            $this->assertEquals(3 - $i, $collection->first()->id);
+            $this->assertSame(3 - $i, $collection->first()->id);
             $i++;
         });
 

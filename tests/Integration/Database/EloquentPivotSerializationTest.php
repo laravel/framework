@@ -55,8 +55,8 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $class = new PivotSerializationTestClass($project->collaborators->first()->pivot);
         $class = unserialize(serialize($class));
 
-        $this->assertEquals($project->collaborators->first()->pivot->user_id, $class->pivot->user_id);
-        $this->assertEquals($project->collaborators->first()->pivot->project_id, $class->pivot->project_id);
+        $this->assertSame($project->collaborators->first()->pivot->user_id, $class->pivot->user_id);
+        $this->assertSame($project->collaborators->first()->pivot->project_id, $class->pivot->project_id);
 
         $class->pivot->save();
     }
@@ -72,9 +72,9 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $class = new PivotSerializationTestClass($project->tags->first()->pivot);
         $class = unserialize(serialize($class));
 
-        $this->assertEquals($project->tags->first()->pivot->tag_id, $class->pivot->tag_id);
-        $this->assertEquals($project->tags->first()->pivot->taggable_id, $class->pivot->taggable_id);
-        $this->assertEquals($project->tags->first()->pivot->taggable_type, $class->pivot->taggable_type);
+        $this->assertSame($project->tags->first()->pivot->tag_id, $class->pivot->tag_id);
+        $this->assertSame($project->tags->first()->pivot->taggable_id, $class->pivot->taggable_id);
+        $this->assertSame($project->tags->first()->pivot->taggable_type, $class->pivot->taggable_type);
 
         $class->pivot->save();
     }
@@ -93,8 +93,8 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $class = new PivotSerializationTestCollectionClass(DatabaseCollection::make($project->collaborators->map->pivot));
         $class = unserialize(serialize($class));
 
-        $this->assertEquals($project->collaborators[0]->pivot->user_id, $class->pivots[0]->user_id);
-        $this->assertEquals($project->collaborators[1]->pivot->project_id, $class->pivots[1]->project_id);
+        $this->assertSame($project->collaborators[0]->pivot->user_id, $class->pivots[0]->user_id);
+        $this->assertSame($project->collaborators[1]->pivot->project_id, $class->pivots[1]->project_id);
     }
 
     public function testCollectionOfMorphPivotsCanBeSerializedAndRestored()
@@ -111,13 +111,13 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $class = new PivotSerializationTestCollectionClass(DatabaseCollection::make($project->tags->map->pivot));
         $class = unserialize(serialize($class));
 
-        $this->assertEquals($project->tags[0]->pivot->tag_id, $class->pivots[0]->tag_id);
-        $this->assertEquals($project->tags[0]->pivot->taggable_id, $class->pivots[0]->taggable_id);
-        $this->assertEquals($project->tags[0]->pivot->taggable_type, $class->pivots[0]->taggable_type);
+        $this->assertSame($project->tags[0]->pivot->tag_id, $class->pivots[0]->tag_id);
+        $this->assertSame($project->tags[0]->pivot->taggable_id, $class->pivots[0]->taggable_id);
+        $this->assertSame($project->tags[0]->pivot->taggable_type, $class->pivots[0]->taggable_type);
 
-        $this->assertEquals($project->tags[1]->pivot->tag_id, $class->pivots[1]->tag_id);
-        $this->assertEquals($project->tags[1]->pivot->taggable_id, $class->pivots[1]->taggable_id);
-        $this->assertEquals($project->tags[1]->pivot->taggable_type, $class->pivots[1]->taggable_type);
+        $this->assertSame($project->tags[1]->pivot->tag_id, $class->pivots[1]->tag_id);
+        $this->assertSame($project->tags[1]->pivot->taggable_id, $class->pivots[1]->taggable_id);
+        $this->assertSame($project->tags[1]->pivot->taggable_type, $class->pivots[1]->taggable_type);
     }
 }
 

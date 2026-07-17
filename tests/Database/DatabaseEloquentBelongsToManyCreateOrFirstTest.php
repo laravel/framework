@@ -97,7 +97,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
         $result = $source->related()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             // Pivot is not loaded when related model is newly created.
             'id' => 456,
             'attr' => 'foo',
@@ -139,7 +139,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
         $result = $source->related()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 456,
             'attr' => 'foo',
             'val' => 'bar',
@@ -211,7 +211,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
         $result = $source->related()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 456,
             'attr' => 'foo',
             'val' => 'bar',
@@ -272,7 +272,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
         $result = $source->related()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             // Pivot is not loaded when related model is newly created.
             'id' => 456,
             'attr' => 'foo',
@@ -342,7 +342,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             ->andReturn([]);
 
         $result = $source->related()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 456,
             'attr' => 'foo',
             'val' => 'bar',
@@ -388,7 +388,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         );
 
         $result = $source->related()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 456,
             'attr' => 'foo',
             'val' => 'bar',
@@ -440,7 +440,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             ->andReturn(1);
 
         $result = $source->related()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 456,
             'attr' => 'foo',
             'val' => 'baz',

@@ -76,7 +76,7 @@ class ValidationRuleCanTest extends TestCase
     public function testValidationPasses()
     {
         $this->gate()->define('update-company', function ($user, $class, $model, $value) {
-            $this->assertEquals(\App\Models\Company::class, $class);
+            $this->assertSame(\App\Models\Company::class, $class);
             $this->assertInstanceOf(stdClass::class, $model);
             $this->assertSame('1', $value);
 

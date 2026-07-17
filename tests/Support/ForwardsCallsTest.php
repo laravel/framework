@@ -13,14 +13,14 @@ class ForwardsCallsTest extends TestCase
     {
         $results = (new ForwardsCallsOne)->forwardedTwo('foo', 'bar');
 
-        $this->assertEquals(['foo', 'bar'], $results);
+        $this->assertSame(['foo', 'bar'], $results);
     }
 
     public function testNestedForwardCalls()
     {
         $results = (new ForwardsCallsOne)->forwardedBase('foo', 'bar');
 
-        $this->assertEquals(['foo', 'bar'], $results);
+        $this->assertSame(['foo', 'bar'], $results);
     }
 
     public function testMissingForwardedCallThrowsCorrectError()

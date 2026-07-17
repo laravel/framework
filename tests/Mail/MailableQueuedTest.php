@@ -49,7 +49,7 @@ class MailableQueuedTest extends TestCase
         $mailable->attach('foo.jpg', $attachmentOption);
         $this->assertIsArray($mailable->attachments);
         $this->assertCount(1, $mailable->attachments);
-        $this->assertEquals($mailable->attachments[0]['options'], $attachmentOption);
+        $this->assertSame($mailable->attachments[0]['options'], $attachmentOption);
         $queueFake->assertNothingPushed();
         $mailer->send($mailable);
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
@@ -76,7 +76,7 @@ class MailableQueuedTest extends TestCase
 
         $this->assertIsArray($mailable->diskAttachments);
         $this->assertCount(1, $mailable->diskAttachments);
-        $this->assertEquals($mailable->diskAttachments[0]['options'], $attachmentOption);
+        $this->assertSame($mailable->diskAttachments[0]['options'], $attachmentOption);
 
         $queueFake->assertNothingPushed();
         $mailer->send($mailable);
@@ -101,7 +101,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
 
         $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
-        $this->assertEquals($mockedMessageGroupId, $pushedJob->messageGroup);
+        $this->assertSame($mockedMessageGroupId, $pushedJob->messageGroup);
     }
 
     public function testQueuedMailableForwardsMessageGroupFromPropertyOverridingMethodToQueueJob(): void
@@ -124,7 +124,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
 
         $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
-        $this->assertEquals($mockedMessageGroupId, $pushedJob->messageGroup);
+        $this->assertSame($mockedMessageGroupId, $pushedJob->messageGroup);
     }
 
     public function testQueuedMailableForwardsDeduplicatorToQueueJob(): void
@@ -144,7 +144,7 @@ class MailableQueuedTest extends TestCase
 
         $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
         $this->assertInstanceOf(SerializableClosure::class, $pushedJob->deduplicator);
-        $this->assertEquals($mockedDeduplicator, $pushedJob->deduplicator->getClosure());
+        $this->assertSame($mockedDeduplicator, $pushedJob->deduplicator->getClosure());
     }
 
     public function testQueuedMailableRespectsDelayAttribute(): void
@@ -161,7 +161,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
 
         $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
-        $this->assertEquals(30, $pushedJob->delay);
+        $this->assertSame(30, $pushedJob->delay);
     }
 
     public function testQueuedMailableDelayPropertyOverridesAttribute(): void
@@ -179,7 +179,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
 
         $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
-        $this->assertEquals(60, $pushedJob->delay);
+        $this->assertSame(60, $pushedJob->delay);
     }
 
     public function testQueuedMailableRespectsQueueAndConnectionAttributes(): void
@@ -218,7 +218,7 @@ class MailableQueuedTest extends TestCase
         $this->assertSame('sqs', $queueFake->connectionName);
         $this->assertSame('delayed-mail-queue', $pushedJob->queue);
         $this->assertSame('sqs', $pushedJob->connection);
-        $this->assertEquals(30, $pushedJob->delay);
+        $this->assertSame(30, $pushedJob->delay);
     }
 
     public function testQueuedMailableForwardsDeduplicationIdMethodToQueueJob(): void

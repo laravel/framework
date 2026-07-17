@@ -23,22 +23,22 @@ class UtilTest extends TestCase
         $array = ['a'];
         $object = new stdClass;
         $object->value = 'a';
-        $this->assertEquals(['a'], Util::arrayWrap($string));
-        $this->assertEquals($array, Util::arrayWrap($array));
-        $this->assertEquals([$object], Util::arrayWrap($object));
+        $this->assertSame(['a'], Util::arrayWrap($string));
+        $this->assertSame($array, Util::arrayWrap($array));
+        $this->assertSame([$object], Util::arrayWrap($object));
         $this->assertSame([], Util::arrayWrap(null));
-        $this->assertEquals([null], Util::arrayWrap([null]));
-        $this->assertEquals([null, null], Util::arrayWrap([null, null]));
-        $this->assertEquals([''], Util::arrayWrap(''));
-        $this->assertEquals([''], Util::arrayWrap(['']));
-        $this->assertEquals([false], Util::arrayWrap(false));
-        $this->assertEquals([false], Util::arrayWrap([false]));
-        $this->assertEquals([0], Util::arrayWrap(0));
+        $this->assertSame([null], Util::arrayWrap([null]));
+        $this->assertSame([null, null], Util::arrayWrap([null, null]));
+        $this->assertSame([''], Util::arrayWrap(''));
+        $this->assertSame([''], Util::arrayWrap(['']));
+        $this->assertSame([false], Util::arrayWrap(false));
+        $this->assertSame([false], Util::arrayWrap([false]));
+        $this->assertSame([0], Util::arrayWrap(0));
 
         $obj = new stdClass;
         $obj->value = 'a';
         $obj = unserialize(serialize($obj));
-        $this->assertEquals([$obj], Util::arrayWrap($obj));
+        $this->assertSame([$obj], Util::arrayWrap($obj));
         $this->assertSame($obj, Util::arrayWrap($obj)[0]);
     }
 

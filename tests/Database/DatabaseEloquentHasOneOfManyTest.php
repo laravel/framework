@@ -289,7 +289,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
         $this->assertTrue((bool) $found);
         $this->assertTrue($found->relationLoaded('latest_login'));
-        $this->assertEquals($found->latest_login->id, $latestLogin->id);
+        $this->assertSame($found->latest_login->id, $latestLogin->id);
 
         $found = HasOneOfManyTestUser::withWhereHas('latest_login', function ($query) use ($previousLogin) {
             $query->where('logins.id', $previousLogin->id);
@@ -305,7 +305,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $user->logins()->create();
 
         $user = HasOneOfManyTestUser::withCount('latest_login')->first();
-        $this->assertEquals(1, $user->latest_login_count);
+        $this->assertSame(1, $user->latest_login_count);
     }
 
     public function testExists()

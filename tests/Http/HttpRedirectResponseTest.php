@@ -40,7 +40,7 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $this->assertCount(0, $response->headers->getCookies());
-        $this->assertEquals($response, $response->withCookie(new Cookie('foo', 'bar')));
+        $this->assertSame($response, $response->withCookie(new Cookie('foo', 'bar')));
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
         $this->assertSame('foo', $cookies[0]->getName());

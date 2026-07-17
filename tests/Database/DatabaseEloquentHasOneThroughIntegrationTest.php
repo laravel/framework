@@ -127,7 +127,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
 
         $this->assertCount(1, $position);
         $this->assertTrue($position->first()->relationLoaded('contract'));
-        $this->assertEquals(['A title'], $position->first()->contract->pluck('title')->unique()->toArray());
+        $this->assertSame(['A title'], $position->first()->contract->pluck('title')->unique()->toArray());
     }
 
     public function testFirstOrFailThrowsAnException()
@@ -164,7 +164,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
     {
         $this->seedData();
         $contract = HasOneThroughTestPosition::first()->contract()->first();
-        $this->assertEquals([
+        $this->assertSame([
             'id',
             'user_id',
             'title',
@@ -181,7 +181,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->seedData();
         $contract = HasOneThroughTestPosition::first()->contract()->first(['title', 'body']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'title',
             'body',
             'laravel_through_key',
@@ -196,7 +196,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
 
         $position->contract()->chunk(10, function ($contractsChunk) {
             $contract = $contractsChunk->first();
-            $this->assertEquals([
+            $this->assertSame([
                 'id',
                 'user_id',
                 'title',
@@ -217,7 +217,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $contracts = $position->contract()->cursor();
 
         foreach ($contracts as $contract) {
-            $this->assertEquals([
+            $this->assertSame([
                 'id',
                 'user_id',
                 'title',
@@ -236,7 +236,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $position = HasOneThroughTestPosition::find(1);
 
         $position->contract()->each(function ($contract) {
-            $this->assertEquals([
+            $this->assertSame([
                 'id',
                 'user_id',
                 'title',
@@ -255,7 +255,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $position = HasOneThroughTestPosition::find(1);
 
         $position->contract()->lazy()->each(function ($contract) {
-            $this->assertEquals([
+            $this->assertSame([
                 'id',
                 'user_id',
                 'title',

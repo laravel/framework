@@ -111,7 +111,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $users = SoftDeletesTestUser::all();
 
         $this->assertCount(1, $users);
-        $this->assertEquals(2, $users->first()->id);
+        $this->assertSame(2, $users->first()->id);
         $this->assertNull(SoftDeletesTestUser::find(1));
     }
 
@@ -147,7 +147,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $query->chunk(2, function ($user) use (&$count) {
             $count += count($user);
         });
-        $this->assertEquals(1, $count);
+        $this->assertSame(1, $count);
 
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->pluck('email')->all());
@@ -169,8 +169,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->cursorPaginate(2)->all());
 
-        $this->assertEquals(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->increment('id'));
-        $this->assertEquals(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->decrement('id'));
+        $this->assertSame(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->increment('id'));
+        $this->assertSame(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->decrement('id'));
     }
 
     public function testWithTrashedReturnsAllRecords()
@@ -205,7 +205,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $users = SoftDeletesTestUser::withTrashed()->get();
 
         $this->assertCount(1, $users);
-        $this->assertEquals(1, $users->first()->id);
+        $this->assertSame(1, $users->first()->id);
     }
 
     public function testForceDeleteUpdateExistsProperty()
@@ -254,7 +254,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $users = SoftDeletesTestUser::withTrashed()->get();
 
         $this->assertCount(1, $users);
-        $this->assertEquals(1, $users->first()->id);
+        $this->assertSame(1, $users->first()->id);
         $this->assertNull(SoftDeletesTestUser::find(2));
     }
 
@@ -268,7 +268,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $users = SoftDeletesTestUser::withTrashed()->get();
 
         $this->assertCount(1, $users);
-        $this->assertEquals(2, $users->first()->id);
+        $this->assertSame(2, $users->first()->id);
         $this->assertNull(SoftDeletesTestUser::find(1));
     }
 
@@ -302,7 +302,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $users = SoftDeletesTestUser::withTrashed()->get();
 
         $this->assertCount(1, $users);
-        $this->assertEquals(1, $users->first()->id);
+        $this->assertSame(1, $users->first()->id);
         $this->assertNull(SoftDeletesTestUser::find(2));
     }
 
@@ -365,7 +365,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $users = SoftDeletesTestUser::onlyTrashed()->get();
 
         $this->assertCount(1, $users);
-        $this->assertEquals(1, $users->first()->id);
+        $this->assertSame(1, $users->first()->id);
     }
 
     public function testOnlyWithoutTrashedOnlyReturnsTrashedRecords()
@@ -375,12 +375,12 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $users = SoftDeletesTestUser::withoutTrashed()->get();
 
         $this->assertCount(1, $users);
-        $this->assertEquals(2, $users->first()->id);
+        $this->assertSame(2, $users->first()->id);
 
         $users = SoftDeletesTestUser::withTrashed()->withoutTrashed()->get();
 
         $this->assertCount(1, $users);
-        $this->assertEquals(2, $users->first()->id);
+        $this->assertSame(2, $users->first()->id);
     }
 
     public function testFirstOrNew()
@@ -391,7 +391,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertNull($result->id);
 
         $result = SoftDeletesTestUser::withTrashed()->firstOrNew(['email' => 'taylorotwell@gmail.com']);
-        $this->assertEquals(1, $result->id);
+        $this->assertSame(1, $result->id);
     }
 
     public function testFindOrNew()
@@ -402,7 +402,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertNull($result->id);
 
         $result = SoftDeletesTestUser::withTrashed()->findOrNew(1);
-        $this->assertEquals(1, $result->id);
+        $this->assertSame(1, $result->id);
     }
 
     public function testFirstOrCreate()
@@ -461,7 +461,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $userModel->delete();
         $userModel->restore();
 
-        $this->assertEquals($userModel->id, SoftDeletesTestUser::find(2)->id);
+        $this->assertSame($userModel->id, SoftDeletesTestUser::find(2)->id);
     }
 
     /**
@@ -474,8 +474,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::withTrashed()->find(1);
         $userModel->restore();
-        $this->assertEquals($userModel->deleted_at, SoftDeletesTestUser::find(1)->deleted_at);
-        $this->assertEquals($userModel->getOriginal('deleted_at'), SoftDeletesTestUser::find(1)->deleted_at);
+        $this->assertSame($userModel->deleted_at, SoftDeletesTestUser::find(1)->deleted_at);
+        $this->assertSame($userModel->getOriginal('deleted_at'), SoftDeletesTestUser::find(1)->deleted_at);
         $userModel->delete();
         $this->assertNull(SoftDeletesTestUser::find(1));
         $this->assertEquals($userModel->deleted_at, SoftDeletesTestUser::withTrashed()->find(1)->deleted_at);
@@ -492,7 +492,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $userModel->delete();
         $userModel->restore();
 
-        $this->assertEquals($userModel->id, SoftDeletesTestUser::find(2)->id);
+        $this->assertSame($userModel->id, SoftDeletesTestUser::find(2)->id);
         $this->assertSame('foo@bar.com', SoftDeletesTestUser::find(2)->email);
     }
 
@@ -667,19 +667,19 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         // check count before soft delete
         $abigail->posts()->create(['title' => 'First Title']);
         $abigail->posts()->create(['title' => 'Second Title']);
-        $this->assertEquals(2, $abigail->posts()->count());
+        $this->assertSame(2, $abigail->posts()->count());
 
         // check count after soft delete
         $abigail->posts()->where('title', 'Second Title')->delete();
-        $this->assertEquals(1, $abigail->posts()->count());
+        $this->assertSame(1, $abigail->posts()->count());
 
         // check count after restore
         $abigail->posts()->withTrashed()->restore();
-        $this->assertEquals(2, $abigail->posts()->count());
+        $this->assertSame(2, $abigail->posts()->count());
 
         // check count after a force delete
         $abigail->posts()->where('title', 'Second Title')->forceDelete();
-        $this->assertEquals(1, $abigail->posts()->count());
+        $this->assertSame(1, $abigail->posts()->count());
     }
 
     public function testRelationAggregatesHonorsSoftDelete()
@@ -691,30 +691,30 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail->posts()->create(['title' => 'First Title', 'priority' => 2]);
         $abigail->posts()->create(['title' => 'Second Title', 'priority' => 4]);
         $abigail->posts()->create(['title' => 'Third Title', 'priority' => 6]);
-        $this->assertEquals(2, $abigail->posts()->min('priority'));
-        $this->assertEquals(6, $abigail->posts()->max('priority'));
-        $this->assertEquals(12, $abigail->posts()->sum('priority'));
+        $this->assertSame(2, $abigail->posts()->min('priority'));
+        $this->assertSame(6, $abigail->posts()->max('priority'));
+        $this->assertSame(12, $abigail->posts()->sum('priority'));
         $this->assertEquals(4, $abigail->posts()->avg('priority'));
 
         // check aggregates after soft delete
         $abigail->posts()->where('title', 'First Title')->delete();
-        $this->assertEquals(4, $abigail->posts()->min('priority'));
-        $this->assertEquals(6, $abigail->posts()->max('priority'));
-        $this->assertEquals(10, $abigail->posts()->sum('priority'));
+        $this->assertSame(4, $abigail->posts()->min('priority'));
+        $this->assertSame(6, $abigail->posts()->max('priority'));
+        $this->assertSame(10, $abigail->posts()->sum('priority'));
         $this->assertEquals(5, $abigail->posts()->avg('priority'));
 
         // check aggregates after restore
         $abigail->posts()->withTrashed()->restore();
-        $this->assertEquals(2, $abigail->posts()->min('priority'));
-        $this->assertEquals(6, $abigail->posts()->max('priority'));
-        $this->assertEquals(12, $abigail->posts()->sum('priority'));
+        $this->assertSame(2, $abigail->posts()->min('priority'));
+        $this->assertSame(6, $abigail->posts()->max('priority'));
+        $this->assertSame(12, $abigail->posts()->sum('priority'));
         $this->assertEquals(4, $abigail->posts()->avg('priority'));
 
         // check aggregates after a force delete
         $abigail->posts()->where('title', 'Third Title')->forceDelete();
-        $this->assertEquals(2, $abigail->posts()->min('priority'));
-        $this->assertEquals(4, $abigail->posts()->max('priority'));
-        $this->assertEquals(6, $abigail->posts()->sum('priority'));
+        $this->assertSame(2, $abigail->posts()->min('priority'));
+        $this->assertSame(4, $abigail->posts()->max('priority'));
+        $this->assertSame(6, $abigail->posts()->sum('priority'));
         $this->assertEquals(3, $abigail->posts()->avg('priority'));
     }
 
@@ -847,27 +847,27 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail->posts()->create(['title' => 'Third Title']);
 
         $user = SoftDeletesTestUser::withCount('posts')->orderBy('postsCount', 'desc')->first();
-        $this->assertEquals(2, $user->posts_count);
+        $this->assertSame(2, $user->posts_count);
 
         $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
             $q->onlyTrashed();
         }])->orderBy('postsCount', 'desc')->first();
-        $this->assertEquals(1, $user->posts_count);
+        $this->assertSame(1, $user->posts_count);
 
         $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
             $q->withTrashed();
         }])->orderBy('postsCount', 'desc')->first();
-        $this->assertEquals(3, $user->posts_count);
+        $this->assertSame(3, $user->posts_count);
 
         $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
             $q->withTrashed()->where('title', 'First Title');
         }])->orderBy('postsCount', 'desc')->first();
-        $this->assertEquals(1, $user->posts_count);
+        $this->assertSame(1, $user->posts_count);
 
         $user = SoftDeletesTestUser::withCount(['posts' => function ($q) {
             $q->where('title', 'First Title');
         }])->orderBy('postsCount', 'desc')->first();
-        $this->assertEquals(0, $user->posts_count);
+        $this->assertSame(0, $user->posts_count);
     }
 
     public function testOrWhereWithSoftDeleteConstraint()
@@ -875,7 +875,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->createUsers();
 
         $users = SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->orWhere('email', 'abigailotwell@gmail.com');
-        $this->assertEquals(['abigailotwell@gmail.com'], $users->pluck('email')->all());
+        $this->assertSame(['abigailotwell@gmail.com'], $users->pluck('email')->all());
     }
 
     public function testMorphToWithTrashed()
@@ -896,19 +896,19 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             $q->withoutGlobalScope(SoftDeletingScope::class);
         }])->first();
 
-        $this->assertEquals($abigail->email, $comment->owner->email);
+        $this->assertSame($abigail->email, $comment->owner->email);
 
         $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => function ($q) {
             $q->withTrashed();
         }])->first();
 
-        $this->assertEquals($abigail->email, $comment->owner->email);
+        $this->assertSame($abigail->email, $comment->owner->email);
 
         $comment = TestCommentWithoutSoftDelete::with(['owner' => function ($q) {
             $q->withTrashed();
         }])->first();
 
-        $this->assertEquals($abigail->email, $comment->owner->email);
+        $this->assertSame($abigail->email, $comment->owner->email);
     }
 
     public function testMorphToWithBadMethodCall()
@@ -964,7 +964,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
 
-        $this->assertEquals($abigail->email, $comment->owner->email);
+        $this->assertSame($abigail->email, $comment->owner->email);
 
         $abigail->delete();
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
@@ -984,7 +984,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
 
-        $this->assertEquals($taylor->email, $comment->owner->email);
+        $this->assertSame($taylor->email, $comment->owner->email);
 
         $taylor->delete();
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
@@ -1001,7 +1001,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertTrue($abigail->self_referencing->first()->is($taylor));
 
         $this->assertCount(0, $taylor->self_referencing);
-        $this->assertEquals(1, SoftDeletesTestUser::whereHas('self_referencing')->count());
+        $this->assertSame(1, SoftDeletesTestUser::whereHas('self_referencing')->count());
     }
 
     /**

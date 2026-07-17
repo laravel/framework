@@ -79,7 +79,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $result = $model->children()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 456,
             'parent_id' => 123,
             'attr' => 'foo',
@@ -141,7 +141,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $result = $model->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 456,
             'parent_id' => 123,
             'attr' => 'foo',
@@ -186,7 +186,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $result = $model->children()->firstOrCreate(['attr' => 'foo'], ['val' => 'bar']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 456,
             'parent_id' => 123,
             'attr' => 'foo',
@@ -253,7 +253,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $result = $model->children()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 456,
             'parent_id' => 123,
             'attr' => 'foo',
@@ -303,7 +303,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $result = $model->children()->updateOrCreate(['attr' => 'foo'], ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals([
+        $this->assertSame([
             'id' => 456,
             'parent_id' => 123,
             'attr' => 'foo',

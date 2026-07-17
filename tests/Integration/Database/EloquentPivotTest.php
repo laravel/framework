@@ -53,8 +53,8 @@ class EloquentPivotTest extends DatabaseTestCase
         $project->collaborators()->attach($user2);
 
         tap($project->contributors->first()->pivot, function ($pivot) {
-            $this->assertEquals(1, $pivot->getKey());
-            $this->assertEquals(1, $pivot->getQueueableId());
+            $this->assertSame(1, $pivot->getKey());
+            $this->assertSame(1, $pivot->getQueueableId());
             $this->assertSame('user_id', $pivot->getRelatedKey());
             $this->assertSame('project_id', $pivot->getForeignKey());
         });

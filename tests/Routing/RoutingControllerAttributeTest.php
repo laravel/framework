@@ -17,7 +17,7 @@ class RoutingControllerAttributeTest extends TestCase
         $route = new Route('GET', 'foo', ['uses' => InheritMiddlewareController::class.'@index']);
         $route->setContainer(new Container);
 
-        $this->assertEquals(['auth', 'log'], $route->gatherMiddleware());
+        $this->assertSame(['auth', 'log'], $route->gatherMiddleware());
     }
 
     public function testControllerMiddlewareAttributesAreInheritedInDeclarationOrder()
@@ -25,7 +25,7 @@ class RoutingControllerAttributeTest extends TestCase
         $route = new Route('GET', 'foo', ['uses' => InheritMiddlewareDeclarationOrderController::class.'@index']);
         $route->setContainer(new Container);
 
-        $this->assertEquals(['middleware1', 'middleware2', 'middleware3'], $route->gatherMiddleware());
+        $this->assertSame(['middleware1', 'middleware2', 'middleware3'], $route->gatherMiddleware());
     }
 
     public function testControllerMiddlewareMergesWithAttributeMiddleware()
@@ -33,12 +33,12 @@ class RoutingControllerAttributeTest extends TestCase
         $route = new Route('GET', 'foo', ['uses' => StaticMiddlewareController::class.'@index']);
         $route->setContainer(new Container);
 
-        $this->assertEquals(['static-middleware', 'attribute-middleware-1', 'attribute-middleware-2'], $route->gatherMiddleware());
+        $this->assertSame(['static-middleware', 'attribute-middleware-1', 'attribute-middleware-2'], $route->gatherMiddleware());
 
         $route = new Route('GET', 'bar', ['uses' => DynamicMiddlewareController::class.'@index']);
         $route->setContainer(new Container);
 
-        $this->assertEquals(['dynamic-middleware', 'attribute-middleware-1', 'attribute-middleware-2'], $route->gatherMiddleware());
+        $this->assertSame(['dynamic-middleware', 'attribute-middleware-1', 'attribute-middleware-2'], $route->gatherMiddleware());
     }
 }
 

@@ -41,7 +41,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         $project->collaborators()->attach($user, ['permissions' => ['foo' => 'bar']]);
         $project = $project->fresh();
 
-        $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
+        $this->assertSame(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
     }
 
     public function testCastsAreRespectedOnAttachArray()
@@ -64,8 +64,8 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         ]);
         $project = $project->fresh();
 
-        $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
-        $this->assertEquals(['baz' => 'bar'], $project->collaborators[1]->pivot->permissions);
+        $this->assertSame(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
+        $this->assertSame(['baz' => 'bar'], $project->collaborators[1]->pivot->permissions);
     }
 
     public function testCastsAreRespectedOnSync()
@@ -81,7 +81,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         $project->collaborators()->sync([$user->id => ['permissions' => ['foo' => 'bar']]]);
         $project = $project->fresh();
 
-        $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
+        $this->assertSame(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
     }
 
     public function testCastsAreRespectedOnSyncArray()
@@ -104,8 +104,8 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         ]);
         $project = $project->fresh();
 
-        $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
-        $this->assertEquals(['baz' => 'bar'], $project->collaborators[1]->pivot->permissions);
+        $this->assertSame(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
+        $this->assertSame(['baz' => 'bar'], $project->collaborators[1]->pivot->permissions);
     }
 
     public function testCastsAreRespectedOnSyncArrayWhileUpdatingExisting()
@@ -134,8 +134,8 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
 
         $project = $project->fresh();
 
-        $this->assertEquals(['foo1' => 'bar1'], $project->collaborators[0]->pivot->permissions);
-        $this->assertEquals(['baz2' => 'bar2'], $project->collaborators[1]->pivot->permissions);
+        $this->assertSame(['foo1' => 'bar1'], $project->collaborators[0]->pivot->permissions);
+        $this->assertSame(['baz2' => 'bar2'], $project->collaborators[1]->pivot->permissions);
     }
 
     public function testDefaultAttributesAreRespectedAndCastsAreRespected()
@@ -146,7 +146,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
 
         $pivot = $project->collaborators()->newPivot();
 
-        $this->assertEquals(['permissions' => ['create', 'update']], $pivot->toArray());
+        $this->assertSame(['permissions' => ['create', 'update']], $pivot->toArray());
     }
 }
 

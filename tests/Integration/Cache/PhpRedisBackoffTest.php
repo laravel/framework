@@ -49,7 +49,7 @@ class PhpRedisBackoffTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals(
+        $this->assertSame(
             $expectedAlgorithm,
             $manager->connection()->client()->getOption(Redis::OPT_BACKOFF_ALGORITHM)
         );
@@ -69,7 +69,7 @@ class PhpRedisBackoffTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals(
+        $this->assertSame(
             $expectedAlgorithm,
             $manager->connection()->client()->getOption(Redis::OPT_BACKOFF_ALGORITHM)
         );
@@ -88,7 +88,7 @@ class PhpRedisBackoffTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals(
+        $this->assertSame(
             Redis::BACKOFF_ALGORITHM_DEFAULT,
             $manager->connection()->client()->getOption(Redis::OPT_BACKOFF_ALGORITHM)
         );

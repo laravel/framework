@@ -22,6 +22,6 @@ if (isset($__contextPrevious) && empty($__contextPrevious)) { unset($__contextPr
 endif;
 unset($__contextArgs); ?>';
 
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

@@ -147,11 +147,11 @@ class SupportStringableTest extends TestCase
         $this->assertSame('bar', (string) $stringable->match('/foo (.*)/'));
         $this->assertTrue($stringable->match('/nothing/')->isEmpty());
 
-        $this->assertEquals(['bar', 'bar'], $this->stringable('bar foo bar')->matchAll('/bar/')->all());
+        $this->assertSame(['bar', 'bar'], $this->stringable('bar foo bar')->matchAll('/bar/')->all());
 
         $stringable = $this->stringable('bar fun bar fly');
 
-        $this->assertEquals(['un', 'ly'], $stringable->matchAll('/f(\w*)/')->all());
+        $this->assertSame(['un', 'ly'], $stringable->matchAll('/f(\w*)/')->all());
         $this->assertTrue($stringable->matchAll('/nothing/')->isEmpty());
     }
 
@@ -619,7 +619,7 @@ class SupportStringableTest extends TestCase
     {
         $nbsp = chr(0xC2).chr(0xA0);
         $this->assertSame(' ', (string) $this->stringable(' ')->words());
-        $this->assertEquals($nbsp, (string) $this->stringable($nbsp)->words());
+        $this->assertSame($nbsp, (string) $this->stringable($nbsp)->words());
     }
 
     public function testAscii()
@@ -885,9 +885,9 @@ class SupportStringableTest extends TestCase
 
     public function testParseCallback()
     {
-        $this->assertEquals(['Class', 'method'], $this->stringable('Class@method')->parseCallback('foo'));
-        $this->assertEquals(['Class', 'foo'], $this->stringable('Class')->parseCallback('foo'));
-        $this->assertEquals(['Class', null], $this->stringable('Class')->parseCallback());
+        $this->assertSame(['Class', 'method'], $this->stringable('Class@method')->parseCallback('foo'));
+        $this->assertSame(['Class', 'foo'], $this->stringable('Class')->parseCallback('foo'));
+        $this->assertSame(['Class', null], $this->stringable('Class')->parseCallback());
     }
 
     public function testSlug()
@@ -1419,8 +1419,8 @@ class SupportStringableTest extends TestCase
 
     public function testWordCount()
     {
-        $this->assertEquals(2, $this->stringable('Hello, world!')->wordCount());
-        $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
+        $this->assertSame(2, $this->stringable('Hello, world!')->wordCount());
+        $this->assertSame(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
     }
 
     public function testWrap()

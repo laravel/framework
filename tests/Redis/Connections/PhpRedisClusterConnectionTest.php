@@ -20,7 +20,7 @@ class PhpRedisClusterConnectionTest extends TestCase
             ->andReturn(['key']);
 
         $connection = new PhpRedisClusterConnection($client);
-        $this->assertEquals([0, ['key']], $connection->scan(0));
+        $this->assertSame([0, ['key']], $connection->scan(0));
     }
 
     public function testItOnlyFetchesDefaultNodeOnce()
@@ -43,7 +43,7 @@ class PhpRedisClusterConnectionTest extends TestCase
             ->andReturn(['key']);
 
         $connection = new PhpRedisClusterConnection($client);
-        $this->assertEquals([0, ['key']], $connection->scan(0, ['node' => 'option-node']));
+        $this->assertSame([0, ['key']], $connection->scan(0, ['node' => 'option-node']));
     }
 
     public function testItThrowsExceptionWithoutNodes()

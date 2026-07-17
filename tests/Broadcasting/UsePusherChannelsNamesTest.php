@@ -34,7 +34,7 @@ class UsePusherChannelsNamesTest extends TestCase
     {
         $broadcaster = new FakeBroadcasterUsingPusherChannelsNames;
 
-        $this->assertEquals(
+        $this->assertSame(
             0,
             $broadcaster->testChannelNameMatchesPattern(
                 'TestChannel',

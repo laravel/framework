@@ -65,7 +65,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
     {
         DB::table(self::TABLE)->insert([self::FLOAT_COL => self::FLOAT_VAL]);
 
-        $this->assertEquals(self::FLOAT_VAL, DB::table(self::TABLE)->value(self::FLOAT_COL));
+        $this->assertSame(self::FLOAT_VAL, DB::table(self::TABLE)->value(self::FLOAT_COL));
     }
 
     #[DataProvider('jsonWhereNullDataProvider')]
@@ -163,7 +163,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
 
             $id = DB::table('auto_id_table')->insertGetId([]);
             $this->assertTrue($callbackExecuted, 'The query listener was not executed.');
-            $this->assertEquals(1, $id);
+            $this->assertSame(1, $id);
         } finally {
             Schema::drop('auto_id_table');
         }

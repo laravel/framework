@@ -40,13 +40,13 @@ class SessionStoreTest extends TestCase
         $oldId = $session->getId();
         $session->getHandler()->shouldReceive('destroy')->never();
         $this->assertTrue($session->migrate());
-        $this->assertNotEquals($oldId, $session->getId());
+        $this->assertNotSame($oldId, $session->getId());
 
         $session = $this->getSession();
         $oldId = $session->getId();
         $session->getHandler()->shouldReceive('destroy')->once()->with($oldId);
         $this->assertTrue($session->migrate(true));
-        $this->assertNotEquals($oldId, $session->getId());
+        $this->assertNotSame($oldId, $session->getId());
     }
 
     public function testSessionRegeneration()
@@ -55,7 +55,7 @@ class SessionStoreTest extends TestCase
         $oldId = $session->getId();
         $session->getHandler()->shouldReceive('destroy')->never();
         $this->assertTrue($session->regenerate());
-        $this->assertNotEquals($oldId, $session->getId());
+        $this->assertNotSame($oldId, $session->getId());
     }
 
     public function testCantSetInvalidId()
@@ -89,7 +89,7 @@ class SessionStoreTest extends TestCase
         $this->assertTrue($session->invalidate());
 
         $this->assertFalse($session->has('name'));
-        $this->assertNotEquals($oldId, $session->getId());
+        $this->assertNotSame($oldId, $session->getId());
         $this->assertCount(0, $session->all());
     }
 
@@ -201,7 +201,7 @@ class SessionStoreTest extends TestCase
         $session->migrate();
         $newId = $session->getId();
 
-        $this->assertNotEquals($newId, $oldId);
+        $this->assertNotSame($newId, $oldId);
 
         $session->getHandler()->shouldReceive('write')->once()->with(
             $newId,
@@ -229,14 +229,14 @@ class SessionStoreTest extends TestCase
 
         $this->assertTrue($session->hasOldInput('foo'));
         $this->assertSame('bar', $session->getOldInput('foo'));
-        $this->assertEquals(0, $session->getOldInput('bar'));
+        $this->assertSame(0, $session->getOldInput('bar'));
         $this->assertFalse($session->hasOldInput('boom'));
 
         $session->ageFlashData();
 
         $this->assertTrue($session->hasOldInput('foo'));
         $this->assertSame('bar', $session->getOldInput('foo'));
-        $this->assertEquals(0, $session->getOldInput('bar'));
+        $this->assertSame(0, $session->getOldInput('bar'));
         $this->assertFalse($session->hasOldInput('boom'));
 
         $this->assertSame('default', $session->getOldInput('input', 'default'));
@@ -252,14 +252,14 @@ class SessionStoreTest extends TestCase
 
         $this->assertTrue($session->has('foo'));
         $this->assertSame('bar', $session->get('foo'));
-        $this->assertEquals(0, $session->get('bar'));
+        $this->assertSame(0, $session->get('bar'));
         $this->assertTrue($session->get('baz'));
 
         $session->ageFlashData();
 
         $this->assertTrue($session->has('foo'));
         $this->assertSame('bar', $session->get('foo'));
-        $this->assertEquals(0, $session->get('bar'));
+        $this->assertSame(0, $session->get('bar'));
 
         $session->ageFlashData();
 
@@ -275,7 +275,7 @@ class SessionStoreTest extends TestCase
 
         $this->assertTrue($session->has('foo'));
         $this->assertSame('bar', $session->get('foo'));
-        $this->assertEquals(0, $session->get('bar'));
+        $this->assertSame(0, $session->get('bar'));
 
         $session->ageFlashData();
 
@@ -322,8 +322,8 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $session->put('foo', 'bar');
         $session->put('qu', 'ux');
-        $this->assertEquals(['foo' => 'bar', 'qu' => 'ux'], $session->all());
-        $this->assertEquals(['qu' => 'ux'], $session->only(['qu']));
+        $this->assertSame(['foo' => 'bar', 'qu' => 'ux'], $session->all());
+        $this->assertSame(['qu' => 'ux'], $session->only(['qu']));
     }
 
     public function testExcept()
@@ -334,7 +334,7 @@ class SessionStoreTest extends TestCase
         $session->put('qu', 'ux');
 
         $this->assertEquals(['foo' => 'bar', 'qu' => 'ux', 'bar' => 'baz'], $session->all());
-        $this->assertEquals(['bar' => 'baz', 'qu' => 'ux'], $session->except(['foo']));
+        $this->assertSame(['bar' => 'baz', 'qu' => 'ux'], $session->except(['foo']));
     }
 
     public function testReplace()
@@ -376,15 +376,15 @@ class SessionStoreTest extends TestCase
 
         $session->put('foo', 5);
         $foo = $session->increment('foo');
-        $this->assertEquals(6, $foo);
-        $this->assertEquals(6, $session->get('foo'));
+        $this->assertSame(6, $foo);
+        $this->assertSame(6, $session->get('foo'));
 
         $foo = $session->increment('foo', 4);
-        $this->assertEquals(10, $foo);
-        $this->assertEquals(10, $session->get('foo'));
+        $this->assertSame(10, $foo);
+        $this->assertSame(10, $session->get('foo'));
 
         $session->increment('bar');
-        $this->assertEquals(1, $session->get('bar'));
+        $this->assertSame(1, $session->get('bar'));
     }
 
     public function testDecrement()
@@ -393,15 +393,15 @@ class SessionStoreTest extends TestCase
 
         $session->put('foo', 5);
         $foo = $session->decrement('foo');
-        $this->assertEquals(4, $foo);
-        $this->assertEquals(4, $session->get('foo'));
+        $this->assertSame(4, $foo);
+        $this->assertSame(4, $session->get('foo'));
 
         $foo = $session->decrement('foo', 4);
-        $this->assertEquals(0, $foo);
-        $this->assertEquals(0, $session->get('foo'));
+        $this->assertSame(0, $foo);
+        $this->assertSame(0, $session->get('foo'));
 
         $session->decrement('bar');
-        $this->assertEquals(-1, $session->get('bar'));
+        $this->assertSame(-1, $session->get('bar'));
     }
 
     public function testHasOldInputWithoutKey()
@@ -430,7 +430,7 @@ class SessionStoreTest extends TestCase
     public function testToken()
     {
         $session = $this->getSession();
-        $this->assertEquals($session->token(), $session->token());
+        $this->assertSame($session->token(), $session->token());
     }
 
     public function testRegenerateToken()
@@ -438,13 +438,13 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $token = $session->token();
         $session->regenerateToken();
-        $this->assertNotEquals($token, $session->token());
+        $this->assertNotSame($token, $session->token());
     }
 
     public function testName()
     {
         $session = $this->getSession();
-        $this->assertEquals($session->getName(), $this->getSessionName());
+        $this->assertSame($session->getName(), $this->getSessionName());
         $session->setName('foo');
         $this->assertSame('foo', $session->getName());
     }
@@ -490,7 +490,7 @@ class SessionStoreTest extends TestCase
         $session->put('language', ['PHP' => ['Laravel']]);
         $session->push('language.PHP', 'Symfony');
 
-        $this->assertEquals(['PHP' => ['Laravel', 'Symfony']], $session->get('language'));
+        $this->assertSame(['PHP' => ['Laravel', 'Symfony']], $session->get('language'));
     }
 
     public function testKeyPull()
@@ -817,7 +817,7 @@ class SessionStoreTest extends TestCase
         $this->assertInstanceOf(ViewErrorBag::class, $errors);
         $this->assertInstanceOf(MessageBag::class, $errors->getBags()['default']);
         $this->assertSame('<p>:message</p>', $errors->getBags()['default']->getFormat());
-        $this->assertEquals(['first_name' => [
+        $this->assertSame(['first_name' => [
             'Your first name is required',
             'Your first name must be at least 1 character',
         ]], $errors->getBags()['default']->getMessages());

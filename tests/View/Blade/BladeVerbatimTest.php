@@ -8,7 +8,7 @@ class BladeVerbatimTest extends AbstractBladeTestCase
     {
         $string = '@verbatim {{ $a }} @if($b) {{ $b }} @endif @endverbatim';
         $expected = ' {{ $a }} @if($b) {{ $b }} @endif ';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testVerbatimBlocksWithMultipleLinesAreCompiled()
@@ -27,14 +27,14 @@ class BladeVerbatimTest extends AbstractBladeTestCase
         {{ $b }}
     @endif
 ';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testMultipleVerbatimBlocksAreCompiled()
     {
         $string = '@verbatim {{ $a }} @endverbatim {{ $b }} @verbatim {{ $c }} @endverbatim';
         $expected = ' {{ $a }}  <?php echo e($b); ?>  {{ $c }} ';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testRawBlocksAreRenderedInTheRightOrder()

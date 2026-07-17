@@ -124,7 +124,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => ['bar' => ['baz' => '']]], ['foo.bar.baz' => 'sometimes|required']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(['foo.bar.baz' => ['Required' => []]], $v->failed());
+        $this->assertSame(['foo.bar.baz' => ['Required' => []]], $v->failed());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => ['bar' => ['baz' => 'nonEmpty']]], ['foo.bar.baz' => 'sometimes|required']);
@@ -220,7 +220,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Same:baz']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(['foo' => ['Same' => ['baz']]], $v->failed());
+        $this->assertSame(['foo' => ['Same' => ['baz']]], $v->failed());
 
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'bar'], ['foo' => 'Same:baz', 'baz' => 'Required']);
         $this->assertTrue($v->passes());
@@ -232,7 +232,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Bail|Same:baz|In:qux']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(['foo' => ['Same' => ['baz']]], $v->failed());
+        $this->assertSame(['foo' => ['Same' => ['baz']]], $v->failed());
     }
 
     public function testHasNotFailedValidationRules()
@@ -1192,7 +1192,7 @@ class ValidationValidatorTest extends TestCase
             ], ['foo' => ['required' => 'Foo is required']]);
 
         $this->assertFalse($validator->passes());
-        $this->assertEquals([
+        $this->assertSame([
             'foo' => ['foo must be false'],
         ], $validator->errors()->messages());
     }
@@ -1424,19 +1424,19 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => null], ['name' => 'Required|string']);
         $v->passes();
-        $this->assertEquals(['validation.required'], $v->errors()->get('name'));
+        $this->assertSame(['validation.required'], $v->errors()->get('name'));
 
         $v = new Validator($trans, ['name' => null, 'email' => 'email'], ['name' => 'required_with:email|string']);
         $v->passes();
-        $this->assertEquals(['validation.required_with'], $v->errors()->get('name'));
+        $this->assertSame(['validation.required_with'], $v->errors()->get('name'));
 
         $v = new Validator($trans, ['name' => null, 'email' => ''], ['name' => 'required_with:email|string']);
         $v->passes();
-        $this->assertEquals(['validation.string'], $v->errors()->get('name'));
+        $this->assertSame(['validation.string'], $v->errors()->get('name'));
 
         $v = new Validator($trans, [], ['name' => 'present|string']);
         $v->passes();
-        $this->assertEquals(['validation.present'], $v->errors()->get('name'));
+        $this->assertSame(['validation.present'], $v->errors()->get('name'));
     }
 
     public function testValidatePresent()
@@ -2300,14 +2300,14 @@ class ValidationValidatorTest extends TestCase
         $file->shouldNotReceive('getSize');
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'Max:10']);
         $this->assertTrue($v->fails());
-        $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
+        $this->assertSame(['validation.uploaded'], $v->errors()->get('photo'));
 
         // Even "required" will not run if the file failed to upload.
         $file = m::mock(UploadedFile::class);
         $file->shouldReceive('isValid')->once()->andReturn(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'required']);
         $this->assertTrue($v->fails());
-        $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
+        $this->assertSame(['validation.uploaded'], $v->errors()->get('photo'));
 
         // It should only fail with that rule if a validation rule implies it's
         // a file. Otherwise it should fail with the regular rule.
@@ -2315,14 +2315,14 @@ class ValidationValidatorTest extends TestCase
         $file->shouldReceive('isValid')->andReturn(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'string']);
         $this->assertTrue($v->fails());
-        $this->assertEquals(['validation.string'], $v->errors()->get('photo'));
+        $this->assertSame(['validation.string'], $v->errors()->get('photo'));
 
         // Validation shouldn't continue if a file failed to upload.
         $file = m::mock(UploadedFile::class);
         $file->shouldReceive('isValid')->once()->andReturn(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'file|mimes:pdf|min:10']);
         $this->assertTrue($v->fails());
-        $this->assertEquals(['validation.uploaded'], $v->errors()->get('photo'));
+        $this->assertSame(['validation.uploaded'], $v->errors()->get('photo'));
     }
 
     public function testValidateInArray()
@@ -5339,7 +5339,7 @@ class ValidationValidatorTest extends TestCase
                     ->andReturn(['hit']);
             }
         );
-        $this->assertEquals($outcome, $v->passes());
+        $this->assertSame($outcome, $v->passes());
     }
 
     public static function activeUrlDataProvider()
@@ -5733,7 +5733,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'asl', 'a' => [1, 4]], ['x' => ['alpha', ['min', 3]], 'a.*' => 'integer']);
         $v->addRules(['x' => ['required', ['max', 10]], 'a.1' => 'digits:1']);
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'x' => ['alpha', ['min', 3], 'required', ['max', 10]],
                 'a.0' => ['integer'],
@@ -6995,7 +6995,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes('x', 'Confirmed', function ($i) {
             return $i->x === 'foo';
         });
-        $this->assertEquals(['x' => ['Required', 'Confirmed']], $v->getRules());
+        $this->assertSame(['x' => ['Required', 'Confirmed']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ''], ['y' => 'Required']);
@@ -7009,28 +7009,28 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes('x', 'Confirmed', function ($i) {
             return $i->x === 'bar';
         });
-        $this->assertEquals(['x' => ['Required']], $v->getRules());
+        $this->assertSame(['x' => ['Required']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'foo'], ['x' => 'Required']);
         $v->sometimes('x', 'Foo|Bar', function ($i) {
             return $i->x === 'foo';
         });
-        $this->assertEquals(['x' => ['Required', 'Foo', 'Bar']], $v->getRules());
+        $this->assertSame(['x' => ['Required', 'Foo', 'Bar']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'foo'], ['x' => 'Required']);
         $v->sometimes('x', ['Foo', 'Bar:Baz'], function ($i) {
             return $i->x === 'foo';
         });
-        $this->assertEquals(['x' => ['Required', 'Foo', 'Bar:Baz']], $v->getRules());
+        $this->assertSame(['x' => ['Required', 'Foo', 'Bar:Baz']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => [['name' => 'first', 'title' => null]]], []);
         $v->sometimes('foo.*.name', 'Required|String', function ($i) {
             return is_null($i['foo'][0]['title']);
         });
-        $this->assertEquals(['foo.0.name' => ['Required', 'String']], $v->getRules());
+        $this->assertSame(['foo.0.name' => ['Required', 'String']], $v->getRules());
     }
 
     public function testItemAwareSometimesAddingRules()
@@ -7065,7 +7065,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['company.users'], 'array', function ($i, $item) {
             return (bool) $item->users;
         });
-        $this->assertEquals(['company' => ['required']], $v->getRules());
+        $this->assertSame(['company' => ['required']], $v->getRules());
 
         // ['company.*'] -> if users is not empty it must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
@@ -7081,7 +7081,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['company.*'], 'array', function ($i, $item) {
             return (bool) $item;
         });
-        $this->assertEquals(['company' => ['required']], $v->getRules());
+        $this->assertSame(['company' => ['required']], $v->getRules());
 
         // ['users.*'] -> all nested array items in users must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
@@ -7138,7 +7138,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes('profiles.*.value', 'url', function ($i, $item) {
             return $item->type !== 'email';
         });
-        $this->assertEquals(['profiles.0.value' => ['required', 'email'], 'profiles.1.value' => ['required', 'url']], $v->getRules());
+        $this->assertSame(['profiles.0.value' => ['required', 'email'], 'profiles.1.value' => ['required', 'url']], $v->getRules());
 
         // ['profiles.*.value'] -> true case with middle wildcard, the item based condition does match and the optional validation is added
         $trans = $this->getIlluminateArrayTranslator();
@@ -7146,7 +7146,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['profiles.*.value'], 'email', function ($i, $item) {
             return $item->type === 'email';
         });
-        $this->assertEquals(['profiles.0.value' => ['required', 'email'], 'profiles.1.value' => ['required']], $v->getRules());
+        $this->assertSame(['profiles.0.value' => ['required', 'email'], 'profiles.1.value' => ['required']], $v->getRules());
 
         // ['profiles.*.value'] -> false case with middle wildcard, the item based condition does not match and the optional validation is not added
         $trans = $this->getIlluminateArrayTranslator();
@@ -7154,7 +7154,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['profiles.*.value'], 'email', function ($i, $item) {
             return $item->type === 'email';
         });
-        $this->assertEquals(['profiles.0.value' => ['required'], 'profiles.1.value' => ['required']], $v->getRules());
+        $this->assertSame(['profiles.0.value' => ['required'], 'profiles.1.value' => ['required']], $v->getRules());
 
         // ['users.profiles.*.value'] -> true case nested and with middle wildcard, the item based condition does match and the optional validation is added
         $trans = $this->getIlluminateArrayTranslator();
@@ -7162,7 +7162,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['users.profiles.*.value'], 'email', function ($i, $item) {
             return $item->type === 'email';
         });
-        $this->assertEquals(['users.profiles.0.value' => ['required', 'email'], 'users.profiles.1.value' => ['required']], $v->getRules());
+        $this->assertSame(['users.profiles.0.value' => ['required', 'email'], 'users.profiles.1.value' => ['required']], $v->getRules());
 
         // ['users.*.*.value'] -> true case nested and with double middle wildcard, the item based condition does match and the optional validation is added
         $trans = $this->getIlluminateArrayTranslator();
@@ -7170,7 +7170,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['users.*.*.value'], 'email', function ($i, $item) {
             return $item->type === 'email';
         });
-        $this->assertEquals(['users.profiles.0.value' => ['required', 'email'], 'users.profiles.1.value' => ['required']], $v->getRules());
+        $this->assertSame(['users.profiles.0.value' => ['required', 'email'], 'users.profiles.1.value' => ['required']], $v->getRules());
 
         // 'user.value' -> true case nested with string, the item based condition does match and the optional validation is added
         $trans = $this->getIlluminateArrayTranslator();
@@ -7178,7 +7178,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes('user.value', 'email', function ($i, $item) {
             return $item->type === 'email';
         });
-        $this->assertEquals(['user.name' => ['required'], 'user.type' => ['required'], 'user.value' => ['required', 'email']], $v->getRules());
+        $this->assertSame(['user.name' => ['required'], 'user.type' => ['required'], 'user.value' => ['required', 'email']], $v->getRules());
 
         // 'user.value' -> standard true case with string, the INPUT based condition does match and the optional validation is added
         $trans = $this->getIlluminateArrayTranslator();
@@ -7186,7 +7186,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes('value', 'email', function ($i) {
             return $i->type === 'email';
         });
-        $this->assertEquals(['name' => ['required'], 'type' => ['required'], 'value' => ['required', 'email']], $v->getRules());
+        $this->assertSame(['name' => ['required'], 'type' => ['required'], 'value' => ['required', 'email']], $v->getRules());
 
         // ['value'] -> standard true case with array, the INPUT based condition does match and the optional validation is added
         $trans = $this->getIlluminateArrayTranslator();
@@ -7194,7 +7194,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['value'], 'email', function ($i, $item) {
             return $i->type === 'email';
         });
-        $this->assertEquals(['name' => ['required'], 'type' => ['required'], 'value' => ['required', 'email']], $v->getRules());
+        $this->assertSame(['name' => ['required'], 'type' => ['required'], 'value' => ['required', 'email']], $v->getRules());
 
         // ['email'] -> if value is set, it will be validated as string
         $trans = $this->getIlluminateArrayTranslator();
@@ -7202,7 +7202,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['email'], 'email', function ($i, $item) {
             return $item;
         });
-        $this->assertEquals(['email' => ['required', 'email']], $v->getRules());
+        $this->assertSame(['email' => ['required', 'email']], $v->getRules());
 
         // ['attendee.*'] -> if attendee name is set, all other fields will be required as well
         $trans = $this->getIlluminateArrayTranslator();
@@ -7210,7 +7210,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['attendee.*'], 'required', function ($i, $item) {
             return (bool) $item;
         });
-        $this->assertEquals(['attendee.name' => ['string', 'required'], 'attendee.title' => ['string', 'required'], 'attendee.type' => ['string', 'required']], $v->getRules());
+        $this->assertSame(['attendee.name' => ['string', 'required'], 'attendee.title' => ['string', 'required'], 'attendee.type' => ['string', 'required']], $v->getRules());
     }
 
     public function testValidateSometimesImplicitEachWithAsterisksBeforeAndAfter()
@@ -7459,7 +7459,7 @@ class ValidationValidatorTest extends TestCase
         $data = ['names' => [['second' => ['Taylor']]]];
         $v = new Validator($trans, $data, ['names.*.second' => 'sometimes|required|string']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(['validation.string'], $v->errors()->get('names.0.second'));
+        $this->assertSame(['validation.string'], $v->errors()->get('names.0.second'));
     }
 
     public function testValidateImplicitEachWithAsterisksForRequiredNonExistingKey()
@@ -7691,7 +7691,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['foo' => ['bar.baz' => '']], ['foo' => 'required']);
-        $this->assertEquals(['foo' => ['bar.baz' => '']], $v->validated());
+        $this->assertSame(['foo' => ['bar.baz' => '']], $v->validated());
     }
 
     public function testValidateNestedArrayWithCommonParentChildKey()
@@ -8294,13 +8294,13 @@ class ValidationValidatorTest extends TestCase
     public function testExtractDataFromPath()
     {
         $data = [['email' => 'mail'], ['email' => 'mail2']];
-        $this->assertEquals([['email' => 'mail'], ['email' => 'mail2']], ValidationData::extractDataFromPath(null, $data));
+        $this->assertSame([['email' => 'mail'], ['email' => 'mail2']], ValidationData::extractDataFromPath(null, $data));
 
         $data = ['cat' => ['cat1' => ['name']], ['cat2' => ['name2']]];
-        $this->assertEquals(['cat' => ['cat1' => ['name']]], ValidationData::extractDataFromPath('cat.cat1', $data));
+        $this->assertSame(['cat' => ['cat1' => ['name']]], ValidationData::extractDataFromPath('cat.cat1', $data));
 
         $data = ['cat' => ['cat1' => ['name' => '1', 'price' => 1]], ['cat2' => ['name' => 2]]];
-        $this->assertEquals(['cat' => ['cat1' => ['name' => '1']]], ValidationData::extractDataFromPath('cat.cat1.name', $data));
+        $this->assertSame(['cat' => ['cat1' => ['name' => '1']]], ValidationData::extractDataFromPath('cat.cat1.name', $data));
     }
 
     public function testParsingTablesFromModels()
@@ -8326,7 +8326,7 @@ class ValidationValidatorTest extends TestCase
 
         $noneloquent_no_connection = $v->parseTable(NonEloquentModel::class);
         $this->assertNull($noneloquent_no_connection[0]);
-        $this->assertEquals(NonEloquentModel::class, $noneloquent_no_connection[1]);
+        $this->assertSame(NonEloquentModel::class, $noneloquent_no_connection[1]);
 
         $raw_no_connection = $v->parseTable('table');
         $this->assertNull($raw_no_connection[0]);
@@ -8346,7 +8346,7 @@ class ValidationValidatorTest extends TestCase
 
         $noneloquent_connection = $v->parseTable('connection.'.NonEloquentModel::class);
         $this->assertSame('connection', $noneloquent_connection[0]);
-        $this->assertEquals(NonEloquentModel::class, $noneloquent_connection[1]);
+        $this->assertSame(NonEloquentModel::class, $noneloquent_connection[1]);
 
         $raw_connection = $v->parseTable('connection.table');
         $this->assertSame('connection', $raw_connection[0]);
@@ -8380,7 +8380,7 @@ class ValidationValidatorTest extends TestCase
                 '*.name' => 'required',
             ]);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 1 => ['name' => null],
                 2 => ['name' => ''],
@@ -8396,7 +8396,7 @@ class ValidationValidatorTest extends TestCase
                 'name' => 'required',
             ]);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'name' => '',
             ],
@@ -8419,7 +8419,7 @@ class ValidationValidatorTest extends TestCase
                 '*.name' => 'required',
             ]);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 0 => ['name' => 'John'],
                 3 => ['name' => 'Doe'],
@@ -8439,7 +8439,7 @@ class ValidationValidatorTest extends TestCase
                 'age' => 'required|int',
             ]);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'name' => 'Carlos',
                 'gender' => 'male',
@@ -8468,7 +8468,7 @@ class ValidationValidatorTest extends TestCase
                 'regex:/[A-F]{3}[0-9]{3}/',
             ],
         ]);
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'testinvalid' => '',
                 'records' => [
@@ -8928,7 +8928,7 @@ class ValidationValidatorTest extends TestCase
         });
         $data = $v->validate();
 
-        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
+        $this->assertSame(['first' => 'john', 'preferred' => 'john'], $data);
     }
 
     public function testValidateReturnsValidatedDataNestedRules()
@@ -8943,7 +8943,7 @@ class ValidationValidatorTest extends TestCase
         });
         $data = $v->validate();
 
-        $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $data);
+        $this->assertSame(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $data);
     }
 
     public function testValidateReturnsValidatedDataNestedChildRules()
@@ -8956,7 +8956,7 @@ class ValidationValidatorTest extends TestCase
         });
         $data = $v->validate();
 
-        $this->assertEquals(['nested' => ['foo' => 'bar']], $data);
+        $this->assertSame(['nested' => ['foo' => 'bar']], $data);
     }
 
     public function testValidateReturnsValidatedDataNestedArrayRules()
@@ -8969,7 +8969,7 @@ class ValidationValidatorTest extends TestCase
         });
         $data = $v->validate();
 
-        $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $data);
+        $this->assertSame(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $data);
     }
 
     public function testValidateAndValidatedData()
@@ -8983,8 +8983,8 @@ class ValidationValidatorTest extends TestCase
         $data = $v->validate();
         $validatedData = $v->validated();
 
-        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
-        $this->assertEquals($data, $validatedData);
+        $this->assertSame(['first' => 'john', 'preferred' => 'john'], $data);
+        $this->assertSame($data, $validatedData);
     }
 
     public function testValidatedNotValidateTwiceData()
@@ -8999,8 +8999,8 @@ class ValidationValidatorTest extends TestCase
         $data = $v->validate();
         $v->validated();
 
-        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
-        $this->assertEquals(1, $validateCount);
+        $this->assertSame(['first' => 'john', 'preferred' => 'john'], $data);
+        $this->assertSame(1, $validateCount);
     }
 
     public function testMultiplePassesCalls()
@@ -9785,7 +9785,7 @@ class ValidationValidatorTest extends TestCase
         ];
         $failOnFirstErrorDisable = new Validator($trans, $data, $rules);
         $this->assertFalse($failOnFirstErrorDisable->passes());
-        $this->assertEquals($expectedFailOnFirstErrorDisableResult, $failOnFirstErrorDisable->getMessageBag()->getMessages());
+        $this->assertSame($expectedFailOnFirstErrorDisableResult, $failOnFirstErrorDisable->getMessageBag()->getMessages());
 
         $expectedFailOnFirstErrorEnableResult = [
             'baz' => [
@@ -9795,7 +9795,7 @@ class ValidationValidatorTest extends TestCase
         $failOnFirstErrorEnable = new Validator($trans, $data, $rules, [], []);
         $failOnFirstErrorEnable->stopOnFirstFailure();
         $this->assertFalse($failOnFirstErrorEnable->passes());
-        $this->assertEquals($expectedFailOnFirstErrorEnableResult, $failOnFirstErrorEnable->getMessageBag()->getMessages());
+        $this->assertSame($expectedFailOnFirstErrorEnableResult, $failOnFirstErrorEnable->getMessageBag()->getMessages());
     }
 
     public function testArrayKeysValidationPassedWhenHasKeys()
@@ -9914,7 +9914,7 @@ class ValidationValidatorTest extends TestCase
         ];
 
         $validator = new Validator($trans, $data, $rules, [], []);
-        $this->assertEquals($expectedResult, $validator->getMessageBag()->getMessages());
+        $this->assertSame($expectedResult, $validator->getMessageBag()->getMessages());
     }
 
     public function testItCanTranslateMessagesForClosureBasedRules()

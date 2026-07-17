@@ -64,13 +64,13 @@ class ConsoleScheduledEventTest extends TestCase
         // chained rules should be commutative
         $eventA = new Event(m::mock(EventMutex::class), 'php foo');
         $eventB = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals(
+        $this->assertSame(
             $eventA->daily()->hourly()->getExpression(),
             $eventB->hourly()->daily()->getExpression());
 
         $eventA = new Event(m::mock(EventMutex::class), 'php foo');
         $eventB = new Event(m::mock(EventMutex::class), 'php foo');
-        $this->assertEquals(
+        $this->assertSame(
             $eventA->weekdays()->hourly()->getExpression(),
             $eventB->hourly()->weekdays()->getExpression());
     }

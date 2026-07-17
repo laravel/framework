@@ -44,7 +44,7 @@ class RouteCollectionTest extends TestCase
             'as' => 'foo_index',
         ]));
         $this->assertInstanceOf(Route::class, $outputRoute);
-        $this->assertEquals($inputRoute, $outputRoute);
+        $this->assertSame($inputRoute, $outputRoute);
     }
 
     public function testRouteCollectionCanRetrieveByName()
@@ -56,7 +56,7 @@ class RouteCollectionTest extends TestCase
 
         $this->assertSame('route_name', $routeIndex->getName());
         $this->assertSame('route_name', $this->routeCollection->getByName('route_name')->getName());
-        $this->assertEquals($routeIndex, $this->routeCollection->getByName('route_name'));
+        $this->assertSame($routeIndex, $this->routeCollection->getByName('route_name'));
     }
 
     public function testRouteCollectionCanRetrieveByAction()
@@ -158,7 +158,7 @@ class RouteCollectionTest extends TestCase
 
         // After the refresh, the name will be properly set to the route.
         $this->routeCollection->refreshNameLookups();
-        $this->assertEquals($routeIndex, $this->routeCollection->getByName('route_name'));
+        $this->assertSame($routeIndex, $this->routeCollection->getByName('route_name'));
     }
 
     public function testRouteCollectionCanGetAllRoutes()
@@ -183,7 +183,7 @@ class RouteCollectionTest extends TestCase
             $routeShow,
             $routeNew,
         ];
-        $this->assertEquals($allRoutes, $this->routeCollection->getRoutes());
+        $this->assertSame($allRoutes, $this->routeCollection->getRoutes());
     }
 
     public function testRouteCollectionCanGetRoutesByName()
@@ -256,10 +256,10 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection->add($routeB);
 
         // Check if the lookups of $routeA and $routeB are there.
-        $this->assertEquals($routeA, $this->routeCollection->getByName('routeA'));
-        $this->assertEquals($routeA, $this->routeCollection->getByAction('View@view'));
-        $this->assertEquals($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
-        $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
+        $this->assertSame($routeA, $this->routeCollection->getByName('routeA'));
+        $this->assertSame($routeA, $this->routeCollection->getByAction('View@view'));
+        $this->assertSame($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
+        $this->assertSame($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
 
         // Rebuild the lookup arrays.
         $this->routeCollection->refreshNameLookups();
@@ -269,8 +269,8 @@ class RouteCollectionTest extends TestCase
         $this->assertNull($this->routeCollection->getByName('routeA'));
         $this->assertNull($this->routeCollection->getByAction('View@view'));
         // The lookups of $routeB are still there.
-        $this->assertEquals($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
-        $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
+        $this->assertSame($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
+        $this->assertSame($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));
     }
 
     public function testCannotCacheDuplicateRouteNames()

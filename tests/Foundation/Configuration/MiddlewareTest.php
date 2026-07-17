@@ -149,7 +149,7 @@ class MiddlewareTest extends TestCase
             '192.168.1.2',
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             '192.168.1.1',
             '192.168.1.2',
         ], $method->invoke($middleware));
@@ -161,7 +161,7 @@ class MiddlewareTest extends TestCase
             '192.168.1.3',
             '192.168.1.4',
         ]);
-        $this->assertEquals([
+        $this->assertSame([
             '192.168.1.3',
             '192.168.1.4',
         ], $method->invoke($middleware));
@@ -176,7 +176,7 @@ class MiddlewareTest extends TestCase
         $method = $reflection->getMethod('headers');
         $property = $reflection->getProperty('headers');
 
-        $this->assertEquals(Request::HEADER_X_FORWARDED_FOR |
+        $this->assertSame(Request::HEADER_X_FORWARDED_FOR |
             Request::HEADER_X_FORWARDED_HOST |
             Request::HEADER_X_FORWARDED_PORT |
             Request::HEADER_X_FORWARDED_PROTO |
@@ -185,11 +185,11 @@ class MiddlewareTest extends TestCase
 
         $property->setValue($middleware, Request::HEADER_X_FORWARDED_AWS_ELB);
 
-        $this->assertEquals(Request::HEADER_X_FORWARDED_AWS_ELB, $method->invoke($middleware));
+        $this->assertSame(Request::HEADER_X_FORWARDED_AWS_ELB, $method->invoke($middleware));
 
         $configuration->trustProxies(headers: Request::HEADER_X_FORWARDED_FOR);
 
-        $this->assertEquals(Request::HEADER_X_FORWARDED_FOR, $method->invoke($middleware));
+        $this->assertSame(Request::HEADER_X_FORWARDED_FOR, $method->invoke($middleware));
 
         $configuration->trustProxies([
             '192.168.1.3',
@@ -199,7 +199,7 @@ class MiddlewareTest extends TestCase
             Request::HEADER_X_FORWARDED_PORT
         );
 
-        $this->assertEquals(Request::HEADER_X_FORWARDED_FOR |
+        $this->assertSame(Request::HEADER_X_FORWARDED_FOR |
             Request::HEADER_X_FORWARDED_HOST |
             Request::HEADER_X_FORWARDED_PORT, $method->invoke($middleware));
     }
@@ -216,28 +216,28 @@ class MiddlewareTest extends TestCase
             }
         };
 
-        $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
+        $this->assertSame(['^(.+\.)?laravel\.test$'], $middleware->hosts());
 
         $configuration->trustHosts();
-        $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
+        $this->assertSame(['^(.+\.)?laravel\.test$'], $middleware->hosts());
 
         $configuration->trustHosts(at: ['my.test']);
-        $this->assertEquals(['my.test', '^(.+\.)?laravel\.test$'], $middleware->hosts());
+        $this->assertSame(['my.test', '^(.+\.)?laravel\.test$'], $middleware->hosts());
 
         $configuration->trustHosts(at: static fn () => ['my.test']);
-        $this->assertEquals(['my.test', '^(.+\.)?laravel\.test$'], $middleware->hosts());
+        $this->assertSame(['my.test', '^(.+\.)?laravel\.test$'], $middleware->hosts());
 
         $configuration->trustHosts(at: ['my.test'], subdomains: false);
-        $this->assertEquals(['my.test'], $middleware->hosts());
+        $this->assertSame(['my.test'], $middleware->hosts());
 
         $configuration->trustHosts(at: static fn () => ['my.test'], subdomains: false);
-        $this->assertEquals(['my.test'], $middleware->hosts());
+        $this->assertSame(['my.test'], $middleware->hosts());
 
         $configuration->trustHosts(at: []);
-        $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
+        $this->assertSame(['^(.+\.)?laravel\.test$'], $middleware->hosts());
 
         $configuration->trustHosts(at: static fn () => []);
-        $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
+        $this->assertSame(['^(.+\.)?laravel\.test$'], $middleware->hosts());
 
         $configuration->trustHosts(at: [], subdomains: false);
         $this->assertSame([], $middleware->hosts());

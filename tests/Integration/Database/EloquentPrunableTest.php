@@ -57,8 +57,8 @@ class EloquentPrunableTest extends DatabaseTestCase
 
         $count = (new PrunableTestModel)->pruneAll();
 
-        $this->assertEquals(1500, $count);
-        $this->assertEquals(3500, PrunableTestModel::count());
+        $this->assertSame(1500, $count);
+        $this->assertSame(3500, PrunableTestModel::count());
 
         Event::assertDispatched(ModelsPruned::class, 2);
     }
@@ -75,9 +75,9 @@ class EloquentPrunableTest extends DatabaseTestCase
 
         $count = (new PrunableSoftDeleteTestModel)->pruneAll();
 
-        $this->assertEquals(3000, $count);
-        $this->assertEquals(0, PrunableSoftDeleteTestModel::count());
-        $this->assertEquals(2000, PrunableSoftDeleteTestModel::withTrashed()->count());
+        $this->assertSame(3000, $count);
+        $this->assertSame(0, PrunableSoftDeleteTestModel::count());
+        $this->assertSame(2000, PrunableSoftDeleteTestModel::withTrashed()->count());
 
         Event::assertDispatched(ModelsPruned::class, 3);
     }
@@ -94,10 +94,10 @@ class EloquentPrunableTest extends DatabaseTestCase
 
         $count = (new PrunableWithCustomPruneMethodTestModel)->pruneAll();
 
-        $this->assertEquals(1000, $count);
+        $this->assertSame(1000, $count);
         $this->assertTrue((bool) PrunableWithCustomPruneMethodTestModel::first()->pruned);
         $this->assertFalse((bool) PrunableWithCustomPruneMethodTestModel::orderBy('id', 'desc')->first()->pruned);
-        $this->assertEquals(5000, PrunableWithCustomPruneMethodTestModel::count());
+        $this->assertSame(5000, PrunableWithCustomPruneMethodTestModel::count());
 
         Event::assertDispatched(ModelsPruned::class, 1);
     }
@@ -115,7 +115,7 @@ class EloquentPrunableTest extends DatabaseTestCase
 
         $count = (new PrunableWithException)->pruneAll();
 
-        $this->assertEquals(999, $count);
+        $this->assertSame(999, $count);
 
         Event::assertDispatched(ModelsPruned::class, 1);
         Event::assertDispatched(fn (ModelsPruned $event) => $event->count === 999);

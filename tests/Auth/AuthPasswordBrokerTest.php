@@ -50,7 +50,7 @@ class AuthPasswordBrokerTest extends TestCase
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
 
-        $this->assertEquals($user, $broker->getUser(['foo']));
+        $this->assertSame($user, $broker->getUser(['foo']));
     }
 
     public function testBrokerCreatesTokenAndRedirectsWithoutError()
@@ -101,7 +101,7 @@ class AuthPasswordBrokerTest extends TestCase
         };
 
         $this->assertSame(PasswordBrokerContract::PASSWORD_RESET, $broker->reset(['password' => 'password', 'token' => 'token'], $callback));
-        $this->assertEquals(['user' => $user, 'password' => 'password'], $_SERVER['__password.reset.test']);
+        $this->assertSame(['user' => $user, 'password' => 'password'], $_SERVER['__password.reset.test']);
     }
 
     public function testExecutesCallbackInsteadOfSendingNotification()
@@ -119,7 +119,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
-        $this->assertEquals(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo'], $closure));
+        $this->assertSame(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo'], $closure));
 
         $this->assertTrue($executed);
     }

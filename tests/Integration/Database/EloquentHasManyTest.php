@@ -58,8 +58,8 @@ class EloquentHasManyTest extends DatabaseTestCase
             'login_time' => '2010-01-01',
         ]);
 
-        $this->assertEquals($oldestLogin->id, $user->oldestLogin->id);
-        $this->assertEquals($latestLogin->id, $user->latestLogin->id);
+        $this->assertSame($oldestLogin->id, $user->oldestLogin->id);
+        $this->assertSame($latestLogin->id, $user->latestLogin->id);
     }
 
     public function testFirstOrCreate()

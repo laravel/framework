@@ -38,7 +38,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $expected = '<?php if($foo): ?>
 <?php echo custom_control(10, $foo, \'bar\'); ?>
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCustomShortStatements()
@@ -49,7 +49,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
         $string = '@customControl';
         $expected = '<?php echo custom_control(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testValidCustomNames()
@@ -94,7 +94,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
         $string = '@foreach';
         $expected = '<?php custom(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCustomConditions()
@@ -107,7 +107,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 @endcustom';
         $expected = '<?php if (\Illuminate\Support\Facades\Blade::check(\'custom\', $user)): ?>
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCustomIfElseConditions()
@@ -124,7 +124,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 <?php elseif (\Illuminate\Support\Facades\Blade::check(\'custom\', $product)): ?>
 <?php else: ?>
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCustomUnlessConditions()
@@ -137,7 +137,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 @endcustom';
         $expected = '<?php if (! \Illuminate\Support\Facades\Blade::check(\'custom\', $user)): ?>
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCustomConditionsAccepts0AsArgument()
@@ -152,7 +152,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $expected = '<?php if (\Illuminate\Support\Facades\Blade::check(\'custom\', 0)): ?>
 <?php elseif (\Illuminate\Support\Facades\Blade::check(\'custom\', 0)): ?>
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCustomComponents()
@@ -163,7 +163,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 @endalert';
         $expected = '<?php $__env->startComponent(\'app.components.alert\'); ?>
 <?php echo $__env->renderComponent(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCustomComponentsWithSlots()
@@ -174,7 +174,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 @endalert';
         $expected = '<?php $__env->startComponent(\'app.components.alert\', [\'type\' => \'danger\']); ?>
 <?php echo $__env->renderComponent(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCustomComponentsWithExistingDirective()
@@ -185,7 +185,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 @endforeach';
         $expected = '<?php $__env->startComponent(\'app.components.foreach\'); ?>
 <?php echo $__env->renderComponent(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCustomIncludes()
@@ -194,7 +194,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
         $string = '@input';
         $expected = '<?php echo $__env->make(\'app.includes.input\', [], array_diff_key(get_defined_vars(), [\'__data\' => 1, \'__path\' => 1]))->render(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCustomIncludesWithData()
@@ -203,7 +203,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
         $string = '@input([\'type\' => \'email\'])';
         $expected = '<?php echo $__env->make(\'app.includes.input\', [\'type\' => \'email\'], array_diff_key(get_defined_vars(), [\'__data\' => 1, \'__path\' => 1]))->render(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCustomIncludesDefaultAlias()
@@ -212,7 +212,7 @@ class BladeCustomTest extends AbstractBladeTestCase
 
         $string = '@input';
         $expected = '<?php echo $__env->make(\'app.includes.input\', [], array_diff_key(get_defined_vars(), [\'__data\' => 1, \'__path\' => 1]))->render(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testCustomIncludesWithExistingDirective()
@@ -221,13 +221,13 @@ class BladeCustomTest extends AbstractBladeTestCase
 
         $string = '@foreach';
         $expected = '<?php echo $__env->make(\'app.includes.foreach\', [], array_diff_key(get_defined_vars(), [\'__data\' => 1, \'__path\' => 1]))->render(); ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testUnescapedNonRegisteredDirective()
     {
         $string = '@media only screen and (min-width:480px) {';
         $expected = '@media only screen and (min-width:480px) {';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

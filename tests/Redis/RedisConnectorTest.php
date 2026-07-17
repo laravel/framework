@@ -33,12 +33,12 @@ class RedisConnectorTest extends TestCase
         $predisClient = $this->redis['predis']->connection()->client();
         $parameters = $predisClient->getConnection()->getParameters();
         $this->assertSame('tcp', $parameters->scheme);
-        $this->assertEquals($host, $parameters->host);
-        $this->assertEquals($port, $parameters->port);
+        $this->assertSame($host, $parameters->host);
+        $this->assertSame($port, $parameters->port);
 
         $phpRedisClient = $this->redis['phpredis']->connection()->client();
-        $this->assertEquals($host, $phpRedisClient->getHost());
-        $this->assertEquals($port, $phpRedisClient->getPort());
+        $this->assertSame($host, $phpRedisClient->getHost());
+        $this->assertSame($port, $phpRedisClient->getPort());
         $this->assertSame('default', $phpRedisClient->client('GETNAME'));
     }
 
@@ -61,8 +61,8 @@ class RedisConnectorTest extends TestCase
         $predisClient = $predis->connection()->client();
         $parameters = $predisClient->getConnection()->getParameters();
         $this->assertSame('tcp', $parameters->scheme);
-        $this->assertEquals($host, $parameters->host);
-        $this->assertEquals($port, $parameters->port);
+        $this->assertSame($host, $parameters->host);
+        $this->assertSame($port, $parameters->port);
 
         $phpRedis = new RedisManager(new Application, 'phpredis', [
             'cluster' => false,
@@ -77,7 +77,7 @@ class RedisConnectorTest extends TestCase
         ]);
         $phpRedisClient = $phpRedis->connection()->client();
         $this->assertSame("tcp://{$host}", $phpRedisClient->getHost());
-        $this->assertEquals($port, $phpRedisClient->getPort());
+        $this->assertSame($port, $phpRedisClient->getPort());
     }
 
     public function testUrlWithScheme()
@@ -99,8 +99,8 @@ class RedisConnectorTest extends TestCase
         $predisClient = $predis->connection()->client();
         $parameters = $predisClient->getConnection()->getParameters();
         $this->assertSame('tls', $parameters->scheme);
-        $this->assertEquals($host, $parameters->host);
-        $this->assertEquals($port, $parameters->port);
+        $this->assertSame($host, $parameters->host);
+        $this->assertSame($port, $parameters->port);
 
         $phpRedis = new RedisManager(new Application, 'phpredis', [
             'cluster' => false,
@@ -115,7 +115,7 @@ class RedisConnectorTest extends TestCase
         ]);
         $phpRedisClient = $phpRedis->connection()->client();
         $this->assertSame("tcp://{$host}", $phpRedisClient->getHost());
-        $this->assertEquals($port, $phpRedisClient->getPort());
+        $this->assertSame($port, $phpRedisClient->getPort());
     }
 
     public function testScheme()
@@ -139,8 +139,8 @@ class RedisConnectorTest extends TestCase
         $predisClient = $predis->connection()->client();
         $parameters = $predisClient->getConnection()->getParameters();
         $this->assertSame('tls', $parameters->scheme);
-        $this->assertEquals($host, $parameters->host);
-        $this->assertEquals($port, $parameters->port);
+        $this->assertSame($host, $parameters->host);
+        $this->assertSame($port, $parameters->port);
 
         $phpRedis = new RedisManager(new Application, 'phpredis', [
             'cluster' => false,
@@ -157,7 +157,7 @@ class RedisConnectorTest extends TestCase
         ]);
         $phpRedisClient = $phpRedis->connection()->client();
         $this->assertSame("tcp://{$host}", $phpRedisClient->getHost());
-        $this->assertEquals($port, $phpRedisClient->getPort());
+        $this->assertSame($port, $phpRedisClient->getPort());
     }
 
     public function testPredisConfigurationWithUsername()
@@ -179,8 +179,8 @@ class RedisConnectorTest extends TestCase
         ]);
         $predisClient = $predis->connection()->client();
         $parameters = $predisClient->getConnection()->getParameters();
-        $this->assertEquals($username, $parameters->username);
-        $this->assertEquals($password, $parameters->password);
+        $this->assertSame($username, $parameters->username);
+        $this->assertSame($password, $parameters->password);
     }
 
     public function testPredisConfigurationWithSentinel()
@@ -206,7 +206,7 @@ class RedisConnectorTest extends TestCase
 
         $predisClient = $predis->connection()->client();
         $parameters = $predisClient->getConnection()->getSentinelConnection()->getParameters();
-        $this->assertEquals($host, $parameters->host);
+        $this->assertSame($host, $parameters->host);
     }
 
     public function testPhpRedisTcpKeepalive()
@@ -226,7 +226,7 @@ class RedisConnectorTest extends TestCase
         ]);
 
         $phpRedisClient = $phpRedis->connection()->client();
-        $this->assertEquals(1, $phpRedisClient->getOption(Redis::OPT_TCP_KEEPALIVE));
+        $this->assertSame(1, $phpRedisClient->getOption(Redis::OPT_TCP_KEEPALIVE));
     }
 
     public function testPrefixOverrideBehaviour()

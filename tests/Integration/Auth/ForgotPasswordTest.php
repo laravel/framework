@@ -81,7 +81,7 @@ class ForgotPasswordTest extends TestCase
         ]);
 
         Event::assertDispatched(PasswordResetLinkSent::class, function ($event) {
-            $this->assertEquals(1, $event->user->id);
+            $this->assertSame(1, $event->user->id);
 
             return true;
         });

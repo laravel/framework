@@ -11,14 +11,14 @@ class MiddlewareAttributeTest extends TestCase
     public function test_attribute_middleware_is_respected(): void
     {
         $route = Route::get('/', [MiddlewareAttributeController::class, 'index']);
-        $this->assertEquals([
+        $this->assertSame([
             'all',
             'only-index',
             'also-index',
         ], $route->controllerMiddleware());
 
         $route = Route::get('/', [MiddlewareAttributeController::class, 'show']);
-        $this->assertEquals([
+        $this->assertSame([
             'all',
             'except-index',
         ], $route->controllerMiddleware());

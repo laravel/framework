@@ -20,7 +20,7 @@ class HigherOrderProxyTest extends TestCase
 
         // The proxied method returns a Collection instance; assert type and values
         $this->assertInstanceOf(Collection::class, $proxy->name);
-        $this->assertEquals(['Alice', 'Bob'], $proxy->name->all());
+        $this->assertSame(['Alice', 'Bob'], $proxy->name->all());
     }
 
     public function test_call_proxies_method_call_to_items()
@@ -46,7 +46,7 @@ class HigherOrderProxyTest extends TestCase
 
         $result = $proxy->shout('hey');
 
-        $this->assertEquals(['HEY', 'HEY!'], $result->all());
+        $this->assertSame(['HEY', 'HEY!'], $result->all());
     }
 
     public function test_call_forwards_and_returns_target()

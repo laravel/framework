@@ -284,7 +284,7 @@ class ContainerTest extends TestCase
             return $config;
         });
         $container->alias('foo', 'baz');
-        $this->assertEquals([1, 2, 3], $container->make('baz', [1, 2, 3]));
+        $this->assertSame([1, 2, 3], $container->make('baz', [1, 2, 3]));
     }
 
     public function testBindingsCanBeOverridden()
@@ -542,7 +542,7 @@ class ContainerTest extends TestCase
         $container = new Container;
 
         $container->afterResolvingAttribute(ContainerCurrentResolvingAttribute::class, function ($attr, $instance, $container) {
-            $this->assertEquals(ContainerCurrentResolvingConcrete::class, $container->currentlyResolving());
+            $this->assertSame(ContainerCurrentResolvingConcrete::class, $container->currentlyResolving());
         });
 
         $container->when(ContainerCurrentResolvingConcrete::class)
@@ -551,7 +551,7 @@ class ContainerTest extends TestCase
 
         $resolved = $container->make(ContainerCurrentResolvingConcrete::class);
 
-        $this->assertEquals(ContainerCurrentResolvingConcrete::class, $resolved->currentlyResolving);
+        $this->assertSame(ContainerCurrentResolvingConcrete::class, $resolved->currentlyResolving);
     }
 
     public function testGetAliasRecursive()
@@ -583,7 +583,7 @@ class ContainerTest extends TestCase
         });
 
         $factory = $container->factory('name');
-        $this->assertEquals($container->make('name'), $factory());
+        $this->assertSame($container->make('name'), $factory());
     }
 
     public function testMakeWithMethodIsAnAliasForMakeMethod()
@@ -615,7 +615,7 @@ class ContainerTest extends TestCase
             return $config;
         });
 
-        $this->assertEquals([1, 2, 3], $container->make('foo', [1, 2, 3]));
+        $this->assertSame([1, 2, 3], $container->make('foo', [1, 2, 3]));
     }
 
     public function testResolvingWithArrayOfMixedParameters()
@@ -646,7 +646,7 @@ class ContainerTest extends TestCase
             return $config;
         });
 
-        $this->assertEquals(['name' => 'Taylor'], $container->make('foo', ['something']));
+        $this->assertSame(['name' => 'Taylor'], $container->make('foo', ['something']));
     }
 
     public function testNestedParametersAreResetForFreshMake()
@@ -672,8 +672,8 @@ class ContainerTest extends TestCase
             return $config;
         });
 
-        $this->assertEquals(['name' => 'taylor'], $container->make('foo', ['name' => 'taylor']));
-        $this->assertEquals(['name' => 'abigail'], $container->make('foo', ['name' => 'abigail']));
+        $this->assertSame(['name' => 'taylor'], $container->make('foo', ['name' => 'taylor']));
+        $this->assertSame(['name' => 'abigail'], $container->make('foo', ['name' => 'abigail']));
     }
 
     public function testCanBuildWithoutParameterStackWithNoConstructors()
@@ -919,7 +919,7 @@ class ContainerTest extends TestCase
         $r = $container->make(RequestDto::class);
 
         $this->assertInstanceOf(RequestDto::class, $r);
-        $this->assertEquals(999, $r->userId);
+        $this->assertSame(999, $r->userId);
         $this->assertSame('taylor@laravel.com', $r->email);
     }
 

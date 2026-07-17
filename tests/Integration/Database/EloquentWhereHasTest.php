@@ -58,13 +58,13 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $userWhereHas = User::whereHas('posts', $callbackEloquent);
         $query = DB::table('users')->whereExists($callbackQuery);
 
-        $this->assertEquals($userWhereRelation->getQuery()->toSql(), $query->toSql());
-        $this->assertEquals($userWhereRelation->getQuery()->toSql(), $userWhereHas->toSql());
-        $this->assertEquals($userWhereHas->getQuery()->toSql(), $query->toSql());
+        $this->assertSame($userWhereRelation->getQuery()->toSql(), $query->toSql());
+        $this->assertSame($userWhereRelation->getQuery()->toSql(), $userWhereHas->toSql());
+        $this->assertSame($userWhereHas->getQuery()->toSql(), $query->toSql());
 
-        $this->assertEquals($userWhereRelation->first()->id, $query->first()->id);
-        $this->assertEquals($userWhereRelation->first()->id, $userWhereHas->first()->id);
-        $this->assertEquals($userWhereHas->first()->id, $query->first()->id);
+        $this->assertSame($userWhereRelation->first()->id, $query->first()->id);
+        $this->assertSame($userWhereRelation->first()->id, $userWhereHas->first()->id);
+        $this->assertSame($userWhereHas->first()->id, $query->first()->id);
     }
 
     /**
@@ -77,13 +77,13 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $userOrWhereHas = User::orWhereHas('posts', $callbackEloquent);
         $query = DB::table('users')->orWhereExists($callbackQuery);
 
-        $this->assertEquals($userOrWhereRelation->getQuery()->toSql(), $query->toSql());
-        $this->assertEquals($userOrWhereRelation->getQuery()->toSql(), $userOrWhereHas->toSql());
-        $this->assertEquals($userOrWhereHas->getQuery()->toSql(), $query->toSql());
+        $this->assertSame($userOrWhereRelation->getQuery()->toSql(), $query->toSql());
+        $this->assertSame($userOrWhereRelation->getQuery()->toSql(), $userOrWhereHas->toSql());
+        $this->assertSame($userOrWhereHas->getQuery()->toSql(), $query->toSql());
 
-        $this->assertEquals($userOrWhereRelation->first()->id, $query->first()->id);
-        $this->assertEquals($userOrWhereRelation->first()->id, $userOrWhereHas->first()->id);
-        $this->assertEquals($userOrWhereHas->first()->id, $query->first()->id);
+        $this->assertSame($userOrWhereRelation->first()->id, $query->first()->id);
+        $this->assertSame($userOrWhereRelation->first()->id, $userOrWhereHas->first()->id);
+        $this->assertSame($userOrWhereHas->first()->id, $query->first()->id);
     }
 
     /**
@@ -96,13 +96,13 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $userWhereHas = User::whereDoesntHave('posts', $callbackEloquent);
         $query = DB::table('users')->whereNotExists($callbackQuery);
 
-        $this->assertEquals($userWhereDoesntRelation->getQuery()->toSql(), $query->toSql());
-        $this->assertEquals($userWhereDoesntRelation->getQuery()->toSql(), $userWhereHas->toSql());
-        $this->assertEquals($userWhereHas->getQuery()->toSql(), $query->toSql());
+        $this->assertSame($userWhereDoesntRelation->getQuery()->toSql(), $query->toSql());
+        $this->assertSame($userWhereDoesntRelation->getQuery()->toSql(), $userWhereHas->toSql());
+        $this->assertSame($userWhereHas->getQuery()->toSql(), $query->toSql());
 
-        $this->assertEquals($userWhereDoesntRelation->first()->id, $query->first()->id);
-        $this->assertEquals($userWhereDoesntRelation->first()->id, $userWhereHas->first()->id);
-        $this->assertEquals($userWhereHas->first()->id, $query->first()->id);
+        $this->assertSame($userWhereDoesntRelation->first()->id, $query->first()->id);
+        $this->assertSame($userWhereDoesntRelation->first()->id, $userWhereHas->first()->id);
+        $this->assertSame($userWhereHas->first()->id, $query->first()->id);
     }
 
     /**
@@ -115,13 +115,13 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $userOrWhereHas = User::orWhereDoesntHave('posts', $callbackEloquent);
         $query = DB::table('users')->orWhereNotExists($callbackQuery);
 
-        $this->assertEquals($userOrWhereDoesntRelation->getQuery()->toSql(), $query->toSql());
-        $this->assertEquals($userOrWhereDoesntRelation->getQuery()->toSql(), $userOrWhereHas->toSql());
-        $this->assertEquals($userOrWhereHas->getQuery()->toSql(), $query->toSql());
+        $this->assertSame($userOrWhereDoesntRelation->getQuery()->toSql(), $query->toSql());
+        $this->assertSame($userOrWhereDoesntRelation->getQuery()->toSql(), $userOrWhereHas->toSql());
+        $this->assertSame($userOrWhereHas->getQuery()->toSql(), $query->toSql());
 
-        $this->assertEquals($userOrWhereDoesntRelation->first()->id, $query->first()->id);
-        $this->assertEquals($userOrWhereDoesntRelation->first()->id, $userOrWhereHas->first()->id);
-        $this->assertEquals($userOrWhereHas->first()->id, $query->first()->id);
+        $this->assertSame($userOrWhereDoesntRelation->first()->id, $query->first()->id);
+        $this->assertSame($userOrWhereDoesntRelation->first()->id, $userOrWhereHas->first()->id);
+        $this->assertSame($userOrWhereHas->first()->id, $query->first()->id);
     }
 
     public static function dataProviderWhereRelationCallback()
@@ -156,35 +156,35 @@ class EloquentWhereHasTest extends DatabaseTestCase
     {
         $users = User::whereRelation('posts', 'public', true)->get();
 
-        $this->assertEquals([1], $users->pluck('id')->all());
+        $this->assertSame([1], $users->pluck('id')->all());
     }
 
     public function testOrWhereRelation()
     {
         $users = User::whereRelation('posts', 'public', true)->orWhereRelation('posts', 'public', false)->get();
 
-        $this->assertEquals([1, 2], $users->pluck('id')->all());
+        $this->assertSame([1, 2], $users->pluck('id')->all());
     }
 
     public function testNestedWhereRelation()
     {
         $texts = User::whereRelation('posts.texts', 'content', 'test')->get();
 
-        $this->assertEquals([1], $texts->pluck('id')->all());
+        $this->assertSame([1], $texts->pluck('id')->all());
     }
 
     public function testNestedOrWhereRelation()
     {
         $texts = User::whereRelation('posts.texts', 'content', 'test')->orWhereRelation('posts.texts', 'content', 'test2')->get();
 
-        $this->assertEquals([1, 2], $texts->pluck('id')->all());
+        $this->assertSame([1, 2], $texts->pluck('id')->all());
     }
 
     public function testWhereMorphRelation()
     {
         $comments = Comment::whereMorphRelation('commentable', '*', 'public', true)->get();
 
-        $this->assertEquals([1], $comments->pluck('id')->all());
+        $this->assertSame([1], $comments->pluck('id')->all());
     }
 
     public function testOrWhereMorphRelation()
@@ -193,42 +193,42 @@ class EloquentWhereHasTest extends DatabaseTestCase
             ->orWhereMorphRelation('commentable', '*', 'public', false)
             ->get();
 
-        $this->assertEquals([1, 2], $comments->pluck('id')->all());
+        $this->assertSame([1, 2], $comments->pluck('id')->all());
     }
 
     public function testWhereDoesntHaveRelation()
     {
         $users = User::whereDoesntHaveRelation('posts', 'public', true)->get();
 
-        $this->assertEquals([2], $users->pluck('id')->all());
+        $this->assertSame([2], $users->pluck('id')->all());
     }
 
     public function testOrWhereDoesntHaveRelation()
     {
         $users = User::whereDoesntHaveRelation('posts', 'public', true)->orWhereDoesntHaveRelation('posts', 'public', false)->get();
 
-        $this->assertEquals([1, 2], $users->pluck('id')->all());
+        $this->assertSame([1, 2], $users->pluck('id')->all());
     }
 
     public function testNestedWhereDoesntHaveRelation()
     {
         $texts = User::whereDoesntHaveRelation('posts.texts', 'content', 'test')->get();
 
-        $this->assertEquals([2], $texts->pluck('id')->all());
+        $this->assertSame([2], $texts->pluck('id')->all());
     }
 
     public function testNestedOrWhereDoesntHaveRelation()
     {
         $texts = User::whereDoesntHaveRelation('posts.texts', 'content', 'test')->orWhereDoesntHaveRelation('posts.texts', 'content', 'test2')->get();
 
-        $this->assertEquals([1, 2], $texts->pluck('id')->all());
+        $this->assertSame([1, 2], $texts->pluck('id')->all());
     }
 
     public function testWhereMorphDoesntHaveRelation()
     {
         $comments = Comment::whereMorphDoesntHaveRelation('commentable', '*', 'public', true)->get();
 
-        $this->assertEquals([2], $comments->pluck('id')->all());
+        $this->assertSame([2], $comments->pluck('id')->all());
     }
 
     public function testOrWhereMorphDoesntHaveRelation()
@@ -237,7 +237,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
             ->orWhereMorphDoesntHaveRelation('commentable', '*', 'public', false)
             ->get();
 
-        $this->assertEquals([1, 2], $comments->pluck('id')->all());
+        $this->assertSame([1, 2], $comments->pluck('id')->all());
     }
 
     public function testWithCount()
@@ -246,7 +246,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
             $query->where('public', true);
         })->get();
 
-        $this->assertEquals([1], $users->pluck('id')->all());
+        $this->assertSame([1], $users->pluck('id')->all());
     }
 }
 

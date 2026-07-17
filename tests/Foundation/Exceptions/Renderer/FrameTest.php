@@ -19,7 +19,7 @@ class FrameTest extends TestCase
         $classMap = [];
         $frame = new Frame($exception, $classMap, $frameData, $basePath);
 
-        $this->assertEquals($expected, $frame->file());
+        $this->assertSame($expected, $frame->file());
     }
 
     public static function unixFileDataProvider()
@@ -54,7 +54,7 @@ class FrameTest extends TestCase
         $classMap = [];
         $frame = new Frame($exception, $classMap, $frameData, $basePath);
 
-        $this->assertEquals($expected, $frame->file());
+        $this->assertSame($expected, $frame->file());
     }
 
     public static function windowsFileDataProvider()
@@ -89,7 +89,7 @@ class FrameTest extends TestCase
         $classMap = [];
         $frame = new Frame($exception, $classMap, $frameData, $basePath);
 
-        $this->assertEquals($expected, $frame->isFromVendor());
+        $this->assertSame($expected, $frame->isFromVendor());
     }
 
     public static function unixIsFromVendorDataProvider()
@@ -124,7 +124,7 @@ class FrameTest extends TestCase
         $classMap = [];
         $frame = new Frame($exception, $classMap, $frameData, $basePath);
 
-        $this->assertEquals($expected, $frame->isFromVendor());
+        $this->assertSame($expected, $frame->isFromVendor());
     }
 
     public static function windowsIsFromVendorDataProvider()

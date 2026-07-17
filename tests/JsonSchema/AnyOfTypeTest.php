@@ -14,7 +14,7 @@ class AnyOfTypeTest extends TestCase
             JsonSchema::integer(),
         ])->title('Identifier');
 
-        $this->assertEquals([
+        $this->assertSame([
             'title' => 'Identifier',
             'anyOf' => [
                 ['type' => 'string'],
@@ -30,7 +30,7 @@ class AnyOfTypeTest extends TestCase
             $schema->integer(),
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'anyOf' => [
                 ['type' => 'string'],
                 ['type' => 'integer'],
@@ -45,7 +45,7 @@ class AnyOfTypeTest extends TestCase
             JsonSchema::integer(),
         ])->nullable();
 
-        $this->assertEquals([
+        $this->assertSame([
             'anyOf' => [
                 ['type' => 'string'],
                 ['type' => 'integer'],

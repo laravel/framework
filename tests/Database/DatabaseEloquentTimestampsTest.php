@@ -78,8 +78,8 @@ class DatabaseEloquentTimestampsTest extends TestCase
             'email' => 'test@test.com',
         ]);
 
-        $this->assertEquals($now->toDateTimeString(), $user->created_at->toDateTimeString());
-        $this->assertEquals($now->toDateTimeString(), $user->updated_at->toDateTimeString());
+        $this->assertSame($now->toDateTimeString(), $user->created_at->toDateTimeString());
+        $this->assertSame($now->toDateTimeString(), $user->updated_at->toDateTimeString());
     }
 
     public function testUserWithCreatedAt()
@@ -90,7 +90,7 @@ class DatabaseEloquentTimestampsTest extends TestCase
             'email' => 'test@test.com',
         ]);
 
-        $this->assertEquals($now->toDateTimeString(), $user->created_at->toDateTimeString());
+        $this->assertSame($now->toDateTimeString(), $user->created_at->toDateTimeString());
     }
 
     public function testUserWithUpdatedAt()
@@ -101,7 +101,7 @@ class DatabaseEloquentTimestampsTest extends TestCase
             'email' => 'test@test.com',
         ]);
 
-        $this->assertEquals($now->toDateTimeString(), $user->updated_at->toDateTimeString());
+        $this->assertSame($now->toDateTimeString(), $user->updated_at->toDateTimeString());
     }
 
     public function testWithoutTimestamp()

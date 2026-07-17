@@ -17,10 +17,10 @@ class ValidatedInputTest extends TestCase
 
         $this->assertSame('Taylor', $input->name);
         $this->assertSame('Taylor', $input['name']);
-        $this->assertEquals(['name' => 'Taylor'], $input->all(['name']));
-        $this->assertEquals(['name' => 'Taylor'], $input->only(['name']));
-        $this->assertEquals(['name' => 'Taylor'], $input->except(['votes']));
-        $this->assertEquals(['name' => 'Taylor', 'votes' => 100], $input->all());
+        $this->assertSame(['name' => 'Taylor'], $input->all(['name']));
+        $this->assertSame(['name' => 'Taylor'], $input->only(['name']));
+        $this->assertSame(['name' => 'Taylor'], $input->except(['votes']));
+        $this->assertSame(['name' => 'Taylor', 'votes' => 100], $input->all());
     }
 
     public function test_can_merge_items()
@@ -31,9 +31,9 @@ class ValidatedInputTest extends TestCase
 
         $this->assertSame('Taylor', $input->name);
         $this->assertSame('Taylor', $input['name']);
-        $this->assertEquals(['name' => 'Taylor'], $input->only(['name']));
-        $this->assertEquals(['name' => 'Taylor'], $input->except(['votes']));
-        $this->assertEquals(['name' => 'Taylor', 'votes' => 100], $input->all());
+        $this->assertSame(['name' => 'Taylor'], $input->only(['name']));
+        $this->assertSame(['name' => 'Taylor'], $input->except(['votes']));
+        $this->assertSame(['name' => 'Taylor', 'votes' => 100], $input->all());
     }
 
     public function test_input_existence()
@@ -134,7 +134,7 @@ class ValidatedInputTest extends TestCase
         $this->assertSame('Fatih', $name);
         $this->assertSame('', $age);
         $this->assertFalse($city);
-        $this->assertEquals(['bar' => null], $foo);
+        $this->assertSame(['bar' => null], $foo);
         $this->assertTrue($baz);
         $this->assertNull($bar);
     }
@@ -223,7 +223,7 @@ class ValidatedInputTest extends TestCase
         });
 
         $this->assertSame('Fatih', $name);
-        $this->assertEquals(['bar' => null], $foo);
+        $this->assertSame(['bar' => null], $foo);
         $this->assertTrue($baz);
         $this->assertFalse($age);
         $this->assertFalse($city);
@@ -322,14 +322,14 @@ class ValidatedInputTest extends TestCase
     {
         $input = new ValidatedInput(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null, 'baz' => '']]);
 
-        $this->assertEquals(['name', 'surname', 'foo'], $input->keys());
+        $this->assertSame(['name', 'surname', 'foo'], $input->keys());
     }
 
     public function test_all_method()
     {
         $input = new ValidatedInput(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null, 'baz' => '']]);
 
-        $this->assertEquals(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null, 'baz' => '']], $input->all());
+        $this->assertSame(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null, 'baz' => '']], $input->all());
     }
 
     public function test_input_method()
@@ -489,7 +489,7 @@ class ValidatedInputTest extends TestCase
         $this->assertNull($input->date('doesnt_exists'));
 
         $this->assertEquals($current, $input->date('as_datetime'));
-        $this->assertEquals($current->format('Y-m-d H:i:s P'), $input->date('as_format', 'U')->format('Y-m-d H:i:s P'));
+        $this->assertSame($current->format('Y-m-d H:i:s P'), $input->date('as_format', 'U')->format('Y-m-d H:i:s P'));
         $this->assertEquals($current, $input->date('as_timezone', null, 'America/Santiago'));
 
         $this->assertTrue($input->date('as_date')->isSameDay($current));
@@ -505,7 +505,7 @@ class ValidatedInputTest extends TestCase
 
         $this->assertNull($input->enum('doesnt_exists', StringBackedEnum::class));
 
-        $this->assertEquals(StringBackedEnum::HELLO_WORLD, $input->enum('valid_enum_value', StringBackedEnum::class));
+        $this->assertSame(StringBackedEnum::HELLO_WORLD, $input->enum('valid_enum_value', StringBackedEnum::class));
 
         $this->assertNull($input->enum('invalid_enum_value', StringBackedEnum::class));
     }
@@ -519,7 +519,7 @@ class ValidatedInputTest extends TestCase
 
         $this->assertEmpty($input->enums('doesnt_exists', StringBackedEnum::class));
 
-        $this->assertEquals([StringBackedEnum::HELLO_WORLD], $input->enums('valid_enum_value', StringBackedEnum::class));
+        $this->assertSame([StringBackedEnum::HELLO_WORLD], $input->enums('valid_enum_value', StringBackedEnum::class));
 
         $this->assertEmpty($input->enums('invalid_enum_value', StringBackedEnum::class));
     }
@@ -547,14 +547,14 @@ class ValidatedInputTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $input->collect('users'));
         $this->assertTrue($input->collect('developers')->isEmpty());
-        $this->assertEquals([1, 2, 3], $input->collect('users')->all());
-        $this->assertEquals(['users' => [1, 2, 3]], $input->collect()->all());
+        $this->assertSame([1, 2, 3], $input->collect('users')->all());
+        $this->assertSame(['users' => [1, 2, 3]], $input->collect()->all());
 
         $input = new ValidatedInput(['text-payload']);
-        $this->assertEquals(['text-payload'], $input->collect()->all());
+        $this->assertSame(['text-payload'], $input->collect()->all());
 
         $input = new ValidatedInput(['email' => 'test@example.com']);
-        $this->assertEquals(['test@example.com'], $input->collect('email')->all());
+        $this->assertSame(['test@example.com'], $input->collect('email')->all());
 
         $input = new ValidatedInput([]);
         $this->assertInstanceOf(Collection::class, $input->collect());
@@ -564,28 +564,28 @@ class ValidatedInputTest extends TestCase
         $this->assertInstanceOf(Collection::class, $input->collect(['users']));
         $this->assertTrue($input->collect(['developers'])->isEmpty());
         $this->assertTrue($input->collect(['roles'])->isNotEmpty());
-        $this->assertEquals(['roles' => [4, 5, 6]], $input->collect(['roles'])->all());
-        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $input->collect(['users', 'email'])->all());
+        $this->assertSame(['roles' => [4, 5, 6]], $input->collect(['roles'])->all());
+        $this->assertSame(['users' => [1, 2, 3], 'email' => 'test@example.com'], $input->collect(['users', 'email'])->all());
         $this->assertEquals(collect(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']]), $input->collect(['roles', 'foo']));
-        $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $input->collect()->all());
+        $this->assertSame(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $input->collect()->all());
     }
 
     public function test_only_method()
     {
         $input = new ValidatedInput(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null, 'baz' => '']]);
 
-        $this->assertEquals(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null]], $input->only('name', 'surname', 'foo.bar'));
-        $this->assertEquals(['name' => 'Fatih', 'foo' => ['bar' => null, 'baz' => '']], $input->only('name', 'foo'));
-        $this->assertEquals(['foo' => ['baz' => '']], $input->only('foo.baz'));
-        $this->assertEquals(['name' => 'Fatih'], $input->only('name'));
+        $this->assertSame(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null]], $input->only('name', 'surname', 'foo.bar'));
+        $this->assertSame(['name' => 'Fatih', 'foo' => ['bar' => null, 'baz' => '']], $input->only('name', 'foo'));
+        $this->assertSame(['foo' => ['baz' => '']], $input->only('foo.baz'));
+        $this->assertSame(['name' => 'Fatih'], $input->only('name'));
     }
 
     public function test_except_method()
     {
         $input = new ValidatedInput(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null, 'baz' => '']]);
 
-        $this->assertEquals(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null]], $input->except('foo.baz'));
-        $this->assertEquals(['surname' => 'AYDIN'], $input->except('name', 'foo'));
+        $this->assertSame(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null]], $input->except('foo.baz'));
+        $this->assertSame(['surname' => 'AYDIN'], $input->except('name', 'foo'));
         $this->assertSame([], $input->except('name', 'surname', 'foo'));
     }
 }

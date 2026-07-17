@@ -16,7 +16,7 @@ breeze
 <?php else: ?>
 boom
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
     public function testElseIfStatementsAreCompiled()
@@ -31,6 +31,6 @@ breeze
 <?php elseif(boom(breeze)): ?>
 boom
 <?php endif; ?>';
-        $this->assertEquals($expected, $this->compiler->compileString($string));
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

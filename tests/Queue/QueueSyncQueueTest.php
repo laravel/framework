@@ -36,7 +36,7 @@ class QueueSyncQueueTest extends TestCase
 
         $sync->push(SyncQueueTestHandler::class, ['foo' => 'bar']);
         $this->assertInstanceOf(SyncJob::class, $_SERVER['__sync.test'][0]);
-        $this->assertEquals(['foo' => 'bar'], $_SERVER['__sync.test'][1]);
+        $this->assertSame(['foo' => 'bar'], $_SERVER['__sync.test'][1]);
     }
 
     public function testFailedJobGetsHandledWhenAnExceptionIsThrown()
