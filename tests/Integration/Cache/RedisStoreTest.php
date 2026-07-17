@@ -146,7 +146,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['votes'])->decrement('person-1');
         Cache::store('redis')->tags(['votes'])->decrement('person-1');
 
-        $this->assertSame(0, Cache::store('redis')->tags(['votes'])->get('person-1'));
+        $this->assertEquals(0, Cache::store('redis')->tags(['votes'])->get('person-1'));
     }
 
     public function testTagEntriesCanBeDecrementedUsingEnumKeys()

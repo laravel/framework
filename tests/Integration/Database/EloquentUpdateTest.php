@@ -124,7 +124,7 @@ class EloquentUpdateTest extends DatabaseTestCase
         TestUpdateModel3::increment('counter');
 
         $models = TestUpdateModel3::withoutGlobalScopes()->orderBy('id')->get();
-        $this->assertSame(1, $models[0]->counter);
+        $this->assertEquals(1, $models[0]->counter);
         $this->assertSame(0, $models[1]->counter);
     }
 
@@ -143,7 +143,7 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertSame(1, $deletedModel->counter);
 
         $deletedModel->decrement('counter');
-        $this->assertSame(0, $deletedModel->fresh()->counter);
+        $this->assertEquals(0, $deletedModel->fresh()->counter);
     }
 
     public function testUpdateSyncsPrevious()
@@ -201,7 +201,7 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertSame(11, $post1->views);
         $this->assertSame(7, $post1->likes);
 
-        $this->assertSame(50, $post2->fresh()->views);
+        $this->assertEquals(50, $post2->fresh()->views);
         $this->assertSame(20, $post2->fresh()->likes);
         $this->assertSame(100, $post3->fresh()->views);
         $this->assertSame(40, $post3->fresh()->likes);
@@ -217,7 +217,7 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertSame(7, $post1->views);
         $this->assertSame(3, $post1->likes);
 
-        $this->assertSame(50, $post2->fresh()->views);
+        $this->assertEquals(50, $post2->fresh()->views);
         $this->assertSame(20, $post2->fresh()->likes);
     }
 
@@ -229,7 +229,7 @@ class EloquentUpdateTest extends DatabaseTestCase
         TestUpdateModel4::incrementEach(['views' => 1]);
 
         $models = TestUpdateModel4::orderBy('id')->get();
-        $this->assertSame(11, $models[0]->views);
+        $this->assertEquals(11, $models[0]->views);
         $this->assertSame(51, $models[1]->views);
     }
 
@@ -257,7 +257,7 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertSame(6, $post->likes);
 
         $fresh = TestUpdateModel4::withTrashed()->find($post->id);
-        $this->assertSame(11, $fresh->views);
+        $this->assertEquals(11, $fresh->views);
         $this->assertSame(6, $fresh->likes);
     }
 

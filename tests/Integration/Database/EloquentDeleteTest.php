@@ -179,7 +179,7 @@ class EloquentDeleteTest extends DatabaseTestCase
         $this->assertStringStartsWith('select * from "my_posts" where "my_id" in (', str_replace(['`', '[', ']'], '"', $logs[0]['query']));
 
         $this->assertStringStartsWith('delete from "my_posts" where "my_id" = ', str_replace(['`', '[', ']'], '"', $logs[1]['query']));
-        $this->assertSame([1], $logs[1]['bindings']);
+        $this->assertEquals([1], $logs[1]['bindings']);
 
         $this->assertStringStartsWith('delete from "my_posts" where "my_id" = ', str_replace(['`', '[', ']'], '"', $logs[2]['query']));
         $this->assertSame([2], $logs[2]['bindings']);

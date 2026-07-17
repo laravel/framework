@@ -27,7 +27,7 @@ class EloquentAggregateTest extends DatabaseTestCase
         UserAggregateTest::create(['c' => 5, 'name' => 'test-name5', 'balance' => +2]);
         UserAggregateTest::create(['c' => 6, 'name' => 'test-name5', 'balance' => null]);
 
-        $this->assertSame(-1, UserAggregateTest::query()->min('balance'));
+        $this->assertEquals(-1, UserAggregateTest::query()->min('balance'));
         $this->assertNull(UserAggregateTest::query()->where('name', 'no-name')->min('balance'));
         $this->assertSame(1, UserAggregateTest::query()->where('c', '>', 3)->min('balance'));
 

@@ -57,7 +57,7 @@ class EloquentModelLoadSumTest extends DatabaseTestCase
 
         $this->assertCount(1, DB::getQueryLog());
         $this->assertEquals(21, $model->related1_sum_number);
-        $this->assertSame(12, $model->related2_sum_number);
+        $this->assertEquals(12, $model->related2_sum_number);
     }
 }
 

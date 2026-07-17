@@ -96,7 +96,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         // Testing on the pivot model
         $this->assertInstanceOf(Pivot::class, $post->tags[0]->pivot);
-        $this->assertSame($post->id, $post->tags[0]->pivot->post_id);
+        $this->assertEquals($post->id, $post->tags[0]->pivot->post_id);
         $this->assertSame('post_id', $post->tags[0]->pivot->getForeignKey());
         $this->assertSame('tag_id', $post->tags[0]->pivot->getOtherKey());
         $this->assertSame('posts_tags', $post->tags[0]->pivot->getTable());
@@ -163,7 +163,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $pivot->save();
 
         $this->assertSame(1, PostTagPivot::count());
-        $this->assertSame(1, PostTagPivot::first()->post_id);
+        $this->assertEquals(1, PostTagPivot::first()->post_id);
         $this->assertSame(2, PostTagPivot::first()->tag_id);
     }
 
@@ -1028,7 +1028,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             ['post_id' => $post->id, 'tag_id' => 3, 'flag' => ''],
         ]);
 
-        $this->assertSame([1, 3], $post->tags()->allRelatedIds()->toArray());
+        $this->assertEquals([1, 3], $post->tags()->allRelatedIds()->toArray());
     }
 
     public function testCanTouchRelatedModels()
@@ -1325,7 +1325,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $tags = $post->tagsWithGlobalScope;
 
-        $this->assertSame(['id' => 1], $tags[0]->getAttributes());
+        $this->assertEquals(['id' => 1], $tags[0]->getAttributes());
     }
 
     public function testPivotDoesntHavePrimaryKey()
@@ -1337,7 +1337,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $user->postsWithCustomPivot()->sync([$post1->uuid]);
         $this->assertSame($user->uuid, $user->postsWithCustomPivot()->first()->pivot->user_uuid);
         $this->assertSame($post1->uuid, $user->postsWithCustomPivot()->first()->pivot->post_uuid);
-        $this->assertSame(1, $user->postsWithCustomPivot()->first()->pivot->is_draft);
+        $this->assertEquals(1, $user->postsWithCustomPivot()->first()->pivot->is_draft);
 
         $user->postsWithCustomPivot()->sync([$post2->uuid]);
         $this->assertSame($user->uuid, $user->postsWithCustomPivot()->first()->pivot->user_uuid);

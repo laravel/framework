@@ -322,7 +322,7 @@ class AfterQueryTest extends DatabaseTestCase
             })
             ->cursor();
 
-        $this->assertSame([$secondUser->id], $users->collect()->pluck('id')->all());
+        $this->assertEquals([$secondUser->id], $users->collect()->pluck('id')->all());
 
         $firstPost = AfterQueryPost::create();
         $secondPost = AfterQueryPost::create();

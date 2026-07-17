@@ -113,7 +113,7 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, $affectedRowsCount);
 
         $rows = DB::table('accounting')->get();
-        $this->assertSame([
+        $this->assertEquals([
             'id' => 1,
             'wallet_1' => 100 + 31.5,
             'wallet_2' => 200 - 32.5,

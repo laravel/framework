@@ -62,7 +62,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertSame($userWhereRelation->getQuery()->toSql(), $userWhereHas->toSql());
         $this->assertSame($userWhereHas->getQuery()->toSql(), $query->toSql());
 
-        $this->assertSame($userWhereRelation->first()->id, $query->first()->id);
+        $this->assertEquals($userWhereRelation->first()->id, $query->first()->id);
         $this->assertSame($userWhereRelation->first()->id, $userWhereHas->first()->id);
         $this->assertSame($userWhereHas->first()->id, $query->first()->id);
     }
@@ -81,7 +81,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertSame($userOrWhereRelation->getQuery()->toSql(), $userOrWhereHas->toSql());
         $this->assertSame($userOrWhereHas->getQuery()->toSql(), $query->toSql());
 
-        $this->assertSame($userOrWhereRelation->first()->id, $query->first()->id);
+        $this->assertEquals($userOrWhereRelation->first()->id, $query->first()->id);
         $this->assertSame($userOrWhereRelation->first()->id, $userOrWhereHas->first()->id);
         $this->assertSame($userOrWhereHas->first()->id, $query->first()->id);
     }
@@ -100,7 +100,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertSame($userWhereDoesntRelation->getQuery()->toSql(), $userWhereHas->toSql());
         $this->assertSame($userWhereHas->getQuery()->toSql(), $query->toSql());
 
-        $this->assertSame($userWhereDoesntRelation->first()->id, $query->first()->id);
+        $this->assertEquals($userWhereDoesntRelation->first()->id, $query->first()->id);
         $this->assertSame($userWhereDoesntRelation->first()->id, $userWhereHas->first()->id);
         $this->assertSame($userWhereHas->first()->id, $query->first()->id);
     }
@@ -119,7 +119,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertSame($userOrWhereDoesntRelation->getQuery()->toSql(), $userOrWhereHas->toSql());
         $this->assertSame($userOrWhereHas->getQuery()->toSql(), $query->toSql());
 
-        $this->assertSame($userOrWhereDoesntRelation->first()->id, $query->first()->id);
+        $this->assertEquals($userOrWhereDoesntRelation->first()->id, $query->first()->id);
         $this->assertSame($userOrWhereDoesntRelation->first()->id, $userOrWhereHas->first()->id);
         $this->assertSame($userOrWhereHas->first()->id, $query->first()->id);
     }

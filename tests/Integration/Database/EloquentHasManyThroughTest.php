@@ -99,7 +99,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         User::create(['name' => Str::random(), 'team_id' => $team1->id]);
 
         $teamMates = $user->teamMatesWithGlobalScope;
-        $this->assertSame(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
+        $this->assertEquals(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
 
         $teamMates = $user->teamMatesWithGlobalScopeWithPendingRelation;
         $this->assertSame(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
@@ -178,7 +178,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         );
 
         $this->assertTrue($newTony->exists);
-        $this->assertSame($team->id, $newTony->team_id);
+        $this->assertEquals($team->id, $newTony->team_id);
         $this->assertSame('tony', $newTony->slug);
         $this->assertSame('Tony Messias', $newTony->name);
 

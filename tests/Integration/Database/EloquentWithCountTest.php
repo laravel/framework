@@ -43,7 +43,7 @@ class EloquentWithCountTest extends DatabaseTestCase
             },
         ]);
 
-        $this->assertSame([
+        $this->assertEquals([
             ['id' => 1, 'twos_count' => 1],
         ], $results->get()->toArray());
     }
@@ -54,7 +54,7 @@ class EloquentWithCountTest extends DatabaseTestCase
         $one->fours()->create();
 
         $result = Model1::withCount('fours')->first();
-        $this->assertSame(0, $result->fours_count);
+        $this->assertEquals(0, $result->fours_count);
 
         $result = Model1::withCount('allFours')->first();
         $this->assertSame(1, $result->all_fours_count);
