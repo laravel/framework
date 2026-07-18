@@ -248,7 +248,7 @@ abstract class Grammar
     }
 
     /**
-     * Escapes any operator that contains a ? for use in PDO
+     * Escapes any operator that contains a ? for use in PDO.
      *
      * @param  string  $operator
      * @return string
