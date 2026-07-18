@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Illuminate\Http\Middleware\PrefersJsonResponses;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class FoundationApplicationBuilderTest extends TestCase
 {
@@ -120,6 +121,60 @@ class FoundationApplicationBuilderTest extends TestCase
         $app = Application::configure()->prefersJsonResponses(false)->create();
 
         $this->assertFalse($this->bootAndResolveKernel($app)->hasMiddleware(PrefersJsonResponses::class));
+    }
+
+    public function testWithBindingsBindsImmediately()
+    {
+        $app = Application::configure()
+            ->withBindings(['foo' => fn () => 'bar'])
+            ->create();
+
+        $this->assertSame('bar', $app->make('foo'));
+    }
+
+    public function testWithSingletonsBindsImmediately()
+    {
+        $app = Application::configure()
+            ->withSingletons([stdClass::class])
+            ->create();
+
+        $this->assertInstanceOf(stdClass::class, $app->make(stdClass::class));
+    }
+
+    public function testWithSingletonsWithConcreteBindsImmediately()
+    {
+        $app = Application::configure()
+            ->withSingletons(['foo' => stdClass::class])
+            ->create();
+
+        $this->assertInstanceOf(stdClass::class, $app->make('foo'));
+    }
+
+    public function testWithSingletonsMaintainsSingletonBehavior()
+    {
+        $app = Application::configure()
+            ->withSingletons(['foo' => stdClass::class])
+            ->create();
+
+        $this->assertSame($app->make('foo'), $app->make('foo'));
+    }
+
+    public function testWithScopedSingletonsBindsImmediately()
+    {
+        $app = Application::configure()
+            ->withScopedSingletons([stdClass::class])
+            ->create();
+
+        $this->assertInstanceOf(stdClass::class, $app->make(stdClass::class));
+    }
+
+    public function testWithScopedSingletonsWithConcreteBindsImmediately()
+    {
+        $app = Application::configure()
+            ->withScopedSingletons(['foo' => stdClass::class])
+            ->create();
+
+        $this->assertInstanceOf(stdClass::class, $app->make('foo'));
     }
 
     protected function bootAndResolveKernel(Application $app): HttpKernel

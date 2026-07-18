@@ -416,11 +416,11 @@ class ApplicationBuilder
      */
     public function withBindings(array $bindings)
     {
-        return $this->registered(function ($app) use ($bindings) {
-            foreach ($bindings as $abstract => $concrete) {
-                $app->bind($abstract, $concrete);
-            }
-        });
+        foreach ($bindings as $abstract => $concrete) {
+            $this->app->bind($abstract, $concrete);
+        }
+
+        return $this;
     }
 
     /**
@@ -431,15 +431,15 @@ class ApplicationBuilder
      */
     public function withSingletons(array $singletons)
     {
-        return $this->registered(function ($app) use ($singletons) {
-            foreach ($singletons as $abstract => $concrete) {
-                if (is_string($abstract)) {
-                    $app->singleton($abstract, $concrete);
-                } else {
-                    $app->singleton($concrete);
-                }
+        foreach ($singletons as $abstract => $concrete) {
+            if (is_string($abstract)) {
+                $this->app->singleton($abstract, $concrete);
+            } else {
+                $this->app->singleton($concrete);
             }
-        });
+        }
+
+        return $this;
     }
 
     /**
@@ -450,15 +450,15 @@ class ApplicationBuilder
      */
     public function withScopedSingletons(array $scopedSingletons)
     {
-        return $this->registered(function ($app) use ($scopedSingletons) {
-            foreach ($scopedSingletons as $abstract => $concrete) {
-                if (is_string($abstract)) {
-                    $app->scoped($abstract, $concrete);
-                } else {
-                    $app->scoped($concrete);
-                }
+        foreach ($scopedSingletons as $abstract => $concrete) {
+            if (is_string($abstract)) {
+                $this->app->scoped($abstract, $concrete);
+            } else {
+                $this->app->scoped($concrete);
             }
-        });
+        }
+
+        return $this;
     }
 
     /**
