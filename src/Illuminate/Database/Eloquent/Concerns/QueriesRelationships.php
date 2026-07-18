@@ -840,6 +840,45 @@ trait QueriesRelationships
     }
 
     /**
+     * Add an "order by" relationship clause to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  SortDirection|'asc'|'desc'  $direction
+     */
+    public function orderByRelation($relation, $column, $direction)
+    {
+        /** @var Builder<Model> $this */
+        $direction = $this->normalizeSortDirection($direction);
+
+        if (is_string($relation)) {
+            $relation = $this->getModel()->{$relation}();
+        }
+
+        return $this->orderBy(
+            $relation->getQuery()->select($column),
+            $direction,
+        );
+    }
+
+    /**
+     * @param  SortDirection|'asc'|'desc'  $direction
+     * @return 'asc'|'desc'
+     */
+    protected function normalizeSortDirection($direction)
+    {
+        return match (true) {
+            $direction instanceof SortDirection => match ($direction) {
+                SortDirection::Ascending => 'asc',
+                SortDirection::Descending => 'desc',
+            },
+            strtolower($direction) === 'asc' => 'asc',
+            strtolower($direction) === 'desc' => 'desc',
+            default => throw new InvalidArgumentException('Order direction must be a SortDirection, "asc" or "desc".'),
+        };
+    }
+
+    /**
      * Add subselect queries to include an aggregate value for a relationship.
      *
      * @param  mixed  $relations
