@@ -605,7 +605,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         $options['MessageDeduplicationId'] = $messageDeduplicationId;
 
-        return array_filter($options);
+        return array_filter($options, fn ($option) => $option !== null && $option !== '');
     }
 
     /**

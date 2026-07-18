@@ -534,6 +534,20 @@ class QueueSqsQueueTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
+    public function testQueueableOptionsPreserveZeroIdentifiers()
+    {
+        $job = $this->getMockBuilder(FakeSqsJobWithDeduplication::class)->onlyMethods(['deduplicationId'])->getMock();
+        $job->expects($this->once())->method('deduplicationId')->with($this->mockedPayload, $this->fifoQueueName)->willReturn('0');
+        $job->onGroup('0');
+
+        $queue = new SqsQueue($this->sqs, $this->fifoQueueName, $this->account);
+
+        $this->assertSame([
+            'MessageGroupId' => '0',
+            'MessageDeduplicationId' => '0',
+        ], $queue->getQueueableOptions($job, $this->fifoQueueName, $this->mockedPayload));
+    }
+
     public function testPushProperlyPushesJobObjectOntoSqsFifoQueueWithDeduplicator()
     {
         $job = $this->getMockBuilder(FakeSqsJobWithDeduplication::class)->onlyMethods(['deduplicationId'])->getMock();
