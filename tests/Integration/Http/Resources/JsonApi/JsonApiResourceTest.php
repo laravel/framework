@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Comment;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\PostResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
@@ -452,6 +453,31 @@ class JsonApiResourceTest extends TestCase
         $this->assertFalse(collect($response->json('included'))->contains(
             fn ($included) => $included['type'] === 'comments' && $included['id'] === (string) $privateComment->getKey()
         ));
+    }
+
+    public function testItResolvesEachRelationshipClosureOnceWhenIncludingNestedRelationships()
+    {
+        $user = User::factory()->create();
+
+        $posts = Post::factory()->count(2)->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        foreach ($posts as $post) {
+            Comment::factory()->create([
+                'content' => 'public',
+                'post_id' => $post->getKey(),
+                'user_id' => $user->getKey(),
+            ]);
+        }
+
+        PostResource::$commentsResolutionCount = 0;
+
+        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'posts.comments']))
+            ->assertJsonPath('data.relationships.posts.data.0.id', (string) $posts[0]->getKey());
+
+        // The "comments" closure should be resolved once per included post, not multiple times...
+        $this->assertSame(2, PostResource::$commentsResolutionCount);
     }
 
     public function testItCanResolveRelationshipWithRecursiveNestedRelationship()

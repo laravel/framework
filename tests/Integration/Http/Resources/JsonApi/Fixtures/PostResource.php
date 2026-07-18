@@ -7,6 +7,11 @@ use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 
 class PostResource extends JsonApiResource
 {
+    /**
+     * The number of times the "comments" relationship closure has been resolved.
+     */
+    public static int $commentsResolutionCount = 0;
+
     protected array $attributes = [
         'title',
         'content',
@@ -17,9 +22,13 @@ class PostResource extends JsonApiResource
     {
         return [
             'author' => AuthorResource::class,
-            'comments' => fn () => CommentResource::collection(
-                $this->comments->where('content', '!=', 'private')
-            ),
+            'comments' => function () {
+                static::$commentsResolutionCount++;
+
+                return CommentResource::collection(
+                    $this->comments->where('content', '!=', 'private')
+                );
+            },
         ];
     }
 }
