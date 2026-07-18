@@ -7672,6 +7672,28 @@ SQL;
         $this->assertSame('select * from "users" where "roles" ??& ?', $builder->toSql());
     }
 
+    public function testWhereColumnQuestionMarkOperatorOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereColumn('foo', '?', '_foo');
+        $this->assertSame('select * from "users" where "foo" ?? "_foo"', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereColumn('foo', '?|', '_foo');
+        $this->assertSame('select * from "users" where "foo" ??| "_foo"', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereColumn('foo', '?&', '_foo');
+        $this->assertSame('select * from "users" where "foo" ??& "_foo"', $builder->toSql());
+    }
+
+    public function testJoinQuestionMarkOperatorOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select(['countries.*', new Raw('count(users.*) as "users"')])->from('countries')->join('users', 'users.country_codes', '?', 'countries.code');
+        $this->assertSame('select "countries".*, count(users.*) as "users" from "countries" inner join "users" on "users"."country_codes" ?? "countries"."code"', $builder->toSql());
+    }
+
     public function testUseIndexMySql()
     {
         $builder = $this->getMySqlBuilder();

@@ -306,7 +306,7 @@ class Grammar extends BaseGrammar
     {
         $value = $this->parameter($where['value']);
 
-        $operator = str_replace('?', '??', $where['operator']);
+        $operator = $this->escapeQuestionMark($where['operator']);
 
         return $this->wrap($where['column']).' '.$operator.' '.$value;
     }
@@ -585,7 +585,9 @@ class Grammar extends BaseGrammar
      */
     protected function whereColumn(Builder $query, $where)
     {
-        return $this->wrap($where['first']).' '.$where['operator'].' '.$this->wrap($where['second']);
+        $operator = $this->escapeQuestionMark($where['operator']);
+
+        return $this->wrap($where['first']).' '.$operator.' '.$this->wrap($where['second']);
     }
 
     /**
