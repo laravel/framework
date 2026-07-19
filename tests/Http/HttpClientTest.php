@@ -174,6 +174,35 @@ class HttpClientTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $response->json());
     }
 
+    public function testFakeResponseSupportsPsr7StreamBody()
+    {
+        $stream = Utils::streamFor('Hello World');
+
+        $response = $this->factory::response($stream)->wait();
+
+        $this->assertSame($stream, $response->getBody());
+        $this->assertSame('Hello World', (string) $response->getBody());
+    }
+
+    public function testFakeResponseSupportsResourceBody()
+    {
+        $resource = fopen('php://temp', 'w+');
+        fwrite($resource, 'Hello World');
+        rewind($resource);
+
+        $response = $this->factory::response($resource)->wait();
+
+        $this->assertSame('Hello World', (string) $response->getBody());
+    }
+
+    public function testFakeResponseRejectsUnsupportedBody()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('HTTP fake response body must be a string, array, resource, Psr\Http\Message\StreamInterface, or null.');
+
+        $this->factory::response(new stdClass);
+    }
+
     public function testAcceptedRequest()
     {
         $this->factory->fake([
