@@ -16,6 +16,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use SortDirection;
 
 use function Illuminate\Support\enum_value;
 
