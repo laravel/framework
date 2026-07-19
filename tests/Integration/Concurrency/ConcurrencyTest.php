@@ -177,6 +177,47 @@ PHP);
         ];
     }
 
+    public function testRunHandlerProcessErrorWithNullParam()
+    {
+        try {
+            Concurrency::run([
+                fn () => throw new ExceptionWithNullableParam(null),
+            ]);
+        } catch (ExceptionWithNullableParam $e) {
+            $this->assertNull($e->status);
+
+            return;
+        }
+
+        $this->fail('The expected exception was not thrown.');
+    }
+
+    public function testRunHandlerProcessErrorWithParamNotBackedByProperty()
+    {
+        $this->expectException(ExceptionWithUnbackedParam::class);
+        $this->expectExceptionMessage('payments');
+
+        Concurrency::run([
+            fn () => throw new ExceptionWithUnbackedParam('payments'),
+        ]);
+    }
+
+    public function testRunHandlerProcessErrorPreservesDefaultExceptionCode()
+    {
+        try {
+            Concurrency::run([
+                fn () => throw new Exception('This exception has a code', 42),
+            ]);
+        } catch (Exception $e) {
+            $this->assertSame('This exception has a code', $e->getMessage());
+            $this->assertSame(42, $e->getCode());
+
+            return;
+        }
+
+        $this->fail('The expected exception was not thrown.');
+    }
+
     public static function getConcurrencyDrivers(): array
     {
         return [
@@ -240,5 +281,21 @@ class ExceptionWithFalseyParam extends Exception
     public function __construct(public int|bool|string $value)
     {
         parent::__construct('Exception with falsey parameter');
+    }
+}
+
+class ExceptionWithNullableParam extends Exception
+{
+    public function __construct(public ?int $status = null)
+    {
+        parent::__construct('Exception with nullable parameter');
+    }
+}
+
+class ExceptionWithUnbackedParam extends Exception
+{
+    public function __construct(string $context)
+    {
+        parent::__construct("Failed in {$context}");
     }
 }

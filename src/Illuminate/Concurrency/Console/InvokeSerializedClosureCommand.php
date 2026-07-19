@@ -54,28 +54,58 @@ class InvokeSerializedClosureCommand extends Command
         } catch (Throwable $e) {
             report($e);
 
-            $reflection = new ReflectionClass($e);
-            $constructor = $reflection->getConstructor();
-            $parameters = [];
-
-            if ($constructor) {
-                $declaringClass = $constructor->getDeclaringClass()->getName();
-
-                if ($declaringClass === $reflection->getName()) {
-                    foreach ($constructor->getParameters() as $parameter) {
-                        $parameters[$parameter->name] = $e->{$parameter->name} ?? null;
-                    }
-                }
-            }
-
             $this->output->write(json_encode([
                 'successful' => false,
                 'exception' => get_class($e),
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'parameters' => $parameters,
+                'parameters' => $this->exceptionParameters($e),
             ]));
         }
+    }
+
+    /**
+     * Get the constructor arguments that may be used to recreate the given exception.
+     *
+     * Arguments are only captured when every constructor parameter is backed by a
+     * property holding a JSON-representable value; otherwise an empty array is
+     * returned and the exception will be recreated from its message instead.
+     *
+     * @param  \Throwable  $e
+     * @return array<string, mixed>
+     */
+    protected function exceptionParameters(Throwable $e)
+    {
+        $reflection = new ReflectionClass($e);
+        $constructor = $reflection->getConstructor();
+
+        if (! $constructor || $constructor->getDeclaringClass()->getName() !== $reflection->getName()) {
+            return [];
+        }
+
+        $parameters = [];
+
+        foreach ($constructor->getParameters() as $parameter) {
+            if (! $reflection->hasProperty($parameter->name)) {
+                return [];
+            }
+
+            $property = $reflection->getProperty($parameter->name);
+
+            if ($property->isStatic() || ! $property->isInitialized($e)) {
+                return [];
+            }
+
+            $value = $property->getValue($e);
+
+            if (! is_null($value) && ! is_scalar($value) && ! is_array($value)) {
+                return [];
+            }
+
+            $parameters[$parameter->name] = $value;
+        }
+
+        return $parameters;
     }
 }
