@@ -248,6 +248,15 @@ class EloquentWhereHasTest extends DatabaseTestCase
 
         $this->assertEquals([1], $users->pluck('id')->all());
     }
+
+    public function testOrderByRelation()
+    {
+        $expectedSql = 'select "posts".*, (select count(*) from "comments" where "posts"."id" = "comments"."commentable_id" and "comments"."commentable_type" = \'Illuminate\Tests\Integration\Database\EloquentWhereHasTest\Post\') as "comments_count" from "posts" order by (select "content" from "texts" where "posts"."id" = "texts"."post_id") desc';
+        $actualSql = Post::orderByRelation('texts', 'content', 'desc')->toRawSql();
+        $this->assertSame($expectedSql, $actualSql);
+        $this->assertEquals([2, 1], Post::orderByRelation('texts', 'content', 'desc')->pluck('id')->all());
+        $this->assertEquals([1, 2], Post::orderByRelation('texts', 'content', 'asc')->pluck('id')->all());
+    }
 }
 
 class Comment extends Model
