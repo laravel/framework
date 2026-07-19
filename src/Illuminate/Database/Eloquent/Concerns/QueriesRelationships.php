@@ -856,7 +856,7 @@ trait QueriesRelationships
         }
 
         return $this->orderBy(
-            $relation->getQuery()->select($column),
+            $relation->getRelationExistenceQuery($relation->getRelated()->newQuery(), $this)->select($column),
             $direction,
         );
     }
