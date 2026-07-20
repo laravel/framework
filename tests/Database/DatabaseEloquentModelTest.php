@@ -16,6 +16,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\RouteKey;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
@@ -3930,6 +3931,20 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertNotInstanceOf(CustomBuilder::class, $eloquentBuilder);
     }
+
+    public function testRouteKeyCanBeResolvedFromAttribute()
+    {
+        $model = new EloquentModelWithRouteKeyAttributeStub;
+
+        $this->assertSame('slug', $model->getRouteKeyName());
+    }
+
+    public function testRouteKeyAttributeIsInherited()
+    {
+        $model = new EloquentModelInheritingRouteKeyAttributeStub;
+
+        $this->assertSame('slug', $model->getRouteKeyName());
+    }
 }
 
 class CustomBuilder extends Builder
@@ -4936,4 +4951,15 @@ class EloquentModelIncrementEachQueryStub
     {
         throw new \BadMethodCallException($name);
     }
+}
+
+#[RouteKey('slug')]
+class EloquentModelWithRouteKeyAttributeStub extends Model
+{
+    //
+}
+
+class EloquentModelInheritingRouteKeyAttributeStub extends EloquentModelWithRouteKeyAttributeStub
+{
+    //
 }
