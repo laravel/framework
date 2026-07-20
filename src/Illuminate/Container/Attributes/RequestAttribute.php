@@ -13,7 +13,7 @@ class RequestAttribute implements ContextualAttribute
     /**
      * Create a new class instance.
      */
-    public function __construct(public string $parameter = null)
+    public function __construct(public string $parameter)
     {
     }
 
