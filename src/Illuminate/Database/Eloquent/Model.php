@@ -1501,6 +1501,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
+        $this->discardGeneratedAttributes();
+
         // First we need to create a fresh query instance and touch the creation and
         // update timestamp on the model which are maintained by us for developer
         // convenience. Then we will just continue saving the model instances.
@@ -1586,6 +1588,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
+        $this->discardGeneratedAttributes();
+
         // First we'll need to create a fresh query instance and touch the creation and
         // update timestamps on this model, which are maintained by us for developer
         // convenience. After, we will just continue saving these model instances.
@@ -1641,6 +1645,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if ($this->fireModelEvent('creating') === false) {
             return false;
         }
+
+        $this->discardGeneratedAttributes();
 
         if ($this->usesTimestamps()) {
             $this->updateTimestamps();

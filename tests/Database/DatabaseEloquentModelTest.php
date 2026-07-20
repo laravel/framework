@@ -2760,6 +2760,34 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame([], $model->getChanges());
     }
 
+    public function testUpdateDiscardsGeneratedColumnsSetByEventListeners()
+    {
+        $model = $this->getMockBuilder(EloquentModelWithGeneratedStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps'])->getMock();
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->once()->with('id', '=', 1);
+        $query->shouldReceive('update')->once()->with(['price' => 150.0])->andReturn(1);
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->once())->method('updateTimestamps');
+
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturnUsing(function () use ($model) {
+            $model->total_price = 999.0;
+
+            return true;
+        });
+        $events->shouldReceive('dispatch')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+
+        $model->setRawAttributes(['id' => 1, 'price' => 100.0, 'total_price' => 200.0], true);
+        $model->exists = true;
+        $model->price = 150.0;
+
+        $this->assertTrue($model->save());
+        $this->assertSame(200.0, $model->total_price);
+        $this->assertSame(['price' => 150.0], $model->getChanges());
+    }
+
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
