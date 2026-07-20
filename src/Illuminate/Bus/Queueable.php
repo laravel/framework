@@ -50,6 +50,13 @@ trait Queueable
     public $debounceOwner = '';
 
     /**
+     * The lock owner token for the "unique until processing" lock.
+     *
+     * @var string
+     */
+    public $uniqueLockOwner = '';
+
+    /**
      * The number of seconds before the job should be made available.
      *
      * @var \DateTimeInterface|\DateInterval|array|int|null

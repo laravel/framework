@@ -48,6 +48,26 @@ class UniqueUntilProcessingJobTest extends QueueTestCase
         UniqueUntilProcessingJobThatReleases::dispatch();
         $this->assertDatabaseCount('jobs', 1);
     }
+
+    public function testShouldBeUniqueUntilProcessingReleasesLockWhenRetryAfterBeingReleasedByMiddlewareSucceeds()
+    {
+        UniqueUntilProcessingJobThatReleasesOnlyOnFirstAttempt::dispatch();
+        $this->assertNotNull(DB::table('cache_locks')->first());
+
+        // Attempt #1: middleware releases the job back to the queue without processing it.
+        $this->runQueueWorkerCommand(['--once' => true, '--tries' => 2]);
+        $this->assertFalse(UniqueUntilProcessingJobThatReleasesOnlyOnFirstAttempt::$handled);
+        $this->assertNotNull(DB::table('cache_locks')->first());
+
+        // Attempt #2: middleware lets it through this time, and the job actually runs.
+        $this->runQueueWorkerCommand(['--once' => true, '--tries' => 2]);
+        $this->assertTrue(UniqueUntilProcessingJobThatReleasesOnlyOnFirstAttempt::$handled);
+        $this->assertNull(DB::table('cache_locks')->first());
+
+        // The lock should be free again for a fresh dispatch.
+        UniqueUntilProcessingJobThatReleasesOnlyOnFirstAttempt::dispatch();
+        $this->assertDatabaseCount('jobs', 1);
+    }
 }
 
 class UniqueTestJobThatDoesNotRelease implements ShouldQueue, ShouldBeUniqueUntilProcessing
@@ -85,5 +105,26 @@ class UniqueUntilProcessingJobThatReleases extends UniqueTestJobThatDoesNotRelea
     public function uniqueId()
     {
         return 100;
+    }
+}
+
+class UniqueUntilProcessingJobThatReleasesOnlyOnFirstAttempt extends UniqueTestJobThatDoesNotRelease
+{
+    public function middleware()
+    {
+        return [
+            function ($job, $next) {
+                if ($job->attempts() === 1) {
+                    return $job->release(0);
+                }
+
+                return $next($job);
+            },
+        ];
+    }
+
+    public function uniqueId()
+    {
+        return 200;
     }
 }

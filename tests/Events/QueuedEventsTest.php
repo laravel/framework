@@ -476,7 +476,7 @@ class QueuedEventsTest extends TestCase
 
         $cache->shouldReceive('lock')
             ->once()
-            ->with($expectedKey, 60)
+            ->with($expectedKey, 60, m::type('string'))
             ->andReturn($lock);
         $lock->shouldReceive('get')->once()->andReturn(true);
 
@@ -510,7 +510,7 @@ class QueuedEventsTest extends TestCase
 
         $uniqueCache->shouldReceive('lock')
             ->once()
-            ->with($expectedKey, 60)
+            ->with($expectedKey, 60, m::type('string'))
             ->andReturn($lock);
         $lock->shouldReceive('get')->once()->andReturn(true);
 

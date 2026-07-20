@@ -5,6 +5,7 @@ namespace Illuminate\Bus;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\Attributes\UniqueFor;
+use Illuminate\Support\Str;
 
 class UniqueLock
 {
@@ -43,11 +44,24 @@ class UniqueLock
             ? ($job->uniqueVia() ?? $this->cache)
             : $this->cache;
 
-        return (bool) $cache->lock(self::getKey($job), $uniqueFor)->get();
+        $owner = Str::random(40);
+
+        $acquired = (bool) $cache->lock(self::getKey($job), $uniqueFor, $owner)->get();
+
+        if ($acquired && property_exists($job, 'uniqueLockOwner')) {
+            $job->uniqueLockOwner = $owner;
+        }
+
+        return $acquired;
     }
 
     /**
      * Release the lock for the given job.
+     *
+     * Releases by owner when the job carries one, so a dispatch that never
+     * released its own lock (e.g. a retry after being released back to the
+     * queue by another middleware) can't release a lock a newer, unrelated
+     * dispatch has since legitimately acquired.
      *
      * @param  mixed  $job
      * @return void
@@ -57,6 +71,14 @@ class UniqueLock
         $cache = method_exists($job, 'uniqueVia')
             ? ($job->uniqueVia() ?? $this->cache)
             : $this->cache;
+
+        $owner = property_exists($job, 'uniqueLockOwner') ? $job->uniqueLockOwner : '';
+
+        if (! empty($owner)) {
+            $cache->restoreLock(self::getKey($job), $owner)->release();
+
+            return;
+        }
 
         $cache->lock(self::getKey($job))->forceRelease();
     }
