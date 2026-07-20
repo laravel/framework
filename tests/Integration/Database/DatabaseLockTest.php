@@ -6,6 +6,7 @@ use Illuminate\Cache\DatabaseLock;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -172,6 +173,64 @@ class DatabaseLockTest extends DatabaseTestCase
             $this->expectException(QueryException::class);
             $this->assertFalse($lock->acquire());
         }
+    }
+
+    public function testAcquireFallsBackToUpdateOnUniqueConstraintViolation()
+    {
+        $connection = m::mock(Connection::class);
+        $insertBuilder = m::mock(Builder::class);
+        $updateBuilder = m::mock(Builder::class);
+
+        $insertBuilder->shouldReceive('insert')->once()->andThrow(
+            new UniqueConstraintViolationException(
+                'mysql',
+                'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
+                [],
+                new PDOException('Duplicate entry', 23000)
+            )
+        );
+
+        $updateBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
+        $updateBuilder->shouldReceive('where')->with(m::type('Closure'))->once()->andReturnSelf();
+        $updateBuilder->shouldReceive('update')->once()->andReturn(1);
+
+        $connection->shouldReceive('table')->with('cache_locks')->andReturn($insertBuilder, $updateBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 0, lottery: [0, 100]);
+
+        $this->assertTrue($lock->acquire());
+    }
+
+    public function testAcquirePropagatesNonUniqueConstraintQueryExceptions()
+    {
+        $connection = m::mock(Connection::class);
+        $insertBuilder = m::mock(Builder::class);
+        $updateBuilder = m::mock(Builder::class);
+
+        $insertBuilder->shouldReceive('insert')->once()->andThrow(
+            new QueryException(
+                'mysql',
+                'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
+                [],
+                new PDOException('String data, right truncated', 22001)
+            )
+        );
+
+        // The fallback "someone else already holds the lock" path: no row matches,
+        // so nothing is updated. Prior to the fix, this made acquire() silently
+        // return false instead of surfacing the real error above.
+        $updateBuilder->shouldReceive('where')->with('key', 'foo')->andReturnSelf();
+        $updateBuilder->shouldReceive('where')->with(m::type('Closure'))->andReturnSelf();
+        $updateBuilder->shouldReceive('update')->andReturn(0);
+
+        $connection->shouldReceive('table')->with('cache_locks')->andReturn($insertBuilder, $updateBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 0, lottery: [0, 100]);
+
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('String data, right truncated');
+
+        $lock->acquire();
     }
 
     #[TestWith(['Serialization failure: 1213 Deadlock', 40001, true])]
