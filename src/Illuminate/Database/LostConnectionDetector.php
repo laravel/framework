@@ -85,6 +85,7 @@ class LostConnectionDetector implements LostConnectionDetectorContract
             'Connection lost',
             'Broken pipe',
             'SQLSTATE[25006]: Read only sql transaction: 7',
+            'failed: Connection refused',
 
             // PlanetScale MySQL / Vitess related things...
             'vtgate connection error: no healthy endpoints',
