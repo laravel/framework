@@ -4,7 +4,6 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Database\Migrations\MigrationCreator;
-use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -38,26 +37,13 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
     protected $creator;
 
     /**
-     * The Composer instance.
-     *
-     * @var \Illuminate\Support\Composer
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     */
-    protected $composer;
-
-    /**
      * Create a new migration install command instance.
-     *
-     * @param  \Illuminate\Database\Migrations\MigrationCreator  $creator
-     * @param  \Illuminate\Support\Composer  $composer
      */
-    public function __construct(MigrationCreator $creator, Composer $composer)
+    public function __construct(MigrationCreator $creator)
     {
         parent::__construct();
 
         $this->creator = $creator;
-        $this->composer = $composer;
     }
 
     /**

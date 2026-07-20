@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Composer;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -17,7 +16,6 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
-            $composer = m::mock(Composer::class)
         );
         $app = new Application;
         $app->useDatabasePath(__DIR__);
@@ -33,7 +31,6 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
-            m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
         $app->useDatabasePath(__DIR__);
@@ -49,7 +46,6 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
-            m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
         $app->useDatabasePath(__DIR__);
@@ -65,7 +61,6 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
-            m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
         $app->useDatabasePath(__DIR__);
@@ -81,7 +76,6 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
-            m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
         $app->useDatabasePath(__DIR__);
@@ -97,7 +91,6 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock(MigrationCreator::class),
-            m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
         $command->setLaravel($app);

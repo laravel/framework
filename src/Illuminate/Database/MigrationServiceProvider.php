@@ -157,14 +157,16 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     protected function registerMigrateMakeCommand()
     {
         $this->app->singleton(MigrateMakeCommand::class, function ($app) {
-            // Once we have the migration creator registered, we will create the command
-            // and inject the creator. The creator is responsible for the actual file
-            // creation of the migrations, and may be extended by these developers.
+            /**
+             * Once we have the migration creator registered, we will create the command
+             * and inject the creator. The creator is responsible for the actual file
+             * creation of the migrations, and may be extended by these developers.
+             *
+             * @var MigrationCreator
+             */
             $creator = $app['migration.creator'];
 
-            $composer = $app['composer'];
-
-            return new MigrateMakeCommand($creator, $composer);
+            return new MigrateMakeCommand($creator);
         });
     }
 
