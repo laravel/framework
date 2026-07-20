@@ -18,7 +18,7 @@ class RequestAttribute implements ContextualAttribute
     }
 
     /**
-     * Resolve the route parameter.
+     * Resolve the request attribute.
      *
      * @param  self  $attribute
      * @param  \Illuminate\Contracts\Container\Container  $container
