@@ -2446,6 +2446,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getRouteKeyName()
     {
+        $reflection = new ReflectionClass($this);
+        $attributes = $reflection->getAttributes(\Illuminate\Database\Eloquent\Attributes\RouteKey::class);
+
+        if (! empty($attributes)) {
+            return $attributes[0]->newInstance()->key;
+        }
+
         return $this->getKeyName();
     }
 
