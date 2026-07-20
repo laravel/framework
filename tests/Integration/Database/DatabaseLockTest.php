@@ -6,10 +6,12 @@ use Illuminate\Cache\DatabaseLock;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 use Orchestra\Testbench\Attributes\WithMigration;
 use PDOException;
@@ -216,9 +218,8 @@ class DatabaseLockTest extends DatabaseTestCase
             )
         );
 
-        // The fallback "someone else already holds the lock" path: no row matches,
-        // so nothing is updated. Prior to the fix, this made acquire() silently
-        // return false instead of surfacing the real error above.
+        // No row matches the fallback update, so nothing is updated: previously
+        // this made acquire() return false instead of surfacing the error above.
         $updateBuilder->shouldReceive('where')->with('key', 'foo')->andReturnSelf();
         $updateBuilder->shouldReceive('where')->with(m::type('Closure'))->andReturnSelf();
         $updateBuilder->shouldReceive('update')->andReturn(0);
@@ -231,6 +232,29 @@ class DatabaseLockTest extends DatabaseTestCase
         $this->expectExceptionMessage('String data, right truncated');
 
         $lock->acquire();
+    }
+
+    public function testAcquirePropagatesRealDriverQueryExceptions()
+    {
+        // The extra NOT NULL column makes the real insert fail without a mock,
+        // while the fallback update (which never touches it) still succeeds.
+        Schema::create('cache_locks_with_required_column', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->string('owner');
+            $table->bigInteger('expiration')->index();
+            $table->string('required_field');
+        });
+
+        $lock = new DatabaseLock(DB::connection(), 'cache_locks_with_required_column', 'foo', 0);
+
+        try {
+            $lock->acquire();
+            $this->fail('Expected a QueryException to be thrown.');
+        } catch (QueryException $e) {
+            $this->assertNotInstanceOf(UniqueConstraintViolationException::class, $e);
+        } finally {
+            Schema::dropIfExists('cache_locks_with_required_column');
+        }
     }
 
     #[TestWith(['Serialization failure: 1213 Deadlock', 40001, true])]
