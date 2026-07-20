@@ -248,17 +248,6 @@ abstract class Grammar
     }
 
     /**
-     * Escapes any operator that contains a ? for use in PDO.
-     *
-     * @param  string  $operator
-     * @return string
-     */
-    protected function escapeQuestionMark($operator)
-    {
-        return str_replace('?', '??', $operator);
-    }
-
-    /**
      * Determine if the given value is a raw expression.
      *
      * @param  mixed  $value
