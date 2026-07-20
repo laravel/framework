@@ -265,6 +265,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
             $this->devCommands
         ));
 
+        $this->registerScheduleDiscovery();
+
         Signals::resolveAvailabilityUsing(function () {
             return $this->app->runningInConsole()
                 && ! $this->app->runningUnitTests()
