@@ -2736,6 +2736,28 @@ class DatabaseEloquentModelTest extends TestCase
         $model->total_price = 300.0;
         $model->exists = true;
         $this->assertTrue($model->save());
+        $this->assertSame(['price' => 150.0], $model->getChanges());
+        $this->assertArrayNotHasKey('total_price', $model->getAttributes());
+    }
+
+    public function testSaveSkipsUpdateWhenOnlyGeneratedColumnsChanged()
+    {
+        $model = $this->getMockBuilder(EloquentModelWithGeneratedStub::class)->onlyMethods(['newModelQuery'])->getMock();
+        $query = m::mock(Builder::class);
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+
+        $model->setRawAttributes(['id' => 1, 'price' => 100.0, 'total_price' => 200.0], true);
+        $model->exists = true;
+        $model->total_price = 999.0;
+
+        $this->assertTrue($model->save());
+        $this->assertSame(200.0, $model->total_price);
+        $this->assertFalse($model->isDirty());
+        $this->assertSame([], $model->getChanges());
     }
 
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()

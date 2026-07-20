@@ -2606,6 +2606,28 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
     }
 
+    public function testFillAndInsertExcludesGeneratedColumns()
+    {
+        $this->schema()->create('test_order_items', function (Blueprint $table) {
+            $table->increments('id');
+            $table->float('price')->nullable();
+            $table->float('total_price')->nullable();
+        });
+
+        $this->assertTrue(EloquentTestOrderItemWithGenerated::fillAndInsert([
+            ['price' => 100.0, 'total_price' => 200.0],
+            ['price' => 50.0],
+        ]));
+
+        $items = EloquentTestOrderItemWithGenerated::get();
+
+        $this->assertCount(2, $items);
+        $this->assertNull($items[0]->total_price);
+        $this->assertNull($items[1]->total_price);
+
+        $this->schema()->drop('test_order_items');
+    }
+
     public function testCanFillAndInsertWithUniqueStringIds()
     {
         Str::createUuidsUsingSequence([
@@ -2729,6 +2751,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
 /**
  * Eloquent Models...
  */
+class EloquentTestOrderItemWithGenerated extends Eloquent
+{
+    public $timestamps = false;
+    protected $generated = ['total_price'];
+    protected $guarded = [];
+    protected $table = 'test_order_items';
+}
+
 class EloquentTestUser extends Eloquent
 {
     protected $table = 'users';

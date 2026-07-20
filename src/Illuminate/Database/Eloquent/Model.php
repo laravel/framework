@@ -1379,6 +1379,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function save(array $options = [])
     {
         $this->mergeAttributesFromCachedCasts();
+        $this->discardGeneratedAttributes();
 
         $query = $this->newModelQuery();
 
@@ -1433,6 +1434,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         $this->mergeAttributesFromCachedCasts();
+        $this->discardGeneratedAttributes();
 
         $query = $this->newModelQuery();
 

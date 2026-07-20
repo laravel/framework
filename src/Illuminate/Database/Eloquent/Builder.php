@@ -532,10 +532,12 @@ class Builder implements BuilderContract
 
         $this->model::unguarded(function () use (&$values) {
             foreach ($values as $key => $rowValues) {
-                $values[$key] = tap(
+                $model = tap(
                     $this->newModelInstance($rowValues),
                     fn ($model) => $model->setUniqueIds()
-                )->getAttributes();
+                );
+
+                $values[$key] = Arr::except($model->getAttributes(), $model->getGenerated());
             }
         });
 

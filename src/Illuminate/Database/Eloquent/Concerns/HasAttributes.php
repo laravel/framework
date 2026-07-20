@@ -2327,7 +2327,7 @@ trait HasAttributes
      */
     protected function getDirtyForUpdate()
     {
-        return Arr::except($this->getDirty(), $this->getGenerated());
+        return $this->getDirty();
     }
 
     /**
@@ -2559,6 +2559,28 @@ trait HasAttributes
         }
 
         $this->generated = array_values(array_unique(array_merge($this->generated, $generated)));
+
+        return $this;
+    }
+
+    /**
+     * Discard any set values for the model's generated columns, since only the database may compute their values.
+     *
+     * @return $this
+     */
+    protected function discardGeneratedAttributes()
+    {
+        foreach ($this->getGenerated() as $key) {
+            if (! array_key_exists($key, $this->attributes)) {
+                continue;
+            }
+
+            if (array_key_exists($key, $this->original)) {
+                $this->attributes[$key] = $this->original[$key];
+            } else {
+                unset($this->attributes[$key]);
+            }
+        }
 
         return $this;
     }
