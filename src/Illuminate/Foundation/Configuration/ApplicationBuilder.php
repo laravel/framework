@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Configuration;
 
 use Closure;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Console\Scheduling\CachedSchedule;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
@@ -383,6 +384,22 @@ class ApplicationBuilder
         });
 
         return $this;
+    }
+
+    /**
+     * Enable automatic scheduled task discovery.
+     *
+     * @return $this
+     */
+    public function withScheduleDiscovery(): static
+    {
+        return $this->withSchedule(function (Schedule $schedule) {
+            $this->app->make(CachedSchedule::class)->register(
+                schedule: $schedule,
+                path: $this->app->path(),
+                namespace: $this->app->getNamespace(),
+            );
+        });
     }
 
     /**

@@ -63,6 +63,7 @@ class OptimizeCommand extends Command
             'events' => 'event:cache',
             'routes' => 'route:cache',
             'views' => 'view:cache',
+            'schedules' => 'schedule:cache',
             ...ServiceProvider::$optimizeCommands,
         ];
     }

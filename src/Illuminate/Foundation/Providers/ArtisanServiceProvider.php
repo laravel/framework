@@ -8,11 +8,15 @@ use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
 use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
 use Illuminate\Cache\Console\PruneStaleTagsCommand;
 use Illuminate\Concurrency\Console\InvokeSerializedClosureCommand;
+use Illuminate\Console\Scheduling\CachedSchedule;
 use Illuminate\Console\Scheduling\ScheduleClearCacheCommand;
+use Illuminate\Console\Scheduling\ScheduleDiscoverer;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleInterruptCommand;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
+use Illuminate\Console\Scheduling\ScheduleManifest;
 use Illuminate\Console\Scheduling\SchedulePauseCommand;
+use Illuminate\Console\Scheduling\ScheduleRegistrar;
 use Illuminate\Console\Scheduling\ScheduleResumeCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Console\Scheduling\ScheduleTestCommand;
@@ -81,6 +85,8 @@ use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
+use Illuminate\Foundation\Console\ScheduleCacheCommand;
+use Illuminate\Foundation\Console\ScheduleClearDiscoveryCommand;
 use Illuminate\Foundation\Console\ScopeMakeCommand;
 use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
@@ -181,6 +187,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ScheduleInterrupt' => ScheduleInterruptCommand::class,
         'SchedulePause' => SchedulePauseCommand::class,
         'ScheduleResume' => ScheduleResumeCommand::class,
+        'ScheduleCache' => ScheduleCacheCommand::class,
+        'ScheduleClearDiscovery' => ScheduleClearDiscoveryCommand::class,
         'ShowModel' => ShowModelCommand::class,
         'StorageLink' => StorageLinkCommand::class,
         'StorageUnlink' => StorageUnlinkCommand::class,
@@ -950,6 +958,31 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         $this->app->singleton(ViewClearCommand::class, function ($app) {
             return new ViewClearCommand($app['files']);
         });
+    }
+
+    /**
+     * Register scheduled task discovery services.
+     *
+     * @return void
+     */
+    protected function registerScheduleDiscovery(): void
+    {
+        $this->app->singleton(ScheduleDiscoverer::class);
+        $this->app->singleton(ScheduleRegistrar::class);
+
+        $this->app->singleton(
+            ScheduleManifest::class,
+            function ($app) {
+                return new ScheduleManifest(
+                    files: $app['files'],
+                    path: $app->bootstrapPath(
+                        'cache/schedules.php'
+                    ),
+                );
+            }
+        );
+
+        $this->app->singleton(CachedSchedule::class);
     }
 
     /**

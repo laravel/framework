@@ -65,6 +65,7 @@ class OptimizeClearCommand extends Command
             'events' => 'event:clear',
             'routes' => 'route:clear',
             'views' => 'view:clear',
+            'schedules' => 'schedule:clear-discovery',
             ...ServiceProvider::$optimizeClearCommands,
         ];
     }
