@@ -15,6 +15,7 @@ use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\DateFormat;
+use Illuminate\Database\Eloquent\Attributes\Generated;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -151,6 +152,13 @@ trait HasAttributes
     protected $appends = [];
 
     /**
+     * The attributes that are computed by the database as generated columns.
+     *
+     * @var array<int, string>
+     */
+    protected $generated = [];
+
+    /**
      * Indicates whether attributes are snake cased on arrays.
      *
      * @var bool
@@ -215,6 +223,7 @@ trait HasAttributes
             ?? null;
 
         $this->mergeAppends(static::resolveClassAttribute(Appends::class, 'columns') ?? []);
+        $this->mergeGenerated(static::resolveClassAttribute(Generated::class, 'columns') ?? []);
     }
 
     /**
@@ -2512,6 +2521,46 @@ trait HasAttributes
     public function withoutAppends()
     {
         return $this->setAppends([]);
+    }
+
+    /**
+     * Get the attributes that are computed by the database as generated columns.
+     *
+     * @return array<int, string>
+     */
+    public function getGenerated()
+    {
+        return $this->generated;
+    }
+
+    /**
+     * Set the attributes that are computed by the database as generated columns.
+     *
+     * @param  array<int, string>  $generated
+     * @return $this
+     */
+    public function setGenerated(array $generated)
+    {
+        $this->generated = $generated;
+
+        return $this;
+    }
+
+    /**
+     * Merge new generated columns with existing generated columns on the model.
+     *
+     * @param  array<int, string>  $generated
+     * @return $this
+     */
+    public function mergeGenerated(array $generated)
+    {
+        if ($generated === []) {
+            return $this;
+        }
+
+        $this->generated = array_values(array_unique(array_merge($this->generated, $generated)));
+
+        return $this;
     }
 
     /**

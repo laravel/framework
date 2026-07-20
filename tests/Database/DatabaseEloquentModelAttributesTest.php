@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Connection;
 use Illuminate\Database\Eloquent\Attributes\DateFormat;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Generated;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -311,6 +312,41 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame(['full_name', 'is_admin'], $model->getAppends());
     }
 
+    public function test_generated_attribute(): void
+    {
+        $model = new ModelWithGeneratedAttribute;
+
+        $this->assertSame(['total_price', 'search_index'], $model->getGenerated());
+    }
+
+    public function test_generated_attribute_variadic(): void
+    {
+        $model = new ModelWithGeneratedAttributeVariadic;
+
+        $this->assertSame(['total_price', 'search_index'], $model->getGenerated());
+    }
+
+    public function test_generated_property_merges_with_attribute(): void
+    {
+        $model = new ModelWithGeneratedAttributeAndProperty;
+
+        $this->assertEqualsCanonicalizing(['full_name', 'total_price', 'search_index'], $model->getGenerated());
+    }
+
+    public function test_replicate_excludes_generated_attribute_columns(): void
+    {
+        $model = new ModelWithGeneratedAttribute;
+        $model->setRawAttributes([
+            'name' => 'Order',
+            'search_index' => 'order',
+            'total_price' => 200.0,
+        ]);
+
+        $replicated = $model->replicate();
+
+        $this->assertSame(['name' => 'Order'], $replicated->getAttributes());
+    }
+
     public function test_touches_attribute(): void
     {
         $model = new ModelWithTouchesAttribute;
@@ -391,6 +427,17 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame($original, $model->getAppends());
     }
 
+    public function test_merge_generated_with_empty_array_is_noop(): void
+    {
+        $model = new ModelWithGeneratedAttribute;
+        $original = $model->getGenerated();
+
+        $result = $model->mergeGenerated([]);
+
+        $this->assertSame($model, $result);
+        $this->assertSame($original, $model->getGenerated());
+    }
+
     public function test_set_fillable_overrides_attribute(): void
     {
         $model = new ModelWithFillableAttribute;
@@ -463,6 +510,13 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $model = new ModelWithFillableAttributeAndTrait;
 
         $this->assertEqualsCanonicalizing(['name', 'email', 'phone'], $model->getFillable());
+    }
+
+    public function test_trait_initializer_merges_generated_with_attribute(): void
+    {
+        $model = new ModelWithGeneratedAttributeAndTrait;
+
+        $this->assertEqualsCanonicalizing(['total_price', 'search_index', 'discounted_price'], $model->getGenerated());
     }
 }
 
@@ -682,6 +736,24 @@ class ModelWithAppendsAttributeVariadic extends Model
     //
 }
 
+#[Generated(['total_price', 'search_index'])]
+class ModelWithGeneratedAttribute extends Model
+{
+    //
+}
+
+#[Generated('total_price', 'search_index')]
+class ModelWithGeneratedAttributeVariadic extends Model
+{
+    //
+}
+
+#[Generated(['total_price', 'search_index'])]
+class ModelWithGeneratedAttributeAndProperty extends Model
+{
+    protected $generated = ['full_name'];
+}
+
 #[Touches(['post', 'author'])]
 class ModelWithTouchesAttribute extends Model
 {
@@ -773,6 +845,14 @@ trait AddsPhoneFillable
     }
 }
 
+trait AddsDiscountedPriceGenerated
+{
+    protected function initializeAddsDiscountedPriceGenerated()
+    {
+        $this->mergeGenerated(['discounted_price']);
+    }
+}
+
 #[Appends(['full_name', 'is_admin'])]
 class ModelWithAppendsAttributeAndTrait extends Model
 {
@@ -795,4 +875,10 @@ class ModelWithVisibleAttributeAndTrait extends Model
 class ModelWithFillableAttributeAndTrait extends Model
 {
     use AddsPhoneFillable;
+}
+
+#[Generated(['total_price', 'search_index'])]
+class ModelWithGeneratedAttributeAndTrait extends Model
+{
+    use AddsDiscountedPriceGenerated;
 }

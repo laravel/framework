@@ -2662,6 +2662,36 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($replicated->updated_at);
     }
 
+    public function testReplicateExcludesGeneratedColumns()
+    {
+        $model = new EloquentModelWithGeneratedStub;
+        $model->id = 'id';
+        $model->price = 100.0;
+        $model->quantity = 2.0;
+        $model->total_price = 200.0;
+        $replicated = $model->replicate();
+
+        $this->assertNull($replicated->id);
+        $this->assertSame(100.0, $replicated->price);
+        $this->assertSame(2.0, $replicated->quantity);
+        $this->assertNull($replicated->total_price);
+        $this->assertArrayNotHasKey('total_price', $replicated->getAttributes());
+    }
+
+    public function testReplicateExcludesGeneratedColumnsAlongsideExcept()
+    {
+        $model = new EloquentModelWithGeneratedStub;
+        $model->id = 'id';
+        $model->price = 100.0;
+        $model->quantity = 2.0;
+        $model->total_price = 200.0;
+        $replicated = $model->replicate(['quantity']);
+
+        $this->assertSame(100.0, $replicated->price);
+        $this->assertArrayNotHasKey('quantity', $replicated->getAttributes());
+        $this->assertArrayNotHasKey('total_price', $replicated->getAttributes());
+    }
+
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
@@ -4131,6 +4161,11 @@ class EloquentModelStubWithTrait extends EloquentModelStub
 class EloquentModelCamelStub extends EloquentModelStub
 {
     public static $snakeAttributes = false;
+}
+
+class EloquentModelWithGeneratedStub extends EloquentModelStub
+{
+    protected $generated = ['total_price'];
 }
 
 class EloquentDateModelStub extends EloquentModelStub
