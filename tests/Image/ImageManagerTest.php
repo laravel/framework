@@ -22,7 +22,7 @@ class ImageManagerTest extends TestCase
 {
     public function test_default_driver_returns_configured_value()
     {
-        $app = $this->makeApp(['image.default' => 'imagick']);
+        $app = $this->makeApp(['images.default' => 'imagick']);
 
         $manager = new ImageManager($app);
 
@@ -40,7 +40,7 @@ class ImageManagerTest extends TestCase
 
     public function test_extend_registers_custom_driver()
     {
-        $app = $this->makeApp(['image.default' => 'custom']);
+        $app = $this->makeApp(['images.default' => 'custom']);
 
         $mockDriver = m::mock(Driver::class);
 

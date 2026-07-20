@@ -146,6 +146,6 @@ class ImageManager extends Manager
      */
     public function getDefaultDriver(): string
     {
-        return $this->config->get('image.default', 'gd');
+        return $this->config->get('images.default', 'gd');
     }
 }
