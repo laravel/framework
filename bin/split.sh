@@ -24,6 +24,7 @@ remote bus git@github.com:illuminate/bus.git
 remote cache git@github.com:illuminate/cache.git
 remote collections git@github.com:illuminate/collections.git
 remote conditionable git@github.com:illuminate/conditionable.git
+remote concurrency git@github.com:illuminate/concurrency.git
 remote config git@github.com:illuminate/config.git
 remote console git@github.com:illuminate/console.git
 remote container git@github.com:illuminate/container.git
@@ -61,6 +62,7 @@ split 'src/Illuminate/Bus' bus
 split 'src/Illuminate/Cache' cache
 split 'src/Illuminate/Collections' collections
 split 'src/Illuminate/Conditionable' conditionable
+split 'src/Illuminate/Concurrency' concurrency
 split 'src/Illuminate/Config' config
 split 'src/Illuminate/Console' console
 split 'src/Illuminate/Container' container
