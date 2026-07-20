@@ -2692,6 +2692,52 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayNotHasKey('total_price', $replicated->getAttributes());
     }
 
+    public function testInsertExcludesGeneratedColumns()
+    {
+        $model = $this->getMockBuilder(EloquentModelWithGeneratedStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('insertGetId')->once()->with(['price' => 100.0, 'quantity' => 2.0], 'id')->andReturn(1);
+        $query->shouldReceive('getConnection')->once();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->once())->method('updateTimestamps');
+
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.created: '.get_class($model), $model);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model);
+
+        $model->price = 100.0;
+        $model->quantity = 2.0;
+        $model->total_price = 200.0;
+        $model->exists = false;
+        $this->assertTrue($model->save());
+        $this->assertEquals(1, $model->id);
+    }
+
+    public function testUpdateExcludesGeneratedColumns()
+    {
+        $model = $this->getMockBuilder(EloquentModelWithGeneratedStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps'])->getMock();
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->once()->with('id', '=', 1);
+        $query->shouldReceive('update')->once()->with(['price' => 150.0])->andReturn(1);
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->once())->method('updateTimestamps');
+
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+
+        $model->id = 1;
+        $model->syncOriginal();
+        $model->price = 150.0;
+        $model->total_price = 300.0;
+        $model->exists = true;
+        $this->assertTrue($model->save());
+    }
+
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');

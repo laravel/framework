@@ -2059,7 +2059,7 @@ trait HasAttributes
      */
     protected function getAttributesForInsert()
     {
-        return $this->getAttributes();
+        return Arr::except($this->getAttributes(), $this->getGenerated());
     }
 
     /**
@@ -2327,7 +2327,7 @@ trait HasAttributes
      */
     protected function getDirtyForUpdate()
     {
-        return $this->getDirty();
+        return Arr::except($this->getDirty(), $this->getGenerated());
     }
 
     /**
