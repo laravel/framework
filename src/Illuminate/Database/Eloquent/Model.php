@@ -16,6 +16,7 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\Boot;
 use Illuminate\Database\Eloquent\Attributes\Connection;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
+use Illuminate\Database\Eloquent\Attributes\RouteKey;
 use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
@@ -2446,14 +2447,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getRouteKeyName()
     {
-        $reflection = new ReflectionClass($this);
-        $attributes = $reflection->getAttributes(\Illuminate\Database\Eloquent\Attributes\RouteKey::class);
-
-        if (! empty($attributes)) {
-            return $attributes[0]->newInstance()->key;
-        }
-
-        return $this->getKeyName();
+        return static::resolveClassAttribute(RouteKey::class, 'key') ?? $this->getKeyName();
     }
 
     /**

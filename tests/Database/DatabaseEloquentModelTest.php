@@ -3939,11 +3939,11 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('slug', $model->getRouteKeyName());
     }
 
-    public function testRouteKeyFallsBackToDefaultWhenAttributeIsMissing()
+    public function testRouteKeyAttributeIsInherited()
     {
-        $model = new EloquentModelStub;
+        $model = new EloquentModelInheritingRouteKeyAttributeStub;
 
-        $this->assertSame('id', $model->getRouteKeyName());
+        $this->assertSame('slug', $model->getRouteKeyName());
     }
 }
 
@@ -4955,6 +4955,11 @@ class EloquentModelIncrementEachQueryStub
 
 #[RouteKey('slug')]
 class EloquentModelWithRouteKeyAttributeStub extends Model
+{
+    //
+}
+
+class EloquentModelInheritingRouteKeyAttributeStub extends EloquentModelWithRouteKeyAttributeStub
 {
     //
 }
