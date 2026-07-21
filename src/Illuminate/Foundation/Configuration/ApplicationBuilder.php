@@ -400,7 +400,7 @@ class ApplicationBuilder
 
         if ($using !== null) {
             $this->app->afterResolving(
-                \Illuminate\Foundation\Exceptions\Handler::class,
+                \Illuminate\Contracts\Debug\ExceptionHandler::class,
                 fn ($handler) => $using(new Exceptions($handler)),
             );
         }
