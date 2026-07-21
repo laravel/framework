@@ -459,29 +459,29 @@ final class ContainerTestImplB implements ContainerTestContract
 {
 }
 
-final class ContainerTestHasAttributeThatResolvesToImplA
+final readonly class ContainerTestHasAttributeThatResolvesToImplA
 {
     public function __construct(
         #[ContainerTestAttributeThatResolvesContractImpl('A')]
-        public readonly ContainerTestContract $property
+        public ContainerTestContract $property
     ) {
     }
 }
 
-final class ContainerTestHasAttributeThatResolvesToImplB
+final readonly class ContainerTestHasAttributeThatResolvesToImplB
 {
     public function __construct(
         #[ContainerTestAttributeThatResolvesContractImpl('B')]
-        public readonly ContainerTestContract $property
+        public ContainerTestContract $property
     ) {
     }
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-final class ContainerTestConfigValue implements ContextualAttribute
+final readonly class ContainerTestConfigValue implements ContextualAttribute
 {
     public function __construct(
-        public readonly string $key
+        public string $key
     ) {
     }
 }
@@ -496,10 +496,10 @@ final class ContainerTestHasConfigValueProperty
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-final class ContainerTestConfigValueWithResolve implements ContextualAttribute
+final readonly class ContainerTestConfigValueWithResolve implements ContextualAttribute
 {
     public function __construct(
-        public readonly string $key
+        public string $key
     ) {
     }
 
@@ -561,7 +561,7 @@ final class ComplexDependency implements ContainerTestContract
     }
 }
 
-final class AuthedTest
+final readonly class AuthedTest
 {
     public function __construct(
         #[Authenticated('foo')] AuthenticatableContract $foo,
@@ -572,7 +572,7 @@ final class AuthedTest
     }
 }
 
-final class CacheTest
+final readonly class CacheTest
 {
     public function __construct(
         #[Cache('foo')] CacheRepository $foo,
@@ -585,35 +585,35 @@ final class CacheTest
     }
 }
 
-final class ConfigTest
+final readonly class ConfigTest
 {
     public function __construct(#[Config('foo')] string $foo, #[Config('bar')] string $bar)
     {
     }
 }
 
-final class ContextTest
+final readonly class ContextTest
 {
     public function __construct(#[Context('foo')] string $foo)
     {
     }
 }
 
-final class ContextHiddenTest
+final readonly class ContextHiddenTest
 {
     public function __construct(#[Context('bar', hidden: true)] string $foo)
     {
     }
 }
 
-final class DatabaseTest
+final readonly class DatabaseTest
 {
     public function __construct(#[Database('foo')] Connection $foo, #[Database('bar')] Connection $bar)
     {
     }
 }
 
-final class GuardTest
+final readonly class GuardTest
 {
     public function __construct(
         #[Auth('foo')] GuardContract $foo,
@@ -624,28 +624,28 @@ final class GuardTest
     }
 }
 
-final class LogTest
+final readonly class LogTest
 {
     public function __construct(#[Log('foo')] LoggerInterface $foo, #[Log('bar')] LoggerInterface $bar)
     {
     }
 }
 
-final class RouteParameterTest
+final readonly class RouteParameterTest
 {
     public function __construct(#[RouteParameter('foo')] Model $foo, #[RouteParameter('bar')] string $bar)
     {
     }
 }
 
-final class RouteParameterTestWithoutParameterName
+final readonly class RouteParameterTestWithoutParameterName
 {
     public function __construct(#[RouteParameter] Model $foo, #[RouteParameter] string $bar)
     {
     }
 }
 
-final class StorageTest
+final readonly class StorageTest
 {
     public function __construct(
         #[Storage('foo')] Filesystem $foo,
@@ -656,46 +656,46 @@ final class StorageTest
     }
 }
 
-final class GiveTestSimple
+final readonly class GiveTestSimple
 {
     public function __construct(
         #[Give(SimpleDependency::class)]
-        public readonly ContainerTestContract $dependency
+        public ContainerTestContract $dependency
     ) {
     }
 }
 
-final class GiveTestComplex
+final readonly class GiveTestComplex
 {
     public function __construct(
         #[Give(ComplexDependency::class, ['param' => true])]
-        public readonly ContainerTestContract $dependency
+        public ContainerTestContract $dependency
     ) {
     }
 }
 
-final class TimezoneObject
+final readonly class TimezoneObject
 {
     public function __construct(
-        #[Config('app.timezone')] public readonly ?string $timezone
-    ) {
-        //
-    }
-}
-
-final class LocaleObject
-{
-    public function __construct(
-        #[Config('app.locale')] public readonly ?string $locale
+        #[Config('app.timezone')] public ?string $timezone
     ) {
         //
     }
 }
 
-final class HasParameterAwareAttribute
+final readonly class LocaleObject
 {
     public function __construct(
-        #[ContainerTestParameterAwareAttribute] public readonly ?string $name,
+        #[Config('app.locale')] public ?string $locale
+    ) {
+        //
+    }
+}
+
+final readonly class HasParameterAwareAttribute
+{
+    public function __construct(
+        #[ContainerTestParameterAwareAttribute] public ?string $name,
     ) {
         //
     }
