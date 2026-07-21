@@ -5,7 +5,9 @@ namespace Illuminate\Tests\Http;
 use Exception;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\NetworkException;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
+use GuzzleHttp\Exception\ResponseException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\Create;
@@ -25,6 +27,7 @@ use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\PersistentTransport;
 use Illuminate\Http\Client\Pool;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
@@ -3222,11 +3225,13 @@ class HttpClientTest extends TestCase
         $pendingRequest = new PendingRequest();
 
         $pendingRequest->setHandler(function () {
-            throw new GuzzleRequestException(
-                'cURL error 28: Operation timed out',
-                new GuzzleRequest('GET', 'https://timeout-laravel.example'),
-                new Psr7Response(301)
-            );
+            $message = 'cURL error 28: Operation timed out';
+            $request = new GuzzleRequest('GET', 'https://timeout-laravel.example');
+            $response = new Psr7Response(301);
+
+            throw class_exists(ResponseException::class)
+                ? new ResponseException($message, $request, $response)
+                : new GuzzleRequestException($message, $request, $response);
         });
 
         $pendingRequest->get('https://timeout-laravel.example');
@@ -4309,7 +4314,7 @@ class HttpClientTest extends TestCase
         $this->factory->post('http://laravel.com');
 
         $this->assertSame(['Laravel Framework/1.0'], $requests[0]->header('User-Agent'));
-        $this->assertSame(['GuzzleHttp/7'], $requests[1]->header('User-Agent'));
+        $this->assertStringStartsWith('GuzzleHttp/', $requests[1]->header('User-Agent')[0]);
     }
 
     public function testItCanAddResponseMiddleware()
@@ -4934,6 +4939,110 @@ class HttpClientTest extends TestCase
         // body() should only be called once
         $response->json();
         $this->assertSame(1, $response->bodyCallCount);
+    }
+
+    public function testRequiredPersistentTransportDoesNotThrowWhenFaking()
+    {
+        $this->factory->fake();
+        $this->factory->globalPersistentTransport(PersistentTransport::Required);
+
+        $response = $this->factory->get('https://example.com');
+
+        $this->assertSame(200, $response->status());
+    }
+
+    public function testGlobalRequiredPersistentTransportThrowsWhenPersistentSharingIsUnavailable()
+    {
+        if (defined('GuzzleHttp\TransportSharing::PERSISTENT_PREFER')) {
+            $this->markTestSkipped('Persistent transport sharing is available.');
+        }
+
+        $this->factory->globalPersistentTransport(PersistentTransport::Required);
+
+        $this->expectException(RuntimeException::class);
+
+        $this->factory->get('https://example.com');
+    }
+
+    public function testRequiredPersistentTransportCanBeSetPerRequest()
+    {
+        if (defined('GuzzleHttp\TransportSharing::PERSISTENT_PREFER')) {
+            $this->markTestSkipped('Persistent transport sharing is available.');
+        }
+
+        $this->expectException(RuntimeException::class);
+
+        $this->factory->createPendingRequest()
+            ->persistentTransport(PersistentTransport::Required)
+            ->get('https://example.com');
+    }
+
+    public function testNetworkExceptionIsConvertedToConnectionException()
+    {
+        if (! class_exists(NetworkException::class)) {
+            $this->markTestSkipped('NetworkException requires guzzlehttp/guzzle ^8.0.');
+        }
+
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('Network error');
+
+        $pendingRequest = new PendingRequest();
+
+        $pendingRequest->setHandler(function () {
+            throw new NetworkException(
+                'Network error',
+                new GuzzleRequest('GET', 'https://network-error.laravel.example')
+            );
+        });
+
+        $pendingRequest->get('https://network-error.laravel.example');
+    }
+
+    public function testNetworkExceptionInPoolIsConsideredConnectionException()
+    {
+        if (! class_exists(NetworkException::class)) {
+            $this->markTestSkipped('NetworkException requires guzzlehttp/guzzle ^8.0.');
+        }
+
+        $networkException = new NetworkException('Network error', new GuzzleRequest('GET', '/'));
+
+        $this->factory->fake([
+            'network-error.com' => new RejectedPromise($networkException),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->get('network-error.com'),
+            ];
+        });
+
+        $this->assertInstanceOf(ConnectionException::class, $responses[0]);
+        $this->assertSame($networkException, $responses[0]->getPrevious());
+    }
+
+    public function testUrlsWithoutTemplateExpressionsAreNotExpanded()
+    {
+        $this->factory->fake();
+
+        $this->factory->withUrlParameters(['page' => 'docs'])->get('https://laravel.com/docs');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com/docs';
+        });
+    }
+
+    public function testUrlsWithTemplateExpressionsAreStillExpanded()
+    {
+        $this->factory->fake();
+
+        $this->factory->withUrlParameters([
+            'endpoint' => 'https://laravel.com',
+            'page' => 'docs',
+        ])->get('{+endpoint}/{page}');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com/docs';
+        });
     }
 }
 

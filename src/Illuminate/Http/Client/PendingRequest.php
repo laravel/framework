@@ -6,14 +6,16 @@ use Closure;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ResponseException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\TransportSharing;
 use GuzzleHttp\UriTemplate\UriTemplate;
+use GuzzleHttp\Utils;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
@@ -30,7 +32,9 @@ use InvalidArgumentException;
 use JsonSerializable;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
 use Throwable;
 
@@ -61,6 +65,13 @@ class PendingRequest
      * @var callable
      */
     protected $handler;
+
+    /**
+     * The persistent transport (connection sharing) mode for the request.
+     *
+     * @var \Illuminate\Http\Client\PersistentTransport
+     */
+    protected PersistentTransport $persistentTransport = PersistentTransport::None;
 
     /**
      * The base URL for the request.
@@ -1106,16 +1117,10 @@ class PendingRequest
                     }
                 });
             } catch (TransferException $e) {
-                if ($e instanceof ConnectException) {
-                    $this->marshalConnectionException($e);
-                }
-
-                if ($e instanceof RequestException && ! $e->hasResponse()) {
-                    $this->marshalRequestExceptionWithoutResponse($e);
-                }
-
-                if ($e instanceof RequestException && $e->hasResponse()) {
-                    $this->marshalRequestExceptionWithResponse($e);
+                if (($response = $this->responseFromException($e)) !== null) {
+                    $this->marshalTransportExceptionWithResponse($e, $response);
+                } elseif (method_exists($e, 'getRequest')) {
+                    $this->marshalTransportException($e);
                 }
 
                 throw $e;
@@ -1137,6 +1142,10 @@ class PendingRequest
      */
     protected function expandUrlParameters(string $url)
     {
+        if (! str_contains($url, '{')) {
+            return $url;
+        }
+
         return UriTemplate::expand($url, $this->urlParameters);
     }
 
@@ -1221,7 +1230,11 @@ class PendingRequest
                     throw $e;
                 }
 
-                if ($e instanceof ConnectException || ($e instanceof RequestException && ! $e->hasResponse())) {
+                if (($response = $this->responseFromException($e)) !== null) {
+                    return $this->populateResponse($this->newResponse($response));
+                }
+
+                if ($e instanceof TransferException && method_exists($e, 'getRequest')) {
                     $exception = new ConnectionException($e->getMessage(), 0, $e);
 
                     $this->dispatchConnectionFailedEvent(
@@ -1232,7 +1245,7 @@ class PendingRequest
                     return $exception;
                 }
 
-                return $e instanceof RequestException && $e->hasResponse() ? $this->populateResponse($this->newResponse($e->getResponse())) : $e;
+                return $e;
             })
             ->then(function (Response|Throwable $response) use ($method, $url, $options, $attempt) {
                 return $this->handlePromiseResponse($response, $method, $url, $options, $attempt);
@@ -1255,8 +1268,9 @@ class PendingRequest
             return $response;
         }
 
-        if ($response instanceof RequestException) {
-            $response = $this->populateResponse($this->newResponse($response->getResponse()));
+        if ($response instanceof RequestException
+            && ($psrResponse = $this->responseFromException($response)) !== null) {
+            $response = $this->populateResponse($this->newResponse($psrResponse));
         }
 
         try {
@@ -1688,7 +1702,64 @@ class PendingRequest
      */
     public function buildHandlerStack()
     {
-        return $this->pushHandlers(HandlerStack::create($this->handler));
+        return $this->pushHandlers(HandlerStack::create($this->buildDefaultHandler()));
+    }
+
+    /**
+     * Resolve the base Guzzle handler, applying persistent transport sharing when enabled.
+     *
+     * @return callable|null
+     */
+    protected function buildDefaultHandler()
+    {
+        // Transport sharing can only be applied when Guzzle builds the handler.
+        if (! is_null($this->handler)) {
+            return $this->handler;
+        }
+
+        $mode = $this->resolveTransportSharingMode();
+
+        return is_null($mode)
+            ? $this->handler
+            : Utils::chooseHandler(['transport_sharing' => $mode]);
+    }
+
+    /**
+     * Resolve the Guzzle "transport_sharing" mode for the configured persistence level.
+     *
+     * @return string|null
+     *
+     * @throws \RuntimeException
+     */
+    protected function resolveTransportSharingMode()
+    {
+        if ($this->persistentTransport === PersistentTransport::None) {
+            return null;
+        }
+
+        // When faking, the stub handler answers before the base handler runs, so a
+        // sharing transport is never needed (and "Required" must not throw in tests).
+        if (($this->stubCallbacks?->isNotEmpty() ?? false) || $this->preventStrayRequests) {
+            return null;
+        }
+
+        $required = $this->persistentTransport === PersistentTransport::Required;
+
+        // Guzzle 8: persistent (cross-request) sharing.
+        if (defined(TransportSharing::class.'::PERSISTENT_PREFER') && defined(TransportSharing::class.'::PERSISTENT_REQUIRE')) {
+            return $required ? TransportSharing::PERSISTENT_REQUIRE : TransportSharing::PERSISTENT_PREFER;
+        }
+
+        if ($required) {
+            throw new RuntimeException('Persistent HTTP transport sharing is set to "Required", but persistent cURL share handles require guzzlehttp/guzzle ^8.0.');
+        }
+
+        // Guzzle 7.11: handler-lifetime sharing only, best-effort.
+        if (class_exists(TransportSharing::class)) {
+            return TransportSharing::HANDLER_PREFER;
+        }
+
+        return null;
     }
 
     /**
@@ -2043,14 +2114,35 @@ class PendingRequest
     }
 
     /**
-     * Handle the given connection exception.
+     * Get the PSR-7 response carried by the given exception, if any.
      *
-     * @param  \GuzzleHttp\Exception\ConnectException  $e
+     * @param  \Throwable  $e
+     * @return \Psr\Http\Message\ResponseInterface|null
+     */
+    protected function responseFromException(Throwable $e)
+    {
+        // Guzzle 8 uses ResponseException
+        if ($e instanceof ResponseException) {
+            return $e->getResponse();
+        }
+
+        // Guzzle 7 uses RequestException with hasResponse() true
+        if ($e instanceof RequestException && is_callable([$e, 'hasResponse']) && $e->hasResponse()) {
+            return $e->getResponse();
+        }
+
+        return null;
+    }
+
+    /**
+     * Handle the given transport exception.
+     *
+     * @param  \GuzzleHttp\Exception\TransferException  $e
      * @return void
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
-    protected function marshalConnectionException(ConnectException $e)
+    protected function marshalTransportException(TransferException $e)
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
 
@@ -2066,40 +2158,18 @@ class PendingRequest
     }
 
     /**
-     * Handle the given request exception.
+     * Handle the given transport exception that carried a response.
      *
-     * @param  \GuzzleHttp\Exception\RequestException  $e
-     * @return void
-     *
-     * @throws \Illuminate\Http\Client\ConnectionException
-     */
-    protected function marshalRequestExceptionWithoutResponse(RequestException $e)
-    {
-        $exception = new ConnectionException($e->getMessage(), 0, $e);
-
-        $request = (new Request($e->getRequest()))->setRequestAttributes($this->attributes);
-
-        $this->factory?->recordRequestResponsePair(
-            $request, null
-        );
-
-        $this->dispatchConnectionFailedEvent($request, $exception);
-
-        throw $exception;
-    }
-
-    /**
-     * Handle the given request exception.
-     *
-     * @param  \GuzzleHttp\Exception\RequestException  $e
+     * @param  \GuzzleHttp\Exception\TransferException  $e
+     * @param  \Psr\Http\Message\ResponseInterface  $response
      * @return void
      *
      * @throws \Illuminate\Http\Client\RequestException
      * @throws \Illuminate\Http\Client\ConnectionException
      */
-    protected function marshalRequestExceptionWithResponse(RequestException $e)
+    protected function marshalTransportExceptionWithResponse(TransferException $e, ResponseInterface $response)
     {
-        $response = $this->populateResponse($this->newResponse($e->getResponse()));
+        $response = $this->populateResponse($this->newResponse($response));
 
         $this->factory?->recordRequestResponsePair(
             (new Request($e->getRequest()))->setRequestAttributes($this->attributes),
@@ -2131,6 +2201,19 @@ class PendingRequest
     public function setHandler($handler)
     {
         $this->handler = $handler;
+
+        return $this;
+    }
+
+    /**
+     * Set the persistent transport (connection sharing) mode for the request.
+     *
+     * @param  \Illuminate\Http\Client\PersistentTransport  $mode
+     * @return $this
+     */
+    public function persistentTransport(PersistentTransport $mode)
+    {
+        $this->persistentTransport = $mode;
 
         return $this;
     }
