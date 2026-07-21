@@ -1,6 +1,8 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.20.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.21.1...13.x)
+
+## [v13.21.1](https://github.com/laravel/framework/compare/v13.20.0...v13.21.1) - 2026-07-21
 
 ## [v13.20.0](https://github.com/laravel/framework/compare/v13.19.0...v13.20.0) - 2026-07-14
 
