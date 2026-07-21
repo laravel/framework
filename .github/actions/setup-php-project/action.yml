@@ -1,0 +1,61 @@
+name: Setup PHP project
+description: Install PHP, pin the framework dev version, and install Composer dependencies with retry. Requires the repository to already be checked out.
+
+inputs:
+  php-version:
+    description: PHP version to install
+    default: '8.3'
+  extensions:
+    description: PHP extensions to install
+    required: false
+    default: ''
+  ini-values:
+    description: php.ini values to set
+    required: false
+    default: ''
+  tools:
+    description: Tools to install alongside PHP
+    default: 'composer:v2'
+  coverage:
+    description: Coverage driver to enable
+    default: 'none'
+  redis-configure-opts:
+    description: REDIS_CONFIGURE_OPTS passed to the PHP redis extension build
+    required: false
+    default: ''
+  redis-libs:
+    description: REDIS_LIBS passed to the PHP redis extension build
+    required: false
+    default: ''
+  framework-version:
+    description: Version string to set in composer.json
+    default: '13.x-dev'
+  composer-command:
+    description: Composer command used to install dependencies
+    default: 'composer update --prefer-stable --prefer-dist --no-interaction --no-progress'
+
+runs:
+  using: composite
+  steps:
+    - name: Setup PHP
+      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      with:
+        php-version: ${{ inputs.php-version }}
+        extensions: ${{ inputs.extensions }}
+        ini-values: ${{ inputs.ini-values }}
+        tools: ${{ inputs.tools }}
+        coverage: ${{ inputs.coverage }}
+      env:
+        REDIS_CONFIGURE_OPTS: ${{ inputs.redis-configure-opts }}
+        REDIS_LIBS: ${{ inputs.redis-libs }}
+
+    - name: Set Framework version
+      shell: bash
+      run: composer config version "${{ inputs.framework-version }}"
+
+    - name: Install dependencies
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
+      with:
+        timeout_minutes: 5
+        max_attempts: 5
+        command: ${{ inputs.composer-command }}
