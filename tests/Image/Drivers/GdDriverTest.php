@@ -372,8 +372,7 @@ class GdDriverTest extends TestCase
     public function test_processes_custom_transformation()
     {
         $driver = new GdDriver;
-        $transformation = new class implements Transformation
-        {
+        $transformation = new class implements Transformation {
             //
         };
         $received = null;
