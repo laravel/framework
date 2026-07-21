@@ -69,6 +69,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Date / Carbon Overflow Behavior
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify whether date and time overflow is allowed when
+    | adding or subtracting months / years using Carbon. This option is
+    | enabled by default, matching Carbon's own default behavior.
+    |
+    */
+
+    'datetime_overflow' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |

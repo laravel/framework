@@ -7,6 +7,7 @@ use Illuminate\Config\Repository;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 
@@ -63,6 +64,10 @@ class LoadConfiguration
         $app->resolveEnvironmentUsing($app->environment(...));
 
         date_default_timezone_set($config->get('app.timezone', 'UTC'));
+
+        $overflow = (bool) $config->get('app.datetime_overflow', true);
+        Date::useMonthsOverflow($overflow);
+        Date::useYearsOverflow($overflow);
 
         mb_internal_encoding('UTF-8');
     }
