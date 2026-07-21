@@ -121,6 +121,26 @@ class ImageTest extends TestCase
         $this->assertNotSame($contents, $result);
     }
 
+    public function test_brightness_and_to_bytes()
+    {
+        $contents = $this->fakeImageContents(100, 100);
+        $image = new Image($contents);
+
+        $result = $image->brightness(50)->toBytes();
+
+        $this->assertNotSame($contents, $result);
+    }
+
+    public function test_brightness_does_not_change_dimensions()
+    {
+        $image = new Image($this->fakeImageContents(200, 150));
+
+        $result = $image->brightness(30);
+
+        $this->assertSame(200, $result->width());
+        $this->assertSame(150, $result->height());
+    }
+
     public function test_immutability_with_variants()
     {
         $image = new Image($this->fakeImageContents(400, 400));

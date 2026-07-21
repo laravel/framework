@@ -8,6 +8,7 @@ use Illuminate\Image\ImageException;
 use Illuminate\Image\ImageOutputOptions;
 use Illuminate\Image\ImagePipeline;
 use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Brightness;
 use Illuminate\Image\Transformations\Contain;
 use Illuminate\Image\Transformations\Cover;
 use Illuminate\Image\Transformations\Crop;
@@ -100,6 +101,7 @@ abstract class InterventionDriver implements Driver
                 $transformation instanceof Rotate => $image->rotate($transformation->angle, $transformation->background),
                 $transformation instanceof Scale => $image->scaleDown($transformation->width, $transformation->height),
                 $transformation instanceof Blur => $image->blur($transformation->amount),
+                $transformation instanceof Brightness => $image->brightness($transformation->amount),
                 $transformation instanceof Grayscale => $image->grayscale(),
                 $transformation instanceof Sharpen => $image->sharpen($transformation->amount),
                 $transformation instanceof FlipVertically => $image->flip(Direction::VERTICAL),

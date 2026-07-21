@@ -8,6 +8,7 @@ use Illuminate\Image\ImageException;
 use Illuminate\Image\ImageOutputOptions;
 use Illuminate\Image\ImagePipeline;
 use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Brightness;
 use Illuminate\Image\Transformations\Contain;
 use Illuminate\Image\Transformations\Cover;
 use Illuminate\Image\Transformations\Crop;
@@ -456,6 +457,41 @@ class ImageTest extends TestCase
         $this->assertSame(10, $this->getOptions($image->sharpen())->sharpen);
     }
 
+    public function test_brightness_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->brightness());
+    }
+
+    public function test_brightness_sets_option()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame(20, $this->getOptions($image->brightness(20))->brightness);
+    }
+
+    public function test_brightness_has_default()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame(10, $this->getOptions($image->brightness())->brightness);
+    }
+
+    public function test_brightness_clamps_low_value()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame(-100, $this->getOptions($image->brightness(-200))->brightness);
+    }
+
+    public function test_brightness_clamps_high_value()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame(100, $this->getOptions($image->brightness(200))->brightness);
+    }
+
     public function test_flip_vertically_returns_new_instance()
     {
         $image = $this->makeImage();
@@ -745,6 +781,14 @@ class ImageTest extends TestCase
     {
         $pipeline = new ImagePipeline;
         $pipeline->add(new Sharpen(0));
+
+        $this->assertTrue($pipeline->hasChanges());
+    }
+
+    public function test_image_pipeline_has_changes_with_zero_brightness()
+    {
+        $pipeline = new ImagePipeline;
+        $pipeline->add(new Brightness(0));
 
         $this->assertTrue($pipeline->hasChanges());
     }
@@ -1049,6 +1093,7 @@ class ImageTest extends TestCase
             'scaleHeight' => null,
             'orient' => null,
             'blur' => null,
+            'brightness' => null,
             'grayscale' => null,
             'sharpen' => null,
             'flipVertically' => null,
@@ -1067,6 +1112,7 @@ class ImageTest extends TestCase
                 $transformation instanceof Scale => [$options->scaleWidth, $options->scaleHeight] = [$transformation->width, $transformation->height],
                 $transformation instanceof Orient => $options->orient = true,
                 $transformation instanceof Blur => $options->blur = $transformation->amount,
+                $transformation instanceof Brightness => $options->brightness = $transformation->amount,
                 $transformation instanceof Grayscale => $options->grayscale = true,
                 $transformation instanceof Sharpen => $options->sharpen = $transformation->amount,
                 $transformation instanceof FlipVertically => $options->flipVertically = true,

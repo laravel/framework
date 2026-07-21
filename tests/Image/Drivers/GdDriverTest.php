@@ -8,6 +8,7 @@ use Illuminate\Image\Drivers\GdDriver;
 use Illuminate\Image\ImageException;
 use Illuminate\Image\ImagePipeline;
 use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Brightness;
 use Illuminate\Image\Transformations\Contain;
 use Illuminate\Image\Transformations\Cover;
 use Illuminate\Image\Transformations\Crop;
@@ -305,6 +306,19 @@ class GdDriverTest extends TestCase
         $this->assertNotSame($contents, $result);
     }
 
+    public function test_processes_brightness()
+    {
+        $driver = new GdDriver;
+        $contents = $this->fakeImageContents(100, 100);
+
+        $pipeline = $this->pipeline(new Brightness(10));
+
+        $result = $driver->process($contents, $pipeline);
+
+        $this->assertNotEmpty($result);
+        $this->assertNotSame($contents, $result);
+    }
+
     public function test_processes_grayscale()
     {
         $driver = new GdDriver;
@@ -358,7 +372,8 @@ class GdDriverTest extends TestCase
     public function test_processes_custom_transformation()
     {
         $driver = new GdDriver;
-        $transformation = new class implements Transformation {
+        $transformation = new class implements Transformation
+        {
             //
         };
         $received = null;

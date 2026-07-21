@@ -10,6 +10,7 @@ use Illuminate\Contracts\Image\Driver;
 use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Brightness;
 use Illuminate\Image\Transformations\Contain;
 use Illuminate\Image\Transformations\Cover;
 use Illuminate\Image\Transformations\Crop;
@@ -144,6 +145,16 @@ class Image implements Stringable
     public function orient(): static
     {
         return $this->transform(new Orient);
+    }
+
+    /**
+     * Adjust the image brightness.
+     *
+     * @param  int<-100, 100>  $amount
+     */
+    public function brightness(int $amount = 10): static
+    {
+        return $this->transform(new Brightness(max(-100, min(100, $amount))));
     }
 
     /**
