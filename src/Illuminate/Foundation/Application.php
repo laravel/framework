@@ -209,6 +209,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $absoluteCachePathPrefixes = ['/', '\\'];
 
     /**
+     * The application builder class.
+     *
+     * @var class-string<Configuration\ApplicationBuilder>
+     */
+    protected static string $applicationBuilder = Configuration\ApplicationBuilder::class;
+
+    /**
      * Create a new Illuminate application instance.
      *
      * @param  string|null  $basePath
@@ -238,7 +245,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             default => static::inferBasePath(),
         };
 
-        return (new Configuration\ApplicationBuilder(new static($basePath)))
+        return (new static::$applicationBuilder(new static($basePath)))
             ->withKernels()
             ->withEvents()
             ->withCommands()
