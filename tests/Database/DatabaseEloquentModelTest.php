@@ -2788,6 +2788,50 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame(['price' => 150.0], $model->getChanges());
     }
 
+    public function testUpdateDiscardsCastCacheForGeneratedColumns()
+    {
+        $model = $this->getMockBuilder(EloquentModelWithGeneratedCastStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps'])->getMock();
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('where')->once()->with('id', '=', 1);
+        $query->shouldReceive('update')->once()->with(['price' => 150.0])->andReturn(1);
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->once())->method('updateTimestamps');
+
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+
+        $model->setRawAttributes(['id' => 1, 'price' => 100.0, 'meta' => '{"total":200}'], true);
+        $model->exists = true;
+        $model->meta['hacked'] = true;
+        $model->price = 150.0;
+
+        $this->assertTrue($model->save());
+        $this->assertSame(['price' => 150.0], $model->getChanges());
+        $this->assertSame(['total' => 200], $model->meta->toArray());
+    }
+
+    public function testIncrementExcludesGeneratedColumns()
+    {
+        $model = m::mock(EloquentModelWithGeneratedStub::class.'[newQueryWithoutScopes]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->quantity = 2;
+        $model->total_price = 999.0;
+
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->andReturn($query);
+        $query->shouldReceive('increment')->once()->with('quantity', 1, ['price' => 150.0]);
+
+        $model->publicIncrement('quantity', 1, ['price' => 150.0, 'total_price' => 300.0]);
+
+        $this->assertArrayNotHasKey('total_price', $model->getAttributes());
+        $this->assertSame(['quantity' => 3, 'price' => 150.0], $model->getChanges());
+    }
+
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
@@ -4262,6 +4306,12 @@ class EloquentModelCamelStub extends EloquentModelStub
 class EloquentModelWithGeneratedStub extends EloquentModelStub
 {
     protected $generated = ['total_price'];
+}
+
+class EloquentModelWithGeneratedCastStub extends EloquentModelStub
+{
+    protected $casts = ['meta' => AsArrayObject::class];
+    protected $generated = ['meta'];
 }
 
 class EloquentDateModelStub extends EloquentModelStub

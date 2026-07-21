@@ -2628,6 +2628,27 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->schema()->drop('test_order_items');
     }
 
+    public function testFillAndInsertDoesNotReinjectGeneratedTimestamps()
+    {
+        $this->schema()->create('test_order_item_timestamps', function (Blueprint $table) {
+            $table->increments('id');
+            $table->float('price')->nullable();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
+        });
+
+        $this->assertTrue(EloquentTestOrderItemWithGeneratedTimestamp::fillAndInsert([
+            ['price' => 100.0],
+        ]));
+
+        $item = EloquentTestOrderItemWithGeneratedTimestamp::first();
+
+        $this->assertNotNull($item->created_at);
+        $this->assertNull($item->updated_at);
+
+        $this->schema()->drop('test_order_item_timestamps');
+    }
+
     public function testCanFillAndInsertWithUniqueStringIds()
     {
         Str::createUuidsUsingSequence([
@@ -2757,6 +2778,13 @@ class EloquentTestOrderItemWithGenerated extends Eloquent
     protected $generated = ['total_price'];
     protected $guarded = [];
     protected $table = 'test_order_items';
+}
+
+class EloquentTestOrderItemWithGeneratedTimestamp extends Eloquent
+{
+    protected $generated = ['updated_at'];
+    protected $guarded = [];
+    protected $table = 'test_order_item_timestamps';
 }
 
 class EloquentTestUser extends Eloquent

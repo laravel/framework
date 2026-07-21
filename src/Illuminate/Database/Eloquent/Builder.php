@@ -532,16 +532,20 @@ class Builder implements BuilderContract
 
         $this->model::unguarded(function () use (&$values) {
             foreach ($values as $key => $rowValues) {
-                $model = tap(
-                    $this->newModelInstance($rowValues),
-                    fn ($model) => $model->setUniqueIds()
-                );
+                $model = $this->newModelInstance($rowValues);
 
-                $values[$key] = Arr::except($model->getAttributes(), $model->getGenerated());
+                $model->setUniqueIds();
+
+                $values[$key] = $model->getAttributes();
             }
         });
 
-        return $this->addTimestampsToUpsertValues($values);
+        $generated = $this->model->getGenerated();
+
+        return array_map(
+            fn ($rowValues) => Arr::except($rowValues, $generated),
+            $this->addTimestampsToUpsertValues($values)
+        );
     }
 
     /**

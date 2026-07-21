@@ -2571,6 +2571,8 @@ trait HasAttributes
     protected function discardGeneratedAttributes()
     {
         foreach ($this->getGenerated() as $key) {
+            unset($this->attributeCastCache[$key], $this->classCastCache[$key]);
+
             if (! array_key_exists($key, $this->attributes)) {
                 continue;
             }

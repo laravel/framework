@@ -1113,9 +1113,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function incrementOrDecrement($column, $amount, $extra, $method)
     {
+        $extra = Arr::except($extra, $this->getGenerated());
+
         if (! $this->exists) {
             return $this->newQueryWithoutRelationships()->{$method}($column, $amount, $extra);
         }
+
+        $this->discardGeneratedAttributes();
 
         $this->{$column} = $this->isClassDeviable($column)
             ? $this->deviateClassCastableAttribute($method, $column, $amount)
@@ -1282,9 +1286,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function incrementOrDecrementEach(array $columns, array $extra, string $method)
     {
+        $extra = Arr::except($extra, $this->getGenerated());
+
         if (! $this->exists) {
             return $this->newQueryWithoutRelationships()->{$method}($columns, $extra);
         }
+
+        $this->discardGeneratedAttributes();
 
         $isIncrement = $method === 'incrementEach';
         $singleMethod = $isIncrement ? 'increment' : 'decrement';
