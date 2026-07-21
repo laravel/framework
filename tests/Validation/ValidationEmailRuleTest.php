@@ -17,8 +17,8 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationEmailRuleTest extends TestCase
 {
-    private const string ATTRIBUTE = 'my_email';
-    private const string ATTRIBUTE_REPLACED = 'my email';
+    private const ATTRIBUTE = 'my_email';
+    private const ATTRIBUTE_REPLACED = 'my email';
 
     public function testBasic()
     {

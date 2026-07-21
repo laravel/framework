@@ -27,6 +27,7 @@ use Rector\Php80\Rector\Ternary\GetDebugTypeRector;
 use Rector\Php81\Rector\Array_\ArrayToFirstClassCallableRector;
 use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
+use Rector\Php83\Rector\ClassConst\AddTypeToConstRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\Php83\Rector\FuncCall\DynamicClassConstFetchRector;
 use Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector;
@@ -71,6 +72,7 @@ return RectorConfig::configure()
     ->withSkip([
         ...$skipPHPUnitSetList,
         AddOverrideAttributeToOverriddenMethodsRector::class,
+        AddTypeToConstRector::class,
         ArrayToFirstClassCallableRector::class,
         ArrowFunctionDelegatingCallToFirstClassCallableRector::class,
         BinaryOpBetweenNumberAndStringRector::class,
