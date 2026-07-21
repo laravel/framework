@@ -19,6 +19,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use JsonSerializable;
 use WeakMap;
 
@@ -112,7 +113,7 @@ trait ResolvesJsonApiElements
         }
 
         if (static::class !== JsonApiResource::class) {
-            return Str::of(static::class)->classBasename()->basename('Resource')->snake()->pluralStudly();
+            return (new Stringable(static::class))->classBasename()->basename('Resource')->snake()->pluralStudly();
         }
 
         if (! $this->resource instanceof Model) {
@@ -123,9 +124,9 @@ trait ResolvesJsonApiElements
 
         $morphMap = Relation::getMorphAlias($modelClassName);
 
-        return Str::of(
+        return (new Stringable(
             $morphMap !== $modelClassName ? $morphMap : class_basename($modelClassName)
-        )->snake()->pluralStudly();
+        ))->snake()->pluralStudly();
     }
 
     /**

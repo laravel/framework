@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Number;
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use stdClass;
 
 use function Illuminate\Support\enum_value;
@@ -261,7 +261,7 @@ trait InteractsWithData
      */
     public function string($key, $default = null)
     {
-        return Str::of($this->data($key, $default));
+        return new Stringable($this->data($key, $default));
     }
 
     /**
