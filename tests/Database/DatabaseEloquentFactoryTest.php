@@ -951,6 +951,25 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(3, FactoryTestPost::count());
     }
 
+    public function test_recycle_accepts_mixed_collection_and_models()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $users = FactoryTestUserFactory::new()->count(3)->create();
+        $posts = FactoryTestPostFactory::new()->count(2)->create();
+
+        $comments = FactoryTestCommentFactory::new()
+            ->count(10)
+            ->recycle($users, $posts)
+            ->create();
+
+        $this->assertTrue(
+            $comments->every(fn ($comment) => $posts->contains('id', $comment->commentable_id))
+        );
+    }
+
     public function test_no_models_can_be_provided_to_recycle()
     {
         Factory::guessFactoryNamesUsing(function ($model) {

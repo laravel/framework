@@ -775,8 +775,7 @@ abstract class Factory
             'recycle' => $this->recycle
                 ->flatten()
                 ->merge(
-                    Collection::wrap($model instanceof Model ? func_get_args() : $model)
-                        ->flatten()
+                    Collection::wrap(func_get_args())->flatten()
                 )->groupBy(fn ($model) => get_class($model)),
         ]);
     }
