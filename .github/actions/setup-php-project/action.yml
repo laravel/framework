@@ -1,5 +1,5 @@
 name: Setup PHP project
-description: Install PHP, pin the framework dev version, and install Composer dependencies with retry. Requires the repository to already be checked out.
+description: Set up PHP, configure the framework development version, and install Composer dependencies with retries. The repository must already be checked out.
 
 inputs:
   php-version:
@@ -49,7 +49,7 @@ runs:
         REDIS_CONFIGURE_OPTS: ${{ inputs.redis-configure-opts }}
         REDIS_LIBS: ${{ inputs.redis-libs }}
 
-    - name: Set Framework version
+    - name: Set framework version
       shell: bash
       run: composer config version "${{ inputs.framework-version }}"
 
