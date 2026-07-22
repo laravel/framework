@@ -2696,6 +2696,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
                     return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
                 }
+
+                foreach ($reflection->getTraits() as $trait) {
+                    $attributes = $trait->getAttributes($attributeClass);
+
+                    if (count($attributes) > 0) {
+                        $instance = $attributes[0]->newInstance();
+
+                        return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
+                    }
+                }
             } while ($reflection = $reflection->getParentClass());
         } catch (Exception) {
             //

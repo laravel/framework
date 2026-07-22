@@ -464,6 +464,20 @@ class DatabaseEloquentModelAttributesTest extends TestCase
 
         $this->assertEqualsCanonicalizing(['name', 'email', 'phone'], $model->getFillable());
     }
+
+    public function test_trait_with_attribute_applies_to_class(): void
+    {
+        $model = new ModelUsingWithoutIncrementingTraitWithAttribute;
+
+        $this->assertFalse($model->getIncrementing());
+    }
+
+    public function test_class_attribute_takes_precedence_over_trait(): void
+    {
+        $model = new ModelOverridingTraitConnectionAttribute;
+
+        $this->assertSame('primary', $model->getConnectionName());
+    }
 }
 
 enum ConnectionUnitEnum
@@ -795,4 +809,25 @@ class ModelWithVisibleAttributeAndTrait extends Model
 class ModelWithFillableAttributeAndTrait extends Model
 {
     use AddsPhoneFillable;
+}
+
+#[WithoutIncrementing]
+trait TraitUsingWithoutIncrementingAttribute
+{
+}
+
+class ModelUsingWithoutIncrementingTraitWithAttribute extends Model
+{
+    use TraitUsingWithoutIncrementingAttribute;
+}
+
+#[Connection('secondary')]
+trait TraitUsingConnectionAttribute
+{
+}
+
+#[Connection('primary')]
+class ModelOverridingTraitConnectionAttribute extends Model
+{
+    use TraitUsingConnectionAttribute;
 }
