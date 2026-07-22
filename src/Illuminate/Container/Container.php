@@ -1043,17 +1043,10 @@ class Container implements ArrayAccess, ContainerContract
                 continue;
             }
 
-            if ($name === Bind::class) {
-                // Bind attributes only apply when an environment resolver is set.
-                if ($this->environmentResolver === null) {
-                    continue;
-                }
-
+            if ($name === Bind::class && $this->environmentResolver !== null) {
                 $instance = $reflectedAttribute->newInstance();
 
                 if ($instance->environments === ['*']) {
-                    // Remember the first wildcard as a fallback, but keep looking for a
-                    // more specific match (either an environment or a later BindWhen).
                     $wildcard ??= $instance->concrete;
 
                     continue;
