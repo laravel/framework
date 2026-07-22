@@ -1887,11 +1887,7 @@ class Str
      */
     public static function lcfirst($string)
     {
-        if (function_exists('mb_lcfirst')) {
-            return mb_lcfirst($string, 'UTF-8');
-        }
-
-        return static::lower(static::substr($string, 0, 1)).static::substr($string, 1);
+        return mb_lcfirst($string, 'UTF-8');
     }
 
     /**
