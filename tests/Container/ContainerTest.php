@@ -11,6 +11,7 @@ use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Container\SelfBuilding;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -18,6 +19,16 @@ use TypeError;
 
 class ContainerTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Fixtures use static closures in PHP attributes, which only work in PHP 8.5+.
+        if (PHP_VERSION_ID >= 80500) {
+            require_once __DIR__.'/ContainerBindWhenFixtures.php';
+        }
+    }
+
     protected function tearDown(): void
     {
         Container::setInstance(null);
@@ -873,6 +884,59 @@ class ContainerTest extends TestCase
 
         $second = $container->make(MultiEnvInterface::class);
         $this->assertInstanceOf(DevConcrete::class, $second);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenBindsFirstConditionThatPasses(): void
+    {
+        $container = new Container;
+
+        $instance = $container->make(BindWhenInterface::class);
+
+        $this->assertInstanceOf(BindWhenTrueConcrete::class, $instance);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenSingletonAttribute(): void
+    {
+        $container = new Container;
+
+        $first = $container->make(BindWhenSingletonInterface::class);
+        $second = $container->make(BindWhenSingletonInterface::class);
+
+        $this->assertInstanceOf(BindWhenSingletonConcrete::class, $first);
+        $this->assertSame($first, $second);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenThrowsWhenNoConditionPasses(): void
+    {
+        $this->expectException(BindingResolutionException::class);
+
+        $container = new Container;
+        $container->make(BindWhenNoMatchInterface::class);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenTakesPrecedenceOverBind(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => true);
+
+        $instance = $container->make(BindWhenAndBindInterface::class);
+
+        $this->assertInstanceOf(BindWhenWinsConcrete::class, $instance);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenFallsThroughToBind(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => true);
+
+        $instance = $container->make(BindWhenFallbackInterface::class);
+
+        $this->assertInstanceOf(BindFallbackConcrete::class, $instance);
     }
 
     public function testNoMatchingEnvironmentAndNoWildcardThrowsBindingResolutionException(): void
