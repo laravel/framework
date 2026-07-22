@@ -25,7 +25,7 @@
     },
     "suggest": {
         "ext-hash": "Required to use the Ably and Pusher broadcast drivers.",
-        "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",
+        "ably/ably-php": "Required to use the Ably broadcast driver (^1.1.10).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0 || ^7.0)."
     },
     "minimum-stability": "dev",
