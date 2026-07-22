@@ -12,6 +12,7 @@ use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\QueueManager;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -573,7 +574,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                     : $data['job'],
                 attempts: 0,
                 payload: [],
-                createdAt: null,
+                createdAt: isset($data['createdAt']) ? Carbon::createFromTimestamp($data['createdAt']) : null,
             ));
     }
 
@@ -595,7 +596,10 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function creationTimeOfOldestPendingJob($queue = null)
     {
-        return null;
+        return (new Collection($this->jobs))
+            ->flatten(1)
+            ->whereStrict('queue', enum_value($queue))
+            ->min('createdAt');
     }
 
     /**
@@ -623,6 +627,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                 'job' => $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
                 'queue' => $queue,
                 'data' => $data,
+                'createdAt' => Carbon::now()->getTimestamp(),
             ];
 
             if ($job instanceof ShouldBeUnique) {
@@ -711,6 +716,7 @@ class QueueFake extends QueueManager implements Fake, Queue
             $this->delayed[is_object($job) ? get_class($job) : $job][] = [
                 'job' => $job,
                 'queue' => enum_value($queue),
+                'createdAt' => Carbon::now()->getTimestamp(),
             ];
         }
 
@@ -762,6 +768,7 @@ class QueueFake extends QueueManager implements Fake, Queue
         $this->reserved[is_object($job) ? get_class($job) : $job][] = [
             'job' => $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
             'queue' => $queue,
+            'createdAt' => Carbon::now()->getTimestamp(),
         ];
     }
 
