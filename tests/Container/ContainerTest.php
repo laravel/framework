@@ -876,7 +876,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(DevConcrete::class, $second);
     }
 
-    public function testBindWhenSkipsFalseConditionsAndBindsFirstTrueCondition(): void
+    public function testBindWhenBindsFirstConditionThatPasses(): void
     {
         $container = new Container;
 
@@ -896,12 +896,32 @@ class ContainerTest extends TestCase
         $this->assertSame($first, $second);
     }
 
-    public function testBindWhenWithNoPassingConditionThrowsBindingResolutionException(): void
+    public function testBindWhenThrowsWhenNoConditionPasses(): void
     {
         $this->expectException(BindingResolutionException::class);
 
         $container = new Container;
         $container->make(BindWhenNoMatchInterface::class);
+    }
+
+    public function testBindWhenTakesPrecedenceOverBind(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => true);
+
+        $instance = $container->make(BindWhenAndBindInterface::class);
+
+        $this->assertInstanceOf(BindWhenWinsConcrete::class, $instance);
+    }
+
+    public function testBindWhenFallsThroughToBind(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => true);
+
+        $instance = $container->make(BindWhenFallbackInterface::class);
+
+        $this->assertInstanceOf(BindFallbackConcrete::class, $instance);
     }
 
     public function testNoMatchingEnvironmentAndNoWildcardThrowsBindingResolutionException(): void
@@ -1261,6 +1281,38 @@ interface BindWhenNoMatchInterface
 }
 
 class BindWhenNoMatchConcrete implements BindWhenNoMatchInterface
+{
+}
+
+#[BindWhen(BindWhenWinsConcrete::class, static function () {
+    return true;
+})]
+#[Bind(BindLosesConcrete::class)]
+interface BindWhenAndBindInterface
+{
+}
+
+class BindWhenWinsConcrete implements BindWhenAndBindInterface
+{
+}
+
+class BindLosesConcrete implements BindWhenAndBindInterface
+{
+}
+
+#[BindWhen(BindWhenSkippedConcrete::class, static function () {
+    return false;
+})]
+#[Bind(BindFallbackConcrete::class)]
+interface BindWhenFallbackInterface
+{
+}
+
+class BindWhenSkippedConcrete implements BindWhenFallbackInterface
+{
+}
+
+class BindFallbackConcrete implements BindWhenFallbackInterface
 {
 }
 
