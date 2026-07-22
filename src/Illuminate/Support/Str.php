@@ -1887,7 +1887,7 @@ class Str
      */
     public static function lcfirst($string)
     {
-        return static::lower(static::substr($string, 0, 1)).static::substr($string, 1);
+        return mb_lcfirst($string, 'UTF-8');
     }
 
     /**
@@ -1898,7 +1898,7 @@ class Str
      */
     public static function ucfirst($string)
     {
-        return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
+        return mb_ucfirst($string, 'UTF-8');
     }
 
     /**
