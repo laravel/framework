@@ -14,13 +14,6 @@ use RuntimeException;
 
 class CacheFileStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     public function testNullIsReturnedIfFileDoesntExist()
     {
         $files = $this->mockFilesystem();
@@ -238,12 +231,11 @@ class CacheFileStoreTest extends TestCase
 
     public function testIncrementExpiredKeys()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $filePath = $this->getCachePath('foo');
         $files = $this->mockFilesystem();
-        $now = Carbon::now()->getTimestamp();
-        $initialValue = ($now - 10).serialize(77);
+        $initialValue = $now->subSeconds(10)->getTimestamp().serialize(77);
         $valueAfterIncrement = '9999999999'.serialize(3);
         $store = new FileStore($files, __DIR__);
 
@@ -316,10 +308,10 @@ class CacheFileStoreTest extends TestCase
 
     public function testIncrementDoesNotExtendCacheLife()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $files = $this->mockFilesystem();
-        $expiration = Carbon::now()->addSeconds(50)->getTimestamp();
+        $expiration = $now->addSeconds(50)->getTimestamp();
         $initialValue = $expiration.serialize(1);
         $valueAfterIncrement = $expiration.serialize(2);
         $store = new FileStore($files, __DIR__);

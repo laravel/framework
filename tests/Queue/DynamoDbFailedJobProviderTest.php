@@ -22,7 +22,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
             return $uuid;
         });
 
-        $now = CarbonImmutable::now();
+        Carbon::setTestNow($now = CarbonImmutable::now());
 
         $exception = new Exception('Something went wrong.');
 

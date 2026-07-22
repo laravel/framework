@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Mail;
 
 use InvalidArgumentException;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -173,6 +174,19 @@ class MailManagerTest extends TestCase
         $mailer2 = $manager->mailer(MailerName::ArrayMailer);
 
         $this->assertNotSame($mailer1, $mailer2);
+    }
+
+    #[WithConfig('mail.mailers.array', ['transport' => 'array'])]
+    #[WithConfig('mail.to', ['address' => 'taylor@laravel.com'])]
+    public function testGlobalToAddressWithoutName(): void
+    {
+        $mailer = $this->app['mail.manager']->mailer('array');
+
+        $sentMessage = $mailer->raw('Hello World', function ($message) {
+            $message->to('jack@laravel.com');
+        });
+
+        $this->assertStringContainsString('To: taylor@laravel.com', $sentMessage->toString());
     }
 
     public static function emptyTransportConfigDataProvider()

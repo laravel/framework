@@ -327,7 +327,7 @@ class ContainerTest extends TestCase
         $container = new Container;
         $instance = $container->make(ContainerClassWithDefaultValueStub::class);
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->noDefault);
-        $this->assertSame(null, $instance->default);
+        $this->assertNull($instance->default);
 
         $container->bind(ContainerConcreteStub::class, fn () => new ContainerConcreteStub);
         $instance = $container->make(ContainerClassWithDefaultValueStub::class);

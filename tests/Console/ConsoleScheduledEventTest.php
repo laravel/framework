@@ -27,7 +27,6 @@ class ConsoleScheduledEventTest extends TestCase
     protected function tearDown(): void
     {
         date_default_timezone_set($this->defaultTimezone);
-        Carbon::setTestNow();
 
         parent::tearDown();
     }
@@ -98,7 +97,7 @@ class ConsoleScheduledEventTest extends TestCase
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
 
-        Carbon::setTestNow(Carbon::now()->startOfDay()->addHours(9));
+        Carbon::setTestNow(Carbon::today()->addHours(9));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertTrue($event->between('8:00', '10:00')->filtersPass($app));
@@ -146,7 +145,7 @@ class ConsoleScheduledEventTest extends TestCase
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
 
-        Carbon::setTestNow(Carbon::now()->startOfDay()->addHours(9));
+        Carbon::setTestNow(Carbon::today()->addHours(9));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
         $this->assertFalse($event->unlessBetween('8:00', '10:00')->filtersPass($app));

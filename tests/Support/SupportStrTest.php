@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -796,6 +797,30 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo bar baz', Str::lower('fOo Bar bAz'));
     }
 
+    public function testTransReturnsStringable()
+    {
+        $originalContainer = Container::getInstance();
+
+        Container::setInstance($container = new Container);
+
+        $container->instance('translator', new class
+        {
+            public function get($key, array $replace = [], $locale = null)
+            {
+                return str_replace(':name', $replace['name'], $key).' '.$locale;
+            }
+        });
+
+        try {
+            $string = Str::trans('Hello :name', ['name' => 'Taylor'], 'en');
+        } finally {
+            Container::setInstance($originalContainer);
+        }
+
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $string);
+        $this->assertSame('hello taylor en', (string) $string->lower());
+    }
+
     public function testUpper()
     {
         $this->assertSame('FOO BAR BAZ', Str::upper('foo bar baz'));
@@ -1230,6 +1255,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('maria@email.co*', Str::mask('maria@email.com', '*', -1));
         $this->assertSame('***************', Str::mask('maria@email.com', '*', -15));
         $this->assertSame('***************', Str::mask('maria@email.com', '*', 0));
+
+        // the trailing portion of the string must respect a non-default encoding
+        $latin1 = mb_convert_encoding('José Pérez García', 'ISO-8859-1', 'UTF-8');
+        $expected = mb_convert_encoding('José ***** García', 'ISO-8859-1', 'UTF-8');
+        $this->assertSame($expected, Str::mask($latin1, '*', 5, 5, 'ISO-8859-1'));
+        $this->assertSame($expected, Str::mask($latin1, '*', -12, 5, 'ISO-8859-1'));
     }
 
     public function testMatch(): void
@@ -1470,6 +1501,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('Hel<br />lo<br />Wor<br />ld', Str::wordWrap('Hello World', 3, '<br />', true));
 
         $this->assertSame('❤Multi<br />Byte☆❤☆❤☆❤', Str::wordWrap('❤Multi Byte☆❤☆❤☆❤', 3, '<br />'));
+
+        $this->assertSame('žltý kôň', Str::wordWrap('žltý kôň', 8, "\n"));
+        $this->assertSame("žltý\nkôň", Str::wordWrap('žltý kôň', 4, "\n", true));
+        $this->assertSame("žl\ntý", Str::wordWrap('žltý', 2, "\n", true));
+        $this->assertSame("😀😀\n😀😀", Str::wordWrap('😀😀😀😀', 2, "\n", true));
+        $this->assertSame("éA\x1ABé", Str::wordWrap('é é', 1, "A\x1AB"));
+        $this->assertSame('❤Mu<br />lti<br />Byt<br />e☆❤<br />☆❤☆<br />❤', Str::wordWrap('❤Multi Byte☆❤☆❤☆❤', 3, '<br />', true));
     }
 
     public static function validUuidList()
@@ -1586,6 +1624,7 @@ class SupportStrTest extends TestCase
             ['Taylor Otwell', ['taylor'], true, true],
             ['Taylor Otwell', ['taylor', 'xxx'], false, false],
             ['Taylor Otwell', ['taylor', 'xxx'], false, true],
+            ['Taylor Otwell', [], false, false],
         ];
     }
 
@@ -1730,16 +1769,16 @@ class SupportStrTest extends TestCase
         $this->assertSame((string) $first, (string) $retrieved);
 
         $retrieved = Str::uuid();
-        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
-        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+        $this->assertNotContains($retrieved, [$zeroth, $first, $third]);
+        $this->assertNotContains((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third]);
 
         $retrieved = Str::uuid();
         $this->assertSame($third, $retrieved);
         $this->assertSame((string) $third, (string) $retrieved);
 
         $retrieved = Str::uuid();
-        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
-        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+        $this->assertNotContains($retrieved, [$zeroth, $first, $third]);
+        $this->assertNotContains((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third]);
 
         Str::createUuidsNormally();
     }
@@ -1832,16 +1871,16 @@ class SupportStrTest extends TestCase
         $this->assertSame((string) $first, (string) $retrieved);
 
         $retrieved = Str::ulid();
-        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
-        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+        $this->assertNotContains($retrieved, [$zeroth, $first, $third]);
+        $this->assertNotContains((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third]);
 
         $retrieved = Str::ulid();
         $this->assertSame($third, $retrieved);
         $this->assertSame((string) $third, (string) $retrieved);
 
         $retrieved = Str::ulid();
-        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
-        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+        $this->assertNotContains($retrieved, [$zeroth, $first, $third]);
+        $this->assertNotContains((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third]);
 
         Str::createUlidsNormally();
     }
@@ -1990,6 +2029,18 @@ class SupportStrTest extends TestCase
         }, 'foo baz baz bar', 1);
 
         $this->assertSame('foo baZ baz bar', $result);
+    }
+
+    public function testCounted(): void
+    {
+        $this->assertSame('1 order', Str::counted('order', 1));
+        $this->assertSame('2 orders', Str::counted('order', 2));
+        $this->assertSame('0 orders', Str::counted('order', 0));
+        $this->assertSame('1 child', Str::counted('child', 1));
+        $this->assertSame('3 children', Str::counted('child', 3));
+        $this->assertSame('1,000 orders', Str::counted('order', 1000));
+        $this->assertSame('1 order', Str::counted('order', ['a']));
+        $this->assertSame('2 orders', Str::counted('order', ['a', 'b']));
     }
 
     public function testPlural(): void

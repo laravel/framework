@@ -163,6 +163,24 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a valid Base64 string.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateBase64($attribute, $value): bool
+    {
+        if (! is_string($value) || $value === '') {
+            return false;
+        }
+
+        $decoded = base64_decode($value, true);
+
+        return $decoded !== false && base64_encode($decoded) === $value;
+    }
+
+    /**
      * "Break" on first validation fail.
      *
      * Always returns true, just lets us put "bail" in rules.
@@ -453,13 +471,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        foreach ($parameters as $param) {
-            if (! Arr::exists($value, $param)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($parameters, fn ($param) => Arr::exists($value, $param));
     }
 
     /**
@@ -529,13 +541,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        foreach ($parameters as $parameter) {
-            if (! in_array($parameter, $value)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($parameters, fn ($parameter) => in_array($parameter, $value));
     }
 
     /**
@@ -552,13 +558,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        foreach ($parameters as $parameter) {
-            if (in_array($parameter, $value)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($parameters, fn ($parameter) => ! in_array($parameter, $value));
     }
 
     /**
@@ -1574,13 +1574,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        foreach ($parameters as $param) {
-            if (Arr::exists($value, $param)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($parameters, fn ($param) => Arr::exists($value, $param));
     }
 
     /**
@@ -2570,13 +2564,7 @@ trait ValidatesAttributes
      */
     protected function anyFailingRequired(array $attributes)
     {
-        foreach ($attributes as $key) {
-            if (! $this->validateRequired($key, $this->getValue($key))) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($attributes, fn ($key) => ! $this->validateRequired($key, $this->getValue($key)));
     }
 
     /**
@@ -2587,13 +2575,7 @@ trait ValidatesAttributes
      */
     protected function allFailingRequired(array $attributes)
     {
-        foreach ($attributes as $key) {
-            if ($this->validateRequired($key, $this->getValue($key))) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($attributes, fn ($key) => ! $this->validateRequired($key, $this->getValue($key)));
     }
 
     /**

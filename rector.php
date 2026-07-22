@@ -12,11 +12,11 @@ use Rector\CodingStyle\Rector\FuncCall\CountArrayToEmptyArrayComparisonRector;
 use Rector\CodingStyle\Rector\FuncCall\FunctionFirstClassCallableRector;
 use Rector\Config\RectorConfig;
 use Rector\Php55\Rector\Class_\ClassConstantToSelfClassRector;
+use Rector\Php55\Rector\ClassConstFetch\StaticToSelfOnFinalClassRector;
 use Rector\Php55\Rector\String_\StringClassNameToClassConstantRector;
 use Rector\Php56\Rector\FuncCall\PowToExpRector;
 use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
 use Rector\Php70\Rector\MethodCall\ThisCallOnStaticMethodToStaticCallRector;
-use Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector;
 use Rector\Php70\Rector\Ternary\TernaryToNullCoalescingRector;
 use Rector\Php71\Rector\BinaryOp\BinaryOpBetweenNumberAndStringRector;
 use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
@@ -34,53 +34,48 @@ use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\Php83\Rector\ClassConst\AddTypeToConstRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\Php83\Rector\FuncCall\DynamicClassConstFetchRector;
-use Rector\PHPUnit\CodeQuality\Rector\CallLike\DirectInstanceOverMockArgRector;
-use Rector\PHPUnit\CodeQuality\Rector\Class_\ConstructClassMethodToSetUpTestCaseRector;
-use Rector\PHPUnit\CodeQuality\Rector\Class_\InlineStubPropertyToCreateStubMethodCallRector;
+use Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRector;
-use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector;
-use Rector\PHPUnit\CodeQuality\Rector\Class_\RemoveNeverUsedMockPropertyRector;
-use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\EntityDocumentCreateMockToDirectNewRector;
-use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\RemoveEmptyTestMethodRector;
-use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\RemoveStandaloneCreateMockRector;
-use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\ReplaceTestAnnotationWithPrefixedFunctionRector;
-use Rector\PHPUnit\CodeQuality\Rector\Foreach_\SimplifyForeachInstanceOfRector;
-use Rector\PHPUnit\CodeQuality\Rector\FuncCall\AssertFuncCallToPHPUnitAssertRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\MergeWithCallableAndWillReturnRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\NarrowIdenticalWithConsecutiveRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\NarrowSingleWillReturnCallbackRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\RemoveExpectAnyFromMockRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\SimplerWithIsInstanceOfRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\SingleWithConsecutiveToWithRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\UseSpecificWillMethodRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\UseSpecificWithMethodRector;
-use Rector\PHPUnit\PHPUnit60\Rector\MethodCall\GetMockBuilderGetMockToCreateMockRector;
-use Rector\PHPUnit\PHPUnit90\Rector\MethodCall\ReplaceAtMethodWithDesiredMatcherRector;
+use Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector;
+use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AddInstanceofAssertForNullableArgumentRector;
+use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AddInstanceofAssertForNullableInstanceRector;
+use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\DataProviderArrayItemsNewLinedRector;
+use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\NoSetupWithParentCallOverrideRector;
+use Rector\PHPUnit\CodeQuality\Rector\Expression\AssertArrayCastedObjectToAssertSameRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertCompareOnCountableWithMethodToAssertCountRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertComparisonToSpecificMethodRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEmptyNullableObjectToAssertInstanceofRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertIssetToSpecificMethodRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\ScalarArgumentToExpectedParamTypeRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\StringCastAssertStringContainsStringRector;
+use Rector\PHPUnit\CodeQuality\Rector\StmtsAwareInterface\DeclareStrictTypesTestsRector;
+use Rector\PHPUnit\PHPUnit120\Rector\CallLike\CreateStubOverCreateMockArgRector;
+use Rector\PHPUnit\Set\PHPUnitSetList;
+use Rector\Privatization\Rector\Class_\FinalizeTestCaseClassRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnNeverTypeRector;
 
-$testsuiteRules = [
-    AssertFuncCallToPHPUnitAssertRector::class,
-    ConstructClassMethodToSetUpTestCaseRector::class,
-    DirectInstanceOverMockArgRector::class,
-    EntityDocumentCreateMockToDirectNewRector::class,
-    GetMockBuilderGetMockToCreateMockRector::class,
-    InlineStubPropertyToCreateStubMethodCallRector::class,
-    MergeWithCallableAndWillReturnRector::class,
-    NarrowIdenticalWithConsecutiveRector::class,
-    NarrowSingleWillReturnCallbackRector::class,
+$skipPHPUnitSetList = [
+    AddInstanceofAssertForNullableArgumentRector::class,
+    AddInstanceofAssertForNullableInstanceRector::class,
+    AssertArrayCastedObjectToAssertSameRector::class,
+    AssertCompareOnCountableWithMethodToAssertCountRector::class,
+    AssertComparisonToSpecificMethodRector::class,
+    AssertEmptyNullableObjectToAssertInstanceofRector::class,
+    AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector::class,
+    AssertEqualsToSameRector::class,
+    AssertIssetToSpecificMethodRector::class,
+    CreateStubOverCreateMockArgRector::class,
+    DataProviderArrayItemsNewLinedRector::class,
+    DeclareStrictTypesTestsRector::class,
+    FinalizeTestCaseClassRector::class,
     NarrowUnusedSetUpDefinedPropertyRector::class,
-    PreferPHPUnitThisCallRector::class,
-    RemoveEmptyTestMethodRector::class,
-    RemoveExpectAnyFromMockRector::class,
-    RemoveNeverUsedMockPropertyRector::class,
-    RemoveStandaloneCreateMockRector::class,
-    ReplaceAtMethodWithDesiredMatcherRector::class,
-    ReplaceTestAnnotationWithPrefixedFunctionRector::class,
-    SimplerWithIsInstanceOfRector::class,
-    SimplifyForeachInstanceOfRector::class,
-    SingleWithConsecutiveToWithRector::class,
-    UseSpecificWillMethodRector::class,
-    UseSpecificWithMethodRector::class,
+    NoSetupWithParentCallOverrideRector::class,
+    ScalarArgumentToExpectedParamTypeRector::class,
+    StaticToSelfOnFinalClassRector::class,
+    StringCastAssertStringContainsStringRector::class,
+    YieldDataProviderRector::class,
 ];
 
 return RectorConfig::configure()
@@ -92,6 +87,7 @@ return RectorConfig::configure()
         __DIR__.'/types',
     ])
     ->withSkip([
+        ...$skipPHPUnitSetList,
         AddOverrideAttributeToOverriddenMethodsRector::class,
         AddTypeToConstRector::class,
         ArrayToFirstClassCallableRector::class,
@@ -105,6 +101,7 @@ return RectorConfig::configure()
         ClosureDelegatingCallToFirstClassCallableRector::class,
         ClosureFromCallableToFirstClassCallableRector::class,
         ClosureToArrowFunctionRector::class,
+        DeprecatedAnnotationToDeprecatedAttributeRector::class,
         DynamicClassConstFetchRector::class,
         FunctionFirstClassCallableRector::class,
         GetDebugTypeRector::class,
@@ -115,7 +112,6 @@ return RectorConfig::configure()
         ReadOnlyPropertyRector::class,
         RemoveExtraParametersRector::class,
         ReturnNeverTypeRector::class,
-        StaticCallOnNonStaticToInstanceCallRector::class,
         StringClassNameToClassConstantRector::class,
         StringableForToStringRector::class,
         TernaryToNullCoalescingRector::class,
@@ -123,7 +119,6 @@ return RectorConfig::configure()
         'tests/Foundation/fixtures/bad-syntax-strategy.php',
     ])
     ->withRules([
-        ...$testsuiteRules,
         CompactToVariablesRector::class,
         CountArrayToEmptyArrayComparisonRector::class,
         SortCallLikeNamedArgsRector::class,
@@ -140,4 +135,10 @@ return RectorConfig::configure()
         instanceOf: false,
         earlyReturn: false,
     )
+    ->withSets([
+        PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
+        PHPUnitSetList::PHPUNIT_110,
+        PHPUnitSetList::PHPUNIT_CODE_QUALITY,
+        PHPUnitSetList::PHPUNIT_MOCK_TO_STUB,
+    ])
     ->withPhpSets(php83: true);

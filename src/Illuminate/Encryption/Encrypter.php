@@ -51,7 +51,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @throws \RuntimeException
      */
-    public function __construct($key, $cipher = 'aes-128-cbc')
+    public function __construct(#[\SensitiveParameter] $key, $cipher = 'aes-128-cbc')
     {
         $key = (string) $key;
 
@@ -72,7 +72,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      * @param  string  $cipher
      * @return bool
      */
-    public static function supported($key, $cipher)
+    public static function supported(#[\SensitiveParameter] $key, $cipher)
     {
         if (! isset(self::$supportedCiphers[strtolower($cipher)])) {
             return false;
@@ -299,7 +299,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      * @param  string  $key
      * @return bool
      */
-    protected function validMacForKey(#[\SensitiveParameter] $payload, $key)
+    protected function validMacForKey(#[\SensitiveParameter] $payload, #[\SensitiveParameter] $key)
     {
         return hash_equals(
             $this->hash($payload['iv'], $payload['value'], $key), $payload['mac']
@@ -397,7 +397,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @throws \RuntimeException
      */
-    public function previousKeys(array $keys)
+    public function previousKeys(#[\SensitiveParameter] array $keys)
     {
         foreach ($keys as $key) {
             if (! static::supported($key, $this->cipher)) {

@@ -38,7 +38,6 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame('foo', $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -70,7 +69,6 @@ class QueueRedisQueueTest extends TestCase
 
         Queue::createPayloadUsing(null);
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -106,7 +104,6 @@ class QueueRedisQueueTest extends TestCase
 
         Queue::createPayloadUsing(null);
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -140,7 +137,6 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame('foo', $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -172,7 +168,6 @@ class QueueRedisQueueTest extends TestCase
         $queue->later($date->addSeconds(5), 'foo', ['data']);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -322,7 +317,6 @@ class QueueRedisQueueTest extends TestCase
 
         $queue->push('foo', ['data']);
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -358,7 +352,6 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame('queues:default', $receivedQueue);
 
         Queue::createPayloadUsing(null);
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 

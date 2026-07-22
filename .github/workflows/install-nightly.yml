@@ -9,14 +9,19 @@ permissions:
 
 jobs:
   install:
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Setup PHP
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: 8.3
-          extensions: dom, curl, libxml, mbstring, zip, pcntl
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, fileinfo
           tools: composer:v2
           coverage: none
 
@@ -25,6 +30,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
+          shell: bash
           # rm -rf app ensures each retry starts clean in case it previously fails...
           command: rm -rf app && composer create-project laravel/laravel app --no-install --no-scripts --no-interaction
 
@@ -37,6 +43,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
+          shell: bash
           command: cd app && composer update --with-all-dependencies --no-interaction --no-progress
 
       - name: Boot the application

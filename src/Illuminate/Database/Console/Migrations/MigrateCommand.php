@@ -192,7 +192,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
 
         if (($e->getCode() === 1049 && in_array($connection->getDriverName(), ['mysql', 'mariadb'])) ||
             (($e->errorInfo[0] ?? null) == '08006' &&
-              $connection->getDriverName() == 'pgsql' &&
+              $connection->getDriverName() === 'pgsql' &&
               Str::contains($e->getMessage(), '"'.$connection->getDatabaseName().'"'))) {
             return $this->createMissingMySqlOrPgsqlDatabase($connection);
         }

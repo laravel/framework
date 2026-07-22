@@ -3,12 +3,16 @@
 namespace Illuminate\Tests\Queue;
 
 use Aws\Result;
+use Aws\Sqs\Exception\SqsException;
 use Aws\Sqs\SqsClient;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Queue\SqsQueue;
@@ -20,6 +24,7 @@ use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithMessageGroup;
 use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class QueueSqsQueueTest extends TestCase
 {
@@ -194,6 +199,87 @@ class QueueSqsQueueTest extends TestCase
         $size = $queue->size($this->queueName);
 
         $this->assertEquals(6, $size); // 1 + 2 + 3
+    }
+
+    public function testPendingSizeProperlyReadsSqsQueuePendingSize()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue->expects($this->exactly(2))->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
+
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['ApproximateNumberOfMessages'],
+        ])->andReturn(new Result([
+            'Attributes' => [
+                'ApproximateNumberOfMessages' => 1,
+            ],
+        ]));
+
+        $this->assertEquals(1, $queue->pendingSize($this->queueName));
+
+        // Test missing attribute fallback
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['ApproximateNumberOfMessages'],
+        ])->andReturn(new Result([
+            'Attributes' => [],
+        ]));
+
+        $this->assertEquals(0, $queue->pendingSize($this->queueName));
+    }
+
+    public function testDelayedSizeProperlyReadsSqsQueueDelayedSize()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue->expects($this->exactly(2))->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
+
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['ApproximateNumberOfMessagesDelayed'],
+        ])->andReturn(new Result([
+            'Attributes' => [
+                'ApproximateNumberOfMessagesDelayed' => 2,
+            ],
+        ]));
+
+        $this->assertEquals(2, $queue->delayedSize($this->queueName));
+
+        // Test missing attribute fallback
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['ApproximateNumberOfMessagesDelayed'],
+        ])->andReturn(new Result([
+            'Attributes' => [],
+        ]));
+
+        $this->assertEquals(0, $queue->delayedSize($this->queueName));
+    }
+
+    public function testReservedSizeProperlyReadsSqsQueueReservedSize()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue->expects($this->exactly(2))->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
+
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['ApproximateNumberOfMessagesNotVisible'],
+        ])->andReturn(new Result([
+            'Attributes' => [
+                'ApproximateNumberOfMessagesNotVisible' => 3,
+            ],
+        ]));
+
+        $this->assertEquals(3, $queue->reservedSize($this->queueName));
+
+        // Test missing attribute fallback
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['ApproximateNumberOfMessagesNotVisible'],
+        ])->andReturn(new Result([
+            'Attributes' => [],
+        ]));
+
+        $this->assertEquals(0, $queue->reservedSize($this->queueName));
     }
 
     public function testGetQueueProperlyResolvesUrlWithPrefix()
@@ -880,6 +966,427 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->shouldReceive('purgeQueue')->once();
 
         $queue->clear($this->queueName);
+    }
+
+    public function testBulkSendsAllJobsInASingleBatchRequest()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account])
+            ->getMock();
+        $queue->setContainer(m::spy(Container::class));
+        $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
+        $queue->expects($this->exactly(3))->method('createPayload')->willReturnOnConsecutiveCalls('p1', 'p2', 'p3');
+
+        $captured = null;
+
+        $this->sqs->shouldReceive('sendMessageBatch')->once()->with(m::on(function ($args) use (&$captured) {
+            $captured = $args;
+
+            return true;
+        }))->andReturn(new Result([
+            'Successful' => [
+                ['Id' => 'placeholder', 'MessageId' => 'mid-1'],
+            ],
+            'Failed' => [],
+        ]));
+
+        $queue->bulk(['a', 'b', 'c'], 'data', $this->queueName);
+
+        $this->assertSame($this->queueUrl, $captured['QueueUrl']);
+        $this->assertCount(3, $captured['Entries']);
+        $this->assertSame(['p1', 'p2', 'p3'], array_column($captured['Entries'], 'MessageBody'));
+    }
+
+    public function testBulkChunksAtTenMessagesPerBatch()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account])
+            ->getMock();
+        $queue->setContainer(m::spy(Container::class));
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->method('createPayload')->willReturnCallback(fn ($job) => "payload-{$job}");
+
+        $batchSizes = [];
+
+        $this->sqs->shouldReceive('sendMessageBatch')->twice()->with(m::on(function ($args) use (&$batchSizes) {
+            $batchSizes[] = count($args['Entries']);
+
+            return true;
+        }))->andReturn(new Result(['Successful' => [], 'Failed' => []]));
+
+        $queue->bulk(range(1, 15), 'data', $this->queueName);
+
+        $this->assertSame([10, 5], $batchSizes);
+    }
+
+    public function testBulkChunksWhenCumulativePayloadSizeExceedsLimit()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account])
+            ->getMock();
+        $queue->setContainer(m::spy(Container::class));
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+
+        $halfPayload = str_repeat('x', (int) (SqsQueue::MAX_SQS_PAYLOAD_SIZE * 0.6));
+        $queue->method('createPayload')->willReturn($halfPayload);
+
+        $batchSizes = [];
+
+        $this->sqs->shouldReceive('sendMessageBatch')->twice()->with(m::on(function ($args) use (&$batchSizes) {
+            $batchSizes[] = count($args['Entries']);
+
+            return true;
+        }))->andReturn(new Result(['Successful' => [], 'Failed' => []]));
+
+        $queue->bulk(['a', 'b'], 'data', $this->queueName);
+
+        $this->assertSame([1, 1], $batchSizes);
+    }
+
+    public function testBulkRaisesQueueingAndQueuedEventsForEachJob()
+    {
+        $events = m::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+        $dispatched = [];
+        $events->shouldReceive('dispatch')->andReturnUsing(function ($event) use (&$dispatched) {
+            $dispatched[] = $event;
+        });
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('bound')->with('events')->andReturn(true);
+        $container->shouldReceive('bound')->with('db.transactions')->andReturn(false);
+        $container->shouldReceive('offsetGet')->with('events')->andReturn($events);
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account])
+            ->getMock();
+        $queue->setContainer($container);
+        $queue->setConnectionName('sqs');
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->method('createPayload')->willReturnCallback(fn ($job) => "payload-{$job}");
+
+        $this->sqs->shouldReceive('sendMessageBatch')->once()->andReturnUsing(function ($args) {
+            $successful = array_map(
+                fn ($entry, $i) => ['Id' => $entry['Id'], 'MessageId' => 'mid-'.$i],
+                $args['Entries'],
+                array_keys($args['Entries'])
+            );
+
+            return new Result(['Successful' => $successful, 'Failed' => []]);
+        });
+
+        $queue->bulk(['a', 'b'], 'data', $this->queueName);
+
+        $queueingEvents = array_filter($dispatched, fn ($e) => $e instanceof \Illuminate\Queue\Events\JobQueueing);
+        $queuedEvents = array_filter($dispatched, fn ($e) => $e instanceof \Illuminate\Queue\Events\JobQueued);
+
+        $this->assertCount(2, $queueingEvents);
+        $this->assertCount(2, $queuedEvents);
+        $this->assertSame(['mid-0', 'mid-1'], array_map(fn ($e) => $e->id, array_values($queuedEvents)));
+    }
+
+    public function testBulkHonoursPerJobDelay()
+    {
+        $jobA = new FakeSqsJob;
+        $jobA->delay = 30;
+
+        $jobB = new FakeSqsJob;
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload', 'secondsUntil'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account])
+            ->getMock();
+        $queue->setContainer(m::spy(Container::class));
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->method('createPayload')->willReturnCallback(fn ($job, $q, $data, $delay) => 'payload-'.($delay ?? 'none'));
+        $queue->method('secondsUntil')->with(30)->willReturn(30);
+
+        $captured = null;
+
+        $this->sqs->shouldReceive('sendMessageBatch')->once()->with(m::on(function ($args) use (&$captured) {
+            $captured = $args;
+
+            return true;
+        }))->andReturn(new Result(['Successful' => [], 'Failed' => []]));
+
+        $queue->bulk([$jobA, $jobB], 'data', $this->queueName);
+
+        $this->assertSame(30, $captured['Entries'][0]['DelaySeconds']);
+        $this->assertArrayNotHasKey('DelaySeconds', $captured['Entries'][1]);
+    }
+
+    public function testBulkThrowsWhenSqsReportsFailedEntries()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account])
+            ->getMock();
+        $queue->setContainer(m::spy(Container::class));
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->expects($this->once())->method('createPayload')->willReturn('payload-a');
+
+        $this->sqs->shouldReceive('sendMessageBatch')->once()->andReturnUsing(function ($args) {
+            return new Result([
+                'Successful' => [],
+                'Failed' => [
+                    ['Id' => $args['Entries'][0]['Id'], 'Code' => 'InternalError', 'Message' => 'oops', 'SenderFault' => false],
+                ],
+            ]);
+        });
+
+        try {
+            $queue->bulk(['a'], 'data', $this->queueName);
+
+            $this->fail('SqsException was not thrown.');
+        } catch (SqsException $e) {
+            $this->assertSame(
+                'SQS SendMessageBatch rejected [1] of [1] messages. First failure [InternalError]: oops',
+                $e->getMessage()
+            );
+            $this->assertSame('InternalError', $e->getAwsErrorCode());
+            $this->assertSame('oops', $e->getAwsErrorMessage());
+            $this->assertNotNull($e->getResult());
+        }
+    }
+
+    public function testBulkSendsFifoBatchesSequentiallyUsingTheQueueNameForMessageGroups()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload'])
+            ->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])
+            ->getMock();
+        $queue->setContainer(m::spy(Container::class));
+        $queue->expects($this->once())->method('getQueue')->with($this->fifoQueueName)->willReturn($this->fifoQueueUrl);
+        $queue->method('createPayload')->willReturnCallback(fn ($job) => "payload-{$job}");
+
+        $captured = [];
+
+        $this->sqs->shouldReceive('sendMessageBatch')->twice()->with(m::on(function ($args) use (&$captured) {
+            $captured[] = $args;
+
+            return true;
+        }))->andReturn(new Result(['Successful' => [], 'Failed' => []]));
+
+        $queue->bulk(range(1, 15), 'data', $this->fifoQueueName);
+
+        $this->assertSame([10, 5], array_map(fn ($args) => count($args['Entries']), $captured));
+        $this->assertSame($this->fifoQueueUrl, $captured[0]['QueueUrl']);
+        $this->assertSame($this->fifoQueueName, $captured[0]['Entries'][0]['MessageGroupId']);
+        $this->assertNotEmpty($captured[0]['Entries'][0]['MessageDeduplicationId']);
+    }
+
+    public function testBulkStopsSendingFifoBatchesAfterAFailedRequest()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload'])
+            ->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])
+            ->getMock();
+        $queue->setContainer(m::spy(Container::class));
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->fifoQueueUrl);
+        $queue->method('createPayload')->willReturnCallback(fn ($job) => "payload-{$job}");
+
+        // Only the first chunk is attempted; its exception propagates untouched and later chunks are not sent.
+        $this->sqs->shouldReceive('sendMessageBatch')->once()->andThrow(new RuntimeException('SQS is down'));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('SQS is down');
+
+        $queue->bulk(range(1, 15), 'data', $this->fifoQueueName);
+    }
+
+    public function testBulkDefersAfterCommitJobsUntilTheTransactionCommits()
+    {
+        $job = new FakeSqsJob;
+        $job->afterCommit = true;
+
+        $transactions = m::mock(\Illuminate\Database\DatabaseTransactionsManager::class);
+
+        $committed = null;
+
+        $transactions->shouldReceive('addCallback')->once()->andReturnUsing(function ($callback) use (&$committed) {
+            $committed = $callback;
+        });
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('bound')->with('db.transactions')->andReturn(true);
+        $container->shouldReceive('bound')->with('events')->andReturn(false);
+        $container->shouldReceive('make')->with('db.transactions')->andReturn($transactions);
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account])
+            ->getMock();
+        $queue->setContainer($container);
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->expects($this->once())->method('createPayload')->willReturn('payload-a');
+
+        $sent = false;
+
+        $this->sqs->shouldReceive('sendMessageBatch')->once()->andReturnUsing(function () use (&$sent) {
+            $sent = true;
+
+            return new Result(['Successful' => [], 'Failed' => []]);
+        });
+
+        $queue->bulk([$job], 'data', $this->queueName);
+
+        // The payload is created at dispatch time, but nothing is sent until commit...
+        $this->assertNotNull($committed);
+        $this->assertFalse($sent);
+
+        $committed();
+
+        $this->assertTrue($sent);
+    }
+
+    public function testBulkRegistersRollbackCallbacksForUniqueAfterCommitJobs()
+    {
+        $job = new class implements ShouldQueue, ShouldBeUnique
+        {
+            use Queueable;
+        };
+        $job->afterCommit = true;
+
+        $transactions = m::mock(\Illuminate\Database\DatabaseTransactionsManager::class);
+        $transactions->shouldReceive('addCallbackForRollback')->once();
+        $transactions->shouldReceive('addCallback')->once();
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('bound')->with('db.transactions')->andReturn(true);
+        $container->shouldReceive('make')->with('db.transactions')->andReturn($transactions);
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account])
+            ->getMock();
+        $queue->setContainer($container);
+        $queue->expects($this->once())->method('createPayload')->willReturn('payload-a');
+
+        $queue->bulk([$job], 'data', $this->queueName);
+    }
+
+    public function testBulkComputesQueueableOptionsBeforeApplyingOverflow()
+    {
+        $job = new FakeSqsJob;
+        $job->messageGroup = 'group-1';
+        $job->deduplicator = fn ($payload, $queue) => 'dedupe-'.$payload;
+
+        $store = m::mock(CacheRepository::class);
+        $store->shouldReceive('put')->once()->with(m::type('string'), 'original-payload');
+
+        $cache = m::mock(CacheFactory::class);
+        $cache->shouldReceive('store')->with('sqs-overflow')->andReturn($store);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('bound')->andReturn(false);
+        $container->shouldReceive('make')->with('cache')->andReturn($cache);
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload'])
+            ->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account, '', false, ['enabled' => true, 'always' => true, 'store' => 'sqs-overflow']])
+            ->getMock();
+        $queue->setContainer($container);
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->fifoQueueUrl);
+        $queue->expects($this->once())->method('createPayload')->willReturn('original-payload');
+
+        $captured = null;
+
+        $this->sqs->shouldReceive('sendMessageBatch')->once()->with(m::on(function ($args) use (&$captured) {
+            $captured = $args;
+
+            return true;
+        }))->andReturn(new Result(['Successful' => [], 'Failed' => []]));
+
+        $queue->bulk([$job], 'data', $this->fifoQueueName);
+
+        // The deduplicator receives the original payload, while the message body is the overflow pointer...
+        $this->assertSame('dedupe-original-payload', $captured['Entries'][0]['MessageDeduplicationId']);
+        $this->assertSame('group-1', $captured['Entries'][0]['MessageGroupId']);
+        $this->assertStringStartsWith('{"@pointer":"laravel:sqs-payloads:', $captured['Entries'][0]['MessageBody']);
+    }
+
+    public function testBulkFiresQueuedEventsForSuccessfulChunksWhenAnotherChunkFails()
+    {
+        $events = m::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+        $dispatched = [];
+        $events->shouldReceive('dispatch')->andReturnUsing(function ($event) use (&$dispatched) {
+            $dispatched[] = $event;
+        });
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('bound')->with('events')->andReturn(true);
+        $container->shouldReceive('bound')->with('db.transactions')->andReturn(false);
+        $container->shouldReceive('offsetGet')->with('events')->andReturn($events);
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account])
+            ->getMock();
+        $queue->setContainer($container);
+        $queue->setConnectionName('sqs');
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->method('createPayload')->willReturnCallback(fn ($job) => "payload-{$job}");
+
+        $calls = 0;
+
+        $this->sqs->shouldReceive('sendMessageBatch')->twice()->andReturnUsing(function ($args) use (&$calls) {
+            if ($calls++ === 0) {
+                return new Result([
+                    'Successful' => array_map(
+                        fn ($entry, $i) => ['Id' => $entry['Id'], 'MessageId' => 'mid-'.$i],
+                        $args['Entries'],
+                        array_keys($args['Entries'])
+                    ),
+                    'Failed' => [],
+                ]);
+            }
+
+            throw new RuntimeException('chunk failed');
+        });
+
+        try {
+            $queue->bulk(range(1, 15), 'data', $this->queueName);
+
+            $this->fail('RuntimeException was not thrown.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('chunk failed', $e->getMessage());
+        }
+
+        // The first chunk was queued before the second failed, so its queued events must already have fired.
+        $queuedEvents = array_filter($dispatched, fn ($e) => $e instanceof \Illuminate\Queue\Events\JobQueued);
+
+        $this->assertCount(10, $queuedEvents);
+    }
+
+    public function testBulkRethrowsTheOriginalExceptionWhenASingleBatchRequestFails()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'createPayload'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account])
+            ->getMock();
+        $queue->setContainer(m::spy(Container::class));
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->expects($this->once())->method('createPayload')->willReturn('payload-a');
+
+        $this->sqs->shouldReceive('sendMessageBatch')->once()->andThrow(new RuntimeException('SQS is down'));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('SQS is down');
+
+        $queue->bulk(['a'], 'data', $this->queueName);
+    }
+
+    public function testBulkDoesNothingWithEmptyInput()
+    {
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->account);
+        $queue->setContainer(m::mock(Container::class));
+
+        $this->sqs->shouldNotReceive('sendMessageBatch');
+
+        $queue->bulk([], 'data', $this->queueName);
     }
 
     public function testPopPassesOverflowStorageOptionsToJob()

@@ -1424,7 +1424,7 @@ class Blueprint
     }
 
     /**
-     * Create a new UUID column on the table with a foreign key constraint.
+     * Create a new UUID foreign ID column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
@@ -1450,7 +1450,7 @@ class Blueprint
     }
 
     /**
-     * Create a new ULID column on the table with a foreign key constraint.
+     * Create a new ULID foreign ID column on the table.
      *
      * @param  string  $column
      * @param  int|null  $length

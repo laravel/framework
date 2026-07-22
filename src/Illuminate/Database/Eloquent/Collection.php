@@ -251,7 +251,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a relationship path for models of the given type if it is not already eager loaded.
      *
-     * @param  array<int, <string, class-string>>  $tuples
+     * @param  array<int, array<string, class-string>>  $tuples
      * @return void
      */
     public function loadMissingRelationshipChain(array $tuples)
@@ -937,7 +937,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $class = get_class($model);
 
-        if ($this->reject(fn ($model) => $model instanceof $class)->isNotEmpty()) {
+        if ($this->contains(fn ($model) => ! $model instanceof $class)) {
             throw new LogicException('Unable to create query for collection with mixed types.');
         }
 

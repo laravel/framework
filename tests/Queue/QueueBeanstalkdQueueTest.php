@@ -52,7 +52,6 @@ class QueueBeanstalkdQueueTest extends TestCase
 
         $this->container->shouldHaveReceived('bound')->with('events')->times(4);
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -78,7 +77,6 @@ class QueueBeanstalkdQueueTest extends TestCase
 
         $this->container->shouldHaveReceived('bound')->with('events')->times(4);
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 

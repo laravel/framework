@@ -42,13 +42,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ValidationValidatorTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     public function testNestedErrorMessagesAreRetrievedFromLocalArray()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2386,6 +2379,21 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateBase64(): void
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['value' => base64_encode('Laravel')], ['value' => 'base64']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['value' => ''], ['value' => 'required|base64']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['value' => 'not-base64!'], ['value' => 'base64']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['value' => 'YQ'], ['value' => 'base64']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['value' => 'YQ=='], ['value' => 'base64']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateConfirmed()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3307,6 +3315,13 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['array']], ['x' => 'hex_color']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateBase64DoesNotThrowOnNonStringValue(): void
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['array']], ['x' => 'base64']);
         $this->assertFalse($v->passes());
     }
 
@@ -6474,7 +6489,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testValidateDateAndFormat()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date']);
         $this->assertTrue($v->passes());
@@ -6555,7 +6569,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testDateEquals()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date_equals:2000-01-01']);
         $this->assertTrue($v->passes());
@@ -6623,7 +6636,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testDateEqualsRespectsCarbonTestNowWhenParameterIsRelative()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         Carbon::setTestNow(new Carbon('2018-01-01'));
 
@@ -6669,7 +6681,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testBeforeAndAfter()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'Before:2012-01-01']);
         $this->assertTrue($v->passes());
@@ -6755,7 +6766,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testBeforeAndAfterWithFormat()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '31/12/2000'], ['x' => 'before:31/02/2012']);
         $this->assertTrue($v->fails());
@@ -6874,7 +6884,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testWeakBeforeAndAfter()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '2012-01-15'], ['x' => 'before_or_equal:2012-01-15']);
         $this->assertTrue($v->passes());

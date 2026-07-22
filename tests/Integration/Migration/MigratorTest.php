@@ -284,13 +284,7 @@ class MigratorTest extends TestCase
     protected function expectBulletList($elements): void
     {
         $this->output->shouldReceive('writeln')->once()->with(m::on(function ($argument) use ($elements) {
-            foreach ($elements as $element) {
-                if (! (new Stringable($argument))->contains("⇂ $element")) {
-                    return false;
-                }
-            }
-
-            return true;
+            return array_all($elements, fn ($element) => (new Stringable($argument))->contains("⇂ $element"));
         }), m::any());
     }
 

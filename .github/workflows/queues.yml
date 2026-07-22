@@ -22,23 +22,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
           php-version: 8.4
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Queue
@@ -56,23 +44,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
           php-version: 8.4
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Setup SQLite Database
         run: php vendor/bin/testbench package:create-sqlite-db
@@ -110,23 +86,12 @@ jobs:
         run: make
         working-directory: beanstalkd-1.13
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress --with="pda/pheanstalk:^${{ matrix.pheanstalk }}"
+          composer-command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress --with="pda/pheanstalk:^${{ matrix.pheanstalk }}"
 
       - name: Daemonize beanstalkd
         run: ./beanstalkd-1.13/beanstalkd &

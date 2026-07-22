@@ -6,11 +6,11 @@ use Carbon\CarbonInterval;
 use Carbon\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Image;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Stringable;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use InvalidArgumentException;
 use Mockery as m;
@@ -670,8 +670,8 @@ class HttpRequestTest extends TestCase
             'empty_str' => '',
             'null' => null,
         ]);
-        $this->assertTrue($request->string('int') instanceof Stringable);
-        $this->assertTrue($request->string('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $request->string('int'));
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $request->string('unknown_key'));
         $this->assertSame('123', $request->string('int')->value());
         $this->assertSame('456', $request->string('int_str')->value());
         $this->assertSame('123.456', $request->string('float')->value());
@@ -1156,6 +1156,27 @@ class HttpRequestTest extends TestCase
         ];
         $request = Request::create('/', 'GET', [], [], $files);
         $this->assertInstanceOf(SymfonyUploadedFile::class, $request->file('foo'));
+    }
+
+    public function testImageMethod()
+    {
+        $files = [
+            'avatar' => [
+                'size' => 500,
+                'name' => 'avatar.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'image/jpeg',
+                'error' => null,
+            ],
+        ];
+        $request = Request::create('/', 'GET', [], [], $files);
+        $this->assertInstanceOf(Image::class, $request->image('avatar'));
+    }
+
+    public function testImageMethodReturnsNullForMissingKey()
+    {
+        $request = Request::create('/', 'GET', [], [], []);
+        $this->assertNull($request->image('avatar'));
     }
 
     public function testHasFileMethod()

@@ -616,6 +616,38 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanSendJsonDataWithQueryMethod()
+    {
+        $this->factory->fake();
+
+        $this->factory->query('http://foo.com/search', [
+            'filter' => 'active',
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/search' &&
+                   $request->method() === 'QUERY' &&
+                   $request->hasHeader('Content-Type', 'application/json') &&
+                   $request['filter'] === 'active';
+        });
+    }
+
+    public function testCanSendFormDataWithQueryMethod()
+    {
+        $this->factory->fake();
+
+        $this->factory->asForm()->query('http://foo.com/search', [
+            'filter' => 'active',
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/search' &&
+                   $request->method() === 'QUERY' &&
+                   $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
+                   $request['filter'] === 'active';
+        });
+    }
+
     public function testQueryParametersNormalizeNonFiniteFloats()
     {
         $this->factory->fake();
@@ -794,6 +826,37 @@ class HttpClientTest extends TestCase
             return $request->hasHeader('X-Test', '123')
                 && $request->hasHeader('X-Null', '')
                 && $request->hasHeader('X-Nan', 'NAN');
+        });
+    }
+
+    public function testRequestHeadersAreCheckedCaseInsensitively()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'foo' => 'Bar',
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasHeader('Foo')
+                && $request->hasHeader('Foo', 'Bar')
+                && $request->header('Foo') === ['Bar'];
+        });
+    }
+
+    public function testContentTypeHeadersAreCheckedCaseInsensitively()
+    {
+        $this->factory->fake();
+
+        $this->factory->send('POST', 'http://foo.com/json', [
+            'headers' => ['content-type' => 'application/json'],
+            'body' => '{"name":"Taylor"}',
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasHeader('Content-Type')
+                && $request->header('Content-Type') === ['application/json']
+                && $request->isJson();
         });
     }
 
@@ -4139,7 +4202,7 @@ class HttpClientTest extends TestCase
 
     public function testItCanAddGlobalMiddleware()
     {
-        Carbon::setTestNow(Carbon::now()->startOfDay());
+        Carbon::setTestNow(Carbon::today());
         $requests = [];
         $responses = [];
         $this->factory->fake(function ($r) use (&$requests) {

@@ -797,7 +797,6 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Flush all locks from the cache store.
      *
-     *
      * @throws \BadMethodCallException
      */
     public function flushLocks(): bool

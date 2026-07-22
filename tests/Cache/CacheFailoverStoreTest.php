@@ -13,11 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class CacheFailoverStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testImplementsCanFlushLocks()
     {
         $store = $this->makeFailoverStore([]);

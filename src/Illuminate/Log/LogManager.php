@@ -103,7 +103,7 @@ class LogManager implements LoggerInterface
     public function stack(array $channels, $channel = null)
     {
         return (new Logger(
-            $this->createStackDriver(['channels' => $channels, 'channel' => $channel]),
+            $this->createStackDriver(['channels' => $channels, 'name' => $channel]),
             $this->app['events']
         ))->withContext($this->sharedContext);
     }
@@ -617,12 +617,12 @@ class LogManager implements LoggerInterface
     /**
      * Unset the given channel instance.
      *
-     * @param  string|null  $driver
+     * @param  \UnitEnum|string|null  $driver
      * @return void
      */
     public function forgetChannel($driver = null)
     {
-        $driver = $this->parseDriver($driver);
+        $driver = $this->parseDriver(enum_value($driver));
 
         if (isset($this->channels[$driver])) {
             unset($this->channels[$driver]);

@@ -289,13 +289,13 @@ class SessionStoreTest extends TestCase
         $session->flash('foo', 'bar');
         $session->put('fu', 'baz');
         $session->put('_flash.old', ['qu']);
-        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
-        $this->assertFalse(array_search('fu', $session->get('_flash.new')));
+        $this->assertContains('foo', $session->get('_flash.new'));
+        $this->assertNotContains('fu', $session->get('_flash.new'));
         $session->keep(['fu', 'qu']);
-        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
-        $this->assertNotFalse(array_search('fu', $session->get('_flash.new')));
-        $this->assertNotFalse(array_search('qu', $session->get('_flash.new')));
-        $this->assertFalse(array_search('qu', $session->get('_flash.old')));
+        $this->assertContains('foo', $session->get('_flash.new'));
+        $this->assertContains('fu', $session->get('_flash.new'));
+        $this->assertContains('qu', $session->get('_flash.new'));
+        $this->assertNotContains('qu', $session->get('_flash.old'));
     }
 
     public function testReflash()
@@ -304,8 +304,8 @@ class SessionStoreTest extends TestCase
         $session->flash('foo', 'bar');
         $session->put('_flash.old', ['foo']);
         $session->reflash();
-        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
-        $this->assertFalse(array_search('foo', $session->get('_flash.old')));
+        $this->assertContains('foo', $session->get('_flash.new'));
+        $this->assertNotContains('foo', $session->get('_flash.old'));
     }
 
     public function testReflashWithNow()
@@ -313,8 +313,8 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $session->now('foo', 'bar');
         $session->reflash();
-        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
-        $this->assertFalse(array_search('foo', $session->get('_flash.old')));
+        $this->assertContains('foo', $session->get('_flash.new'));
+        $this->assertNotContains('foo', $session->get('_flash.old'));
     }
 
     public function testOnly()

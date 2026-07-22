@@ -420,6 +420,23 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertFalse(ModelWithFillableAttribute::isIgnoringTouch());
     }
 
+    public function test_is_ignoring_touch_after_model_is_constructed(): void
+    {
+        new ModelWithTableAndTimestampsFalseAttribute;
+
+        $this->assertTrue(ModelWithTableAndTimestampsFalseAttribute::isIgnoringTouch());
+    }
+
+    public function test_table_and_timestamps_attributes_apply_after_is_ignoring_touch(): void
+    {
+        ModelWithTableAndTimestampsFalseAttribute::isIgnoringTouch();
+
+        $model = new ModelWithTableAndTimestampsFalseAttribute;
+
+        $this->assertSame('collision_table', $model->getTable());
+        $this->assertFalse($model->usesTimestamps());
+    }
+
     public function test_trait_initializer_merges_appends_with_attribute(): void
     {
         $model = new ModelWithAppendsAttributeAndTrait;
@@ -446,6 +463,20 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $model = new ModelWithFillableAttributeAndTrait;
 
         $this->assertEqualsCanonicalizing(['name', 'email', 'phone'], $model->getFillable());
+    }
+
+    public function test_trait_with_attribute_applies_to_class(): void
+    {
+        $model = new ModelUsingWithoutIncrementingTraitWithAttribute;
+
+        $this->assertFalse($model->getIncrementing());
+    }
+
+    public function test_class_attribute_takes_precedence_over_trait(): void
+    {
+        $model = new ModelOverridingTraitConnectionAttribute;
+
+        $this->assertSame('primary', $model->getConnectionName());
     }
 }
 
@@ -562,6 +593,12 @@ class ModelWithoutTimestampsAttribute extends Model
 class ModelWithTimestampsAttributeAndProperty extends Model
 {
     public $timestamps = false;
+}
+
+#[Table(name: 'collision_table', timestamps: false)]
+class ModelWithTableAndTimestampsFalseAttribute extends Model
+{
+    //
 }
 
 #[Table(dateFormat: 'U')]
@@ -772,4 +809,25 @@ class ModelWithVisibleAttributeAndTrait extends Model
 class ModelWithFillableAttributeAndTrait extends Model
 {
     use AddsPhoneFillable;
+}
+
+#[WithoutIncrementing]
+trait TraitUsingWithoutIncrementingAttribute
+{
+}
+
+class ModelUsingWithoutIncrementingTraitWithAttribute extends Model
+{
+    use TraitUsingWithoutIncrementingAttribute;
+}
+
+#[Connection('secondary')]
+trait TraitUsingConnectionAttribute
+{
+}
+
+#[Connection('primary')]
+class ModelOverridingTraitConnectionAttribute extends Model
+{
+    use TraitUsingConnectionAttribute;
 }

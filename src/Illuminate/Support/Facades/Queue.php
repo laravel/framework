@@ -76,10 +76,14 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static \Illuminate\Support\Collection allDelayedJobs()
  * @method static \Illuminate\Support\Collection allReservedJobs()
  * @method static bool shouldFakeJob(object $job)
+ * @method static void reserve(\Closure|string|object $job, \UnitEnum|string|null $queue = null)
  * @method static array pushedJobs()
  * @method static array rawPushes()
  * @method static \Illuminate\Support\Testing\Fakes\QueueFake serializeAndRestore(bool $serializeAndRestore = true)
  * @method static void releaseUniqueJobLocks()
+ * @method static void clearReserved()
+ * @method static \Illuminate\Support\Testing\Fakes\QueueFake beforePushing(callable $callback)
+ * @method static \Illuminate\Support\Testing\Fakes\QueueFake afterPushing(callable $callback)
  *
  * @see \Illuminate\Queue\QueueManager
  * @see \Illuminate\Queue\Queue

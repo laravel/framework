@@ -281,7 +281,7 @@ class Store implements Session
     {
         $placeholder = new stdClass;
 
-        return ! (new Collection(is_array($key) ? $key : func_get_args()))->contains(function ($key) use ($placeholder) {
+        return (new Collection(is_array($key) ? $key : func_get_args()))->doesntContain(function ($key) use ($placeholder) {
             return $this->get($key, $placeholder) === $placeholder;
         });
     }
@@ -305,7 +305,7 @@ class Store implements Session
      */
     public function has($key)
     {
-        return ! (new Collection(is_array($key) ? $key : func_get_args()))->contains(function ($key) {
+        return (new Collection(is_array($key) ? $key : func_get_args()))->doesntContain(function ($key) {
             return is_null($this->get($key));
         });
     }
@@ -318,9 +318,9 @@ class Store implements Session
      */
     public function hasAny($key)
     {
-        return (new Collection(is_array($key) ? $key : func_get_args()))->filter(function ($key) {
+        return (new Collection(is_array($key) ? $key : func_get_args()))->contains(function ($key) {
             return ! is_null($this->get($key));
-        })->count() >= 1;
+        });
     }
 
     /**

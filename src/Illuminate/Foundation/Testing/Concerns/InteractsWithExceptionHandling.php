@@ -252,8 +252,8 @@ trait InteractsWithExceptionHandling
             $exceptionMessage = $exception->getMessage();
         }
 
-        Assert::assertTrue(
-            ! $thrown,
+        Assert::assertFalse(
+            $thrown,
             sprintf('Unexpected exception of type %s with message %s was thrown.', $exceptionClass ?? null, $exceptionMessage ?? null)
         );
 

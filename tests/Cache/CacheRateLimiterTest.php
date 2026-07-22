@@ -163,7 +163,7 @@ class CacheRateLimiterTest extends TestCase
             return 'foo';
         }, 1));
 
-        $this->assertSame(false, $rateLimiter->attempt('key', 1, function () {
+        $this->assertFalse($rateLimiter->attempt('key', 1, function () {
             return false;
         }, 1));
 
