@@ -23,7 +23,7 @@ class ContainerTest extends TestCase
     {
         parent::setUp();
 
-        if (PHP_VERSION_ID >= 80500) {
+        if (version_compare(PHP_VERSION, '8.5.0', '>=')) {
             require_once __DIR__.'/Fixtures/ContainerBindWhenFixtures.php';
         }
     }
