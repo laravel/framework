@@ -876,7 +876,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(DevConcrete::class, $second);
     }
 
-    public function testBindWhenSkipsFalseConditionsAndBindsTheFirstTrueOne(): void
+    public function testBindWhenSkipsFalseConditionsAndBindsFirstTrueCondition(): void
     {
         $container = new Container;
 
@@ -885,7 +885,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(BindWhenTrueConcrete::class, $instance);
     }
 
-    public function testBindWhenRespectsTheSingletonAttribute(): void
+    public function testBindWhenRespectsSingletonAttribute(): void
     {
         $container = new Container;
 
@@ -896,7 +896,7 @@ class ContainerTest extends TestCase
         $this->assertSame($first, $second);
     }
 
-    public function testBindWhenWithNoPassingConditionDoesNotBind(): void
+    public function testBindWhenWithNoPassingConditionThrowsBindingResolutionException(): void
     {
         $this->expectException(BindingResolutionException::class);
 
