@@ -6,12 +6,6 @@ use Illuminate\Container\Attributes\Bind;
 use Illuminate\Container\Attributes\BindWhen;
 use Illuminate\Container\Attributes\Singleton;
 
-/*
- * These fixtures embed static closures inside attribute arguments, which is only
- * valid on PHP >= 8.5. They live in a standalone file that is required at runtime
- * by the PHP >= 8.5 gated tests so that older PHP versions never compile them.
- */
-
 #[BindWhen(BindWhenFalseConcrete::class, static function () {
     return false;
 })]
