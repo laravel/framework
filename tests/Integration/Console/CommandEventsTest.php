@@ -42,8 +42,7 @@ class CommandEventsTest extends TestCase
         $this->beforeApplicationDestroyed(function () {
             $this->files->delete($this->logfile);
 
-            unset($this->files);
-            unset($this->logfile);
+            unset($this->files, $this->logfile);
         });
 
         parent::setUp();

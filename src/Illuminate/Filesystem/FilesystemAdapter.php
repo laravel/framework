@@ -10,6 +10,7 @@ use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Image;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
@@ -208,6 +209,18 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Assert that the disk contains no files.
+     *
+     * @return $this
+     */
+    public function assertEmpty()
+    {
+        PHPUnit::assertEmpty($this->allFiles(), 'Disk is not empty.');
+
+        return $this;
+    }
+
+    /**
      * Determine if a file or directory exists.
      *
      * @param  string  $path
@@ -323,6 +336,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  array  $headers
      * @param  string|null  $disposition
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     *
+     * @throws UnableToRetrieveMetadata
      */
     public function response($path, $name = null, array $headers = [], $disposition = 'inline')
     {
@@ -360,6 +375,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string|null  $name
      * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     *
+     * @throws UnableToRetrieveMetadata
      */
     public function serve(Request $request, $path, $name = null, array $headers = [])
     {
@@ -375,10 +392,20 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string|null  $name
      * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     *
+     * @throws UnableToRetrieveMetadata
      */
     public function download($path, $name = null, array $headers = [])
     {
         return $this->response($path, $name, $headers, 'attachment');
+    }
+
+    /**
+     * Create an image instance from a file in storage.
+     */
+    public function image(string $path): Image
+    {
+        return new Image(fn () => $this->get($path));
     }
 
     /**
@@ -663,6 +690,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @return string|false
+     *
+     * @throws UnableToRetrieveMetadata
      */
     public function mimeType($path)
     {

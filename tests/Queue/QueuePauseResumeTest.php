@@ -50,7 +50,6 @@ class QueuePauseResumeTest extends TestCase
 
     public function testPauseQueueWithTTL()
     {
-        Carbon::setTestNow();
         $this->manager->pauseFor('redis', 'default', 30);
 
         $this->assertTrue($this->manager->isPaused('redis', 'default'));
@@ -61,7 +60,6 @@ class QueuePauseResumeTest extends TestCase
 
     public function testPauseQueueIndefinitely()
     {
-        Carbon::setTestNow();
         $this->manager->pause('redis', 'default');
 
         $this->assertTrue($this->manager->isPaused('redis', 'default'));
@@ -159,6 +157,19 @@ class QueuePauseResumeTest extends TestCase
         $this->assertInstanceOf(QueueResumed::class, $dispatchedEvent);
         $this->assertSame('database', $dispatchedEvent->connection);
         $this->assertSame('notifications', $dispatchedEvent->queue);
+    }
+
+    public function testGetPausedQueues()
+    {
+        $this->assertSame([], $this->manager->getPausedQueues('redis', ['default', 'emails']));
+
+        $this->manager->pause('redis', 'emails');
+        $this->manager->pause('redis', 'notifications');
+
+        $this->assertSame(
+            ['emails', 'notifications'],
+            $this->manager->getPausedQueues('redis', ['default', 'emails', 'notifications'])
+        );
     }
 
     public function testParsingQueueString()

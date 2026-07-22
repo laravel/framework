@@ -355,7 +355,7 @@ class DatabaseEloquentCollectionTest extends TestCase
             return 'not-a-model';
         });
 
-        $this->assertEquals(BaseCollection::class, get_class($c));
+        $this->assertInstanceOf(BaseCollection::class, $c);
     }
 
     public function testMapWithKeys()
@@ -384,7 +384,7 @@ class DatabaseEloquentCollectionTest extends TestCase
             return [$key++ => 'not-a-model'];
         });
 
-        $this->assertEquals(BaseCollection::class, get_class($c));
+        $this->assertInstanceOf(BaseCollection::class, $c);
     }
 
     public function testCollectionDiffsWithGivenCollection()
@@ -439,7 +439,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c1 = new Collection([$one, $two, $three]);
 
-        $this->assertEquals([], $c1->intersect(null)->all());
+        $this->assertSame([], $c1->intersect(null)->all());
     }
 
     public function testCollectionIntersectsWithGivenCollection()
@@ -543,7 +543,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = new Collection([new TestEloquentCollectionModel]);
         $c = $c->makeVisible(['hidden']);
 
-        $this->assertEquals([], $c[0]->getHidden());
+        $this->assertSame([], $c[0]->getHidden());
     }
 
     public function testMergeHiddenAddsHiddenOnEntireCollection()
@@ -602,7 +602,7 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $this->seedData();
         $c = EloquentAppendingTestUserModel::query()->get();
-        $this->assertEquals('hello', $c->toArray()[0]['appended_field']);
+        $this->assertSame('hello', $c->toArray()[0]['appended_field']);
 
         $c = $c->withoutAppends();
         $this->assertArrayNotHasKey('appended_field', $c->toArray()[0]);
@@ -612,15 +612,15 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
         $b = new Collection(['a', 'b', 'c']);
-        $this->assertEquals(BaseCollection::class, get_class($a->pluck('foo')));
-        $this->assertEquals(BaseCollection::class, get_class($a->keys()));
-        $this->assertEquals(BaseCollection::class, get_class($a->collapse()));
-        $this->assertEquals(BaseCollection::class, get_class($a->flatten()));
-        $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
-        $this->assertEquals(BaseCollection::class, get_class($a->countBy('foo')));
-        $this->assertEquals(BaseCollection::class, get_class($b->flip()));
-        $this->assertEquals(BaseCollection::class, get_class($a->partition('foo', '=', 'bar')));
-        $this->assertEquals(BaseCollection::class, get_class($a->partition('foo', 'bar')));
+        $this->assertInstanceOf(BaseCollection::class, $a->pluck('foo'));
+        $this->assertInstanceOf(BaseCollection::class, $a->keys());
+        $this->assertInstanceOf(BaseCollection::class, $a->collapse());
+        $this->assertInstanceOf(BaseCollection::class, $a->flatten());
+        $this->assertInstanceOf(BaseCollection::class, $a->zip(['a', 'b'], ['c', 'd']));
+        $this->assertInstanceOf(BaseCollection::class, $a->countBy('foo'));
+        $this->assertInstanceOf(BaseCollection::class, $b->flip());
+        $this->assertInstanceOf(BaseCollection::class, $a->partition('foo', '=', 'bar'));
+        $this->assertInstanceOf(BaseCollection::class, $a->partition('foo', 'bar'));
     }
 
     public function testMakeVisibleRemovesHiddenAndIncludesVisible()
@@ -628,7 +628,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = new Collection([new TestEloquentCollectionModel]);
         $c = $c->makeVisible('hidden');
 
-        $this->assertEquals([], $c[0]->getHidden());
+        $this->assertSame([], $c[0]->getHidden());
         $this->assertEquals(['visible', 'hidden'], $c[0]->getVisible());
     }
 
@@ -639,8 +639,8 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c = new Collection([$a, $b]);
 
-        $this->assertEquals([], $c->multiply(-1)->all());
-        $this->assertEquals([], $c->multiply(0)->all());
+        $this->assertSame([], $c->multiply(-1)->all());
+        $this->assertSame([], $c->multiply(0)->all());
 
         $this->assertEquals([$a, $b], $c->multiply(1)->all());
 
@@ -704,7 +704,7 @@ class DatabaseEloquentCollectionTest extends TestCase
             },
         ]);
 
-        $this->assertEquals([], $c->getQueueableRelations());
+        $this->assertSame([], $c->getQueueableRelations());
     }
 
     public function testEmptyCollectionStayEmptyOnFresh()

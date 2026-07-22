@@ -15,9 +15,11 @@ class InteractsWithTimeTestCase
     {
         assertType(Carbon::class, $this->freezeTime());
         assertType('42', $this->freezeTime(fn () => 42));
+        assertType('42', $this->freezeTime(fn (Carbon $date) => 42));
 
         assertType(Carbon::class, $this->freezeSecond());
         assertType('42', $this->freezeSecond(fn () => 42));
+        assertType('42', $this->freezeSecond(fn (Carbon $date) => 42));
 
         // @phpstan-ignore method.void
         assertType('null', $this->travelTo(Carbon::now(), function () {

@@ -100,7 +100,7 @@ class SesV2Transport extends AbstractTransport implements Stringable
     }
 
     /**
-     * Extract the SES list managenent options, if applicable.
+     * Extract the SES list management options, if applicable.
      *
      * @param  \Symfony\Component\Mailer\SentMessage  $message
      * @return array|null

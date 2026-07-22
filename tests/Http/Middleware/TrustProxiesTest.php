@@ -42,7 +42,7 @@ class TrustProxiesTest extends TestCase
     public function test_does_trust_trusted_proxy()
     {
         $req = $this->createProxiedRequest();
-        $req->setTrustedProxies(['192.168.10.10'], $this->headerAll);
+        $req::setTrustedProxies(['192.168.10.10'], $this->headerAll);
 
         $this->assertSame('173.174.200.38', $req->getClientIp(), 'Assert trusted proxy x-forwarded-for header used');
         $this->assertSame('https', $req->getScheme(), 'Assert trusted proxy x-forwarded-proto header used');
@@ -76,6 +76,24 @@ class TrustProxiesTest extends TestCase
 
         $trustedProxy->handle($request, function ($request) {
             $this->assertSame('173.174.200.38', $request->getClientIp(), 'Assert trusted proxy x-forwarded-for header used with wildcard proxy setting');
+        });
+    }
+
+    /**
+     * Test that the wildcard trusts proxies in an IPv6 forwarded chain, so the
+     * left-most client IP is returned rather than an intermediate IPv6 proxy.
+     */
+    public function test_trusted_proxy_sets_trusted_proxies_with_wildcard_and_ipv6_chain()
+    {
+        $trustedProxy = $this->createTrustedProxy($this->headerAll, '*');
+        $request = $this->createProxiedRequest([
+            'REMOTE_ADDR' => '2001:db8::1',
+            'HTTP_X_FORWARDED_FOR' => '173.174.200.38, 2001:db8::2, 2001:db8::3',
+        ]);
+
+        $trustedProxy->handle($request, function ($request) {
+            $this->assertSame('173.174.200.38', $request->getClientIp(),
+                'Assert IPv6 proxies in the forwarded chain are trusted with wildcard proxy setting');
         });
     }
 
@@ -163,9 +181,9 @@ class TrustProxiesTest extends TestCase
 
         $forwardedFor = [
             '192.0.2.2',
-            '192.0.2.199, 192.0.2.2',
-            '192.0.2.199,192.0.2.2',
-            '99.99.99.99,192.0.2.199,192.0.2.2',
+            '192.0.2.2, 192.0.2.199',
+            '192.0.2.2,192.0.2.199',
+            '192.0.2.2,99.99.99.99,192.0.2.199',
         ];
 
         foreach ($forwardedFor as $forwardedForHeader) {
@@ -173,6 +191,28 @@ class TrustProxiesTest extends TestCase
 
             $trustedProxy->handle($request, function ($request) use ($forwardedForHeader) {
                 $this->assertSame('192.0.2.2', $request->getClientIp(), 'Assert sets the '.$forwardedForHeader);
+            });
+        }
+    }
+
+    /**
+     * Test Forwarded header with multiple IP addresses, with * wildcard trusting of all proxies.
+     */
+    public function test_get_client_ip_with_multiple_ip_addresses_all_proxies_are_trusted_using_forwarded_header()
+    {
+        $trustedProxy = $this->createTrustedProxy(Request::HEADER_FORWARDED, '*');
+
+        $forwarded = [
+            'for=192.0.2.2',
+            'for=192.0.2.2,for=192.0.2.199',
+            'for=192.0.2.2,for=99.99.99.99,for=192.0.2.199',
+        ];
+
+        foreach ($forwarded as $forwardedHeader) {
+            $request = $this->createProxiedRequest(['HTTP_FORWARDED' => $forwardedHeader, 'HTTP_X_FORWARDED_FOR' => '']);
+
+            $trustedProxy->handle($request, function ($request) use ($forwardedHeader) {
+                $this->assertSame('192.0.2.2', $request->getClientIp(), 'Assert sets the '.$forwardedHeader);
             });
         }
     }
@@ -346,27 +386,27 @@ class TrustProxiesTest extends TestCase
             $this->assertEquals($request->getTrustedHeaderSet(), $this->headerAll,
                 'Assert trusted proxy used all "X-Forwarded-*" header');
 
-            $this->assertEquals($request->getTrustedProxies(), ['192.168.1.1', '192.168.1.2'],
+            $this->assertEquals(['192.168.1.1', '192.168.1.2'], $request->getTrustedProxies(),
                 'Assert trusted proxy using proxies as string separated by comma.');
         });
 
         // or, if your proxy instead uses the "Forwarded" header
         $trustedProxy = $this->createTrustedProxy('HEADER_FORWARDED', '192.168.1.1, 192.168.1.2');
         $trustedProxy->handle($request, function (Request $request) {
-            $this->assertEquals($request->getTrustedHeaderSet(), Request::HEADER_FORWARDED,
+            $this->assertEquals(Request::HEADER_FORWARDED, $request->getTrustedHeaderSet(),
                 'Assert trusted proxy used forwarded header');
 
-            $this->assertEquals($request->getTrustedProxies(), ['192.168.1.1', '192.168.1.2'],
+            $this->assertEquals(['192.168.1.1', '192.168.1.2'], $request->getTrustedProxies(),
                 'Assert trusted proxy using proxies as string separated by comma.');
         });
 
         // or, if you're using AWS ELB
         $trustedProxy = $this->createTrustedProxy('HEADER_X_FORWARDED_AWS_ELB', '192.168.1.1, 192.168.1.2');
         $trustedProxy->handle($request, function (Request $request) {
-            $this->assertEquals($request->getTrustedHeaderSet(), Request::HEADER_X_FORWARDED_AWS_ELB,
+            $this->assertEquals(Request::HEADER_X_FORWARDED_AWS_ELB, $request->getTrustedHeaderSet(),
                 'Assert trusted proxy used AWS ELB header');
 
-            $this->assertEquals($request->getTrustedProxies(), ['192.168.1.1', '192.168.1.2'],
+            $this->assertEquals(['192.168.1.1', '192.168.1.2'], $request->getTrustedProxies(),
                 'Assert trusted proxy using proxies as string separated by comma.');
         });
     }
@@ -396,7 +436,7 @@ class TrustProxiesTest extends TestCase
         // which is likely something like this:
         $request = Request::create('http://localhost:8888/tag/proxy', 'GET', [], [], [], $serverOverrides, null);
         // Need to make sure these haven't already been set
-        $request->setTrustedProxies([], $this->headerAll);
+        $request::setTrustedProxies([], $this->headerAll);
 
         return $request;
     }

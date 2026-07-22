@@ -47,8 +47,37 @@ class CloudTest extends TestCase
 
         Cloud::configureDisks($this->app);
 
-        $this->assertEquals('test-disk-2', $this->app['config']->get('filesystems.default'));
-        $this->assertEquals('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
+        $this->assertSame('test-disk-2', $this->app['config']->get('filesystems.default'));
+        $this->assertSame('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
+
+        unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
+    }
+
+    public function test_it_can_configure_scoped_disks()
+    {
+        $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode(
+            [
+                [
+                    'disk' => 'test-disk',
+                    'access_key_id' => 'test-access-key-id',
+                    'access_key_secret' => 'test-access-key-secret',
+                    'bucket' => 'test-bucket',
+                    'url' => 'test-url',
+                    'endpoint' => 'test-endpoint',
+                ],
+                [
+                    'disk' => 'test-disk-scoped',
+                    'scoped_disk' => 'test-disk',
+                    'prefix' => 'test/prefix/',
+                    'is_default' => true,
+                ],
+            ]
+        );
+
+        Cloud::configureDisks($this->app);
+
+        $this->assertSame('scoped', $this->app['config']->get('filesystems.disks.test-disk-scoped.driver'));
+        $this->assertSame('test-disk', $this->app['config']->get('filesystems.disks.test-disk-scoped.disk'));
 
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
     }
@@ -63,12 +92,37 @@ class CloudTest extends TestCase
 
         Cloud::configureCloudLogging($this->app);
 
-        $this->assertEquals('notice', $this->app['config']->get('logging.channels.laravel-cloud-socket.level'));
+        $this->assertSame('notice', $this->app['config']->get('logging.channels.laravel-cloud-socket.level'));
 
         unset($_SERVER['LOG_LEVEL']);
 
         if (isset($logLevelBackup)) {
             $_SERVER['LOG_LEVEL'] = $logLevelBackup;
         }
+    }
+
+    public function test_it_aliases_cloud_logging_channel()
+    {
+        Cloud::configureCloudLogging($this->app);
+
+        $this->assertSame(
+            $this->app['config']->get('logging.channels.laravel-cloud-socket'),
+            $this->app['config']->get('logging.channels.cloud')
+        );
+    }
+
+    public function test_it_does_not_replace_existing_cloud_logging_channel()
+    {
+        $this->app['config']->set('logging.channels.cloud', [
+            'driver' => 'single',
+            'path' => 'test.log',
+        ]);
+
+        Cloud::configureCloudLogging($this->app);
+
+        $this->assertSame([
+            'driver' => 'single',
+            'path' => 'test.log',
+        ], $this->app['config']->get('logging.channels.cloud'));
     }
 }

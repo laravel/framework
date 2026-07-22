@@ -6,6 +6,7 @@ use Exception;
 use Generator;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Schema\MySqlSchemaState;
+use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -27,13 +28,13 @@ class DatabaseMySqlSchemaStateTest extends TestCase
         $method = new ReflectionMethod(get_class($schemaState), 'connectionString');
         $connString = $method->invoke($schemaState, $versionInfo);
 
-        self::assertEquals($expectedConnectionString, $connString);
+        $this->assertEquals($expectedConnectionString, $connString);
 
         // test baseVariables
         $method = new ReflectionMethod(get_class($schemaState), 'baseVariables');
         $variables = $method->invoke($schemaState, $dbConfig);
 
-        self::assertEquals($expectedVariables, $variables);
+        $this->assertEquals($expectedVariables, $variables);
     }
 
     public static function provider(): Generator
@@ -71,7 +72,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
                 'username' => 'root',
                 'database' => 'forge',
                 'options' => [
-                    PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA => 'ssl.ca',
+                    Mysql::ATTR_SSL_CA => 'ssl.ca',
                 ],
             ],
         ];
@@ -91,9 +92,9 @@ class DatabaseMySqlSchemaStateTest extends TestCase
                 'username' => 'root',
                 'database' => 'forge',
                 'options' => [
-                    PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA => 'ssl.ca',
-                    PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CERT : \PDO::MYSQL_ATTR_SSL_CERT => '/path/to/client-cert.pem',
-                    PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_KEY : \PDO::MYSQL_ATTR_SSL_KEY => '/path/to/client-key.pem',
+                    Mysql::ATTR_SSL_CA => 'ssl.ca',
+                    Mysql::ATTR_SSL_CERT => '/path/to/client-cert.pem',
+                    Mysql::ATTR_SSL_KEY => '/path/to/client-key.pem',
                 ],
             ],
         ];
@@ -113,7 +114,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
                 'username' => 'root',
                 'database' => 'forge',
                 'options' => [
-                    PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+                    Mysql::ATTR_SSL_VERIFY_SERVER_CERT => false,
                 ],
             ],
         ];
@@ -141,11 +142,11 @@ class DatabaseMySqlSchemaStateTest extends TestCase
     {
         $mockProcess = $this->createMock(Process::class);
         $mockProcess->method('setTimeout')->willReturnSelf();
-        $mockProcess->method('mustRun')->will(
-            $this->throwException(new Exception('column-statistics'))
+        $mockProcess->method('mustRun')->willThrowException(
+            new Exception('column-statistics')
         );
 
-        $mockOutput = $this->createMock(\stdClass::class);
+        $mockOutput = $this->createStub(\stdClass::class);
         $mockVariables = [];
 
         $schemaState = $this->getMockBuilder(MySqlSchemaState::class)

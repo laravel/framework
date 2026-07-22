@@ -14,32 +14,17 @@ jobs:
   update:
     runs-on: ubuntu-24.04
 
-    strategy:
-      fail-fast: true
-
     name: Facade DocBlocks
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
-          php-version: 8.3
           extensions: :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: |
+          composer-command: |
             composer config repositories.facade-documenter vcs git@github.com:laravel/facade-documenter.git
             composer require --dev laravel/facade-documenter:dev-main --prefer-stable --prefer-dist --no-interaction --no-progress
 
@@ -66,6 +51,7 @@ jobs:
             Illuminate\\Support\\Facades\\Gate \
             Illuminate\\Support\\Facades\\Hash \
             Illuminate\\Support\\Facades\\Http \
+            Illuminate\\Support\\Facades\\Image \
             Illuminate\\Support\\Facades\\Lang \
             Illuminate\\Support\\Facades\\Log \
             Illuminate\\Support\\Facades\\Mail \
@@ -92,7 +78,7 @@ jobs:
             Illuminate\\Support\\Facades\\Vite
 
       - name: Commit facade docblocks
-        uses: stefanzweifel/git-auto-commit-action@v7
+        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7
         with:
           commit_message: Update facade docblocks
           file_pattern: src/

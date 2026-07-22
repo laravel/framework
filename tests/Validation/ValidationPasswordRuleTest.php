@@ -57,6 +57,7 @@ class ValidationPasswordRuleTest extends TestCase
         $rule = (new Password(8))->when($is_privileged_user, function ($rule) {
             $rule->symbols();
         });
+        $this->assertInstanceOf(Password::class, $rule);
 
         $this->fails($rule, ['aaaaaaaa', '11111111'], [
             'validation.password.symbols',
@@ -66,6 +67,7 @@ class ValidationPasswordRuleTest extends TestCase
         $rule = (new Password(8))->when($is_privileged_user, function ($rule) {
             $rule->symbols();
         });
+        $this->assertInstanceOf(Password::class, $rule);
 
         $this->passes($rule, ['aaaaaaaa', '11111111']);
     }
@@ -348,7 +350,7 @@ class ValidationPasswordRuleTest extends TestCase
             ->letters()
             ->symbols();
 
-        $this->assertSame($password->appliedRules(), [
+        $this->assertSame([
             'min' => 2,
             'max' => 4,
             'mixedCase' => true,
@@ -358,11 +360,11 @@ class ValidationPasswordRuleTest extends TestCase
             'uncompromised' => false,
             'compromisedThreshold' => 0,
             'customRules' => [],
-        ]);
+        ], $password->appliedRules());
 
         $password = Password::min(2);
 
-        $this->assertSame($password->appliedRules(), [
+        $this->assertSame([
             'min' => 2,
             'max' => null,
             'mixedCase' => false,
@@ -372,7 +374,7 @@ class ValidationPasswordRuleTest extends TestCase
             'uncompromised' => false,
             'compromisedThreshold' => 0,
             'customRules' => [],
-        ]);
+        ], $password->appliedRules());
     }
 
     public function testRequired()
@@ -458,7 +460,7 @@ class ValidationPasswordRuleTest extends TestCase
         $v = \Illuminate\Support\Facades\Validator::make(
             [],
             [
-                'password' => [\Illuminate\Validation\Rules\Password::required()],
+                'password' => [Password::required()],
             ]
         );
 
@@ -496,6 +498,26 @@ class ValidationPasswordRuleTest extends TestCase
     {
         $this->assertSame(['required', 'string', 'min:8'], [...Password::required()]);
         $this->assertSame(['sometimes', 'string', 'min:8'], [...Password::sometimes()]);
+    }
+
+    public function testToPasswordRulesString()
+    {
+        $this->assertSame('minlength: 8;', Password::min(8)->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; maxlength: 64;', Password::min(8)->max(64)->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; required: lower; required: upper;', Password::min(8)->mixedCase()->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; required: lower;', Password::min(8)->letters()->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; required: digit;', Password::min(8)->numbers()->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; required: special;', Password::min(8)->symbols()->toPasswordRulesString());
+
+        $this->assertSame(
+            'minlength: 12; maxlength: 64; required: lower; required: upper; required: digit; required: special;',
+            Password::min(12)->max(64)->mixedCase()->numbers()->symbols()->toPasswordRulesString()
+        );
     }
 
     protected function passes($rule, $values)

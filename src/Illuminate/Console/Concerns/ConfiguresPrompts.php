@@ -141,7 +141,7 @@ trait ConfiguresPrompts
 
             $error = is_callable($validate) ? $validate($result) : $this->validatePrompt($result, $validate);
 
-            if (is_string($error) && strlen($error) > 0) {
+            if (is_string($error) && $error !== '') {
                 $this->components->error($error);
 
                 if ($this->laravel->runningUnitTests()) {

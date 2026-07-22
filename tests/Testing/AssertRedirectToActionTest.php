@@ -12,11 +12,6 @@ use Orchestra\Testbench\TestCase;
 class AssertRedirectToActionTest extends TestCase
 {
     /**
-     * @var \Illuminate\Contracts\Routing\Registrar
-     */
-    private $router;
-
-    /**
      * @var \Illuminate\Routing\UrlGenerator
      */
     public $urlGenerator;
@@ -25,16 +20,16 @@ class AssertRedirectToActionTest extends TestCase
     {
         parent::setUp();
 
-        $this->router = $this->app->make(Registrar::class);
+        $router = $this->app->make(Registrar::class);
 
-        $this->router->get('controller/index', [TestActionController::class, 'index']);
-        $this->router->get('controller/show/{id}', [TestActionController::class, 'show']);
+        $router->get('controller/index', [TestActionController::class, 'index']);
+        $router->get('controller/show/{id}', [TestActionController::class, 'show']);
 
-        $this->router->get('redirect-to-index', function () {
+        $router->get('redirect-to-index', function () {
             return new RedirectResponse($this->urlGenerator->action([TestActionController::class, 'index']));
         });
 
-        $this->router->get('redirect-to-show', function () {
+        $router->get('redirect-to-show', function () {
             return new RedirectResponse($this->urlGenerator->action([TestActionController::class, 'show'], ['id' => 123]));
         });
 

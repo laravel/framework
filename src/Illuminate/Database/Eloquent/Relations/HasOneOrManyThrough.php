@@ -593,9 +593,9 @@ abstract class HasOneOrManyThrough extends Relation
      */
     public function eachById(callable $callback, $count = 1000, $column = null, $alias = null)
     {
-        $column = $column ?? $this->getRelated()->getQualifiedKeyName();
+        $column ??= $this->getRelated()->getQualifiedKeyName();
 
-        $alias = $alias ?? $this->getRelated()->getKeyName();
+        $alias ??= $this->getRelated()->getKeyName();
 
         return $this->prepareQueryBuilder()->eachById($callback, $count, $column, $alias);
     }

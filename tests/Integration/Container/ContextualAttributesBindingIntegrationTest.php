@@ -31,10 +31,10 @@ class ContextualAttributesBindingIntegrationTest extends TestCase
         $records = new Collection($testHandler->getRecords());
 
         $this->assertCount(2, $records);
-        $this->assertEquals('hello', $records->firstWhere(function (LogRecord $record) {
+        $this->assertSame('hello', $records->firstWhere(function (LogRecord $record) {
             return $record->channel === 'testing';
         })->message);
-        $this->assertEquals('bye', $records->firstWhere(function (LogRecord $record) {
+        $this->assertSame('bye', $records->firstWhere(function (LogRecord $record) {
             return $record->channel === 'look-ma-a-channel-name';
         })->message);
     }

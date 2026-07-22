@@ -171,9 +171,9 @@ class RateLimiter
 
         $hits = (int) $this->cache->increment($key, $amount);
 
-        if (! $added && $hits == 1) {
+        if (! $added && $hits == $amount) {
             $this->withoutSerializationOrCompression(
-                fn () => $this->cache->put($key, 1, $decaySeconds)
+                fn () => $this->cache->put($key, $amount, $decaySeconds)
             );
         }
 
@@ -289,8 +289,10 @@ class RateLimiter
     /**
      * Execute the given callback without serialization or compression when applicable.
      *
-     * @param  callable  $callback
-     * @return mixed
+     * @template TReturn
+     *
+     * @param  (callable(): TReturn)  $callback
+     * @return TReturn
      */
     protected function withoutSerializationOrCompression(callable $callback)
     {

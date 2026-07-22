@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue;
 
+use function Illuminate\Support\enum_value;
+
 class QueueRoutes
 {
     /**
@@ -26,7 +28,7 @@ class QueueRoutes
         }
 
         return is_string($route)
-            ? $route
+            ? null
             : $route[0];
     }
 
@@ -81,8 +83,8 @@ class QueueRoutes
      * Register the queue route for the given class.
      *
      * @param  array|class-string  $class
-     * @param  string|null  $queue
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string|null  $queue
+     * @param  \UnitEnum|string|null  $connection
      * @return void
      */
     public function set(array|string $class, $queue = null, $connection = null)
@@ -90,14 +92,16 @@ class QueueRoutes
         $routes = is_array($class) ? $class : [$class => [$connection, $queue]];
 
         foreach ($routes as $from => $to) {
-            $this->routes[$from] = $to;
+            $this->routes[$from] = is_array($to)
+                ? array_map(enum_value(...), $to)
+                : enum_value($to);
         }
     }
 
     /**
      * Get all registered queue routes.
      *
-     * @return array
+     * @return array<class-string, array|string>
      */
     public function all()
     {

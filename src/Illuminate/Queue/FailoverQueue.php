@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Events\QueueFailedOver;
+use Illuminate\Support\Collection;
 use RuntimeException;
 use Throwable;
 
@@ -69,6 +70,69 @@ class FailoverQueue extends Queue implements QueueContract
     public function reservedSize($queue = null)
     {
         return $this->manager->connection($this->connections[0])->reservedSize($queue);
+    }
+
+    /**
+     * Get the pending jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection
+     */
+    public function pendingJobs($queue = null): Collection
+    {
+        return $this->manager->connection($this->connections[0])->pendingJobs($queue);
+    }
+
+    /**
+     * Get the delayed jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection
+     */
+    public function delayedJobs($queue = null): Collection
+    {
+        return $this->manager->connection($this->connections[0])->delayedJobs($queue);
+    }
+
+    /**
+     * Get the reserved jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection
+     */
+    public function reservedJobs($queue = null): Collection
+    {
+        return $this->manager->connection($this->connections[0])->reservedJobs($queue);
+    }
+
+    /**
+     * Get all pending jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allPendingJobs(): Collection
+    {
+        return $this->manager->connection($this->connections[0])->allPendingJobs();
+    }
+
+    /**
+     * Get all delayed jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allDelayedJobs(): Collection
+    {
+        return $this->manager->connection($this->connections[0])->allDelayedJobs();
+    }
+
+    /**
+     * Get all reserved jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allReservedJobs(): Collection
+    {
+        return $this->manager->connection($this->connections[0])->allReservedJobs();
     }
 
     /**

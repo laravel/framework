@@ -24,6 +24,7 @@ remote bus git@github.com:illuminate/bus.git
 remote cache git@github.com:illuminate/cache.git
 remote collections git@github.com:illuminate/collections.git
 remote conditionable git@github.com:illuminate/conditionable.git
+remote concurrency git@github.com:illuminate/concurrency.git
 remote config git@github.com:illuminate/config.git
 remote console git@github.com:illuminate/console.git
 remote container git@github.com:illuminate/container.git
@@ -35,6 +36,7 @@ remote events git@github.com:illuminate/events.git
 remote filesystem git@github.com:illuminate/filesystem.git
 remote hashing git@github.com:illuminate/hashing.git
 remote http git@github.com:illuminate/http.git
+remote image git@github.com:illuminate/image.git
 remote json-schema git@github.com:illuminate/json-schema.git
 remote log git@github.com:illuminate/log.git
 remote macroable git@github.com:illuminate/macroable.git
@@ -60,6 +62,7 @@ split 'src/Illuminate/Bus' bus
 split 'src/Illuminate/Cache' cache
 split 'src/Illuminate/Collections' collections
 split 'src/Illuminate/Conditionable' conditionable
+split 'src/Illuminate/Concurrency' concurrency
 split 'src/Illuminate/Config' config
 split 'src/Illuminate/Console' console
 split 'src/Illuminate/Container' container
@@ -71,6 +74,7 @@ split 'src/Illuminate/Events' events
 split 'src/Illuminate/Filesystem' filesystem
 split 'src/Illuminate/Hashing' hashing
 split 'src/Illuminate/Http' http
+split 'src/Illuminate/Image' image
 split 'src/Illuminate/JsonSchema' json-schema
 split 'src/Illuminate/Log' log
 split 'src/Illuminate/Macroable' macroable

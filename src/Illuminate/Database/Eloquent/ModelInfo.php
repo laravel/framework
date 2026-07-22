@@ -77,21 +77,39 @@ class ModelInfo implements Arrayable, ArrayAccess
         ];
     }
 
+    /**
+     * Determine if the given offset exists.
+     */
     public function offsetExists(mixed $offset): bool
     {
         return property_exists($this, $offset);
     }
 
+    /**
+     * Get the value for a given offset.
+     *
+     * @throws \InvalidArgumentException
+     */
     public function offsetGet(mixed $offset): mixed
     {
         return property_exists($this, $offset) ? $this->{$offset} : throw new InvalidArgumentException("Property {$offset} does not exist.");
     }
 
+    /**
+     * Set the value at the given offset.
+     *
+     * @throws \LogicException
+     */
     public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new LogicException(self::class.' may not be mutated using array access.');
     }
 
+    /**
+     * Unset the value at the given offset.
+     *
+     * @throws \LogicException
+     */
     public function offsetUnset(mixed $offset): void
     {
         throw new LogicException(self::class.' may not be mutated using array access.');

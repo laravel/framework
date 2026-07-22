@@ -2,13 +2,30 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Mail\Attachable;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Mail\Attachment;
 use Illuminate\Notifications\Messages\MailMessage;
 use PHPUnit\Framework\TestCase;
 
 class NotificationMailMessageTest extends TestCase
 {
+    protected ?string $filesystemRoot = null;
+
+    protected function tearDown(): void
+    {
+        if ($this->filesystemRoot !== null) {
+            $this->deleteDirectory($this->filesystemRoot);
+            $this->filesystemRoot = null;
+        }
+
+        parent::tearDown();
+    }
+
     public function testTemplate()
     {
         $message = new MailMessage;
@@ -303,6 +320,37 @@ class NotificationMailMessageTest extends TestCase
         $this->assertSame([['truthy@example.com', null]], $message->cc);
     }
 
+    public function testItAttachesFilesFromStorage()
+    {
+        $this->bootstrapFilesystem();
+
+        file_put_contents($this->filesystemRoot.'/invoices/1.pdf', 'pdf content');
+
+        $message = new MailMessage;
+        $message->attachFromStorage('invoices/1.pdf', 'invoice.pdf');
+
+        $this->assertCount(1, $message->rawAttachments);
+        $this->assertSame('invoice.pdf', $message->rawAttachments[0]['name']);
+        $this->assertSame('pdf content', $message->rawAttachments[0]['data']);
+    }
+
+    public function testItAttachesFilesFromStorageDisk()
+    {
+        $this->bootstrapFilesystem();
+
+        file_put_contents($this->filesystemRoot.'/reports/report.txt', 'report content');
+
+        $message = new MailMessage;
+        $message->attachFromStorageDisk('s3', 'reports/report.txt', 'monthly-report.txt', [
+            'mime' => 'text/plain',
+        ]);
+
+        $this->assertCount(1, $message->rawAttachments);
+        $this->assertSame('monthly-report.txt', $message->rawAttachments[0]['name']);
+        $this->assertSame('report content', $message->rawAttachments[0]['data']);
+        $this->assertSame('text/plain', $message->rawAttachments[0]['options']['mime']);
+    }
+
     public function testItAttachesFilesViaAttachableContractFromPath()
     {
         $message = new MailMessage;
@@ -388,5 +436,58 @@ class NotificationMailMessageTest extends TestCase
                 ],
             ],
         ], $mailMessage->attachments);
+    }
+
+    protected function bootstrapFilesystem(): void
+    {
+        $this->filesystemRoot = sys_get_temp_dir().'/laravel-notification-mail-message-'.uniqid();
+
+        mkdir($this->filesystemRoot.'/invoices', 0777, true);
+        mkdir($this->filesystemRoot.'/reports', 0777, true);
+
+        $container = Container::getInstance() ?? new Container;
+
+        Container::setInstance($container);
+
+        $container->instance('config', new ConfigRepository([
+            'filesystems' => [
+                'default' => 'local',
+                'disks' => [
+                    'local' => [
+                        'driver' => 'local',
+                        'root' => $this->filesystemRoot,
+                    ],
+                    's3' => [
+                        'driver' => 'local',
+                        'root' => $this->filesystemRoot,
+                    ],
+                ],
+            ],
+        ]));
+
+        $container->instance('files', new Filesystem);
+
+        $container->singleton('filesystem', fn ($container) => new FilesystemManager($container));
+
+        $container->alias('filesystem', FilesystemFactory::class);
+    }
+
+    protected function deleteDirectory(string $directory): void
+    {
+        if (! is_dir($directory)) {
+            return;
+        }
+
+        foreach (scandir($directory) as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            $path = $directory.'/'.$item;
+
+            is_dir($path) ? $this->deleteDirectory($path) : unlink($path);
+        }
+
+        rmdir($directory);
     }
 }

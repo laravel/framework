@@ -255,7 +255,7 @@ class TestView implements Stringable
 
         $values = $escape ? array_map(e(...), $value) : $value;
 
-        PHPUnit::assertThat($values, new SeeInHtml($this->rendered));
+        PHPUnit::assertThat($values, new SeeInHtml($this->rendered, negate: true));
 
         return $this;
     }

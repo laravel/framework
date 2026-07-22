@@ -122,7 +122,7 @@ class SeeInHtml extends Constraint
         $value = strip_tags($value);
         $value = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
         $value = trim($value);
-        $value = preg_replace('/\s+/', ' ', $value);
+        $value = preg_replace('/\s+/u', ' ', $value);
 
         return $value;
     }

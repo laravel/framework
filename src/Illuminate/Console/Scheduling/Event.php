@@ -92,6 +92,13 @@ class Event
     public $exitCode;
 
     /**
+     * Indicates whether the execution was skipped due to the mutex already being reserved.
+     *
+     * @var bool
+     */
+    public $skippedBecauseOverlapping = false;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
@@ -127,9 +134,15 @@ class Event
      */
     public function run(Container $container)
     {
+        $this->skippedBecauseOverlapping = false;
+
         if ($this->shouldSkipDueToOverlapping()) {
+            $this->skippedBecauseOverlapping = true;
+
             return;
         }
+
+        $this->ensureMutexIsReleasedOnSignal();
 
         $exitCode = $this->start($container);
 
@@ -236,7 +249,7 @@ class Event
     public function callBeforeCallbacks(Container $container)
     {
         foreach ($this->beforeCallbacks as $callback) {
-            $container->call($callback);
+            $this->callEventCallback($container, $callback);
         }
     }
 
@@ -249,7 +262,7 @@ class Event
     public function callAfterCallbacks(Container $container)
     {
         foreach ($this->afterCallbacks as $callback) {
-            $container->call($callback);
+            $this->callEventCallback($container, $callback);
         }
     }
 
@@ -336,19 +349,8 @@ class Event
     {
         $this->lastChecked = Date::now();
 
-        foreach ($this->filters as $callback) {
-            if (! $app->call($callback)) {
-                return false;
-            }
-        }
-
-        foreach ($this->rejects as $callback) {
-            if ($app->call($callback)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($this->filters, fn ($callback) => $this->callEventCallback($app, $callback))
+            && array_all($this->rejects, fn ($callback) => ! $this->callEventCallback($app, $callback));
     }
 
     /**
@@ -688,7 +690,7 @@ class Event
 
         return $this->then(function (Container $container) use ($callback) {
             if ($this->exitCode === 0) {
-                $container->call($callback);
+                $this->callEventCallback($container, $callback);
             }
         });
     }
@@ -723,7 +725,7 @@ class Event
 
         return $this->then(function (Container $container) use ($callback) {
             if ($this->exitCode !== 0) {
-                $container->call($callback);
+                $this->callEventCallback($container, $callback);
             }
         });
     }
@@ -756,8 +758,46 @@ class Event
 
             return $onlyIfOutputExists && empty($output)
                 ? null
-                : $container->call($callback, ['output' => new Stringable($output)]);
+                : $this->callEventCallback($container, $callback, ['output' => new Stringable($output)]);
         };
+    }
+
+    /**
+     * Call the given event callback.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  callable  $callback
+     * @param  array<string, mixed>  $parameters
+     * @return mixed
+     */
+    protected function callEventCallback(Container $container, callable $callback, array $parameters = [])
+    {
+        $eventParameters = $callback instanceof Closure
+            ? $this->eventParametersForCallback($callback)
+            : [];
+
+        return $container->call($callback, array_merge(
+            $eventParameters, $parameters
+        ));
+    }
+
+    /**
+     * Get the event parameters for the given callback.
+     *
+     * @param  \Closure  $callback
+     * @return array
+     */
+    protected function eventParametersForCallback(Closure $callback)
+    {
+        $parameters = $this->closureParameterTypes($callback);
+
+        foreach ($parameters as $name => $type) {
+            if ($type !== null && is_a($this, $type)) {
+                return [$name => $this];
+            }
+        }
+
+        return [];
     }
 
     /**
@@ -825,7 +865,7 @@ class Event
         }
 
         return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.
-            sha1($this->expression.$this->normalizeCommand($this->command ?? ''));
+            sha1($this->expression.self::normalizeCommand($this->command ?? ''));
     }
 
     /**
@@ -839,6 +879,30 @@ class Event
         $this->mutexNameResolver = is_string($mutexName) ? fn () => $mutexName : $mutexName;
 
         return $this;
+    }
+
+    /**
+     * Ensure the mutex is released if the process receives a termination signal.
+     *
+     * @return void
+     */
+    protected function ensureMutexIsReleasedOnSignal()
+    {
+        if (! $this->releaseOnTerminationSignals ||
+            $this->runInBackground ||
+            ! extension_loaded('pcntl')) {
+            return;
+        }
+
+        pcntl_async_signals(true);
+
+        foreach ([SIGTERM, SIGINT, SIGQUIT] as $signal) {
+            pcntl_signal($signal, function () {
+                $this->removeMutex();
+
+                exit(1);
+            });
+        }
     }
 
     /**

@@ -63,15 +63,9 @@ class TableCommand extends MigrationGeneratorCommand
             return parent::migrationExists($table);
         }
 
-        foreach ([
+        return array_any([
             join_paths($this->laravel->databasePath('migrations'), '*_*_*_*_create_'.$table.'_table.php'),
             join_paths($this->laravel->databasePath('migrations'), '0001_01_01_000002_create_jobs_table.php'),
-        ] as $path) {
-            if (count($this->files->glob($path)) !== 0) {
-                return true;
-            }
-        }
-
-        return false;
+        ], fn ($path) => count($this->files->glob($path)) !== 0);
     }
 }

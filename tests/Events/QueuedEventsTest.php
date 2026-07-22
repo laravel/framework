@@ -587,6 +587,7 @@ class QueuedEventsTest extends TestCase
         $job->shouldReceive('isDeleted')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+        $job->shouldReceive('attempts')->andReturn(1);
         $job->shouldReceive('delete')->once();
 
         $handler = new CallQueuedHandler(new BusDispatcher($container), $container);
@@ -669,7 +670,7 @@ class TestDispatcherOptions implements ShouldQueue
 
     public function retryUntil()
     {
-        return Carbon::now()->addHour(1);
+        return Carbon::now()->addHour();
     }
 
     public function tries()

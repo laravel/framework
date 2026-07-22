@@ -29,7 +29,7 @@ class PreventRequestForgeryTest extends TestCase
 
         $response = $middleware->handle($request, fn () => new Response('OK'));
 
-        $this->assertEquals('OK', $response->getContent());
+        $this->assertSame('OK', $response->getContent());
     }
 
     public function test_same_site_header_rejected_by_default()
@@ -51,7 +51,7 @@ class PreventRequestForgeryTest extends TestCase
 
         $response = $middleware->handle($request, fn () => new Response('OK'));
 
-        $this->assertEquals('OK', $response->getContent());
+        $this->assertSame('OK', $response->getContent());
     }
 
     public function test_cross_site_with_valid_token_passes()
@@ -61,7 +61,7 @@ class PreventRequestForgeryTest extends TestCase
 
         $response = $middleware->handle($request, fn () => new Response('OK'));
 
-        $this->assertEquals('OK', $response->getContent());
+        $this->assertSame('OK', $response->getContent());
     }
 
     public function test_cross_site_without_token_fails()
@@ -118,7 +118,7 @@ class PreventRequestForgeryTest extends TestCase
 
         $response = $middleware->handle($request, fn () => new Response('OK'));
 
-        $this->assertEquals('OK', $response->getContent());
+        $this->assertSame('OK', $response->getContent());
     }
 
     protected function createRequest(array $server = [], ?string $token = null)

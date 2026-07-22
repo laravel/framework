@@ -22,7 +22,7 @@ class TrimStringsTest extends TestCase
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals('This title does not contain any zero-width space', $req->title);
+            $this->assertSame('This title does not contain any zero-width space', $req->title);
         });
     }
 
@@ -40,7 +40,7 @@ class TrimStringsTest extends TestCase
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals('This title contains a zero-width space at the beginning', $req->title);
+            $this->assertSame('This title contains a zero-width space at the beginning', $req->title);
         });
     }
 
@@ -57,7 +57,7 @@ class TrimStringsTest extends TestCase
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals(' test title ', $req->globally_ignored_title);
+            $this->assertSame(' test title ', $req->globally_ignored_title);
         });
     }
 
@@ -75,7 +75,7 @@ class TrimStringsTest extends TestCase
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals('This title contains a zero-width space at the end', $req->title);
+            $this->assertSame('This title contains a zero-width space at the end', $req->title);
         });
     }
 
@@ -93,7 +93,7 @@ class TrimStringsTest extends TestCase
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals('This title contains a zero-width non-breakable space at the beginning', $req->title);
+            $this->assertSame('This title contains a zero-width non-breakable space at the beginning', $req->title);
         });
     }
 
@@ -111,7 +111,7 @@ class TrimStringsTest extends TestCase
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals('This title contains a zero-width non-breakable space at the beginning', $req->title);
+            $this->assertSame('This title contains a zero-width non-breakable space at the beginning', $req->title);
         });
     }
 
@@ -129,7 +129,7 @@ class TrimStringsTest extends TestCase
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals('This title contains a combination of zero-width non-breakable space and zero-width spaces characters at the beginning and the end', $req->title);
+            $this->assertSame('This title contains a combination of zero-width non-breakable space and zero-width spaces characters at the beginning and the end', $req->title);
         });
     }
 
@@ -147,7 +147,7 @@ class TrimStringsTest extends TestCase
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals('This title contains a invisible character at the beginning', $req->title);
+            $this->assertSame('This title contains a invisible character at the beginning', $req->title);
         });
     }
 
@@ -165,7 +165,7 @@ class TrimStringsTest extends TestCase
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals('This title contains a invisible character at the end', $req->title);
+            $this->assertSame('This title contains a invisible character at the end', $req->title);
         });
     }
 
@@ -183,7 +183,7 @@ class TrimStringsTest extends TestCase
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals('This title contains a invisible character at the beginning', $req->title);
+            $this->assertSame('This title contains a invisible character at the beginning', $req->title);
         });
     }
 
@@ -201,7 +201,7 @@ class TrimStringsTest extends TestCase
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals('This title contains a invisible character at the end', $req->title);
+            $this->assertSame('This title contains a invisible character at the end', $req->title);
         });
     }
 
@@ -219,7 +219,7 @@ class TrimStringsTest extends TestCase
         $middleware = new TrimStrings;
 
         $middleware->handle($request, function ($req) {
-            $this->assertEquals('This title contains a combination of a invisible character at beginning and the end', $req->title);
+            $this->assertSame('This title contains a combination of a invisible character at beginning and the end', $req->title);
         });
     }
 

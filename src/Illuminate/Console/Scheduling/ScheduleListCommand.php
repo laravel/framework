@@ -6,6 +6,7 @@ use Closure;
 use Cron\CronExpression;
 use DateTimeZone;
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use ReflectionClass;
@@ -23,6 +24,7 @@ class ScheduleListCommand extends Command
      */
     protected $signature = 'schedule:list
         {--timezone= : The timezone that times should be displayed in}
+        {--environment=* : Display the tasks scheduled to run on this environment}
         {--next : Sort the listed tasks by their next due date}
         {--json : Output the scheduled tasks as JSON}
     ';
@@ -51,7 +53,13 @@ class ScheduleListCommand extends Command
      */
     public function handle(Schedule $schedule)
     {
-        $events = new Collection($schedule->events());
+        $environments = Arr::wrap($this->option('environment'));
+
+        $events = new Collection(
+            empty($environments)
+                ? $schedule->events()
+                : $schedule->eventsForEnvironments($environments)
+        );
 
         if ($events->isEmpty()) {
             if ($this->option('json')) {
@@ -79,7 +87,7 @@ class ScheduleListCommand extends Command
      */
     protected function displayJson(Collection $events, DateTimeZone $timezone)
     {
-        $this->output->writeln($events->map(function ($event) use ($timezone) {
+        $this->output->writeln($events->flatMap(function ($event) use ($timezone) {
             $nextDueDate = $this->getNextDueDateForEvent($event, $timezone);
 
             $command = $event->command ?? '';
@@ -96,8 +104,8 @@ class ScheduleListCommand extends Command
                 }
             }
 
-            return [
-                'expression' => $event->expression,
+            return (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))->map(fn ($expression) => [
+                'expression' => $expression,
                 'command' => $command,
                 'description' => $event->description ?? null,
                 'next_due_date' => $nextDueDate->format('Y-m-d H:i:s P'),
@@ -106,7 +114,7 @@ class ScheduleListCommand extends Command
                 'has_mutex' => $event->mutex->exists($event),
                 'repeat_seconds' => $event->isRepeatable() ? $event->repeatSeconds : null,
                 'environments' => $event->environments,
-            ];
+            ]);
         })->values()->toJson());
     }
 
@@ -121,16 +129,18 @@ class ScheduleListCommand extends Command
     {
         $terminalWidth = self::getTerminalWidth();
 
-        $expressionSpacing = $this->getCronExpressionSpacing($events);
+        $expressionSpacing = $this->getCronExpressionSpacing($events, $timezone);
 
         $repeatExpressionSpacing = $this->getRepeatExpressionSpacing($events);
 
-        $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone) {
-            return $this->listEvent($event, $terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone);
+        $events = $events->flatMap(function ($event) use ($terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone) {
+            return (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))->map(
+                fn ($expression) => $this->listEvent($event, $terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone, $expression),
+            );
         });
 
         $this->line(
-            $events->flatten()->filter()->prepend('')->push('')->toArray()
+            $events->flatten()->filter()->prepend('')->push('')->toArray(),
         );
     }
 
@@ -140,9 +150,10 @@ class ScheduleListCommand extends Command
      * @param  \Illuminate\Support\Collection  $events
      * @return array<int, int>
      */
-    private function getCronExpressionSpacing($events)
+    private function getCronExpressionSpacing($events, DateTimeZone $timezone)
     {
-        $rows = $events->map(fn ($event) => array_map(mb_strlen(...), preg_split("/\s+/", $event->expression)));
+        $rows = $events->flatMap(fn ($event) => (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))
+            ->map(fn ($expression) => array_map(mb_strlen(...), preg_split("/\s+/", $expression))));
 
         return (new Collection($rows[0] ?? []))->keys()->map(fn ($key) => $rows->max($key))->all();
     }
@@ -166,11 +177,12 @@ class ScheduleListCommand extends Command
      * @param  array  $expressionSpacing
      * @param  int  $repeatExpressionSpacing
      * @param  \DateTimeZone  $timezone
+     * @param  string|null  $convertedExpression
      * @return array
      */
-    private function listEvent($event, $terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone)
+    private function listEvent($event, $terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone, $convertedExpression = null)
     {
-        $expression = $this->formatCronExpression($event->expression, $expressionSpacing);
+        $expression = $this->formatCronExpression($convertedExpression ?? $event->expression, $expressionSpacing);
 
         $repeatExpression = str_pad($this->getRepeatExpression($event), $repeatExpressionSpacing);
 
@@ -203,7 +215,7 @@ class ScheduleListCommand extends Command
         $hasMutex = $event->mutex->exists($event) ? 'Has Mutex › ' : '';
 
         $dots = str_repeat('.', max(
-            $terminalWidth - mb_strwidth($expression.$repeatExpression.$command.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0
+            $terminalWidth - mb_strwidth($expression.$repeatExpression.$command.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0,
         ));
 
         // Highlight the parameters...
@@ -217,12 +229,12 @@ class ScheduleListCommand extends Command
             $dots,
             $hasMutex,
             $nextDueDateLabel,
-            $nextDueDate
+            $nextDueDate,
         ), $this->output->isVerbose() && mb_strlen($description) > 1 ? sprintf(
             '  <fg=#6C7280>%s%s %s</>',
             str_repeat(' ', mb_strlen($expression) + 2),
             '⇁',
-            $description
+            $description,
         ) : ''];
     }
 
@@ -275,7 +287,7 @@ class ScheduleListCommand extends Command
         $nextDueDate = Carbon::instance(
             (new CronExpression($event->expression))
                 ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
-                ->setTimezone($timezone)
+                ->setTimezone($timezone),
         );
 
         if (! $event->isRepeatable()) {
@@ -285,7 +297,7 @@ class ScheduleListCommand extends Command
         $previousDueDate = Carbon::instance(
             (new CronExpression($event->expression))
                 ->getPreviousRunDate(Carbon::now()->setTimezone($event->timezone), allowCurrentDate: true)
-                ->setTimezone($timezone)
+                ->setTimezone($timezone),
         );
 
         $now = Carbon::now()->setTimezone($event->timezone);
@@ -331,7 +343,7 @@ class ScheduleListCommand extends Command
             return sprintf(
                 '%s:%s',
                 str_replace($this->laravel->basePath().DIRECTORY_SEPARATOR, '', $function->getFileName() ?: ''),
-                $function->getStartLine()
+                $function->getStartLine(),
             );
         }
 

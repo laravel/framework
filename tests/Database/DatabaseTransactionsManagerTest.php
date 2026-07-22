@@ -253,6 +253,121 @@ class DatabaseTransactionsManagerTest extends TestCase
         $this->assertEquals(['default', 1], $callbacks[1]);
     }
 
+    public function testRollbackExecutesCallbacksForCommittedSavepointsWhenOuterRollsBack()
+    {
+        $callbacks = [];
+
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('default', 1);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 1];
+        });
+
+        $manager->begin('default', 2);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 2];
+        });
+
+        $manager->commit('default', 2, 1);
+        $manager->rollback('default', 0);
+
+        $this->assertSame([['default', 2], ['default', 1]], $callbacks);
+    }
+
+    public function testRollbackExecutesCallbacksInDeepestFirstOrderAcrossCommittedAndOpenBranches()
+    {
+        $callbacks = [];
+
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('default', 1);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 1];
+        });
+
+        $manager->begin('default', 2);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['committed', 2];
+        });
+
+        $manager->commit('default', 2, 1);
+
+        $manager->begin('default', 2);
+        $manager->begin('default', 3);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['open', 3];
+        });
+
+        $manager->rollback('default', 0);
+
+        $this->assertSame([['open', 3], ['committed', 2], ['default', 1]], $callbacks);
+    }
+
+    public function testRollbackExecutesCallbacksInDeepestFirstOrderAcrossCommittedBranches()
+    {
+        $callbacks = [];
+
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('default', 1);
+        $manager->begin('default', 2);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['first', 2];
+        });
+
+        $manager->commit('default', 2, 1);
+
+        $manager->begin('default', 2);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['second', 2];
+        });
+
+        $manager->begin('default', 3);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['second', 3];
+        });
+
+        $manager->commit('default', 3, 2);
+        $manager->commit('default', 2, 1);
+        $manager->rollback('default', 0);
+
+        $this->assertSame([['second', 3], ['first', 2], ['second', 2]], $callbacks);
+    }
+
+    public function testPartialRollbackExecutesCallbacksForCommittedDescendantSavepoints()
+    {
+        $callbacks = [];
+
+        $manager = new DatabaseTransactionsManager;
+
+        $manager->begin('default', 1);
+        $manager->begin('default', 2);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 2];
+        });
+
+        $manager->begin('default', 3);
+
+        $manager->addCallbackForRollback(function () use (&$callbacks) {
+            $callbacks[] = ['default', 3];
+        });
+
+        $manager->commit('default', 3, 2);
+        $manager->rollback('default', 1);
+
+        $this->assertSame([['default', 3], ['default', 2]], $callbacks);
+    }
+
     public function testRollbackExecutesOnlyCallbacksOfTheConnection()
     {
         $callbacks = [];
@@ -304,21 +419,21 @@ class DatabaseTransactionsManagerTest extends TestCase
         $pendingTransactions = $manager->getPendingTransactions();
 
         $this->assertEquals(1, $pendingTransactions[0]->level);
-        $this->assertEquals('default', $pendingTransactions[0]->connection);
+        $this->assertSame('default', $pendingTransactions[0]->connection);
         $this->assertEquals(1, $pendingTransactions[1]->level);
-        $this->assertEquals('admin', $pendingTransactions[1]->connection);
+        $this->assertSame('admin', $pendingTransactions[1]->connection);
 
         $manager->stageTransactions('default', 1);
 
         $this->assertCount(1, $manager->getPendingTransactions());
         $this->assertCount(1, $manager->getCommittedTransactions());
-        $this->assertEquals('default', $manager->getCommittedTransactions()[0]->connection);
+        $this->assertSame('default', $manager->getCommittedTransactions()[0]->connection);
 
         $manager->stageTransactions('admin', 1);
 
         $this->assertCount(0, $manager->getPendingTransactions());
         $this->assertCount(2, $manager->getCommittedTransactions());
-        $this->assertEquals('admin', $manager->getCommittedTransactions()[1]->connection);
+        $this->assertSame('admin', $manager->getCommittedTransactions()[1]->connection);
     }
 
     public function testStageTransactionsOnlyStagesTheTransactionsAtOrAboveTheGivenLevel()

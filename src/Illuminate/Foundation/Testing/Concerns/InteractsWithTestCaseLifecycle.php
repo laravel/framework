@@ -11,6 +11,7 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
@@ -36,6 +37,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
+use Illuminate\Support\Lottery;
 use Illuminate\Support\Once;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
@@ -183,12 +185,14 @@ trait InteractsWithTestCaseLifecycle
         Component::forgetFactory();
         ConvertEmptyStringsToNull::flushState();
         Factory::flushState();
+        FormRequest::flushState();
         EncodedHtmlString::flushState();
         EncryptCookies::flushState();
         HandleCors::flushState();
         HandleExceptions::flushState($this);
         JsonApiResource::flushState();
         JsonResource::flushState();
+        Lottery::determineResultsNormally();
         Markdown::flushState();
         Migrator::withoutMigrations([]);
         Once::flush();
@@ -217,7 +221,7 @@ trait InteractsWithTestCaseLifecycle
      */
     protected function setUpTraits()
     {
-        $uses = $this->traitsUsedByTest ?? array_flip(class_uses_recursive(static::class));
+        $uses = $this->traitsUsedByTest ?? class_uses_recursive(static::class);
 
         if (isset($uses[RefreshDatabase::class])) {
             $this->refreshDatabase();

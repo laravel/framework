@@ -11,7 +11,6 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\ThrottlesExceptionsWithRedis;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -28,8 +27,6 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         parent::setUp();
 
         $this->setUpRedis();
-
-        Carbon::setTestNow(Carbon::now());
     }
 
     protected function tearDown(): void
@@ -149,6 +146,38 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
 
         $middleware->report(fn () => false);
         $middleware->handle($job, $next);
+    }
+
+    public function testItCanBackoffUsingException()
+    {
+        $job = new class
+        {
+            public $releasedAfter;
+
+            public function release($delay)
+            {
+                $this->releasedAfter = $delay;
+
+                return $this;
+            }
+        };
+        $expectedException = new RuntimeException('Whoops!');
+        $receivedException = null;
+        $next = function () use ($expectedException) {
+            throw $expectedException;
+        };
+
+        $middleware = (new ThrottlesExceptionsWithRedis())->backoff(function ($throwable) use (&$receivedException) {
+            $receivedException = $throwable;
+
+            return 5;
+        });
+
+        $result = $middleware->handle($job, $next);
+
+        $this->assertSame($job, $result);
+        $this->assertSame($expectedException, $receivedException);
+        $this->assertSame(300, $job->releasedAfter);
     }
 }
 

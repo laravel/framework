@@ -18,19 +18,19 @@ class TranslationTranslatorTest extends TestCase
     public function testHasMethodReturnsFalseWhenReturnedTranslationIsNull()
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
-        $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->willReturn('foo');
+        $t->expects($this->once())->method('get')->with('foo', [], 'bar')->willReturn('foo');
         $this->assertFalse($t->has('foo', 'bar'));
 
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en', 'sp'])->getMock();
-        $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->willReturn('bar');
+        $t->expects($this->once())->method('get')->with('foo', [], 'bar')->willReturn('bar');
         $this->assertTrue($t->has('foo', 'bar'));
 
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
-        $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'), false)->willReturn('bar');
+        $t->expects($this->once())->method('get')->with('foo', [], 'bar', false)->willReturn('bar');
         $this->assertTrue($t->hasForLocale('foo', 'bar'));
 
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
-        $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'), false)->willReturn('foo');
+        $t->expects($this->once())->method('get')->with('foo', [], 'bar', false)->willReturn('foo');
         $this->assertFalse($t->hasForLocale('foo', 'bar'));
 
         $t = new Translator($this->getLoader(), 'en');
@@ -62,6 +62,44 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals(['foo' => 'foo', 'baz' => 'breeze bar', 'qux' => ['tree bar', 'breeze bar', 'beep' => ['rock' => 'tree bar']]], $t->get('foo::bar', ['foo' => 'bar'], 'en'));
         $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo', $t->get('foo::bar.foo'));
+    }
+
+    public function testStringMethodProperlyLoadsAndRetrievesStringItem()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => 'breeze :foo']);
+        $this->assertSame('breeze bar', $t->string('foo::bar.baz', ['foo' => 'bar'], 'en'));
+    }
+
+    public function testStringMethodThrowsExceptionForArrayItem()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => ['breeze']]);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Translation value for key [foo::bar.baz] must be a string, array given.');
+
+        $t->string('foo::bar.baz', [], 'en');
+    }
+
+    public function testArrayMethodProperlyLoadsAndRetrievesArrayItem()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => ['breeze :foo']]);
+        $this->assertSame(['breeze bar'], $t->array('foo::bar.baz', ['foo' => 'bar'], 'en'));
+    }
+
+    public function testArrayMethodThrowsExceptionForStringItem()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => 'breeze']);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Translation value for key [foo::bar.baz] must be an array, string given.');
+
+        $t->array('foo::bar.baz', [], 'en');
     }
 
     public function testGetMethodForNonExistingReturnsSameKey()
@@ -135,8 +173,8 @@ class TranslationTranslatorTest extends TestCase
     public function testChoiceMethodProperlyLoadsAndRetrievesItemForAnInt()
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
-        $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('en'))->willReturn('line');
-        $t->expects($this->once())->method('localeForChoice')->with($this->equalTo('foo'), $this->equalTo(null))->willReturn('en');
+        $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
+        $t->expects($this->once())->method('localeForChoice')->with('foo', null)->willReturn('en');
         $t->setSelector($selector = m::mock(MessageSelector::class));
         $selector->shouldReceive('choose')->once()->with('line', 10, 'en')->andReturn('choiced');
 
@@ -146,8 +184,8 @@ class TranslationTranslatorTest extends TestCase
     public function testChoiceMethodProperlyLoadsAndRetrievesItemForAFloat()
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
-        $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('en'))->willReturn('line');
-        $t->expects($this->once())->method('localeForChoice')->with($this->equalTo('foo'), $this->equalTo(null))->willReturn('en');
+        $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
+        $t->expects($this->once())->method('localeForChoice')->with('foo', null)->willReturn('en');
         $t->setSelector($selector = m::mock(MessageSelector::class));
         $selector->shouldReceive('choose')->once()->with('line', 1.2, 'en')->andReturn('choiced');
 
@@ -157,8 +195,8 @@ class TranslationTranslatorTest extends TestCase
     public function testChoiceMethodProperlyCountsCollectionsAndLoadsAndRetrievesItem()
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
-        $t->expects($this->exactly(2))->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('en'))->willReturn('line');
-        $t->expects($this->exactly(2))->method('localeForChoice')->with($this->equalTo('foo'), $this->equalTo(null))->willReturn('en');
+        $t->expects($this->exactly(2))->method('get')->with('foo', [], 'en')->willReturn('line');
+        $t->expects($this->exactly(2))->method('localeForChoice')->with('foo', null)->willReturn('en');
         $t->setSelector($selector = m::mock(MessageSelector::class));
         $selector->shouldReceive('choose')->twice()->with('line', 3, 'en')->andReturn('choiced');
 
@@ -173,8 +211,8 @@ class TranslationTranslatorTest extends TestCase
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'hasForLocale'])->setConstructorArgs([$this->getLoader(), 'cs'])->getMock();
         $t->setFallback('en');
-        $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('en'))->willReturn('line');
-        $t->expects($this->once())->method('hasForLocale')->with($this->equalTo('foo'), $this->equalTo('cs'))->willReturn(false);
+        $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
+        $t->expects($this->once())->method('hasForLocale')->with('foo', 'cs')->willReturn(false);
         $t->setSelector($selector = m::mock(MessageSelector::class));
         $selector->shouldReceive('choose')->once()->with('line', 10, 'en')->andReturn('choiced');
 
@@ -184,12 +222,12 @@ class TranslationTranslatorTest extends TestCase
     public function testChoiceMethodProperlyUsesCustomCountReplacement()
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
-        $t->expects($this->once())->method('get')->with($this->equalTo(':count foos'), $this->equalTo([]), $this->equalTo('en'))->willReturn('{1} :count foos|[2,*] :count foos');
-        $t->expects($this->once())->method('localeForChoice')->with($this->equalTo(':count foos'), $this->equalTo(null))->willReturn('en');
+        $t->expects($this->once())->method('get')->with(':count foos', [], 'en')->willReturn('{1} :count foos|[2,*] :count foos');
+        $t->expects($this->once())->method('localeForChoice')->with(':count foos', null)->willReturn('en');
         $t->setSelector($selector = m::mock(MessageSelector::class));
         $selector->shouldReceive('choose')->once()->with('{1} :count foos|[2,*] :count foos', 1234, 'en')->andReturn(':count foos');
 
-        $this->assertEquals('1,234 foos', $t->choice(':count foos', 1234, ['count' => '1,234']));
+        $this->assertSame('1,234 foos', $t->choice(':count foos', 1234, ['count' => '1,234']));
     }
 
     public function testGetJson()

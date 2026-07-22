@@ -24,15 +24,75 @@ class RouteGroup
             unset($old['controller']);
         }
 
+        $metadata = static::formatMetadata($new, $old);
+
+        unset($new['metadata']);
+
         $new = array_merge(static::formatAs($new, $old), [
             'namespace' => static::formatNamespace($new, $old),
             'prefix' => static::formatPrefix($new, $old, $prependExistingPrefix),
             'where' => static::formatWhere($new, $old),
         ]);
 
+        if ($metadata !== []) {
+            $new['metadata'] = $metadata;
+        }
+
         return array_merge_recursive(Arr::except(
-            $old, ['namespace', 'prefix', 'where', 'as']
+            $old, ['metadata', 'namespace', 'prefix', 'where', 'as']
         ), $new);
+    }
+
+    /**
+     * Format the metadata for the new group attributes.
+     *
+     * @param  array  $new
+     * @param  array  $old
+     * @return array
+     */
+    protected static function formatMetadata($new, $old)
+    {
+        return static::mergeMetadata(
+            $old['metadata'] ?? [],
+            $new['metadata'] ?? []
+        );
+    }
+
+    /**
+     * Merge the given route metadata.
+     *
+     * Associative array values are merged recursively, while all other values, including lists, replace the existing value entirely.
+     *
+     * @param  array  $old
+     * @param  array  $new
+     * @return array
+     */
+    public static function mergeMetadata(array $old, array $new)
+    {
+        foreach ($new as $key => $value) {
+            if (isset($old[$key]) && static::mergableMetadata($old[$key], $value)) {
+                $value = static::mergeMetadata($old[$key], $value);
+            }
+
+            $old[$key] = $value;
+        }
+
+        return $old;
+    }
+
+    /**
+     * Determine if the given metadata values should be merged.
+     *
+     * @param  mixed  $old
+     * @param  mixed  $new
+     * @return bool
+     */
+    protected static function mergableMetadata($old, $new)
+    {
+        return is_array($old) &&
+            is_array($new) &&
+            Arr::isAssoc($old) &&
+            Arr::isAssoc($new);
     }
 
     /**

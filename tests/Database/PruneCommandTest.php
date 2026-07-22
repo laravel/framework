@@ -42,7 +42,7 @@ class PruneCommandTest extends TestCase
     public function testPrunableModelAndExceptWithEachOther(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The --models and --except options cannot be combined.');
+        $this->expectExceptionMessage('The --model and --except options cannot be combined.');
 
         $this->artisan([
             '--model' => Pruning\Models\PrunableTestModelWithPrunableRecords::class,

@@ -14,7 +14,7 @@ class DatabaseProcessorTest extends TestCase
     public function testInsertGetIdProcessing()
     {
         $pdo = $this->createMock(ProcessorTestPDOStub::class);
-        $pdo->expects($this->once())->method('lastInsertId')->with($this->equalTo('id'))->willReturn('1');
+        $pdo->expects($this->once())->method('lastInsertId')->with('id')->willReturn('1');
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('insert')->once()->with('sql', ['foo']);
         $connection->shouldReceive('getPdo')->once()->andReturn($pdo);

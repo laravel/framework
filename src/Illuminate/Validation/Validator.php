@@ -564,14 +564,8 @@ class Validator implements ValidatorContract
      */
     protected function shouldBeExcluded($attribute)
     {
-        foreach ($this->excludeAttributes as $excludeAttribute) {
-            if ($attribute === $excludeAttribute ||
-                Str::startsWith($attribute, $excludeAttribute.'.')) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->excludeAttributes, fn ($excludeAttribute) => $attribute === $excludeAttribute ||
+            Str::startsWith($attribute, $excludeAttribute.'.'));
     }
 
     /**
@@ -622,8 +616,10 @@ class Validator implements ValidatorContract
     /**
      * Get a validated input container for the validated input.
      *
-     * @param  array|null  $keys
-     * @return \Illuminate\Support\ValidatedInput|array
+     * @param  array<int, string>|null  $keys
+     * @return ($keys is array ? array<string, mixed> : \Illuminate\Support\ValidatedInput)
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function safe(?array $keys = null)
     {
@@ -1647,7 +1643,7 @@ class Validator implements ValidatorContract
     /**
      * Ensure exponents are within range using the given callback.
      *
-     * @param  callable(int $scale, string $attribute, mixed $value)  $callback
+     * @param  callable(int, string, mixed): mixed  $callback
      * @return $this
      */
     public function ensureExponentWithinAllowedRangeUsing($callback)

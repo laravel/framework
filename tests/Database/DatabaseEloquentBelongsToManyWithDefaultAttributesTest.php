@@ -54,6 +54,16 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         $builder->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock(stdClass::class));
         $mockQueryBuilder->shouldReceive('getGrammar')->andReturn(m::mock(Grammar::class, ['isExpression' => false]));
 
-        return [$builder, $parent, 'club_user', 'club_id', 'user_id', 'id', 'id', null, false];
+        return [
+            $builder,
+            $parent,
+            'club_user',
+            'club_id',
+            'user_id',
+            'id',
+            'id',
+            null,
+            false,
+        ];
     }
 }

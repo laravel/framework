@@ -24,7 +24,7 @@ class AuthenticateSessionTest extends TestCase
 
         $middleware = new AuthenticateSession($authFactory);
         $response = $middleware->handle($request, $next);
-        $this->assertEquals('next-1', $response);
+        $this->assertSame('next-1', $response);
     }
 
     public function test_handle_with_session_without_request_user()
@@ -40,7 +40,7 @@ class AuthenticateSessionTest extends TestCase
         $next = fn () => 'next-2';
         $middleware = new AuthenticateSession($authFactory);
         $response = $middleware->handle($request, $next);
-        $this->assertEquals('next-2', $response);
+        $this->assertSame('next-2', $response);
     }
 
     public function test_handle_with_session_without_auth_password()
@@ -67,7 +67,7 @@ class AuthenticateSessionTest extends TestCase
         $middleware = new AuthenticateSession($authFactory);
         $response = $middleware->handle($request, $next);
 
-        $this->assertEquals('next-3', $response);
+        $this->assertSame('next-3', $response);
     }
 
     public function test_handle_with_session_with_user_auth_password_on_request_via_remember_false()
@@ -96,8 +96,8 @@ class AuthenticateSessionTest extends TestCase
         $middleware = new AuthenticateSession($authFactory);
         $response = $middleware->handle($request, fn () => 'next-4');
 
-        $this->assertEquals('mac:my-pass-(*&^%$#!@', $session->get('password_hash_web'));
-        $this->assertEquals('next-4', $response);
+        $this->assertSame('mac:my-pass-(*&^%$#!@', $session->get('password_hash_web'));
+        $this->assertSame('next-4', $response);
     }
 
     public function test_handle_with_invalid_password_hash()
@@ -140,9 +140,9 @@ class AuthenticateSessionTest extends TestCase
             $middleware->handle($request, fn () => 'next-7');
         } catch (AuthenticationException $e) {
             $message = $e->getMessage();
-            $this->assertEquals('i-wanna-go-home', $e->redirectTo($request));
+            $this->assertSame('i-wanna-go-home', $e->redirectTo($request));
         }
-        $this->assertEquals('Unauthenticated.', $message);
+        $this->assertSame('Unauthenticated.', $message);
 
         // ensure session is flushed:
         $this->assertNull($session->get('a'));
@@ -185,7 +185,7 @@ class AuthenticateSessionTest extends TestCase
         } catch (AuthenticationException $e) {
             $message = $e->getMessage();
         }
-        $this->assertEquals('Unauthenticated.', $message);
+        $this->assertSame('Unauthenticated.', $message);
 
         // ensure session is flushed
         $this->assertNull($session->get('password_hash_web'));
@@ -230,7 +230,7 @@ class AuthenticateSessionTest extends TestCase
         } catch (AuthenticationException $e) {
             $message = $e->getMessage();
         }
-        $this->assertEquals('Unauthenticated.', $message);
+        $this->assertSame('Unauthenticated.', $message);
 
         // ensure session is flushed:
         $this->assertNull($session->get('password_hash_web'));
@@ -271,11 +271,11 @@ class AuthenticateSessionTest extends TestCase
         $middleware = new AuthenticateSession($authFactory);
         $response = $middleware->handle($request, fn () => 'next-8');
 
-        $this->assertEquals('next-8', $response);
+        $this->assertSame('next-8', $response);
         // ensure session is flushed:
-        $this->assertEquals('mac:my-pass-(*&^%$#!@', $session->get('password_hash_web'));
-        $this->assertEquals('1', $session->get('a'));
-        $this->assertEquals('2', $session->get('b'));
+        $this->assertSame('mac:my-pass-(*&^%$#!@', $session->get('password_hash_web'));
+        $this->assertSame('1', $session->get('a'));
+        $this->assertSame('2', $session->get('b'));
     }
 
     public function test_handle_with_old_format_cookie_for_backward_compatibility()
@@ -311,11 +311,11 @@ class AuthenticateSessionTest extends TestCase
         $response = $middleware->handle($request, fn () => 'next-9');
 
         // Should succeed because of backward compatibility fallback
-        $this->assertEquals('next-9', $response);
+        $this->assertSame('next-9', $response);
         // Session should be updated to new format (HMAC)
-        $this->assertEquals('mac:my-pass-(*&^%$#!@', $session->get('password_hash_web'));
-        $this->assertEquals('1', $session->get('a'));
-        $this->assertEquals('2', $session->get('b'));
+        $this->assertSame('mac:my-pass-(*&^%$#!@', $session->get('password_hash_web'));
+        $this->assertSame('1', $session->get('a'));
+        $this->assertSame('2', $session->get('b'));
     }
 
     public function test_handle_with_old_format_cookie_and_legacy_guard()
@@ -351,10 +351,10 @@ class AuthenticateSessionTest extends TestCase
         $response = $middleware->handle($request, fn () => 'next-9');
 
         // Should succeed because of backward compatibility fallback
-        $this->assertEquals('next-9', $response);
+        $this->assertSame('next-9', $response);
         // Session should stay intact
-        $this->assertEquals('my-pass-(*&^%$#!@', $session->get('password_hash_web'));
-        $this->assertEquals('1', $session->get('a'));
-        $this->assertEquals('2', $session->get('b'));
+        $this->assertSame('my-pass-(*&^%$#!@', $session->get('password_hash_web'));
+        $this->assertSame('1', $session->get('a'));
+        $this->assertSame('2', $session->get('b'));
     }
 }

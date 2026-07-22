@@ -205,7 +205,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
         Relation::morphMap([], false);
         Eloquent::unsetConnectionResolver();
 
-        Carbon::setTestNow(null);
         Str::createUuidsNormally();
         DB::flushQueryLog();
 
@@ -1205,7 +1204,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
         $this->assertTrue($results->first()->relationLoaded('friends'));
-        $this->assertSame($results->first()->friends->pluck('email')->unique()->toArray(), ['abigailotwell@gmail.com']);
+        $this->assertSame(['abigailotwell@gmail.com'], $results->first()->friends->pluck('email')->unique()->toArray());
     }
 
     public function testHasOnNestedSelfReferencingBelongsToManyRelationship()
@@ -1247,8 +1246,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
         $this->assertTrue($results->first()->relationLoaded('friends'));
-        $this->assertSame($results->first()->friends->pluck('email')->unique()->toArray(), ['abigailotwell@gmail.com']);
-        $this->assertSame($results->first()->friends->pluck('friends')->flatten()->pluck('email')->unique()->toArray(), ['foo@gmail.com']);
+        $this->assertSame(['abigailotwell@gmail.com'], $results->first()->friends->pluck('email')->unique()->toArray());
+        $this->assertSame(['foo@gmail.com'], $results->first()->friends->pluck('friends')->flatten()->pluck('email')->unique()->toArray());
     }
 
     public function testHasOnSelfReferencingBelongsToManyRelationshipWithWherePivot()
@@ -1321,7 +1320,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame('Child Post', $results->first()->name);
         $this->assertTrue($results->first()->relationLoaded('parentPost'));
-        $this->assertSame($results->first()->parentPost->name, 'Parent Post');
+        $this->assertSame('Parent Post', $results->first()->parentPost->name);
     }
 
     public function testHasOnNestedSelfReferencingBelongsToRelationship()
@@ -1363,9 +1362,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame('Child Post', $results->first()->name);
         $this->assertTrue($results->first()->relationLoaded('parentPost'));
-        $this->assertSame($results->first()->parentPost->name, 'Parent Post');
+        $this->assertSame('Parent Post', $results->first()->parentPost->name);
         $this->assertTrue($results->first()->parentPost->relationLoaded('parentPost'));
-        $this->assertSame($results->first()->parentPost->parentPost->name, 'Grandparent Post');
+        $this->assertSame('Grandparent Post', $results->first()->parentPost->parentPost->name);
     }
 
     public function testHasOnSelfReferencingHasManyRelationship()
@@ -1404,7 +1403,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame('Parent Post', $results->first()->name);
         $this->assertTrue($results->first()->relationLoaded('childPosts'));
-        $this->assertSame($results->first()->childPosts->pluck('name')->unique()->toArray(), ['Child Post']);
+        $this->assertSame(['Child Post'], $results->first()->childPosts->pluck('name')->unique()->toArray());
     }
 
     public function testHasOnNestedSelfReferencingHasManyRelationship()
@@ -1446,8 +1445,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame('Grandparent Post', $results->first()->name);
         $this->assertTrue($results->first()->relationLoaded('childPosts'));
-        $this->assertSame($results->first()->childPosts->pluck('name')->unique()->toArray(), ['Parent Post']);
-        $this->assertSame($results->first()->childPosts->pluck('childPosts')->flatten()->pluck('name')->unique()->toArray(), ['Child Post']);
+        $this->assertSame(['Parent Post'], $results->first()->childPosts->pluck('name')->unique()->toArray());
+        $this->assertSame(['Child Post'], $results->first()->childPosts->pluck('childPosts')->flatten()->pluck('name')->unique()->toArray());
     }
 
     public function testHasWithNonWhereBindings()
@@ -2588,7 +2587,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNull($users[0]->birthday);
         $this->assertInstanceOf(\DateTime::class, $users[1]->birthday);
         $this->assertInstanceOf(\DateTime::class, $users[2]->birthday);
-        $this->assertEquals('1987-11-01', $users[2]->birthday->format('Y-m-d'));
+        $this->assertSame('1987-11-01', $users[2]->birthday->format('Y-m-d'));
 
         DB::flushQueryLog();
 

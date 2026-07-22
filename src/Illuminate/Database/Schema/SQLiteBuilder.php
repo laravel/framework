@@ -164,7 +164,7 @@ class SQLiteBuilder extends Builder
     /**
      * Get the names of current schemas for the connection.
      *
-     * @return string[]|null
+     * @return string[]
      */
     public function getCurrentSchemaListing()
     {

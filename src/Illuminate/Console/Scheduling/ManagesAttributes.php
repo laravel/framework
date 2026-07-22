@@ -63,6 +63,13 @@ trait ManagesAttributes
     public $withoutOverlapping = false;
 
     /**
+     * Indicates if the mutex should be released when the process receives a termination signal.
+     *
+     * @var bool
+     */
+    public $releaseOnTerminationSignals = true;
+
+    /**
      * Indicates if the command should only be allowed to run on one server for each cron expression.
      *
      * @var bool
@@ -103,6 +110,13 @@ trait ManagesAttributes
      * @var string|null
      */
     public $description;
+
+    /**
+     * The arbitrary attributes stored with the event.
+     *
+     * @var array<array-key, mixed>
+     */
+    public $attributes = [];
 
     /**
      * Set which user the command should run as.
@@ -156,16 +170,20 @@ trait ManagesAttributes
 
     /**
      * Do not allow the event to overlap each other.
+     *
      * The expiration time of the underlying cache lock may be specified in minutes.
      *
      * @param  int  $expiresAt
+     * @param  bool  $releaseOnTerminationSignals
      * @return $this
      */
-    public function withoutOverlapping($expiresAt = 1440)
+    public function withoutOverlapping($expiresAt = 1440, $releaseOnTerminationSignals = true)
     {
         $this->withoutOverlapping = true;
 
         $this->expiresAt = $expiresAt;
+
+        $this->releaseOnTerminationSignals = $releaseOnTerminationSignals;
 
         return $this->skip(function () {
             return $this->mutex->exists($this);
@@ -246,6 +264,19 @@ trait ManagesAttributes
     public function description($description)
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * Set arbitrary attributes to store with the event.
+     *
+     * @param  array<array-key, mixed>  $attributes
+     * @return $this
+     */
+    public function withAttributes($attributes)
+    {
+        $this->attributes = array_merge_recursive($this->attributes, $attributes);
 
         return $this;
     }

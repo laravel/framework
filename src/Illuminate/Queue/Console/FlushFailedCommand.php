@@ -3,11 +3,14 @@
 namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\Prohibitable;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:flush')]
 class FlushFailedCommand extends Command
 {
+    use Prohibitable;
+
     /**
      * The console command name.
      *
@@ -29,6 +32,10 @@ class FlushFailedCommand extends Command
      */
     public function handle()
     {
+        if ($this->isProhibited()) {
+            return;
+        }
+
         $this->laravel['queue.failer']->flush($this->option('hours'));
 
         if ($this->option('hours')) {

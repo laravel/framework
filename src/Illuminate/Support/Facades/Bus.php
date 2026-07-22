@@ -11,6 +11,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static mixed dispatch(mixed $command)
  * @method static mixed dispatchSync(mixed $command, mixed $handler = null)
  * @method static mixed dispatchNow(mixed $command, mixed $handler = null)
+ * @method static void bulk(iterable $jobs)
  * @method static \Illuminate\Bus\Batch|null findBatch(string $batchId)
  * @method static \Illuminate\Bus\PendingBatch batch(\Illuminate\Support\Collection|mixed $jobs)
  * @method static \Illuminate\Foundation\Bus\PendingChain chain(\Illuminate\Support\Collection|array|null $jobs = null)

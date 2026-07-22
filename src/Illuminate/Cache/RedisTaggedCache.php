@@ -16,7 +16,7 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Store an item in the cache if the key does not exist.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
@@ -44,7 +44,7 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Store an item in the cache.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
@@ -72,7 +72,7 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @return int|bool
      */
@@ -88,12 +88,14 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @return int|bool
      */
     public function decrement($key, $value = 1)
     {
+        $key = enum_value($key);
+
         $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
 
         return parent::decrement($key, $value);
@@ -102,7 +104,7 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @return bool
      */

@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 
@@ -32,7 +33,9 @@ trait HasTimestamps
     public function initializeHasTimestamps()
     {
         if ($this->timestamps === true) {
-            if (($table = static::resolveClassAttribute(Table::class)) && $table->timestamps !== null) {
+            if (static::resolveClassAttribute(WithoutTimestamps::class) !== null) {
+                $this->timestamps = false;
+            } elseif (($table = static::resolveClassAttribute(Table::class)) && $table->timestamps !== null) {
                 $this->timestamps = $table->timestamps;
             }
         }
@@ -203,7 +206,10 @@ trait HasTimestamps
     /**
      * Disable timestamps for the current class during the given callback scope.
      *
-     * @return mixed
+     * @template TReturn
+     *
+     * @param  (callable(): TReturn)  $callback
+     * @return TReturn
      */
     public static function withoutTimestamps(callable $callback)
     {
@@ -213,9 +219,11 @@ trait HasTimestamps
     /**
      * Disable timestamps for the given model classes during the given callback scope.
      *
+     * @template TReturn
+     *
      * @param  array  $models
-     * @param  callable  $callback
-     * @return mixed
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
      */
     public static function withoutTimestampsOn($models, $callback)
     {
@@ -242,12 +250,6 @@ trait HasTimestamps
     {
         $class ??= static::class;
 
-        foreach (static::$ignoreTimestampsOn as $ignoredClass) {
-            if ($class === $ignoredClass || is_subclass_of($class, $ignoredClass)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(static::$ignoreTimestampsOn, fn ($ignoredClass) => $class === $ignoredClass || is_subclass_of($class, $ignoredClass));
     }
 }

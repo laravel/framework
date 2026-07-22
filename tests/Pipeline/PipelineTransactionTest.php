@@ -25,7 +25,7 @@ class PipelineTransactionTest extends TestCase
             ])
             ->thenReturn();
 
-        $this->assertEquals('some string', $result);
+        $this->assertSame('some string', $result);
         Event::assertDispatchedTimes(TransactionBeginning::class, 1);
         Event::assertDispatchedTimes(TransactionCommitted::class, 1);
     }
@@ -55,7 +55,7 @@ class PipelineTransactionTest extends TestCase
             ])
             ->thenReturn();
 
-        $this->assertEquals('some string', $result);
+        $this->assertSame('some string', $result);
         Event::dispatched(TransactionBeginning::class, function (TransactionBeginning $event) use ($connectionName) {
             return $event->connection === $connectionName;
         });

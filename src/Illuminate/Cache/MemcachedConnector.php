@@ -15,7 +15,7 @@ class MemcachedConnector
      * @param  array  $credentials
      * @return \Memcached
      */
-    public function connect(array $servers, $connectionId = null, array $options = [], array $credentials = [])
+    public function connect(array $servers, $connectionId = null, array $options = [], #[\SensitiveParameter] array $credentials = [])
     {
         $memcached = $this->getMemcached(
             $connectionId, $credentials, $options
@@ -43,7 +43,7 @@ class MemcachedConnector
      * @param  array  $options
      * @return \Memcached
      */
-    protected function getMemcached($connectionId, array $credentials, array $options)
+    protected function getMemcached($connectionId, #[\SensitiveParameter] array $credentials, array $options)
     {
         $memcached = $this->createMemcachedInstance($connectionId);
 
@@ -51,7 +51,7 @@ class MemcachedConnector
             $this->setCredentials($memcached, $credentials);
         }
 
-        if (count($options)) {
+        if ($options !== []) {
             $memcached->setOptions($options);
         }
 
@@ -76,7 +76,7 @@ class MemcachedConnector
      * @param  array  $credentials
      * @return void
      */
-    protected function setCredentials($memcached, $credentials)
+    protected function setCredentials($memcached, #[\SensitiveParameter] $credentials)
     {
         [$username, $password] = $credentials;
 
