@@ -269,7 +269,7 @@ trait InteractsWithData
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @return string
+     * @return string|null
      */
     public function plainString($key, $default = null)
     {
