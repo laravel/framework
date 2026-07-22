@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Container;
 
 use Attribute;
 use Illuminate\Container\Attributes\Bind;
+use Illuminate\Container\Attributes\BindWhen;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Container\Container;
@@ -875,6 +876,34 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(DevConcrete::class, $second);
     }
 
+    public function testBindWhenSkipsFalseConditionsAndBindsTheFirstTrueOne(): void
+    {
+        $container = new Container;
+
+        $instance = $container->make(BindWhenInterface::class);
+
+        $this->assertInstanceOf(BindWhenTrueConcrete::class, $instance);
+    }
+
+    public function testBindWhenRespectsTheSingletonAttribute(): void
+    {
+        $container = new Container;
+
+        $first = $container->make(BindWhenSingletonInterface::class);
+        $second = $container->make(BindWhenSingletonInterface::class);
+
+        $this->assertInstanceOf(BindWhenSingletonConcrete::class, $first);
+        $this->assertSame($first, $second);
+    }
+
+    public function testBindWhenWithNoPassingConditionDoesNotBind(): void
+    {
+        $this->expectException(BindingResolutionException::class);
+
+        $container = new Container;
+        $container->make(BindWhenNoMatchInterface::class);
+    }
+
     public function testNoMatchingEnvironmentAndNoWildcardThrowsBindingResolutionException(): void
     {
         $this->expectException(BindingResolutionException::class);
@@ -1191,6 +1220,47 @@ class IsScopedConcrete implements IsScoped
 #[Bind(IsScopedConcrete::class)]
 #[Singleton]
 interface IsSingleton
+{
+}
+
+#[BindWhen(BindWhenFalseConcrete::class, static function () {
+    return false;
+})]
+#[BindWhen(BindWhenTrueConcrete::class, static function () {
+    return true;
+})]
+interface BindWhenInterface
+{
+}
+
+class BindWhenFalseConcrete implements BindWhenInterface
+{
+}
+
+class BindWhenTrueConcrete implements BindWhenInterface
+{
+}
+
+#[BindWhen(BindWhenSingletonConcrete::class, static function () {
+    return true;
+})]
+#[Singleton]
+interface BindWhenSingletonInterface
+{
+}
+
+class BindWhenSingletonConcrete implements BindWhenSingletonInterface
+{
+}
+
+#[BindWhen(BindWhenNoMatchConcrete::class, static function () {
+    return false;
+})]
+interface BindWhenNoMatchInterface
+{
+}
+
+class BindWhenNoMatchConcrete implements BindWhenNoMatchInterface
 {
 }
 

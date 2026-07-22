@@ -6,6 +6,7 @@ use ArrayAccess;
 use Closure;
 use Exception;
 use Illuminate\Container\Attributes\Bind;
+use Illuminate\Container\Attributes\BindWhen;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -981,8 +982,7 @@ class Container implements ArrayAccess, ContainerContract
             return $this->bindings[$abstract]['concrete'];
         }
 
-        if ($this->environmentResolver === null ||
-            ($this->checkedForAttributeBindings[$abstract] ?? false) || ! is_string($abstract)) {
+        if (($this->checkedForAttributeBindings[$abstract] ?? false) || ! is_string($abstract)) {
             return $abstract;
         }
 
@@ -990,7 +990,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Get the concrete binding for an abstract from the Bind attribute.
+     * Get the concrete binding for an abstract from the BindWhen or Bind attributes.
      *
      * @param  string  $abstract
      * @return mixed
@@ -1005,10 +1005,59 @@ class Container implements ArrayAccess, ContainerContract
             return $abstract;
         }
 
+        // BindWhen attributes are evaluated first and, unlike Bind, do not depend on
+        // the container's environment. The first attribute whose condition returns
+        // true wins, letting a binding be selected from arbitrary runtime state.
+        $concrete = $this->getConcreteFromBindWhenAttributes($reflected);
+
+        if ($concrete === null && $this->environmentResolver !== null) {
+            $concrete = $this->getConcreteFromBindAttributes($reflected);
+        }
+
+        if ($concrete === null) {
+            return $abstract;
+        }
+
+        match ($this->getScopedTyped($reflected)) {
+            'scoped' => $this->scoped($abstract, $concrete),
+            'singleton' => $this->singleton($abstract, $concrete),
+            null => $this->bind($abstract, $concrete),
+        };
+
+        return $this->bindings[$abstract]['concrete'];
+    }
+
+    /**
+     * Resolve the concrete for the first BindWhen attribute whose condition passes.
+     *
+     * @param  ReflectionClass<object>  $reflected
+     * @return class-string|null
+     */
+    protected function getConcreteFromBindWhenAttributes(ReflectionClass $reflected)
+    {
+        foreach ($reflected->getAttributes(BindWhen::class) as $reflectedAttribute) {
+            $instance = $reflectedAttribute->newInstance();
+
+            if (($instance->condition)($this)) {
+                return $instance->concrete;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve the concrete from the Bind attributes for the current environment.
+     *
+     * @param  ReflectionClass<object>  $reflected
+     * @return class-string|null
+     */
+    protected function getConcreteFromBindAttributes(ReflectionClass $reflected)
+    {
         $bindAttributes = $reflected->getAttributes(Bind::class);
 
         if ($bindAttributes === []) {
-            return $abstract;
+            return null;
         }
 
         $concrete = $maybeConcrete = null;
@@ -1033,17 +1082,7 @@ class Container implements ArrayAccess, ContainerContract
             $concrete = $maybeConcrete;
         }
 
-        if ($concrete === null) {
-            return $abstract;
-        }
-
-        match ($this->getScopedTyped($reflected)) {
-            'scoped' => $this->scoped($abstract, $concrete),
-            'singleton' => $this->singleton($abstract, $concrete),
-            null => $this->bind($abstract, $concrete),
-        };
-
-        return $this->bindings[$abstract]['concrete'];
+        return $concrete;
     }
 
     /**
