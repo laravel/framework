@@ -1005,9 +1005,6 @@ class Container implements ArrayAccess, ContainerContract
             return $abstract;
         }
 
-        // BindWhen attributes are evaluated first and, unlike Bind, do not depend on
-        // the container's environment. The first attribute whose condition returns
-        // true wins, letting a binding be selected from arbitrary runtime state.
         $concrete = $this->getConcreteFromBindWhenAttributes($reflected);
 
         if ($concrete === null && $this->environmentResolver !== null) {
