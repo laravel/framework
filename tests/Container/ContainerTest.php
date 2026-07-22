@@ -942,7 +942,7 @@ class ContainerTest extends TestCase
     public function testBindAndBindWhenResolveInDeclarationOrder(): void
     {
         $container = new Container;
-        $container->resolveEnvironmentUsing(fn ($environments) => in_array('prod', (array) $environments));
+        $container->resolveEnvironmentUsing(fn ($environments) => in_array('foobar', (array) $environments));
 
         $instance = $container->make(BindBeforeBindWhenInterface::class);
 

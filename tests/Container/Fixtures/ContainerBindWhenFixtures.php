@@ -79,7 +79,7 @@ class BindFallbackConcrete implements BindWhenFallbackInterface
 {
 }
 
-#[Bind(BindBeforeConcrete::class, environments: 'prod')]
+#[Bind(BindBeforeConcrete::class, environments: 'foobar')]
 #[BindWhen(BindWhenAfterConcrete::class, static function () {
     return true;
 })]
