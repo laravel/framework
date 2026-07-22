@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   mysql_9:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     services:
       mysql:
@@ -40,7 +40,7 @@ jobs:
           DB_CONNECTION: mysql
 
   mariadb:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     continue-on-error: true
 
     services:
