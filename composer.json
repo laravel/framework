@@ -67,7 +67,7 @@
     },
     "require-dev": {
         "ext-gmp": "*",
-        "ably/ably-php": "^1.0",
+        "ably/ably-php": "^1.1.10",
         "aws/aws-sdk-php": "^3.322.9",
         "fakerphp/faker": "^1.24",
         "guzzlehttp/psr7": "^2.9",
@@ -151,7 +151,7 @@
         "ext-pdo": "Required to use all database features.",
         "ext-posix": "Required to use all features of the queue worker.",
         "ext-redis": "Required to use the Redis cache and queue drivers (^4.0 || ^5.0 || ^6.0).",
-        "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",
+        "ably/ably-php": "Required to use the Ably broadcast driver (^1.1.10).",
         "aws/aws-sdk-php": "Required to use the SQS queue driver, DynamoDb failed job storage, and SES mail driver (^3.322.9).",
         "brianium/paratest": "Required to run tests in parallel (^7.0 || ^8.0).",
         "fakerphp/faker": "Required to generate fake data using the fake() helper (^1.23).",
