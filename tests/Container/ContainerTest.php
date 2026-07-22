@@ -885,7 +885,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(BindWhenTrueConcrete::class, $instance);
     }
 
-    public function testBindWhenRespectsSingletonAttribute(): void
+    public function testBindWhenSingletonAttribute(): void
     {
         $container = new Container;
 
