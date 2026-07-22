@@ -939,6 +939,17 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(BindFallbackConcrete::class, $instance);
     }
 
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindAndBindWhenResolveInDeclarationOrder(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => in_array('prod', (array) $environments));
+
+        $instance = $container->make(BindBeforeBindWhenInterface::class);
+
+        $this->assertInstanceOf(BindBeforeConcrete::class, $instance);
+    }
+
     public function testNoMatchingEnvironmentAndNoWildcardThrowsBindingResolutionException(): void
     {
         $this->expectException(BindingResolutionException::class);

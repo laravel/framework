@@ -78,3 +78,19 @@ class BindWhenSkippedConcrete implements BindWhenFallbackInterface
 class BindFallbackConcrete implements BindWhenFallbackInterface
 {
 }
+
+#[Bind(BindBeforeConcrete::class, environments: 'prod')]
+#[BindWhen(BindWhenAfterConcrete::class, static function () {
+    return true;
+})]
+interface BindBeforeBindWhenInterface
+{
+}
+
+class BindBeforeConcrete implements BindBeforeBindWhenInterface
+{
+}
+
+class BindWhenAfterConcrete implements BindBeforeBindWhenInterface
+{
+}

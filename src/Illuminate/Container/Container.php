@@ -1005,11 +1005,7 @@ class Container implements ArrayAccess, ContainerContract
             return $abstract;
         }
 
-        $concrete = $this->getConcreteFromBindWhenAttributes($reflected);
-
-        if ($concrete === null && $this->environmentResolver !== null) {
-            $concrete = $this->getConcreteFromBindAttributes($reflected);
-        }
+        $concrete = $this->resolveConcreteFromAttributes($reflected);
 
         if ($concrete === null) {
             return $abstract;
@@ -1025,61 +1021,51 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Resolve the concrete for the first BindWhen attribute whose condition passes.
+     * Resolve the concrete from the Bind and BindWhen attributes in declaration order.
      *
      * @param  ReflectionClass<object>  $reflected
      * @return class-string|null
      */
-    protected function getConcreteFromBindWhenAttributes(ReflectionClass $reflected)
+    protected function resolveConcreteFromAttributes(ReflectionClass $reflected)
     {
-        foreach ($reflected->getAttributes(BindWhen::class) as $reflectedAttribute) {
-            $instance = $reflectedAttribute->newInstance();
+        $wildcard = null;
 
-            if (($instance->condition)($this)) {
-                return $instance->concrete;
-            }
-        }
+        foreach ($reflected->getAttributes() as $reflectedAttribute) {
+            $name = $reflectedAttribute->getName();
 
-        return null;
-    }
+            if ($name === BindWhen::class) {
+                $instance = $reflectedAttribute->newInstance();
 
-    /**
-     * Resolve the concrete from the Bind attributes for the current environment.
-     *
-     * @param  ReflectionClass<object>  $reflected
-     * @return class-string|null
-     */
-    protected function getConcreteFromBindAttributes(ReflectionClass $reflected)
-    {
-        $bindAttributes = $reflected->getAttributes(Bind::class);
-
-        if ($bindAttributes === []) {
-            return null;
-        }
-
-        $concrete = $maybeConcrete = null;
-
-        foreach ($bindAttributes as $reflectedAttribute) {
-            $instance = $reflectedAttribute->newInstance();
-
-            if ($instance->environments === ['*']) {
-                $maybeConcrete = $instance->concrete;
+                if (($instance->condition)($this)) {
+                    return $instance->concrete;
+                }
 
                 continue;
             }
 
-            if ($this->currentEnvironmentIs($instance->environments)) {
-                $concrete = $instance->concrete;
+            if ($name === Bind::class) {
+                // Bind attributes only apply when an environment resolver is set.
+                if ($this->environmentResolver === null) {
+                    continue;
+                }
 
-                break;
+                $instance = $reflectedAttribute->newInstance();
+
+                if ($instance->environments === ['*']) {
+                    // Remember the first wildcard as a fallback, but keep looking for a
+                    // more specific match (either an environment or a later BindWhen).
+                    $wildcard ??= $instance->concrete;
+
+                    continue;
+                }
+
+                if ($this->currentEnvironmentIs($instance->environments)) {
+                    return $instance->concrete;
+                }
             }
         }
 
-        if ($maybeConcrete !== null && $concrete === null) {
-            $concrete = $maybeConcrete;
-        }
-
-        return $concrete;
+        return $wildcard;
     }
 
     /**
