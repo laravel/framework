@@ -265,6 +265,22 @@ trait InteractsWithData
     }
 
     /**
+     * Retrieve data from the instance as a string.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return string
+     */
+    public function plainString($key, $default = null)
+    {
+        if ($this->isNotFilled($key)) {
+            return value($default);
+        }
+
+        return (string) $this->data($key);
+    }
+
+    /**
      * Retrieve data as a boolean value.
      *
      * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
