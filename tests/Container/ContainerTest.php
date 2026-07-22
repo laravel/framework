@@ -25,7 +25,7 @@ class ContainerTest extends TestCase
 
         // Fixtures use static closures in PHP attributes, which only work in PHP 8.5+.
         if (PHP_VERSION_ID >= 80500) {
-            require_once __DIR__.'/ContainerBindWhenFixtures.php';
+            require_once __DIR__.'/Fixtures/ContainerBindWhenFixtures.php';
         }
     }
 
