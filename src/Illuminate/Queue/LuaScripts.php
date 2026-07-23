@@ -63,6 +63,7 @@ LUA;
      * KEYS[2] - The queue to place reserved jobs on, for example: queues:foo:reserved
      * KEYS[3] - The notify queue
      * ARGV[1] - The time at which the reserved job will expire
+     * ARGV[2] - The base time for expiring jobs based on their own timeout
      *
      * @return string
      */
@@ -77,8 +78,15 @@ if(job ~= false) then
     -- Increment the attempt count and place job on the reserved queue...
     reserved = cjson.decode(job)
     reserved['attempts'] = reserved['attempts'] + 1
+
+    local expiration = ARGV[1]
+
+    if(tonumber(ARGV[2]) and type(reserved['timeout']) == 'number' and reserved['timeout'] > 0) then
+        expiration = reserved['timeout'] + ARGV[2]
+    end
+
     reserved = cjson.encode(reserved)
-    redis.call('zadd', KEYS[2], ARGV[1], reserved)
+    redis.call('zadd', KEYS[2], expiration, reserved)
     redis.call('lpop', KEYS[3])
 end
 

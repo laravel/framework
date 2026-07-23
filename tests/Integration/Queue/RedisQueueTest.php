@@ -182,6 +182,60 @@ class RedisQueueTest extends TestCase
      * @param  string  $driver
      */
     #[DataProvider('redisDriverProvider')]
+    public function testPopReservesJobsBasedOnTheJobTimeoutWhenExpireAfterTimeoutIsEnabled($driver)
+    {
+        $default = config('queue.connections.redis.queue', 'default');
+        $this->queue = new RedisQueue($this->redis[$driver], $default, null, 90, expireAfterTimeout: true);
+        $this->queue->setContainer($this->container = m::spy(Container::class));
+        $redisKey = $this->getQueueRedisKey($default);
+
+        $getJobExpirationTimestamp = function () use ($driver, $redisKey) {
+            $this->queue->pop();
+
+            $result = $this->redis[$driver]->connection()->zrangebyscore("$redisKey:reserved", -INF, INF, ['withscores' => true]);
+
+            $this->queue->clear();
+
+            return (int) $result[array_keys($result)[0]];
+        };
+
+        Carbon::setTestNow($time = Carbon::now());
+
+        // Timeout defined on the job is used
+        $job = new RedisQueueIntegrationTestJob(123);
+        $job->timeout = 25;
+        $this->queue->push($job);
+        $this->assertSame($time->getTimestamp() + 25 + 10, $getJobExpirationTimestamp());
+
+        // No timeout on the job, no timeout shared by the queue worker: retry_after is used
+        $this->queue->push(new RedisQueueIntegrationTestJob(123));
+        $this->assertSame($time->getTimestamp() + 90, $getJobExpirationTimestamp());
+
+        // Timeout of 0 on the job is ignored: retry_after is used
+        $job = new RedisQueueIntegrationTestJob(123);
+        $job->timeout = 0;
+        $this->queue->push($job);
+        $this->assertSame($time->getTimestamp() + 90, $getJobExpirationTimestamp());
+
+        // No timeout on the job, the queue worker's timeout is used
+        $this->queue->setWorkerTimeout(15);
+        $this->queue->push(new RedisQueueIntegrationTestJob(123));
+        $this->assertSame($time->getTimestamp() + 15 + 10, $getJobExpirationTimestamp());
+
+        // Timeout on the job takes precedence over the queue worker timeout
+        $this->queue->setWorkerTimeout(15);
+        $job = new RedisQueueIntegrationTestJob(123);
+        $job->timeout = 25;
+        $this->queue->push($job);
+        $this->assertSame($time->getTimestamp() + 25 + 10, $getJobExpirationTimestamp());
+
+        Carbon::setTestNow();
+    }
+
+    /**
+     * @param  string  $driver
+     */
+    #[DataProvider('redisDriverProvider')]
     public function testPopProperlyPopsDelayedJobOffOfRedis($driver)
     {
         $default = config('queue.connections.redis.queue', 'default');

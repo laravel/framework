@@ -44,6 +44,13 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     protected $retryAfter = 60;
 
     /**
+     * Indicates if jobs should be reserved until their timeout instead of the retry_after value.
+     *
+     * @var bool
+     */
+    protected $expireAfterTimeout = false;
+
+    /**
      * The maximum number of seconds to block for a job.
      *
      * @var int|null
@@ -85,6 +92,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  int|null  $blockFor
      * @param  bool  $dispatchAfterCommit
      * @param  int  $migrationBatchSize
+     * @param  bool  $expireAfterTimeout
      */
     public function __construct(
         Redis $redis,
@@ -94,6 +102,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $blockFor = null,
         $dispatchAfterCommit = false,
         $migrationBatchSize = -1,
+        $expireAfterTimeout = false,
     ) {
         $this->redis = $redis;
         $this->default = $default;
@@ -102,6 +111,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $this->retryAfter = $retryAfter;
         $this->dispatchAfterCommit = $dispatchAfterCommit;
         $this->migrationBatchSize = $migrationBatchSize;
+        $this->expireAfterTimeout = $expireAfterTimeout;
     }
 
     /**
@@ -456,7 +466,8 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $nextJob = $this->getConnection()->eval(
             LuaScripts::pop(), 3, $queue, $queue.':reserved', $queue.':notify',
-            $this->availableAt($this->retryAfter)
+            $this->availableAt($this->expireAfterTimeout && $this->workerTimeout ? $this->workerTimeout + 10 : $this->retryAfter),
+            $this->expireAfterTimeout ? $this->availableAt(10) : ''
         );
 
         if (empty($nextJob)) {
