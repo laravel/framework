@@ -17,6 +17,10 @@ namespace Illuminate\Support\Facades;
  * @method static void clear(string $key)
  * @method static int availableIn(string $key)
  * @method static string cleanRateLimiterKey(string $key)
+ * @method static void macro(string $name, object|callable $macro)
+ * @method static void mixin(object $mixin, bool $replace = true)
+ * @method static bool hasMacro(string $name)
+ * @method static void flushMacros()
  *
  * @see \Illuminate\Cache\RateLimiter
  */
