@@ -231,5 +231,7 @@ class ScheduledWithMultipleAttributesCommand extends Command
 #[Schedule(hourly: true, environments: ['production'])]
 class ScheduledJob implements ShouldQueue
 {
-    public function handle(): void {}
+    public function handle(): void
+    {
+    }
 }
