@@ -15,6 +15,7 @@ permissions:
 jobs:
   linux_tests:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
 
     services:
       memcached:
@@ -87,6 +88,7 @@ jobs:
 
   windows_tests:
     runs-on: windows-2022
+    timeout-minutes: 10
 
     strategy:
       fail-fast: true
