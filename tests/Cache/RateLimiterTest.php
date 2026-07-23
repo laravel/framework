@@ -66,6 +66,15 @@ class RateLimiterTest extends TestCase
         $this->assertNotSame($limiterForUser1[0]->key, $limiterForUser2[0]->key);
         $this->assertNotSame($limiterForUser1[1]->key, $limiterForUser2[1]->key);
     }
+
+    public function testMacroable(): void
+    {
+        RateLimiter::macro('foo', fn () => 'bar');
+
+        $rateLimiter = new RateLimiter($this->createStub(Cache::class));
+
+        $this->assertSame('bar', $rateLimiter->foo());
+    }
 }
 
 enum BackedEnumNamedRateLimiter: string
