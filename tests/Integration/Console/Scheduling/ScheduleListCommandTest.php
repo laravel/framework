@@ -256,13 +256,15 @@ class ScheduleListCommandTest extends TestCase
             // No conversion needed — same timezone
             'same timezone' => ['0 8 * * *', 'UTC', null, ['0 8 * * *']],
 
-            // Wildcards/steps — pass through unchanged
+            // Wildcards and unsupported ranges — pass through unchanged
             'every minute' => ['* * * * *', 'America/New_York', null, ['* * * * *']],
             'every five minutes' => ['*/5 * * * *', 'Asia/Tokyo', null, ['*/5 * * * *']],
-            'every two hours' => ['0 */2 * * *', 'Asia/Tokyo', null, ['0 */2 * * *']],
-            'every odd hour' => ['0 1-23/2 * * *', 'Asia/Tokyo', null, ['0 1-23/2 * * *']],
             'quarterly step month' => ['0 0 1 1-12/3 *', 'Asia/Tokyo', null, ['0 15 31 1-12/3 *']],
             'weekdays range' => ['0 8 * * 1-5', 'Asia/Tokyo', null, ['0 23 * * 1-5']],
+
+            // Stepped hours
+            'every two hours' => ['0 */2 * * *', 'Asia/Tokyo', null, ['0 15,17,19,21,23 * * *', '0 1,3,5,7,9,11,13 * * *']],
+            'every odd hour' => ['0 1-23/2 * * *', 'Asia/Tokyo', null, ['0 16,18,20,22 * * *', '0 0,2,4,6,8,10,12,14 * * *']],
 
             // Simple hour shift (no day boundary)
             'daily LA to UTC' => ['0 8 * * *', 'America/Los_Angeles', null, ['0 16 * * *']],
@@ -341,6 +343,25 @@ class ScheduleListCommandTest extends TestCase
         foreach ($expectedExpressions as $index => $expected) {
             $this->assertSame($expected, $data[$index]['expression']);
         }
+    }
+
+    public function testExpressionTimezoneConversionHandlesSteppedHours()
+    {
+        Carbon::setTestNow('2023-07-01');
+
+        $this->schedule->command('inspire')->everyFourHours()->timezone('Europe/London');
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, [
+            '--timezone' => 'UTC',
+            '--json' => true,
+        ]);
+
+        $data = json_decode(Artisan::output(), true);
+
+        $this->assertSame([
+            '0 23 * * *',
+            '0 3,7,11,15,19 * * *',
+        ], array_column($data, 'expression'));
     }
 
     public function testDisplayScheduleCliSplitsExpressionWhenMixedCarry()

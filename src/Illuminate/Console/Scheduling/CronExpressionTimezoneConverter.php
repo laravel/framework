@@ -125,13 +125,19 @@ class CronExpressionTimezoneConverter
      */
     protected static function shiftAndGroup($field, $offset, $mod, $min = 0)
     {
-        if ($offset === 0 || ! preg_match('/^[\d,]+$/', $field)) {
+        if ($offset === 0) {
+            return [0 => $field];
+        }
+
+        $values = static::expandField($field, $mod, $min);
+
+        if ($values === null) {
             return [0 => $field];
         }
 
         $groups = [];
 
-        foreach (explode(',', $field) as $value) {
+        foreach ($values as $value) {
             $new = (int) $value + $offset;
             $carry = 0;
 
@@ -151,6 +157,35 @@ class CronExpressionTimezoneConverter
 
             return implode(',', $values);
         })->all();
+    }
+
+    /**
+     * Expand a cron field containing stepped values.
+     *
+     * @param  string  $field
+     * @param  int  $mod
+     * @param  int  $min
+     * @return array<int>|null
+     */
+    protected static function expandField($field, $mod, $min = 0)
+    {
+        if (preg_match('/^[\d,]+$/', $field)) {
+            return array_map('intval', explode(',', $field));
+        }
+
+        if (! preg_match('/^(?<start>\*|\d+)(?:-(?<end>\d+))?\/(?<step>\d+)$/', $field, $matches)) {
+            return null;
+        }
+
+        $start = $matches['start'] === '*' ? $min : (int) $matches['start'];
+        $end = $matches['end'] !== '' ? (int) $matches['end'] : $mod + $min - 1;
+        $step = (int) $matches['step'];
+
+        if ($step === 0 || $start < $min || $end >= $mod + $min || $start > $end) {
+            return null;
+        }
+
+        return range($start, $end, $step);
     }
 
     /**
