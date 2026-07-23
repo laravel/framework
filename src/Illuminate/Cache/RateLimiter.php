@@ -7,12 +7,13 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Traits\Macroable;
 
 use function Illuminate\Support\enum_value;
 
 class RateLimiter
 {
-    use InteractsWithTime;
+    use InteractsWithTime, Macroable;
 
     /**
      * The cache store implementation.
