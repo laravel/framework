@@ -1008,6 +1008,10 @@ class Container implements ArrayAccess, ContainerContract
         $concrete = $this->resolveConcreteFromAttributes($reflected);
 
         if ($concrete === null) {
+            if ($this->environmentResolver === null && $reflected->getAttributes(Bind::class) !== []) {
+                unset($this->checkedForAttributeBindings[$abstract]);
+            }
+
             return $abstract;
         }
 

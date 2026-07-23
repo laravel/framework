@@ -827,6 +827,23 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(WildcardConcrete::class, $instance);
     }
 
+    public function testBindAttributeIsRecheckedAfterEnvironmentResolverIsSet(): void
+    {
+        $container = new Container;
+
+        try {
+            $container->make(WildcardOnlyInterface::class);
+
+            $this->fail('Expected binding resolution to fail without an environment resolver.');
+        } catch (BindingResolutionException) {
+            // Continue after the expected first resolution failure.
+        }
+
+        $container->resolveEnvironmentUsing(fn () => true);
+
+        $this->assertInstanceOf(WildcardConcrete::class, $container->make(WildcardOnlyInterface::class));
+    }
+
     public function testChecksForMoreSpecificEnvironmentBeforeFallingBackToDefault(): void
     {
         $container = new Container;
