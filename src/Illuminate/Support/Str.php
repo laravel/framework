@@ -1286,7 +1286,50 @@ class Str
 
         return $caseSensitive
             ? str_replace($search, $replace, $subject)
-            : str_ireplace($search, $replace, $subject);
+            : static::replaceIgnoreCase($search, $replace, $subject);
+    }
+
+    /**
+     * Replace the given value in the given string regardless of case.
+     *
+     * @param  array|string  $search
+     * @param  array|string  $replace
+     * @param  array|string  $subject
+     * @return string|string[]
+     */
+    protected static function replaceIgnoreCase($search, $replace, $subject)
+    {
+        $searches = is_array($search) ? array_values($search) : [$search];
+
+        if (static::isAscii(implode('', $searches))) {
+            return str_ireplace($search, $replace, $subject);
+        }
+
+        foreach ((array) $subject as $value) {
+            if (! preg_match('//u', (string) $value)) {
+                return str_ireplace($search, $replace, $subject);
+            }
+        }
+
+        $replacements = is_array($replace)
+            ? array_values($replace)
+            : array_fill(0, count($searches), $replace);
+
+        foreach ($searches as $index => $term) {
+            if ((string) $term === '') {
+                continue;
+            }
+
+            $replacement = (string) ($replacements[$index] ?? '');
+
+            $subject = preg_replace_callback(
+                '/'.preg_quote((string) $term, '/').'/iu',
+                fn () => $replacement,
+                $subject
+            );
+        }
+
+        return $subject;
     }
 
     /**
@@ -1419,7 +1462,7 @@ class Str
 
         return $caseSensitive
             ? str_replace($search, '', $subject)
-            : str_ireplace($search, '', $subject);
+            : static::replaceIgnoreCase($search, '', $subject);
     }
 
     /**
