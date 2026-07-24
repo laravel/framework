@@ -128,7 +128,7 @@ trait MakesHttpRequests
      * @param  string  $type
      * @return $this
      */
-    public function withToken(string $token, string $type = 'Bearer')
+    public function withToken(#[\SensitiveParameter] string $token, string $type = 'Bearer')
     {
         return $this->withHeader('Authorization', $type.' '.$token);
     }
@@ -140,7 +140,7 @@ trait MakesHttpRequests
      * @param  string  $password
      * @return $this
      */
-    public function withBasicAuth(string $username, string $password)
+    public function withBasicAuth(string $username, #[\SensitiveParameter] string $password)
     {
         return $this->withToken(base64_encode("$username:$password"), 'Basic');
     }
