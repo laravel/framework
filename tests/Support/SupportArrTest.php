@@ -11,6 +11,7 @@ use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\MultipleItemsFoundException;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use WeakMap;
@@ -1961,5 +1962,18 @@ class SupportArrTest extends TestCase
         $result = Arr::partition($array, fn (string $value) => str_contains($value, 'J'));
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
+    }
+
+    #[TestWith([[[1, 2], [3, 4]], [2, 4, 6, 8]])]
+    #[TestWith([[['a' => 1, 'b' => 2], ['c' => 3, 'd' => 4]], [2, 4, 6, 8]])]
+    public function testConcurrent(array $input, array $output)
+    {
+        $result = [];
+
+        foreach (Arr::concurrent(...$input) as $key => [$c, $d]) {
+            array_push($result, ...array_map(fn ($value) => $value * 2), [$c, $d])
+        }
+        
+        $this->assertEquals($output, $result);
     }
 }
