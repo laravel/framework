@@ -22,6 +22,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
+use Illuminate\Validation\FakeDnsGetRecordWrapper;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
@@ -147,6 +148,16 @@ trait ValidatesAttributes
      */
     protected function getDnsRecords($hostname, $type)
     {
+        if (static::$fakeDnsLookups) {
+            $hostname = rtrim($hostname, '.');
+
+            if (filter_var($hostname, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) === false || filter_var($hostname, FILTER_VALIDATE_IP) !== false) {
+                return false;
+            }
+
+            return [['host' => $hostname, 'class' => 'IN', 'ttl' => 60, 'type' => 'A', 'ip' => '127.0.0.1']];
+        }
+
         return dns_get_record($hostname, $type);
     }
 
@@ -959,14 +970,13 @@ trait ValidatesAttributes
             ->unique()
             ->map(fn ($validation) => match (true) {
                 $validation === 'strict' => new NoRFCWarningsValidation(),
-                $validation === 'dns' => new DNSCheckValidation(),
+                $validation === 'dns' => new DNSCheckValidation(static::$fakeDnsLookups ? new FakeDnsGetRecordWrapper : null),
                 $validation === 'spoof' => new SpoofCheckValidation(),
                 $validation === 'filter' => new FilterEmailValidation(),
                 $validation === 'filter_unicode' => FilterEmailValidation::unicode(),
                 is_string($validation) && class_exists($validation) => $this->container->make($validation),
                 default => new RFCValidation(),
             })
-            ->values()
             ->all() ?: [new RFCValidation];
 
         $emailValidator = Container::getInstance()->make(EmailValidator::class);

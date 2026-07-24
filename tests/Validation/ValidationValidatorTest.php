@@ -31,10 +31,10 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use Mockery as m;
-use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\File;
@@ -42,6 +42,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ValidationValidatorTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Validator::flushState();
+
+        parent::tearDown();
+    }
+
     public function testNestedErrorMessagesAreRetrievedFromLocalArray()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5327,18 +5334,10 @@ class ValidationValidatorTest extends TestCase
     #[DataProvider('activeUrlDataProvider')]
     public function testValidateActiveUrl($data, $outcome)
     {
+        Validator::fakeDnsLookups();
+
         $trans = $this->getIlluminateArrayTranslator();
-        $v = m::mock(
-            new Validator($trans, $data, ['x' => 'active_url']),
-            function (MockInterface $mock) {
-                $mock
-                    ->shouldAllowMockingProtectedMethods()
-                    ->shouldReceive('getDnsRecords')
-                    ->withAnyArgs()
-                    ->zeroOrMoreTimes()
-                    ->andReturn(['hit']);
-            }
-        );
+        $v = new Validator($trans, $data, ['x' => 'active_url']);
         $this->assertEquals($outcome, $v->passes());
     }
 
@@ -5366,6 +5365,65 @@ class ValidationValidatorTest extends TestCase
                 true,
             ],
         ];
+    }
+
+    public function testValidateActiveUrlWithFakedDnsLookups()
+    {
+        Validator::fakeDnsLookups();
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => 'https://this-domain-does-not-exist.invalid'], ['x' => 'active_url']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'active_url']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => ['not-a-string']], ['x' => 'active_url']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://foo..com'], ['x' => 'active_url']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://127.0.0.1'], ['x' => 'active_url']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateEmailWithDnsCheckWithFakedDnsLookups()
+    {
+        Validator::fakeDnsLookups();
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => 'taylor@this-domain-does-not-exist.com'], ['x' => 'email:dns']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'taylor@this-domain-does-not-exist.com'], ['x' => 'email:rfc,dns']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'not-an-email'], ['x' => 'email:dns']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '.invalid@gmail.com'], ['x' => 'email:dns']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'taylor@this-domain-does-not-exist.invalid'], ['x' => 'email:dns']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testFakedDnsLookupsCanBeToggledAndAreFlushed()
+    {
+        $property = new ReflectionProperty(Validator::class, 'fakeDnsLookups');
+
+        Validator::fakeDnsLookups();
+        $this->assertTrue($property->getValue());
+
+        Validator::fakeDnsLookups(false);
+        $this->assertFalse($property->getValue());
+
+        Validator::fakeDnsLookups();
+        Validator::flushState();
+        $this->assertFalse($property->getValue());
     }
 
     public function testValidateImage()

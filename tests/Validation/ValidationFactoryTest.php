@@ -9,9 +9,17 @@ use Illuminate\Validation\PresenceVerifierInterface;
 use Illuminate\Validation\Validator;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 class ValidationFactoryTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Validator::flushState();
+
+        parent::tearDown();
+    }
+
     public function testMakeMethodCreatesValidValidator()
     {
         $translator = m::mock(TranslatorInterface::class);
@@ -145,5 +153,12 @@ class ValidationFactoryTest extends TestCase
         $this->assertNull($factory->getContainer());
 
         $this->assertSame($container, $factory->setContainer($container)->getContainer());
+    }
+
+    public function testFakeDnsLookupsDelegatesToTheValidator()
+    {
+        (new Factory(m::mock(TranslatorInterface::class)))->fakeDnsLookups();
+
+        $this->assertTrue((new ReflectionProperty(Validator::class, 'fakeDnsLookups'))->getValue());
     }
 }
