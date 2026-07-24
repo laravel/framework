@@ -43,7 +43,7 @@ class ClearCommand extends Command
             $this->isProhibited() ||
             ! $this->confirmToProceed()
         ) {
-            return 1;
+            return self::FAILURE;
         }
 
         $connection = $this->argument('connection')
@@ -59,7 +59,7 @@ class ClearCommand extends Command
         if (! $queue instanceof ClearableQueue) {
             $this->components->error('Clearing queues is not supported on ['.(new ReflectionClass($queue))->getShortName().']');
 
-            return 1;
+            return self::FAILURE;
         }
 
         $count = 0;
@@ -79,7 +79,7 @@ class ClearCommand extends Command
             sprintf('Cleared %s %s from the [%s] %s', $count, Str::plural('job', $count), implode(', ', $queues), (new Stringable('queue'))->plural($queues))
         );
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**
