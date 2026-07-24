@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use ArrayIterator;
 use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -502,6 +503,15 @@ class SupportArrTest extends TestCase
         $this->assertSame('bar', $value3);
         $this->assertSame('baz', $value4);
         $this->assertEquals(200, $value5);
+    }
+
+    public function testLastAcceptsIterables()
+    {
+        $items = new ArrayIterator(['first' => 100, 'second' => 200, 'third' => 300]);
+
+        $this->assertSame(300, Arr::last($items));
+        $this->assertSame(200, Arr::last($items, fn ($value, $key) => $key !== 'third'));
+        $this->assertSame('default', Arr::last(new ArrayIterator, default: 'default'));
     }
 
     public function testFlatten()
