@@ -1315,7 +1315,7 @@ class Arr
         $typeFlag = array_all($arguments, fn ($value) => array_is_list($value))
             ? MultipleIterator::MIT_KEYS_ASSOC
             : MultipleIterator::MIT_KEYS_NUMERIC;
-        $multipleIterator = new MultipleIterator(MultipleIterator::MIT_NEED_ALL|$typeFlag);
+        $multipleIterator = new MultipleIterator(MultipleIterator::MIT_NEED_ANY|$typeFlag);
         
         foreach ($arguments as $idx => $array) {
             $multipleIterator->attachIterator(new ArrayIterator($array), $idx);
