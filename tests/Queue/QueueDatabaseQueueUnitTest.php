@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
 use Illuminate\Queue\Attributes\Timeout;
@@ -234,6 +235,22 @@ class QueueDatabaseQueueUnitTest extends TestCase
         Str::createUuidsNormally();
     }
 
+    public function testDelayAttributeIsRespectedWhenBulkPushing()
+    {
+        $database = m::mock(Connection::class);
+        $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
+        $queue->method('currentTime')->willReturn('created');
+        $queue->method('availableAt')->willReturnCallback(function ($delay = 0) {
+            return 'available:'.$delay;
+        });
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) {
+            $this->assertSame('available:15', $records[0]['available_at']);
+        });
+
+        $queue->bulk([new JobWithDelayAttribute], ['data'], 'queue');
+    }
+
     public function testBuildDatabaseRecordWithPayloadAtTheEnd()
     {
         $queue = m::mock(DatabaseQueue::class);
@@ -442,6 +459,11 @@ class MyTestJob
 class MyBatchableJob
 {
     use Batchable;
+}
+
+#[Delay(15)]
+class JobWithDelayAttribute
+{
 }
 
 #[Backoff(9)]

@@ -7,6 +7,7 @@ use Aws\Sqs\Exception\SqsException;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -374,7 +375,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     {
         return (new Collection($jobs))
             ->map(function ($job) use ($data, $queue) {
-                $delay = is_object($job) ? ($job->delay ?? null) : null;
+                $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
 
                 return [
                     'job' => $job,
