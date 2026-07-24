@@ -945,6 +945,11 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo/bar/baz', Str::replace(' ', '/', 'foo bar baz'));
         $this->assertSame('foo bar baz', Str::replace(['?1', '?2', '?3'], ['foo', 'bar', 'baz'], '?1 ?2 ?3'));
         $this->assertSame(['foo', 'bar', 'baz'], Str::replace(collect(['?1', '?2', '?3']), collect(['foo', 'bar', 'baz']), collect(['?1', '?2', '?3'])));
+
+        $this->assertSame('Xltý kôň', Str::replace('ž', 'X', 'Žltý kôň', false));
+        $this->assertSame('žltý pes', Str::replace('KÔŇ', 'pes', 'žltý kôň', false));
+        $this->assertSame('Xltý pes', Str::replace(['ž', 'KÔŇ'], ['X', 'pes'], 'Žltý kôň', false));
+        $this->assertSame(['Xltý', 'kôň'], Str::replace('ž', 'X', ['Žltý', 'kôň'], false));
     }
 
     public function testReplaceArray()
@@ -1026,6 +1031,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('Fooar', Str::remove(['f', 'b'], 'Foobar'));
         $this->assertSame('ooar', Str::remove(['f', 'b'], 'Foobar', false));
         $this->assertSame('Foobar', Str::remove(['f', '|'], 'Foo|bar'));
+
+        $this->assertSame('ltý', Str::remove('ž', 'Žltý', false));
+        $this->assertSame('žltý ', Str::remove('KÔŇ', 'žltý kôň', false));
     }
 
     public function testReverse()
