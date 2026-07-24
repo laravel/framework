@@ -56,6 +56,13 @@ class Vite implements Htmlable
     protected $manifestFilename = 'manifest.json';
 
     /**
+     * The name of the import map file.
+     *
+     * @var string
+     */
+    protected $importMapFilename = 'importmap.json';
+
+    /**
      * The custom asset path resolver.
      *
      * @var callable|null
@@ -96,6 +103,13 @@ class Vite implements Htmlable
      * @var array
      */
     protected static $manifests = [];
+
+    /**
+     * The cached import map files.
+     *
+     * @var array
+     */
+    protected static $importMaps = [];
 
     /**
      * The ViteFonts instance.
@@ -212,6 +226,19 @@ class Vite implements Htmlable
     public function useManifestFilename($filename)
     {
         $this->manifestFilename = $filename;
+
+        return $this;
+    }
+
+    /**
+     * Set the filename for the import map file.
+     *
+     * @param  string  $filename
+     * @return $this
+     */
+    public function useImportMapFilename($filename)
+    {
+        $this->importMapFilename = $filename;
 
         return $this;
     }
@@ -470,6 +497,13 @@ class Vite implements Htmlable
             ->map(fn ($args) => $this->makePreloadTagForChunk(...$args));
 
         $base = $preloads->join('').$stylesheets->join('').$scripts->join('');
+
+        // When the build uses Vite's "chunkImportMap" option, chunks import one
+        // another through stable identifiers that only resolve via an import map,
+        // which must be output before the module scripts that depend on it.
+        if ($scripts->isNotEmpty() && ($importMap = $this->importMap($buildDirectory)) !== null) {
+            $base = $this->makeImportMapTag($importMap).$base;
+        }
 
         if ($this->prefetchStrategy === null || $this->isRunningHot()) {
             return new HtmlString($base);
@@ -975,6 +1009,49 @@ class Vite implements Htmlable
     protected function manifestPath($buildDirectory)
     {
         return public_path($buildDirectory.'/'.$this->manifestFilename);
+    }
+
+    /**
+     * Get the import map for the given build directory, or null if there is none.
+     *
+     * @param  string  $buildDirectory
+     * @return array|null
+     */
+    protected function importMap($buildDirectory)
+    {
+        $path = $this->importMapPath($buildDirectory);
+
+        if (! array_key_exists($path, static::$importMaps)) {
+            static::$importMaps[$path] = is_file($path)
+                ? json_decode(file_get_contents($path), true)
+                : null;
+        }
+
+        return static::$importMaps[$path];
+    }
+
+    /**
+     * Get the path to the import map file for the given build directory.
+     *
+     * @param  string  $buildDirectory
+     * @return string
+     */
+    protected function importMapPath($buildDirectory)
+    {
+        return public_path($buildDirectory.'/'.$this->importMapFilename);
+    }
+
+    /**
+     * Make the import map script tag for the given import map.
+     *
+     * @param  array  $importMap
+     * @return string
+     */
+    protected function makeImportMapTag($importMap)
+    {
+        return '<script type="importmap"'.$this->nonceAttribute().'>'
+            .json_encode($importMap, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG)
+            .'</script>';
     }
 
     /**
