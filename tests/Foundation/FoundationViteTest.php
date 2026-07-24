@@ -1762,6 +1762,79 @@ class FoundationViteTest extends TestCase
         $this->assertCount(0, app(Vite::class)->preloadedAssets());
     }
 
+    public function testViteInjectsTheImportMapWhenPresent()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest(null, $buildDir);
+        $this->makeViteImportMap(null, $buildDir);
+
+        $result = app(Vite::class)('resources/js/app.js', $buildDir)->toHtml();
+
+        $this->assertStringStartsWith(
+            '<script type="importmap">{"imports":{"/'.$buildDir.'/assets/app.stable.js":"/'.$buildDir.'/assets/app.versioned.js"}}</script>',
+            $result
+        );
+        // The import map must come before the module scripts it resolves.
+        $this->assertLessThan(
+            strpos($result, '<script type="module"'),
+            strpos($result, '<script type="importmap"')
+        );
+        $this->assertStringEndsWith(
+            '<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js"></script>',
+            $result
+        );
+
+        $this->cleanViteImportMap($buildDir);
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testViteDoesNotInjectAnImportMapWhenItIsMissing()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest(null, $buildDir);
+
+        $result = app(Vite::class)('resources/js/app.js', $buildDir)->toHtml();
+
+        $this->assertStringNotContainsString('type="importmap"', $result);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testViteImportMapReceivesTheCspNonce()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest(null, $buildDir);
+        $this->makeViteImportMap(null, $buildDir);
+
+        ViteFacade::useCspNonce('expected-nonce');
+        $result = app(Vite::class)('resources/js/app.js', $buildDir)->toHtml();
+
+        $this->assertStringStartsWith('<script type="importmap" nonce="expected-nonce">', $result);
+
+        $this->cleanViteImportMap($buildDir);
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanConfigureTheImportMapFilename()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest(null, $buildDir);
+
+        file_put_contents(
+            public_path("{$buildDir}/custom-importmap.json"),
+            json_encode(['imports' => ["/{$buildDir}/x.stable.js" => "/{$buildDir}/x.versioned.js"]])
+        );
+
+        ViteFacade::useImportMapFilename('custom-importmap.json');
+        $result = app(Vite::class)('resources/js/app.js', $buildDir)->toHtml();
+
+        $this->assertStringStartsWith('<script type="importmap">', $result);
+        $this->assertStringContainsString("/{$buildDir}/x.versioned.js", $result);
+
+        unlink(public_path("{$buildDir}/custom-importmap.json"));
+        $this->cleanViteManifest($buildDir);
+    }
+
     protected function cleanViteManifest($path = 'build')
     {
         if (file_exists(public_path("{$path}/manifest.json"))) {
@@ -1770,6 +1843,30 @@ class FoundationViteTest extends TestCase
 
         if (file_exists(public_path($path))) {
             rmdir(public_path($path));
+        }
+    }
+
+    protected function makeViteImportMap($contents = null, $path = 'build')
+    {
+        app()->usePublicPath(__DIR__);
+
+        if (! file_exists(public_path($path))) {
+            mkdir(public_path($path));
+        }
+
+        $importMap = json_encode($contents ?? [
+            'imports' => [
+                "/{$path}/assets/app.stable.js" => "/{$path}/assets/app.versioned.js",
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+        file_put_contents(public_path("{$path}/importmap.json"), $importMap);
+    }
+
+    protected function cleanViteImportMap($path = 'build')
+    {
+        if (file_exists(public_path("{$path}/importmap.json"))) {
+            unlink(public_path("{$path}/importmap.json"));
         }
     }
 
