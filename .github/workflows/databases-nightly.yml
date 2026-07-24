@@ -10,6 +10,7 @@ permissions:
 jobs:
   mysql_9:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
 
     services:
       mysql:
@@ -42,6 +43,7 @@ jobs:
   mariadb:
     runs-on: ubuntu-24.04
     continue-on-error: true
+    timeout-minutes: 10
 
     services:
       mariadb:

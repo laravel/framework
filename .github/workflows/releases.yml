@@ -13,6 +13,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
 
     name: Release ${{ inputs.version }}
 
@@ -131,6 +132,7 @@ jobs:
 
   update-changelog:
     needs: release
+    timeout-minutes: 10
 
     name: Update changelog
 
