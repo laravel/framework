@@ -5381,6 +5381,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => ['not-a-string']], ['x' => 'active_url']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://foo..com'], ['x' => 'active_url']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://127.0.0.1'], ['x' => 'active_url']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateEmailWithDnsCheckWithFakedDnsLookups()
@@ -5389,13 +5395,19 @@ class ValidationValidatorTest extends TestCase
 
         $trans = $this->getIlluminateArrayTranslator();
 
-        $v = new Validator($trans, ['x' => 'taylor@this-domain-does-not-exist.invalid'], ['x' => 'email:dns']);
+        $v = new Validator($trans, ['x' => 'taylor@this-domain-does-not-exist.com'], ['x' => 'email:dns']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['x' => 'taylor@this-domain-does-not-exist.invalid'], ['x' => 'email:rfc,dns']);
+        $v = new Validator($trans, ['x' => 'taylor@this-domain-does-not-exist.com'], ['x' => 'email:rfc,dns']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => 'not-an-email'], ['x' => 'email:dns']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '.invalid@gmail.com'], ['x' => 'email:dns']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'taylor@this-domain-does-not-exist.invalid'], ['x' => 'email:dns']);
         $this->assertFalse($v->passes());
     }
 
