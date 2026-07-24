@@ -1971,7 +1971,7 @@ class SupportArrTest extends TestCase
         $result = [];
 
         foreach (Arr::concurrent(...$input) as $key => [$c, $d]) {
-            array_push($result, ...array_map(fn ($value) => $value * 2), [$c, $d])
+            array_push($result, ...array_map(fn ($value) => $value * 2), [$c, $d]);
         }
         
         $this->assertEquals($output, $result);
