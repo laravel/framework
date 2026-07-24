@@ -90,7 +90,7 @@ class LazyPromise implements PromiseInterface
     }
 
     #[\Override]
-    public function resolve($value): void
+    public function resolve($value = null): void
     {
         throw new \LogicException('Cannot resolve a lazy promise.');
     }
