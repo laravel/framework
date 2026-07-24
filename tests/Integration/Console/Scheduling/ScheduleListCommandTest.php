@@ -263,7 +263,7 @@ class ScheduleListCommandTest extends TestCase
             // Steps/ranges — expanded, shifted, and re-collapsed
             'every two hours' => ['0 */2 * * *', 'Asia/Tokyo', null, ['0 1-23/2 * * *']],
             'every odd hour' => ['0 1-23/2 * * *', 'Asia/Tokyo', null, ['0 */2 * * *']],
-            'quarterly step month' => ['0 0 1 1-12/3 *', 'Asia/Tokyo', null, ['0 15 31 3-12/3 *']],
+            'quarterly step month' => ['0 0 1 1-12/3 *', 'Asia/Tokyo', null, ['0 15 31 3,12 *', '0 15 30 6,9 *']],
             'weekdays range' => ['0 8 * * 1-5', 'Asia/Tokyo', null, ['0 23 * * 0-4']],
 
             // Simple hour shift (no day boundary)
@@ -296,18 +296,20 @@ class ScheduleListCommandTest extends TestCase
             // Day-of-month shifts
             'monthly 15th Tokyo (no day wrap)' => ['0 12 15 * *', 'Asia/Tokyo', null, ['0 3 15 * *']],
             'monthly 15th Tokyo (day wraps back)' => ['0 8 15 * *', 'Asia/Tokyo', null, ['0 23 14 * *']],
-            'monthly 1st Tokyo (day wraps to 31)' => ['0 1 1 * *', 'Asia/Tokyo', null, ['0 16 31 * *']],
+            // day 1 wraps into the previous month, whose last day varies (incl. February) — unchanged
+            'monthly 1st Tokyo (day wraps back)' => ['0 1 1 * *', 'Asia/Tokyo', null, ['0 1 1 * *']],
             'monthly 1st LA (day wraps forward)' => ['0 22 1 * *', 'America/Los_Angeles', null, ['0 6 2 * *']],
 
-            // Month shifts (day-of-month carry propagates to month)
+            // Month shifts (day-of-month carry respects month lengths)
             'yearly Jan 1 Tokyo' => ['0 1 1 1 *', 'Asia/Tokyo', null, ['0 16 31 12 *']],
-            'yearly Jul 1 Tokyo' => ['0 1 1 7 *', 'Asia/Tokyo', null, ['0 16 31 6 *']],
+            'yearly Jul 1 Tokyo' => ['0 1 1 7 *', 'Asia/Tokyo', null, ['0 16 30 6 *']],
             'yearly Dec 31 LA' => ['0 22 31 12 *', 'America/Los_Angeles', null, ['0 6 1 1 *']],
+            'dom 31 across months' => ['0 1 31 * *', 'Asia/Tokyo', null, ['0 16 30 1,3,5,7,8,10,12 *']],
 
             // Comma day-of-month
             'twice monthly Tokyo (no wrap)' => ['0 12 1,16 * *', 'Asia/Tokyo', null, ['0 3 1,16 * *']],
-            // day 1→31 (carry -1 to month) and 16→15 (no carry) — splits
-            'twice monthly Tokyo (wraps)' => ['0 1 1,16 * *', 'Asia/Tokyo', null, ['0 16 31 * *', '0 16 15 * *']],
+            // day 1 wraps into a month whose last day varies — unchanged
+            'twice monthly Tokyo (wraps)' => ['0 1 1,16 * *', 'Asia/Tokyo', null, ['0 1 1,16 * *']],
 
             // Comma day-of-week
             'weekends LA night' => ['0 22 * * 0,6', 'America/Los_Angeles', null, ['0 6 * * 0,1']],
@@ -346,6 +348,18 @@ class ScheduleListCommandTest extends TestCase
 
             // Unsupported syntax in a field that does not need shifting — converts
             'named dow without day carry' => ['0 14 * * MON', 'Asia/Tokyo', null, ['0 5 * * MON']],
+
+            // Wildcard dom with a restricted month splits at the month boundary
+            'wildcard dom restricted month' => ['0 1 * 1 *', 'Asia/Tokyo', null, ['0 16 31 12 *', '0 16 1-30 1 *']],
+
+            // Restricted dom and dow combine with "or" semantics — unchanged
+            'dom and dow both restricted' => ['0 1 1 3 1', 'Asia/Tokyo', null, ['0 1 1 3 1']],
+            'dow with restricted month' => ['0 1 * 1 1', 'Asia/Tokyo', null, ['0 1 * 1 1']],
+
+            // February's length depends on the year — unchanged
+            'into February' => ['0 1 1 3 *', 'Asia/Tokyo', null, ['0 1 1 3 *']],
+            'out of February' => ['0 23 28 2 *', 'America/Los_Angeles', null, ['0 23 28 2 *']],
+            'February 29th' => ['0 1 29 2 *', 'Asia/Tokyo', null, ['0 1 29 2 *']],
         ];
     }
 
@@ -370,6 +384,25 @@ class ScheduleListCommandTest extends TestCase
         foreach ($expectedExpressions as $index => $expected) {
             $this->assertSame($expected, $data[$index]['expression']);
         }
+    }
+
+    public function testExpressionTimezoneConversionUsesOffsetAtNextRunDate()
+    {
+        // Listed during BST (UTC+1), but both events next run after DST has
+        // ended, so they convert with the UTC+0 offset in effect when they run.
+        Carbon::setTestNow('2023-10-29');
+
+        $this->schedule->command('inspire')->cron('0 0 30 10 *')->timezone('Europe/London');
+        $this->schedule->command('inspire')->cron('0 0 30 6 *')->timezone('Europe/London');
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, [
+            '--timezone' => 'UTC',
+            '--json' => true,
+        ]);
+
+        $data = json_decode(Artisan::output(), true);
+
+        $this->assertSame(['0 0 30 10 *', '0 23 29 6 *'], array_column($data, 'expression'));
     }
 
     public function testDisplayScheduleCliSplitsExpressionWhenMixedCarry()

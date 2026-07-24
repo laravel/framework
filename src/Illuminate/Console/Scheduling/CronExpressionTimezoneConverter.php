@@ -5,6 +5,7 @@ namespace Illuminate\Console\Scheduling;
 use DateTimeZone;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Throwable;
 
 class CronExpressionTimezoneConverter
 {
@@ -22,7 +23,7 @@ class CronExpressionTimezoneConverter
         $eventTimezone = static::resolveEventTimezone($event, $timezone);
 
         [$totalOffsetMinutes, $hourOffset, $minuteOffset] = static::offsetComponents(
-            $eventTimezone, $timezone
+            $event, $eventTimezone, $timezone
         );
 
         if ($totalOffsetMinutes === 0) {
@@ -57,12 +58,16 @@ class CronExpressionTimezoneConverter
      *
      * @return array{int, int, int}
      */
-    protected static function offsetComponents(DateTimeZone $eventTimezone, DateTimeZone $displayTimezone)
+    protected static function offsetComponents(Event $event, DateTimeZone $eventTimezone, DateTimeZone $displayTimezone)
     {
-        $now = Carbon::now();
+        try {
+            $at = $event->nextRunDate(Carbon::now());
+        } catch (Throwable) {
+            $at = Carbon::now();
+        }
 
         $totalOffsetMinutes = intdiv(
-            $displayTimezone->getOffset($now) - $eventTimezone->getOffset($now),
+            $displayTimezone->getOffset($at) - $eventTimezone->getOffset($at),
             60
         );
 
@@ -133,39 +138,126 @@ class CronExpressionTimezoneConverter
         }
 
         if ($segments[4] !== '*') {
+            // A day-of-week restriction only shifts safely when the day-of-month
+            // and month match everything, since cron treats restricted
+            // day-of-month and day-of-week fields as an "or" and month
+            // boundaries cannot be represented in the day-of-week field.
+            if ($segments[2] !== '*' || $segments[3] !== '*') {
+                return null;
+            }
+
             if (is_null($days = static::expand($segments[4], 0, 7))) {
                 return null;
             }
 
             $parts[4] = static::collapse(static::shiftWrapped($days, $hourCarry, 7), 0, 6);
+
+            return [implode(' ', $parts)];
         }
 
-        $dayGroups = $segments[2] === '*'
-            ? [0 => '*']
-            : static::shiftedGroups($segments[2], $hourCarry, 1, 31, mergeCarries: false);
+        if ($segments[2] === '*' && $segments[3] === '*') {
+            return [implode(' ', $parts)];
+        }
 
-        if (is_null($dayGroups)) {
+        if (is_null($dayGroups = static::shiftDaysOfMonth($segments[2], $segments[3], $hourCarry))) {
             return null;
         }
 
-        $expressions = [];
+        return array_map(function ($group) use ($parts) {
+            [$parts[2], $parts[3]] = $group;
 
-        foreach ($dayGroups as $dayCarry => $dayValues) {
-            $dayParts = $parts;
-            $dayParts[2] = $dayValues;
+            return implode(' ', $parts);
+        }, $dayGroups);
+    }
 
-            if ($dayCarry !== 0 && $segments[3] !== '*') {
-                if (is_null($months = static::expand($segments[3], 1, 12))) {
+    /**
+     * Shift the day-of-month field by the given carry, respecting month lengths.
+     *
+     * Returns pairs of day-of-month and month fields, or null when the shift
+     * cannot be represented because February's length depends on the year.
+     *
+     * @param  string  $domField
+     * @param  string  $monthField
+     * @param  int  $carry
+     * @return array<int, array{string, string}>|null
+     */
+    protected static function shiftDaysOfMonth(string $domField, string $monthField, int $carry)
+    {
+        $months = $monthField === '*' ? range(1, 12) : static::expand($monthField, 1, 12);
+        $days = $domField === '*' ? range(1, 31) : static::expand($domField, 1, 31);
+
+        if (is_null($months) || is_null($days)) {
+            return null;
+        }
+
+        $shifted = [];
+
+        foreach ($months as $month) {
+            foreach ($days as $day) {
+                if ($month === 2 && $day === 29) {
                     return null;
                 }
 
-                $dayParts[3] = static::collapse(static::shiftWrapped($months, $dayCarry, 12, min: 1), 1, 12);
-            }
+                if ($day > static::daysInMonth($month)) {
+                    continue;
+                }
 
-            $expressions[] = implode(' ', $dayParts);
+                [$targetMonth, $targetDay] = [$month, $day + $carry];
+
+                if ($targetDay < 1) {
+                    $targetMonth = $month === 1 ? 12 : $month - 1;
+
+                    if ($targetMonth === 2) {
+                        return null;
+                    }
+
+                    $targetDay = static::daysInMonth($targetMonth);
+                } elseif ($month === 2 && $targetDay > 28) {
+                    return null;
+                } elseif ($targetDay > static::daysInMonth($month)) {
+                    [$targetMonth, $targetDay] = [$month === 12 ? 1 : $month + 1, 1];
+                }
+
+                $shifted[$targetMonth][$targetDay] = true;
+            }
         }
 
-        return $expressions;
+        if ($shifted === []) {
+            return null;
+        }
+
+        $groups = [];
+
+        foreach ($shifted as $month => $days) {
+            $days = array_keys($days);
+
+            sort($days);
+
+            $groups[implode(',', $days)][] = $month;
+        }
+
+        return (new Collection($groups))->map(function ($months, $days) {
+            sort($months);
+
+            return [
+                static::collapse(array_map(intval(...), explode(',', $days)), 1, 31),
+                static::collapse($months, 1, 12),
+            ];
+        })->values()->all();
+    }
+
+    /**
+     * Get the number of days in the given month of a non-leap year.
+     *
+     * February's leap day depends on the year, which the callers handle
+     * by falling back to the original expression.
+     *
+     * @param  int  $month
+     * @return int
+     */
+    protected static function daysInMonth(int $month)
+    {
+        return Carbon::create(2023, $month)->daysInMonth;
     }
 
     /**
