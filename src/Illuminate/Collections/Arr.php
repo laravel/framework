@@ -4,12 +4,14 @@ namespace Illuminate\Support;
 
 use ArgumentCountError;
 use ArrayAccess;
+use ArrayIterator;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use JsonSerializable;
+use MultipleIterator;
 use Random\Randomizer;
 use SortDirection;
 use Traversable;
@@ -1306,6 +1308,17 @@ class Arr
     public static function whereNotNull($array)
     {
         return static::where($array, fn ($value) => ! is_null($value));
+    }
+
+    public static function concurrent(array ...$arguments)
+    {
+        $multipleIterator = new MultipleIterator(MultipleIterator::MIT_NEED_ALL|MultipleIterator::MIT_KEYS_ASSOC);
+        
+        foreach ($arguments as $idx => $array) {
+            $multipleIterator->attachIterator(new ArrayIterator($array), $idx);
+        }
+        
+        return $multipleIterator;
     }
 
     /**
