@@ -30,7 +30,7 @@ use Illuminate\Support\Fluent;
  * @method $this storedAs(string|\Illuminate\Contracts\Database\Query\Expression $expression) Create a stored generated column (MySQL/PostgreSQL/SQLite)
  * @method $this type(string $type) Specify a type for the column
  * @method $this unique(bool|string $indexName = null) Add a unique index
- * @method $this unsigned() Set the INTEGER column as UNSIGNED (MySQL)
+ * @method $this unsigned(bool $value = true) Set the INTEGER column as UNSIGNED if value is true (MySQL)
  * @method $this useCurrent() Set the TIMESTAMP column to use CURRENT_TIMESTAMP as default value
  * @method $this useCurrentOnUpdate() Set the TIMESTAMP column to use CURRENT_TIMESTAMP when updating (MySQL)
  * @method $this virtualAs(string|\Illuminate\Contracts\Database\Query\Expression $expression) Create a virtual generated column (MySQL/PostgreSQL/SQLite)
