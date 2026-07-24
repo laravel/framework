@@ -132,7 +132,6 @@ jobs:
 
   update-changelog:
     needs: release
-    timeout-minutes: 10
 
     name: Update changelog
 
