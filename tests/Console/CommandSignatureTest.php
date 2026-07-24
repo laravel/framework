@@ -71,7 +71,6 @@ class CommandSignatureTest extends TestCase
         return $cases;
     }
 
-
     protected function makeCommandWithoutDependencies(string $class): Command
     {
         $reflection = new ReflectionClass($class);

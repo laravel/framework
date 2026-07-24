@@ -3326,7 +3326,7 @@ return [
                 'valueOptional' => true,
                 'isArray' => false,
                 'acceptValue' => true,
-                'default' => 10,
+                'default' => '10',
                 'description' => 'The max number of ports to attempt to serve from',
             ],
             [

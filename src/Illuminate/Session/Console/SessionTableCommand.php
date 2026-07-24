@@ -11,11 +11,11 @@ use function Illuminate\Filesystem\join_paths;
 class SessionTableCommand extends MigrationGeneratorCommand
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'make:session-table';
+    protected $signature = 'make:session-table';
 
     /**
      * The console command name aliases.

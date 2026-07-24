@@ -6,17 +6,16 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'optimize')]
 class OptimizeCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'optimize';
+    protected $signature = 'optimize {--e|except= : Do not run the commands matching the key or name}';
 
     /**
      * The console command description.
@@ -64,18 +63,6 @@ class OptimizeCommand extends Command
             'routes' => 'route:cache',
             'views' => 'view:cache',
             ...ServiceProvider::$optimizeCommands,
-        ];
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['except', 'e', InputOption::VALUE_OPTIONAL, 'Do not run the commands matching the key or name'],
         ];
     }
 }
