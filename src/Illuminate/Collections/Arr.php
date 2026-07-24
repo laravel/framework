@@ -594,7 +594,17 @@ class Arr
      */
     public static function every($array, callable $callback)
     {
-        return array_all($array, $callback);
+        if (is_array($array)) {
+            return array_all($array, $callback);
+        }
+
+        foreach ($array as $key => $value) {
+            if (! $callback($value, $key)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -606,7 +616,17 @@ class Arr
      */
     public static function some($array, callable $callback)
     {
-        return array_any($array, $callback);
+        if (is_array($array)) {
+            return array_any($array, $callback);
+        }
+
+        foreach ($array as $key => $value) {
+            if ($callback($value, $key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
