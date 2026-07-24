@@ -1016,11 +1016,28 @@ class Validator implements ValidatorContract
             $parameters = $this->replaceDotPlaceholderInParameters($parameters);
         }
 
+        $messageRule = $this->failedOnUnexpectedArrayKeys($rule, $attribute, $parameters) ? 'ArrayKeys' : $rule;
+
         $this->messages->add($attribute, $this->makeReplacements(
-            $this->getMessage($attributeWithPlaceholders, $rule), $attribute, $rule, $parameters
+            $this->getMessage($attributeWithPlaceholders, $messageRule), $attribute, $messageRule, $parameters
         ));
 
         $this->failedRules[$attribute][$rule] = $parameters;
+    }
+
+    /**
+     * Determine if the "array" rule failed because the value contained unexpected keys.
+     *
+     * @param  string  $rule
+     * @param  string  $attribute
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function failedOnUnexpectedArrayKeys($rule, $attribute, $parameters)
+    {
+        return $rule === 'Array'
+            && $parameters !== []
+            && is_array($this->getValue($attribute));
     }
 
     /**

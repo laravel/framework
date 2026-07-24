@@ -23,6 +23,7 @@ return [
     'alpha_num' => 'The :attribute field must only contain letters and numbers.',
     'any_of' => 'The :attribute field is invalid.',
     'array' => 'The :attribute field must be an array.',
+    'array_keys' => 'The :attribute field must only contain the following keys: :values. Unexpected: :unexpected.',
     'ascii' => 'The :attribute field must only contain single-byte alphanumeric characters and symbols.',
     'base64' => 'The :attribute field must be a valid Base64 string.',
     'before' => 'The :attribute field must be a date before :date.',
