@@ -537,6 +537,16 @@ class CacheRepositoryTest extends TestCase
         $this->assertTrue($repo->touch($key, DateInterval::createFromDateString("$ttl seconds")));
     }
 
+    public function testTouchWithDatetimeInPastOrZeroSecondsRemovesOldItem(): void
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('touch')->never();
+        $repo->getStore()->shouldReceive('forget')->twice()->with('key')->andReturn(true);
+
+        $this->assertTrue($repo->touch('key', Carbon::now()->subMinute()));
+        $this->assertTrue($repo->touch('key', 0));
+    }
+
     public function testTouchWorksWithEnumKey(): void
     {
         $ttl = 60;

@@ -692,7 +692,13 @@ class Repository implements ArrayAccess, CacheContract
     {
         $key = enum_value($key);
 
-        return $this->store->touch($this->itemKey($key), $this->getSeconds($ttl));
+        $seconds = $this->getSeconds($ttl);
+
+        if ($seconds <= 0) {
+            return $this->forget($key);
+        }
+
+        return $this->store->touch($this->itemKey($key), $seconds);
     }
 
     /**
