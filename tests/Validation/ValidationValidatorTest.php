@@ -31,7 +31,6 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use Mockery as m;
-use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -5335,18 +5334,10 @@ class ValidationValidatorTest extends TestCase
     #[DataProvider('activeUrlDataProvider')]
     public function testValidateActiveUrl($data, $outcome)
     {
+        Validator::fakeDnsLookups();
+
         $trans = $this->getIlluminateArrayTranslator();
-        $v = m::mock(
-            new Validator($trans, $data, ['x' => 'active_url']),
-            function (MockInterface $mock) {
-                $mock
-                    ->shouldAllowMockingProtectedMethods()
-                    ->shouldReceive('getDnsRecords')
-                    ->withAnyArgs()
-                    ->zeroOrMoreTimes()
-                    ->andReturn(['hit']);
-            }
-        );
+        $v = new Validator($trans, $data, ['x' => 'active_url']);
         $this->assertEquals($outcome, $v->passes());
     }
 
