@@ -505,6 +505,15 @@ class SupportArrTest extends TestCase
         $this->assertEquals(200, $value5);
     }
 
+    public function testLastAcceptsIterables()
+    {
+        $items = new ArrayIterator(['first' => 100, 'second' => 200, 'third' => 300]);
+
+        $this->assertSame(300, Arr::last($items));
+        $this->assertSame(200, Arr::last($items, fn ($value, $key) => $key !== 'third'));
+        $this->assertSame('default', Arr::last(new ArrayIterator, default: 'default'));
+    }
+
     public function testFlatten()
     {
         // Flat arrays are unaffected
