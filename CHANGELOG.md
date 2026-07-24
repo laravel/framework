@@ -1,6 +1,30 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.21.1...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.22.0...13.x)
+
+## [v13.22.0](https://github.com/laravel/framework/compare/v13.21.1...v13.22.0) - 2026-07-24
+
+* [13.x] Fix PHP extensions in sqlite workflow job by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60850
+* [13.x] Use new Stringable(...) instead of Str::of()/str() internally by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60852
+* [13.x] Extract PHP setup steps into a shared composite action by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60851
+* [13.x] add the exception to JobReleasedAfterException by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60823
+* [13.x] Implement `creationTimeOfOldestPendingJob` on the QueueFake by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60730
+* [13.x] Check traits in resolveClassAttribute  by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60566
+* [13.x] Enable additional Rector rules by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60854
+* [13.x] Optimize Str::ucfirst and Str::lcfirst using native PHP 8.4 functions by [@bunyaminbilenkaratas](https://github.com/bunyaminbilenkaratas) in https://github.com/laravel/framework/pull/60864
+* [13.x] Fix queue name parameter in Mailer::later() by [@Button99](https://github.com/Button99) in https://github.com/laravel/framework/pull/60865
+* [13.x] Support stream bodies in HTTP fake responses by [@drewmt](https://github.com/drewmt) in https://github.com/laravel/framework/pull/60834
+* [13.x] Allow RateLimiter to be Macroable by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60869
+* [13.x] Add a `#[BindWhen()]` attribute to conditionally bind into the container by [@ziadoz](https://github.com/ziadoz) in https://github.com/laravel/framework/pull/60862
+* [13.x] Add timeout minutes to workflows by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60872
+* [13.x] Restore iterable support to Arr::every() and Arr::some() by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/60876
+* [13.x] ColumnDefinition::unsigned takes a parameter, which should be documented by [@afk11](https://github.com/afk11) in https://github.com/laravel/framework/pull/60875
+* [13.x] Add multi-queue support to queue:clear command by [@miladshakerdn](https://github.com/miladshakerdn) in https://github.com/laravel/framework/pull/60873
+* [13.x] Fix Cache::touch() expiration handling by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/60878
+* [13.x] Mark HTTP testing credentials as sensitive by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/60880
+* [13.x] Allow faking DNS lookups in validation rules by [@SjorsO](https://github.com/SjorsO) in https://github.com/laravel/framework/pull/60879
+* [13.x] Fix iterable support in Arr::last() by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/60881
+* [13.x] Support `Delay` attribute when using `Bus::batch` & bulk by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60766
 
 ## [v13.21.1](https://github.com/laravel/framework/compare/v13.20.0...v13.21.1) - 2026-07-21
 
