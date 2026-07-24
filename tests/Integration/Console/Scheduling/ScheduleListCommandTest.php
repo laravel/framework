@@ -360,6 +360,11 @@ class ScheduleListCommandTest extends TestCase
             'into February' => ['0 1 1 3 *', 'Asia/Tokyo', null, ['0 1 1 3 *']],
             'out of February' => ['0 23 28 2 *', 'America/Los_Angeles', null, ['0 23 28 2 *']],
             'February 29th' => ['0 1 29 2 *', 'Asia/Tokyo', null, ['0 1 29 2 *']],
+            'wildcard dom in February' => ['0 1 * 2 *', 'Asia/Tokyo', null, ['0 1 * 2 *']],
+
+            // February shifts that do not depend on the year — convert
+            'within February' => ['0 1 15 2 *', 'Asia/Tokyo', null, ['0 16 14 2 *']],
+            'into February 1st' => ['0 22 31 1 *', 'America/Los_Angeles', null, ['0 6 1 2 *']],
         ];
     }
 
