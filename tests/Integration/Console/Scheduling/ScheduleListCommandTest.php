@@ -256,13 +256,15 @@ class ScheduleListCommandTest extends TestCase
             // No conversion needed — same timezone
             'same timezone' => ['0 8 * * *', 'UTC', null, ['0 8 * * *']],
 
-            // Wildcards/steps — pass through unchanged
+            // Wildcards — shift-invariant when the day fields are wildcards
             'every minute' => ['* * * * *', 'America/New_York', null, ['* * * * *']],
             'every five minutes' => ['*/5 * * * *', 'Asia/Tokyo', null, ['*/5 * * * *']],
-            'every two hours' => ['0 */2 * * *', 'Asia/Tokyo', null, ['0 */2 * * *']],
-            'every odd hour' => ['0 1-23/2 * * *', 'Asia/Tokyo', null, ['0 1-23/2 * * *']],
-            'quarterly step month' => ['0 0 1 1-12/3 *', 'Asia/Tokyo', null, ['0 15 31 1-12/3 *']],
-            'weekdays range' => ['0 8 * * 1-5', 'Asia/Tokyo', null, ['0 23 * * 1-5']],
+
+            // Steps/ranges — expanded, shifted, and re-collapsed
+            'every two hours' => ['0 */2 * * *', 'Asia/Tokyo', null, ['0 1-23/2 * * *']],
+            'every odd hour' => ['0 1-23/2 * * *', 'Asia/Tokyo', null, ['0 */2 * * *']],
+            'quarterly step month' => ['0 0 1 1-12/3 *', 'Asia/Tokyo', null, ['0 15 31 3,12 *', '0 15 30 6,9 *']],
+            'weekdays range' => ['0 8 * * 1-5', 'Asia/Tokyo', null, ['0 23 * * 0-4']],
 
             // Simple hour shift (no day boundary)
             'daily LA to UTC' => ['0 8 * * *', 'America/Los_Angeles', null, ['0 16 * * *']],
@@ -281,9 +283,9 @@ class ScheduleListCommandTest extends TestCase
             'twice daily Tokyo' => ['0 9,17 * * *', 'Asia/Tokyo', null, ['0 0,8 * * *']],
             'twice daily Tokyo wrapping' => ['0 13,22 * * *', 'Asia/Tokyo', null, ['0 4,13 * * *']],
 
-            // Comma-separated hours — mixed carries (splits into two entries)
-            'twice daily LA mixed carry' => ['0 13,17 * * *', 'America/Los_Angeles', null, ['0 21 * * *', '0 1 * * *']],
-            'twice daily Tokyo mixed carry' => ['0 3,20 * * *', 'Asia/Tokyo', null, ['0 18 * * *', '0 11 * * *']],
+            // Comma-separated hours — mixed carries merge when the day fields are wildcards
+            'twice daily LA mixed carry' => ['0 13,17 * * *', 'America/Los_Angeles', null, ['0 1,21 * * *']],
+            'twice daily Tokyo mixed carry' => ['0 3,20 * * *', 'Asia/Tokyo', null, ['0 11,18 * * *']],
 
             // Day-of-week shifts
             'weekly Monday night LA' => ['0 22 * * 1', 'America/Los_Angeles', null, ['0 6 * * 2']],
@@ -294,18 +296,20 @@ class ScheduleListCommandTest extends TestCase
             // Day-of-month shifts
             'monthly 15th Tokyo (no day wrap)' => ['0 12 15 * *', 'Asia/Tokyo', null, ['0 3 15 * *']],
             'monthly 15th Tokyo (day wraps back)' => ['0 8 15 * *', 'Asia/Tokyo', null, ['0 23 14 * *']],
-            'monthly 1st Tokyo (day wraps to 31)' => ['0 1 1 * *', 'Asia/Tokyo', null, ['0 16 31 * *']],
+            // day 1 wraps into the previous month, whose last day varies (incl. February) — unchanged
+            'monthly 1st Tokyo (day wraps back)' => ['0 1 1 * *', 'Asia/Tokyo', null, ['0 1 1 * *']],
             'monthly 1st LA (day wraps forward)' => ['0 22 1 * *', 'America/Los_Angeles', null, ['0 6 2 * *']],
 
-            // Month shifts (day-of-month carry propagates to month)
+            // Month shifts (day-of-month carry respects month lengths)
             'yearly Jan 1 Tokyo' => ['0 1 1 1 *', 'Asia/Tokyo', null, ['0 16 31 12 *']],
-            'yearly Jul 1 Tokyo' => ['0 1 1 7 *', 'Asia/Tokyo', null, ['0 16 31 6 *']],
+            'yearly Jul 1 Tokyo' => ['0 1 1 7 *', 'Asia/Tokyo', null, ['0 16 30 6 *']],
             'yearly Dec 31 LA' => ['0 22 31 12 *', 'America/Los_Angeles', null, ['0 6 1 1 *']],
+            'dom 31 across months' => ['0 1 31 * *', 'Asia/Tokyo', null, ['0 16 30 1,3,5,7,8,10,12 *']],
 
             // Comma day-of-month
             'twice monthly Tokyo (no wrap)' => ['0 12 1,16 * *', 'Asia/Tokyo', null, ['0 3 1,16 * *']],
-            // day 1→31 (carry -1 to month) and 16→15 (no carry) — splits
-            'twice monthly Tokyo (wraps)' => ['0 1 1,16 * *', 'Asia/Tokyo', null, ['0 16 31 * *', '0 16 15 * *']],
+            // day 1 wraps into a month whose last day varies — unchanged
+            'twice monthly Tokyo (wraps)' => ['0 1 1,16 * *', 'Asia/Tokyo', null, ['0 1 1,16 * *']],
 
             // Comma day-of-week
             'weekends LA night' => ['0 22 * * 0,6', 'America/Los_Angeles', null, ['0 6 * * 0,1']],
@@ -317,6 +321,45 @@ class ScheduleListCommandTest extends TestCase
             // Comma minutes with half-hour timezone — mixed minute carries (splits)
             // 15+(-30)=-15→45 (carry -1) and 45+(-30)=15 (no carry)
             'comma minutes Kolkata mixed carry' => ['15,45 8 * * *', 'Asia/Kolkata', null, ['45 2 * * *', '15 3 * * *']],
+
+            // Hour ranges
+            'hour range NY' => ['0 0-4 * * *', 'America/New_York', null, ['0 5-9 * * *']],
+            'hour range with minute step Amsterdam' => ['*/10 8-23 * * *', 'Europe/Amsterdam', null, ['*/10 7-22 * * *']],
+            'hour range with minute step Johannesburg' => ['*/10 8-23 * * *', 'Africa/Johannesburg', null, ['*/10 6-21 * * *']],
+            'hour range LA' => ['0 8-11 * * *', 'America/Los_Angeles', null, ['0 16-19 * * *']],
+
+            // Ranges/steps with half-hour timezone offsets
+            'minute step Kolkata' => ['*/10 * * * *', 'Asia/Kolkata', null, ['*/10 * * * *']],
+            'hour range Kolkata' => ['0 9-17 * * *', 'Asia/Kolkata', null, ['30 3-11 * * *']],
+            'hour range Kathmandu' => ['0 9-11 * * *', 'Asia/Kathmandu', null, ['15 3-5 * * *']],
+
+            // Day-of-week ranges shift with the day carry
+            'weeknights range LA' => ['0 22 * * 1-5', 'America/Los_Angeles', null, ['0 6 * * 2-6']],
+            'dow range wraps through Sunday' => ['0 3 * * 0-2', 'Asia/Tokyo', null, ['0 18 * * 0,1,6']],
+
+            // Steps/wildcards split when a day field is fixed (no merge)
+            'hour step with fixed day' => ['0 */2 15 * *', 'Asia/Tokyo', null, ['0 15-23/2 14 * *', '0 1-13/2 15 * *']],
+            'wildcard hour with fixed day' => ['30 * 15 * *', 'Asia/Tokyo', null, ['30 15-23 14 * *', '30 0-14 15 * *']],
+            'wildcard minute with half-hour offset' => ['* 8 * * *', 'Asia/Kolkata', null, ['30-59 2 * * *', '0-29 3 * * *']],
+
+            // Unsupported syntax in a field that needs shifting — unchanged
+            'named dow range needing shift' => ['0 8 * * MON-FRI', 'Asia/Tokyo', null, ['0 8 * * MON-FRI']],
+            'last day of month needing shift' => ['0 8 L * *', 'Asia/Tokyo', null, ['0 8 L * *']],
+
+            // Unsupported syntax in a field that does not need shifting — converts
+            'named dow without day carry' => ['0 14 * * MON', 'Asia/Tokyo', null, ['0 5 * * MON']],
+
+            // Wildcard dom with a restricted month splits at the month boundary
+            'wildcard dom restricted month' => ['0 1 * 1 *', 'Asia/Tokyo', null, ['0 16 31 12 *', '0 16 1-30 1 *']],
+
+            // Restricted dom and dow combine with "or" semantics — unchanged
+            'dom and dow both restricted' => ['0 1 1 3 1', 'Asia/Tokyo', null, ['0 1 1 3 1']],
+            'dow with restricted month' => ['0 1 * 1 1', 'Asia/Tokyo', null, ['0 1 * 1 1']],
+
+            // February's length depends on the year — unchanged
+            'into February' => ['0 1 1 3 *', 'Asia/Tokyo', null, ['0 1 1 3 *']],
+            'out of February' => ['0 23 28 2 *', 'America/Los_Angeles', null, ['0 23 28 2 *']],
+            'February 29th' => ['0 1 29 2 *', 'Asia/Tokyo', null, ['0 1 29 2 *']],
         ];
     }
 
@@ -343,15 +386,44 @@ class ScheduleListCommandTest extends TestCase
         }
     }
 
+    public function testExpressionTimezoneConversionUsesOffsetAtNextRunDate()
+    {
+        // Listed during BST (UTC+1), but both events next run after DST has
+        // ended, so they convert with the UTC+0 offset in effect when they run.
+        Carbon::setTestNow('2023-10-29');
+
+        $this->schedule->command('inspire')->cron('0 0 30 10 *')->timezone('Europe/London');
+        $this->schedule->command('inspire')->cron('0 0 30 6 *')->timezone('Europe/London');
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, [
+            '--timezone' => 'UTC',
+            '--json' => true,
+        ]);
+
+        $data = json_decode(Artisan::output(), true);
+
+        $this->assertSame(['0 0 30 10 *', '0 23 29 6 *'], array_column($data, 'expression'));
+    }
+
     public function testDisplayScheduleCliSplitsExpressionWhenMixedCarry()
     {
-        // 13+8=21 (no carry), 17+8=1 (carry +1) — splits into two CLI rows
+        // 13+8=21 (no carry), 17+8=1 (carry +1) — the fixed day forces two CLI rows
+        $this->schedule->command('inspire')->cron('0 13,17 1 * *')->timezone('America/Los_Angeles');
+
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutputToContain('0 21 1 * *')
+            ->expectsOutputToContain('0 1  2 * *');
+    }
+
+    public function testDisplayScheduleCliMergesMixedCarryWhenDaysAreWildcards()
+    {
+        // 13+8=21 (no carry), 17+8=1 (carry +1) — wildcard days merge into one CLI row
         $this->schedule->command('inspire')->twiceDaily(13, 17)->timezone('America/Los_Angeles');
 
         $this->artisan(ScheduleListCommand::class)
             ->assertSuccessful()
-            ->expectsOutputToContain('0 21 * * *')
-            ->expectsOutputToContain('0 1  * * *');
+            ->expectsOutputToContain('0 1,21 * * *');
     }
 
     public function testDisplayScheduleCliConvertsExpression()
