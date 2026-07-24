@@ -147,6 +147,10 @@ trait ValidatesAttributes
      */
     protected function getDnsRecords($hostname, $type)
     {
+        if (static::$fakeDnsLookups) {
+            return [['host' => $hostname, 'class' => 'IN', 'ttl' => 60, 'type' => 'A', 'ip' => '127.0.0.1']];
+        }
+
         return dns_get_record($hostname, $type);
     }
 
@@ -959,13 +963,14 @@ trait ValidatesAttributes
             ->unique()
             ->map(fn ($validation) => match (true) {
                 $validation === 'strict' => new NoRFCWarningsValidation(),
-                $validation === 'dns' => new DNSCheckValidation(),
+                $validation === 'dns' => static::$fakeDnsLookups ? null : new DNSCheckValidation(),
                 $validation === 'spoof' => new SpoofCheckValidation(),
                 $validation === 'filter' => new FilterEmailValidation(),
                 $validation === 'filter_unicode' => FilterEmailValidation::unicode(),
                 is_string($validation) && class_exists($validation) => $this->container->make($validation),
                 default => new RFCValidation(),
             })
+            ->filter()
             ->values()
             ->all() ?: [new RFCValidation];
 
