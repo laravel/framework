@@ -8,6 +8,7 @@ use Aws\HandlerList;
 use Aws\MockHandler;
 use Aws\Result;
 use Aws\Sqs\SqsClient;
+use GuzzleHttp\Promise\Create;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\LostConnectionDetector;
 use Illuminate\Foundation\Cloud;
@@ -917,9 +918,9 @@ class QueueTest extends TestCase
         $eventsFake = $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
         $client->shouldReceive('sendMessage')->times(5)->andReturn(new Result());
-        $client->shouldReceive('sendMessageBatch')->once()->andReturnUsing(fn ($args) => new Result([
+        $client->shouldReceive('sendMessageBatchAsync')->once()->andReturnUsing(fn ($args) => Create::promiseFor(new Result([
             'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
-        ]));
+        ])));
 
         $queue->push(new FakeJob, queue: '1');
         $queue->pushOn('2', new FakeJob);
@@ -1197,9 +1198,9 @@ class QueueTest extends TestCase
         $this->app['config']->set('queue.connections.cloud.connection.after_commit', true);
         [$queue, $client] = $this->mockedQueue();
         $client->shouldReceive('sendMessage')->times(5)->andReturn(new Result());
-        $client->shouldReceive('sendMessageBatch')->once()->andReturnUsing(fn ($args) => new Result([
+        $client->shouldReceive('sendMessageBatchAsync')->once()->andReturnUsing(fn ($args) => Create::promiseFor(new Result([
             'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
-        ]));
+        ])));
 
         DB::beginTransaction();
 
