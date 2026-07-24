@@ -1964,8 +1964,8 @@ class SupportArrTest extends TestCase
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
 
-    #[TestWith([[[1, 2], [3, 4]], [2, 4, 6, 8]])]
-    #[TestWith([[['a' => 1, 'b' => 2], ['c' => 3, 'd' => 4]], [2, 4, 6, 8]])]
+    #[TestWith([[[1, 2], [3, 4]], [2, 6, 4, 8]])]
+    #[TestWith([[['a' => 1, 'b' => 2], ['c' => 3, 'd' => 4]], [2, 6, 4, 8]])]
     public function testConcurrent(array $input, array $output)
     {
         $result = [];
