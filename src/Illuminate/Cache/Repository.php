@@ -25,6 +25,7 @@ use Illuminate\Cache\Events\WritingKey;
 use Illuminate\Cache\Events\WritingManyKeys;
 use Illuminate\Cache\Limiters\ConcurrencyLimiterBuilder;
 use Illuminate\Contracts\Cache\CanFlushLocks;
+use Illuminate\Contracts\Cache\CanFlushPrefix;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
@@ -821,6 +822,32 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Flush all cache entries managed by the store's configured prefix.
+     *
+     * @throws \BadMethodCallException
+     */
+    public function flushPrefix(): bool
+    {
+        $store = $this->getStore();
+
+        if (! $this->supportsFlushingPrefix()) {
+            throw new BadMethodCallException('This cache store does not support flushing by prefix.');
+        }
+
+        $this->event(new CacheFlushing($this->getName()));
+
+        $result = $store->flushPrefix();
+
+        if ($result) {
+            $this->event(new CacheFlushed($this->getName()));
+        } else {
+            $this->event(new CacheFlushFailed($this->getName()));
+        }
+
+        return $result;
+    }
+
+    /**
      * Begin executing a new tags operation if the store supports it.
      *
      * @param  mixed  $names
@@ -923,6 +950,14 @@ class Repository implements ArrayAccess, CacheContract
     public function supportsFlushingLocks(): bool
     {
         return $this->store instanceof CanFlushLocks;
+    }
+
+    /**
+     * Determine if the current store supports flushing by prefix.
+     */
+    public function supportsFlushingPrefix(): bool
+    {
+        return $this->store instanceof CanFlushPrefix;
     }
 
     /**

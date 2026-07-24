@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\CanFlushLocks;
+use Illuminate\Contracts\Cache\CanFlushPrefix;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
@@ -13,7 +14,7 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use RuntimeException;
 
-class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
+class RedisStore extends TaggableStore implements CanFlushLocks, CanFlushPrefix, LockProvider
 {
     use RetrievesMultipleKeys {
         many as private manyAlias;
@@ -301,6 +302,30 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
     }
 
     /**
+     * Remove all cache entries managed by the store's configured prefix.
+     *
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function flushPrefix(): bool
+    {
+        if ((string) $this->getPrefix() === '') {
+            throw new RuntimeException('Flushing Redis cache by prefix is only supported when a cache prefix is configured.');
+        }
+
+        $connection = $this->connection();
+        $connectionPrefix = $this->connectionPrefix($connection);
+        $prefix = $connectionPrefix.$this->getPrefix();
+
+        foreach ($this->scan($connection, $prefix.'*') as $keys) {
+            $this->deleteKeys($connection, $keys, $connectionPrefix);
+        }
+
+        return true;
+    }
+
+    /**
      * Remove all locks from the store.
      *
      * @return bool
@@ -397,6 +422,135 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
                 }
             } while (((string) $cursor) !== $defaultCursorValue);
         }))->map(fn (string $tagKey) => Str::match('/^'.preg_quote($prefix, '/').'tag:(.*):entries$/', $tagKey));
+    }
+
+    /**
+     * Scan all Redis keys matching the given pattern.
+     *
+     * @param  \Illuminate\Redis\Connections\Connection  $connection
+     * @param  string  $pattern
+     * @param  int  $chunkSize
+     * @return \Illuminate\Support\LazyCollection
+     */
+    protected function scan($connection, string $pattern, int $chunkSize = 1000)
+    {
+        if ($connection instanceof PhpRedisClusterConnection) {
+            return (new LazyCollection(function () use ($connection, $pattern, $chunkSize) {
+                foreach ($connection->client()->_masters() as $master) {
+                    yield from $this->scanNode($connection, $pattern, $chunkSize, $master);
+                }
+            }))->filter->isNotEmpty();
+        }
+
+        if ($connection instanceof PredisClusterConnection) {
+            return (new LazyCollection(function () use ($connection, $pattern, $chunkSize) {
+                foreach ($connection->client() as $node) {
+                    yield from $this->scanNode($node, $pattern, $chunkSize);
+                }
+            }))->filter->isNotEmpty();
+        }
+
+        return (new LazyCollection(function () use ($connection, $pattern, $chunkSize) {
+            yield from $this->scanNode($connection, $pattern, $chunkSize);
+        }))->filter->isNotEmpty();
+    }
+
+    /**
+     * Scan matching Redis keys for a connection or cluster node.
+     *
+     * @param  mixed  $connection
+     * @param  string  $pattern
+     * @param  int  $chunkSize
+     * @param  mixed|null  $node
+     * @return \Generator
+     */
+    protected function scanNode($connection, string $pattern, int $chunkSize, $node = null)
+    {
+        $cursor = $this->initialScanCursor($connection);
+
+        do {
+            $options = ['match' => $pattern, 'count' => $chunkSize];
+
+            if (! is_null($node)) {
+                $options['node'] = $node;
+            }
+
+            $results = $connection->scan($cursor, $options);
+
+            if (! is_array($results)) {
+                break;
+            }
+
+            [$cursor, $keys] = $results;
+
+            if (is_array($keys) && $keys !== []) {
+                yield collect($keys);
+            }
+        } while (! in_array($cursor, [0, '0', null], true));
+    }
+
+    /**
+     * Get the initial scan cursor for the Redis connection.
+     *
+     * @param  mixed  $connection
+     * @return mixed
+     */
+    protected function initialScanCursor($connection)
+    {
+        return $connection instanceof PhpRedisConnection && version_compare(phpversion('redis'), '6.1.0', '>=')
+            ? null
+            : '0';
+    }
+
+    /**
+     * Delete the given keys from Redis.
+     *
+     * @param  \Illuminate\Redis\Connections\Connection  $connection
+     * @param  \Illuminate\Support\Collection  $keys
+     * @param  string  $connectionPrefix
+     * @return void
+     */
+    protected function deleteKeys($connection, $keys, string $connectionPrefix)
+    {
+        $keys = $keys->map(fn (string $key) => $this->normalizeKey($key, $connectionPrefix))->values();
+
+        if ($connection instanceof PhpRedisClusterConnection ||
+            $connection instanceof PredisClusterConnection) {
+            $keys->each(fn (string $key) => $connection->del($key));
+
+            return;
+        }
+
+        $connection->del(...$keys->all());
+    }
+
+    /**
+     * Remove the Redis client's configured prefix from a scanned key.
+     *
+     * @param  string  $key
+     * @param  string  $connectionPrefix
+     * @return string
+     */
+    protected function normalizeKey(string $key, string $connectionPrefix): string
+    {
+        return $connectionPrefix !== '' && Str::startsWith($key, $connectionPrefix)
+            ? Str::after($key, $connectionPrefix)
+            : $key;
+    }
+
+    /**
+     * Get the configured Redis client prefix for the connection.
+     *
+     * @param  \Illuminate\Redis\Connections\Connection  $connection
+     * @return string
+     */
+    protected function connectionPrefix($connection): string
+    {
+        return (string) match (true) {
+            $connection instanceof PhpRedisConnection => $connection->client()->getOption(\Redis::OPT_PREFIX) ?: '',
+            $connection instanceof PredisConnection => $connection->client()->getOptions()->prefix ?: '',
+            default => '',
+        };
     }
 
     /**

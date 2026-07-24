@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cache;
 use BadMethodCallException;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Console\ClearCommand;
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
@@ -109,6 +110,73 @@ class ClearCommandTest extends TestCase
         $this->cacheRepository->shouldReceive('flush')->once();
 
         $this->runCommand($this->command, ['store' => 'redis', '--tags' => 'foo']);
+    }
+
+    public function testClearWithPrefixOption()
+    {
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn([]);
+
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flushPrefix')->once()->andReturn(true);
+        $this->cacheRepository->shouldReceive('flush')->never();
+
+        $this->assertSame(0, $this->runCommand($this->command, ['--prefix' => true]));
+    }
+
+    public function testClearWithPrefixOptionAndTagsFails()
+    {
+        $this->cacheManager->shouldNotReceive('store');
+        $this->cacheRepository->shouldNotReceive('flush');
+        $this->cacheRepository->shouldNotReceive('flushPrefix');
+
+        $this->assertSame(1, $this->runCommand($this->command, ['--prefix' => true, '--tags' => 'foo']));
+    }
+
+    public function testClearWithPrefixOptionAndLocksFails()
+    {
+        $this->cacheManager->shouldNotReceive('store');
+        $this->cacheRepository->shouldNotReceive('flush');
+        $this->cacheRepository->shouldNotReceive('flushPrefix');
+        $this->cacheRepository->shouldNotReceive('flushLocks');
+
+        $this->assertSame(1, $this->runCommand($this->command, ['--prefix' => true, '--locks' => true]));
+    }
+
+    public function testClearWithPrefixOptionWillFailWhenNotSupportedByStore()
+    {
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flushPrefix')->once()->andThrow(new BadMethodCallException);
+        $this->cacheRepository->shouldReceive('flush')->never();
+
+        $this->files->shouldNotReceive('exists');
+        $this->files->shouldNotReceive('files');
+        $this->files->shouldNotReceive('delete');
+
+        $this->assertSame(1, $this->runCommand($this->command, ['--prefix' => true]));
+    }
+
+    public function testClearUsesConfiguredPrefixFlushScope()
+    {
+        $this->command->getLaravel()->instance('config', new ConfigRepository([
+            'cache' => [
+                'default' => 'redis',
+                'stores' => [
+                    'redis' => [
+                        'flush_scope' => 'prefix',
+                    ],
+                ],
+            ],
+        ]));
+
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn([]);
+
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flushPrefix')->once()->andReturn(true);
+        $this->cacheRepository->shouldReceive('flush')->never();
+
+        $this->assertSame(0, $this->runCommand($this->command));
     }
 
     public function testClearWillClearRealTimeFacades()
