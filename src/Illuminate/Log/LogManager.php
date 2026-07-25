@@ -325,10 +325,43 @@ class LogManager implements LoggerInterface
      */
     protected function createDailyDriver(array $config)
     {
+        return $this->createRotatingDriver(
+            $config,
+            RotatingFileHandler::FILE_PER_DAY,
+            $config['max_files'] ?? $config['days'] ?? 7,
+        );
+    }
+
+    /**
+     * Create an instance of the monthly file log driver.
+     *
+     * @param  array  $config
+     * @return \Psr\Log\LoggerInterface
+     */
+    protected function createMonthlyDriver(array $config)
+    {
+        return $this->createRotatingDriver(
+            $config,
+            RotatingFileHandler::FILE_PER_MONTH,
+            $config['max_files'] ?? 3,
+        );
+    }
+
+    /**
+     * Create an instance of a rotating file log driver.
+     *
+     * @param  array  $config
+     * @param  string  $dateFormat
+     * @param  int  $maxFiles
+     * @return \Psr\Log\LoggerInterface
+     */
+    protected function createRotatingDriver(array $config, string $dateFormat, $maxFiles)
+    {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new RotatingFileHandler(
-                $config['path'], $config['days'] ?? 7, $this->level($config),
-                $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
+                $config['path'], $maxFiles, $this->level($config),
+                $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false,
+                $dateFormat,
             ), $config),
         ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : []);
     }
