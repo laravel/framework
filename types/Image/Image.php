@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Image\Image;
+use Illuminate\Image\Image;
 
 use function PHPStan\Testing\assertType;
 
