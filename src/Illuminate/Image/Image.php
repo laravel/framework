@@ -99,6 +99,7 @@ class Image implements Stringable
      *
      * @param  int<1, max>|null  $width
      * @param  int<1, max>|null  $height
+     * @phpstan-return ($width is null ? ($height is null ? never : static) : static)
      */
     public function resize(?int $width = null, ?int $height = null): static
     {
@@ -125,6 +126,7 @@ class Image implements Stringable
      *
      * @param  int<1, max>|null  $width
      * @param  int<1, max>|null  $height
+     * @phpstan-return ($width is null ? ($height is null ? never : static) : static)
      */
     public function scale(?int $width = null, ?int $height = null): static
     {
@@ -218,6 +220,7 @@ class Image implements Stringable
      * Set the optimization options.
      *
      * @throws ImageException
+     * @phpstan-return ($format is 'webp'|'jpg'|'jpeg'|'png'|'gif'|'avif'|'bmp' ? static : never)
      */
     public function optimize(string $format = 'webp', int $quality = ImageOutputOptions::DEFAULT_QUALITY): static
     {
@@ -293,6 +296,7 @@ class Image implements Stringable
     /**
      * Set the output format.
      *
+     * @phpstan-return ($format is 'webp'|'jpg'|'jpeg'|'png'|'gif'|'avif'|'bmp' ? static : never)
      * @throws ImageException
      */
     protected function toFormat(string $format): static
