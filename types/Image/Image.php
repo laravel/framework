@@ -2,6 +2,7 @@
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Image;
+
 use function PHPStan\Testing\assertType;
 
 $file = UploadedFile::fake()->image('test.jpg', 100, 100);
