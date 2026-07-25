@@ -146,7 +146,7 @@ class ConsoleParserTest extends TestCase
         $this->assertSame('default', $results[2][0]->getDefault());
     }
 
-    public function testRequiredOptionValueParsing()
+    public function testRequiredOptionValueParsing(): void
     {
         $results = Parser::parse('command:name {--!option= : The option description.}');
 
@@ -173,7 +173,7 @@ class ConsoleParserTest extends TestCase
 
         $this->assertTrue($results[2][0]->isArray());
         $this->assertTrue($results[2][0]->isValueRequired());
-        $this->assertEquals(['defaultOptionValue1', 'defaultOptionValue2'], $results[2][0]->getDefault());
+        $this->assertSame(['defaultOptionValue1', 'defaultOptionValue2'], $results[2][0]->getDefault());
 
         $results = Parser::parse('command:name {--!option=defaultOptionValue}');
 
