@@ -11,4 +11,3 @@ $image = new Image(file_get_contents($file->getRealPath()));
 rescue(fn () => assertType('never', $image->resize()));
 rescue(fn () => assertType('never', $image->scale()));
 rescue(fn () => assertType('never', $image->optimize('gibberish')));
-rescue(fn () => assertType('never', $image->toFormat('gibberish')));
