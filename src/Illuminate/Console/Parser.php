@@ -97,20 +97,17 @@ class Parser
     {
         [$token, $description] = static::extractDescription($token);
 
-        $matches = preg_split('/\s*\|\s*/', $token, 2);
+        preg_match('/^(?:(.*?)\s*\|\s*)?(!)?(.*)$/', $token, $matches);
 
-        $shortcut = null;
+        [$required, $shortcut, $token] = [$matches[2] === '!', $matches[1] !== '' ? $matches[1] : null, $matches[3]];
 
-        if (isset($matches[1])) {
-            $shortcut = $matches[0];
-            $token = $matches[1];
-        }
+        $mode = $required ? InputOption::VALUE_REQUIRED : InputOption::VALUE_OPTIONAL;
 
         return match (true) {
-            str_ends_with($token, '=') => new InputOption(trim($token, '='), $shortcut, InputOption::VALUE_OPTIONAL, $description),
-            str_ends_with($token, '=*') => new InputOption(trim($token, '=*'), $shortcut, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, $description),
-            (bool) preg_match('/(.+)\=\*(.+)/', $token, $matches) => new InputOption($matches[1], $shortcut, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, $description, preg_split('/,\s?/', $matches[2])),
-            (bool) preg_match('/(.+)\=(.+)/', $token, $matches) => new InputOption($matches[1], $shortcut, InputOption::VALUE_OPTIONAL, $description, $matches[2]),
+            str_ends_with($token, '=') => new InputOption(trim($token, '='), $shortcut, $mode, $description),
+            str_ends_with($token, '=*') => new InputOption(trim($token, '=*'), $shortcut, $mode | InputOption::VALUE_IS_ARRAY, $description),
+            (bool) preg_match('/(.+)\=\*(.+)/', $token, $matches) => new InputOption($matches[1], $shortcut, $mode | InputOption::VALUE_IS_ARRAY, $description, preg_split('/,\s?/', $matches[2])),
+            (bool) preg_match('/(.+)\=(.+)/', $token, $matches) => new InputOption($matches[1], $shortcut, $mode, $description, $matches[2]),
             default => new InputOption($token, $shortcut, InputOption::VALUE_NONE, $description),
         };
     }

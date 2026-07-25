@@ -146,6 +146,41 @@ class ConsoleParserTest extends TestCase
         $this->assertSame('default', $results[2][0]->getDefault());
     }
 
+    public function testRequiredOptionValueParsing()
+    {
+        $results = Parser::parse('command:name {--!option= : The option description.}');
+
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertSame('The option description.', $results[2][0]->getDescription());
+        $this->assertTrue($results[2][0]->acceptValue());
+        $this->assertTrue($results[2][0]->isValueRequired());
+        $this->assertFalse($results[2][0]->isValueOptional());
+        $this->assertNull($results[2][0]->getDefault());
+
+        $results = Parser::parse('command:name {--o|!option=}');
+
+        $this->assertSame('o', $results[2][0]->getShortcut());
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertTrue($results[2][0]->isValueRequired());
+
+        $results = Parser::parse('command:name {--!option=*}');
+
+        $this->assertSame('option', $results[2][0]->getName());
+        $this->assertTrue($results[2][0]->isArray());
+        $this->assertTrue($results[2][0]->isValueRequired());
+
+        $results = Parser::parse('command:name {--!option=*defaultOptionValue1,defaultOptionValue2}');
+
+        $this->assertTrue($results[2][0]->isArray());
+        $this->assertTrue($results[2][0]->isValueRequired());
+        $this->assertEquals(['defaultOptionValue1', 'defaultOptionValue2'], $results[2][0]->getDefault());
+
+        $results = Parser::parse('command:name {--!option=defaultOptionValue}');
+
+        $this->assertTrue($results[2][0]->isValueRequired());
+        $this->assertSame('defaultOptionValue', $results[2][0]->getDefault());
+    }
+
     public function testNameIsSpacesException()
     {
         $this->expectException(InvalidArgumentException::class);
