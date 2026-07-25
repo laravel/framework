@@ -300,6 +300,7 @@ class Image implements Stringable
      * Set the output format.
      *
      * @phpstan-return ($format is 'webp'|'jpg'|'jpeg'|'png'|'gif'|'avif'|'bmp' ? static : never)
+     *
      * @throws ImageException
      */
     protected function toFormat(string $format): static
