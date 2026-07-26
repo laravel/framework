@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,7 +14,10 @@ use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Context;
+use Mockery as m;
 use Orchestra\Testbench\Attributes\WithMigration;
+use RuntimeException;
 
 #[WithMigration]
 #[WithMigration('queue')]
@@ -138,6 +142,44 @@ class JobDispatchingTest extends QueueTestCase
         UniqueJob::dispatchAfterResponse('test');
         $this->app->terminate();
         $this->assertFalse(UniqueJob::$ran);
+    }
+
+    public function testUniqueJobContextIsRemovedWhenDispatchThrows()
+    {
+        $job = new UniqueJob('context-failure');
+
+        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher->shouldReceive('dispatch')->once()->with($job)->andReturnUsing(function () use ($job) {
+            $this->assertSame(
+                config('cache.default'),
+                Context::getHidden('laravel_unique_job_cache_store')
+            );
+            $this->assertSame(
+                'laravel_unique_job:'.UniqueJob::class.':context-failure',
+                Context::getHidden('laravel_unique_job_key')
+            );
+            $this->assertSame(
+                $job->uniqueLockOwner,
+                Context::getHidden('laravel_unique_job_lock_owner')
+            );
+            $this->assertNotSame('', $job->uniqueLockOwner);
+
+            throw new RuntimeException('Dispatch failed.');
+        });
+
+        $this->app->instance(Dispatcher::class, $dispatcher);
+
+        try {
+            dispatch($job);
+
+            $this->fail('Expected the dispatcher to throw.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('Dispatch failed.', $e->getMessage());
+        }
+
+        $this->assertNull(Context::getHidden('laravel_unique_job_cache_store'));
+        $this->assertNull(Context::getHidden('laravel_unique_job_key'));
+        $this->assertNull(Context::getHidden('laravel_unique_job_lock_owner'));
     }
 
     public function testQueueMayBeNullForJobQueueingAndJobQueuedEvent()

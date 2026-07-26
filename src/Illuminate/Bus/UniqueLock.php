@@ -2,6 +2,7 @@
 
 namespace Illuminate\Bus;
 
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\Attributes\UniqueFor;
@@ -39,11 +40,20 @@ class UniqueLock
             ? $job->uniqueFor()
             : ($this->getAttributeValue($job, UniqueFor::class, 'uniqueFor') ?? 0);
 
-        $cache = method_exists($job, 'uniqueVia')
-            ? ($job->uniqueVia() ?? $this->cache)
-            : $this->cache;
+        $cache = $this->resolveCache($job);
 
-        return (bool) $cache->lock(self::getKey($job), $uniqueFor)->get();
+        $lock = $cache->lock(self::getKey($job), $uniqueFor);
+
+        if (! $lock->get()) {
+            return false;
+        }
+
+        if (isset(class_uses_recursive($job)[Queueable::class]) &&
+            $cache->getStore() instanceof LockProvider) {
+            $job->uniqueLockOwner = $lock->owner();
+        }
+
+        return true;
     }
 
     /**
@@ -54,11 +64,34 @@ class UniqueLock
      */
     public function release($job)
     {
-        $cache = method_exists($job, 'uniqueVia')
-            ? ($job->uniqueVia() ?? $this->cache)
-            : $this->cache;
+        $cache = $this->resolveCache($job);
+
+        $owner = isset(class_uses_recursive($job)[Queueable::class])
+            ? ($job->uniqueLockOwner ?? '')
+            : '';
+
+        if (is_string($owner) && $owner !== '') {
+            if ($cache->getStore() instanceof LockProvider) {
+                $cache->restoreLock(self::getKey($job), $owner)->release();
+            }
+
+            return;
+        }
 
         $cache->lock(self::getKey($job))->forceRelease();
+    }
+
+    /**
+     * Resolve the cache repository that should be used for the given job.
+     *
+     * @param  mixed  $job
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    private function resolveCache($job)
+    {
+        return method_exists($job, 'uniqueVia')
+            ? ($job->uniqueVia() ?? $this->cache)
+            : $this->cache;
     }
 
     /**

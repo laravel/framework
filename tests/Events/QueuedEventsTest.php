@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Events;
 use Illuminate\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Lock;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue;
@@ -354,7 +355,9 @@ class QueuedEventsTest extends TestCase
         $container->instance(Cache::class, $cache);
 
         $cache->shouldReceive('lock')->once()->andReturn($lock);
+        $cache->shouldReceive('getStore')->once()->andReturn(m::mock(LockProvider::class));
         $lock->shouldReceive('get')->once()->andReturn(true);
+        $lock->shouldReceive('owner')->andReturn('unique-lock-owner');
 
         $d->setQueueResolver(function () use ($fakeQueue) {
             return $fakeQueue;
@@ -407,7 +410,9 @@ class QueuedEventsTest extends TestCase
         $container->instance(Cache::class, $cache);
 
         $cache->shouldReceive('lock')->once()->andReturn($lock);
+        $cache->shouldReceive('getStore')->once()->andReturn(m::mock(LockProvider::class));
         $lock->shouldReceive('get')->once()->andReturn(true);
+        $lock->shouldReceive('owner')->andReturn('unique-lock-owner');
 
         $d->setQueueResolver(function () use ($fakeQueue) {
             return $fakeQueue;
@@ -434,7 +439,9 @@ class QueuedEventsTest extends TestCase
         $container->instance(Cache::class, $cache);
 
         $cache->shouldReceive('lock')->once()->andReturn($lock);
+        $cache->shouldReceive('getStore')->once()->andReturn(m::mock(LockProvider::class));
         $lock->shouldReceive('get')->once()->andReturn(true);
+        $lock->shouldReceive('owner')->andReturn('unique-lock-owner');
 
         $d->setQueueResolver(function () use ($fakeQueue) {
             return $fakeQueue;
@@ -478,7 +485,9 @@ class QueuedEventsTest extends TestCase
             ->once()
             ->with($expectedKey, 60)
             ->andReturn($lock);
+        $cache->shouldReceive('getStore')->once()->andReturn(m::mock(LockProvider::class));
         $lock->shouldReceive('get')->once()->andReturn(true);
+        $lock->shouldReceive('owner')->andReturn('unique-lock-owner');
 
         $d->setQueueResolver(function () use ($fakeQueue) {
             return $fakeQueue;
@@ -512,7 +521,9 @@ class QueuedEventsTest extends TestCase
             ->once()
             ->with($expectedKey, 60)
             ->andReturn($lock);
+        $uniqueCache->shouldReceive('getStore')->once()->andReturn(m::mock(LockProvider::class));
         $lock->shouldReceive('get')->once()->andReturn(true);
+        $lock->shouldReceive('owner')->andReturn('unique-lock-owner');
 
         $d->setQueueResolver(function () use ($fakeQueue) {
             return $fakeQueue;

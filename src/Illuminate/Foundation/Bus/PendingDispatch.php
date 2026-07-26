@@ -282,22 +282,22 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        $this->addUniqueJobInformationToContext($this->job);
-
         if (! $this->shouldDispatch()) {
-            $this->removeUniqueJobInformationFromContext($this->job);
-
             return;
         }
 
-        $this->acquireDebounceLock();
+        try {
+            $this->addUniqueJobInformationToContext($this->job);
 
-        if ($this->afterResponse) {
-            app(Dispatcher::class)->dispatchAfterResponse($this->job);
-        } else {
-            app(Dispatcher::class)->dispatch($this->job);
+            $this->acquireDebounceLock();
+
+            if ($this->afterResponse) {
+                app(Dispatcher::class)->dispatchAfterResponse($this->job);
+            } else {
+                app(Dispatcher::class)->dispatch($this->job);
+            }
+        } finally {
+            $this->removeUniqueJobInformationFromContext($this->job);
         }
-
-        $this->removeUniqueJobInformationFromContext($this->job);
     }
 }
