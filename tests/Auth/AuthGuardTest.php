@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\CurrentDeviceLogout;
 use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\LoggingOut;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\Validated;
@@ -407,7 +408,7 @@ class AuthGuardTest extends TestCase
         $this->assertNull($mock->getUser());
     }
 
-    public function testLogoutFiresLogoutEvent()
+    public function testLogoutFiresLoggingOutAndLogoutEvents()
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['clearUserDataFromStorage'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
@@ -418,6 +419,7 @@ class AuthGuardTest extends TestCase
         $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));
         $mock->setUser($user);
         $events->shouldReceive('dispatch')->once()->with(m::type(Logout::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(LoggingOut::class));
         $mock->logout();
     }
 

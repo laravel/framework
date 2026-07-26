@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\CurrentDeviceLogout;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\LoggingOut;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\OtherDeviceLogout;
 use Illuminate\Auth\Events\Validated;
@@ -650,6 +651,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function logout()
     {
         $user = $this->user();
+
+        $this->events?->dispatch(new LoggingOut($this->name, $user));
 
         $this->clearUserDataFromStorage();
 
