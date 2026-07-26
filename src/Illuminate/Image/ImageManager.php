@@ -2,6 +2,7 @@
 
 namespace Illuminate\Image;
 
+use BackedEnum;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Filesystem\Filesystem;
@@ -11,6 +12,8 @@ use Illuminate\Image\Drivers\GdDriver;
 use Illuminate\Image\Drivers\ImagickDriver;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
+
+use function Illuminate\Support\enum_value;
 
 class ImageManager extends Manager
 {
@@ -52,8 +55,10 @@ class ImageManager extends Manager
     /**
      * Create an image instance from a storage disk path.
      */
-    public function fromStorage(string $path, ?string $disk = null): Image
+    public function fromStorage(string $path, BackedEnum|string|null $disk = null): Image
     {
+        $disk = enum_value($disk);
+
         return new Image(
             fn () => $this->container->make(FilesystemFactory::class)->disk($disk)->get($path),
         );

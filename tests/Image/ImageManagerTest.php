@@ -160,6 +160,34 @@ class ImageManagerTest extends TestCase
         $this->assertSame($contents, $image->toBytes());
     }
 
+    public function test_from_storage_accepts_backed_enum_disk()
+    {
+        $contents = $this->fakeImageContents();
+
+        $disk = m::mock();
+        $disk->shouldReceive('get')
+            ->once()
+            ->with('images/avatar.jpg')
+            ->andReturn($contents);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')
+            ->once()
+            ->with('public')
+            ->andReturn($disk);
+
+        $app = $this->makeApp([]);
+        $app->shouldReceive('make')
+            ->with(FilesystemFactory::class)
+            ->andReturn($filesystem);
+
+        $manager = new ImageManager($app);
+        $image = $manager->fromStorage('images/avatar.jpg', ImageDiskStub::Public);
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame($contents, $image->toBytes());
+    }
+
     public function test_from_storage_is_lazy()
     {
         $filesystem = m::mock(FilesystemFactory::class);
@@ -363,4 +391,9 @@ class ImageManagerTest extends TestCase
 
         return $app;
     }
+}
+
+enum ImageDiskStub: string
+{
+    case Public = 'public';
 }
