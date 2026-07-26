@@ -1292,9 +1292,9 @@ class Str
     /**
      * Replace the given value in the given string regardless of case.
      *
-     * @param  array|string  $search
-     * @param  array|string  $replace
-     * @param  array|string  $subject
+     * @param  string|string[]  $search
+     * @param  string|string[]  $replace
+     * @param  string|string[]  $subject
      * @return string|string[]
      */
     protected static function replaceIgnoreCase($search, $replace, $subject)
