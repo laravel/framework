@@ -436,6 +436,7 @@ class LogManagerTest extends TestCase
         $this->assertSame($expectedPath, $handler->getUrl());
         $this->assertStringContainsString('WARNING: Something went wrong', file_get_contents($expectedPath));
 
+        // max_files = 3, the oldest 4th file was deleted
         $this->assertFileDoesNotExist($stalePaths[0]);
         $this->assertFileExists($stalePaths[1]);
         $this->assertFileExists($stalePaths[2]);
