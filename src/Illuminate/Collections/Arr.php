@@ -326,7 +326,6 @@ class Arr
      * @param  (callable(TValue, TKey): bool)|null  $callback
      * @param  TLastDefault|(\Closure(): TLastDefault)  $default
      * @return TValue|TLastDefault
-     * @phpstan-result ($array is null ? TLastDefault : TValue|TLastDefault)
      */
     public static function last($array, ?callable $callback = null, $default = null)
     {
