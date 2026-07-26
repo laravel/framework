@@ -329,6 +329,10 @@ class Arr
      */
     public static function last($array, ?callable $callback = null, $default = null)
     {
+        if ($array === null) {
+            return value($default);
+        }
+
         $array = static::from($array);
 
         if (is_null($callback)) {
