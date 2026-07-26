@@ -4980,6 +4980,56 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateNotEmail()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.not_email' => 'The :attribute field must not be a valid email address.'], 'en');
+
+        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'NotEmail']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => ['not a string']], ['x' => 'NotEmail']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            'x' => new class
+            {
+                public function __toString()
+                {
+                    return 'aslsdlks';
+                }
+            },
+        ], ['x' => 'NotEmail']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            'x' => new class
+            {
+                public function __toString()
+                {
+                    return 'foo@gmail.com';
+                }
+            },
+        ], ['x' => 'NotEmail']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'foo@gmail.com'], ['x' => 'NotEmail']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The x field must not be a valid email address.', $v->messages()->first('x'));
+
+        $v = new Validator($trans, ['x' => "\"foo\r\nBcc: victim@example.com\"@example.com"], ['x' => 'NotEmail']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'foo@bar '], ['x' => 'NotEmail:strict']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['x' => 'NotEmail']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => ''], ['x' => 'NotEmail']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateEmailWithInternationalCharacters()
     {
         $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@gmäil.com'], ['x' => 'email']);
