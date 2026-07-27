@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Queue;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Facades\Context;
@@ -20,6 +21,9 @@ trait InteractsWithUniqueJobs
             Context::addHidden([
                 'laravel_unique_job_cache_store' => $this->getUniqueJobCacheStore($job),
                 'laravel_unique_job_key' => UniqueLock::getKey($job),
+                'laravel_unique_job_lock_owner' => isset(class_uses_recursive($job)[Queueable::class])
+                    ? ($job->uniqueLockOwner ?? '')
+                    : '',
             ]);
         }
     }
@@ -36,6 +40,7 @@ trait InteractsWithUniqueJobs
             Context::forgetHidden([
                 'laravel_unique_job_cache_store',
                 'laravel_unique_job_key',
+                'laravel_unique_job_lock_owner',
             ]);
         }
     }
