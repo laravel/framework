@@ -674,6 +674,75 @@ class BusBatchTest extends TestCase
         $this->assertSame('custom-queue', $firstJob->queue);
     }
 
+    public function test_chained_jobs_in_batch_preserve_their_connection_when_batch_has_no_connection()
+    {
+        $queue = m::mock(Factory::class);
+
+        $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
+
+        // Create a batch WITHOUT onConnection — this is the key difference
+        $pendingBatch = (new PendingBatch(new Container, collect()))
+            ->onQueue('test-queue');
+
+        $batch = $repository->store($pendingBatch);
+
+        $firstJob = (new ChainHeadJob)->onConnection('custom-connection');
+        $secondJob = (new SecondTestJob)->onConnection('custom-connection');
+
+        $queue->shouldReceive('connection')->once()
+            ->with('custom-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once()->with(m::on(function ($args) use ($firstJob) {
+            return $args[0] == $firstJob;
+        }), '', 'test-queue');
+
+        $batch->add([
+            [$firstJob, $secondJob],
+        ]);
+
+        // Both jobs had ->onConnection('custom-connection') set before batching,
+        // so the chain head must be pushed to that connection instead of the
+        // default connection when the batch itself defines no connection.
+        $this->assertSame('custom-connection', $firstJob->connection);
+        $this->assertSame('custom-connection', $secondJob->connection);
+    }
+
+    public function test_jobs_in_batch_without_connection_are_pushed_to_their_own_connections()
+    {
+        $queue = m::mock(Factory::class);
+
+        $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
+
+        $pendingBatch = new PendingBatch(new Container, collect());
+
+        $batch = $repository->store($pendingBatch);
+
+        $defaultConnectionJob = new SecondTestJob;
+        $customConnectionJob = (new ThirdTestJob)->onConnection('custom-connection');
+
+        $queue->shouldReceive('connection')->once()
+            ->with(null)
+            ->andReturn($defaultConnection = m::mock(stdClass::class));
+
+        $defaultConnection->shouldReceive('bulk')->once()->with(m::on(function ($args) use ($defaultConnectionJob) {
+            return $args == [$defaultConnectionJob];
+        }), '', null);
+
+        $queue->shouldReceive('connection')->once()
+            ->with('custom-connection')
+            ->andReturn($customConnection = m::mock(stdClass::class));
+
+        $customConnection->shouldReceive('bulk')->once()->with(m::on(function ($args) use ($customConnectionJob) {
+            return $args == [$customConnectionJob];
+        }), '', null);
+
+        $batch = $batch->add([$defaultConnectionJob, $customConnectionJob]);
+
+        $this->assertEquals(2, $batch->totalJobs);
+        $this->assertEquals(2, $batch->pendingJobs);
+    }
+
     public function test_chained_closure_after_multiple_batches_is_properly_dispatched()
     {
         Queue::fake();
