@@ -17,10 +17,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RouteCollectionTest extends TestCase
 {
-    /**
-     * @var \Illuminate\Routing\RouteCollection
-     */
-    protected $routeCollection;
+    protected RouteCollection $routeCollection;
 
     protected function setUp(): void
     {
