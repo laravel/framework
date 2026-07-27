@@ -1,0 +1,15 @@
+name: Checkout code
+description: Checkout the repository using a pinned version of actions/checkout.
+
+inputs:
+  persist-credentials:
+    description: Whether to configure the token in the local git config
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: ${{ inputs.persist-credentials }}
