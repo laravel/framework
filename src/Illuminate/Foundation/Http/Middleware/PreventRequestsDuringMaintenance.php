@@ -72,7 +72,7 @@ class PreventRequestsDuringMaintenance
                 throw $exception;
             }
 
-            if (isset($data['secret']) && $request->path() === $data['secret']) {
+            if (is_string($data['secret'] ?? null) && hash_equals($data['secret'], $request->path())) {
                 return $this->bypassResponse($data['secret']);
             }
 
