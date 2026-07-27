@@ -996,7 +996,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Select specific values from the items within the collection.
      *
-     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string|null  $keys
+     * @param  \Illuminate\Support\Enumerable<int, string>|list<string>|string|null  $keys
      * @return static
      */
     public function select($keys)
