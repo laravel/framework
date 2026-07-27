@@ -74,7 +74,7 @@ trait ResolvesJsonApiElements
             'type' => $resourceType,
             ...(new Collection([
                 'attributes' => $this->resolveResourceAttributes($request, $resourceType),
-                'relationships' => $this->resolveResourceRelationshipIdentifiers($request),
+                'relationships' => $this->resolveResourceRelationshipIdentifiers($request, $resourceType),
                 'links' => $this->resolveResourceLinks($request),
                 'meta' => $this->resolveResourceMetaInformation($request),
             ]))->filter()->map(fn ($value) => (object) $value),
@@ -164,7 +164,7 @@ trait ResolvesJsonApiElements
      *
      * @throws \RuntimeException
      */
-    protected function resolveResourceRelationshipIdentifiers(JsonApiRequest $request): array
+    protected function resolveResourceRelationshipIdentifiers(JsonApiRequest $request, ?string $resourceType = null): array
     {
         if (! $this->resource instanceof Model) {
             return [];
@@ -172,8 +172,13 @@ trait ResolvesJsonApiElements
 
         $this->compileResourceRelationships($request);
 
+        $resourceType ??= $this->resolveResourceType($request);
+
+        $usesSparseFieldset = $this->usesRequestQueryString && $request->hasSparseFieldset($resourceType);
+
         return [
             ...(new Collection($this->filter($this->loadedRelationshipIdentifiers)))
+                ->when($usesSparseFieldset, fn ($relationships) => $relationships->only($request->sparseFields($resourceType)))
                 ->map(function ($relation) {
                     return ! is_null($relation) ? $relation : ['data' => null];
                 })->all(),

@@ -64,6 +64,84 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonMissing(['jsonapi', 'included']);
     }
 
+    public function testItOmitsRelationshipsNotListedInSparseFieldsets()
+    {
+        $user = User::factory()->create();
+
+        $post = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $this->getJson("/users/{$user->getKey()}?".http_build_query([
+            'include' => 'posts',
+            'fields' => ['users' => 'name'],
+        ]))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'id' => (string) $user->getKey(),
+                    'type' => 'users',
+                    'attributes' => [
+                        'name' => $user->name,
+                    ],
+                ],
+                'included' => [
+                    [
+                        'id' => (string) $post->getKey(),
+                        'type' => 'posts',
+                        'attributes' => [
+                            'title' => $post->title,
+                            'content' => $post->content,
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
+    public function testItRetainsRelationshipsListedInSparseFieldsets()
+    {
+        $user = User::factory()->create();
+
+        $post = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $this->getJson("/users/{$user->getKey()}?".http_build_query([
+            'include' => 'posts',
+            'fields' => ['users' => 'name,posts'],
+        ]))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'id' => (string) $user->getKey(),
+                    'type' => 'users',
+                    'attributes' => [
+                        'name' => $user->name,
+                    ],
+                    'relationships' => [
+                        'posts' => [
+                            'data' => [
+                                [
+                                    'id' => (string) $post->getKey(),
+                                    'type' => 'posts',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'included' => [
+                    [
+                        'id' => (string) $post->getKey(),
+                        'type' => 'posts',
+                        'attributes' => [
+                            'title' => $post->title,
+                            'content' => $post->content,
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
     public function testItCanGenerateJsonApiResponseWithEmptyRelationshipsUsingSparseIncluded()
     {
         $user = User::factory()->create();
