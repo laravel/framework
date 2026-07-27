@@ -203,8 +203,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
             })
             ->all();
 
-        // Dynamically added routes take precedence over cached routes that share
-        // the same domain / URI, so we let them overwrite any cached entries.
+        // Dynamically added routes take precedence over cached routes with the same URI...
         return $this->routes->get($method) + $routes;
     }
 
@@ -277,8 +276,9 @@ class CompiledRouteCollection extends AbstractRouteCollection
     public function getRoutesByMethod()
     {
         return (new Collection($this->routeNamesByMethod()))
-            ->merge($this->routes->getRoutesByMethod())
             ->keys()
+            ->merge(array_keys($this->routes->getRoutesByMethod()))
+            ->unique()
             ->mapWithKeys(fn ($method) => [$method => $this->get($method)])
             ->all();
     }
@@ -300,9 +300,8 @@ class CompiledRouteCollection extends AbstractRouteCollection
     /**
      * Get the cached route names grouped by the HTTP method they respond to.
      *
-     * This is built directly from the raw route attributes so that we don't have to
-     * instantiate every cached Route instance just to determine which routes
-     * respond to a given HTTP method.
+     * Built from the raw route attributes so we don't have to instantiate every
+     * cached Route instance just to determine which routes respond to a method.
      *
      * @return array<string, array<int, string>>
      */
@@ -314,15 +313,15 @@ class CompiledRouteCollection extends AbstractRouteCollection
 
         return $this->routeNamesByMethod = (new Collection($this->attributes))
             ->groupBy(fn (array $attributes) => $attributes['methods'], preserveKeys: true)
-            ->map(fn ($routes) => $routes->keys()->all())
+            ->map(fn (Collection $group) => $group->keys()->all())
             ->all();
     }
 
     /**
      * Get the cached route names keyed by their controller action.
      *
-     * This is built directly from the raw route attributes so that we don't have to
-     * instantiate every cached Route instance just to resolve a single action.
+     * Built from the raw route attributes so we don't have to instantiate every
+     * cached Route instance just to resolve a single action.
      *
      * @return array<string, string>
      */
@@ -332,6 +331,8 @@ class CompiledRouteCollection extends AbstractRouteCollection
             return $this->routeNameByAction;
         }
 
+        // We reverse the list before flipping it so that, when multiple route names
+        // share the same action, the first one registered wins instead of the last.
         return $this->routeNameByAction = (new Collection($this->attributes))
             ->map(fn (array $attributes) => isset($attributes['action']['controller'])
                 ? trim($attributes['action']['controller'], '\\')

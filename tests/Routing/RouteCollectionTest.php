@@ -486,7 +486,9 @@ class RouteCollectionTest extends TestCase
             'as' => 'bar_show',
         ]));
 
-        $this->assertCount(2, $this->toCompiledRouteCollection()->get('GET'));
+        $compiled = $this->toCompiledRouteCollection();
+
+        $this->assertCount(2, $compiled->get('GET'));
     }
 
     public function testCompiledRouteCollectionCanRetrieveByAction(): void
