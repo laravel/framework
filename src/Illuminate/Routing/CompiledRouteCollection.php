@@ -57,6 +57,20 @@ class CompiledRouteCollection extends AbstractRouteCollection
     protected $nameCache = [];
 
     /**
+     * A cache of route names grouped by the HTTP method they respond to, built from the route attributes.
+     *
+     * @var array<string, array<int, string>>|null
+     */
+    protected $routeNamesByMethod;
+
+    /**
+     * A cache of route names keyed by their controller action, built from the route attributes.
+     *
+     * @var array<string, string>|null
+     */
+    protected $routeNameByAction;
+
+    /**
      * Create a new CompiledRouteCollection instance.
      *
      * @param  array  $compiled
@@ -177,7 +191,21 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function get($method = null)
     {
-        return $this->getRoutesByMethod()[$method] ?? [];
+        if (is_null($method)) {
+            return $this->getRoutes();
+        }
+
+        $routes = (new Collection($this->routeNamesByMethod()[$method] ?? []))
+            ->mapWithKeys(function ($name) {
+                $route = $this->getByName($name);
+
+                return [$route->getDomain().$route->uri => $route];
+            })
+            ->all();
+
+        // Dynamically added routes take precedence over cached routes that share
+        // the same domain / URI, so we let them overwrite any cached entries.
+        return $this->routes->get($method) + $routes;
     }
 
     /**
@@ -218,16 +246,8 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getByAction($action)
     {
-        $attributes = (new Collection($this->attributes))->first(function (array $attributes) use ($action) {
-            if (isset($attributes['action']['controller'])) {
-                return trim($attributes['action']['controller'], '\\') === $action;
-            }
-
-            return $attributes['action']['uses'] === $action;
-        });
-
-        if ($attributes) {
-            return $this->newRoute($attributes);
+        if ($name = $this->routeNameByAction()[$action] ?? null) {
+            return $this->getByName($name);
         }
 
         return $this->routes->getByAction($action);
@@ -256,15 +276,10 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getRoutesByMethod()
     {
-        return (new Collection($this->getRoutes()))
-            ->groupBy(function (Route $route) {
-                return $route->methods();
-            })
-            ->map(function (Collection $routes) {
-                return $routes->mapWithKeys(function (Route $route) {
-                    return [$route->getDomain().$route->uri => $route];
-                })->all();
-            })
+        return (new Collection($this->routeNamesByMethod()))
+            ->merge($this->routes->getRoutesByMethod())
+            ->keys()
+            ->mapWithKeys(fn ($method) => [$method => $this->get($method)])
             ->all();
     }
 
@@ -279,6 +294,51 @@ class CompiledRouteCollection extends AbstractRouteCollection
             ->keyBy(function (Route $route) {
                 return $route->getName();
             })
+            ->all();
+    }
+
+    /**
+     * Get the cached route names grouped by the HTTP method they respond to.
+     *
+     * This is built directly from the raw route attributes so that we don't have to
+     * instantiate every cached Route instance just to determine which routes
+     * respond to a given HTTP method.
+     *
+     * @return array<string, array<int, string>>
+     */
+    protected function routeNamesByMethod()
+    {
+        if (! is_null($this->routeNamesByMethod)) {
+            return $this->routeNamesByMethod;
+        }
+
+        return $this->routeNamesByMethod = (new Collection($this->attributes))
+            ->groupBy(fn (array $attributes) => $attributes['methods'], preserveKeys: true)
+            ->map(fn ($routes) => $routes->keys()->all())
+            ->all();
+    }
+
+    /**
+     * Get the cached route names keyed by their controller action.
+     *
+     * This is built directly from the raw route attributes so that we don't have to
+     * instantiate every cached Route instance just to resolve a single action.
+     *
+     * @return array<string, string>
+     */
+    protected function routeNameByAction()
+    {
+        if (! is_null($this->routeNameByAction)) {
+            return $this->routeNameByAction;
+        }
+
+        return $this->routeNameByAction = (new Collection($this->attributes))
+            ->map(fn (array $attributes) => isset($attributes['action']['controller'])
+                ? trim($attributes['action']['controller'], '\\')
+                : ($attributes['action']['uses'] ?? null))
+            ->filter(fn ($action) => is_string($action))
+            ->reverse()
+            ->flip()
             ->all();
     }
 
