@@ -1301,7 +1301,7 @@ class Str
     {
         $searches = is_array($search) ? array_values($search) : [$search];
 
-        if (static::isAscii(implode('', $searches))) {
+        if (array_all($searches, static::isAscii(...))) {
             return str_ireplace($search, $replace, $subject);
         }
 
