@@ -1366,6 +1366,18 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertStringNotContainsString('a.attgenerated', $statement);
     }
 
+    public function testAddUsingKeywordToColumnOnChange()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'currency_rates');
+        $blueprint->date('name')->using('name::date')->change();
+        $statements = $blueprint->toSql();
+
+        $this->assertSame(
+            'alter table "currency_rates" alter column "name" type date using name::date, alter column "name" set not null, alter column "name" drop default, alter column "name" drop identity if exists',
+            $statements[0]
+        );
+    }
+
     protected function getConnection(
         ?PostgresGrammar $grammar = null,
         ?PostgresBuilder $builder = null,

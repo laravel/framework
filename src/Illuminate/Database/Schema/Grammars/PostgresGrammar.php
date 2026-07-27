@@ -287,7 +287,7 @@ class PostgresGrammar extends Grammar
     {
         $column = $command->column;
 
-        $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column)];
+        $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column).($column->using ? ' using '.$column->using : '')];
 
         foreach ($this->modifiers as $modifier) {
             if ($modifier === 'Collate') {
