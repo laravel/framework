@@ -287,7 +287,7 @@ class PostgresGrammar extends Grammar
     {
         $column = $command->column;
 
-        $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column).$this->getUsing($column)];
+        $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column).($column->using ? ' using '.$column->using : '')];
 
         foreach ($this->modifiers as $modifier) {
             if ($modifier === 'Collate') {
@@ -1347,16 +1347,5 @@ class PostgresGrammar extends Grammar
         }
 
         return $sql;
-    }
-
-    /**
-     * get USING keyword, if it's available.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function getUsing($column)
-    {
-        return $column?->using ? ' using '.$column->using : '';
     }
 }
