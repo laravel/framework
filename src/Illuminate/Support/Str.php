@@ -1305,28 +1305,28 @@ class Str
             return str_ireplace($search, $replace, $subject);
         }
 
-        foreach ((array) $subject as $value) {
+        $replacements = is_array($replace)
+            ? array_values($replace)
+            : array_fill(0, count($searches), $replace);
+
+        foreach ([...$searches, ...$replacements, ...(array) $subject] as $value) {
             if (! preg_match('//u', (string) $value)) {
                 return str_ireplace($search, $replace, $subject);
             }
         }
 
-        $replacements = is_array($replace)
-            ? array_values($replace)
-            : array_fill(0, count($searches), $replace);
-
         foreach ($searches as $index => $term) {
-            if ((string) $term === '') {
+            $term = (string) $term;
+
+            if ($term === '') {
                 continue;
             }
 
             $replacement = (string) ($replacements[$index] ?? '');
 
-            $subject = preg_replace_callback(
-                '/'.preg_quote((string) $term, '/').'/iu',
-                fn () => $replacement,
-                $subject
-            );
+            $subject = static::isAscii($term)
+                ? str_ireplace($term, $replacement, $subject)
+                : preg_replace_callback('/'.preg_quote($term, '/').'/iu', fn () => $replacement, $subject);
         }
 
         return $subject;
