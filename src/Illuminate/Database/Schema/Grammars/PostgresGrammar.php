@@ -1355,8 +1355,8 @@ class PostgresGrammar extends Grammar
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
-     protected function getUsing($column)
-     {
-         return $column?->using ? ' using '.$column->using : '';
-     }
+    protected function getUsing($column)
+    {
+        return $column?->using ? ' using '.$column->using : '';
+    }
 }
