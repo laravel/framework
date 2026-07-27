@@ -1,6 +1,25 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.22.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.23.0...13.x)
+
+## [v13.23.0](https://github.com/laravel/framework/compare/v13.22.0...v13.23.0) - 2026-07-27
+
+* Bump postcss from 8.5.15 to 8.5.23 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/60884
+* [13.x] Add a monthly log driver by [@SjorsO](https://github.com/SjorsO) in https://github.com/laravel/framework/pull/60892
+* [13.x] Improve types in `Image` class by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/60890
+* Fix null handling in Arr::last() method by [@AmadulHaque](https://github.com/AmadulHaque) in https://github.com/laravel/framework/pull/60887
+* [13.x] Allow ImageManager fromStorage disk to accept enums by [@riesjart](https://github.com/riesjart) in https://github.com/laravel/framework/pull/60889
+* [13.x] Add SES tenant support to the SES v2 transport by [@atymic](https://github.com/atymic) in https://github.com/laravel/framework/pull/60886
+* Bump actions/checkout from 7.0.0 to 7.0.1 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/60900
+* [13.x] Prevent fatal errors when logging deprecations fails by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/60893
+* [13.x] Bump `monolog/monolog` constraint by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60894
+* [13.x] Add monthly channel to logging config by [@yazansalhi](https://github.com/yazansalhi) in https://github.com/laravel/framework/pull/60895
+* [13.x] Use a timing-safe comparison for the maintenance mode bypass secret by [@yazansalhi](https://github.com/yazansalhi) in https://github.com/laravel/framework/pull/60896
+* [13.x] Improve `Collection::select` generic types by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/60898
+* [13.x] Allow ->using(...) in ->change() migrations for PostgreSQL compatibility by [@shemgp](https://github.com/shemgp) in https://github.com/laravel/framework/pull/60901
+* Revert "[13.x] Fix that retries of `ShouldBeUniqueUntilProcessing` jobs are force-releasing locks they don't own" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/60905
+* [13.x] Fix default handling in `CookieJar::queued()` by [@alies-dev](https://github.com/alies-dev) in https://github.com/laravel/framework/pull/60904
+* [13.x] Fix schedule:list timezone conversion for range, step, and wildcard cron expressions by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/60877
 
 ## [v13.22.0](https://github.com/laravel/framework/compare/v13.21.1...v13.22.0) - 2026-07-24
 
