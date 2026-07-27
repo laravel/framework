@@ -365,6 +365,10 @@ class ScheduleListCommandTest extends TestCase
             // February shifts that do not depend on the year — convert
             'within February' => ['0 1 15 2 *', 'Asia/Tokyo', null, ['0 16 14 2 *']],
             'into February 1st' => ['0 22 31 1 *', 'America/Los_Angeles', null, ['0 6 1 2 *']],
+
+            // The largest timezone difference can carry by two calendar days
+            'two-day carry forward' => ['0 23 31 1 *', 'Etc/GMT+12', 'Pacific/Kiritimati', ['0 1 2 2 *']],
+            'two-day carry backward' => ['0 0 1 4 *', 'Pacific/Kiritimati', 'Etc/GMT+12', ['0 22 30 3 *']],
         ];
     }
 
@@ -408,6 +412,22 @@ class ScheduleListCommandTest extends TestCase
         $data = json_decode(Artisan::output(), true);
 
         $this->assertSame(['0 0 30 10 *', '0 23 29 6 *'], array_column($data, 'expression'));
+    }
+
+    public function testExpressionTimezoneConversionFallsBackAcrossDstTransition()
+    {
+        Carbon::setTestNow('2024-10-26 22:30:00 UTC');
+
+        $this->schedule->command('inspire')->cron('0 0,2 * * *')->timezone('Europe/London');
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, [
+            '--timezone' => 'UTC',
+            '--json' => true,
+        ]);
+
+        $data = json_decode(Artisan::output(), true);
+
+        $this->assertSame(['0 0,2 * * *'], array_column($data, 'expression'));
     }
 
     public function testDisplayScheduleCliSplitsExpressionWhenMixedCarry()

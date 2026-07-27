@@ -22,9 +22,15 @@ class CronExpressionTimezoneConverter
     {
         $eventTimezone = static::resolveEventTimezone($event, $timezone);
 
-        [$totalOffsetMinutes, $hourOffset, $minuteOffset] = static::offsetComponents(
+        $offsetComponents = static::offsetComponents(
             $event, $eventTimezone, $timezone
         );
+
+        if (is_null($offsetComponents)) {
+            return [$event->expression];
+        }
+
+        [$totalOffsetMinutes, $hourOffset, $minuteOffset] = $offsetComponents;
 
         if ($totalOffsetMinutes === 0) {
             return [$event->expression];
@@ -56,20 +62,29 @@ class CronExpressionTimezoneConverter
     /**
      * Get offset components between the event and display timezones.
      *
-     * @return array{int, int, int}
+     * @return array{int, int, int}|null
      */
     protected static function offsetComponents(Event $event, DateTimeZone $eventTimezone, DateTimeZone $displayTimezone)
     {
         try {
             $at = $event->nextRunDate(Carbon::now());
+            $nextAt = $event->nextRunDate(Carbon::now(), 1);
         } catch (Throwable) {
             $at = Carbon::now();
+            $nextAt = null;
         }
 
         $totalOffsetMinutes = intdiv(
             $displayTimezone->getOffset($at) - $eventTimezone->getOffset($at),
             60
         );
+
+        if ($nextAt && $totalOffsetMinutes !== intdiv(
+            $displayTimezone->getOffset($nextAt) - $eventTimezone->getOffset($nextAt),
+            60
+        )) {
+            return null;
+        }
 
         return [$totalOffsetMinutes, intdiv($totalOffsetMinutes, 60), $totalOffsetMinutes % 60];
     }
@@ -196,18 +211,23 @@ class CronExpressionTimezoneConverter
 
                 [$targetMonth, $targetDay] = [$month, $day + $carry];
 
-                if ($targetDay < 1) {
-                    $targetMonth = $month === 1 ? 12 : $month - 1;
+                while ($targetDay < 1) {
+                    $targetMonth = $targetMonth === 1 ? 12 : $targetMonth - 1;
 
                     if ($targetMonth === 2) {
                         return null;
                     }
 
-                    $targetDay = static::daysInMonth($targetMonth);
-                } elseif ($month === 2 && $targetDay > 28) {
-                    return null;
-                } elseif ($targetDay > static::daysInMonth($month)) {
-                    [$targetMonth, $targetDay] = [$month === 12 ? 1 : $month + 1, 1];
+                    $targetDay += static::daysInMonth($targetMonth);
+                }
+
+                while ($targetDay > static::daysInMonth($targetMonth)) {
+                    if ($targetMonth === 2) {
+                        return null;
+                    }
+
+                    $targetDay -= static::daysInMonth($targetMonth);
+                    $targetMonth = $targetMonth === 12 ? 1 : $targetMonth + 1;
                 }
 
                 $shifted[$targetMonth][$targetDay] = true;
