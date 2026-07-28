@@ -9,6 +9,8 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Events\CallQueuedListener;
+use Illuminate\Queue\Attributes\Delay;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\QueueManager;
@@ -25,7 +27,7 @@ use function Illuminate\Support\enum_value;
  */
 class QueueFake extends QueueManager implements Fake, Queue
 {
-    use ReflectsClosures;
+    use ReadsQueueAttributes, ReflectsClosures;
 
     /**
      * The original queue manager.
@@ -794,7 +796,13 @@ class QueueFake extends QueueManager implements Fake, Queue
     public function bulk($jobs, $data = '', $queue = null)
     {
         foreach ($jobs as $job) {
-            $this->push($job, $data, $queue);
+            $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
+
+            if (isset($delay)) {
+                $this->later($delay, $job, $data, $queue);
+            } else {
+                $this->push($job, $data, $queue);
+            }
         }
     }
 
