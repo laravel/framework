@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -178,6 +180,65 @@ class RepositoryTest extends TestCase
         });
         $this->assertSame(2, $value);
         $this->assertSame(2, $count);
+    }
+
+    public function testItUsesTheConfiguredLockWhenFillingAMissingFlexibleValue(): void
+    {
+        $cache = Cache::driver('array');
+        $lock = $cache->lock('illuminate:cache:flexible:lock:foo', 10);
+
+        $this->assertTrue($lock->acquire());
+
+        try {
+            $cache->flexible('foo', [10, 20], fn () => 'value', lock: [
+                'seconds' => 0,
+            ]);
+
+            $this->fail('Expected LockTimeoutException was not thrown.');
+        } catch (LockTimeoutException) {
+            $this->assertTrue($cache->missing('foo'));
+        } finally {
+            $lock->release();
+        }
+    }
+
+    public function testItDoesNotRecomputeAMissingFlexibleValueFilledWhileWaitingForTheLock(): void
+    {
+        $store = new class extends ArrayStore
+        {
+            public $beforeLock = null;
+
+            public function lock($name, $seconds = 0, $owner = null)
+            {
+                if ($this->beforeLock !== null) {
+                    $beforeLock = $this->beforeLock;
+                    $this->beforeLock = null;
+
+                    $beforeLock();
+                }
+
+                return parent::lock($name, $seconds, $owner);
+            }
+        };
+
+        $cache = new Repository($store);
+        $calls = 0;
+
+        // Simulate a concurrent request winning the lock and filling the value
+        // after this request observes the miss, but before it acquires the lock.
+        $store->beforeLock = function () use ($store) {
+            $store->put('foo', 'winner', 20);
+            $store->put(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo', Carbon::now()->getTimestamp(), 20);
+        };
+
+        $value = $cache->flexible('foo', [10, 20], function () use (&$calls) {
+            $calls++;
+
+            return 'loser';
+        }, lock: ['seconds' => 10]);
+
+        $this->assertSame('winner', $value);
+        $this->assertSame(0, $calls);
     }
 
     public function testItImplicitlyClearsTtlKeysFromDatabaseCache()
