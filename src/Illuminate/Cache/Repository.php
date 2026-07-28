@@ -649,6 +649,29 @@ class Repository implements ArrayAccess, CacheContract
         ] = $this->many([$key, self::FLEXIBLE_CREATED_KEY_PREFIX.$key]);
 
         if (in_array(null, [$value, $created], true)) {
+            if ($lock !== null) {
+                // Re-check after acquiring the lock in case another request filled the cache while we waited.
+                return $this->store->lock(
+                    "illuminate:cache:flexible:lock:{$this->itemKey($key)}",
+                    $lock['seconds'] ?? 0,
+                    $lock['owner'] ?? null,
+                )->block($lock['seconds'] ?? 0, function () use ($key, $ttl, $callback) {
+                    [
+                        $key => $value,
+                        self::FLEXIBLE_CREATED_KEY_PREFIX.$key => $created,
+                    ] = $this->many([$key, self::FLEXIBLE_CREATED_KEY_PREFIX.$key]);
+
+                    if (! in_array(null, [$value, $created], true)) {
+                        return $value;
+                    }
+
+                    return tap(value($callback), fn ($value) => $this->putMany([
+                        $key => $value,
+                        self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
+                    ], $ttl[1]));
+                });
+            }
+
             return tap(value($callback), fn ($value) => $this->putMany([
                 $key => $value,
                 self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
