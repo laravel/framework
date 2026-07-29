@@ -246,7 +246,14 @@ trait HasAttributes
         // as these attributes are not really in the attributes array, but are run
         // when we need to array or JSON the model for convenience to the coder.
         foreach ($this->getArrayableAppends() as $key) {
-            $attributes[$key] = $this->mutateAttributeForArray($key, null);
+           // If the attribute already exists and was already mutated above, it has
+           // already received its real, underlying value. Re-running the mutator
+           // here with a "null" placeholder would discard that computed value.
+           if (array_key_exists($key, $attributes) && in_array($key, $mutatedAttributes)) {
+               continue;
+           }
+
+           $attributes[$key] = $this->mutateAttributeForArray($key, $attributes[$key] ?? null);
         }
 
         return $attributes;

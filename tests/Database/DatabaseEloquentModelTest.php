@@ -2566,6 +2566,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame([], $model->toArray());
     }
 
+    public function testAppendingAnAttributeThatAlreadyHasAnAccessorUsesItsRealValue()
+    {
+        $model = new EloquentModelAppendsRealAttributeStub;
+        $model->setRawAttributes(['price' => 50]);
+
+        $this->assertSame(100, $model->price);
+        $this->assertSame(100, $model->toArray()['price']);
+    }
+
     public function testMergeAppendsMergesAppends()
     {
         $model = new EloquentModelAppendsStub;
@@ -4304,6 +4313,18 @@ class EloquentModelAppendsStub extends Model
     public function getStudlyCasedAttribute()
     {
         return 'StudlyCased';
+    }
+}
+
+class EloquentModelAppendsRealAttributeStub extends Model
+{
+    protected $appends = ['price'];
+
+    protected function price(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value * 2,
+        );
     }
 }
 
