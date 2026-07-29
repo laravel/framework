@@ -780,9 +780,20 @@ class PostgresGrammar extends Grammar
             ->map(fn ($attribute) => $this->parseJsonPathArrayKeys($attribute))
             ->collapse()
             ->map(function ($attribute) use ($quote) {
-                return filter_var($attribute, FILTER_VALIDATE_INT) !== false
-                    ? $attribute
-                    : $quote.$attribute.$quote;
+                if (filter_var($attribute, FILTER_VALIDATE_INT) !== false) {
+                    return $attribute;
+                }
+
+                // The wrapped path is always embedded within a single quoted SQL
+                // string literal, so single quotes have to be escaped whatever
+                // character has been used to delimit the path attributes...
+                $attribute = str_replace("'", "''", $attribute);
+
+                if ($quote !== "'") {
+                    $attribute = str_replace($quote, $quote.$quote, $attribute);
+                }
+
+                return $quote.$attribute.$quote;
             })
             ->all();
     }
