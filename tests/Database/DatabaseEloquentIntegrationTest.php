@@ -1033,7 +1033,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame([1, 2], EloquentTestUser::oldest('id')->modelKeys());
     }
 
-    public function testModelKeysCastsThePrimaryKey()
+    public function testModelKeysWithCastPrimaryKey()
     {
         EloquentTestUserWithStringCastId::insert([
             ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
@@ -1053,7 +1053,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame(['first', 'second'], EloquentTestUniqueUserWithCustomKey::orderBy('screen_name')->modelKeys());
     }
 
-    public function testModelKeysRespectsQueryConstraints()
+    public function testModelKeysWithQueryConstraints()
     {
         EloquentTestUser::insert([
             ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
