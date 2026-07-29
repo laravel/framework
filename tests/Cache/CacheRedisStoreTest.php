@@ -4,8 +4,12 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PredisConnection;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class CacheRedisStoreTest extends TestCase
 {
@@ -146,6 +150,70 @@ class CacheRedisStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testFlushesCachedByPrefix()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('scan')->once()->with('0', ['match' => 'prefix:*', 'count' => 1000])->andReturn(['17', ['prefix:foo', 'prefix:bar']]);
+        $redis->getRedis()->shouldReceive('del')->once()->with('prefix:foo', 'prefix:bar');
+        $redis->getRedis()->shouldReceive('scan')->once()->with('17', ['match' => 'prefix:*', 'count' => 1000])->andReturn(['0', ['prefix:baz']]);
+        $redis->getRedis()->shouldReceive('del')->once()->with('prefix:baz');
+
+        $result = $redis->flushPrefix();
+
+        $this->assertTrue($result);
+    }
+
+    public function testFlushesCachedByPrefixWithRedisConnectionPrefix()
+    {
+        $factory = m::mock(Factory::class);
+        $connection = new CacheRedisStorePredisConnectionStub(new CacheRedisStorePredisClientStub('redis:'));
+
+        $factory->shouldReceive('connection')->once()->with('default')->andReturn($connection);
+
+        $result = (new RedisStore($factory, 'prefix:'))->flushPrefix();
+
+        $this->assertTrue($result);
+        $this->assertSame([
+            ['0', ['match' => 'redis:prefix:*', 'count' => 1000]],
+        ], $connection->scans);
+        $this->assertSame([
+            ['prefix:foo', 'prefix:bar'],
+        ], $connection->deletions);
+    }
+
+    public function testFlushPrefixRequiresCachePrefix()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Flushing Redis cache by prefix is only supported when a cache prefix is configured.');
+
+        (new RedisStore(m::mock(Factory::class), ''))->flushPrefix();
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testFlushesCachedByPrefixAcrossPhpRedisClusterMasters()
+    {
+        $client = m::mock(\RedisCluster::class);
+        $factory = m::mock(Factory::class);
+        $connection = new PhpRedisClusterConnection($client);
+
+        $client->shouldReceive('getOption')->once()->with(\Redis::OPT_PREFIX)->andReturn('');
+        $client->shouldReceive('_masters')->once()->andReturn([
+            ['127.0.0.1', '6379'],
+            ['127.0.0.2', '6379'],
+        ]);
+        $client->shouldReceive('scan')->once()->with(m::any(), ['127.0.0.1', '6379'], 'prefix:*', 1000)->andReturn(['prefix:foo']);
+        $client->shouldReceive('scan')->once()->with(m::any(), ['127.0.0.2', '6379'], 'prefix:*', 1000)->andReturn(['prefix:bar']);
+        $client->shouldReceive('del')->once()->with('prefix:foo')->andReturn(1);
+        $client->shouldReceive('del')->once()->with('prefix:bar')->andReturn(1);
+
+        $factory->shouldReceive('connection')->once()->with('default')->andReturn($connection);
+
+        $result = (new RedisStore($factory, 'prefix:'))->flushPrefix();
+
+        $this->assertTrue($result);
+    }
+
     public function testFlushesCachedLocks()
     {
         $redis = $this->getRedis();
@@ -169,5 +237,38 @@ class CacheRedisStoreTest extends TestCase
     protected function getRedis()
     {
         return new RedisStore(m::mock(Factory::class), 'prefix:');
+    }
+}
+
+class CacheRedisStorePredisConnectionStub extends PredisConnection
+{
+    public array $deletions = [];
+
+    public array $scans = [];
+
+    public function scan($cursor, $options = [])
+    {
+        $this->scans[] = [$cursor, $options];
+
+        return ['0', ['redis:prefix:foo', 'redis:prefix:bar']];
+    }
+
+    public function del(...$keys)
+    {
+        $this->deletions[] = $keys;
+
+        return count($keys);
+    }
+}
+
+class CacheRedisStorePredisClientStub
+{
+    public function __construct(protected string $prefix)
+    {
+    }
+
+    public function getOptions()
+    {
+        return (object) ['prefix' => $this->prefix];
     }
 }
