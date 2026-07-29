@@ -85,17 +85,7 @@ class ImagickDriverTest extends TestCase
 
     public function test_processes_optimize_to_avif()
     {
-        if (\Imagick::queryFormats('AVIF') === []) {
-            $this->markTestSkipped('The Imagick extension was not compiled with AVIF support.');
-        }
-
-        $imagick = new \Imagick;
-        $imagick->newImage(1, 1, 'white');
-        $imagick->setImageFormat('avif');
-
-        if ($imagick->getImageBlob() === '') {
-            $this->markTestSkipped('The Imagick extension cannot encode AVIF images.');
-        }
+        $this->ensureImageFormatCanBeEncoded('avif');
 
         $driver = new ImagickDriver;
 
@@ -112,9 +102,7 @@ class ImagickDriverTest extends TestCase
 
     public function test_processes_avif_input()
     {
-        if (\Imagick::queryFormats('AVIF') === []) {
-            $this->markTestSkipped('The Imagick extension was not compiled with AVIF support.');
-        }
+        $this->ensureImageFormatCanBeEncoded('avif');
 
         $driver = new ImagickDriver;
         $contents = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'avif'));
@@ -126,9 +114,7 @@ class ImagickDriverTest extends TestCase
 
     public function test_processes_optimize_to_heic()
     {
-        if (\Imagick::queryFormats('HEIC') === []) {
-            $this->markTestSkipped('The Imagick extension was not compiled with HEIC support.');
-        }
+        $this->ensureImageFormatCanBeEncoded('heic');
 
         $driver = new ImagickDriver;
 
@@ -140,9 +126,7 @@ class ImagickDriverTest extends TestCase
 
     public function test_processes_heic_input()
     {
-        if (\Imagick::queryFormats('HEIC') === []) {
-            $this->markTestSkipped('The Imagick extension was not compiled with HEIC support.');
-        }
+        $this->ensureImageFormatCanBeEncoded('heic');
 
         $driver = new ImagickDriver;
         $contents = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'heic'));
@@ -453,6 +437,21 @@ class ImagickDriverTest extends TestCase
         $file = UploadedFile::fake()->image('test.jpg', $width, $height);
 
         return file_get_contents($file->getRealPath());
+    }
+
+    protected function ensureImageFormatCanBeEncoded(string $format): void
+    {
+        if (\Imagick::queryFormats(strtoupper($format)) === []) {
+            $this->markTestSkipped("The Imagick extension was not compiled with {$format} support.");
+        }
+
+        $imagick = new \Imagick;
+        $imagick->newImage(1, 1, 'white');
+        $imagick->setImageFormat($format);
+
+        if ($imagick->getImageBlob() === '') {
+            $this->markTestSkipped("The Imagick extension cannot encode {$format} images.");
+        }
     }
 
     protected function pipeline(?Transformation $transformation = null, ?string $format = null, ?int $quality = null): ImagePipeline
