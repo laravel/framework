@@ -1108,7 +1108,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Get the array of primary keys from the query result.
+     * Get an array of primary keys from the query result.
      *
      * @return array<int, array-key>
      */
