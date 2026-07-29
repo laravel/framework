@@ -13,8 +13,6 @@
 return [
     \Illuminate\Auth\Console\ClearResetsCommand::class => [
         'name' => 'auth:clear-resets',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -24,21 +22,15 @@ return [
                 'description' => 'The name of the password broker',
             ],
         ],
-        'options' => [],
     ],
     \Illuminate\Cache\Console\CacheTableCommand::class => [
         'name' => 'make:cache-table',
         'aliases' => [
             'cache:table',
         ],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Cache\Console\ClearCommand::class => [
         'name' => 'cache:clear',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'store',
@@ -75,8 +67,6 @@ return [
     ],
     \Illuminate\Cache\Console\ForgetCommand::class => [
         'name' => 'cache:forget',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'key',
@@ -93,12 +83,9 @@ return [
                 'description' => 'The store to remove the key from',
             ],
         ],
-        'options' => [],
     ],
     \Illuminate\Cache\Console\PruneStaleTagsCommand::class => [
         'name' => 'cache:prune-stale-tags',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'store',
@@ -108,11 +95,9 @@ return [
                 'description' => 'The name of the store you would like to prune tags from',
             ],
         ],
-        'options' => [],
     ],
     \Illuminate\Concurrency\Console\InvokeSerializedClosureCommand::class => [
         'name' => 'invoke-serialized-closure',
-        'aliases' => [],
         'hidden' => true,
         'arguments' => [
             [
@@ -123,18 +108,12 @@ return [
                 'description' => 'The serialized closure',
             ],
         ],
-        'options' => [],
     ],
     \Illuminate\Console\Scheduling\ScheduleClearCacheCommand::class => [
         'name' => 'schedule:clear-cache',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Console\Scheduling\ScheduleFinishCommand::class => [
         'name' => 'schedule:finish',
-        'aliases' => [],
         'hidden' => true,
         'arguments' => [
             [
@@ -152,20 +131,12 @@ return [
                 'description' => '',
             ],
         ],
-        'options' => [],
     ],
     \Illuminate\Console\Scheduling\ScheduleInterruptCommand::class => [
         'name' => 'schedule:interrupt',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Console\Scheduling\ScheduleListCommand::class => [
         'name' => 'schedule:list',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'timezone',
@@ -215,25 +186,15 @@ return [
     ],
     \Illuminate\Console\Scheduling\SchedulePauseCommand::class => [
         'name' => 'schedule:pause',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Console\Scheduling\ScheduleResumeCommand::class => [
         'name' => 'schedule:resume',
         'aliases' => [
             'schedule:continue',
         ],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Console\Scheduling\ScheduleRunCommand::class => [
         'name' => 'schedule:run',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'whisper',
@@ -250,9 +211,6 @@ return [
     ],
     \Illuminate\Console\Scheduling\ScheduleTestCommand::class => [
         'name' => 'schedule:test',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'name',
@@ -269,9 +227,6 @@ return [
     ],
     \Illuminate\Console\Scheduling\ScheduleWorkCommand::class => [
         'name' => 'schedule:work',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'run-output-file',
@@ -299,8 +254,6 @@ return [
     ],
     \Illuminate\Database\Console\DbCommand::class => [
         'name' => 'db',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'connection',
@@ -348,9 +301,6 @@ return [
     ],
     \Illuminate\Database\Console\DumpCommand::class => [
         'name' => 'schema:dump',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'database',
@@ -400,8 +350,6 @@ return [
     ],
     \Illuminate\Database\Console\Factories\FactoryMakeCommand::class => [
         'name' => 'make:factory',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -427,9 +375,6 @@ return [
     ],
     \Illuminate\Database\Console\Migrations\FreshCommand::class => [
         'name' => 'migrate:fresh',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'database',
@@ -545,9 +490,6 @@ return [
     ],
     \Illuminate\Database\Console\Migrations\InstallCommand::class => [
         'name' => 'migrate:install',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'database',
@@ -564,9 +506,6 @@ return [
     ],
     \Illuminate\Database\Console\Migrations\MigrateCommand::class => [
         'name' => 'migrate',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'database',
@@ -693,8 +632,6 @@ return [
     ],
     \Illuminate\Database\Console\Migrations\MigrateMakeCommand::class => [
         'name' => 'make:migration',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -764,9 +701,6 @@ return [
     ],
     \Illuminate\Database\Console\Migrations\RefreshCommand::class => [
         'name' => 'migrate:refresh',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'database',
@@ -849,9 +783,6 @@ return [
     ],
     \Illuminate\Database\Console\Migrations\ResetCommand::class => [
         'name' => 'migrate:reset',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'database',
@@ -912,9 +843,6 @@ return [
     ],
     \Illuminate\Database\Console\Migrations\RollbackCommand::class => [
         'name' => 'migrate:rollback',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'database',
@@ -997,9 +925,6 @@ return [
     ],
     \Illuminate\Database\Console\Migrations\StatusCommand::class => [
         'name' => 'migrate:status',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'database',
@@ -1049,9 +974,6 @@ return [
     ],
     \Illuminate\Database\Console\MonitorCommand::class => [
         'name' => 'db:monitor',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'databases',
@@ -1079,9 +1001,6 @@ return [
     ],
     \Illuminate\Database\Console\PruneCommand::class => [
         'name' => 'model:prune',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'model',
@@ -1142,8 +1061,6 @@ return [
     ],
     \Illuminate\Database\Console\Seeds\SeedCommand::class => [
         'name' => 'db:seed',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'class',
@@ -1191,8 +1108,6 @@ return [
     ],
     \Illuminate\Database\Console\Seeds\SeederMakeCommand::class => [
         'name' => 'make:seeder',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -1202,13 +1117,9 @@ return [
                 'description' => 'The name of the seeder',
             ],
         ],
-        'options' => [],
     ],
     \Illuminate\Database\Console\ShowCommand::class => [
         'name' => 'db:show',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'database',
@@ -1269,8 +1180,6 @@ return [
     ],
     \Illuminate\Database\Console\ShowModelCommand::class => [
         'name' => 'model:show',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'model',
@@ -1307,8 +1216,6 @@ return [
     ],
     \Illuminate\Database\Console\TableCommand::class => [
         'name' => 'db:table',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'table',
@@ -1345,9 +1252,6 @@ return [
     ],
     \Illuminate\Database\Console\WipeCommand::class => [
         'name' => 'db:wipe',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'database',
@@ -1397,9 +1301,6 @@ return [
     ],
     \Illuminate\Foundation\Console\AboutCommand::class => [
         'name' => 'about',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'only',
@@ -1427,9 +1328,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ApiInstallCommand::class => [
         'name' => 'install:api',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'composer',
@@ -1479,9 +1377,6 @@ return [
     ],
     \Illuminate\Foundation\Console\BroadcastingInstallCommand::class => [
         'name' => 'install:broadcasting',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'composer',
@@ -1564,8 +1459,6 @@ return [
     ],
     \Illuminate\Foundation\Console\CastMakeCommand::class => [
         'name' => 'make:cast',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -1602,15 +1495,9 @@ return [
     ],
     \Illuminate\Foundation\Console\ChannelListCommand::class => [
         'name' => 'channel:list',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\ChannelMakeCommand::class => [
         'name' => 'make:channel',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -1636,8 +1523,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ClassMakeCommand::class => [
         'name' => 'make:class',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -1674,15 +1559,9 @@ return [
     ],
     \Illuminate\Foundation\Console\ClearCompiledCommand::class => [
         'name' => 'clear-compiled',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\ComponentMakeCommand::class => [
         'name' => 'make:component',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -1741,24 +1620,15 @@ return [
     ],
     \Illuminate\Foundation\Console\ConfigCacheCommand::class => [
         'name' => 'config:cache',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\ConfigClearCommand::class => [
         'name' => 'config:clear',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\ConfigMakeCommand::class => [
         'name' => 'make:config',
         'aliases' => [
             'config:make',
         ],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -1784,8 +1654,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ConfigPublishCommand::class => [
         'name' => 'config:publish',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -1822,8 +1690,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ConfigShowCommand::class => [
         'name' => 'config:show',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'config',
@@ -1833,12 +1699,9 @@ return [
                 'description' => 'The configuration file or key to show',
             ],
         ],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\ConsoleMakeCommand::class => [
         'name' => 'make:command',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -1875,16 +1738,9 @@ return [
     ],
     \Illuminate\Foundation\Console\DevCommand::class => [
         'name' => 'dev',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\DevListCommand::class => [
         'name' => 'dev:list',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'json',
@@ -1934,8 +1790,6 @@ return [
     ],
     \Illuminate\Foundation\Console\DocsCommand::class => [
         'name' => 'docs',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'page',
@@ -1952,13 +1806,9 @@ return [
                 'description' => 'The section of the page to open',
             ],
         ],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\DownCommand::class => [
         'name' => 'down',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'redirect',
@@ -2041,8 +1891,6 @@ return [
     ],
     \Illuminate\Foundation\Console\EnumMakeCommand::class => [
         'name' => 'make:enum',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2090,16 +1938,9 @@ return [
     ],
     \Illuminate\Foundation\Console\EnvironmentCommand::class => [
         'name' => 'env',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\EnvironmentDecryptCommand::class => [
         'name' => 'env:decrypt',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'key',
@@ -2171,9 +2012,6 @@ return [
     ],
     \Illuminate\Foundation\Console\EnvironmentEncryptCommand::class => [
         'name' => 'env:encrypt',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'key',
@@ -2245,30 +2083,16 @@ return [
     ],
     \Illuminate\Foundation\Console\EventCacheCommand::class => [
         'name' => 'event:cache',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\EventClearCommand::class => [
         'name' => 'event:clear',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\EventGenerateCommand::class => [
         'name' => 'event:generate',
-        'aliases' => [],
         'hidden' => true,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\EventListCommand::class => [
         'name' => 'event:list',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'event',
@@ -2296,8 +2120,6 @@ return [
     ],
     \Illuminate\Foundation\Console\EventMakeCommand::class => [
         'name' => 'make:event',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2323,8 +2145,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ExceptionMakeCommand::class => [
         'name' => 'make:exception',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2372,8 +2192,6 @@ return [
     ],
     \Illuminate\Foundation\Console\InterfaceMakeCommand::class => [
         'name' => 'make:interface',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2399,8 +2217,6 @@ return [
     ],
     \Illuminate\Foundation\Console\JobMakeCommand::class => [
         'name' => 'make:job',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2448,8 +2264,6 @@ return [
     ],
     \Illuminate\Foundation\Console\JobMiddlewareMakeCommand::class => [
         'name' => 'make:job-middleware',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2475,9 +2289,6 @@ return [
     ],
     \Illuminate\Foundation\Console\KeyGenerateCommand::class => [
         'name' => 'key:generate',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'show',
@@ -2505,9 +2316,6 @@ return [
     ],
     \Illuminate\Foundation\Console\LangPublishCommand::class => [
         'name' => 'lang:publish',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'existing',
@@ -2535,8 +2343,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ListenerMakeCommand::class => [
         'name' => 'make:listener',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2584,8 +2390,6 @@ return [
     ],
     \Illuminate\Foundation\Console\MailMakeCommand::class => [
         'name' => 'make:mail',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2633,8 +2437,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ModelMakeCommand::class => [
         'name' => 'make:model',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2781,8 +2583,6 @@ return [
     ],
     \Illuminate\Foundation\Console\NotificationMakeCommand::class => [
         'name' => 'make:notification',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2819,8 +2619,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ObserverMakeCommand::class => [
         'name' => 'make:observer',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2857,9 +2655,6 @@ return [
     ],
     \Illuminate\Foundation\Console\OptimizeClearCommand::class => [
         'name' => 'optimize:clear',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'except',
@@ -2876,9 +2671,6 @@ return [
     ],
     \Illuminate\Foundation\Console\OptimizeCommand::class => [
         'name' => 'optimize',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'except',
@@ -2895,15 +2687,9 @@ return [
     ],
     \Illuminate\Foundation\Console\PackageDiscoverCommand::class => [
         'name' => 'package:discover',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\PolicyMakeCommand::class => [
         'name' => 'make:policy',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2951,8 +2737,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ProviderMakeCommand::class => [
         'name' => 'make:provider',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -2978,9 +2762,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ReloadCommand::class => [
         'name' => 'reload',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'except',
@@ -2997,8 +2778,6 @@ return [
     ],
     \Illuminate\Foundation\Console\RequestMakeCommand::class => [
         'name' => 'make:request',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -3024,8 +2803,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ResourceMakeCommand::class => [
         'name' => 'make:resource',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -3073,23 +2850,12 @@ return [
     ],
     \Illuminate\Foundation\Console\RouteCacheCommand::class => [
         'name' => 'route:cache',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\RouteClearCommand::class => [
         'name' => 'route:clear',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\RouteListCommand::class => [
         'name' => 'route:list',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'json',
@@ -3227,8 +2993,6 @@ return [
     ],
     \Illuminate\Foundation\Console\RuleMakeCommand::class => [
         'name' => 'make:rule',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -3265,8 +3029,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ScopeMakeCommand::class => [
         'name' => 'make:scope',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -3292,9 +3054,6 @@ return [
     ],
     \Illuminate\Foundation\Console\ServeCommand::class => [
         'name' => 'serve',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'host',
@@ -3344,9 +3103,6 @@ return [
     ],
     \Illuminate\Foundation\Console\StorageLinkCommand::class => [
         'name' => 'storage:link',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'relative',
@@ -3374,16 +3130,9 @@ return [
     ],
     \Illuminate\Foundation\Console\StorageUnlinkCommand::class => [
         'name' => 'storage:unlink',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\StubPublishCommand::class => [
         'name' => 'stub:publish',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'existing',
@@ -3411,8 +3160,6 @@ return [
     ],
     \Illuminate\Foundation\Console\TestMakeCommand::class => [
         'name' => 'make:test',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -3471,8 +3218,6 @@ return [
     ],
     \Illuminate\Foundation\Console\TraitMakeCommand::class => [
         'name' => 'make:trait',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -3498,16 +3243,9 @@ return [
     ],
     \Illuminate\Foundation\Console\UpCommand::class => [
         'name' => 'up',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\VendorPublishCommand::class => [
         'name' => 'vendor:publish',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'existing',
@@ -3568,22 +3306,12 @@ return [
     ],
     \Illuminate\Foundation\Console\ViewCacheCommand::class => [
         'name' => 'view:cache',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\ViewClearCommand::class => [
         'name' => 'view:clear',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Foundation\Console\ViewMakeCommand::class => [
         'name' => 'make:view',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -3623,23 +3351,15 @@ return [
         'aliases' => [
             'notifications:table',
         ],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Queue\Console\BatchesTableCommand::class => [
         'name' => 'make:queue-batches-table',
         'aliases' => [
             'queue:batches-table',
         ],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Queue\Console\ClearCommand::class => [
         'name' => 'queue:clear',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'connection',
@@ -3679,15 +3399,9 @@ return [
         'aliases' => [
             'queue:failed-table',
         ],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Queue\Console\FlushFailedCommand::class => [
         'name' => 'queue:flush',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'hours',
@@ -3704,8 +3418,6 @@ return [
     ],
     \Illuminate\Queue\Console\ForgetFailedCommand::class => [
         'name' => 'queue:forget',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'id',
@@ -3715,13 +3427,9 @@ return [
                 'description' => 'The ID of the failed job',
             ],
         ],
-        'options' => [],
     ],
     \Illuminate\Queue\Console\ListFailedCommand::class => [
         'name' => 'queue:failed',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'json',
@@ -3738,8 +3446,6 @@ return [
     ],
     \Illuminate\Queue\Console\ListenCommand::class => [
         'name' => 'queue:listen',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'connection',
@@ -3864,8 +3570,6 @@ return [
     ],
     \Illuminate\Queue\Console\MonitorCommand::class => [
         'name' => 'queue:monitor',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'queues',
@@ -3902,8 +3606,6 @@ return [
     ],
     \Illuminate\Queue\Console\PauseCommand::class => [
         'name' => 'queue:pause',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'queue',
@@ -3913,13 +3615,9 @@ return [
                 'description' => 'The name of the queue to pause',
             ],
         ],
-        'options' => [],
     ],
     \Illuminate\Queue\Console\PruneBatchesCommand::class => [
         'name' => 'queue:prune-batches',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'hours',
@@ -3958,9 +3656,6 @@ return [
     ],
     \Illuminate\Queue\Console\PruneFailedJobsCommand::class => [
         'name' => 'queue:prune-failed',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
         'options' => [
             [
                 'name' => 'hours',
@@ -3977,17 +3672,12 @@ return [
     ],
     \Illuminate\Queue\Console\RestartCommand::class => [
         'name' => 'queue:restart',
-        'aliases' => [],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Queue\Console\ResumeCommand::class => [
         'name' => 'queue:resume',
         'aliases' => [
             'queue:continue',
         ],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'queue',
@@ -3997,12 +3687,9 @@ return [
                 'description' => 'The name of the queue that should resume processing',
             ],
         ],
-        'options' => [],
     ],
     \Illuminate\Queue\Console\RetryBatchCommand::class => [
         'name' => 'queue:retry-batch',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'id',
@@ -4028,8 +3715,6 @@ return [
     ],
     \Illuminate\Queue\Console\RetryCommand::class => [
         'name' => 'queue:retry',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'id',
@@ -4069,14 +3754,9 @@ return [
         'aliases' => [
             'queue:table',
         ],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
     \Illuminate\Queue\Console\WorkCommand::class => [
         'name' => 'queue:work',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'connection',
@@ -4278,8 +3958,6 @@ return [
     ],
     \Illuminate\Routing\Console\ControllerMakeCommand::class => [
         'name' => 'make:controller',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -4404,8 +4082,6 @@ return [
     ],
     \Illuminate\Routing\Console\MiddlewareMakeCommand::class => [
         'name' => 'make:middleware',
-        'aliases' => [],
-        'hidden' => false,
         'arguments' => [
             [
                 'name' => 'name',
@@ -4415,15 +4091,11 @@ return [
                 'description' => 'The name of the middleware',
             ],
         ],
-        'options' => [],
     ],
     \Illuminate\Session\Console\SessionTableCommand::class => [
         'name' => 'make:session-table',
         'aliases' => [
             'session:table',
         ],
-        'hidden' => false,
-        'arguments' => [],
-        'options' => [],
     ],
 ];

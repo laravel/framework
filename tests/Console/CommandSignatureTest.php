@@ -65,6 +65,14 @@ class CommandSignatureTest extends TestCase
         $cases = [];
 
         foreach ($commands as $class => $expected) {
+            $expected = [
+                'aliases' => $expected['aliases'] ?? [],
+                'hidden' => $expected['hidden'] ?? false,
+                'arguments' => $expected['arguments'] ?? [],
+                'options' => $expected['options'] ?? [],
+                ...$expected,
+            ];
+
             $cases[$class] = [$class, $expected];
         }
 
