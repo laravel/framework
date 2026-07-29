@@ -634,7 +634,7 @@ trait HasAttributes
      */
     protected function getRelationshipFromMethod($method)
     {
-        $relation = $this->$method();
+        $relation = Relation::withConstraints(fn () => $this->$method());
 
         if (! $relation instanceof Relation) {
             if (is_null($relation)) {
