@@ -23,6 +23,7 @@ use Intervention\Image\Direction;
 use Intervention\Image\Encoders\AvifEncoder;
 use Intervention\Image\Encoders\BmpEncoder;
 use Intervention\Image\Encoders\GifEncoder;
+use Intervention\Image\Encoders\HeicEncoder;
 use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\Encoders\MediaTypeEncoder;
 use Intervention\Image\Encoders\PngEncoder;
@@ -78,7 +79,7 @@ abstract class InterventionDriver implements Driver
     {
         $mimeType = (new finfo(FILEINFO_MIME_TYPE))->buffer($contents);
 
-        if (! in_array($mimeType, ['image/jpeg', 'image/png', 'image/bmp', 'image/gif', 'image/webp'])) {
+        if (! in_array($mimeType, ['image/jpeg', 'image/png', 'image/bmp', 'image/gif', 'image/webp', 'image/avif', 'image/x-avif', 'image/heic', 'image/x-heic', 'image/heif'])) {
             throw new ImageException("The image format [{$mimeType}] is not supported.");
         }
 
@@ -118,6 +119,7 @@ abstract class InterventionDriver implements Driver
                     'png' => new PngEncoder,
                     'gif' => new GifEncoder,
                     'avif' => new AvifEncoder($quality),
+                    'heic' => new HeicEncoder($quality),
                     'bmp' => new BmpEncoder,
                 })->toString();
             }

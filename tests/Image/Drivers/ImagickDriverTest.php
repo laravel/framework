@@ -110,6 +110,53 @@ class ImagickDriverTest extends TestCase
         $this->assertMatchesRegularExpression('/avif|avis|mif1/', substr($result, 0, 32));
     }
 
+    public function test_processes_avif_input()
+    {
+        if (\Imagick::queryFormats('AVIF') === []) {
+            $this->markTestSkipped('The Imagick extension was not compiled with AVIF support.');
+        }
+
+        $driver = new ImagickDriver;
+        $contents = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'avif'));
+
+        $result = $driver->process($contents, $this->pipeline(new Cover(50, 25), format: 'jpg'));
+
+        $this->assertSame([50, 25], array_slice(getimagesizefromstring($result), 0, 2));
+    }
+
+    public function test_processes_optimize_to_heic()
+    {
+        if (\Imagick::queryFormats('HEIC') === []) {
+            $this->markTestSkipped('The Imagick extension was not compiled with HEIC support.');
+        }
+
+        $driver = new ImagickDriver;
+
+        $result = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'heic'));
+
+        $this->assertStringContainsString('ftyp', substr($result, 0, 16));
+        $this->assertMatchesRegularExpression('/heic|heix|hevc|hevx|mif1/', substr($result, 0, 32));
+    }
+
+    public function test_processes_heic_input()
+    {
+        if (\Imagick::queryFormats('HEIC') === []) {
+            $this->markTestSkipped('The Imagick extension was not compiled with HEIC support.');
+        }
+
+        $driver = new ImagickDriver;
+        $contents = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'heic'));
+
+        $result = $driver->process($contents, $this->pipeline(new Cover(50, 25)));
+
+        $this->assertStringContainsString('ftyp', substr($result, 0, 16));
+        $this->assertMatchesRegularExpression('/heic|heix|hevc|hevx|mif1/', substr($result, 0, 32));
+
+        $result = $driver->process($result, $this->pipeline(format: 'jpg'));
+
+        $this->assertSame([50, 25], array_slice(getimagesizefromstring($result), 0, 2));
+    }
+
     public function test_processes_optimize_to_bmp()
     {
         $driver = new ImagickDriver;

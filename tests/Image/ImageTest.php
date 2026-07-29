@@ -146,6 +146,13 @@ class ImageTest extends TestCase
         $this->assertNotSame($image, $image->toAvif());
     }
 
+    public function test_to_heic_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toHeic());
+    }
+
     public function test_to_bmp_returns_new_instance()
     {
         $image = $this->makeImage();
@@ -399,6 +406,13 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $this->assertSame('avif', $this->getOptions($image->toAvif())->format);
+    }
+
+    public function test_to_heic_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('heic', $this->getOptions($image->toHeic())->format);
     }
 
     public function test_to_bmp_sets_format()
@@ -914,6 +928,20 @@ class ImageTest extends TestCase
         $result = $this->makeImage()->optimize('avif');
 
         $this->assertSame('avif', $this->getOptions($result)->format);
+    }
+
+    public function test_optimize_allows_heic()
+    {
+        $result = $this->makeImage()->optimize('heic');
+
+        $this->assertSame('heic', $this->getOptions($result)->format);
+    }
+
+    public function test_optimize_normalizes_heif_to_heic()
+    {
+        $result = $this->makeImage()->optimize('heif');
+
+        $this->assertSame('heic', $this->getOptions($result)->format);
     }
 
     public function test_optimize_allows_jpeg_spelling()
