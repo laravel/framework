@@ -54,9 +54,8 @@ class ResetCommand extends BaseCommand
      */
     public function handle()
     {
-        if ($this->isProhibited() ||
-            ! $this->confirmToProceed()) {
-            return Command::FAILURE;
+        if ($this->isProhibited() || ! $this->confirmToProceed()) {
+            return self::FAILURE;
         }
 
         return $this->migrator->usingConnection($this->option('database'), function () {
