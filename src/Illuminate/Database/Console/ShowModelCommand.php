@@ -56,12 +56,12 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
         } catch (BindingResolutionException $e) {
             $this->components->error($e->getMessage());
 
-            return 1;
+            return self::FAILURE;
         }
 
         $this->display($info);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

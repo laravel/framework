@@ -63,7 +63,7 @@ class DbCommand extends Command
             return Command::FAILURE;
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

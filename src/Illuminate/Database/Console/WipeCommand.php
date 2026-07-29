@@ -60,7 +60,7 @@ class WipeCommand extends Command
 
         $this->flushDatabaseConnection($database);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

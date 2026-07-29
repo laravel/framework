@@ -75,7 +75,7 @@ class SeedCommand extends Command
             $this->resolver->setDefaultConnection($previousConnection);
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

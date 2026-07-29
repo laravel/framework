@@ -39,13 +39,13 @@ class PauseCommand extends Command
         if (! Worker::$pausable) {
             $this->components->error('Queue pausing is currently disabled.');
 
-            return 1;
+            return self::FAILURE;
         }
 
         $manager->pause($connection, $queue);
 
         $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused.");
 
-        return 0;
+        return self::SUCCESS;
     }
 }

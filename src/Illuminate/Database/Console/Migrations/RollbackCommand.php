@@ -69,7 +69,7 @@ class RollbackCommand extends BaseCommand
             );
         });
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

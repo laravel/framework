@@ -79,7 +79,7 @@ class RefreshCommand extends Command
             $this->runSeeder($database);
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

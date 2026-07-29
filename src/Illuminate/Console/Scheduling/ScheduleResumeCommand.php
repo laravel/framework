@@ -38,6 +38,6 @@ class ScheduleResumeCommand extends Command
 
         $this->components->info('Scheduled task processing has resumed.');
 
-        return 0;
+        return self::SUCCESS;
     }
 }

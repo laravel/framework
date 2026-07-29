@@ -74,7 +74,7 @@ class DownCommand extends Command
                 $e->getMessage(),
             ));
 
-            return 1;
+            return self::FAILURE;
         }
     }
 
