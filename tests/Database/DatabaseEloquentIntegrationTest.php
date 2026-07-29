@@ -1030,7 +1030,39 @@ class DatabaseEloquentIntegrationTest extends TestCase
             ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
         ]);
 
-        $this->assertEquals([1, 2], EloquentTestUser::oldest('id')->modelKeys());
+        $this->assertSame([1, 2], EloquentTestUser::oldest('id')->modelKeys());
+    }
+
+    public function testModelKeysCastsThePrimaryKey()
+    {
+        EloquentTestUserWithStringCastId::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame(['1', '2'], EloquentTestUserWithStringCastId::oldest('id')->modelKeys());
+    }
+
+    public function testModelKeysWithCustomPrimaryKey()
+    {
+        EloquentTestUniqueUserWithCustomKey::insert([
+            ['screen_name' => 'first', 'email' => 'taylorotwell@gmail.com'],
+            ['screen_name' => 'second', 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame(['first', 'second'], EloquentTestUniqueUserWithCustomKey::orderBy('screen_name')->modelKeys());
+    }
+
+    public function testModelKeysRespectsQueryConstraints()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
+
+        $this->assertSame([2, 3], EloquentTestUser::where('id', '>', 1)->oldest('id')->modelKeys());
+        $this->assertSame([1], EloquentTestUser::oldest('id')->take(1)->modelKeys());
     }
 
     public function testModelKeysWithRelationshipAndJoin()
@@ -2879,6 +2911,13 @@ class EloquentTestUniqueUser extends Eloquent
     protected $table = 'unique_users';
     protected $casts = ['birthday' => 'datetime'];
     protected $guarded = [];
+}
+
+class EloquentTestUniqueUserWithCustomKey extends EloquentTestUniqueUser
+{
+    protected $primaryKey = 'screen_name';
+    public $incrementing = false;
+    protected $keyType = 'string';
 }
 
 class EloquentTestPost extends Eloquent
