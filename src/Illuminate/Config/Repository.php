@@ -42,6 +42,17 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Determine if the given configuration value is missing.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function missing($key)
+    {
+        return ! $this->has($key);
+    }
+
+    /**
      * Get the specified configuration value.
      *
      * @param  array|string  $key

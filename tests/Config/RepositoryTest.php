@@ -91,6 +91,12 @@ class RepositoryTest extends TestCase
         $this->assertFalse($this->repository->has('not-exist'));
     }
 
+    public function testMissing()
+    {
+        $this->assertFalse($this->repository->missing('foo'));
+        $this->assertTrue($this->repository->missing('not-exist'));
+    }
+
     public function testGet()
     {
         $this->assertSame('bar', $this->repository->get('foo'));

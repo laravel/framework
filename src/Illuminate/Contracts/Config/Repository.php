@@ -13,6 +13,14 @@ interface Repository
     public function has($key);
 
     /**
+     * Determine if the given configuration value is missing.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function missing($key);
+
+    /**
      * Get the specified configuration value.
      *
      * @param  array|string  $key
