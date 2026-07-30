@@ -41,7 +41,7 @@ class RequirePassword
     {
         $this->responseFactory = $responseFactory;
         $this->urlGenerator = $urlGenerator;
-        $this->passwordTimeout = $passwordTimeout ?: 10800;
+        $this->passwordTimeout = $passwordTimeout ?? 10800;
     }
 
     /**

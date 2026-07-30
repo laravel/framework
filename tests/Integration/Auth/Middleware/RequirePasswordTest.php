@@ -155,4 +155,27 @@ class RequirePasswordTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirect($this->app->make(UrlGenerator::class)->route('password.confirm'));
     }
+
+    public function testAuthPasswordTimeoutMayBeZero()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var \Illuminate\Contracts\Routing\Registrar $router */
+        $router = $this->app->make(Registrar::class);
+
+        $router->get('password-confirm', function (): Response {
+            return new Response('foo');
+        })->name('password.confirm');
+
+        $router->get('test-route', function (): Response {
+            return new Response('foobar');
+        })->middleware([StartSession::class, RequirePassword::class]);
+
+        $this->app->make(Repository::class)->set('auth.password_timeout', 0);
+
+        $response = $this->withSession(['auth.password_confirmed_at' => time() - 1])->get('test-route');
+
+        $response->assertStatus(302);
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('password.confirm'));
+    }
 }
