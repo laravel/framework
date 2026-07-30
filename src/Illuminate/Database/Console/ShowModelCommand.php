@@ -19,13 +19,6 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
     use FindsAvailableModels;
 
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'model:show {model}';
-
-    /**
      * The console command description.
      *
      * @var string

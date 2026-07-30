@@ -11,11 +11,11 @@ use Symfony\Component\Console\Attribute\AsCommand;
 class UpCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'up';
+    protected $signature = 'up';
 
     /**
      * The console command description.
