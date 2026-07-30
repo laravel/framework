@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Image\Image as ImageFacade;
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentWithCastsTest extends TestCase
 {
