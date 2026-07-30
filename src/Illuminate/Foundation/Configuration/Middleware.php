@@ -538,6 +538,10 @@ class Middleware
      */
     public function redirectGuestsTo(callable|string|null $redirect)
     {
+        if (is_null($redirect)) {
+            $redirect = fn () => null;
+        }
+
         return $this->redirectTo(guests: $redirect);
     }
 

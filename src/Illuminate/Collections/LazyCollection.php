@@ -90,7 +90,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @param  int  $from
      * @param  int  $to
      * @param  int  $step
-     * @return ($step is zero ? never : static<int, int>)
+     * @return ($step is 0 ? never : static<int, int>)
      *
      * @throws \InvalidArgumentException
      */
@@ -567,6 +567,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             foreach ($this as $key => $item) {
                 $resolvedKey = $keyBy($item, $key);
 
+                if ($resolvedKey instanceof \UnitEnum) {
+                    $resolvedKey = enum_value($resolvedKey);
+                }
+
                 if (is_object($resolvedKey)) {
                     $resolvedKey = (string) $resolvedKey;
                 }
@@ -585,10 +589,11 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function has($key)
     {
         $keys = array_flip(is_array($key) ? $key : func_get_args());
-        $count = count($keys);
 
         foreach ($this as $key => $value) {
-            if (array_key_exists($key, $keys) && --$count == 0) {
+            unset($keys[$key]);
+
+            if (empty($keys)) {
                 return true;
             }
         }
@@ -1026,7 +1031,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @param  int|null  $number
      * @param  bool  $preserveKeys
-     * @return static<int, TValue>|TValue
+     * @return ($number is null ? TValue : static<int, TValue>)
      *
      * @throws \InvalidArgumentException
      */
@@ -1937,7 +1942,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     protected function now()
     {
         return class_exists(Carbon::class)
-            ? Carbon::now()->timestamp
+            ? Carbon::now()->getTimestamp()
             : time();
     }
 

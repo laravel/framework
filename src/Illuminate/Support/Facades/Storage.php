@@ -40,16 +40,17 @@ use function Illuminate\Support\enum_value;
  * @method static bool move(string $from, string $to)
  * @method static int size(string $path)
  * @method static int lastModified(string $path)
- * @method static array<string> files(string|null $directory = null, bool $recursive = false)
- * @method static array<string> allFiles(string|null $directory = null)
- * @method static array<string> directories(string|null $directory = null, bool $recursive = false)
- * @method static array<string> allDirectories(string|null $directory = null)
+ * @method static array files(string|null $directory = null, bool $recursive = false)
+ * @method static array allFiles(string|null $directory = null)
+ * @method static array directories(string|null $directory = null, bool $recursive = false)
+ * @method static array allDirectories(string|null $directory = null)
  * @method static bool makeDirectory(string $path)
  * @method static bool deleteDirectory(string $directory)
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertExists(string|array $path, string|null $content = null)
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertCount(string $path, int $count, bool $recursive = false)
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertMissing(string|array $path)
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertDirectoryEmpty(string $path)
+ * @method static \Illuminate\Filesystem\FilesystemAdapter assertEmpty()
  * @method static bool missing(string $path)
  * @method static bool fileExists(string $path)
  * @method static bool fileMissing(string $path)
@@ -59,6 +60,7 @@ use function Illuminate\Support\enum_value;
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse response(string $path, string|null $name = null, array $headers = [], string|null $disposition = 'inline')
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse serve(\Illuminate\Http\Request $request, string $path, string|null $name = null, array $headers = [])
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse download(string $path, string|null $name = null, array $headers = [])
+ * @method static \Illuminate\Image\Image image(string $path)
  * @method static string|false checksum(string $path, array $options = [])
  * @method static string|false mimeType(string $path)
  * @method static string url(string $path)
@@ -81,7 +83,7 @@ use function Illuminate\Support\enum_value;
  * @method static mixed macroCall(string $method, array $parameters)
  * @method static bool has(string $location)
  * @method static string read(string $location)
- * @method static \League\Flysystem\DirectoryListing<\League\Flysystem\StorageAttributes> listContents(string $location, bool $deep = false)
+ * @method static \League\Flysystem\DirectoryListing listContents(string $location, bool $deep = false)
  * @method static int fileSize(string $path)
  * @method static string visibility(string $path)
  * @method static void write(string $location, string $contents, array $config = [])
@@ -96,7 +98,7 @@ class Storage extends Facade
      *
      * @param  \UnitEnum|string|null  $disk
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \Illuminate\Filesystem\LocalFilesystemAdapter
      */
     public static function fake($disk = null, array $config = [])
     {
@@ -128,7 +130,7 @@ class Storage extends Facade
      *
      * @param  \UnitEnum|string|null  $disk
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \Illuminate\Filesystem\LocalFilesystemAdapter
      */
     public static function persistentFake($disk = null, array $config = [])
     {

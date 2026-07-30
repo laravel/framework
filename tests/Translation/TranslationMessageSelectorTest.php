@@ -20,14 +20,14 @@ class TranslationMessageSelectorTest extends TestCase
     {
         $selector = new MessageSelector;
 
-        $this->assertEquals('many', $selector->choose('{0} zero|{1} one|[2,*] many', 2.75, 'pl'));
+        $this->assertSame('many', $selector->choose('{0} zero|{1} one|[2,*] many', 2.75, 'pl'));
     }
 
     public function testChoosePluralizesFloats()
     {
         $selector = new MessageSelector;
 
-        $this->assertEquals('plural', $selector->choose('singular|plural', 0.5, 'en'));
+        $this->assertSame('plural', $selector->choose('singular|plural', 0.5, 'en'));
     }
 
     public static function chooseTestData()

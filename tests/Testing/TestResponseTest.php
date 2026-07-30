@@ -246,7 +246,7 @@ class TestResponseTest extends TestCase
             'gatherData' => ['foo' => 'bar', 'baz' => 'qux'],
         ]);
 
-        $this->assertEquals('bar', $response->viewData('foo'));
+        $this->assertSame('bar', $response->viewData('foo'));
 
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $response->viewData());
     }
@@ -1593,6 +1593,66 @@ EOT
         $response->assertJsonPathCanonicalizing('*.foo', ['foo 0', 'foo 2', 'foo 3']);
     }
 
+    public function testAssertJsonPathsCanonicalizing(): void
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => [
+                ['id' => 10, 'name' => 'Taylor'],
+                ['id' => 20, 'name' => 'Mohamed'],
+                ['id' => 30, 'name' => 'Nuno'],
+            ],
+        ]));
+
+        $response->assertJsonPathsCanonicalizing([
+            'data.*.id' => [30, 10, 20],
+            'data.*.name' => ['Nuno', 'Taylor', 'Mohamed'],
+        ]);
+    }
+
+    public function testAssertJsonPathsCanonicalizingCanFail(): void
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that two arrays are equal.');
+
+        $response->assertJsonPathsCanonicalizing([
+            '*.foo' => ['foo 0', 'foo 2', 'foo 3'],
+        ]);
+    }
+
+    public function testAssertJsonPaths(): void
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => [
+                'id' => 1,
+                'name' => 'Taylor',
+            ],
+            'meta' => [
+                'count' => 3,
+            ],
+        ]));
+
+        $response->assertJsonPaths([
+            'data.id' => 1,
+            'data.name' => fn ($value) => $value === 'Taylor',
+            'meta.count' => 3,
+        ]);
+    }
+
+    public function testAssertJsonPathsCanFail(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that 10 is identical to 11.');
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonPaths([
+            '0.id' => 11,
+            '1.id' => 20,
+        ]);
+    }
+
     public function testAssertJsonFragment(): void
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
@@ -1688,7 +1748,7 @@ EOT
         try {
             $response->assertExactJsonStructure(['foo']);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 
@@ -1700,7 +1760,7 @@ EOT
         try {
             $response->assertExactJsonStructure(['foobar' => ['foobar_foo'], 'foo', 0, 'bars', 'baz', 'barfoo', 'numeric_keys']);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 
@@ -1712,7 +1772,7 @@ EOT
         try {
             $response->assertExactJsonStructure(['bars' => ['*' => ['bar']], 'foo', 'foobar', 0, 'baz', 'barfoo', 'numeric_keys']);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 
@@ -1724,7 +1784,7 @@ EOT
         try {
             $response->assertExactJsonStructure(['numeric_keys' => ['*' => ['bar']], 'foo', 'foobar', 0, 'bars', 'baz', 'barfoo']);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 
@@ -1736,7 +1796,7 @@ EOT
         try {
             $response->assertExactJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo']]], 'foo', 'foobar', 0, 'bars', 'barfoo', 'numeric_keys']);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 
@@ -1750,7 +1810,7 @@ EOT
         try {
             $response->assertExactJsonStructure(['*' => ['foo', 'bar']]);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 
@@ -1852,6 +1912,28 @@ EOT
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         $response->assertJsonMissingPath('numeric_keys.3');
+    }
+
+    public function testAssertJsonMissingPaths(): void
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPaths([
+            'foobar.missing',
+            'numeric_keys.0',
+        ]);
+    }
+
+    public function testAssertJsonMissingPathsCanFail(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPaths([
+            'foo',
+            'foobar.missing',
+        ]);
     }
 
     public function testAssertJsonValidationErrors(): void
@@ -3082,6 +3164,20 @@ EOT
         $response->assertSessionHasInput('foo', function ($value) {
             return $value === 'value';
         });
+    }
+
+    public function testAssertSessionMissingInput(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('_old_input', [
+            'foo' => 'value',
+        ]);
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionMissingInput('bar');
+        $response->assertSessionMissingInput(['bar', 'baz']);
     }
 
     public function testGetEncryptedCookie(): void

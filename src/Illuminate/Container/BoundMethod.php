@@ -175,7 +175,7 @@ class BoundMethod
 
             unset($parameters[$paramName]);
         } elseif ($attribute = Util::getContextualAttributeFromDependency($parameter)) {
-            $pendingDependencies[] = $container->resolveFromAttribute($attribute);
+            $pendingDependencies[] = $container->resolveFromAttribute($attribute, $parameter);
         } elseif (! is_null($className = Util::getParameterClassName($parameter))) {
             if (array_key_exists($className, $parameters)) {
                 $pendingDependencies[] = $parameters[$className];

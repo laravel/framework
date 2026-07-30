@@ -51,7 +51,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/installation')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/installation');
+        $this->assertSame('https://laravel.com/docs/8.x/installation', $this->openedUrl);
     }
 
     public function testItCanSpecifyAutocompleteInOriginalCasing(): void
@@ -61,7 +61,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/dusk');
+        $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
     public function testItCanSpecifyAutocompleteInLowerCasing(): void
@@ -71,7 +71,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/dusk');
+        $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
     public function testItMatchesSectionsThatStartWithInput()
@@ -80,7 +80,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent-collections#method-unique')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent-collections#method-unique');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent-collections#method-unique', $this->openedUrl);
     }
 
     public function testItMatchesSectionsWithFuzzyMatching()
@@ -89,7 +89,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent-collections#method-toquery')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent-collections#method-toquery');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent-collections#method-toquery', $this->openedUrl);
     }
 
     public function testItCanProvidePageToVisit(): void
@@ -98,7 +98,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent-collections')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent-collections');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent-collections', $this->openedUrl);
     }
 
     public function testItCanUseHyphensInsteadOfEscapingSpaces(): void
@@ -107,7 +107,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent-collections')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent-collections');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent-collections', $this->openedUrl);
     }
 
     public function testItHasMinimumScoreToMatch(): void
@@ -116,7 +116,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Unable to determine the page you are trying to visit.')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x');
+        $this->assertSame('https://laravel.com/docs/8.x', $this->openedUrl);
     }
 
     public function testItMinimumScoreAccountsForInputLength(): void
@@ -125,7 +125,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/localization')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/localization');
+        $this->assertSame('https://laravel.com/docs/8.x/localization', $this->openedUrl);
     }
 
     public function testItCanUseCustomAskStrategy()
@@ -136,7 +136,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/dusk');
+        $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
     public function testItFallsbackToAutocompleteWhenAskStrategyContainsBadSyntax(): void
@@ -148,7 +148,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/dusk');
+        $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
     public function testItFallsbackToAutocompleteWithBadAskStrategyReturnValue(): void
@@ -160,7 +160,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/dusk');
+        $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
     public function testItCatchesAndHandlesProcessInterruptExceptionsInAskStrategies()
@@ -209,7 +209,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent', $this->openedUrl);
     }
 
     public function testItCanGuessTheRequestedPageWhenItIsContainedSomewhereInThePageTitle()
@@ -218,7 +218,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent', $this->openedUrl);
     }
 
     public function testItCanGuessTheWithTopAndTailMatching()
@@ -227,7 +227,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent-collections')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent-collections');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent-collections', $this->openedUrl);
     }
 
     public function testItCanSpecifyCustomOpenCommandsViaEnvVariables()
@@ -282,7 +282,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x?q=here%20is%20my%20search%20term%20for%20the%20laravel%20website')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x?q=here%20is%20my%20search%20term%20for%20the%20laravel%20website');
+        $this->assertSame('https://laravel.com/docs/8.x?q=here%20is%20my%20search%20term%20for%20the%20laravel%20website', $this->openedUrl);
 
         $_SERVER['argv'] = $argCache;
     }
@@ -302,7 +302,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/filesystem')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/filesystem');
+        $this->assertSame('https://laravel.com/docs/8.x/filesystem', $this->openedUrl);
     }
 
     public function testItHandlesPoorSpelling()
@@ -311,7 +311,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/views')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/views');
+        $this->assertSame('https://laravel.com/docs/8.x/views', $this->openedUrl);
     }
 
     public function testItHandlesNoInteractionOption()
@@ -320,7 +320,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x');
+        $this->assertSame('https://laravel.com/docs/8.x', $this->openedUrl);
     }
 
     public function testCanGetHelpWithoutInstantiatingDependencies()

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 use function PHPStan\Testing\assertType;
@@ -162,6 +163,18 @@ class User extends Model
     {
         $belongsToMany = $this->belongsToMany(Role::class);
         assertType('Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, $this(Illuminate\Types\Relations\User), Illuminate\Database\Eloquent\Relations\Pivot, \'pivot\'>', $belongsToMany);
+
+        return $belongsToMany;
+    }
+
+    /** @return BelongsToMany<Role, $this, Tenant> */
+    public function tenantRoles(): BelongsToMany
+    {
+        $belongsToMany = $this->belongsToMany(Role::class)->using(Tenant::class);
+        assertType('Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, $this(Illuminate\Types\Relations\User), Illuminate\Types\Relations\Tenant, \'pivot\'>', $belongsToMany);
+
+        $belongsToManyShorthand = $this->belongsToMany(Role::class, Tenant::class);
+        assertType('Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, $this(Illuminate\Types\Relations\User), Illuminate\Types\Relations\Tenant, \'pivot\'>', $belongsToManyShorthand);
 
         return $belongsToMany;
     }
@@ -350,6 +363,9 @@ class Address extends Model
 {
 }
 class Role extends Model
+{
+}
+class Tenant extends Pivot
 {
 }
 class Car extends Model

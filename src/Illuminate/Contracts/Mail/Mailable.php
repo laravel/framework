@@ -36,7 +36,7 @@ interface Mailable
      *
      * @param  object|array|string  $address
      * @param  string|null  $name
-     * @return self
+     * @return $this
      */
     public function cc($address, $name = null);
 

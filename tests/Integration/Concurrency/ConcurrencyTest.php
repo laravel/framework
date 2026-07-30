@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Concurrency;
 
 use Exception;
 use Illuminate\Concurrency\ProcessDriver;
+use Illuminate\Concurrency\SyncDriver;
 use Illuminate\Foundation\Application;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Support\Facades\Concurrency;
@@ -11,7 +12,7 @@ use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
-#[RequiresOperatingSystem('Linux|DAR')]
+#[RequiresOperatingSystem('Linux|Darwin')]
 class ConcurrencyTest extends TestCase
 {
     protected function setUp(): void
@@ -72,18 +73,48 @@ PHP);
         $this->assertArrayHasKey('first', $syncOutput);
         $this->assertArrayHasKey('second', $syncOutput);
 
-        /** As of now, the spatie/fork package is not included by default.
-         * $forkOutput = Concurrency::driver('fork')->run([
-         * 'first' => fn() => 1 + 1,
-         * 'second' => fn() => 2 + 2,
-         * ]);.
-         *
-         * $this->assertIsArray($forkOutput);
-         * $this->assertArrayHasKey('first', $forkOutput);
-         * $this->assertArrayHasKey('second', $forkOutput);
-         * $this->assertEquals(2, $forkOutput['first']);
-         * $this->assertEquals(4, $forkOutput['second']);
+        /**
+         * As of now, the spatie/fork package is not included by default,
+         * as it is practically incompatible with Windows.
          */
+        // $forkOutput = Concurrency::driver('fork')->run([
+        //     'first' => fn () => 1 + 1,
+        //     'second' => fn () => 2 + 2,
+        // ]);
+
+        // $this->assertIsArray($forkOutput);
+        // $this->assertArrayHasKey('first', $forkOutput);
+        // $this->assertArrayHasKey('second', $forkOutput);
+        // $this->assertEquals(2, $forkOutput['first']);
+        // $this->assertEquals(4, $forkOutput['second']);
+    }
+
+    public function testProcessDriverRunMayUseCustomTimeout()
+    {
+        $factory = $this->app->make(ProcessFactory::class);
+
+        $factory->fake(fn () => $factory->result(json_encode([
+            'successful' => true,
+            'result' => serialize('result'),
+        ])));
+
+        $result = (new ProcessDriver($factory))->run([
+            fn () => 'result',
+        ], timeout: 120);
+
+        $this->assertSame(['result'], $result);
+
+        $factory->assertRan(function ($process) {
+            return $process->timeout === 120;
+        });
+    }
+
+    public function testDriverCanBeResolvedUsingBackedEnum()
+    {
+        $this->assertInstanceOf(
+            SyncDriver::class,
+            Concurrency::driver(ConcurrencyDriverEnum::Sync),
+        );
     }
 
     public function testRunHandlerProcessErrorWithDefaultExceptionWithoutParam()
@@ -121,6 +152,31 @@ PHP);
         ]);
     }
 
+    #[DataProvider('falseyExceptionParameters')]
+    public function testRunHandlerProcessErrorWithFalseyParam(int|bool|string $value)
+    {
+        try {
+            Concurrency::run([
+                fn () => throw new ExceptionWithFalseyParam($value),
+            ]);
+        } catch (ExceptionWithFalseyParam $e) {
+            $this->assertSame($value, $e->value);
+
+            return;
+        }
+
+        $this->fail('The expected exception was not thrown.');
+    }
+
+    public static function falseyExceptionParameters(): array
+    {
+        return [
+            'zero' => [0],
+            'false' => [false],
+            'empty string' => [''],
+        ];
+    }
+
     public static function getConcurrencyDrivers(): array
     {
         return [
@@ -152,10 +208,15 @@ PHP);
             },
         ]);
 
-        $this->assertEquals('first', $first);
-        $this->assertEquals('second', $second);
-        $this->assertEquals('third', $third);
+        $this->assertSame('first', $first);
+        $this->assertSame('second', $second);
+        $this->assertSame('third', $third);
     }
+}
+
+enum ConcurrencyDriverEnum: string
+{
+    case Sync = 'sync';
 }
 
 class ExceptionWithoutParam extends Exception
@@ -171,5 +232,13 @@ class ExceptionWithParam extends Exception
         public string|array $responseBody = '',
     ) {
         parent::__construct("API request to {$uri} failed with status $statusCode $reason");
+    }
+}
+
+class ExceptionWithFalseyParam extends Exception
+{
+    public function __construct(public int|bool|string $value)
+    {
+        parent::__construct('Exception with falsey parameter');
     }
 }

@@ -31,6 +31,13 @@ abstract class TestCase extends BaseTestCase
     protected array $traitsUsedByTest;
 
     /**
+     * Memoized result of the withoutBootingFramework check.
+     *
+     * @var bool|null
+     */
+    protected ?bool $withoutBootingFramework = null;
+
+    /**
      * Creates the application.
      *
      * @return \Illuminate\Foundation\Application
@@ -41,13 +48,11 @@ abstract class TestCase extends BaseTestCase
 
         $this->traitsUsedByTest = class_uses_recursive(static::class);
 
-        if (isset(CachedState::$cachedConfig) &&
-            isset($this->traitsUsedByTest[WithCachedConfig::class])) {
+        if (isset(CachedState::$cachedConfig, $this->traitsUsedByTest[WithCachedConfig::class])) {
             $this->markConfigCached($app);
         }
 
-        if (isset(CachedState::$cachedRoutes) &&
-            isset($this->traitsUsedByTest[WithCachedRoutes::class])) {
+        if (isset(CachedState::$cachedRoutes, $this->traitsUsedByTest[WithCachedRoutes::class])) {
             $app->booting(fn () => $this->markRoutesCached($app));
         }
 
@@ -105,10 +110,14 @@ abstract class TestCase extends BaseTestCase
      */
     protected function withoutBootingFramework(): bool
     {
+        if ($this->withoutBootingFramework !== null) {
+            return $this->withoutBootingFramework;
+        }
+
         try {
-            return (new ReflectionMethod(static::class, $this->name()))->getAttributes(UnitTest::class) !== [];
+            return $this->withoutBootingFramework = (new ReflectionMethod(static::class, $this->name()))->getAttributes(UnitTest::class) !== [];
         } catch (Throwable) {
-            return false;
+            return $this->withoutBootingFramework = false;
         }
     }
 

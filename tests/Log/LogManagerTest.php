@@ -11,6 +11,7 @@ use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\LogEntriesHandler;
 use Monolog\Handler\NewRelicHandler;
 use Monolog\Handler\NullHandler;
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Level;
@@ -19,6 +20,7 @@ use Monolog\Processor\MemoryUsageProcessor;
 use Monolog\Processor\PsrLogMessageProcessor;
 use Monolog\Processor\UidProcessor;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use ReflectionProperty;
@@ -47,7 +49,7 @@ class LogManagerTest extends TestCase
         //we don't specify any channel name
         $manager->channel();
         $this->assertCount(1, $manager->getChannels());
-        $this->assertEquals('single', $manager->getDefaultDriver());
+        $this->assertSame('single', $manager->getDefaultDriver());
     }
 
     public function testStackChannel()
@@ -111,8 +113,8 @@ class LogManagerTest extends TestCase
         $manager->channel('stack');
 
         $this->assertSame(
-            array_keys($manager->getChannels()),
-            ['single', 'daily', 'stderr', 'stack']
+            ['single', 'daily', 'stderr', 'stack'],
+            array_keys($manager->getChannels())
         );
     }
 
@@ -362,7 +364,7 @@ class LogManagerTest extends TestCase
         $handler = $logger->getLogger()->getHandlers()[0];
         $formatter = $handler->getFormatter();
 
-        $this->assertInstanceOf(StreamHandler::class, $handler);
+        $this->assertInstanceOf(RotatingFileHandler::class, $handler);
         $this->assertInstanceOf(LineFormatter::class, $formatter);
         $this->assertInstanceOf(PsrLogMessageProcessor::class, $logger->getLogger()->getProcessors()[1]);
 
@@ -381,13 +383,67 @@ class LogManagerTest extends TestCase
         $handler = $logger->getLogger()->getHandlers()[0];
         $formatter = $handler->getFormatter();
 
-        $this->assertInstanceOf(StreamHandler::class, $handler);
+        $this->assertInstanceOf(RotatingFileHandler::class, $handler);
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
         $this->assertCount(1, $logger->getLogger()->getProcessors());
 
         $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
+    }
+
+    public static function rotatingFileDriverDataProvider()
+    {
+        return [
+            'daily' => ['daily', 'Y-m-d', ['2026-01-01', '2026-01-02', '2026-01-03']],
+            'monthly' => ['monthly', 'Y-m', ['2026-01', '2026-02', '2026-03']],
+        ];
+    }
+
+    #[DataProvider('rotatingFileDriverDataProvider')]
+    public function testRotatingFileDriversLogToADateStampedFileAndPruneOldOnes($driver, $dateFormat, $staleDates)
+    {
+        foreach (glob(storage_path("logs/rotating-$driver-*.log")) as $file) {
+            unlink($file);
+        }
+
+        $stalePaths = array_map(fn ($date) => storage_path("logs/rotating-$driver-$date.log"), $staleDates);
+
+        foreach ($stalePaths as $stalePath) {
+            file_put_contents($stalePath, 'stale');
+        }
+
+        $this->app['config']->set("logging.channels.rotating-$driver", [
+            'driver' => $driver,
+            'path' => storage_path("logs/rotating-$driver.log"),
+            'level' => 'warning',
+            'max_files' => 3,
+        ]);
+
+        $logger = (new LogManager($this->app))->channel("rotating-$driver");
+
+        $logger->warning('Something went wrong');
+
+        $handler = $logger->getLogger()->getHandlers()[0];
+
+        $handler->close();
+
+        $expectedPath = storage_path("logs/rotating-$driver-".date($dateFormat).'.log');
+
+        $this->assertInstanceOf(RotatingFileHandler::class, $handler);
+        $this->assertSame(Level::Warning, $handler->getLevel());
+        $this->assertFileExists($expectedPath);
+        $this->assertSame($expectedPath, $handler->getUrl());
+        $this->assertStringContainsString('WARNING: Something went wrong', file_get_contents($expectedPath));
+
+        // max_files = 3, the oldest 4th file was deleted
+        $this->assertFileDoesNotExist($stalePaths[0]);
+        $this->assertFileExists($stalePaths[1]);
+        $this->assertFileExists($stalePaths[2]);
+
+        unlink($expectedPath);
+        unlink($stalePaths[1]);
+        unlink($stalePaths[2]);
     }
 
     public function testLogManagerCreateSyslogDriverWithConfiguredFormatter()
@@ -498,6 +554,15 @@ class LogManagerTest extends TestCase
         $url = new ReflectionProperty(get_class($handler), 'url');
 
         $this->assertSame(storage_path('logs/custom.log'), $url->getValue($handler));
+    }
+
+    public function testLogManagerCanSetChannelNameForOnDemandStack()
+    {
+        $manager = new LogManager($this->app);
+
+        $logger = $manager->stack(['single'], 'custom');
+
+        $this->assertSame('custom', $logger->getName());
     }
 
     public function testWrappingHandlerInFingersCrossedWhenActionLevelIsUsed()
@@ -646,7 +711,7 @@ class LogManagerTest extends TestCase
             'invocation-id' => 'expected-id',
         ]);
 
-        $this->assertSame($manager->sharedContext(), ['invocation-id' => 'expected-id']);
+        $this->assertSame(['invocation-id' => 'expected-id'], $manager->sharedContext());
     }
 
     public function testItSharesContextWithStacksWhenTheyAreResolved()
@@ -726,7 +791,7 @@ class LogManagerTest extends TestCase
 
         $format = new ReflectionProperty(get_class($formatter), 'format');
 
-        $this->assertEquals(
+        $this->assertSame(
             '[%datetime%] %channel%.%level_name%: %message% %context% %extra%',
             rtrim($format->getValue($formatter)));
     }
@@ -750,7 +815,7 @@ class LogManagerTest extends TestCase
 
         // Then
         $this->assertCount(1, $loggerSpy->logs);
-        $this->assertEquals('some alert', $loggerSpy->logs[0]['message']);
+        $this->assertSame('some alert', $loggerSpy->logs[0]['message']);
     }
 
     public function testCustomDriverClosureBoundObjectIsLogManager()
@@ -783,6 +848,26 @@ class LogManagerTest extends TestCase
         $logger2 = $manager->driver('single');
 
         $this->assertSame($logger1, $logger2);
+    }
+
+    public function testSetDefaultDriverAcceptsBackedEnum()
+    {
+        $manager = new LogManager($this->app);
+        $manager->setDefaultDriver(LogChannelName::Single);
+
+        $this->assertSame('single', $this->app['config']['logging.default']);
+    }
+
+    public function testForgetChannelAcceptsBackedEnum(): void
+    {
+        $manager = new LogManager($this->app);
+        $logger = $manager->channel(LogChannelName::Single);
+
+        $this->assertSame($logger, $manager->channel('single'));
+
+        $manager->forgetChannel(LogChannelName::Single);
+
+        $this->assertNotSame($logger, $manager->channel('single'));
     }
 }
 

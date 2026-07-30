@@ -6,11 +6,11 @@ use Carbon\CarbonInterval;
 use Carbon\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Image;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Stringable;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use InvalidArgumentException;
 use Mockery as m;
@@ -453,6 +453,37 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($bar);
     }
 
+    public function testWhenEnumMethod()
+    {
+        $request = Request::create('/', 'GET', ['status' => 'test', 'invalid' => 'invalid', 'empty' => '']);
+
+        $status = $invalid = $empty = $missing = $default = false;
+
+        $request->whenEnum('status', TestEnumBacked::class, function ($value) use (&$status) {
+            $status = $value;
+        });
+
+        $request->whenEnum('invalid', TestEnumBacked::class, function ($value) use (&$invalid) {
+            $invalid = $value;
+        });
+
+        $request->whenEnum('empty', TestEnumBacked::class, function ($value) use (&$empty) {
+            $empty = $value;
+        });
+
+        $request->whenEnum('missing', TestEnumBacked::class, function ($value) use (&$missing) {
+            $missing = $value;
+        }, function () use (&$default) {
+            $default = true;
+        });
+
+        $this->assertSame(TestEnumBacked::test, $status);
+        $this->assertFalse($invalid);
+        $this->assertFalse($empty);
+        $this->assertFalse($missing);
+        $this->assertTrue($default);
+    }
+
     public function testMissingMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
@@ -639,8 +670,8 @@ class HttpRequestTest extends TestCase
             'empty_str' => '',
             'null' => null,
         ]);
-        $this->assertTrue($request->string('int') instanceof Stringable);
-        $this->assertTrue($request->string('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $request->string('int'));
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $request->string('unknown_key'));
         $this->assertSame('123', $request->string('int')->value());
         $this->assertSame('456', $request->string('int_str')->value());
         $this->assertSame('123.456', $request->string('float')->value());
@@ -1053,15 +1084,15 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', ['developer' => ['name' => 'Taylor', 'age' => null]]);
         $this->assertEquals(['developer' => ['name' => 'Taylor']], $request->only('developer.name', 'developer.skills'));
         $this->assertEquals(['developer' => ['age' => null]], $request->only('developer.age'));
-        $this->assertEquals([], $request->only('developer.skills'));
+        $this->assertSame([], $request->only('developer.skills'));
     }
 
     public function testExceptMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
         $this->assertEquals(['name' => 'Taylor'], $request->except('age'));
-        $this->assertEquals([], $request->except('age', 'name'));
-        $this->assertEquals([], $request->except(['age', 'name']));
+        $this->assertSame([], $request->except('age', 'name'));
+        $this->assertSame([], $request->except(['age', 'name']));
     }
 
     public function testQueryMethod()
@@ -1125,6 +1156,27 @@ class HttpRequestTest extends TestCase
         ];
         $request = Request::create('/', 'GET', [], [], $files);
         $this->assertInstanceOf(SymfonyUploadedFile::class, $request->file('foo'));
+    }
+
+    public function testImageMethod()
+    {
+        $files = [
+            'avatar' => [
+                'size' => 500,
+                'name' => 'avatar.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'image/jpeg',
+                'error' => null,
+            ],
+        ];
+        $request = Request::create('/', 'GET', [], [], $files);
+        $this->assertInstanceOf(Image::class, $request->image('avatar'));
+    }
+
+    public function testImageMethodReturnsNullForMissingKey()
+    {
+        $request = Request::create('/', 'GET', [], [], []);
+        $this->assertNull($request->image('avatar'));
     }
 
     public function testHasFileMethod()
@@ -1245,6 +1297,13 @@ class HttpRequestTest extends TestCase
         $this->assertSame('taylor', $request->input('name'));
         $data = $request->json()->all();
         $this->assertEquals($payload, $data);
+    }
+
+    public function testJSONMethodDecodesTopLevelZero()
+    {
+        $request = Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], '0');
+
+        $this->assertSame([0], $request->json()->all());
     }
 
     public function testJSONEmulatingPHPBuiltInServer()
@@ -1764,12 +1823,12 @@ class HttpRequestTest extends TestCase
         $params = ['foo' => 'bar'];
 
         $getRequest = Request::create('/', 'GET', $params, [], [], []);
-        $this->assertEquals($getRequest->request->all(), []);
+        $this->assertSame([], $getRequest->request->all());
         $this->assertEquals($getRequest->query->all(), $params);
 
         $postRequest = Request::create('/', 'POST', $params, [], [], []);
         $this->assertEquals($postRequest->request->all(), $params);
-        $this->assertEquals($postRequest->query->all(), []);
+        $this->assertSame([], $postRequest->query->all());
     }
 
     /**
@@ -1886,6 +1945,16 @@ class HttpRequestTest extends TestCase
 
         $this->assertInstanceOf(InputBag::class, $request->getPayload());
         $this->assertSame('world', $request->getPayload()->get('hello'));
+    }
+
+    public function testCreatingJsonRequestFromBaseDoesNotTriggerRequestPropertyDeprecation()
+    {
+        $request = Request::createFromBase(
+            SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"hello":"world"}')
+        );
+
+        $this->assertTrue($request->isJson());
+        $this->assertSame('world', $request->input('hello'));
     }
 
     public function testJsonRequestsCanMergeDataIntoJsonRequest()

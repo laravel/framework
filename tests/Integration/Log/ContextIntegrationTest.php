@@ -20,7 +20,7 @@ class ContextIntegrationTest extends TestCase
     public function test_it_can_hydrate_null()
     {
         Context::hydrate(null);
-        $this->assertEquals([], Context::all());
+        $this->assertSame([], Context::all());
     }
 
     public function test_it_handles_eloquent()

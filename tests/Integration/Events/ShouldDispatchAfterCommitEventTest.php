@@ -186,7 +186,7 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
                     Event::dispatch(new AnotherShouldDispatchAfterCommitTestEvent);
                     throw new \Exception;
                 });
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         });
 
@@ -207,7 +207,7 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
 
                     throw new \Exception;
                 });
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 //
             }
         });
@@ -232,7 +232,7 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
                     Event::dispatch(new AnotherShouldDispatchAfterCommitTestEvent);
                     throw new \Exception;
                 });
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         });
 
@@ -255,7 +255,7 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
 
                     throw new \Exception;
                 });
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         });
 

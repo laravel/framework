@@ -187,7 +187,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
             ];
         }
 
-        return compact('compiled', 'attributes');
+        return ['compiled' => $compiled, 'attributes' => $attributes];
     }
 
     /**

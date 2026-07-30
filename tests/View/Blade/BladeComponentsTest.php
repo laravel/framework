@@ -26,14 +26,14 @@ class BladeComponentsTest extends AbstractBladeTestCase
 
     public function testEndComponentsAreCompiled()
     {
-        $this->compiler->newComponentHash('foo');
+        $this->compiler::newComponentHash('foo');
 
         $this->assertSame('<?php echo $__env->renderComponent(); ?>', $this->compiler->compileString('@endcomponent'));
     }
 
     public function testEndComponentClassesAreCompiled()
     {
-        $this->compiler->newComponentHash('foo');
+        $this->compiler::newComponentHash('foo');
 
         $this->assertSame(str_replace("\r\n", "\n", '<?php echo $__env->renderComponent(); ?>
 <?php endif; ?>

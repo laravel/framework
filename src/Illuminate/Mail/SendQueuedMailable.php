@@ -44,7 +44,7 @@ class SendQueuedMailable
     /**
      * The maximum number of unhandled exceptions to allow before failing.
      *
-     * @return int|null
+     * @var int|null
      */
     public $maxExceptions;
 

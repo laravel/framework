@@ -341,9 +341,10 @@ class PendingCommand
      *
      * @param  array<int, string|array<int, string>>|Collection<int, string|array<int, string>>  $headers
      * @param  array<int, array<int, string>>|Collection<int, array<int, string>>|null  $rows
-     * @return $this
      *
      * @phpstan-param ($rows is null ? list<list<string>>|Collection<int, list<string>> : list<string|list<string>>|Collection<int, string|list<string>>) $headers
+     *
+     * @return $this
      */
     public function expectsPromptsTable(array|Collection $headers, array|Collection|null $rows)
     {
@@ -531,11 +532,11 @@ class PendingCommand
             $this->test->fail('Output does not contain "'.Arr::first($this->test->expectedOutputSubstrings).'".');
         }
 
-        if ($output = array_search(true, $this->test->unexpectedOutput)) {
+        if (($output = array_search(true, $this->test->unexpectedOutput)) !== false) {
             $this->test->fail('Output "'.$output.'" was printed.');
         }
 
-        if ($output = array_search(true, $this->test->unexpectedOutputSubstrings)) {
+        if (($output = array_search(true, $this->test->unexpectedOutputSubstrings)) !== false) {
             $this->test->fail('Output "'.$output.'" was printed.');
         }
     }

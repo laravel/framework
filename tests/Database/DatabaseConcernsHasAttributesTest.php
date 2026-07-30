@@ -54,7 +54,7 @@ class DatabaseConcernsHasAttributesTest extends TestCase
     public function testUnsettingCachedAttribute()
     {
         $instance = new HasCacheableAttributeWithAccessor();
-        $this->assertEquals('foo', $instance->getAttribute('cacheableProperty'));
+        $this->assertSame('foo', $instance->getAttribute('cacheableProperty'));
         $this->assertTrue($instance->cachedAttributeIsset('cacheableProperty'));
 
         unset($instance->cacheableProperty);

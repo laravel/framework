@@ -72,6 +72,19 @@ class CacheRateLimiterTest extends TestCase
         $rateLimiter->hit('key', 1);
     }
 
+    public function testIncrementWithCustomAmountHasNoMemoryLeak()
+    {
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 60)->andReturn(true);
+        $cache->shouldReceive('add')->once()->with('key', 0, 60)->andReturn(false);
+        $cache->shouldReceive('increment')->once()->with('key', 2)->andReturn(2);
+        $cache->shouldReceive('put')->once()->with('key', 2, 60);
+        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $rateLimiter = new RateLimiter($cache);
+
+        $rateLimiter->increment('key', 60, 2);
+    }
+
     public function testRemainingIsNotNegative(): void
     {
         $cache = m::mock(Cache::class);
@@ -108,7 +121,7 @@ class CacheRateLimiterTest extends TestCase
     public function testAvailableInReturnsPositiveValues()
     {
         $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->andReturn(Carbon::now()->subSeconds(60)->getTimestamp(), null);
+        $cache->shouldReceive('get')->andReturn(Carbon::now()->subMinute()->getTimestamp(), null);
         $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 
@@ -150,7 +163,7 @@ class CacheRateLimiterTest extends TestCase
             return 'foo';
         }, 1));
 
-        $this->assertSame(false, $rateLimiter->attempt('key', 1, function () {
+        $this->assertFalse($rateLimiter->attempt('key', 1, function () {
             return false;
         }, 1));
 

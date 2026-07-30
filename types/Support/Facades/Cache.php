@@ -22,6 +22,9 @@ assertType('mixed', Cache::sear('cache', function (): int {
 assertType('mixed', Cache::remember('cache', Carbon::now(), function (): int {
     return 36;
 }));
+assertType('array', Cache::rememberWithWarmth('cache', Carbon::now(), function (): int {
+    return 36;
+}));
 assertType('mixed', Cache::rememberForever('cache', function (): int {
     return 36;
 }));

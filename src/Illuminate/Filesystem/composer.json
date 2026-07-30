@@ -26,6 +26,7 @@
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-hash": "Required to use the Filesystem class.",
         "illuminate/http": "Required for handling uploaded files (^13.0).",
+        "illuminate/image": "Required to create images from stored files (^13.0).",
         "league/flysystem": "Required to use the Flysystem local driver (^3.25.1).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^3.25.1).",
         "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^3.25.1).",

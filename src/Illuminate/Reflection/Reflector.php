@@ -82,6 +82,8 @@ class Reflector
      * @param  class-string<TAttribute>  $attribute
      * @param  bool  $includeParents
      * @return ($includeParents is true ? Collection<class-string<contravariant TTarget>, Collection<int, TAttribute>> : Collection<int, TAttribute>)
+     *
+     * @throws \ReflectionException
      */
     public static function getClassAttributes($objectOrClass, $attribute, $includeParents = false)
     {
@@ -205,7 +207,7 @@ class Reflector
             $reflectionBackedEnum = new ReflectionEnum($backedEnumClass);
 
             return $reflectionBackedEnum->isBacked()
-                && $reflectionBackedEnum->getBackingType()->getName() == 'string';
+                && $reflectionBackedEnum->getBackingType()->getName() === 'string';
         }
 
         return false;

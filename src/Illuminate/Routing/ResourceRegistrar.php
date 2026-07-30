@@ -217,7 +217,7 @@ class ResourceRegistrar
             $me->resource($name, $controller, $options);
         };
 
-        return $this->router->group(compact('prefix'), $callback);
+        return $this->router->group(['prefix' => $prefix], $callback);
     }
 
     /**
@@ -239,7 +239,7 @@ class ResourceRegistrar
             $me->singleton($name, $controller, $options);
         };
 
-        return $this->router->group(compact('prefix'), $callback);
+        return $this->router->group(['prefix' => $prefix], $callback);
     }
 
     /**
@@ -654,6 +654,13 @@ class ResourceRegistrar
 
         if (isset($options['missing'])) {
             $action['missing'] = $options['missing'];
+        }
+
+        if (isset($options['metadata'])) {
+            $action['metadata'] = RouteGroup::mergeMetadata(
+                $action['metadata'] ?? [],
+                $options['metadata']
+            );
         }
 
         return $action;

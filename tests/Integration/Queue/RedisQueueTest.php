@@ -62,6 +62,11 @@ class RedisQueueTest extends TestCase
         $this->queue->setContainer($this->container);
     }
 
+    private function getQueueRedisKey($queue = null)
+    {
+        return (new \ReflectionMethod($this->queue, 'getQueueRedisKey'))->invoke($this->queue, $queue);
+    }
+
     /**
      * @param  string  $driver
      */
@@ -88,8 +93,9 @@ class RedisQueueTest extends TestCase
         $this->assertEquals($jobs[3], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $this->assertNull($this->queue->pop());
 
-        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("queues:$default:delayed"));
-        $this->assertEquals(3, $this->redis[$driver]->connection()->zcard("queues:$default:reserved"));
+        $redisKey = $this->getQueueRedisKey($default);
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("$redisKey:delayed"));
+        $this->assertEquals(3, $this->redis[$driver]->connection()->zcard("$redisKey:reserved"));
     }
 
     /**
@@ -162,8 +168,9 @@ class RedisQueueTest extends TestCase
         $this->assertEquals($redisJob->getJobId(), json_decode($redisJob->getReservedJob())->id);
 
         // Check reserved queue
-        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("queues:$default:reserved"));
-        $result = $this->redis[$driver]->connection()->zrangebyscore("queues:$default:reserved", -INF, INF, ['withscores' => true]);
+        $redisKey = $this->getQueueRedisKey($default);
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("$redisKey:reserved"));
+        $result = $this->redis[$driver]->connection()->zrangebyscore("$redisKey:reserved", -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = (int) $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before + 60);
@@ -189,8 +196,9 @@ class RedisQueueTest extends TestCase
         $after = $this->currentTime();
 
         // Check reserved queue
-        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("queues:$default:reserved"));
-        $result = $this->redis[$driver]->connection()->zrangebyscore("queues:$default:reserved", -INF, INF, ['withscores' => true]);
+        $redisKey = $this->getQueueRedisKey($default);
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("$redisKey:reserved"));
+        $result = $this->redis[$driver]->connection()->zrangebyscore("$redisKey:reserved", -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = (int) $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before + 60);
@@ -219,8 +227,9 @@ class RedisQueueTest extends TestCase
         $after = $this->currentTime();
 
         // Check reserved queue
-        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("queues:$default:reserved"));
-        $result = $this->redis[$driver]->connection()->zrangebyscore("queues:$default:reserved", -INF, INF, ['withscores' => true]);
+        $redisKey = $this->getQueueRedisKey($default);
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("$redisKey:reserved"));
+        $result = $this->redis[$driver]->connection()->zrangebyscore("$redisKey:reserved", -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = (int) $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before);
@@ -273,9 +282,10 @@ class RedisQueueTest extends TestCase
         $this->assertEquals($jobs[0], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $this->assertEquals($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
 
-        $this->assertEquals(0, $this->redis[$driver]->connection()->llen('queues:default:notify'));
-        $this->assertEquals(0, $this->redis[$driver]->connection()->zcard("queues:$default:delayed"));
-        $this->assertEquals(2, $this->redis[$driver]->connection()->zcard("queues:$default:reserved"));
+        $redisKey = $this->getQueueRedisKey($default);
+        $this->assertEquals(0, $this->redis[$driver]->connection()->llen("$redisKey:notify"));
+        $this->assertEquals(0, $this->redis[$driver]->connection()->zcard("$redisKey:delayed"));
+        $this->assertEquals(2, $this->redis[$driver]->connection()->zcard("$redisKey:reserved"));
 
         Str::createUuidsNormally();
     }
@@ -309,8 +319,9 @@ class RedisQueueTest extends TestCase
         $after = $this->currentTime();
 
         // Check reserved queue
-        $this->assertEquals(2, $this->redis[$driver]->connection()->zcard("queues:$default:reserved"));
-        $result = $this->redis[$driver]->connection()->zrangebyscore("queues:$default:reserved", -INF, INF, ['withscores' => true]);
+        $redisKey = $this->getQueueRedisKey($default);
+        $this->assertEquals(2, $this->redis[$driver]->connection()->zcard("$redisKey:reserved"));
+        $result = $this->redis[$driver]->connection()->zrangebyscore("$redisKey:reserved", -INF, INF, ['withscores' => true]);
 
         foreach ($result as $payload => $score) {
             $command = unserialize(json_decode($payload)->data->command);
@@ -349,8 +360,9 @@ class RedisQueueTest extends TestCase
         $after = $this->currentTime();
 
         // Check reserved queue
-        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("queues:$default:reserved"));
-        $result = $this->redis[$driver]->connection()->zrangebyscore("queues:$default:reserved", -INF, INF, ['withscores' => true]);
+        $redisKey = $this->getQueueRedisKey($default);
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("$redisKey:reserved"));
+        $result = $this->redis[$driver]->connection()->zrangebyscore("$redisKey:reserved", -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = (int) $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before + 30);
@@ -379,9 +391,10 @@ class RedisQueueTest extends TestCase
         $after = $this->currentTime();
 
         // check the content of delayed queue
-        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("queues:$default:delayed"));
+        $redisKey = $this->getQueueRedisKey($default);
+        $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("$redisKey:delayed"));
 
-        $results = $this->redis[$driver]->connection()->zrangebyscore("queues:$default:delayed", -INF, INF, ['withscores' => true]);
+        $results = $this->redis[$driver]->connection()->zrangebyscore("$redisKey:delayed", -INF, INF, ['withscores' => true]);
 
         $payload = array_keys($results)[0];
 
@@ -434,9 +447,10 @@ class RedisQueueTest extends TestCase
 
         $redisJob->delete();
 
-        $this->assertEquals(0, $this->redis[$driver]->connection()->zcard("queues:$default:delayed"));
-        $this->assertEquals(0, $this->redis[$driver]->connection()->zcard("queues:$default:reserved"));
-        $this->assertEquals(0, $this->redis[$driver]->connection()->llen("queues:$default"));
+        $redisKey = $this->getQueueRedisKey($default);
+        $this->assertEquals(0, $this->redis[$driver]->connection()->zcard("$redisKey:delayed"));
+        $this->assertEquals(0, $this->redis[$driver]->connection()->zcard("$redisKey:reserved"));
+        $this->assertEquals(0, $this->redis[$driver]->connection()->llen("$redisKey"));
 
         $this->assertNull($this->queue->pop());
     }
@@ -458,7 +472,8 @@ class RedisQueueTest extends TestCase
 
         $this->assertEquals(2, $this->queue->clear(null));
         $this->assertEquals(0, $this->queue->size());
-        $this->assertEquals(0, $this->redis[$driver]->connection()->llen('queues:default:notify'));
+        $redisKey = $this->getQueueRedisKey($default);
+        $this->assertEquals(0, $this->redis[$driver]->connection()->llen("$redisKey:notify"));
     }
 
     /**
@@ -613,6 +628,7 @@ class RedisQueueTest extends TestCase
         $this->assertSame(0, $pending->first()->attempts);
         $this->assertNotNull($pending->first()->uuid);
         $this->assertInstanceOf(Carbon::class, $pending->first()->createdAt);
+        $this->assertSame($default, $pending->first()->queue);
     }
 
     #[DataProvider('redisDriverProvider')]
@@ -632,6 +648,7 @@ class RedisQueueTest extends TestCase
         $this->assertSame(0, $delayed->first()->attempts);
         $this->assertNotNull($delayed->first()->uuid);
         $this->assertInstanceOf(Carbon::class, $delayed->first()->createdAt);
+        $this->assertSame($default, $delayed->first()->queue);
     }
 
     #[DataProvider('redisDriverProvider')]
@@ -652,6 +669,69 @@ class RedisQueueTest extends TestCase
         $this->assertSame(1, $reserved->first()->attempts);
         $this->assertNotNull($reserved->first()->uuid);
         $this->assertInstanceOf(Carbon::class, $reserved->first()->createdAt);
+        $this->assertSame($default, $reserved->first()->queue);
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testAllPendingJobs($driver)
+    {
+        $default = config('queue.connections.redis.queue', 'default');
+        $this->setQueue($driver, $default);
+
+        $this->queue->push(new RedisQueueIntegrationTestJob(1));
+        $this->queue->pushOn('emails', new RedisQueueIntegrationTestJob(2));
+
+        $pending = $this->queue->allPendingJobs();
+
+        $this->assertCount(2, $pending);
+        $this->assertInstanceOf(InspectedJob::class, $pending->first());
+        $this->assertSame(RedisQueueIntegrationTestJob::class, $pending->first()->name);
+        $this->assertSame(0, $pending->first()->attempts);
+        $this->assertNotNull($pending->first()->uuid);
+        $this->assertInstanceOf(Carbon::class, $pending->first()->createdAt);
+        $this->assertSame([$default, 'emails'], $pending->pluck('queue')->sort()->values()->all());
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testAllDelayedJobs($driver)
+    {
+        $default = config('queue.connections.redis.queue', 'default');
+        $this->setQueue($driver, $default);
+
+        $this->queue->later(60, new RedisQueueIntegrationTestJob(1));
+        $this->queue->laterOn('emails', 60, new RedisQueueIntegrationTestJob(2));
+
+        $delayed = $this->queue->allDelayedJobs();
+
+        $this->assertCount(2, $delayed);
+        $this->assertInstanceOf(InspectedJob::class, $delayed->first());
+        $this->assertSame(RedisQueueIntegrationTestJob::class, $delayed->first()->name);
+        $this->assertSame(0, $delayed->first()->attempts);
+        $this->assertNotNull($delayed->first()->uuid);
+        $this->assertInstanceOf(Carbon::class, $delayed->first()->createdAt);
+        $this->assertSame([$default, 'emails'], $delayed->pluck('queue')->sort()->values()->all());
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testAllReservedJobs($driver)
+    {
+        $default = config('queue.connections.redis.queue', 'default');
+        $this->setQueue($driver, $default);
+
+        $this->queue->push(new RedisQueueIntegrationTestJob(1));
+        $this->queue->pushOn('emails', new RedisQueueIntegrationTestJob(2));
+        $this->queue->pop();
+        $this->queue->pop('emails');
+
+        $reserved = $this->queue->allReservedJobs();
+
+        $this->assertCount(2, $reserved);
+        $this->assertInstanceOf(InspectedJob::class, $reserved->first());
+        $this->assertSame(RedisQueueIntegrationTestJob::class, $reserved->first()->name);
+        $this->assertSame(1, $reserved->first()->attempts);
+        $this->assertNotNull($reserved->first()->uuid);
+        $this->assertInstanceOf(Carbon::class, $reserved->first()->createdAt);
+        $this->assertSame([$default, 'emails'], $reserved->pluck('queue')->sort()->values()->all());
     }
 }
 

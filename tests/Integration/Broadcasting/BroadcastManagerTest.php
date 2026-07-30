@@ -176,7 +176,26 @@ class BroadcastManagerTest extends TestCase
         $this->assertSame($driver, $manager->connection(__CLASS__));
     }
 
-    public function testThrowExceptionWhenDriverCreationFails()
+    public function testInvokableObjectDriverClosure()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    __CLASS__ => [
+                        'driver' => __CLASS__,
+                    ],
+                ],
+            ],
+        ]));
+
+        $driver = new stdClass;
+        $creator = new CustomBroadcastDriver($driver);
+
+        $manager->extend(__CLASS__, $creator(...));
+        $this->assertSame($driver, $manager->connection(__CLASS__));
+    }
+
+    public function test_throw_exception_when_driver_creation_fails()
     {
         $userConfig = [
             'broadcasting' => [
@@ -205,6 +224,77 @@ class BroadcastManagerTest extends TestCase
         }
     }
 
+    public function testBroadcastManagerCanResolveBackedEnumConnection(): void
+    {
+        $app = $this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    'log' => ['driver' => 'log'],
+                ],
+            ],
+        ]);
+
+        $driver = new stdClass;
+        $manager = new BroadcastManager($app);
+        $manager->extend('log', static fn () => $driver);
+
+        $this->assertSame($driver, $manager->connection(BroadcastConnectionName::Log));
+        $this->assertSame($manager->connection('log'), $manager->connection(BroadcastConnectionName::Log));
+    }
+
+    public function testBroadcastManagerCanResolveBackedEnumDriver(): void
+    {
+        $app = $this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    'log' => ['driver' => 'log'],
+                ],
+            ],
+        ]);
+
+        $driver = new stdClass;
+        $manager = new BroadcastManager($app);
+        $manager->extend('log', static fn () => $driver);
+
+        $this->assertSame($driver, $manager->driver(BroadcastConnectionName::Log));
+        $this->assertSame($manager->driver('log'), $manager->driver(BroadcastConnectionName::Log));
+    }
+
+    public function testSetDefaultDriverAcceptsBackedEnum(): void
+    {
+        $app = $this->getApp([
+            'broadcasting' => [
+                'default' => 'null',
+                'connections' => [],
+            ],
+        ]);
+
+        $manager = new BroadcastManager($app);
+        $manager->setDefaultDriver(BroadcastConnectionName::Log);
+
+        $this->assertSame('log', $app['config']['broadcasting.default']);
+    }
+
+    public function testPurgeAcceptsBackedEnum(): void
+    {
+        $app = $this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    'log' => ['driver' => 'log'],
+                ],
+            ],
+        ]);
+
+        $manager = new BroadcastManager($app);
+        $manager->extend('log', static fn () => new stdClass);
+
+        $instance1 = $manager->connection(BroadcastConnectionName::Log);
+        $manager->purge(BroadcastConnectionName::Log);
+        $instance2 = $manager->connection(BroadcastConnectionName::Log);
+
+        $this->assertNotSame($instance1, $instance2);
+    }
+
     protected function getApp(array $userConfig)
     {
         $app = new Container;
@@ -212,6 +302,11 @@ class BroadcastManagerTest extends TestCase
 
         return $app;
     }
+}
+
+enum BroadcastConnectionName: string
+{
+    case Log = 'log';
 }
 
 class TestEvent implements ShouldBroadcast
@@ -286,5 +381,17 @@ class TestEventNowRescue implements ShouldBroadcastNow, ShouldRescue
     public function broadcastOn()
     {
         //
+    }
+}
+
+class CustomBroadcastDriver
+{
+    public function __construct(private object $driver)
+    {
+    }
+
+    public function __invoke()
+    {
+        return $this->driver;
     }
 }

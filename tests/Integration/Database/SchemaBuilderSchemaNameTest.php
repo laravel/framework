@@ -526,16 +526,16 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $tableName = $connection === 'with-prefix' ? 'example_table' : 'table';
         $defaultSchema = $this->driver === 'pgsql' ? 'public' : 'laravel';
 
-        $this->assertEquals('comment on schema table',
+        $this->assertSame('comment on schema table',
             $tables->first(fn ($table) => $table['name'] === $tableName && $table['schema'] === 'my_schema')['comment']
         );
-        $this->assertEquals('comment on table',
+        $this->assertSame('comment on table',
             $tables->first(fn ($table) => $table['name'] === $tableName && $table['schema'] === $defaultSchema)['comment']
         );
-        $this->assertEquals('comment on schema column',
+        $this->assertSame('comment on schema column',
             collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'name')['comment']
         );
-        $this->assertEquals('comment on column',
+        $this->assertSame('comment on column',
             collect($schema->getColumns('table'))->firstWhere('name', 'name')['comment']
         );
     }
@@ -579,7 +579,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             'database.connections.'.$connection.'.password' => 'Passw0rd',
         ]);
 
-        $this->assertEquals('my_schema', $schema->getCurrentSchemaName());
+        $this->assertSame('my_schema', $schema->getCurrentSchemaName());
 
         $schema->create('table', function (Blueprint $table) {
             $table->id();

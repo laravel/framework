@@ -112,6 +112,13 @@ trait ManagesAttributes
     public $description;
 
     /**
+     * The arbitrary attributes stored with the event.
+     *
+     * @var array<array-key, mixed>
+     */
+    public $attributes = [];
+
+    /**
      * Set which user the command should run as.
      *
      * @param  string  $user
@@ -257,6 +264,19 @@ trait ManagesAttributes
     public function description($description)
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * Set arbitrary attributes to store with the event.
+     *
+     * @param  array<array-key, mixed>  $attributes
+     * @return $this
+     */
+    public function withAttributes($attributes)
+    {
+        $this->attributes = array_merge_recursive($this->attributes, $attributes);
 
         return $this;
     }

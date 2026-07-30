@@ -26,9 +26,9 @@ class BuildableIntegrationTest extends TestCase
         $config = $this->app->make(AolInstantMessengerConfig::class);
 
         $this->assertEquals(500, $config->awayMessageDuration);
-        $this->assertEquals('sad emo lyrics', $config->awayMessage);
-        $this->assertEquals('api-key', $config->apiKey);
-        $this->assertEquals('cosmastech', $config->userName);
+        $this->assertSame('sad emo lyrics', $config->awayMessage);
+        $this->assertSame('api-key', $config->apiKey);
+        $this->assertSame('cosmastech', $config->userName);
 
         config(['aim.away_message.duration' => 5]);
 

@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
+use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Queue\Events\JobDebounced;
 use RuntimeException;
 
 class CallQueuedHandler
@@ -35,6 +37,13 @@ class CallQueuedHandler
      * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
+
+    /**
+     * The command currently being processed.
+     *
+     * @var mixed
+     */
+    protected $runningCommand;
 
     /**
      * Create a new handler instance.
@@ -65,7 +74,17 @@ class CallQueuedHandler
             return $this->handleModelNotFound($job, $e);
         }
 
-        $this->dispatchThroughMiddleware($job, $command);
+        if ($this->commandShouldBeDebounced($command)) {
+            return $this->deleteDebouncedJob($job, $command);
+        }
+
+        $this->runningCommand = $command;
+
+        try {
+            $this->dispatchThroughMiddleware($job, $command);
+        } finally {
+            $this->runningCommand = null;
+        }
 
         if (! $job->isReleased() && ! $this->commandShouldBeUniqueUntilProcessing($command)) {
             $this->ensureUniqueJobLockIsReleased($command);
@@ -214,6 +233,50 @@ class CallQueuedHandler
         if ($this->commandShouldBeUnique($command)) {
             (new UniqueLock($this->container->make(Cache::class)))->release($command);
         }
+    }
+
+    /**
+     * Determine if the debounced command was superseded by a newer dispatch.
+     *
+     * @param  mixed  $command
+     * @return bool
+     */
+    protected function commandShouldBeDebounced($command)
+    {
+        $owner = $command->debounceOwner ?? '';
+
+        if (empty($owner)) {
+            return false;
+        }
+
+        $lock = new DebounceLock($this->container->make(Cache::class));
+
+        $currentOwner = $lock->getCurrentOwner($command);
+
+        // Fail-open: if the lock no longer exists (cache eviction, TTL expiry), let the job execute...
+        if (is_null($currentOwner)) {
+            return false;
+        }
+
+        return $currentOwner !== $owner;
+    }
+
+    /**
+     * Handle a debounced (superseded) job by firing an event and deleting it.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  mixed  $command
+     * @return void
+     */
+    protected function deleteDebouncedJob($job, $command)
+    {
+        if ($this->container->bound('events')) {
+            $this->container->make('events')->dispatch(
+                new JobDebounced($job->getConnectionName(), $job, $command)
+            );
+        }
+
+        $job->delete();
     }
 
     /**
@@ -379,5 +442,15 @@ class CallQueuedHandler
         if (method_exists($command, 'invokeChainCatchCallbacks')) {
             $command->invokeChainCatchCallbacks($e);
         }
+    }
+
+    /**
+     * Get the command currently being processed.
+     *
+     * @return mixed
+     */
+    public function getRunningCommand()
+    {
+        return $this->runningCommand;
     }
 }

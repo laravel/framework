@@ -114,7 +114,7 @@ class CacheDatabaseStoreTest extends TestCase
     public function testForeverCallsStoreItemWithReallyLongTime()
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['put'])->setConstructorArgs($this->getMocks())->getMock();
-        $store->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(315360000))->willReturn(true);
+        $store->expects($this->once())->method('put')->with('foo', 'bar', 315360000)->willReturn(true);
         $result = $store->forever('foo', 'bar');
         $this->assertTrue($result);
     }

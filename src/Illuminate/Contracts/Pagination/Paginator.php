@@ -32,7 +32,7 @@ interface Paginator
      * Get / set the URL fragment to be appended to URLs.
      *
      * @param  string|null  $fragment
-     * @return $this|string|null
+     * @return ($fragment is null ? string|null : $this)
      */
     public function fragment($fragment = null);
 

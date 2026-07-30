@@ -5,13 +5,13 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Support\Testing\Fakes\MailFake;
 
 /**
- * @method static \Illuminate\Contracts\Mail\Mailer mailer(string|null $name = null)
- * @method static \Illuminate\Mail\Mailer driver(string|null $driver = null)
+ * @method static \Illuminate\Contracts\Mail\Mailer mailer(\UnitEnum|string|null $name = null)
+ * @method static \Illuminate\Mail\Mailer driver(\UnitEnum|string|null $driver = null)
  * @method static \Illuminate\Mail\Mailer build(array $config)
  * @method static \Symfony\Component\Mailer\Transport\TransportInterface createSymfonyTransport(array $config)
  * @method static string getDefaultDriver()
- * @method static void setDefaultDriver(string $name)
- * @method static void purge(string|null $name = null)
+ * @method static void setDefaultDriver(\UnitEnum|string $name)
+ * @method static void purge(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Mail\MailManager extend(string $driver, \Closure $callback)
  * @method static \Illuminate\Contracts\Foundation\Application getApplication()
  * @method static \Illuminate\Mail\MailManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
@@ -49,6 +49,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static void assertNothingOutgoing()
  * @method static void assertNothingSent()
  * @method static void assertQueued(string|\Closure $mailable, callable|array|string|int|null $callback = null)
+ * @method static void assertQueuedTimes(string $mailable, int $times = 1)
  * @method static void assertNotQueued(string|\Closure $mailable, callable|array|string|null $callback = null)
  * @method static void assertNothingQueued()
  * @method static void assertSentCount(int $count)

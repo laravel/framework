@@ -53,13 +53,13 @@ class BroadcasterTest extends TestCase
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd', 'asd', $callback);
-        $this->assertEquals([], $parameters);
+        $this->assertSame([], $parameters);
 
         $callback = function ($user, $something) {
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd', 'asd', $callback);
-        $this->assertEquals([], $parameters);
+        $this->assertSame([], $parameters);
 
         // Test Explicit Binding...
         $container = new Container;

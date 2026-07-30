@@ -11,13 +11,6 @@ use stdClass;
 
 class CacheSessionStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow(null);
-
-        parent::tearDown();
-    }
-
     public function testItemsCanBeSetAndRetrieved()
     {
         $store = new SessionStore(self::getSession());
@@ -60,12 +53,12 @@ class CacheSessionStoreTest extends TestCase
 
     public function testItemsCanExpire()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $store = new SessionStore(self::getSession());
 
         $store->put('foo', 'bar', 10);
-        Carbon::setTestNow(Carbon::now()->addSeconds(10)->addSecond());
+        Carbon::setTestNow($now->addSeconds(10)->addSecond());
         $result = $store->get('foo');
 
         $this->assertNull($result);
@@ -73,21 +66,21 @@ class CacheSessionStoreTest extends TestCase
 
     public function testTouchExtendsTtl()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $store = new SessionStore(self::getSession());
         $store->put('foo', 'bar', 10);
 
         // Move time forward and touch to extend TTL
-        Carbon::setTestNow(Carbon::now()->addSeconds(5));
+        Carbon::setTestNow($now->addSeconds(5));
         $this->assertTrue($store->touch('foo', 60));
 
         // Value should still exist past the original expiry
-        Carbon::setTestNow(Carbon::now()->addSeconds(10));
+        Carbon::setTestNow($now->addSeconds(10));
         $this->assertSame('bar', $store->get('foo'));
 
         // Value should expire after the new TTL
-        Carbon::setTestNow(Carbon::now()->addSeconds(50));
+        Carbon::setTestNow($now->addSeconds(50));
         $this->assertNull($store->get('foo'));
     }
 
@@ -98,7 +91,7 @@ class CacheSessionStoreTest extends TestCase
             ->onlyMethods(['put'])
             ->getMock();
         $mock->expects($this->once())
-            ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))
+            ->method('put')->with('foo', 'bar', 0)
             ->willReturn(true);
         $result = $mock->forever('foo', 'bar');
         $this->assertTrue($result);
@@ -148,18 +141,18 @@ class CacheSessionStoreTest extends TestCase
         $this->assertEquals(1, $store->get('foo'));
 
         // Will be there forever
-        Carbon::setTestNow(Carbon::now()->addYears(10));
+        Carbon::setTestNow(Carbon::now()->addCentury());
         $this->assertEquals(1, $store->get('foo'));
     }
 
     public function testExpiredKeysAreIncrementedLikeNonExistingKeys()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $store = new SessionStore(self::getSession());
 
         $store->put('foo', 999, 10);
-        Carbon::setTestNow(Carbon::now()->addSeconds(10)->addSecond());
+        Carbon::setTestNow($now->addSeconds(10)->addSecond());
         $result = $store->increment('foo');
 
         $this->assertEquals(1, $result);
@@ -207,7 +200,7 @@ class CacheSessionStoreTest extends TestCase
     public function testItemKey()
     {
         $store = new SessionStore(self::getSession(), 'custom_prefix');
-        $this->assertEquals('custom_prefix.foo', $store->itemKey('foo'));
+        $this->assertSame('custom_prefix.foo', $store->itemKey('foo'));
     }
 
     public function testValuesAreStoredByReference()
@@ -227,13 +220,13 @@ class CacheSessionStoreTest extends TestCase
 
     public function testCanGetAll()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $store = new SessionStore(self::getSession());
         $store->put('foo', 'bar', 10);
 
         $this->assertEquals([
-            'foo' => ['value' => 'bar', 'expiresAt' => Carbon::now()->addSeconds(10)->getPreciseTimestamp(3) / 1000],
+            'foo' => ['value' => 'bar', 'expiresAt' => $now->addSeconds(10)->getPreciseTimestamp(3) / 1000],
         ], $store->all());
     }
 
@@ -241,9 +234,9 @@ class CacheSessionStoreTest extends TestCase
     {
         return new Store(
             name: 'name',
-            serialization: 'php',
             handler: new ArraySessionHandler(10),
             id: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            serialization: 'php',
         );
     }
 }

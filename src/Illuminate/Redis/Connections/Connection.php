@@ -11,6 +11,9 @@ use Illuminate\Redis\Limiters\DurationLimiterBuilder;
 use Illuminate\Support\Traits\Macroable;
 use Throwable;
 
+/**
+ * @mixin \Redis
+ */
 abstract class Connection
 {
     use Macroable {
@@ -183,6 +186,16 @@ abstract class Connection
     }
 
     /**
+     * Determine if the connection is a cluster connection.
+     *
+     * @return bool
+     */
+    public function isCluster()
+    {
+        return false;
+    }
+
+    /**
      * Get the connection name.
      *
      * @return string|null
@@ -234,6 +247,25 @@ abstract class Connection
     public function unsetEventDispatcher()
     {
         $this->events = null;
+    }
+
+    /**
+     * Determine if the given key contains a Redis Cluster hash tag.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public static function hasHashTag(string $key): bool
+    {
+        $open = strpos($key, '{');
+
+        if ($open === false) {
+            return false;
+        }
+
+        $close = strpos($key, '}', $open + 1);
+
+        return $close !== false && $close - $open > 1;
     }
 
     /**

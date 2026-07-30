@@ -71,8 +71,9 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
         );
 
         if (is_string($exception)) {
-            Assert::assertTrue(
-                in_array($exception, array_map(get_class(...), $this->reported), true),
+            Assert::assertContains(
+                $exception,
+                array_map(get_class(...), $this->reported),
                 $message,
             );
 
@@ -176,7 +177,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     protected function isFakedException(Throwable $e)
     {
-        return count($this->exceptions) === 0 || in_array(get_class($e), $this->exceptions, true);
+        return $this->exceptions === [] || in_array(get_class($e), $this->exceptions, true);
     }
 
     /**

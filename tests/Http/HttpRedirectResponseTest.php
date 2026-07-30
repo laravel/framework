@@ -78,8 +78,8 @@ class HttpRedirectResponseTest extends TestCase
             new Cookie('name', 'milwad'),
         ]);
 
-        $this->assertEquals('name', $response->headers->getCookies()[0]->getName());
-        $this->assertEquals('milwad', $response->headers->getCookies()[0]->getValue());
+        $this->assertSame('name', $response->headers->getCookies()[0]->getName());
+        $this->assertSame('milwad', $response->headers->getCookies()[0]->getValue());
     }
 
     public function testOnlyInputOnRedirect()

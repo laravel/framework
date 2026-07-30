@@ -6,6 +6,7 @@ use Aws\S3\S3Client;
 use Closure;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\RebindsCallbacksToSelf;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter as AwsS3PortableVisibilityConverter;
@@ -20,8 +21,8 @@ use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
 use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
+use ReflectionException;
 use RuntimeException;
-use Throwable;
 
 use function Illuminate\Support\enum_value;
 
@@ -31,6 +32,8 @@ use function Illuminate\Support\enum_value;
  */
 class FilesystemManager implements FactoryContract
 {
+    use RebindsCallbacksToSelf;
+
     /**
      * The application instance.
      *
@@ -442,9 +445,9 @@ class FilesystemManager implements FactoryContract
     public function extend($driver, Closure $callback)
     {
         try {
-            $callback = $callback->bindTo($this, static::class) ?? throw new RuntimeException;
-        } catch (Throwable) {
-            $callback = $callback->bindTo(null, static::class);
+            $callback = $this->bindCallbackToSelf($callback) ?? throw new RuntimeException('Unable to bind custom driver callback');
+        } catch (ReflectionException $e) {
+            throw new RuntimeException('Unable to bind custom driver callback', previous: $e);
         }
 
         $this->customCreators[$driver] = $callback;

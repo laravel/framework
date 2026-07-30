@@ -170,7 +170,7 @@ class Frame
      */
     public function args()
     {
-        if (! isset($this->frame['args']) || ! is_array($this->frame['args']) || count($this->frame['args']) === 0) {
+        if (! isset($this->frame['args']) || ! is_array($this->frame['args']) || $this->frame['args'] === []) {
             return [];
         }
 

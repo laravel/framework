@@ -462,7 +462,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function json($key = null, $default = null)
     {
         if (! isset($this->json)) {
-            $this->json = new InputBag((array) json_decode($this->getContent() ?: '[]', true));
+            $content = $this->getContent();
+
+            $this->json = new InputBag((array) json_decode(trim($content) === '' ? '[]' : $content, true));
         }
 
         if (is_null($key)) {
@@ -546,7 +548,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $newRequest->content = $request->content;
 
         if ($newRequest->isJson()) {
-            $newRequest->request = $newRequest->json();
+            $newRequest->request->replace($newRequest->json()->all());
+            $newRequest->setJson($newRequest->request);
         }
 
         return $newRequest;

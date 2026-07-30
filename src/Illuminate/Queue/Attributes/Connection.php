@@ -5,6 +5,8 @@ namespace Illuminate\Queue\Attributes;
 use Attribute;
 use UnitEnum;
 
+use function Illuminate\Support\enum_value;
+
 #[Attribute(Attribute::TARGET_CLASS)]
 class Connection
 {
@@ -15,6 +17,6 @@ class Connection
      */
     public function __construct(public UnitEnum|string $connection)
     {
-        //
+        $this->connection = enum_value($connection);
     }
 }

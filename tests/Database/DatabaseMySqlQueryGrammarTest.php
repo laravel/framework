@@ -52,7 +52,7 @@ class DatabaseMySqlQueryGrammarTest extends TestCase
         $builder->from('users')->timeout(10);
         $builder->aggregate = ['function' => 'count', 'columns' => ['*']];
         $this->assertSame(
-            'select /*+ MAX_EXECUTION_TIME(10000) */ count(*) as aggregate from `users`',
+            'select /*+ MAX_EXECUTION_TIME(10000) */ count(*) as `aggregate` from `users`',
             $builder->toSql()
         );
     }

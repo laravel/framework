@@ -237,7 +237,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testFunnelThrowsExceptionWhenStoreDoesNotSupportLocks()
     {
-        $store = $this->createMock(Store::class);
+        $store = $this->createStub(Store::class);
         $repository = new Repository($store);
 
         $this->assertNotInstanceOf(LockProvider::class, $store);

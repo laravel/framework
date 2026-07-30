@@ -21,6 +21,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
     public function __construct(
         protected Repository $cache,
         protected HasherContract $hasher,
+        #[\SensitiveParameter]
         protected string $hashKey,
         protected int $expires = 3600,
         protected int $throttle = 60,

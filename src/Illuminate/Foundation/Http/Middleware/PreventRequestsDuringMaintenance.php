@@ -72,7 +72,7 @@ class PreventRequestsDuringMaintenance
                 throw $exception;
             }
 
-            if (isset($data['secret']) && $request->path() === $data['secret']) {
+            if (is_string($data['secret'] ?? null) && hash_equals($data['secret'], $request->path())) {
                 return $this->bypassResponse($data['secret']);
             }
 
@@ -80,7 +80,7 @@ class PreventRequestsDuringMaintenance
                 return $next($request);
             }
 
-            if (isset($data['redirect'])) {
+            if (isset($data['redirect']) && ! $request->expectsJson()) {
                 $path = $data['redirect'] === '/'
                     ? $data['redirect']
                     : trim($data['redirect'], '/');
@@ -90,7 +90,7 @@ class PreventRequestsDuringMaintenance
                 }
             }
 
-            if (isset($data['template'])) {
+            if (isset($data['template']) && ! $request->expectsJson()) {
                 return response(
                     $data['template'],
                     $data['status'] ?? 503,

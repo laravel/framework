@@ -7,6 +7,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
+use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Collection;
@@ -273,7 +274,7 @@ class Blueprint
     {
         foreach ($this->columns as $column) {
             foreach ($this->grammar->getFluentCommands() as $commandName) {
-                $this->addCommand($commandName, compact('column'));
+                $this->addCommand($commandName, ['column' => $column]);
             }
         }
     }
@@ -422,7 +423,7 @@ class Blueprint
     {
         $columns = is_array($columns) ? $columns : func_get_args();
 
-        return $this->addCommand('dropColumn', compact('columns'));
+        return $this->addCommand('dropColumn', ['columns' => $columns]);
     }
 
     /**
@@ -434,7 +435,7 @@ class Blueprint
      */
     public function renameColumn($from, $to)
     {
-        return $this->addCommand('renameColumn', compact('from', 'to'));
+        return $this->addCommand('renameColumn', ['from' => $from, 'to' => $to]);
     }
 
     /**
@@ -557,7 +558,7 @@ class Blueprint
      */
     public function renameIndex($from, $to)
     {
-        return $this->addCommand('renameIndex', compact('from', 'to'));
+        return $this->addCommand('renameIndex', ['from' => $from, 'to' => $to]);
     }
 
     /**
@@ -634,7 +635,7 @@ class Blueprint
      */
     public function rename($to)
     {
-        return $this->addCommand('rename', compact('to'));
+        return $this->addCommand('rename', ['to' => $to]);
     }
 
     /**
@@ -711,7 +712,11 @@ class Blueprint
      */
     public function vectorIndex($column, $name = null)
     {
-        return $this->indexCommand('vectorIndex', $column, $name, 'hnsw', 'vector_cosine_ops');
+        [$algorithm, $operatorClass] = $this->grammar instanceof MariaDbGrammar
+            ? [null, 'M=6 DISTANCE=cosine']
+            : ['hnsw', 'vector_cosine_ops'];
+
+        return $this->indexCommand('vectorIndex', $column, $name, $algorithm, $operatorClass);
     }
 
     /**
@@ -832,7 +837,7 @@ class Blueprint
     {
         $length = ! is_null($length) ? $length : Builder::$defaultStringLength;
 
-        return $this->addColumn('char', $column, compact('length'));
+        return $this->addColumn('char', $column, ['length' => $length]);
     }
 
     /**
@@ -846,7 +851,7 @@ class Blueprint
     {
         $length = $length ?: Builder::$defaultStringLength;
 
-        return $this->addColumn('string', $column, compact('length'));
+        return $this->addColumn('string', $column, ['length' => $length]);
     }
 
     /**
@@ -904,7 +909,7 @@ class Blueprint
      */
     public function integer($column, $autoIncrement = false, $unsigned = false)
     {
-        return $this->addColumn('integer', $column, compact('autoIncrement', 'unsigned'));
+        return $this->addColumn('integer', $column, ['autoIncrement' => $autoIncrement, 'unsigned' => $unsigned]);
     }
 
     /**
@@ -918,7 +923,7 @@ class Blueprint
      */
     public function tinyInteger($column, $autoIncrement = false, $unsigned = false)
     {
-        return $this->addColumn('tinyInteger', $column, compact('autoIncrement', 'unsigned'));
+        return $this->addColumn('tinyInteger', $column, ['autoIncrement' => $autoIncrement, 'unsigned' => $unsigned]);
     }
 
     /**
@@ -932,7 +937,7 @@ class Blueprint
      */
     public function smallInteger($column, $autoIncrement = false, $unsigned = false)
     {
-        return $this->addColumn('smallInteger', $column, compact('autoIncrement', 'unsigned'));
+        return $this->addColumn('smallInteger', $column, ['autoIncrement' => $autoIncrement, 'unsigned' => $unsigned]);
     }
 
     /**
@@ -946,7 +951,7 @@ class Blueprint
      */
     public function mediumInteger($column, $autoIncrement = false, $unsigned = false)
     {
-        return $this->addColumn('mediumInteger', $column, compact('autoIncrement', 'unsigned'));
+        return $this->addColumn('mediumInteger', $column, ['autoIncrement' => $autoIncrement, 'unsigned' => $unsigned]);
     }
 
     /**
@@ -960,7 +965,7 @@ class Blueprint
      */
     public function bigInteger($column, $autoIncrement = false, $unsigned = false)
     {
-        return $this->addColumn('bigInteger', $column, compact('autoIncrement', 'unsigned'));
+        return $this->addColumn('bigInteger', $column, ['autoIncrement' => $autoIncrement, 'unsigned' => $unsigned]);
     }
 
     /**
@@ -1072,6 +1077,24 @@ class Blueprint
     }
 
     /**
+     * Create a foreign UUID column for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignUuidFor($model, $column = null)
+    {
+        if (is_string($model)) {
+            $model = new $model;
+        }
+
+        return $this->foreignUuid($column ?: $model->getForeignKey())
+            ->table($model->getTable())
+            ->referencesModelColumn($model->getKeyName());
+    }
+
+    /**
      * Create a new float column on the table.
      *
      * @param  string  $column
@@ -1080,7 +1103,7 @@ class Blueprint
      */
     public function float($column, $precision = 53)
     {
-        return $this->addColumn('float', $column, compact('precision'));
+        return $this->addColumn('float', $column, ['precision' => $precision]);
     }
 
     /**
@@ -1104,7 +1127,7 @@ class Blueprint
      */
     public function decimal($column, $total = 8, $places = 2)
     {
-        return $this->addColumn('decimal', $column, compact('total', 'places'));
+        return $this->addColumn('decimal', $column, ['total' => $total, 'places' => $places]);
     }
 
     /**
@@ -1129,7 +1152,7 @@ class Blueprint
     {
         $allowed = array_map(fn ($value) => enum_value($value), $allowed);
 
-        return $this->addColumn('enum', $column, compact('allowed'));
+        return $this->addColumn('enum', $column, ['allowed' => $allowed]);
     }
 
     /**
@@ -1141,7 +1164,7 @@ class Blueprint
      */
     public function set($column, array $allowed)
     {
-        return $this->addColumn('set', $column, compact('allowed'));
+        return $this->addColumn('set', $column, ['allowed' => $allowed]);
     }
 
     /**
@@ -1188,7 +1211,7 @@ class Blueprint
     {
         $precision ??= $this->defaultTimePrecision();
 
-        return $this->addColumn('dateTime', $column, compact('precision'));
+        return $this->addColumn('dateTime', $column, ['precision' => $precision]);
     }
 
     /**
@@ -1202,7 +1225,7 @@ class Blueprint
     {
         $precision ??= $this->defaultTimePrecision();
 
-        return $this->addColumn('dateTimeTz', $column, compact('precision'));
+        return $this->addColumn('dateTimeTz', $column, ['precision' => $precision]);
     }
 
     /**
@@ -1216,7 +1239,7 @@ class Blueprint
     {
         $precision ??= $this->defaultTimePrecision();
 
-        return $this->addColumn('time', $column, compact('precision'));
+        return $this->addColumn('time', $column, ['precision' => $precision]);
     }
 
     /**
@@ -1230,7 +1253,7 @@ class Blueprint
     {
         $precision ??= $this->defaultTimePrecision();
 
-        return $this->addColumn('timeTz', $column, compact('precision'));
+        return $this->addColumn('timeTz', $column, ['precision' => $precision]);
     }
 
     /**
@@ -1244,7 +1267,7 @@ class Blueprint
     {
         $precision ??= $this->defaultTimePrecision();
 
-        return $this->addColumn('timestamp', $column, compact('precision'));
+        return $this->addColumn('timestamp', $column, ['precision' => $precision]);
     }
 
     /**
@@ -1258,7 +1281,7 @@ class Blueprint
     {
         $precision ??= $this->defaultTimePrecision();
 
-        return $this->addColumn('timestampTz', $column, compact('precision'));
+        return $this->addColumn('timestampTz', $column, ['precision' => $precision]);
     }
 
     /**
@@ -1386,7 +1409,7 @@ class Blueprint
      */
     public function binary($column, $length = null, $fixed = false)
     {
-        return $this->addColumn('binary', $column, compact('length', 'fixed'));
+        return $this->addColumn('binary', $column, ['length' => $length, 'fixed' => $fixed]);
     }
 
     /**
@@ -1401,7 +1424,7 @@ class Blueprint
     }
 
     /**
-     * Create a new UUID column on the table with a foreign key constraint.
+     * Create a new UUID foreign ID column on the table.
      *
      * @param  string  $column
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
@@ -1427,7 +1450,7 @@ class Blueprint
     }
 
     /**
-     * Create a new ULID column on the table with a foreign key constraint.
+     * Create a new ULID foreign ID column on the table.
      *
      * @param  string  $column
      * @param  int|null  $length
@@ -1474,7 +1497,7 @@ class Blueprint
      */
     public function geometry($column, $subtype = null, $srid = 0)
     {
-        return $this->addColumn('geometry', $column, compact('subtype', 'srid'));
+        return $this->addColumn('geometry', $column, ['subtype' => $subtype, 'srid' => $srid]);
     }
 
     /**
@@ -1487,7 +1510,7 @@ class Blueprint
      */
     public function geography($column, $subtype = null, $srid = 4326)
     {
-        return $this->addColumn('geography', $column, compact('subtype', 'srid'));
+        return $this->addColumn('geography', $column, ['subtype' => $subtype, 'srid' => $srid]);
     }
 
     /**
@@ -1499,7 +1522,7 @@ class Blueprint
      */
     public function computed($column, $expression)
     {
-        return $this->addColumn('computed', $column, compact('expression'));
+        return $this->addColumn('computed', $column, ['expression' => $expression]);
     }
 
     /**
@@ -1511,7 +1534,7 @@ class Blueprint
      */
     public function vector($column, $dimensions = null)
     {
-        $options = $dimensions ? compact('dimensions') : [];
+        $options = $dimensions ? ['dimensions' => $dimensions] : [];
 
         return $this->addColumn('vector', $column, $options);
     }
@@ -1704,7 +1727,7 @@ class Blueprint
      */
     public function rawColumn($column, $definition)
     {
-        return $this->addColumn('raw', $column, compact('definition'));
+        return $this->addColumn('raw', $column, ['definition' => $definition]);
     }
 
     /**
@@ -1715,7 +1738,7 @@ class Blueprint
      */
     public function comment($comment)
     {
-        return $this->addCommand('tableComment', compact('comment'));
+        return $this->addCommand('tableComment', ['comment' => $comment]);
     }
 
     /**
@@ -1738,7 +1761,7 @@ class Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
-            $type, compact('index', 'columns', 'algorithm', 'operatorClass')
+            $type, ['index' => $index, 'columns' => $columns, 'algorithm' => $algorithm, 'operatorClass' => $operatorClass]
         );
     }
 
@@ -1797,7 +1820,7 @@ class Blueprint
     public function addColumn($type, $name, array $parameters = [])
     {
         return $this->addColumnDefinition(new ColumnDefinition(
-            array_merge(compact('type', 'name'), $parameters)
+            array_merge(['type' => $type, 'name' => $name], $parameters)
         ));
     }
 
@@ -1882,7 +1905,7 @@ class Blueprint
      */
     protected function createCommand($name, array $parameters = [])
     {
-        return new Fluent(array_merge(compact('name'), $parameters));
+        return new Fluent(array_merge(['name' => $name], $parameters));
     }
 
     /**

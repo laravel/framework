@@ -59,9 +59,7 @@ class ArrayType extends Type
      */
     public function unique(bool $unique = true): static
     {
-        if ($unique) {
-            $this->uniqueItems = true;
-        }
+        $this->uniqueItems = $unique ?: null;
 
         return $this;
     }

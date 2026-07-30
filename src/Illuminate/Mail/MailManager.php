@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
 use Illuminate\Mail\Transport\ArrayTransport;
+use Illuminate\Mail\Transport\CloudflareTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\ResendTransport;
 use Illuminate\Mail\Transport\SesTransport;
@@ -28,6 +29,8 @@ use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @mixin \Illuminate\Mail\Mailer
@@ -68,12 +71,12 @@ class MailManager implements FactoryContract
     /**
      * Get a mailer instance by name.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Contracts\Mail\Mailer
      */
     public function mailer($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name = enum_value($name) ?: $this->getDefaultDriver();
 
         return $this->mailers[$name] = $this->get($name);
     }
@@ -81,7 +84,7 @@ class MailManager implements FactoryContract
     /**
      * Get a mailer driver instance.
      *
-     * @param  string|null  $driver
+     * @param  \UnitEnum|string|null  $driver
      * @return \Illuminate\Mail\Mailer
      */
     public function driver($driver = null)
@@ -322,6 +325,25 @@ class MailManager implements FactoryContract
     }
 
     /**
+     * Create an instance of the Cloudflare Transport driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Mail\Transport\CloudflareTransport
+     */
+    protected function createCloudflareTransport(array $config)
+    {
+        return new CloudflareTransport(
+            $config['account_id'] ??
+                $this->app['config']->get('services.cloudflare.account_id'),
+            $config['token'] ??
+                $config['key'] ??
+                $this->app['config']->get('services.cloudflare.token') ??
+                $this->app['config']->get('services.cloudflare.key'),
+            $this->getHttpClient($config),
+        );
+    }
+
+    /**
      * Create an instance of the Symfony Mail Transport driver.
      *
      * @return \Symfony\Component\Mailer\Transport\SendmailTransport
@@ -492,7 +514,7 @@ class MailManager implements FactoryContract
         $address = Arr::get($config, $type, $this->app['config']['mail.'.$type]);
 
         if (is_array($address) && isset($address['address'])) {
-            $mailer->{'always'.Str::studly($type)}($address['address'], $address['name']);
+            $mailer->{'always'.Str::studly($type)}($address['address'], $address['name'] ?? null);
         }
     }
 
@@ -537,11 +559,13 @@ class MailManager implements FactoryContract
     /**
      * Set the default mail driver name.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @return void
      */
-    public function setDefaultDriver(string $name)
+    public function setDefaultDriver($name)
     {
+        $name = enum_value($name);
+
         if ($this->app['config']['mail.driver']) {
             $this->app['config']['mail.driver'] = $name;
         }
@@ -552,12 +576,12 @@ class MailManager implements FactoryContract
     /**
      * Disconnect the given mailer and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return void
      */
     public function purge($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name = enum_value($name) ?: $this->getDefaultDriver();
 
         unset($this->mailers[$name]);
     }

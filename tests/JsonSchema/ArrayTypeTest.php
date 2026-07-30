@@ -67,6 +67,15 @@ class ArrayTypeTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_may_unset_unique_items(): void
+    {
+        $type = JsonSchema::array()->unique()->unique(false);
+
+        $this->assertEquals([
+            'type' => 'array',
+        ], $type->toArray());
+    }
+
     public function test_it_may_combine_unique_items_with_min_and_max(): void
     {
         $type = JsonSchema::array()->min(1)->max(5)->unique();

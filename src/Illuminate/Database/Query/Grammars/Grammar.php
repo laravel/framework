@@ -139,7 +139,7 @@ class Grammar extends BaseGrammar
             $column = 'distinct '.$column;
         }
 
-        return 'select '.$aggregate['function'].'('.$column.') as aggregate';
+        return 'select '.$aggregate['function'].'('.$column.') as '.$this->wrap('aggregate');
     }
 
     /**
@@ -585,7 +585,9 @@ class Grammar extends BaseGrammar
      */
     protected function whereColumn(Builder $query, $where)
     {
-        return $this->wrap($where['first']).' '.$where['operator'].' '.$this->wrap($where['second']);
+        $operator = str_replace('?', '??', $where['operator']);
+
+        return $this->wrap($where['first']).' '.$operator.' '.$this->wrap($where['second']);
     }
 
     /**

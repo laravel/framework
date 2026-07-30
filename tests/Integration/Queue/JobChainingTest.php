@@ -653,7 +653,7 @@ class JobChainingTest extends QueueTestCase
                 $chain->onConnection('sync2');
             });
 
-        $this->assertEquals('sync2', $chain->connection);
+        $this->assertSame('sync2', $chain->connection);
 
         $chain = Bus::chain([])
             ->onConnection('sync1')
@@ -661,7 +661,7 @@ class JobChainingTest extends QueueTestCase
                 $chain->onConnection('sync2');
             });
 
-        $this->assertEquals('sync1', $chain->connection);
+        $this->assertSame('sync1', $chain->connection);
     }
 
     public function testBatchConditionable()
@@ -672,14 +672,14 @@ class JobChainingTest extends QueueTestCase
                 $batch->onConnection('sync2');
             });
 
-        $this->assertEquals('sync2', $batch->connection());
+        $this->assertSame('sync2', $batch->connection());
         $batch = Bus::batch([])
             ->onConnection('sync1')
             ->when(false, function (PendingBatch $batch) {
                 $batch->onConnection('sync2');
             });
 
-        $this->assertEquals('sync1', $batch->connection());
+        $this->assertSame('sync1', $batch->connection());
     }
 
     public function testJobsAreChainedWhenDispatchIfIsTrue()

@@ -15,7 +15,7 @@ class InteractsWithQueueTest extends TestCase
         $queueJob = m::mock(Job::class);
         $queueJob->shouldReceive('fail')->withArgs(function ($e) {
             $this->assertInstanceOf(Exception::class, $e);
-            $this->assertEquals('Whoops!', $e->getMessage());
+            $this->assertSame('Whoops!', $e->getMessage());
 
             return true;
         });

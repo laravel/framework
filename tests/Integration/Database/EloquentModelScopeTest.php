@@ -28,6 +28,13 @@ class EloquentModelScopeTest extends DatabaseTestCase
 
         $this->assertTrue($model->hasNamedScope('existsAsWell'));
     }
+
+    public function testModelDoesNotHaveScopeWhenPrivateVisibility()
+    {
+        $model = new TestScopeModel1;
+
+        $this->assertFalse($model->hasNamedScope('existsAsPrivate'));
+    }
 }
 
 class TestScopeModel1 extends Model
@@ -39,6 +46,12 @@ class TestScopeModel1 extends Model
 
     #[Scope]
     protected function existsAsWell(Builder $builder)
+    {
+        return $builder;
+    }
+
+    #[Scope]
+    private function existsAsPrivate(Builder $builder)
     {
         return $builder;
     }

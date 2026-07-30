@@ -26,7 +26,7 @@ trait FileHelpers
     /**
      * Get the file's extension.
      *
-     * @return string
+     * @return string|null
      */
     public function extension()
     {

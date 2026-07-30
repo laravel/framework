@@ -116,6 +116,7 @@ class Composer
      * @param  callable(array<string, mixed>):array<string, mixed>  $callback
      * @return void
      *
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     public function modify(callable $callback)

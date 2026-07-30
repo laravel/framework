@@ -11,6 +11,7 @@ use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Container\SelfBuilding;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -18,6 +19,15 @@ use TypeError;
 
 class ContainerTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (version_compare(PHP_VERSION, '8.5.0', '>=')) {
+            require_once __DIR__.'/Fixtures/ContainerBindWhenFixtures.php';
+        }
+    }
+
     protected function tearDown(): void
     {
         Container::setInstance(null);
@@ -327,7 +337,7 @@ class ContainerTest extends TestCase
         $container = new Container;
         $instance = $container->make(ContainerClassWithDefaultValueStub::class);
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->noDefault);
-        $this->assertSame(null, $instance->default);
+        $this->assertNull($instance->default);
 
         $container->bind(ContainerConcreteStub::class, fn () => new ContainerConcreteStub);
         $instance = $container->make(ContainerClassWithDefaultValueStub::class);
@@ -661,7 +671,7 @@ class ContainerTest extends TestCase
             return $config;
         });
 
-        $this->assertEquals([], $container->make('foo', ['something']));
+        $this->assertSame([], $container->make('foo', ['something']));
     }
 
     public function testSingletonBindingsNotRespectedWithMakeParameters()
@@ -817,6 +827,23 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(WildcardConcrete::class, $instance);
     }
 
+    public function testBindAttributeIsRecheckedAfterEnvironmentResolverIsSet(): void
+    {
+        $container = new Container;
+
+        try {
+            $container->make(WildcardOnlyInterface::class);
+
+            $this->fail('Expected binding resolution to fail without an environment resolver.');
+        } catch (BindingResolutionException) {
+            // Continue after the expected first resolution failure.
+        }
+
+        $container->resolveEnvironmentUsing(fn () => true);
+
+        $this->assertInstanceOf(WildcardConcrete::class, $container->make(WildcardOnlyInterface::class));
+    }
+
     public function testChecksForMoreSpecificEnvironmentBeforeFallingBackToDefault(): void
     {
         $container = new Container;
@@ -875,6 +902,70 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(DevConcrete::class, $second);
     }
 
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenBindsFirstConditionThatPasses(): void
+    {
+        $container = new Container;
+
+        $instance = $container->make(BindWhenInterface::class);
+
+        $this->assertInstanceOf(BindWhenTrueConcrete::class, $instance);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenSingletonAttribute(): void
+    {
+        $container = new Container;
+
+        $first = $container->make(BindWhenSingletonInterface::class);
+        $second = $container->make(BindWhenSingletonInterface::class);
+
+        $this->assertInstanceOf(BindWhenSingletonConcrete::class, $first);
+        $this->assertSame($first, $second);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenThrowsWhenNoConditionPasses(): void
+    {
+        $this->expectException(BindingResolutionException::class);
+
+        $container = new Container;
+        $container->make(BindWhenNoMatchInterface::class);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenTakesPrecedenceOverBind(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => true);
+
+        $instance = $container->make(BindWhenAndBindInterface::class);
+
+        $this->assertInstanceOf(BindWhenWinsConcrete::class, $instance);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenFallsThroughToBind(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => true);
+
+        $instance = $container->make(BindWhenFallbackInterface::class);
+
+        $this->assertInstanceOf(BindFallbackConcrete::class, $instance);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindAndBindWhenResolveInDeclarationOrder(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => in_array('foobar', (array) $environments));
+
+        $instance = $container->make(BindBeforeBindWhenInterface::class);
+
+        $this->assertInstanceOf(BindBeforeConcrete::class, $instance);
+    }
+
     public function testNoMatchingEnvironmentAndNoWildcardThrowsBindingResolutionException(): void
     {
         $this->expectException(BindingResolutionException::class);
@@ -920,7 +1011,7 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(RequestDto::class, $r);
         $this->assertEquals(999, $r->userId);
-        $this->assertEquals('taylor@laravel.com', $r->email);
+        $this->assertSame('taylor@laravel.com', $r->email);
     }
 
     // public function testContainerCanCatchCircularDependency()
@@ -1118,9 +1209,7 @@ class WildcardConcrete implements WildcardOnlyInterface
 {
 }
 
-/*
- * The order of these attributes matters because we want to ensure we only fallback to '*' when there's no more specific environment.
- */
+// The order of these attributes matters because we want to ensure we only fallback to '*' when there's no more specific environment.
 #[Bind(FallbackConcrete::class)]
 #[Bind(ProdConcrete::class, environments: 'prod')]
 interface WildcardAndProdInterface

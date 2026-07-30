@@ -43,7 +43,7 @@ class UniqueLock
             ? ($job->uniqueVia() ?? $this->cache)
             : $this->cache;
 
-        return (bool) $cache->lock($this->getKey($job), $uniqueFor)->get();
+        return (bool) $cache->lock(self::getKey($job), $uniqueFor)->get();
     }
 
     /**
@@ -58,7 +58,7 @@ class UniqueLock
             ? ($job->uniqueVia() ?? $this->cache)
             : $this->cache;
 
-        $cache->lock($this->getKey($job))->forceRelease();
+        $cache->lock(self::getKey($job))->forceRelease();
     }
 
     /**

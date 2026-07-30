@@ -398,7 +398,7 @@ trait HasEvents
     /**
      * Get the event map for the model.
      *
-     * @return array
+     * @return array<string, class-string>
      */
     public function dispatchesEvents()
     {
@@ -439,8 +439,10 @@ trait HasEvents
     /**
      * Execute a callback without firing any model events for any model type.
      *
-     * @param  callable  $callback
-     * @return mixed
+     * @template TReturn
+     *
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
      */
     public static function withoutEvents(callable $callback)
     {

@@ -11,6 +11,7 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use JsonSerializable;
 use Random\Randomizer;
+use SortDirection;
 use Traversable;
 use WeakMap;
 
@@ -328,6 +329,12 @@ class Arr
      */
     public static function last($array, ?callable $callback = null, $default = null)
     {
+        if ($array === null) {
+            return value($default);
+        }
+
+        $array = static::from($array);
+
         if (is_null($callback)) {
             return empty($array) ? value($default) : array_last($array);
         }
@@ -412,7 +419,7 @@ class Arr
 
         $keys = (array) $keys;
 
-        if (count($keys) === 0) {
+        if ($keys === []) {
             return;
         }
 
@@ -555,13 +562,7 @@ class Arr
             return false;
         }
 
-        foreach ($keys as $key) {
-            if (! static::has($array, $key)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($keys, fn ($key) => static::has($array, $key));
     }
 
     /**
@@ -587,13 +588,7 @@ class Arr
             return false;
         }
 
-        foreach ($keys as $key) {
-            if (static::has($array, $key)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($keys, fn ($key) => static::has($array, $key));
     }
 
     /**
@@ -605,7 +600,17 @@ class Arr
      */
     public static function every($array, callable $callback)
     {
-        return array_all($array, $callback);
+        if (is_array($array)) {
+            return array_all($array, $callback);
+        }
+
+        foreach ($array as $key => $value) {
+            if (! $callback($value, $key)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -617,7 +622,17 @@ class Arr
      */
     public static function some($array, callable $callback)
     {
-        return array_any($array, $callback);
+        if (is_array($array)) {
+            return array_any($array, $callback);
+        }
+
+        foreach ($array as $key => $value) {
+            if ($callback($value, $key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -947,7 +962,7 @@ class Arr
      * @param  array  $array
      * @param  int|null  $number
      * @param  bool  $preserveKeys
-     * @return mixed
+     * @return ($number is null ? mixed : array)
      *
      * @throws \InvalidArgumentException
      */
@@ -1091,7 +1106,7 @@ class Arr
      * @template TValue
      *
      * @param  iterable<TKey, TValue>  $array
-     * @param  callable|string|null|array<int, (callable(TValue, TValue): -1|0|1)|array{string, 'asc'|'desc'}>  $callback
+     * @param  callable|string|null|array<int, (callable(TValue, TValue): -1|0|1)|array{string, SortDirection|'asc'|'desc'}>  $callback
      * @return array<TKey, TValue>
      */
     public static function sort($array, $callback = null)
@@ -1122,7 +1137,7 @@ class Arr
      *
      * @param  array<TKey, TValue>  $array
      * @param  int-mask-of<SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_LOCALE_STRING|SORT_NATURAL|SORT_FLAG_CASE>  $options
-     * @param  bool  $descending
+     * @param  SortDirection|bool  $descending
      * @return array<TKey, TValue>
      */
     public static function sortRecursive($array, $options = SORT_REGULAR, $descending = false)
@@ -1134,13 +1149,15 @@ class Arr
         }
 
         if (! array_is_list($array)) {
-            $descending
-                ? krsort($array, $options)
-                : ksort($array, $options);
+            match ($descending) {
+                false, SortDirection::Ascending => ksort($array, $options),
+                true, SortDirection::Descending => krsort($array, $options),
+            };
         } else {
-            $descending
-                ? rsort($array, $options)
-                : sort($array, $options);
+            match ($descending) {
+                false, SortDirection::Ascending => sort($array, $options),
+                true, SortDirection::Descending => rsort($array, $options),
+            };
         }
 
         return $array;
@@ -1158,7 +1175,7 @@ class Arr
      */
     public static function sortRecursiveDesc($array, $options = SORT_REGULAR)
     {
-        return static::sortRecursive($array, $options, true);
+        return static::sortRecursive($array, $options, SortDirection::Descending);
     }
 
     /**

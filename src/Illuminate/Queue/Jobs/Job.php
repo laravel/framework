@@ -199,7 +199,7 @@ abstract class Job
 
             try {
                 $batchRepository->rollBack();
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 // ...
             }
         }

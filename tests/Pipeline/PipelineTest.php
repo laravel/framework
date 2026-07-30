@@ -210,8 +210,7 @@ class PipelineTest extends TestCase
         $this->assertSame('pipe::then::not_foo::', $result);
         $this->assertSame('::not_foo::', $_SERVER['__test.then.arg']);
 
-        unset($_SERVER['__test.then.arg']);
-        unset($_SERVER['__test.pipe.return']);
+        unset($_SERVER['__test.then.arg'], $_SERVER['__test.pipe.return']);
     }
 
     public function testPipelineUsageWithParameters()
@@ -329,7 +328,7 @@ class PipelineTest extends TestCase
                 return $piped;
             });
 
-        $this->assertSame(null, $result);
+        $this->assertNull($result);
         $this->assertSame('foo', $_SERVER['__test.pipe.one']);
         $this->assertSame('foo', $_SERVER['__test.pipe.two']);
         $this->assertSame('foo', $_SERVER['__test.pipe.finally']);
@@ -353,7 +352,7 @@ class PipelineTest extends TestCase
                 return $piped;
             });
 
-        $this->assertSame(null, $result);
+        $this->assertNull($result);
         $this->assertSame('foo', $_SERVER['__test.pipe.one']);
         $this->assertSame('foo', $_SERVER['__test.pipe.two']);
         $this->assertSame('foo', $_SERVER['__test.pipe.finally']);

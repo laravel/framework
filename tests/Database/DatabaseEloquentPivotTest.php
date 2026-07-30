@@ -69,7 +69,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
 
-        $this->assertEquals([], $pivot->getDirty());
+        $this->assertSame([], $pivot->getDirty());
     }
 
     public function testPropertiesChangedAreDirty()

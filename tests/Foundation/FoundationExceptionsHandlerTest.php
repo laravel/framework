@@ -14,6 +14,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithExceptionHandling;
@@ -264,6 +265,36 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('{"response":"My renderable exception response"}', $response);
     }
 
+    public function testShouldntRetryDefaultsToFalse()
+    {
+        $this->assertFalse($this->handler->shouldStopRetries(new CustomException));
+    }
+
+    public function testShouldntRetryUsesRegisteredExceptionClass()
+    {
+        $this->handler->dontRetry(CustomException::class);
+
+        $this->assertTrue($this->handler->shouldStopRetries(new CustomException));
+    }
+
+    public function testShouldntRetryUsesRegisteredCallback()
+    {
+        $this->handler->dontRetryWhen(function (CustomException $e) {
+            return true;
+        });
+
+        $this->assertTrue($this->handler->shouldStopRetries(new CustomException));
+    }
+
+    public function testShouldntRetryIgnoresFalseCallbackResult()
+    {
+        $this->handler->dontRetryWhen(function (CustomException $e) {
+            return false;
+        });
+
+        $this->assertFalse($this->handler->shouldStopRetries(new CustomException));
+    }
+
     public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
     {
         $response = $this->handler->render($this->request, new ResponsableException)->getContent();
@@ -391,6 +422,15 @@ class FoundationExceptionsHandlerTest extends TestCase
         $logger->shouldNotReceive('log');
 
         $this->handler->report(new RecordsNotFoundException);
+    }
+
+    public function testMultipleRecordsFoundIsReported()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error')->withArgs(['2 records were found.', m::hasKey('exception')])->once();
+
+        $this->handler->report(new MultipleRecordsFoundException(2));
     }
 
     public function testItReturnsSpecificErrorViewIfExists()
@@ -864,7 +904,7 @@ class FoundationExceptionsHandlerTest extends TestCase
                 return parent::attempt(...func_get_args());
             }
         });
-        Carbon::setTestNow(Carbon::now()->startOfDay());
+        Carbon::setTestNow(Carbon::today());
 
         for ($i = 0; $i < 100; $i++) {
             $handler->report(new Exception('Something in the app went wrong.'));

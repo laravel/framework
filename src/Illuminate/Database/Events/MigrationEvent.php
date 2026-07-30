@@ -22,14 +22,23 @@ abstract class MigrationEvent implements MigrationEventContract
     public $method;
 
     /**
+     * The migration name.
+     *
+     * @var string|null
+     */
+    public $name;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Database\Migrations\Migration  $migration
      * @param  string  $method
+     * @param  string|null  $name
      */
-    public function __construct(Migration $migration, $method)
+    public function __construct(Migration $migration, $method, $name = null)
     {
         $this->method = $method;
         $this->migration = $migration;
+        $this->name = $name;
     }
 }

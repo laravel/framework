@@ -5,9 +5,9 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Contracts\Auth\PasswordBroker;
 
 /**
- * @method static \Illuminate\Contracts\Auth\PasswordBroker broker(string|null $name = null)
+ * @method static \Illuminate\Contracts\Auth\PasswordBroker broker(\UnitEnum|string|null $name = null)
  * @method static string getDefaultDriver()
- * @method static void setDefaultDriver(string $name)
+ * @method static void setDefaultDriver(\UnitEnum|string $name)
  * @method static string sendResetLink(array $credentials, \Closure|null $callback = null)
  * @method static mixed reset(array $credentials, \Closure $callback)
  * @method static \Illuminate\Contracts\Auth\CanResetPassword|null getUser(array $credentials)

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
@@ -93,8 +94,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      */
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
-
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('comments');
@@ -321,6 +320,42 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(2, $users);
         $this->assertNull($users->find(1)->deleted_at);
         $this->assertNull($users->find(2)->deleted_at);
+    }
+
+    public function testRestoreDoesNotFireRestoredEventWhenSavingEventCancelsSave()
+    {
+        $previousDispatcher = Eloquent::getEventDispatcher();
+
+        Eloquent::setEventDispatcher(new Dispatcher);
+
+        try {
+            $this->createUsers();
+
+            $restored = false;
+
+            SoftDeletesTestUser::saving(function () {
+                return false;
+            });
+
+            SoftDeletesTestUser::restored(function () use (&$restored) {
+                $restored = true;
+            });
+
+            $user = SoftDeletesTestUser::withTrashed()->find(1);
+
+            $this->assertFalse($user->restore());
+            $this->assertFalse($restored);
+            $this->assertNotNull(SoftDeletesTestUser::withTrashed()->find(1)->deleted_at);
+            $this->assertNull(SoftDeletesTestUser::find(1));
+        } finally {
+            SoftDeletesTestUser::flushEventListeners();
+
+            if ($previousDispatcher) {
+                Eloquent::setEventDispatcher($previousDispatcher);
+            } else {
+                Eloquent::unsetEventDispatcher();
+            }
+        }
     }
 
     public function testOnlyTrashedOnlyReturnsTrashedRecords()

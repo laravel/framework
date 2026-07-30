@@ -84,6 +84,40 @@ class BroadcastEventTest extends TestCase
         (new BroadcastEvent($event))->handle($manager);
     }
 
+    public function testBroadcastAsStringIsUsedAsEventName()
+    {
+        $broadcaster = m::mock(Broadcaster::class);
+
+        $broadcaster->shouldReceive('broadcast')->once()->with(
+            ['test-channel'], 'custom-name', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
+        );
+
+        $manager = m::mock(BroadcastingFactory::class);
+
+        $manager->shouldReceive('connection')->once()->with(null)->andReturn($broadcaster);
+
+        $event = new TestBroadcastEventWithStringName;
+
+        (new BroadcastEvent($event))->handle($manager);
+    }
+
+    public function testBroadcastAsBackedEnumResolvesToValue()
+    {
+        $broadcaster = m::mock(Broadcaster::class);
+
+        $broadcaster->shouldReceive('broadcast')->once()->with(
+            ['test-channel'], 'custom-enum-name', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
+        );
+
+        $manager = m::mock(BroadcastingFactory::class);
+
+        $manager->shouldReceive('connection')->once()->with(null)->andReturn($broadcaster);
+
+        $event = new TestBroadcastEventWithEnumName;
+
+        (new BroadcastEvent($event))->handle($manager);
+    }
+
     public function testMiddlewareProxiesMiddlewareFromUnderlyingEvent()
     {
         $event = new class
@@ -134,6 +168,27 @@ class TestBroadcastEvent
     {
         return ['test-channel'];
     }
+}
+
+class TestBroadcastEventWithStringName extends TestBroadcastEvent
+{
+    public function broadcastAs()
+    {
+        return 'custom-name';
+    }
+}
+
+class TestBroadcastEventWithEnumName extends TestBroadcastEvent
+{
+    public function broadcastAs()
+    {
+        return TestBroadcastEventName::Custom;
+    }
+}
+
+enum TestBroadcastEventName: string
+{
+    case Custom = 'custom-enum-name';
 }
 
 class TestBroadcastEventWithManualData extends TestBroadcastEvent

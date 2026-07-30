@@ -892,8 +892,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         eval(" ?> $template <?php ");
         ob_get_clean();
 
-        $this->assertSame($attributes->get('userId'), 'bar');
-        $this->assertSame($attributes->get('other'), 'ok');
+        $this->assertSame('bar', $attributes->get('userId'));
+        $this->assertSame('ok', $attributes->get('other'));
     }
 
     public function testOriginalAttributesAreRestoredAfterRenderingChildComponentWithProps()
@@ -942,8 +942,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         eval(" ?> $template <?php ");
         ob_get_clean();
 
-        $this->assertSame($attributes->get('userId'), 'bar');
-        $this->assertSame($attributes->get('other'), 'ok');
+        $this->assertSame('bar', $attributes->get('userId'));
+        $this->assertSame('ok', $attributes->get('other'));
     }
 
     protected function mockViewFactory($existsSucceeds = true)

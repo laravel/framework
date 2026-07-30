@@ -17,13 +17,6 @@ class QueryDurationThresholdTest extends TestCase
      */
     protected $now;
 
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow(null);
-
-        parent::tearDown();
-    }
-
     public function testItCanHandleReachingADurationThresholdInTheDb()
     {
         $connection = new Connection(new PDO('sqlite::memory:'));

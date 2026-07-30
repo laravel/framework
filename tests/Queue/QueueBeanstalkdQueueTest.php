@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Container\Container;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\BeanstalkdQueue;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Support\Carbon;
@@ -52,7 +53,6 @@ class QueueBeanstalkdQueueTest extends TestCase
 
         $this->container->shouldHaveReceived('bound')->with('events')->times(4);
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -78,8 +78,17 @@ class QueueBeanstalkdQueueTest extends TestCase
 
         $this->container->shouldHaveReceived('bound')->with('events')->times(4);
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
+    }
+
+    public function testBulkRespectsDelayAttributeWhenPushingOntoBeanstalkd()
+    {
+        $this->setQueue('default', 60);
+        $pheanstalk = $this->queue->getPheanstalk();
+        $pheanstalk->shouldReceive('useTube')->once()->with(m::type(TubeName::class));
+        $pheanstalk->shouldReceive('put')->once()->with(m::type('string'), Pheanstalk::DEFAULT_PRIORITY, 15, Pheanstalk::DEFAULT_TTR);
+
+        $this->queue->bulk([new BeanstalkdJobWithDelayAttribute], ['data']);
     }
 
     public function testPopProperlyPopsJobOffOfBeanstalkd()
@@ -147,4 +156,9 @@ class QueueBeanstalkdQueueTest extends TestCase
         $this->container = m::spy(Container::class);
         $this->queue->setContainer($this->container);
     }
+}
+
+#[Delay(15)]
+class BeanstalkdJobWithDelayAttribute
+{
 }

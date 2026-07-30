@@ -47,7 +47,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
 
         $result = $connection->selectOne('SELECT COUNT(*) as total FROM test_1');
 
-        self::assertSame(1, $result->total);
+        $this->assertSame(1, $result->total);
     }
 
     public function testThrowExceptionIfConnectionAlreadyExists()
@@ -92,9 +92,9 @@ class DatabaseConnectionsTest extends DatabaseTestCase
         // longer be available. It's a new and fresh database
         $resultAfterOverride = $connection->select("SELECT name FROM sqlite_master WHERE type='table';");
 
-        self::assertSame('test_1', $resultBeforeOverride[0]->name);
+        $this->assertSame('test_1', $resultBeforeOverride[0]->name);
 
-        self::assertEmpty($resultAfterOverride);
+        $this->assertEmpty($resultAfterOverride);
     }
 
     public function testEstablishingAConnectionWillDispatchAnEvent()
@@ -116,13 +116,13 @@ class DatabaseConnectionsTest extends DatabaseTestCase
             'database' => ':memory:',
         ]);
 
-        self::assertInstanceOf(
+        $this->assertInstanceOf(
             ConnectionEstablished::class,
             $event,
             'Expected the ConnectionEstablished event to be dispatched when establishing a connection.'
         );
 
-        self::assertSame('my-phpunit-connection', $event->connectionName);
+        $this->assertSame('my-phpunit-connection', $event->connectionName);
     }
 
     public function testTablePrefix()

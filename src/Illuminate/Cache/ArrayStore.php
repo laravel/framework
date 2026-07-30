@@ -181,6 +181,14 @@ class ArrayStore extends TaggableStore implements CanFlushLocks, LockProvider
             return false;
         }
 
+        $expiresAt = $item['expiresAt'] ?? 0;
+
+        if ($expiresAt !== 0 && (Carbon::now()->getPreciseTimestamp(3) / 1000) >= $expiresAt) {
+            $this->forget($key);
+
+            return false;
+        }
+
         $item['expiresAt'] = $this->calculateExpiration($seconds);
 
         $this->storage = array_merge($this->storage, [$key => $item]);

@@ -181,13 +181,7 @@ class Dispatcher implements DispatcherContract
      */
     public function hasWildcardListeners($eventName)
     {
-        foreach ($this->wildcards as $key => $listeners) {
-            if (Str::is($key, $eventName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->wildcards, fn ($listeners, $key) => Str::is($key, $eventName));
     }
 
     /**
@@ -700,6 +694,8 @@ class Dispatcher implements DispatcherContract
      * @param  string  $method
      * @param  array  $arguments
      * @return array{TListener, mixed}
+     *
+     * @throws \ReflectionException
      */
     protected function createListenerAndJob($class, $method, $arguments)
     {
@@ -892,7 +888,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Gets the raw, unprepared listeners.
      *
-     * @return array
+     * @return array<string, callable|array|class-string|null>
      */
     public function getRawListeners()
     {

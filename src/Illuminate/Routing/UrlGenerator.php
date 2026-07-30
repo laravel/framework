@@ -483,16 +483,16 @@ class UrlGenerator implements UrlGeneratorContract
 
         $keys = is_array($keys) ? $keys : [$keys];
 
-        foreach ($keys as $key) {
-            if (hash_equals(
-                hash_hmac('sha256', $original, $key),
-                (string) $request->query('signature', '')
-            )) {
-                return true;
-            }
+        $signature = $request->query('signature');
+
+        if (! is_string($signature)) {
+            return false;
         }
 
-        return false;
+        return array_any($keys, fn ($key) => hash_equals(
+            hash_hmac('sha256', $original, $key),
+            $signature
+        ));
     }
 
     /**
@@ -504,6 +504,10 @@ class UrlGenerator implements UrlGeneratorContract
     public function signatureHasNotExpired(Request $request)
     {
         $expires = $request->query('expires');
+
+        if ($expires !== null && ! is_string($expires)) {
+            return false;
+        }
 
         return ! ($expires && Carbon::now()->getTimestamp() > $expires);
     }

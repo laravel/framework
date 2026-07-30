@@ -7,6 +7,14 @@ use PHPUnit\Framework\TestCase;
 
 class FoundationAliasLoaderTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        AliasLoader::setInstance(null);
+        AliasLoader::setFacadeNamespace('Facades\\');
+    }
+
     public function testLoaderCanBeCreatedAndRegisteredOnce()
     {
         $loader = AliasLoader::getInstance(['foo' => 'bar']);

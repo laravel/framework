@@ -25,9 +25,11 @@ class SqlServerConnection extends Connection
     /**
      * Execute a Closure within a transaction.
      *
-     * @param  \Closure  $callback
+     * @template TReturn
+     *
+     * @param  (\Closure(static): TReturn)  $callback
      * @param  int  $attempts
-     * @return mixed
+     * @return TReturn
      *
      * @throws \Throwable
      */
@@ -81,9 +83,9 @@ class SqlServerConnection extends Connection
      * @param  \Exception  $exception
      * @return bool
      */
-    protected function isUniqueConstraintError(Exception $exception)
+    protected function isUniqueConstraintError(Exception $exception): bool
     {
-        return (bool) preg_match('#Cannot insert duplicate key row in object#i', $exception->getMessage());
+        return (bool) preg_match('#Cannot insert duplicate key(?: row)? in object#i', $exception->getMessage());
     }
 
     /**

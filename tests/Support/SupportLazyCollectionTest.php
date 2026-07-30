@@ -278,7 +278,6 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertSame([1, 2, 3], $data);
 
         Sleep::fake(false);
-        Carbon::setTestNow();
     }
 
     public function testUniqueDoubleEnumeration()
@@ -509,8 +508,6 @@ class SupportLazyCollectionTest extends TestCase
             ],
             $output->all(),
         );
-
-        Carbon::setTestNow();
     }
 
     public function testRandomPreservesKeys()
@@ -530,5 +527,18 @@ class SupportLazyCollectionTest extends TestCase
         foreach ($keysWithPreserve as $key) {
             $this->assertContains($key, ['first', 'second', 'third']);
         }
+    }
+
+    public function testHasDoesNotCountDuplicateKeys()
+    {
+        $collection = LazyCollection::make(function () {
+            yield 'a' => 1;
+            yield 'a' => 2;
+            yield 'c' => 3;
+        });
+
+        $this->assertFalse($collection->has('a', 'b'));
+        $this->assertFalse($collection->has(['a', 'b']));
+        $this->assertTrue($collection->has('a'));
     }
 }

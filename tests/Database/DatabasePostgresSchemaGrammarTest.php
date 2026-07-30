@@ -1348,6 +1348,34 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
 
         $this->assertStringContainsString("where c.relname = 'table' and n.nspname = 'public'", $statement);
+        $this->assertStringContainsString('pg_catalog.pg_collation', $statement);
+        $this->assertStringContainsString('a.attgenerated as generated', $statement);
+    }
+
+    public function testCompileColumnsOnLegacyServer()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getServerVersion')->once()->andReturn('8.0.2');
+
+        $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
+
+        $this->assertStringContainsString("where c.relname = 'table' and n.nspname = 'public'", $statement);
+        $this->assertStringContainsString('null as collation', $statement);
+        $this->assertStringContainsString("'' as generated", $statement);
+        $this->assertStringNotContainsString('pg_catalog.pg_collation', $statement);
+        $this->assertStringNotContainsString('a.attgenerated', $statement);
+    }
+
+    public function testAddUsingKeywordToColumnOnChange()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'currency_rates');
+        $blueprint->date('name')->using('name::date')->change();
+        $statements = $blueprint->toSql();
+
+        $this->assertSame(
+            'alter table "currency_rates" alter column "name" type date using name::date, alter column "name" set not null, alter column "name" drop default, alter column "name" drop identity if exists',
+            $statements[0]
+        );
     }
 
     protected function getConnection(

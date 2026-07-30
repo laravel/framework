@@ -54,6 +54,27 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame('property_table', $model->getTable());
     }
 
+    public function test_child_table_attribute_overrides_inherited_table_property(): void
+    {
+        $model = new ChildModelWithTableAttribute;
+
+        $this->assertSame('child_attr', $model->getTable());
+    }
+
+    public function test_child_inherits_parent_table_attribute(): void
+    {
+        $model = new ChildModelWithNoTable;
+
+        $this->assertSame('parent_attr', $model->getTable());
+    }
+
+    public function test_child_table_property_overrides_parent_table_attribute(): void
+    {
+        $model = new ChildModelWithTableProperty;
+
+        $this->assertSame('child_prop', $model->getTable());
+    }
+
     public function test_primary_key_attribute(): void
     {
         $model = new ModelWithPrimaryKeyAttribute;
@@ -326,6 +347,50 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame(['password', 'secret', 'api_key'], $model->getHidden());
     }
 
+    public function test_merge_fillable_with_empty_array_is_noop(): void
+    {
+        $model = new ModelWithFillableAttribute;
+        $original = $model->getFillable();
+
+        $result = $model->mergeFillable([]);
+
+        $this->assertSame($model, $result);
+        $this->assertSame($original, $model->getFillable());
+    }
+
+    public function test_merge_hidden_with_empty_array_is_noop(): void
+    {
+        $model = new ModelWithHiddenAttribute;
+        $original = $model->getHidden();
+
+        $result = $model->mergeHidden([]);
+
+        $this->assertSame($model, $result);
+        $this->assertSame($original, $model->getHidden());
+    }
+
+    public function test_merge_visible_with_empty_array_is_noop(): void
+    {
+        $model = new ModelWithVisibleAttribute;
+        $original = $model->getVisible();
+
+        $result = $model->mergeVisible([]);
+
+        $this->assertSame($model, $result);
+        $this->assertSame($original, $model->getVisible());
+    }
+
+    public function test_merge_appends_with_empty_array_is_noop(): void
+    {
+        $model = new ModelWithAppendsAttribute;
+        $original = $model->getAppends();
+
+        $result = $model->mergeAppends([]);
+
+        $this->assertSame($model, $result);
+        $this->assertSame($original, $model->getAppends());
+    }
+
     public function test_set_fillable_overrides_attribute(): void
     {
         $model = new ModelWithFillableAttribute;
@@ -355,6 +420,23 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertFalse(ModelWithFillableAttribute::isIgnoringTouch());
     }
 
+    public function test_is_ignoring_touch_after_model_is_constructed(): void
+    {
+        new ModelWithTableAndTimestampsFalseAttribute;
+
+        $this->assertTrue(ModelWithTableAndTimestampsFalseAttribute::isIgnoringTouch());
+    }
+
+    public function test_table_and_timestamps_attributes_apply_after_is_ignoring_touch(): void
+    {
+        ModelWithTableAndTimestampsFalseAttribute::isIgnoringTouch();
+
+        $model = new ModelWithTableAndTimestampsFalseAttribute;
+
+        $this->assertSame('collision_table', $model->getTable());
+        $this->assertFalse($model->usesTimestamps());
+    }
+
     public function test_trait_initializer_merges_appends_with_attribute(): void
     {
         $model = new ModelWithAppendsAttributeAndTrait;
@@ -382,6 +464,20 @@ class DatabaseEloquentModelAttributesTest extends TestCase
 
         $this->assertEqualsCanonicalizing(['name', 'email', 'phone'], $model->getFillable());
     }
+
+    public function test_trait_with_attribute_applies_to_class(): void
+    {
+        $model = new ModelUsingWithoutIncrementingTraitWithAttribute;
+
+        $this->assertFalse($model->getIncrementing());
+    }
+
+    public function test_class_attribute_takes_precedence_over_trait(): void
+    {
+        $model = new ModelOverridingTraitConnectionAttribute;
+
+        $this->assertSame('primary', $model->getConnectionName());
+    }
 }
 
 enum ConnectionUnitEnum
@@ -404,6 +500,33 @@ class ModelWithTableAttribute extends Model
 class ModelWithTableAttributeAndProperty extends Model
 {
     protected $table = 'property_table';
+}
+
+class ParentModelWithTableProperty extends Model
+{
+    protected $table = 'parent_prop';
+}
+
+#[Table(name: 'child_attr')]
+class ChildModelWithTableAttribute extends ParentModelWithTableProperty
+{
+    //
+}
+
+#[Table(name: 'parent_attr')]
+class ParentModelWithTableAttribute extends Model
+{
+    //
+}
+
+class ChildModelWithNoTable extends ParentModelWithTableAttribute
+{
+    //
+}
+
+class ChildModelWithTableProperty extends ParentModelWithTableAttribute
+{
+    protected $table = 'child_prop';
 }
 
 #[Table(key: 'custom_id')]
@@ -470,6 +593,12 @@ class ModelWithoutTimestampsAttribute extends Model
 class ModelWithTimestampsAttributeAndProperty extends Model
 {
     public $timestamps = false;
+}
+
+#[Table(name: 'collision_table', timestamps: false)]
+class ModelWithTableAndTimestampsFalseAttribute extends Model
+{
+    //
 }
 
 #[Table(dateFormat: 'U')]
@@ -680,4 +809,25 @@ class ModelWithVisibleAttributeAndTrait extends Model
 class ModelWithFillableAttributeAndTrait extends Model
 {
     use AddsPhoneFillable;
+}
+
+#[WithoutIncrementing]
+trait TraitUsingWithoutIncrementingAttribute
+{
+}
+
+class ModelUsingWithoutIncrementingTraitWithAttribute extends Model
+{
+    use TraitUsingWithoutIncrementingAttribute;
+}
+
+#[Connection('secondary')]
+trait TraitUsingConnectionAttribute
+{
+}
+
+#[Connection('primary')]
+class ModelOverridingTraitConnectionAttribute extends Model
+{
+    use TraitUsingConnectionAttribute;
 }

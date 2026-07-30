@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Bootstrap;
 
+use Error;
 use ErrorException;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Foundation\Application;
@@ -335,6 +336,23 @@ class HandleExceptionsTest extends TestCase
         );
     }
 
+    public function testIgnoreDeprecationIfLoggingFails()
+    {
+        $logger = m::mock(LogManager::class);
+        $this->app->instance(LogManager::class, $logger);
+        $this->app->expects('runningUnitTests')->andReturn(false);
+        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
+
+        $logger->expects('channel')->with('deprecations')->andThrow(new Error('Class "Monolog\Logger" not found'));
+
+        $this->handleExceptions()->handleError(
+            E_DEPRECATED,
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+            '/home/user/laravel/routes/web.php',
+            17
+        );
+    }
+
     public function testItIgnoreDeprecationLoggingWhenRunningUnitTests()
     {
         $resolved = false;
@@ -402,6 +420,23 @@ class HandleExceptionsTest extends TestCase
 
         $this->assertNotSame($this->app, $appResolver());
         $this->assertSame($newApp, $appResolver());
+    }
+
+    public function testDeprecationErrorsAreIgnoredWhenAppIsNull()
+    {
+        $instance = $this->handleExceptions();
+
+        HandleExceptions::forgetApp();
+
+        // Should not throw when static::$app is null (e.g., during Octane request marshaling)
+        $instance->handleError(
+            E_USER_DEPRECATED,
+            'Directly setting property "request" of "Illuminate\Http\Request" is deprecated',
+            '/vendor/symfony/http-foundation/Request.php',
+            100
+        );
+
+        $this->assertTrue(true);
     }
 }
 

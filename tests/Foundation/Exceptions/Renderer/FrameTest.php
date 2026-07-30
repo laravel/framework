@@ -11,7 +11,7 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 class FrameTest extends TestCase
 {
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     #[DataProvider('unixFileDataProvider')]
     public function test_it_normalizes_file_path_on_unix($frameData, $basePath, $expected)
     {
@@ -81,7 +81,7 @@ class FrameTest extends TestCase
         ];
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     #[DataProvider('unixIsFromVendorDataProvider')]
     public function test_it_determines_if_frame_is_from_vendor_on_unix($frameData, $basePath, $expected)
     {

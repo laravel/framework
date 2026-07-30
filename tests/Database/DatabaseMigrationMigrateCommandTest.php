@@ -76,7 +76,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(false);
-        $command->expects($this->once())->method('callSilent')->with($this->equalTo('migrate:install'), $this->equalTo([]));
+        $command->expects($this->once())->method('callSilent')->with('migrate:install', []);
 
         $this->runCommand($command);
     }

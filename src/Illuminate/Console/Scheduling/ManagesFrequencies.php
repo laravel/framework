@@ -55,21 +55,30 @@ trait ManagesFrequencies
      */
     private function inTimeInterval($startTime, $endTime)
     {
-        [$now, $startTime, $endTime] = [
-            Carbon::now($this->timezone),
-            Carbon::parse($startTime, $this->timezone),
-            Carbon::parse($endTime, $this->timezone),
-        ];
+        $now = Carbon::now();
 
-        if ($endTime->lessThan($startTime)) {
-            if ($startTime->greaterThan($now)) {
-                $startTime = $startTime->subDay();
-            } else {
-                $endTime = $endTime->addDay();
+        return function () use ($startTime, $endTime, $now) {
+            $now = $now->copy();
+
+            if ($this->timezone) {
+                $now->setTimezone($this->timezone);
             }
-        }
 
-        return fn () => $now->between($startTime, $endTime);
+            [$startTime, $endTime] = [
+                Carbon::parse($startTime, $this->timezone),
+                Carbon::parse($endTime, $this->timezone),
+            ];
+
+            if ($endTime->lessThan($startTime)) {
+                if ($startTime->greaterThan($now)) {
+                    $startTime = $startTime->subDay();
+                } else {
+                    $endTime = $endTime->addDay();
+                }
+            }
+
+            return $now->between($startTime, $endTime);
+        };
     }
 
     /**

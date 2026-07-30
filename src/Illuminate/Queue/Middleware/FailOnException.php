@@ -37,13 +37,7 @@ class FailOnException
     protected function failForExceptions(array $exceptions)
     {
         return static function (Throwable $throwable) use ($exceptions) {
-            foreach ($exceptions as $exception) {
-                if ($throwable instanceof $exception) {
-                    return true;
-                }
-            }
-
-            return false;
+            return array_any($exceptions, fn ($exception) => $throwable instanceof $exception);
         };
     }
 

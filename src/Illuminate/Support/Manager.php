@@ -5,10 +5,13 @@ namespace Illuminate\Support;
 use Closure;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
-use Throwable;
+use ReflectionException;
+use RuntimeException;
 
 abstract class Manager
 {
+    use RebindsCallbacksToSelf;
+
     /**
      * The container instance.
      *
@@ -58,14 +61,14 @@ abstract class Manager
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $driver
+     * @param  \UnitEnum|string|null  $driver
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
     public function driver($driver = null)
     {
-        $driver = $driver ?: $this->getDefaultDriver();
+        $driver = enum_value($driver) ?: $this->getDefaultDriver();
 
         if (is_null($driver)) {
             throw new InvalidArgumentException(sprintf(
@@ -120,7 +123,6 @@ abstract class Manager
      * Register a custom driver creator Closure.
      *
      * @param  string  $driver
-     * @param  \Closure  $callback
      *
      * @param-closure-this  $this  $callback
      *
@@ -129,9 +131,9 @@ abstract class Manager
     public function extend($driver, Closure $callback)
     {
         try {
-            $callback = $callback->bindTo($this, static::class) ?? throw new RuntimeException;
-        } catch (Throwable) {
-            $callback = $callback->bindTo(null, static::class);
+            $callback = $this->bindCallbackToSelf($callback) ?? throw new RuntimeException('Unable to bind custom driver callback');
+        } catch (ReflectionException $e) {
+            throw new RuntimeException('Unable to bind custom driver callback', previous: $e);
         }
 
         $this->customCreators[$driver] = $callback;

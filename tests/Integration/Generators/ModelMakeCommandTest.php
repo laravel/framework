@@ -2,16 +2,22 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
+use Illuminate\Support\Carbon;
+
 class ModelMakeCommandTest extends TestCase
 {
     protected $files = [
         'app/Models/Foo.php',
         'app/Models/Foo/Bar.php',
+        'app/Models/Aaa.php',
+        'app/Models/Xxx.php',
         'app/Http/Controllers/FooController.php',
         'app/Http/Controllers/BarController.php',
         'database/factories/FooFactory.php',
         'database/factories/Foo/BarFactory.php',
+        'database/migrations/*_create_aaas_table.php',
         'database/migrations/*_create_foos_table.php',
+        'database/migrations/*_create_xxxes_table.php',
         'database/seeders/FooSeeder.php',
         'tests/Feature/Models/FooTest.php',
     ];
@@ -192,6 +198,20 @@ class ModelMakeCommandTest extends TestCase
         $this->assertFilenameNotExists('app/Http/Controllers/FooController.php');
         $this->assertFilenameNotExists('database/factories/FooFactory.php');
         $this->assertFilenameNotExists('database/seeders/FooSeeder.php');
+    }
+
+    public function testItPreservesMigrationGenerationOrderForModelsCreatedWithinTheSameSecond()
+    {
+        Carbon::setTestNow('2026-07-13 15:54:55');
+
+        $this->artisan('make:model', ['name' => 'Xxx', '--migration' => true])
+            ->assertExitCode(0);
+
+        $this->artisan('make:model', ['name' => 'Aaa', '--migration' => true])
+            ->assertExitCode(0);
+
+        $this->assertFilenameExists('database/migrations/2026_07_13_155455_create_xxxes_table.php');
+        $this->assertFilenameExists('database/migrations/2026_07_13_155456_create_aaas_table.php');
     }
 
     public function testItCanGenerateModelFileWithSeederption()
