@@ -366,7 +366,7 @@ class BroadcastManagerTest extends TestCase
         $pusher->get('/channels');
 
         $this->assertCount(1, $requests);
-        $this->assertSame('reverb.example.test', $requests[0]->getHeaderLine('Host'));
+        $this->assertSame('reverb.example.test:8080', $requests[0]->getHeaderLine('Host'));
     }
 
     public function testPusherClientDoesNotOverrideHostHeaderWhenNotConfigured()
@@ -400,7 +400,7 @@ class BroadcastManagerTest extends TestCase
         $pusher->get('/channels');
 
         $this->assertCount(1, $requests);
-        $this->assertSame('10.0.0.1', $requests[0]->getHeaderLine('Host'));
+        $this->assertSame('10.0.0.1:8080', $requests[0]->getHeaderLine('Host'));
     }
 
     protected function getApp(array $userConfig)
