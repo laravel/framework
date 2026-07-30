@@ -142,6 +142,16 @@ abstract class InterventionDriver implements Driver
     }
 
     /**
+     * Resolve a background color, expanding the "dominant" sentinel when needed.
+     */
+    protected function resolveBackground(ImageInterface $image, ?string $background): ?string
+    {
+        return $background === 'dominant'
+            ? $this->dominantColorFrom($image)
+            : $background;
+    }
+
+    /**
      * Get the dominant (average) color of the image as a hex string.
      */
     public function dominantColor(string $contents): string
@@ -156,28 +166,6 @@ abstract class InterventionDriver implements Driver
     }
 
     /**
-     * Register a transformation handler.
-     *
-     * @param  class-string<\Illuminate\Contracts\Image\Transformation>  $transformation
-     */
-    public function transformUsing(string $transformation, callable $callback): static
-    {
-        $this->transformationHandlers[$transformation] = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Resolve a background color, expanding the "dominant" sentinel when needed.
-     */
-    protected function resolveBackground(ImageInterface $image, ?string $background): ?string
-    {
-        return $background === 'dominant'
-            ? $this->dominantColorFrom($image)
-            : $background;
-    }
-
-    /**
      * Sample the dominant color by resizing the image to a single pixel.
      */
     protected function dominantColorFrom(ImageInterface $image): string
@@ -189,6 +177,18 @@ abstract class InterventionDriver implements Driver
         } finally {
             unset($sample);
         }
+    }
+
+    /**
+     * Register a transformation handler.
+     *
+     * @param  class-string<\Illuminate\Contracts\Image\Transformation>  $transformation
+     */
+    public function transformUsing(string $transformation, callable $callback): static
+    {
+        $this->transformationHandlers[$transformation] = $callback;
+
+        return $this;
     }
 
     /**
