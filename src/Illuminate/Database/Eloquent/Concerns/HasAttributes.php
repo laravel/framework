@@ -901,7 +901,7 @@ trait HasAttributes
             case 'image:storage':
             case 'image:base64':
             case 'image:bytes':
-                return $this->toImage($value, substr($casType, 6));
+                return $this->toImage($value, substr($castType, 6));
         }
 
         if ($this->isEnumCastable($key)) {
