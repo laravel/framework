@@ -87,7 +87,7 @@ class DefaultProviders
     public function except(array $providers)
     {
         return new static((new Collection($this->providers))
-            ->reject(fn ($p) => in_array($p, $providers))
+            ->diff($providers)
             ->values()
             ->toArray());
     }
