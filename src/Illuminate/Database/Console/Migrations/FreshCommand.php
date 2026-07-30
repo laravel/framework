@@ -57,9 +57,8 @@ class FreshCommand extends Command
      */
     public function handle()
     {
-        if ($this->isProhibited() ||
-            ! $this->confirmToProceed()) {
-            return Command::FAILURE;
+        if ($this->isProhibited() || ! $this->confirmToProceed()) {
+            return self::FAILURE;
         }
 
         $database = $this->input->getOption('database');
@@ -104,7 +103,7 @@ class FreshCommand extends Command
             $this->runSeeder($database);
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

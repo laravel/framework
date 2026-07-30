@@ -70,7 +70,7 @@ class TableCommand extends DatabaseInspectionCommand
         if (! $table) {
             $this->components->warn("Table [{$tableName}] doesn't exist.");
 
-            return 1;
+            return self::FAILURE;
         }
 
         [$columns, $indexes, $foreignKeys] = $connection->withoutTablePrefix(function ($connection) use ($table) {
@@ -102,7 +102,7 @@ class TableCommand extends DatabaseInspectionCommand
 
         $this->display($data);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

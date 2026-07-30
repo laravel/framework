@@ -46,7 +46,7 @@ class DumpCommand extends Command
     public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher)
     {
         if ($this->isProhibited()) {
-            return Command::FAILURE;
+            return self::FAILURE;
         }
 
         $connection = $connections->connection($database = $this->input->getOption('database'));

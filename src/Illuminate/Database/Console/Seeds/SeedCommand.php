@@ -56,9 +56,8 @@ class SeedCommand extends Command
      */
     public function handle()
     {
-        if ($this->isProhibited() ||
-            ! $this->confirmToProceed()) {
-            return Command::FAILURE;
+        if ($this->isProhibited() || ! $this->confirmToProceed()) {
+            return self::FAILURE;
         }
 
         $this->components->info('Seeding database.');
@@ -75,7 +74,7 @@ class SeedCommand extends Command
             $this->resolver->setDefaultConnection($previousConnection);
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**
