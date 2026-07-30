@@ -774,6 +774,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $this->provider->rehashPasswordIfRequired(
             $user, ['password' => $password], force: true
         );
+
+        return $user;
     }
 
     /**
