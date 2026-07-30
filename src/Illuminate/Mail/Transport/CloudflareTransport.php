@@ -61,12 +61,12 @@ class CloudflareTransport extends AbstractTransport
             );
         }
 
-        throw_if(
-            $response->getStatusCode() !== Response::HTTP_OK,
-            TransportException::class,
-            $result['errors'][0]['message'] ?? 'Unknown error',
-            $response->getStatusCode(),
-        );
+        if ($response->getStatusCode() !== Response::HTTP_OK) {
+            throw new TransportException(
+                $result['errors'][0]['message'] ?? 'Unknown error',
+                $response->getStatusCode(),
+            );
+        }
     }
 
     /**
