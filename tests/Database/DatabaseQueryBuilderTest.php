@@ -4101,6 +4101,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('bar', $results);
     }
 
+    public function testValueOrFailMethodReturnsSingleColumn()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select "foo" from "users" where "id" = ? limit 1', [1], true, [])->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturn([['foo' => 'bar']]);
+        $results = $builder->from('users')->where('id', '=', 1)->valueOrFail('foo');
+        $this->assertSame('bar', $results);
+    }
+
+    public function testValueOrFailMethodThrowsRecordNotFoundException()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select "foo" from "users" where "id" = ? limit 1', [1], true, [])->andReturn([]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [])->andReturn([]);
+
+        $this->expectException(RecordNotFoundException::class);
+        $this->expectExceptionMessage('No record found for the given query.');
+
+        $builder->from('users')->where('id', '=', 1)->valueOrFail('foo');
+    }
+
     public function testRawValueMethodReturnsSingleColumn()
     {
         $builder = $this->getBuilder();

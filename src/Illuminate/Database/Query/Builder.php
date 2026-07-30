@@ -3544,6 +3544,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get a single column's value from the first result of the query or throw an exception.
+     *
+     * @param  string  $column
+     * @return mixed
+     *
+     * @throws \Illuminate\Database\RecordNotFoundException
+     */
+    public function valueOrFail($column)
+    {
+        $result = (array) $this->firstOrFail([$column]);
+
+        return array_first($result);
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
