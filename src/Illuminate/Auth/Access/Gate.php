@@ -773,7 +773,7 @@ class Gate implements GateContract
 
         return function () use ($user, $ability, $arguments, $policy) {
             // This callback will be responsible for calling the policy's before method and
-            // running this policy method if necessary. This is used to when objects are
+            // running this policy method if necessary. This is used when objects are
             // mapped to policy objects in the user's configurations or on this class.
             $result = $this->callPolicyBefore(
                 $policy, $user, $ability, $arguments
