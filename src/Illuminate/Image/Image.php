@@ -476,6 +476,22 @@ class Image implements Stringable
     }
 
     /**
+     * Get the dominant (average) color of the image as a hex string.
+     */
+    public function dominantColor(): string
+    {
+        return once(function () {
+            $contents = value($this->contents);
+
+            if ($this->pipeline->hasChanges() && ! $this->processed) {
+                $contents = $this->resolveDriver()->process($contents, clone $this->pipeline);
+            }
+
+            return $this->resolveDriver()->dominantColor($contents);
+        });
+    }
+
+    /**
      * Set the driver to use for processing.
      */
     public function using(string $driver): static

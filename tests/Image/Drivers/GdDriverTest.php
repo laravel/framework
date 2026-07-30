@@ -142,6 +142,29 @@ class GdDriverTest extends TestCase
         $this->assertSame(200, $height);
     }
 
+    public function test_processes_contain_with_dominant_background()
+    {
+        $driver = new GdDriver;
+        $contents = $this->solidColorImageContents(255, 0, 0, 400, 200);
+
+        $pipeline = $this->pipeline(new Contain(200, 200, 'dominant'));
+
+        $result = $driver->process($contents, $pipeline);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(200, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_dominant_color_returns_hex_for_solid_image()
+    {
+        $driver = new GdDriver;
+        $contents = $this->solidColorImageContents(0, 128, 255);
+
+        $this->assertSame('#0080ff', $driver->dominantColor($contents));
+    }
+
     public function test_processes_crop()
     {
         $driver = new GdDriver;
@@ -185,6 +208,19 @@ class GdDriverTest extends TestCase
 
         $this->assertSame(50, $width);
         $this->assertSame(100, $height);
+    }
+
+    public function test_processes_rotate_with_dominant_background()
+    {
+        $driver = new GdDriver;
+        $contents = $this->solidColorImageContents(0, 255, 0, 100, 50);
+
+        $pipeline = $this->pipeline(new Rotate(45, 'dominant'));
+
+        $result = $driver->process($contents, $pipeline);
+
+        $this->assertNotEmpty($result);
+        $this->assertNotFalse(getimagesizefromstring($result));
     }
 
     public function test_processes_scale()
@@ -429,6 +465,19 @@ class GdDriverTest extends TestCase
         $file = UploadedFile::fake()->image('test.jpg', $width, $height);
 
         return file_get_contents($file->getRealPath());
+    }
+
+    protected function solidColorImageContents(int $red, int $green, int $blue, int $width = 100, int $height = 100): string
+    {
+        $image = imagecreatetruecolor($width, $height);
+        $color = imagecolorallocate($image, $red, $green, $blue);
+        imagefill($image, 0, 0, $color);
+
+        ob_start();
+        imagepng($image);
+        imagedestroy($image);
+
+        return ob_get_clean();
     }
 
     protected function pipeline(?Transformation $transformation = null, ?string $format = null, ?int $quality = null): ImagePipeline
