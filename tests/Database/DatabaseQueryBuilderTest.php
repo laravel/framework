@@ -5199,6 +5199,36 @@ SQL;
         $this->assertEquals($expectedWithJsonEscaped, $builder->toSql());
     }
 
+    public function testPostgresJsonPathEscaping()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select("json->'))#");
+        $this->assertSame('select "json"->>\'\'\'))#\'', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where("json->'))#", '=', 1);
+        $this->assertSame('select * from "users" where "json"->>\'\'\'))#\' = ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->orderBy("json->'))#");
+        $this->assertSame('select * from "users" order by "json"->>\'\'\'))#\' asc', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonLength("json->'))#", 1);
+        $this->assertSame('select * from "users" where jsonb_array_length(("json"->\'\'\'))#\')::jsonb) = ?', $builder->toSql());
+    }
+
+    public function testPostgresUpdateJsonPathEscaping()
+    {
+        // The update path delimits its attributes with double quotes, but the
+        // resulting path is still nested within a single quoted string literal,
+        // so single quotes must be escaped there as well...
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"\'\'))#"}\', ?)', ['"John"']);
+        $builder->from('users')->update(["options->'))#" => 'John']);
+    }
+
     public function testMySqlWrappingJson()
     {
         $builder = $this->getMySqlBuilder();
