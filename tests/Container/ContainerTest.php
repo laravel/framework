@@ -934,6 +934,24 @@ class ContainerTest extends TestCase
     }
 
     #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenIsReevaluatedAfterAnInitialMiss(): void
+    {
+        $container = new Container;
+
+        try {
+            $container->make(BindWhenConditionalInterface::class);
+
+            $this->fail('Expected binding resolution to fail when the BindWhen condition does not match.');
+        } catch (BindingResolutionException) {
+            // Continue after the expected first resolution failure.
+        }
+
+        $container->instance(BindWhenCondition::class, new BindWhenCondition);
+
+        $this->assertInstanceOf(BindWhenConditionalConcrete::class, $container->make(BindWhenConditionalInterface::class));
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
     public function testBindWhenTakesPrecedenceOverBind(): void
     {
         $container = new Container;
