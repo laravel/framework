@@ -1057,6 +1057,30 @@ class ProcessTest extends TestCase
         });
     }
 
+    public function testAssertRanWithFalsyCommandString(): void
+    {
+        $factory = new Factory;
+
+        $factory->fake();
+
+        $factory->run('0');
+
+        $factory->assertRan('0');
+        $factory->assertRanTimes('0', 1);
+        $factory->assertNotRan('ls -la');
+    }
+
+    public function testAssertRanWithFalsyStartedCommandString(): void
+    {
+        $factory = new Factory;
+
+        $factory->fake();
+
+        $factory->start('0')->wait();
+
+        $factory->assertRan('0');
+    }
+
     public function testAssertingThatNothingRan()
     {
         $factory = new Factory;
