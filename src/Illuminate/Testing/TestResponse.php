@@ -1448,11 +1448,7 @@ class TestResponse implements ArrayAccess
             return $this->assertJsonMissingValidationErrors($keys, $responseKey);
         }
 
-        if ($this->session()->get('errors')) {
-            $errors = $this->session()->get('errors')->getBag($errorBag)->getMessages();
-        } else {
-            $errors = [];
-        }
+        $errors = $this->session()->get('errors') ? $this->session()->get('errors')->getBag($errorBag)->getMessages() : [];
 
         if (empty($errors)) {
             PHPUnit::withResponse($this)->assertTrue(true);
