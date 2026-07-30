@@ -5,6 +5,8 @@ namespace Illuminate\Broadcasting;
 use Ably\AblyRest;
 use Closure;
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
@@ -24,6 +26,7 @@ use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\RebindsCallbacksToSelf;
 use InvalidArgumentException;
+use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Pusher\Pusher;
 use ReflectionException;
@@ -361,16 +364,7 @@ class BroadcastManager implements FactoryContract
      */
     public function pusher(array $config)
     {
-        $guzzleClient = new GuzzleClient(
-            array_merge(
-                [
-                    'connect_timeout' => 10,
-                    'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
-                    'timeout' => 30,
-                ],
-                $config['client_options'] ?? [],
-            ),
-        );
+        $guzzleClient = new GuzzleClient($this->pusherClientOptions($config));
 
         $pusher = new Pusher(
             $config['key'],
@@ -385,6 +379,56 @@ class BroadcastManager implements FactoryContract
         }
 
         return $pusher;
+    }
+
+    /**
+     * Get the Guzzle client options for the Pusher SDK.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function pusherClientOptions(array $config)
+    {
+        $clientOptions = array_merge(
+            [
+                'connect_timeout' => 10,
+                'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+                'timeout' => 30,
+            ],
+            $config['client_options'] ?? [],
+        );
+
+        $hostHeader = $config['host_header'] ?? null;
+
+        if (! empty($hostHeader) && $hostHeader !== ($config['options']['host'] ?? null)) {
+            $clientOptions = $this->withHostHeaderClientOptions($clientOptions, $hostHeader);
+        }
+
+        return $clientOptions;
+    }
+
+    /**
+     * Configure the Guzzle client to send a custom Host header.
+     *
+     * @param  array  $clientOptions
+     * @param  string  $hostHeader
+     * @return array
+     */
+    protected function withHostHeaderClientOptions(array $clientOptions, string $hostHeader)
+    {
+        $handler = $clientOptions['handler'] ?? null;
+        $handlerStack = $handler instanceof HandlerStack ? $handler : HandlerStack::create($handler);
+
+        $handlerStack->push(
+            Middleware::mapRequest(
+                static fn (RequestInterface $request): RequestInterface => $request->withHeader('Host', $hostHeader),
+            ),
+            'broadcasting-host-header',
+        );
+
+        $clientOptions['handler'] = $handlerStack;
+
+        return $clientOptions;
     }
 
     /**

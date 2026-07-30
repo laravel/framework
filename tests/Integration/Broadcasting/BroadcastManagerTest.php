@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Broadcasting;
 
+use GuzzleHttp\Promise\Create;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Broadcasting\UniqueBroadcastEvent;
@@ -17,7 +19,9 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
+use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
+use Pusher\Pusher;
 use RuntimeException;
 use stdClass;
 
@@ -293,6 +297,110 @@ class BroadcastManagerTest extends TestCase
         $instance2 = $manager->connection(BroadcastConnectionName::Log);
 
         $this->assertNotSame($instance1, $instance2);
+    }
+
+    public function testPusherClientOverridesHostHeaderWhenConfigured()
+    {
+        if (! class_exists(Pusher::class)) {
+            $this->markTestSkipped('Pusher PHP SDK not installed.');
+        }
+
+        $requests = [];
+        $manager = new BroadcastManager($this->getApp([]));
+
+        $pusher = $manager->pusher([
+            'key' => 'test-key',
+            'secret' => 'test-secret',
+            'app_id' => 'test-app',
+            'host_header' => 'public-reverb.example.test',
+            'options' => [
+                'host' => '10.0.0.1',
+                'port' => 8080,
+                'scheme' => 'http',
+                'useTLS' => false,
+            ],
+            'client_options' => [
+                'handler' => function (RequestInterface $request) use (&$requests) {
+                    $requests[] = $request;
+
+                    return Create::promiseFor(new Response(200, [], '{}'));
+                },
+            ],
+        ]);
+
+        $pusher->get('/channels');
+
+        $this->assertCount(1, $requests);
+        $this->assertSame('public-reverb.example.test', $requests[0]->getHeaderLine('Host'));
+    }
+
+    public function testPusherClientDoesNotOverrideHostHeaderWhenHostHeaderMatchesConnectionHost()
+    {
+        if (! class_exists(Pusher::class)) {
+            $this->markTestSkipped('Pusher PHP SDK not installed.');
+        }
+
+        $requests = [];
+        $manager = new BroadcastManager($this->getApp([]));
+
+        $pusher = $manager->pusher([
+            'key' => 'test-key',
+            'secret' => 'test-secret',
+            'app_id' => 'test-app',
+            'host_header' => 'reverb.example.test',
+            'options' => [
+                'host' => 'reverb.example.test',
+                'port' => 8080,
+                'scheme' => 'http',
+                'useTLS' => false,
+            ],
+            'client_options' => [
+                'handler' => function (RequestInterface $request) use (&$requests) {
+                    $requests[] = $request;
+
+                    return Create::promiseFor(new Response(200, [], '{}'));
+                },
+            ],
+        ]);
+
+        $pusher->get('/channels');
+
+        $this->assertCount(1, $requests);
+        $this->assertSame('reverb.example.test', $requests[0]->getHeaderLine('Host'));
+    }
+
+    public function testPusherClientDoesNotOverrideHostHeaderWhenNotConfigured()
+    {
+        if (! class_exists(Pusher::class)) {
+            $this->markTestSkipped('Pusher PHP SDK not installed.');
+        }
+
+        $requests = [];
+        $manager = new BroadcastManager($this->getApp([]));
+
+        $pusher = $manager->pusher([
+            'key' => 'test-key',
+            'secret' => 'test-secret',
+            'app_id' => 'test-app',
+            'options' => [
+                'host' => '10.0.0.1',
+                'port' => 8080,
+                'scheme' => 'http',
+                'useTLS' => false,
+            ],
+            'client_options' => [
+                'handler' => function (RequestInterface $request) use (&$requests) {
+                    $requests[] = $request;
+
+                    return Create::promiseFor(new Response(200, [], '{}'));
+                },
+            ],
+        ]);
+
+        $pusher->get('/channels');
+
+        $this->assertCount(1, $requests);
+        $this->assertSame('10.0.0.1', $requests[0]->getHeaderLine('Host'));
     }
 
     protected function getApp(array $userConfig)
