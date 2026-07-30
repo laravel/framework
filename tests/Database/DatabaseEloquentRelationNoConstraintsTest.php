@@ -31,7 +31,7 @@ class DatabaseEloquentRelationNoConstraintsTest extends TestCase
             $table->string('name');
         });
 
-        DB::schema()->create('personal_access_tokens', function ($table) {
+        DB::schema()->create('tokens', function ($table) {
             $table->increments('id');
             $table->string('tokenable_type');
             $table->unsignedInteger('tokenable_id');
@@ -41,11 +41,32 @@ class DatabaseEloquentRelationNoConstraintsTest extends TestCase
 
     protected function tearDown(): void
     {
+        NoConstraintsTestUser::$selectedToken = null;
+
         DB::schema()->drop('users');
-        DB::schema()->drop('personal_access_tokens');
+        DB::schema()->drop('tokens');
     }
 
-    public function testRelationshipAccessInsideNoConstraintsPreservesConstraints()
+    public function testRelationshipAccessWhileResolvingEagerLoadPreservesConstraints()
+    {
+        $admin = NoConstraintsTestUser::create(['name' => 'Admin User']);
+        $normalUser = NoConstraintsTestUser::create(['name' => 'Normal User']);
+
+        NoConstraintsTestUser::$selectedToken = NoConstraintsTestToken::create([
+            'tokenable_type' => NoConstraintsTestUser::class,
+            'tokenable_id' => $normalUser->id,
+            'token' => 'secret-token',
+        ]);
+
+        $users = NoConstraintsTestUser::with('selectedUserTokens')->get();
+
+        $this->assertCount(0, $users->find($admin->id)->selectedUserTokens);
+        $this->assertTrue(NoConstraintsTestUser::$selectedToken->is(
+            $users->find($normalUser->id)->selectedUserTokens->sole()
+        ));
+    }
+
+    public function testRelationshipAccessInsideExplicitNoConstraintsRemainsUnconstrained()
     {
         $admin = NoConstraintsTestUser::create(['name' => 'Admin User']);
         $normalUser = NoConstraintsTestUser::create(['name' => 'Normal User']);
@@ -56,28 +77,31 @@ class DatabaseEloquentRelationNoConstraintsTest extends TestCase
             'token' => 'secret-token',
         ]);
 
-        $resolvedUser = null;
+        $resolvedUser = Relation::noConstraints(fn () => $token->tokenable);
 
-        Relation::noConstraints(function () use ($token, &$resolvedUser) {
-            $resolvedUser = $token->tokenable;
-        });
-
-        $this->assertNotNull($resolvedUser);
-        $this->assertEquals($normalUser->id, $resolvedUser->id);
+        $this->assertTrue($admin->is($resolvedUser));
     }
 }
 
 class NoConstraintsTestUser extends Model
 {
+    public static $selectedToken;
+
     public $timestamps = false;
     protected $table = 'users';
     protected $guarded = [];
+
+    public function selectedUserTokens()
+    {
+        return $this->hasMany(NoConstraintsTestToken::class, 'tokenable_id')
+            ->where('tokenable_id', static::$selectedToken->tokenable->getKey());
+    }
 }
 
 class NoConstraintsTestToken extends Model
 {
     public $timestamps = false;
-    protected $table = 'personal_access_tokens';
+    protected $table = 'tokens';
     protected $guarded = [];
 
     public function tokenable()
