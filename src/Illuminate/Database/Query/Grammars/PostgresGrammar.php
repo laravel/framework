@@ -784,9 +784,6 @@ class PostgresGrammar extends Grammar
                     return $attribute;
                 }
 
-                // The wrapped path is always embedded within a single quoted SQL
-                // string literal, so single quotes have to be escaped whatever
-                // character has been used to delimit the path attributes...
                 $attribute = str_replace("'", "''", $attribute);
 
                 if ($quote !== "'") {
