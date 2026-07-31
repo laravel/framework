@@ -1485,7 +1485,7 @@ class Str
 
         $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
 
-        return implode(' ', array_filter(explode('_', $collapsed)));
+        return implode(' ', array_filter(explode('_', $collapsed), 'strlen'));
     }
 
     /**

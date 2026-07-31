@@ -93,6 +93,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('Orwell 1984', Str::headline(' orwell_- 1984 '));
 
         $this->assertSame('Laravel Rocks!', Str::headline('laravel rocks!'));
+
+        $this->assertSame('Field 0', Str::headline('field 0'));
+        $this->assertSame('User 0 Name', Str::headline('user_0_name'));
+        $this->assertSame('Version 0 0 1', Str::headline('version_0_0_1'));
     }
 
     public function testStringInitials()
