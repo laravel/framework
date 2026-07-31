@@ -15,6 +15,7 @@ use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
+use Illuminate\Queue\Events\JobTimedOut;
 use Illuminate\Queue\Events\WorkerIdle;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
@@ -729,6 +730,25 @@ class QueueWorkerTest extends TestCase
         }
 
         $this->assertTrue($worker->killed);
+    }
+
+    public function testFailOnTimeoutTakesPriorityOverReleaseOnTimeout()
+    {
+        $job = new WorkerFakeJob;
+        $job->shouldFailOnTimeout = true;
+        $job->shouldReleaseOnTimeout = true;
+
+        $worker = $this->getWorker();
+
+        (new \ReflectionMethod($worker, 'handleWorkerTimeout'))->invoke(
+            $worker, $job, $this->workerOptions(['maxTries' => 4, 'backoff' => 10])
+        );
+
+        $this->assertTrue($job->failed);
+        $this->assertFalse($job->released);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobTimedOut::class))->once();
+        $this->events->shouldNotHaveReceived('dispatch', [m::type(JobReleasedAfterException::class)]);
     }
 
     public function testInterruptibleJobIsNotifiedOnSignal()
