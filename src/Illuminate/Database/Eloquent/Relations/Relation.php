@@ -576,11 +576,15 @@ abstract class Relation implements BuilderContract
     /**
      * Get the model associated with a custom polymorphic type.
      *
-     * @param  string  $alias
+     * @param  string|int|null  $alias
      * @return class-string<\Illuminate\Database\Eloquent\Model>|null
      */
     public static function getMorphedModel($alias)
     {
+        if (is_null($alias)) {
+            return null;
+        }
+
         return static::$morphMap[$alias] ?? null;
     }
 
