@@ -119,7 +119,7 @@ class DatabaseEloquentWithCastsTest extends TestCase
 
     public function testImageCast()
     {
-        $file = UploadedFile::fake()->image('test.jpg', $width, $height);
+        $file = UploadedFile::fake()->image('test.jpg', 100, 100);
         $image = new ImageFacade(file_get_contents($file->getRealPath()));
         $base64 = $image->toBase64();
         $image->store('avatars/john_doe.png');
