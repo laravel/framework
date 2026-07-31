@@ -4,9 +4,9 @@ namespace Illuminate\Tests\Integration\Database\EloquentModelDateCastingTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image as ImageFacade;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelImageCastingTest extends DatabaseTestCase
