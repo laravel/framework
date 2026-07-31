@@ -295,34 +295,7 @@ class Worker
         // process if it is running too long because it has frozen. This uses the async
         // signals supported in recent versions of PHP to accomplish it conveniently.
         pcntl_signal(SIGALRM, function () use ($job, $options) {
-            if ($job) {
-                $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
-                );
-
-                $this->markJobAsFailedIfWillExceedMaxExceptions(
-                    $job->getConnectionName(), $job, $e
-                );
-
-                $this->markJobAsFailedIfItShouldFailOnTimeout(
-                    $job->getConnectionName(), $job, $e
-                );
-
-                if ($this->shouldReleaseJobOnTimeout($job)) {
-                    $backoff = $this->calculateBackoff($job, $options);
-                    $job->release($backoff);
-
-                    $this->events->dispatch(new JobReleasedAfterException(
-                        $job->getConnectionName(), $job, $backoff, $e
-                    ));
-                } else {
-                    $this->events->dispatch(new JobTimedOut(
-                        $job->getConnectionName(), $job
-                    ));
-                }
-            }
-
-            $this->kill(static::$timedOutExitCode ?? static::EXIT_ERROR, $options, WorkerStopReason::TimedOut);
+            $this->handleWorkerTimeout($job, $options);
         }, true);
 
         pcntl_alarm(
@@ -338,6 +311,50 @@ class Worker
     protected function resetTimeoutHandler()
     {
         pcntl_alarm(0);
+    }
+
+    /**
+     * Handle a worker timeout by failing or releasing the job, then killing the worker.
+     *
+     * The worker is killed unconditionally, even if handling the job above throws,
+     * since the process may be in a corrupted state after having been frozen.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job|null  $job
+     * @return void
+     */
+    protected function handleWorkerTimeout($job, WorkerOptions $options)
+    {
+        try {
+            if ($job) {
+                $this->markJobAsFailedIfWillExceedMaxAttempts(
+                    $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
+                );
+
+                $this->markJobAsFailedIfWillExceedMaxExceptions(
+                    $job->getConnectionName(), $job, $e
+                );
+
+                $this->markJobAsFailedIfItShouldFailOnTimeout(
+                    $job->getConnectionName(), $job, $e
+                );
+
+                if ($this->shouldReleaseJobOnTimeout($job)) {
+                    $backoff = $this->calculateBackoff($job, $options);
+
+                    $job->release($backoff);
+
+                    $this->events->dispatch(new JobReleasedAfterException(
+                        $job->getConnectionName(), $job, $backoff, $e
+                    ));
+                } else {
+                    $this->events->dispatch(new JobTimedOut(
+                        $job->getConnectionName(), $job
+                    ));
+                }
+            }
+        } finally {
+            $this->kill(static::$timedOutExitCode ?? static::EXIT_ERROR, $options, WorkerStopReason::TimedOut);
+        }
     }
 
     /**

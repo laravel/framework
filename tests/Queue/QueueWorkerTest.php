@@ -695,6 +695,42 @@ class QueueWorkerTest extends TestCase
         return $method->invoke($worker, $job);
     }
 
+    public function testWorkerIsKilledAfterHandlingTimeoutNormally()
+    {
+        $job = new WorkerFakeJob;
+        $job->shouldReleaseOnTimeout = true;
+
+        $worker = $this->getWorker();
+
+        (new \ReflectionMethod($worker, 'handleWorkerTimeout'))->invoke(
+            $worker, $job, $this->workerOptions(['backoff' => 10])
+        );
+
+        $this->assertTrue($job->released);
+        $this->assertTrue($worker->killed);
+    }
+
+    public function testWorkerIsStillKilledWhenReleaseThrowsDuringTimeout()
+    {
+        $job = new WorkerFakeJob;
+        $job->shouldReleaseOnTimeout = true;
+        $job->releaseThrows = new RuntimeException('redis connection lost');
+
+        $worker = $this->getWorker();
+
+        try {
+            (new \ReflectionMethod($worker, 'handleWorkerTimeout'))->invoke(
+                $worker, $job, $this->workerOptions(['backoff' => 10])
+            );
+
+            $this->fail('Expected exception was not thrown.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('redis connection lost', $e->getMessage());
+        }
+
+        $this->assertTrue($worker->killed);
+    }
+
     public function testInterruptibleJobIsNotifiedOnSignal()
     {
         $interruptible = new class implements Interruptible
@@ -795,6 +831,16 @@ class InsomniacWorker extends Worker
     public function memoryExceeded($memoryLimit)
     {
         return $this->stopOnMemoryExceeded;
+    }
+
+    public $killed = false;
+
+    public $killedWith = [];
+
+    public function kill($status = 0, $options = null, $reason = null)
+    {
+        $this->killed = true;
+        $this->killedWith = [$status, $options, $reason];
     }
 }
 
@@ -898,6 +944,7 @@ class WorkerFakeJob implements QueueJobContract
     public $shouldFailOnTimeout = false;
 
     public $shouldReleaseOnTimeout = false;
+    public $releaseThrows;
     public $uuid;
     public $backoff;
     public $retryUntil;
@@ -979,6 +1026,10 @@ class WorkerFakeJob implements QueueJobContract
 
     public function release($delay = 0)
     {
+        if ($this->releaseThrows) {
+            throw $this->releaseThrows;
+        }
+
         $this->released = true;
 
         $this->releaseAfter = $delay;
