@@ -18,7 +18,7 @@ class EloquentModelImageCastingTest extends DatabaseTestCase
             $table->increments('id');
             $table->string('storage_path');
             $table->string('web_url');
-            $table->text('image');
+            $table->binary('image');
             $table->text('encoded');
             $table->timestamps();
         });
