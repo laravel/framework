@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\LazyLoadingViolationException;
+use Illuminate\Image\Image;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -38,7 +39,7 @@ use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Image;
+use Illuminate\Support\Facades\Image as ImageFacade;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use LogicException;
@@ -1651,10 +1652,10 @@ trait HasAttributes
     protected function toImage(string $key, $value, string $sourceType): Image
     {
         return match ($sourceType) {
-            'storage' => Image::fromStorage($value),
-            'bytes' => Image::fromBytes($value),
-            'base64' => Image::fromBase64($value),
-            'url' => Image::fromUrl($value),
+            'storage' => ImageFacade::fromStorage($value),
+            'bytes' => ImageFacade::fromBytes($value),
+            'base64' => ImageFacade::fromBase64($value),
+            'url' => ImageFacade::fromUrl($value),
             default => throw new InvalidCastException($this->getModel(), $key, $sourceType === '' ? 'image' : 'image:'.$sourceType),
         };
     }
