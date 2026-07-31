@@ -1537,11 +1537,15 @@ class Str
             if (str_contains($lowercaseWord, '-')) {
                 $hyphenatedWords = explode('-', $lowercaseWord);
 
-                $hyphenatedWords = array_map(function ($part) use ($minorWords) {
-                    return (in_array($part, $minorWords) && mb_strlen($part) <= 3)
-                        ? $part
-                        : mb_strtoupper(mb_substr($part, 0, 1)).mb_substr($part, 1);
-                }, $hyphenatedWords);
+                $isFirstWord = $i === 0 || in_array(mb_substr($words[$i - 1], -1), $endPunctuation);
+
+                $hyphenatedWords = array_map(function ($part, $index) use ($minorWords, $isFirstWord) {
+                    if (in_array($part, $minorWords) && mb_strlen($part) <= 3 && ! ($isFirstWord && $index === 0)) {
+                        return $part;
+                    }
+
+                    return mb_strtoupper(mb_substr($part, 0, 1)).mb_substr($part, 1);
+                }, $hyphenatedWords, array_keys($hyphenatedWords));
 
                 $words[$i] = implode('-', $hyphenatedWords);
             } else {

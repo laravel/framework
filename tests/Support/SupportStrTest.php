@@ -135,6 +135,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('Self-Report', Str::apa('Self-report'));
         $this->assertSame('Self-Report', Str::apa('SELF-REPORT'));
 
+        $this->assertSame('In-Depth Analysis', Str::apa('in-depth analysis'));
+        $this->assertSame('In-Depth Analysis', Str::apa('IN-DEPTH ANALYSIS'));
+        $this->assertSame('In-Depth Analysis', Str::apa('In-Depth Analysis'));
+        $this->assertSame('The in-Depth Analysis', Str::apa('the in-depth analysis'));
+        $this->assertSame('Introduction. In-Depth Analysis', Str::apa('introduction. in-depth analysis'));
+
         $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('as the world turns, so are the days of our lives'));
         $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('AS THE WORLD TURNS, SO ARE THE DAYS OF OUR LIVES'));
         $this->assertSame('As the World Turns, So Are the Days of Our Lives', Str::apa('As The World Turns, So Are The Days Of Our Lives'));
