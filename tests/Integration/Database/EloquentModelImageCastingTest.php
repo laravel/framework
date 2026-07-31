@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-class EloquentModelmageCastingTest extends DatabaseTestCase
+class EloquentModelImageCastingTest extends DatabaseTestCase
 {
     /** {@inheritdoc} */
     protected function afterRefreshingDatabase()
