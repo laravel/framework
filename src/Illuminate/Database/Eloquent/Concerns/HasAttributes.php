@@ -124,6 +124,7 @@ trait HasAttributes
         'encrypted:object',
         'float',
         'hashed',
+        'image',
         'immutable_date',
         'immutable_datetime',
         'immutable_custom_datetime',
