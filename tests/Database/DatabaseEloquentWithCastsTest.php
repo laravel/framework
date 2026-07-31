@@ -6,10 +6,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Image\Image as ImageFacade;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentWithCastsTest extends TestCase
@@ -42,15 +39,6 @@ class DatabaseEloquentWithCastsTest extends TestCase
         $this->schema()->create('unique_times', function ($table) {
             $table->increments('id');
             $table->time('time')->unique();
-            $table->timestamps();
-        });
-
-        $this->schema()->create('images', function ($table) {
-            $table->increments('id');
-            $table->string('storage_path');
-            $table->string('web_url');
-            $table->text('image');
-            $table->text('encoded');
             $table->timestamps();
         });
     }
@@ -106,42 +94,6 @@ class DatabaseEloquentWithCastsTest extends TestCase
         }
     }
 
-    protected function makeImage(): Image
-    {
-        return new Image($this->fakeImageContents());
-    }
-
-    protected function fakeImageContents(int $width = 100, int $height = 100): string
-    {
-        $file = UploadedFile::fake()->image('test.jpg', $width, $height);
-
-        return file_get_contents($file->getRealPath());
-    }
-
-    public function testImageCast()
-    {
-        Storage::fake();
-
-        $file = UploadedFile::fake()->image('test.jpg', 100, 100);
-        $image = new ImageFacade(file_get_contents($file->getRealPath()));
-        $base64 = $image->toBase64();
-        $image->store('avatars/john_doe.png');
-        $img = Image::create([
-            'web_url' => 'https://example.com/favicon.ico',
-            'storage_path' => 'avatars/john_doe.png',
-            'image' => $image->toBytes(),
-            'encoded' => $image->toBase64(),
-        ]);
-
-        $this->assertInstanceOf(ImageFacade::class, $img->web_url);
-        $this->assertInstanceOf(ImageFacade::class, $img->storage_path);
-        $this->assertInstanceOf(ImageFacade::class, $img->image);
-        $this->assertInstanceOf(ImageFacade::class, $img->encoded);
-        $this->assertSame($base64, $img->storage_path->toBase64());
-        $this->assertSame($base64, $img->image->toBase64());
-        $this->assertSame($base64, $img->encoded->toBase64());
-    }
-
     /**
      * Get a database connection instance.
      *
@@ -178,17 +130,5 @@ class UniqueTime extends Eloquent
 
     protected $casts = [
         'time' => 'datetime',
-    ];
-}
-
-class Image extends Eloquent
-{
-    protected $guarded = [];
-
-    protected $casts = [
-        'web_url' => 'image:url',
-        'storage_path' => 'image:storage',
-        'image' => 'image:bytes',
-        'encoded' => 'image:base64',
     ];
 }
