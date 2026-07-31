@@ -91,10 +91,17 @@ class Serializer
                     $attributes['required'] = $required;
                 }
 
-                $attributes['properties'] = array_map(
+                $properties = array_map(
                     static fn (Types\Type $property) => static::serialize($property),
                     $attributes['properties'],
                 );
+
+                // PHP casts numeric property names to integer array keys, so a schema
+                // whose property names are "0", "1", ... would otherwise encode as a
+                // JSON array rather than the object the specification requires...
+                $attributes['properties'] = array_is_list($properties)
+                    ? (object) $properties
+                    : $properties;
             }
         }
 

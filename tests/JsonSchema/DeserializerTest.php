@@ -180,6 +180,44 @@ class DeserializerTest extends TestCase
         $this->assertIsString($array['required'][0]);
     }
 
+    public function test_it_encodes_sequential_numeric_property_names_as_a_json_object(): void
+    {
+        $type = JsonSchema::fromArray([
+            'type' => 'object',
+            'properties' => [
+                '0' => ['type' => 'string'],
+                '1' => ['type' => 'integer'],
+            ],
+            'required' => ['0'],
+        ]);
+
+        $decoded = json_decode($type->toString());
+
+        $this->assertEquals((object) [
+            '0' => (object) ['type' => 'string'],
+            '1' => (object) ['type' => 'integer'],
+        ], $decoded->properties);
+
+        $this->assertEquals(['0'], $decoded->required);
+    }
+
+    public function test_it_round_trips_sequential_numeric_property_names(): void
+    {
+        $type = JsonSchema::fromArray([
+            'type' => 'object',
+            'properties' => [
+                '0' => ['type' => 'string'],
+                '1' => ['type' => 'integer'],
+            ],
+            'required' => ['0'],
+        ]);
+
+        $this->assertEquals(
+            $type->toArray(),
+            JsonSchema::fromArray($type->toArray())->toArray()
+        );
+    }
+
     public function test_it_disallows_additional_properties_when_false(): void
     {
         $type = JsonSchema::fromArray([

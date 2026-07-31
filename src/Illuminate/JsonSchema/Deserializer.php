@@ -164,12 +164,18 @@ class Deserializer
     {
         $properties = [];
 
-        if (isset($schema['properties']) && is_array($schema['properties'])) {
+        // A JSON object decoded without associative arrays arrives as an object, as
+        // does the "properties" a schema with numeric property names serializes to...
+        $definitions = is_object($schema['properties'] ?? null)
+            ? (array) $schema['properties']
+            : $schema['properties'] ?? null;
+
+        if (is_array($definitions)) {
             $required = is_array($schema['required'] ?? null)
                 ? array_flip(array_map('strval', $schema['required']))
                 : [];
 
-            foreach ($schema['properties'] as $key => $definition) {
+            foreach ($definitions as $key => $definition) {
                 if (! is_array($definition)) {
                     throw new InvalidArgumentException(
                         "Unable to represent the schema for property [{$key}]; boolean schemas are not supported."

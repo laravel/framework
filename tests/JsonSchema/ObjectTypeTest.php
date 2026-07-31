@@ -53,6 +53,21 @@ class ObjectTypeTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_may_have_sequential_numeric_property_names(): void
+    {
+        $type = JsonSchema::object([
+            '0' => JsonSchema::string()->required(),
+            '1' => JsonSchema::integer(),
+        ]);
+
+        $this->assertSame(
+            '{"0":{"type":"string"},"1":{"type":"integer"}}',
+            json_encode($type->toArray()['properties'])
+        );
+
+        $this->assertSame(['0'], $type->toArray()['required']);
+    }
+
     public function test_it_may_be_initialized_with_a_closure_but_may_have_properties(): void
     {
         $type = JsonSchema::object(fn (JsonSchemaTypeFactory $schema) => [
