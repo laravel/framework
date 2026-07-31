@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image as ImageFacade;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentWithCastsTest extends TestCase
@@ -119,6 +120,8 @@ class DatabaseEloquentWithCastsTest extends TestCase
 
     public function testImageCast()
     {
+        Storage::fake();
+
         $file = UploadedFile::fake()->image('test.jpg', 100, 100);
         $image = new ImageFacade(file_get_contents($file->getRealPath()));
         $base64 = $image->toBase64();
