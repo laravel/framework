@@ -10,6 +10,7 @@ use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
+use Illuminate\Queue\Attributes\ReleaseOnTimeout;
 use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\DatabaseQueue;
@@ -161,6 +162,38 @@ class QueueDatabaseQueueUnitTest extends TestCase
         });
 
         $queue->push(new JobWithAttributesAndDefaultProperties, ['data']);
+
+        $container->shouldHaveReceived('bound')->with('events')->twice();
+    }
+
+    public function testPushDefaultsReleaseOnTimeoutToFalse()
+    {
+        $queue = new DatabaseQueue($database = m::mock(Connection::class), 'table', 'default');
+        $queue->setContainer($container = m::spy(Container::class));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
+            $payload = json_decode($array['payload'], true);
+
+            $this->assertFalse($payload['releaseOnTimeout']);
+        });
+
+        $queue->push(new JobWithAttributesAndDefaultProperties, ['data']);
+
+        $container->shouldHaveReceived('bound')->with('events')->twice();
+    }
+
+    public function testPushIncludesReleaseOnTimeoutFromAttribute()
+    {
+        $queue = new DatabaseQueue($database = m::mock(Connection::class), 'table', 'default');
+        $queue->setContainer($container = m::spy(Container::class));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
+            $payload = json_decode($array['payload'], true);
+
+            $this->assertTrue($payload['releaseOnTimeout']);
+        });
+
+        $queue->push(new JobWithReleaseOnTimeoutAttribute, ['data']);
 
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
@@ -504,4 +537,9 @@ class JobWithAttributesAndDefaultProperties implements ShouldQueue
     public $timeout = 1700;
 
     public $tries = 7;
+}
+
+#[ReleaseOnTimeout]
+class JobWithReleaseOnTimeoutAttribute implements ShouldQueue
+{
 }

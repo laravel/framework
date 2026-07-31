@@ -317,6 +317,16 @@ abstract class Job
     }
 
     /**
+     * Determine if the job should be released back onto the queue when it times out.
+     *
+     * @return bool
+     */
+    public function shouldReleaseOnTimeout()
+    {
+        return $this->payload()['releaseOnTimeout'] ?? false;
+    }
+
+    /**
      * The number of seconds to wait before retrying a job that encountered an uncaught exception.
      *
      * @return int|int[]|null

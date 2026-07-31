@@ -633,6 +633,68 @@ class QueueWorkerTest extends TestCase
         }))->once();
     }
 
+    public function testShouldReleaseJobOnTimeoutIsTrueWhenAttributeEnabledAndJobIsStillActive()
+    {
+        $job = new WorkerFakeJob;
+        $job->shouldReleaseOnTimeout = true;
+
+        $this->assertTrue($this->callShouldReleaseJobOnTimeout($job));
+    }
+
+    public function testShouldReleaseJobOnTimeoutIsFalseWhenReleaseOnTimeoutIsDisabled()
+    {
+        $job = new WorkerFakeJob;
+        $job->shouldReleaseOnTimeout = false;
+
+        $this->assertFalse($this->callShouldReleaseJobOnTimeout($job));
+    }
+
+    public function testShouldReleaseJobOnTimeoutIsFalseWhenJobIsAlreadyDeleted()
+    {
+        $job = new WorkerFakeJob;
+        $job->shouldReleaseOnTimeout = true;
+        $job->deleted = true;
+
+        $this->assertFalse($this->callShouldReleaseJobOnTimeout($job));
+    }
+
+    public function testShouldReleaseJobOnTimeoutIsFalseWhenJobIsAlreadyReleased()
+    {
+        $job = new WorkerFakeJob;
+        $job->shouldReleaseOnTimeout = true;
+        $job->released = true;
+
+        $this->assertFalse($this->callShouldReleaseJobOnTimeout($job));
+    }
+
+    public function testShouldReleaseJobOnTimeoutIsFalseWhenJobHasAlreadyFailed()
+    {
+        $job = new WorkerFakeJob;
+        $job->shouldReleaseOnTimeout = true;
+        $job->failed = true;
+
+        $this->assertFalse($this->callShouldReleaseJobOnTimeout($job));
+    }
+
+    public function testShouldReleaseJobOnTimeoutIsFalseWhenJobDoesNotImplementTheMethod()
+    {
+        $job = $this->createStub(QueueJobContract::class);
+        $job->method('isDeleted')->willReturn(false);
+        $job->method('isReleased')->willReturn(false);
+        $job->method('hasFailed')->willReturn(false);
+
+        $this->assertFalse($this->callShouldReleaseJobOnTimeout($job));
+    }
+
+    private function callShouldReleaseJobOnTimeout($job)
+    {
+        $worker = $this->getWorker();
+
+        $method = new \ReflectionMethod($worker, 'shouldReleaseJobOnTimeout');
+
+        return $method->invoke($worker, $job);
+    }
+
     public function testInterruptibleJobIsNotifiedOnSignal()
     {
         $interruptible = new class implements Interruptible
@@ -834,6 +896,8 @@ class WorkerFakeJob implements QueueJobContract
     public $maxTries;
     public $maxExceptions;
     public $shouldFailOnTimeout = false;
+
+    public $shouldReleaseOnTimeout = false;
     public $uuid;
     public $backoff;
     public $retryUntil;
@@ -881,6 +945,11 @@ class WorkerFakeJob implements QueueJobContract
     public function shouldFailOnTimeout()
     {
         return $this->shouldFailOnTimeout;
+    }
+
+    public function shouldReleaseOnTimeout()
+    {
+        return $this->shouldReleaseOnTimeout;
     }
 
     public function uuid()

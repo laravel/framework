@@ -308,9 +308,18 @@ class Worker
                     $job->getConnectionName(), $job, $e
                 );
 
-                $this->events->dispatch(new JobTimedOut(
-                    $job->getConnectionName(), $job
-                ));
+                if ($this->shouldReleaseJobOnTimeout($job)) {
+                    $backoff = $this->calculateBackoff($job, $options);
+                    $job->release($backoff);
+
+                    $this->events->dispatch(new JobReleasedAfterException(
+                        $job->getConnectionName(), $job, $backoff, $e
+                    ));
+                } else {
+                    $this->events->dispatch(new JobTimedOut(
+                        $job->getConnectionName(), $job
+                    ));
+                }
             }
 
             $this->kill(static::$timedOutExitCode ?? static::EXIT_ERROR, $options, WorkerStopReason::TimedOut);
@@ -329,6 +338,20 @@ class Worker
     protected function resetTimeoutHandler()
     {
         pcntl_alarm(0);
+    }
+
+    /**
+     * Determine if the given job should be released back onto the queue after timing out.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return bool
+     */
+    protected function shouldReleaseJobOnTimeout($job)
+    {
+        return (method_exists($job, 'shouldReleaseOnTimeout') ? $job->shouldReleaseOnTimeout() : false)
+            && ! $job->isDeleted()
+            && ! $job->isReleased()
+            && ! $job->hasFailed();
     }
 
     /**
