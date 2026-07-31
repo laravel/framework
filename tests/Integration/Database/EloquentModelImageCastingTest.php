@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\EloquentModelDateCastingTest;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
@@ -11,7 +12,7 @@ class EloquentModelImageCastingTest extends DatabaseTestCase
     /** {@inheritdoc} */
     protected function afterRefreshingDatabase()
     {
-        $this->schema()->create('images', function (Blueprint $table) {
+        Schema::create('images', function (Blueprint $table) {
             $table->increments('id');
             $table->string('storage_path');
             $table->string('web_url');
