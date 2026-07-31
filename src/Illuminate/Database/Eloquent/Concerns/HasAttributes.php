@@ -898,11 +898,12 @@ trait HasAttributes
                 return $this->asDateTime($value)->toImmutable();
             case 'timestamp':
                 return $this->asTimestamp($value);
+            case 'image':
             case 'image:url':
             case 'image:storage':
             case 'image:base64':
             case 'image:bytes':
-                return $this->toImage($value, substr($castType, 6));
+                return $this->toImage($key, $value, substr($castType, 6));
         }
 
         if ($this->isEnumCastable($key)) {
@@ -1646,13 +1647,14 @@ trait HasAttributes
         return $this->asDateTime($value)->getTimestamp();
     }
 
-    protected function toImage($value, string $sourceType): Image
+    protected function toImage(string $key, $value, string $sourceType): Image
     {
         return match ($sourceType) {
             'storage' => Image::fromStorage($value),
             'bytes' => Image::fromBytes($value),
             'base64' => Image::fromBase64($value),
             'url' => Image::fromUrl($value),
+            default => throw new InvalidCastException($this->getModel(), $key, $castType),
         };
     }
 
