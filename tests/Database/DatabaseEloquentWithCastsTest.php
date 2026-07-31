@@ -47,8 +47,8 @@ class DatabaseEloquentWithCastsTest extends TestCase
             $table->increments('id');
             $table->string('storage_path');
             $table->string('web_url');
-            $table->string('image');
-            $table->string('encoded');
+            $table->text('image');
+            $table->text('encoded');
             $table->timestamps();
         });
     }
