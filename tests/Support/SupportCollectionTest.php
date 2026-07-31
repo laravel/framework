@@ -3751,6 +3751,19 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testGroupByNull($collection)
+    {
+        $data = new $collection($payload = [
+            ['name' => 'a', 'url' => '1'],
+            ['name' => 'b', 'url' => null],
+            ['name' => 'c', 'url' => null],
+        ]);
+
+        $result = $data->groupBy('url');
+        $this->assertEquals(['1' => [$payload[0]], 'null' => [$payload[1], $payload[2]]], $result->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testKeyByAttribute($collection)
     {
         $data = new $collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => '2'], ['rating' => 3, 'name' => '3']]);
@@ -3808,6 +3821,15 @@ class SupportCollectionTest extends TestCase
             '[0,"Taylor","Otwell"]' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
             '[1,"Lucas","Michot"]' => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
         ], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testKeyByNull($collection)
+    {
+        $data = new $collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => null]]);
+
+        $result = $data->keyBy('name');
+        $this->assertEquals(['1' => ['rating' => 1, 'name' => '1'], 'null' => ['rating' => 2, 'name' => null]], $result->all());
     }
 
     #[DataProvider('collectionClassProvider')]
