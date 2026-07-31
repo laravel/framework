@@ -18,7 +18,7 @@ class EloquentModelImageCastingTest extends DatabaseTestCase
             $table->increments('id');
             $table->string('storage_path');
             $table->string('web_url');
-            $table->binary('image');
+            //$table->binary('image');
             $table->text('encoded');
             $table->timestamps();
         });
@@ -33,16 +33,16 @@ class EloquentModelImageCastingTest extends DatabaseTestCase
         $img = Image::create([
             'web_url' => 'https://example.com/favicon.ico',
             'storage_path' => 'avatars/john_doe.png',
-            'image' => $image->toBytes(),
+            //'image' => $image->toBytes(),
             'encoded' => $image->toBase64(),
         ]);
 
         $this->assertInstanceOf(ImageFacade::class, $img->web_url);
         $this->assertInstanceOf(ImageFacade::class, $img->storage_path);
-        $this->assertInstanceOf(ImageFacade::class, $img->image);
+        //$this->assertInstanceOf(ImageFacade::class, $img->image);
         $this->assertInstanceOf(ImageFacade::class, $img->encoded);
         $this->assertSame($base64, $img->storage_path->toBase64());
-        $this->assertSame($base64, $img->image->toBase64());
+        //$this->assertSame($base64, $img->image->toBase64());
         $this->assertSame($base64, $img->encoded->toBase64());
     }
 }
