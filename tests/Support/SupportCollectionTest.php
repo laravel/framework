@@ -3760,7 +3760,7 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $result = $data->groupBy('url');
-        $this->assertEquals(['1' => [$payload[0]], 'null' => [$payload[1], $payload[2]]], $result->toArray());
+        $this->assertEquals(['1' => [$payload[0]], '' => [$payload[1], $payload[2]]], $result->toArray());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -3829,7 +3829,7 @@ class SupportCollectionTest extends TestCase
         $data = new $collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => null]]);
 
         $result = $data->keyBy('name');
-        $this->assertEquals(['1' => ['rating' => 1, 'name' => '1'], 'null' => ['rating' => 2, 'name' => null]], $result->all());
+        $this->assertEquals(['1' => ['rating' => 1, 'name' => '1'], '' => ['rating' => 2, 'name' => null]], $result->all());
     }
 
     #[DataProvider('collectionClassProvider')]
