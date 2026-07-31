@@ -16,6 +16,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\RouteKey;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
@@ -72,8 +73,6 @@ class DatabaseEloquentModelTest extends TestCase
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow();
-
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();
 
@@ -2780,6 +2779,96 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(3, $model->bar);
     }
 
+    public function testIncrementEachQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
+    {
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->foo = 2;
+        $model->bar = 5;
+
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->andReturn($query);
+        $query->shouldReceive('incrementEach');
+
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->never()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->never()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+
+        $model->publicIncrementEachQuietly(['foo' => 1, 'bar' => 2]);
+        $this->assertEquals(3, $model->foo);
+        $this->assertEquals(7, $model->bar);
+        $this->assertFalse($model->isDirty());
+
+        $model->publicIncrementEachQuietly(['foo' => 1], ['category' => 1]);
+        $this->assertEquals(4, $model->foo);
+        $this->assertEquals(1, $model->category);
+        $this->assertTrue($model->isDirty('category'));
+    }
+
+    public function testDecrementEachQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
+    {
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->foo = 10;
+        $model->bar = 5;
+
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->andReturn($query);
+        $query->shouldReceive('decrementEach');
+
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->never()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->never()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+
+        $model->publicDecrementEachQuietly(['foo' => 3, 'bar' => 2]);
+        $this->assertEquals(7, $model->foo);
+        $this->assertEquals(3, $model->bar);
+        $this->assertFalse($model->isDirty());
+
+        $model->publicDecrementEachQuietly(['foo' => 1], ['category' => 1]);
+        $this->assertEquals(6, $model->foo);
+        $this->assertEquals(1, $model->category);
+        $this->assertTrue($model->isDirty('category'));
+    }
+
+    public function testIncrementEachQuietlyCanBeCalledDynamicallyOnModelInstance()
+    {
+        $model = new EloquentModelDynamicIncrementEachStub(['foo' => 2, 'bar' => 5]);
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+
+        // Called dynamically (the method is protected) so it routes through Model::__call.
+        $model->incrementEachQuietly(['foo' => 1, 'bar' => 2]);
+
+        $this->assertSame('incrementEach', $model->queryStub->called);
+        $this->assertEquals(3, $model->foo);
+        $this->assertEquals(7, $model->bar);
+    }
+
+    public function testDecrementEachQuietlyCanBeCalledDynamicallyOnModelInstance()
+    {
+        $model = new EloquentModelDynamicIncrementEachStub(['foo' => 5, 'bar' => 10]);
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+
+        // Called dynamically (the method is protected) so it routes through Model::__call.
+        $model->decrementEachQuietly(['foo' => 1, 'bar' => 2]);
+
+        $this->assertSame('decrementEach', $model->queryStub->called);
+        $this->assertEquals(4, $model->foo);
+        $this->assertEquals(8, $model->bar);
+    }
+
     public function testIncrementEachWithExtraColumnsOnExistingModel()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
@@ -3827,7 +3916,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelWithUseEloquentBuilderAttributeStub();
 
-        $query = $this->createMock(\Illuminate\Database\Query\Builder::class);
+        $query = $this->createStub(\Illuminate\Database\Query\Builder::class);
         $eloquentBuilder = $model->newEloquentBuilder($query);
 
         $this->assertInstanceOf(CustomBuilder::class, $eloquentBuilder);
@@ -3837,10 +3926,24 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelWithoutUseEloquentBuilderAttributeStub();
 
-        $query = $this->createMock(\Illuminate\Database\Query\Builder::class);
+        $query = $this->createStub(\Illuminate\Database\Query\Builder::class);
         $eloquentBuilder = $model->newEloquentBuilder($query);
 
         $this->assertNotInstanceOf(CustomBuilder::class, $eloquentBuilder);
+    }
+
+    public function testRouteKeyCanBeResolvedFromAttribute()
+    {
+        $model = new EloquentModelWithRouteKeyAttributeStub;
+
+        $this->assertSame('slug', $model->getRouteKeyName());
+    }
+
+    public function testRouteKeyAttributeIsInherited()
+    {
+        $model = new EloquentModelInheritingRouteKeyAttributeStub;
+
+        $this->assertSame('slug', $model->getRouteKeyName());
     }
 }
 
@@ -3947,6 +4050,16 @@ class EloquentModelStub extends Model
     public function publicDecrementEach(array $columns, array $extra = [])
     {
         return $this->decrementEach($columns, $extra);
+    }
+
+    public function publicIncrementEachQuietly(array $columns, array $extra = [])
+    {
+        return $this->incrementEachQuietly($columns, $extra);
+    }
+
+    public function publicDecrementEachQuietly(array $columns, array $extra = [])
+    {
+        return $this->decrementEachQuietly($columns, $extra);
     }
 
     public function belongsToStub()
@@ -4785,4 +4898,68 @@ enum ConnectionNameBacked: string
 {
     case Foo = 'Foo';
     case Bar = 'Bar';
+}
+
+class EloquentModelDynamicIncrementEachStub extends Model
+{
+    protected $guarded = [];
+
+    public $queryStub;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->queryStub = new EloquentModelIncrementEachQueryStub;
+    }
+
+    public function newQueryWithoutScopes()
+    {
+        return $this->queryStub;
+    }
+
+    public function newQuery()
+    {
+        return $this->queryStub;
+    }
+}
+
+class EloquentModelIncrementEachQueryStub
+{
+    public $called;
+
+    public function where()
+    {
+        return $this;
+    }
+
+    public function incrementEach($columns, $extra = [])
+    {
+        $this->called = 'incrementEach';
+
+        return 1;
+    }
+
+    public function decrementEach($columns, $extra = [])
+    {
+        $this->called = 'decrementEach';
+
+        return 1;
+    }
+
+    public function __call($name, $arguments)
+    {
+        throw new \BadMethodCallException($name);
+    }
+}
+
+#[RouteKey('slug')]
+class EloquentModelWithRouteKeyAttributeStub extends Model
+{
+    //
+}
+
+class EloquentModelInheritingRouteKeyAttributeStub extends EloquentModelWithRouteKeyAttributeStub
+{
+    //
 }

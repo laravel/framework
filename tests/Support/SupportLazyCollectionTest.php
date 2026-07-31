@@ -278,7 +278,6 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertSame([1, 2, 3], $data);
 
         Sleep::fake(false);
-        Carbon::setTestNow();
     }
 
     public function testUniqueDoubleEnumeration()
@@ -509,8 +508,6 @@ class SupportLazyCollectionTest extends TestCase
             ],
             $output->all(),
         );
-
-        Carbon::setTestNow();
     }
 
     public function testRandomPreservesKeys()

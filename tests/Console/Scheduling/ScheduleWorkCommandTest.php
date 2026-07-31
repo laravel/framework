@@ -38,8 +38,6 @@ class ScheduleWorkCommandTest extends TestCase
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow();
-
         Signals::resolveAvailabilityUsing($this->originalAvailabilityResolver);
 
         parent::tearDown();

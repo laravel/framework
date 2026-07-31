@@ -155,6 +155,7 @@ namespace Illuminate\Support\Facades;
  * @method static array allFiles()
  * @method static bool hasFile(string $key)
  * @method static array|\Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]|null file(string|null $key = null, mixed $default = null)
+ * @method static \Illuminate\Image\Image|null image(string $key)
  * @method static \Illuminate\Http\Request dump(mixed $keys = [])
  * @method static never dd(mixed ...$args)
  * @method static bool exists(string|array $key)

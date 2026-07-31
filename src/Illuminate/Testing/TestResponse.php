@@ -69,6 +69,13 @@ class TestResponse implements ArrayAccess
     protected $streamedContent;
 
     /**
+     * The decoded response JSON.
+     *
+     * @var \Illuminate\Testing\AssertableJsonString|null
+     */
+    protected $decodedResponseJson;
+
+    /**
      * Create a new test response instance.
      *
      * @param  TResponse  $response
@@ -545,7 +552,7 @@ class TestResponse implements ArrayAccess
         $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime(), date_default_timezone_get());
 
         PHPUnit::withResponse($this)->assertTrue(
-            $cookie->getExpiresTime() !== 0 && $expiresAt->lessThan(Carbon::now()),
+            $cookie->getExpiresTime() !== 0 && $expiresAt->isPast(),
             "Cookie [{$cookieName}] is not expired, it expires at [{$expiresAt}]."
         );
 
@@ -568,7 +575,7 @@ class TestResponse implements ArrayAccess
         $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime(), date_default_timezone_get());
 
         PHPUnit::withResponse($this)->assertTrue(
-            $cookie->getExpiresTime() === 0 || $expiresAt->greaterThan(Carbon::now()),
+            $cookie->getExpiresTime() === 0 || $expiresAt->isFuture(),
             "Cookie [{$cookieName}] is expired, it expired at [{$expiresAt}]."
         );
 
@@ -1265,6 +1272,10 @@ class TestResponse implements ArrayAccess
      */
     public function decodeResponseJson()
     {
+        if (! is_null($this->decodedResponseJson)) {
+            return $this->decodedResponseJson;
+        }
+
         if ($this->baseResponse instanceof StreamedResponse ||
             $this->baseResponse instanceof StreamedJsonResponse) {
             $testJson = new AssertableJsonString($this->streamedContent());
@@ -1282,7 +1293,7 @@ class TestResponse implements ArrayAccess
             }
         }
 
-        return $testJson;
+        return $this->decodedResponseJson = $testJson;
     }
 
     /**
@@ -1448,11 +1459,7 @@ class TestResponse implements ArrayAccess
             return $this->assertJsonMissingValidationErrors($keys, $responseKey);
         }
 
-        if ($this->session()->get('errors')) {
-            $errors = $this->session()->get('errors')->getBag($errorBag)->getMessages();
-        } else {
-            $errors = [];
-        }
+        $errors = $this->session()->get('errors') ? $this->session()->get('errors')->getBag($errorBag)->getMessages() : [];
 
         if (empty($errors)) {
             PHPUnit::withResponse($this)->assertTrue(true);

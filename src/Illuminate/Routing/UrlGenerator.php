@@ -489,16 +489,10 @@ class UrlGenerator implements UrlGeneratorContract
             return false;
         }
 
-        foreach ($keys as $key) {
-            if (hash_equals(
-                hash_hmac('sha256', $original, $key),
-                $signature
-            )) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($keys, fn ($key) => hash_equals(
+            hash_hmac('sha256', $original, $key),
+            $signature
+        ));
     }
 
     /**

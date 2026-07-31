@@ -31,10 +31,10 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use Mockery as m;
-use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\File;
@@ -44,7 +44,7 @@ class ValidationValidatorTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Carbon::setTestNow();
+        Validator::flushState();
 
         parent::tearDown();
     }
@@ -2386,6 +2386,21 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateBase64(): void
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['value' => base64_encode('Laravel')], ['value' => 'base64']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['value' => ''], ['value' => 'required|base64']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['value' => 'not-base64!'], ['value' => 'base64']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['value' => 'YQ'], ['value' => 'base64']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['value' => 'YQ=='], ['value' => 'base64']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateConfirmed()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3307,6 +3322,13 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['array']], ['x' => 'hex_color']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateBase64DoesNotThrowOnNonStringValue(): void
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['array']], ['x' => 'base64']);
         $this->assertFalse($v->passes());
     }
 
@@ -5312,18 +5334,10 @@ class ValidationValidatorTest extends TestCase
     #[DataProvider('activeUrlDataProvider')]
     public function testValidateActiveUrl($data, $outcome)
     {
+        Validator::fakeDnsLookups();
+
         $trans = $this->getIlluminateArrayTranslator();
-        $v = m::mock(
-            new Validator($trans, $data, ['x' => 'active_url']),
-            function (MockInterface $mock) {
-                $mock
-                    ->shouldAllowMockingProtectedMethods()
-                    ->shouldReceive('getDnsRecords')
-                    ->withAnyArgs()
-                    ->zeroOrMoreTimes()
-                    ->andReturn(['hit']);
-            }
-        );
+        $v = new Validator($trans, $data, ['x' => 'active_url']);
         $this->assertEquals($outcome, $v->passes());
     }
 
@@ -5351,6 +5365,65 @@ class ValidationValidatorTest extends TestCase
                 true,
             ],
         ];
+    }
+
+    public function testValidateActiveUrlWithFakedDnsLookups()
+    {
+        Validator::fakeDnsLookups();
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => 'https://this-domain-does-not-exist.invalid'], ['x' => 'active_url']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'active_url']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => ['not-a-string']], ['x' => 'active_url']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://foo..com'], ['x' => 'active_url']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://127.0.0.1'], ['x' => 'active_url']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateEmailWithDnsCheckWithFakedDnsLookups()
+    {
+        Validator::fakeDnsLookups();
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => 'taylor@this-domain-does-not-exist.com'], ['x' => 'email:dns']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'taylor@this-domain-does-not-exist.com'], ['x' => 'email:rfc,dns']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'not-an-email'], ['x' => 'email:dns']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '.invalid@gmail.com'], ['x' => 'email:dns']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'taylor@this-domain-does-not-exist.invalid'], ['x' => 'email:dns']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testFakedDnsLookupsCanBeToggledAndAreFlushed()
+    {
+        $property = new ReflectionProperty(Validator::class, 'fakeDnsLookups');
+
+        Validator::fakeDnsLookups();
+        $this->assertTrue($property->getValue());
+
+        Validator::fakeDnsLookups(false);
+        $this->assertFalse($property->getValue());
+
+        Validator::fakeDnsLookups();
+        Validator::flushState();
+        $this->assertFalse($property->getValue());
     }
 
     public function testValidateImage()
@@ -6474,7 +6547,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testValidateDateAndFormat()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date']);
         $this->assertTrue($v->passes());
@@ -6555,7 +6627,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testDateEquals()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date_equals:2000-01-01']);
         $this->assertTrue($v->passes());
@@ -6623,7 +6694,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testDateEqualsRespectsCarbonTestNowWhenParameterIsRelative()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         Carbon::setTestNow(new Carbon('2018-01-01'));
 
@@ -6669,7 +6739,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testBeforeAndAfter()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'Before:2012-01-01']);
         $this->assertTrue($v->passes());
@@ -6755,7 +6824,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testBeforeAndAfterWithFormat()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '31/12/2000'], ['x' => 'before:31/02/2012']);
         $this->assertTrue($v->fails());
@@ -6874,7 +6942,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testWeakBeforeAndAfter()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '2012-01-15'], ['x' => 'before_or_equal:2012-01-15']);
         $this->assertTrue($v->passes());

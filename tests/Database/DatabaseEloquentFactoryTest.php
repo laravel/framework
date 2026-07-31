@@ -834,8 +834,6 @@ class DatabaseEloquentFactoryTest extends TestCase
         $post = FactoryTestPostFactory::new()->trashed($deleted_at)->create();
 
         $this->assertTrue($deleted_at->equalTo($post->deleted_at));
-
-        Carbon::setTestNow();
     }
 
     public function test_dynamic_trashed_state_respects_existing_state()
@@ -845,8 +843,6 @@ class DatabaseEloquentFactoryTest extends TestCase
         $comment = FactoryTestCommentFactory::new()->trashed()->create();
 
         $this->assertTrue($comment->deleted_at->equalTo($now->subWeek()));
-
-        Carbon::setTestNow();
     }
 
     public function test_dynamic_trashed_state_throws_exception_when_not_a_softdeletes_model()
@@ -1108,9 +1104,9 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->insert();
         $this->assertCount(5, $posts = FactoryTestPost::query()->where('title', 'hello')->get());
         $this->assertEquals(strtoupper($posts[0]->user->name), $posts[0]->upper_case_name);
-        $this->assertEquals(
+        $this->assertCount(
             2,
-            ($users = FactoryTestUser::query()->get())->count()
+            $users = FactoryTestUser::query()->get()
         );
         $this->assertCount(1, $users->where('name', 'totwell'));
         $this->assertCount(1, $users->where('name', 'shaedrich'));

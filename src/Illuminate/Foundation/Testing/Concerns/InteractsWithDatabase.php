@@ -151,7 +151,7 @@ trait InteractsWithDatabase
     {
         if (is_iterable($table)) {
             foreach ($table as $item) {
-                $this->assertSoftDeleted($item, $data, $connection);
+                $this->assertSoftDeleted($item, $data, $connection, $deletedAtColumn);
             }
 
             return $this;
@@ -199,7 +199,7 @@ trait InteractsWithDatabase
     {
         if (is_iterable($table)) {
             foreach ($table as $item) {
-                $this->assertNotSoftDeleted($item, $data, $connection);
+                $this->assertNotSoftDeleted($item, $data, $connection, $deletedAtColumn);
             }
 
             return $this;

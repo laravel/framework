@@ -59,11 +59,7 @@ class ArraySubset extends Constraint
 
         $patched = array_replace_recursive($other, $this->subset);
 
-        if ($this->strict) {
-            $result = $other === $patched;
-        } else {
-            $result = $other == $patched;
-        }
+        $result = $this->strict ? $other === $patched : $other == $patched;
 
         if ($returnResult) {
             return $result;

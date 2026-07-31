@@ -243,11 +243,7 @@ class ValidationRuleParser
             return [$rule, []];
         }
 
-        if (is_array($rule)) {
-            $rule = static::parseArrayRule($rule);
-        } else {
-            $rule = static::parseStringRule($rule);
-        }
+        $rule = is_array($rule) ? static::parseArrayRule($rule) : static::parseStringRule($rule);
 
         $rule[0] = static::normalizeRule($rule[0]);
 

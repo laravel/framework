@@ -58,7 +58,7 @@ trait HasParameters
      *
      * @return (InputOption|array{
      *    0: non-empty-string,
-     *    1?: string|non-empty-array<string>,
+     *    1?: string|non-empty-array<string>|null,
      *    2?: int-mask-of<InputOption::VALUE_*>,
      *    3?: string,
      *    4?: mixed,

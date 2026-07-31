@@ -9,6 +9,7 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Image;
 use Illuminate\Support\Carbon;
 use Illuminate\Testing\Assert;
 use InvalidArgumentException;
@@ -20,6 +21,7 @@ use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -200,6 +202,18 @@ class FilesystemAdapterTest extends TestCase
         $this->filesystem->write('file.json', '{"foo":');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertNull($filesystemAdapter->json('file.json'));
+    }
+
+    public function testImage()
+    {
+        $file = UploadedFile::fake()->image('photo.jpg', 100, 100);
+        $this->filesystem->write('photo.jpg', file_get_contents($file->getRealPath()));
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $image = $filesystemAdapter->image('photo.jpg');
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame([100, 100], $image->dimensions());
     }
 
     public function testMimeTypeNotDetected()
@@ -821,10 +835,39 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->providesTemporaryUploadUrls());
     }
 
+    public function testProvidesTemporaryUploadUrlsForS3Adapter()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $filesystemAdapter = $filesystem->createS3Driver([
+            'region' => 'us-west-1',
+            'bucket' => 'laravel',
+        ]);
+
+        $this->assertTrue($filesystemAdapter->providesTemporaryUploadUrls());
+    }
+
     public function testProvidesTemporaryUploadUrlsForAdapterWithoutTemporaryUploadUrlSupport()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
         $this->assertFalse($filesystemAdapter->providesTemporaryUploadUrls());
+    }
+
+    public function testAssertEmpty()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $filesystemAdapter->assertEmpty();
+    }
+
+    public function testAssertEmptyFailsWhenDiskContainsFiles()
+    {
+        $this->filesystem->write('foo/file.txt', 'Hello World');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Disk is not empty.');
+
+        $filesystemAdapter->assertEmpty();
     }
 }

@@ -349,19 +349,8 @@ class Event
     {
         $this->lastChecked = Date::now();
 
-        foreach ($this->filters as $callback) {
-            if (! $this->callEventCallback($app, $callback)) {
-                return false;
-            }
-        }
-
-        foreach ($this->rejects as $callback) {
-            if ($this->callEventCallback($app, $callback)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($this->filters, fn ($callback) => $this->callEventCallback($app, $callback))
+            && array_all($this->rejects, fn ($callback) => ! $this->callEventCallback($app, $callback));
     }
 
     /**

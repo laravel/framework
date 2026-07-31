@@ -1548,8 +1548,6 @@ class Mailable implements MailableContract, Renderable
     /**
      * Assert the mailable has the given attachment.
      *
-     * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
-     * @param  array  $options
      * @return $this
      */
     public function assertHasNoAttachments()

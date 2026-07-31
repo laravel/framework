@@ -244,7 +244,7 @@ class PendingProcess
      */
     public function run(array|string|null $command = null, ?callable $output = null)
     {
-        $this->command = $command ?: $this->command;
+        $this->command = $command ?? $this->command;
 
         $process = $this->toSymfonyProcess($command);
 
@@ -274,7 +274,7 @@ class PendingProcess
      */
     public function start(array|string|null $command = null, ?callable $output = null)
     {
-        $this->command = $command ?: $this->command;
+        $this->command = $command ?? $this->command;
 
         $process = $this->toSymfonyProcess($command);
 

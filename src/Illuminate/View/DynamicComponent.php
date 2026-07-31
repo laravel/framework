@@ -22,7 +22,7 @@ class DynamicComponent extends Component
     /**
      * The component tag compiler instance.
      *
-     * @var \Illuminate\View\Compilers\BladeTagCompiler
+     * @var \Illuminate\View\Compilers\ComponentTagCompiler
      */
     protected static $compiler;
 

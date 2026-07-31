@@ -56,6 +56,10 @@ class SesV2Transport extends AbstractTransport implements Stringable
                 $options['ListManagementOptions'] = $listManagementOptions;
             }
 
+            if ($tenantName = $this->tenantName($message)) {
+                $options['TenantName'] = $tenantName;
+            }
+
             foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
                 if ($header instanceof MetadataHeader) {
                     $options['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
@@ -107,11 +111,24 @@ class SesV2Transport extends AbstractTransport implements Stringable
      */
     protected function listManagementOptions(SentMessage $message)
     {
-        if ($header = $message->getOriginalMessage()->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
-            if (preg_match("/^(contactListName=)*(?<ContactListName>[^;]+)(;\s?topicName=(?<TopicName>.+))?$/ix", $header->getBodyAsString(), $listManagementOptions)) {
-                return array_filter($listManagementOptions, fn ($e) => in_array($e, ['ContactListName', 'TopicName']), ARRAY_FILTER_USE_KEY);
-            }
+        if (($header = $message->getOriginalMessage()->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) && preg_match("/^(contactListName=)*(?<ContactListName>[^;]+)(;\s?topicName=(?<TopicName>.+))?$/ix", $header->getBodyAsString(), $listManagementOptions)) {
+            return array_filter($listManagementOptions, fn ($e) => in_array($e, ['ContactListName', 'TopicName']), ARRAY_FILTER_USE_KEY);
         }
+    }
+
+    /**
+     * Extract the SES tenant name, if applicable.
+     *
+     * @param  \Symfony\Component\Mailer\SentMessage  $message
+     * @return string|null
+     */
+    protected function tenantName(SentMessage $message)
+    {
+        if ($header = $message->getOriginalMessage()->getHeaders()->get('X-SES-TENANT-NAME')) {
+            return $header->getBodyAsString() ?: null;
+        }
+
+        return null;
     }
 
     /**

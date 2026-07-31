@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use ArrayIterator;
 use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -504,6 +505,15 @@ class SupportArrTest extends TestCase
         $this->assertEquals(200, $value5);
     }
 
+    public function testLastAcceptsIterables()
+    {
+        $items = new ArrayIterator(['first' => 100, 'second' => 200, 'third' => 300]);
+
+        $this->assertSame(300, Arr::last($items));
+        $this->assertSame(200, Arr::last($items, fn ($value, $key) => $key !== 'third'));
+        $this->assertSame('default', Arr::last(new ArrayIterator, default: 'default'));
+    }
+
     public function testFlatten()
     {
         // Flat arrays are unaffected
@@ -710,13 +720,13 @@ class SupportArrTest extends TestCase
         $test_array = ['string' => 'foo bar',  'boolean' => true];
 
         // Test boolean values are returned as booleans
-        $this->assertSame(
-            true, Arr::boolean($test_array, 'boolean')
+        $this->assertTrue(
+            Arr::boolean($test_array, 'boolean')
         );
 
         // Test that default boolean values are returned for missing keys
-        $this->assertSame(
-            true, Arr::boolean($test_array, 'missing_key', true)
+        $this->assertTrue(
+            Arr::boolean($test_array, 'missing_key', true)
         );
 
         // Test that an exception is raised if the value is not a boolean
@@ -860,11 +870,25 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::every(['foo', 'bar'], fn ($value, $key) => is_string($value)));
     }
 
+    public function testEveryAcceptsIterables()
+    {
+        $items = new ArrayIterator(['first' => 1, 'second' => 2]);
+
+        $this->assertTrue(Arr::every($items, fn ($value, $key) => is_string($key) && $value > 0));
+    }
+
     public function testSome()
     {
         $this->assertFalse(Arr::some([1, 2], fn ($value, $key) => is_string($value)));
         $this->assertTrue(Arr::some(['foo', 2], fn ($value, $key) => is_string($value)));
         $this->assertTrue(Arr::some(['foo', 'bar'], fn ($value, $key) => is_string($value)));
+    }
+
+    public function testSomeAcceptsIterables()
+    {
+        $items = new ArrayIterator(['first' => 1, 'second' => 2]);
+
+        $this->assertTrue(Arr::some($items, fn ($value, $key) => $key === 'second' && $value === 2));
     }
 
     public function testIsAssoc()

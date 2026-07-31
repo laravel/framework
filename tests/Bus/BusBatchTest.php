@@ -749,7 +749,7 @@ class BusBatchTest extends TestCase
         $factory->shouldReceive('make')
             ->withSomeOfArgs($batch, '', '', '', '', '', '', $options);
 
-        $batch->find(1);
+        $batch->find('1');
     }
 
     /**

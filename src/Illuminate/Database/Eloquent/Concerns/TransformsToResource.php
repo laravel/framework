@@ -65,7 +65,7 @@ trait TransformsToResource
         $relativeNamespace = Str::after($modelClass, '\\Models\\');
 
         $relativeNamespace = Str::contains($relativeNamespace, '\\')
-            ? Str::before($relativeNamespace, '\\'.class_basename($modelClass))
+            ? Str::beforeLast($relativeNamespace, '\\'.class_basename($modelClass))
             : '';
 
         $potentialResource = sprintf(

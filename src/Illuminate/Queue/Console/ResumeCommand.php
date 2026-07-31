@@ -46,6 +46,6 @@ class ResumeCommand extends Command
 
         $this->components->info("Job processing on queue [{$connection}:{$queue}] has been resumed.");
 
-        return 0;
+        return self::SUCCESS;
     }
 }

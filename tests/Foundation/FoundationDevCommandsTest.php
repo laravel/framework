@@ -6,6 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\DevCommand;
 use Illuminate\Foundation\DevCommandColor;
 use Illuminate\Foundation\DevCommands;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -292,6 +293,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame(DevCommand::PRIORITY_USERLAND, $method->invoke(null, $trace));
     }
 
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRegisterDefaultsRegistersExpectedCommands()
     {
         DevCommands::registerDefaults();
@@ -305,6 +307,22 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertContains('queue', $names);
         $this->assertContains('logs', $names);
         $this->assertContains('vite', $names);
+    }
+
+    #[RequiresOperatingSystem('Windows')]
+    public function testRegisterDefaultsExcludesPailOnWindows()
+    {
+        DevCommands::registerDefaults();
+
+        $commands = DevCommands::commands();
+
+        $this->assertCount(3, $commands);
+
+        $names = array_column($commands, 'name');
+        $this->assertContains('server', $names);
+        $this->assertContains('queue', $names);
+        $this->assertContains('vite', $names);
+        $this->assertNotContains('logs', $names);
     }
 
     public function testRegisteredCommandIncludesSource()

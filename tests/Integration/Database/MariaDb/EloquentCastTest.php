@@ -36,8 +36,8 @@ class EloquentCastTest extends MariaDbTestCase
 
     public function testItCastTimestampsCreatedByTheBuilderWhenTimeHasNotPassed()
     {
-        Carbon::setTestNow(Carbon::now());
-        $createdAt = Carbon::now()->getTimestamp();
+        Carbon::setTestNow($now = Carbon::now());
+        $createdAt = $now->getTimestamp();
 
         $castUser = UserWithIntTimestampsViaCasts::create([
             'email' => fake()->unique()->email,
@@ -49,12 +49,12 @@ class EloquentCastTest extends MariaDbTestCase
             'email' => fake()->unique()->email,
         ]);
 
-        $this->assertSame($createdAt, $castUser->created_at->timestamp);
-        $this->assertSame($createdAt, $castUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->created_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->created_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->updated_at->timestamp);
+        $this->assertSame($createdAt, $castUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $castUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->updated_at->getTimestamp());
 
         $castUser->update([
             'email' => fake()->unique()->email,
@@ -66,21 +66,21 @@ class EloquentCastTest extends MariaDbTestCase
             'email' => fake()->unique()->email,
         ]);
 
-        $this->assertSame($createdAt, $castUser->created_at->timestamp);
-        $this->assertSame($createdAt, $castUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $castUser->fresh()->updated_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->created_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->fresh()->updated_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->created_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->fresh()->updated_at->timestamp);
+        $this->assertSame($createdAt, $castUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $castUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $castUser->fresh()->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->fresh()->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->fresh()->updated_at->getTimestamp());
     }
 
     public function testItCastTimestampsCreatedByTheBuilderWhenTimeHasPassed()
     {
-        Carbon::setTestNow(Carbon::now());
-        $createdAt = Carbon::now()->getTimestamp();
+        Carbon::setTestNow($now = Carbon::now());
+        $createdAt = $now->getTimestamp();
 
         $castUser = UserWithIntTimestampsViaCasts::create([
             'email' => fake()->unique()->email,
@@ -92,15 +92,15 @@ class EloquentCastTest extends MariaDbTestCase
             'email' => fake()->unique()->email,
         ]);
 
-        $this->assertSame($createdAt, $castUser->created_at->timestamp);
-        $this->assertSame($createdAt, $castUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->created_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->created_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->updated_at->timestamp);
+        $this->assertSame($createdAt, $castUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $castUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->updated_at->getTimestamp());
 
-        Carbon::setTestNow(Carbon::now()->addSecond());
-        $updatedAt = Carbon::now()->getTimestamp();
+        Carbon::setTestNow($now->addSecond());
+        $updatedAt = $now->getTimestamp();
 
         $castUser->update([
             'email' => fake()->unique()->email,
@@ -112,20 +112,20 @@ class EloquentCastTest extends MariaDbTestCase
             'email' => fake()->unique()->email,
         ]);
 
-        $this->assertSame($createdAt, $castUser->created_at->timestamp);
-        $this->assertSame($updatedAt, $castUser->updated_at->timestamp);
-        $this->assertSame($updatedAt, $castUser->fresh()->updated_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->created_at->timestamp);
-        $this->assertSame($updatedAt, $attributeUser->updated_at->timestamp);
-        $this->assertSame($updatedAt, $attributeUser->fresh()->updated_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->created_at->timestamp);
-        $this->assertSame($updatedAt, $mutatorUser->updated_at->timestamp);
-        $this->assertSame($updatedAt, $mutatorUser->fresh()->updated_at->timestamp);
+        $this->assertSame($createdAt, $castUser->created_at->getTimestamp());
+        $this->assertSame($updatedAt, $castUser->updated_at->getTimestamp());
+        $this->assertSame($updatedAt, $castUser->fresh()->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->created_at->getTimestamp());
+        $this->assertSame($updatedAt, $attributeUser->updated_at->getTimestamp());
+        $this->assertSame($updatedAt, $attributeUser->fresh()->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->created_at->getTimestamp());
+        $this->assertSame($updatedAt, $mutatorUser->updated_at->getTimestamp());
+        $this->assertSame($updatedAt, $mutatorUser->fresh()->updated_at->getTimestamp());
     }
 
     public function testItCastTimestampsUpdatedByAMutator()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $mutatorUser = UserWithUpdatedAtViaMutator::create([
             'email' => fake()->unique()->email,
@@ -133,15 +133,15 @@ class EloquentCastTest extends MariaDbTestCase
 
         $this->assertNull($mutatorUser->updated_at);
 
-        Carbon::setTestNow(Carbon::now()->addSecond());
-        $updatedAt = Carbon::now()->getTimestamp();
+        Carbon::setTestNow($now->addSecond());
+        $updatedAt = $now->getTimestamp();
 
         $mutatorUser->update([
             'email' => fake()->unique()->email,
         ]);
 
-        $this->assertSame($updatedAt, $mutatorUser->updated_at->timestamp);
-        $this->assertSame($updatedAt, $mutatorUser->fresh()->updated_at->timestamp);
+        $this->assertSame($updatedAt, $mutatorUser->updated_at->getTimestamp());
+        $this->assertSame($updatedAt, $mutatorUser->fresh()->updated_at->getTimestamp());
     }
 }
 

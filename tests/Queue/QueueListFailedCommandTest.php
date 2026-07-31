@@ -12,11 +12,6 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class QueueListFailedCommandTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testQueuedListenerShowsUnderlyingListenerClassNotWrapper()
     {
         // CallQueuedListener is the wrapper class Laravel uses to dispatch

@@ -2313,7 +2313,7 @@ class RoutingRouteTest extends TestCase
 
         try {
             $route->run();
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             //
         }
 
@@ -2727,10 +2727,10 @@ class ExampleMiddleware implements ExampleMiddlewareContract
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-final class RoutingTestOnTenant
+final readonly class RoutingTestOnTenant
 {
     public function __construct(
-        public readonly RoutingTestTenant $tenant
+        public RoutingTestTenant $tenant
     ) {
     }
 }

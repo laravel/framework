@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Support\Collection;
 use Pheanstalk\Contract\JobIdInterface;
@@ -265,8 +266,10 @@ class BeanstalkdQueue extends Queue implements QueueContract
     public function bulk($jobs, $data = '', $queue = null)
     {
         foreach ((array) $jobs as $job) {
-            if (isset($job->delay)) {
-                $this->later($job->delay, $job, $data, $queue);
+            $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
+
+            if (isset($delay)) {
+                $this->later($delay, $job, $data, $queue);
             } else {
                 $this->push($job, $data, $queue);
             }

@@ -98,10 +98,8 @@ class Serializer
             }
         }
 
-        if ($type instanceof Types\ArrayType) {
-            if (isset($attributes['items']) && $attributes['items'] instanceof Types\Type) {
-                $attributes['items'] = static::serialize($attributes['items']);
-            }
+        if ($type instanceof Types\ArrayType && (isset($attributes['items']) && $attributes['items'] instanceof Types\Type)) {
+            $attributes['items'] = static::serialize($attributes['items']);
         }
 
         return $attributes;

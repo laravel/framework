@@ -904,7 +904,7 @@ class FoundationExceptionsHandlerTest extends TestCase
                 return parent::attempt(...func_get_args());
             }
         });
-        Carbon::setTestNow(Carbon::now()->startOfDay());
+        Carbon::setTestNow(Carbon::today());
 
         for ($i = 0; $i < 100; $i++) {
             $handler->report(new Exception('Something in the app went wrong.'));

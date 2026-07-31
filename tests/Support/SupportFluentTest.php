@@ -6,7 +6,6 @@ use ArrayIterator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
-use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
@@ -181,8 +180,8 @@ class SupportFluentTest extends TestCase
             'empty_str' => '',
             'null' => null,
         ]);
-        $this->assertTrue($fluent->string('int') instanceof Stringable);
-        $this->assertTrue($fluent->string('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $fluent->string('int'));
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $fluent->string('unknown_key'));
         $this->assertSame('123', $fluent->string('int')->value());
         $this->assertSame('456', $fluent->string('int_str')->value());
         $this->assertSame('123.456', $fluent->string('float')->value());

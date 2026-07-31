@@ -19,13 +19,6 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
     use FindsAvailableModels;
 
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'model:show {model}';
-
-    /**
      * The console command description.
      *
      * @var string
@@ -56,12 +49,12 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
         } catch (BindingResolutionException $e) {
             $this->components->error($e->getMessage());
 
-            return 1;
+            return self::FAILURE;
         }
 
         $this->display($info);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

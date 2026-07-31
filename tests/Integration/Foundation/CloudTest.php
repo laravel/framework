@@ -100,4 +100,29 @@ class CloudTest extends TestCase
             $_SERVER['LOG_LEVEL'] = $logLevelBackup;
         }
     }
+
+    public function test_it_aliases_cloud_logging_channel()
+    {
+        Cloud::configureCloudLogging($this->app);
+
+        $this->assertSame(
+            $this->app['config']->get('logging.channels.laravel-cloud-socket'),
+            $this->app['config']->get('logging.channels.cloud')
+        );
+    }
+
+    public function test_it_does_not_replace_existing_cloud_logging_channel()
+    {
+        $this->app['config']->set('logging.channels.cloud', [
+            'driver' => 'single',
+            'path' => 'test.log',
+        ]);
+
+        Cloud::configureCloudLogging($this->app);
+
+        $this->assertSame([
+            'driver' => 'single',
+            'path' => 'test.log',
+        ], $this->app['config']->get('logging.channels.cloud'));
+    }
 }

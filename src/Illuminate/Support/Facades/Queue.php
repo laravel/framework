@@ -82,6 +82,8 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static \Illuminate\Support\Testing\Fakes\QueueFake serializeAndRestore(bool $serializeAndRestore = true)
  * @method static void releaseUniqueJobLocks()
  * @method static void clearReserved()
+ * @method static \Illuminate\Support\Testing\Fakes\QueueFake beforePushing(callable $callback)
+ * @method static \Illuminate\Support\Testing\Fakes\QueueFake afterPushing(callable $callback)
  *
  * @see \Illuminate\Queue\QueueManager
  * @see \Illuminate\Queue\Queue

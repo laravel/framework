@@ -15,7 +15,7 @@ class DevCommands
     protected static ?NodePackageManager $packageManager = null;
 
     /**
-     * Counter to keep track of how many colors have been assigned,.
+     * Counter to keep track of how many colors have been assigned.
      *
      * Used to ensure colors are reused only after all have been used at least once.
      *
@@ -57,7 +57,11 @@ class DevCommands
 
         self::artisan('serve --host=localhost', 'server');
         self::artisan('queue:listen --tries=1 --timeout=0', 'queue');
-        self::artisan('pail --timeout=0', 'logs');
+
+        if (function_exists('pcntl_fork')) {
+            self::artisan('pail --timeout=0', 'logs');
+        }
+
         self::node('dev', 'vite');
     }
 

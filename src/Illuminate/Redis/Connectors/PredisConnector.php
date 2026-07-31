@@ -91,7 +91,7 @@ class PredisConnector implements Connector
             throw new InvalidArgumentException('The scheme configured in the Redis host option must match the scheme option.');
         }
 
-        $config['scheme'] = $config['scheme'] ?? $hostScheme;
+        $config['scheme'] ??= $hostScheme;
         $config['host'] = Str::after($host, "{$hostScheme}://");
 
         return $config;

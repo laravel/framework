@@ -11,13 +11,6 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class ListFailedCommandTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     public function testItDisplaysEmptyFailedJobsAsJson()
     {
         $output = $this->runCommandWithFailedJobs([], ['--json' => true]);

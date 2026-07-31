@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Illuminate\Tests;
 
-use PHPUnit\Event\Test\AfterTestMethodFinished;
-use PHPUnit\Event\Test\AfterTestMethodFinishedSubscriber;
+use Illuminate\Support\Carbon;
+use PHPUnit\Event\Test\Finished;
+use PHPUnit\Event\Test\FinishedSubscriber;
 
-final class AfterEachTestSubscriber implements AfterTestMethodFinishedSubscriber
+final class AfterEachTestSubscriber implements FinishedSubscriber
 {
-    public function notify(AfterTestMethodFinished $event): void
+    public function notify(Finished $event): void
     {
         if (class_exists(\Mockery::class)) {
             \Mockery::close();
         }
+
+        Carbon::setTestNow();
+        date_default_timezone_set('UTC');
     }
 }

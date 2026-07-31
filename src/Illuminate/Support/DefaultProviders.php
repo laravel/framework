@@ -29,6 +29,7 @@ class DefaultProviders
             \Illuminate\Database\DatabaseServiceProvider::class,
             \Illuminate\Encryption\EncryptionServiceProvider::class,
             \Illuminate\Filesystem\FilesystemServiceProvider::class,
+            \Illuminate\Image\ImageServiceProvider::class,
             \Illuminate\Foundation\Providers\FoundationServiceProvider::class,
             \Illuminate\Hashing\HashServiceProvider::class,
             \Illuminate\Mail\MailServiceProvider::class,
@@ -86,7 +87,7 @@ class DefaultProviders
     public function except(array $providers)
     {
         return new static((new Collection($this->providers))
-            ->reject(fn ($p) => in_array($p, $providers))
+            ->diff($providers)
             ->values()
             ->toArray());
     }

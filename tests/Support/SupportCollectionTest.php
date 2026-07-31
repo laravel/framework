@@ -4930,6 +4930,31 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testReduceInto($collection)
+    {
+        $data = new $collection([1, 2, 3]);
+        $this->assertEquals(6, $data->reduceInto(0, function (&$result, $element) {
+            $result += $element;
+        }));
+
+        $data = new $collection([
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ]);
+        $this->assertSame('foobarbazqux', $data->reduceInto('', function (&$result, $element, $key) {
+            $result .= $key.$element;
+        }));
+
+        $data = new $collection([1, 2, 3, 4, 5]);
+        $result = $data->reduceInto([], function (&$result, $value) {
+            if ($value % 2 === 0) {
+                $result[] = $value;
+            }
+        });
+        $this->assertSame([2, 4], $result);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testReduceSpread($collection)
     {
         $data = new $collection([-1, 0, 1, 2, 3, 4, 5]);

@@ -112,7 +112,7 @@ class AuthGuardTest extends TestCase
         });
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Validated::class));
-        $user = $this->createMock(Authenticatable::class);
+        $user = $this->createStub(Authenticatable::class);
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->shouldReceive('rehashPasswordIfRequired')->with($user, ['foo'])->once();
@@ -192,7 +192,7 @@ class AuthGuardTest extends TestCase
         });
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Validated::class));
-        $user = $this->createMock(Authenticatable::class);
+        $user = $this->createStub(Authenticatable::class);
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->shouldReceive('rehashPasswordIfRequired')->with($user, ['foo'])->once();
@@ -212,7 +212,7 @@ class AuthGuardTest extends TestCase
         });
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Validated::class));
-        $user = $this->createMock(Authenticatable::class);
+        $user = $this->createStub(Authenticatable::class);
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');

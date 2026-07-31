@@ -130,6 +130,54 @@ class CookieTest extends TestCase
         $this->assertEquals($cookieTwo, $cookieJar->queued('foo'));
     }
 
+    public function testQueuedReturnsTheDefaultWhenTheCookieIsNotQueued(): void
+    {
+        $cookieJar = $this->getCreator();
+        $fallback = $cookieJar->make('fallback', 'bar');
+        $cookieJar->queue($cookieJar->make('foo', 'bar', 0, '/path'));
+
+        $this->assertNull($cookieJar->queued('nonexistent'));
+        $this->assertSame($fallback, $cookieJar->queued('nonexistent', $fallback));
+        $this->assertSame('bar', $cookieJar->queued('nonexistent', 'bar'));
+        $this->assertSame('bar', $cookieJar->queued('nonexistent', fn () => 'bar'));
+        $this->assertSame($fallback, $cookieJar->queued('nonexistent', $fallback, '/path'));
+        $this->assertSame($fallback, $cookieJar->queued('foo', $fallback, '/wrongPath'));
+    }
+
+    public function testQueuedResolvesADefaultClosureOnlyOnce(): void
+    {
+        $cookieJar = $this->getCreator();
+        $invocations = 0;
+        $default = function () use (&$invocations) {
+            $invocations++;
+
+            return 'bar';
+        };
+
+        $this->assertSame('bar', $cookieJar->queued('nonexistent', $default, '/path'));
+        $this->assertSame(1, $invocations);
+    }
+
+    public function testQueuedDoesNotResolveCookieNamesUsingDotNotation(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookieJar->queue($cookieJar->make('foo', 'bar', 0, 'path'));
+
+        $this->assertNull($cookieJar->queued('foo.path'));
+        $this->assertSame('fallback', $cookieJar->queued('foo.path', 'fallback'));
+        $this->assertFalse($cookieJar->hasQueued('foo.path'));
+    }
+
+    public function testQueuedFindsCookieNamesContainingDots(): void
+    {
+        $cookieJar = $this->getCreator();
+        $cookie = $cookieJar->make('foo.path', 'bar');
+        $cookieJar->queue($cookie);
+
+        $this->assertSame($cookie, $cookieJar->queued('foo.path'));
+        $this->assertTrue($cookieJar->hasQueued('foo.path'));
+    }
+
     public function testHasQueued(): void
     {
         $cookieJar = $this->getCreator();

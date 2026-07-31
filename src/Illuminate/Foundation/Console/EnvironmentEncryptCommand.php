@@ -76,7 +76,7 @@ class EnvironmentEncryptCommand extends Command
                 default: 'generate'
             );
 
-            if ($ask == 'ask') {
+            if ($ask === 'ask') {
                 $key = password('What is the encryption key?');
             }
         }

@@ -83,7 +83,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
     public function handle()
     {
         if (! $this->confirmToProceed()) {
-            return 1;
+            return self::FAILURE;
         }
 
         try {
@@ -92,13 +92,13 @@ class MigrateCommand extends BaseCommand implements Isolatable
             if ($this->option('graceful')) {
                 $this->components->warn($e->getMessage());
 
-                return 0;
+                return self::SUCCESS;
             }
 
             throw $e;
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**
@@ -192,7 +192,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
 
         if (($e->getCode() === 1049 && in_array($connection->getDriverName(), ['mysql', 'mariadb'])) ||
             (($e->errorInfo[0] ?? null) == '08006' &&
-              $connection->getDriverName() == 'pgsql' &&
+              $connection->getDriverName() === 'pgsql' &&
               Str::contains($e->getMessage(), '"'.$connection->getDatabaseName().'"'))) {
             return $this->createMissingMySqlOrPgsqlDatabase($connection);
         }

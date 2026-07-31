@@ -123,8 +123,6 @@ class FrequencyTest extends TestCase
         Carbon::setTestNow('2020-10-10 10:10:10');
 
         $this->assertSame('0 0 31 * *', $this->event->lastDayOfMonth()->getExpression());
-
-        Carbon::setTestNow();
     }
 
     public function testTwiceMonthly()
@@ -200,6 +198,11 @@ class FrequencyTest extends TestCase
     public function testQuarterly()
     {
         $this->assertSame('0 0 1 1-12/3 *', $this->event->quarterly()->getExpression());
+    }
+
+    public function testQuarterlyOn()
+    {
+        $this->assertSame('0 15 4 1-12/3 *', $this->event->quarterlyOn(4, '15:00')->getExpression());
     }
 
     public function testYearly()

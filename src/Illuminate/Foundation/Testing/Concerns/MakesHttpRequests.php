@@ -129,7 +129,7 @@ trait MakesHttpRequests
      * @param  string  $type
      * @return $this
      */
-    public function withToken(string $token, string $type = 'Bearer')
+    public function withToken(#[\SensitiveParameter] string $token, string $type = 'Bearer')
     {
         return $this->withHeader('Authorization', $type.' '.$token);
     }
@@ -141,7 +141,7 @@ trait MakesHttpRequests
      * @param  string  $password
      * @return $this
      */
-    public function withBasicAuth(string $username, string $password)
+    public function withBasicAuth(string $username, #[\SensitiveParameter] string $password)
     {
         return $this->withToken(base64_encode("$username:$password"), 'Basic');
     }
@@ -547,6 +547,37 @@ trait MakesHttpRequests
         $cookies = $this->prepareCookiesForRequest();
 
         return $this->call('HEAD', $uri, [], $cookies, [], $server);
+    }
+
+    /**
+     * Visit the given URI with a QUERY request.
+     *
+     * @param  \Illuminate\Support\Uri|string  $uri
+     * @param  array  $data
+     * @param  array  $headers
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function query($uri, array $data = [], array $headers = [])
+    {
+        $server = $this->transformHeadersToServerVars($headers);
+
+        $cookies = $this->prepareCookiesForRequest();
+
+        return $this->call('QUERY', $uri, $data, $cookies, [], $server);
+    }
+
+    /**
+     * Visit the given URI with a QUERY request, expecting a JSON response.
+     *
+     * @param  \Illuminate\Support\Uri|string  $uri
+     * @param  array  $data
+     * @param  array  $headers
+     * @param  int  $options
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function queryJson($uri, array $data = [], array $headers = [], $options = 0)
+    {
+        return $this->json('QUERY', $uri, $data, $headers, $options);
     }
 
     /**

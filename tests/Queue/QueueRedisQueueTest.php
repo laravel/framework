@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\RedisQueue;
@@ -38,7 +39,6 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame('foo', $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -70,7 +70,6 @@ class QueueRedisQueueTest extends TestCase
 
         Queue::createPayloadUsing(null);
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -106,7 +105,6 @@ class QueueRedisQueueTest extends TestCase
 
         Queue::createPayloadUsing(null);
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -140,7 +138,6 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame('foo', $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -172,8 +169,22 @@ class QueueRedisQueueTest extends TestCase
         $queue->later($date->addSeconds(5), 'foo', ['data']);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
+    }
+
+    public function testBulkRespectsDelayAttributeWhenPushingOntoRedis()
+    {
+        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['later', 'push'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
+        $redis->shouldReceive('connection')->once()->andReturn($redis);
+        $redis->shouldReceive('pipeline')->once()->andReturnUsing(function ($callback) {
+            $callback();
+        });
+        $redis->shouldReceive('transaction')->once()->andReturnUsing(function ($callback) {
+            $callback();
+        });
+        $queue->expects($this->once())->method('later')->with(15, $this->isInstanceOf(RedisJobWithDelayAttribute::class), ['data'], null);
+
+        $queue->bulk([new RedisJobWithDelayAttribute], ['data']);
     }
 
     public function testGetQueueRemainsUnchangedForNonCluster()
@@ -322,7 +333,6 @@ class QueueRedisQueueTest extends TestCase
 
         $queue->push('foo', ['data']);
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -358,7 +368,6 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame('queues:default', $receivedQueue);
 
         Queue::createPayloadUsing(null);
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -437,4 +446,9 @@ class TestableRedisQueue extends RedisQueue
     {
         return $this->allQueueNames();
     }
+}
+
+#[Delay(15)]
+class RedisJobWithDelayAttribute
+{
 }

@@ -135,10 +135,4 @@ class BusPendingDispatchTest extends TestCase
 
         $this->pendingDispatch->unless(false, fn ($pendingDispatch) => $pendingDispatch->delay(300));
     }
-
-    protected function tearDown(): void
-    {
-        m::close();
-        parent::tearDown();
-    }
 }

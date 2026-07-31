@@ -5,9 +5,11 @@ namespace Illuminate\Tests\Support;
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Application;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\QueueManager;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -229,6 +231,31 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushed(JobStub::class, 2);
     }
 
+    public function testBulkRespectsDelayAttribute()
+    {
+        $this->fake->bulk([
+            new JobWithDelayAttributeStub,
+            new JobStub,
+        ], ['foo' => 'bar'], 'redis');
+
+        $this->assertSame(1, $this->fake->delayedSize('redis'));
+        $this->fake->assertPushedOn('redis', JobWithDelayAttributeStub::class);
+        $this->fake->assertPushed(JobWithDelayAttributeStub::class, function ($job, $queue, $data) {
+            return $queue === 'redis' && $data === ['foo' => 'bar'];
+        });
+        $this->fake->assertPushedOn('redis', JobStub::class);
+    }
+
+    public function testBulkRespectsRuntimeDelay()
+    {
+        $job = (new JobWithRuntimeDelayStub)->delay(30);
+
+        $this->fake->bulk([$job], '', 'redis');
+
+        $this->assertSame(1, $this->fake->delayedSize('redis'));
+        $this->fake->assertPushedOn('redis', JobWithRuntimeDelayStub::class);
+    }
+
     public function testPushOnAndLaterOnAcceptUnitEnums()
     {
         $this->fake->pushOn(QueueNameEnumStub::Foo, $this->job);
@@ -427,6 +454,71 @@ class SupportTestingQueueFakeTest extends TestCase
         );
     }
 
+    public function testItCanInvokeCallbacksBeforeAndAfterPushingFakedJobs()
+    {
+        $steps = [];
+
+        $this->fake->beforePushing(function ($job, $data, $queue) use (&$steps) {
+            $steps[] = ['before', is_object($job) ? get_class($job) : $job, $data, $queue];
+        });
+
+        $this->fake->beforePushing(function ($job, $data, $queue) use (&$steps) {
+            $steps[] = ['before again', is_object($job) ? get_class($job) : $job, $data, $queue];
+        });
+
+        $this->fake->afterPushing(function ($job, $data, $queue) use (&$steps) {
+            $steps[] = ['after', is_object($job) ? get_class($job) : $job, $data, $queue];
+        });
+
+        $this->fake->afterPushing(function ($job, $data, $queue) use (&$steps) {
+            $steps[] = ['after again', is_object($job) ? get_class($job) : $job, $data, $queue];
+        });
+
+        $this->fake->push($this->job, ['foo' => 'bar'], 'redis');
+
+        $this->assertSame([
+            ['before', JobStub::class, ['foo' => 'bar'], 'redis'],
+            ['before again', JobStub::class, ['foo' => 'bar'], 'redis'],
+            ['after', JobStub::class, ['foo' => 'bar'], 'redis'],
+            ['after again', JobStub::class, ['foo' => 'bar'], 'redis'],
+        ], $steps);
+    }
+
+    public function testItCanInvokeCallbacksBeforeAndAfterPushingDispatchedJobs()
+    {
+        $job = new JobStub;
+        $steps = [];
+
+        $manager = m::mock(QueueManager::class);
+        $manager->shouldReceive('push')->once()->withArgs(function ($passedJob, $passedData, $passedQueue) use ($job) {
+            return $passedJob === $job && $passedData === ['foo' => 'bar'] && $passedQueue === 'redis';
+        });
+
+        $fake = (new QueueFake(new Application, [], $manager))
+            ->except(JobStub::class)
+            ->beforePushing(function ($job, $data, $queue) use (&$steps) {
+                $steps[] = ['before', is_object($job) ? get_class($job) : $job, $data, $queue];
+            })
+            ->beforePushing(function ($job, $data, $queue) use (&$steps) {
+                $steps[] = ['before again', is_object($job) ? get_class($job) : $job, $data, $queue];
+            })
+            ->afterPushing(function ($job, $data, $queue) use (&$steps) {
+                $steps[] = ['after', is_object($job) ? get_class($job) : $job, $data, $queue];
+            })
+            ->afterPushing(function ($job, $data, $queue) use (&$steps) {
+                $steps[] = ['after again', is_object($job) ? get_class($job) : $job, $data, $queue];
+            });
+
+        $fake->push($job, ['foo' => 'bar'], 'redis');
+
+        $this->assertSame([
+            ['before', JobStub::class, ['foo' => 'bar'], 'redis'],
+            ['before again', JobStub::class, ['foo' => 'bar'], 'redis'],
+            ['after', JobStub::class, ['foo' => 'bar'], 'redis'],
+            ['after again', JobStub::class, ['foo' => 'bar'], 'redis'],
+        ], $steps);
+    }
+
     public function testItCanFakePushedJobsWithClassAndPayload()
     {
         $fake = new QueueFake(new Application, ['JobStub']);
@@ -585,6 +677,21 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushedOn('foo', JobStub::class);
     }
 
+    public function testCreationTimeOfOldestPendingJob()
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $this->assertNull($this->fake->creationTimeOfOldestPendingJob('foo'));
+
+        $this->fake->push($this->job, '', 'foo');
+
+        Carbon::setTestNow($now->copy()->addMinutes(5));
+
+        $this->fake->push(new JobToFakeStub, '', 'foo');
+
+        $this->assertSame($now->getTimestamp(), $this->fake->creationTimeOfOldestPendingJob('foo'));
+    }
+
     public function testReservedJobs()
     {
         $this->fake->reserve($this->job, 'foo');
@@ -712,6 +819,27 @@ class JobStub
 
 class JobToFakeStub
 {
+    public function handle()
+    {
+        //
+    }
+}
+
+#[Delay(15)]
+class JobWithDelayAttributeStub
+{
+    use Queueable;
+
+    public function handle()
+    {
+        //
+    }
+}
+
+class JobWithRuntimeDelayStub
+{
+    use Queueable;
+
     public function handle()
     {
         //

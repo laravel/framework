@@ -328,7 +328,7 @@ class PipelineTest extends TestCase
                 return $piped;
             });
 
-        $this->assertSame(null, $result);
+        $this->assertNull($result);
         $this->assertSame('foo', $_SERVER['__test.pipe.one']);
         $this->assertSame('foo', $_SERVER['__test.pipe.two']);
         $this->assertSame('foo', $_SERVER['__test.pipe.finally']);
@@ -352,7 +352,7 @@ class PipelineTest extends TestCase
                 return $piped;
             });
 
-        $this->assertSame(null, $result);
+        $this->assertNull($result);
         $this->assertSame('foo', $_SERVER['__test.pipe.one']);
         $this->assertSame('foo', $_SERVER['__test.pipe.two']);
         $this->assertSame('foo', $_SERVER['__test.pipe.finally']);

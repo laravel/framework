@@ -285,13 +285,7 @@ class Builder
     {
         $tableColumns = array_map(strtolower(...), $this->getColumnListing($table));
 
-        foreach ($columns as $column) {
-            if (! in_array(strtolower($column), $tableColumns)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($columns, fn ($column) => in_array(strtolower($column), $tableColumns));
     }
 
     /**

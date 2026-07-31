@@ -57,7 +57,6 @@ class CacheMemcachedStoreTest extends TestCase
         $store = new MemcachedStore($memcache);
         $result = $store->put('foo', 'bar', 60);
         $this->assertTrue($result);
-        Carbon::setTestNow();
     }
 
     public function testTouchMethodProperlyCallsMemcache(): void

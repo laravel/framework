@@ -71,7 +71,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
                 'payload' => ['S' => $payload],
                 'exception' => ['S' => (string) $exception],
                 'failed_at' => ['N' => (string) $failedAt->getTimestamp()],
-                'expires_at' => ['N' => (string) $failedAt->addDays(7)->getTimestamp()],
+                'expires_at' => ['N' => (string) $failedAt->addWeek()->getTimestamp()],
             ],
         ]);
 

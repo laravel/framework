@@ -98,23 +98,23 @@ class HandleExceptions
 
         try {
             $logger = static::$app->make(LogManager::class);
-        } catch (Exception) {
+
+            $this->ensureDeprecationLoggerIsConfigured();
+
+            $options = static::$app['config']->get('logging.deprecations') ?? [];
+
+            with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
+                if ($options['trace'] ?? false) {
+                    $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
+                } else {
+                    $log->warning(sprintf('%s in %s on line %s',
+                        $message, $file, $line
+                    ));
+                }
+            });
+        } catch (Throwable) {
             return;
         }
-
-        $this->ensureDeprecationLoggerIsConfigured();
-
-        $options = static::$app['config']->get('logging.deprecations') ?? [];
-
-        with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
-            if ($options['trace'] ?? false) {
-                $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
-            } else {
-                $log->warning(sprintf('%s in %s on line %s',
-                    $message, $file, $line
-                ));
-            }
-        });
     }
 
     /**
@@ -145,11 +145,7 @@ class HandleExceptions
 
         $this->ensureNullLogDriverIsConfigured();
 
-        if (is_array($options = $config->get('logging.deprecations'))) {
-            $driver = $options['channel'] ?? 'null';
-        } else {
-            $driver = $options ?? 'null';
-        }
+        $driver = (is_array($options = $config->get('logging.deprecations')) ? $options['channel'] : $options) ?? 'null';
 
         $config->set('logging.channels.deprecations', $config->get("logging.channels.{$driver}"));
     }

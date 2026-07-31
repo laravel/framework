@@ -602,7 +602,7 @@ class Kernel implements KernelContract
     /**
      * Get the application's route middleware groups.
      *
-     * @return array
+     * @return array<string, array<int, class-string|string>>
      */
     public function getMiddlewareGroups()
     {

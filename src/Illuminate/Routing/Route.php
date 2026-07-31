@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Attributes\Controllers\Middleware as MiddlewareAttribute;
+use Illuminate\Routing\Attributes\Controllers\WithoutMiddleware;
 use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -922,13 +923,7 @@ class Route
             return false;
         }
 
-        foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $routeName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($patterns, fn ($pattern) => Str::is($pattern, $routeName));
     }
 
     /**
@@ -1221,6 +1216,71 @@ class Route
     }
 
     /**
+     * Get the excluded middleware for the route's controller.
+     *
+     * @return array
+     */
+    public function excludedControllerMiddleware()
+    {
+        if (! $this->isControllerAction()) {
+            return [];
+        }
+
+        [$controllerClass, $controllerMethod] = [
+            $this->getControllerClass(),
+            $this->getControllerMethod(),
+        ];
+
+        return $this->attributeProvidedControllerMiddlewareExclusions($controllerClass, $controllerMethod);
+    }
+
+    /**
+     * Get the attribute provided excluded controller middleware for the given class and method.
+     *
+     * @param  string  $class
+     * @param  string  $method
+     * @return array
+     */
+    protected function attributeProvidedControllerMiddlewareExclusions(string $class, string $method): array
+    {
+        try {
+            $reflectionClass = new ReflectionClass($class);
+            $reflectionMethod = $reflectionClass->getMethod($method);
+        } catch (ReflectionException) {
+            return [];
+        }
+
+        $attributes = new Collection;
+
+        $current = $reflectionClass;
+
+        while ($current) {
+            $classAttributes = array_reverse($current->getAttributes(
+                WithoutMiddleware::class, ReflectionAttribute::IS_INSTANCEOF
+            ));
+
+            foreach ($classAttributes as $attribute) {
+                $attributes->prepend($attribute);
+            }
+
+            $current = $current->getParentClass();
+        }
+
+        return $attributes->merge(
+            $reflectionMethod->getAttributes(WithoutMiddleware::class, ReflectionAttribute::IS_INSTANCEOF)
+        )->map(function (ReflectionAttribute $attribute) use ($method) {
+            $instance = $attribute->newInstance();
+
+            return static::methodExcludedByOptions(
+                $method, ['only' => $instance->only, 'except' => $instance->except],
+            ) ? null : $instance->middleware;
+        })
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    /**
      * Specify middleware that should be removed from the given route.
      *
      * @param  array|string  $middleware
@@ -1242,7 +1302,10 @@ class Route
      */
     public function excludedMiddleware()
     {
-        return (array) ($this->action['excluded_middleware'] ?? []);
+        return array_merge(
+            (array) ($this->action['excluded_middleware'] ?? []),
+            $this->excludedControllerMiddleware(),
+        );
     }
 
     /**

@@ -205,7 +205,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
         Relation::morphMap([], false);
         Eloquent::unsetConnectionResolver();
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
         DB::flushQueryLog();
 
@@ -1022,6 +1021,64 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertEquals(['taylorotwell@gmail.com', 'abigailotwell@gmail.com'], $simple);
         $this->assertEquals([1 => 'taylorotwell@gmail.com', 2 => 'abigailotwell@gmail.com'], $keyed);
+    }
+
+    public function testModelKeys()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame([1, 2], EloquentTestUser::oldest('id')->modelKeys());
+    }
+
+    public function testModelKeysWithCastPrimaryKey()
+    {
+        EloquentTestUserWithStringCastId::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame(['1', '2'], EloquentTestUserWithStringCastId::oldest('id')->modelKeys());
+    }
+
+    public function testModelKeysWithCustomPrimaryKey()
+    {
+        EloquentTestUniqueUserWithCustomKey::insert([
+            ['screen_name' => 'first', 'email' => 'taylorotwell@gmail.com'],
+            ['screen_name' => 'second', 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame(['first', 'second'], EloquentTestUniqueUserWithCustomKey::orderBy('screen_name')->modelKeys());
+    }
+
+    public function testModelKeysWithQueryConstraints()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
+
+        $this->assertSame([2, 3], EloquentTestUser::where('id', '>', 1)->oldest('id')->modelKeys());
+        $this->assertSame([1], EloquentTestUser::oldest('id')->take(1)->modelKeys());
+    }
+
+    public function testModelKeysWithRelationshipAndJoin()
+    {
+        $user1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user2 = EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $user1->posts()->create(['id' => 1, 'name' => 'First post']);
+        $user1->posts()->create(['id' => 2, 'name' => 'Second post']);
+        $user2->posts()->create(['id' => 3, 'name' => 'Third post']);
+
+        $this->assertEquals([1, 2], $user1->posts()->oldest('id')->modelKeys());
+
+        $join = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id')->where('users.id', 1);
+
+        $this->assertEquals([1, 1], $join->modelKeys());
     }
 
     public function testFindOrFail()
@@ -2854,6 +2911,13 @@ class EloquentTestUniqueUser extends Eloquent
     protected $table = 'unique_users';
     protected $casts = ['birthday' => 'datetime'];
     protected $guarded = [];
+}
+
+class EloquentTestUniqueUserWithCustomKey extends EloquentTestUniqueUser
+{
+    protected $primaryKey = 'screen_name';
+    public $incrementing = false;
+    protected $keyType = 'string';
 }
 
 class EloquentTestPost extends Eloquent

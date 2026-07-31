@@ -6,6 +6,7 @@ use ArrayAccess;
 use Closure;
 use Exception;
 use Illuminate\Container\Attributes\Bind;
+use Illuminate\Container\Attributes\BindWhen;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -289,10 +290,8 @@ class Container implements ArrayAccess, ContainerContract
             return false;
         }
 
-        if ($scopedType === 'scoped') {
-            if (! in_array($abstract, $this->scopedInstances, true)) {
-                $this->scopedInstances[] = $abstract;
-            }
+        if ($scopedType === 'scoped' && ! in_array($abstract, $this->scopedInstances, true)) {
+            $this->scopedInstances[] = $abstract;
         }
 
         return true;
@@ -981,8 +980,7 @@ class Container implements ArrayAccess, ContainerContract
             return $this->bindings[$abstract]['concrete'];
         }
 
-        if ($this->environmentResolver === null ||
-            ($this->checkedForAttributeBindings[$abstract] ?? false) || ! is_string($abstract)) {
+        if (($this->checkedForAttributeBindings[$abstract] ?? false) || ! is_string($abstract)) {
             return $abstract;
         }
 
@@ -990,7 +988,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Get the concrete binding for an abstract from the Bind attribute.
+     * Get the concrete binding for an abstract from the BindWhen or Bind attributes.
      *
      * @param  string  $abstract
      * @return mixed
@@ -1005,35 +1003,14 @@ class Container implements ArrayAccess, ContainerContract
             return $abstract;
         }
 
-        $bindAttributes = $reflected->getAttributes(Bind::class);
-
-        if ($bindAttributes === []) {
-            return $abstract;
-        }
-
-        $concrete = $maybeConcrete = null;
-
-        foreach ($bindAttributes as $reflectedAttribute) {
-            $instance = $reflectedAttribute->newInstance();
-
-            if ($instance->environments === ['*']) {
-                $maybeConcrete = $instance->concrete;
-
-                continue;
-            }
-
-            if ($this->currentEnvironmentIs($instance->environments)) {
-                $concrete = $instance->concrete;
-
-                break;
-            }
-        }
-
-        if ($maybeConcrete !== null && $concrete === null) {
-            $concrete = $maybeConcrete;
-        }
+        $concrete = $this->resolveConcreteFromAttributes($reflected);
 
         if ($concrete === null) {
+            if ($reflected->getAttributes(BindWhen::class) !== [] ||
+                ($this->environmentResolver === null && $reflected->getAttributes(Bind::class) !== [])) {
+                unset($this->checkedForAttributeBindings[$abstract]);
+            }
+
             return $abstract;
         }
 
@@ -1044,6 +1021,47 @@ class Container implements ArrayAccess, ContainerContract
         };
 
         return $this->bindings[$abstract]['concrete'];
+    }
+
+    /**
+     * Resolve the concrete from the Bind and BindWhen attributes in declaration order.
+     *
+     * @param  ReflectionClass<object>  $reflected
+     * @return class-string|null
+     */
+    protected function resolveConcreteFromAttributes(ReflectionClass $reflected)
+    {
+        $wildcard = null;
+
+        foreach ($reflected->getAttributes() as $reflectedAttribute) {
+            $name = $reflectedAttribute->getName();
+
+            if ($name === BindWhen::class) {
+                $instance = $reflectedAttribute->newInstance();
+
+                if (($instance->condition)($this)) {
+                    return $instance->concrete;
+                }
+
+                continue;
+            }
+
+            if ($name === Bind::class && $this->environmentResolver !== null) {
+                $instance = $reflectedAttribute->newInstance();
+
+                if ($instance->environments === ['*']) {
+                    $wildcard ??= $instance->concrete;
+
+                    continue;
+                }
+
+                if ($this->currentEnvironmentIs($instance->environments)) {
+                    return $instance->concrete;
+                }
+            }
+        }
+
+        return $wildcard;
     }
 
     /**

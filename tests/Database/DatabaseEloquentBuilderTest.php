@@ -27,13 +27,6 @@ use stdClass;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     public function testFindMethod()
     {
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
@@ -2696,8 +2689,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->from('table as alias')->update(['foo' => 'bar', 'alias.updated_at' => null]);
         $this->assertEquals(1, $result);
-
-        Carbon::setTestNow();
     }
 
     public function testUpsert()

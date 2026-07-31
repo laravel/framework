@@ -10,13 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class CacheStorageStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     public function testValuesCanBeStoredAndRetrieved()
     {
         $disk = new ArrayFilesystem;
@@ -29,14 +22,14 @@ class CacheStorageStoreTest extends TestCase
 
     public function testExpiredItemsReturnNullAndGetDeleted()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $disk = new ArrayFilesystem;
         $store = new StorageStore($disk, 'cache');
 
         $store->put('foo', 'bar', 1);
 
-        Carbon::setTestNow(Carbon::now()->addSeconds(2));
+        Carbon::setTestNow($now->addSeconds(2));
 
         $this->assertNull($store->get('foo'));
         $this->assertFalse($disk->exists($store->path('foo')));
@@ -53,7 +46,7 @@ class CacheStorageStoreTest extends TestCase
 
     public function testIncrementAndDecrementRetainExpiration()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $store = new StorageStore(new ArrayFilesystem, 'cache');
         $store->put('foo', 5, 60);
@@ -61,23 +54,23 @@ class CacheStorageStoreTest extends TestCase
         $this->assertSame(7, $store->increment('foo', 2));
         $this->assertSame(4, $store->decrement('foo', 3));
 
-        Carbon::setTestNow(Carbon::now()->addSeconds(61));
+        Carbon::setTestNow($now->addSeconds(61));
 
         $this->assertNull($store->get('foo'));
     }
 
     public function testTouchUpdatesExpiration()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $store = new StorageStore(new ArrayFilesystem, 'cache');
         $store->put('foo', 'bar', 2);
 
-        Carbon::setTestNow(Carbon::now()->addSecond());
+        Carbon::setTestNow($now->addSecond());
 
         $this->assertTrue($store->touch('foo', 60));
 
-        Carbon::setTestNow(Carbon::now()->addSecond());
+        Carbon::setTestNow($now->addSecond());
 
         $this->assertSame('bar', $store->get('foo'));
     }

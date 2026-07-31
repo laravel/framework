@@ -26,12 +26,12 @@ class JsonFormatterTest extends TestCase
     protected function createRecord(): LogRecord
     {
         return new LogRecord(
-            message: 'Test message',
-            level: Level::Info,
-            channel: 'test',
             datetime: new \DateTimeImmutable,
-            extra: [],
+            channel: 'test',
+            level: Level::Info,
+            message: 'Test message',
             context: [],
+            extra: [],
         );
     }
 
@@ -46,7 +46,7 @@ class JsonFormatterTest extends TestCase
         $formatted = $formatter->format($this->createRecord());
         $decoded = json_decode($formatted, true);
 
-        $this->assertEquals('550e8400-e29b-41d4-a716-446655440000', $decoded['cloud_request_id']);
+        $this->assertSame('550e8400-e29b-41d4-a716-446655440000', $decoded['cloud_request_id']);
     }
 
     public function test_does_not_add_field_when_no_request_bound()
@@ -79,23 +79,23 @@ class JsonFormatterTest extends TestCase
         $app->instance('request', $request);
 
         $record = new LogRecord(
-            message: 'Test message',
-            level: Level::Warning,
-            channel: 'my-channel',
             datetime: new \DateTimeImmutable('2024-01-15 10:30:00'),
-            extra: ['extra_field' => 'extra_value'],
+            channel: 'my-channel',
+            level: Level::Warning,
+            message: 'Test message',
             context: ['context_field' => 'context_value'],
+            extra: ['extra_field' => 'extra_value'],
         );
 
         $formatter = new JsonFormatter;
         $formatted = $formatter->format($record);
         $decoded = json_decode($formatted, true);
 
-        $this->assertEquals('Test message', $decoded['message']);
-        $this->assertEquals('WARNING', $decoded['level_name']);
-        $this->assertEquals('my-channel', $decoded['channel']);
-        $this->assertEquals('extra_value', $decoded['extra']['extra_field']);
-        $this->assertEquals('context_value', $decoded['context']['context_field']);
-        $this->assertEquals('6ba7b810-9dad-11d1-80b4-00c04fd430c8', $decoded['cloud_request_id']);
+        $this->assertSame('Test message', $decoded['message']);
+        $this->assertSame('WARNING', $decoded['level_name']);
+        $this->assertSame('my-channel', $decoded['channel']);
+        $this->assertSame('extra_value', $decoded['extra']['extra_field']);
+        $this->assertSame('context_value', $decoded['context']['context_field']);
+        $this->assertSame('6ba7b810-9dad-11d1-80b4-00c04fd430c8', $decoded['cloud_request_id']);
     }
 }

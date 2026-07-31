@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Database\Connection;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Queue\Jobs\InspectedJob;
@@ -308,10 +309,12 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
 
         return $this->database->table($this->table)->insert((new Collection((array) $jobs))->map(
             function ($job) use ($queue, $data, $now) {
+                $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
+
                 return $this->buildDatabaseRecord(
                     $queue,
                     $this->createPayload($job, $this->getQueue($queue), $data),
-                    isset($job->delay) ? $this->availableAt($job->delay) : $now,
+                    isset($delay) ? $this->availableAt($delay) : $now,
                 );
             }
         )->all());
