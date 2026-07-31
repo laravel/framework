@@ -1654,7 +1654,7 @@ trait HasAttributes
             'bytes' => Image::fromBytes($value),
             'base64' => Image::fromBase64($value),
             'url' => Image::fromUrl($value),
-            default => throw new InvalidCastException($this->getModel(), $key, $sourceType === '' ? 'image' : 'image:' . $sourceType),
+            default => throw new InvalidCastException($this->getModel(), $key, $sourceType === '' ? 'image' : 'image:'.$sourceType),
         };
     }
 
