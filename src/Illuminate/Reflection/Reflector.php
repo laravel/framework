@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use LogicException;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionEnum;
@@ -99,6 +100,55 @@ class Reflector
         } while ($includeParents && false !== $reflectionClass = $reflectionClass->getParentClass());
 
         return $includeParents ? new Collection($attributes) : array_first($attributes);
+    }
+
+    /**
+     * Get the given attribute from traits used by the class.
+     *
+     * @template TAttribute of object
+     *
+     * @param  \ReflectionClass  $reflectionClass
+     * @param  class-string<TAttribute>  $attribute
+     * @return TAttribute|null
+     *
+     * @throws \LogicException
+     */
+    public static function getClassAttributeFromTraits(ReflectionClass $reflectionClass, $attribute)
+    {
+        $matches = [];
+
+        foreach ($reflectionClass->getTraits() as $trait) {
+            $attributes = $trait->getAttributes($attribute);
+
+            if ($attributes !== []) {
+                $matches[$trait->getName()] = $attributes[0]->newInstance();
+            }
+        }
+
+        if ($matches === []) {
+            return null;
+        }
+
+        $resolved = null;
+
+        foreach ($matches as $instance) {
+            if (is_null($resolved)) {
+                $resolved = $instance;
+
+                continue;
+            }
+
+            if ($resolved != $instance) {
+                throw new LogicException(sprintf(
+                    'Could not resolve [%s] attribute on [%s]: traits [%s] declare conflicting values.',
+                    $attribute,
+                    $reflectionClass->getName(),
+                    implode(', ', array_keys($matches))
+                ));
+            }
+        }
+
+        return $resolved;
     }
 
     /**

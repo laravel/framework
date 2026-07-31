@@ -3,6 +3,8 @@
 namespace Illuminate\Support\Traits;
 
 use Exception;
+use Illuminate\Support\Reflector;
+use LogicException;
 use ReflectionClass;
 
 trait ReadsClassAttributes
@@ -57,6 +59,8 @@ trait ReadsClassAttributes
      * @param  class-string  $attributeClass
      * @param  \ReflectionClass|null  $declaringClass
      * @return object|null
+     *
+     * @throws \LogicException
      */
     protected function getAttributeInstance($target, string $attributeClass, ?ReflectionClass &$declaringClass = null)
     {
@@ -72,16 +76,14 @@ trait ReadsClassAttributes
                     return $attributes[0]->newInstance();
                 }
 
-                foreach ($reflection->getTraits() as $trait) {
-                    $attributes = $trait->getAttributes($attributeClass);
+                if (! is_null($instance = Reflector::getClassAttributeFromTraits($reflection, $attributeClass))) {
+                    $declaringClass = $reflection;
 
-                    if (count($attributes) > 0) {
-                        $declaringClass = $reflection;
-
-                        return $attributes[0]->newInstance();
-                    }
+                    return $instance;
                 }
             } while ($reflection = $reflection->getParentClass());
+        } catch (LogicException $e) {
+            throw $e;
         } catch (Exception) {
             //
         }

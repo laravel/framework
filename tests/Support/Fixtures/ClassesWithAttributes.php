@@ -39,3 +39,38 @@ class ParentClass
 class ChildClass extends ParentClass
 {
 }
+
+#[StrAttr('from_alpha')]
+trait TraitWithAlphaStrAttr
+{
+}
+
+#[StrAttr('from_beta')]
+trait TraitWithBetaStrAttr
+{
+}
+
+#[StrAttr('same')]
+trait TraitWithSameStrAttrA
+{
+}
+
+#[StrAttr('same')]
+trait TraitWithSameStrAttrB
+{
+}
+
+class ClassWithConflictingTraitAttributes
+{
+    use TraitWithAlphaStrAttr, TraitWithBetaStrAttr;
+}
+
+class ClassWithIdenticalTraitAttributes
+{
+    use TraitWithSameStrAttrA, TraitWithSameStrAttrB;
+}
+
+class ClassWithSingleTraitAttribute
+{
+    use TraitWithAlphaStrAttr;
+}

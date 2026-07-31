@@ -8,6 +8,7 @@ use Illuminate\Support\Reflector;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use Illuminate\Support\Testing\Fakes\PendingMailFake;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -131,6 +132,34 @@ class SupportReflectorTest extends TestCase
         $this->assertSame('quick', Reflector::getClassAttribute(Fixtures\ChildClass::class, Fixtures\StrAttr::class)->string);
         $this->assertSame('quick', Reflector::getClassAttribute(Fixtures\ChildClass::class, Fixtures\StrAttr::class, true)->string);
         $this->assertSame('lazy', Reflector::getClassAttribute(Fixtures\ParentClass::class, Fixtures\StrAttr::class)->string);
+    }
+
+    public function testGetClassAttributeFromTraits()
+    {
+        require_once __DIR__.'/Fixtures/ClassesWithAttributes.php';
+
+        $this->assertNull(Reflector::getClassAttributeFromTraits(
+            new ReflectionClass(Fixtures\ChildClass::class),
+            Fixtures\StrAttr::class
+        ));
+
+        $this->assertSame('from_alpha', Reflector::getClassAttributeFromTraits(
+            new ReflectionClass(Fixtures\ClassWithSingleTraitAttribute::class),
+            Fixtures\StrAttr::class
+        )->string);
+
+        $this->assertSame('same', Reflector::getClassAttributeFromTraits(
+            new ReflectionClass(Fixtures\ClassWithIdenticalTraitAttributes::class),
+            Fixtures\StrAttr::class
+        )->string);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('declare conflicting values');
+
+        Reflector::getClassAttributeFromTraits(
+            new ReflectionClass(Fixtures\ClassWithConflictingTraitAttributes::class),
+            Fixtures\StrAttr::class
+        );
     }
 }
 

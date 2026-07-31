@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable as SupportStringable;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -2674,6 +2675,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  string|null  $property
      * @param  string|null  $class
      * @return mixed
+     *
+     * @throws \LogicException
      */
     protected static function resolveClassAttribute(string $attributeClass, ?string $property = null, ?string $class = null)
     {
@@ -2697,16 +2700,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                     return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
                 }
 
-                foreach ($reflection->getTraits() as $trait) {
-                    $attributes = $trait->getAttributes($attributeClass);
-
-                    if (count($attributes) > 0) {
-                        $instance = $attributes[0]->newInstance();
-
-                        return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
-                    }
+                if (! is_null($instance = Reflector::getClassAttributeFromTraits($reflection, $attributeClass))) {
+                    return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
                 }
             } while ($reflection = $reflection->getParentClass());
+        } catch (LogicException $e) {
+            throw $e;
         } catch (Exception) {
             //
         }

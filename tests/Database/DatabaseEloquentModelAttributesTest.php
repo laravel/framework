@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Attributes\Visible;
 use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Model;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentModelAttributesTest extends TestCase
@@ -478,6 +479,28 @@ class DatabaseEloquentModelAttributesTest extends TestCase
 
         $this->assertSame('primary', $model->getConnectionName());
     }
+
+    public function test_identical_trait_attributes_are_allowed(): void
+    {
+        $model = new ModelWithIdenticalTraitTableAttributes;
+
+        $this->assertSame('shared_table', $model->getTable());
+    }
+
+    public function test_conflicting_trait_attributes_throw_logic_exception(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('declare conflicting values');
+
+        new ModelWithConflictingTraitTableAttributes;
+    }
+
+    public function test_class_attribute_takes_precedence_over_conflicting_traits(): void
+    {
+        $model = new ModelOverridingConflictingTraitTableAttributes;
+
+        $this->assertSame('from_class', $model->getTable());
+    }
 }
 
 enum ConnectionUnitEnum
@@ -830,4 +853,40 @@ trait TraitUsingConnectionAttribute
 class ModelOverridingTraitConnectionAttribute extends Model
 {
     use TraitUsingConnectionAttribute;
+}
+
+#[Table(name: 'from_alpha')]
+trait TraitCarryingAlphaTableAttribute
+{
+}
+
+#[Table(name: 'from_beta')]
+trait TraitCarryingBetaTableAttribute
+{
+}
+
+#[Table(name: 'shared_table')]
+trait TraitCarryingSharedTableAttributeA
+{
+}
+
+#[Table(name: 'shared_table')]
+trait TraitCarryingSharedTableAttributeB
+{
+}
+
+class ModelWithConflictingTraitTableAttributes extends Model
+{
+    use TraitCarryingAlphaTableAttribute, TraitCarryingBetaTableAttribute;
+}
+
+class ModelWithIdenticalTraitTableAttributes extends Model
+{
+    use TraitCarryingSharedTableAttributeA, TraitCarryingSharedTableAttributeB;
+}
+
+#[Table(name: 'from_class')]
+class ModelOverridingConflictingTraitTableAttributes extends Model
+{
+    use TraitCarryingAlphaTableAttribute, TraitCarryingBetaTableAttribute;
 }
