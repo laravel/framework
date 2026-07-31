@@ -6,6 +6,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image as ImageFacade;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
