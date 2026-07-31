@@ -78,11 +78,7 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
         $result = [];
 
         foreach ($keys as $key) {
-            if (array_key_exists($key, $memoized)) {
-                $result[$key] = $memoized[$key];
-            } else {
-                $result[$key] = $retrieved[$key];
-            }
+            $result[$key] = array_key_exists($key, $memoized) ? $memoized[$key] : $retrieved[$key];
         }
 
         return $result;

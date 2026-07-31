@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Container;
 use Illuminate\Container\Attributes\Bind;
 use Illuminate\Container\Attributes\BindWhen;
 use Illuminate\Container\Attributes\Singleton;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 
 #[BindWhen(BindWhenFalseConcrete::class, static function () {
     return false;
@@ -44,6 +45,21 @@ interface BindWhenNoMatchInterface
 }
 
 class BindWhenNoMatchConcrete implements BindWhenNoMatchInterface
+{
+}
+
+#[BindWhen(BindWhenConditionalConcrete::class, static function (ContainerContract $container) {
+    return $container->bound(BindWhenCondition::class);
+})]
+interface BindWhenConditionalInterface
+{
+}
+
+class BindWhenCondition
+{
+}
+
+class BindWhenConditionalConcrete implements BindWhenConditionalInterface
 {
 }
 

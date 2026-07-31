@@ -99,7 +99,7 @@ class AboutCommand extends Command
 
         $this->newLine();
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

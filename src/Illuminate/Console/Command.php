@@ -130,9 +130,21 @@ class Command extends SymfonyCommand
             $this->specifyParameters();
         }
 
+        $this->configureDefaults();
+
         if ($this instanceof Isolatable) {
             $this->configureIsolation();
         }
+    }
+
+    /**
+     * Configure argument/option defaults that can't be expressed as static signature
+     * text (e.g. environment-dependent values, or non-string literal defaults such as
+     * booleans or integers), by patching the already-built definition.
+     */
+    protected function configureDefaults(): void
+    {
+        //
     }
 
     /**

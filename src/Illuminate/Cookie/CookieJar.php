@@ -41,9 +41,9 @@ class CookieJar implements JarContract
     protected $sameSite = 'lax';
 
     /**
-     * All of the cookies queued for sending.
+     * All of the cookies queued for sending, keyed by name and then by path.
      *
-     * @var \Symfony\Component\HttpFoundation\Cookie[]
+     * @var array<string, array<string, \Symfony\Component\HttpFoundation\Cookie>>
      */
     protected $queued = [];
 
@@ -116,20 +116,26 @@ class CookieJar implements JarContract
     /**
      * Get a queued cookie instance.
      *
+     * @template TQueuedDefault
+     *
      * @param  string  $key
-     * @param  mixed  $default
+     * @param  TQueuedDefault|(\Closure(): TQueuedDefault)  $default
      * @param  string|null  $path
-     * @return \Symfony\Component\HttpFoundation\Cookie|null
+     * @return \Symfony\Component\HttpFoundation\Cookie|TQueuedDefault
      */
     public function queued($key, $default = null, $path = null)
     {
-        $queued = Arr::get($this->queued, $key, $default);
+        $queued = $this->queued[$key] ?? null;
+
+        if ($queued === null) {
+            return value($default);
+        }
 
         if ($path === null) {
             return Arr::last($queued, null, $default);
         }
 
-        return Arr::get($queued, $path, $default);
+        return $queued[$path] ?? value($default);
     }
 
     /**

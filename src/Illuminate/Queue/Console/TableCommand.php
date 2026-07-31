@@ -11,11 +11,11 @@ use function Illuminate\Filesystem\join_paths;
 class TableCommand extends MigrationGeneratorCommand
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'make:queue-table';
+    protected $signature = 'make:queue-table';
 
     /**
      * The console command name aliases.

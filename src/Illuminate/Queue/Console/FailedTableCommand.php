@@ -11,11 +11,11 @@ use function Illuminate\Filesystem\join_paths;
 class FailedTableCommand extends MigrationGeneratorCommand
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'make:queue-failed-table';
+    protected $signature = 'make:queue-failed-table';
 
     /**
      * The console command name aliases.

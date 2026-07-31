@@ -635,7 +635,7 @@ trait HasAttributes
      */
     protected function getRelationshipFromMethod($method)
     {
-        $relation = $this->$method();
+        $relation = Relation::withConstraintsForNestedRelation(fn () => $this->$method());
 
         if (! $relation instanceof Relation) {
             if (is_null($relation)) {
@@ -2592,14 +2592,9 @@ trait HasAttributes
         return (new Collection((new ReflectionClass($instance))->getMethods()))->filter(function ($method) use ($instance) {
             $returnType = $method->getReturnType();
 
-            if ($returnType instanceof ReflectionNamedType &&
-                $returnType->getName() === Attribute::class) {
-                if (is_callable($method->invoke($instance)->get)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return $returnType instanceof ReflectionNamedType &&
+                $returnType->getName() === Attribute::class &&
+                is_callable($method->invoke($instance)->get);
         })->map->name->values()->all();
     }
 }
