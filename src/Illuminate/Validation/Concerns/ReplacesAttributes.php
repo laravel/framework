@@ -365,6 +365,33 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the array_keys rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceArrayKeys($message, $attribute, $rule, $parameters)
+    {
+        $message = $this->replaceIn($message, $attribute, $rule, $parameters);
+
+        $value = $this->getValue($attribute);
+
+        $unexpected = is_array($value)
+            ? array_keys(array_diff_key($value, array_fill_keys($parameters, '')))
+            : [];
+
+        $unexpected = array_map(
+            fn ($key) => $this->getDisplayableValue($attribute, $key),
+            $unexpected,
+        );
+
+        return $this->replaceWhileKeepingCase($message, ['unexpected' => implode(', ', $unexpected)]);
+    }
+
+    /**
      * Replace all place-holders for the required_array_keys rule.
      *
      * @param  string  $message

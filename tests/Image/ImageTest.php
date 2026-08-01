@@ -802,6 +802,18 @@ class ImageTest extends TestCase
         $this->assertSame('#ffffff', $options->containBackground);
     }
 
+    public function test_contain_sets_dominant_background()
+    {
+        $image = $this->makeImage();
+        $result = $image->contain(1200, 800, 'dominant');
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(1200, $options->containWidth);
+        $this->assertSame(800, $options->containHeight);
+        $this->assertSame('dominant', $options->containBackground);
+    }
+
     public function test_crop_sets_dimensions_and_position()
     {
         $image = $this->makeImage();
@@ -865,6 +877,17 @@ class ImageTest extends TestCase
 
         $this->assertSame(90.0, $options->rotateAngle);
         $this->assertSame('#ffffff', $options->rotateBackground);
+    }
+
+    public function test_rotate_sets_dominant_background()
+    {
+        $image = $this->makeImage();
+        $result = $image->rotate(45, 'dominant');
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(45.0, $options->rotateAngle);
+        $this->assertSame('dominant', $options->rotateBackground);
     }
 
     public function test_scale_sets_width_only()

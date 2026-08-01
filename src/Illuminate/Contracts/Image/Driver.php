@@ -12,6 +12,11 @@ interface Driver
     public function process(string $contents, ImagePipeline $pipeline): string;
 
     /**
+     * Get the dominant (average) color of the image as a hex string.
+     */
+    public function dominantColor(string $contents): string;
+
+    /**
      * Register a transformation handler.
      *
      * @param  class-string<\Illuminate\Contracts\Image\Transformation>  $transformation

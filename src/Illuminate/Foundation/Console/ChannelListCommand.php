@@ -13,11 +13,11 @@ use Symfony\Component\Console\Terminal;
 class ChannelListCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'channel:list';
+    protected $signature = 'channel:list';
 
     /**
      * The console command description.

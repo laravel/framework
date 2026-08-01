@@ -237,11 +237,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
             $rules[] = 'filter_unicode';
         }
 
-        if ($rules) {
-            $rules = ['email:'.implode(',', $rules)];
-        } else {
-            $rules = ['email'];
-        }
+        $rules = $rules ? ['email:'.implode(',', $rules)] : ['email'];
 
         return array_merge(array_filter($rules), $this->customRules);
     }

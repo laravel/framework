@@ -290,10 +290,8 @@ class Container implements ArrayAccess, ContainerContract
             return false;
         }
 
-        if ($scopedType === 'scoped') {
-            if (! in_array($abstract, $this->scopedInstances, true)) {
-                $this->scopedInstances[] = $abstract;
-            }
+        if ($scopedType === 'scoped' && ! in_array($abstract, $this->scopedInstances, true)) {
+            $this->scopedInstances[] = $abstract;
         }
 
         return true;
@@ -1008,7 +1006,8 @@ class Container implements ArrayAccess, ContainerContract
         $concrete = $this->resolveConcreteFromAttributes($reflected);
 
         if ($concrete === null) {
-            if ($this->environmentResolver === null && $reflected->getAttributes(Bind::class) !== []) {
+            if ($reflected->getAttributes(BindWhen::class) !== [] ||
+                ($this->environmentResolver === null && $reflected->getAttributes(Bind::class) !== [])) {
                 unset($this->checkedForAttributeBindings[$abstract]);
             }
 

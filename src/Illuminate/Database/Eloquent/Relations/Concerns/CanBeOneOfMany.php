@@ -205,11 +205,7 @@ trait CanBeOneOfMany
             foreach ($columns as $key => $column) {
                 $aggregatedColumn = $subQuery->getQuery()->grammar->wrap($subQuery->qualifyColumn($column));
 
-                if ($key === 0) {
-                    $aggregatedColumn = "{$aggregate}({$aggregatedColumn})";
-                } else {
-                    $aggregatedColumn = "min({$aggregatedColumn})";
-                }
+                $aggregatedColumn = $key === 0 ? "{$aggregate}({$aggregatedColumn})" : "min({$aggregatedColumn})";
 
                 $subQuery->selectRaw($aggregatedColumn.' as '.$subQuery->getQuery()->grammar->wrap($column.'_aggregate'));
             }

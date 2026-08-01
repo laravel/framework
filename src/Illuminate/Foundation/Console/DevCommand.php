@@ -16,11 +16,11 @@ class DevCommand extends Command
     use Prohibitable;
 
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'dev';
+    protected $signature = 'dev';
 
     /**
      * The console command description.

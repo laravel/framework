@@ -197,7 +197,7 @@ trait ResolvesJsonApiElements
         $resourceRelationships = (new Collection($this->toRelationships($request)))
             ->transform(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
             ->mapWithKeys(fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
-            ->filter(fn ($value, $key) => in_array($key, $sparseIncluded));
+            ->only($sparseIncluded);
 
         $resourceRelationshipKeys = $resourceRelationships->keys();
 
@@ -209,10 +209,8 @@ trait ResolvesJsonApiElements
             foreach ($resourceRelationships as $relationName => $relationResolver) {
                 $relatedModels = $relationResolver->handle($this->resource);
 
-                if (! is_null($relatedModels) && $this->includesPreviouslyLoadedRelationships === false) {
-                    if (! empty($relations = $request->sparseIncluded($relationName))) {
-                        $relatedModels->loadMissing($relations);
-                    }
+                if (! is_null($relatedModels) && $this->includesPreviouslyLoadedRelationships === false && ! empty($relations = $request->sparseIncluded($relationName))) {
+                    $relatedModels->loadMissing($relations);
                 }
 
                 yield from $this->compileResourceRelationshipUsingResolver(

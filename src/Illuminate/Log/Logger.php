@@ -213,11 +213,7 @@ class Logger implements LoggerInterface
      */
     public function withoutContext(?array $keys = null)
     {
-        if (is_array($keys)) {
-            $this->context = array_diff_key($this->context, array_flip($keys));
-        } else {
-            $this->context = [];
-        }
+        $this->context = is_array($keys) ? array_diff_key($this->context, array_flip($keys)) : [];
 
         return $this;
     }

@@ -457,6 +457,25 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an array does not contain any keys other than the given keys.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateArrayKeys($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'array_keys');
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        return empty(array_diff_key($value, array_fill_keys($parameters, '')));
+    }
+
+    /**
      * Validate that an attribute is a list.
      *
      * @param  string  $attribute

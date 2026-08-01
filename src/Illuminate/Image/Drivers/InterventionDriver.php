@@ -29,6 +29,7 @@ use Intervention\Image\Encoders\MediaTypeEncoder;
 use Intervention\Image\Encoders\PngEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Interfaces\ImageInterface;
 
 abstract class InterventionDriver implements Driver
 {
@@ -95,10 +96,17 @@ abstract class InterventionDriver implements Driver
             $image = match (true) {
                 $transformation instanceof Orient => $image->orient(),
                 $transformation instanceof Cover => $image->cover($transformation->width, $transformation->height),
-                $transformation instanceof Contain => $image->contain($transformation->width, $transformation->height, $transformation->background),
+                $transformation instanceof Contain => $image->contain(
+                    $transformation->width,
+                    $transformation->height,
+                    $this->resolveBackground($image, $transformation->background),
+                ),
                 $transformation instanceof Crop => $image->crop($transformation->width, $transformation->height, $transformation->x, $transformation->y),
                 $transformation instanceof Resize => $image->resize($transformation->width, $transformation->height),
-                $transformation instanceof Rotate => $image->rotate($transformation->angle, $transformation->background),
+                $transformation instanceof Rotate => $image->rotate(
+                    $transformation->angle,
+                    $this->resolveBackground($image, $transformation->background),
+                ),
                 $transformation instanceof Scale => $image->scaleDown($transformation->width, $transformation->height),
                 $transformation instanceof Blur => $image->blur($transformation->amount),
                 $transformation instanceof Grayscale => $image->grayscale(),
@@ -132,6 +140,44 @@ abstract class InterventionDriver implements Driver
             return $image->encode(new MediaTypeEncoder($mediaType, quality: $quality))->toString();
         } finally {
             unset($image);
+        }
+    }
+
+    /**
+     * Resolve a background color, expanding the "dominant" sentinel when needed.
+     */
+    protected function resolveBackground(ImageInterface $image, ?string $background): ?string
+    {
+        return $background === 'dominant'
+            ? $this->dominantColorFrom($image)
+            : $background;
+    }
+
+    /**
+     * Get the dominant (average) color of the image as a hex string.
+     */
+    public function dominantColor(string $contents): string
+    {
+        $image = $this->manager->decode($contents);
+
+        try {
+            return $this->dominantColorFrom($image);
+        } finally {
+            unset($image);
+        }
+    }
+
+    /**
+     * Sample the dominant color by resizing the image to a single pixel.
+     */
+    protected function dominantColorFrom(ImageInterface $image): string
+    {
+        $sample = clone $image;
+
+        try {
+            return $sample->resize(1, 1)->colorAt(0, 0)->toHex(true);
+        } finally {
+            unset($sample);
         }
     }
 

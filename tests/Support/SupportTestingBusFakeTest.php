@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
@@ -777,6 +778,28 @@ class SupportTestingBusFakeTest extends TestCase
         $batch->cancel();
 
         $this->assertTrue($batch->cancelled());
+    }
+
+    public function testCancelledBatchesHaveImmutableCancelledAtTimestamp()
+    {
+        $batch = $this->fake->batch([])->dispatch();
+
+        $batch->cancel();
+
+        $this->assertInstanceOf(CarbonImmutable::class, $batch->cancelledAt);
+    }
+
+    public function testFinishedBatchesHaveImmutableFinishedAtTimestamp()
+    {
+        $batchRepository = new BatchRepositoryFake;
+
+        $fake = new BusFake(m::mock(QueueingDispatcher::class), [], $batchRepository);
+
+        $batch = $fake->batch([])->dispatch();
+
+        $batchRepository->markAsFinished($batch->id);
+
+        $this->assertInstanceOf(CarbonImmutable::class, $batch->finishedAt);
     }
 
     public function testDispatchFakeBatch()
