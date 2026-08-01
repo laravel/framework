@@ -40,9 +40,7 @@ class UpCommand extends Command
 
             $this->laravel->maintenanceMode()->deactivate();
 
-            if (is_file(storage_path('framework/maintenance.php'))) {
-                unlink(storage_path('framework/maintenance.php'));
-            }
+            @unlink(storage_path('framework/maintenance.php'));
 
             $this->laravel->get('events')->dispatch(new MaintenanceModeDisabled());
 

@@ -27,9 +27,7 @@ class FileBasedMaintenanceMode implements MaintenanceModeContract
      */
     public function deactivate(): void
     {
-        if ($this->active()) {
-            unlink($this->path());
-        }
+        @unlink($this->path());
     }
 
     /**
