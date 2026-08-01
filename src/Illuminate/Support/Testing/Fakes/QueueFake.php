@@ -626,10 +626,10 @@ class QueueFake extends QueueManager implements Fake, Queue
             }
 
             $this->jobs[is_object($job) ? get_class($job) : $job][] = [
+                'uuid' => (string) Str::uuid(),
                 'job' => $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
                 'queue' => $queue,
                 'data' => $data,
-                'uuid' => (string) Str::uuid(),
                 'createdAt' => Carbon::now()->getTimestamp(),
             ];
 
@@ -717,9 +717,9 @@ class QueueFake extends QueueManager implements Fake, Queue
     {
         if ($this->shouldFakeJob($job)) {
             $this->delayed[is_object($job) ? get_class($job) : $job][] = [
+                'uuid' => (string) Str::uuid(),
                 'job' => $job,
                 'queue' => enum_value($queue),
-                'uuid' => (string) Str::uuid(),
                 'createdAt' => Carbon::now()->getTimestamp(),
             ];
         }
@@ -770,9 +770,9 @@ class QueueFake extends QueueManager implements Fake, Queue
         }
 
         $this->reserved[is_object($job) ? get_class($job) : $job][] = [
+            'uuid' => (string) Str::uuid(),
             'job' => $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
             'queue' => $queue,
-            'uuid' => (string) Str::uuid(),
             'createdAt' => Carbon::now()->getTimestamp(),
         ];
     }
