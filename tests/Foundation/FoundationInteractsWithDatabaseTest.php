@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Mockery as m;
 use Orchestra\Testbench\Concerns\CreatesApplication;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -599,6 +600,103 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $case->setUp();
         $case->testExpectsDatabaseQueryCount();
+        $case->tearDown();
+    }
+
+    public function testAssertNoRepeatedQueriesPassesWhenNoQueryShapeRepeats()
+    {
+        $case = new class('foo') extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testAssertNoRepeatedQueries()
+            {
+                $this->assertNoRepeatedQueries();
+
+                DB::pretend(function ($db) {
+                    $db->table('teams')->limit(50)->get();
+                    $db->table('countries')->whereIn('id', [1, 2, 3])->get();
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testAssertNoRepeatedQueries();
+        $case->tearDown();
+    }
+
+    public function testAssertNoRepeatedQueriesFailsWhenAQueryShapeRepeats()
+    {
+        $case = new class('foo') extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testAssertNoRepeatedQueries()
+            {
+                $this->assertNoRepeatedQueries();
+
+                DB::pretend(function ($db) {
+                    $db->table('countries')->where('id', 1)->get();
+                    $db->table('countries')->where('id', 2)->get();
+                    $db->table('countries')->where('id', 3)->get();
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testAssertNoRepeatedQueries();
+
+        try {
+            $case->tearDown();
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringContainsString('possible N+1', $e->getMessage());
+        }
+    }
+
+    public function testAssertNoRepeatedQueriesRespectsThreshold()
+    {
+        $case = new class('foo') extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testAssertNoRepeatedQueries()
+            {
+                $this->assertNoRepeatedQueries(threshold: 3);
+
+                DB::pretend(function ($db) {
+                    $db->table('countries')->where('id', 1)->get();
+                    $db->table('countries')->where('id', 2)->get();
+                    $db->table('countries')->where('id', 3)->get();
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testAssertNoRepeatedQueries();
+        $case->tearDown();
+    }
+
+    public function testAssertNoRepeatedQueriesIgnoresNonSelectStatements()
+    {
+        $case = new class('foo') extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testAssertNoRepeatedQueries()
+            {
+                $this->assertNoRepeatedQueries();
+
+                DB::pretend(function ($db) {
+                    $db->table('solves')->insert(['team_id' => 1]);
+                    $db->table('solves')->insert(['team_id' => 2]);
+                    $db->table('solves')->insert(['team_id' => 3]);
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testAssertNoRepeatedQueries();
         $case->tearDown();
     }
 

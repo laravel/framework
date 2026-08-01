@@ -287,6 +287,80 @@ trait InteractsWithDatabase
     }
 
     /**
+     * Assert that no "N+1" query pattern occurs throughout the test.
+     *
+     * Detects the N+1 signature: the same normalized query shape executing
+     * more than the allowed threshold. Only SELECT statements are considered,
+     * since writes are commonly repeated intentionally (e.g. batch inserts).
+     *
+     * @param  int  $threshold
+     * @param  string|null  $connection
+     * @return $this
+     */
+    public function assertNoRepeatedQueries($threshold = 1, $connection = null)
+    {
+        $connectionInstance = $this->getConnection($connection);
+
+        $counts = [];
+
+        $connectionInstance->listen(function (QueryExecuted $event) use (&$counts, $connectionInstance, $connection) {
+            if (! is_null($connection) && $connectionInstance !== $event->connection) {
+                return;
+            }
+
+            if (! str_starts_with(strtolower(ltrim($event->sql)), 'select')) {
+                return;
+            }
+
+            $fingerprint = $this->fingerprintQuery($event->sql);
+
+            $counts[$fingerprint] = ($counts[$fingerprint] ?? 0) + 1;
+        });
+
+        $this->beforeApplicationDestroyed(function () use (&$counts, $threshold, $connectionInstance) {
+            $repeated = array_filter($counts, fn ($count) => $count > $threshold);
+
+            if (empty($repeated)) {
+                $this->assertTrue(true);
+
+                return;
+            }
+
+            $lines = [];
+
+            foreach ($repeated as $fingerprint => $count) {
+                $lines[] = "  [{$count}x] {$fingerprint}";
+            }
+
+            $this->fail(sprintf(
+                'Repeated query pattern detected on the [%s] connection (possible N+1).'.
+                'The following query shapes executed more than %d time(s):\n%s',
+                $connectionInstance->getName(),
+                $threshold,
+                implode("\n", $lines)
+            ));
+        });
+
+        return $this;
+    }
+
+    /**
+     * Normalize a SQL statement into a "shape" by removing its bound values,
+     * so that queries differing only by value collapse into a single pattern.
+     *
+     * @param  string  $sql
+     * @return string
+     */
+    protected function fingerprintQuery($sql)
+    {
+        $sql = preg_replace('/\b\d+\b/', '?', $sql);
+        $sql = preg_replace("/'[^']*'/", '?', $sql);
+        $sql = preg_replace('/in \([^)]+\)/i', 'in (?)', $sql);
+
+        return strtolower(trim($sql));
+    }
+
+    /**
      * Determine if the argument is a soft deletable model.
      *
      * @param  mixed  $model
