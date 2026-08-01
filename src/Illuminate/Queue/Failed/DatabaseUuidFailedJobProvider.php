@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Date;
 
 class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, FailedJobProviderInterface, PrunableFailedJobProvider
 {
+    use ExtractsFailedJobUuid;
+
     /**
      * The connection resolver implementation.
      *
@@ -55,7 +57,7 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
     public function log($connection, $queue, $payload, $exception)
     {
         $this->getTable()->insert([
-            'uuid' => $uuid = json_decode($payload, true)['uuid'],
+            'uuid' => $uuid = $this->extractUuid($payload),
             'connection' => $connection,
             'queue' => $queue,
             'payload' => $payload,

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Date;
 
 class DynamoDbFailedJobProvider implements FailedJobProviderInterface
 {
+    use ExtractsFailedJobUuid;
+
     /**
      * The DynamoDB client instance.
      *
@@ -57,7 +59,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      */
     public function log($connection, $queue, $payload, $exception)
     {
-        $id = json_decode($payload, true)['uuid'];
+        $id = $this->extractUuid($payload);
 
         $failedAt = Date::now();
 

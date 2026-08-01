@@ -39,6 +39,16 @@ class FileFailedJobProviderTest extends TestCase
         ], $failedJobs);
     }
 
+    public function testCanLogFailedJobsWithInvalidPayload()
+    {
+        $payload = '{invalid';
+
+        $id = $this->provider->log('connection', 'queue', $payload, new Exception('Something went wrong.'));
+
+        $this->assertTrue(Str::isUuid($id));
+        $this->assertSame($payload, $this->provider->find($id)->payload);
+    }
+
     public function testCanRetrieveAllFailedJobs()
     {
         Carbon::setTestNow(Carbon::now());

@@ -49,6 +49,40 @@ class DynamoDbFailedJobProviderTest extends TestCase
         Str::createUuidsNormally();
     }
 
+    public function testCanLogFailedJobWithInvalidPayload()
+    {
+        $uuid = Str::orderedUuid();
+
+        Str::createUuidsUsing(fn () => $uuid);
+
+        Carbon::setTestNow($now = CarbonImmutable::now());
+
+        $exception = new Exception('Something went wrong.');
+        $payload = '{invalid';
+
+        $dynamoDbClient = m::mock(DynamoDbClient::class);
+
+        $dynamoDbClient->shouldReceive('putItem')->once()->with([
+            'TableName' => 'table',
+            'Item' => [
+                'application' => ['S' => 'application'],
+                'uuid' => ['S' => (string) $uuid],
+                'connection' => ['S' => 'connection'],
+                'queue' => ['S' => 'queue'],
+                'payload' => ['S' => $payload],
+                'exception' => ['S' => (string) $exception],
+                'failed_at' => ['N' => (string) $now->getTimestamp()],
+                'expires_at' => ['N' => (string) $now->addWeek()->getTimestamp()],
+            ],
+        ]);
+
+        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
+
+        $this->assertSame((string) $uuid, $provider->log('connection', 'queue', $payload, $exception));
+
+        Str::createUuidsNormally();
+    }
+
     public function testCanRetrieveAllFailedJobs()
     {
         $dynamoDbClient = m::mock(DynamoDbClient::class);

@@ -26,6 +26,17 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         $this->assertSame(['uuid-3', 'uuid-4'], $provider->ids('queue-2'));
     }
 
+    public function testLoggingFailedJobWithInvalidPayload()
+    {
+        $provider = $this->getFailedJobProvider();
+        $payload = '{invalid';
+
+        $id = $provider->log('connection', 'queue', $payload, new RuntimeException());
+
+        $this->assertTrue(Str::isUuid($id));
+        $this->assertSame($payload, $provider->find($id)->payload);
+    }
+
     public function testGettingAllFailedJobs()
     {
         $provider = $this->getFailedJobProvider();
