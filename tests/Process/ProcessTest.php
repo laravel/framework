@@ -686,6 +686,15 @@ class ProcessTest extends TestCase
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testRealProcessesCanUseFalsyStandardInput()
+    {
+        $factory = new Factory();
+        $result = $factory->input(0)->run('cat');
+
+        $this->assertSame('0', $result->output());
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testProcessPipe()
     {
         $factory = new Factory;

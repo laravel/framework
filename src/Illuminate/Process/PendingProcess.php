@@ -310,7 +310,7 @@ class PendingProcess
             $process->setIdleTimeout($this->idleTimeout);
         }
 
-        if ($this->input) {
+        if ($this->input !== null) {
             $process->setInput($this->input);
         }
 
