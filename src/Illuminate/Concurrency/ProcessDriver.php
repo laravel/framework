@@ -12,6 +12,7 @@ use Illuminate\Process\Pool;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Defer\DeferredCallback;
 use Laravel\SerializableClosure\SerializableClosure;
+use Throwable;
 
 use function Illuminate\Support\defer;
 
@@ -62,11 +63,17 @@ class ProcessDriver implements Driver
             $result = json_decode($output, true);
 
             if (! $result['successful']) {
-                throw new $result['exception'](
-                    ...(! empty(array_filter($result['parameters'], fn ($parameter) => ! is_null($parameter)))
-                        ? $result['parameters']
-                        : [$result['message']])
-                );
+                try {
+                    $exception = new $result['exception'](
+                        ...(! empty(array_filter($result['parameters'], fn ($parameter) => ! is_null($parameter)))
+                            ? $result['parameters']
+                            : [$result['message']])
+                    );
+                } catch (Throwable) {
+                    $exception = new Exception($result['exception'].': '.$result['message']);
+                }
+
+                throw $exception;
             }
 
             return [$key => unserialize($result['result'])];

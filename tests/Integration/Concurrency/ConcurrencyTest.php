@@ -5,10 +5,12 @@ namespace Illuminate\Tests\Integration\Concurrency;
 use Exception;
 use Illuminate\Concurrency\ProcessDriver;
 use Illuminate\Concurrency\SyncDriver;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Support\Facades\Concurrency;
 use Orchestra\Testbench\TestCase;
+use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
@@ -150,6 +152,22 @@ PHP);
                 'Invalid payload'
             ),
         ]);
+    }
+
+    public function testRunHandlerProcessErrorWithNonStandardConstructorException()
+    {
+        try {
+            Concurrency::run([
+                fn () => throw new QueryException('mariadb', 'insert into t values (1)', [], new PDOException('dup')),
+            ]);
+        } catch (Exception $e) {
+            $this->assertStringContainsString(QueryException::class, $e->getMessage());
+            $this->assertStringContainsString('dup', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('The expected exception was not thrown.');
     }
 
     #[DataProvider('falseyExceptionParameters')]
