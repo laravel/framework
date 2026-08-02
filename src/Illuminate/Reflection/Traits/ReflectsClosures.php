@@ -117,8 +117,7 @@ trait ReflectsClosures
             : [$reflection->getReturnType()];
 
         return (new Collection($types))
-            ->reject(fn ($type) => $type->isBuiltin())
-            ->reject(fn ($type) => in_array($type->getName(), ['static', 'self']))
+            ->reject(fn ($type) => $type->isBuiltin() || in_array($type->getName(), ['static', 'self']))
             ->map(fn ($type) => $type->getName())
             ->values()
             ->all();
