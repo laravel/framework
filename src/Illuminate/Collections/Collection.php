@@ -589,6 +589,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                 $resolvedKey = (string) $resolvedKey;
             }
 
+            if (is_null($resolvedKey)) {
+                $resolvedKey = (string) $resolvedKey;
+            }
+
             $results[$resolvedKey] = $item;
         }
 
