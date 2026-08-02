@@ -954,6 +954,13 @@ class SupportStrTest extends TestCase
         $this->assertSame("caf\xC3 X", Str::replace('ž', 'X', "caf\xC3 ž", false));
     }
 
+    public function testReplaceThrowsForScalarSearchAndArrayReplacement()
+    {
+        $this->expectException(\TypeError::class);
+
+        Str::replace('ž', ['X'], 'Ž', false);
+    }
+
     public function testReplaceArray()
     {
         $this->assertSame('foo/bar/baz', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?/?'));

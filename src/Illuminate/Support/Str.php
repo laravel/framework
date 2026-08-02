@@ -1299,6 +1299,10 @@ class Str
      */
     protected static function replaceIgnoreCase($search, $replace, $subject)
     {
+        if (! is_array($search) && is_array($replace)) {
+            return str_ireplace($search, $replace, $subject);
+        }
+
         $searches = is_array($search) ? array_values($search) : [$search];
 
         if (array_all($searches, static::isAscii(...))) {
