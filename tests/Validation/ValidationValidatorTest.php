@@ -4550,6 +4550,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => ['0100', '100']], ['foo.*' => 'distinct:strict']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['users' => [['name' => ['John']], ['name' => ['john']]]], ['users.*.name' => 'distinct:ignore_case']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateDistinctForTopLevelArrays()
