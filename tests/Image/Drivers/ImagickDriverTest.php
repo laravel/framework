@@ -448,6 +448,7 @@ class ImagickDriverTest extends TestCase
     {
         $imagick = new \Imagick;
         $imagick->newImage($width, $height, new \ImagickPixel(sprintf('rgb(%d,%d,%d)', $red, $green, $blue)));
+        $imagick->setImageAlphaChannel(\Imagick::ALPHACHANNEL_OPAQUE);
         $imagick->setImageFormat('png');
 
         $contents = $imagick->getImageBlob();
