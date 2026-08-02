@@ -923,7 +923,7 @@ class RoutingUrlGeneratorTest extends TestCase
         );
     }
 
-    public function testRouteGenerationWithUnitEnums():void
+    public function testRouteGenerationWithUnitEnums(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -936,7 +936,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com/foo/Fruits', $url->route('foo.bar', CategoryEnum::Fruits));
     }
 
-    public function testRouteGenerationWithNestedUnitEnums():void
+    public function testRouteGenerationWithNestedUnitEnums(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,

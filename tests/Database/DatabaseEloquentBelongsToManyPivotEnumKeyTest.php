@@ -24,7 +24,7 @@ class DatabaseEloquentBelongsToManyPivotEnumKeyTest extends TestCase
         $this->createSchema();
     }
 
-    protected function createSchema()
+    protected function createSchema(): void
     {
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
@@ -81,7 +81,7 @@ class DatabaseEloquentBelongsToManyPivotEnumKeyTest extends TestCase
         $this->assertSame([], $user->fresh()->roles->pluck('name')->all());
     }
 
-    protected function connection()
+    protected function connection(): \Illuminate\Database\ConnectionInterface
     {
         return Eloquent::getConnectionResolver()->connection();
     }
@@ -97,7 +97,7 @@ class PivotEnumKeyTestUser extends Eloquent
     protected $table = 'users';
     public $timestamps = false;
 
-    public function roles()
+    public function roles(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(PivotEnumKeyTestRole::class, 'role_user', 'user_id', 'role_id');
     }
