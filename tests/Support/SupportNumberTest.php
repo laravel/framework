@@ -169,6 +169,28 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1 234,56 $US', Number::currency(1234.56, 'USD', 'fr'));
     }
 
+    #[RequiresPhpExtension('intl')]
+    public function testToCurrencyWithAppCurrency()
+    {
+        $this->assertSame('$1.00', Number::currency(1));
+
+        Number::useCurrency('EUR');
+
+        $this->assertSame('EUR', Number::defaultCurrency());
+        $this->assertSame('€1.00', Number::currency(1));
+
+        Number::useCurrency('USD');
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testToCurrencyWithCurrency()
+    {
+        $this->assertSame('€1.00', Number::withCurrency('EUR', fn () => Number::currency(1)));
+
+        $this->assertSame('USD', Number::defaultCurrency());
+        $this->assertSame('$1.00', Number::currency(1));
+    }
+
     public function testBytesToHuman()
     {
         $this->assertSame('0 B', Number::fileSize(0));
