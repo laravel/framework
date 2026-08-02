@@ -1286,7 +1286,54 @@ class Str
 
         return $caseSensitive
             ? str_replace($search, $replace, $subject)
-            : str_ireplace($search, $replace, $subject);
+            : static::replaceWhileIgnoringCase($search, $replace, $subject);
+    }
+
+    /**
+     * Replace the given value in the given string regardless of case.
+     *
+     * @param  string|string[]  $search
+     * @param  string|string[]  $replace
+     * @param  string|string[]  $subject
+     * @return string|string[]
+     */
+    protected static function replaceWhileIgnoringCase($search, $replace, $subject)
+    {
+        if (! is_array($search) && is_array($replace)) {
+            return str_ireplace($search, $replace, $subject);
+        }
+
+        $searches = is_array($search) ? array_values($search) : [$search];
+
+        if (array_all($searches, static::isAscii(...))) {
+            return str_ireplace($search, $replace, $subject);
+        }
+
+        $replacements = is_array($replace)
+            ? array_values($replace)
+            : array_fill(0, count($searches), $replace);
+
+        foreach ([...$searches, ...$replacements, ...(array) $subject] as $value) {
+            if (! preg_match('//u', (string) $value)) {
+                return str_ireplace($search, $replace, $subject);
+            }
+        }
+
+        foreach ($searches as $index => $term) {
+            $term = (string) $term;
+
+            if ($term === '') {
+                continue;
+            }
+
+            $replacement = (string) ($replacements[$index] ?? '');
+
+            $subject = static::isAscii($term)
+                ? str_ireplace($term, $replacement, $subject)
+                : preg_replace_callback('/'.preg_quote($term, '/').'/iu', fn () => $replacement, $subject);
+        }
+
+        return $subject;
     }
 
     /**
@@ -1419,7 +1466,7 @@ class Str
 
         return $caseSensitive
             ? str_replace($search, '', $subject)
-            : str_ireplace($search, '', $subject);
+            : static::replaceWhileIgnoringCase($search, '', $subject);
     }
 
     /**
