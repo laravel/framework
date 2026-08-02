@@ -41,8 +41,6 @@ class ClearCommandTest extends TestCase
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->cacheManager = m::mock(CacheManager::class);
         $this->files = m::mock(Filesystem::class);
         $this->cacheRepository = m::mock(Repository::class);

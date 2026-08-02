@@ -26,8 +26,6 @@ class LengthAwarePaginatorTest extends TestCase
     protected function tearDown(): void
     {
         unset($this->p);
-
-        parent::tearDown();
     }
 
     public function testLengthAwarePaginatorGetAndSetPageName()

@@ -29,8 +29,6 @@ class AuthorizeMiddlewareTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->user = new stdClass;
 
         Container::setInstance($this->container = new Container);
@@ -51,8 +49,6 @@ class AuthorizeMiddlewareTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
-
-        parent::tearDown();
     }
 
     public function testItCanGenerateDefinitionViaStaticMethod()

@@ -21,8 +21,6 @@ class ContainerTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         if (version_compare(PHP_VERSION, '8.5.0', '>=')) {
             require_once __DIR__.'/Fixtures/ContainerBindWhenFixtures.php';
         }
@@ -31,8 +29,6 @@ class ContainerTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
-
-        parent::tearDown();
     }
 
     public function testContainerSingleton()

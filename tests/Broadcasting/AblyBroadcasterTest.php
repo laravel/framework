@@ -20,8 +20,6 @@ class AblyBroadcasterTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->ably = m::mock(AblyRest::class, ['abcd:efgh']);
 
         $this->broadcaster = m::mock(AblyBroadcaster::class, [$this->ably])->makePartial();

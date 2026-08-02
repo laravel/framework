@@ -15,8 +15,6 @@ class InteractsWithDeprecationHandlingTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         set_error_handler(function () {
             $this->deprecationsFound = true;
         });
@@ -27,8 +25,6 @@ class InteractsWithDeprecationHandlingTest extends TestCase
         $this->deprecationsFound = false;
 
         HandleExceptions::flushHandlersState($this);
-
-        parent::tearDown();
     }
 
     public function testWithDeprecationHandling()

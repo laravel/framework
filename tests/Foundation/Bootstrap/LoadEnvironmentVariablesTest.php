@@ -13,8 +13,6 @@ class LoadEnvironmentVariablesTest extends TestCase
     {
         unset($_ENV['FOO'], $_SERVER['FOO']);
         putenv('FOO');
-
-        parent::tearDown();
     }
 
     protected function getAppMock($file)

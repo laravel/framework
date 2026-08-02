@@ -45,8 +45,6 @@ class ValidationValidatorTest extends TestCase
     protected function tearDown(): void
     {
         Validator::flushState();
-
-        parent::tearDown();
     }
 
     public function testNestedErrorMessagesAreRetrievedFromLocalArray()

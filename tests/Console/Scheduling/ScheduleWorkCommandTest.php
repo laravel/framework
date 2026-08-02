@@ -28,8 +28,6 @@ class ScheduleWorkCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->originalAvailabilityResolver = (new ReflectionProperty(Signals::class, 'availabilityResolver'))
             ->getValue();
 
@@ -39,8 +37,6 @@ class ScheduleWorkCommandTest extends TestCase
     protected function tearDown(): void
     {
         Signals::resolveAvailabilityUsing($this->originalAvailabilityResolver);
-
-        parent::tearDown();
     }
 
     public function test_stop_signal_marks_the_worker_to_quit()

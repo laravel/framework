@@ -32,16 +32,12 @@ class CacheRepositoryTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         Carbon::setTestNow(Carbon::parse(self::getTestDate()));
     }
 
     protected function tearDown(): void
     {
         Repository::handleUnserializableClassUsing(null);
-
-        parent::tearDown();
     }
 
     public function testGetReturnsValueFromCache()

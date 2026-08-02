@@ -17,8 +17,6 @@ class SupportFacadesQueueTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->queueManager = m::mock(Factory::class);
 
         $container = new Container;
@@ -32,8 +30,6 @@ class SupportFacadesQueueTest extends TestCase
     {
         Queue::clearResolvedInstance();
         Queue::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 
     public function testFakeFor()

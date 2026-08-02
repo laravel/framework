@@ -75,8 +75,6 @@ class DatabaseEloquentModelTest extends TestCase
     {
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();
-
-        parent::tearDown();
     }
 
     public function testAttributeManipulation()

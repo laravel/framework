@@ -33,8 +33,6 @@ class FoundationFormRequestTest extends TestCase
         Container::setInstance(null);
 
         $this->mocks = [];
-
-        parent::tearDown();
     }
 
     public function testValidatedMethodReturnsTheValidatedData()

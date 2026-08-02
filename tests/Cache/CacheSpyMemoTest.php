@@ -16,8 +16,6 @@ class CacheSpyMemoTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         $container = new Container;
 
         $container->instance('config', new ConfigRepository([
@@ -40,8 +38,6 @@ class CacheSpyMemoTest extends TestCase
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 
     public function test_cache_spy_works_with_memoized_cache()

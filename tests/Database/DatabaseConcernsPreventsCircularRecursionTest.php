@@ -10,8 +10,6 @@ class DatabaseConcernsPreventsCircularRecursionTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         PreventsCircularRecursionWithRecursiveMethod::$globalStack = 0;
     }
 

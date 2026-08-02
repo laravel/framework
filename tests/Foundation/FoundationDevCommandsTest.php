@@ -14,8 +14,6 @@ class FoundationDevCommandsTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         $ref = new ReflectionClass(DevCommands::class);
 
         foreach (['commands', 'except', 'only'] as $prop) {

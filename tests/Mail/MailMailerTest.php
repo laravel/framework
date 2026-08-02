@@ -20,8 +20,6 @@ class MailMailerTest extends TestCase
     protected function tearDown(): void
     {
         unset($_SERVER['__mailer.test']);
-
-        parent::tearDown();
     }
 
     public function testMailerSendSendsMessageWithProperViewContent(): void
