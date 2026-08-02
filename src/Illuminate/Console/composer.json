@@ -19,6 +19,7 @@
         "illuminate/collections": "^13.0",
         "illuminate/contracts": "^13.0",
         "illuminate/macroable": "^13.0",
+        "illuminate/reflection": "^13.0",
         "illuminate/support": "^13.0",
         "illuminate/view": "^13.0",
         "laravel/prompts": "^0.3.0",
