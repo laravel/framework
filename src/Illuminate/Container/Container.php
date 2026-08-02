@@ -1157,16 +1157,18 @@ class Container implements ArrayAccess, ContainerContract
 
         // Once we have all the constructor's parameters we can create each of the
         // dependency instances and then use the reflection instances to make a
-        // new instance of this class, injecting the created dependencies in.
+        // new instance of this class, injecting the created dependencies in. The
+        // concrete stays on the build stack until the constructor has finished
+        // running so contextual bindings resolve against the class being built.
         try {
             $instances = $this->resolveDependencies($dependencies);
+
+            $this->fireAfterResolvingAttributeCallbacks(
+                $reflector->getAttributes(), $instance = new $concrete(...$instances)
+            );
         } finally {
             array_pop($this->buildStack);
         }
-
-        $this->fireAfterResolvingAttributeCallbacks(
-            $reflector->getAttributes(), $instance = new $concrete(...$instances)
-        );
 
         return $instance;
     }

@@ -345,6 +345,45 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
     }
 
+    public function testContextualBindingsDoNotLeakIntoNestedDependencyConstructors()
+    {
+        $container = new Container;
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->when(ContainerNestedContextualParentStub::class)
+            ->needs(IContainerContractStub::class)
+            ->give(ContainerImplementationStubTwo::class);
+
+        ContainerNestedContextualChildStub::$onConstruct = function () use ($container) {
+            return $container->make(IContainerContractStub::class);
+        };
+
+        $instance = $container->make(ContainerNestedContextualParentStub::class);
+
+        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $instance->contract);
+        $this->assertInstanceOf(ContainerImplementationStub::class, ContainerNestedContextualChildStub::$resolved);
+    }
+
+    public function testContextualBindingsAreAppliedInsideConstructorBody()
+    {
+        $container = new Container;
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->when(ContainerNestedContextualChildStub::class)
+            ->needs(IContainerContractStub::class)
+            ->give(ContainerImplementationStubTwo::class);
+
+        ContainerNestedContextualChildStub::$onConstruct = function () use ($container) {
+            return $container->make(IContainerContractStub::class);
+        };
+
+        $container->make(ContainerNestedContextualChildStub::class);
+
+        $this->assertInstanceOf(ContainerImplementationStubTwo::class, ContainerNestedContextualChildStub::$resolved);
+    }
+
     public function testBound()
     {
         $container = new Container;
@@ -974,6 +1013,29 @@ class ContainerImplementationStub implements IContainerContractStub
 class ContainerImplementationStubTwo implements IContainerContractStub
 {
     //
+}
+
+class ContainerNestedContextualParentStub
+{
+    public function __construct(
+        public IContainerContractStub $contract,
+        public ContainerNestedContextualChildStub $child,
+    ) {
+    }
+}
+
+class ContainerNestedContextualChildStub
+{
+    public static $onConstruct;
+
+    public static $resolved;
+
+    public function __construct()
+    {
+        if (static::$onConstruct) {
+            static::$resolved = (static::$onConstruct)();
+        }
+    }
 }
 
 class ContainerDependentStub
