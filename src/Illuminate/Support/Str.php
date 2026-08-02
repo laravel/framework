@@ -1286,7 +1286,7 @@ class Str
 
         return $caseSensitive
             ? str_replace($search, $replace, $subject)
-            : static::replaceIgnoreCase($search, $replace, $subject);
+            : static::replaceWhileIgnoringCase($search, $replace, $subject);
     }
 
     /**
@@ -1297,7 +1297,7 @@ class Str
      * @param  string|string[]  $subject
      * @return string|string[]
      */
-    protected static function replaceIgnoreCase($search, $replace, $subject)
+    protected static function replaceWhileIgnoringCase($search, $replace, $subject)
     {
         if (! is_array($search) && is_array($replace)) {
             return str_ireplace($search, $replace, $subject);
@@ -1466,7 +1466,7 @@ class Str
 
         return $caseSensitive
             ? str_replace($search, '', $subject)
-            : static::replaceIgnoreCase($search, '', $subject);
+            : static::replaceWhileIgnoringCase($search, '', $subject);
     }
 
     /**
