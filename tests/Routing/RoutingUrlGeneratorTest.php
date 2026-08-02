@@ -806,6 +806,36 @@ class RoutingUrlGeneratorTest extends TestCase
         }
     }
 
+    public function testSignedUrlDoesNotTrustForwardedPrefixToChangeThePathBeingVerified()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(fn () => 'secret');
+
+        $routes->add(new Route(['GET'], 'document/{document}', ['as' => 'document.show', function () {
+            //
+        }]));
+
+        $signedUrl = $url->signedRoute('document.show', ['document' => 1]);
+
+        $request = Request::create(
+            'http://www.foo.com/admin/42?'.parse_url($signedUrl, PHP_URL_QUERY),
+            'GET', [], [], [], [
+                'REMOTE_ADDR' => '127.0.0.1',
+                'HTTP_X_FORWARDED_PREFIX' => '/document/1?',
+            ]
+        );
+        $request::setTrustedProxies(['127.0.0.1'], Request::HEADER_X_FORWARDED_PREFIX);
+
+        try {
+            $this->assertFalse($url->hasValidSignature($request));
+        } finally {
+            $request::setTrustedProxies([], Request::HEADER_X_FORWARDED_PREFIX);
+        }
+    }
+
     public function testSignedUrlImplicitModelBinding()
     {
         $url = new UrlGenerator(

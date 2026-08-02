@@ -451,7 +451,9 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function hasCorrectSignature(Request $request, $absolute = true, Closure|array $ignoreQuery = [])
     {
-        $url = $absolute ? $request->url() : '/'.$request->path();
+        $url = $absolute
+            ? rtrim($request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo(), '/')
+            : '/'.$request->path();
 
         $queryString = (new Collection(explode('&', (string) $request->server->get('QUERY_STRING'))))
             ->reject(function ($parameter) use ($ignoreQuery) {
