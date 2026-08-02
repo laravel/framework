@@ -97,6 +97,24 @@ class CursorPaginatorTest extends TestCase
         $this->assertTrue($paginator->onLastPage());
     }
 
+    public function testItemsAreConsistentlyReindexedForNextAndPreviousPages(): void
+    {
+        $next = new CursorPaginator([['id' => 1], ['id' => 2], ['id' => 3]], 2, null, [
+            'parameters' => ['id'],
+        ]);
+
+        $this->assertSame([0, 1], array_keys($next->items()));
+
+        $cursor = new Cursor(['id' => 5], false);
+
+        $previous = new CursorPaginator([['id' => 4], ['id' => 3], ['id' => 2]], 2, $cursor, [
+            'parameters' => ['id'],
+        ]);
+
+        $this->assertSame([0, 1], array_keys($previous->items()));
+        $this->assertSame([['id' => 3], ['id' => 4]], $previous->items());
+    }
+
     public function testReturnEmptyCursorWhenItemsAreEmpty()
     {
         $cursor = new Cursor(['id' => 25], true);
