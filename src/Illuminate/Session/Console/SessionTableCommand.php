@@ -20,7 +20,7 @@ class SessionTableCommand extends MigrationGeneratorCommand
     /**
      * The console command name aliases.
      *
-     * @var array
+     * @var string[]
      */
     protected $aliases = ['session:table'];
 
