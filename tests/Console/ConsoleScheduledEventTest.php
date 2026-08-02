@@ -27,8 +27,6 @@ class ConsoleScheduledEventTest extends TestCase
     protected function tearDown(): void
     {
         date_default_timezone_set($this->defaultTimezone);
-
-        parent::tearDown();
     }
 
     public function testBasicCronCompilation()

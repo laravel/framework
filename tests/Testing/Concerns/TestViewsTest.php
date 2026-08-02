@@ -19,8 +19,6 @@ class TestViewsTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         Container::setInstance($container = new Container);
 
         Facade::setFacadeApplication($container);
@@ -43,8 +41,6 @@ class TestViewsTest extends TestCase
         Facade::setFacadeApplication(null);
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
-
-        parent::tearDown();
     }
 
     public function testCompiledViewPathAppendsToken()

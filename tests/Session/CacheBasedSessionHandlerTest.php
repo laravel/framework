@@ -15,7 +15,6 @@ class CacheBasedSessionHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->cacheMock = m::mock(CacheContract::class);
         $this->sessionHandler = new CacheBasedSessionHandler(cache: $this->cacheMock, minutes: 10);
     }

@@ -21,8 +21,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         $db = new DB;
 
         $db->addConnection([
@@ -97,8 +95,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('comments');
-
-        parent::tearDown();
     }
 
     /**

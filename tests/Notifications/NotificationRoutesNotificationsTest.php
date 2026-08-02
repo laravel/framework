@@ -16,8 +16,6 @@ class NotificationRoutesNotificationsTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
-
-        parent::tearDown();
     }
 
     public function testNotificationCanBeDispatched()

@@ -17,8 +17,6 @@ class SleepTest extends TestCase
     protected function tearDown(): void
     {
         Sleep::fake(false);
-
-        parent::tearDown();
     }
 
     public function testItSleepsForSeconds()

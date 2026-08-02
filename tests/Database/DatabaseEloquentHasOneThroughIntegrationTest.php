@@ -68,8 +68,6 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('contracts');
         $this->schema()->drop('positions');
-
-        parent::tearDown();
     }
 
     public function testItLoadsAHasOneThroughRelationWithCustomKeys()

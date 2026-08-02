@@ -17,8 +17,6 @@ class RedisManagerExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->redis = new RedisManager(new Application, 'my_custom_driver', [
             'default' => [
                 'host' => 'some-host',

@@ -15,8 +15,6 @@ class TestDatabasesTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         Container::setInstance($container = new Container);
 
         $container->singleton('config', function () {
@@ -103,7 +101,5 @@ class TestDatabasesTest extends TestCase
         DB::setFacadeApplication(null);
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
-
-        parent::tearDown();
     }
 }

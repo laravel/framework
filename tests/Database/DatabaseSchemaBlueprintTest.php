@@ -16,8 +16,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
     protected function tearDown(): void
     {
         Builder::$defaultMorphKeyType = 'int';
-
-        parent::tearDown();
     }
 
     public function testToSqlRunsCommandsFromBlueprint()

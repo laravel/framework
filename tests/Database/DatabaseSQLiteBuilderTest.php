@@ -27,8 +27,6 @@ class DatabaseSQLiteBuilderTest extends TestCase
     {
         Container::setInstance(null);
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 
     public function testCreateDatabase()

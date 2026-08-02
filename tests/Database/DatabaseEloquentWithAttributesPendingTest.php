@@ -25,8 +25,6 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
     protected function tearDown(): void
     {
         $this->schema()->dropIfExists((new PendingAttributesModel)->getTable());
-
-        parent::tearDown();
     }
 
     public function testAddsAttributes(): void
