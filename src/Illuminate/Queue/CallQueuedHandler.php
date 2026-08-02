@@ -225,19 +225,6 @@ class CallQueuedHandler
     }
 
     /**
-     * Ensure the lock for a unique job is released.
-     *
-     * @param  mixed  $command
-     * @return void
-     */
-    protected function ensureUniqueJobLockIsReleased($command)
-    {
-        if ($this->commandShouldBeUnique($command)) {
-            (new UniqueLock($this->container->make(Cache::class)))->release($command);
-        }
-    }
-
-    /**
      * Determine if the unique job lock can be safely released.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -250,6 +237,19 @@ class CallQueuedHandler
             (isset(class_uses_recursive($command)[Queueable::class]) &&
              is_string($command->uniqueLockOwner ?? null) &&
              $command->uniqueLockOwner !== '');
+    }
+
+    /**
+     * Ensure the lock for a unique job is released.
+     *
+     * @param  mixed  $command
+     * @return void
+     */
+    protected function ensureUniqueJobLockIsReleased($command)
+    {
+        if ($this->commandShouldBeUnique($command)) {
+            (new UniqueLock($this->container->make(Cache::class)))->release($command);
+        }
     }
 
     /**
