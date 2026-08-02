@@ -60,7 +60,16 @@ class DynamoBatchRepository implements BatchRepository
     protected $marshaler;
 
     /**
+     * The classes that are allowed to be unserialized from batch options.
+     *
+     * @var array|bool|null
+     */
+    protected $serializableClasses;
+
+    /**
      * Create a new batch repository instance.
+     *
+     * @param  array|bool|null  $serializableClasses
      */
     public function __construct(
         BatchFactory $factory,
@@ -69,6 +78,7 @@ class DynamoBatchRepository implements BatchRepository
         string $table,
         ?int $ttl,
         ?string $ttlAttribute,
+        $serializableClasses = null,
     ) {
         $this->factory = $factory;
         $this->dynamoDbClient = $dynamoDbClient;
@@ -76,6 +86,7 @@ class DynamoBatchRepository implements BatchRepository
         $this->table = $table;
         $this->ttl = $ttl;
         $this->ttlAttribute = $ttlAttribute;
+        $this->serializableClasses = $serializableClasses;
         $this->marshaler = new Marshaler;
     }
 
@@ -511,6 +522,10 @@ class DynamoBatchRepository implements BatchRepository
      */
     protected function unserialize($serialized)
     {
+        if ($this->serializableClasses !== null) {
+            return unserialize($serialized, ['allowed_classes' => $this->serializableClasses]);
+        }
+
         return unserialize($serialized);
     }
 

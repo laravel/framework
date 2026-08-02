@@ -84,6 +84,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
                 $app->config->get('queue.batching.table', 'job_batches'),
                 ttl: $app->config->get('queue.batching.ttl', null),
                 ttlAttribute: $app->config->get('queue.batching.ttl_attribute', 'ttl'),
+                serializableClasses: $app->config->get('queue.batching.serializable_classes', null),
             );
         });
     }
