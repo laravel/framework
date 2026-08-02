@@ -13,14 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class ChannelListCommandTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
-    public function testItDisplaysAnErrorWhenThereAreNoChannels()
+    public function testItDisplaysAnErrorWhenThereAreNoChannels(): void
     {
         $app = $this->makeApplication([]);
 
@@ -31,7 +24,7 @@ class ChannelListCommandTest extends TestCase
         );
     }
 
-    public function testItListsRegisteredChannels()
+    public function testItListsRegisteredChannels(): void
     {
         $app = $this->makeApplication([
             'orders.{order}' => fn () => true,
@@ -45,7 +38,7 @@ class ChannelListCommandTest extends TestCase
         $this->assertStringContainsString('Showing [1] private channels', $output);
     }
 
-    protected function makeApplication(array $channels)
+    protected function makeApplication(array $channels): Application
     {
         $laravel = new FoundationApplication(__DIR__);
 
