@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class PromptsForMissingInputTest extends TestCase
 {
-    public function testDidReceiveOptionsReturnsFalseWhenAllOptionsMatchTheirDefaults()
+    public function testDidReceiveOptionsReturnsFalseWhenAllOptionsMatchTheirDefaults(): void
     {
         $stub = $this->makeStub();
 
@@ -19,7 +19,7 @@ class PromptsForMissingInputTest extends TestCase
         $this->assertFalse($stub->didReceiveOptions($input));
     }
 
-    public function testDidReceiveOptionsReturnsTrueWhenAnOptionDiffersFromItsDefault()
+    public function testDidReceiveOptionsReturnsTrueWhenAnOptionDiffersFromItsDefault(): void
     {
         $stub = $this->makeStub();
 
@@ -36,7 +36,7 @@ class PromptsForMissingInputTest extends TestCase
                 didReceiveOptions as public;
             }
 
-            public function getDefinition()
+            public function getDefinition(): InputDefinition
             {
                 return new InputDefinition([
                     new InputOption('force', null, InputOption::VALUE_NONE),
