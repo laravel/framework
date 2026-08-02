@@ -495,7 +495,7 @@ class RouteListCommand extends Command
         $actionClass = explode('@', $action)[0];
 
         if (class_exists($actionClass) && str_starts_with((new ReflectionClass($actionClass))->getFilename(), base_path('vendor'))) {
-            $actionCollection = new Collection(explode('\\', $action));
+            $actionCollection = (new Stringable($action))->explode('\\');
 
             return $name.$actionCollection->take(2)->implode('\\').'   '.$actionCollection->last();
         }

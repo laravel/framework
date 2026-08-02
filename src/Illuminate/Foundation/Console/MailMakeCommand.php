@@ -5,8 +5,8 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -168,7 +168,7 @@ class MailMakeCommand extends GeneratorCommand
         if (! $view) {
             $name = str_replace('\\', '/', $this->argument('name'));
 
-            $view = 'mail.'.(new Collection(explode('/', $name)))
+            $view = 'mail.'.(new Stringable($name))->explode('/')
                 ->map(fn ($part) => Str::kebab($part))
                 ->implode('.');
         }
