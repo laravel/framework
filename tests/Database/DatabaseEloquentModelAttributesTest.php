@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Attributes\Visible;
 use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentModelAttributesTest extends TestCase
@@ -267,6 +269,49 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $model = new ModelExtendingGuardedParent;
 
         $this->assertSame(['id', 'secret'], $model->getGuarded());
+    }
+
+    public function test_guarded_attribute_on_pivot(): void
+    {
+        $model = new PivotWithGuardedAttribute;
+
+        $this->assertSame(['id', 'secret'], $model->getGuarded());
+    }
+
+    public function test_guarded_attribute_on_morph_pivot(): void
+    {
+        $model = new MorphPivotWithGuardedAttribute;
+
+        $this->assertSame(['id', 'secret'], $model->getGuarded());
+    }
+
+    public function test_unguarded_attribute_on_pivot(): void
+    {
+        $model = new PivotWithUnguardedAttribute;
+
+        $this->assertSame([], $model->getGuarded());
+        $this->assertFalse($model->isGuarded('anything'));
+    }
+
+    public function test_guarded_property_takes_precedence_on_pivot(): void
+    {
+        $model = new PivotWithGuardedAttributeAndProperty;
+
+        $this->assertSame(['token'], $model->getGuarded());
+    }
+
+    public function test_pivot_without_guarded_attribute_stays_unguarded(): void
+    {
+        $model = new PivotWithoutGuardedAttribute;
+
+        $this->assertSame([], $model->getGuarded());
+        $this->assertFalse($model->isGuarded('anything'));
+    }
+
+    public function test_empty_guarded_property_is_not_treated_as_unset(): void
+    {
+        $this->assertSame([], (new ModelWithEmptyGuardedProperty)->getGuarded());
+        $this->assertSame([], (new ModelWithEmptyGuardedPropertyAndAttribute)->getGuarded());
     }
 
     public function test_hidden_attribute(): void
@@ -656,6 +701,46 @@ class ModelExtendingGuardedParent extends GuardedBaseModel
 
 #[Unguarded]
 class ModelWithUnguardedAttribute extends Model
+{
+    //
+}
+
+class ModelWithEmptyGuardedProperty extends Model
+{
+    protected $guarded = [];
+}
+
+#[Guarded(['id', 'secret'])]
+class ModelWithEmptyGuardedPropertyAndAttribute extends Model
+{
+    protected $guarded = [];
+}
+
+#[Guarded(['id', 'secret'])]
+class PivotWithGuardedAttribute extends Pivot
+{
+    //
+}
+
+#[Guarded(['id', 'secret'])]
+class MorphPivotWithGuardedAttribute extends MorphPivot
+{
+    //
+}
+
+#[Unguarded]
+class PivotWithUnguardedAttribute extends Pivot
+{
+    //
+}
+
+#[Guarded(['id', 'secret'])]
+class PivotWithGuardedAttributeAndProperty extends Pivot
+{
+    protected $guarded = ['token'];
+}
+
+class PivotWithoutGuardedAttribute extends Pivot
 {
     //
 }
