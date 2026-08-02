@@ -153,7 +153,7 @@ class QueueFake extends QueueManager implements Fake, Queue
         }
 
         PHPUnit::assertTrue(
-            $this->pushed($job, $callback)->count() > 0,
+            $this->pushed($job, $callback)->isNotEmpty(),
             "The expected [{$job}] job was not pushed."
         );
     }
@@ -285,16 +285,14 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     protected function assertPushedWithChainOfClasses($job, $expectedChain, $callback)
     {
-        $matching = $this->pushed($job, $callback)->map->chained->map(function ($chain) {
-            return (new Collection($chain))->map(function ($job) {
+        $matching = $this->pushed($job, $callback)->contains(function ($pushedJob) use ($expectedChain) {
+            return (new Collection($pushedJob->chained))->map(function ($job) {
                 return get_class(unserialize($job));
-            });
-        })->filter(function ($chain) use ($expectedChain) {
-            return $chain->all() === $expectedChain;
+            })->all() === $expectedChain;
         });
 
         PHPUnit::assertTrue(
-            $matching->isNotEmpty(), 'The expected chain was not pushed.'
+            $matching, 'The expected chain was not pushed.'
         );
     }
 

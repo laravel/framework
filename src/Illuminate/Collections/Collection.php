@@ -126,7 +126,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function mode($key = null)
     {
-        if ($this->count() === 0) {
+        if ($this->isEmpty()) {
             return;
         }
 
