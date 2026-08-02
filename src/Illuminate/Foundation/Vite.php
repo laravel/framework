@@ -498,9 +498,7 @@ class Vite implements Htmlable
 
         $base = $preloads->join('').$stylesheets->join('').$scripts->join('');
 
-        // When the build uses Vite's "chunkImportMap" option, chunks import one
-        // another through stable identifiers that only resolve via an import map,
-        // which must be output before the module scripts that depend on it.
+        // When using import mapping, chunks import one another through stable identifiers...
         if ($scripts->isNotEmpty() && ($importMap = $this->importMap($buildDirectory)) !== null) {
             $base = $this->makeImportMapTag($importMap).$base;
         }
@@ -1012,6 +1010,27 @@ class Vite implements Htmlable
     }
 
     /**
+     * Get a unique hash representing the current manifest, or null if there is no manifest.
+     *
+     * @param  string|null  $buildDirectory
+     * @return string|null
+     */
+    public function manifestHash($buildDirectory = null)
+    {
+        $buildDirectory ??= $this->buildDirectory;
+
+        if ($this->isRunningHot()) {
+            return null;
+        }
+
+        if (! is_file($path = $this->manifestPath($buildDirectory))) {
+            return null;
+        }
+
+        return md5_file($path) ?: null;
+    }
+
+    /**
      * Get the import map for the given build directory, or null if there is none.
      *
      * @param  string  $buildDirectory
@@ -1052,27 +1071,6 @@ class Vite implements Htmlable
         return '<script type="importmap"'.$this->nonceAttribute().'>'
             .json_encode($importMap, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG)
             .'</script>';
-    }
-
-    /**
-     * Get a unique hash representing the current manifest, or null if there is no manifest.
-     *
-     * @param  string|null  $buildDirectory
-     * @return string|null
-     */
-    public function manifestHash($buildDirectory = null)
-    {
-        $buildDirectory ??= $this->buildDirectory;
-
-        if ($this->isRunningHot()) {
-            return null;
-        }
-
-        if (! is_file($path = $this->manifestPath($buildDirectory))) {
-            return null;
-        }
-
-        return md5_file($path) ?: null;
     }
 
     /**
