@@ -20,6 +20,7 @@
         "guzzlehttp/guzzle": "^7.8.2",
         "guzzlehttp/uri-template": "^1.0",
         "illuminate/collections": "^13.0",
+        "illuminate/conditionable": "^13.0",
         "illuminate/macroable": "^13.0",
         "illuminate/session": "^13.0",
         "illuminate/support": "^13.0",
