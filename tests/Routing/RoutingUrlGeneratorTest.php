@@ -923,6 +923,35 @@ class RoutingUrlGeneratorTest extends TestCase
         );
     }
 
+    public function testRouteGenerationWithUnitEnums():void
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $namedRoute = new Route(['GET'], '/foo/{bar}', ['as' => 'foo.bar']);
+        $routes->add($namedRoute);
+
+        $this->assertSame('http://www.foo.com/foo/Fruits', $url->route('foo.bar', CategoryEnum::Fruits));
+    }
+
+    public function testRouteGenerationWithNestedUnitEnums():void
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $namedRoute = new Route(['GET'], '/foo', ['as' => 'foo']);
+        $routes->add($namedRoute);
+
+        $this->assertSame(
+            'http://www.foo.com/foo?filter%5B0%5D=People&filter%5B1%5D=Fruits',
+            $url->route('foo', ['filter' => [CategoryEnum::People, CategoryEnum::Fruits]]),
+        );
+    }
+
     public function testSignedUrlWithKeyResolver()
     {
         $url = new UrlGenerator(
