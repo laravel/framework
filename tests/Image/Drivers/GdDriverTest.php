@@ -475,7 +475,6 @@ class GdDriverTest extends TestCase
 
         ob_start();
         imagepng($image);
-        imagedestroy($image);
 
         return ob_get_clean();
     }
