@@ -571,7 +571,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                     $resolvedKey = enum_value($resolvedKey);
                 }
 
-                if (is_object($resolvedKey)) {
+                if (is_object($resolvedKey) || is_null($resolvedKey)) {
                     $resolvedKey = (string) $resolvedKey;
                 }
 

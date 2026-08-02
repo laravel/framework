@@ -2,11 +2,12 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
-use BackedEnum;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection as BaseCollection;
+
+use function Illuminate\Support\enum_value;
 
 trait InteractsWithPivotTable
 {
@@ -215,9 +216,7 @@ trait InteractsWithPivotTable
                 [$id, $attributes] = [$attributes, []];
             }
 
-            if ($id instanceof BackedEnum) {
-                $id = $id->value;
-            }
+            $id = enum_value($id);
 
             return [$id => $attributes];
         })->all();

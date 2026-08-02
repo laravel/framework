@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'optimize')]
@@ -33,7 +34,7 @@ class OptimizeCommand extends Command
     {
         $this->components->info('Caching framework bootstrap, configuration, and metadata.');
 
-        $exceptions = Collection::wrap(explode(',', $this->option('except') ?? ''))
+        $exceptions = (new Stringable($this->option('except') ?? ''))->explode(',')
             ->map(fn ($except) => trim($except))
             ->filter()
             ->unique()

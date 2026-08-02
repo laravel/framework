@@ -81,7 +81,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
                 $callback = fn ($mail) => $mail->hasTo($address);
 
                 PHPUnit::assertTrue(
-                    $this->sent($mailable, $callback)->count() > 0,
+                    $this->sent($mailable, $callback)->isNotEmpty(),
                     "The expected [{$mailable}] mailable was not sent to address [{$address}].".$suggestion
                 );
             }
@@ -90,7 +90,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
         }
 
         PHPUnit::assertTrue(
-            $this->sent($mailable, $callback)->count() > 0,
+            $this->sent($mailable, $callback)->isNotEmpty(),
             "The expected [{$mailable}] mailable was not sent.".$suggestion
         );
     }
@@ -204,7 +204,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
                 $callback = fn ($mail) => $mail->hasTo($address);
 
                 PHPUnit::assertTrue(
-                    $this->queued($mailable, $callback)->count() > 0,
+                    $this->queued($mailable, $callback)->isNotEmpty(),
                     "The expected [{$mailable}] mailable was not queued to address [{$address}]."
                 );
             }
@@ -213,7 +213,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
         }
 
         PHPUnit::assertTrue(
-            $this->queued($mailable, $callback)->count() > 0,
+            $this->queued($mailable, $callback)->isNotEmpty(),
             "The expected [{$mailable}] mailable was not queued."
         );
     }
@@ -361,7 +361,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function hasSent($mailable)
     {
-        return $this->mailablesOf($mailable)->count() > 0;
+        return $this->mailablesOf($mailable)->isNotEmpty();
     }
 
     /**
@@ -392,7 +392,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     public function hasQueued($mailable)
     {
-        return $this->queuedMailablesOf($mailable)->count() > 0;
+        return $this->queuedMailablesOf($mailable)->isNotEmpty();
     }
 
     /**

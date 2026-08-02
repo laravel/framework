@@ -366,6 +366,31 @@ class ComponentTest extends TestCase
         $this->assertTrue((bool) $anotherSlot->hasActualContent());
         $this->assertTrue((bool) $moreComplexSlot->hasActualContent());
     }
+
+    public function testDataOnlyIncludesNonStaticNonIgnoredPublicProperties(): void
+    {
+        $component = new TestComponentWithStaticAndIgnoredProperties;
+
+        $data = $component->data();
+
+        $this->assertSame('bar', $data['visible']);
+        $this->assertArrayNotHasKey('staticProp', $data);
+        $this->assertArrayNotHasKey('__hidden', $data);
+    }
+}
+
+class TestComponentWithStaticAndIgnoredProperties extends Component
+{
+    public static $staticProp = 'static';
+
+    public $__hidden = 'hidden';
+
+    public $visible = 'bar';
+
+    public function render()
+    {
+        return 'Hello';
+    }
 }
 
 class TestInlineViewComponent extends Component

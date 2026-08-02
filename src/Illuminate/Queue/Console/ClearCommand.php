@@ -65,7 +65,7 @@ class ClearCommand extends Command
 
         $count = 0;
 
-        $queues = collect(explode(',', $queueName))
+        $queues = (new Stringable($queueName))->explode(',')
             ->map(fn ($queue) => trim($queue))
             ->filter()
             ->unique()

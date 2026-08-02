@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -88,7 +89,7 @@ class SetCacheHeaders
      */
     protected function parseOptions($options)
     {
-        return (new Collection(explode(';', rtrim($options, ';'))))->mapWithKeys(function ($option) {
+        return (new Stringable(rtrim($options, ';')))->explode(';')->mapWithKeys(function ($option) {
             $data = explode('=', $option, 2);
 
             return [$data[0] => $data[1] ?? true];

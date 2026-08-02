@@ -4,6 +4,7 @@ namespace Illuminate\Database;
 
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
@@ -67,7 +68,7 @@ abstract class Grammar
         if (str_contains($table, '.')) {
             $table = substr_replace($table, '.'.$prefix, strrpos($table, '.'), 1);
 
-            return (new Collection(explode('.', $table)))
+            return (new Stringable($table))->explode('.')
                 ->map($this->wrapValue(...))
                 ->implode('.');
         }

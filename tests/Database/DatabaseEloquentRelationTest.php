@@ -230,6 +230,18 @@ class DatabaseEloquentRelationTest extends TestCase
         Relation::morphMap([], false);
     }
 
+    public function testGetMorphedModel()
+    {
+        Relation::morphMap(['user' => 'App\User', 1 => 'App\Team']);
+
+        $this->assertSame('App\User', Relation::getMorphedModel('user'));
+        $this->assertSame('App\Team', Relation::getMorphedModel(1));
+        $this->assertNull(Relation::getMorphedModel('does_not_exist'));
+        $this->assertNull(Relation::getMorphedModel(null));
+
+        Relation::morphMap([], false);
+    }
+
     public function testGetMorphAlias()
     {
         Relation::morphMap(['user' => 'App\User']);
