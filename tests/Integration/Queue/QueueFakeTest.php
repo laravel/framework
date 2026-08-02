@@ -57,6 +57,21 @@ class QueueFakeTest extends TestCase
 
         $this->assertSame('test-value', $result);
     }
+
+    public function testDelayedJobsAreExcludedFromPendingInspection()
+    {
+        $queue = Queue::fake();
+
+        Queue::later(60, new TestJob, queue: 'emails');
+
+        Queue::assertPushed(TestJob::class);
+        $this->assertSame(1, $queue->size('emails'));
+        $this->assertSame(0, $queue->pendingSize('emails'));
+        $this->assertCount(0, $queue->pendingJobs('emails'));
+        $this->assertNull($queue->creationTimeOfOldestPendingJob('emails'));
+        $this->assertSame(1, $queue->delayedSize('emails'));
+        $this->assertCount(1, $queue->delayedJobs('emails'));
+    }
 }
 
 class TestJob

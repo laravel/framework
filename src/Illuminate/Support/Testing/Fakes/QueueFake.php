@@ -480,7 +480,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function pendingSize($queue = null)
     {
-        return $this->size($queue);
+        return $this->pendingJobs($queue)->count();
     }
 
     /**
@@ -545,7 +545,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function allPendingJobs(): Collection
     {
-        return $this->inspectJobs($this->jobs);
+        return $this->inspectJobs($this->jobs, includeDelayed: false);
     }
 
     /**
@@ -564,10 +564,11 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @param  array  $jobs
      * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
      */
-    protected function inspectJobs(array $jobs): Collection
+    protected function inspectJobs(array $jobs, bool $includeDelayed = true): Collection
     {
         return (new Collection($jobs))
             ->flatten(1)
+            ->when(! $includeDelayed, fn (Collection $jobs) => $jobs->reject(fn ($job) => $job['delayed'] ?? false))
             ->map(fn ($data) => new InspectedJob(
                 uuid: null,
                 queue: $data['queue'],
@@ -600,6 +601,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     {
         return (new Collection($this->jobs))
             ->flatten(1)
+            ->reject(fn ($job) => $job['delayed'] ?? false)
             ->whereStrict('queue', enum_value($queue))
             ->min('createdAt');
     }
@@ -613,6 +615,20 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
+    {
+        return $this->pushJob($job, $data, $queue);
+    }
+
+    /**
+     * Push a job onto the queue.
+     *
+     * @param  string|object  $job
+     * @param  mixed  $data
+     * @param  \UnitEnum|string|null  $queue
+     * @param  bool  $delayed
+     * @return mixed
+     */
+    protected function pushJob($job, $data, $queue, bool $delayed = false)
     {
         $queue = enum_value($queue);
 
@@ -630,6 +646,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                 'queue' => $queue,
                 'data' => $data,
                 'createdAt' => Carbon::now()->getTimestamp(),
+                'delayed' => $delayed,
             ];
 
             if ($job instanceof ShouldBeUnique) {
@@ -722,7 +739,7 @@ class QueueFake extends QueueManager implements Fake, Queue
             ];
         }
 
-        return $this->push($job, $data, $queue);
+        return $this->pushJob($job, $data, $queue, delayed: true);
     }
 
     /**
