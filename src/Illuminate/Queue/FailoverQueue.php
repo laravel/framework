@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Events\QueueFailedOver;
 use Illuminate\Support\Collection;
 use RuntimeException;
@@ -185,6 +186,27 @@ class FailoverQueue extends Queue implements QueueContract
     public function later($delay, $job, $data = '', $queue = null)
     {
         return $this->attemptOnAllConnections(__FUNCTION__, func_get_args(), $job);
+    }
+
+    /**
+     * Push an array of jobs onto the queue.
+     *
+     * @param  array  $jobs
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return void
+     */
+    public function bulk($jobs, $data = '', $queue = null)
+    {
+        foreach ((array) $jobs as $job) {
+            $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
+
+            if (isset($delay)) {
+                $this->later($delay, $job, $data, $queue);
+            } else {
+                $this->push($job, $data, $queue);
+            }
+        }
     }
 
     /**
