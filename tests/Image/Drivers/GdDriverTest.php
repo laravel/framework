@@ -100,6 +100,20 @@ class GdDriverTest extends TestCase
         $this->assertSame(IMAGETYPE_AVIF, getimagesizefromstring($result)[2]);
     }
 
+    public function test_processes_avif_input()
+    {
+        if (! function_exists('imageavif')) {
+            $this->markTestSkipped('The GD extension was not compiled with AVIF support.');
+        }
+
+        $driver = new GdDriver;
+        $contents = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'avif'));
+
+        $result = $driver->process($contents, $this->pipeline(new Cover(50, 25), format: 'jpg'));
+
+        $this->assertSame([50, 25], array_slice(getimagesizefromstring($result), 0, 2));
+    }
+
     public function test_processes_optimize_to_bmp()
     {
         $driver = new GdDriver;

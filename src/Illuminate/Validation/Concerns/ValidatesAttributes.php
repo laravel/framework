@@ -1530,7 +1530,7 @@ trait ValidatesAttributes
      */
     public function validateImage($attribute, $value, $parameters = [])
     {
-        $mimes = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+        $mimes = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'avif', 'heic', 'heif'];
 
         if (is_array($parameters) && in_array('allow_svg', $parameters)) {
             $mimes[] = 'svg';
