@@ -20,7 +20,7 @@ class FailedTableCommand extends MigrationGeneratorCommand
     /**
      * The console command name aliases.
      *
-     * @var array
+     * @var string[]
      */
     protected $aliases = ['queue:failed-table'];
 
