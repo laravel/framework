@@ -585,6 +585,29 @@ class ContainerTest extends TestCase
         $container->alias('name', 'name');
     }
 
+    public function testItThrowsExceptionOnCircularAliasReference(): void
+    {
+        $this->expectExceptionObject(new \LogicException('Circular alias reference for [a].'));
+
+        $container = new Container;
+        $container->alias('a', 'b');
+        $container->alias('b', 'a');
+
+        $container->getAlias('a');
+    }
+
+    public function testItThrowsExceptionOnIndirectCircularAliasReference(): void
+    {
+        $this->expectExceptionObject(new \LogicException('Circular alias reference for [a].'));
+
+        $container = new Container;
+        $container->alias('a', 'b');
+        $container->alias('b', 'c');
+        $container->alias('c', 'a');
+
+        $container->getAlias('a');
+    }
+
     public function testContainerGetFactory()
     {
         $container = new Container;
