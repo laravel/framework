@@ -163,27 +163,6 @@ class FailoverQueue extends Queue implements QueueContract
     }
 
     /**
-     * Push an array of jobs onto the queue.
-     *
-     * @param  array  $jobs
-     * @param  mixed  $data
-     * @param  string|null  $queue
-     * @return void
-     */
-    public function bulk($jobs, $data = '', $queue = null)
-    {
-        foreach ((array) $jobs as $job) {
-            $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
-
-            if (isset($delay)) {
-                $this->later($delay, $job, $data, $queue);
-            } else {
-                $this->push($job, $data, $queue);
-            }
-        }
-    }
-
-    /**
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
@@ -207,6 +186,27 @@ class FailoverQueue extends Queue implements QueueContract
     public function later($delay, $job, $data = '', $queue = null)
     {
         return $this->attemptOnAllConnections(__FUNCTION__, func_get_args(), $job);
+    }
+
+    /**
+     * Push an array of jobs onto the queue.
+     *
+     * @param  array  $jobs
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return void
+     */
+    public function bulk($jobs, $data = '', $queue = null)
+    {
+        foreach ((array) $jobs as $job) {
+            $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
+
+            if (isset($delay)) {
+                $this->later($delay, $job, $data, $queue);
+            } else {
+                $this->push($job, $data, $queue);
+            }
+        }
     }
 
     /**
