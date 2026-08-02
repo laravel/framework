@@ -1157,6 +1157,11 @@ class Container implements ArrayAccess, ContainerContract
             return $this->buildSelfBuildingInstance($concrete, $reflector);
         }
 
+        // Self-building types re-enter build() for themselves once via newInstance().
+        if (count(array_keys($this->buildStack, $concrete, true)) > 1) {
+            throw new CircularDependencyException("Circular dependency detected while resolving [{$concrete}].");
+        }
+
         $this->buildStack[] = $concrete;
 
         $constructor = $reflector->getConstructor();

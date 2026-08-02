@@ -9,6 +9,7 @@ use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Container\SelfBuilding;
 use PHPUnit\Framework\Attributes\RequiresPhp;
@@ -1032,13 +1033,15 @@ class ContainerTest extends TestCase
         $this->assertSame('taylor@laravel.com', $r->email);
     }
 
-    // public function testContainerCanCatchCircularDependency()
-    // {
-    //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
+    public function testContainerCanCatchCircularDependency(): void
+    {
+        $this->expectExceptionObject(new CircularDependencyException(
+            'Circular dependency detected while resolving ['.CircularAStub::class.'].'
+        ));
 
-    //     $container = new Container;
-    //     $container->get(CircularAStub::class);
-    // }
+        $container = new Container;
+        $container->get(CircularAStub::class);
+    }
 }
 
 class CircularAStub
