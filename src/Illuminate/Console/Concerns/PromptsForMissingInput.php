@@ -103,7 +103,6 @@ trait PromptsForMissingInput
     protected function didReceiveOptions(InputInterface $input)
     {
         return (new Collection($this->getDefinition()->getOptions()))
-            ->reject(fn ($option) => $input->getOption($option->getName()) === $option->getDefault())
-            ->isNotEmpty();
+            ->contains(fn ($option) => $input->getOption($option->getName()) !== $option->getDefault());
     }
 }
