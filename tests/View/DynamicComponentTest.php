@@ -9,7 +9,7 @@ use ReflectionMethod;
 
 class DynamicComponentTest extends TestCase
 {
-    public function testCompileSlotsExcludesDefaultSlot()
+    public function testCompileSlotsExcludesDefaultSlot(): void
     {
         $component = new DynamicComponent('alert');
 
@@ -24,7 +24,7 @@ class DynamicComponentTest extends TestCase
         $this->assertStringContainsString('{{ $title }}', $result);
     }
 
-    public function testCompileSlotsReturnsEmptyStringWhenOnlyDefaultSlotIsPresent()
+    public function testCompileSlotsReturnsEmptyStringWhenOnlyDefaultSlotIsPresent(): void
     {
         $component = new DynamicComponent('alert');
 
