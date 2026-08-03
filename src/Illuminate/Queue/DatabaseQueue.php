@@ -305,19 +305,54 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     {
         $queue = $this->getQueue($queue);
 
-        $now = $this->availableAt();
+        [$afterCommit, $immediate] = $this->partitionJobsByAfterCommit((array) $jobs);
 
-        return $this->database->table($this->table)->insert((new Collection((array) $jobs))->map(
-            function ($job) use ($queue, $data, $now) {
+        $result = null;
+
+        if (! empty($immediate) || empty($afterCommit)) {
+            $now = $this->availableAt();
+
+            $result = $this->database->table($this->table)->insert((new Collection($immediate))->map(
+                function ($job) use ($queue, $data, $now) {
+                    $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
+
+                    return $this->buildDatabaseRecord(
+                        $queue,
+                        $this->createPayload($job, $this->getQueue($queue), $data),
+                        isset($delay) ? $this->availableAt($delay) : $now,
+                    );
+                }
+            )->all());
+        }
+
+        if (! empty($afterCommit)) {
+            foreach ($afterCommit as $job) {
+                $this->registerRollbackCallbacksForJobsThatDispatchAfterCommit($job);
+            }
+
+            $jobs = (new Collection($afterCommit))->map(function ($job) use ($queue, $data) {
                 $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
 
-                return $this->buildDatabaseRecord(
-                    $queue,
-                    $this->createPayload($job, $this->getQueue($queue), $data),
-                    isset($delay) ? $this->availableAt($delay) : $now,
-                );
-            }
-        )->all());
+                return [
+                    'payload' => $this->createPayload($job, $this->getQueue($queue), $data),
+                    'delay' => $delay,
+                ];
+            })->all();
+
+            $this->container->make('db.transactions')->addCallback(function () use ($queue, $jobs) {
+                $now = $this->availableAt();
+
+                $this->database->table($this->table)->insert((new Collection($jobs))->map(
+                    fn ($job) => $this->buildDatabaseRecord(
+                        $queue,
+                        $job['payload'],
+                        isset($job['delay']) ? $this->availableAt($job['delay']) : $now,
+                    )
+                )->all());
+            });
+        }
+
+        return $result;
     }
 
     /**

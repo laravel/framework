@@ -344,24 +344,6 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Partition the given jobs by whether they should be deferred until the active database transaction commits.
-     *
-     * @param  array  $jobs
-     * @return array{0: array, 1: array}
-     */
-    protected function partitionJobsByAfterCommit(array $jobs)
-    {
-        if (! $this->container->bound('db.transactions')) {
-            return [[], $jobs];
-        }
-
-        return (new Collection($jobs))
-            ->partition(fn ($job) => $this->shouldDispatchAfterCommit($job))
-            ->map(fn ($jobs) => $jobs->values()->all())
-            ->all();
-    }
-
-    /**
      * Create the payload for each of the given jobs.
      *
      * Payloads are created at dispatch time, even for jobs deferred until after the transaction commits.
