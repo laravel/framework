@@ -343,6 +343,56 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add constraint "users_foo_unique" unique using index "users_foo_unique"', $statements[1]);
     }
 
+    public function testAddingPartialUniqueKeyWithWhereNull()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique(['user_id', 'slug'])->whereNull('deleted_at');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "users_user_id_slug_unique" on "users" ("user_id", "slug") where "deleted_at" is null', $statements[0]);
+    }
+
+    public function testAddingPartialUniqueKeyWithWhereNotNull()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email', 'users_email_active_unique')->whereNotNull('email');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "users_email_active_unique" on "users" ("email") where "email" is not null', $statements[0]);
+    }
+
+    public function testAddingPartialUniqueKeyWithRawWhere()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->where('deleted_at is null');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "users_email_unique" on "users" ("email") where deleted_at is null', $statements[0]);
+    }
+
+    public function testAddingPartialUniqueKeyWithBasicWhere()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->where('active', true);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "users_email_unique" on "users" ("email") where "active" = 1', $statements[0]);
+    }
+
+    public function testAddingPartialUniqueKeyOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->whereNull('deleted_at')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index concurrently "users_email_unique" on "users" ("email") where "deleted_at" is null', $statements[0]);
+    }
+
     public function testAddingIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -351,6 +401,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "baz" on "users" ("foo", "bar")', $statements[0]);
+    }
+
+    public function testAddingPartialIndexWithWhereNull()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('email')->whereNull('deleted_at');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "users_email_index" on "users" ("email") where "deleted_at" is null', $statements[0]);
     }
 
     public function testAddingIndexWithAlgorithm()

@@ -1760,9 +1760,15 @@ class Blueprint
         // index type, such as primary or index, which makes the index unique.
         $index = $index ?: $this->createIndexName($type, $columns);
 
-        return $this->addCommand(
-            $type, ['index' => $index, 'columns' => $columns, 'algorithm' => $algorithm, 'operatorClass' => $operatorClass]
-        );
+        $this->commands[] = $command = new IndexDefinition([
+            'name' => $type,
+            'index' => $index,
+            'columns' => $columns,
+            'algorithm' => $algorithm,
+            'operatorClass' => $operatorClass,
+        ]);
+
+        return $command;
     }
 
     /**

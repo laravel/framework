@@ -399,11 +399,12 @@ class SQLiteGrammar extends Grammar
     {
         [$schema, $table] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
 
-        return sprintf('create unique index %s%s on %s (%s)',
+        return sprintf('create unique index %s%s on %s (%s)%s',
             $schema ? $this->wrapValue($schema).'.' : '',
             $this->wrap($command->index),
             $this->wrapTable($table),
-            $this->columnize($command->columns)
+            $this->columnize($command->columns),
+            $this->compileWhereClause($command)
         );
     }
 
@@ -418,11 +419,12 @@ class SQLiteGrammar extends Grammar
     {
         [$schema, $table] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
 
-        return sprintf('create index %s%s on %s (%s)',
+        return sprintf('create index %s%s on %s (%s)%s',
             $schema ? $this->wrapValue($schema).'.' : '',
             $this->wrap($command->index),
             $this->wrapTable($table),
-            $this->columnize($command->columns)
+            $this->columnize($command->columns),
+            $this->compileWhereClause($command)
         );
     }
 

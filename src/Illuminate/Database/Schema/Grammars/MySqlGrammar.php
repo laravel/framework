@@ -445,6 +445,10 @@ class MySqlGrammar extends Grammar
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
     {
+        if ($this->hasWhereClause($command)) {
+            $this->throwMissingPartialIndexSupport();
+        }
+
         return $this->compileKey($blueprint, $command, 'unique');
     }
 
@@ -457,6 +461,10 @@ class MySqlGrammar extends Grammar
      */
     public function compileIndex(Blueprint $blueprint, Fluent $command)
     {
+        if ($this->hasWhereClause($command)) {
+            $this->throwMissingPartialIndexSupport();
+        }
+
         return $this->compileKey($blueprint, $command, 'index');
     }
 

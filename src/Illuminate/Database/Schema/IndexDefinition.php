@@ -15,5 +15,84 @@ use Illuminate\Support\Fluent;
  */
 class IndexDefinition extends Fluent
 {
-    //
+    /**
+     * Specify a partial index predicate.
+     *
+     * Supported by PostgreSQL, SQLite, and SQL Server. MySQL and MariaDB do not
+     * support partial indexes and will throw a RuntimeException when compiling.
+     *
+     * When a single argument is provided, it is treated as a raw SQL fragment:
+     *
+     *     $table->unique('email')->where('deleted_at is null');
+     *
+     * Column / operator / value forms are also supported:
+     *
+     *     $table->index('status')->where('active', true);
+     *     $table->index('status')->where('active', '=', 1);
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function where($column, $operator = null, $value = null)
+    {
+        if (func_num_args() === 1) {
+            $this->attributes['where'] = [
+                'type' => 'Raw',
+                'sql' => $column,
+            ];
+
+            return $this;
+        }
+
+        if (func_num_args() === 2) {
+            [$value, $operator] = [$operator, '='];
+        }
+
+        $this->attributes['where'] = [
+            'type' => 'Basic',
+            'column' => $column,
+            'operator' => $operator,
+            'value' => $value,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Specify a partial index "where null" predicate.
+     *
+     * Useful for soft-delete-aware unique indexes:
+     *
+     *     $table->unique(['user_id', 'slug'])->whereNull('deleted_at');
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function whereNull($column)
+    {
+        $this->attributes['where'] = [
+            'type' => 'Null',
+            'column' => $column,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Specify a partial index "where not null" predicate.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function whereNotNull($column)
+    {
+        $this->attributes['where'] = [
+            'type' => 'NotNull',
+            'column' => $column,
+        ];
+
+        return $this;
+    }
 }

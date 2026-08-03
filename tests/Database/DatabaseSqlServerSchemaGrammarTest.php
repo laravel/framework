@@ -288,6 +288,36 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('create unique index "bar" on "users" ("foo") with (online = on)', $statements[0]);
     }
 
+    public function testAddingPartialUniqueKeyWithWhereNull()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique(['user_id', 'slug'])->whereNull('deleted_at');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "users_user_id_slug_unique" on "users" ("user_id", "slug") where "deleted_at" is null', $statements[0]);
+    }
+
+    public function testAddingPartialUniqueKeyOnlineWithWhereNull()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email', 'users_email_unique')->whereNull('deleted_at')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "users_email_unique" on "users" ("email") where "deleted_at" is null with (online = on)', $statements[0]);
+    }
+
+    public function testAddingPartialIndexWithWhereNull()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('email')->whereNull('deleted_at');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "users_email_index" on "users" ("email") where "deleted_at" is null', $statements[0]);
+    }
+
     public function testAddingIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');

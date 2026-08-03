@@ -332,6 +332,19 @@ class PostgresGrammar extends Grammar
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
     {
+        // Partial unique indexes must be created as indexes; PostgreSQL unique
+        // constraints do not support WHERE predicates.
+        if ($this->hasWhereClause($command)) {
+            return sprintf('create unique index %s%s on %s%s (%s)%s',
+                $command->online ? 'concurrently ' : '',
+                $this->wrap($command->index),
+                $this->wrapTable($blueprint),
+                $command->algorithm ? ' using '.$command->algorithm : '',
+                $this->columnize($command->columns),
+                $this->compileWhereClause($command)
+            );
+        }
+
         $uniqueStatement = 'unique';
 
         if (! is_null($command->nullsNotDistinct)) {
@@ -382,12 +395,13 @@ class PostgresGrammar extends Grammar
      */
     public function compileIndex(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('create index %s%s on %s%s (%s)',
+        return sprintf('create index %s%s on %s%s (%s)%s',
             $command->online ? 'concurrently ' : '',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
             $command->algorithm ? ' using '.$command->algorithm : '',
-            $this->columnize($command->columns)
+            $this->columnize($command->columns),
+            $this->compileWhereClause($command)
         );
     }
 

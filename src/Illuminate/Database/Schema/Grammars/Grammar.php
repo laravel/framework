@@ -520,6 +520,90 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Determine if the given index command has a partial index predicate.
+     *
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return bool
+     */
+    protected function hasWhereClause(Fluent $command)
+    {
+        return ! is_null($command->where);
+    }
+
+    /**
+     * Compile a partial index WHERE clause for the given index command.
+     *
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function compileWhereClause(Fluent $command)
+    {
+        if (is_null($command->where)) {
+            return '';
+        }
+
+        $where = $command->where;
+
+        if (is_string($where)) {
+            return ' where '.$where;
+        }
+
+        return match ($where['type'] ?? null) {
+            'Raw' => ' where '.$this->getValue($where['sql']),
+            'Null' => ' where '.$this->wrap($where['column']).' is null',
+            'NotNull' => ' where '.$this->wrap($where['column']).' is not null',
+            'Basic' => sprintf(
+                ' where %s %s %s',
+                $this->wrap($where['column']),
+                $where['operator'],
+                $this->quoteWhereValue($where['value'])
+            ),
+            default => throw new RuntimeException('Unsupported partial index where clause.'),
+        };
+    }
+
+    /**
+     * Quote a value for use in a partial index WHERE clause.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function quoteWhereValue($value)
+    {
+        if ($value instanceof Expression) {
+            return $this->getValue($value);
+        }
+
+        if (is_null($value)) {
+            return 'null';
+        }
+
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+
+        if (is_numeric($value)) {
+            return (string) $value;
+        }
+
+        return "'".str_replace("'", "''", (string) $value)."'";
+    }
+
+    /**
+     * Throw an exception for databases that do not support partial indexes.
+     *
+     * @return never
+     *
+     * @throws \RuntimeException
+     */
+    protected function throwMissingPartialIndexSupport()
+    {
+        throw new RuntimeException('This database driver does not support partial indexes.');
+    }
+
+    /**
      * Get the fluent commands for the grammar.
      *
      * @return array
