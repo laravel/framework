@@ -103,6 +103,15 @@ class SupportReflectsClosuresTest extends TestCase
         });
     }
 
+    public function testItThrowsWhenFirstParameterHasNoTypeHintEvenIfLaterParameterDoes(): void
+    {
+        $this->expectExceptionObject(new RuntimeException('The first parameter of the given Closure is missing a type hint.'));
+
+        ReflectsClosuresClass::reflectFirstAll(function ($a, ExampleParameter $b) {
+            //
+        });
+    }
+
     public function testClosureReturnTypesReturnsClassReturnType(): void
     {
         $this->assertSame(
