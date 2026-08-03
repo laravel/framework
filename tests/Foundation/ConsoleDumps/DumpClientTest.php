@@ -9,7 +9,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class DumpClientTest extends TestCase
 {
-    public function test_it_sends_cloned_values_and_context_to_the_server()
+    public function testItSendsClonedValuesAndContextToTheServer()
     {
         $server = stream_socket_server('tcp://127.0.0.1:0');
         $host = stream_socket_get_name($server, false);
@@ -35,7 +35,7 @@ class DumpClientTest extends TestCase
         fclose($server);
     }
 
-    public function test_it_silently_discards_dumps_when_the_server_is_unavailable()
+    public function testItSilentlyDiscardsDumpsWhenTheServerIsUnavailable()
     {
         $client = new DumpClient('tcp://127.0.0.1:1');
 
@@ -44,7 +44,7 @@ class DumpClientTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function test_it_silently_discards_dumps_when_preparing_the_payload_fails()
+    public function testItSilentlyDiscardsDumpsWhenPreparingThePayloadFails()
     {
         $cloner = new class extends VarCloner
         {
@@ -61,7 +61,7 @@ class DumpClientTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function test_it_uses_a_non_blocking_socket()
+    public function testItUsesANonBlockingSocket()
     {
         $server = stream_socket_server('tcp://127.0.0.1:0');
         $host = stream_socket_get_name($server, false);

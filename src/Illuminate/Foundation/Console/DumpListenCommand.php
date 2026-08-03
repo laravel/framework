@@ -16,9 +16,7 @@ class DumpListenCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'dump:listen
-                    {--host=127.0.0.1 : The host address to listen for dumps on}
-                    {--port=9912 : The port to listen for dumps on}';
+    protected $signature = 'dump:listen';
 
     /**
      * The console command description.
@@ -55,11 +53,7 @@ class DumpListenCommand extends Command
      */
     protected function server()
     {
-        return new DumpServer(sprintf(
-            'tcp://%s:%d',
-            $this->option('host'),
-            $this->option('port'),
-        ));
+        return new DumpServer;
     }
 
     /**

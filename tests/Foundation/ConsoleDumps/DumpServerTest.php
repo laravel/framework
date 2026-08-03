@@ -9,14 +9,14 @@ use RuntimeException;
 
 class DumpServerTest extends TestCase
 {
-    public function test_it_normalizes_the_server_host()
+    public function testItNormalizesTheServerHost()
     {
         $server = new DumpServer('127.0.0.1:9912');
 
         $this->assertSame('tcp://127.0.0.1:9912', $server->getHost());
     }
 
-    public function test_it_receives_dumps_from_the_client()
+    public function testItReceivesDumpsFromTheClient()
     {
         if (! function_exists('pcntl_fork')) {
             $this->markTestSkipped('The PCNTL extension is required.');

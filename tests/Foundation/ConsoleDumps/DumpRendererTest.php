@@ -10,7 +10,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class DumpRendererTest extends TestCase
 {
-    public function test_it_renders_dumps_with_their_source()
+    public function testItRendersDumpsWithTheirSource()
     {
         $output = new BufferedOutput;
         $renderer = new DumpRenderer(
@@ -34,7 +34,7 @@ class DumpRendererTest extends TestCase
         $this->assertStringContainsString('routes/web.php:10', $rendered);
     }
 
-    public function test_it_ignores_invalid_source_context()
+    public function testItIgnoresInvalidSourceContext()
     {
         $output = new BufferedOutput;
         $renderer = new DumpRenderer(
@@ -50,7 +50,7 @@ class DumpRendererTest extends TestCase
         $this->assertSame("\"value\"\n", $output->fetch());
     }
 
-    public function test_it_ignores_non_array_source_context()
+    public function testItIgnoresNonArraySourceContext()
     {
         $output = new BufferedOutput;
         $renderer = new DumpRenderer(

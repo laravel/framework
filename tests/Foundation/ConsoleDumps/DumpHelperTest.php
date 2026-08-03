@@ -9,7 +9,7 @@ use Symfony\Component\VarDumper\Caster\ScalarStub;
 
 class DumpHelperTest extends TestCase
 {
-    public function test_it_is_registered_as_a_singleton()
+    public function testItIsRegisteredAsASingleton()
     {
         $this->assertSame(
             $this->app->make(DumpHelper::class),
@@ -17,7 +17,7 @@ class DumpHelperTest extends TestCase
         );
     }
 
-    public function test_it_dumps_and_returns_a_single_value()
+    public function testItDumpsAndReturnsASingleValue()
     {
         $client = new FakeDumpClient;
         $helper = new DumpHelper($client, $this->app);
@@ -31,7 +31,7 @@ class DumpHelperTest extends TestCase
         $this->assertSame($line, $client->dumps[0][1]['source']['line']);
     }
 
-    public function test_it_dumps_and_returns_multiple_values()
+    public function testItDumpsAndReturnsMultipleValues()
     {
         $client = new FakeDumpClient;
         $helper = new DumpHelper($client, $this->app);
@@ -45,7 +45,7 @@ class DumpHelperTest extends TestCase
         $this->assertSame('second', $client->dumps[1][2]);
     }
 
-    public function test_it_dumps_a_marker_when_no_values_are_given()
+    public function testItDumpsAMarkerWhenNoValuesAreGiven()
     {
         $client = new FakeDumpClient;
         $helper = new DumpHelper($client, $this->app);
@@ -54,7 +54,7 @@ class DumpHelperTest extends TestCase
         $this->assertInstanceOf(ScalarStub::class, $client->dumps[0][0]);
     }
 
-    public function test_the_global_helper_resolves_the_dump_helper()
+    public function testTheGlobalHelperResolvesTheDumpHelper()
     {
         $client = new FakeDumpClient;
         $this->app->instance(DumpHelper::class, new DumpHelper($client, $this->app));
@@ -67,14 +67,14 @@ class DumpHelperTest extends TestCase
         $this->assertSame($line, $client->dumps[0][1]['source']['line']);
     }
 
-    public function test_it_never_allows_client_failures_to_affect_the_application()
+    public function testItNeverAllowsClientFailuresToAffectTheApplication()
     {
         $helper = new DumpHelper(new FailingDumpClient, $this->app);
 
         $this->assertSame('value', $helper->dump('value'));
     }
 
-    public function test_it_dumps_without_a_configured_compiled_view_path()
+    public function testItDumpsWithoutAConfiguredCompiledViewPath()
     {
         $this->app['config']->set('view.compiled');
 

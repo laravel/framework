@@ -26,7 +26,7 @@ class FoundationDevCommandsTest extends TestCase
         $app['env'] = 'testing';
     }
 
-    public function test_register_adds_command()
+    public function testRegisterAddsCommand()
     {
         $devCommand = DevCommands::register('echo hello', 'greeter');
 
@@ -39,7 +39,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('greeter', $commands[0]['name']);
     }
 
-    public function test_register_derives_name_from_command()
+    public function testRegisterDerivesNameFromCommand()
     {
         DevCommands::register('echo hello world');
 
@@ -48,7 +48,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('echo', $commands[0]['name']);
     }
 
-    public function test_artisan_prefixes_command()
+    public function testArtisanPrefixesCommand()
     {
         DevCommands::artisan('serve --host=localhost', 'server');
 
@@ -58,7 +58,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('server', $commands[0]['name']);
     }
 
-    public function test_artisan_derives_name_from_command()
+    public function testArtisanDerivesNameFromCommand()
     {
         DevCommands::artisan('queue:listen --tries=1');
 
@@ -67,7 +67,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('queue:listen', $commands[0]['name']);
     }
 
-    public function test_except_excludes_commands()
+    public function testExceptExcludesCommands()
     {
         DevCommands::register('echo one', 'one');
         DevCommands::register('echo two', 'two');
@@ -82,7 +82,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('three', $commands[1]['name']);
     }
 
-    public function test_only_includes_only_specified_commands()
+    public function testOnlyIncludesOnlySpecifiedCommands()
     {
         DevCommands::register('echo one', 'one');
         DevCommands::register('echo two', 'two');
@@ -97,7 +97,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('three', $commands[1]['name']);
     }
 
-    public function test_only_takes_precedence_over_except()
+    public function testOnlyTakesPrecedenceOverExcept()
     {
         DevCommands::register('echo one', 'one');
         DevCommands::register('echo two', 'two');
@@ -112,7 +112,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('one', $commands[0]['name']);
     }
 
-    public function test_commands_get_auto_assigned_colors()
+    public function testCommandsGetAutoAssignedColors()
     {
         DevCommands::register('echo one', 'one');
         DevCommands::register('echo two', 'two');
@@ -124,7 +124,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertNotSame($commands[0]['color'], $commands[1]['color']);
     }
 
-    public function test_explicit_color_is_preserved()
+    public function testExplicitColorIsPreserved()
     {
         DevCommands::register('echo one', 'one')->pink();
         DevCommands::register('echo two', 'two');
@@ -135,7 +135,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertNotSame(DevCommandColor::PINK->value, $commands[1]['color']);
     }
 
-    public function test_auto_color_skips_explicitly_used_colors()
+    public function testAutoColorSkipsExplicitlyUsedColors()
     {
         DevCommands::register('echo one', 'one')->blue();
         DevCommands::register('echo two', 'two');
@@ -146,7 +146,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertNotSame(DevCommandColor::BLUE->value, $commands[1]['color']);
     }
 
-    public function test_colors_recycle_when_all_used()
+    public function testColorsRecycleWhenAllUsed()
     {
         DevCommands::register('cmd1', 'c1');
         DevCommands::register('cmd2', 'c2');
@@ -165,7 +165,7 @@ class FoundationDevCommandsTest extends TestCase
         }
     }
 
-    public function test_registering_command_with_same_name_and_same_priority_overwrites_previous()
+    public function testRegisteringCommandWithSameNameAndSamePriorityOverwritesPrevious()
     {
         DevCommands::register('echo old', 'myname');
         DevCommands::register('echo new', 'myname');
@@ -176,7 +176,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('echo new', $commands[0]['command']);
     }
 
-    public function test_userland_overwrites_vendor_priority()
+    public function testUserlandOverwritesVendorPriority()
     {
         $ref = new ReflectionClass(DevCommands::class);
         $ref->getProperty('commands')->setValue(null, [
@@ -190,7 +190,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('echo userland', collect($result)->firstWhere('name', 'myname')['command']);
     }
 
-    public function test_userland_overwrites_default_priority()
+    public function testUserlandOverwritesDefaultPriority()
     {
         // registerDefaults() gets DEFAULT priority, then register() gets USERLAND
         DevCommands::registerDefaults();
@@ -202,7 +202,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame(DevCommand::PRIORITY_USERLAND, $server['priority']);
     }
 
-    public function test_default_does_not_overwrite_userland_priority()
+    public function testDefaultDoesNotOverwriteUserlandPriority()
     {
         $ref = new ReflectionClass(DevCommands::class);
         $ref->getProperty('commands')->setValue(null, [
@@ -216,7 +216,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('userland-server', collect($result)->firstWhere('name', 'server')['command']);
     }
 
-    public function test_default_does_not_overwrite_vendor_priority()
+    public function testDefaultDoesNotOverwriteVendorPriority()
     {
         $ref = new ReflectionClass(DevCommands::class);
         $ref->getProperty('commands')->setValue(null, [
@@ -230,7 +230,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('vendor-server', collect($result)->firstWhere('name', 'server')['command']);
     }
 
-    public function test_default_priority_is_lowest()
+    public function testDefaultPriorityIsLowest()
     {
         DevCommands::registerDefaults();
 
@@ -240,7 +240,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame(DevCommand::PRIORITY_DEFAULT, $serverCommand['priority']);
     }
 
-    public function test_userland_registration_gets_userland_priority()
+    public function testUserlandRegistrationGetsUserlandPriority()
     {
         DevCommands::register('echo hello', 'greeter');
 
@@ -249,7 +249,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame(DevCommand::PRIORITY_USERLAND, $commands[0]['priority']);
     }
 
-    public function test_resolve_priority_detects_userland_through_dev_commands_frame()
+    public function testResolvePriorityDetectsUserlandThroughDevCommandsFrame()
     {
         $ref = new ReflectionClass(DevCommands::class);
         $method = $ref->getMethod('resolvePriority');
@@ -263,7 +263,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame(DevCommand::PRIORITY_USERLAND, $method->invoke(null, $trace));
     }
 
-    public function test_resolve_priority_detects_vendor()
+    public function testResolvePriorityDetectsVendor()
     {
         $ref = new ReflectionClass(DevCommands::class);
         $method = $ref->getMethod('resolvePriority');
@@ -277,7 +277,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame(DevCommand::PRIORITY_VENDOR, $method->invoke(null, $trace));
     }
 
-    public function test_resolve_priority_detects_userland_calling_vendor_helper()
+    public function testResolvePriorityDetectsUserlandCallingVendorHelper()
     {
         $ref = new ReflectionClass(DevCommands::class);
         $method = $ref->getMethod('resolvePriority');
@@ -292,7 +292,7 @@ class FoundationDevCommandsTest extends TestCase
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
-    public function test_register_defaults_registers_expected_commands()
+    public function testRegisterDefaultsRegistersExpectedCommands()
     {
         DevCommands::registerDefaults();
 
@@ -313,7 +313,7 @@ class FoundationDevCommandsTest extends TestCase
     }
 
     #[RequiresOperatingSystem('Windows')]
-    public function test_register_defaults_excludes_pail_on_windows()
+    public function testRegisterDefaultsExcludesPailOnWindows()
     {
         DevCommands::registerDefaults();
 
@@ -329,7 +329,7 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertNotContains('logs', $names);
     }
 
-    public function test_registered_command_includes_source()
+    public function testRegisteredCommandIncludesSource()
     {
         DevCommands::register('echo hello', 'greeter');
 

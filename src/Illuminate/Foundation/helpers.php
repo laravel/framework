@@ -1,12 +1,8 @@
 <?php
 
 use Carbon\CarbonInterface;
-use Faker\Factory;
-use Faker\Generator;
 use Illuminate\Broadcasting\FakePendingBroadcast;
 use Illuminate\Broadcasting\PendingBroadcast;
-use Illuminate\Cache\CacheManager;
-use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
@@ -17,33 +13,25 @@ use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Contracts\View\Factory as ViewFactory;
-use Illuminate\Contracts\View\View;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Cookie\CookieJar;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bus\PendingClosureDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\ConsoleDumps\DumpHelper;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response as IlluminateResponse;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Log\LogManager;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\Router;
-use Illuminate\Session\SessionManager;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Illuminate\Support\Facades\Date;
@@ -54,8 +42,6 @@ use League\Uri\Contracts\UriInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use function Illuminate\Support\enum_value;
 
@@ -63,13 +49,13 @@ if (! function_exists('abort')) {
     /**
      * Throw an HttpException with the given data.
      *
-     * @param  Response|Responsable|int  $code
+     * @param  \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Support\Responsable|int  $code
      * @param  string  $message
      * @return never
      *
-     * @throws HttpException
-     * @throws NotFoundHttpException
-     * @throws HttpResponseException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
      */
     function abort($code, $message = '', array $headers = [])
     {
@@ -88,11 +74,11 @@ if (! function_exists('abort_if')) {
      * Throw an HttpException with the given data if the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  Response|Responsable|int  $code
+     * @param  \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Support\Responsable|int  $code
      * @param  string  $message
      *
-     * @throws HttpException
-     * @throws NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     function abort_if($boolean, $code, $message = '', array $headers = []): void
     {
@@ -107,11 +93,11 @@ if (! function_exists('abort_unless')) {
      * Throw an HttpException with the given data unless the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  Response|Responsable|int  $code
+     * @param  \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Support\Responsable|int  $code
      * @param  string  $message
      *
-     * @throws HttpException
-     * @throws NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     function abort_unless($boolean, $code, $message = '', array $headers = []): void
     {
@@ -142,7 +128,7 @@ if (! function_exists('app')) {
      * @template TClass of object
      *
      * @param  string|class-string<TClass>|null  $abstract
-     * @return ($abstract is class-string<TClass> ? TClass : ($abstract is null ? Application : mixed))
+     * @return ($abstract is class-string<TClass> ? TClass : ($abstract is null ? \Illuminate\Foundation\Application : mixed))
      */
     function app($abstract = null, array $parameters = [])
     {
@@ -184,7 +170,7 @@ if (! function_exists('auth')) {
      * Get the available auth instance.
      *
      * @param  string|null  $guard
-     * @return ($guard is null ? AuthFactory : Guard)
+     * @return ($guard is null ? \Illuminate\Contracts\Auth\Factory : \Illuminate\Contracts\Auth\Guard)
      */
     function auth($guard = null): AuthFactory|Guard
     {
@@ -289,9 +275,9 @@ if (! function_exists('cache')) {
      *
      * @param  string|array<string, mixed>|null  $key  key|data
      * @param  mixed  $default  default|expiration|null
-     * @return ($key is null ? CacheManager : ($key is string ? mixed : bool))
+     * @return ($key is null ? \Illuminate\Cache\CacheManager : ($key is string ? mixed : bool))
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     function cache($key = null, $default = null)
     {
@@ -321,7 +307,7 @@ if (! function_exists('config')) {
      *
      * @param  array<string, mixed>|string|null  $key
      * @param  mixed  $default
-     * @return ($key is null ? Repository : ($key is string ? mixed : null))
+     * @return ($key is null ? \Illuminate\Config\Repository : ($key is string ? mixed : null))
      */
     function config($key = null, $default = null)
     {
@@ -355,7 +341,7 @@ if (! function_exists('context')) {
      *
      * @param  array|string|null  $key
      * @param  mixed  $default
-     * @return ($key is string ? mixed : ContextRepository)
+     * @return ($key is string ? mixed : \Illuminate\Log\Context\Repository)
      */
     function context($key = null, $default = null)
     {
@@ -382,7 +368,7 @@ if (! function_exists('cookie')) {
      * @param  bool  $httpOnly
      * @param  bool  $raw
      * @param  string|null  $sameSite
-     * @return ($name is null ? CookieJar : Cookie)
+     * @return ($name is null ? \Illuminate\Cookie\CookieJar : \Symfony\Component\HttpFoundation\Cookie)
      */
     function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null): CookieJar|Cookie
     {
@@ -410,7 +396,7 @@ if (! function_exists('csrf_token')) {
     /**
      * Get the CSRF token value.
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     function csrf_token(): ?string
     {
@@ -454,7 +440,7 @@ if (! function_exists('defer')) {
     /**
      * Defer execution of the given callback.
      *
-     * @return ($callback is null ? DeferredCallbackCollection : DeferredCallback)
+     * @return ($callback is null ? \Illuminate\Support\Defer\DeferredCallbackCollection : \Illuminate\Support\Defer\DeferredCallback)
      */
     function defer(?callable $callback = null, ?string $name = null, bool $always = false): DeferredCallback|DeferredCallbackCollection
     {
@@ -467,7 +453,7 @@ if (! function_exists('dispatch')) {
      * Dispatch a job to its appropriate handler.
      *
      * @param  mixed  $job
-     * @return ($job is Closure ? PendingClosureDispatch : PendingDispatch)
+     * @return ($job is \Closure ? \Illuminate\Foundation\Bus\PendingClosureDispatch : \Illuminate\Foundation\Bus\PendingDispatch)
      */
     function dispatch($job): PendingDispatch|PendingClosureDispatch
     {
@@ -531,13 +517,13 @@ if (! function_exists('event')) {
     }
 }
 
-if (! function_exists('fake') && class_exists(Factory::class)) {
+if (! function_exists('fake') && class_exists(\Faker\Factory::class)) {
     /**
      * Get a faker instance.
      *
      * @param  string|null  $locale
      */
-    function fake($locale = null): Generator
+    function fake($locale = null): \Faker\Generator
     {
         if (app()->bound('config')) {
             $locale ??= app('config')->get('app.faker_locale');
@@ -545,10 +531,10 @@ if (! function_exists('fake') && class_exists(Factory::class)) {
 
         $locale ??= 'en_US';
 
-        $abstract = Generator::class.':'.$locale;
+        $abstract = \Faker\Generator::class.':'.$locale;
 
         if (! app()->bound($abstract)) {
-            app()->singleton($abstract, fn () => Factory::create($locale));
+            app()->singleton($abstract, fn () => \Faker\Factory::create($locale));
         }
 
         return app()->make($abstract);
@@ -585,7 +571,7 @@ if (! function_exists('logger')) {
      * Log a debug message to the logs.
      *
      * @param  string|null  $message
-     * @return ($message is null ? LoggerInterface : null)
+     * @return ($message is null ? \Psr\Log\LoggerInterface : null)
      */
     function logger($message = null, array $context = []): ?LoggerInterface
     {
@@ -602,7 +588,7 @@ if (! function_exists('logs')) {
      * Get a log driver instance.
      *
      * @param  string|null  $driver
-     * @return ($driver is null ? LogManager : LoggerInterface)
+     * @return ($driver is null ? \Illuminate\Log\LogManager : \Psr\Log\LoggerInterface)
      */
     function logs($driver = null): LoggerInterface|LogManager
     {
@@ -629,7 +615,7 @@ if (! function_exists('mix')) {
      * @param  string  $path
      * @param  string  $manifestDirectory
      *
-     * @throws Exception
+     * @throws \Exception
      */
     function mix($path, $manifestDirectory = ''): HtmlString|string
     {
@@ -641,7 +627,7 @@ if (! function_exists('now')) {
     /**
      * Create a new Carbon instance for the current time.
      *
-     * @param  DateTimeZone|UnitEnum|string|null  $tz
+     * @param  \DateTimeZone|\UnitEnum|string|null  $tz
      */
     function now($tz = null): CarbonInterface
     {
@@ -654,7 +640,7 @@ if (! function_exists('old')) {
      * Retrieve an old input item.
      *
      * @param  string|null  $key
-     * @param  Model|string|array|null  $default
+     * @param  \Illuminate\Database\Eloquent\Model|string|array|null  $default
      * @return string|array|null
      */
     function old($key = null, $default = null)
@@ -670,7 +656,7 @@ if (! function_exists('policy')) {
      * @param  object|string  $class
      * @return mixed
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     function policy($class)
     {
@@ -727,7 +713,7 @@ if (! function_exists('redirect')) {
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return ($to is null ? Redirector : RedirectResponse)
+     * @return ($to is null ? \Illuminate\Routing\Redirector : \Illuminate\Http\RedirectResponse)
      */
     function redirect($to = null, $status = 302, $headers = [], $secure = null): Redirector|RedirectResponse
     {
@@ -743,7 +729,7 @@ if (! function_exists('report')) {
     /**
      * Report an exception.
      *
-     * @param  Throwable|string  $exception
+     * @param  \Throwable|string  $exception
      */
     function report($exception): void
     {
@@ -760,7 +746,7 @@ if (! function_exists('report_if')) {
      * Report an exception if the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  Throwable|string  $exception
+     * @param  \Throwable|string  $exception
      */
     function report_if($boolean, $exception): void
     {
@@ -775,7 +761,7 @@ if (! function_exists('report_unless')) {
      * Report an exception unless the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  Throwable|string  $exception
+     * @param  \Throwable|string  $exception
      */
     function report_unless($boolean, $exception): void
     {
@@ -791,7 +777,7 @@ if (! function_exists('request')) {
      *
      * @param  list<string>|string|null  $key
      * @param  mixed  $default
-     * @return ($key is null ? Request : ($key is string ? mixed : array<string, mixed>))
+     * @return ($key is null ? \Illuminate\Http\Request : ($key is string ? mixed : array<string, mixed>))
      */
     function request($key = null, $default = null)
     {
@@ -817,8 +803,8 @@ if (! function_exists('rescue')) {
      * @template TFallback
      *
      * @param  callable(): TValue  $callback
-     * @param  (callable(Throwable): TFallback)|TFallback  $rescue
-     * @param  bool|callable(Throwable): bool  $report
+     * @param  (callable(\Throwable): TFallback)|TFallback  $rescue
+     * @param  bool|callable(\Throwable): bool  $report
      * @return TValue|TFallback
      */
     function rescue(callable $callback, $rescue = null, $report = true)
@@ -866,9 +852,9 @@ if (! function_exists('response')) {
     /**
      * Return a new response from the application.
      *
-     * @param  View|string|array|null  $content
+     * @param  \Illuminate\Contracts\View\View|string|array|null  $content
      * @param  int  $status
-     * @return ($content is null ? ResponseFactory : IlluminateResponse)
+     * @return ($content is null ? \Illuminate\Contracts\Routing\ResponseFactory : \Illuminate\Http\Response)
      */
     function response($content = null, $status = 200, array $headers = []): ResponseFactory|IlluminateResponse
     {
@@ -886,7 +872,7 @@ if (! function_exists('route')) {
     /**
      * Generate the URL to a named route.
      *
-     * @param  BackedEnum|string  $name
+     * @param  \BackedEnum|string  $name
      * @param  mixed  $parameters
      * @param  bool  $absolute
      */
@@ -930,7 +916,7 @@ if (! function_exists('session')) {
      *
      * @param  array<string, mixed>|string|null  $key
      * @param  mixed  $default
-     * @return ($key is null ? SessionManager : ($key is string ? mixed : null))
+     * @return ($key is null ? \Illuminate\Session\SessionManager : ($key is string ? mixed : null))
      */
     function session($key = null, $default = null)
     {
@@ -966,7 +952,7 @@ if (! function_exists('to_action')) {
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
-     * @return RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
     function to_action($action, $parameters = [], $status = 302, $headers = [])
     {
@@ -978,11 +964,11 @@ if (! function_exists('to_route')) {
     /**
      * Create a new redirect response to a named route.
      *
-     * @param  BackedEnum|string  $route
+     * @param  \BackedEnum|string  $route
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
-     * @return RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
     function to_route($route, $parameters = [], $status = 302, $headers = [])
     {
@@ -994,8 +980,8 @@ if (! function_exists('today')) {
     /**
      * Create a new Carbon instance for the current date.
      *
-     * @param  DateTimeZone|UnitEnum|string|null  $tz
-     * @return Carbon
+     * @param  \DateTimeZone|\UnitEnum|string|null  $tz
+     * @return \Illuminate\Support\Carbon
      */
     function today($tz = null): CarbonInterface
     {
@@ -1010,7 +996,7 @@ if (! function_exists('trans')) {
      * @param  string|null  $key
      * @param  array  $replace
      * @param  string|null  $locale
-     * @return ($key is null ? Translator : array|string)
+     * @return ($key is null ? \Illuminate\Contracts\Translation\Translator : array|string)
      */
     function trans($key = null, $replace = [], $locale = null): Translator|array|string
     {
@@ -1027,7 +1013,7 @@ if (! function_exists('trans_choice')) {
      * Translates the given message based on a count.
      *
      * @param  string  $key
-     * @param  Countable|int|float|array  $number
+     * @param  \Countable|int|float|array  $number
      * @param  string|null  $locale
      */
     function trans_choice($key, $number, array $replace = [], $locale = null): string
@@ -1076,7 +1062,7 @@ if (! function_exists('url')) {
      * @param  string|null  $path
      * @param  mixed  $parameters
      * @param  bool|null  $secure
-     * @return ($path is null ? UrlGenerator : string)
+     * @return ($path is null ? \Illuminate\Contracts\Routing\UrlGenerator : string)
      */
     function url($path = null, $parameters = [], $secure = null): UrlGenerator|string
     {
@@ -1092,7 +1078,7 @@ if (! function_exists('validator')) {
     /**
      * Create a new Validator instance.
      *
-     * @return ($data is null ? ValidationFactory : Validator)
+     * @return ($data is null ? \Illuminate\Contracts\Validation\Factory : \Illuminate\Contracts\Validation\Validator)
      */
     function validator(?array $data = null, array $rules = [], array $messages = [], array $attributes = []): ValidatorContract|ValidationFactory
     {
@@ -1111,9 +1097,9 @@ if (! function_exists('view')) {
      * Get the evaluated view contents for the given view.
      *
      * @param  string|null  $view
-     * @param  Arrayable|array  $data
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @param  array  $mergeData
-     * @return ($view is null ? ViewFactory : View)
+     * @return ($view is null ? \Illuminate\Contracts\View\Factory : \Illuminate\Contracts\View\View)
      */
     function view($view = null, $data = [], $mergeData = []): ViewFactory|ViewContract
     {

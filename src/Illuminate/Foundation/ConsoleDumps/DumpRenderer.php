@@ -13,7 +13,8 @@ class DumpRenderer
     public function __construct(
         protected CliDumper $dumper,
         protected string $basePath,
-    ) {}
+    ) {
+    }
 
     /**
      * Render an incoming dump.

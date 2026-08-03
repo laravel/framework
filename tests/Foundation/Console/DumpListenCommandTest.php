@@ -6,12 +6,11 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Console\DumpListenCommand;
 use Illuminate\Foundation\ConsoleDumps\DumpServer;
 use Orchestra\Testbench\TestCase;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class DumpListenCommandTest extends TestCase
 {
-    public function test_it_is_registered_with_artisan()
+    public function testItIsRegisteredWithArtisan()
     {
         $this->assertInstanceOf(
             DumpListenCommand::class,
@@ -19,7 +18,7 @@ class DumpListenCommandTest extends TestCase
         );
     }
 
-    public function test_it_listens_for_and_renders_dumps()
+    public function testItListensForAndRendersDumps()
     {
         $server = new FakeDumpServer;
 
@@ -47,24 +46,6 @@ class DumpListenCommandTest extends TestCase
         $this->assertStringContainsString('routes/web.php:10', $output);
 
         $this->assertSame(['start', 'listen'], $server->calls);
-    }
-
-    public function test_it_uses_the_configured_host_and_port()
-    {
-        $command = new class extends DumpListenCommand
-        {
-            public function serverForTesting()
-            {
-                return $this->server();
-            }
-        };
-
-        $command->setInput(new ArrayInput([
-            '--host' => 'localhost',
-            '--port' => 9988,
-        ], $command->getDefinition()));
-
-        $this->assertSame('tcp://localhost:9988', $command->serverForTesting()->getHost());
     }
 }
 

@@ -29,7 +29,6 @@ use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Support\AggregateServiceProvider;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Uri;
 use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\ParallelTestingServiceProvider;
@@ -43,7 +42,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     /**
      * The provider class names.
      *
-     * @var array<int, class-string<ServiceProvider>>
+     * @var array<int, class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected $providers = [
         FormRequestServiceProvider::class,
@@ -133,10 +132,10 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $format = $_SERVER['VAR_DUMPER_FORMAT'] ?? null;
 
         match (true) {
-            $format == 'html' => HtmlDumper::register($basePath, $compiledViewPath),
-            $format == 'cli' => CliDumper::register($basePath, $compiledViewPath),
-            $format == 'server' => null,
-            $format && parse_url($format, PHP_URL_SCHEME) == 'tcp' => null,
+            'html' == $format => HtmlDumper::register($basePath, $compiledViewPath),
+            'cli' == $format => CliDumper::register($basePath, $compiledViewPath),
+            'server' == $format => null,
+            $format && 'tcp' == parse_url($format, PHP_URL_SCHEME) => null,
             default => in_array(PHP_SAPI, ['cli', 'phpdbg']) ? CliDumper::register($basePath, $compiledViewPath) : HtmlDumper::register($basePath, $compiledViewPath),
         };
     }
@@ -146,7 +145,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
      *
      * @return void
      *
-     * @throws ValidationException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function registerRequestValidation()
     {
