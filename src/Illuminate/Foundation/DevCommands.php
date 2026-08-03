@@ -9,8 +9,6 @@ class DevCommands
 {
     /**
      * The resolved NodePackageManager instance.
-     *
-     * @var NodePackageManager|null
      */
     protected static ?NodePackageManager $packageManager = null;
 
@@ -62,15 +60,12 @@ class DevCommands
             self::artisan('pail --timeout=0', 'logs');
         }
 
+        self::artisan('dump:listen', 'dumps');
         self::node('dev', 'vite');
     }
 
     /**
      * Register a development command.
-     *
-     * @param  string  $command
-     * @param  string|null  $name
-     * @return DevCommand
      */
     public static function register(string $command, ?string $name = null): DevCommand
     {
@@ -95,10 +90,6 @@ class DevCommands
 
     /**
      * Registers an Artisan command, automatically prefixing it with "php artisan".
-     *
-     * @param  string  $command
-     * @param  string|null  $name
-     * @return DevCommand
      */
     public static function artisan(string $command, ?string $name = null): DevCommand
     {
@@ -107,10 +98,6 @@ class DevCommands
 
     /**
      * Registers a Node command, automatically prefixing it with the detected package manager's run command.
-     *
-     * @param  string  $command
-     * @param  string|null  $name
-     * @return DevCommand
      */
     public static function node(string $command, ?string $name = null): DevCommand
     {
@@ -119,10 +106,6 @@ class DevCommands
 
     /**
      * Registers a Node command, automatically prefixing it with the detected package manager's exec command.
-     *
-     * @param  string  $command
-     * @param  string|null  $name
-     * @return DevCommand
      */
     public static function nodeExec(string $command, ?string $name = null): DevCommand
     {
@@ -153,9 +136,6 @@ class DevCommands
 
     /**
      * Fill in any empty colors in the given commands array, ensuring each command has a color assigned.
-     *
-     * @param  array  $commands
-     * @return array
      */
     protected static function fillInEmptyColors(array $commands): array
     {
@@ -170,9 +150,6 @@ class DevCommands
 
     /**
      * Get a color for a command, ensuring that colors are reused only after all available colors have been used at least once.
-     *
-     * @param  array  $commands
-     * @return string
      */
     protected static function getColor(array $commands): string
     {
@@ -211,7 +188,6 @@ class DevCommands
      * Determine the registration priority from a debug backtrace.
      *
      * @param  array<int, array{'file': string, 'line': int, 'class'?: string, 'function'?: string}>  $trace
-     * @return int
      */
     protected static function resolvePriority(array $trace): int
     {
@@ -247,7 +223,6 @@ class DevCommands
      * Set the commands that should be included when running the "dev" command.
      *
      * @param  string  ...$names
-     * @return void
      */
     public static function only(...$names): void
     {
@@ -258,7 +233,6 @@ class DevCommands
      * Set the commands that should be excluded when running the "dev" command.
      *
      * @param  string  ...$names
-     * @return void
      */
     public static function except(...$names): void
     {
@@ -267,11 +241,9 @@ class DevCommands
 
     /**
      * Resolve and return the NodePackageManager instance.
-     *
-     * @return NodePackageManager
      */
     protected static function getPackageManager(): NodePackageManager
     {
-        return self::$packageManager ??= new NodePackageManager();
+        return self::$packageManager ??= new NodePackageManager;
     }
 }

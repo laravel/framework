@@ -49,6 +49,7 @@ use Illuminate\Foundation\Console\DevCommand;
 use Illuminate\Foundation\Console\DevListCommand;
 use Illuminate\Foundation\Console\DocsCommand;
 use Illuminate\Foundation\Console\DownCommand;
+use Illuminate\Foundation\Console\DumpListenCommand;
 use Illuminate\Foundation\Console\EnumMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\EnvironmentDecryptCommand;
@@ -210,6 +211,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'Dev' => DevCommand::class,
         'DevList' => DevListCommand::class,
         'Docs' => DocsCommand::class,
+        'DumpListen' => DumpListenCommand::class,
         'EnumMake' => EnumMakeCommand::class,
         'EventGenerate' => EventGenerateCommand::class,
         'EventMake' => EventMakeCommand::class,
