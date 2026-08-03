@@ -1480,6 +1480,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Set the underlying string value to a new UUID (version 4).
+     *
+     * @return static
+     */
+    public function uuid()
+    {
+        return new static(Str::uuid()->toString());
+    }
+
+    /**
      * Get the underlying string value.
      *
      * @return string

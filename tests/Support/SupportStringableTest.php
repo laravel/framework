@@ -7,6 +7,7 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
 use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
@@ -1421,6 +1422,14 @@ class SupportStringableTest extends TestCase
     {
         $this->assertEquals(2, $this->stringable('Hello, world!')->wordCount());
         $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
+    }
+
+    public function testUuid(): void
+    {
+        $result = $this->stringable('ignored')->uuid();
+
+        $this->assertInstanceOf(Stringable::class, $result);
+        $this->assertTrue(Str::isUuid((string) $result));
     }
 
     public function testWrap()
