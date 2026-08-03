@@ -44,3 +44,4 @@ Executar uma etapa por vez e iniciar a seguinte somente após a conclusão da an
 - [x] Criar o comando Artisan.
 - [x] Criar o helper `doc()`.
 - [x] Revisar a implementação, a documentação e os testes.
+- [x] Garantir que o cliente seja tolerante a falhas e não bloqueante.
