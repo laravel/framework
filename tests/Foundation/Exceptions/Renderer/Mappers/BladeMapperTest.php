@@ -11,13 +11,6 @@ use ReflectionMethod;
 
 class BladeMapperTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     public function testAddLineNumbersPrefixesEachMatchWithItsLineNumber(): void
     {
         $mapper = new BladeMapper(m::mock(Factory::class), m::mock(BladeCompiler::class));
