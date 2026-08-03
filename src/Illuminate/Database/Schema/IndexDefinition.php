@@ -34,8 +34,8 @@ class IndexDefinition extends Fluent
      *     $table->index('status')->where('active', '=', 1);
      *
      * Use whereRaw() for raw SQL predicates. Partial indexes are supported by
-     * PostgreSQL, SQLite, and SQL Server. On PostgreSQL, drop partial unique
-     * indexes with dropIndex() rather than dropUnique().
+     * PostgreSQL, SQLite, and SQL Server. On PostgreSQL, dropUnique() detects
+     * whether the unique is a constraint or a partial index.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  mixed  $operator
@@ -77,8 +77,6 @@ class IndexDefinition extends Fluent
      *
      *     $table->unique('email')->whereRaw('deleted_at is null');
      *
-     * On PostgreSQL, drop partial unique indexes with dropIndex() rather than dropUnique().
-     *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $expression
      * @return $this
      */
@@ -98,8 +96,6 @@ class IndexDefinition extends Fluent
      * Useful for soft-delete-aware unique indexes:
      *
      *     $table->unique(['user_id', 'slug'])->whereNull('deleted_at');
-     *
-     * On PostgreSQL, drop partial unique indexes with dropIndex() rather than dropUnique().
      *
      * @param  string  $column
      * @return $this

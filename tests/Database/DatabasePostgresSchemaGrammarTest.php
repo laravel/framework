@@ -204,12 +204,28 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testDropUnique()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $connection = $this->getConnection();
+        $connection->shouldReceive('selectOne')->once()->andReturn((object) ['exists' => true]);
+
+        $blueprint = new Blueprint($connection, 'users');
         $blueprint->dropUnique('foo');
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" drop constraint "foo"', $statements[0]);
+    }
+
+    public function testDropUniqueFallsBackToDropIndexForPartialUnique()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('selectOne')->once()->andReturn((object) ['exists' => false]);
+
+        $blueprint = new Blueprint($connection, 'users');
+        $blueprint->dropUnique('users_email_unique');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('drop index "users_email_unique"', $statements[0]);
     }
 
     public function testDropIndex()
@@ -444,15 +460,6 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create unique index concurrently "users_email_unique" on "users" ("email") where "deleted_at" is null', $statements[0]);
     }
 
-    public function testDroppingPartialUniqueUsesDropIndex()
-    {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
-        $blueprint->dropIndex('users_email_unique');
-        $statements = $blueprint->toSql();
-
-        $this->assertCount(1, $statements);
-        $this->assertSame('drop index "users_email_unique"', $statements[0]);
-    }
 
     public function testAddingIndex()
     {
@@ -1515,6 +1522,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         return $connection
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
             ->shouldReceive('getSchemaBuilder')->andReturn($builder)
+            ->shouldReceive('selectOne')->andReturn((object) ['exists' => true])->byDefault()
             ->getMock();
     }
 
@@ -1525,7 +1533,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function getBuilder()
     {
-        return mock(PostgresBuilder::class);
+        return mock(PostgresBuilder::class, function ($mock) {
+            $mock->shouldReceive('parseSchemaAndTable')->andReturnUsing(
+                fn ($table) => [null, last(explode('.', $table))]
+            )->byDefault();
+        });
     }
 
     /** @return list<array{method: string, type: string, user: int|null, grammar: false|int|null, expected: int|null}> */

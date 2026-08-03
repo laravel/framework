@@ -102,7 +102,7 @@ class SchemaPartialUniqueIndexTest extends DatabaseTestCase
     public function testPartialUniqueIndexCanBeDropped()
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->dropIndex('posts_user_id_slug_unique');
+            $table->dropUnique('posts_user_id_slug_unique');
         });
 
         DB::table('posts')->insert([

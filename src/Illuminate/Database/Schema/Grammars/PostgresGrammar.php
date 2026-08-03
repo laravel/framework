@@ -330,7 +330,7 @@ class PostgresGrammar extends Grammar
      * Compile a unique key command.
      *
      * Partial unique indexes are created via CREATE UNIQUE INDEX (not as table
-     * constraints). Drop them with dropIndex() rather than dropUnique().
+     * constraints). dropUnique() detects this and falls back to DROP INDEX.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
@@ -645,15 +645,51 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a drop unique key command.
      *
+     * Partial unique indexes are created via CREATE UNIQUE INDEX and are not
+     * table constraints. When the named unique is not a constraint, fall back
+     * to DROP INDEX so dropUnique() works for both forms.
+     *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
     public function compileDropUnique(Blueprint $blueprint, Fluent $command)
     {
+        if (! $this->uniqueIsConstraint($blueprint, $command->index)) {
+            return $this->compileDropIndex($blueprint, $command);
+        }
+
         $index = $this->wrap($command->index);
 
         return "alter table {$this->wrapTable($blueprint)} drop constraint {$index}";
+    }
+
+    /**
+     * Determine whether the given unique name is a table constraint.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  string  $index
+     * @return bool
+     */
+    protected function uniqueIsConstraint(Blueprint $blueprint, $index)
+    {
+        [$schema, $table] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
+
+        $table = $this->connection->getTablePrefix().$table;
+
+        $result = $this->connection->selectOne(sprintf(
+            'select exists ('
+            .'select 1 from pg_constraint c '
+            .'join pg_class t on c.conrelid = t.oid '
+            .'join pg_namespace n on n.oid = t.relnamespace '
+            ."where c.contype = 'u' and c.conname = %s and t.relname = %s and n.nspname = %s"
+            .') as "exists"',
+            $this->quoteString($index),
+            $this->quoteString($table),
+            $schema ? $this->quoteString($schema) : 'current_schema()'
+        ));
+
+        return (bool) ($result->exists ?? false);
     }
 
     /**
