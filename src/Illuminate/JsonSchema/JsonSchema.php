@@ -30,6 +30,18 @@ class JsonSchema
     }
 
     /**
+     * Build a schema from a set of Laravel validation rules.
+     *
+     * Rules without a JSON Schema equivalent are ignored.
+     *
+     * @param  array<string, mixed>  $rules
+     */
+    public static function fromRules(array $rules): Types\ObjectType
+    {
+        return RuleDeserializer::deserialize($rules);
+    }
+
+    /**
      * Dynamically pass static methods to the schema instance.
      */
     public static function __callStatic(string $name, mixed $arguments): Type
