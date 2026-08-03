@@ -145,7 +145,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
             $this->components->task('Creating migration table', function () {
                 return $this->callSilent('migrate:install', array_filter([
                     '--database' => $this->option('database'),
-                ])) == 0;
+                ])) === 0;
             });
 
             $this->newLine();

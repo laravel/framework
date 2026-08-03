@@ -143,7 +143,7 @@ abstract class Grammar
     protected function wrapSegments($segments)
     {
         return (new Collection($segments))->map(function ($segment, $key) use ($segments) {
-            return $key == 0 && count($segments) > 1
+            return $key === 0 && count($segments) > 1
                 ? $this->wrapTable($segment)
                 : $this->wrapValue($segment);
         })->implode('.');

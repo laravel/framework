@@ -49,7 +49,7 @@ trait ManagesTransactions
             $levelBeingCommitted = $this->transactions;
 
             try {
-                if ($this->transactions == 1) {
+                if ($this->transactions === 1) {
                     $this->fireConnectionEvent('committing');
                     $this->getPdo()->commit();
                 }
@@ -147,7 +147,7 @@ trait ManagesTransactions
      */
     protected function createTransaction()
     {
-        if ($this->transactions == 0) {
+        if ($this->transactions === 0) {
             $this->reconnectIfMissingConnection();
 
             try {
@@ -202,7 +202,7 @@ trait ManagesTransactions
      */
     public function commit()
     {
-        if ($this->transactionLevel() == 1) {
+        if ($this->transactionLevel() === 1) {
             $this->fireConnectionEvent('committing');
             $this->getPdo()->commit();
         }
@@ -299,7 +299,7 @@ trait ManagesTransactions
      */
     protected function performRollBack($toLevel)
     {
-        if ($toLevel == 0) {
+        if ($toLevel === 0) {
             $pdo = $this->getPdo();
 
             if ($pdo->inTransaction()) {
