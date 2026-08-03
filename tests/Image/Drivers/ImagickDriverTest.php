@@ -206,6 +206,14 @@ class ImagickDriverTest extends TestCase
         $this->assertSame('#0080ff', $driver->dominantColor($contents));
     }
 
+    public function test_dominant_color_ignores_alpha_channel(): void
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->semiTransparentColorImageContents(0, 128, 255, 128);
+
+        $this->assertSame('#0080ff', $driver->dominantColor($contents));
+    }
+
     public function test_processes_crop()
     {
         $driver = new ImagickDriver;
@@ -495,6 +503,19 @@ class ImagickDriverTest extends TestCase
         $imagick = new \Imagick;
         $imagick->newImage($width, $height, new \ImagickPixel(sprintf('rgb(%d,%d,%d)', $red, $green, $blue)));
         $imagick->setImageAlphaChannel(\Imagick::ALPHACHANNEL_OPAQUE);
+        $imagick->setImageFormat('png');
+
+        $contents = $imagick->getImageBlob();
+        $imagick->clear();
+        $imagick->destroy();
+
+        return $contents;
+    }
+
+    protected function semiTransparentColorImageContents(int $red, int $green, int $blue, int $alpha, int $width = 100, int $height = 100): string
+    {
+        $imagick = new \Imagick;
+        $imagick->newImage($width, $height, new \ImagickPixel(sprintf('rgba(%d,%d,%d,%.2f)', $red, $green, $blue, $alpha / 255)));
         $imagick->setImageFormat('png');
 
         $contents = $imagick->getImageBlob();
