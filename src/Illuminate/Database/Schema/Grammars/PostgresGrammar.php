@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Stringable;
 use LogicException;
+use RuntimeException;
 
 class PostgresGrammar extends Grammar
 {
@@ -318,6 +319,8 @@ class PostgresGrammar extends Grammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
+        $this->ensurePartialIndexCommandIsSupported($command);
+
         $columns = $this->columnize($command->columns);
 
         return 'alter table '.$this->wrapTable($blueprint)." add primary key ({$columns})";
@@ -326,21 +329,37 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a unique key command.
      *
+     * Partial unique indexes are created via CREATE UNIQUE INDEX (not as table
+     * constraints). Drop them with dropIndex() rather than dropUnique().
+     *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string[]
+     * @return string|string[]
+     *
+     * @throws \RuntimeException
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
     {
         // Partial unique indexes must be created as indexes; PostgreSQL unique
         // constraints do not support WHERE predicates.
         if ($this->hasWhereClause($command)) {
-            return sprintf('create unique index %s%s on %s%s (%s)%s',
+            if (! is_null($command->deferrable) || ! is_null($command->initiallyImmediate)) {
+                throw new RuntimeException('Partial unique indexes may not be deferrable.');
+            }
+
+            $nullsDistinct = '';
+
+            if (! is_null($command->nullsNotDistinct)) {
+                $nullsDistinct = ' nulls '.($command->nullsNotDistinct ? 'not distinct' : 'distinct');
+            }
+
+            return sprintf('create unique index %s%s on %s%s (%s)%s%s',
                 $command->online ? 'concurrently ' : '',
                 $this->wrap($command->index),
                 $this->wrapTable($blueprint),
                 $command->algorithm ? ' using '.$command->algorithm : '',
                 $this->columnize($command->columns),
+                $nullsDistinct,
                 $this->compileWhereClause($command)
             );
         }
@@ -416,6 +435,8 @@ class PostgresGrammar extends Grammar
      */
     public function compileFulltext(Blueprint $blueprint, Fluent $command)
     {
+        $this->ensurePartialIndexCommandIsSupported($command);
+
         $language = $command->language ?: 'english';
 
         $columns = array_map(function ($column) use ($language) {
@@ -439,6 +460,8 @@ class PostgresGrammar extends Grammar
      */
     public function compileSpatialIndex(Blueprint $blueprint, Fluent $command)
     {
+        $this->ensurePartialIndexCommandIsSupported($command);
+
         $command->algorithm = 'gist';
 
         if (! is_null($command->operatorClass)) {
@@ -457,6 +480,8 @@ class PostgresGrammar extends Grammar
      */
     public function compileVectorIndex(Blueprint $blueprint, Fluent $command)
     {
+        $this->ensurePartialIndexCommandIsSupported($command);
+
         return $this->compileIndexWithOperatorClass($blueprint, $command);
     }
 

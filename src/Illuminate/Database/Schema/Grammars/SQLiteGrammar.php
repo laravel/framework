@@ -385,6 +385,8 @@ class SQLiteGrammar extends Grammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
+        $this->ensurePartialIndexCommandIsSupported($command);
+
         // Handled on table creation or alteration...
     }
 

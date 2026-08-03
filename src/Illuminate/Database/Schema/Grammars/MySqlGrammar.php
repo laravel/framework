@@ -428,6 +428,8 @@ class MySqlGrammar extends Grammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
+        $this->ensurePartialIndexCommandIsSupported($command);
+
         return sprintf('alter table %s add primary key %s(%s)%s',
             $this->wrapTable($blueprint),
             $command->algorithm ? 'using '.$command->algorithm : '',
@@ -477,6 +479,8 @@ class MySqlGrammar extends Grammar
      */
     public function compileFullText(Blueprint $blueprint, Fluent $command)
     {
+        $this->ensurePartialIndexCommandIsSupported($command);
+
         return $this->compileKey($blueprint, $command, 'fulltext');
     }
 
@@ -489,6 +493,8 @@ class MySqlGrammar extends Grammar
      */
     public function compileSpatialIndex(Blueprint $blueprint, Fluent $command)
     {
+        $this->ensurePartialIndexCommandIsSupported($command);
+
         return $this->compileKey($blueprint, $command, 'spatial index');
     }
 

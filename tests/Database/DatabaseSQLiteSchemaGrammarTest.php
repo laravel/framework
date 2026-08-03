@@ -231,6 +231,36 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('create unique index "users_user_id_slug_unique" on "users" ("user_id", "slug") where "deleted_at" is null', $statements[0]);
     }
 
+    public function testAddingPartialUniqueKeyWithRawWhere()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->whereRaw('deleted_at is null');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "users_email_unique" on "users" ("email") where deleted_at is null', $statements[0]);
+    }
+
+    public function testAddingPartialUniqueKeyWithBasicWhere()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->where('active', true);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "users_email_unique" on "users" ("email") where "active" = \'1\'', $statements[0]);
+    }
+
+    public function testAddingPartialUniqueKeyWithNullValueWhere()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->where('deleted_at', null);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "users_email_unique" on "users" ("email") where "deleted_at" is null', $statements[0]);
+    }
+
     public function testAddingPartialIndexWithWhereNull()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');

@@ -531,7 +531,29 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Reject partial index predicates on unsupported schema commands.
+     *
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    protected function ensurePartialIndexCommandIsSupported(Fluent $command)
+    {
+        if (! $this->hasWhereClause($command)) {
+            return;
+        }
+
+        if (! in_array($command->name, ['unique', 'index'], true)) {
+            throw new RuntimeException("Partial indexes are not supported for [{$command->name}] commands.");
+        }
+    }
+
+    /**
      * Compile a partial index WHERE clause for the given index command.
+     *
+     * Supports structured attributes from IndexDefinition and a plain string
+     * attribute for direct / legacy attribute assignment.
      *
      * @param  \Illuminate\Support\Fluent  $command
      * @return string
@@ -543,6 +565,8 @@ abstract class Grammar extends BaseGrammar
         if (is_null($command->where)) {
             return '';
         }
+
+        $this->ensurePartialIndexCommandIsSupported($command);
 
         $where = $command->where;
 
@@ -581,7 +605,7 @@ abstract class Grammar extends BaseGrammar
         }
 
         if (is_bool($value)) {
-            return $value ? '1' : '0';
+            return $this->getDefaultValue($value);
         }
 
         if (is_numeric($value)) {

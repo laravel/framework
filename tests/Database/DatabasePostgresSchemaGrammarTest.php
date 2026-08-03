@@ -14,6 +14,7 @@ use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class DatabasePostgresSchemaGrammarTest extends TestCase
 {
@@ -363,10 +364,30 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create unique index "users_email_active_unique" on "users" ("email") where "email" is not null', $statements[0]);
     }
 
+    public function testAddingPartialUniqueKeyWithOneArgumentWhere()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->where('deleted_at');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "users_email_unique" on "users" ("email") where "deleted_at" is null', $statements[0]);
+    }
+
+    public function testAddingPartialUniqueKeyWithNullValueWhere()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->where('deleted_at', null);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "users_email_unique" on "users" ("email") where "deleted_at" is null', $statements[0]);
+    }
+
     public function testAddingPartialUniqueKeyWithRawWhere()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
-        $blueprint->unique('email')->where('deleted_at is null');
+        $blueprint->unique('email')->whereRaw('deleted_at is null');
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
@@ -380,7 +401,37 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('create unique index "users_email_unique" on "users" ("email") where "active" = 1', $statements[0]);
+        $this->assertSame('create unique index "users_email_unique" on "users" ("email") where "active" = \'1\'', $statements[0]);
+    }
+
+    public function testAddingPartialUniqueKeyWithNullsNotDistinct()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->whereNull('deleted_at')->nullsNotDistinct();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "users_email_unique" on "users" ("email") nulls not distinct where "deleted_at" is null', $statements[0]);
+    }
+
+    public function testAddingPartialUniqueKeyWithDeferrableThrowsException()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Partial unique indexes may not be deferrable.');
+
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->whereNull('deleted_at')->deferrable();
+        $blueprint->toSql();
+    }
+
+    public function testAddingPartialPrimaryKeyThrowsException()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Partial indexes are not supported for [primary] commands.');
+
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->primary('id')->whereNull('deleted_at');
+        $blueprint->toSql();
     }
 
     public function testAddingPartialUniqueKeyOnline()
@@ -391,6 +442,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create unique index concurrently "users_email_unique" on "users" ("email") where "deleted_at" is null', $statements[0]);
+    }
+
+    public function testDroppingPartialUniqueUsesDropIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->dropIndex('users_email_unique');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('drop index "users_email_unique"', $statements[0]);
     }
 
     public function testAddingIndex()

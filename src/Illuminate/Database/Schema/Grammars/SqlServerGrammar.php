@@ -256,6 +256,8 @@ class SqlServerGrammar extends Grammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
+        $this->ensurePartialIndexCommandIsSupported($command);
+
         return sprintf('alter table %s add constraint %s primary key (%s)',
             $this->wrapTable($blueprint),
             $this->wrap($command->index),
@@ -308,6 +310,8 @@ class SqlServerGrammar extends Grammar
      */
     public function compileSpatialIndex(Blueprint $blueprint, Fluent $command)
     {
+        $this->ensurePartialIndexCommandIsSupported($command);
+
         return sprintf('create spatial index %s on %s (%s)',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),

@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Illuminate\Support\Fluent;
+use InvalidArgumentException;
 
 /**
  * @method $this algorithm(string $algorithm) Specify an algorithm for the index (MySQL/PostgreSQL)
@@ -16,38 +17,49 @@ use Illuminate\Support\Fluent;
 class IndexDefinition extends Fluent
 {
     /**
+     * The valid operators for partial index where clauses.
+     *
+     * @var list<string>
+     */
+    protected $operators = ['=', '<', '>', '<=', '>=', '<>', '!=', '<=>'];
+
+    /**
      * Specify a partial index predicate.
      *
-     * Supported by PostgreSQL, SQLite, and SQL Server. MySQL and MariaDB do not
-     * support partial indexes and will throw a RuntimeException when compiling.
+     * Semantics match the query builder where possible:
      *
-     * When a single argument is provided, it is treated as a raw SQL fragment:
-     *
-     *     $table->unique('email')->where('deleted_at is null');
-     *
-     * Column / operator / value forms are also supported:
-     *
+     *     $table->unique('email')->where('deleted_at');          // IS NULL
+     *     $table->unique('email')->where('deleted_at', null);    // IS NULL
      *     $table->index('status')->where('active', true);
      *     $table->index('status')->where('active', '=', 1);
+     *
+     * Use whereRaw() for raw SQL predicates. Partial indexes are supported by
+     * PostgreSQL, SQLite, and SQL Server. On PostgreSQL, drop partial unique
+     * indexes with dropIndex() rather than dropUnique().
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function where($column, $operator = null, $value = null)
     {
         if (func_num_args() === 1) {
-            $this->attributes['where'] = [
-                'type' => 'Raw',
-                'sql' => $column,
-            ];
-
-            return $this;
+            return $this->whereNull($column);
         }
 
         if (func_num_args() === 2) {
             [$value, $operator] = [$operator, '='];
+        } elseif ($this->invalidOperator($operator)) {
+            throw new InvalidArgumentException('Illegal operator for partial index where clause.');
+        }
+
+        if (is_null($value)) {
+            return in_array($operator, ['=', '<=>'], true)
+                ? $this->whereNull($column)
+                : $this->whereNotNull($column);
         }
 
         $this->attributes['where'] = [
@@ -61,11 +73,33 @@ class IndexDefinition extends Fluent
     }
 
     /**
+     * Specify a raw partial index predicate.
+     *
+     *     $table->unique('email')->whereRaw('deleted_at is null');
+     *
+     * On PostgreSQL, drop partial unique indexes with dropIndex() rather than dropUnique().
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $expression
+     * @return $this
+     */
+    public function whereRaw($expression)
+    {
+        $this->attributes['where'] = [
+            'type' => 'Raw',
+            'sql' => $expression,
+        ];
+
+        return $this;
+    }
+
+    /**
      * Specify a partial index "where null" predicate.
      *
      * Useful for soft-delete-aware unique indexes:
      *
      *     $table->unique(['user_id', 'slug'])->whereNull('deleted_at');
+     *
+     * On PostgreSQL, drop partial unique indexes with dropIndex() rather than dropUnique().
      *
      * @param  string  $column
      * @return $this
@@ -94,5 +128,16 @@ class IndexDefinition extends Fluent
         ];
 
         return $this;
+    }
+
+    /**
+     * Determine if the given operator is supported.
+     *
+     * @param  mixed  $operator
+     * @return bool
+     */
+    protected function invalidOperator($operator)
+    {
+        return ! is_string($operator) || ! in_array(strtolower($operator), $this->operators, true);
     }
 }
