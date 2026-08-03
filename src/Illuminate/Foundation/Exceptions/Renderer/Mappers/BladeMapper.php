@@ -266,6 +266,9 @@ class BladeMapper
      */
     protected function addLineNumbers(string $value, string $pattern)
     {
+        // The "?? $value" falls back to the original string if the pattern hits
+        // the PCRE recursion/backtrack limit, in which case preg_replace_callback()
+        // returns null instead of throwing.
         return preg_replace_callback($pattern, function ($match) use ($value) {
             $position = mb_strlen(substr($value, 0, $match[0][1]));
 

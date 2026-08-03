@@ -267,6 +267,9 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function replaceEmbeddedAttachments(string $renderedView, array $attachments)
     {
+        // The "?? $renderedView" falls back to the original view if the pattern hits
+        // the PCRE recursion/backtrack limit, in which case preg_replace_callback()
+        // returns null instead of throwing.
         return preg_replace_callback('/<img.+?src=[\'"]cid:([^\'"]+)[\'"].*?>/is', function ($matches) use ($attachments) {
             foreach ($attachments as $attachment) {
                 if ($attachment->getContentId() === $matches[1] || $attachment->getFilename() === $matches[1]) {
