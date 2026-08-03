@@ -459,6 +459,12 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function hasCorrectSignature(Request $request, $absolute = true, Closure|array $ignoreQuery = [])
     {
+        $signature = $request->query('signature');
+
+        if (! is_string($signature)) {
+            return false;
+        }
+
         $url = $absolute
             ? rtrim($request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo(), '/')
             : '/'.$request->path();
@@ -484,12 +490,6 @@ class UrlGenerator implements UrlGeneratorContract
         $keys = call_user_func($this->keyResolver);
 
         $keys = is_array($keys) ? $keys : [$keys];
-
-        $signature = $request->query('signature');
-
-        if (! is_string($signature)) {
-            return false;
-        }
 
         return array_any($keys, fn ($key) => hash_equals(
             hash_hmac('sha256', $original, $key),
