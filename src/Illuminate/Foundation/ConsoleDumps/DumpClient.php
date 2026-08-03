@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\ConsoleDumps;
 
+use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Throwable;
 
@@ -38,7 +39,7 @@ class DumpClient
             $this->host = 'tcp://'.$this->host;
         }
 
-        $this->cloner = $cloner ?: new VarCloner;
+        $this->cloner = $cloner ?: tap(new VarCloner)->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
     }
 
     /**
@@ -46,11 +47,17 @@ class DumpClient
      *
      * @param  array<string, mixed>  $context
      */
-    public function dump(mixed $value, array $context = []): void
+    public function dump(mixed $value, array $context = [], ?string $label = null): void
     {
         try {
+            $data = $this->cloner->cloneVar($value);
+
+            if (! is_null($label)) {
+                $data = $data->withContext(['label' => $label]);
+            }
+
             $payload = base64_encode(serialize([
-                $this->cloner->cloneVar($value),
+                $data,
                 array_filter(['timestamp' => microtime(true), ...$context]),
             ]))."\n";
 
@@ -111,7 +118,11 @@ class DumpClient
             return false;
         }
 
-        stream_set_blocking($socket, false);
+        if (! @stream_set_blocking($socket, false)) {
+            @fclose($socket);
+
+            return false;
+        }
 
         $this->socket = $socket;
 
@@ -124,14 +135,16 @@ class DumpClient
     protected function disconnect(): void
     {
         if (is_resource($this->socket)) {
-            fclose($this->socket);
+            @fclose($this->socket);
         }
 
         $this->socket = null;
     }
 
     /**
-     * Disconnect from the dump server.
+     * Handle the object's destruction.
+     *
+     * @return void
      */
     public function __destruct()
     {

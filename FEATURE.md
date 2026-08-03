@@ -11,7 +11,7 @@ A experiência deve ser semelhante à do `dump()`: o conteúdo será exibido de 
 1. O helper `doc()` recebe o valor e obtém ou instancia um cliente.
 2. O cliente envia o dump para um servidor local por meio de uma conexão TCP.
 3. Um comando Artisan mantém o servidor ativo e recebe os dumps.
-4. O servidor restaura e exibe o conteúdo no terminal usando a formatação do Symfony VarDumper e os padrões visuais do Laravel.
+4. Um renderer restaura e exibe o conteúdo no terminal usando a formatação do Symfony VarDumper e os padrões visuais do Laravel.
 
 ## Decisões de nomenclatura
 
@@ -32,7 +32,7 @@ A experiência deve ser semelhante à do `dump()`: o conteúdo será exibido de 
 - A estrutura, a organização e o estilo do código devem seguir as convenções existentes no Laravel para aumentar as chances de aceitação do futuro pull request.
 - O [Laravel Ray](https://github.com/spatie/laravel-ray) pode servir como referência para decisões que já tenham sido bem resolvidas, sem criar acoplamento ou copiar complexidade desnecessária.
 - Todas as interações, nomenclaturas e mensagens presentes no código devem estar em inglês.
-- Branches, arquivos, mensagens de commit e demais artefatos do projeto não podem conter referências a ferramentas de inteligência artificial.
+- Branches, arquivos, mensagens de commit e demais artefatos devem usar somente nomenclaturas relacionadas ao projeto e à funcionalidade.
 
 ## Etapas
 
@@ -42,4 +42,5 @@ Executar uma etapa por vez e iniciar a seguinte somente após a conclusão da an
 - [x] Criar a estrutura-base de diretórios.
 - [x] Criar o servidor e o cliente.
 - [x] Criar o comando Artisan.
-- [ ] Criar o helper `doc()`.
+- [x] Criar o helper `doc()`.
+- [x] Revisar a implementação, a documentação e os testes.

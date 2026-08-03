@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Foundation\Concerns\ResolvesDumpSource;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -24,7 +25,7 @@ class CliDumper extends BaseCliDumper
     /**
      * The output instance.
      *
-     * @var \Symfony\Component\Console\Output\OutputInterface
+     * @var OutputInterface
      */
     protected $output;
 
@@ -45,7 +46,7 @@ class CliDumper extends BaseCliDumper
     /**
      * Create a new CLI dumper instance.
      *
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @param  OutputInterface  $output
      * @param  string  $basePath
      * @param  string  $compiledViewPath
      */
@@ -69,9 +70,9 @@ class CliDumper extends BaseCliDumper
      */
     public static function register($basePath, $compiledViewPath)
     {
-        $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
+        $cloner = tap(new VarCloner)->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
 
-        $dumper = new static(new ConsoleOutput(), $basePath, $compiledViewPath);
+        $dumper = new static(new ConsoleOutput, $basePath, $compiledViewPath);
 
         VarDumper::setHandler(fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
     }
@@ -79,10 +80,10 @@ class CliDumper extends BaseCliDumper
     /**
      * Dump a variable with its source file / line.
      *
-     * @param  \Symfony\Component\VarDumper\Cloner\Data  $data
+     * @param  array{0: string, 1: string, 2: int|null}|null  $source
      * @return void
      */
-    public function dumpWithSource(Data $data)
+    public function dumpWithSource(Data $data, ?array $source = null)
     {
         if ($this->dumping) {
             $this->dump($data);
@@ -95,7 +96,9 @@ class CliDumper extends BaseCliDumper
         $output = (string) $this->dump($data, true);
         $lines = explode("\n", $output);
 
-        $lines[array_key_last($lines) - 1] .= $this->getDumpSourceContent();
+        $lines[array_key_last($lines) - 1] .= $this->getDumpSourceContent(
+            func_num_args() === 1 ? $this->resolveDumpSource() : $source
+        );
 
         $this->output->write(implode("\n", $lines));
 
@@ -105,11 +108,12 @@ class CliDumper extends BaseCliDumper
     /**
      * Get the dump's source console content.
      *
+     * @param  array{0: string, 1: string, 2: int|null}|null  $dumpSource
      * @return string
      */
-    protected function getDumpSourceContent()
+    protected function getDumpSourceContent(?array $dumpSource)
     {
-        if (is_null($dumpSource = $this->resolveDumpSource())) {
+        if (is_null($dumpSource)) {
             return '';
         }
 

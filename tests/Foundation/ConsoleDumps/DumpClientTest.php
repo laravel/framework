@@ -16,13 +16,14 @@ class DumpClientTest extends TestCase
         $client = new DumpClient($host);
         $client->dump(['name' => 'Taylor'], [
             'source' => ['file' => '/app/routes/web.php', 'line' => 10],
-        ]);
+        ], 'result');
 
         $connection = stream_socket_accept($server, 1);
         [$data, $context] = unserialize(base64_decode(fgets($connection)));
 
         $this->assertInstanceOf(Data::class, $data);
         $this->assertSame(['name' => 'Taylor'], $data->getValue(true));
+        $this->assertSame('result', $data->getContext()['label']);
         $this->assertIsFloat($context['timestamp']);
         $this->assertSame(
             ['file' => '/app/routes/web.php', 'line' => 10],
