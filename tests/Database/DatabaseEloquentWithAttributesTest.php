@@ -25,8 +25,6 @@ class DatabaseEloquentWithAttributesTest extends TestCase
     protected function tearDown(): void
     {
         $this->schema()->dropIfExists((new WithAttributesModel)->getTable());
-
-        parent::tearDown();
     }
 
     public function testAddsAttributes(): void

@@ -27,8 +27,6 @@ class SupportFacadesEventTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->events = m::mock(Dispatcher::class);
 
         $container = new Container;
@@ -44,8 +42,6 @@ class SupportFacadesEventTest extends TestCase
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 
     public function testFakeFor()

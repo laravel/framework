@@ -20,8 +20,6 @@ class PruneCommandTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         Application::setInstance($container = new Application(__DIR__.'/Pruning'));
 
         Closure::bind(
@@ -269,7 +267,5 @@ class PruneCommandTest extends TestCase
     protected function tearDown(): void
     {
         Application::setInstance(null);
-
-        parent::tearDown();
     }
 }

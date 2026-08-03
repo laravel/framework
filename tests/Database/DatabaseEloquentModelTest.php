@@ -75,8 +75,6 @@ class DatabaseEloquentModelTest extends TestCase
     {
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();
-
-        parent::tearDown();
     }
 
     public function testAttributeManipulation()
@@ -2566,6 +2564,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame([], $model->toArray());
     }
 
+    public function testToArrayPassesRealValueToAppendedAccessor()
+    {
+        $model = new EloquentModelAppendsWithExistingAttributeStub;
+        $model->price = 100;
+
+        $this->assertSame(100, $model->price);
+        $this->assertSame(100, $model->toArray()['price']);
+    }
+
     public function testMergeAppendsMergesAppends()
     {
         $model = new EloquentModelAppendsStub;
@@ -4304,6 +4311,18 @@ class EloquentModelAppendsStub extends Model
     public function getStudlyCasedAttribute()
     {
         return 'StudlyCased';
+    }
+}
+
+class EloquentModelAppendsWithExistingAttributeStub extends Model
+{
+    protected $guarded = [];
+
+    protected $appends = ['price'];
+
+    protected function price(): Attribute
+    {
+        return Attribute::get(fn ($value) => $value);
     }
 }
 

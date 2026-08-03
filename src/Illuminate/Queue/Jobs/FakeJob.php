@@ -35,7 +35,7 @@ class FakeJob extends Job implements JobContract
      */
     public function getJobId()
     {
-        return once(fn () => (string) Str::uuid());
+        return once(fn () => Str::uuid()->toString());
     }
 
     /**

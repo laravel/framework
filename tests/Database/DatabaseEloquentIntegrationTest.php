@@ -207,8 +207,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Str::createUuidsNormally();
         DB::flushQueryLog();
-
-        parent::tearDown();
     }
 
     /**

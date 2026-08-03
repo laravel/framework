@@ -39,8 +39,6 @@ class FilesystemTest extends TestCase
     {
         $files = new Filesystem;
         $files->deleteDirectory(self::$tempDir, $preserve = true);
-
-        parent::tearDown();
     }
 
     public function testGetRetrievesFiles()

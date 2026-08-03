@@ -945,6 +945,20 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo/bar/baz', Str::replace(' ', '/', 'foo bar baz'));
         $this->assertSame('foo bar baz', Str::replace(['?1', '?2', '?3'], ['foo', 'bar', 'baz'], '?1 ?2 ?3'));
         $this->assertSame(['foo', 'bar', 'baz'], Str::replace(collect(['?1', '?2', '?3']), collect(['foo', 'bar', 'baz']), collect(['?1', '?2', '?3'])));
+
+        $this->assertSame('Xltý kôň', Str::replace('ž', 'X', 'Žltý kôň', false));
+        $this->assertSame('žltý pes', Str::replace('KÔŇ', 'pes', 'žltý kôň', false));
+        $this->assertSame('Xltý pes', Str::replace(['ž', 'KÔŇ'], ['X', 'pes'], 'Žltý kôň', false));
+        $this->assertSame(['Xltý', 'kôň'], Str::replace('ž', 'X', ['Žltý', 'kôň'], false));
+        $this->assertSame('ſ Yito X', Str::replace(['s', 'ž'], ['X', 'Y'], 'ſ žito s', false));
+        $this->assertSame("caf\xC3 X", Str::replace('ž', 'X', "caf\xC3 ž", false));
+    }
+
+    public function testReplaceThrowsForScalarSearchAndArrayReplacement()
+    {
+        $this->expectException(\TypeError::class);
+
+        Str::replace('ž', ['X'], 'Ž', false);
     }
 
     public function testReplaceArray()
@@ -1026,6 +1040,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('Fooar', Str::remove(['f', 'b'], 'Foobar'));
         $this->assertSame('ooar', Str::remove(['f', 'b'], 'Foobar', false));
         $this->assertSame('Foobar', Str::remove(['f', '|'], 'Foo|bar'));
+
+        $this->assertSame('ltý', Str::remove('ž', 'Žltý', false));
+        $this->assertSame('žltý ', Str::remove('KÔŇ', 'žltý kôň', false));
     }
 
     public function testReverse()
@@ -1696,25 +1713,25 @@ class SupportStrTest extends TestCase
         $this->assertSame($expected, Str::transliterate($value, '?', true));
     }
 
-    public function testItCanFreezeUuids()
+    public function testItCanFreezeUuids(): void
     {
-        $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
+        $this->assertNotSame(Str::uuid()->toString(), Str::uuid()->toString());
         $this->assertNotSame(Str::uuid(), Str::uuid());
 
         $uuid = Str::freezeUuids();
 
         $this->assertSame($uuid, Str::uuid());
         $this->assertSame(Str::uuid(), Str::uuid());
-        $this->assertSame((string) $uuid, (string) Str::uuid());
-        $this->assertSame((string) Str::uuid(), (string) Str::uuid());
+        $this->assertSame($uuid->toString(), Str::uuid()->toString());
+        $this->assertSame(Str::uuid()->toString(), Str::uuid()->toString());
 
         Str::createUuidsNormally();
 
         $this->assertNotSame(Str::uuid(), Str::uuid());
-        $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
+        $this->assertNotSame(Str::uuid()->toString(), Str::uuid()->toString());
     }
 
-    public function testItCanFreezeUuidsInAClosure()
+    public function testItCanFreezeUuidsInAClosure(): void
     {
         $uuids = [];
 
@@ -1725,14 +1742,14 @@ class SupportStrTest extends TestCase
         });
 
         $this->assertSame($uuid, $uuids[0]);
-        $this->assertSame((string) $uuid, (string) $uuids[0]);
-        $this->assertSame((string) $uuids[0], (string) $uuids[1]);
+        $this->assertSame($uuid->toString(), $uuids[0]->toString());
+        $this->assertSame($uuids[0]->toString(), $uuids[1]->toString());
         $this->assertSame($uuids[0], $uuids[1]);
-        $this->assertSame((string) $uuids[0], (string) $uuids[1]);
+        $this->assertSame($uuids[0]->toString(), $uuids[1]->toString());
         $this->assertSame($uuids[1], $uuids[2]);
-        $this->assertSame((string) $uuids[1], (string) $uuids[2]);
+        $this->assertSame($uuids[1]->toString(), $uuids[2]->toString());
         $this->assertNotSame(Str::uuid(), Str::uuid());
-        $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
+        $this->assertNotSame(Str::uuid()->toString(), Str::uuid()->toString());
 
         Str::createUuidsNormally();
     }

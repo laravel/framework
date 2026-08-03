@@ -47,8 +47,6 @@ class FilesystemAdapterTest extends TestCase
         $filesystem->deleteDirectory(basename($this->tempDir));
 
         unset($this->tempDir, $this->filesystem, $this->adapter);
-
-        parent::tearDown();
     }
 
     public function testResponse()

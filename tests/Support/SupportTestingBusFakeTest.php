@@ -23,7 +23,6 @@ class SupportTestingBusFakeTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->fake = new BusFake(m::mock(QueueingDispatcher::class));
     }
 

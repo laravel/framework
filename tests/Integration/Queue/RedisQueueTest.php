@@ -560,12 +560,8 @@ class RedisQueueTest extends TestCase
      * uses zadd directly (which triggers phpredis serialization) instead of a Lua
      * script (which bypasses serialization like pushRaw does).
      */
-    public function testDelayedJobsWorkWithPhpRedisSerializationEnabled()
+    public function testDelayedJobsWorkWithPhpRedisSerializationEnabled(): void
     {
-        if (! extension_loaded('redis')) {
-            $this->markTestSkipped('The redis extension is not installed.');
-        }
-
         // Get the phpredis connection and enable serialization
         $connection = $this->redis['phpredis']->connection();
         $client = $connection->client();

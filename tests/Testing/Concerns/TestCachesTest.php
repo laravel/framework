@@ -18,8 +18,6 @@ class TestCachesTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         Container::setInstance($container = new Container);
 
         Facade::setFacadeApplication($container);
@@ -57,8 +55,6 @@ class TestCachesTest extends TestCase
         };
 
         (new ReflectionProperty($instance::class, 'originalCachePrefix'))->setValue(null, null);
-
-        parent::tearDown();
     }
 
     #[DataProvider('cachePrefixes')]

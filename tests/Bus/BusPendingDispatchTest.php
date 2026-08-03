@@ -29,8 +29,6 @@ class BusPendingDispatchTest extends TestCase
     {
         $this->job = m::mock(stdClass::class);
         $this->pendingDispatch = new PendingDispatchWithoutDestructor($this->job);
-
-        parent::setUp();
     }
 
     public function testOnConnection()

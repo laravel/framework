@@ -105,8 +105,6 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->schema()->drop('users');
 
         Container::setInstance(null);
-
-        parent::tearDown();
     }
 
     public function test_basic_model_can_be_created()

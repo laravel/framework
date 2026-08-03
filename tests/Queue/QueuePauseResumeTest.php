@@ -20,8 +20,6 @@ class QueuePauseResumeTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->cache = new Repository(new ArrayStore);
 
         // Mock the cache facade to return our cache repository

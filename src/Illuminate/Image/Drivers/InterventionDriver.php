@@ -175,7 +175,8 @@ abstract class InterventionDriver implements Driver
         $sample = clone $image;
 
         try {
-            return $sample->resize(1, 1)->colorAt(0, 0)->toHex(true);
+            // Interpolation during the 1x1 resize can leave alpha slightly non-opaque, so it's dropped here.
+            return substr($sample->resize(1, 1)->colorAt(0, 0)->toHex(true), 0, 7);
         } finally {
             unset($sample);
         }

@@ -30,7 +30,6 @@ class SupportTestingMailFakeTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->mailManager = m::mock(MailManager::class, function ($mock) {
             $mock->shouldReceive('getDefaultDriver')
                 ->andReturn('smtp');

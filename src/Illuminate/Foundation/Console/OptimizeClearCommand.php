@@ -45,7 +45,7 @@ class OptimizeClearCommand extends Command
             ->toArray();
 
         foreach ($tasks as $description => $command) {
-            $this->components->task($description, fn () => $this->callSilently($command) == 0);
+            $this->components->task($description, fn () => $this->callSilently($command) === 0);
         }
 
         $this->newLine();

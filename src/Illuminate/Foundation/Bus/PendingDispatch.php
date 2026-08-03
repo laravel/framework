@@ -282,13 +282,11 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        $this->addUniqueJobInformationToContext($this->job);
-
         if (! $this->shouldDispatch()) {
-            $this->removeUniqueJobInformationFromContext($this->job);
-
             return;
         }
+
+        $this->addUniqueJobInformationToContext($this->job);
 
         $this->acquireDebounceLock();
 

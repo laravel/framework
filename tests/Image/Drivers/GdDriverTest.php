@@ -20,6 +20,7 @@ use Illuminate\Image\Transformations\Rotate;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
 use Intervention\Image\Interfaces\ImageInterface;
+use PHPUnit\Framework\Attributes\RequiresFunction;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -85,12 +86,9 @@ class GdDriverTest extends TestCase
         $this->assertSame(IMAGETYPE_GIF, getimagesizefromstring($result)[2]);
     }
 
-    public function test_processes_optimize_to_avif()
+    #[RequiresFunction('imageavif')]
+    public function test_processes_optimize_to_avif(): void
     {
-        if (! function_exists('imageavif')) {
-            $this->markTestSkipped('The GD extension was not compiled with AVIF support.');
-        }
-
         $driver = new GdDriver;
 
         $pipeline = $this->pipeline(format: 'avif');
@@ -100,12 +98,9 @@ class GdDriverTest extends TestCase
         $this->assertSame(IMAGETYPE_AVIF, getimagesizefromstring($result)[2]);
     }
 
-    public function test_processes_avif_input()
+    #[RequiresFunction('imageavif')]
+    public function test_processes_avif_input(): void
     {
-        if (! function_exists('imageavif')) {
-            $this->markTestSkipped('The GD extension was not compiled with AVIF support.');
-        }
-
         $driver = new GdDriver;
         $contents = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'avif'));
 
@@ -175,6 +170,14 @@ class GdDriverTest extends TestCase
     {
         $driver = new GdDriver;
         $contents = $this->solidColorImageContents(0, 128, 255);
+
+        $this->assertSame('#0080ff', $driver->dominantColor($contents));
+    }
+
+    public function test_dominant_color_ignores_alpha_channel(): void
+    {
+        $driver = new GdDriver;
+        $contents = $this->semiTransparentColorImageContents(0, 128, 255, 128);
 
         $this->assertSame('#0080ff', $driver->dominantColor($contents));
     }
@@ -485,6 +488,21 @@ class GdDriverTest extends TestCase
     {
         $image = imagecreatetruecolor($width, $height);
         $color = imagecolorallocate($image, $red, $green, $blue);
+        imagefill($image, 0, 0, $color);
+
+        ob_start();
+        imagepng($image);
+
+        return ob_get_clean();
+    }
+
+    protected function semiTransparentColorImageContents(int $red, int $green, int $blue, int $alpha, int $width = 100, int $height = 100): string
+    {
+        $image = imagecreatetruecolor($width, $height);
+        imagesavealpha($image, true);
+        // GD alpha runs 0 (opaque) to 127 (fully transparent), the inverse of a 0-255 alpha channel.
+        $gdAlpha = (int) round((255 - $alpha) / 255 * 127);
+        $color = imagecolorallocatealpha($image, $red, $green, $blue, $gdAlpha);
         imagefill($image, 0, 0, $color);
 
         ob_start();

@@ -314,7 +314,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
 
         foreach ($notifiables as $notifiable) {
             if (! $notification->id) {
-                $notification->id = (string) Str::uuid();
+                $notification->id = Str::uuid()->toString();
             }
 
             $notifiableChannels = $channels ?: $notification->via($notifiable);

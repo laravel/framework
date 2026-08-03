@@ -87,7 +87,7 @@ class FreshCommand extends Command
                     '--drop-views' => $this->option('drop-views'),
                     '--drop-types' => $this->option('drop-types'),
                     '--force' => true,
-                ])) == 0);
+                ])) === 0);
             }
         });
 

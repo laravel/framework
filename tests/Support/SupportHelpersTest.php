@@ -20,6 +20,7 @@ use IteratorAggregate;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
@@ -31,8 +32,6 @@ class SupportHelpersTest extends TestCase
     protected function setUp(): void
     {
         mkdir(__DIR__.'/tmp');
-
-        parent::setUp();
     }
 
     protected function tearDown(): void
@@ -40,8 +39,6 @@ class SupportHelpersTest extends TestCase
         if (is_dir(__DIR__.'/tmp')) {
             (new Filesystem)->deleteDirectory(__DIR__.'/tmp');
         }
-
-        parent::tearDown();
     }
 
     public function testE()
@@ -1612,12 +1609,9 @@ class SupportHelpersTest extends TestCase
         );
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testLazy(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
@@ -1632,12 +1626,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testLazyCanAcceptShortClosure(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => $instance->__construct('foo', 'bar'));
@@ -1650,12 +1641,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
-    public function testLazyThrowsExceptionWhenConstructorIsNotCalled()
+    #[RequiresPhp('>= 8.4.0')]
+    public function testLazyThrowsExceptionWhenConstructorIsNotCalled(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         $instance = lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
             //
         });
@@ -1668,12 +1656,9 @@ class SupportHelpersTest extends TestCase
         $instance->first;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testLazyCanAcceptHashForProperties(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => [
@@ -1689,12 +1674,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testLazyCanAcceptListForProperties(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => ['foo', 'bar']);
@@ -1707,12 +1689,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testLazyCanAcceptSingleValueForConstructor(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClassWithArrayParameter::$constructorCalled = false;
 
         $instance = lazy(SupportLazyClassWithArrayParameter::class, fn (SupportLazyClassWithArrayParameter $instance) => [['foo']]);
@@ -1724,12 +1703,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClassWithArrayParameter::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testLazySupportsPositionAndNamedArguments(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => ['foo', 'second' => 'bar']);
@@ -1742,12 +1718,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testLazyThrowsWhenPositionalArgumentsComeAfterNamedArguments(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => ['second' => 'bar', 'foo']);
@@ -1759,12 +1732,9 @@ class SupportHelpersTest extends TestCase
         $instance->first;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testLazyCanReturnInitializedObject(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
@@ -1781,12 +1751,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testLazyMustInitilizeObject(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
@@ -1800,12 +1767,9 @@ class SupportHelpersTest extends TestCase
         $instance->first;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testLazyCanEagerlySetProperties(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(SupportLazyClass::class, fn () => ['foo', 'bar'], eager: ['eager' => 'baz']);
@@ -1820,12 +1784,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyLazy(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(function (SupportLazyClass $instance) {
@@ -1840,12 +1801,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyLazyCanAcceptShortClosure(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(fn (SupportLazyClass $instance) => $instance->__construct('foo', 'bar'));
@@ -1858,12 +1816,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
-    public function testClosureOnlyLazyThrowsExceptionWhenConstructorIsNotCalled()
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyLazyThrowsExceptionWhenConstructorIsNotCalled(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         $instance = lazy(function (SupportLazyClass $instance) {
             //
         });
@@ -1876,12 +1831,9 @@ class SupportHelpersTest extends TestCase
         $instance->first;
     }
 
-    public function testClosureOnlyLazyThrowsWhenNotClassSpecifiedInClosure()
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyLazyThrowsWhenNotClassSpecifiedInClosure(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The first parameter of the given Closure is missing a type hint.');
 
@@ -1890,12 +1842,9 @@ class SupportHelpersTest extends TestCase
         });
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyLazyCanAcceptHashForProperties(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(fn (SupportLazyClass $instance) => [
@@ -1911,12 +1860,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyLazyCanAcceptListForProperties(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(fn (SupportLazyClass $instance) => ['foo', 'bar']);
@@ -1929,12 +1875,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testClousureOnlyLazyCanAcceptSingleValueForConstructor(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClassWithArrayParameter::$constructorCalled = false;
 
         $instance = lazy(fn (SupportLazyClassWithArrayParameter $instance) => [['foo']]);
@@ -1946,12 +1889,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClassWithArrayParameter::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyLazySupportsPositionAndNamedArguments(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(fn (SupportLazyClass $instance) => ['foo', 'second' => 'bar']);
@@ -1964,12 +1904,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyLazyThrowsWhenPositionalArgumentsComeAfterNamedArguments(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(fn (SupportLazyClass $instance) => ['second' => 'bar', 'foo']);
@@ -1981,12 +1918,9 @@ class SupportHelpersTest extends TestCase
         $instance->first;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyLazyCanReturnInitializedObject(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(function (SupportLazyClass $instance) {
@@ -2003,12 +1937,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyLazyMustInitilizeObject(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = lazy(function (SupportLazyClass $instance) {
@@ -2022,12 +1953,9 @@ class SupportHelpersTest extends TestCase
         $instance->first;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testProxy(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
         $factory = fn () => new SupportLazyClass('foo', 'bar');
 
@@ -2041,12 +1969,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testProxyCanEagerlySetProperties(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
         $factory = fn () => new SupportLazyClass('foo', 'bar');
 
@@ -2062,12 +1987,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testProxyCanEagerlySetPropertiesAndThenAlsoSetThemOnActualObject(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
         $factory = fn () => new SupportLazyClass('foo', 'bar');
 
@@ -2091,12 +2013,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testProxyCanAcceptShortClosure(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
         $factory = fn () => new SupportLazyClass('foo', 'bar');
 
@@ -2110,12 +2029,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
-    public function testProxyThrowsExceptionWhenObjectIsNotReturned()
+    #[RequiresPhp('>= 8.4.0')]
+    public function testProxyThrowsExceptionWhenObjectIsNotReturned(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         $instance = proxy(SupportLazyClass::class, function (SupportLazyClass $proxy) {
             //
         });
@@ -2128,12 +2044,9 @@ class SupportHelpersTest extends TestCase
         $instance->first;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testProxyMustNotInitilizeProxy(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = proxy(SupportLazyClass::class, function (SupportLazyClass $proxy) {
@@ -2149,12 +2062,9 @@ class SupportHelpersTest extends TestCase
         $instance->first;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyProxy(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
         $factory = fn () => new SupportLazyClass('foo', 'bar');
 
@@ -2170,12 +2080,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyProxyCanAcceptShortClosure(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
         $factory = fn () => new SupportLazyClass('foo', 'bar');
 
@@ -2189,12 +2096,9 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
-    public function testClosureOnlyProxyThrowsExceptionWhenObjectIsNotReturned()
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyProxyThrowsExceptionWhenObjectIsNotReturned(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         $instance = proxy(function (SupportLazyClass $proxy) {
             //
         });
@@ -2207,12 +2111,9 @@ class SupportHelpersTest extends TestCase
         $instance->first;
     }
 
-    public function testClosureOnlyProxyThrowsWhenNotClassSpecifiedInClosure()
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyProxyThrowsWhenNotClassSpecifiedInClosure(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The first parameter of the given Closure is missing a type hint.');
 
@@ -2221,12 +2122,9 @@ class SupportHelpersTest extends TestCase
         });
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyProxyMustNotInitilizeProxy(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
 
         $instance = proxy(function (SupportLazyClass $proxy) {
@@ -2242,12 +2140,9 @@ class SupportHelpersTest extends TestCase
         $instance->first;
     }
 
+    #[RequiresPhp('>= 8.4.0')]
     public function testProxyCanUseClosureReturnTypeForClassDetection(): void
     {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         SupportLazyClass::$constructorCalled = false;
         $factory = fn () => new SupportLazyClass('foo', 'bar');
 

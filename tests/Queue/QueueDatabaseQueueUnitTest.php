@@ -20,16 +20,17 @@ use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use ReflectionClass;
 use stdClass;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
     #[DataProvider('pushJobsDataProvider')]
-    public function testPushProperlyPushesJobOntoDatabase($uuid, $job, $displayNameStartsWith, $jobStartsWith)
+    public function testPushProperlyPushesJobOntoDatabase($uuid, $job, $displayNameStartsWith, $jobStartsWith): void
     {
         Str::createUuidsUsing(function () use ($uuid) {
-            return $uuid;
+            return Uuid::fromString($uuid);
         });
 
         $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime'])->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])->getMock();
@@ -99,9 +100,9 @@ class QueueDatabaseQueueUnitTest extends TestCase
         Str::createUuidsNormally();
     }
 
-    public function testPushIncludesBatchIdInPayloadForBatchableJob()
+    public function testPushIncludesBatchIdInPayloadForBatchableJob(): void
     {
-        $uuid = Str::uuid()->toString();
+        $uuid = Str::uuid();
 
         Str::createUuidsUsing(function () use ($uuid) {
             return $uuid;

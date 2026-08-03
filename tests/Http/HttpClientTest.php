@@ -65,8 +65,6 @@ class HttpClientTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->factory = new Factory;
 
         RequestException::truncate();
