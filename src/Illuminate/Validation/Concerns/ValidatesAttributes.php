@@ -1125,7 +1125,7 @@ trait ValidatesAttributes
 
         return $verifier->getCount(
             $table, $column, $value, $id, $idColumn, $extra
-        ) == 0;
+        ) === 0;
     }
 
     /**
