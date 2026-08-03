@@ -1534,6 +1534,19 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->acceptsMarkdown());
     }
 
+    public function testMatchesType()
+    {
+        $this->assertTrue(Request::matchesType('application/json', 'application/json'));
+
+        $this->assertTrue(Request::matchesType('application/json', 'application/vnd.api+json'));
+        $this->assertTrue(Request::matchesType('application/xml', 'application/atom+xml'));
+
+        $this->assertFalse(Request::matchesType('application/vnd.api+json', 'application/json'));
+        $this->assertFalse(Request::matchesType('application/json', 'application/xml'));
+        $this->assertFalse(Request::matchesType('application/json', 'text/json'));
+        $this->assertFalse(Request::matchesType('json', 'application/json'));
+    }
+
     public function testFormatReturnsAcceptsJson()
     {
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
