@@ -20,6 +20,7 @@ use Illuminate\Image\Transformations\Rotate;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
 use Intervention\Image\Interfaces\ImageInterface;
+use PHPUnit\Framework\Attributes\RequiresFunction;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -85,12 +86,9 @@ class GdDriverTest extends TestCase
         $this->assertSame(IMAGETYPE_GIF, getimagesizefromstring($result)[2]);
     }
 
-    public function test_processes_optimize_to_avif()
+    #[RequiresFunction('imageavif')]
+    public function test_processes_optimize_to_avif(): void
     {
-        if (! function_exists('imageavif')) {
-            $this->markTestSkipped('The GD extension was not compiled with AVIF support.');
-        }
-
         $driver = new GdDriver;
 
         $pipeline = $this->pipeline(format: 'avif');
@@ -100,12 +98,9 @@ class GdDriverTest extends TestCase
         $this->assertSame(IMAGETYPE_AVIF, getimagesizefromstring($result)[2]);
     }
 
-    public function test_processes_avif_input()
+    #[RequiresFunction('imageavif')]
+    public function test_processes_avif_input(): void
     {
-        if (! function_exists('imageavif')) {
-            $this->markTestSkipped('The GD extension was not compiled with AVIF support.');
-        }
-
         $driver = new GdDriver;
         $contents = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'avif'));
 

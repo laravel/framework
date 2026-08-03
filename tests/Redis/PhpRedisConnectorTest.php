@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Redis;
 
 use Illuminate\Redis\Connectors\PhpRedisConnector;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 class PhpRedisConnectorTest extends TestCase
@@ -201,12 +202,9 @@ class PhpRedisConnectorTest extends TestCase
         $this->assertSame(42, $connector->testParseBackoffAlgorithm(42));
     }
 
-    public function testParseBackoffAlgorithmParsesValidNames()
+    #[RequiresPhpExtension('redis')]
+    public function testParseBackoffAlgorithmParsesValidNames(): void
     {
-        if (! extension_loaded('redis')) {
-            $this->markTestSkipped('Requires phpredis extension.');
-        }
-
         $connector = new TestablePhpRedisConnector;
 
         $this->assertSame(\Redis::BACKOFF_ALGORITHM_DEFAULT, $connector->testParseBackoffAlgorithm('default'));

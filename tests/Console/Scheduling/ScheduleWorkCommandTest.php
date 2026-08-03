@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Tests\Console\Fixtures\FakeSignalsRegistry;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -43,12 +44,9 @@ class ScheduleWorkCommandTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_stop_signal_marks_the_worker_to_quit()
+    #[RequiresPhpExtension('pcntl')]
+    public function test_stop_signal_marks_the_worker_to_quit(): void
     {
-        if (! extension_loaded('pcntl')) {
-            $this->markTestSkipped('The pcntl extension is required to trap signals.');
-        }
-
         // When a handler is registered, Signals chains any handler already bound
         // to the signal (see Signals::initializeSignal). Other tests may leave
         // real handlers in place, so reset these signals to their default
