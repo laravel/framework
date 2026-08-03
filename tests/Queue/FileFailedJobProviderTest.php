@@ -70,7 +70,7 @@ class FileFailedJobProviderTest extends TestCase
         ], $failedJobs);
     }
 
-    public function testCanFindFailedJobs()
+    public function testCanFindFailedJobs(): void
     {
         [$uuid, $exception] = $this->logFailedJob();
 
@@ -80,7 +80,7 @@ class FileFailedJobProviderTest extends TestCase
             'id' => $uuid,
             'connection' => 'connection',
             'queue' => 'queue',
-            'payload' => json_encode(['uuid' => (string) $uuid]),
+            'payload' => json_encode(['uuid' => $uuid]),
             'exception' => (string) mb_convert_encoding($exception, 'UTF-8'),
             'failed_at' => $failedJob->failed_at,
             'failed_at_timestamp' => $failedJob->failed_at_timestamp,
@@ -160,7 +160,7 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertEmpty($failedJobs);
     }
 
-    public function testJobsCanBeCounted()
+    public function testJobsCanBeCounted(): void
     {
         $this->assertSame(0, $this->provider->count());
 
@@ -172,7 +172,7 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertSame(3, $this->provider->count());
     }
 
-    public function testJobsCanBeCountedByConnection()
+    public function testJobsCanBeCountedByConnection(): void
     {
         $this->logFailedJob('connection-1', 'default');
         $this->logFailedJob('connection-2', 'default');
@@ -184,7 +184,7 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertSame(1, $this->provider->count('connection-2'));
     }
 
-    public function testJobsCanBeCountedByQueue()
+    public function testJobsCanBeCountedByQueue(): void
     {
         $this->logFailedJob('database', 'queue-1');
         $this->logFailedJob('database', 'queue-2');
@@ -196,7 +196,7 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertSame(1, $this->provider->count(queue: 'queue-2'));
     }
 
-    public function testJobsCanBeCountedByQueueAndConnection()
+    public function testJobsCanBeCountedByQueueAndConnection(): void
     {
         $this->logFailedJob('connection-1', 'queue-99');
         $this->logFailedJob('connection-1', 'queue-99');
@@ -216,10 +216,10 @@ class FileFailedJobProviderTest extends TestCase
 
         $exception = new Exception("Something went wrong at job [{$uuid}].");
 
-        $this->provider->log($connection, $queue, json_encode(['uuid' => (string) $uuid]), $exception);
+        $this->provider->log($connection, $queue, json_encode(['uuid' => $uuid->toString()]), $exception);
 
         return [
-            (string) $uuid,
+            $uuid->toString(),
             $exception,
         ];
     }

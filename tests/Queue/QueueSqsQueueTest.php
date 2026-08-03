@@ -419,9 +419,9 @@ class QueueSqsQueueTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
-    public function testPushProperlyPushesJobStringOntoSqsFifoQueue()
+    public function testPushProperlyPushesJobStringOntoSqsFifoQueue(): void
     {
-        Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
+        Str::createUuidsUsing(fn () => $this->mockedUuid($this->mockedDeduplicationId));
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
         $queue->setContainer($container = m::spy(Container::class));
@@ -440,9 +440,9 @@ class QueueSqsQueueTest extends TestCase
         Str::createUuidsNormally();
     }
 
-    public function testPushProperlyPushesJobObjectOntoSqsFifoQueue()
+    public function testPushProperlyPushesJobObjectOntoSqsFifoQueue(): void
     {
-        Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
+        Str::createUuidsUsing(fn () => $this->mockedUuid($this->mockedDeduplicationId));
 
         $job = (new FakeSqsJob())->onGroup($this->mockedMessageGroupId);
 
@@ -463,9 +463,9 @@ class QueueSqsQueueTest extends TestCase
         Str::createUuidsNormally();
     }
 
-    public function testPushProperlyPushesJobObjectOntoSqsFifoQueueWithMessageGroupMethod()
+    public function testPushProperlyPushesJobObjectOntoSqsFifoQueueWithMessageGroupMethod(): void
     {
-        Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
+        Str::createUuidsUsing(fn () => $this->mockedUuid($this->mockedDeduplicationId));
 
         $job = $this->getMockBuilder(FakeSqsJobWithMessageGroup::class)->onlyMethods(['messageGroup'])->getMock();
         $job->expects($this->once())->method('messageGroup')->willReturn($this->mockedMessageGroupId);
@@ -487,9 +487,9 @@ class QueueSqsQueueTest extends TestCase
         Str::createUuidsNormally();
     }
 
-    public function testPushProperlyPushesJobObjectOntoSqsFifoQueueWithMessageGroupPropertyOverridingMethod()
+    public function testPushProperlyPushesJobObjectOntoSqsFifoQueueWithMessageGroupPropertyOverridingMethod(): void
     {
-        Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
+        Str::createUuidsUsing(fn () => $this->mockedUuid($this->mockedDeduplicationId));
 
         $job = $this->getMockBuilder(FakeSqsJobWithMessageGroup::class)->onlyMethods(['messageGroup'])->getMock();
 
@@ -563,9 +563,9 @@ class QueueSqsQueueTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
-    public function testPendingDispatchProperlyPushesJobObjectOntoSqsFifoQueue()
+    public function testPendingDispatchProperlyPushesJobObjectOntoSqsFifoQueue(): void
     {
-        Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
+        Str::createUuidsUsing(fn () => $this->mockedUuid($this->mockedDeduplicationId));
 
         $pendingDispatch = FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId);
 
@@ -692,9 +692,9 @@ class QueueSqsQueueTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
-    public function testDelayedPushProperlyPushesJobStringOntoSqsFifoQueueWithoutDelay()
+    public function testDelayedPushProperlyPushesJobStringOntoSqsFifoQueueWithoutDelay(): void
     {
-        Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
+        Str::createUuidsUsing(fn () => $this->mockedUuid($this->mockedDeduplicationId));
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
         $queue->setContainer($container = m::spy(Container::class));
@@ -714,9 +714,9 @@ class QueueSqsQueueTest extends TestCase
         Str::createUuidsNormally();
     }
 
-    public function testDelayedPushProperlyPushesJobObjectOntoSqsFifoQueueWithoutDelay()
+    public function testDelayedPushProperlyPushesJobObjectOntoSqsFifoQueueWithoutDelay(): void
     {
-        Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
+        Str::createUuidsUsing(fn () => $this->mockedUuid($this->mockedDeduplicationId));
 
         $job = (new FakeSqsJob())->onGroup($this->mockedMessageGroupId);
 
@@ -738,9 +738,9 @@ class QueueSqsQueueTest extends TestCase
         Str::createUuidsNormally();
     }
 
-    public function testDelayedPendingDispatchProperlyPushesJobObjectOntoSqsFifoQueueWithoutDelay()
+    public function testDelayedPendingDispatchProperlyPushesJobObjectOntoSqsFifoQueueWithoutDelay(): void
     {
-        Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
+        Str::createUuidsUsing(fn () => $this->mockedUuid($this->mockedDeduplicationId));
 
         $pendingDispatch = FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId)->delay($this->mockedDelay);
 
@@ -1436,5 +1436,25 @@ class QueueSqsQueueTest extends TestCase
         $job = $queue->pop($this->queueName);
 
         $this->assertInstanceOf(SqsJob::class, $job);
+    }
+
+    protected function mockedUuid(string $value)
+    {
+        return new class($value)
+        {
+            public function __construct(private readonly string $value)
+            {
+            }
+
+            public function toString(): string
+            {
+                return $this->value;
+            }
+
+            public function __toString(): string
+            {
+                return $this->value;
+            }
+        };
     }
 }
