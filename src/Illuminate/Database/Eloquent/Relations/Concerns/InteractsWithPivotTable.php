@@ -571,15 +571,8 @@ trait InteractsWithPivotTable
      */
     protected function detachUsingCustomClass($ids)
     {
-        $results = 0;
-
-        $records = $this->getCurrentlyAttachedPivotsForIds($ids);
-
-        foreach ($records as $record) {
-            $results += $record->delete();
-        }
-
-        return $results;
+        return $this->getCurrentlyAttachedPivotsForIds($ids)
+            ->reduce(fn ($carry, $record) => $carry + $record->delete(), 0);
     }
 
     /**
