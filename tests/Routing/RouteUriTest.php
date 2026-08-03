@@ -67,6 +67,16 @@ class RouteUriTest extends TestCase
                 '/foo/{bar}/baz/{qux?}/{test?}',
                 ['qux' => 'slug', 'test' => 'id'],
             ],
+            [
+                '/foo/{bar:slug}/{bar:slug}',
+                '/foo/{bar}/{bar}',
+                ['bar' => 'slug'],
+            ],
+            [
+                '/foo/{bar:slug}{baz:id}',
+                '/foo/{bar}{baz}',
+                ['bar' => 'slug', 'baz' => 'id'],
+            ],
         ];
     }
 }

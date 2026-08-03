@@ -127,6 +127,40 @@ class MailMailerTest extends TestCase
         $this->assertStringContainsString('<p>Hello World</p>', $sentMessage->toString());
     }
 
+    public function testRenderReplacesEmbeddedAttachmentCidsWithDataUris(): void
+    {
+        $view = m::mock(Factory::class);
+        $view->shouldReceive('make')->never();
+
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $rendered = $mailer->render(function ($data) {
+            $cid = $data['message']->embedData('fake-image-bytes', 'logo.png', 'image/png');
+
+            return new HtmlString('<p>Hello</p><img src="'.$cid.'">');
+        });
+
+        $this->assertStringNotContainsString('cid:', $rendered);
+        $this->assertStringContainsString(
+            'data:image/png;base64,'.base64_encode('fake-image-bytes'),
+            $rendered
+        );
+    }
+
+    public function testRenderLeavesUnmatchedEmbeddedCidsUntouched(): void
+    {
+        $view = m::mock(Factory::class);
+        $view->shouldReceive('make')->never();
+
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $rendered = $mailer->render(function ($data) {
+            return new HtmlString('<img src="cid:unknown-image">');
+        });
+
+        $this->assertStringContainsString('<img src="cid:unknown-image">', $rendered);
+    }
+
     public function testMailerSendSendsMessageWithProperPlainViewContent(): void
     {
         $view = m::mock(Factory::class);

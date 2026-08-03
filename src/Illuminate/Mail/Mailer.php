@@ -267,23 +267,19 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function replaceEmbeddedAttachments(string $renderedView, array $attachments)
     {
-        if (preg_match_all('/<img.+?src=[\'"]cid:([^\'"]+)[\'"].*?>/is', $renderedView, $matches)) {
-            foreach (array_unique($matches[1]) as $image) {
-                foreach ($attachments as $attachment) {
-                    if ($attachment->getContentId() === $image || $attachment->getFilename() === $image) {
-                        $renderedView = str_replace(
-                            'cid:'.$image,
-                            'data:'.$attachment->getContentType().';base64,'.$attachment->bodyToString(),
-                            $renderedView
-                        );
-
-                        break;
-                    }
+        return preg_replace_callback('/<img.+?src=[\'"]cid:([^\'"]+)[\'"].*?>/is', function ($matches) use ($attachments) {
+            foreach ($attachments as $attachment) {
+                if ($attachment->getContentId() === $matches[1] || $attachment->getFilename() === $matches[1]) {
+                    return str_replace(
+                        'cid:'.$matches[1],
+                        'data:'.$attachment->getContentType().';base64,'.$attachment->bodyToString(),
+                        $matches[0]
+                    );
                 }
             }
-        }
 
-        return $renderedView;
+            return $matches[0];
+        }, $renderedView) ?? $renderedView;
     }
 
     /**

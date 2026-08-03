@@ -210,13 +210,7 @@ class BladeMapper
             // Matches {{ $value }}, {!! $value !!} and  {{{ $value }}} depending on $pair
             $pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $pair[0], $pair[1]);
 
-            if (preg_match_all($pattern, $value, $matches, PREG_OFFSET_CAPTURE)) {
-                foreach (array_reverse($matches[0]) as $match) {
-                    $position = mb_strlen(substr($value, 0, $match[1]));
-
-                    $value = $this->insertLineNumberAtPosition($position, $value);
-                }
-            }
+            $value = $this->addLineNumbers($value, $pattern);
         }
 
         return $value;
@@ -230,22 +224,10 @@ class BladeMapper
      */
     protected function addStatementLineNumbers(string $value)
     {
-        $shouldInsertLineNumbers = preg_match_all(
-            '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
+        return $this->addLineNumbers(
             $value,
-            $matches,
-            PREG_OFFSET_CAPTURE
+            '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x'
         );
-
-        if ($shouldInsertLineNumbers) {
-            foreach (array_reverse($matches[0]) as $match) {
-                $position = mb_strlen(substr($value, 0, $match[1]));
-
-                $value = $this->insertLineNumberAtPosition($position, $value);
-            }
-        }
-
-        return $value;
     }
 
     /**
@@ -256,22 +238,7 @@ class BladeMapper
      */
     protected function addBladeComponentLineNumbers(string $value)
     {
-        $shouldInsertLineNumbers = preg_match_all(
-            '/<\s*x[-:]([\w\-:.]*)/mx',
-            $value,
-            $matches,
-            PREG_OFFSET_CAPTURE
-        );
-
-        if ($shouldInsertLineNumbers) {
-            foreach (array_reverse($matches[0]) as $match) {
-                $position = mb_strlen(substr($value, 0, $match[1]));
-
-                $value = $this->insertLineNumberAtPosition($position, $value);
-            }
-        }
-
-        return $value;
+        return $this->addLineNumbers($value, '/<\s*x[-:]([\w\-:.]*)/mx');
     }
 
     /**
@@ -288,6 +255,24 @@ class BladeMapper
         $lineNumber = count(explode("\n", $before));
 
         return mb_substr($value, 0, $position)."|---LINE:{$lineNumber}---|".mb_substr($value, $position);
+    }
+
+    /**
+     * Prefix each match of the given pattern with its originating line number.
+     *
+     * @param  string  $value
+     * @param  string  $pattern
+     * @return string
+     */
+    protected function addLineNumbers(string $value, string $pattern)
+    {
+        return preg_replace_callback($pattern, function ($match) use ($value) {
+            $position = mb_strlen(substr($value, 0, $match[0][1]));
+
+            $lineNumber = count(explode("\n", mb_substr($value, 0, $position)));
+
+            return "|---LINE:{$lineNumber}---|".$match[0][0];
+        }, $value, -1, $count, PREG_OFFSET_CAPTURE) ?? $value;
     }
 
     /**
