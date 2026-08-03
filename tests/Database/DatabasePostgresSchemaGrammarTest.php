@@ -460,7 +460,6 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create unique index concurrently "users_email_unique" on "users" ("email") where "deleted_at" is null', $statements[0]);
     }
 
-
     public function testAddingIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
