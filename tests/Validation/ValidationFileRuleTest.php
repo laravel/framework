@@ -504,7 +504,5 @@ class ValidationFileRuleTest extends TestCase
         Facade::clearResolvedInstances();
 
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 }

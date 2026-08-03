@@ -38,8 +38,6 @@ class SupportServiceProviderTest extends TestCase
         if (isset($this->tempFile) && file_exists($this->tempFile)) {
             @unlink($this->tempFile);
         }
-
-        parent::tearDown();
     }
 
     public function testPublishableServiceProviders()

@@ -22,8 +22,6 @@ class ConsoleEventSchedulerTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $container = Container::getInstance();
 
         $container->instance(EventMutex::class, m::mock(CacheEventMutex::class));

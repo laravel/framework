@@ -289,7 +289,5 @@ class HtmlDumperTest extends TestCase
     {
         HtmlDumper::resolveDumpSourceUsing(null);
         Container::setInstance(null);
-
-        parent::tearDown();
     }
 }

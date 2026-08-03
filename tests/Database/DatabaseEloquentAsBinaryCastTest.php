@@ -17,8 +17,6 @@ class DatabaseEloquentAsBinaryCastTest extends TestCase
         $reflection = new \ReflectionClass(BinaryCodec::class);
         $property = $reflection->getProperty('customCodecs');
         $property->setValue(null, []);
-
-        parent::tearDown();
     }
 
     public function testCastThrowsWhenFormatMissing()

@@ -23,8 +23,6 @@ class DatabaseTruncationTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->app['config'] = new Repository([
             'database' => [
                 'migrations' => [
@@ -40,8 +38,6 @@ class DatabaseTruncationTest extends TestCase
         static::$allTables = [];
         $this->tablesToTruncate = null;
         $this->exceptTables = null;
-
-        parent::tearDown();
     }
 
     public function testTruncateTables()

@@ -19,7 +19,6 @@ class PhpRedisBackoffTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->setUpRedis();
 
         $client = $this->redis['phpredis']->connection()->client();
@@ -31,8 +30,6 @@ class PhpRedisBackoffTest extends TestCase
     protected function tearDown(): void
     {
         $this->tearDownRedis();
-
-        parent::tearDown();
     }
 
     #[DataProvider('phpRedisBackoffAlgorithmsProvider')]

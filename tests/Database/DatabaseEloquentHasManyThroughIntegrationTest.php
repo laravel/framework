@@ -70,8 +70,6 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('countries');
-
-        parent::tearDown();
     }
 
     public function testItLoadsAHasManyThroughRelationWithCustomKeys()

@@ -39,8 +39,6 @@ class MiddlewareTest extends TestCase
         foreach ([Authenticate::class, AuthenticateSession::class, AuthenticationException::class, RedirectIfAuthenticated::class] as $class) {
             (new ReflectionClass($class))->getProperty('redirectToCallback')->setValue(null, null);
         }
-
-        parent::tearDown();
     }
 
     public function testConvertEmptyStringsToNull()

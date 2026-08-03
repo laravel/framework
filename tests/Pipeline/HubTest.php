@@ -14,8 +14,6 @@ class HubTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->hub = new Hub(new Container);
     }
 

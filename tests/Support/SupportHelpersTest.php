@@ -32,8 +32,6 @@ class SupportHelpersTest extends TestCase
     protected function setUp(): void
     {
         mkdir(__DIR__.'/tmp');
-
-        parent::setUp();
     }
 
     protected function tearDown(): void
@@ -41,8 +39,6 @@ class SupportHelpersTest extends TestCase
         if (is_dir(__DIR__.'/tmp')) {
             (new Filesystem)->deleteDirectory(__DIR__.'/tmp');
         }
-
-        parent::tearDown();
     }
 
     public function testE()

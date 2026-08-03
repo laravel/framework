@@ -18,8 +18,6 @@ class PreventRequestForgeryTest extends TestCase
     protected function tearDown(): void
     {
         PreventRequestForgery::flushState();
-
-        parent::tearDown();
     }
 
     public function test_same_origin_header_passes()

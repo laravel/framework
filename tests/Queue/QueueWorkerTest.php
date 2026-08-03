@@ -48,8 +48,6 @@ class QueueWorkerTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance();
-
-        parent::tearDown();
     }
 
     public function testJobCanBeFired()

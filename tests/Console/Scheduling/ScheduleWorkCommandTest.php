@@ -29,8 +29,6 @@ class ScheduleWorkCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->originalAvailabilityResolver = (new ReflectionProperty(Signals::class, 'availabilityResolver'))
             ->getValue();
 
@@ -40,8 +38,6 @@ class ScheduleWorkCommandTest extends TestCase
     protected function tearDown(): void
     {
         Signals::resolveAvailabilityUsing($this->originalAvailabilityResolver);
-
-        parent::tearDown();
     }
 
     #[RequiresPhpExtension('pcntl')]

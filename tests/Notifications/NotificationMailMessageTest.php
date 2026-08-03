@@ -22,8 +22,6 @@ class NotificationMailMessageTest extends TestCase
             $this->deleteDirectory($this->filesystemRoot);
             $this->filesystemRoot = null;
         }
-
-        parent::tearDown();
     }
 
     public function testTemplate()

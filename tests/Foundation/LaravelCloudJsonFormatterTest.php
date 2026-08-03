@@ -13,14 +13,12 @@ class LaravelCloudJsonFormatterTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
         Container::setInstance(new Container);
     }
 
     protected function tearDown(): void
     {
         Container::setInstance(null);
-        parent::tearDown();
     }
 
     protected function createRecord(): LogRecord
