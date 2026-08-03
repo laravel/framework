@@ -112,11 +112,7 @@ trait BuildsQueries
     public function each(callable $callback, $count = 1000)
     {
         return $this->chunk($count, function ($results) use ($callback) {
-            foreach ($results as $key => $value) {
-                if ($callback($value, $key) === false) {
-                    return false;
-                }
-            }
+            return array_all($results->all(), fn ($value, $key) => $callback($value, $key) !== false);
         });
     }
 
@@ -234,11 +230,10 @@ trait BuildsQueries
     public function eachById(callable $callback, $count = 1000, $column = null, $alias = null)
     {
         return $this->chunkById($count, function ($results, $page) use ($callback, $count) {
-            foreach ($results as $key => $value) {
-                if ($callback($value, (($page - 1) * $count) + $key) === false) {
-                    return false;
-                }
-            }
+            return array_all(
+                $results->all(),
+                fn ($value, $key) => $callback($value, (($page - 1) * $count) + $key) !== false
+            );
         }, $column, $alias);
     }
 

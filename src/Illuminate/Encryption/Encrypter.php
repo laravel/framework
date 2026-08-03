@@ -268,10 +268,8 @@ class Encrypter implements EncrypterContract, StringEncrypter
             return false;
         }
 
-        foreach (['iv', 'value', 'mac'] as $item) {
-            if (! isset($payload[$item]) || ! is_string($payload[$item])) {
-                return false;
-            }
+        if (! array_all(['iv', 'value', 'mac'], fn ($item) => isset($payload[$item]) && is_string($payload[$item]))) {
+            return false;
         }
 
         if (isset($payload['tag']) && ! is_string($payload['tag'])) {

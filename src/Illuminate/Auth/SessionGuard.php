@@ -506,13 +506,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function shouldLogin($callbacks, AuthenticatableContract $user)
     {
-        foreach (Arr::wrap($callbacks) as $callback) {
-            if (! $callback($user, $this)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all(Arr::wrap($callbacks), fn ($callback) => $callback($user, $this));
     }
 
     /**

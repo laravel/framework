@@ -1550,10 +1550,8 @@ trait ValidatesAttributes
     public function validateIn($attribute, $value, $parameters)
     {
         if (is_array($value) && $this->hasRule($attribute, 'Array')) {
-            foreach ($value as $element) {
-                if (is_array($element)) {
-                    return false;
-                }
+            if (! array_all($value, fn ($element) => ! is_array($element))) {
+                return false;
             }
 
             return array_diff($value, $parameters) === [];
@@ -2338,11 +2336,10 @@ trait ValidatesAttributes
     public function validateProhibits($attribute, $value, $parameters)
     {
         if ($this->validateRequired($attribute, $value)) {
-            foreach ($parameters as $parameter) {
-                if ($this->validateRequired($parameter, Arr::get($this->data, $parameter))) {
-                    return false;
-                }
-            }
+            return array_all(
+                $parameters,
+                fn ($parameter) => ! $this->validateRequired($parameter, Arr::get($this->data, $parameter))
+            );
         }
 
         return true;
