@@ -176,13 +176,10 @@ class Builder
             return (bool) $this->connection->scalar($sql);
         }
 
-        foreach ($this->getTables($schema ?? $this->getCurrentSchemaName()) as $value) {
-            if (strtolower($table) === strtolower($value['name'])) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(
+            $this->getTables($schema ?? $this->getCurrentSchemaName()),
+            fn ($value) => strtolower($table) === strtolower($value['name'])
+        );
     }
 
     /**
@@ -197,13 +194,10 @@ class Builder
 
         $view = $this->connection->getTablePrefix().$view;
 
-        foreach ($this->getViews($schema ?? $this->getCurrentSchemaName()) as $value) {
-            if (strtolower($view) === strtolower($value['name'])) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(
+            $this->getViews($schema ?? $this->getCurrentSchemaName()),
+            fn ($value) => strtolower($view) === strtolower($value['name'])
+        );
     }
 
     /**
@@ -468,13 +462,10 @@ class Builder
      */
     public function hasForeignKey($table, $foreignKey)
     {
-        foreach ($this->getForeignKeys($table) as $value) {
-            if ($value['name'] === $foreignKey || $value['columns'] === $foreignKey) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(
+            $this->getForeignKeys($table),
+            fn ($value) => $value['name'] === $foreignKey || $value['columns'] === $foreignKey
+        );
     }
 
     /**

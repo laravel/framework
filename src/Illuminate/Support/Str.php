@@ -313,21 +313,17 @@ class Str
             $haystack = mb_strtolower($haystack);
         }
 
-        if (! is_iterable($needles)) {
-            $needles = (array) $needles;
+        if (! is_array($needles)) {
+            $needles = $needles instanceof Traversable ? iterator_to_array($needles) : (array) $needles;
         }
 
-        foreach ($needles as $needle) {
+        return array_any($needles, function ($needle) use ($haystack, $ignoreCase) {
             if ($ignoreCase) {
                 $needle = mb_strtolower($needle);
             }
 
-            if ($needle !== '' && str_contains($haystack, $needle)) {
-                return true;
-            }
-        }
-
-        return false;
+            return $needle !== '' && str_contains($haystack, $needle);
+        });
     }
 
     /**
@@ -424,17 +420,11 @@ class Str
             return false;
         }
 
-        if (! is_iterable($needles)) {
-            $needles = (array) $needles;
+        if (! is_array($needles)) {
+            $needles = $needles instanceof Traversable ? iterator_to_array($needles) : (array) $needles;
         }
 
-        foreach ($needles as $needle) {
-            if ((string) $needle !== '' && str_ends_with($haystack, $needle)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($needles, fn ($needle) => (string) $needle !== '' && str_ends_with($haystack, $needle));
     }
 
     /**
@@ -920,19 +910,11 @@ class Str
     {
         $value = (string) $value;
 
-        if (! is_iterable($pattern)) {
-            $pattern = [$pattern];
+        if (! is_array($pattern)) {
+            $pattern = $pattern instanceof Traversable ? iterator_to_array($pattern) : [$pattern];
         }
 
-        foreach ($pattern as $pattern) {
-            $pattern = (string) $pattern;
-
-            if (preg_match($pattern, $value) === 1) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($pattern, fn ($pattern) => preg_match((string) $pattern, $value) === 1);
     }
 
     /**
@@ -1754,17 +1736,11 @@ class Str
             return false;
         }
 
-        if (! is_iterable($needles)) {
-            $needles = [$needles];
+        if (! is_array($needles)) {
+            $needles = $needles instanceof Traversable ? iterator_to_array($needles) : [$needles];
         }
 
-        foreach ($needles as $needle) {
-            if ((string) $needle !== '' && str_starts_with($haystack, $needle)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($needles, fn ($needle) => (string) $needle !== '' && str_starts_with($haystack, $needle));
     }
 
     /**

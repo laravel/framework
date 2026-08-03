@@ -447,13 +447,7 @@ abstract class Grammar extends BaseGrammar
      */
     protected function hasCommand(Blueprint $blueprint, $name)
     {
-        foreach ($blueprint->getCommands() as $command) {
-            if ($command->name === $name) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($blueprint->getCommands(), fn ($command) => $command->name === $name);
     }
 
     /**

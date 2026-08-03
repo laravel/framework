@@ -2281,16 +2281,7 @@ trait HasAttributes
             return count($changes) > 0;
         }
 
-        // Here we will spin through every attribute and see if this is in the array of
-        // dirty attributes. If it is, we will return true and if we make it through
-        // all of the attributes for the entire array we will return false at end.
-        foreach (Arr::wrap($attributes) as $attribute) {
-            if (array_key_exists($attribute, $changes)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(Arr::wrap($attributes), fn ($attribute) => array_key_exists($attribute, $changes));
     }
 
     /**

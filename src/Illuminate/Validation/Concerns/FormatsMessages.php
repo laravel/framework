@@ -187,13 +187,10 @@ trait FormatsMessages
      */
     protected function getWildcardCustomMessages($messages, $search, $default)
     {
-        foreach ($messages as $key => $message) {
-            if ($search === $key || (Str::contains($key, ['*']) && Str::is($key, $search))) {
-                return $message;
-            }
-        }
-
-        return $default;
+        return array_find(
+            $messages,
+            fn ($message, $key) => $search === $key || (Str::contains($key, ['*']) && Str::is($key, $search))
+        ) ?? $default;
     }
 
     /**

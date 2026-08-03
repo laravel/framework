@@ -520,10 +520,8 @@ class Handler implements ExceptionHandlerContract
             return true;
         }
 
-        foreach ($this->dontReportCallbacks as $dontReportCallback) {
-            if ($dontReportCallback($e) === true) {
-                return true;
-            }
+        if (array_any($this->dontReportCallbacks, fn ($dontReportCallback) => $dontReportCallback($e) === true)) {
+            return true;
         }
 
         return rescue(fn () => with($this->throttle($e), function ($throttle) use ($e) {
