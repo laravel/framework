@@ -19,6 +19,7 @@ use Illuminate\Image\Transformations\Resize;
 use Illuminate\Image\Transformations\Rotate;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 class ImageTest extends TestCase
@@ -256,12 +257,9 @@ class ImageTest extends TestCase
         $this->assertSame('jpg', $image->extension());
     }
 
-    public function test_extension_returns_avif_for_avif()
+    #[RequiresPhpExtension('imagick')]
+    public function test_extension_returns_avif_for_avif(): void
     {
-        if (! extension_loaded('imagick')) {
-            $this->markTestSkipped('The Imagick extension is not available.');
-        }
-
         $imagick = new \Imagick;
         $imagick->newImage(10, 10, 'red');
         $imagick->setImageFormat('avif');
