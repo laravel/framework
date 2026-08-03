@@ -1257,6 +1257,26 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testWhereUlidRegistration()
+    {
+        $this->router->get('/{foo}')->whereUlid('foo');
+
+        $this->assertTrue($this->getRoute()->matches(Request::create('/01ARZ3NDEKTSV4RRFFQ69G5FAV', 'GET')));
+        $this->assertFalse($this->getRoute()->matches(Request::create('/01ARZ3NDEKTSV4RRFFQ69G5FA', 'GET')));
+        $this->assertFalse($this->getRoute()->matches(Request::create('/01ARZ3NDEKTSV4RRFFQ69G5FAI', 'GET')));
+        $this->assertFalse($this->getRoute()->matches(Request::create('/81ARZ3NDEKTSV4RRFFQ69G5FAV', 'GET')));
+    }
+
+    public function testWhereUuidRegistration()
+    {
+        $this->router->get('/{foo}')->whereUuid('foo');
+
+        $this->assertTrue($this->getRoute()->matches(Request::create('/2cd90b6d-3c34-4a0a-9d0d-9d0b7b1a2e6f', 'GET')));
+        $this->assertTrue($this->getRoute()->matches(Request::create('/2CD90B6D-3C34-4A0A-9D0D-9D0B7B1A2E6F', 'GET')));
+        $this->assertFalse($this->getRoute()->matches(Request::create('/2cd90b6d3c344a0a9d0d9d0b7b1a2e6f', 'GET')));
+        $this->assertFalse($this->getRoute()->matches(Request::create('/2cd90b6d-3c34-4a0a-9d0d-9d0b7b1a2e6', 'GET')));
+    }
+
     public function testWhereInRegistration()
     {
         $wheres = ['foo' => 'one|two', 'bar' => 'one|two'];
