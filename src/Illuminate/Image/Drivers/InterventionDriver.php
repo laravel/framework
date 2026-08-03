@@ -168,6 +168,22 @@ abstract class InterventionDriver implements Driver
     }
 
     /**
+     * Get the dimensions of the given image contents.
+     *
+     * @return array{0: int, 1: int}
+     */
+    public function dimensions(string $contents): array
+    {
+        $image = $this->manager->decode($contents);
+
+        try {
+            return [$image->width(), $image->height()];
+        } finally {
+            unset($image);
+        }
+    }
+
+    /**
      * Sample the dominant color by resizing the image to a single pixel.
      */
     protected function dominantColorFrom(ImageInterface $image): string

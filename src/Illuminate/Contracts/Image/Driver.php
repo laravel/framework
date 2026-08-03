@@ -17,6 +17,13 @@ interface Driver
     public function dominantColor(string $contents): string;
 
     /**
+     * Get the dimensions of the given image contents.
+     *
+     * @return array{0: int, 1: int}
+     */
+    public function dimensions(string $contents): array;
+
+    /**
      * Register a transformation handler.
      *
      * @param  class-string<\Illuminate\Contracts\Image\Transformation>  $transformation
