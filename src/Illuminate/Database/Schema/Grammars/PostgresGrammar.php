@@ -673,6 +673,12 @@ class PostgresGrammar extends Grammar
      */
     protected function uniqueIsConstraint(Blueprint $blueprint, $index)
     {
+        // Grammar SQL-generation tests may attach this grammar to a non-Postgres
+        // connection. Only introspect against a live PostgreSQL connection.
+        if ($this->connection->getDriverName() !== 'pgsql') {
+            return true;
+        }
+
         [$schema, $table] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
 
         $table = $this->connection->getTablePrefix().$table;

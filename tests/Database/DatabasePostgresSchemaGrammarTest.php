@@ -1522,6 +1522,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         return $connection
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
             ->shouldReceive('getSchemaBuilder')->andReturn($builder)
+            ->shouldReceive('getDriverName')->andReturn('pgsql')->byDefault()
             ->shouldReceive('selectOne')->andReturn((object) ['exists' => true])->byDefault()
             ->getMock();
     }
