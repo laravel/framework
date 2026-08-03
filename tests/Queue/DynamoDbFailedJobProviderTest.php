@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 class DynamoDbFailedJobProviderTest extends TestCase
 {
-    public function testCanProperlyLogFailedJob()
+    public function testCanProperlyLogFailedJob(): void
     {
         $uuid = Str::orderedUuid();
 
@@ -32,10 +32,10 @@ class DynamoDbFailedJobProviderTest extends TestCase
             'TableName' => 'table',
             'Item' => [
                 'application' => ['S' => 'application'],
-                'uuid' => ['S' => (string) $uuid],
+                'uuid' => ['S' => $uuid->toString()],
                 'connection' => ['S' => 'connection'],
                 'queue' => ['S' => 'queue'],
-                'payload' => ['S' => json_encode(['uuid' => (string) $uuid])],
+                'payload' => ['S' => json_encode(['uuid' => $uuid->toString()])],
                 'exception' => ['S' => (string) $exception],
                 'failed_at' => ['N' => (string) $now->getTimestamp()],
                 'expires_at' => ['N' => (string) $now->addWeek()->getTimestamp()],
@@ -44,7 +44,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
 
-        $provider->log('connection', 'queue', json_encode(['uuid' => (string) $uuid]), $exception);
+        $provider->log('connection', 'queue', json_encode(['uuid' => $uuid->toString()]), $exception);
 
         Str::createUuidsNormally();
     }

@@ -113,7 +113,7 @@ class NotificationSender
             }
 
             $this->withLocale($this->preferredLocale($notifiable, $original), function () use ($viaChannels, $notifiable, $original) {
-                $notificationId = (string) Str::uuid();
+                $notificationId = Str::uuid()->toString();
 
                 foreach ((array) $viaChannels as $channel) {
                     if (! ($notifiable instanceof AnonymousNotifiable && $channel === 'database')) {
@@ -222,7 +222,7 @@ class NotificationSender
         $original = clone $notification;
 
         foreach ($notifiables as $notifiable) {
-            $notificationId = (string) Str::uuid();
+            $notificationId = Str::uuid()->toString();
 
             foreach ((array) $original->via($notifiable) as $channel) {
                 $notification = clone $original;

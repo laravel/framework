@@ -49,7 +49,7 @@ class BatchRepositoryFake implements BatchRepository
      */
     public function store(PendingBatch $batch)
     {
-        $id = (string) Str::orderedUuid();
+        $id = Str::orderedUuid()->toString();
 
         $this->batches[$id] = new BatchFake(
             $id,
