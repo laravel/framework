@@ -17,6 +17,7 @@ use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use Ramsey\Uuid\Uuid;
 
 #[RequiresPhpExtension('redis')]
 class RedisQueueTest extends TestCase
@@ -265,7 +266,7 @@ class RedisQueueTest extends TestCase
     public function testBlockingPopProperlyPopsExpiredJobs($driver)
     {
         Str::createUuidsUsing(function () {
-            return 'uuid';
+            return Uuid::fromString('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
         });
 
         $default = config('queue.connections.redis.queue', 'default');
