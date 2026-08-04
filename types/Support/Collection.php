@@ -109,7 +109,8 @@ assertType('bool', $collection->some(function ($user) {
 }));
 assertType('bool', $collection::make(['string'])->some('string', '=', 'string'));
 
-assertType('bool', $collection->containsStrict(function ($user) {
+assertType('bool', $collection->containsStrict(function ($user, $int) {
+    assertType('int', $int);
     assertType('User', $user);
 
     return true;

@@ -208,7 +208,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if an item exists, using strict comparison.
      *
-     * @param  (callable(TValue): bool)|TValue|array-key  $key
+     * @param  (callable(TValue, TKey): bool)|TValue|array-key  $key
      * @param  TValue|null  $value
      * @return bool
      */
@@ -219,7 +219,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
 
         if ($this->useAsCallable($key)) {
-            return ! is_null($this->first($key));
+            return array_any($this->items, $key);
         }
 
         return in_array($key, $this->items, true);

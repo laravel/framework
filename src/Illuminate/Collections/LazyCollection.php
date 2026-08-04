@@ -268,7 +268,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if an item exists, using strict comparison.
      *
-     * @param  (callable(TValue): bool)|TValue|array-key  $key
+     * @param  (callable(TValue, TKey): bool)|TValue|array-key  $key
      * @param  TValue|null  $value
      * @return bool
      */
@@ -279,7 +279,9 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         }
 
         if ($this->useAsCallable($key)) {
-            return ! is_null($this->first($key));
+            $placeholder = new stdClass;
+
+            return $this->first($key, $placeholder) !== $placeholder;
         }
 
         foreach ($this as $item) {
