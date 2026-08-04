@@ -481,6 +481,19 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $getSql('MySql'));
     }
 
+    public function testGenerateUlidRelationshipColumnWithUlidModel()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->foreignUlidFor(Fixtures\Models\EloquentModelUsingUlid::class);
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'alter table `posts` add `model_using_ulid_id` char(26) not null',
+        ], $getSql('MySql'));
+    }
+
     public function testGenerateRelationshipConstrainedColumn()
     {
         $getSql = function ($grammar) {
@@ -506,6 +519,20 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals([
             'alter table `posts` add `model_using_uuid_id` char(36) not null',
             'alter table `posts` add constraint `posts_model_using_uuid_id_foreign` foreign key (`model_using_uuid_id`) references `model` (`id`)',
+        ], $getSql('MySql'));
+    }
+
+    public function testGenerateUlidRelationshipConstrainedColumn()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->foreignUlidFor(Fixtures\Models\EloquentModelUsingUlid::class)->constrained();
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'alter table `posts` add `model_using_ulid_id` char(26) not null',
+            'alter table `posts` add constraint `posts_model_using_ulid_id_foreign` foreign key (`model_using_ulid_id`) references `model` (`id`)',
         ], $getSql('MySql'));
     }
 
