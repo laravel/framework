@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\View\Blade;
 
 use Illuminate\Support\Str;
-use Ramsey\Uuid\Uuid;
 
 class BladePrependTest extends AbstractBladeTestCase
 {
@@ -33,9 +32,9 @@ test
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testPrependOnceIsCompiledWhenIdIsMissing(): void
+    public function testPrependOnceIsCompiledWhenIdIsMissing()
     {
-        Str::createUuidsUsing(fn () => Uuid::fromString('e60e8f77-9ac3-4f71-9f8e-a044ef481d7f'));
+        Str::createUuidsUsing(fn () => 'e60e8f77-9ac3-4f71-9f8e-a044ef481d7f');
 
         $string = '@prependOnce(\'foo\')
 test
