@@ -59,6 +59,13 @@ trait InteractsWithTestCaseLifecycle
     protected $app;
 
     /**
+     * The callbacks that should be run while the application is booting.
+     *
+     * @var array
+     */
+    protected $beforeApplicationBootedCallbacks = [];
+
+    /**
      * The callbacks that should be run after the application is created.
      *
      * @var array
@@ -169,6 +176,7 @@ trait InteractsWithTestCaseLifecycle
 
         $this->afterApplicationCreatedCallbacks = [];
         $this->beforeApplicationDestroyedCallbacks = [];
+        $this->beforeApplicationBootedCallbacks = [];
 
         if (property_exists($this, 'originalExceptionHandler')) {
             $this->originalExceptionHandler = null;
@@ -300,6 +308,17 @@ trait InteractsWithTestCaseLifecycle
         if ($this->setUpHasRun) {
             $callback();
         }
+    }
+
+    /**
+     * Register a callback to be run while the application is booting.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    protected function beforeApplicationBooted(callable $callback)
+    {
+        $this->beforeApplicationBootedCallbacks[] = $callback;
     }
 
     /**

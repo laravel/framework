@@ -56,6 +56,10 @@ abstract class TestCase extends BaseTestCase
             $app->booting(fn () => $this->markRoutesCached($app));
         }
 
+        foreach ($this->beforeApplicationBootedCallbacks as $callback) {
+            $app->booting($callback);
+        }
+
         $app->make(Kernel::class)->bootstrap();
 
         return $app;
