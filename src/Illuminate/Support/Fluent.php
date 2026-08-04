@@ -19,6 +19,7 @@ use Traversable;
  *
  * @implements \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
  * @implements \ArrayAccess<TKey, TValue>
+ * @implements \IteratorAggregate<TKey, TValue>
  */
 class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, JsonSerializable
 {
@@ -46,8 +47,11 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
     /**
      * Create a new fluent instance.
      *
-     * @param  iterable<TKey, TValue>  $attributes
-     * @return static
+     * @template TMakeKey of array-key
+     * @template TMakeValue
+     *
+     * @param  iterable<TMakeKey, TMakeValue>  $attributes
+     * @return static<TMakeKey, TMakeValue>
      */
     public static function make($attributes = [])
     {
@@ -100,9 +104,11 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
     /**
      * Get an attribute from the fluent instance.
      *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @template TValueDefault
+     *
+     * @param  TKey  $key
+     * @param  TValueDefault|(\Closure(): TValueDefault)  $default
+     * @return TValue|TValueDefault
      */
     public function value($key, $default = null)
     {
