@@ -197,10 +197,12 @@ class ShowCommand extends DatabaseInspectionCommand
                     ($tableSize ?? '—').($this->option('counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>'.Number::format($table['rows']).'</>' : '')
                 );
 
-                if ($this->output->isVerbose() && $table['comment']) {
-                    $this->components->bulletList([
-                        $table['comment'],
-                    ]);
+                if ($this->output->isVerbose()) {
+                    if ($table['comment']) {
+                        $this->components->bulletList([
+                            $table['comment'],
+                        ]);
+                    }
                 }
             });
 

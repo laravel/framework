@@ -2576,9 +2576,14 @@ trait HasAttributes
         return (new Collection((new ReflectionClass($instance))->getMethods()))->filter(function ($method) use ($instance) {
             $returnType = $method->getReturnType();
 
-            return $returnType instanceof ReflectionNamedType &&
-                $returnType->getName() === Attribute::class &&
-                is_callable($method->invoke($instance)->get);
+            if ($returnType instanceof ReflectionNamedType &&
+                $returnType->getName() === Attribute::class) {
+                if (is_callable($method->invoke($instance)->get)) {
+                    return true;
+                }
+            }
+
+            return false;
         })->map->name->values()->all();
     }
 }

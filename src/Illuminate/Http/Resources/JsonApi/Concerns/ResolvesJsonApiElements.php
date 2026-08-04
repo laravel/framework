@@ -209,8 +209,10 @@ trait ResolvesJsonApiElements
             foreach ($resourceRelationships as $relationName => $relationResolver) {
                 $relatedModels = $relationResolver->handle($this->resource);
 
-                if (! is_null($relatedModels) && $this->includesPreviouslyLoadedRelationships === false && ! empty($relations = $request->sparseIncluded($relationName))) {
-                    $relatedModels->loadMissing($relations);
+                if (! is_null($relatedModels) && $this->includesPreviouslyLoadedRelationships === false) {
+                    if (! empty($relations = $request->sparseIncluded($relationName))) {
+                        $relatedModels->loadMissing($relations);
+                    }
                 }
 
                 yield from $this->compileResourceRelationshipUsingResolver(

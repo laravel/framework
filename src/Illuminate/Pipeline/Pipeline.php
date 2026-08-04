@@ -237,7 +237,11 @@ class Pipeline implements PipelineContract
     {
         [$name, $parameters] = array_pad(explode(':', $pipe, 2), 2, null);
 
-        $parameters = ! is_null($parameters) ? explode(',', $parameters) : [];
+        if (! is_null($parameters)) {
+            $parameters = explode(',', $parameters);
+        } else {
+            $parameters = [];
+        }
 
         return [$name, $parameters];
     }

@@ -145,7 +145,11 @@ class HandleExceptions
 
         $this->ensureNullLogDriverIsConfigured();
 
-        $driver = (is_array($options = $config->get('logging.deprecations')) ? $options['channel'] : $options) ?? 'null';
+        if (is_array($options = $config->get('logging.deprecations'))) {
+            $driver = $options['channel'] ?? 'null';
+        } else {
+            $driver = $options ?? 'null';
+        }
 
         $config->set('logging.channels.deprecations', $config->get("logging.channels.{$driver}"));
     }
