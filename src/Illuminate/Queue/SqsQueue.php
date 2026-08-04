@@ -532,7 +532,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         $uuid = is_object($decoded) && isset($decoded->uuid)
             ? $decoded->uuid
-            : Str::uuid()->toString();
+            : (string) Str::uuid();
 
         $this->container->make('cache')->store(
             Arr::get($this->overflowStorage, 'store')
@@ -600,7 +600,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
                 $isObject && method_exists($job, 'deduplicationId') => transform(
                     $job->deduplicationId($payload, $queue), $transformToString
                 ),
-                default => Str::orderedUuid()->toString(),
+                default => (string) Str::orderedUuid(),
             };
         }
 

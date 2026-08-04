@@ -91,7 +91,7 @@ trait Batchable
                                   ?CarbonImmutable $finishedAt = null)
     {
         $this->fakeBatch = new BatchFake(
-            empty($id) ? Str::uuid()->toString() : $id,
+            empty($id) ? (string) Str::uuid() : $id,
             $name,
             $totalJobs,
             $pendingJobs,
