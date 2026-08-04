@@ -1376,14 +1376,14 @@ class QueueTest extends TestCase
         }
     }
 
-    public function testForgetProxiesToFailerForNonUrls(): void
+    public function testForgetProxiesToFailerForNonUrls()
     {
         $eventsFake = $this->fakeEvents();
         $failer = $this->fakeFailer();
         $provider = new FailedJobProvider($failer, $eventsFake, $this->app['encrypter']);
 
         // First log a job to the failer with a UUID
-        $uuid = Str::uuid()->toString();
+        $uuid = (string) Str::uuid();
         $failer->log('database', 'default', json_encode(['uuid' => $uuid]), new \Exception('test'));
         $jobId = $failer->ids()[0];
 
@@ -1670,7 +1670,7 @@ class QueueTest extends TestCase
             public function pushJob(array $job = []): array
             {
                 $job = array_merge([
-                    'messageId' => Str::uuid()->toString(),
+                    'messageId' => (string) Str::uuid(),
                     'receiptHandle' => 'receipt-handle',
                     // The agent always reports the SQS queue URL the message came from.
                     'queueUrl' => 'https://sqs.us-east-1.amazonaws.com/123456789012/default',

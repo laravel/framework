@@ -5,8 +5,6 @@ declare(strict_types=1);
 use Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector;
 use Rector\CodeQuality\Rector\FuncCall\SortCallLikeNamedArgsRector;
 use Rector\CodeQuality\Rector\Identical\StrlenZeroToIdenticalEmptyStringRector;
-use Rector\CodeQuality\Rector\If_\CombineIfRector;
-use Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector;
 use Rector\CodingStyle\Rector\ArrowFunction\ArrowFunctionDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\Closure\ClosureDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\FuncCall\CountArrayToEmptyArrayComparisonRector;
@@ -99,10 +97,8 @@ return RectorConfig::configure()
         'tests/Foundation/fixtures/bad-syntax-strategy.php',
     ])
     ->withRules([
-        CombineIfRector::class,
         CompactToVariablesRector::class,
         CountArrayToEmptyArrayComparisonRector::class,
-        SimplifyIfElseToTernaryRector::class,
         SortCallLikeNamedArgsRector::class,
         StrlenZeroToIdenticalEmptyStringRector::class,
     ])
@@ -114,9 +110,7 @@ return RectorConfig::configure()
         typeDeclarationDocblocks: false,
         privatization: false,
         naming: false,
-        namedArgs: false,
         instanceOf: false,
-        if: false,
         earlyReturn: false,
     )
     ->withSets([

@@ -290,8 +290,10 @@ class Container implements ArrayAccess, ContainerContract
             return false;
         }
 
-        if ($scopedType === 'scoped' && ! in_array($abstract, $this->scopedInstances, true)) {
-            $this->scopedInstances[] = $abstract;
+        if ($scopedType === 'scoped') {
+            if (! in_array($abstract, $this->scopedInstances, true)) {
+                $this->scopedInstances[] = $abstract;
+            }
         }
 
         return true;

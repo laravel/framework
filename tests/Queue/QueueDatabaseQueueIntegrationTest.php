@@ -14,7 +14,6 @@ use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
 
 class QueueDatabaseQueueIntegrationTest extends TestCase
 {
@@ -265,12 +264,12 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         Queue::createPayloadUsing(null);
     }
 
-    public function testJobPayloadIsAvailableOnEvents(): void
+    public function testJobPayloadIsAvailableOnEvents()
     {
         $jobQueueingEvent = null;
         $jobQueuedEvent = null;
         Str::createUuidsUsingSequence([
-            Uuid::fromString('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'),
+            'expected-job-uuid',
         ]);
         $this->container['events']->listen(function (JobQueueing $e) use (&$jobQueueingEvent) {
             $jobQueueingEvent = $e;
@@ -284,9 +283,9 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         ]);
 
         $this->assertIsArray($jobQueueingEvent->payload());
-        $this->assertSame('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', $jobQueueingEvent->payload()['uuid']);
+        $this->assertSame('expected-job-uuid', $jobQueueingEvent->payload()['uuid']);
 
         $this->assertIsArray($jobQueuedEvent->payload());
-        $this->assertSame('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', $jobQueuedEvent->payload()['uuid']);
+        $this->assertSame('expected-job-uuid', $jobQueuedEvent->payload()['uuid']);
     }
 }

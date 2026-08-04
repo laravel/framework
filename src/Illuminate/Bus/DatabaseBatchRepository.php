@@ -94,7 +94,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      */
     public function store(PendingBatch $batch)
     {
-        $id = Str::orderedUuid()->toString();
+        $id = (string) Str::orderedUuid();
 
         $this->connection->table($this->table)->insert([
             'id' => $id,

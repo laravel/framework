@@ -1713,25 +1713,25 @@ class SupportStrTest extends TestCase
         $this->assertSame($expected, Str::transliterate($value, '?', true));
     }
 
-    public function testItCanFreezeUuids(): void
+    public function testItCanFreezeUuids()
     {
-        $this->assertNotSame(Str::uuid()->toString(), Str::uuid()->toString());
+        $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
         $this->assertNotSame(Str::uuid(), Str::uuid());
 
         $uuid = Str::freezeUuids();
 
         $this->assertSame($uuid, Str::uuid());
         $this->assertSame(Str::uuid(), Str::uuid());
-        $this->assertSame($uuid->toString(), Str::uuid()->toString());
-        $this->assertSame(Str::uuid()->toString(), Str::uuid()->toString());
+        $this->assertSame((string) $uuid, (string) Str::uuid());
+        $this->assertSame((string) Str::uuid(), (string) Str::uuid());
 
         Str::createUuidsNormally();
 
         $this->assertNotSame(Str::uuid(), Str::uuid());
-        $this->assertNotSame(Str::uuid()->toString(), Str::uuid()->toString());
+        $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
     }
 
-    public function testItCanFreezeUuidsInAClosure(): void
+    public function testItCanFreezeUuidsInAClosure()
     {
         $uuids = [];
 
@@ -1742,14 +1742,14 @@ class SupportStrTest extends TestCase
         });
 
         $this->assertSame($uuid, $uuids[0]);
-        $this->assertSame($uuid->toString(), $uuids[0]->toString());
-        $this->assertSame($uuids[0]->toString(), $uuids[1]->toString());
+        $this->assertSame((string) $uuid, (string) $uuids[0]);
+        $this->assertSame((string) $uuids[0], (string) $uuids[1]);
         $this->assertSame($uuids[0], $uuids[1]);
-        $this->assertSame($uuids[0]->toString(), $uuids[1]->toString());
+        $this->assertSame((string) $uuids[0], (string) $uuids[1]);
         $this->assertSame($uuids[1], $uuids[2]);
-        $this->assertSame($uuids[1]->toString(), $uuids[2]->toString());
+        $this->assertSame((string) $uuids[1], (string) $uuids[2]);
         $this->assertNotSame(Str::uuid(), Str::uuid());
-        $this->assertNotSame(Str::uuid()->toString(), Str::uuid()->toString());
+        $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
 
         Str::createUuidsNormally();
     }
