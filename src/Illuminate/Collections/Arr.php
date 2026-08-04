@@ -424,6 +424,9 @@ class Arr
         }
 
         foreach ($keys as $key) {
+            // clean up before each pass
+            $array = &$original;
+
             // if the exact key exists in the top-level, remove it
             if (static::exists($array, $key)) {
                 unset($array[$key]);
@@ -432,9 +435,6 @@ class Arr
             }
 
             $parts = explode('.', $key);
-
-            // clean up before each pass
-            $array = &$original;
 
             while (count($parts) > 1) {
                 $part = array_shift($parts);
