@@ -158,7 +158,11 @@ class Grammar extends BaseGrammar
             return;
         }
 
-        $select = $query->distinct ? 'select distinct ' : 'select ';
+        if ($query->distinct) {
+            $select = 'select distinct ';
+        } else {
+            $select = 'select ';
+        }
 
         return $select.$this->columnize($columns);
     }
