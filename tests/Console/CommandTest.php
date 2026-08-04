@@ -24,6 +24,143 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class CommandTest extends TestCase
 {
+    public function testMetadataDefaultsToAnEmptyArray()
+    {
+        $this->assertSame([], (new Command)->getMetadata());
+    }
+
+    public function testMetadataMergesAssociativeValuesAndSupportsDotNotation()
+    {
+        $command = new Command;
+
+        $this->assertSame($command, $command->metadata([
+            'operations' => [
+                'owner' => 'platform',
+                'monitoring' => [
+                    'enabled' => true,
+                ],
+            ],
+        ]));
+
+        $command->metadata([
+            'operations' => [
+                'owner' => 'finance',
+                'monitoring' => [
+                    'channel' => 'finance-alerts',
+                ],
+            ],
+        ]);
+
+        $this->assertSame([
+            'operations' => [
+                'owner' => 'finance',
+                'monitoring' => [
+                    'enabled' => true,
+                    'channel' => 'finance-alerts',
+                ],
+            ],
+        ], $command->getMetadata());
+        $this->assertSame('finance', $command->getMetadata('operations.owner'));
+        $this->assertSame('Not configured', $command->getMetadata('operations.runbook', 'Not configured'));
+    }
+
+    public function testMetadataReplacesListsScalarsAndValueTypes()
+    {
+        $command = (new Command)->metadata([
+            'roles' => ['operator', 'administrator'],
+            'criticality' => 'low',
+            'monitoring' => ['enabled' => true],
+        ]);
+
+        $command->metadata([
+            'roles' => ['finance'],
+            'criticality' => 'high',
+            'monitoring' => false,
+        ]);
+
+        $this->assertSame([
+            'roles' => ['finance'],
+            'criticality' => 'high',
+            'monitoring' => false,
+        ], $command->getMetadata());
+    }
+
+    public function testMetadataCanBeReplaced()
+    {
+        $command = (new Command)->metadata([
+            'owner' => 'platform',
+            'criticality' => 'high',
+        ]);
+
+        $this->assertSame($command, $command->setMetadata([
+            'owner' => 'finance',
+        ]));
+        $this->assertSame(['owner' => 'finance'], $command->getMetadata());
+    }
+
+    public function testMetadataDoesNotAlterTheCommandDefinition()
+    {
+        $command = new class extends Command
+        {
+            protected $signature = 'test:metadata {argument?} {--option=}';
+
+            protected $description = 'Test command metadata';
+        };
+
+        $command->metadata([
+            'name' => 'other:name',
+            'description' => 'Other description',
+            'arguments' => [],
+            'options' => [],
+            'hidden' => true,
+        ]);
+
+        $this->assertSame('test:metadata', $command->getName());
+        $this->assertSame('Test command metadata', $command->getDescription());
+        $this->assertTrue($command->getDefinition()->hasArgument('argument'));
+        $this->assertTrue($command->getDefinition()->hasOption('option'));
+        $this->assertFalse($command->isHidden());
+    }
+
+    public function testMetadataStorageDoesNotConflictWithUserlandMetadataProperties()
+    {
+        $commandWithPrivateProperty = new class extends Command
+        {
+            private $metadata = ['userland' => true];
+        };
+
+        $commandWithTypedProperty = new class extends Command
+        {
+            protected array $metadata = ['userland' => true];
+        };
+
+        $commandWithPrivateProperty->metadata(['framework' => 'private']);
+        $commandWithTypedProperty->metadata(['framework' => 'typed']);
+
+        $this->assertSame(['framework' => 'private'], $commandWithPrivateProperty->getMetadata());
+        $this->assertSame(['framework' => 'typed'], $commandWithTypedProperty->getMetadata());
+    }
+
+    public function testConcreteMetadataMethodTakesPrecedenceOverCommandMacro()
+    {
+        $macroCalled = false;
+
+        Command::macro('metadata', function () use (&$macroCalled) {
+            $macroCalled = true;
+
+            return $this;
+        });
+
+        try {
+            $command = (new Command)->metadata(['owner' => 'finance']);
+
+            $this->assertFalse($macroCalled);
+            $this->assertSame(['owner' => 'finance'], $command->getMetadata());
+        } finally {
+            Command::flushMacros();
+        }
+    }
+
     public function testCallingClassCommandResolveCommandViaApplicationResolution()
     {
         $command = new class extends Command

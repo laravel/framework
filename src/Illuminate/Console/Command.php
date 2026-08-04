@@ -10,6 +10,8 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Attributes\Usage;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Console\Isolatable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\MetadataMerger;
 use Illuminate\Support\Traits\Macroable;
 use ReflectionClass;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -90,6 +92,13 @@ class Command extends SymfonyCommand
      * @var string[]
      */
     protected $aliases;
+
+    /**
+     * The command metadata.
+     *
+     * @var array<array-key, mixed>
+     */
+    private $commandMetadata = [];
 
     /**
      * Create a new console command instance.
@@ -379,6 +388,49 @@ class Command extends SymfonyCommand
     public function setHidden(bool $hidden = true): static
     {
         parent::setHidden($this->hidden = $hidden);
+
+        return $this;
+    }
+
+    /**
+     * Add metadata to the command.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function metadata(array $metadata)
+    {
+        $this->commandMetadata = MetadataMerger::merge(
+            $this->commandMetadata,
+            $metadata,
+        );
+
+        return $this;
+    }
+
+    /**
+     * Get metadata for the command.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return ($key is null ? array<array-key, mixed> : mixed)
+     */
+    public function getMetadata($key = null, $default = null)
+    {
+        return is_null($key)
+            ? $this->commandMetadata
+            : Arr::get($this->commandMetadata, $key, $default);
+    }
+
+    /**
+     * Set the metadata for the command, replacing existing metadata.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function setMetadata(array $metadata)
+    {
+        $this->commandMetadata = $metadata;
 
         return $this;
     }
