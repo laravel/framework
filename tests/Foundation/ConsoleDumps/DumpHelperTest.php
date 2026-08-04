@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation\ConsoleDumps;
 
 use Illuminate\Foundation\ConsoleDumps\DumpClient;
 use Illuminate\Foundation\ConsoleDumps\DumpHelper;
+use Illuminate\Support\Benchmark;
 use Illuminate\Support\ValidatedInput;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\VarDumper\Caster\ScalarStub;
@@ -80,6 +81,31 @@ class DumpHelperTest extends TestCase
 
         $this->assertSame($input, $result);
         $this->assertSame($input, $client->dumps[0][0]);
+        $this->assertSame(__FILE__, $client->dumps[0][1]['source']['file']);
+        $this->assertSame($line, $client->dumps[0][1]['source']['line']);
+    }
+
+    public function testBenchmarkCanBeSentToTheConsoleWhileReturningTheResult()
+    {
+        $client = new FakeDumpClient;
+        $this->app->instance(DumpHelper::class, new DumpHelper($client, $this->app));
+
+        $expected = new \stdClass;
+        $calls = 0;
+
+        $line = __LINE__ + 1;
+        $result = Benchmark::doc(function () use ($expected, &$calls) {
+            $calls++;
+
+            return $expected;
+        });
+
+        $this->assertSame($expected, $result);
+        $this->assertSame(1, $calls);
+        $this->assertStringEndsWith('ms', $client->dumps[0][0]);
+        $this->assertSame('duration', $client->dumps[0][2]);
+        $this->assertSame($expected, $client->dumps[1][0]);
+        $this->assertSame('result', $client->dumps[1][2]);
         $this->assertSame(__FILE__, $client->dumps[0][1]['source']['file']);
         $this->assertSame($line, $client->dumps[0][1]['source']['line']);
     }

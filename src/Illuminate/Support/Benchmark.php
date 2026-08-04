@@ -55,6 +55,26 @@ class Benchmark
     }
 
     /**
+     * Measure a callable once, dump the result and duration to the console, and return the result.
+     *
+     * @template TReturn of mixed
+     *
+     * @param  (callable(): TReturn)  $callback
+     * @return TReturn
+     */
+    public static function doc(callable $callback): mixed
+    {
+        [$result, $duration] = static::value($callback);
+
+        doc(
+            duration: number_format($duration, 3).'ms',
+            result: $result,
+        );
+
+        return $result;
+    }
+
+    /**
      * Measure a callable or array of callables over the given number of iterations, then dump and die.
      *
      * @param  \Closure|array<callable>  $benchmarkables

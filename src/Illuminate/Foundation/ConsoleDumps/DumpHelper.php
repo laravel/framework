@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\ConsoleDumps;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Concerns\ResolvesDumpSource;
-use Illuminate\Support\Traits\Dumpable;
 use Symfony\Component\VarDumper\Caster\ScalarStub;
 use Throwable;
 
@@ -103,11 +102,9 @@ class DumpHelper
             }
 
             if (($frame['function'] ?? null) === 'doc' && isset($frame['class'])) {
-                if (isset(class_uses_recursive($frame['class'])[Dumpable::class])) {
-                    $source = $frame;
+                $source = $frame;
 
-                    break;
-                }
+                break;
             }
 
             if (($frame['function'] ?? null) === 'dump' && is_a($frame['class'] ?? '', self::class, true)) {
