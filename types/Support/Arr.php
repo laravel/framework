@@ -205,3 +205,5 @@ assertType('array<int<0, max>, int>', Arr::whereNotNull($arr));
 
 assertType('mixed', Arr::random($array));
 assertType('array', Arr::random($array, 2));
+
+assertType('array<string, User>', Arr::prependKeysWith($array, 'user_'));

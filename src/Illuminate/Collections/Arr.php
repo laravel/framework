@@ -721,9 +721,11 @@ class Arr
     /**
      * Prepend the key names of an associative array.
      *
-     * @param  array  $array
+     * @template TValue
+     *
+     * @param  array<TValue>  $array
      * @param  string  $prependWith
-     * @return array
+     * @return array<string, TValue>
      */
     public static function prependKeysWith($array, $prependWith)
     {
