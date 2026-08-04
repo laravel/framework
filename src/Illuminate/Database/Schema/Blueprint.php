@@ -604,6 +604,17 @@ class Blueprint
     }
 
     /**
+     * Indicate that the soft delete column should be dropped.
+     *
+     * @param  string  $column
+     * @return void
+     */
+    public function dropSoftDeletesBoolean($column = 'is_deleted')
+    {
+        $this->dropColumn($column);
+    }
+
+    /**
      * Indicate that the remember token column should be dropped.
      *
      * @return void
@@ -1386,6 +1397,17 @@ class Blueprint
     public function softDeletesDatetime($column = 'deleted_at', $precision = null)
     {
         return $this->dateTime($column, $precision)->nullable();
+    }
+
+    /**
+     * Add an "is deleted" boolean for the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function softDeletesBoolean($column = 'is_deleted')
+    {
+        return $this->boolean($column);
     }
 
     /**
