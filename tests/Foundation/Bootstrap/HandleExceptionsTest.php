@@ -130,6 +130,47 @@ class HandleExceptionsTest extends TestCase
         ], $this->config->get('logging.channels.deprecations'));
     }
 
+    public function testMissingChannelKeyUsesNullDriverWithoutRaisingAWarning()
+    {
+        $logger = m::mock(LogManager::class);
+        $this->app->instance(LogManager::class, $logger);
+        $this->app->expects('runningUnitTests')->andReturn(false);
+        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
+
+        $this->config->set('logging.deprecations', [
+            'trace' => false,
+        ]);
+
+        $logger->expects('channel')->with('deprecations')->andReturnSelf();
+        $logger->expects('warning');
+
+        $warnings = [];
+
+        set_error_handler(function ($level, $message) use (&$warnings) {
+            $warnings[] = $message;
+
+            return true;
+        }, E_WARNING);
+
+        try {
+            $this->handleExceptions()->handleError(
+                E_DEPRECATED,
+                'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+                '/home/user/laravel/routes/web.php',
+                17
+            );
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $warnings);
+
+        $this->assertEquals([
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+        ], $this->config->get('logging.channels.deprecations'));
+    }
+
     public function testUserDeprecations()
     {
         $logger = m::mock(LogManager::class);
