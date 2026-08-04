@@ -97,11 +97,11 @@ class DumpHelper
         $source = null;
 
         foreach ($trace as $frame) {
-            if (($frame['function'] ?? null) === 'doc' && ! isset($frame['class'])) {
+            if (($frame['function'] ?? null) === 'dc' && ! isset($frame['class'])) {
                 $source = $frame;
             }
 
-            if (($frame['function'] ?? null) === 'doc' && isset($frame['class'])) {
+            if (($frame['function'] ?? null) === 'dc' && isset($frame['class'])) {
                 $source = $frame;
 
                 break;

@@ -34,9 +34,9 @@ trait Dumpable
      * @param  mixed  ...$args
      * @return $this
      */
-    public function doc(...$args)
+    public function dc(...$args)
     {
-        doc($this, ...$args);
+        dc($this, ...$args);
 
         return $this;
     }

@@ -62,7 +62,7 @@ class DumpHelperTest extends TestCase
         $this->app->instance(DumpHelper::class, new DumpHelper($client, $this->app));
 
         $line = __LINE__ + 1;
-        $result = doc('value');
+        $result = dc('value');
 
         $this->assertSame('value', $result);
         $this->assertSame(__FILE__, $client->dumps[0][1]['source']['file']);
@@ -77,7 +77,7 @@ class DumpHelperTest extends TestCase
         $input = new ValidatedInput(['name' => 'Taylor']);
 
         $line = __LINE__ + 1;
-        $result = $input->doc();
+        $result = $input->dc();
 
         $this->assertSame($input, $result);
         $this->assertSame($input, $client->dumps[0][0]);
@@ -94,7 +94,7 @@ class DumpHelperTest extends TestCase
         $calls = 0;
 
         $line = __LINE__ + 1;
-        $result = Benchmark::doc(function () use ($expected, &$calls) {
+        $result = Benchmark::dc(function () use ($expected, &$calls) {
             $calls++;
 
             return $expected;

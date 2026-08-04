@@ -62,11 +62,11 @@ class Benchmark
      * @param  (callable(): TReturn)  $callback
      * @return TReturn
      */
-    public static function doc(callable $callback): mixed
+    public static function dc(callable $callback): mixed
     {
         [$result, $duration] = static::value($callback);
 
-        doc(
+        dc(
             duration: number_format($duration, 3).'ms',
             result: $result,
         );

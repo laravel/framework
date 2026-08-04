@@ -479,11 +479,11 @@ if (! function_exists('dispatch_sync')) {
     }
 }
 
-if (! function_exists('doc')) {
+if (! function_exists('dc')) {
     /**
      * Dump the given values to the dump server.
      */
-    function doc(mixed ...$values): mixed
+    function dc(mixed ...$values): mixed
     {
         return app(DumpHelper::class)->dump(...$values);
     }
