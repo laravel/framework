@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
+use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Foundation\Console\ClosureCommand;
 use Illuminate\Support\Facades\Artisan;
@@ -26,6 +27,14 @@ class ClosureCommandTest extends TestCase
     public function testItCanRunClosureCommand()
     {
         $this->artisan('inspire')->expectsOutput('We must ship. - Taylor Otwell');
+    }
+
+    public function testClosureCommandMetadataRemainsInspectableAfterRegistration()
+    {
+        $command = Artisan::all()['inspire'];
+
+        $this->assertInstanceOf(Command::class, $command);
+        $this->assertSame('framework', $command->getMetadata('operations.owner'));
     }
 
     public function testClosureCommandSupportsMetadataWithoutCreatingAScheduledEvent()
