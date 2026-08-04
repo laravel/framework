@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation\ConsoleDumps;
 
 use Illuminate\Foundation\ConsoleDumps\DumpClient;
 use Illuminate\Foundation\ConsoleDumps\DumpHelper;
+use Illuminate\Support\ValidatedInput;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\VarDumper\Caster\ScalarStub;
 
@@ -63,6 +64,22 @@ class DumpHelperTest extends TestCase
         $result = doc('value');
 
         $this->assertSame('value', $result);
+        $this->assertSame(__FILE__, $client->dumps[0][1]['source']['file']);
+        $this->assertSame($line, $client->dumps[0][1]['source']['line']);
+    }
+
+    public function testDumpableObjectsCanBeSentToTheConsole()
+    {
+        $client = new FakeDumpClient;
+        $this->app->instance(DumpHelper::class, new DumpHelper($client, $this->app));
+
+        $input = new ValidatedInput(['name' => 'Taylor']);
+
+        $line = __LINE__ + 1;
+        $result = $input->doc();
+
+        $this->assertSame($input, $result);
+        $this->assertSame($input, $client->dumps[0][0]);
         $this->assertSame(__FILE__, $client->dumps[0][1]['source']['file']);
         $this->assertSame($line, $client->dumps[0][1]['source']['line']);
     }

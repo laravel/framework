@@ -27,4 +27,17 @@ trait Dumpable
 
         return $this;
     }
+
+    /**
+     * Dump the given arguments to the console.
+     *
+     * @param  mixed  ...$args
+     * @return $this
+     */
+    public function doc(...$args)
+    {
+        doc($this, ...$args);
+
+        return $this;
+    }
 }
