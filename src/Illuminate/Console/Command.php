@@ -6,6 +6,7 @@ use Illuminate\Console\Attributes\Aliases;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Help;
 use Illuminate\Console\Attributes\Hidden;
+use Illuminate\Console\Attributes\Metadata;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Attributes\Usage;
 use Illuminate\Console\View\Components\Factory;
@@ -197,6 +198,10 @@ class Command extends SymfonyCommand
 
         if ($aliases !== []) {
             $this->aliases = $aliases[0]->newInstance()->aliases;
+        }
+
+        foreach ($reflection->getAttributes(Metadata::class) as $metadata) {
+            $this->metadata($metadata->newInstance()->metadata);
         }
     }
 

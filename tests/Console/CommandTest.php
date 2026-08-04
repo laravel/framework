@@ -4,8 +4,10 @@ namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Application;
 use Illuminate\Console\Attributes\Aliases;
+use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Help;
 use Illuminate\Console\Attributes\Hidden;
+use Illuminate\Console\Attributes\Metadata as CommandMetadata;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Attributes\Usage;
 use Illuminate\Console\Command;
@@ -459,6 +461,63 @@ class CommandTest extends TestCase
 
         $this->assertSame(['foo:bar 1', 'foo:bar 1 --force'], $command->getUsages());
     }
+
+    public function testMetadataAttributeConfiguresCommandMetadata()
+    {
+        $command = new MetadataCommand;
+
+        $this->assertSame([
+            'operations' => [
+                'owner' => 'finance',
+            ],
+        ], $command->getMetadata());
+    }
+
+    public function testRepeatableMetadataAttributesMergeInDeclarationOrder()
+    {
+        $command = new RepeatableMetadataCommand;
+
+        $this->assertSame([
+            'operations' => [
+                'owner' => 'finance',
+                'criticality' => 'low',
+                'monitoring' => [
+                    'enabled' => true,
+                    'channel' => 'finance-alerts',
+                ],
+            ],
+        ], $command->getMetadata());
+    }
+
+    public function testConstructorMetadataIsMergedAfterAttributeMetadata()
+    {
+        $command = new ConstructorMetadataCommand;
+
+        $this->assertSame([
+            'operations' => [
+                'owner' => 'finance',
+                'criticality' => 'high',
+            ],
+        ], $command->getMetadata());
+    }
+
+    public function testMetadataAttributesAreNotInheritedFromParentCommands()
+    {
+        $this->assertSame([], (new ChildMetadataCommand)->getMetadata());
+    }
+
+    public function testMetadataAttributeDoesNotAffectOtherCommandAttributes()
+    {
+        $command = new MetadataWithCommandAttributesCommand;
+
+        $this->assertSame('metadata:attributes', $command->getName());
+        $this->assertSame('Command with metadata', $command->getDescription());
+        $this->assertSame('Extended metadata command help.', $command->getHelp());
+        $this->assertSame(['metadata:alias'], $command->getAliases());
+        $this->assertSame(['metadata:attributes --force'], $command->getUsages());
+        $this->assertTrue($command->isHidden());
+        $this->assertSame(['domain' => 'testing'], $command->getMetadata());
+    }
 }
 
 enum CommandInputType: string
@@ -515,6 +574,97 @@ class AliasesAttributeCommand extends Command
 #[Signature('foo:bar', aliases: ['ignored:alias'])]
 #[Aliases(['override:alias'])]
 class AliasesAttributeOverridesSignatureCommand extends Command
+{
+    public function handle()
+    {
+    }
+}
+
+#[CommandMetadata([
+    'operations' => [
+        'owner' => 'finance',
+    ],
+])]
+class MetadataCommand extends Command
+{
+    public function handle()
+    {
+    }
+}
+
+#[CommandMetadata([
+    'operations' => [
+        'owner' => 'platform',
+        'criticality' => 'low',
+        'monitoring' => [
+            'enabled' => true,
+            'channel' => 'operations',
+        ],
+    ],
+])]
+#[CommandMetadata([
+    'operations' => [
+        'owner' => 'finance',
+        'monitoring' => [
+            'channel' => 'finance-alerts',
+        ],
+    ],
+])]
+class RepeatableMetadataCommand extends Command
+{
+    public function handle()
+    {
+    }
+}
+
+#[CommandMetadata([
+    'operations' => [
+        'owner' => 'platform',
+        'criticality' => 'low',
+    ],
+])]
+class ConstructorMetadataCommand extends Command
+{
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->metadata([
+            'operations' => [
+                'owner' => 'finance',
+                'criticality' => 'high',
+            ],
+        ]);
+    }
+
+    public function handle()
+    {
+    }
+}
+
+#[CommandMetadata(['inherited' => true])]
+class ParentMetadataCommand extends Command
+{
+    public function handle()
+    {
+    }
+}
+
+class ChildMetadataCommand extends ParentMetadataCommand
+{
+    public function handle()
+    {
+    }
+}
+
+#[Signature('metadata:attributes', aliases: ['ignored:alias'])]
+#[Description('Command with metadata')]
+#[Help('Extended metadata command help.')]
+#[Usage('metadata:attributes --force')]
+#[Aliases(['metadata:alias'])]
+#[Hidden]
+#[CommandMetadata(['domain' => 'testing'])]
+class MetadataWithCommandAttributesCommand extends Command
 {
     public function handle()
     {
