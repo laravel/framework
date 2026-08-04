@@ -264,9 +264,7 @@ class RedisQueueTest extends TestCase
     #[DataProvider('redisDriverProvider')]
     public function testBlockingPopProperlyPopsExpiredJobs($driver)
     {
-        Str::createUuidsUsing(function () {
-            return 'uuid';
-        });
+        Str::freezeUuids();
 
         $default = config('queue.connections.redis.queue', 'default');
         $this->setQueue($driver, $default, null, 60, 5);
