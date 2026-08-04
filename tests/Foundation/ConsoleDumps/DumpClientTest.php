@@ -5,7 +5,9 @@ namespace Illuminate\Tests\Foundation\ConsoleDumps;
 use Illuminate\Foundation\ConsoleDumps\DumpClient;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 class DumpClientTest extends TestCase
 {
@@ -20,7 +22,9 @@ class DumpClientTest extends TestCase
         ], 'result');
 
         $connection = stream_socket_accept($server, 1);
-        [$data, $context] = unserialize(base64_decode(fgets($connection)));
+        [$data, $context] = unserialize(base64_decode(fgets($connection)), [
+            'allowed_classes' => [Data::class, Stub::class],
+        ]);
 
         $this->assertInstanceOf(Data::class, $data);
         $this->assertSame(['name' => 'Taylor'], $data->getValue(true));
@@ -29,6 +33,30 @@ class DumpClientTest extends TestCase
         $this->assertSame(
             ['file' => '/app/routes/web.php', 'line' => 10],
             $context['source'],
+        );
+
+        fclose($connection);
+        fclose($server);
+    }
+
+    public function testItSendsClassStringsUsingTheServerProtocol()
+    {
+        $server = stream_socket_server('tcp://127.0.0.1:0');
+        $host = stream_socket_get_name($server, false);
+
+        $client = new DumpClient($host);
+        $client->dump(DumpClientTestFixture::class);
+
+        $connection = stream_socket_accept($server, 1);
+        [$data] = unserialize(base64_decode(fgets($connection)), [
+            'allowed_classes' => [Data::class, Stub::class],
+        ]);
+
+        $dumper = new CliDumper;
+
+        $this->assertSame(
+            $dumper->dump((new VarCloner)->cloneVar(DumpClientTestFixture::class), true),
+            $dumper->dump($data, true),
         );
 
         fclose($connection);
@@ -88,4 +116,9 @@ class TestableDumpClient extends DumpClient
     {
         return $this->socket;
     }
+}
+
+class DumpClientTestFixture
+{
+    public static string $value = 'Laravel';
 }

@@ -39,7 +39,7 @@ class DumpClient
             $this->host = 'tcp://'.$this->host;
         }
 
-        $this->cloner = $cloner ?: tap(new VarCloner)->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
+        $this->cloner = $cloner ?: tap(new DumpCloner)->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
     }
 
     /**
