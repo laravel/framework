@@ -7,6 +7,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
+use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -4225,6 +4226,26 @@ class HttpClientTest extends TestCase
             ->handlerStats();
 
         $this->assertTrue($onStatsFunctionCalled);
+    }
+
+    public function testTheTransferStatsCanBeCustomizedWithACallable(): void
+    {
+        $collector = new class
+        {
+            public $called = false;
+
+            public function collect(TransferStats $stats): void
+            {
+                $this->called = true;
+            }
+        };
+
+        $this->factory->createPendingRequest()
+            ->setHandler(new MockHandler([new Psr7Response(200)]))
+            ->withOptions(['on_stats' => [$collector, 'collect']])
+            ->get('https://example.com');
+
+        $this->assertTrue($collector->called);
     }
 
     public function testItCanAddGlobalMiddleware()
