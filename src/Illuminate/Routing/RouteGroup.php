@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\MetadataMerger;
 
 class RouteGroup
 {
@@ -69,30 +70,7 @@ class RouteGroup
      */
     public static function mergeMetadata(array $old, array $new)
     {
-        foreach ($new as $key => $value) {
-            if (isset($old[$key]) && static::mergableMetadata($old[$key], $value)) {
-                $value = static::mergeMetadata($old[$key], $value);
-            }
-
-            $old[$key] = $value;
-        }
-
-        return $old;
-    }
-
-    /**
-     * Determine if the given metadata values should be merged.
-     *
-     * @param  mixed  $old
-     * @param  mixed  $new
-     * @return bool
-     */
-    protected static function mergableMetadata($old, $new)
-    {
-        return is_array($old) &&
-            is_array($new) &&
-            Arr::isAssoc($old) &&
-            Arr::isAssoc($new);
+        return MetadataMerger::merge($old, $new);
     }
 
     /**
