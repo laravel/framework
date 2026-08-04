@@ -590,6 +590,10 @@ class Builder implements BuilderContract
     /**
      * Find multiple models by their primary keys.
      *
+     * It is safe to provide an empty array of primary keys:
+     * in that case you obtain an empty collection, and no
+     * database query is executed.
+     *
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
      * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Collection<int, TModel>
