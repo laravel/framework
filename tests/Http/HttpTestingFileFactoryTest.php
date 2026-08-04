@@ -119,6 +119,13 @@ class HttpTestingFileFactoryTest extends TestCase
         );
     }
 
+    public function testSizeCanBeSetToZero()
+    {
+        $file = (new FileFactory)->createWithContent('test.txt', 'content')->size(0);
+
+        $this->assertSame(0, $file->getSize());
+    }
+
     #[DataProvider('generateImageDataProvider')]
     public function testCallingCreateWithoutGDLoadedThrowsAnException(string $fileExtension, string $driver)
     {

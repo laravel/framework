@@ -23,7 +23,7 @@ class File extends UploadedFile
     /**
      * The "size" to report.
      *
-     * @var int
+     * @var int|null
      */
     public $sizeToReport;
 
@@ -108,7 +108,7 @@ class File extends UploadedFile
      */
     public function getSize(): int
     {
-        return $this->sizeToReport ?: parent::getSize();
+        return $this->sizeToReport ?? parent::getSize();
     }
 
     /**
