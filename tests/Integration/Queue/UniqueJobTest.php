@@ -56,7 +56,7 @@ class UniqueJobTest extends QueueTestCase
         );
     }
 
-    public function testUniqueJobEmitsEventWhenAlreadyAcquired()
+    public function testUniqueJobEmitsUniqueJobSkippedEventWhenAlreadyAcquired()
     {
         Bus::fake();
 
