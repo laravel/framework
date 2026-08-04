@@ -1728,9 +1728,9 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['products' => ['desk' => []]], $array);
 
         // A "dot" key following a deeper "dot" key is also resolved from the top level
-        $array = ['a' => ['b' => ['c' => 1, 'd' => 2]], 'e' => ['d' => 3]];
+        $array = ['a' => ['b' => ['c' => 1, 'e.d' => 'literal']], 'e' => ['d' => 3]];
         Arr::forget($array, ['a.b.c', 'e.d']);
-        $this->assertEquals(['a' => ['b' => ['d' => 2]], 'e' => []], $array);
+        $this->assertEquals(['a' => ['b' => ['e.d' => 'literal']], 'e' => []], $array);
     }
 
     public function testFrom()
