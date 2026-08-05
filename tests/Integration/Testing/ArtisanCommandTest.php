@@ -128,8 +128,7 @@ class ArtisanCommandTest extends TestCase
 
     public function test_console_command_that_fails_from_zero_as_unexpected_output()
     {
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Output "0" was printed.');
+        $this->expectExceptionObject(new AssertionFailedError('Output "0" was printed.'));
 
         $this->artisan('zero')
             ->doesntExpectOutput('0')
@@ -138,8 +137,7 @@ class ArtisanCommandTest extends TestCase
 
     public function test_console_command_that_fails_from_zero_as_unexpected_output_substring()
     {
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Output "0" was printed.');
+        $this->expectExceptionObject(new AssertionFailedError('Output "0" was printed.'));
 
         $this->artisan('zero')
             ->doesntExpectOutputToContain('0')

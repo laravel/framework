@@ -249,8 +249,7 @@ class PhpRedisConnectorTest extends TestCase
     {
         $connector = new TestablePhpRedisConnector;
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The scheme configured in the Redis host option must match the scheme option.');
+        $this->expectExceptionObject(new InvalidArgumentException('The scheme configured in the Redis host option must match the scheme option.'));
 
         $connector->testFormatHost([
             'host' => 'tcp://127.0.0.1',
@@ -272,8 +271,7 @@ class PhpRedisConnectorTest extends TestCase
     {
         $connector = new TestablePhpRedisConnector;
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Redis host must be a non-empty string.');
+        $this->expectExceptionObject(new InvalidArgumentException('Redis host must be a non-empty string.'));
 
         $connector->testFormatHost([
             'scheme' => 'tls',
@@ -284,8 +282,7 @@ class PhpRedisConnectorTest extends TestCase
     {
         $connector = new TestablePhpRedisConnector;
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Redis host must be a non-empty string.');
+        $this->expectExceptionObject(new InvalidArgumentException('Redis host must be a non-empty string.'));
 
         $connector->testFormatHost([
             'host' => null,

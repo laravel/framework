@@ -1217,8 +1217,7 @@ class QueueSqsQueueTest extends TestCase
         // Only the first chunk is attempted; its exception propagates untouched and later chunks are not sent.
         $this->sqs->shouldReceive('sendMessageBatch')->once()->andThrow(new RuntimeException('SQS is down'));
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('SQS is down');
+        $this->expectExceptionObject(new RuntimeException('SQS is down'));
 
         $queue->bulk(range(1, 15), 'data', $this->fifoQueueName);
     }
@@ -1399,8 +1398,7 @@ class QueueSqsQueueTest extends TestCase
 
         $this->sqs->shouldReceive('sendMessageBatch')->once()->andThrow(new RuntimeException('SQS is down'));
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('SQS is down');
+        $this->expectExceptionObject(new RuntimeException('SQS is down'));
 
         $queue->bulk(['a'], 'data', $this->queueName);
     }

@@ -56,8 +56,7 @@ class ViewCompilerEngineTest extends TestCase
         $engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/http-exception.php');
         $engine->getCompiler()->shouldReceive('isExpired')->once()->andReturn(false);
 
-        $this->expectException(HttpException::class);
-        $this->expectExceptionMessage('http exception message');
+        $this->expectExceptionObject(new HttpException(403, 'http exception message'));
 
         $engine->get(__DIR__.'/fixtures/foo.php');
     }

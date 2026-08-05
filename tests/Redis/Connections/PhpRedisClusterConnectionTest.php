@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Redis\Connections;
 
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -52,7 +53,7 @@ class PhpRedisClusterConnectionTest extends TestCase
         $client->shouldReceive('_masters')->once()->andReturn([]);
         $client->shouldReceive('scan');
 
-        $this->expectExceptionMessage('Unable to determine default node. No master nodes found in the cluster.');
+        $this->expectExceptionObject(new InvalidArgumentException('Unable to determine default node. No master nodes found in the cluster.'));
 
         $connection = new PhpRedisClusterConnection($client);
         $connection->scan(0);

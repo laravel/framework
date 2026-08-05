@@ -435,8 +435,7 @@ class GdDriverTest extends TestCase
     {
         $driver = new GdDriver;
 
-        $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('The image format [text/plain] is not supported.');
+        $this->expectExceptionObject(new ImageException('The image format [text/plain] is not supported.'));
 
         $driver->process('not-an-image', new ImagePipeline);
     }

@@ -135,8 +135,7 @@ class HttpClientTest extends TestCase
     #[DataProvider('invalidFakeResponseHeaderValuesProvider')]
     public function testInvalidFakeResponseHeaderValuesAreRejected($value)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.');
+        $this->expectExceptionObject(new InvalidArgumentException('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'));
 
         $this->factory::response('OK', 200, ['X-Test' => $value]);
     }
@@ -195,16 +194,14 @@ class HttpClientTest extends TestCase
 
     public function testFakeResponseRejectsUnsupportedBody()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('HTTP fake response body must be a string, array, stream resource, Psr\Http\Message\StreamInterface, or null.');
+        $this->expectExceptionObject(new InvalidArgumentException('HTTP fake response body must be a string, array, stream resource, Psr\Http\Message\StreamInterface, or null.'));
 
         $this->factory::response(new stdClass);
     }
 
     public function testFakeResponseRejectsNonStreamResourceBody()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('HTTP fake response body must be a string, array, stream resource, Psr\Http\Message\StreamInterface, or null.');
+        $this->expectExceptionObject(new InvalidArgumentException('HTTP fake response body must be a string, array, stream resource, Psr\Http\Message\StreamInterface, or null.'));
 
         $this->factory::response(stream_context_create());
     }
@@ -843,8 +840,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('HTTP header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.');
+        $this->expectExceptionObject(new InvalidArgumentException('HTTP header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'));
 
         $this->factory->withHeaders(['X-Test' => $value])->post('http://foo.com/json');
     }
@@ -1094,8 +1090,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Multipart header values must be scalar, null, or Laravel Stringable.');
+        $this->expectExceptionObject(new InvalidArgumentException('Multipart header values must be scalar, null, or Laravel Stringable.'));
 
         $this->factory->asMultipart()->post('http://foo.com/multipart', [
             [
@@ -4071,8 +4066,7 @@ class HttpClientTest extends TestCase
         $responses[] = $this->factory->get('https://forge.laravel.com')->body();
         $this->assertSame(['ok', 'ok'], $responses);
 
-        $this->expectException(StrayRequestException::class);
-        $this->expectExceptionMessage('Attempted request to [https://laravel.com] without a matching fake.');
+        $this->expectExceptionObject(new StrayRequestException('https://laravel.com'));
 
         $this->factory->get('https://laravel.com');
     }

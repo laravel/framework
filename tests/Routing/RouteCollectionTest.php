@@ -319,8 +319,7 @@ class RouteCollectionTest extends TestCase
 
     public function testRouteCollectionRequestMethodNotAllowed()
     {
-        $this->expectException(MethodNotAllowedHttpException::class);
-        $this->expectExceptionMessage('The POST method is not supported for route users. Supported methods: GET, HEAD.');
+        $this->expectExceptionObject(new MethodNotAllowedHttpException(['GET', 'HEAD'], 'The POST method is not supported for route users. Supported methods: GET, HEAD.'));
 
         $this->routeCollection->add(
             new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])

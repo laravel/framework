@@ -75,8 +75,7 @@ class ImageManagerTest extends TestCase
 
         $manager = new ImageManager($app);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Image driver [nonexistent] is not supported.');
+        $this->expectExceptionObject(new InvalidArgumentException('Image driver [nonexistent] is not supported.'));
 
         $manager->driver('nonexistent');
     }
@@ -273,8 +272,7 @@ class ImageManagerTest extends TestCase
         $app = $this->makeApp([]);
         $manager = new ImageManager($app);
 
-        $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('Invalid base64 image data.');
+        $this->expectExceptionObject(new ImageException('Invalid base64 image data.'));
 
         $manager->fromBase64('!!!not-base64!!!')->toBytes();
     }

@@ -387,8 +387,7 @@ class RoutingRouteTest extends TestCase
 
     public function testMiddlewareGroupsCannotReferenceItself()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('[web] middleware group is referencing itself.');
+        $this->expectExceptionObject(new LogicException('[web] middleware group is referencing itself.'));
 
         $router = $this->getRouter();
         $router->get('foo/bar', ['middleware' => 'web', function () {

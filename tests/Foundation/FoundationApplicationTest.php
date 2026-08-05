@@ -590,8 +590,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testAbortThrowsHttpException()
     {
-        $this->expectException(HttpException::class);
-        $this->expectExceptionMessage('Request is bad');
+        $this->expectExceptionObject(new HttpException(400, 'Request is bad'));
 
         $app = new Application();
         $app->abort(400, 'Request is bad');
