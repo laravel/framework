@@ -956,12 +956,12 @@ class Str
     /**
      * Remove all non-numeric characters from a string.
      *
-     * @param  string  $value
-     * @return string
+     * @param  string|string[]  $value
+     * @return ($value is string ? string : string[])
      */
     public static function numbers($value)
     {
-        return preg_replace('/[^0-9]/', '', $value);
+        return preg_replace('/\D/', '', $value);
     }
 
     /**
