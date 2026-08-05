@@ -80,7 +80,9 @@ class ThrottlesExceptionsTest extends TestCase
 
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
         $job->shouldReceive('release')->withArgs(function ($delay) {
-            return $delay >= 600;
+            // The delay is the remainder of the decay window, less wall clock
+            // seconds elapsed since the first exception opened the circuit.
+            return $delay >= 590 && $delay <= 610;
         })->once();
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
