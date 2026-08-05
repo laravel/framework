@@ -169,8 +169,7 @@ class ViewTest extends TestCase
 
     public function testViewBadMethod()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Method Illuminate\View\View::badMethodCall does not exist.');
+        $this->expectExceptionObject(new BadMethodCallException('Method Illuminate\View\View::badMethodCall does not exist.'));
 
         $view = $this->getView();
         $view->badMethodCall();

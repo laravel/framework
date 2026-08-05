@@ -255,8 +255,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c->push($model2);
         $this->assertCount(2, $c->findOrFail([1, 2]));
 
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\TestEloquentCollectionModel] 3');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\TestEloquentCollectionModel] 3'));
 
         $c->findOrFail([1, 2, 3]);
     }
@@ -267,8 +266,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c = new Collection([$model]);
 
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\TestEloquentCollectionModel] 2');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\TestEloquentCollectionModel] 2'));
 
         $c->findOrFail(2);
     }
@@ -277,8 +275,7 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $c = new Collection();
 
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('');
+        $this->expectExceptionObject(new ModelNotFoundException(''));
 
         $c->findOrFail(1);
     }
@@ -653,8 +650,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testQueueableCollectionImplementationThrowsExceptionOnMultipleModelTypes()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Queueing collections with multiple model types is not supported.');
+        $this->expectExceptionObject(new LogicException('Queueing collections with multiple model types is not supported.'));
 
         $c = new Collection([new TestEloquentCollectionModel, (object) ['id' => 'something']]);
         $c->getQueueableClass();

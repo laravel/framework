@@ -7,6 +7,7 @@ use ArrayIterator;
 use Carbon\CarbonInterval;
 use Countable;
 use Error;
+use Exception;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
@@ -850,42 +851,37 @@ class SupportHelpersTest extends TestCase
 
     public function testThrowExceptionWithMessage()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new RuntimeException('test'));
 
         throw_if(true, 'test');
     }
 
     public function testThrowExceptionAsStringWithMessage()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new LogicException('test'));
 
         throw_if(true, LogicException::class, 'test');
     }
 
     public function testThrowClosureException()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new Exception('test'));
 
-        throw_if(true, fn () => new \Exception('test'));
+        throw_if(true, fn () => new Exception('test'));
     }
 
     public function testThrowClosureWithParamsException()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new Exception('test'));
 
-        throw_if(true, fn (string $message) => new \Exception($message), 'test');
+        throw_if(true, fn (string $message) => new Exception($message), 'test');
     }
 
     public function testThrowClosureStringWithParamsException()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new Exception('test'));
 
-        throw_if(true, fn () => \Exception::class, 'test');
+        throw_if(true, fn () => Exception::class, 'test');
     }
 
     public function testThrowUnless()
@@ -904,16 +900,14 @@ class SupportHelpersTest extends TestCase
 
     public function testThrowUnlessExceptionWithMessage()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new RuntimeException('test'));
 
         throw_unless(false, 'test');
     }
 
     public function testThrowUnlessExceptionAsStringWithMessage()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new LogicException('test'));
 
         throw_unless(false, LogicException::class, 'test');
     }
@@ -925,8 +919,7 @@ class SupportHelpersTest extends TestCase
 
     public function testThrowWithString()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Test Message');
+        $this->expectExceptionObject(new RuntimeException('Test Message'));
 
         throw_if(true, RuntimeException::class, 'Test Message');
     }
@@ -1834,8 +1827,7 @@ class SupportHelpersTest extends TestCase
     #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyLazyThrowsWhenNotClassSpecifiedInClosure(): void
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The first parameter of the given Closure is missing a type hint.');
+        $this->expectExceptionObject(new RuntimeException('The first parameter of the given Closure is missing a type hint.'));
 
         lazy(function ($instance) {
             //
@@ -2114,8 +2106,7 @@ class SupportHelpersTest extends TestCase
     #[RequiresPhp('>= 8.4.0')]
     public function testClosureOnlyProxyThrowsWhenNotClassSpecifiedInClosure(): void
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The first parameter of the given Closure is missing a type hint.');
+        $this->expectExceptionObject(new RuntimeException('The first parameter of the given Closure is missing a type hint.'));
 
         proxy(function ($proxy) {
             //

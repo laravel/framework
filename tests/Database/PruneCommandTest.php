@@ -11,6 +11,7 @@ use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -39,8 +40,7 @@ class PruneCommandTest extends TestCase
 
     public function testPrunableModelAndExceptWithEachOther(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The --model and --except options cannot be combined.');
+        $this->expectExceptionObject(new InvalidArgumentException('The --model and --except options cannot be combined.'));
 
         $this->artisan([
             '--model' => Pruning\Models\PrunableTestModelWithPrunableRecords::class,

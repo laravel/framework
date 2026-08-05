@@ -119,8 +119,7 @@ PHP);
 
     public function testRunHandlerProcessErrorWithDefaultExceptionWithoutParam()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('This is a different exception');
+        $this->expectExceptionObject(new Exception('This is a different exception'));
 
         Concurrency::run([
             fn () => throw new Exception(
@@ -131,8 +130,7 @@ PHP);
 
     public function testRunHandlerProcessErrorWithCustomExceptionWithoutParam()
     {
-        $this->expectException(ExceptionWithoutParam::class);
-        $this->expectExceptionMessage('Test');
+        $this->expectExceptionObject(new ExceptionWithoutParam('Test'));
         Concurrency::run([
             fn () => throw new ExceptionWithoutParam('Test'),
         ]);
