@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
+use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\Attributes\Timeout;
@@ -66,6 +67,13 @@ class BroadcastEvent implements ShouldQueue
     public $deleteWhenMissingModels = true;
 
     /**
+     * Indicates if the job should be marked as failed on timeout.
+     *
+     * @var bool
+     */
+    public $failOnTimeout = false;
+
+    /**
      * Create a new job handler instance.
      *
      * @param  mixed  $event
@@ -79,6 +87,7 @@ class BroadcastEvent implements ShouldQueue
         $this->afterCommit = property_exists($event, 'afterCommit') ? $event->afterCommit : null;
         $this->maxExceptions = $this->getAttributeValue($event, MaxExceptions::class, 'maxExceptions');
         $this->deleteWhenMissingModels = $this->getAttributeValue($event, DeleteWhenMissingModels::class, 'deleteWhenMissingModels');
+        $this->failOnTimeout = $this->getAttributeValue($event, FailOnTimeout::class, 'failOnTimeout') ?? false;
     }
 
     /**
