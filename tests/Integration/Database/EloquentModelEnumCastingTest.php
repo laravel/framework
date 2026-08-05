@@ -275,9 +275,10 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
     {
         $model = new EloquentModelEnumCastingTestModel;
 
-        $this->expectExceptionObject(new ValueError(
+        $this->expectException(ValueError::class);
+        $this->expectExceptionMessage(
             sprintf('Value [%s] is not of the expected enum type [%s].', var_export(ArrayableStatus::pending, true), StringStatus::class)
-        ));
+        );
 
         $model->string_status = ArrayableStatus::pending;
     }
@@ -286,9 +287,10 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
     {
         $model = new EloquentModelEnumCastingTestModel;
 
-        $this->expectExceptionObject(new ValueError(
+        $this->expectException(ValueError::class);
+        $this->expectExceptionMessage(
             sprintf('"unexpected_value" is not a valid backing value for enum %s', StringStatus::class)
-        ));
+        );
 
         $model->string_status = 'unexpected_value';
     }
