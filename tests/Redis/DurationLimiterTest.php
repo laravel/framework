@@ -14,16 +14,12 @@ class DurationLimiterTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->setUpRedis();
     }
 
     protected function tearDown(): void
     {
         $this->tearDownRedis();
-
-        parent::tearDown();
     }
 
     public function testItLocksTasksWhenNoSlotAvailable()

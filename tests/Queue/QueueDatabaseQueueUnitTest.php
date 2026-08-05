@@ -251,6 +251,40 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->bulk([new JobWithDelayAttribute], ['data'], 'queue');
     }
 
+    public function testBulkDefersAfterCommitJobsUntilTheTransactionCommits()
+    {
+        $transactions = m::mock(\Illuminate\Database\DatabaseTransactionsManager::class);
+
+        $committed = null;
+
+        $transactions->shouldReceive('addCallback')->once()->andReturnUsing(function ($callback) use (&$committed) {
+            $committed = $callback;
+        });
+
+        $container = new Container;
+        $container->instance('db.transactions', $transactions);
+
+        $database = m::mock(Connection::class);
+        $queue = new DatabaseQueue($database, 'table', 'default');
+        $queue->setContainer($container);
+
+        $inserted = false;
+
+        $database->shouldReceive('table')->with('table')->once()->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('insert')->once()->andReturnUsing(function () use (&$inserted) {
+            $inserted = true;
+        });
+
+        $queue->bulk([new AfterCommitJob]);
+
+        $this->assertNotNull($committed);
+        $this->assertFalse($inserted);
+
+        $committed();
+
+        $this->assertTrue($inserted);
+    }
+
     public function testBuildDatabaseRecordWithPayloadAtTheEnd()
     {
         $queue = m::mock(DatabaseQueue::class);
@@ -464,6 +498,11 @@ class MyBatchableJob
 #[Delay(15)]
 class JobWithDelayAttribute
 {
+}
+
+class AfterCommitJob implements ShouldQueue
+{
+    public $afterCommit = true;
 }
 
 #[Backoff(9)]

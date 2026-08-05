@@ -54,7 +54,7 @@ class DevCommand extends Command
 
         putenv('COLUMNS='.max(terminal()->width() - $longestName - 4, 1));
 
-        $this->line('');
+        // $this->line('');
 
         foreach ($devCommands as $devCommand) {
             $this->line(

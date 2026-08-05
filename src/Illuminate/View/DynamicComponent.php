@@ -123,8 +123,8 @@ EOF;
     protected function compileSlots(array $slots)
     {
         return (new Collection($slots))
-            ->map(fn ($slot, $name) => $name === '__default' ? null : '<x-slot name="'.$name.'" '.((string) $slot->attributes).'>{{ $'.$name.' }}</x-slot>')
-            ->filter()
+            ->reject(fn ($slot, $name) => $name === '__default')
+            ->map(fn ($slot, $name) => '<x-slot name="'.$name.'" '.((string) $slot->attributes).'>{{ $'.$name.' }}</x-slot>')
             ->implode(PHP_EOL);
     }
 

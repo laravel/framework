@@ -613,7 +613,5 @@ class ValidationPasswordRuleTest extends TestCase
         Facade::setFacadeApplication(null);
 
         Password::$defaultCallback = null;
-
-        parent::tearDown();
     }
 }

@@ -212,8 +212,10 @@ class FailoverStore extends TaggableStore implements CanFlushLocks, LockProvider
         foreach ($this->stores as $store) {
             $underlyingStore = $this->store($store)->getStore();
 
-            if ($underlyingStore instanceof CanFlushLocks && ! $underlyingStore->flushLocks()) {
-                $result = false;
+            if ($underlyingStore instanceof CanFlushLocks) {
+                if (! $underlyingStore->flushLocks()) {
+                    $result = false;
+                }
             }
         }
 

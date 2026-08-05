@@ -9,9 +9,9 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -459,9 +459,17 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function hasCorrectSignature(Request $request, $absolute = true, Closure|array $ignoreQuery = [])
     {
-        $url = $absolute ? $request->url() : '/'.$request->path();
+        $signature = $request->query('signature');
 
-        $queryString = (new Collection(explode('&', (string) $request->server->get('QUERY_STRING'))))
+        if (! is_string($signature)) {
+            return false;
+        }
+
+        $url = $absolute
+            ? rtrim($request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo(), '/')
+            : '/'.$request->path();
+
+        $queryString = (new Stringable((string) $request->server->get('QUERY_STRING')))->explode('&')
             ->reject(function ($parameter) use ($ignoreQuery) {
                 $parameter = Str::before($parameter, '=');
 
@@ -482,12 +490,6 @@ class UrlGenerator implements UrlGeneratorContract
         $keys = call_user_func($this->keyResolver);
 
         $keys = is_array($keys) ? $keys : [$keys];
-
-        $signature = $request->query('signature');
-
-        if (! is_string($signature)) {
-            return false;
-        }
 
         return array_any($keys, fn ($key) => hash_equals(
             hash_hmac('sha256', $original, $key),

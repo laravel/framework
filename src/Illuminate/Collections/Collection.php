@@ -126,7 +126,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function mode($key = null)
     {
-        if ($this->count() === 0) {
+        if ($this->isEmpty()) {
             return;
         }
 
@@ -586,6 +586,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             }
 
             if (is_object($resolvedKey)) {
+                $resolvedKey = (string) $resolvedKey;
+            }
+
+            if (is_null($resolvedKey)) {
                 $resolvedKey = (string) $resolvedKey;
             }
 

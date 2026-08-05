@@ -145,7 +145,7 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
 
         $this->components->twoColumnDetail('<fg=green;options=bold>Events</>');
 
-        if ($modelData->events->count()) {
+        if ($modelData->events->isNotEmpty()) {
             foreach ($modelData->events as $event) {
                 $this->components->twoColumnDetail(
                     sprintf('%s', $event['event']),
@@ -158,7 +158,7 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
 
         $this->components->twoColumnDetail('<fg=green;options=bold>Observers</>');
 
-        if ($modelData->observers->count()) {
+        if ($modelData->observers->isNotEmpty()) {
             foreach ($modelData->observers as $observer) {
                 $this->components->twoColumnDetail(
                     sprintf('%s', $observer['event']),

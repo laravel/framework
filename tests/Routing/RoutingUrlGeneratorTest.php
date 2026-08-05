@@ -804,6 +804,36 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url->hasValidSignature($request, ignoreQuery: fn ($parameter) => $parameter === 'tampered'));
     }
 
+    public function testSignedUrlDoesNotTrustForwardedPrefixToChangeThePathBeingVerified()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(fn () => 'secret');
+
+        $routes->add(new Route(['GET'], 'document/{document}', ['as' => 'document.show', function () {
+            //
+        }]));
+
+        $signedUrl = $url->signedRoute('document.show', ['document' => 1]);
+
+        $request = Request::create(
+            'http://www.foo.com/admin/42?'.parse_url($signedUrl, PHP_URL_QUERY),
+            'GET', [], [], [], [
+                'REMOTE_ADDR' => '127.0.0.1',
+                'HTTP_X_FORWARDED_PREFIX' => '/document/1?',
+            ]
+        );
+        $request::setTrustedProxies(['127.0.0.1'], Request::HEADER_X_FORWARDED_PREFIX);
+
+        try {
+            $this->assertFalse($url->hasValidSignature($request));
+        } finally {
+            $request::setTrustedProxies([], Request::HEADER_X_FORWARDED_PREFIX);
+        }
+    }
+
     public function testSignedUrlImplicitModelBinding()
     {
         $url = new UrlGenerator(
@@ -920,6 +950,35 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame(
             'http://www.foo.com/foo?filter%5B0%5D=people&filter%5B1%5D=fruits',
             $url->route('foo', ['filter' => [CategoryBackedEnum::People, CategoryBackedEnum::Fruits]]),
+        );
+    }
+
+    public function testRouteGenerationWithUnitEnums(): void
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $namedRoute = new Route(['GET'], '/foo/{bar}', ['as' => 'foo.bar']);
+        $routes->add($namedRoute);
+
+        $this->assertSame('http://www.foo.com/foo/Fruits', $url->route('foo.bar', CategoryEnum::Fruits));
+    }
+
+    public function testRouteGenerationWithNestedUnitEnums(): void
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $namedRoute = new Route(['GET'], '/foo', ['as' => 'foo']);
+        $routes->add($namedRoute);
+
+        $this->assertSame(
+            'http://www.foo.com/foo?filter%5B0%5D=People&filter%5B1%5D=Fruits',
+            $url->route('foo', ['filter' => [CategoryEnum::People, CategoryEnum::Fruits]]),
         );
     }
 

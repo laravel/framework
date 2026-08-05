@@ -22,8 +22,6 @@ final class ScheduleTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->container = new Container;
         Container::setInstance($this->container);
         $eventMutex = m::mock(EventMutex::class);

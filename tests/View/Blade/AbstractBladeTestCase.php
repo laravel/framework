@@ -18,8 +18,6 @@ abstract class AbstractBladeTestCase extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->compiler = new BladeCompiler($this->getFiles(), __DIR__);
     }
 
@@ -29,8 +27,6 @@ abstract class AbstractBladeTestCase extends TestCase
         Component::flushCache();
         Component::forgetComponentsResolver();
         Component::forgetFactory();
-
-        parent::tearDown();
     }
 
     protected function getFiles()

@@ -85,17 +85,7 @@ class ImagickDriverTest extends TestCase
 
     public function test_processes_optimize_to_avif()
     {
-        if (\Imagick::queryFormats('AVIF') === []) {
-            $this->markTestSkipped('The Imagick extension was not compiled with AVIF support.');
-        }
-
-        $imagick = new \Imagick;
-        $imagick->newImage(1, 1, 'white');
-        $imagick->setImageFormat('avif');
-
-        if ($imagick->getImageBlob() === '') {
-            $this->markTestSkipped('The Imagick extension cannot encode AVIF images.');
-        }
+        $this->ensureImageFormatCanBeEncoded('avif');
 
         $driver = new ImagickDriver;
 
@@ -108,6 +98,47 @@ class ImagickDriverTest extends TestCase
         // "ftyp" box and brand directly instead of relying on either.
         $this->assertStringContainsString('ftyp', substr($result, 0, 16));
         $this->assertMatchesRegularExpression('/avif|avis|mif1/', substr($result, 0, 32));
+    }
+
+    public function test_processes_avif_input()
+    {
+        $this->ensureImageFormatCanBeEncoded('avif');
+
+        $driver = new ImagickDriver;
+        $contents = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'avif'));
+
+        $result = $driver->process($contents, $this->pipeline(new Cover(50, 25), format: 'jpg'));
+
+        $this->assertSame([50, 25], array_slice(getimagesizefromstring($result), 0, 2));
+    }
+
+    public function test_processes_optimize_to_heic()
+    {
+        $this->ensureImageFormatCanBeEncoded('heic');
+
+        $driver = new ImagickDriver;
+
+        $result = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'heic'));
+
+        $this->assertStringContainsString('ftyp', substr($result, 0, 16));
+        $this->assertMatchesRegularExpression('/heic|heix|hevc|hevx|mif1/', substr($result, 0, 32));
+    }
+
+    public function test_processes_heic_input()
+    {
+        $this->ensureImageFormatCanBeEncoded('heic');
+
+        $driver = new ImagickDriver;
+        $contents = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'heic'));
+
+        $result = $driver->process($contents, $this->pipeline(new Cover(50, 25)));
+
+        $this->assertStringContainsString('ftyp', substr($result, 0, 16));
+        $this->assertMatchesRegularExpression('/heic|heix|hevc|hevx|mif1/', substr($result, 0, 32));
+
+        $result = $driver->process($result, $this->pipeline(format: 'jpg'));
+
+        $this->assertSame([50, 25], array_slice(getimagesizefromstring($result), 0, 2));
     }
 
     public function test_processes_optimize_to_bmp()
@@ -171,6 +202,14 @@ class ImagickDriverTest extends TestCase
     {
         $driver = new ImagickDriver;
         $contents = $this->solidColorImageContents(0, 128, 255);
+
+        $this->assertSame('#0080ff', $driver->dominantColor($contents));
+    }
+
+    public function test_dominant_color_ignores_alpha_channel(): void
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->semiTransparentColorImageContents(0, 128, 255, 128);
 
         $this->assertSame('#0080ff', $driver->dominantColor($contents));
     }
@@ -444,10 +483,39 @@ class ImagickDriverTest extends TestCase
         return file_get_contents($file->getRealPath());
     }
 
+    protected function ensureImageFormatCanBeEncoded(string $format): void
+    {
+        if (\Imagick::queryFormats(strtoupper($format)) === []) {
+            $this->markTestSkipped("The Imagick extension was not compiled with {$format} support.");
+        }
+
+        $imagick = new \Imagick;
+        $imagick->newImage(1, 1, 'white');
+        $imagick->setImageFormat($format);
+
+        if ($imagick->getImageBlob() === '') {
+            $this->markTestSkipped("The Imagick extension cannot encode {$format} images.");
+        }
+    }
+
     protected function solidColorImageContents(int $red, int $green, int $blue, int $width = 100, int $height = 100): string
     {
         $imagick = new \Imagick;
         $imagick->newImage($width, $height, new \ImagickPixel(sprintf('rgb(%d,%d,%d)', $red, $green, $blue)));
+        $imagick->setImageAlphaChannel(\Imagick::ALPHACHANNEL_OPAQUE);
+        $imagick->setImageFormat('png');
+
+        $contents = $imagick->getImageBlob();
+        $imagick->clear();
+        $imagick->destroy();
+
+        return $contents;
+    }
+
+    protected function semiTransparentColorImageContents(int $red, int $green, int $blue, int $alpha, int $width = 100, int $height = 100): string
+    {
+        $imagick = new \Imagick;
+        $imagick->newImage($width, $height, new \ImagickPixel(sprintf('rgba(%d,%d,%d,%.2f)', $red, $green, $blue, $alpha / 255)));
         $imagick->setImageFormat('png');
 
         $contents = $imagick->getImageBlob();

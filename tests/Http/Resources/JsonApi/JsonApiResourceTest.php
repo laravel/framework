@@ -13,8 +13,6 @@ class JsonApiResourceTest extends TestCase
     {
         JsonResource::flushState();
         JsonApiResource::flushState();
-
-        parent::tearDown();
     }
 
     public function testResponseWrapperIsHardCodedToData()

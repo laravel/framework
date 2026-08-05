@@ -45,8 +45,6 @@ class ValidationValidatorTest extends TestCase
     protected function tearDown(): void
     {
         Validator::flushState();
-
-        parent::tearDown();
     }
 
     public function testNestedErrorMessagesAreRetrievedFromLocalArray()
@@ -4549,6 +4547,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('There is a duplication!', $v->messages()->first('foo.1'));
 
         $v = new Validator($trans, ['foo' => ['0100', '100']], ['foo.*' => 'distinct:strict']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['users' => [['name' => ['John']], ['name' => ['john']]]], ['users.*.name' => 'distinct:ignore_case']);
         $this->assertTrue($v->passes());
     }
 

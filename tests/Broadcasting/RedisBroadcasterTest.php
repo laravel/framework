@@ -19,8 +19,6 @@ class RedisBroadcasterTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->broadcaster = m::mock(RedisBroadcaster::class)->makePartial();
         $container = Container::setInstance(new Container);
 

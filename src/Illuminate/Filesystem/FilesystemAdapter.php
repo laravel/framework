@@ -942,7 +942,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string|null  $directory
      * @param  bool  $recursive
-     * @return array
+     * @return array<string>
      */
     public function files($directory = null, $recursive = false)
     {
@@ -961,7 +961,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Get all of the files from the given directory (recursive).
      *
      * @param  string|null  $directory
-     * @return array
+     * @return array<string>
      */
     public function allFiles($directory = null)
     {
@@ -973,7 +973,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string|null  $directory
      * @param  bool  $recursive
-     * @return array
+     * @return array<string>
      */
     public function directories($directory = null, $recursive = false)
     {
@@ -991,7 +991,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Get all the directories within a given directory (recursive).
      *
      * @param  string|null  $directory
-     * @return array
+     * @return array<string>
      */
     public function allDirectories($directory = null)
     {

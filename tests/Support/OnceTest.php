@@ -11,8 +11,6 @@ class OnceTest extends TestCase
     {
         Once::flush();
         Once::enable();
-
-        parent::tearDown();
     }
 
     public function testResultMemoization()

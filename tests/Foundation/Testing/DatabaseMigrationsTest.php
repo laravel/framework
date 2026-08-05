@@ -47,8 +47,6 @@ class DatabaseMigrationsTest extends TestCase
         $this->tearDownTheApplicationTestingHooks();
 
         RefreshDatabaseState::$migrated = false;
-
-        parent::tearDown();
     }
 
     protected function refreshApplication()

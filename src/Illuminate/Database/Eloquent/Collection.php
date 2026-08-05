@@ -268,8 +268,8 @@ class Collection extends BaseCollection implements QueueableCollection
         if ($loadMissingRelations) {
             $this->filter(function ($model) use ($relation, $class) {
                 return ! is_null($model) &&
-                    ! $model->relationLoaded($relation) &&
-                    $model::class === $class;
+                    $model::class === $class &&
+                    ! $model->relationLoaded($relation);
             })->load($relation);
         }
 
@@ -277,9 +277,11 @@ class Collection extends BaseCollection implements QueueableCollection
             return;
         }
 
-        $models = $this->filter(fn ($model) => ! is_null($model) && $model->relationLoaded($relation))
-            ->pluck($relation)
-            ->whereNotNull();
+        $models = $this->filter(function ($model) use ($relation, $class) {
+            return ! is_null($model) &&
+                $model::class === $class &&
+                $model->relationLoaded($relation);
+        })->pluck($relation)->whereNotNull();
 
         if ($models->first() instanceof BaseCollection) {
             $models = $models->collapse();
@@ -302,9 +304,9 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $this->filter(function ($model) use ($attribute, $class) {
             return ! is_null($model) &&
+                $model::class === $class &&
                 $model->exists &&
-                ! array_key_exists($attribute, $model->getAttributes()) &&
-                $model::class === $class;
+                ! array_key_exists($attribute, $model->getAttributes());
         })->loadAggregate($relation, '*', $function);
     }
 

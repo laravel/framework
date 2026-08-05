@@ -19,8 +19,6 @@ class ConcurrencyLimiterTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->repository = new Repository(new ArrayStore);
     }
 

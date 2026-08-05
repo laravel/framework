@@ -2,11 +2,12 @@
 
 namespace Illuminate\Routing;
 
-use BackedEnum;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+
+use function Illuminate\Support\enum_value;
 
 class RouteUrlGenerator
 {
@@ -299,9 +300,7 @@ class RouteUrlGenerator
         })->all();
 
         array_walk_recursive($parameters, function (&$item) {
-            if ($item instanceof BackedEnum) {
-                $item = $item->value;
-            }
+            $item = enum_value($item);
         });
 
         return $this->url->formatParameters($parameters);

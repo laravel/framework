@@ -16,8 +16,6 @@ class DatabaseMigratorTest extends TestCase
     protected function tearDown(): void
     {
         (new ReflectionProperty(Migrator::class, 'connectionResolverCallback'))->setValue(null, null);
-
-        parent::tearDown();
     }
 
     public function testResolveConnectionUsesDirectVariantWhenConfigured()

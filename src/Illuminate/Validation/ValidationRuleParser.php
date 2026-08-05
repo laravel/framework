@@ -176,11 +176,13 @@ class ValidationRuleParser
                             [$attribute => [$key]]
                         );
 
-                        $results = $this->mergeRules($results, $compiled->rules);
+                        foreach ($compiled->rules as $compiledAttribute => $compiledRules) {
+                            $this->mergeRulesForAttributeInto($results, $compiledAttribute, $compiledRules);
+                        }
                     } else {
                         $this->implicitAttributes[$attribute][] = $key;
 
-                        $results = $this->mergeRules($results, $key, $rule);
+                        $this->mergeRulesForAttributeInto($results, $key, $rule);
                     }
                 }
             }
@@ -222,13 +224,26 @@ class ValidationRuleParser
      */
     protected function mergeRulesForAttribute($results, $attribute, $rules)
     {
+        $this->mergeRulesForAttributeInto($results, $attribute, $rules);
+
+        return $results;
+    }
+
+    /**
+     * Merge additional rules into a given attribute by reference.
+     *
+     * @param  array  $results
+     * @param  string  $attribute
+     * @param  string|array  $rules
+     * @return void
+     */
+    private function mergeRulesForAttributeInto(&$results, $attribute, $rules)
+    {
         $merge = head($this->explodeRules([$rules]));
 
         $results[$attribute] = array_merge(
             isset($results[$attribute]) ? $this->explodeExplicitRule($results[$attribute], $attribute) : [], $merge
         );
-
-        return $results;
     }
 
     /**
@@ -243,7 +258,11 @@ class ValidationRuleParser
             return [$rule, []];
         }
 
-        $rule = is_array($rule) ? static::parseArrayRule($rule) : static::parseStringRule($rule);
+        if (is_array($rule)) {
+            $rule = static::parseArrayRule($rule);
+        } else {
+            $rule = static::parseStringRule($rule);
+        }
 
         $rule[0] = static::normalizeRule($rule[0]);
 

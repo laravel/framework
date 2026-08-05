@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Stringable;
 use RuntimeException;
 
 class MySqlGrammar extends Grammar
@@ -743,7 +744,7 @@ class MySqlGrammar extends Grammar
     public function escapeNames($names)
     {
         return array_map(
-            fn ($name) => (new Collection(explode('.', $name)))->map($this->wrapValue(...))->implode('.'),
+            fn ($name) => (new Stringable($name))->explode('.')->map($this->wrapValue(...))->implode('.'),
             $names
         );
     }
@@ -972,8 +973,11 @@ class MySqlGrammar extends Grammar
         $isMaria = $this->connection->isMaria();
         $version = $this->connection->getServerVersion();
 
-        if (($isMaria || ! $isMaria && version_compare($version, '8.0.13', '>=')) && $column->useCurrent) {
-            $column->default(new Expression('(CURDATE())'));
+        if ($isMaria ||
+            (! $isMaria && version_compare($version, '8.0.13', '>='))) {
+            if ($column->useCurrent) {
+                $column->default(new Expression('(CURDATE())'));
+            }
         }
 
         return 'date';
@@ -1076,8 +1080,11 @@ class MySqlGrammar extends Grammar
         $isMaria = $this->connection->isMaria();
         $version = $this->connection->getServerVersion();
 
-        if (($isMaria || ! $isMaria && version_compare($version, '8.0.13', '>=')) && $column->useCurrent) {
-            $column->default(new Expression('(YEAR(CURDATE()))'));
+        if ($isMaria ||
+            (! $isMaria && version_compare($version, '8.0.13', '>='))) {
+            if ($column->useCurrent) {
+                $column->default(new Expression('(YEAR(CURDATE()))'));
+            }
         }
 
         return 'year';

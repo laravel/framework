@@ -16,8 +16,6 @@ class RouteListCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->app = new Application(
             $laravel = new \Illuminate\Foundation\Application(__DIR__),
             m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),

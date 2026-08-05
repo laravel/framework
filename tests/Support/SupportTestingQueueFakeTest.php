@@ -29,7 +29,6 @@ class SupportTestingQueueFakeTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->fake = new QueueFake(new Application);
         $this->job = new JobStub;
     }
@@ -604,6 +603,7 @@ class SupportTestingQueueFakeTest extends TestCase
 
         $this->assertCount(1, $pending);
         $this->assertInstanceOf(InspectedJob::class, $pending->first());
+        $this->assertIsString($pending->first()->uuid);
         $this->assertSame(JobStub::class, $pending->first()->name);
         $this->assertSame(0, $pending->first()->attempts);
         $this->assertSame('foo', $pending->first()->queue);
@@ -629,6 +629,7 @@ class SupportTestingQueueFakeTest extends TestCase
 
         $this->assertCount(2, $pending);
         $this->assertInstanceOf(InspectedJob::class, $pending->first());
+        $this->assertCount(2, $pending->pluck('uuid')->unique());
         $this->assertTrue($pending->contains(fn ($job) => $job->name === JobStub::class));
         $this->assertTrue($pending->contains(fn ($job) => $job->name === JobToFakeStub::class));
     }
@@ -642,6 +643,7 @@ class SupportTestingQueueFakeTest extends TestCase
 
         $this->assertCount(1, $delayed);
         $this->assertInstanceOf(InspectedJob::class, $delayed->first());
+        $this->assertIsString($delayed->first()->uuid);
         $this->assertSame(JobStub::class, $delayed->first()->name);
         $this->assertSame(0, $delayed->first()->attempts);
         $this->assertSame('foo', $delayed->first()->queue);
@@ -656,6 +658,7 @@ class SupportTestingQueueFakeTest extends TestCase
 
         $this->assertCount(2, $delayed);
         $this->assertInstanceOf(InspectedJob::class, $delayed->first());
+        $this->assertCount(2, $delayed->pluck('uuid')->unique());
         $this->assertTrue($delayed->contains(fn ($job) => $job->name === JobStub::class));
         $this->assertTrue($delayed->contains(fn ($job) => $job->name === JobToFakeStub::class));
     }
@@ -701,6 +704,7 @@ class SupportTestingQueueFakeTest extends TestCase
 
         $this->assertCount(1, $reserved);
         $this->assertInstanceOf(InspectedJob::class, $reserved->first());
+        $this->assertIsString($reserved->first()->uuid);
         $this->assertSame(JobStub::class, $reserved->first()->name);
         $this->assertSame(0, $reserved->first()->attempts);
         $this->assertSame('foo', $reserved->first()->queue);

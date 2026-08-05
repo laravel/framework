@@ -5,8 +5,6 @@ declare(strict_types=1);
 use Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector;
 use Rector\CodeQuality\Rector\FuncCall\SortCallLikeNamedArgsRector;
 use Rector\CodeQuality\Rector\Identical\StrlenZeroToIdenticalEmptyStringRector;
-use Rector\CodeQuality\Rector\If_\CombineIfRector;
-use Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector;
 use Rector\CodingStyle\Rector\ArrowFunction\ArrowFunctionDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\Closure\ClosureDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\FuncCall\CountArrayToEmptyArrayComparisonRector;
@@ -27,7 +25,6 @@ use Rector\Php80\Rector\FuncCall\ClassOnObjectRector;
 use Rector\Php80\Rector\Switch_\ChangeSwitchToMatchRector;
 use Rector\Php80\Rector\Ternary\GetDebugTypeRector;
 use Rector\Php81\Rector\Array_\ArrayToFirstClassCallableRector;
-use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\Php83\Rector\ClassConst\AddTypeToConstRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
@@ -89,7 +86,6 @@ return RectorConfig::configure()
         DynamicClassConstFetchRector::class,
         FunctionFirstClassCallableRector::class,
         GetDebugTypeRector::class,
-        NullToStrictStringFuncCallArgRector::class,
         RandomFunctionRector::class,
         ReadOnlyPropertyRector::class,
         RemoveExtraParametersRector::class,
@@ -101,10 +97,8 @@ return RectorConfig::configure()
         'tests/Foundation/fixtures/bad-syntax-strategy.php',
     ])
     ->withRules([
-        CombineIfRector::class,
         CompactToVariablesRector::class,
         CountArrayToEmptyArrayComparisonRector::class,
-        SimplifyIfElseToTernaryRector::class,
         SortCallLikeNamedArgsRector::class,
         StrlenZeroToIdenticalEmptyStringRector::class,
     ])
@@ -116,9 +110,7 @@ return RectorConfig::configure()
         typeDeclarationDocblocks: false,
         privatization: false,
         naming: false,
-        namedArgs: false,
         instanceOf: false,
-        if: false,
         earlyReturn: false,
     )
     ->withSets([

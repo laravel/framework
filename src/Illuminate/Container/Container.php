@@ -290,8 +290,10 @@ class Container implements ArrayAccess, ContainerContract
             return false;
         }
 
-        if ($scopedType === 'scoped' && ! in_array($abstract, $this->scopedInstances, true)) {
-            $this->scopedInstances[] = $abstract;
+        if ($scopedType === 'scoped') {
+            if (! in_array($abstract, $this->scopedInstances, true)) {
+                $this->scopedInstances[] = $abstract;
+            }
         }
 
         return true;
@@ -1667,12 +1669,24 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string  $abstract
      * @return string
+     *
+     * @throws \LogicException
      */
     public function getAlias($abstract)
     {
-        return isset($this->aliases[$abstract])
-            ? $this->getAlias($this->aliases[$abstract])
-            : $abstract;
+        $seen = [];
+
+        while (isset($this->aliases[$abstract])) {
+            if (isset($seen[$abstract])) {
+                throw new LogicException("Circular alias reference for [{$abstract}].");
+            }
+
+            $seen[$abstract] = true;
+
+            $abstract = $this->aliases[$abstract];
+        }
+
+        return $abstract;
     }
 
     /**

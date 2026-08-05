@@ -106,8 +106,6 @@ class DatabaseEloquentBelongsToManyExpressionTest extends TestCase
         $this->schema()->drop('posts');
         $this->schema()->drop('tags');
         $this->schema()->drop('taggables');
-
-        parent::tearDown();
     }
 
     /**
