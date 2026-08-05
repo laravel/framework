@@ -863,8 +863,7 @@ class FilesystemAdapterTest extends TestCase
         $this->filesystem->write('foo/file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Disk is not empty.');
+        $this->expectExceptionObject(new ExpectationFailedException('Disk is not empty.'));
 
         $filesystemAdapter->assertEmpty();
     }

@@ -809,9 +809,7 @@ EOT
     {
         $statusCode = 500;
 
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+                $this->expectExceptionObject(new AssertionFailedError('Expected response status code'));
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -825,9 +823,7 @@ EOT
     {
         $statusCode = 500;
 
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+                $this->expectExceptionObject(new AssertionFailedError('Expected response status code'));
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -890,9 +886,7 @@ EOT
     {
         $statusCode = 500;
 
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+                $this->expectExceptionObject(new AssertionFailedError('Expected response status code'));
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -906,9 +900,7 @@ EOT
     {
         $statusCode = 500;
 
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+                $this->expectExceptionObject(new AssertionFailedError('Expected response status code'));
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -1137,9 +1129,7 @@ EOT
     {
         $statusCode = 500;
 
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+                $this->expectExceptionObject(new AssertionFailedError('Expected response status code'));
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -1229,9 +1219,7 @@ EOT
     {
         $statusCode = 500;
 
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+                $this->expectExceptionObject(new AssertionFailedError('Expected response status code'));
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -1246,9 +1234,7 @@ EOT
         $statusCode = 500;
         $expectedStatusCode = 418;
 
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+                $this->expectExceptionObject(new AssertionFailedError('Expected response status code'));
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -1260,9 +1246,7 @@ EOT
 
     public function testAssertNoContentAssertsEmptyContent(): void
     {
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Response content is not empty');
+                $this->expectExceptionObject(new AssertionFailedError('Response content is not empty'));
 
         $baseResponse = tap(new Response, function ($response) {
             $response->setStatusCode(204);
@@ -1278,9 +1262,7 @@ EOT
         $statusCode = 500;
         $expectedStatusCode = 401;
 
-        $this->expectException(AssertionFailedError::class);
-
-        $this->expectExceptionMessage('Expected response status code');
+                $this->expectExceptionObject(new AssertionFailedError('Expected response status code'));
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -1581,8 +1563,7 @@ EOT
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that two arrays are equal.');
+                $this->expectExceptionObject(new AssertionFailedError('Failed asserting that two arrays are equal.'));
 
         $response->assertJsonPathsCanonicalizing([
             '*.foo' => ['foo 0', 'foo 2', 'foo 3'],

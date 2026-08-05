@@ -1080,10 +1080,7 @@ class AssertTest extends TestCase
             'bar' => [],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage(
-            'Cannot scope directly onto the first element of property [bar] because it is empty.'
-        );
+        $this->expectExceptionObject(new AssertionFailedError('Cannot scope directly onto the first element of property [bar] because it is empty.'));
 
         $assert->has('bar', 0, function (AssertableJson $item) {
             $item->where('key', 'first');
@@ -1096,10 +1093,7 @@ class AssertTest extends TestCase
             'bar' => [],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage(
-            'Cannot scope directly onto the first element of property [bar] because it is empty.'
-        );
+        $this->expectExceptionObject(new AssertionFailedError('Cannot scope directly onto the first element of property [bar] because it is empty.'));
 
         $assert->has('bar', null, function (AssertableJson $item) {
             $item->where('key', 'first');

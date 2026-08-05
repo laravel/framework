@@ -89,9 +89,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testSeeInDatabaseFindsNotMatchingResults()
     {
-        $this->expectException(ExpectationFailedException::class);
-
-        $this->expectExceptionMessage('Found similar results: '.json_encode([['title' => 'Forge']], JSON_PRETTY_PRINT));
+        $this->expectExceptionObject(new ExpectationFailedException('Found similar results: '.json_encode([['title' => 'Forge']], JSON_PRETTY_PRINT)));
 
         $builder = $this->mockCountBuilder(false);
 
@@ -103,9 +101,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testSeeInDatabaseFindsManyNotMatchingResults()
     {
-        $this->expectException(ExpectationFailedException::class);
-
-        $this->expectExceptionMessage('Found similar results: '.json_encode(['data', 'data', 'data'], JSON_PRETTY_PRINT).' and 2 others.');
+        $this->expectExceptionObject(new ExpectationFailedException('Found similar results: '.json_encode(['data', 'data', 'data'], JSON_PRETTY_PRINT).' and 2 others.'));
 
         $builder = $this->mockCountBuilder(false, countResult: [5, 5]);
 

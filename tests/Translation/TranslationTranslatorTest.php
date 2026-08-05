@@ -10,6 +10,7 @@ use Illuminate\Tests\Translation\Fixtures\Enums\Baz;
 use Illuminate\Tests\Translation\Fixtures\Enums\Foo;
 use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -77,8 +78,7 @@ class TranslationTranslatorTest extends TestCase
         $t = new Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => ['breeze']]);
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Translation value for key [foo::bar.baz] must be a string, array given.');
+        $this->expectExceptionObject(new InvalidArgumentException('Translation value for key [foo::bar.baz] must be a string, array given.'));
 
         $t->string('foo::bar.baz', [], 'en');
     }
@@ -96,8 +96,7 @@ class TranslationTranslatorTest extends TestCase
         $t = new Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => 'breeze']);
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Translation value for key [foo::bar.baz] must be an array, string given.');
+        $this->expectExceptionObject(new InvalidArgumentException('Translation value for key [foo::bar.baz] must be an array, string given.'));
 
         $t->array('foo::bar.baz', [], 'en');
     }

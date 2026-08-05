@@ -84,8 +84,7 @@ class ValidationArrayKeysRuleTest extends TestCase
 
         $v = new Validator($trans, ['foo' => ['key_1' => 'bar']], ['foo' => 'array_keys']);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Validation rule array_keys requires at least 1 parameters.');
+        $this->expectExceptionObject(new InvalidArgumentException('Validation rule array_keys requires at least 1 parameters.'));
 
         $v->passes();
     }
