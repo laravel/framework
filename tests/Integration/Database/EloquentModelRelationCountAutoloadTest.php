@@ -56,7 +56,7 @@ class EloquentModelRelationCountAutoloadTest extends DatabaseTestCase
 
         Post::create();
 
-        $posts = Post::get();
+        $posts = Post::orderBy('id')->get();
 
         DB::enableQueryLog();
 
@@ -109,7 +109,7 @@ class EloquentModelRelationCountAutoloadTest extends DatabaseTestCase
             tap($post->comments()->create(), fn ($comment) => $comment->likes()->create());
         });
 
-        $posts = Post::with('comments')->get();
+        $posts = Post::with(['comments' => fn ($query) => $query->orderBy('id')])->orderBy('id')->get();
 
         DB::enableQueryLog();
 
@@ -140,7 +140,7 @@ class EloquentModelRelationCountAutoloadTest extends DatabaseTestCase
             $video->comments()->create();
         });
 
-        $comments = Comment::with('commentable')->get();
+        $comments = Comment::with('commentable')->orderBy('id')->get();
 
         DB::enableQueryLog();
 

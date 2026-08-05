@@ -53,7 +53,7 @@ class EloquentModelRelationExistsAutoloadTest extends DatabaseTestCase
 
         Post::create();
 
-        $posts = Post::get();
+        $posts = Post::orderBy('id')->get();
 
         DB::enableQueryLog();
 
@@ -102,7 +102,7 @@ class EloquentModelRelationExistsAutoloadTest extends DatabaseTestCase
             $post->comments()->create();
         });
 
-        $posts = Post::with('comments')->get();
+        $posts = Post::with(['comments' => fn ($query) => $query->orderBy('id')])->orderBy('id')->get();
 
         DB::enableQueryLog();
 
@@ -133,7 +133,7 @@ class EloquentModelRelationExistsAutoloadTest extends DatabaseTestCase
             $video->comments()->create();
         });
 
-        $comments = Comment::with('commentable')->get();
+        $comments = Comment::with('commentable')->orderBy('id')->get();
 
         DB::enableQueryLog();
 
