@@ -656,7 +656,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testRouteMetadataAttributeRequiresArray()
     {
-        $this->expectExceptionObject(new \InvalidArgumentException('Attribute [metadata] expects an array.'));
+        $this->expectExceptionObject(new InvalidArgumentException('Attribute [metadata] expects an array.'));
 
         (new RouteRegistrar($this->router))->attribute('metadata', 'invalid');
     }

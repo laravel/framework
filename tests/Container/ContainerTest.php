@@ -579,7 +579,7 @@ class ContainerTest extends TestCase
 
     public function testItThrowsExceptionOnCircularAliasReference(): void
     {
-        $this->expectExceptionObject(new \LogicException('Circular alias reference for [a].'));
+        $this->expectExceptionObject(new LogicException('Circular alias reference for [a].'));
 
         $container = new Container;
         $container->alias('a', 'b');
@@ -590,7 +590,7 @@ class ContainerTest extends TestCase
 
     public function testItThrowsExceptionOnIndirectCircularAliasReference(): void
     {
-        $this->expectExceptionObject(new \LogicException('Circular alias reference for [a].'));
+        $this->expectExceptionObject(new LogicException('Circular alias reference for [a].'));
 
         $container = new Container;
         $container->alias('a', 'b');
