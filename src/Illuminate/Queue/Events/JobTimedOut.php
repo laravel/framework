@@ -9,10 +9,12 @@ class JobTimedOut
      *
      * @param  string  $connectionName  The connection name.
      * @param  \Illuminate\Contracts\Queue\Job  $job  The job instance.
+     * @param  int|null  $timeout  The timeout exceeded in seconds.
      */
     public function __construct(
         public $connectionName,
         public $job,
+        public $timeout = null,
     ) {
     }
 }
