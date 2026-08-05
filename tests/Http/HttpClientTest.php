@@ -196,9 +196,17 @@ class HttpClientTest extends TestCase
     public function testFakeResponseRejectsUnsupportedBody()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('HTTP fake response body must be a string, array, resource, Psr\Http\Message\StreamInterface, or null.');
+        $this->expectExceptionMessage('HTTP fake response body must be a string, array, stream resource, Psr\Http\Message\StreamInterface, or null.');
 
         $this->factory::response(new stdClass);
+    }
+
+    public function testFakeResponseRejectsNonStreamResourceBody()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('HTTP fake response body must be a string, array, stream resource, Psr\Http\Message\StreamInterface, or null.');
+
+        $this->factory::response(stream_context_create());
     }
 
     public function testAcceptedRequest()
