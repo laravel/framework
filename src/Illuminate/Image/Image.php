@@ -462,12 +462,12 @@ class Image implements Stringable
         return once(function () {
             $contents = $this->toBytes();
 
-            // getimagesize() misreports HEIC's coded/padded frame size, so read HEIC via the driver.
+            // getimagesize() misreports HEIC's coded / padded frame size, so read HEIC via the driver...
             if (in_array($this->mimeType(), ['image/heic', 'image/heif', 'image/x-heic'], true)) {
                 try {
                     return $this->resolveDriver()->dimensions($contents);
                 } catch (Throwable) {
-                    // The driver can't decode this image; fall back to the native reader below.
+                    // The driver can't decode this image; fall back to the native reader below...
                 }
             }
 
