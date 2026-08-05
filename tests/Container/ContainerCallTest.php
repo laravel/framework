@@ -7,6 +7,7 @@ use Error;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use stdClass;
 
 class ContainerCallTest extends TestCase
@@ -228,6 +229,28 @@ class ContainerCallTest extends TestCase
         });
     }
 
+    public function testCallCleansUpBuildStackAfterException()
+    {
+        $container = new Container;
+
+        $container->when(ContainerCallFailingStub::class)
+            ->needs(ContainerCallConcreteStub::class)
+            ->give(ContainerCallContextualConcreteStub::class);
+
+        try {
+            $container->call([new ContainerCallFailingStub, 'handle']);
+
+            $this->fail('Expected the callback to throw an exception.');
+        } catch (RuntimeException) {
+            // Expected.
+        }
+
+        $dependency = $container->make(ContainerCallConcreteStub::class);
+
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $dependency);
+        $this->assertNotInstanceOf(ContainerCallContextualConcreteStub::class, $dependency);
+    }
+
     public function testCallWithNullableClassParameterDefaultValue()
     {
         $container = new Container;
@@ -273,6 +296,19 @@ class ContainerTestCallStub
 class ContainerCallConcreteStub
 {
     //
+}
+
+class ContainerCallContextualConcreteStub extends ContainerCallConcreteStub
+{
+    //
+}
+
+class ContainerCallFailingStub
+{
+    public function handle(ContainerCallConcreteStub $stub)
+    {
+        throw new RuntimeException('Expected.');
+    }
 }
 
 function containerTestInject(ContainerCallConcreteStub $stub, $default = 'taylor')
