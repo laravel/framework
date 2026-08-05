@@ -4324,6 +4324,47 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Update records in the database and return the specified columns of the updated rows.
+     *
+     * @param  non-empty-array<non-empty-string>  $returning
+     * @return \Illuminate\Support\Collection
+     */
+    public function updateReturning(array $values, array $returning = ['*'])
+    {
+        if ($returning === []) {
+            throw new InvalidArgumentException('The returning columns must not be empty.');
+        }
+
+        $this->applyBeforeQueryCallbacks();
+
+        $values = (new Collection($values))->map(function ($value) {
+            if (! $value instanceof self && ! $value instanceof EloquentBuilder && ! $value instanceof Relation) {
+                return ['value' => $value, 'bindings' => match (true) {
+                    $value instanceof Collection => $value->all(),
+                    $value instanceof UnitEnum => enum_value($value),
+                    default => $value,
+                }];
+            }
+
+            [$query, $bindings] = $this->parseSub($value);
+
+            return ['value' => new Expression("({$query})"), 'bindings' => fn () => $bindings];
+        });
+
+        $sql = $this->grammar->compileUpdateReturning($this, $values->map(fn ($value) => $value['value'])->all(), $returning);
+
+        $result = new Collection(
+            $this->connection->selectFromWriteConnection($sql, $this->cleanBindings(
+                $this->grammar->prepareBindingsForUpdate($this->bindings, $values->map(fn ($value) => $value['bindings'])->all())
+            ))
+        );
+
+        $this->connection->recordsHaveBeenModified($result->isNotEmpty());
+
+        return $result;
+    }
+
+    /**
      * Update records in a PostgreSQL database using the update from syntax.
      *
      * @return int

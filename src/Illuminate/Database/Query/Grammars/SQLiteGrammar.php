@@ -277,6 +277,19 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile an update statement with a returning clause into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @param  array  $returning
+     * @return string
+     */
+    public function compileUpdateReturning(Builder $query, array $values, array $returning)
+    {
+        return $this->compileUpdate($query, $values).' returning '.$this->columnize($returning);
+    }
+
+    /**
      * Compile an insert ignore statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

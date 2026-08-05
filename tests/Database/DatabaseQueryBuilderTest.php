@@ -4556,6 +4556,90 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($result->isEmpty());
     }
 
+    public function testUpdateReturningMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('does not support');
+        $builder = $this->getBuilder();
+        $builder->from('users')->where('id', 1)->updateReturning(['email' => 'foo']);
+    }
+
+    public function testMySqlUpdateReturningMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('does not support');
+        $builder = $this->getMySqlBuilder();
+        $builder->from('users')->where('id', 1)->updateReturning(['email' => 'foo']);
+    }
+
+    public function testSqlServerUpdateReturningMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('does not support');
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('users')->where('id', 1)->updateReturning(['email' => 'foo']);
+    }
+
+    public function testUpdateReturningWithEmptyReturning()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The returning columns must not be empty.');
+        $builder = $this->getPostgresBuilder();
+        $builder->from('users')->where('id', 1)->updateReturning(['email' => 'foo'], []);
+    }
+
+    public function testPostgresUpdateReturningMethod()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('selectFromWriteConnection')->once()->with(
+            'update "users" set "status" = ? where "id" = ? returning "id", "status"',
+            ['claimed', 1]
+        )->andReturn([['id' => 1, 'status' => 'claimed']]);
+        $builder->getConnection()->shouldReceive('recordsHaveBeenModified')->once()->with(true);
+        $result = $builder->from('users')->where('id', 1)->updateReturning(['status' => 'claimed'], ['id', 'status']);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals([['id' => 1, 'status' => 'claimed']], $result->all());
+    }
+
+    public function testPostgresUpdateReturningMethodDefaultsToAllColumns()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('selectFromWriteConnection')->once()->with(
+            'update "users" set "email" = ? returning *',
+            ['foo']
+        )->andReturn([['id' => 1, 'email' => 'foo']]);
+        $builder->getConnection()->shouldReceive('recordsHaveBeenModified')->once()->with(true);
+        $result = $builder->from('users')->updateReturning(['email' => 'foo']);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals([['id' => 1, 'email' => 'foo']], $result->all());
+    }
+
+    public function testSqliteUpdateReturningMethod()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('selectFromWriteConnection')->once()->with(
+            'update "users" set "status" = ? where "id" = ? returning "id", "status"',
+            ['claimed', 1]
+        )->andReturn([['id' => 1, 'status' => 'claimed']]);
+        $builder->getConnection()->shouldReceive('recordsHaveBeenModified')->once()->with(true);
+        $result = $builder->from('users')->where('id', 1)->updateReturning(['status' => 'claimed'], ['id', 'status']);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals([['id' => 1, 'status' => 'claimed']], $result->all());
+    }
+
+    public function testUpdateReturningDoesNotMarkRecordsModifiedWhenNoRowsWereUpdated()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('selectFromWriteConnection')->once()->with(
+            'update "users" set "email" = ? where "id" = ? returning *',
+            ['foo', 1]
+        )->andReturn([]);
+        $builder->getConnection()->shouldReceive('recordsHaveBeenModified')->once()->with(false);
+        $result = $builder->from('users')->where('id', 1)->updateReturning(['email' => 'foo']);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertTrue($result->isEmpty());
+    }
+
     public function testInsertOrIgnoreUsingMethod()
     {
         $this->expectException(RuntimeException::class);

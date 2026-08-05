@@ -1361,6 +1361,21 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile an update statement with a returning clause into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @param  array  $returning
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileUpdateReturning(Builder $query, array $values, array $returning)
+    {
+        throw new RuntimeException('This database engine does not support update with returning.');
+    }
+
+    /**
      * Compile the columns for an update statement.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
