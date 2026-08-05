@@ -43,8 +43,20 @@ class EloquentModelRelationExistsAutoloadTest extends DatabaseTestCase
         parent::tearDown();
     }
 
+    /**
+     * Skip the test when the database can not execute an "exists" aggregate.
+     */
+    protected function skipIfExistsAggregateIsUnsupported(): void
+    {
+        if ($this->driver === 'sqlsrv') {
+            $this->markTestSkipped('SQL Server does not support "exists" as a selected column.');
+        }
+    }
+
     public function testExistsAutoloadForCollection()
     {
+        $this->skipIfExistsAggregateIsUnsupported();
+
         Model::automaticallyEagerLoadRelationshipExistence();
 
         $post1 = Post::create();
@@ -71,6 +83,8 @@ class EloquentModelRelationExistsAutoloadTest extends DatabaseTestCase
 
     public function testExistsAutoloadForSingleModel()
     {
+        $this->skipIfExistsAggregateIsUnsupported();
+
         Model::automaticallyEagerLoadRelationshipExistence();
 
         $post = Post::create();
@@ -90,6 +104,8 @@ class EloquentModelRelationExistsAutoloadTest extends DatabaseTestCase
 
     public function testExistsAutoloadForNestedRelations()
     {
+        $this->skipIfExistsAggregateIsUnsupported();
+
         Model::automaticallyEagerLoadRelationshipExistence();
 
         tap(Post::create(), function ($post) {
@@ -122,6 +138,8 @@ class EloquentModelRelationExistsAutoloadTest extends DatabaseTestCase
 
     public function testExistsAutoloadForVariousNestedMorphRelations()
     {
+        $this->skipIfExistsAggregateIsUnsupported();
+
         Model::automaticallyEagerLoadRelationshipExistence();
 
         tap(Post::create(), function ($post) {
@@ -152,6 +170,8 @@ class EloquentModelRelationExistsAutoloadTest extends DatabaseTestCase
 
     public function testExistsAutoloadResolvesCamelCaseRelationNames()
     {
+        $this->skipIfExistsAggregateIsUnsupported();
+
         Model::automaticallyEagerLoadRelationshipExistence();
 
         $post = Post::create();
@@ -171,6 +191,8 @@ class EloquentModelRelationExistsAutoloadTest extends DatabaseTestCase
 
     public function testExistsAutoloadWithSerialization()
     {
+        $this->skipIfExistsAggregateIsUnsupported();
+
         Model::automaticallyEagerLoadRelationshipExistence();
 
         $post = Post::create();
@@ -189,6 +211,8 @@ class EloquentModelRelationExistsAutoloadTest extends DatabaseTestCase
 
     public function testExistsAutoloadIsSkippedWhenExistsIsAlreadyLoaded()
     {
+        $this->skipIfExistsAggregateIsUnsupported();
+
         Model::automaticallyEagerLoadRelationshipExistence();
 
         Post::create();
@@ -225,6 +249,8 @@ class EloquentModelRelationExistsAutoloadTest extends DatabaseTestCase
 
     public function testExistsAutoloadIsSkippedForModelsThatDoNotExist()
     {
+        $this->skipIfExistsAggregateIsUnsupported();
+
         Model::automaticallyEagerLoadRelationshipExistence();
 
         $post = Post::create();
@@ -331,6 +357,8 @@ class EloquentModelRelationExistsAutoloadTest extends DatabaseTestCase
 
     public function testExistsAutoloadWhenAccessingMissingAttributesIsPrevented()
     {
+        $this->skipIfExistsAggregateIsUnsupported();
+
         Model::automaticallyEagerLoadRelationshipExistence();
         Model::preventAccessingMissingAttributes();
 

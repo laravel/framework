@@ -366,6 +366,10 @@ class EloquentModelRelationCountAutoloadTest extends DatabaseTestCase
 
     public function testCountAndExistsAutoloadingCanBeEnabledTogether()
     {
+        if ($this->driver === 'sqlsrv') {
+            $this->markTestSkipped('SQL Server does not support "exists" as a selected column.');
+        }
+
         Model::automaticallyEagerLoadRelationshipCounts();
         Model::automaticallyEagerLoadRelationshipExistence();
 
