@@ -1,6 +1,13 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.64.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.65.0...12.x)
+
+## [v12.65.0](https://github.com/laravel/framework/compare/v12.64.0...v12.65.0) - 2026-08-05
+
+* [12.x] Prevent fatal errors when logging deprecations fails by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/60907
+* [12.x] Fix Factory::insert() with a count of zero by [@alies-dev](https://github.com/alies-dev) in https://github.com/laravel/framework/pull/60911
+* [12.x] Fix schedule:list timezone conversion for range, step, and wildcard cron expressions by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/60913
+* [12.x] Fix getMigrationBatches return type annotation by [@wouterj](https://github.com/wouterj) in https://github.com/laravel/framework/pull/60973
 
 ## [v12.64.0](https://github.com/laravel/framework/compare/v12.63.0...v12.64.0) - 2026-07-14
 
