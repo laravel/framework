@@ -33,7 +33,7 @@ class ServeCommandLogParserTest extends TestCase
         $line = '[Mon Nov 19 10:30:45 2024] Info';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Failed to extract the request port. Ensure the log line contains a valid port: [Mon Nov 19 10:30:45 2024] Info');
+        $this->expectExceptionMessageIs('Failed to extract the request port. Ensure the log line contains a valid port: [Mon Nov 19 10:30:45 2024] Info');
 
         ServeCommand::getRequestPortFromLine($line);
     }
@@ -43,7 +43,7 @@ class ServeCommandLogParserTest extends TestCase
         $line = '[Mon Nov 19 10:30:45 2024] :abcd Info';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Failed to extract the request port. Ensure the log line contains a valid port: [Mon Nov 19 10:30:45 2024] :abcd Info');
+        $this->expectExceptionMessageIs('Failed to extract the request port. Ensure the log line contains a valid port: [Mon Nov 19 10:30:45 2024] :abcd Info');
 
         ServeCommand::getRequestPortFromLine($line);
     }
@@ -51,7 +51,7 @@ class ServeCommandLogParserTest extends TestCase
     public function testExtractRequestPortWithEmptyLogLine()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Failed to extract the request port. Ensure the log line contains a valid port: ');
+        $this->expectExceptionMessageIs('Failed to extract the request port. Ensure the log line contains a valid port: ');
 
         ServeCommand::getRequestPortFromLine('');
     }
@@ -59,7 +59,7 @@ class ServeCommandLogParserTest extends TestCase
     public function testExtractRequestPortWithWhitespaceOnlyLine()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Failed to extract the request port. Ensure the log line contains a valid port: ');
+        $this->expectExceptionMessageIs('Failed to extract the request port. Ensure the log line contains a valid port: ');
 
         ServeCommand::getRequestPortFromLine('   ');
     }
@@ -69,7 +69,7 @@ class ServeCommandLogParserTest extends TestCase
         $line = 'Random log entry without port';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Failed to extract the request port. Ensure the log line contains a valid port: Random log entry without port');
+        $this->expectExceptionMessageIs('Failed to extract the request port. Ensure the log line contains a valid port: Random log entry without port');
 
         ServeCommand::getRequestPortFromLine($line);
     }

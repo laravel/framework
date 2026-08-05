@@ -66,7 +66,7 @@ class AssertTest extends TestCase
     public function testArraySubsetMayFailIfArrayIsNotArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionMessageIs(
             'Argument #1 of Illuminate\Testing\Assert::assertArraySubset() must be an array or ArrayAccess'
         );
 
@@ -80,7 +80,7 @@ class AssertTest extends TestCase
     public function testArraySubsetMayFailIfSubsetIsNotArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionMessageIs(
             'Argument #2 of Illuminate\Testing\Assert::assertArraySubset() must be an array or ArrayAccess'
         );
 

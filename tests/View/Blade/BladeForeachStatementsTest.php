@@ -99,7 +99,7 @@ tag info
     public function testForeachStatementsThrowHumanizedMessageWhenInvalidStatement($initialStatement)
     {
         $this->expectException(ViewCompilationException::class);
-        $this->expectExceptionMessage('Malformed @foreach statement.');
+        $this->expectExceptionMessageIs('Malformed @foreach statement.');
         $string = "$initialStatement
 test
 @endforeach";

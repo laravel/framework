@@ -361,7 +361,7 @@ class DatabaseConnectionTest extends TestCase
     public function testTransactionRetriesOnSerializationFailure()
     {
         $this->expectException(PDOException::class);
-        $this->expectExceptionMessage('Serialization failure');
+        $this->expectExceptionMessageIs('Serialization failure');
 
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
@@ -376,7 +376,7 @@ class DatabaseConnectionTest extends TestCase
     public function testTransactionMethodRetriesOnDeadlock()
     {
         $this->expectException(QueryException::class);
-        $this->expectExceptionMessage('Deadlock found when trying to get lock (Connection: conn, SQL: )');
+        $this->expectExceptionMessageIs('Deadlock found when trying to get lock (Connection: conn, SQL: )');
 
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
@@ -410,7 +410,7 @@ class DatabaseConnectionTest extends TestCase
     public function testOnLostConnectionPDOIsNotSwappedWithinATransaction()
     {
         $this->expectException(QueryException::class);
-        $this->expectExceptionMessage('server has gone away (Connection: , Host: , Port: , Database: , SQL: foo)');
+        $this->expectExceptionMessageIs('server has gone away (Connection: , Host: , Port: , Database: , SQL: foo)');
 
         $pdo = m::mock(PDO::class);
         $pdo->shouldReceive('beginTransaction')->once();
@@ -462,7 +462,7 @@ class DatabaseConnectionTest extends TestCase
     public function testRunMethodNeverRetriesIfWithinTransaction()
     {
         $this->expectException(QueryException::class);
-        $this->expectExceptionMessage('(Connection: conn, SQL: ) (Connection: , Host: , Port: , Database: , SQL: )');
+        $this->expectExceptionMessageIs('(Connection: conn, SQL: ) (Connection: , Host: , Port: , Database: , SQL: )');
 
         $method = (new ReflectionClass(Connection::class))->getMethod('run');
 
@@ -512,7 +512,7 @@ class DatabaseConnectionTest extends TestCase
     public function testBeforeExecutingHooksCanBeRegistered()
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The callback was fired');
+        $this->expectExceptionMessageIs('The callback was fired');
 
         $connection = $this->getMockConnection();
         $connection->beforeExecuting(function () {
@@ -524,7 +524,7 @@ class DatabaseConnectionTest extends TestCase
     public function testBeforeStartingTransactionHooksCanBeRegistered()
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The callback was fired');
+        $this->expectExceptionMessageIs('The callback was fired');
 
         $connection = $this->getMockConnection();
         $connection->beforeStartingTransaction(function () {

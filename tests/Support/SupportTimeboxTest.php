@@ -58,7 +58,7 @@ class SupportTimeboxTest extends TestCase
         $mock->shouldReceive('usleep')->once();
 
         try {
-            $this->expectExceptionMessage('Exception within Timebox callback.');
+            $this->expectExceptionMessageIs('Exception within Timebox callback.');
 
             $mock->call(function () {
                 throw new Exception('Exception within Timebox callback.');
@@ -73,7 +73,7 @@ class SupportTimeboxTest extends TestCase
         $mock = m::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
 
         try {
-            $this->expectExceptionMessage('Exception within Timebox callback.');
+            $this->expectExceptionMessageIs('Exception within Timebox callback.');
 
             $mock->call(function ($timebox) {
                 $timebox->returnEarly();

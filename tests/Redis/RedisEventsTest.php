@@ -32,7 +32,7 @@ class RedisEventsTest extends TestCase
         $connection->setEventDispatcher($events);
 
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Test exception');
+        $this->expectExceptionMessageIs('Test exception');
 
         $connection->command('get', ['key']);
     }

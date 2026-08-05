@@ -134,7 +134,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testDropSpatialIndex()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The database driver in use does not support spatial indexes.');
+        $this->expectExceptionMessageIs('The database driver in use does not support spatial indexes.');
 
         $blueprint = new Blueprint($this->getConnection(), 'geo');
         $blueprint->dropSpatialIndex(['coordinates']);
@@ -250,7 +250,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingSpatialIndex()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The database driver in use does not support spatial indexes.');
+        $this->expectExceptionMessageIs('The database driver in use does not support spatial indexes.');
 
         $blueprint = new Blueprint($this->getConnection(), 'geo');
         $blueprint->spatialIndex('coordinates');
@@ -260,7 +260,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingFluentSpatialIndex()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The database driver in use does not support spatial indexes.');
+        $this->expectExceptionMessageIs('The database driver in use does not support spatial indexes.');
 
         $blueprint = new Blueprint($this->getConnection(), 'geo');
         $blueprint->geometry('coordinates')->spatialIndex();

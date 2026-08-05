@@ -223,7 +223,7 @@ class MailCloudflareTransportTest extends TestCase
         $message->to('me@example.com');
 
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('invalid_request_schema');
+        $this->expectExceptionMessageIs('invalid_request_schema');
 
         $transport->send($message);
     }

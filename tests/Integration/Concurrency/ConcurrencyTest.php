@@ -120,7 +120,7 @@ PHP);
     public function testRunHandlerProcessErrorWithDefaultExceptionWithoutParam()
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('This is a different exception');
+        $this->expectExceptionMessageIs('This is a different exception');
 
         Concurrency::run([
             fn () => throw new Exception(
@@ -132,7 +132,7 @@ PHP);
     public function testRunHandlerProcessErrorWithCustomExceptionWithoutParam()
     {
         $this->expectException(ExceptionWithoutParam::class);
-        $this->expectExceptionMessage('Test');
+        $this->expectExceptionMessageIs('Test');
         Concurrency::run([
             fn () => throw new ExceptionWithoutParam('Test'),
         ]);
@@ -141,7 +141,7 @@ PHP);
     public function testRunHandlerProcessErrorWithCustomExceptionWithParam()
     {
         $this->expectException(ExceptionWithParam::class);
-        $this->expectExceptionMessage('API request to https://api.example.com failed with status 400 Bad Request');
+        $this->expectExceptionMessageIs('API request to https://api.example.com failed with status 400 Bad Request');
         Concurrency::run([
             fn () => throw new ExceptionWithParam(
                 'https://api.example.com',

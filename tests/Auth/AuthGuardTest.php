@@ -297,7 +297,7 @@ class AuthGuardTest extends TestCase
     public function testAuthenticateThrowsWhenUserIsNull()
     {
         $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Unauthenticated.');
+        $this->expectExceptionMessageIs('Unauthenticated.');
 
         $guard = $this->getGuard();
         $guard->getSession()->shouldReceive('get')->once()->andReturn(null);

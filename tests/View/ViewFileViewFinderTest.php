@@ -89,7 +89,7 @@ class ViewFileViewFinderTest extends TestCase
     public function testExceptionThrownOnInvalidViewName()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('No hint path defined for [name].');
+        $this->expectExceptionMessageIs('No hint path defined for [name].');
 
         $finder = $this->getFinder();
         $finder->find('name::');
@@ -98,7 +98,7 @@ class ViewFileViewFinderTest extends TestCase
     public function testExceptionThrownWhenNoHintPathIsRegistered()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('No hint path defined for [name].');
+        $this->expectExceptionMessageIs('No hint path defined for [name].');
 
         $finder = $this->getFinder();
         $finder->find('name::foo');

@@ -22,7 +22,7 @@ class DatabaseEloquentResourceModelTest extends TestCase
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel].');
+        $this->expectExceptionMessageIs('Failed to find resource class for model [Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel].');
 
         $model = new EloquentResourceTestResourceModel();
         $model->toResource();

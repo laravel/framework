@@ -51,7 +51,7 @@ class JobEncryptionTest extends DatabaseTestCase
         Bus::dispatch(new JobEncryptionTestNonEncryptedJob);
 
         $this->expectException(DecryptException::class);
-        $this->expectExceptionMessage('The payload is invalid');
+        $this->expectExceptionMessageIs('The payload is invalid');
 
         $this->assertInstanceOf(JobEncryptionTestNonEncryptedJob::class,
             unserialize(json_decode(DB::table('jobs')->first()->payload)->data->command)

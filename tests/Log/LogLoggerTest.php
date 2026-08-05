@@ -87,7 +87,7 @@ class LogLoggerTest extends TestCase
     public function testListenShortcutFailsWithNoDispatcher()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Events dispatcher has not been set.');
+        $this->expectExceptionMessageIs('Events dispatcher has not been set.');
 
         $writer = new Logger(m::mock(Monolog::class));
         $writer->listen(function () {

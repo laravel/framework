@@ -864,7 +864,7 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Disk is not empty.');
+        $this->expectExceptionMessageIs('Disk is not empty.');
 
         $filesystemAdapter->assertEmpty();
     }

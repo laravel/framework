@@ -136,7 +136,7 @@ class HttpClientTest extends TestCase
     public function testInvalidFakeResponseHeaderValuesAreRejected($value)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.');
+        $this->expectExceptionMessageIs('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.');
 
         $this->factory::response('OK', 200, ['X-Test' => $value]);
     }
@@ -196,7 +196,7 @@ class HttpClientTest extends TestCase
     public function testFakeResponseRejectsUnsupportedBody()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('HTTP fake response body must be a string, array, resource, Psr\Http\Message\StreamInterface, or null.');
+        $this->expectExceptionMessageIs('HTTP fake response body must be a string, array, resource, Psr\Http\Message\StreamInterface, or null.');
 
         $this->factory::response(new stdClass);
     }
@@ -836,7 +836,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('HTTP header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.');
+        $this->expectExceptionMessageIs('HTTP header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.');
 
         $this->factory->withHeaders(['X-Test' => $value])->post('http://foo.com/json');
     }
@@ -1087,7 +1087,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Multipart header values must be scalar, null, or Laravel Stringable.');
+        $this->expectExceptionMessageIs('Multipart header values must be scalar, null, or Laravel Stringable.');
 
         $this->factory->asMultipart()->post('http://foo.com/multipart', [
             [
@@ -1671,7 +1671,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionSummary()
     {
         $this->expectException(RequestException::class);
-        $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be completed"}}');
+        $this->expectExceptionMessageIs('{"error":{"code":403,"message":"The Request can not be completed"}}');
 
         $error = [
             'error' => [
@@ -1688,7 +1688,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionTruncatedSummary()
     {
         $this->expectException(RequestException::class);
-        $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be completed because quota limit was exceeded. Please, check our sup (truncated...)');
+        $this->expectExceptionMessageIs('{"error":{"code":403,"message":"The Request can not be completed because quota limit was exceeded. Please, check our sup (truncated...)');
 
         $error = [
             'error' => [
@@ -1706,7 +1706,7 @@ class HttpClientTest extends TestCase
         RequestException::dontTruncate();
 
         $this->expectException(RequestException::class);
-        $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be completed because quota limit was exceeded. Please, check our support team to increase your limit');
+        $this->expectExceptionMessageIs('{"error":{"code":403,"message":"The Request can not be completed because quota limit was exceeded. Please, check our support team to increase your limit');
 
         $error = [
             'error' => [
@@ -1724,7 +1724,7 @@ class HttpClientTest extends TestCase
         RequestException::truncateAt(60);
 
         $this->expectException(RequestException::class);
-        $this->expectExceptionMessage('{"error":{"code":403,"message":"The Request can not be compl (truncated...)');
+        $this->expectExceptionMessageIs('{"error":{"code":403,"message":"The Request can not be compl (truncated...)');
 
         $error = [
             'error' => [
@@ -1827,7 +1827,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionEmptyBody()
     {
         $this->expectException(RequestException::class);
-        $this->expectExceptionMessageMatches('/HTTP request returned status code 403$/');
+        $this->expectExceptionMessageIsMatches('/HTTP request returned status code 403$/');
 
         $response = new Psr7Response(403);
 
@@ -3202,7 +3202,7 @@ class HttpClientTest extends TestCase
         });
 
         $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('cURL error 60: SSL certificate problem: unable to get local issuer certificate');
+        $this->expectExceptionMessageIs('cURL error 60: SSL certificate problem: unable to get local issuer certificate');
 
         $this->factory->head('https://ssl-error.laravel.example');
     }
@@ -3210,7 +3210,7 @@ class HttpClientTest extends TestCase
     public function testConnectExceptionIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
     {
         $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('cURL error 60: SSL certificate problem');
+        $this->expectExceptionMessageIs('cURL error 60: SSL certificate problem');
 
         $pendingRequest = new PendingRequest();
 
@@ -3227,7 +3227,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionWithoutResponseIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
     {
         $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('cURL error 28: Operation timed out');
+        $this->expectExceptionMessageIs('cURL error 28: Operation timed out');
 
         $pendingRequest = new PendingRequest();
 
@@ -3244,7 +3244,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionWithResponseIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
     {
         $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('cURL error 28: Operation timed out');
+        $this->expectExceptionMessageIs('cURL error 28: Operation timed out');
 
         $pendingRequest = new PendingRequest();
 
@@ -3262,7 +3262,7 @@ class HttpClientTest extends TestCase
     public function testTooManyRedirectsExceptionIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
     {
         $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('Maximum number of redirects (5) exceeded');
+        $this->expectExceptionMessageIs('Maximum number of redirects (5) exceeded');
 
         $pendingRequest = new PendingRequest();
 
@@ -3291,7 +3291,7 @@ class HttpClientTest extends TestCase
         });
 
         $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('Maximum number of redirects (5) exceeded');
+        $this->expectExceptionMessageIs('Maximum number of redirects (5) exceeded');
 
         $this->factory->maxRedirects(5)->get('https://redirect.laravel.example');
     }
@@ -4070,7 +4070,7 @@ class HttpClientTest extends TestCase
         $this->assertSame(['ok', 'ok'], $responses);
 
         $this->expectException(StrayRequestException::class);
-        $this->expectExceptionMessage('Attempted request to [https://laravel.com] without a matching fake.');
+        $this->expectExceptionMessageIs('Attempted request to [https://laravel.com] without a matching fake.');
 
         $this->factory->get('https://laravel.com');
     }

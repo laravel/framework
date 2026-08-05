@@ -41,7 +41,7 @@ class InteractsWithDeprecationHandlingTest extends TestCase
         $this->withoutDeprecationHandling();
 
         $this->expectException(ErrorException::class);
-        $this->expectExceptionMessage('Something is deprecated');
+        $this->expectExceptionMessageIs('Something is deprecated');
 
         trigger_error('Something is deprecated', E_USER_DEPRECATED);
     }

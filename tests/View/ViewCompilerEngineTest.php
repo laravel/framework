@@ -46,7 +46,7 @@ class ViewCompilerEngineTest extends TestCase
         $engine->getCompiler()->shouldReceive('isExpired')->once()->andReturn(false);
 
         $this->expectException(ViewException::class);
-        $this->expectExceptionMessage('regular exception message');
+        $this->expectExceptionMessageIs('regular exception message');
 
         $engine->get(__DIR__.'/fixtures/foo.php');
     }
@@ -58,7 +58,7 @@ class ViewCompilerEngineTest extends TestCase
         $engine->getCompiler()->shouldReceive('isExpired')->once()->andReturn(false);
 
         $this->expectException(HttpException::class);
-        $this->expectExceptionMessage('http exception message');
+        $this->expectExceptionMessageIs('http exception message');
 
         $engine->get(__DIR__.'/fixtures/foo.php');
     }
@@ -215,7 +215,7 @@ class ViewCompilerEngineTest extends TestCase
         $engine->get($path);
 
         $this->expectException(ViewException::class);
-        $this->expectExceptionMessage("File does not exist at path {$path}.");
+        $this->expectExceptionMessageIs("File does not exist at path {$path}.");
         $engine->get($path);
     }
 
@@ -250,7 +250,7 @@ class ViewCompilerEngineTest extends TestCase
             ->andReturn($compiled);
 
         $this->expectException(ViewException::class);
-        $this->expectExceptionMessage('Just an regular error...');
+        $this->expectExceptionMessageIs('Just an regular error...');
         $engine->get($path);
     }
 
@@ -286,7 +286,7 @@ class ViewCompilerEngineTest extends TestCase
             ->andReturn($compiled);
 
         $this->expectException(ViewException::class);
-        $this->expectExceptionMessage("File does not exist at path {$path}.");
+        $this->expectExceptionMessageIs("File does not exist at path {$path}.");
         $engine->get($path);
     }
 

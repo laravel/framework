@@ -70,7 +70,7 @@ class UrlSigningTest extends TestCase
     public function testTemporarySignedUrlsWithExpiresParameter()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('reserved');
+        $this->expectExceptionMessageIs('reserved');
 
         Route::get('/foo/{id}', function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';

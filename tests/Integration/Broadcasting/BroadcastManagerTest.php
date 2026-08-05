@@ -124,7 +124,7 @@ class BroadcastManagerTest extends TestCase
     public function testThrowExceptionWhenUnknownStoreIsUsed()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Broadcast connection [alien_connection] is not defined.');
+        $this->expectExceptionMessageIs('Broadcast connection [alien_connection] is not defined.');
 
         $userConfig = [
             'broadcasting' => [

@@ -84,7 +84,7 @@ class DatabaseMigrationCreatorTest extends TestCase
     public function testTableUpdateMigrationWontCreateDuplicateClass()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A MigrationCreatorFakeMigration class already exists.');
+        $this->expectExceptionMessageIs('A MigrationCreatorFakeMigration class already exists.');
 
         $creator = $this->getCreator();
 

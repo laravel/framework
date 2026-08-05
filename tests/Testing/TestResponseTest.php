@@ -594,7 +594,7 @@ class TestResponseTest extends TestCase
     public function testAssertSeeTextCanFail(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that \'foo<strong>bar</strong>\' contains "bazfoo".');
+        $this->expectExceptionMessageIs('Failed asserting that \'foo<strong>bar</strong>\' contains "bazfoo".');
 
         $response = $this->makeMockResponse([
             'render' => 'foo<strong>bar</strong>',
@@ -677,7 +677,7 @@ EOT
     public function testAssertSeeTextInOrderCanFail(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that \'foo<strong>bar</strong> baz <strong>foo</strong>\' contains "foobar" in specified order.');
+        $this->expectExceptionMessageIs('Failed asserting that \'foo<strong>bar</strong> baz <strong>foo</strong>\' contains "foobar" in specified order.');
 
         $response = $this->makeMockResponse([
             'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
@@ -776,7 +776,7 @@ EOT
     public function testAssertDontSeeTextCanFail(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that \'foo<strong>bar</strong>baz<strong>qux</strong>\' does not contain "foobar".');
+        $this->expectExceptionMessageIs('Failed asserting that \'foo<strong>bar</strong>baz<strong>qux</strong>\' does not contain "foobar".');
 
         $response = $this->makeMockResponse([
             'render' => 'foo<strong>bar</strong>baz<strong>qux</strong>',
@@ -814,7 +814,7 @@ EOT
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected response status code');
+        $this->expectExceptionMessageIs('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -830,7 +830,7 @@ EOT
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected response status code');
+        $this->expectExceptionMessageIs('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -845,7 +845,7 @@ EOT
         $statusCode = 500;
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Expected response status code');
+        $this->expectExceptionMessageIs('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -868,7 +868,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [405] but received 200.\nFailed asserting that 200 is identical to 405.");
+        $this->expectExceptionMessageIs("Expected response status code [405] but received 200.\nFailed asserting that 200 is identical to 405.");
 
         $response->assertMethodNotAllowed();
     }
@@ -886,7 +886,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [406] but received 200.\nFailed asserting that 200 is identical to 406.");
+        $this->expectExceptionMessageIs("Expected response status code [406] but received 200.\nFailed asserting that 200 is identical to 406.");
 
         $response->assertNotAcceptable();
         $this->fail();
@@ -898,7 +898,7 @@ EOT
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected response status code');
+        $this->expectExceptionMessageIs('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -914,7 +914,7 @@ EOT
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected response status code');
+        $this->expectExceptionMessageIs('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -937,7 +937,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [400] but received 200.\nFailed asserting that 200 is identical to 400.");
+        $this->expectExceptionMessageIs("Expected response status code [400] but received 200.\nFailed asserting that 200 is identical to 400.");
 
         $response->assertBadRequest();
         $this->fail();
@@ -956,7 +956,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [408] but received 200.\nFailed asserting that 200 is identical to 408.");
+        $this->expectExceptionMessageIs("Expected response status code [408] but received 200.\nFailed asserting that 200 is identical to 408.");
 
         $response->assertRequestTimeout();
         $this->fail();
@@ -975,7 +975,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [402] but received 200.\nFailed asserting that 200 is identical to 402.");
+        $this->expectExceptionMessageIs("Expected response status code [402] but received 200.\nFailed asserting that 200 is identical to 402.");
 
         $response->assertPaymentRequired();
         $this->fail();
@@ -994,7 +994,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [301] but received 200.\nFailed asserting that 200 is identical to 301.");
+        $this->expectExceptionMessageIs("Expected response status code [301] but received 200.\nFailed asserting that 200 is identical to 301.");
 
         $response->assertMovedPermanently();
         $this->fail();
@@ -1013,7 +1013,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [302] but received 200.\nFailed asserting that 200 is identical to 302.");
+        $this->expectExceptionMessageIs("Expected response status code [302] but received 200.\nFailed asserting that 200 is identical to 302.");
 
         $response->assertFound();
         $this->fail();
@@ -1032,7 +1032,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [304] but received 200.\nFailed asserting that 200 is identical to 304.");
+        $this->expectExceptionMessageIs("Expected response status code [304] but received 200.\nFailed asserting that 200 is identical to 304.");
 
         $response->assertNotModified();
         $this->fail();
@@ -1051,7 +1051,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [307] but received 200.\nFailed asserting that 200 is identical to 307.");
+        $this->expectExceptionMessageIs("Expected response status code [307] but received 200.\nFailed asserting that 200 is identical to 307.");
 
         $response->assertTemporaryRedirect();
         $this->fail();
@@ -1070,7 +1070,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [308] but received 200.\nFailed asserting that 200 is identical to 308.");
+        $this->expectExceptionMessageIs("Expected response status code [308] but received 200.\nFailed asserting that 200 is identical to 308.");
 
         $response->assertPermanentRedirect();
         $this->fail();
@@ -1089,7 +1089,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [409] but received 200.\nFailed asserting that 200 is identical to 409.");
+        $this->expectExceptionMessageIs("Expected response status code [409] but received 200.\nFailed asserting that 200 is identical to 409.");
 
         $response->assertConflict();
         $this->fail();
@@ -1108,7 +1108,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [410] but received 200.\nFailed asserting that 200 is identical to 410.");
+        $this->expectExceptionMessageIs("Expected response status code [410] but received 200.\nFailed asserting that 200 is identical to 410.");
 
         $response->assertGone();
     }
@@ -1126,7 +1126,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [429] but received 200.\nFailed asserting that 200 is identical to 429.");
+        $this->expectExceptionMessageIs("Expected response status code [429] but received 200.\nFailed asserting that 200 is identical to 429.");
 
         $response->assertTooManyRequests();
         $this->fail();
@@ -1145,7 +1145,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [202] but received 200.\nFailed asserting that 200 is identical to 202.");
+        $this->expectExceptionMessageIs("Expected response status code [202] but received 200.\nFailed asserting that 200 is identical to 202.");
 
         $response->assertAccepted();
         $this->fail();
@@ -1157,7 +1157,7 @@ EOT
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected response status code');
+        $this->expectExceptionMessageIs('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -1180,7 +1180,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [424] but received 200.\nFailed asserting that 200 is identical to 424.");
+        $this->expectExceptionMessageIs("Expected response status code [424] but received 200.\nFailed asserting that 200 is identical to 424.");
 
         $response->assertFailedDependency();
         $this->fail();
@@ -1223,7 +1223,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [500] but received 200.\nFailed asserting that 200 is identical to 500.");
+        $this->expectExceptionMessageIs("Expected response status code [500] but received 200.\nFailed asserting that 200 is identical to 500.");
 
         $response->assertInternalServerError();
     }
@@ -1241,7 +1241,7 @@ EOT
         );
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Expected response status code [503] but received 200.\nFailed asserting that 200 is identical to 503.");
+        $this->expectExceptionMessageIs("Expected response status code [503] but received 200.\nFailed asserting that 200 is identical to 503.");
 
         $response->assertServiceUnavailable();
     }
@@ -1252,7 +1252,7 @@ EOT
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected response status code');
+        $this->expectExceptionMessageIs('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -1269,7 +1269,7 @@ EOT
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected response status code');
+        $this->expectExceptionMessageIs('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -1283,7 +1283,7 @@ EOT
     {
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Response content is not empty');
+        $this->expectExceptionMessageIs('Response content is not empty');
 
         $baseResponse = tap(new Response, function ($response) {
             $response->setStatusCode(204);
@@ -1301,7 +1301,7 @@ EOT
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Expected response status code');
+        $this->expectExceptionMessageIs('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -1327,7 +1327,7 @@ EOT
     public function testAssertHeaderMissing(): void
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Unexpected header [Location] is present on response.');
+        $this->expectExceptionMessageIs('Unexpected header [Location] is present on response.');
 
         $baseResponse = tap(new Response, function ($response) {
             $response->header('Location', '/foo');
@@ -1341,7 +1341,7 @@ EOT
     public function testAssertPrecognitionSuccessfulWithMissingHeader(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Header [Precognition-Success] not present on response.');
+        $this->expectExceptionMessageIs('Header [Precognition-Success] not present on response.');
 
         $baseResponse = new Response('', 204);
 
@@ -1353,7 +1353,7 @@ EOT
     public function testAssertPrecognitionSuccessfulWithIncorrectValue(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('The Precognition-Success header was found, but the value is not `true`.');
+        $this->expectExceptionMessageIs('The Precognition-Success header was found, but the value is not `true`.');
 
         $baseResponse = tap(new Response('', 204), function ($response) {
             $response->header('Precognition-Success', '');
@@ -1378,7 +1378,7 @@ EOT
         $response = TestResponse::fromBaseResponse(new Response(null));
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Invalid JSON was returned from the route.');
+        $this->expectExceptionMessageIs('Invalid JSON was returned from the route.');
 
         $resource = new JsonSerializableSingleResourceStub;
 
@@ -1400,7 +1400,7 @@ EOT
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Unexpected properties were found on the root level.');
+        $this->expectExceptionMessageIs('Unexpected properties were found on the root level.');
 
         $response->assertJson(function (AssertableJson $json) {
             $json->where('foo', 'bar');
@@ -1424,7 +1424,7 @@ EOT
         $response = TestResponse::fromBaseResponse(new Response([]));
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('None of properties [data, errors, meta] exist.');
+        $this->expectExceptionMessageIs('None of properties [data, errors, meta] exist.');
 
         $response->assertJson(function (AssertableJson $json) {
             $json->hasAny('data', 'errors', 'meta');
@@ -1472,7 +1472,7 @@ EOT
     public function testAssertExactJsonWithMixedWhenDataIsSimilar(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that two strings are equal.');
+        $this->expectExceptionMessageIs('Failed asserting that two strings are equal.');
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
@@ -1521,7 +1521,7 @@ EOT
     public function testAssertJsonPathCanFail(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that 10 is identical to \'10\'.');
+        $this->expectExceptionMessageIs('Failed asserting that 10 is identical to \'10\'.');
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
@@ -1544,7 +1544,7 @@ EOT
         ]));
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that false is true.');
+        $this->expectExceptionMessageIs('Failed asserting that false is true.');
 
         $response->assertJsonPath('data.foo', fn ($value) => $value === null);
     }
@@ -1565,7 +1565,7 @@ EOT
         ]));
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that two strings are identical.');
+        $this->expectExceptionMessageIs('Failed asserting that two strings are identical.');
 
         $response->assertJsonPath('data.status', TestStatus::Booked);
     }
@@ -1588,7 +1588,7 @@ EOT
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that two arrays are equal.');
+        $this->expectExceptionMessageIs('Failed asserting that two arrays are equal.');
 
         $response->assertJsonPathCanonicalizing('*.foo', ['foo 0', 'foo 2', 'foo 3']);
     }
@@ -1614,7 +1614,7 @@ EOT
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that two arrays are equal.');
+        $this->expectExceptionMessageIs('Failed asserting that two arrays are equal.');
 
         $response->assertJsonPathsCanonicalizing([
             '*.foo' => ['foo 0', 'foo 2', 'foo 3'],
@@ -1643,7 +1643,7 @@ EOT
     public function testAssertJsonPathsCanFail(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that 10 is identical to 11.');
+        $this->expectExceptionMessageIs('Failed asserting that 10 is identical to 11.');
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
@@ -1702,7 +1702,7 @@ EOT
     public function testAssertJsonFragmentUnicodeCanFail(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessageMatches('/Привет|Мир/');
+        $this->expectExceptionMessageIsMatches('/Привет|Мир/');
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithUnicodeStub));
 
@@ -2501,7 +2501,7 @@ EOT
     public function testAssertJsonMissingValidationErrorsOnInvalidJson(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Invalid JSON was returned from the route.');
+        $this->expectExceptionMessageIs('Invalid JSON was returned from the route.');
 
         $invalidJsonResponse = TestResponse::fromBaseResponse(
             (new Response)->setContent('~invalid json')
@@ -2857,7 +2857,7 @@ EOT
         $response = TestResponse::fromBaseResponse($baseResponse);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Header [X-Custom-Header] was found, but [unrelated] does not contain [value].');
+        $this->expectExceptionMessageIs('Header [X-Custom-Header] was found, but [unrelated] does not contain [value].');
 
         $response->assertHeaderContains('X-Custom-Header', 'value');
     }
@@ -3209,7 +3209,7 @@ EOT
             ->withExceptions(collect([new Exception('Unexpected exception.')]));
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessageMatches('/Expected response status code \[200\] but received 500.*Exception: Unexpected exception/s');
+        $this->expectExceptionMessageIsMatches('/Expected response status code \[200\] but received 500.*Exception: Unexpected exception/s');
 
         $response->assertStatus(200);
     }
@@ -3226,7 +3226,7 @@ EOT
         );
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessageMatches('/Expected response status code \[200\] but received 302.*The first name field is required.*The last name field is required/s');
+        $this->expectExceptionMessageIsMatches('/Expected response status code \[200\] but received 302.*The first name field is required.*The last name field is required/s');
 
         $response->assertStatus(200);
     }
@@ -3241,7 +3241,7 @@ EOT
         ], 422));
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessageMatches('/Expected response status code \[200\] but received 422.*The first name field is required.*The last name field is required/s');
+        $this->expectExceptionMessageIsMatches('/Expected response status code \[200\] but received 422.*The first name field is required.*The last name field is required/s');
 
         $response->assertStatus(200);
     }
@@ -3253,7 +3253,7 @@ EOT
         );
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Expected response status code [200] but received 422.');
+        $this->expectExceptionMessageIs('Expected response status code [200] but received 422.');
 
         $response->assertStatus(200);
     }
@@ -3265,7 +3265,7 @@ EOT
         );
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Expected response status code [200] but received 422.');
+        $this->expectExceptionMessageIs('Expected response status code [200] but received 422.');
 
         $response->assertStatus(200);
     }

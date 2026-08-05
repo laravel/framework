@@ -325,7 +325,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_for_an_unresolvable_ref(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to resolve JSON Schema $ref [#/$defs/Missing].');
+        $this->expectExceptionMessageIs('Unable to resolve JSON Schema $ref [#/$defs/Missing].');
 
         JsonSchema::fromArray([
             '$ref' => '#/$defs/Missing',
@@ -336,7 +336,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_for_a_remote_ref(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to resolve non-local JSON Schema $ref [https://example.com/user.json].');
+        $this->expectExceptionMessageIs('Unable to resolve non-local JSON Schema $ref [https://example.com/user.json].');
 
         JsonSchema::fromArray([
             '$ref' => 'https://example.com/user.json',
@@ -421,7 +421,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_when_the_type_cannot_be_determined(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to determine the JSON Schema type for the given schema.');
+        $this->expectExceptionMessageIs('Unable to determine the JSON Schema type for the given schema.');
 
         JsonSchema::fromArray([
             'title' => 'Mystery',
@@ -431,7 +431,7 @@ class DeserializerTest extends TestCase
     public function test_it_detects_a_circular_ref_instead_of_recursing(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Circular JSON Schema $ref [#/$defs/node] detected.');
+        $this->expectExceptionMessageIs('Circular JSON Schema $ref [#/$defs/node] detected.');
 
         JsonSchema::fromArray([
             'type' => 'object',
@@ -618,7 +618,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_for_an_unsupported_union_member(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unsupported JSON Schema type [wat] in a multi-type union.');
+        $this->expectExceptionMessageIs('Unsupported JSON Schema type [wat] in a multi-type union.');
 
         JsonSchema::fromArray([
             'type' => ['string', 'wat'],
@@ -628,7 +628,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_for_a_non_string_union_member(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unsupported JSON Schema type [123] in a multi-type union.');
+        $this->expectExceptionMessageIs('Unsupported JSON Schema type [123] in a multi-type union.');
 
         JsonSchema::fromArray([
             'type' => ['string', 123],
@@ -638,7 +638,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_when_a_union_carries_type_specific_keywords(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Type-specific keywords [items] are not supported on a multi-type JSON Schema union.');
+        $this->expectExceptionMessageIs('Type-specific keywords [items] are not supported on a multi-type JSON Schema union.');
 
         JsonSchema::fromArray([
             'type' => ['array', 'string'],
@@ -649,7 +649,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_for_a_boolean_property_schema(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to represent the schema for property [meta]; boolean schemas are not supported.');
+        $this->expectExceptionMessageIs('Unable to represent the schema for property [meta]; boolean schemas are not supported.');
 
         JsonSchema::fromArray([
             'type' => 'object',
@@ -662,7 +662,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_for_a_non_numeric_numeric_constraint(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The JSON Schema [minimum] constraint must be a number.');
+        $this->expectExceptionMessageIs('The JSON Schema [minimum] constraint must be a number.');
 
         JsonSchema::fromArray([
             'type' => 'number',
@@ -673,7 +673,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_for_a_non_integer_integer_constraint(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The JSON Schema integer constraint [1.9] must be an integer.');
+        $this->expectExceptionMessageIs('The JSON Schema integer constraint [1.9] must be an integer.');
 
         JsonSchema::fromArray([
             'type' => 'integer',
@@ -684,7 +684,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_for_tuple_items(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Tuple and boolean JSON Schema "items" are not supported.');
+        $this->expectExceptionMessageIs('Tuple and boolean JSON Schema "items" are not supported.');
 
         JsonSchema::fromArray([
             'type' => 'array',
@@ -698,7 +698,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_when_a_union_branch_conflicts_with_sibling_keys(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Conflicting [type] between a "anyOf" branch and its sibling keys.');
+        $this->expectExceptionMessageIs('Conflicting [type] between a "anyOf" branch and its sibling keys.');
 
         JsonSchema::fromArray([
             'type' => 'integer',
@@ -712,7 +712,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_for_an_unsupported_one_of_union(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Only a nullable "oneOf" (a single schema plus a "null" branch) is supported.');
+        $this->expectExceptionMessageIs('Only a nullable "oneOf" (a single schema plus a "null" branch) is supported.');
 
         JsonSchema::fromArray([
             'oneOf' => [
@@ -725,7 +725,7 @@ class DeserializerTest extends TestCase
     public function test_it_throws_for_a_null_default(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A null JSON Schema [default] is not supported.');
+        $this->expectExceptionMessageIs('A null JSON Schema [default] is not supported.');
 
         JsonSchema::fromArray([
             'type' => 'string',
@@ -737,7 +737,7 @@ class DeserializerTest extends TestCase
     {
         // "#" resolves to the root, so a self-reference is detected as circular...
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Circular JSON Schema $ref [#] detected.');
+        $this->expectExceptionMessageIs('Circular JSON Schema $ref [#] detected.');
 
         JsonSchema::fromArray(['$ref' => '#']);
     }

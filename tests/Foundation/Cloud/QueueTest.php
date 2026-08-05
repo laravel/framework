@@ -204,7 +204,7 @@ class QueueTest extends TestCase
         Cloud::bootManagedQueues($this->app);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The [cloud] queue connection has not been configured.');
+        $this->expectExceptionMessageIs('The [cloud] queue connection has not been configured.');
         $this->app['queue']->connection('cloud');
     }
 
@@ -1477,7 +1477,7 @@ class QueueTest extends TestCase
         $queue = $this->app['queue']->connection('cloud');
 
         $this->expectException(ManagedQueueNotFoundException::class);
-        $this->expectExceptionMessage('Managed queue [missing-queue] does not exist.');
+        $this->expectExceptionMessageIs('Managed queue [missing-queue] does not exist.');
 
         $queue->push(new FakeJob, queue: 'missing-queue');
     }

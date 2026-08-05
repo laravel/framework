@@ -521,7 +521,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         // the error view as the debug handler should handle this gracefully.
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Rendering this view throws an exception');
+        $this->expectExceptionMessageIs('Rendering this view throws an exception');
         $this->executeScenarioWhereErrorViewThrowsWhileRenderingAndDebugIs(true);
     }
 

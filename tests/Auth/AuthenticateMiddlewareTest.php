@@ -63,7 +63,7 @@ class AuthenticateMiddlewareTest extends TestCase
     public function testDefaultUnauthenticatedThrows()
     {
         $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Unauthenticated.');
+        $this->expectExceptionMessageIs('Unauthenticated.');
 
         $this->registerAuthDriver('default', false);
 
@@ -108,7 +108,7 @@ class AuthenticateMiddlewareTest extends TestCase
     public function testMultipleDriversUnauthenticatedThrows()
     {
         $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Unauthenticated.');
+        $this->expectExceptionMessageIs('Unauthenticated.');
 
         $this->registerAuthDriver('default', false);
 

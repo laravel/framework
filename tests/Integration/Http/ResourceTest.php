@@ -1449,7 +1449,7 @@ class ResourceTest extends TestCase
         ]);
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('must collect');
+        $this->expectExceptionMessageIs('must collect');
 
         new PostModelCollectionResource($posts);
     }
@@ -1573,7 +1573,7 @@ class ResourceTest extends TestCase
         $post->handle($request, fn () => null);
 
         $this->expectException(PostTooLargeException::class);
-        $this->expectExceptionMessage('The POST data is too large.');
+        $this->expectExceptionMessageIs('The POST data is too large.');
 
         $request = new Request(server: ['CONTENT_LENGTH' => '2147483640']);
         $post = new ValidatePostSize;

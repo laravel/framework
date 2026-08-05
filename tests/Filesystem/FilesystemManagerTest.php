@@ -17,7 +17,7 @@ class FilesystemManagerTest extends TestCase
     public function testExceptionThrownOnUnsupportedDriver()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Disk [local] does not have a configured driver.');
+        $this->expectExceptionMessageIs('Disk [local] does not have a configured driver.');
 
         $filesystem = new FilesystemManager(tap(new Application, function ($app) {
             $app['config'] = ['filesystems.disks.local' => null];

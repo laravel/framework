@@ -28,7 +28,7 @@ class CommandManualFailTest extends TestCase
     public function testCreatesAnExceptionFromString(): void
     {
         $this->expectException(ManuallyFailedException::class);
-        $this->expectExceptionMessage('Whoops!');
+        $this->expectExceptionMessageIs('Whoops!');
         $command = new Command;
         $command->fail('Whoops!');
     }
@@ -36,7 +36,7 @@ class CommandManualFailTest extends TestCase
     public function testCreatesAnExceptionFromNull(): void
     {
         $this->expectException(ManuallyFailedException::class);
-        $this->expectExceptionMessage('Command failed manually.');
+        $this->expectExceptionMessageIs('Command failed manually.');
         $command = new Command;
         $command->fail();
     }

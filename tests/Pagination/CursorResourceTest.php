@@ -23,7 +23,7 @@ class CursorResourceTest extends TestCase
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Pagination\Fixtures\Models\CursorResourceTestModel].');
+        $this->expectExceptionMessageIs('Failed to find resource class for model [Illuminate\Tests\Pagination\Fixtures\Models\CursorResourceTestModel].');
 
         $paginator = new CursorResourceTestPaginator([
             new CursorResourceTestModel(),

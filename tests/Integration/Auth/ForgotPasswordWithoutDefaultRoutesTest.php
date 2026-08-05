@@ -42,7 +42,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
     public function testItCannotSendForgotPasswordEmail()
     {
         $this->expectException('Symfony\Component\Routing\Exception\RouteNotFoundException');
-        $this->expectExceptionMessage('Route [password.reset] not defined.');
+        $this->expectExceptionMessageIs('Route [password.reset] not defined.');
 
         Notification::fake();
 

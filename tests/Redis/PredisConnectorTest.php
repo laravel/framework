@@ -72,7 +72,7 @@ class PredisConnectorTest extends TestCase
         $connector = new TestablePredisConnector;
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The scheme configured in the Redis host option must match the scheme option.');
+        $this->expectExceptionMessageIs('The scheme configured in the Redis host option must match the scheme option.');
 
         $connector->testFormatHost([
             'host' => 'tcp://127.0.0.1',
@@ -229,7 +229,7 @@ class PredisConnectorTest extends TestCase
         $connector = new TestablePredisConnector;
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Strategy [bogus] is not a valid Predis backoff strategy.');
+        $this->expectExceptionMessageIs('Strategy [bogus] is not a valid Predis backoff strategy.');
 
         $connector->testFormatRetry([
             'retry' => [

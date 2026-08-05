@@ -78,7 +78,7 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => ['breeze']]);
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Translation value for key [foo::bar.baz] must be a string, array given.');
+        $this->expectExceptionMessageIs('Translation value for key [foo::bar.baz] must be a string, array given.');
 
         $t->string('foo::bar.baz', [], 'en');
     }
@@ -97,7 +97,7 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => 'breeze']);
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Translation value for key [foo::bar.baz] must be an array, string given.');
+        $this->expectExceptionMessageIs('Translation value for key [foo::bar.baz] must be an array, string given.');
 
         $t->array('foo::bar.baz', [], 'en');
     }

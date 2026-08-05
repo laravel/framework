@@ -220,7 +220,7 @@ class PhpRedisConnectorTest extends TestCase
         $connector = new TestablePhpRedisConnector;
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Algorithm [bogus] is not a valid PhpRedis backoff algorithm.');
+        $this->expectExceptionMessageIs('Algorithm [bogus] is not a valid PhpRedis backoff algorithm.');
 
         $connector->testParseBackoffAlgorithm('bogus');
     }
@@ -250,7 +250,7 @@ class PhpRedisConnectorTest extends TestCase
         $connector = new TestablePhpRedisConnector;
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The scheme configured in the Redis host option must match the scheme option.');
+        $this->expectExceptionMessageIs('The scheme configured in the Redis host option must match the scheme option.');
 
         $connector->testFormatHost([
             'host' => 'tcp://127.0.0.1',
@@ -273,7 +273,7 @@ class PhpRedisConnectorTest extends TestCase
         $connector = new TestablePhpRedisConnector;
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Redis host must be a non-empty string.');
+        $this->expectExceptionMessageIs('Redis host must be a non-empty string.');
 
         $connector->testFormatHost([
             'scheme' => 'tls',
@@ -285,7 +285,7 @@ class PhpRedisConnectorTest extends TestCase
         $connector = new TestablePhpRedisConnector;
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Redis host must be a non-empty string.');
+        $this->expectExceptionMessageIs('Redis host must be a non-empty string.');
 
         $connector->testFormatHost([
             'host' => null,

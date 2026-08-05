@@ -175,7 +175,7 @@ class FoundationDocsCommandTest extends TestCase
         putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/exception-throwing-strategy.php');
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('strategy failed');
+        $this->expectExceptionMessageIs('strategy failed');
 
         $this->artisan('docs');
     }
@@ -187,13 +187,13 @@ class FoundationDocsCommandTest extends TestCase
         $this->expectException(ProcessFailedException::class);
 
         if (PHP_OS_FAMILY === 'Windows') {
-            $this->expectExceptionMessage('The command "expected-command" failed.
+            $this->expectExceptionMessageIs('The command "expected-command" failed.
 
 Exit Code: 1(General error)
 
 Working directory: expected-working-directory');
         } else {
-            $this->expectExceptionMessage('The command "\'expected-command\'" failed.
+            $this->expectExceptionMessageIs('The command "\'expected-command\'" failed.
 
 Exit Code: 1(General error)
 

@@ -26,7 +26,7 @@ class ForwardsCallsTest extends TestCase
     public function testMissingForwardedCallThrowsCorrectError()
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::missingMethod()');
+        $this->expectExceptionMessageIs('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::missingMethod()');
 
         (new ForwardsCallsOne)->missingMethod('foo', 'bar');
     }
@@ -34,7 +34,7 @@ class ForwardsCallsTest extends TestCase
     public function testMissingAlphanumericForwardedCallThrowsCorrectError()
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::this1_shouldWork_too()');
+        $this->expectExceptionMessageIs('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::this1_shouldWork_too()');
 
         (new ForwardsCallsOne)->this1_shouldWork_too('foo', 'bar');
     }
@@ -42,7 +42,7 @@ class ForwardsCallsTest extends TestCase
     public function testNonForwardedErrorIsNotTamperedWith()
     {
         $this->expectException(Error::class);
-        $this->expectExceptionMessage('Call to undefined method Illuminate\Tests\Support\ForwardsCallsBase::missingMethod()');
+        $this->expectExceptionMessageIs('Call to undefined method Illuminate\Tests\Support\ForwardsCallsBase::missingMethod()');
 
         (new ForwardsCallsOne)->baseError('foo', 'bar');
     }
@@ -50,7 +50,7 @@ class ForwardsCallsTest extends TestCase
     public function testThrowBadMethodCallException()
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::test()');
+        $this->expectExceptionMessageIs('Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::test()');
 
         (new ForwardsCallsOne)->throwTestException('test');
     }

@@ -403,9 +403,9 @@ class ProcessTest extends TestCase
     public function testStrayProcessesCanBePreventedWithStringCommand()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Attempted process [');
-        $this->expectExceptionMessage('cat composer.json');
-        $this->expectExceptionMessage('] without a matching fake.');
+        $this->expectExceptionMessageIs('Attempted process [');
+        $this->expectExceptionMessageIs('cat composer.json');
+        $this->expectExceptionMessageIs('] without a matching fake.');
 
         $factory = new Factory;
 
@@ -421,9 +421,9 @@ class ProcessTest extends TestCase
     public function testStrayProcessesCanBePreventedWithArrayCommand()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Attempted process [');
-        $this->expectExceptionMessage('cat composer.json');
-        $this->expectExceptionMessage('] without a matching fake.');
+        $this->expectExceptionMessageIs('Attempted process [');
+        $this->expectExceptionMessageIs('cat composer.json');
+        $this->expectExceptionMessageIs('] without a matching fake.');
 
         $factory = new Factory;
 
@@ -451,7 +451,7 @@ class ProcessTest extends TestCase
     public function testProcessFakeThrowShorthand()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('fake exception message');
+        $this->expectExceptionMessageIs('fake exception message');
 
         $factory = new Factory;
 
@@ -510,7 +510,7 @@ class ProcessTest extends TestCase
     public function testFakeProcessesCanThrowWithoutOutput()
     {
         $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage(<<<'EOT'
+        $this->expectExceptionMessageIs(<<<'EOT'
             The command "exit 1;" failed.
 
             Exit Code: 1
@@ -528,7 +528,7 @@ class ProcessTest extends TestCase
     public function testRealProcessesCanThrowWithoutOutput()
     {
         $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage(<<<'EOT'
+        $this->expectExceptionMessageIs(<<<'EOT'
             The command "exit 1;" failed.
 
             Exit Code: 1
@@ -544,7 +544,7 @@ class ProcessTest extends TestCase
     public function testFakeProcessesCanThrowWithErrorOutput()
     {
         $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage(<<<'EOT'
+        $this->expectExceptionMessageIs(<<<'EOT'
             The command "echo "Hello World" >&2; exit 1;" failed.
 
             Exit Code: 1
@@ -566,7 +566,7 @@ class ProcessTest extends TestCase
     public function testRealProcessesCanThrowWithErrorOutput()
     {
         $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage(<<<'EOT'
+        $this->expectExceptionMessageIs(<<<'EOT'
             The command "echo "Hello World" >&2; exit 1;" failed.
 
             Exit Code: 1
@@ -586,7 +586,7 @@ class ProcessTest extends TestCase
     public function testFakeProcessesCanThrowWithOutput()
     {
         $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage(<<<'EOT'
+        $this->expectExceptionMessageIs(<<<'EOT'
             The command "echo "Hello World" >&1; exit 1;" failed.
 
             Exit Code: 1
@@ -608,7 +608,7 @@ class ProcessTest extends TestCase
     public function testRealProcessesCanThrowWithOutput()
     {
         $this->expectException(ProcessFailedException::class);
-        $this->expectExceptionMessage(<<<'EOT'
+        $this->expectExceptionMessageIs(<<<'EOT'
             The command "echo "Hello World" >&1; exit 1;" failed.
 
             Exit Code: 1
@@ -629,7 +629,7 @@ class ProcessTest extends TestCase
     public function testRealProcessesCanTimeout()
     {
         $this->expectException(ProcessTimedOutException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionMessageIs(
             'The process "sleep 2; exit 1;" exceeded the timeout of 1 seconds.'
         );
 
@@ -643,7 +643,7 @@ class ProcessTest extends TestCase
     public function testATimeoutCanBeSetWithACarbonInterval()
     {
         $this->expectException(ProcessTimedOutException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionMessageIs(
             'The process "sleep 2; exit 1;" exceeded the timeout of 1 seconds.'
         );
 

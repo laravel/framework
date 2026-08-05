@@ -799,7 +799,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testMissingStaticMacrosThrowsProperException()
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Call to undefined method Illuminate\Database\Eloquent\Builder::missingMacro()');
+        $this->expectExceptionMessageIs('Call to undefined method Illuminate\Database\Eloquent\Builder::missingMacro()');
 
         Builder::missingMacro();
     }

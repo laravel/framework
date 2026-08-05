@@ -202,7 +202,7 @@ class DatabaseLockTest extends DatabaseTestCase
             $this->assertTrue($lock->release());
         } else {
             $this->expectException(QueryException::class);
-            $this->expectExceptionMessage($message);
+            $this->expectExceptionMessageIs($message);
             $lock->release();
         }
     }

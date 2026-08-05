@@ -91,7 +91,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['Chris', 'Nuno', 'Taylor'], $array);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Array value for key [foo.bar] must be an array, boolean found.');
+        $this->expectExceptionMessageIs('Array value for key [foo.bar] must be an array, boolean found.');
 
         $array = ['foo' => ['bar' => false]];
         Arr::push($array, 'foo.bar', 'baz');
@@ -671,7 +671,7 @@ class SupportArrTest extends TestCase
 
         // Test that an exception is raised if the value is not a string
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#^Array value for key \[integer\] must be a string, (.*) found.#');
+        $this->expectExceptionMessageIsMatches('#^Array value for key \[integer\] must be a string, (.*) found.#');
         Arr::string($test_array, 'integer');
     }
 
@@ -691,7 +691,7 @@ class SupportArrTest extends TestCase
 
         // Test that an exception is raised if the value is not an integer
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be an integer, (.*) found.#');
+        $this->expectExceptionMessageIsMatches('#^Array value for key \[string\] must be an integer, (.*) found.#');
         Arr::integer($test_array, 'string');
     }
 
@@ -711,7 +711,7 @@ class SupportArrTest extends TestCase
 
         // Test that an exception is raised if the value is not a float
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be a float, (.*) found.#');
+        $this->expectExceptionMessageIsMatches('#^Array value for key \[string\] must be a float, (.*) found.#');
         Arr::float($test_array, 'string');
     }
 
@@ -731,7 +731,7 @@ class SupportArrTest extends TestCase
 
         // Test that an exception is raised if the value is not a boolean
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be a boolean, (.*) found.#');
+        $this->expectExceptionMessageIsMatches('#^Array value for key \[string\] must be a boolean, (.*) found.#');
         Arr::boolean($test_array, 'string');
     }
 
@@ -751,7 +751,7 @@ class SupportArrTest extends TestCase
 
         // Test that an exception is raised if the value is not an array
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('#^Array value for key \[string\] must be an array, (.*) found.#');
+        $this->expectExceptionMessageIsMatches('#^Array value for key \[string\] must be an array, (.*) found.#');
         Arr::array($test_array, 'string');
     }
 
@@ -1756,7 +1756,7 @@ class SupportArrTest extends TestCase
         $this->assertSame(['bar'], Arr::from($items));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Items cannot be represented by a scalar value.');
+        $this->expectExceptionMessageIs('Items cannot be represented by a scalar value.');
         Arr::from(123);
     }
 

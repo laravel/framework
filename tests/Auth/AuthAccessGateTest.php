@@ -664,7 +664,7 @@ class AuthAccessGateTest extends TestCase
     public function testAuthorizeThrowsUnauthorizedException()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('You are not an admin.');
+        $this->expectExceptionMessageIs('You are not an admin.');
         $this->expectExceptionCode(0);
 
         $gate = $this->getBasicGate();
@@ -677,7 +677,7 @@ class AuthAccessGateTest extends TestCase
     public function testAuthorizeThrowsUnauthorizedExceptionWithCustomStatusCode()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('Not allowed to view as it is not published.');
+        $this->expectExceptionMessageIs('Not allowed to view as it is not published.');
         $this->expectExceptionCode('unpublished');
 
         $gate = $this->getBasicGate();
@@ -690,7 +690,7 @@ class AuthAccessGateTest extends TestCase
     public function testAuthorizeWithPolicyThatReturnsDeniedResponseObjectThrowsException()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('Not allowed.');
+        $this->expectExceptionMessageIs('Not allowed.');
         $this->expectExceptionCode('some_code');
 
         $gate = $this->getBasicGate();
@@ -854,7 +854,7 @@ class AuthAccessGateTest extends TestCase
     public function testAllowIfThrowsExceptionWhenCallbackFalse()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('foo');
+        $this->expectExceptionMessageIs('foo');
         $this->expectExceptionCode('bar');
 
         $this->getBasicGate()->allowIf(function () {
@@ -865,7 +865,7 @@ class AuthAccessGateTest extends TestCase
     public function testAllowIfThrowsExceptionWhenResponseDenied()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('foo');
+        $this->expectExceptionMessageIs('foo');
         $this->expectExceptionCode('bar');
 
         $this->getBasicGate()->allowIf(Response::deny('foo', 'bar'));
@@ -874,7 +874,7 @@ class AuthAccessGateTest extends TestCase
     public function testAllowIfThrowsExceptionWhenCallbackResponseDenied()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('quz');
+        $this->expectExceptionMessageIs('quz');
         $this->expectExceptionCode('qux');
 
         $this->getBasicGate()->allowIf(function () {
@@ -885,7 +885,7 @@ class AuthAccessGateTest extends TestCase
     public function testAllowIfThrowsExceptionIfUnauthenticated()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('foo');
+        $this->expectExceptionMessageIs('foo');
         $this->expectExceptionCode('bar');
 
         $gate = $this->getBasicGate()->forUser(null);
@@ -898,7 +898,7 @@ class AuthAccessGateTest extends TestCase
     public function testAllowIfThrowsExceptionIfAuthUserExpectedWhenGuest()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('foo');
+        $this->expectExceptionMessageIs('foo');
         $this->expectExceptionCode('bar');
 
         $gate = $this->getBasicGate()->forUser(null);
@@ -992,7 +992,7 @@ class AuthAccessGateTest extends TestCase
     public function testDenyIfThrowsExceptionWhenCallbackTrue()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('foo');
+        $this->expectExceptionMessageIs('foo');
         $this->expectExceptionCode('bar');
 
         $this->getBasicGate()->denyIf(function () {
@@ -1003,7 +1003,7 @@ class AuthAccessGateTest extends TestCase
     public function testDenyIfThrowsExceptionWhenResponseDenied()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('foo');
+        $this->expectExceptionMessageIs('foo');
         $this->expectExceptionCode('bar');
 
         $this->getBasicGate()->denyIf(Response::deny('foo', 'bar'));
@@ -1012,7 +1012,7 @@ class AuthAccessGateTest extends TestCase
     public function testDenyIfThrowsExceptionWhenCallbackResponseDenied()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('quz');
+        $this->expectExceptionMessageIs('quz');
         $this->expectExceptionCode('qux');
 
         $this->getBasicGate()->denyIf(function () {
@@ -1023,7 +1023,7 @@ class AuthAccessGateTest extends TestCase
     public function testDenyIfThrowsExceptionIfUnauthenticated()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('foo');
+        $this->expectExceptionMessageIs('foo');
         $this->expectExceptionCode('bar');
 
         $gate = $this->getBasicGate()->forUser(null);
@@ -1036,7 +1036,7 @@ class AuthAccessGateTest extends TestCase
     public function testDenyIfThrowsExceptionIfAuthUserExpectedWhenGuest()
     {
         $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('foo');
+        $this->expectExceptionMessageIs('foo');
         $this->expectExceptionCode('bar');
 
         $gate = $this->getBasicGate()->forUser(null);

@@ -212,7 +212,7 @@ class MailMailerTest extends TestCase
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Email addresses may not contain line break characters.');
+        $this->expectExceptionMessageIs('Email addresses may not contain line break characters.');
 
         $mailer->send('foo', ['data'], function (Message $message) {
             $message->to("\"foo\r\nBcc: victim@example.com\"@example.com")->from('hello@laravel.com');

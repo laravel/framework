@@ -3360,7 +3360,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testIncrementManyArgumentValidation1()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Non-numeric value passed as increment amount for column: \'col\'.');
+        $this->expectExceptionMessageIs('Non-numeric value passed as increment amount for column: \'col\'.');
         $builder = $this->getBuilder();
         $builder->from('users')->incrementEach(['col' => 'a']);
     }
@@ -3368,7 +3368,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testIncrementManyArgumentValidation2()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Non-associative array passed to incrementEach method.');
+        $this->expectExceptionMessageIs('Non-associative array passed to incrementEach method.');
         $builder = $this->getBuilder();
         $builder->from('users')->incrementEach([11 => 11]);
     }
@@ -4036,7 +4036,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [])->andReturn([]);
 
         $this->expectException(RecordNotFoundException::class);
-        $this->expectExceptionMessage('No record found for the given query.');
+        $this->expectExceptionMessageIs('No record found for the given query.');
 
         $builder->from('users')->where('id', '=', 1)->firstOrFail();
     }
@@ -4340,7 +4340,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testInsertOrIgnoreMethod()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not support');
+        $this->expectExceptionMessageIs('does not support');
         $builder = $this->getBuilder();
         $builder->from('users')->insertOrIgnore(['email' => 'foo']);
     }
@@ -4372,7 +4372,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSqlServerInsertOrIgnoreMethod()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not support');
+        $this->expectExceptionMessageIs('does not support');
         $builder = $this->getSqlServerBuilder();
         $builder->from('users')->insertOrIgnore(['email' => 'foo']);
     }
@@ -4380,7 +4380,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testInsertOrIgnoreReturningMethod()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not support');
+        $this->expectExceptionMessageIs('does not support');
         $builder = $this->getBuilder();
         $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo']);
     }
@@ -4396,7 +4396,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testMySqlInsertOrIgnoreReturningMethod()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not support');
+        $this->expectExceptionMessageIs('does not support');
         $builder = $this->getMySqlBuilder();
         $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo']);
     }
@@ -4514,7 +4514,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSqlServerInsertOrIgnoreReturningMethod()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not support');
+        $this->expectExceptionMessageIs('does not support');
         $builder = $this->getSqlServerBuilder();
         $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo']);
     }
@@ -4522,7 +4522,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testInsertOrIgnoreReturningWithEmptyUniqueByArray()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The unique columns must not be empty.');
+        $this->expectExceptionMessageIs('The unique columns must not be empty.');
         $builder = $this->getPostgresBuilder();
         $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo'], ['*'], []);
     }
@@ -4530,7 +4530,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testInsertOrIgnoreReturningWithEmptyUniqueByString()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The unique columns must not be empty.');
+        $this->expectExceptionMessageIs('The unique columns must not be empty.');
         $builder = $this->getPostgresBuilder();
         $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo'], ['*'], '');
     }
@@ -4538,7 +4538,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testInsertOrIgnoreReturningWithEmptyReturning()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The returning columns must not be empty.');
+        $this->expectExceptionMessageIs('The returning columns must not be empty.');
         $builder = $this->getPostgresBuilder();
         $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo'], []);
     }
@@ -4559,7 +4559,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testInsertOrIgnoreUsingMethod()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not support');
+        $this->expectExceptionMessageIs('does not support');
         $builder = $this->getBuilder();
         $builder->from('users')->insertOrIgnoreUsing(['email' => 'foo'], 'bar');
     }
@@ -4567,7 +4567,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSqlServerInsertOrIgnoreUsingMethod()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('does not support');
+        $this->expectExceptionMessageIs('does not support');
         $builder = $this->getSqlServerBuilder();
         $builder->from('users')->insertOrIgnoreUsing(['email' => 'foo'], 'bar');
     }
@@ -4818,7 +4818,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpsertMethodWithEmptyUniqueByArray()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The unique columns must not be empty.');
+        $this->expectExceptionMessageIs('The unique columns must not be empty.');
         $builder = $this->getPostgresBuilder();
         $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar']], []);
     }
@@ -4826,7 +4826,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpsertMethodWithEmptyUniqueByString()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The unique columns must not be empty.');
+        $this->expectExceptionMessageIs('The unique columns must not be empty.');
         $builder = $this->getPostgresBuilder();
         $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar']], '');
     }
@@ -5847,7 +5847,7 @@ SQL;
     public function testPrepareValueAndOperatorExpectException()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Illegal operator and value combination.');
+        $this->expectExceptionMessageIs('Illegal operator and value combination.');
 
         $builder = $this->getBuilder();
         $builder->prepareValueAndOperator(null, 'like');
@@ -7224,7 +7224,7 @@ SQL;
     public function testWhereRowValuesArityMismatch()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The number of columns must match the number of values');
+        $this->expectExceptionMessageIs('The number of columns must match the number of values');
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('orders')->whereRowValues(['last_update'], '<', [1, 2]);

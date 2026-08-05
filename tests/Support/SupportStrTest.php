@@ -928,7 +928,7 @@ class SupportStrTest extends TestCase
         Str::random();
 
         try {
-            $this->expectExceptionMessage('Out of random strings.');
+            $this->expectExceptionMessageIs('Out of random strings.');
             Str::random();
             $this->fail();
         } finally {
@@ -1807,7 +1807,7 @@ class SupportStrTest extends TestCase
         Str::uuid();
 
         try {
-            $this->expectExceptionMessage('Out of Uuids.');
+            $this->expectExceptionMessageIs('Out of Uuids.');
             Str::uuid();
             $this->fail();
         } finally {
@@ -1912,7 +1912,7 @@ class SupportStrTest extends TestCase
         Str::ulid();
 
         try {
-            $this->expectExceptionMessage('Out of Ulids');
+            $this->expectExceptionMessageIs('Out of Ulids');
             Str::ulid();
             $this->fail();
         } finally {

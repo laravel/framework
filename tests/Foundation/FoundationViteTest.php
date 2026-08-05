@@ -607,7 +607,7 @@ class FoundationViteTest extends TestCase
     public function testItThrowsWhenUnableToFindAssetManifestInBuildMode()
     {
         $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Vite manifest not found at: '.public_path('build/manifest.json'));
+        $this->expectExceptionMessageIs('Vite manifest not found at: '.public_path('build/manifest.json'));
 
         ViteFacade::asset('resources/js/app.js');
     }
@@ -615,7 +615,7 @@ class FoundationViteTest extends TestCase
     public function testItThrowsDeprecatedExecptionWhenUnableToFindAssetManifestInBuildMode()
     {
         $this->expectException(ViteManifestNotFoundException::class);
-        $this->expectExceptionMessage('Vite manifest not found at: '.public_path('build/manifest.json'));
+        $this->expectExceptionMessageIs('Vite manifest not found at: '.public_path('build/manifest.json'));
 
         ViteFacade::asset('resources/js/app.js');
     }
@@ -625,7 +625,7 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest();
 
         $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Unable to locate file in Vite manifest: resources/js/missing.js');
+        $this->expectExceptionMessageIs('Unable to locate file in Vite manifest: resources/js/missing.js');
 
         ViteFacade::asset('resources/js/missing.js');
     }
@@ -1300,7 +1300,7 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest();
 
         $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Unable to locate file from Vite manifest: '.public_path('build/assets/app.versioned.js'));
+        $this->expectExceptionMessageIs('Unable to locate file from Vite manifest: '.public_path('build/assets/app.versioned.js'));
 
         ViteFacade::content('resources/js/app.js');
     }

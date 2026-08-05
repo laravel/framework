@@ -55,7 +55,7 @@ class SupportCarbonTest extends TestCase
     public function testCarbonRaisesExceptionWhenStaticMacroIsNotFound()
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('nonExistingStaticMacro does not exist.');
+        $this->expectExceptionMessageIs('nonExistingStaticMacro does not exist.');
 
         Carbon::nonExistingStaticMacro();
     }
@@ -63,7 +63,7 @@ class SupportCarbonTest extends TestCase
     public function testCarbonRaisesExceptionWhenMacroIsNotFound()
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('nonExistingMacro does not exist.');
+        $this->expectExceptionMessageIs('nonExistingMacro does not exist.');
 
         Carbon::now()->nonExistingMacro();
     }
