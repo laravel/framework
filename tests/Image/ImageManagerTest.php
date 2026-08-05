@@ -326,6 +326,11 @@ class ImageManagerTest extends TestCase
                 return '#000000';
             }
 
+            public function dimensions(string $contents): array
+            {
+                return [0, 0];
+            }
+
             public function transformUsing(string $transformation, callable $callback): static
             {
                 $this->handlers[$transformation] = $callback;
@@ -360,6 +365,11 @@ class ImageManagerTest extends TestCase
             public function dominantColor(string $contents): string
             {
                 return '#000000';
+            }
+
+            public function dimensions(string $contents): array
+            {
+                return [0, 0];
             }
 
             public function transformUsing(string $transformation, callable $callback): static

@@ -2,9 +2,13 @@
 
 namespace Illuminate\Tests\Image;
 
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Image\Driver;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image;
 use Illuminate\Image\ImageException;
+use Illuminate\Image\ImageManager;
 use Illuminate\Image\ImageOutputOptions;
 use Illuminate\Image\ImagePipeline;
 use Illuminate\Image\Transformations\Blur;
@@ -289,6 +293,94 @@ class ImageTest extends TestCase
         $this->expectExceptionMessage('Unable to determine the dimensions of the image.');
 
         $image->dimensions();
+    }
+
+    public function test_dimensions_defers_to_the_driver_for_heic_images()
+    {
+        $container = new Container;
+        $container->instance('config', new Repository(['images' => ['default' => 'fake']]));
+
+        $manager = new ImageManager($container);
+        $manager->extend('fake', fn () => new class implements Driver
+        {
+            public function process(string $contents, ImagePipeline $pipeline): string
+            {
+                // Bytes that finfo reports as image/heic but getimagesizefromstring() cannot read.
+                return "\x00\x00\x00\x18ftypheic\x00\x00\x00\x00mif1heic";
+            }
+
+            public function dimensions(string $contents): array
+            {
+                return [123, 45];
+            }
+
+            public function dominantColor(string $contents): string
+            {
+                return '#000000';
+            }
+
+            public function transformUsing(string $transformation, callable $callback): static
+            {
+                return $this;
+            }
+        });
+        $container->instance('image', $manager);
+
+        Container::setInstance($container);
+
+        try {
+            $image = (new Image($this->fakeImageContents()))->using('fake')->cover(1, 1);
+
+            $this->assertSame([123, 45], $image->dimensions());
+            $this->assertSame(123, $image->width());
+            $this->assertSame(45, $image->height());
+        } finally {
+            Container::setInstance(null);
+        }
+    }
+
+    public function test_dimensions_falls_back_to_native_reader_when_the_driver_cannot_decode_heic()
+    {
+        $container = new Container;
+        $container->instance('config', new Repository(['images' => ['default' => 'fake']]));
+
+        $manager = new ImageManager($container);
+        $manager->extend('fake', fn () => new class implements Driver
+        {
+            public function process(string $contents, ImagePipeline $pipeline): string
+            {
+                return "\x00\x00\x00\x18ftypheic\x00\x00\x00\x00mif1heic";
+            }
+
+            public function dimensions(string $contents): array
+            {
+                throw new ImageException('The driver cannot decode this image.');
+            }
+
+            public function dominantColor(string $contents): string
+            {
+                return '#000000';
+            }
+
+            public function transformUsing(string $transformation, callable $callback): static
+            {
+                return $this;
+            }
+        });
+        $container->instance('image', $manager);
+
+        Container::setInstance($container);
+
+        try {
+            $image = (new Image($this->fakeImageContents()))->using('fake')->cover(1, 1);
+
+            $this->expectException(ImageException::class);
+            $this->expectExceptionMessage('Unable to determine the dimensions of the image.');
+
+            $image->dimensions();
+        } finally {
+            Container::setInstance(null);
+        }
     }
 
     public function test_hash_name_returns_name_with_extension()

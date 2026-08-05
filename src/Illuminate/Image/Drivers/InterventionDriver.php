@@ -144,6 +144,22 @@ abstract class InterventionDriver implements Driver
     }
 
     /**
+     * Get the dimensions of the given image contents.
+     *
+     * @return array{0: int, 1: int}
+     */
+    public function dimensions(string $contents): array
+    {
+        $image = $this->manager->decode($contents);
+
+        try {
+            return [$image->width(), $image->height()];
+        } finally {
+            unset($image);
+        }
+    }
+
+    /**
      * Resolve a background color, expanding the "dominant" sentinel when needed.
      */
     protected function resolveBackground(ImageInterface $image, ?string $background): ?string

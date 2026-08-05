@@ -2,9 +2,13 @@
 
 namespace Illuminate\Tests\Image\Drivers;
 
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Drivers\ImagickDriver;
+use Illuminate\Image\Image;
+use Illuminate\Image\ImageManager;
 use Illuminate\Image\ImagePipeline;
 use Illuminate\Image\Transformations\Blur;
 use Illuminate\Image\Transformations\Contain;
@@ -139,6 +143,49 @@ class ImagickDriverTest extends TestCase
         $result = $driver->process($result, $this->pipeline(format: 'jpg'));
 
         $this->assertSame([50, 25], array_slice(getimagesizefromstring($result), 0, 2));
+    }
+
+    public function test_dimensions_returns_the_decoded_size()
+    {
+        $driver = new ImagickDriver;
+        $contents = $driver->process($this->fakeImageContents(320, 240), $this->pipeline(new Cover(200, 150), format: 'png'));
+
+        $this->assertSame([200, 150], $driver->dimensions($contents));
+    }
+
+    public function test_dimensions_returns_the_display_size_for_heic()
+    {
+        $this->ensureImageFormatCanBeEncoded('heic');
+
+        $driver = new ImagickDriver;
+
+        // 137x73 is a size where HEIC's coded/padded frame differs from the display size, which
+        // getimagesize() misreports; the driver must return the true display size.
+        $contents = $driver->process($this->fakeImageContents(400, 300), $this->pipeline(new Cover(137, 73), format: 'heic'));
+
+        $this->assertSame([137, 73], $driver->dimensions($contents));
+    }
+
+    public function test_image_dimensions_are_correct_for_real_heic_through_public_api()
+    {
+        $this->ensureImageFormatCanBeEncoded('heic');
+
+        // End-to-end through the public Image API on a real HEIC; fails pre-fix (getimagesize returns 138x74).
+        $heic = (new ImagickDriver)->process(
+            $this->fakeImageContents(400, 300),
+            $this->pipeline(new Cover(137, 73), format: 'heic')
+        );
+
+        $container = new Container;
+        $container->instance('config', new Repository(['images' => ['default' => 'imagick']]));
+        $container->instance('image', new ImageManager($container));
+        Container::setInstance($container);
+
+        try {
+            $this->assertSame([137, 73], (new Image($heic))->dimensions());
+        } finally {
+            Container::setInstance(null);
+        }
     }
 
     public function test_processes_optimize_to_bmp()
@@ -489,11 +536,18 @@ class ImagickDriverTest extends TestCase
             $this->markTestSkipped("The Imagick extension was not compiled with {$format} support.");
         }
 
-        $imagick = new \Imagick;
-        $imagick->newImage(1, 1, 'white');
-        $imagick->setImageFormat($format);
+        try {
+            $imagick = new \Imagick;
+            $imagick->newImage(1, 1, 'white');
+            $imagick->setImageFormat($format);
+            $encoded = $imagick->getImageBlob();
+        } catch (\ImagickException) {
+            // Some builds ship the HEIC decode delegate but no encoder, in which case encoding
+            // raises instead of returning an empty blob. Either way, encoding is unavailable.
+            $encoded = '';
+        }
 
-        if ($imagick->getImageBlob() === '') {
+        if ($encoded === '') {
             $this->markTestSkipped("The Imagick extension cannot encode {$format} images.");
         }
     }
