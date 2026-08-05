@@ -6,7 +6,6 @@ use Illuminate\Contracts\Redis\LimiterTimeoutException;
 use Illuminate\Redis\Connections\Connection;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
-use Throwable;
 
 class ConcurrencyLimiter
 {
@@ -88,13 +87,9 @@ class ConcurrencyLimiter
 
         if (is_callable($callback)) {
             try {
-                return tap($callback(), function () use ($slot, $id) {
-                    $this->release($slot, $id);
-                });
-            } catch (Throwable $exception) {
+                return $callback();
+            } finally {
                 $this->release($slot, $id);
-
-                throw $exception;
             }
         }
 

@@ -4,7 +4,6 @@ namespace Illuminate\Cache\Limiters;
 
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
-use Throwable;
 
 class ConcurrencyLimiter
 {
@@ -79,13 +78,9 @@ class ConcurrencyLimiter
 
         if (is_callable($callback)) {
             try {
-                return tap($callback(), function () use ($slot) {
-                    $this->release($slot);
-                });
-            } catch (Throwable $exception) {
+                return $callback();
+            } finally {
                 $this->release($slot);
-
-                throw $exception;
             }
         }
 
