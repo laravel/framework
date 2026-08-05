@@ -12,6 +12,20 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 class LoadEnvironmentVariables
 {
     /**
+     * The environment defined outside of the environment files.
+     *
+     * @var string|null
+     */
+    protected static $externalEnvironment;
+
+    /**
+     * Indicates if the external environment has been resolved.
+     *
+     * @var bool
+     */
+    protected static $externalEnvironmentResolved = false;
+
+    /**
      * Bootstrap the given application.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -46,14 +60,17 @@ class LoadEnvironmentVariables
             return;
         }
 
-        $environment = Env::get('APP_ENV');
+        if (! static::$externalEnvironmentResolved) {
+            static::$externalEnvironment = Env::get('APP_ENV');
+            static::$externalEnvironmentResolved = true;
+        }
 
-        if (! $environment) {
+        if (! static::$externalEnvironment) {
             return;
         }
 
         $this->setEnvironmentFilePath(
-            $app, $app->environmentFile().'.'.$environment
+            $app, $app->environmentFile().'.'.static::$externalEnvironment
         );
     }
 
@@ -106,5 +123,17 @@ class LoadEnvironmentVariables
         http_response_code(500);
 
         exit(1);
+    }
+
+    /**
+     * Flush the bootstrapper's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$externalEnvironment = null;
+
+        static::$externalEnvironmentResolved = false;
     }
 }

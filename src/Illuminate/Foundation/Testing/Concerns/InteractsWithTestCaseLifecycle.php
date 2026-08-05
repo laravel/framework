@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\FormRequest;
@@ -192,6 +193,7 @@ trait InteractsWithTestCaseLifecycle
         HandleExceptions::flushState($this);
         JsonApiResource::flushState();
         JsonResource::flushState();
+        LoadEnvironmentVariables::flushState();
         Lottery::determineResultsNormally();
         Markdown::flushState();
         Migrator::withoutMigrations([]);
