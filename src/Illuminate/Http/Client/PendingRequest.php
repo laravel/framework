@@ -297,7 +297,7 @@ class PendingRequest
     /**
      * Attach a raw body to the request.
      *
-     * @param  \Psr\Http\Message\StreamInterface|string  $content
+     * @param  \Psr\Http\Message\StreamInterface|string|resource|null  $content
      * @param  string  $contentType
      * @return $this
      */
@@ -1617,8 +1617,8 @@ class PendingRequest
      */
     protected function ensureValidRequestBody($body): void
     {
-        if (! is_string($body) && ! is_null($body) && ! is_resource($body) && ! $body instanceof StreamInterface) {
-            throw new InvalidArgumentException('HTTP request body must be a string, resource, Psr\Http\Message\StreamInterface, or null.');
+        if (! is_string($body) && ! is_null($body) && (! is_resource($body) || get_resource_type($body) !== 'stream') && ! $body instanceof StreamInterface) {
+            throw new InvalidArgumentException('HTTP request body must be a string, stream resource, Psr\Http\Message\StreamInterface, or null.');
         }
     }
 

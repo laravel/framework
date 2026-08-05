@@ -593,6 +593,40 @@ class HttpClientTest extends TestCase
         $this->factory->withBody($body, 'text/plain')->send('post', 'http://foo.com/api');
     }
 
+    public function testSendStreamResourceRequestBody()
+    {
+        $string = 'Look at me, i am a stream resource!!';
+        $body = fopen('php://temp', 'w+');
+        fwrite($body, $string);
+        rewind($body);
+
+        $this->factory->fake(function (Request $request) use ($string) {
+            $this->assertSame($string, $request->body());
+
+            return ['my' => 'response'];
+        });
+
+        $this->factory->withBody($body, 'text/plain')->send('post', 'http://foo.com/api');
+    }
+
+    public function testRejectsNonStreamRequestBodyResource()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('HTTP request body must be a string, stream resource, Psr\Http\Message\StreamInterface, or null.');
+
+        $this->factory->withBody(stream_context_create());
+    }
+
+    public function testRejectsNonStreamRequestBodyResourceProvidedThroughOptions()
+    {
+        $this->factory->fake();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('HTTP request body must be a string, stream resource, Psr\Http\Message\StreamInterface, or null.');
+
+        $this->factory->withOptions(['body' => stream_context_create()])->post('http://foo.com/api');
+    }
+
     public function testUrlsCanBeStubbedByPath()
     {
         $this->factory->fake([
