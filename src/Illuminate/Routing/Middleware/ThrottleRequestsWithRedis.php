@@ -59,7 +59,9 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
             if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
                 throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
             }
+        }
 
+        foreach ($limits as $limit) {
             if (! $limit->afterCallback) {
                 $this->hit($limit->key, $limit->maxAttempts, $limit->decaySeconds);
             }

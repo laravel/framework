@@ -18,6 +18,24 @@ class ThrottleRequestsWithRedisTest extends TestCase
 {
     use InteractsWithRedis;
 
+    public function testRejectedRequestDoesNotIncrementEarlierLimits()
+    {
+        $this->ifRedisAvailable(function () {
+            RateLimiter::for('test', fn () => [
+                Limit::perDay(4)->by('day-key'),
+                Limit::perMinute(3)->by('minute-key'),
+            ]);
+            Route::get('/', fn () => 'ok')->middleware(ThrottleRequestsWithRedis::using('test'));
+
+            $this->get('/')->assertOk();
+            $this->get('/')->assertOk();
+            $this->get('/')->assertOk();
+            $this->get('/')->assertTooManyRequests();
+
+            $this->assertSame('3', $this->app['redis']->connection()->hget(md5('testday-key'), 'count'));
+        });
+    }
+
     public function testLockOpensImmediatelyAfterDecay()
     {
         $this->ifRedisAvailable(function () {
