@@ -251,30 +251,61 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a relationship path for models of the given type if it is not already eager loaded.
      *
-     * @param  array<int, array<string, class-string>>  $tuples
+     * @param  array<int, array{0: string, 1: class-string, 2: array{0: string, 1: string}|null}>  $tuples
+     * @param  bool  $loadMissingRelations
      * @return void
      */
-    public function loadMissingRelationshipChain(array $tuples)
+    public function loadMissingRelationshipChain(array $tuples, $loadMissingRelations = true)
     {
-        [$relation, $class] = array_shift($tuples);
+        [$relation, $class, $aggregate] = array_pad(array_shift($tuples), 3, null);
 
-        $this->filter(function ($model) use ($relation, $class) {
-            return ! is_null($model) &&
-                ! $model->relationLoaded($relation) &&
-                $model::class === $class;
-        })->load($relation);
+        if (! is_null($aggregate)) {
+            $this->loadMissingRelationshipAggregate($relation, $class, $aggregate);
+
+            return;
+        }
+
+        if ($loadMissingRelations) {
+            $this->filter(function ($model) use ($relation, $class) {
+                return ! is_null($model) &&
+                    ! $model->relationLoaded($relation) &&
+                    $model::class === $class;
+            })->load($relation);
+        }
 
         if (empty($tuples)) {
             return;
         }
 
-        $models = $this->pluck($relation)->whereNotNull();
+        $models = $this->filter(fn ($model) => ! is_null($model) && $model->relationLoaded($relation))
+            ->pluck($relation)
+            ->whereNotNull();
 
         if ($models->first() instanceof BaseCollection) {
             $models = $models->collapse();
         }
 
-        (new static($models))->loadMissingRelationshipChain($tuples);
+        (new static($models))->loadMissingRelationshipChain($tuples, $loadMissingRelations);
+    }
+
+    /**
+     * Load an aggregate of a relationship for models of the given type if it is not already loaded.
+     *
+     * @param  string  $relation
+     * @param  class-string<TModel>  $class
+     * @param  array{0: string, 1: string}  $aggregate
+     * @return void
+     */
+    protected function loadMissingRelationshipAggregate($relation, $class, $aggregate)
+    {
+        [$function, $attribute] = $aggregate;
+
+        $this->filter(function ($model) use ($attribute, $class) {
+            return ! is_null($model) &&
+                $model->exists &&
+                ! array_key_exists($attribute, $model->getAttributes()) &&
+                $model::class === $class;
+        })->loadAggregate($relation, '*', $function);
     }
 
     /**
@@ -806,15 +837,18 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Enable relationship autoloading for all models in this collection.
      *
+     * @param  array<int, string>  $features
      * @return $this
      */
-    public function withRelationshipAutoloading()
+    public function withRelationshipAutoloading(array $features = ['relations'])
     {
-        $callback = fn ($tuples) => $this->loadMissingRelationshipChain($tuples);
+        $loadMissingRelations = in_array('relations', $features, true);
+
+        $callback = fn ($tuples) => $this->loadMissingRelationshipChain($tuples, $loadMissingRelations);
 
         foreach ($this as $model) {
             if (! $model->hasRelationAutoloadCallback()) {
-                $model->autoloadRelationsUsing($callback, $this);
+                $model->autoloadRelationsUsing($callback, $this, $features);
             }
         }
 

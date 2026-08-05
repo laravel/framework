@@ -56,6 +56,13 @@ trait HasRelationships
     protected $relationAutoloadContext = null;
 
     /**
+     * The autoloading features that are enabled for this model.
+     *
+     * @var array<int, string>
+     */
+    protected $relationAutoloadFeatures = [];
+
+    /**
      * The many to many relationship methods.
      *
      * @var string[]
@@ -132,13 +139,25 @@ trait HasRelationships
     }
 
     /**
+     * Determine if the given autoloading feature is enabled for this model.
+     *
+     * @param  string  $feature
+     * @return bool
+     */
+    protected function hasRelationAutoloadFeature($feature)
+    {
+        return in_array($feature, $this->relationAutoloadFeatures, true);
+    }
+
+    /**
      * Define an automatic relationship autoloader callback for this model and its relations.
      *
      * @param  \Closure  $callback
      * @param  mixed  $context
+     * @param  array<int, string>  $features
      * @return $this
      */
-    public function autoloadRelationsUsing(Closure $callback, $context = null)
+    public function autoloadRelationsUsing(Closure $callback, $context = null, array $features = ['relations'])
     {
         // Prevent circular relation autoloading...
         if ($context && $this->relationAutoloadContext === $context) {
@@ -147,6 +166,7 @@ trait HasRelationships
 
         $this->relationAutoloadCallback = $callback;
         $this->relationAutoloadContext = $context;
+        $this->relationAutoloadFeatures = $features;
 
         foreach ($this->relations as $key => $value) {
             $this->propagateRelationAutoloadCallbackToRelation($key, $value);
@@ -163,7 +183,7 @@ trait HasRelationships
      */
     protected function attemptToAutoloadRelation($key)
     {
-        if (! $this->hasRelationAutoloadCallback()) {
+        if (! $this->hasRelationAutoloadCallback() || ! $this->hasRelationAutoloadFeature('relations')) {
             return false;
         }
 
@@ -173,15 +193,72 @@ trait HasRelationships
     }
 
     /**
+     * Attempt to autoload the relationship aggregate for the given key using the autoload callback.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function attemptToAutoloadRelationAggregate($key)
+    {
+        if (! $this->hasRelationAutoloadCallback()) {
+            return false;
+        }
+
+        if (is_null($aggregate = $this->resolveRelationAggregateFromAttribute($key))) {
+            return false;
+        }
+
+        [$relation, $function] = $aggregate;
+
+        $this->invokeRelationAutoloadCallbackFor($relation, [], [$function, $key]);
+
+        return array_key_exists($key, $this->attributes);
+    }
+
+    /**
+     * Resolve the relationship name and aggregate function for the given attribute.
+     *
+     * @param  string  $key
+     * @return array{0: string, 1: string}|null
+     */
+    protected function resolveRelationAggregateFromAttribute($key)
+    {
+        foreach (['count', 'exists'] as $function) {
+            $suffix = '_'.$function;
+
+            if (! $this->hasRelationAutoloadFeature($function) || ! str_ends_with($key, $suffix)) {
+                continue;
+            }
+
+            $name = Str::beforeLast($key, $suffix);
+
+            // Aggregate aliases are snaked when generated, so either form may define the relationship...
+            foreach (array_unique([$name, Str::camel($name)]) as $relation) {
+                if ($relation === '' || ! $this->isRelation($relation)) {
+                    continue;
+                }
+
+                // Confirm the method truly returns a relationship before aggregating it...
+                if (Relation::noConstraints(fn () => $this->{$relation}()) instanceof Relation) {
+                    return [$relation, $function];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Invoke the relationship autoloader callback for the given relationships.
      *
      * @param  string  $key
      * @param  array  $tuples
+     * @param  array{0: string, 1: string}|null  $aggregate
      * @return void
      */
-    protected function invokeRelationAutoloadCallbackFor($key, $tuples)
+    protected function invokeRelationAutoloadCallbackFor($key, $tuples, $aggregate = null)
     {
-        $tuples = array_merge([[$key, get_class($this)]], $tuples);
+        $tuples = array_merge([[$key, get_class($this), $aggregate]], $tuples);
 
         call_user_func($this->relationAutoloadCallback, $tuples);
     }
@@ -210,7 +287,7 @@ trait HasRelationships
         $callback = fn (array $tuples) => $this->invokeRelationAutoloadCallbackFor($key, $tuples);
 
         foreach ($models as $model) {
-            $model->autoloadRelationsUsing($callback, $this->relationAutoloadContext);
+            $model->autoloadRelationsUsing($callback, $this->relationAutoloadContext, $this->relationAutoloadFeatures);
         }
     }
 
@@ -1148,11 +1225,12 @@ trait HasRelationships
     /**
      * Enable relationship autoloading for this model.
      *
+     * @param  array<int, string>  $features
      * @return $this
      */
-    public function withRelationshipAutoloading()
+    public function withRelationshipAutoloading(array $features = ['relations'])
     {
-        $this->newCollection([$this])->withRelationshipAutoloading();
+        $this->newCollection([$this])->withRelationshipAutoloading($features);
 
         return $this;
     }

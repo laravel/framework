@@ -502,9 +502,15 @@ trait HasAttributes
             return $this->throwMissingAttributeExceptionIfApplicable($key);
         }
 
-        return $this->isRelation($key) || $this->relationLoaded($key)
-            ? $this->getRelationValue($key)
-            : $this->throwMissingAttributeExceptionIfApplicable($key);
+        if ($this->isRelation($key) || $this->relationLoaded($key)) {
+            return $this->getRelationValue($key);
+        }
+
+        if ($this->attemptToAutoloadRelationAggregate($key)) {
+            return $this->getAttributeValue($key);
+        }
+
+        return $this->throwMissingAttributeExceptionIfApplicable($key);
     }
 
     /**

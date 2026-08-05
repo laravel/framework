@@ -29,8 +29,8 @@ trait HasCollection
 
         $collection = new static::$resolvedCollectionClasses[static::class]($models);
 
-        if (Model::isAutomaticallyEagerLoadingRelationships()) {
-            $collection->withRelationshipAutoloading();
+        if ($features = Model::enabledRelationAutoloadFeatures()) {
+            $collection->withRelationshipAutoloading($features);
         }
 
         return $collection;

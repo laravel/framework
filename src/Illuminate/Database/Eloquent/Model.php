@@ -211,6 +211,20 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $modelsShouldAutomaticallyEagerLoadRelationships = false;
 
     /**
+     * Indicates whether relationship counts should be automatically loaded on all models when they are accessed.
+     *
+     * @var bool
+     */
+    protected static $modelsShouldAutomaticallyEagerLoadRelationshipCounts = false;
+
+    /**
+     * Indicates whether relationship existence should be automatically loaded on all models when it is accessed.
+     *
+     * @var bool
+     */
+    protected static $modelsShouldAutomaticallyEagerLoadRelationshipExistence = false;
+
+    /**
      * The callback that is responsible for handling lazy loading violations.
      *
      * @var (callable(self, string): mixed)|null
@@ -586,6 +600,28 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function automaticallyEagerLoadRelationships($value = true)
     {
         static::$modelsShouldAutomaticallyEagerLoadRelationships = $value;
+    }
+
+    /**
+     * Determine if model relationship counts should be automatically eager loaded when accessed.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function automaticallyEagerLoadRelationshipCounts($value = true)
+    {
+        static::$modelsShouldAutomaticallyEagerLoadRelationshipCounts = $value;
+    }
+
+    /**
+     * Determine if model relationship existence should be automatically eager loaded when accessed.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function automaticallyEagerLoadRelationshipExistence($value = true)
+    {
+        static::$modelsShouldAutomaticallyEagerLoadRelationshipExistence = $value;
     }
 
     /**
@@ -2626,6 +2662,40 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Determine if relationship counts are being automatically eager loaded when accessed.
+     *
+     * @return bool
+     */
+    public static function isAutomaticallyEagerLoadingRelationshipCounts()
+    {
+        return static::$modelsShouldAutomaticallyEagerLoadRelationshipCounts;
+    }
+
+    /**
+     * Determine if relationship existence is being automatically eager loaded when accessed.
+     *
+     * @return bool
+     */
+    public static function isAutomaticallyEagerLoadingRelationshipExistence()
+    {
+        return static::$modelsShouldAutomaticallyEagerLoadRelationshipExistence;
+    }
+
+    /**
+     * Get the autoloading features that are currently enabled for all models.
+     *
+     * @return array<int, string>
+     */
+    protected static function enabledRelationAutoloadFeatures()
+    {
+        return array_keys(array_filter([
+            'relations' => static::isAutomaticallyEagerLoadingRelationships(),
+            'count' => static::isAutomaticallyEagerLoadingRelationshipCounts(),
+            'exists' => static::isAutomaticallyEagerLoadingRelationshipExistence(),
+        ]));
+    }
+
+    /**
      * Determine if discarding guarded attribute fills is disabled.
      *
      * @return bool
@@ -2896,6 +2966,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->attributeCastCache = [];
         $this->relationAutoloadCallback = null;
         $this->relationAutoloadContext = null;
+        $this->relationAutoloadFeatures = [];
 
         $keys = get_object_vars($this);
 
@@ -2921,8 +2992,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->initializeTraits();
         $this->initializeModelAttributes();
 
-        if (static::isAutomaticallyEagerLoadingRelationships()) {
-            $this->withRelationshipAutoloading();
+        if ($features = static::enabledRelationAutoloadFeatures()) {
+            $this->withRelationshipAutoloading($features);
         }
     }
 }
