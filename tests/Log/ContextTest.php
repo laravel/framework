@@ -63,6 +63,21 @@ class ContextTest extends TestCase
         $this->assertSame(1, Context::get('foo'));
     }
 
+    public function test_it_can_add_hidden_values_when_not_already_present()
+    {
+        Context::addHiddenIf('foo', 1);
+        $this->assertSame(1, Context::getHidden('foo'));
+
+        Context::addHiddenIf('foo', 2);
+        $this->assertSame(1, Context::getHidden('foo'));
+
+        Context::add('bar', 'visible');
+        Context::addHiddenIf('bar', 'hidden');
+
+        $this->assertSame('visible', Context::get('bar'));
+        $this->assertSame('hidden', Context::getHidden('bar'));
+    }
+
     public function test_it_can_listen_to_the_hydrating_event()
     {
         Context::add('one', 1);
@@ -273,6 +288,16 @@ class ContextTest extends TestCase
 
         $this->assertTrue(Context::missing('lorem'));
         $this->assertFalse(Context::missing('foo'));
+    }
+
+    public function test_it_can_check_if_hidden_context_is_missing()
+    {
+        Context::addHidden('foo', 'bar');
+        Context::add('baz', 'visible');
+
+        $this->assertTrue(Context::missingHidden('lorem'));
+        $this->assertFalse(Context::missingHidden('foo'));
+        $this->assertTrue(Context::missingHidden('baz'));
     }
 
     public function test_it_can_check_if_value_is_in_context_stack()
@@ -491,6 +516,22 @@ class ContextTest extends TestCase
 
         $this->expectExceptionObject(new RuntimeException('Unable to push value onto hidden context stack for key [foo].'));
         Context::pushHidden('foo', 2);
+    }
+
+    public function test_it_can_forget_values()
+    {
+        Context::add(['foo' => 'bar', 'baz' => 'lorem', 'ipsum' => 'dolor']);
+        Context::addHidden('foo', 'data');
+
+        Context::forget('foo');
+
+        $this->assertFalse(Context::has('foo'));
+        $this->assertSame('data', Context::getHidden('foo'));
+
+        Context::forget(['baz', 'ipsum']);
+
+        $this->assertFalse(Context::has('baz'));
+        $this->assertFalse(Context::has('ipsum'));
     }
 
     public function test_it_can_pull()
