@@ -27,8 +27,7 @@ class AssertTest extends TestCase
             'bar' => 'value',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [prop] does not exist.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [prop] does not exist.'));
 
         $assert->has('prop');
     }
@@ -52,8 +51,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [example.another] does not exist.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [example.another] does not exist.'));
 
         $assert->has('example.another');
     }
@@ -79,8 +77,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] does not have the expected size.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] does not have the expected size.'));
 
         $assert->has('bar', 1);
     }
@@ -94,8 +91,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [baz] does not exist.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [baz] does not exist.'));
 
         $assert->has('baz', 1);
     }
@@ -130,8 +126,7 @@ class AssertTest extends TestCase
             'baz',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Root level does not have the expected size.');
+        $this->expectExceptionObject(new AssertionFailedError('Root level does not have the expected size.'));
 
         $assert->has(2);
     }
@@ -145,8 +140,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] does not have the expected size.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] does not have the expected size.'));
 
         $assert->has('bar', function ($bar) {
             $bar->has(3);
@@ -189,8 +183,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [data.1.id] contains a value that should be missing: [id, 2]');
+        $this->expectExceptionObject(new AssertionFailedError('Property [data.1.id] contains a value that should be missing: [id, 2]'));
 
         $assert->has('data', function ($bar) {
             $bar->has(2)
@@ -234,8 +227,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [data.1.id] was marked as invalid using a closure.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [data.1.id] was marked as invalid using a closure.'));
 
         $assert->has('data', function ($bar) {
             $bar->has(2)
@@ -262,8 +254,7 @@ class AssertTest extends TestCase
             'baz',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Root level does not have the expected size.');
+        $this->expectExceptionObject(new AssertionFailedError('Root level does not have the expected size.'));
 
         $assert->count(2);
     }
@@ -277,8 +268,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] does not have the expected size.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] does not have the expected size.'));
 
         $assert->has('bar', function ($bar) {
             $bar->count(3);
@@ -304,8 +294,7 @@ class AssertTest extends TestCase
             'baz',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Root level size is not less than or equal to [2].');
+        $this->expectExceptionObject(new AssertionFailedError('Root level size is not less than or equal to [2].'));
 
         $assert->countBetween(1, 2);
     }
@@ -318,8 +307,7 @@ class AssertTest extends TestCase
             'baz',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Root level size is not greater than or equal to [4].');
+        $this->expectExceptionObject(new AssertionFailedError('Root level size is not greater than or equal to [4].'));
 
         $assert->countBetween(4, 3);
     }
@@ -334,8 +322,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] size is not less than or equal to [2].');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] size is not less than or equal to [2].'));
 
         $assert->has('bar', function (AssertableJson $bar) {
             $bar->countBetween(1, 2);
@@ -362,8 +349,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo.bar] was found while it was expected to be missing.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo.bar] was found while it was expected to be missing.'));
 
         $assert->missing('foo.bar');
     }
@@ -386,8 +372,7 @@ class AssertTest extends TestCase
             'baz' => 'foo',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [baz] was found while it was expected to be missing.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [baz] was found while it was expected to be missing.'));
 
         $assert->missingAll([
             'bar',
@@ -403,8 +388,7 @@ class AssertTest extends TestCase
 
         $assert->missingAll('foo', 'bar');
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [baz] was found while it was expected to be missing.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [baz] was found while it was expected to be missing.'));
 
         $assert->missingAll('bar', 'baz');
     }
@@ -424,8 +408,7 @@ class AssertTest extends TestCase
             'bar' => 'value',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] does not match the expected value.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] does not match the expected value.'));
 
         $assert->where('bar', 'invalid');
     }
@@ -436,8 +419,7 @@ class AssertTest extends TestCase
             'bar' => 'value',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [baz] does not exist.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [baz] does not exist.'));
 
         $assert->where('baz', 'invalid');
     }
@@ -448,8 +430,7 @@ class AssertTest extends TestCase
             'bar' => 1,
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] does not match the expected value.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] does not match the expected value.'));
 
         $assert->where('bar', true);
     }
@@ -471,8 +452,7 @@ class AssertTest extends TestCase
             'bar' => 'baz',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] was marked as invalid using a closure.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] was marked as invalid using a closure.'));
 
         $assert->where('bar', function ($value) {
             return $value === 'invalid';
@@ -574,8 +554,7 @@ class AssertTest extends TestCase
             'bar' => BackedEnum::test->value,
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] does not match the expected value.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] does not match the expected value.'));
 
         $assert->where('bar', BackedEnum::test_empty);
     }
@@ -595,8 +574,7 @@ class AssertTest extends TestCase
             'bar' => 'value',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] should be null.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] should be null.'));
 
         $assert->whereNull('bar');
     }
@@ -607,8 +585,7 @@ class AssertTest extends TestCase
             'bar' => 'value',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [baz] does not exist.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [baz] does not exist.'));
 
         $assert->whereNull('baz');
     }
@@ -628,8 +605,7 @@ class AssertTest extends TestCase
             'bar' => null,
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] should not be null.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] should not be null.'));
 
         $assert->whereNotNull('bar');
     }
@@ -640,8 +616,7 @@ class AssertTest extends TestCase
             'bar' => 'value',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [baz] does not exist.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [baz] does not exist.'));
 
         $assert->whereNotNull('baz');
     }
@@ -650,8 +625,7 @@ class AssertTest extends TestCase
     {
         $assert = AssertableJson::fromArray([]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] does not contain [1].');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo] does not contain [1].'));
 
         $assert->whereContains('foo', ['1']);
     }
@@ -662,8 +636,7 @@ class AssertTest extends TestCase
             'foo' => ['bar', 'baz'],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] does not contain [invalid].');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo] does not contain [invalid].'));
 
         $assert->whereContains('foo', ['bar', 'baz', 'invalid']);
     }
@@ -677,8 +650,7 @@ class AssertTest extends TestCase
             ['id' => 4],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [id] does not contain [5].');
+        $this->expectExceptionObject(new AssertionFailedError('Property [id] does not contain [5].'));
 
         $assert->whereContains('id', [1, 2, 3, 4, 5]);
     }
@@ -689,8 +661,7 @@ class AssertTest extends TestCase
             'foo' => [1, 2, 3, 4],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] does not contain [1].');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo] does not contain [1].'));
 
         $assert->whereContains('foo', ['1']);
     }
@@ -701,8 +672,7 @@ class AssertTest extends TestCase
             'foo' => [1, 2, 3, 4],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] does not contain a value that passes the truth test within the given closure.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo] does not contain a value that passes the truth test within the given closure.'));
 
         $assert->whereContains('foo', [function ($actual) {
             return $actual === 5;
@@ -715,8 +685,7 @@ class AssertTest extends TestCase
             'foo' => [1, 2, 3, 4],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] does not contain a value that passes the truth test within the given closure.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo] does not contain a value that passes the truth test within the given closure.'));
 
         $assert->whereContains('foo', [1, function ($actual) {
             return $actual === 5;
@@ -729,8 +698,7 @@ class AssertTest extends TestCase
             'foo' => [1, 2, 3, 4],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] does not contain [5].');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo] does not contain [5].'));
 
         $assert->whereContains('foo', [5, function ($actual) {
             return $actual === 1;
@@ -861,8 +829,7 @@ class AssertTest extends TestCase
             'bar' => [BackedEnum::test_empty->value],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] does not contain [test].');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] does not contain [test].'));
 
         $assert->whereContains('bar', BackedEnum::test);
     }
@@ -886,8 +853,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [example.nested] does not match the expected value.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [example.nested] does not match the expected value.'));
 
         $assert->where('example.nested', 'another-value');
     }
@@ -911,8 +877,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [example.nested] does not match the expected value.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [example.nested] does not match the expected value.'));
 
         $assert->where('example.nested', BackedEnum::test);
     }
@@ -932,8 +897,7 @@ class AssertTest extends TestCase
             'bar' => 'value',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] contains a value that should be missing: [bar, value]');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] contains a value that should be missing: [bar, value]'));
 
         $assert->whereNot('bar', 'value');
     }
@@ -944,8 +908,7 @@ class AssertTest extends TestCase
             'bar' => 'value',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [baz] does not exist.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [baz] does not exist.'));
 
         $assert->whereNot('baz', 'value');
     }
@@ -967,8 +930,7 @@ class AssertTest extends TestCase
             'bar' => 'baz',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] was marked as invalid using a closure.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] was marked as invalid using a closure.'));
 
         $assert->whereNot('bar', function ($value) {
             return $value === 'baz';
@@ -990,8 +952,7 @@ class AssertTest extends TestCase
             'bar' => BackedEnum::test->value,
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] contains a value that should be missing: [bar, test]');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] contains a value that should be missing: [bar, test]'));
 
         $assert->whereNot('bar', BackedEnum::test);
     }
@@ -1025,8 +986,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [baz] does not exist.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [baz] does not exist.'));
 
         $assert->has('baz', function (AssertableJson $item) {
             $item->where('baz', 'example');
@@ -1039,8 +999,7 @@ class AssertTest extends TestCase
             'bar' => 'value',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] is not scopeable.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] is not scopeable.'));
 
         $assert->has('bar', function (AssertableJson $item) {
             //
@@ -1092,8 +1051,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] does not have the expected size.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] does not have the expected size.'));
 
         $assert->has('bar', 0, function (AssertableJson $item) {
             $item->where('key', 'first');
@@ -1109,8 +1067,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [bar] does not have the expected size.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [bar] does not have the expected size.'));
 
         $assert->has('bar', 1, function (AssertableJson $item) {
             $item->where('key', 'first');
@@ -1185,8 +1142,7 @@ class AssertTest extends TestCase
     {
         $assert = AssertableJson::fromArray([]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Cannot scope directly onto the first element of the root level because it is empty.');
+        $this->expectExceptionObject(new AssertionFailedError('Cannot scope directly onto the first element of the root level because it is empty.'));
 
         $assert->first(function (AssertableJson $item) {
             //
@@ -1199,8 +1155,7 @@ class AssertTest extends TestCase
             'foo' => [],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Cannot scope directly onto the first element of property [foo] because it is empty.');
+        $this->expectExceptionObject(new AssertionFailedError('Cannot scope directly onto the first element of property [foo] because it is empty.'));
 
         $assert->has('foo', function (AssertableJson $assert) {
             $assert->first(function (AssertableJson $item) {
@@ -1215,8 +1170,7 @@ class AssertTest extends TestCase
             'foo' => 'bar',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] is not scopeable.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo] is not scopeable.'));
 
         $assert->first(function (AssertableJson $item) {
             //
@@ -1243,8 +1197,7 @@ class AssertTest extends TestCase
     {
         $assert = AssertableJson::fromArray([]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Cannot scope directly onto each element of the root level because it is empty.');
+        $this->expectExceptionObject(new AssertionFailedError('Cannot scope directly onto each element of the root level because it is empty.'));
 
         $assert->each(function (AssertableJson $item) {
             //
@@ -1257,8 +1210,7 @@ class AssertTest extends TestCase
             'foo' => [],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Cannot scope directly onto each element of property [foo] because it is empty.');
+        $this->expectExceptionObject(new AssertionFailedError('Cannot scope directly onto each element of property [foo] because it is empty.'));
 
         $assert->has('foo', function (AssertableJson $assert) {
             $assert->each(function (AssertableJson $item) {
@@ -1273,8 +1225,7 @@ class AssertTest extends TestCase
             'foo' => 'bar',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] is not scopeable.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo] is not scopeable.'));
 
         $assert->each(function (AssertableJson $item) {
             //
@@ -1290,8 +1241,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Unexpected properties were found in scope [bar].');
+        $this->expectExceptionObject(new AssertionFailedError('Unexpected properties were found in scope [bar].'));
 
         $assert->has('bar', function (AssertableJson $item) {
             $item->where('baz', 'example');
@@ -1324,8 +1274,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Unexpected properties were found in scope [bar.baz].');
+        $this->expectExceptionObject(new AssertionFailedError('Unexpected properties were found in scope [bar.baz].'));
 
         $assert->has('bar', function (AssertableJson $item) {
             $item
@@ -1353,8 +1302,7 @@ class AssertTest extends TestCase
             'bar' => 'baz',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Unexpected properties were found on the root level.');
+        $this->expectExceptionObject(new AssertionFailedError('Unexpected properties were found on the root level.'));
 
         $assert
             ->has('foo')
@@ -1387,8 +1335,7 @@ class AssertTest extends TestCase
             'baz' => 'example',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [baz] was marked as invalid using a closure.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [baz] was marked as invalid using a closure.'));
 
         $assert->whereAll([
             'foo' => 'bar',
@@ -1483,8 +1430,7 @@ class AssertTest extends TestCase
             'foo' => 'bar',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] is not of expected type [integer].');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo] is not of expected type [integer].'));
 
         $assert->whereType('foo', 'integer');
     }
@@ -1509,8 +1455,7 @@ class AssertTest extends TestCase
             'foo' => 123,
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] is not of expected type [string|null].');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo] is not of expected type [string|null].'));
 
         $assert->whereType('foo', ['string', 'null']);
     }
@@ -1530,8 +1475,7 @@ class AssertTest extends TestCase
             'foo' => 'bar',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] is not of expected type [integer|null].');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo] is not of expected type [integer|null].'));
 
         $assert->whereType('foo', 'integer|null');
     }
@@ -1563,8 +1507,7 @@ class AssertTest extends TestCase
             'baz' => 'another',
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo.baz] does not exist.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo.baz] does not exist.'));
 
         $assert->hasAll([
             'foo.bar',
@@ -1585,8 +1528,7 @@ class AssertTest extends TestCase
 
         $assert->hasAll('foo.bar', 'foo.example', 'baz');
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo.baz] does not exist.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [foo.baz] does not exist.'));
 
         $assert->hasAll('foo.bar', 'foo.baz', 'baz');
     }
@@ -1618,8 +1560,7 @@ class AssertTest extends TestCase
             ],
         ]);
 
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [baz] does not exist.');
+        $this->expectExceptionObject(new AssertionFailedError('Property [baz] does not exist.'));
 
         $assert->hasAll([
             'bar' => 2,
@@ -1633,8 +1574,7 @@ class AssertTest extends TestCase
             throw new RuntimeException('My Custom Macro was called!');
         });
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('My Custom Macro was called!');
+        $this->expectExceptionObject(new RuntimeException('My Custom Macro was called!'));
 
         $assert = AssertableJson::fromArray(['foo' => 'bar']);
         $assert->myCustomMacro();

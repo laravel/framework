@@ -11,6 +11,7 @@ use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Container\SelfBuilding;
+use LogicException;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
@@ -438,8 +439,7 @@ class ContainerTest extends TestCase
 
     public function testInternalClassWithDefaultParameters()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class Illuminate\Tests\Container\ContainerMixedPrimitiveStub');
+        $this->expectExceptionObject(new BindingResolutionException('Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class Illuminate\Tests\Container\ContainerMixedPrimitiveStub'));
 
         $container = new Container;
         $container->make(ContainerMixedPrimitiveStub::class, []);
@@ -447,8 +447,7 @@ class ContainerTest extends TestCase
 
     public function testBindingResolutionExceptionMessage()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable.');
+        $this->expectExceptionObject(new BindingResolutionException('Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable.'));
 
         $container = new Container;
         $container->make(IContainerContractStub::class, []);
@@ -456,8 +455,7 @@ class ContainerTest extends TestCase
 
     public function testBindingResolutionExceptionMessageIncludesBuildStack()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable while building [Illuminate\Tests\Container\ContainerDependentStub].');
+        $this->expectExceptionObject(new BindingResolutionException('Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable while building [Illuminate\Tests\Container\ContainerDependentStub].'));
 
         $container = new Container;
         $container->make(ContainerDependentStub::class, []);
@@ -465,8 +463,7 @@ class ContainerTest extends TestCase
 
     public function testBindingResolutionExceptionMessageWhenClassDoesNotExist()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Target class [Foo\Bar\Baz\DummyClass] does not exist.');
+        $this->expectExceptionObject(new BindingResolutionException('Target class [Foo\Bar\Baz\DummyClass] does not exist.'));
 
         $container = new Container;
         $container->build('Foo\Bar\Baz\DummyClass');
@@ -574,8 +571,7 @@ class ContainerTest extends TestCase
 
     public function testItThrowsExceptionWhenAbstractIsSameAsAlias()
     {
-        $this->expectException('LogicException');
-        $this->expectExceptionMessage('[name] is aliased to itself.');
+        $this->expectExceptionObject(new LogicException('[name] is aliased to itself.'));
 
         $container = new Container;
         $container->alias('name', 'name');

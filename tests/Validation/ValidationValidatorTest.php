@@ -1122,7 +1122,8 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => ''], ['name' => 'required']);
 
-        $exception = new class($v) extends ValidationException {
+        $exception = new class($v) extends ValidationException
+        {
         };
         $v->setException($exception);
 
@@ -1139,8 +1140,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, [], []);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Exception [RuntimeException] is invalid. It must extend [Illuminate\Validation\ValidationException].');
+        $this->expectExceptionObject(new InvalidArgumentException('Exception [RuntimeException] is invalid. It must extend [Illuminate\Validation\ValidationException].'));
 
         $v->setException(RuntimeException::class);
     }
@@ -7428,8 +7428,7 @@ class ValidationValidatorTest extends TestCase
 
     public function testExceptionThrownOnIncorrectParameterCount()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Validation rule required_if requires at least 2 parameters.');
+        $this->expectExceptionObject(new InvalidArgumentException('Validation rule required_if requires at least 2 parameters.'));
 
         $trans = $this->getTranslator();
         $v = new Validator($trans, [], ['foo' => 'required_if:foo']);

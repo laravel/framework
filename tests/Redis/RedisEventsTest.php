@@ -31,8 +31,7 @@ class RedisEventsTest extends TestCase
         $connection = new PhpRedisConnection($client);
         $connection->setEventDispatcher($events);
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Test exception');
+        $this->expectExceptionObject(new Exception('Test exception'));
 
         $connection->command('get', ['key']);
     }
