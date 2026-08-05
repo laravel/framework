@@ -9,6 +9,8 @@ use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Mail\Attachment;
+use Illuminate\Notifications\Messages\InlineImage;
+use Illuminate\Notifications\Messages\InlineImageLine;
 use Illuminate\Notifications\Messages\MailMessage;
 use PHPUnit\Framework\TestCase;
 
@@ -33,6 +35,82 @@ class NotificationMailMessageTest extends TestCase
         $message->template('notifications::foo');
 
         $this->assertSame('notifications::foo', $message->markdown);
+    }
+
+    public function testItCanAddAnImage()
+    {
+        $attachment = Attachment::fromData(fn () => 'image data', 'logo.png')
+            ->withMime('image/png');
+        $message = new MailMessage;
+
+        $message->image($attachment, 'Company logo', 24, 24, 'vertical-align: middle;');
+
+        $this->assertInstanceOf(InlineImage::class, $message->introLines[0]);
+        $this->assertSame($attachment, $message->introLines[0]->attachment);
+        $this->assertSame('Company logo', $message->introLines[0]->alt);
+        $this->assertSame(24, $message->introLines[0]->width);
+        $this->assertSame(24, $message->introLines[0]->height);
+        $this->assertSame('vertical-align: middle;', $message->introLines[0]->style);
+    }
+
+    public function testItCanAddALineBeforeAnImage()
+    {
+        $attachment = Attachment::fromData(fn () => 'image data', 'logo.png');
+        $message = new MailMessage;
+
+        $message->lineBeforeImage('Before the image.', $attachment, 'Company logo', null, null, 'vertical-align: middle;');
+
+        $this->assertInstanceOf(InlineImageLine::class, $message->introLines[0]);
+        $this->assertSame('Before the image.', $message->introLines[0]->before);
+        $this->assertNull($message->introLines[0]->after);
+        $this->assertSame($attachment, $message->introLines[0]->image->attachment);
+        $this->assertSame('vertical-align: middle;', $message->introLines[0]->image->style);
+    }
+
+    public function testItCanAddALineAfterAnImage()
+    {
+        $attachment = Attachment::fromData(fn () => 'image data', 'logo.png');
+        $message = new MailMessage;
+
+        $message->lineAfterImage('After the image.', $attachment, 'Company logo');
+
+        $this->assertInstanceOf(InlineImageLine::class, $message->introLines[0]);
+        $this->assertNull($message->introLines[0]->before);
+        $this->assertSame('After the image.', $message->introLines[0]->after);
+        $this->assertSame($attachment, $message->introLines[0]->image->attachment);
+    }
+
+    public function testItCanAddImageFromData()
+    {
+        $message = new MailMessage;
+
+        $message->imageFromData('image data', 'logo.png', 'Company logo', 'image/png');
+
+        $this->assertInstanceOf(InlineImage::class, $message->introLines[0]);
+        $this->assertSame('logo.png', $message->introLines[0]->attachment->as);
+        $this->assertSame('image/png', $message->introLines[0]->attachment->mime);
+    }
+
+    public function testItCanAddImageFromStorageWithOptions()
+    {
+        $this->bootstrapFilesystem();
+
+        file_put_contents($this->filesystemRoot.'/reports/report.txt', 'image data');
+
+        $message = new MailMessage;
+        $message->imageFromStorage('reports/report.txt', 'Report', 'report.png', [
+            'mime' => 'image/png',
+            'width' => 16,
+            'height' => 16,
+            'style' => 'vertical-align: middle;',
+        ]);
+
+        $this->assertInstanceOf(InlineImage::class, $message->introLines[0]);
+        $this->assertSame('report.png', $message->introLines[0]->attachment->as);
+        $this->assertSame('image/png', $message->introLines[0]->attachment->mime);
+        $this->assertSame(16, $message->introLines[0]->width);
+        $this->assertSame(16, $message->introLines[0]->height);
+        $this->assertSame('vertical-align: middle;', $message->introLines[0]->style);
     }
 
     public function testHtmlAndPlainView()

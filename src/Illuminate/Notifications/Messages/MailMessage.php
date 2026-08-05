@@ -2,6 +2,7 @@
 
 namespace Illuminate\Notifications\Messages;
 
+use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -9,6 +10,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Traits\Conditionable;
 
 class MailMessage extends SimpleMessage implements Renderable
@@ -184,6 +186,151 @@ class MailMessage extends SimpleMessage implements Renderable
     public function theme($theme)
     {
         $this->theme = $theme;
+
+        return $this;
+    }
+
+    /**
+     * Add an image to the notification.
+     *
+     * The image may be a path, an attachment, or an attachable instance. For
+     * in-memory data, use the imageFromData method.
+     *
+     * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $image
+     * @param  string|null  $alt
+     * @param  int|string|null  $width
+     * @param  int|string|null  $height
+     * @param  string|null  $style
+     * @return $this
+     */
+    public function image($image, $alt = '', $width = null, $height = null, $style = null)
+    {
+        return $this->addInlineImageLine(new InlineImage($image, $alt, $width, $height, $style));
+    }
+
+    /**
+     * Add in-memory data as an inline image to the notification.
+     *
+     * @param  string|resource|\Closure  $data
+     * @param  string  $name
+     * @param  string|null  $alt
+     * @param  string|null  $mime
+     * @param  int|string|null  $width
+     * @param  int|string|null  $height
+     * @param  string|null  $style
+     * @return $this
+     */
+    public function imageFromData($data, $name, $alt = '', $mime = null, $width = null, $height = null, $style = null)
+    {
+        $attachment = Attachment::fromData(
+            $data instanceof Closure ? $data : fn () => $data,
+            $name,
+        );
+
+        if (! is_null($mime)) {
+            $attachment->withMime($mime);
+        }
+
+        return $this->image($attachment, $alt, $width, $height, $style);
+    }
+
+    /**
+     * Add an inline image from storage to the notification.
+     *
+     * @param  string  $path
+     * @param  string|null  $alt
+     * @param  string|null  $name
+     * @param  array  $options
+     * @return $this
+     */
+    public function imageFromStorage($path, $alt = '', $name = null, array $options = [])
+    {
+        return $this->imageFromStorageDisk(null, $path, $alt, $name, $options);
+    }
+
+    /**
+     * Add an inline image from storage to the notification.
+     *
+     * @param  string|null  $disk
+     * @param  string  $path
+     * @param  string|null  $alt
+     * @param  string|null  $name
+     * @param  array  $options
+     * @return $this
+     */
+    public function imageFromStorageDisk($disk, $path, $alt = '', $name = null, array $options = [])
+    {
+        $attachment = Attachment::fromStorageDisk($disk, $path);
+
+        if (! is_null($name)) {
+            $attachment->as($name);
+        }
+
+        if (isset($options['mime'])) {
+            $attachment->withMime($options['mime']);
+        }
+
+        return $this->image(
+            $attachment,
+            $alt,
+            $options['width'] ?? null,
+            $options['height'] ?? null,
+            $options['style'] ?? null,
+        );
+    }
+
+    /**
+     * Add a line of text before an image.
+     *
+     * @param  \Illuminate\Contracts\Support\Htmlable|string|array|null  $line
+     * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $image
+     * @param  string|null  $alt
+     * @param  int|string|null  $width
+     * @param  int|string|null  $height
+     * @param  string|null  $style
+     * @return $this
+     */
+    public function lineBeforeImage($line, $image, $alt = '', $width = null, $height = null, $style = null)
+    {
+        return $this->addInlineImageLine(new InlineImageLine(
+            new InlineImage($image, $alt, $width, $height, $style),
+            $this->formatLine($line),
+        ));
+    }
+
+    /**
+     * Add a line of text after an image.
+     *
+     * @param  \Illuminate\Contracts\Support\Htmlable|string|array|null  $line
+     * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $image
+     * @param  string|null  $alt
+     * @param  int|string|null  $width
+     * @param  int|string|null  $height
+     * @param  string|null  $style
+     * @return $this
+     */
+    public function lineAfterImage($line, $image, $alt = '', $width = null, $height = null, $style = null)
+    {
+        return $this->addInlineImageLine(new InlineImageLine(
+            new InlineImage($image, $alt, $width, $height, $style),
+            null,
+            $this->formatLine($line),
+        ));
+    }
+
+    /**
+     * Add a structured inline image line to the notification.
+     *
+     * @param  \Illuminate\Notifications\Messages\InlineImage|\Illuminate\Notifications\Messages\InlineImageLine  $line
+     * @return $this
+     */
+    protected function addInlineImageLine($line)
+    {
+        if (! $this->actionText) {
+            $this->introLines[] = $line;
+        } else {
+            $this->outroLines[] = $line;
+        }
 
         return $this;
     }
@@ -441,8 +588,19 @@ class MailMessage extends SimpleMessage implements Renderable
 
         $markdown = Container::getInstance()->make(Markdown::class);
 
-        return $markdown->theme($this->theme ?: $markdown->getTheme())
-            ->render($this->markdown, $this->data());
+        return new HtmlString(
+            Container::getInstance()->make('mailer')->render(
+                fn ($data) => $markdown->theme($this->theme ?: $markdown->getTheme())
+                    ->render(
+                        $this->markdown,
+                        InlineImageRenderer::render(
+                            array_merge($data, $this->data()),
+                            $data['message'] ?? null,
+                        ),
+                    ),
+                $this->data(),
+            )
+        );
     }
 
     /**
