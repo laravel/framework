@@ -1750,8 +1750,7 @@ class SupportArrTest extends TestCase
         $this->assertSame($subject, Arr::from($items));
 
         $items = new WeakMap;
-        $items[$temp = new class
-        {
+        $items[$temp = new class {
         }] = 'bar';
         $this->assertSame(['bar'], Arr::from($items));
 

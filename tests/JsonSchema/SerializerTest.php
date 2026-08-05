@@ -12,8 +12,7 @@ class SerializerTest extends TestCase
     {
         $this->expectExceptionObject(new RuntimeException('Unsupported [Illuminate\\JsonSchema\\Types\\Type@anonymous'));
 
-        $type = new class extends Type
-        {
+        $type = new class extends Type {
             // anonymous type for triggering serializer failure
         };
 
