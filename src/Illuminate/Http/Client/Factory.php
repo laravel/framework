@@ -152,6 +152,27 @@ class Factory
     }
 
     /**
+     * Execute a callback while requests are created without global middleware or global options.
+     *
+     * @template TReturn
+     *
+     * @param  (\Closure(): TReturn)  $callback
+     * @return TReturn
+     */
+    public function withoutGlobalConfiguration(Closure $callback)
+    {
+        [$middleware, $options] = [$this->globalMiddleware, $this->globalOptions];
+
+        [$this->globalMiddleware, $this->globalOptions] = [[], []];
+
+        try {
+            return $callback();
+        } finally {
+            [$this->globalMiddleware, $this->globalOptions] = [$middleware, $options];
+        }
+    }
+
+    /**
      * Create a new response instance for use during stubbing.
      *
      * @param  array|string|null  $body
