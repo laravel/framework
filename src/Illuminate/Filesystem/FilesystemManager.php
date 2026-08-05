@@ -6,6 +6,7 @@ use Aws\S3\S3Client;
 use Closure;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\AwsTransportSharing;
 use Illuminate\Support\RebindsCallbacksToSelf;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -258,7 +259,7 @@ class FilesystemManager implements FactoryContract
 
         $streamReads = $s3Config['stream_reads'] ?? false;
 
-        $client = new S3Client($s3Config);
+        $client = new S3Client(AwsTransportSharing::apply($s3Config));
 
         $adapter = new S3Adapter($client, $s3Config['bucket'], $root, $visibility, null, $config['options'] ?? [], $streamReads);
 

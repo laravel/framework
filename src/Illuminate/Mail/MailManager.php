@@ -14,6 +14,7 @@ use Illuminate\Mail\Transport\ResendTransport;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\SesV2Transport;
 use Illuminate\Support\Arr;
+use Illuminate\Support\AwsTransportSharing;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -265,7 +266,7 @@ class MailManager implements FactoryContract
         $config = Arr::except($config, ['transport']);
 
         return new SesTransport(
-            new SesClient($this->addSesCredentials($config)),
+            new SesClient(AwsTransportSharing::apply($this->addSesCredentials($config))),
             $config['options'] ?? []
         );
     }
@@ -287,7 +288,7 @@ class MailManager implements FactoryContract
         $config = Arr::except($config, ['transport']);
 
         return new SesV2Transport(
-            new SesV2Client($this->addSesCredentials($config)),
+            new SesV2Client(AwsTransportSharing::apply($this->addSesCredentials($config))),
             $config['options'] ?? []
         );
     }
