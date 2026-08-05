@@ -819,6 +819,27 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
         $repo->array('foo');
     }
+
+    public static function typedGetterTypeMismatchProvider()
+    {
+        return [
+            ['string', 123, 'Cache value for key [foo] must be a string, integer given.'],
+            ['integer', 'bar', 'Cache value for key [foo] must be an integer, string given.'],
+            ['float', 'bar', 'Cache value for key [foo] must be a float, string given.'],
+            ['boolean', 'bar', 'Cache value for key [foo] must be a boolean, string given.'],
+            ['array', 'bar', 'Cache value for key [foo] must be an array, string given.'],
+        ];
+    }
+
+    #[DataProvider('typedGetterTypeMismatchProvider')]
+    public function testTypedGettersReportTypeMismatchesForEnumKeys($method, $value, $message)
+    {
+        $this->expectExceptionObject(new InvalidArgumentException($message));
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn($value);
+        $repo->{$method}(TestCacheKey::FOO);
+    }
 }
 
 enum TestCacheKey: string

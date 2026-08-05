@@ -242,6 +242,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function string($key, $default = null): string
     {
+        $key = enum_value($key);
+
         $value = $this->get($key, $default);
 
         if (! is_string($value)) {
@@ -263,6 +265,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function integer($key, $default = null): int
     {
+        $key = enum_value($key);
+
         $value = $this->get($key, $default);
 
         if (is_int($value)) {
@@ -288,6 +292,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function float($key, $default = null): float
     {
+        $key = enum_value($key);
+
         $value = $this->get($key, $default);
 
         if (is_float($value)) {
@@ -313,6 +319,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function boolean($key, $default = null): bool
     {
+        $key = enum_value($key);
+
         $value = $this->get($key, $default);
 
         if (! is_bool($value)) {
@@ -335,6 +343,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function array($key, $default = null): array
     {
+        $key = enum_value($key);
+
         $value = $this->get($key, $default);
 
         if (! is_array($value)) {
