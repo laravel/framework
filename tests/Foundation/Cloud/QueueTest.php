@@ -189,6 +189,35 @@ class QueueTest extends TestCase
         $this->assertSame([], $eventsFake->emitted);
     }
 
+    public function testAgentRequestsIgnoreGlobalClientConfiguration()
+    {
+        $options = null;
+        $hasGlobalHeader = null;
+
+        $this->fakeEvents();
+        Http::globalOptions([
+            'force_ip_resolve' => 'v4',
+            'connect_timeout' => 5,
+            'timeout' => 30,
+        ]);
+        Http::globalRequestMiddleware(fn ($request) => $request->withHeader('X-Global', 'Foo'));
+        Http::fake(function ($request, $requestOptions) use (&$options, &$hasGlobalHeader) {
+            if (str_ends_with($request->url(), '/next')) {
+                $options = $requestOptions;
+                $hasGlobalHeader = $request->hasHeader('X-Global');
+            }
+        });
+
+        [$queue] = $this->fakeQueue();
+
+        $queue->pop();
+
+        $this->assertIsArray($options);
+        $this->assertArrayNotHasKey('force_ip_resolve', $options);
+        $this->assertSame(10, $options['connect_timeout']);
+        $this->assertFalse($hasGlobalHeader);
+    }
+
     public function testItEmitsStartedEventWhenJobIsSuccessfullyPopped()
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
