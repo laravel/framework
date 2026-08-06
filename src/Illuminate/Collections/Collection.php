@@ -187,7 +187,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if an item exists in the collection.
      *
-     * @param  (callable(TValue, TKey): bool)|TValue|string  $key
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|TValue|string  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool
@@ -418,7 +418,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Run a filter over each of the items.
      *
-     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|null  $callback
      * @return static
      */
     public function filter(?callable $callback = null)
@@ -435,7 +435,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @template TFirstDefault
      *
-     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|null  $callback
      * @param  TFirstDefault|(\Closure(): TFirstDefault)  $default
      * @return TValue|TFirstDefault
      */
@@ -729,7 +729,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if the collection contains exactly one item. If a callback is provided, determine if exactly one item matches the condition.
      *
-     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|null  $callback
      * @return bool
      *
      * @deprecated 12.49.0 Use the `hasSole()` method instead.
@@ -742,7 +742,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if the collection contains multiple items.
      *
-     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|null  $callback
      * @return bool
      *
      * @deprecated 12.50.0 Use the `hasMany()` method instead.
@@ -797,7 +797,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @template TLastDefault
      *
-     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|null  $callback
      * @param  TLastDefault|(\Closure(): TLastDefault)  $default
      * @return TValue|TLastDefault
      */
@@ -809,7 +809,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the values of a given key.
      *
-     * @param  \Closure|string|int|array<array-key, string>|null  $value
+     * @param  \Closure|(callable(TValue):mixed)|string|int|array<array-key, string>|null  $value
      * @param  \Closure|string|null  $key
      * @return static<array-key, mixed>
      */
@@ -823,7 +823,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @template TMapValue
      *
-     * @param  callable(TValue, TKey): TMapValue  $callback
+     * @param  (callable(TValue, TKey): TMapValue)|(callable(TValue): TMapValue)  $callback
      * @return static<TKey, TMapValue>
      */
     public function map(callable $callback)
@@ -1434,7 +1434,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
      *
-     * @param  (callable(TValue, TKey): bool)|string|null  $key
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|string|null  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return TValue
@@ -1466,7 +1466,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if the collection contains a single item, optionally matching the given criteria.
      *
-     * @param  (callable(TValue, TKey): bool)|string|null  $key
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|string|null  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool
@@ -1486,7 +1486,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the first item in the collection but throw an exception if no matching items exist.
      *
-     * @param  (callable(TValue, TKey): bool)|string  $key
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|string  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return TValue
