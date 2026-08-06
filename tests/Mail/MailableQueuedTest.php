@@ -239,6 +239,17 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals($mailable->deduplicationId(...), $pushedJob->deduplicator->getClosure());
     }
 
+    public function testQueueSetsBackedEnumQueueOnMailable(): void
+    {
+        $queueFake = new QueueFake(new Application);
+        $mailer = new Mailer(...$this->getMocks());
+        $mailer->setQueue($queueFake);
+
+        $mailer->queue(new MailableQueueableStub, MailableQueue::Emails);
+
+        $queueFake->assertPushedOn('emails', SendQueuedMailable::class);
+    }
+
     public function testLaterSetsQueueOnMailable(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -292,6 +303,11 @@ class MailableQueueableStub extends Mailable implements ShouldQueue
 
         return $this;
     }
+}
+
+enum MailableQueue: string
+{
+    case Emails = 'emails';
 }
 
 class MailableQueueableStubWithMessageGroup extends Mailable implements ShouldQueue
