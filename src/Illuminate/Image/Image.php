@@ -498,6 +498,38 @@ class Image implements Stringable
     }
 
     /**
+     * Get the aspect ratio of the processed image.
+     */
+    public function aspectRatio(): float
+    {
+        return $this->width() / $this->height();
+    }
+
+    /**
+     * Check if the image has a landscape orientation.
+     */
+    public function isLandscape(): bool
+    {
+        return $this->aspectRatio() > 1;
+    }
+
+    /**
+     * Check if the image has a portrait orientation.
+     */
+    public function isPortrait(): bool
+    {
+        return $this->aspectRatio() < 1;
+    }
+
+    /**
+     * Check if the image is square.
+     */
+    public function isSquare(): bool
+    {
+        return $this->aspectRatio() === 1.0;
+    }
+
+    /**
      * Get the dominant (average) color of the image as a hex string.
      */
     public function dominantColor(): string

@@ -1068,6 +1068,76 @@ class ImageTest extends TestCase
         $this->assertNull($options->coverHeight);
     }
 
+    public function test_aspect_ratio_returns_correct_value()
+    {
+        $image = new Image($this->fakeImageContents(800, 600));
+
+        $this->assertEquals(4 / 3, $image->aspectRatio());
+    }
+
+    public function test_is_landscape_returns_true_for_width_larger_than_height()
+    {
+        $image = new Image($this->fakeImageContents(800, 600));
+
+        $this->assertEquals(true, $image->isLandscape());
+    }
+
+    public function test_is_landscape_returns_false_for_width_smaller_than_height()
+    {
+        $image = new Image($this->fakeImageContents(600, 800));
+
+        $this->assertEquals(false, $image->isLandscape());
+    }
+
+    public function test_is_landscape_returns_false_for_width_equal_to_height()
+    {
+        $image = new Image($this->fakeImageContents(600, 600));
+
+        $this->assertEquals(false, $image->isLandscape());
+    }
+
+    public function test_is_portrait_returns_true_for_height_larger_than_width()
+    {
+        $image = new Image($this->fakeImageContents(600, 800));
+
+        $this->assertEquals(true, $image->isPortrait());
+    }
+
+    public function test_is_portrait_returns_false_for_height_smaller_than_width()
+    {
+        $image = new Image($this->fakeImageContents(800, 600));
+
+        $this->assertEquals(false, $image->isPortrait());
+    }
+
+    public function test_is_portrait_returns_false_for_height_equal_to_width()
+    {
+        $image = new Image($this->fakeImageContents(600, 600));
+
+        $this->assertEquals(false, $image->isPortrait());
+    }
+
+    public function test_is_square_returns_true_for_width_equal_to_height()
+    {
+        $image = new Image($this->fakeImageContents(600, 600));
+
+        $this->assertEquals(true, $image->isSquare());
+    }
+
+    public function test_is_square_returns_false_for_width_larger_than_height()
+    {
+        $image = new Image($this->fakeImageContents(800, 600));
+
+        $this->assertEquals(false, $image->isSquare());
+    }
+
+    public function test_is_square_returns_false_for_width_smaller_than_height()
+    {
+        $image = new Image($this->fakeImageContents(600, 800));
+
+        $this->assertEquals(false, $image->isSquare());
+    }
+
     public function test_cover_does_not_set_scale()
     {
         $image = $this->makeImage();
