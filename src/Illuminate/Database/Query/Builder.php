@@ -3615,7 +3615,14 @@ class Builder implements BuilderContract
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $total = value($total) ?? $this->getCountForPagination();
+        $countColumns = ['*'];
+
+        if ($this->distinct && $columns !== ['*']
+            && empty(array_filter($columns, fn ($column) => str_contains($column, '*')))) {
+            $countColumns = $columns;
+        }
+
+        $total = value($total) ?? $this->getCountForPagination($countColumns);
 
         $perPage = value($perPage, $total);
 

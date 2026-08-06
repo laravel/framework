@@ -398,6 +398,33 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf(LengthAwarePaginator::class, $models);
     }
 
+    public function testPaginatedModelCollectionRetrievalWithJoinAndDistinct()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
+
+        EloquentTestPost::insert([
+            ['id' => 1, 'user_id' => 1, 'parent_id' => null, 'name' => 'First Post'],
+            ['id' => 2, 'user_id' => 1, 'parent_id' => null, 'name' => 'Second Post'],
+            ['id' => 3, 'user_id' => 2, 'parent_id' => null, 'name' => 'Third Post'],
+        ]);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+
+        $models = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id')
+            ->distinct()
+            ->oldest('users.id')
+            ->paginate(10, ['users.*']);
+
+        $this->assertCount(2, $models);
+        $this->assertSame(2, $models->total());
+    }
+
     public function testCountForPaginationWithGrouping()
     {
         EloquentTestUser::insert([
