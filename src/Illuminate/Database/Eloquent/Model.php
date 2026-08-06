@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
+use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -544,6 +545,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         $timestamps = static::resolveClassAttribute(Table::class, 'timestamps', $class)
+            ?? (static::resolveClassAttribute(WithoutTimestamps::class, null, $class) !== null ? false : null)
             ?? get_class_vars($class)['timestamps'];
 
         if (! $timestamps) {

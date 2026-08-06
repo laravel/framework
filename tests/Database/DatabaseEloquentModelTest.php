@@ -17,7 +17,9 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\RouteKey;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -3597,6 +3599,20 @@ class DatabaseEloquentModelTest extends TestCase
         );
     }
 
+    public function testNotTouchingModelWithoutTimestampsAttribute()
+    {
+        $this->assertTrue(
+            Model::isIgnoringTouch(EloquentModelWithoutTimestampsAttribute::class)
+        );
+    }
+
+    public function testNotTouchingModelWithoutTimestampsTable()
+    {
+        $this->assertTrue(
+            Model::isIgnoringTouch(EloquentModelWithoutTimestampsTable::class)
+        );
+    }
+
     public function testGetOriginalCastsAttributes()
     {
         $model = new EloquentModelCastingStub;
@@ -4582,6 +4598,18 @@ class EloquentModelWithoutTimestamps extends Model
 {
     protected $table = 'stub';
     public $timestamps = false;
+}
+
+#[WithoutTimestamps]
+class EloquentModelWithoutTimestampsAttribute extends Model
+{
+    protected $table = 'stub';
+}
+
+#[Table(timestamps: false)]
+class EloquentModelWithoutTimestampsTable extends Model
+{
+    protected $table = 'stub';
 }
 
 class EloquentModelWithUpdatedAtNull extends Model
