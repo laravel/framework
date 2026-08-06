@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
@@ -475,7 +476,7 @@ class Mailer implements MailerContract, MailQueueContract
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
-        if (is_string($queue)) {
+        if (is_string($queue) || $queue instanceof BackedEnum) {
             $view->onQueue($queue);
         }
 
