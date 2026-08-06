@@ -60,6 +60,16 @@ class StorageFacadeTest extends TestCase
         $this->assertNull(Storage::persistentFake(StorageDisk::Test)->get('nonExistentFile'));
         $this->assertNull(Storage::fake(StorageDisk::Public)->get('nonExistentFile'));
     }
+
+    public function testStorageFakesAreAllowedWhenPreventingStrayDisks()
+    {
+        Storage::preventStrayDisks();
+
+        $fake = Storage::fake('test');
+
+        $this->assertSame($fake, Storage::disk('test'));
+        $this->assertTrue(Storage::preventingStrayDisks());
+    }
 }
 
 enum StorageDisk: string

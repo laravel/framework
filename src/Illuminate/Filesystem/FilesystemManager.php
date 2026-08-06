@@ -49,6 +49,20 @@ class FilesystemManager implements FactoryContract
     protected $disks = [];
 
     /**
+     * The array of explicitly set filesystem drivers.
+     *
+     * @var array
+     */
+    protected $customDisks = [];
+
+    /**
+     * Indicates that an exception should be thrown if any disk is not faked.
+     *
+     * @var bool
+     */
+    protected $preventStrayDisks = false;
+
+    /**
      * The registered custom driver creators.
      *
      * @var array
@@ -109,6 +123,8 @@ class FilesystemManager implements FactoryContract
      */
     public function build($config)
     {
+        $this->ensureDiskIsAllowed('ondemand');
+
         return $this->resolve('ondemand', is_array($config) ? $config : [
             'driver' => 'local',
             'root' => $config,
@@ -123,6 +139,8 @@ class FilesystemManager implements FactoryContract
      */
     protected function get($name)
     {
+        $this->ensureDiskIsAllowed($name);
+
         return $this->disks[$name] ?? $this->resolve($name);
     }
 
@@ -369,8 +387,47 @@ class FilesystemManager implements FactoryContract
     public function set($name, $disk)
     {
         $this->disks[$name] = $disk;
+        $this->customDisks[$name] = true;
 
         return $this;
+    }
+
+    /**
+     * Indicate that an exception should be thrown if any disk is not faked.
+     *
+     * @param  bool  $prevent
+     * @return $this
+     */
+    public function preventStrayDisks(bool $prevent = true)
+    {
+        $this->preventStrayDisks = $prevent;
+
+        return $this;
+    }
+
+    /**
+     * Determine if stray disks are being prevented.
+     *
+     * @return bool
+     */
+    public function preventingStrayDisks()
+    {
+        return $this->preventStrayDisks;
+    }
+
+    /**
+     * Ensure the given disk is allowed to be accessed.
+     *
+     * @param  string  $name
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    protected function ensureDiskIsAllowed($name)
+    {
+        if ($this->preventStrayDisks && ! isset($this->customDisks[$name])) {
+            throw new RuntimeException("Attempted to access disk [{$name}] without a matching fake.");
+        }
     }
 
     /**
@@ -413,7 +470,7 @@ class FilesystemManager implements FactoryContract
     public function forgetDisk($disk)
     {
         foreach ((array) $disk as $diskName) {
-            unset($this->disks[$diskName]);
+            unset($this->disks[$diskName], $this->customDisks[$diskName]);
         }
 
         return $this;
@@ -429,7 +486,7 @@ class FilesystemManager implements FactoryContract
     {
         $name ??= $this->getDefaultDriver();
 
-        unset($this->disks[$name]);
+        unset($this->disks[$name], $this->customDisks[$name]);
     }
 
     /**

@@ -17,6 +17,8 @@ use function Illuminate\Support\enum_value;
  * @method static \Illuminate\Contracts\Filesystem\Cloud createS3Driver(array $config)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem createScopedDriver(array $config)
  * @method static \Illuminate\Filesystem\FilesystemManager set(string $name, mixed $disk)
+ * @method static \Illuminate\Filesystem\FilesystemManager preventStrayDisks(bool $prevent = true)
+ * @method static bool preventingStrayDisks()
  * @method static string getDefaultDriver()
  * @method static string getDefaultCloudDriver()
  * @method static \Illuminate\Filesystem\FilesystemManager forgetDisk(array|string $disk)

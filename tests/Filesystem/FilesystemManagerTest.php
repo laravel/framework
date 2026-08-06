@@ -10,6 +10,7 @@ use League\Flysystem\PathPrefixing\PathPrefixedAdapter;
 use League\Flysystem\UnableToReadFile;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use stdClass;
 
 class FilesystemManagerTest extends TestCase
@@ -40,6 +41,100 @@ class FilesystemManagerTest extends TestCase
         ]));
 
         rmdir(__DIR__.'/../../my-custom-path');
+    }
+
+    public function testStrayDisksAreAllowedByDefault()
+    {
+        $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+            $app['config'] = [
+                'filesystems.disks.local' => [
+                    'driver' => 'local',
+                    'root' => 'my-custom-path',
+                ],
+            ];
+        }));
+
+        $this->assertInstanceOf(Filesystem::class, $filesystem->disk('local'));
+    }
+
+    public function testStrayDisksCanBePrevented()
+    {
+        $filesystem = new FilesystemManager(new Application);
+
+        $filesystem->preventStrayDisks();
+
+        $this->expectExceptionObject(new RuntimeException('Attempted to access disk [s3] without a matching fake.'));
+
+        $filesystem->disk('s3');
+    }
+
+    public function testPreviouslyResolvedDisksArePrevented()
+    {
+        $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+            $app['config'] = [
+                'filesystems.disks.local' => [
+                    'driver' => 'local',
+                    'root' => 'my-custom-path',
+                ],
+            ];
+        }));
+
+        $filesystem->disk('local');
+        $filesystem->preventStrayDisks();
+
+        $this->expectExceptionObject(new RuntimeException('Attempted to access disk [local] without a matching fake.'));
+
+        $filesystem->disk('local');
+    }
+
+    public function testExplicitlySetDisksAreAllowedWhenPreventingStrayDisks()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $disk = new stdClass;
+
+        $filesystem->preventStrayDisks()->set('fake', $disk);
+
+        $this->assertSame($disk, $filesystem->disk('fake'));
+    }
+
+    public function testForgottenDisksAreNoLongerAllowedWhenPreventingStrayDisks()
+    {
+        $filesystem = new FilesystemManager(new Application);
+
+        $filesystem->set('fake', new stdClass);
+        $filesystem->preventStrayDisks()->forgetDisk('fake');
+
+        $this->expectExceptionObject(new RuntimeException('Attempted to access disk [fake] without a matching fake.'));
+
+        $filesystem->disk('fake');
+    }
+
+    public function testOnDemandDisksCanBePrevented()
+    {
+        $filesystem = new FilesystemManager(new Application);
+
+        $filesystem->preventStrayDisks();
+
+        $this->expectExceptionObject(new RuntimeException('Attempted to access disk [ondemand] without a matching fake.'));
+
+        $filesystem->build('my-custom-path');
+    }
+
+    public function testPreventingStrayDisksCanBeDisabled()
+    {
+        $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+            $app['config'] = [
+                'filesystems.disks.local' => [
+                    'driver' => 'local',
+                    'root' => 'my-custom-path',
+                ],
+            ];
+        }));
+
+        $filesystem->preventStrayDisks()->preventStrayDisks(false);
+
+        $this->assertFalse($filesystem->preventingStrayDisks());
+        $this->assertInstanceOf(Filesystem::class, $filesystem->disk('local'));
     }
 
     public function testCanBuildReadOnlyDisks()
