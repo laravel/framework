@@ -48,6 +48,14 @@ class QueuePauseResumeTest extends TestCase
         $this->assertTrue($this->manager->isPaused('default', 'redis'));
     }
 
+    public function testConnectionDefaultsToTheDefaultConnection()
+    {
+        $this->manager->pause('emails');
+
+        $this->assertTrue($this->manager->isPaused('emails', 'redis'));
+        $this->assertFalse($this->manager->isPaused('emails', 'database'));
+    }
+
     public function testPauseQueueWithTTL()
     {
         $this->manager->pauseFor('default', 30, 'redis');
