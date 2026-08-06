@@ -39,13 +39,13 @@ class SupportLazyCollectionTest extends TestCase
     {
         $array = [1, 2, 3];
 
-        $data = LazyCollection::make(Collection::make($array));
+        $data = LazyCollection::make(new Collection($array));
 
         $this->assertSame($array, $data->all());
 
         $array = ['a' => 1, 'b' => 2, 'c' => 3];
 
-        $data = LazyCollection::make(Collection::make($array));
+        $data = LazyCollection::make(new Collection($array));
 
         $this->assertSame($array, $data->all());
     }
