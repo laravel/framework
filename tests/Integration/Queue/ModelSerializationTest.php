@@ -71,7 +71,6 @@ class ModelSerializationTest extends TestCase
         });
     }
 
-    #[\Override]
     protected function tearDown(): void
     {
         Relation::morphMap([], false);

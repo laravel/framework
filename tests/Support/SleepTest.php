@@ -14,11 +14,6 @@ use RuntimeException;
 
 class SleepTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Sleep::fake(false);
-    }
-
     public function testItSleepsForSeconds()
     {
         $start = microtime(true);

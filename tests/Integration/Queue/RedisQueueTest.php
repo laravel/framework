@@ -33,8 +33,6 @@ class RedisQueueTest extends TestCase
      */
     private $container;
 
-    /** {@inheritdoc} */
-    #[\Override]
     protected function setUp(): void
     {
         $this->afterApplicationCreated(function () {

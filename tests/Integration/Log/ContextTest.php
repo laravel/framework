@@ -22,7 +22,6 @@ class ContextTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
-    #[\Override]
     protected function tearDown(): void
     {
         MyAddContextProcessor::$wasConstructed = false;

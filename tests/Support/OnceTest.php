@@ -9,7 +9,6 @@ class OnceTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Once::flush();
         Once::enable();
     }
 

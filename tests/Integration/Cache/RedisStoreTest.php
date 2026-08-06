@@ -19,8 +19,6 @@ class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;
 
-    /** {@inheritdoc} */
-    #[\Override]
     protected function setUp(): void
     {
         $this->afterApplicationCreated(function () {

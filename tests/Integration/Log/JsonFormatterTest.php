@@ -17,7 +17,6 @@ use Throwable;
 
 final class JsonFormatterTest extends TestCase
 {
-    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

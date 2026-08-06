@@ -8,11 +8,6 @@ use RuntimeException;
 
 class LotteryTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Lottery::determineResultNormally();
-    }
-
     public function testItCanWin()
     {
         $wins = false;
