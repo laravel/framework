@@ -35,7 +35,7 @@ interface Authenticatable
     /**
      * Get the token value for the "remember me" session.
      *
-     * @return string
+     * @return string|null
      */
     public function getRememberToken();
 
