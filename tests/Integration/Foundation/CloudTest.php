@@ -101,6 +101,13 @@ class CloudTest extends TestCase
         }
     }
 
+    public function test_it_configures_a_cloud_logging_socket_timeout()
+    {
+        Cloud::configureCloudLogging($this->app);
+
+        $this->assertSame(2.0, $this->app['config']->get('logging.channels.laravel-cloud-socket.with.timeout'));
+    }
+
     public function test_it_aliases_cloud_logging_channel()
     {
         Cloud::configureCloudLogging($this->app);
