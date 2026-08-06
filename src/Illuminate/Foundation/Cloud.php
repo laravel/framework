@@ -133,6 +133,7 @@ class Cloud
                                       $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
                                       'unix:///tmp/cloud-init.sock',
                 'persistent' => true,
+                'timeout' => 2.0,
             ],
         ]);
     }
