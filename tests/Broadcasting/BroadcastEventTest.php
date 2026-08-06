@@ -133,6 +133,25 @@ class BroadcastEventTest extends TestCase
         $this->assertSame(['foo', 'bar'], $job->middleware());
     }
 
+    public function testDeletesWhenMissingModelsByDefault()
+    {
+        $job = new BroadcastEvent(new TestBroadcastEvent);
+
+        $this->assertTrue($job->deleteWhenMissingModels);
+    }
+
+    public function testDeletingWhenMissingModelsCanBeDisabled()
+    {
+        $event = new class
+        {
+            public $deleteWhenMissingModels = false;
+        };
+
+        $job = new BroadcastEvent($event);
+
+        $this->assertFalse($job->deleteWhenMissingModels);
+    }
+
     public function testMiddlewareProxiesFailedHandlerFromUnderlyingEvent()
     {
         $event = new class
