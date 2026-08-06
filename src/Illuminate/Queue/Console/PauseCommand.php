@@ -42,7 +42,7 @@ class PauseCommand extends Command
             return 1;
         }
 
-        $manager->pause($connection, $queue);
+        $manager->pause($queue, $connection);
 
         $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused.");
 

@@ -486,7 +486,7 @@ class Worker
             return [];
         }
 
-        return $this->manager->getPausedQueues($connectionName, $queues);
+        return $this->manager->getPausedQueues($queues, $connectionName);
     }
 
     /**

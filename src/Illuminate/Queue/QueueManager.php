@@ -216,14 +216,16 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Pause a queue by its connection and name.
+     * Pause a queue by its name and connection.
      *
-     * @param  string  $connection
      * @param  string  $queue
+     * @param  string|null  $connection
      * @return void
      */
-    public function pause($connection, $queue)
+    public function pause($queue, $connection = null)
     {
+        $connection ??= $this->getDefaultDriver();
+
         $this->app['cache']
             ->store()
             ->forever("illuminate:queue:paused:{$connection}:{$queue}", true);
@@ -234,15 +236,17 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Pause a queue by its connection and name for a given amount of time.
+     * Pause a queue by its name and connection for a given amount of time.
      *
-     * @param  string  $connection
      * @param  string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $ttl
+     * @param  string|null  $connection
      * @return void
      */
-    public function pauseFor($connection, $queue, $ttl)
+    public function pauseFor($queue, $ttl, $connection = null)
     {
+        $connection ??= $this->getDefaultDriver();
+
         $this->app['cache']
             ->store()
             ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $ttl);
@@ -253,14 +257,16 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Resume a paused queue by its connection and name.
+     * Resume a paused queue by its name and connection.
      *
-     * @param  string  $connection
      * @param  string  $queue
+     * @param  string|null  $connection
      * @return void
      */
-    public function resume($connection, $queue)
+    public function resume($queue, $connection = null)
     {
+        $connection ??= $this->getDefaultDriver();
+
         $this->app['cache']
             ->store()
             ->forget("illuminate:queue:paused:{$connection}:{$queue}");
@@ -273,12 +279,14 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Determine if a queue is paused.
      *
-     * @param  string  $connection
      * @param  string  $queue
+     * @param  string|null  $connection
      * @return bool
      */
-    public function isPaused($connection, $queue)
+    public function isPaused($queue, $connection = null)
     {
+        $connection ??= $this->getDefaultDriver();
+
         return (bool) $this->app['cache']
             ->store()
             ->get("illuminate:queue:paused:{$connection}:{$queue}", false);
@@ -287,12 +295,14 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Determine which of the given queues are currently paused.
      *
-     * @param  string  $connection
      * @param  array  $queues
+     * @param  string|null  $connection
      * @return array
      */
-    public function getPausedQueues($connection, $queues)
+    public function getPausedQueues($queues, $connection = null)
     {
+        $connection ??= $this->getDefaultDriver();
+
         $keys = array_map(fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues);
 
         $states = $this->app['cache']->store()->many($keys);
