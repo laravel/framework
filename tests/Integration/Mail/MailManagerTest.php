@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Mail;
+namespace Illuminate\Tests\Integration\Mail;
 
 use InvalidArgumentException;
 use Orchestra\Testbench\Attributes\WithConfig;
