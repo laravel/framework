@@ -106,8 +106,8 @@ class ProcessTest extends TestCase
 
         $poolResults = $pool->wait();
 
-        $this->assertTrue($output[0]['out'] !== []);
-        $this->assertTrue($output[1]['out'] !== []);
+        $this->assertNotSame($output[0]['out'], []);
+        $this->assertNotSame($output[1]['out'], []);
         $this->assertInstanceOf(ProcessResult::class, $poolResults[0]);
         $this->assertInstanceOf(ProcessResult::class, $poolResults[1]);
         $this->assertStringContainsString('ProcessTest.php', $poolResults[0]->output());

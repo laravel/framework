@@ -202,7 +202,7 @@ class DebouncedJobTest extends QueueTestCase
         $lock->release($jobA, $ownerA);
 
         // B should still be the current owner.
-        $this->assertTrue($lock->getCurrentOwner($jobB) === $ownerB);
+        $this->assertSame($lock->getCurrentOwner($jobB), $ownerB);
     }
 
     public function testReleaseClearsMaxWaitTimestamp()

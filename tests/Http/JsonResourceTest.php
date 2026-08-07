@@ -42,7 +42,7 @@ class JsonResourceTest extends TestCase
 
         // Simulate a JSON error
         json_decode('{');
-        $this->assertTrue(json_last_error() !== JSON_ERROR_NONE);
+        $this->assertNotSame(json_last_error(), JSON_ERROR_NONE);
 
         $this->assertSame('{"foo":"bar"}', $resource->toJson(JSON_THROW_ON_ERROR));
     }

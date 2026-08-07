@@ -1925,7 +1925,7 @@ class SupportStrTest extends TestCase
 
     public function testPasswordCreation()
     {
-        $this->assertTrue(strlen(Str::password()) === 32);
+        $this->assertSame(strlen(Str::password()), 32);
 
         $this->assertStringNotContainsString(' ', Str::password());
         $this->assertStringContainsString(' ', Str::password(spaces: true));

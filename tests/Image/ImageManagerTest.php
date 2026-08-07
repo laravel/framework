@@ -212,7 +212,7 @@ class ImageManagerTest extends TestCase
         $image = $manager->fromUpload($file);
 
         $this->assertInstanceOf(Image::class, $image);
-        $this->assertSame(file_get_contents($file->getRealPath()), $image->toBytes());
+        $this->assertStringEqualsFile($file->getRealPath(), $image->toBytes());
         $this->assertSame($file, $image->file());
     }
 
