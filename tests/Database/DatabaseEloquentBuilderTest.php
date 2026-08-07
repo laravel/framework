@@ -2606,6 +2606,42 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testUpdateAndTouchWithSingleColumn()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $query = new BaseBuilder($connection, new Grammar($connection), m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" set "foo" = ?, "published_at" = ?, "table"."updated_at" = ?', ['bar', $now, $now])->andReturn(1);
+
+        $result = $builder->updateAndTouch(['foo' => 'bar'], 'published_at');
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUpdateAndTouchWithMultipleColumns()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $query = new BaseBuilder($connection, new Grammar($connection), m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" set "foo" = ?, "published_at" = ?, "verified_at" = ?, "table"."updated_at" = ?', ['bar', $now, $now, $now])->andReturn(1);
+
+        $result = $builder->updateAndTouch(['foo' => 'bar'], ['published_at', 'verified_at']);
+        $this->assertEquals(1, $result);
+    }
+
     public function testUpdateWithTimestampValue()
     {
         $connection = m::mock(Connection::class);

@@ -35,6 +35,8 @@ class DatabaseEloquentTimestampsTest extends TestCase
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
             $table->string('email')->unique();
+            $table->timestamp('verified_at')->nullable();
+            $table->timestamp('activated_at')->nullable();
             $table->timestamps();
         });
 
@@ -124,6 +126,24 @@ class DatabaseEloquentTimestampsTest extends TestCase
         $this->assertTrue($user->usesTimestamps());
         $this->assertTrue($now->equalTo($user->updated_at));
         $this->assertSame('bar@example.com', $user->email);
+    }
+
+    public function testUpdateAndTouch()
+    {
+        $user = UserWithCreatedAndUpdated::create(['email' => 'foo@example.com']);
+
+        Carbon::setTestNow($now = Carbon::now()->addHour());
+
+        $this->assertTrue($user->updateAndTouch(
+            ['email' => 'bar@example.com'],
+            ['verified_at', 'activated_at'],
+        ));
+
+        $user->refresh();
+
+        $this->assertSame('bar@example.com', $user->email);
+        $this->assertSame($now->toDateTimeString(), $user->verified_at);
+        $this->assertSame($now->toDateTimeString(), $user->activated_at);
     }
 
     public function testWithoutTimestampWhenAlreadyIgnoringTimestamps()
@@ -306,7 +326,7 @@ class UserWithCreatedAndUpdated extends Eloquent
 {
     protected $table = 'users';
 
-    protected $guarded = [];
+    protected $fillable = ['email'];
 }
 
 class UserWithCreated extends Eloquent

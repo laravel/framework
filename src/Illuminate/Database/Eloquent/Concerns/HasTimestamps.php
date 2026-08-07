@@ -80,6 +80,31 @@ trait HasTimestamps
     }
 
     /**
+     * Update the model and touch the given columns.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @param  array|string  $columns
+     * @param  array<string, mixed>  $options
+     * @return bool
+     */
+    public function updateAndTouch(array $attributes, array|string $columns, array $options = [])
+    {
+        if (! $this->exists) {
+            return false;
+        }
+
+        $this->fill($attributes);
+
+        $timestamp = $this->freshTimestamp();
+
+        foreach (Arr::wrap($columns) as $column) {
+            $this->{$column} = $timestamp;
+        }
+
+        return $this->save($options);
+    }
+
+    /**
      * Update the creation and update timestamps.
      *
      * @return $this

@@ -1283,6 +1283,24 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Update records in the database and touch the given columns.
+     *
+     * @param  array  $values
+     * @param  array|string  $columns
+     * @return int
+     */
+    public function updateAndTouch(array $values, array|string $columns)
+    {
+        $timestamp = $this->model->freshTimestamp();
+
+        foreach (Arr::wrap($columns) as $column) {
+            $values[$column] = $timestamp;
+        }
+
+        return $this->update($values);
+    }
+
+    /**
      * Insert new records or update the existing ones.
      *
      * @param  array  $values
