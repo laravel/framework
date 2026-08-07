@@ -789,8 +789,7 @@ class Arr
 
     /**
      * Pluck an array of values from an array.
-     * 
-     * 
+     *
      * @template TKey of array-key
      * @template TValue of mixed
      * @template TPluckedItem of mixed
