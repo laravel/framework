@@ -28,6 +28,23 @@ class ScheduleGroupTest extends TestCase
         $this->assertSame('0 0 * * *', $events[0]->expression);
     }
 
+    public function testGroupAttributesDoNotLeakAfterDefinitionException()
+    {
+        $schedule = new ScheduleClass;
+
+        try {
+            $schedule->daily()->group(function () {
+                throw new \RuntimeException;
+            });
+        } catch (\RuntimeException) {
+            // Continue registering unrelated scheduled tasks.
+        }
+
+        $schedule->command('inspire');
+
+        $this->assertSame('* * * * *', $schedule->events()[0]->expression);
+    }
+
     public function testGroupedScheduleCanOverrideGroupCronExpression()
     {
         Schedule::daily()->group(function () {

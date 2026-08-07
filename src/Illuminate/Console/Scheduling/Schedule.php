@@ -337,9 +337,11 @@ class Schedule
         $this->groupStack[] = $this->attributes;
         $this->attributes = null;
 
-        $events($this);
-
-        array_pop($this->groupStack);
+        try {
+            $events($this);
+        } finally {
+            array_pop($this->groupStack);
+        }
     }
 
     /**
