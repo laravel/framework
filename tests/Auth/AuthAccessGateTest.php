@@ -638,6 +638,20 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame(3, $counter);
     }
 
+    public function testForUserMethodPreservesDefaultDenialResponse()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('view-secret', fn () => false);
+        $gate->defaultDenialResponse(Response::denyAsNotFound('Not found'));
+
+        $response = $gate->forUser((object) ['id' => 2])->inspect('view-secret');
+
+        $this->assertTrue($response->denied());
+        $this->assertSame('Not found', $response->message());
+        $this->assertSame(404, $response->status());
+    }
+
     #[DataProvider('notCallableDataProvider')]
     public function testDefineSecondParameterShouldBeStringOrCallable($callback)
     {

@@ -858,7 +858,7 @@ class Gate implements GateContract
      */
     public function forUser($user)
     {
-        return new static(
+        $gate = new static(
             $this->container,
             fn () => $user,
             $this->abilities,
@@ -867,6 +867,10 @@ class Gate implements GateContract
             $this->afterCallbacks,
             $this->guessPolicyNamesUsingCallback,
         );
+
+        $gate->defaultDenialResponse = $this->defaultDenialResponse;
+
+        return $gate;
     }
 
     /**
