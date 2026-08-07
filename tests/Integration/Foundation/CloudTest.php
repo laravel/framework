@@ -52,4 +52,11 @@ class CloudTest extends TestCase
 
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
     }
+
+    public function test_it_configures_a_cloud_logging_socket_timeout()
+    {
+        Cloud::configureCloudLogging($this->app);
+
+        $this->assertSame(2.0, $this->app['config']->get('logging.channels.laravel-cloud-socket.with.timeout'));
+    }
 }
