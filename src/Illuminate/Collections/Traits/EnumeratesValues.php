@@ -1116,7 +1116,7 @@ trait EnumeratesValues
      * @param  callable|string  $key
      * @param  string|null  $operator
      * @param  mixed  $value
-     * @return \Closure
+     * @return \Closure(TValue):bool|int<-1,1>
      */
     protected function operatorForWhere($key, $operator = null, $value = null)
     {

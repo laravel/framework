@@ -286,7 +286,7 @@ class Arr
      * @template TFirstDefault
      *
      * @param  iterable<TKey, TValue>  $array
-     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|null  $callback
      * @param  TFirstDefault|(\Closure(): TFirstDefault)  $default
      * @return TValue|TFirstDefault
      */
@@ -789,17 +789,23 @@ class Arr
 
     /**
      * Pluck an array of values from an array.
+     * 
+     * @template TKey of array-key
+     * @template TValue of mixed
+     * @template TPluckedItem of mixed
+     * @template TPluckedKey of array-key
      *
-     * @param  iterable  $array
-     * @param  string|array|int|Closure|null  $value
-     * @param  string|array|Closure|null  $key
-     * @return array
+     * @param  iterable<TKey,TValue>  $array
+     * @param  (Closure(TValue):TPluckedItem)|array<array-key,string>|string|int|null  $value
+     * @param  (Closure(TValue):TPluckedKey)|array<array-key,string>|string|int|null  $key
+     * @return array<TPluckedKey ,TPluckedItem>
      */
     public static function pluck($array, $value, $key = null)
     {
         $results = [];
 
-        [$value, $key] = static::explodePluckParameters($value, $key);
+        $value = is_string($value) ? explode('.', $value) : $value;
+        $key = is_string($key) ? explode('.', $key) : $key;
 
         foreach ($array as $item) {
             $itemValue = $value instanceof Closure
@@ -832,7 +838,7 @@ class Arr
      *
      * @param  Closure|array|string  $value
      * @param  string|array|Closure|null  $key
-     * @return array
+     * @return array<int<0, 1>, mixed>
      */
     protected static function explodePluckParameters($value, $key)
     {

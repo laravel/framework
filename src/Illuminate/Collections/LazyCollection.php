@@ -189,7 +189,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Get the mode of a given key.
      *
-     * @param  string|array<string>|null  $key
+     * @param  string|array<array-key, string>|null  $key
      * @return array<int, float|int>|null
      */
     public function mode($key = null)
@@ -236,7 +236,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if an item exists in the enumerable.
      *
-     * @param  (callable(TValue, TKey): bool)|TValue|string  $key
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|TValue|string  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool
@@ -294,7 +294,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if an item is not contained in the enumerable.
      *
-     * @param  mixed  $key
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|TValue|string  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool

@@ -208,7 +208,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if an item exists, using strict comparison.
      *
-     * @param  (callable(TValue): bool)|TValue|array-key  $key
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|TValue|array-key $key
      * @param  TValue|null  $value
      * @return bool
      */
@@ -228,7 +228,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if an item is not contained in the collection.
      *
-     * @param  mixed  $key
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|TValue|string  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool
@@ -241,9 +241,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if an item is not contained in the enumerable, using strict comparison.
      *
-     * @param  mixed  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|TValue|array-key $key
+     * @param  TValue|null  $value
      * @return bool
      */
     public function doesntContainStrict($key, $operator = null, $value = null)
@@ -632,7 +631,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Concatenate values of a given key as a string.
      *
-     * @param  (callable(TValue, TKey): mixed)|string|null  $value
+     * @param  (callable(TValue, TKey): mixed)|(callable(TValue): mixed)|string|null  $value
      * @param  string|null  $glue
      * @return string
      */
@@ -728,6 +727,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
     /**
      * Determine if the collection contains exactly one item. If a callback is provided, determine if exactly one item matches the condition.
+     * 
+     * @phpstan-assert-if-true =TValue $this->first()
+     * @phpstan-assert-if-true =TValue $this->last()
      *
      * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|null  $callback
      * @return bool
@@ -741,6 +743,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
     /**
      * Determine if the collection contains multiple items.
+     * 
+     * @phpstan-assert-if-true =TValue $this->first()
+     * @phpstan-assert-if-true =TValue $this->last()
      *
      * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|null  $callback
      * @return bool
@@ -794,7 +799,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
     /**
      * Get the last item from the collection.
-     *
+     * 
      * @template TLastDefault
      *
      * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|null  $callback
@@ -808,10 +813,13 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
     /**
      * Get the values of a given key.
+     * 
+     * @template TPluckedItem of mixed
+     * @template TPluckedKey of array-key
      *
-     * @param  \Closure|(callable(TValue):mixed)|string|int|array<array-key, string>|null  $value
-     * @param  \Closure|string|null  $key
-     * @return static<array-key, mixed>
+     * @param  (\Closure(TValue):TPluckedItem)|array<array-key,string>|string|int|null  $value
+     * @param  (\Closure(TValue):TPluckedKey)|array<array-key,string>|string|int|null  $key
+     * @return static<TPluckedKey, TPluckedItem>
      */
     public function pluck($value, $key = null)
     {
@@ -1465,6 +1473,12 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
     /**
      * Determine if the collection contains a single item, optionally matching the given criteria.
+     * 
+     * @phpstan-assert-if-true =TValue $this->first()
+     * @phpstan-assert-if-true =TValue $this->last()
+     * @phpstan-assert-if-true =false $this->isEmpty()
+     * @phpstan-assert-if-true =true $this->isNotEmpty()
+     *
      *
      * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|string|null  $key
      * @param  mixed  $operator
