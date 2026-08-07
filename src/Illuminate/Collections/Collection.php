@@ -819,7 +819,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  (\Closure(TValue):TPluckedItem)|array<array-key,string>|string|int|null  $value
      * @param  (\Closure(TValue):TPluckedKey)|array<array-key,string>|string|int|null  $key
-     * @return static<($value is \Closure ? TPluckedKey : array-key), ($value is \Closure ? TPluckedItem : mixed)>
+     * @return static<($key is \Closure ? TPluckedKey : array-key), ($value is \Closure ? TPluckedItem : mixed)>
      */
     public function pluck($value, $key = null)
     {

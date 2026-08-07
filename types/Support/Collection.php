@@ -935,9 +935,8 @@ assertType('User', $collection->pipeInto(User::class));
 assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection::make(['string' => 'string'])->pluck('string'));
 assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection::make(['string' => 'string'])->pluck('string', 'string'));
 
-
-assertType('Illuminate\Support\Collection<(string, string>', 
-    $collection::make([['string' => 'string', 'key' => 'test']])->pluck(fn ($item) => $item['string'], fn ($item) => $item['key'])
+assertType('Illuminate\Support\Collection<string, string>',
+    $collection::make([['string' => 'string', 'key' => 'test']])->pluck(fn($item) => $item['string'], fn ($item) => $item['key'])
 );
 
 assertType('Illuminate\Support\Collection<(int|string), string>', $collection::make([['string' => 'string']])->pluck(fn($item) => $item['string']));
