@@ -28,7 +28,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()->expects('insert')->with(
             'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
@@ -51,7 +51,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $sql = 'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)';
         $bindings = ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
@@ -88,7 +88,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -117,7 +117,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -145,7 +145,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -187,7 +187,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -224,7 +224,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -252,7 +252,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -302,7 +302,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -344,7 +344,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -372,7 +372,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -416,7 +416,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -472,7 +472,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -500,7 +500,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -531,7 +531,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -558,7 +558,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -595,7 +595,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')
@@ -613,7 +613,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
-        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('getNameWithDirectType')->andReturn('sqlite');
 
         $model->getConnection()
             ->expects('select')

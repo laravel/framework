@@ -1097,6 +1097,29 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->exists);
     }
 
+    public function testNewModelIsBoundToTheDirectConnectionAfterInsert()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('insertGetId')->once()->with(['name' => 'taylor'], 'id')->andReturn(1);
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getNameWithDirectType')->once()->andReturn('sqlite::direct');
+        $query->shouldReceive('getConnection')->once()->andReturn($connection);
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->once())->method('updateTimestamps');
+
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.created: '.get_class($model), $model);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model);
+
+        $model->name = 'taylor';
+
+        $this->assertTrue($model->save());
+        $this->assertSame('sqlite::direct', $model->getConnectionName());
+    }
+
     public function testInsertIsCanceledIfCreatingEventReturnsFalse()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
@@ -4201,7 +4224,7 @@ class EloquentModelSaveStub extends Model
         $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
         $grammar->shouldReceive('isExpression')->andReturnFalse();
         $mock->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
-        $mock->shouldReceive('getName')->andReturn('name');
+        $mock->shouldReceive('getNameWithDirectType')->andReturn('name');
         $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {
             return new BaseBuilder($mock, $grammar, $processor);
         });

@@ -1408,7 +1408,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             if (! $this->getConnectionName() &&
                 $connection = $query->getConnection()) {
-                $this->setConnection($connection->getName());
+                $this->setConnection($connection->getNameWithDirectType());
             }
         }
 

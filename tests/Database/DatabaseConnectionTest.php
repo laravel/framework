@@ -824,6 +824,30 @@ class DatabaseConnectionTest extends TestCase
         $this->assertSame('pgsql::direct', $connection->getNameWithReadWriteType());
     }
 
+    public function testNameWithDirectTypeKeepsTheDirectSuffix()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO, 'database', '', [
+            'name' => 'pgsql',
+        ]);
+
+        $connection->setReadWriteType('direct');
+
+        $this->assertSame('pgsql::direct', $connection->getNameWithDirectType());
+    }
+
+    public function testNameWithDirectTypeCollapsesReadAndWriteTypes()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO, 'database', '', [
+            'name' => 'pgsql',
+        ]);
+
+        foreach ([null, 'read', 'write'] as $readWriteType) {
+            $connection->setReadWriteType($readWriteType);
+
+            $this->assertSame('pgsql', $connection->getNameWithDirectType());
+        }
+    }
+
     public function testQueryExceptionContainsDirectConnectionDetailsWhenUsingDirectConnection()
     {
         $directPdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)

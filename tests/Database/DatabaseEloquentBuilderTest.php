@@ -3003,6 +3003,34 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testNewModelInstanceIsBoundToTheDirectConnection()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getNameWithDirectType')->once()->andReturn('pgsql::direct');
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('table');
+        $query->shouldReceive('getConnection')->andReturn($connection);
+
+        $builder = (new Builder($query))->setModel(new EloquentBuilderTestStub);
+
+        $this->assertSame('pgsql::direct', $builder->newModelInstance()->getConnectionName());
+    }
+
+    public function testNewModelInstanceIsBoundToTheBaseNameForReadWriteConnections()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getNameWithDirectType')->once()->andReturn('pgsql');
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('table');
+        $query->shouldReceive('getConnection')->andReturn($connection);
+
+        $builder = (new Builder($query))->setModel(new EloquentBuilderTestStub);
+
+        $this->assertSame('pgsql', $builder->newModelInstance()->getConnectionName());
+    }
+
     protected function getMockModel()
     {
         $model = m::mock(Model::class);

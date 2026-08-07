@@ -204,7 +204,7 @@ class MorphTo extends BelongsTo
 
         return tap(new $class, function ($instance) {
             if (! $instance->getConnectionName()) {
-                $instance->setConnection($this->getConnection()->getName());
+                $instance->setConnection($this->getConnection()->getNameWithDirectType());
             }
         });
     }

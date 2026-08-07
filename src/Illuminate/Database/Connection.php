@@ -1494,6 +1494,22 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get the connection name that resolves back to this same connection.
+     *
+     * The read and write suffixes collapse to the base name so models resolved
+     * from a replica may still be written, while the "direct" suffix is kept
+     * so the name does not resolve back to the pooled connection.
+     *
+     * @return string|null
+     */
+    public function getNameWithDirectType()
+    {
+        return $this->readWriteType === 'direct'
+            ? $this->getNameWithReadWriteType()
+            : $this->getName();
+    }
+
+    /**
      * Get an option from the configuration options.
      *
      * @param  string|null  $option

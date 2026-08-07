@@ -1791,7 +1791,7 @@ class Builder implements BuilderContract
         $attributes = array_merge($this->pendingAttributes, $attributes);
 
         return $this->model->newInstance($attributes)->setConnection(
-            $this->query->getConnection()->getName()
+            $this->query->getConnection()->getNameWithDirectType()
         );
     }
 

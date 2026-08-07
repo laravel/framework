@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -147,6 +148,20 @@ class DatabaseEloquentMorphToTest extends TestCase
         $result = $relation->getResults();
 
         $this->assertEquals($newModel, $result);
+    }
+
+    public function testCreateModelByTypeKeepsTheDirectConnection()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getNameWithDirectType')->once()->andReturn('sqlite::direct');
+
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('getModel')->once()->andReturn(new EloquentMorphToRelatedStub);
+        $builder->shouldReceive('getConnection')->once()->andReturn($connection);
+
+        $relation = Relation::noConstraints(fn () => new MorphTo($builder, new EloquentMorphToModelStub, 'foreign_key', 'id', 'morph_type', 'relation'));
+
+        $this->assertSame('sqlite::direct', $relation->createModelByType(EloquentMorphToRelatedStub::class)->getConnectionName());
     }
 
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
