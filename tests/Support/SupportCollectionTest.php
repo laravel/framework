@@ -2297,8 +2297,28 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testFlip($collection)
     {
+        $this->assertSame([], (new $collection)->flip()->all());
+        $this->assertSame(['taylor' => 'name'], (new $collection(['name' => 'taylor']))->flip()->all());
+
         $data = new $collection(['name' => 'taylor', 'framework' => 'laravel']);
         $this->assertEquals(['taylor' => 'name', 'laravel' => 'framework'], $data->flip()->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testFlipSkipsUnsupportedValues($collection)
+    {
+        $data = new $collection([
+            'string' => 'taylor',
+            'integer' => 1,
+            'null' => null,
+            'false' => false,
+            'true' => true,
+            'float' => 1.5,
+            'array' => [],
+            'object' => new stdClass,
+        ]);
+
+        $this->assertSame(['taylor' => 'string', 1 => 'integer'], @$data->flip()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
