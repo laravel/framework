@@ -1916,6 +1916,32 @@ class HttpRequestTest extends TestCase
         $this->assertEmpty($request->undefined);
     }
 
+    public function testMagicMethodsPreferInputOverFilesForCollidingKeys()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'email.txt');
+        $request = Request::create('/', 'POST', ['email' => 'taylor@laravel.com'], [], ['email' => $file]);
+
+        $this->assertSame('taylor@laravel.com', $request->email);
+        $this->assertSame('taylor@laravel.com', $request['email']);
+        $this->assertInstanceOf(UploadedFile::class, $request->all()['email']);
+    }
+
+    public function testMagicMethodsMergeNestedInputAndFilesWhilePreferringInput()
+    {
+        $avatar = new SymfonyUploadedFile(__FILE__, 'avatar.jpg');
+        $collision = new SymfonyUploadedFile(__FILE__, 'name.txt');
+        $request = Request::create('/', 'POST', [
+            'profile' => ['name' => 'Taylor'],
+        ], [], [
+            'profile' => ['name' => $collision, 'avatar' => $avatar],
+        ]);
+
+        $this->assertSame([
+            'name' => 'Taylor',
+            'avatar' => $request->file('profile.avatar'),
+        ], $request->profile);
+    }
+
     public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
     {
         $session = m::mock(Store::class);
