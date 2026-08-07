@@ -187,6 +187,7 @@ class Cloud
             'with' => [
                 'connectionString' => Cloud::socket(),
                 'persistent' => true,
+                'timeout' => 2.0,
             ],
         ]);
     }
