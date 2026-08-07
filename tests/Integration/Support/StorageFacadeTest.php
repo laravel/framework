@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Support;
+namespace Illuminate\Tests\Integration\Support;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;

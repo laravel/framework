@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Mail;
+namespace Illuminate\Tests\Integration\Mail;
 
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Message;

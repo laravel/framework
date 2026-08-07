@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Log;
+namespace Illuminate\Tests\Integration\Log;
 
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;

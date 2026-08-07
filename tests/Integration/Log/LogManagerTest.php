@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Log;
+namespace Illuminate\Tests\Integration\Log;
 
 use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;

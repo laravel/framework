@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\View;
+namespace Illuminate\Tests\Integration\View;
 
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;

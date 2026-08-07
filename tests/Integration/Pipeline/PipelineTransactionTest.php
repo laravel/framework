@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Pipeline;
+namespace Illuminate\Tests\Integration\Pipeline;
 
 use Exception;
 use Illuminate\Database\Events\TransactionBeginning;
