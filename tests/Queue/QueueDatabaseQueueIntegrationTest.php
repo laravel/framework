@@ -288,4 +288,21 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $this->assertIsArray($jobQueuedEvent->payload());
         $this->assertSame('expected-job-uuid', $jobQueuedEvent->payload()['uuid']);
     }
+
+    public function testCreationTimeOfOldestPendingJobUsesTheCreationTime()
+    {
+        $this->connection()
+            ->table('jobs')
+            ->insert([
+                'id' => 1,
+                'queue' => $mock_queue_name = 'mock_queue_name',
+                'payload' => 'mock_payload',
+                'attempts' => 0,
+                'reserved_at' => null,
+                'available_at' => Carbon::now()->subMinute()->getTimestamp(),
+                'created_at' => $created_at = Carbon::now()->subMinutes(10)->getTimestamp(),
+            ]);
+
+        $this->assertEquals($created_at, $this->queue->creationTimeOfOldestPendingJob($mock_queue_name));
+    }
 }

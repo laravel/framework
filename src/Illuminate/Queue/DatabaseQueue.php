@@ -233,8 +233,8 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
             ->where('queue', $this->getQueue($queue))
             ->whereNull('reserved_at')
             ->where('available_at', '<=', $this->currentTime())
-            ->oldest('available_at')
-            ->value('available_at');
+            ->oldest('created_at')
+            ->value('created_at');
     }
 
     /**
