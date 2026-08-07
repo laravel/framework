@@ -208,7 +208,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if an item exists, using strict comparison.
      *
-     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|TValue|array-key $key
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|TValue|array-key  $key
      * @param  TValue|null  $value
      * @return bool
      */
@@ -241,7 +241,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if an item is not contained in the enumerable, using strict comparison.
      *
-     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|TValue|array-key $key
+     * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|TValue|array-key  $key
      * @param  TValue|null  $value
      * @return bool
      */
@@ -728,6 +728,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if the collection contains exactly one item. If a callback is provided, determine if exactly one item matches the condition.
      * 
+     * 
      * @phpstan-assert-if-true =TValue $this->first()
      * @phpstan-assert-if-true =TValue $this->last()
      *
@@ -743,6 +744,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
     /**
      * Determine if the collection contains multiple items.
+     * 
      * 
      * @phpstan-assert-if-true =TValue $this->first()
      * @phpstan-assert-if-true =TValue $this->last()
@@ -800,6 +802,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the last item from the collection.
      * 
+     * 
      * @template TLastDefault
      *
      * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|null  $callback
@@ -813,6 +816,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
     /**
      * Get the values of a given key.
+     * 
      * 
      * @template TPluckedItem of mixed
      * @template TPluckedKey of array-key
@@ -1474,11 +1478,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if the collection contains a single item, optionally matching the given criteria.
      * 
+     * 
      * @phpstan-assert-if-true =TValue $this->first()
      * @phpstan-assert-if-true =TValue $this->last()
      * @phpstan-assert-if-true =false $this->isEmpty()
      * @phpstan-assert-if-true =true $this->isNotEmpty()
-     *
      *
      * @param  (callable(TValue, TKey): bool)|(callable(TValue): bool)|string|null  $key
      * @param  mixed  $operator
