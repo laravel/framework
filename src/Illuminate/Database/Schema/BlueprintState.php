@@ -91,6 +91,7 @@ class BlueprintState
             },
             'index' => $index['name'],
             'columns' => $index['columns'],
+            'where' => $index['where'] ?? null,
         ]))->partition(fn ($index) => $index->name === 'primary');
 
         $this->indexes = $indexes->all();

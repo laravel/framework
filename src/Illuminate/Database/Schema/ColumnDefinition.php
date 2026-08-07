@@ -35,6 +35,7 @@ use Illuminate\Support\Fluent;
  * @method $this useCurrent() Set the TIMESTAMP column to use CURRENT_TIMESTAMP as default value
  * @method $this useCurrentOnUpdate() Set the TIMESTAMP column to use CURRENT_TIMESTAMP when updating (MySQL)
  * @method $this virtualAs(string|\Illuminate\Contracts\Database\Query\Expression $expression) Create a virtual generated column (MySQL/PostgreSQL/SQLite)
+ * @method $this where(\Closure|\Illuminate\Contracts\Database\Query\Expression|string $predicate) Only index the rows matching the given predicate (PostgreSQL/SQLite/SqlServer)
  */
 class ColumnDefinition extends Fluent
 {

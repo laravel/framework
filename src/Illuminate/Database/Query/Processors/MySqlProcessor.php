@@ -78,6 +78,7 @@ class MySqlProcessor extends Processor
                 'type' => strtolower($result->type),
                 'unique' => (bool) $result->unique,
                 'primary' => $name === 'primary',
+                'where' => null,
             ];
         }, $results);
     }

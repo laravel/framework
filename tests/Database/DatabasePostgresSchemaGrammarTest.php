@@ -14,6 +14,7 @@ use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class DatabasePostgresSchemaGrammarTest extends TestCase
 {
@@ -310,6 +311,72 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add constraint "bar" unique ("foo")', $statements[0]);
+    }
+
+    public function testAddingPartialUniqueKey()
+    {
+        // A unique constraint may not be backed by a partial index, so the index has
+        // to be created directly rather than through an "add constraint" statement...
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->where('deleted_at is null');
+
+        $this->assertSame(
+            ['create unique index "bar" on "users" ("foo") where deleted_at is null'],
+            $blueprint->toSql()
+        );
+    }
+
+    public function testAddingPartialUniqueKeyWithNullsNotDistinct()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->nullsNotDistinct()->where('deleted_at is null');
+
+        $this->assertSame(
+            ['create unique index "bar" on "users" ("foo") nulls not distinct where deleted_at is null'],
+            $blueprint->toSql()
+        );
+    }
+
+    public function testAddingPartialUniqueKeyConcurrently()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->online()->where('deleted_at is null');
+
+        $this->assertSame(
+            ['create unique index concurrently "bar" on "users" ("foo") where deleted_at is null'],
+            $blueprint->toSql()
+        );
+    }
+
+    public function testAddingDeferrablePartialUniqueKeyIsNotSupported()
+    {
+        $this->expectExceptionObject(new RuntimeException('PostgreSQL does not support deferrable partial unique indexes.'));
+
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->deferrable()->where('deleted_at is null');
+        $blueprint->toSql();
+    }
+
+    public function testAddingPartialIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index(['foo', 'bar'], 'baz')->where(new Expression('"foo" is not null'));
+
+        $this->assertSame(
+            ['create index "baz" on "users" ("foo", "bar") where "foo" is not null'],
+            $blueprint->toSql()
+        );
+    }
+
+    public function testAddingPartialIndexFluentlyOnColumn()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->string('foo')->index()->where('deleted_at is null');
+
+        $this->assertSame([
+            'alter table "users" add column "foo" varchar(255) not null',
+            'create index "users_foo_index" on "users" ("foo") where deleted_at is null',
+        ], $blueprint->toSql());
     }
 
     public function testAddingUniqueKeyWithNullsNotDistinct()

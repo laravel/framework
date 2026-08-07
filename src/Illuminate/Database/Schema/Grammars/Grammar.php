@@ -2,11 +2,13 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Closure;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Str;
 use RuntimeException;
 use UnitEnum;
 
@@ -238,6 +240,56 @@ abstract class Grammar extends BaseGrammar
     public function compileDropFullText(Blueprint $blueprint, Fluent $command)
     {
         throw new RuntimeException('This database driver does not support fulltext index removal.');
+    }
+
+    /**
+     * Compile the "where" clause of a partial index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function compileIndexPredicate(Blueprint $blueprint, Fluent $command)
+    {
+        if (is_null($command->where)) {
+            return '';
+        }
+
+        $predicate = trim($this->getIndexPredicate($blueprint, $command->where));
+
+        return $predicate === '' ? '' : ' where '.$predicate;
+    }
+
+    /**
+     * Resolve the given partial index predicate into raw SQL.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $predicate
+     * @return string
+     */
+    protected function getIndexPredicate(Blueprint $blueprint, $predicate)
+    {
+        if ($this->isExpression($predicate)) {
+            return $this->getValue($predicate);
+        }
+
+        if (! $predicate instanceof Closure) {
+            return $predicate;
+        }
+
+        $predicate($query = $this->connection->query()->from($blueprint->getTable()));
+
+        $grammar = $this->connection->getQueryGrammar();
+
+        // The query grammar prefixes the compiled constraints with the "where" keyword,
+        // which the index syntax supplies itself. Index predicates also may not carry
+        // any bindings, so the values are inlined into the resulting SQL statement.
+        return $grammar->substituteBindingsIntoRawSql(
+            Str::after($grammar->compileWheres($query), 'where '),
+            $this->connection->prepareBindings($query->getRawBindings()['where'])
+        );
     }
 
     /**

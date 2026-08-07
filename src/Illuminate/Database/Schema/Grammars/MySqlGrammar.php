@@ -494,14 +494,33 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
-        return sprintf('alter table %s add %s %s%s(%s)%s',
+        return sprintf('alter table %s add %s %s%s(%s)%s%s',
             $this->wrapTable($blueprint),
             $type,
             $this->wrap($command->index),
             $command->algorithm ? ' using '.$command->algorithm : '',
             $this->columnize($command->columns),
+            $this->compileIndexPredicate($blueprint, $command),
             $command->lock ? ', lock='.$command->lock : ''
         );
+    }
+
+    /**
+     * Compile the "where" clause of a partial index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function compileIndexPredicate(Blueprint $blueprint, Fluent $command)
+    {
+        if (! is_null($command->where)) {
+            throw new RuntimeException('This database driver does not support partial indexes.');
+        }
+
+        return '';
     }
 
     /**

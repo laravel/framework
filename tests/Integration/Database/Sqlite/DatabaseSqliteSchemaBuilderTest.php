@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\Sqlite;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
@@ -92,5 +93,44 @@ SQL);
         $indexes = Schema::getIndexes('table');
 
         $this->assertSame([], collect($indexes)->firstWhere('name', 'table_raw_index')['columns']);
+    }
+
+    public function testPartialIndexIsEnforcedAndSurvivesATableRebuild()
+    {
+        Schema::create('teams', fn (Blueprint $table) => $table->id());
+
+        Schema::create('table', function (Blueprint $table) {
+            $table->id();
+            $table->string('email');
+            $table->softDeletes();
+
+            $table->unique('email')->where(fn ($query) => $query->whereNull('deleted_at'));
+        });
+
+        $this->assertSame(
+            '"deleted_at" is null',
+            collect(Schema::getIndexes('table'))->firstWhere('name', 'table_email_unique')['where']
+        );
+
+        // Adding a constrained column forces SQLite to rebuild the table, which
+        // regenerates its indexes from the introspected schema. The predicate of
+        // the partial index has to be carried over to the rebuilt index...
+        Schema::table('table', function (Blueprint $table) {
+            $table->foreignId('team_id')->nullable()->constrained();
+        });
+
+        $this->assertSame(
+            '"deleted_at" is null',
+            collect(Schema::getIndexes('table'))->firstWhere('name', 'table_email_unique')['where']
+        );
+
+        DB::table('table')->insert(['email' => 'taylor@laravel.com', 'deleted_at' => null]);
+        DB::table('table')->insert(['email' => 'taylor@laravel.com', 'deleted_at' => '2026-01-01 00:00:00']);
+
+        $this->assertSame(2, DB::table('table')->count());
+
+        $this->expectException(UniqueConstraintViolationException::class);
+
+        DB::table('table')->insert(['email' => 'taylor@laravel.com', 'deleted_at' => null]);
     }
 }

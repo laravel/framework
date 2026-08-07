@@ -152,14 +152,15 @@ class SqlServerGrammar extends Grammar
     {
         return sprintf(
             "select idx.name as name, string_agg(col.name, ',') within group (order by idxcol.key_ordinal) as columns, "
-            .'idx.type_desc as [type], idx.is_unique as [unique], idx.is_primary_key as [primary] '
+            .'idx.type_desc as [type], idx.is_unique as [unique], idx.is_primary_key as [primary], '
+            .'idx.filter_definition as [where] '
             .'from sys.indexes as idx '
             .'join sys.tables as tbl on idx.object_id = tbl.object_id '
             .'join sys.schemas as scm on tbl.schema_id = scm.schema_id '
             .'join sys.index_columns as idxcol on idx.object_id = idxcol.object_id and idx.index_id = idxcol.index_id '
             .'join sys.columns as col on idxcol.object_id = col.object_id and idxcol.column_id = col.column_id '
             .'where tbl.name = %s and scm.name = %s '
-            .'group by idx.name, idx.type_desc, idx.is_unique, idx.is_primary_key',
+            .'group by idx.name, idx.type_desc, idx.is_unique, idx.is_primary_key, idx.filter_definition',
             $this->quoteString($table),
             $schema ? $this->quoteString($schema) : 'schema_name()',
         );
@@ -272,10 +273,11 @@ class SqlServerGrammar extends Grammar
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('create unique index %s on %s (%s)%s',
+        return sprintf('create unique index %s on %s (%s)%s%s',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
             $this->columnize($command->columns),
+            $this->compileIndexPredicate($blueprint, $command),
             $command->online ? ' with (online = on)' : ''
         );
     }
@@ -289,10 +291,11 @@ class SqlServerGrammar extends Grammar
      */
     public function compileIndex(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('create index %s on %s (%s)%s',
+        return sprintf('create index %s on %s (%s)%s%s',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
             $this->columnize($command->columns),
+            $this->compileIndexPredicate($blueprint, $command),
             $command->online ? ' with (online = on)' : ''
         );
     }

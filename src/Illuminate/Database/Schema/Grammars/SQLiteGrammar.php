@@ -187,17 +187,22 @@ class SQLiteGrammar extends Grammar
      */
     public function compileIndexes($schema, $table)
     {
+        $schema ??= 'main';
+
         return sprintf(
-            'select \'primary\' as name, group_concat(col) as columns, 1 as "unique", 1 as "primary" '
+            'select \'primary\' as name, group_concat(col) as columns, 1 as "unique", 1 as "primary", null as "definition" '
             .'from (select name as col from pragma_table_xinfo(%s, %s) where pk > 0 order by pk, cid) group by name '
-            .'union select name, group_concat(col) as columns, "unique", origin = \'pk\' as "primary" '
-            .'from (select il.*, ii.name as col from pragma_index_list(%s, %s) il, pragma_index_info(il.name, %s) ii order by il.seq, ii.seqno) '
-            .'group by name, "unique", "primary"',
-            $table = $this->quoteString($table),
-            $schema = $this->quoteString($schema ?? 'main'),
-            $table,
-            $schema,
-            $schema
+            .'union select name, group_concat(col) as columns, "unique", origin = \'pk\' as "primary", "definition" '
+            .'from (select il.*, ii.name as col, '
+            .'(select m.sql from %s.sqlite_master m where m.type = \'index\' and m.name = il.name) as "definition" '
+            .'from pragma_index_list(%s, %s) il, pragma_index_info(il.name, %s) ii order by il.seq, ii.seqno) '
+            .'group by name, "unique", "primary", "definition"',
+            $quotedTable = $this->quoteString($table),
+            $quotedSchema = $this->quoteString($schema),
+            $this->wrapValue($schema),
+            $quotedTable,
+            $quotedSchema,
+            $quotedSchema
         );
     }
 
@@ -399,11 +404,12 @@ class SQLiteGrammar extends Grammar
     {
         [$schema, $table] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
 
-        return sprintf('create unique index %s%s on %s (%s)',
+        return sprintf('create unique index %s%s on %s (%s)%s',
             $schema ? $this->wrapValue($schema).'.' : '',
             $this->wrap($command->index),
             $this->wrapTable($table),
-            $this->columnize($command->columns)
+            $this->columnize($command->columns),
+            $this->compileIndexPredicate($blueprint, $command)
         );
     }
 
@@ -418,11 +424,12 @@ class SQLiteGrammar extends Grammar
     {
         [$schema, $table] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
 
-        return sprintf('create index %s%s on %s (%s)',
+        return sprintf('create index %s%s on %s (%s)%s',
             $schema ? $this->wrapValue($schema).'.' : '',
             $this->wrap($command->index),
             $this->wrapTable($table),
-            $this->columnize($command->columns)
+            $this->columnize($command->columns),
+            $this->compileIndexPredicate($blueprint, $command)
         );
     }
 
@@ -651,7 +658,7 @@ class SQLiteGrammar extends Grammar
             return [
                 $this->compileDropUnique($blueprint, new IndexDefinition(['index' => $index['name']])),
                 $this->compileUnique($blueprint,
-                    new IndexDefinition(['index' => $command->to, 'columns' => $index['columns']])
+                    new IndexDefinition(['index' => $command->to, 'columns' => $index['columns'], 'where' => $index['where'] ?? null])
                 ),
             ];
         }
@@ -659,7 +666,7 @@ class SQLiteGrammar extends Grammar
         return [
             $this->compileDropIndex($blueprint, new IndexDefinition(['index' => $index['name']])),
             $this->compileIndex($blueprint,
-                new IndexDefinition(['index' => $command->to, 'columns' => $index['columns']])
+                new IndexDefinition(['index' => $command->to, 'columns' => $index['columns'], 'where' => $index['where'] ?? null])
             ),
         ];
     }

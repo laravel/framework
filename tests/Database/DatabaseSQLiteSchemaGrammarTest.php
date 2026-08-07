@@ -230,6 +230,58 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('create index "baz" on "users" ("foo", "bar")', $statements[0]);
     }
 
+    public function testAddingPartialUniqueKey()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->where('deleted_at is null');
+
+        $this->assertSame(
+            ['create unique index "bar" on "users" ("foo") where deleted_at is null'],
+            $blueprint->toSql()
+        );
+    }
+
+    public function testAddingPartialIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index(['foo', 'bar'], 'baz')->where(new Expression('"foo" is not null'));
+
+        $this->assertSame(
+            ['create index "baz" on "users" ("foo", "bar") where "foo" is not null'],
+            $blueprint->toSql()
+        );
+    }
+
+    public function testAddingPartialIndexFluentlyOnColumn()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->string('foo')->unique()->where('deleted_at is null');
+
+        $this->assertSame([
+            'alter table "users" add column "foo" varchar not null',
+            'create unique index "users_foo_unique" on "users" ("foo") where deleted_at is null',
+        ], $blueprint->toSql());
+    }
+
+    public function testAddingPartialIndexUsingAQueryBuilder()
+    {
+        $db = new Manager;
+        $db->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);
+
+        $connection = $db->getConnection();
+        $connection->useDefaultSchemaGrammar();
+
+        $blueprint = new Blueprint($connection, 'users');
+        $blueprint->unique('foo', 'bar')->where(
+            fn ($query) => $query->whereNotNull('foo')->where('type', 'active')
+        );
+
+        $this->assertSame(
+            ['create unique index "bar" on "users" ("foo") where "foo" is not null and "type" = \'active\''],
+            $blueprint->toSql()
+        );
+    }
+
     public function testAddingUniqueKeyWithSchema()
     {
         $blueprint = new Blueprint($this->getConnection(), 'foo.users');

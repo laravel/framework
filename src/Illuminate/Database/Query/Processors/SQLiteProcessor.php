@@ -69,6 +69,7 @@ class SQLiteProcessor extends Processor
                 'type' => null,
                 'unique' => (bool) $result->unique,
                 'primary' => $isPrimary,
+                'where' => $this->parseIndexPredicate($result->definition ?? null),
             ];
         }, $results);
 
@@ -77,6 +78,25 @@ class SQLiteProcessor extends Processor
         }
 
         return $indexes;
+    }
+
+    /**
+     * Extract the predicate of a partial index from its "CREATE INDEX" statement.
+     *
+     * SQLite exposes no pragma for the predicate of a partial index, so it has to be
+     * recovered from the statement stored in "sqlite_master". The first ") where"
+     * in that statement always terminates the index's column list.
+     *
+     * @param  string|null  $definition
+     * @return string|null
+     */
+    protected function parseIndexPredicate($definition)
+    {
+        if (! $definition || ! preg_match('/\)\s*where\s+(.+)$/is', $definition, $matches)) {
+            return null;
+        }
+
+        return trim($matches[1]);
     }
 
     /** @inheritDoc */

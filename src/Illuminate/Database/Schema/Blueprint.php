@@ -232,7 +232,7 @@ class Blueprint
                         ? 'vectorIndex'
                         : $index;
 
-                    $this->{$indexMethod}($column->name);
+                    $this->addFluentIndexPredicate($this->{$indexMethod}($column->name), $column);
                     $column->{$index} = null;
 
                     continue 2;
@@ -256,13 +256,29 @@ class Blueprint
                         ? 'vectorIndex'
                         : $index;
 
-                    $this->{$indexMethod}($column->name, $column->{$index});
+                    $this->addFluentIndexPredicate($this->{$indexMethod}($column->name, $column->{$index}), $column);
                     $column->{$index} = null;
 
                     continue 2;
                 }
             }
         }
+    }
+
+    /**
+     * Apply the predicate fluently specified on a column to its index.
+     *
+     * @param  \Illuminate\Database\Schema\IndexDefinition  $index
+     * @param  \Illuminate\Database\Schema\ColumnDefinition  $column
+     * @return \Illuminate\Database\Schema\IndexDefinition
+     */
+    protected function addFluentIndexPredicate($index, $column)
+    {
+        if (! is_null($column->where)) {
+            $index->where($column->where);
+        }
+
+        return $index;
     }
 
     /**

@@ -115,6 +115,7 @@ class PostgresProcessor extends Processor
                 'type' => strtolower($result->type),
                 'unique' => (bool) $result->unique,
                 'primary' => (bool) $result->primary,
+                'where' => $result->where,
             ];
         }, $results);
     }

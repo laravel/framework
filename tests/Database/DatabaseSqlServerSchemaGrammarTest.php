@@ -278,6 +278,40 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('create unique index "bar" on "users" ("foo")', $statements[0]);
     }
 
+    public function testAddingPartialUniqueKey()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->where('[deleted_at] is null');
+
+        $this->assertSame(
+            ['create unique index "bar" on "users" ("foo") where [deleted_at] is null'],
+            $blueprint->toSql()
+        );
+    }
+
+    public function testAddingPartialUniqueKeyOnline()
+    {
+        // The filter of a filtered index has to precede the index options...
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->online()->where('[deleted_at] is null');
+
+        $this->assertSame(
+            ['create unique index "bar" on "users" ("foo") where [deleted_at] is null with (online = on)'],
+            $blueprint->toSql()
+        );
+    }
+
+    public function testAddingPartialIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index(['foo', 'bar'], 'baz')->where(new Expression('[foo] is not null'));
+
+        $this->assertSame(
+            ['create index "baz" on "users" ("foo", "bar") where [foo] is not null'],
+            $blueprint->toSql()
+        );
+    }
+
     public function testAddingUniqueKeyOnline()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');

@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Stringable;
 use LogicException;
+use RuntimeException;
 
 class PostgresGrammar extends Grammar
 {
@@ -186,7 +187,8 @@ class PostgresGrammar extends Grammar
     {
         return sprintf(
             "select ic.relname as name, string_agg(a.attname, ',' order by indseq.ord) as columns, "
-            .'am.amname as "type", i.indisunique as "unique", i.indisprimary as "primary" '
+            .'am.amname as "type", i.indisunique as "unique", i.indisprimary as "primary", '
+            .'pg_get_expr(i.indpred, i.indrelid) as "where" '
             .'from pg_index i '
             .'join pg_class tc on tc.oid = i.indrelid '
             .'join pg_namespace tn on tn.oid = tc.relnamespace '
@@ -195,7 +197,7 @@ class PostgresGrammar extends Grammar
             .'join lateral unnest(i.indkey) with ordinality as indseq(num, ord) on true '
             .'left join pg_attribute a on a.attrelid = i.indrelid and a.attnum = indseq.num '
             .'where tc.relname = %s and tn.nspname = %s '
-            .'group by ic.relname, am.amname, i.indisunique, i.indisprimary',
+            .'group by ic.relname, am.amname, i.indisunique, i.indisprimary, pg_get_expr(i.indpred, i.indrelid)',
             $this->quoteString($table),
             $schema ? $this->quoteString($schema) : 'current_schema()'
         );
@@ -338,6 +340,25 @@ class PostgresGrammar extends Grammar
             $uniqueStatement .= ' nulls '.($command->nullsNotDistinct ? 'not distinct' : 'distinct');
         }
 
+        // A unique constraint may not be backed by a partial index, so a predicate forces
+        // the index to be created on its own instead of via a constraint. Constraint only
+        // options such as "deferrable" have no equivalent on a bare index in that case...
+        if ($predicate = $this->compileIndexPredicate($blueprint, $command)) {
+            if (! is_null($command->deferrable)) {
+                throw new RuntimeException('PostgreSQL does not support deferrable partial unique indexes.');
+            }
+
+            return [sprintf('create unique index %s%s on %s%s (%s)%s%s',
+                $command->online ? 'concurrently ' : '',
+                $this->wrap($command->index),
+                $this->wrapTable($blueprint),
+                $command->algorithm ? ' using '.$command->algorithm : '',
+                $this->columnize($command->columns),
+                is_null($command->nullsNotDistinct) ? '' : ' nulls '.($command->nullsNotDistinct ? 'not distinct' : 'distinct'),
+                $predicate
+            )];
+        }
+
         if ($command->online || $command->algorithm) {
             $createIndexSql = sprintf('create unique index %s%s on %s%s (%s)',
                 $command->online ? 'concurrently ' : '',
@@ -382,12 +403,13 @@ class PostgresGrammar extends Grammar
      */
     public function compileIndex(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('create index %s%s on %s%s (%s)',
+        return sprintf('create index %s%s on %s%s (%s)%s',
             $command->online ? 'concurrently ' : '',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
             $command->algorithm ? ' using '.$command->algorithm : '',
-            $this->columnize($command->columns)
+            $this->columnize($command->columns),
+            $this->compileIndexPredicate($blueprint, $command)
         );
     }
 
@@ -408,11 +430,12 @@ class PostgresGrammar extends Grammar
             return "to_tsvector({$this->quoteString($language)}, {$this->wrap($column)})";
         }, $command->columns);
 
-        return sprintf('create index %s%s on %s using gin ((%s))',
+        return sprintf('create index %s%s on %s using gin ((%s))%s',
             $command->online ? 'concurrently ' : '',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
-            implode(' || ', $columns)
+            implode(' || ', $columns),
+            $this->compileIndexPredicate($blueprint, $command)
         );
     }
 
@@ -457,12 +480,13 @@ class PostgresGrammar extends Grammar
     {
         $columns = $this->columnizeWithOperatorClass($command->columns, $command->operatorClass);
 
-        return sprintf('create index %s%s on %s%s (%s)',
+        return sprintf('create index %s%s on %s%s (%s)%s',
             $command->online ? 'concurrently ' : '',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
             $command->algorithm ? ' using '.$command->algorithm : '',
-            $columns
+            $columns,
+            $this->compileIndexPredicate($blueprint, $command)
         );
     }
 

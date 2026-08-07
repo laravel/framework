@@ -11,6 +11,7 @@ use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class DatabaseMySqlSchemaGrammarTest extends TestCase
 {
@@ -364,6 +365,15 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add unique `bar`(`foo`)', $statements[0]);
+    }
+
+    public function testAddingPartialIndexIsNotSupported()
+    {
+        $this->expectExceptionObject(new RuntimeException('This database driver does not support partial indexes.'));
+
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->where('deleted_at is null');
+        $blueprint->toSql();
     }
 
     public function testAddingIndex()
