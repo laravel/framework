@@ -26,8 +26,6 @@ class CommandMutexTest extends TestCase
      */
     protected $commandMutex;
 
-    /** {@inheritdoc} */
-    #[\Override]
     protected function setUp(): void
     {
         $this->command = new class extends Command implements Isolatable
@@ -47,8 +45,6 @@ class CommandMutexTest extends TestCase
         $this->command->setLaravel($app);
     }
 
-    /** {@inheritdoc} */
-    #[\Override]
     protected function tearDown(): void
     {
         $this->tearDownTheTestEnvironmentUsingMockery();

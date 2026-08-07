@@ -109,7 +109,6 @@ class DatabaseMigrationCreatorTest extends TestCase
             $this->assertSame($path.'/2026_07_13_144122_create_bs_table.php', $first);
             $this->assertSame($path.'/2026_07_13_144123_create_as_table.php', $second);
         } finally {
-            Carbon::setTestNow();
             $files->deleteDirectory($path);
         }
     }

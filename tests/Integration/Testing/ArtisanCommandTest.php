@@ -213,7 +213,7 @@ class ArtisanCommandTest extends TestCase
             ->expectsOutput()
             ->assertExitCode(0);
 
-        m::close();
+        $this->verifyMockeryExpectationsNow();
     }
 
     public function test_console_command_that_fail_if_doesnt_output_something_and_is_not_the_expected_output()
@@ -264,7 +264,7 @@ class ArtisanCommandTest extends TestCase
             ->expectsConfirmation('Do you want to continue?', true)
             ->assertExitCode(0);
 
-        m::close();
+        $this->verifyMockeryExpectationsNow();
     }
 
     public function test_console_command_that_fails_if_doesnt_expect_output_but_outputs_something()
@@ -275,7 +275,7 @@ class ArtisanCommandTest extends TestCase
             ->doesntExpectOutput()
             ->assertExitCode(0);
 
-        m::close();
+        $this->verifyMockeryExpectationsNow();
     }
 
     public function test_console_command_that_fails_if_doesnt_expect_output_and_does_expect_output()
@@ -287,7 +287,7 @@ class ArtisanCommandTest extends TestCase
             ->doesntExpectOutput('My name is Taylor Otwell')
             ->assertExitCode(0);
 
-        m::close();
+        $this->verifyMockeryExpectationsNow();
     }
 
     public function test_console_command_that_fails_if_the_output_does_not_contain()
@@ -320,6 +320,15 @@ class ArtisanCommandTest extends TestCase
                 }
             })
             ->assertExitCode(0);
+    }
+
+    /**
+     * Verify the PendingCommand mock expectations immediately, so an unmet
+     * expectation throws here and is caught by the test's expectException().
+     */
+    protected function verifyMockeryExpectationsNow(): void
+    {
+        m::close();
     }
 
     /**
