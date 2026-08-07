@@ -1368,6 +1368,16 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['foo' => ['bar' => 'baz', 'photo' => $file], 'boom' => 'breeze'], $request->all());
     }
 
+    public function testAllInputPrefersInputOverFilesForCollidingKeys()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'email.txt');
+        $request = Request::create('/', 'POST', ['email' => 'taylor@laravel.com'], [], ['email' => $file]);
+
+        $this->assertSame(['email' => 'taylor@laravel.com'], $request->all());
+        $this->assertSame(['email' => 'taylor@laravel.com'], $request->only('email'));
+        $this->assertInstanceOf(UploadedFile::class, $request->file('email'));
+    }
+
     public function testAllInputReturnsInputAfterReplace()
     {
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']]);
@@ -1914,6 +1924,34 @@ class HttpRequestTest extends TestCase
         $this->assertNull($request->undefined);
         $this->assertFalse(isset($request->undefined));
         $this->assertEmpty($request->undefined);
+    }
+
+    public function testMagicMethodsPreferInputOverFilesForCollidingKeys()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'email.txt');
+        $request = Request::create('/', 'POST', ['email' => 'taylor@laravel.com'], [], ['email' => $file]);
+
+        $this->assertSame('taylor@laravel.com', $request->email);
+        $this->assertSame('taylor@laravel.com', $request['email']);
+    }
+
+    public function testMagicMethodsMergeNestedInputAndFilesWhilePreferringInput()
+    {
+        $avatar = new SymfonyUploadedFile(__FILE__, 'avatar.jpg');
+        $collision = new SymfonyUploadedFile(__FILE__, 'name.txt');
+        $request = Request::create('/', 'POST', [
+            'profile' => ['name' => 'Taylor'],
+        ], [], [
+            'profile' => ['name' => $collision, 'avatar' => $avatar],
+        ]);
+
+        $expected = [
+            'name' => 'Taylor',
+            'avatar' => $request->file('profile.avatar'),
+        ];
+
+        $this->assertSame($expected, $request->profile);
+        $this->assertSame(['profile' => $expected], $request->all());
     }
 
     public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
