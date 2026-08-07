@@ -6,6 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Mockery as m;
@@ -128,6 +129,22 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertEquals(1, $rowsAffected);
     }
 
+    public function testDeleteMethodDefersToTheParentForSoftDeletablePivots()
+    {
+        $pivot = $this->getMockBuilder(DatabaseEloquentPivotTestSoftDeletingStub::class)
+            ->onlyMethods(['newQueryWithoutRelationships', 'performDeleteOnModel'])
+            ->getMock();
+        $pivot->setPivotKeys('foreign', 'other');
+        $pivot->foreign = 'foreign.value';
+        $pivot->other = 'other.value';
+        $pivot->exists = true;
+        $pivot->expects($this->never())->method('newQueryWithoutRelationships');
+        $pivot->expects($this->once())->method('performDeleteOnModel');
+
+        $rowsAffected = $pivot->delete();
+        $this->assertSame(1, $rowsAffected);
+    }
+
     public function testPivotModelTableNameIsSingular()
     {
         $pivot = new Pivot;
@@ -214,6 +231,11 @@ class DatabaseEloquentPivotTestJsonCastStub extends Pivot
     protected $casts = [
         'foo' => 'json',
     ];
+}
+
+class DatabaseEloquentPivotTestSoftDeletingStub extends Pivot
+{
+    use SoftDeletes;
 }
 
 class DummyModel extends Model
