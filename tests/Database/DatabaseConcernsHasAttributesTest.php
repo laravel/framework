@@ -48,7 +48,7 @@ class DatabaseConcernsHasAttributesTest extends TestCase
         $instance = new HasAttributesWithArrayCast();
         $this->assertEquals(['foo' => null], $instance->attributesToArray());
 
-        $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
+        $this->assertSame(json_last_error(), JSON_ERROR_NONE);
     }
 
     public function testUnsettingCachedAttribute()
