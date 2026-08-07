@@ -51,11 +51,14 @@ class MorphPivot extends Pivot
     /**
      * Delete the pivot model record from the database.
      *
+     * Soft deletable pivots defer to the parent implementation, which keys the
+     * delete by the morph type via "setKeysForSelectQuery".
+     *
      * @return int
      */
     public function delete()
     {
-        if (isset($this->attributes[$this->getKeyName()])) {
+        if (isset($this->attributes[$this->getKeyName()]) || static::isSoftDeletable()) {
             return (int) parent::delete();
         }
 

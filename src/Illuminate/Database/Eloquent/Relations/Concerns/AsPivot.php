@@ -126,11 +126,15 @@ trait AsPivot
     /**
      * Delete the pivot model record from the database.
      *
+     * Soft deletable pivots defer to the parent implementation so that the
+     * "deleted at" column, the model's own state, and force deletes are
+     * all handled by the soft deleting trait.
+     *
      * @return int
      */
     public function delete()
     {
-        if (isset($this->attributes[$this->getKeyName()])) {
+        if (isset($this->attributes[$this->getKeyName()]) || static::isSoftDeletable()) {
             return (int) parent::delete();
         }
 
