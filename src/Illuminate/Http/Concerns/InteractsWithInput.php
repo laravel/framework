@@ -86,7 +86,7 @@ trait InteractsWithInput
      */
     public function all($keys = null)
     {
-        $input = array_replace_recursive($this->input(), $this->allFiles());
+        $input = array_replace_recursive($this->allFiles(), $this->input());
 
         if (! $keys) {
             return $input;

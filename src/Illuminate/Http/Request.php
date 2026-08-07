@@ -852,10 +852,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function __get($key)
     {
-        return Arr::get(
-            array_replace_recursive($this->allFiles(), $this->input()),
-            $key,
-            fn () => $this->route($key)
-        );
+        return Arr::get($this->all(), $key, fn () => $this->route($key));
     }
 }

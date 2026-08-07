@@ -1368,6 +1368,16 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['foo' => ['bar' => 'baz', 'photo' => $file], 'boom' => 'breeze'], $request->all());
     }
 
+    public function testAllInputPrefersInputOverFilesForCollidingKeys()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'email.txt');
+        $request = Request::create('/', 'POST', ['email' => 'taylor@laravel.com'], [], ['email' => $file]);
+
+        $this->assertSame(['email' => 'taylor@laravel.com'], $request->all());
+        $this->assertSame(['email' => 'taylor@laravel.com'], $request->only('email'));
+        $this->assertInstanceOf(UploadedFile::class, $request->file('email'));
+    }
+
     public function testAllInputReturnsInputAfterReplace()
     {
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']]);
@@ -1923,7 +1933,6 @@ class HttpRequestTest extends TestCase
 
         $this->assertSame('taylor@laravel.com', $request->email);
         $this->assertSame('taylor@laravel.com', $request['email']);
-        $this->assertInstanceOf(UploadedFile::class, $request->all()['email']);
     }
 
     public function testMagicMethodsMergeNestedInputAndFilesWhilePreferringInput()
@@ -1936,10 +1945,13 @@ class HttpRequestTest extends TestCase
             'profile' => ['name' => $collision, 'avatar' => $avatar],
         ]);
 
-        $this->assertSame([
+        $expected = [
             'name' => 'Taylor',
             'avatar' => $request->file('profile.avatar'),
-        ], $request->profile);
+        ];
+
+        $this->assertSame($expected, $request->profile);
+        $this->assertSame(['profile' => $expected], $request->all());
     }
 
     public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
