@@ -55,7 +55,7 @@ class DevCommands
             return;
         }
 
-        self::artisan('serve --host=localhost', 'server');
+        self::artisan('serve', 'server');
         self::artisan('queue:listen --tries=1 --timeout=0', 'queue');
 
         if (function_exists('pcntl_fork')) {

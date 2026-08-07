@@ -302,6 +302,7 @@ class FoundationDevCommandsTest extends TestCase
 
         $names = array_column($commands, 'name');
         $this->assertContains('server', $names);
+        $this->assertSame('php artisan serve', collect($commands)->firstWhere('name', 'server')['command']);
         $this->assertContains('queue', $names);
         $this->assertContains('logs', $names);
         $this->assertContains('vite', $names);
