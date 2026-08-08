@@ -482,7 +482,6 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobReleased::class))->once();
     }
 
-
     public function testJobReleasedEventIsNotRaisedWhenJobIsReleasedAfterException()
     {
         $job = new WorkerFakeJob(function () {
