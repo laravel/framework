@@ -1385,6 +1385,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('kenga', Str::substrReplace('kenka', 'ng', -3, 2));
     }
 
+    public function testSubstrReplaceWithArrays()
+    {
+        $this->assertSame(
+            ['INV-****', 'INV-****'],
+            Str::substrReplace(['INV-1234', 'INV-5678'], ['****', '****'], [4, 4], [4, 4])
+        );
+    }
+
     public function testTake()
     {
         $this->assertSame('ab', Str::take('abcdef', 2));

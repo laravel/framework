@@ -1866,6 +1866,10 @@ class Str
      */
     public static function substrReplace($string, $replace, $offset = 0, $length = null)
     {
+        if (is_array($string) || is_array($replace) || is_array($offset) || is_array($length)) {
+            return substr_replace($string, $replace, $offset, $length);
+        }
+
         if ($length === null) {
             $length = static::length($string);
         }
