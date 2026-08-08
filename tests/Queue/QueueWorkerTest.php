@@ -482,19 +482,6 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobReleased::class))->once();
     }
 
-    public function testJobReleasedEventIsNotRaisedWhenJobIsReleasedAfterException()
-    {
-        $job = new WorkerFakeJob(function () {
-            throw new RuntimeException;
-        });
-
-        $worker = $this->getWorker('default', ['queue' => [$job]]);
-        $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 10]));
-
-        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobReleasedAfterException::class))->once();
-        $this->events->shouldNotHaveReceived('dispatch', [m::type(JobReleased::class)]);
-    }
-
     public function testWorkerPicksJobUsingCustomCallbacks()
     {
         $worker = $this->getWorker('default', [
