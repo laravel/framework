@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Pagination;
 
+use Generator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CursorPaginatorTest extends TestCase
@@ -170,21 +172,33 @@ class CursorPaginatorTest extends TestCase
         $this->assertStringContainsString('"id": 1', $results);
     }
 
-    public function testPerPageIsClampedToAMinimumOfOne(): void
+    #[DataProvider('invalidPerPageProvider')]
+    public function testPerPageIsClampedToAMinimumOfOne($perPage): void
     {
-        $p = new CursorPaginator([['id' => 1], ['id' => 2]], 0, null);
-        $this->assertSame(1, $p->perPage());
+        $p = new CursorPaginator(
+            items: new Collection([['id' => 1], ['id' => 2]]),
+            perPage: $perPage,
+            cursor: null,
+        );
 
-        $p = new CursorPaginator([['id' => 1], ['id' => 2]], 0.5, null);
         $this->assertSame(1, $p->perPage());
+    }
 
-        $p = new CursorPaginator([['id' => 1], ['id' => 2]], -1, null);
-        $this->assertSame(1, $p->perPage());
+    public static function invalidPerPageProvider(): Generator
+    {
+        yield 'zero' => [0];
+        yield 'float' => [0.5];
+        yield 'negative' => [-1];
     }
 
     public function testPerPageIsClampedToTheInstanceMax(): void
     {
-        $p = new CursorPaginator([['id' => 1], ['id' => 2]], 10, null, ['maxPerPage' => 2]);
+        $p = new CursorPaginator(
+            items: new Collection([['id' => 1], ['id' => 2]]),
+            perPage: 10,
+            cursor: null,
+            options: ['maxPerPage' => 2],
+        );
 
         $this->assertSame(2, $p->perPage());
     }
@@ -193,7 +207,11 @@ class CursorPaginatorTest extends TestCase
     {
         CursorPaginator::setDefaultMaxPerPage(5);
 
-        $p = new CursorPaginator([['id' => 1], ['id' => 2]], 10, null);
+        $p = new CursorPaginator(
+            items: new Collection([['id' => 1], ['id' => 2]]),
+            perPage: 10,
+            cursor: null,
+        );
 
         $this->assertSame(5, $p->perPage());
     }
@@ -202,7 +220,12 @@ class CursorPaginatorTest extends TestCase
     {
         CursorPaginator::setDefaultMaxPerPage(5);
 
-        $p = new CursorPaginator([['id' => 1], ['id' => 2]], 10, null, ['maxPerPage' => 2]);
+        $p = new CursorPaginator(
+            items: new Collection([['id' => 1], ['id' => 2]]),
+            perPage: 10,
+            cursor: null,
+            options: ['maxPerPage' => 2],
+        );
 
         $this->assertSame(2, $p->perPage());
     }

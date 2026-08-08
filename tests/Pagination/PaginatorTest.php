@@ -2,7 +2,10 @@
 
 namespace Illuminate\Tests\Pagination;
 
+use Generator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class PaginatorTest extends TestCase
@@ -106,21 +109,33 @@ class PaginatorTest extends TestCase
         $this->assertStringContainsString('item/1', $results);
     }
 
-    public function testPerPageIsClampedToAMinimumOfOne(): void
+    #[DataProvider('invalidPerPageProvider')]
+    public function testPerPageIsClampedToAMinimumOfOne($perPage): void
     {
-        $p = new Paginator(['item1', 'item2'], 0, 1);
-        $this->assertSame(1, $p->perPage());
+        $p = new Paginator(
+            items: new Collection(['item1', 'item2']),
+            perPage: $perPage,
+            currentPage: 1,
+        );
 
-        $p = new Paginator(['item1', 'item2'], 0.5, 1);
         $this->assertSame(1, $p->perPage());
+    }
 
-        $p = new Paginator(['item1', 'item2'], -1, 1);
-        $this->assertSame(1, $p->perPage());
+    public static function invalidPerPageProvider(): Generator
+    {
+        yield 'zero' => [0];
+        yield 'float' => [0.5];
+        yield 'negative' => [-1];
     }
 
     public function testPerPageIsClampedToTheInstanceMax(): void
     {
-        $p = new Paginator(['item1', 'item2', 'item3'], 10, 1, ['maxPerPage' => 2]);
+        $p = new Paginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            perPage: 10,
+            currentPage: 1,
+            options: ['maxPerPage' => 2],
+        );
 
         $this->assertSame(2, $p->perPage());
     }
@@ -129,7 +144,11 @@ class PaginatorTest extends TestCase
     {
         Paginator::setDefaultMaxPerPage(5);
 
-        $p = new Paginator(['item1', 'item2', 'item3'], 10, 1);
+        $p = new Paginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            perPage: 10,
+            currentPage: 1,
+        );
 
         $this->assertSame(5, $p->perPage());
     }
@@ -138,14 +157,23 @@ class PaginatorTest extends TestCase
     {
         Paginator::setDefaultMaxPerPage(5);
 
-        $p = new Paginator(['item1', 'item2', 'item3'], 10, 1, ['maxPerPage' => 2]);
+        $p = new Paginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            perPage: 10,
+            currentPage: 1,
+            options: ['maxPerPage' => 2],
+        );
 
         $this->assertSame(2, $p->perPage());
     }
 
     public function testPerPageIsNotClampedWhenNoMaxIsSet(): void
     {
-        $p = new Paginator(['item1', 'item2', 'item3'], 10, 1);
+        $p = new Paginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            perPage: 10,
+            currentPage: 1,
+        );
 
         $this->assertSame(10, $p->perPage());
     }

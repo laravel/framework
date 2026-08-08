@@ -2,7 +2,10 @@
 
 namespace Illuminate\Tests\Pagination;
 
+use Generator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class LengthAwarePaginatorTest extends TestCase
@@ -66,21 +69,35 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertSame(1, $paginator->perPage());
     }
 
-    public function testPerPageIsClampedToAMinimumOfOne(): void
+    #[DataProvider('invalidPerPageProvider')]
+    public function testPerPageIsClampedToAMinimumOfOne($perPage): void
     {
-        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, 0, 1);
-        $this->assertSame(1, $paginator->perPage());
+        $paginator = new LengthAwarePaginator(
+            items: new Collection(['item1', 'item2', 'item3', 'item4']),
+            total: 4,
+            perPage: $perPage,
+            currentPage: 1,
+        );
 
-        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, 0.5, 1);
         $this->assertSame(1, $paginator->perPage());
+    }
 
-        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, -1, 1);
-        $this->assertSame(1, $paginator->perPage());
+    public static function invalidPerPageProvider(): Generator
+    {
+        yield 'zero' => [0];
+        yield 'float' => [0.5];
+        yield 'negative' => [-1];
     }
 
     public function testPerPageIsClampedToTheInstanceMax(): void
     {
-        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3'], 3, 10, 1, ['maxPerPage' => 2]);
+        $paginator = new LengthAwarePaginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            total: 3,
+            perPage: 10,
+            currentPage: 1,
+            options: ['maxPerPage' => 2],
+        );
 
         $this->assertSame(2, $paginator->perPage());
     }
@@ -89,7 +106,12 @@ class LengthAwarePaginatorTest extends TestCase
     {
         LengthAwarePaginator::setDefaultMaxPerPage(5);
 
-        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3'], 3, 10, 1);
+        $paginator = new LengthAwarePaginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            total: 3,
+            perPage: 10,
+            currentPage: 1,
+        );
 
         $this->assertSame(5, $paginator->perPage());
     }
@@ -98,7 +120,13 @@ class LengthAwarePaginatorTest extends TestCase
     {
         LengthAwarePaginator::setDefaultMaxPerPage(5);
 
-        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3'], 3, 10, 1, ['maxPerPage' => 2]);
+        $paginator = new LengthAwarePaginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            total: 3,
+            perPage: 10,
+            currentPage: 1,
+            options: ['maxPerPage' => 2],
+        );
 
         $this->assertSame(2, $paginator->perPage());
     }
