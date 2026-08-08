@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Pagination;
 
 use Generator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -80,6 +81,7 @@ class LengthAwarePaginatorTest extends TestCase
         );
 
         $this->assertSame(1, $paginator->perPage());
+        $this->assertSame(4, $paginator->lastPage());
     }
 
     public static function invalidPerPageProvider(): Generator
@@ -129,6 +131,83 @@ class LengthAwarePaginatorTest extends TestCase
         );
 
         $this->assertSame(2, $paginator->perPage());
+    }
+
+    public function testLastPageReflectsTheClampedMax(): void
+    {
+        $paginator = new LengthAwarePaginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            total: 100,
+            perPage: 1000,
+            currentPage: 1,
+            options: ['maxPerPage' => 10],
+        );
+
+        $this->assertSame(10, $paginator->perPage());
+        $this->assertSame(10, $paginator->lastPage());
+    }
+
+    public function testDefaultMaxIsSharedBetweenPaginatorAndLengthAwarePaginator(): void
+    {
+        Paginator::setDefaultMaxPerPage(5);
+
+        $paginator = new LengthAwarePaginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            total: 3,
+            perPage: 10,
+            currentPage: 1,
+        );
+
+        $this->assertSame(5, $paginator->perPage());
+    }
+
+    #[DataProvider('invalidMaxProvider')]
+    public function testInstanceMaxIsFlooredToOneWhenInvalid($max): void
+    {
+        $paginator = new LengthAwarePaginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            total: 3,
+            perPage: 10,
+            currentPage: 1,
+            options: ['maxPerPage' => $max],
+        );
+
+        $this->assertSame(1, $paginator->perPage());
+    }
+
+    #[DataProvider('invalidMaxProvider')]
+    public function testDefaultMaxIsFlooredToOneWhenInvalid($max): void
+    {
+        LengthAwarePaginator::setDefaultMaxPerPage($max);
+
+        $paginator = new LengthAwarePaginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            total: 3,
+            perPage: 10,
+            currentPage: 1,
+        );
+
+        $this->assertSame(1, $paginator->perPage());
+    }
+
+    public static function invalidMaxProvider(): Generator
+    {
+        yield 'zero' => [0];
+        yield 'float' => [0.5];
+        yield 'negative' => [-5];
+    }
+
+    public function testMinimumAndMaximumClampsCanCollide(): void
+    {
+        $paginator = new LengthAwarePaginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            total: 3,
+            perPage: 0,
+            currentPage: 1,
+            options: ['maxPerPage' => 1],
+        );
+
+        $this->assertSame(1, $paginator->perPage());
     }
 
     public function testLengthAwarePaginatorOnFirstAndLastPage()

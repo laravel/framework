@@ -119,6 +119,8 @@ class PaginatorTest extends TestCase
         );
 
         $this->assertSame(1, $p->perPage());
+        $this->assertCount(1, $p->items());
+        $this->assertTrue($p->hasMorePages());
     }
 
     public static function invalidPerPageProvider(): Generator
@@ -176,5 +178,51 @@ class PaginatorTest extends TestCase
         );
 
         $this->assertSame(10, $p->perPage());
+    }
+
+    #[DataProvider('invalidMaxProvider')]
+    public function testInstanceMaxIsFlooredToOneWhenInvalid($max): void
+    {
+        $p = new Paginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            perPage: 10,
+            currentPage: 1,
+            options: ['maxPerPage' => $max],
+        );
+
+        $this->assertSame(1, $p->perPage());
+    }
+
+    #[DataProvider('invalidMaxProvider')]
+    public function testDefaultMaxIsFlooredToOneWhenInvalid($max): void
+    {
+        Paginator::setDefaultMaxPerPage($max);
+
+        $p = new Paginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            perPage: 10,
+            currentPage: 1,
+        );
+
+        $this->assertSame(1, $p->perPage());
+    }
+
+    public static function invalidMaxProvider(): Generator
+    {
+        yield 'zero' => [0];
+        yield 'float' => [0.5];
+        yield 'negative' => [-5];
+    }
+
+    public function testMinimumAndMaximumClampsCanCollide(): void
+    {
+        $p = new Paginator(
+            items: new Collection(['item1', 'item2', 'item3']),
+            perPage: 0,
+            currentPage: 1,
+            options: ['maxPerPage' => 1],
+        );
+
+        $this->assertSame(1, $p->perPage());
     }
 }

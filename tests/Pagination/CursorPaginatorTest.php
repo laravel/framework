@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Pagination;
 use Generator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +15,7 @@ class CursorPaginatorTest extends TestCase
     protected function tearDown(): void
     {
         CursorPaginator::setDefaultMaxPerPage(null);
+        Paginator::setDefaultMaxPerPage(null);
     }
 
     public function testReturnsRelevantContextInformation()
@@ -182,6 +184,8 @@ class CursorPaginatorTest extends TestCase
         );
 
         $this->assertSame(1, $p->perPage());
+        $this->assertCount(1, $p->items());
+        $this->assertTrue($p->hasMorePages());
     }
 
     public static function invalidPerPageProvider(): Generator
@@ -228,6 +232,65 @@ class CursorPaginatorTest extends TestCase
         );
 
         $this->assertSame(2, $p->perPage());
+    }
+
+    public function testDefaultMaxIsNotSharedWithSimplePaginatorHierarchy(): void
+    {
+        Paginator::setDefaultMaxPerPage(2);
+
+        $p = new CursorPaginator(
+            items: new Collection([['id' => 1], ['id' => 2]]),
+            perPage: 10,
+            cursor: null,
+        );
+
+        $this->assertSame(10, $p->perPage());
+    }
+
+    #[DataProvider('invalidMaxProvider')]
+    public function testInstanceMaxIsFlooredToOneWhenInvalid($max): void
+    {
+        $p = new CursorPaginator(
+            items: new Collection([['id' => 1], ['id' => 2]]),
+            perPage: 10,
+            cursor: null,
+            options: ['maxPerPage' => $max],
+        );
+
+        $this->assertSame(1, $p->perPage());
+    }
+
+    #[DataProvider('invalidMaxProvider')]
+    public function testDefaultMaxIsFlooredToOneWhenInvalid($max): void
+    {
+        CursorPaginator::setDefaultMaxPerPage($max);
+
+        $p = new CursorPaginator(
+            items: new Collection([['id' => 1], ['id' => 2]]),
+            perPage: 10,
+            cursor: null,
+        );
+
+        $this->assertSame(1, $p->perPage());
+    }
+
+    public static function invalidMaxProvider(): Generator
+    {
+        yield 'zero' => [0];
+        yield 'float' => [0.5];
+        yield 'negative' => [-5];
+    }
+
+    public function testMinimumAndMaximumClampsCanCollide(): void
+    {
+        $p = new CursorPaginator(
+            items: new Collection([['id' => 1], ['id' => 2]]),
+            perPage: 0,
+            cursor: null,
+            options: ['maxPerPage' => 1],
+        );
+
+        $this->assertSame(1, $p->perPage());
     }
 
     protected function getCursor($params, $isNext = true)
