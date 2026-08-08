@@ -303,7 +303,7 @@ class Image implements Stringable
      *
      * @throws ImageException
      */
-    protected function toFormat(string $format): static
+    public function toFormat(string $format): static
     {
         if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'heic', 'heif', 'bmp'])) {
             throw new ImageException("The [{$format}] format is not supported.");
