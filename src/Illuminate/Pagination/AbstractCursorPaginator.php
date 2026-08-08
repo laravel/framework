@@ -44,6 +44,13 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     protected $perPage;
 
     /**
+     * The maximum number of items that may be requested per page for this paginator instance.
+     *
+     * @var int|null
+     */
+    protected $maxPerPage;
+
+    /**
      * The base path to assign to all URLs.
      *
      * @var string
@@ -98,6 +105,39 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      * @var \Closure
      */
     protected static $currentCursorResolver;
+
+    /**
+     * The maximum number of items that may be requested per page for every instance of this paginator type.
+     *
+     * @var int|null
+     */
+    protected static $defaultMaxPerPage;
+
+    /**
+     * Set the maximum number of items that may be requested per page for every instance of this paginator type.
+     *
+     * @param  int|null  $max
+     * @return void
+     */
+    public static function setDefaultMaxPerPage($max)
+    {
+        static::$defaultMaxPerPage = $max;
+    }
+
+    /**
+     * Clamp the given "per page" value between 1 and the instance or global maximum, if one is set.
+     *
+     * @param  mixed  $perPage
+     * @return int
+     */
+    protected function resolvePerPage($perPage)
+    {
+        $perPage = max((int) $perPage, 1);
+
+        $max = $this->maxPerPage ?? static::$defaultMaxPerPage;
+
+        return is_null($max) ? $perPage : min($perPage, max((int) $max, 1));
+    }
 
     /**
      * Get the URL for a given cursor.

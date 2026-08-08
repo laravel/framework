@@ -39,6 +39,13 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
     protected $perPage;
 
     /**
+     * The maximum number of items that may be requested per page for this paginator instance.
+     *
+     * @var int|null
+     */
+    protected $maxPerPage;
+
+    /**
      * The current page being "viewed".
      *
      * @var int
@@ -121,6 +128,13 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
      * @var \Closure
      */
     protected static $viewFactoryResolver;
+
+    /**
+     * The maximum number of items that may be requested per page for every instance of this paginator type.
+     *
+     * @var int|null
+     */
+    protected static $defaultMaxPerPage;
 
     /**
      * The default pagination view.
@@ -661,6 +675,32 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
     {
         static::defaultView('pagination::bootstrap-5');
         static::defaultSimpleView('pagination::simple-bootstrap-5');
+    }
+
+    /**
+     * Set the maximum number of items that may be requested per page for every instance of this paginator type.
+     *
+     * @param  int|null  $max
+     * @return void
+     */
+    public static function setDefaultMaxPerPage($max)
+    {
+        static::$defaultMaxPerPage = $max;
+    }
+
+    /**
+     * Clamp the given "per page" value between 1 and the instance or global maximum, if one is set.
+     *
+     * @param  mixed  $perPage
+     * @return int
+     */
+    protected function resolvePerPage($perPage)
+    {
+        $perPage = max((int) $perPage, 1);
+
+        $max = $this->maxPerPage ?? static::$defaultMaxPerPage;
+
+        return is_null($max) ? $perPage : min($perPage, max((int) $max, 1));
     }
 
     /**

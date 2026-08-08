@@ -7,6 +7,11 @@ use PHPUnit\Framework\TestCase;
 
 class PaginatorTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Paginator::setDefaultMaxPerPage(null);
+    }
+
     public function testSimplePaginatorReturnsRelevantContextInformation()
     {
         /** @var Paginator<int, string> $p */
@@ -99,5 +104,49 @@ class PaginatorTest extends TestCase
         $this->assertStringContainsString("\n", $results);
         $this->assertStringContainsString('    ', $results);
         $this->assertStringContainsString('item/1', $results);
+    }
+
+    public function testPerPageIsClampedToAMinimumOfOne(): void
+    {
+        $p = new Paginator(['item1', 'item2'], 0, 1);
+        $this->assertSame(1, $p->perPage());
+
+        $p = new Paginator(['item1', 'item2'], 0.5, 1);
+        $this->assertSame(1, $p->perPage());
+
+        $p = new Paginator(['item1', 'item2'], -1, 1);
+        $this->assertSame(1, $p->perPage());
+    }
+
+    public function testPerPageIsClampedToTheInstanceMax(): void
+    {
+        $p = new Paginator(['item1', 'item2', 'item3'], 10, 1, ['maxPerPage' => 2]);
+
+        $this->assertSame(2, $p->perPage());
+    }
+
+    public function testPerPageIsClampedToTheDefaultMax(): void
+    {
+        Paginator::setDefaultMaxPerPage(5);
+
+        $p = new Paginator(['item1', 'item2', 'item3'], 10, 1);
+
+        $this->assertSame(5, $p->perPage());
+    }
+
+    public function testInstanceMaxTakesPrecedenceOverDefaultMax(): void
+    {
+        Paginator::setDefaultMaxPerPage(5);
+
+        $p = new Paginator(['item1', 'item2', 'item3'], 10, 1, ['maxPerPage' => 2]);
+
+        $this->assertSame(2, $p->perPage());
+    }
+
+    public function testPerPageIsNotClampedWhenNoMaxIsSet(): void
+    {
+        $p = new Paginator(['item1', 'item2', 'item3'], 10, 1);
+
+        $this->assertSame(10, $p->perPage());
     }
 }

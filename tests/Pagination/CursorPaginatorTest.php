@@ -9,6 +9,11 @@ use PHPUnit\Framework\TestCase;
 
 class CursorPaginatorTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        CursorPaginator::setDefaultMaxPerPage(null);
+    }
+
     public function testReturnsRelevantContextInformation()
     {
         $p = new CursorPaginator($array = [['id' => 1], ['id' => 2], ['id' => 3]], 2, null, [
@@ -163,6 +168,43 @@ class CursorPaginatorTest extends TestCase
         $this->assertStringContainsString("\n", $results);
         $this->assertStringContainsString('    ', $results);
         $this->assertStringContainsString('"id": 1', $results);
+    }
+
+    public function testPerPageIsClampedToAMinimumOfOne(): void
+    {
+        $p = new CursorPaginator([['id' => 1], ['id' => 2]], 0, null);
+        $this->assertSame(1, $p->perPage());
+
+        $p = new CursorPaginator([['id' => 1], ['id' => 2]], 0.5, null);
+        $this->assertSame(1, $p->perPage());
+
+        $p = new CursorPaginator([['id' => 1], ['id' => 2]], -1, null);
+        $this->assertSame(1, $p->perPage());
+    }
+
+    public function testPerPageIsClampedToTheInstanceMax(): void
+    {
+        $p = new CursorPaginator([['id' => 1], ['id' => 2]], 10, null, ['maxPerPage' => 2]);
+
+        $this->assertSame(2, $p->perPage());
+    }
+
+    public function testPerPageIsClampedToTheDefaultMax(): void
+    {
+        CursorPaginator::setDefaultMaxPerPage(5);
+
+        $p = new CursorPaginator([['id' => 1], ['id' => 2]], 10, null);
+
+        $this->assertSame(5, $p->perPage());
+    }
+
+    public function testInstanceMaxTakesPrecedenceOverDefaultMax(): void
+    {
+        CursorPaginator::setDefaultMaxPerPage(5);
+
+        $p = new CursorPaginator([['id' => 1], ['id' => 2]], 10, null, ['maxPerPage' => 2]);
+
+        $this->assertSame(2, $p->perPage());
     }
 
     protected function getCursor($params, $isNext = true)

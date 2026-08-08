@@ -48,7 +48,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
             $this->{$key} = $value;
         }
 
-        $this->perPage = $perPage;
+        $this->perPage = $this->resolvePerPage($perPage);
         $this->currentPage = $this->setCurrentPage($currentPage);
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
 

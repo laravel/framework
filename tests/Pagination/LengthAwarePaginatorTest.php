@@ -26,6 +26,8 @@ class LengthAwarePaginatorTest extends TestCase
     protected function tearDown(): void
     {
         unset($this->p);
+
+        LengthAwarePaginator::setDefaultMaxPerPage(null);
     }
 
     public function testLengthAwarePaginatorGetAndSetPageName()
@@ -61,7 +63,44 @@ class LengthAwarePaginatorTest extends TestCase
         $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, 0, 1);
 
         $this->assertSame(4, $paginator->lastPage());
-        $this->assertSame(0, $paginator->perPage());
+        $this->assertSame(1, $paginator->perPage());
+    }
+
+    public function testPerPageIsClampedToAMinimumOfOne(): void
+    {
+        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, 0, 1);
+        $this->assertSame(1, $paginator->perPage());
+
+        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, 0.5, 1);
+        $this->assertSame(1, $paginator->perPage());
+
+        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, -1, 1);
+        $this->assertSame(1, $paginator->perPage());
+    }
+
+    public function testPerPageIsClampedToTheInstanceMax(): void
+    {
+        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3'], 3, 10, 1, ['maxPerPage' => 2]);
+
+        $this->assertSame(2, $paginator->perPage());
+    }
+
+    public function testPerPageIsClampedToTheDefaultMax(): void
+    {
+        LengthAwarePaginator::setDefaultMaxPerPage(5);
+
+        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3'], 3, 10, 1);
+
+        $this->assertSame(5, $paginator->perPage());
+    }
+
+    public function testInstanceMaxTakesPrecedenceOverDefaultMax(): void
+    {
+        LengthAwarePaginator::setDefaultMaxPerPage(5);
+
+        $paginator = new LengthAwarePaginator(['item1', 'item2', 'item3'], 3, 10, 1, ['maxPerPage' => 2]);
+
+        $this->assertSame(2, $paginator->perPage());
     }
 
     public function testLengthAwarePaginatorOnFirstAndLastPage()
