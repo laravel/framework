@@ -180,7 +180,7 @@ class PaginatorTest extends TestCase
         $this->assertSame(10, $p->perPage());
     }
 
-    #[DataProvider('invalidMaxProvider')]
+    #[DataProvider('dataProviderInvalidMax')]
     public function testInstanceMaxIsFlooredToOneWhenInvalid($max): void
     {
         $p = new Paginator(
@@ -193,7 +193,7 @@ class PaginatorTest extends TestCase
         $this->assertSame(1, $p->perPage());
     }
 
-    #[DataProvider('invalidMaxProvider')]
+    #[DataProvider('dataProviderInvalidMax')]
     public function testDefaultMaxIsFlooredToOneWhenInvalid($max): void
     {
         Paginator::setDefaultMaxPerPage($max);
@@ -207,7 +207,7 @@ class PaginatorTest extends TestCase
         $this->assertSame(1, $p->perPage());
     }
 
-    public static function invalidMaxProvider(): Generator
+    public static function dataProviderInvalidMax(): Generator
     {
         yield 'zero' => [0];
         yield 'float' => [0.5];

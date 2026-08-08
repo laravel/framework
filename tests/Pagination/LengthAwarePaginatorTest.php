@@ -161,7 +161,7 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertSame(5, $paginator->perPage());
     }
 
-    #[DataProvider('invalidMaxProvider')]
+    #[DataProvider('dataProviderInvalidMax')]
     public function testInstanceMaxIsFlooredToOneWhenInvalid($max): void
     {
         $paginator = new LengthAwarePaginator(
@@ -175,7 +175,7 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertSame(1, $paginator->perPage());
     }
 
-    #[DataProvider('invalidMaxProvider')]
+    #[DataProvider('dataProviderInvalidMax')]
     public function testDefaultMaxIsFlooredToOneWhenInvalid($max): void
     {
         LengthAwarePaginator::setDefaultMaxPerPage($max);
@@ -190,7 +190,7 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertSame(1, $paginator->perPage());
     }
 
-    public static function invalidMaxProvider(): Generator
+    public static function dataProviderInvalidMax(): Generator
     {
         yield 'zero' => [0];
         yield 'float' => [0.5];
