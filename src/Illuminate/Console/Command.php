@@ -92,6 +92,15 @@ class Command extends SymfonyCommand
     protected $aliases;
 
     /**
+     * The commands that have been replaced or disabled, keyed by command name or class name.
+     *
+     * A null value indicates the command has been disabled entirely.
+     *
+     * @var array<string, string|null>
+     */
+    protected static $overrides = [];
+
+    /**
      * Create a new console command instance.
      */
     public function __construct()
@@ -381,6 +390,112 @@ class Command extends SymfonyCommand
         parent::setHidden($this->hidden = $hidden);
 
         return $this;
+    }
+
+    /**
+     * Run the given command in place of another command.
+     *
+     * The replaced command will no longer be registered with the console application.
+     * Both commands may be given as a command name or as a command class name.
+     *
+     * @param  string  $command
+     * @param  string  $replacement
+     * @return void
+     */
+    public static function replace($command, $replacement)
+    {
+        static::$overrides[$command] = $replacement;
+    }
+
+    /**
+     * Prevent the given commands from being registered with the console application.
+     *
+     * The commands may be given as command names or as command class names.
+     *
+     * @param  string  ...$commands
+     * @return void
+     */
+    public static function disable(...$commands)
+    {
+        foreach ($commands as $command) {
+            static::$overrides[$command] = null;
+        }
+    }
+
+    /**
+     * Determine if the given command has been replaced or disabled.
+     *
+     * @param  \Symfony\Component\Console\Command\Command|string|null  $command
+     * @return bool
+     */
+    public static function overridden($command)
+    {
+        if (static::$overrides === []) {
+            return false;
+        }
+
+        if ($command instanceof SymfonyCommand) {
+            return static::overridden($command->getName()) || static::overridden($command::class);
+        }
+
+        return ! is_null($command) && array_key_exists($command, static::$overrides);
+    }
+
+    /**
+     * Resolve the overrides that were registered using the given command's class name.
+     *
+     * Class names are exchanged for the command's name as soon as the command is
+     * registered with the console application, so that overrides configured by
+     * class name may be resolved by name when a command is looked up or run.
+     *
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
+     * @param  string|null  $name
+     * @return void
+     */
+    public static function resolveOverrides($command, $name = null)
+    {
+        if (static::$overrides === []) {
+            return;
+        }
+
+        if ($command instanceof SymfonyCommand) {
+            [$command, $name] = [$command::class, $command->getName()];
+        }
+
+        if (is_null($name)) {
+            return;
+        }
+
+        if (array_key_exists($command, static::$overrides) && ! array_key_exists($name, static::$overrides)) {
+            static::$overrides[$name] = static::$overrides[$command];
+        }
+
+        foreach (static::$overrides as $overridden => $replacement) {
+            if ($replacement === $command) {
+                static::$overrides[$overridden] = $name;
+            }
+        }
+    }
+
+    /**
+     * Get the name of the command that should be run in place of the given command.
+     *
+     * @param  string  $command
+     * @return string
+     */
+    public static function replacementFor($command)
+    {
+        return static::$overrides[$command] ?? $command;
+    }
+
+    /**
+     * Flush the replaced and disabled commands.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$overrides = [];
     }
 
     /**

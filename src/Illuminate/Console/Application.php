@@ -232,6 +232,14 @@ class Application extends SymfonyApplication implements ApplicationContract
             $command->setLaravel($this->laravel);
         }
 
+        if ($command instanceof SymfonyCommand) {
+            Command::resolveOverrides($command);
+
+            if (Command::overridden($command)) {
+                return null;
+            }
+        }
+
         return $this->addToParent($command);
     }
 
@@ -244,6 +252,24 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected function addToParent(SymfonyCommand|callable $command)
     {
         return parent::addCommand($command);
+    }
+
+    /**
+     * Determine if the given command exists, resolving replaced commands to their replacement.
+     */
+    #[\Override]
+    public function has(string $name): bool
+    {
+        return parent::has(Command::replacementFor($name));
+    }
+
+    /**
+     * Get a registered command, resolving replaced commands to their replacement.
+     */
+    #[\Override]
+    public function get(string $name): SymfonyCommand
+    {
+        return parent::get(Command::replacementFor($name));
     }
 
     /**
@@ -261,7 +287,11 @@ class Application extends SymfonyApplication implements ApplicationContract
 
             if (! is_null($commandName)) {
                 foreach (explode('|', $commandName) as $name) {
-                    $this->commandMap[$name] = $command;
+                    Command::resolveOverrides($command, $name);
+
+                    if (! Command::overridden($name)) {
+                        $this->commandMap[$name] = $command;
+                    }
                 }
 
                 return null;

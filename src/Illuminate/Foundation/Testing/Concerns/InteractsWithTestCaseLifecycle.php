@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Console\Command;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
@@ -180,6 +181,7 @@ trait InteractsWithTestCaseLifecycle
 
         AboutCommand::flushState();
         Artisan::forgetBootstrappers();
+        Command::flushState();
         Component::flushCache();
         Component::forgetComponentsResolver();
         Component::forgetFactory();
