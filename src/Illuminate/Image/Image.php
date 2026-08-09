@@ -426,18 +426,6 @@ class Image implements Responsable, Stringable
     }
 
     /**
-     * Create an HTTP response that represents the image.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
-    public function toResponse($request): Response
-    {
-        return new Response($this->toBytes(), 200, [
-            'Content-Type' => $this->mimeType(),
-        ]);
-    }
-
-    /**
      * Get the file extension based on the MIME type.
      */
     public function extension(): string
@@ -606,6 +594,18 @@ class Image implements Responsable, Stringable
         $callback($clone);
 
         return $clone;
+    }
+
+    /**
+     * Create an HTTP response that represents the image.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     */
+    public function toResponse($request): Response
+    {
+        return new Response($this->toBytes(), 200, [
+            'Content-Type' => $this->mimeType(),
+        ]);
     }
 
     /**
