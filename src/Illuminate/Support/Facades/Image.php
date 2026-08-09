@@ -4,10 +4,10 @@ namespace Illuminate\Support\Facades;
 
 /**
  * @method static \Illuminate\Image\Image fromBytes(string $contents)
+ * @method static \Illuminate\Image\Image fromStream(resource $stream)
  * @method static \Illuminate\Image\Image fromBase64(string $base64)
  * @method static \Illuminate\Image\Image fromPath(string $path)
  * @method static \Illuminate\Image\Image fromStorage(string $path, \BackedEnum|string|null $disk = null)
- * @method static \Illuminate\Image\Image fromStream(resource $stream)
  * @method static \Illuminate\Image\Image fromUpload(\Illuminate\Http\UploadedFile $file)
  * @method static \Illuminate\Image\Image fromUrl(string $url)
  * @method static \Illuminate\Image\ImageManager transformUsing(string $driver, string $transformation, callable $callback)
