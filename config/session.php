@@ -25,10 +25,9 @@ return [
     | Session Lifetime
     |--------------------------------------------------------------------------
     |
-    | Here you may specify the number of minutes that you wish the session
-    | to be allowed to remain idle before it expires. If you want them
-    | to expire immediately when the browser is closed then you may
-    | indicate that via the expire_on_close configuration option.
+    | Here you may specify the number of minutes that you wish the session to
+    | remain idle before it expires. The "cookie" driver supports expiring
+    | a session immediately when the browser window (not tab) is closed.
     |
     */
 
