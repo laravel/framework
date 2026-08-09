@@ -33,7 +33,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $container = m::spy(Container::class);
         $queue->setContainer($container);
-        $redis->expects('connection')->atLeast()->andReturn($redis);
+        $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
         $redis->shouldReceive('isCluster')->andReturn(false);
         $redis->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
@@ -60,7 +60,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $container = m::spy(Container::class);
         $queue->setContainer($container);
-        $redis->expects('connection')->atLeast()->andReturn($redis);
+        $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
         $redis->shouldReceive('isCluster')->andReturn(false);
         $redis->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
@@ -93,7 +93,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $container = m::spy(Container::class);
         $queue->setContainer($container);
-        $redis->expects('connection')->atLeast()->andReturn($redis);
+        $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
         $redis->shouldReceive('isCluster')->andReturn(false);
         $redis->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
@@ -132,7 +132,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
 
-        $redis->expects('connection')->atLeast()->andReturn($redis);
+        $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
         $redis->shouldReceive('isCluster')->andReturn(false);
         $redis->expects('eval')->with(
             LuaScripts::later(),
@@ -166,7 +166,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(5);
 
-        $redis->expects('connection')->atLeast()->andReturn($redis);
+        $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
         $redis->shouldReceive('isCluster')->andReturn(false);
         $redis->expects('eval')->with(
             LuaScripts::later(),
