@@ -20,14 +20,17 @@ class DatabaseSqliteSchemaStateTest extends TestCase
         $connection->shouldReceive('getDatabaseName')->andReturn($config['database']);
 
         $process = m::spy(Process::class);
-        $processFactory = m::spy(function () use ($process) {
+        $command = null;
+        $processFactory = function ($givenCommand) use ($process, &$command) {
+            $command = $givenCommand;
+
             return $process;
-        });
+        };
 
         $schemaState = new SqliteSchemaState($connection, null, $processFactory);
         $schemaState->load('database/schema/sqlite-schema.dump');
 
-        $processFactory->shouldHaveBeenCalled()->with('sqlite3 "${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"');
+        $this->assertSame('sqlite3 "${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"', $command);
 
         $process->shouldHaveReceived('mustRun')->with(null, [
             'LARAVEL_LOAD_DATABASE' => 'database/database.sqlite',
