@@ -203,6 +203,54 @@ class ImageManagerTest extends TestCase
         $this->assertInstanceOf(Image::class, $image);
     }
 
+    public function test_from_stream_returns_image()
+    {
+        $contents = $this->fakeImageContents();
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, $contents);
+        rewind($stream);
+
+        $app = $this->makeApp([]);
+        $manager = new ImageManager($app);
+        $image = $manager->fromStream($stream);
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame($contents, $image->toBytes());
+
+        fclose($stream);
+    }
+
+    public function test_from_stream_is_lazy()
+    {
+        $contents = $this->fakeImageContents();
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, $contents);
+        rewind($stream);
+
+        $app = $this->makeApp([]);
+        $manager = new ImageManager($app);
+        $image = $manager->fromStream($stream);
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame(0, ftell($stream));
+
+        fclose($stream);
+    }
+
+    public function test_from_stream_throws_for_invalid_data()
+    {
+        $stream = fopen('php://memory', 'r+');
+
+        $app = $this->makeApp([]);
+        $manager = new ImageManager($app);
+
+        $this->expectExceptionObject(new ImageException('Invalid stream image data.'));
+
+        $manager->fromStream($stream)->toBytes();
+
+        fclose($stream);
+    }
+
     public function test_from_upload_returns_image_from_uploaded_file()
     {
         $file = UploadedFile::fake()->image('avatar.jpg', 100, 100);
