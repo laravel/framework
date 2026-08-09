@@ -69,7 +69,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
 
         $this->assertSame(1, $code);
 
-        $migrator->shouldNotHaveBeenCalled();
+        $migrator->shouldNotHaveReceived('paths');
     }
 
     protected function runCommand($command, $input = [])

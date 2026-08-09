@@ -92,10 +92,9 @@ class CommandMutexTest extends TestCase
 
     public function testCanRunCommandAgainNonAutomated()
     {
-        $this->commandMutex->shouldNotHaveBeenCalled();
-
         $this->runCommand(false);
 
+        $this->commandMutex->shouldNotHaveReceived('create');
         $this->assertEquals(1, $this->command->ran);
     }
 
