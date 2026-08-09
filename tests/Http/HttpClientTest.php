@@ -2714,6 +2714,30 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(2);
     }
 
+    public function testAsyncRetryCallbackReceivesHttpMethod()
+    {
+        $method = null;
+
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 500)
+                ->push(['ok'], 200),
+        ]);
+
+        $response = $this->factory
+            ->async()
+            ->retry(2, 0, function ($exception, $request, $requestMethod) use (&$method) {
+                $method = $requestMethod;
+
+                return true;
+            }, false)
+            ->get('http://foo.com/get')
+            ->wait();
+
+        $this->assertSame('GET', $method);
+        $this->assertTrue($response->successful());
+    }
+
     public function testRequestExceptionIsNotThrownWithoutRetriesIfRetryNotNecessary()
     {
         $this->factory->fake([
