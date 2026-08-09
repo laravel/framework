@@ -56,6 +56,13 @@ class FilesystemManager implements FactoryContract
     protected $customCreators = [];
 
     /**
+     * Indicates if an exception should be thrown when a disk that has not been faked is resolved.
+     *
+     * @var bool
+     */
+    protected $preventStrayDiskUsage = false;
+
+    /**
      * Create a new filesystem manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -120,10 +127,20 @@ class FilesystemManager implements FactoryContract
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Filesystem\Filesystem
+     *
+     * @throws \Illuminate\Filesystem\StrayDiskUsageException
      */
     protected function get($name)
     {
-        return $this->disks[$name] ?? $this->resolve($name);
+        if (isset($this->disks[$name])) {
+            return $this->disks[$name];
+        }
+
+        if ($this->preventStrayDiskUsage) {
+            throw new StrayDiskUsageException($name);
+        }
+
+        return $this->resolve($name);
     }
 
     /**
@@ -371,6 +388,29 @@ class FilesystemManager implements FactoryContract
         $this->disks[$name] = $disk;
 
         return $this;
+    }
+
+    /**
+     * Indicate that an exception should be thrown if a disk that has not been faked is used.
+     *
+     * @param  bool  $prevent
+     * @return $this
+     */
+    public function preventStrayDiskUsage(bool $prevent = true)
+    {
+        $this->preventStrayDiskUsage = $prevent;
+
+        return $this;
+    }
+
+    /**
+     * Determine if stray disk usage is being prevented.
+     *
+     * @return bool
+     */
+    public function preventingStrayDiskUsage()
+    {
+        return $this->preventStrayDiskUsage;
     }
 
     /**
