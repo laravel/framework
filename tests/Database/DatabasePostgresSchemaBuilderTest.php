@@ -32,11 +32,11 @@ class DatabasePostgresSchemaBuilderTest extends TestCase
         $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $grammar->shouldReceive('compileColumns')->with(null, 'prefix_table')->once()->andReturn('sql');
-        $processor->shouldReceive('processColumns')->once()->andReturn([['name' => 'column']]);
+        $grammar->expects('compileColumns')->with(null, 'prefix_table')->andReturn('sql');
+        $processor->expects('processColumns')->andReturn([['name' => 'column']]);
         $builder = new PostgresBuilder($connection);
-        $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql')->andReturn([['name' => 'column']]);
+        $connection->expects('getTablePrefix')->andReturn('prefix_');
+        $connection->expects('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'column']]);
 
         $this->assertEquals(['column'], $builder->getColumnListing('table'));
     }

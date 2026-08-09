@@ -831,7 +831,7 @@ class SupportHelpersTest extends TestCase
         })->id);
 
         $mock = m::mock();
-        $mock->shouldReceive('foo')->once()->andReturn('bar');
+        $mock->expects('foo')->andReturn('bar');
         $this->assertEquals($mock, tap($mock)->foo());
     }
 

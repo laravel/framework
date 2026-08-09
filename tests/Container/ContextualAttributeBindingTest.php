@@ -275,7 +275,7 @@ class ContextualAttributeBindingTest extends TestCase
 
         $container->singleton(ContextRepository::class, function () {
             $context = m::mock(ContextRepository::class);
-            $context->shouldReceive('get')->once()->with('foo', null)->andReturn('foo');
+            $context->expects('get')->with('foo', null)->andReturn('foo');
 
             return $context;
         });
@@ -289,7 +289,7 @@ class ContextualAttributeBindingTest extends TestCase
 
         $container->singleton(ContextRepository::class, function () {
             $context = m::mock(ContextRepository::class);
-            $context->shouldReceive('getHidden')->once()->with('bar', null)->andReturn('bar');
+            $context->expects('getHidden')->with('bar', null)->andReturn('bar');
             $context->shouldNotReceive('get');
 
             return $context;

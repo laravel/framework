@@ -150,10 +150,10 @@ class DatabaseLockTest extends DatabaseTestCase
         $insertBuilder = m::mock(Builder::class);
         $deleteBuilder = m::mock(Builder::class);
 
-        $insertBuilder->shouldReceive('insert')->once()->andReturn(true);
+        $insertBuilder->expects('insert')->andReturn(true);
 
-        $deleteBuilder->shouldReceive('where')->with('expiration', '<=', m::any())->once()->andReturnSelf();
-        $deleteBuilder->shouldReceive('delete')->once()->andThrow(
+        $deleteBuilder->expects('where')->with('expiration', '<=', m::any())->andReturnSelf();
+        $deleteBuilder->expects('delete')->andThrow(
             new QueryException(
                 'mysql',
                 'delete from cache_locks where expiration <= ?',
@@ -183,9 +183,9 @@ class DatabaseLockTest extends DatabaseTestCase
 
         $owner = 'owner-123';
 
-        $deleteBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
-        $deleteBuilder->shouldReceive('where')->with('owner', $owner)->once()->andReturnSelf();
-        $deleteBuilder->shouldReceive('delete')->once()->andThrow(
+        $deleteBuilder->expects('where')->with('key', 'foo')->andReturnSelf();
+        $deleteBuilder->expects('where')->with('owner', $owner)->andReturnSelf();
+        $deleteBuilder->expects('delete')->andThrow(
             new QueryException(
                 'mysql',
                 'delete from cache_locks where key = ? and owner = ?',

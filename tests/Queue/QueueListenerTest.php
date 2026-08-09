@@ -16,9 +16,9 @@ class QueueListenerTest extends TestCase
     public function testRunProcessCallsProcess()
     {
         $process = m::mock(Process::class)->makePartial();
-        $process->shouldReceive('run')->once();
+        $process->expects('run');
         $listener = m::mock(Listener::class)->makePartial();
-        $listener->shouldReceive('memoryExceeded')->once()->with(1)->andReturn(false);
+        $listener->expects('memoryExceeded')->with(1)->andReturn(false);
 
         $listener->runProcess($process, 1);
     }
@@ -26,10 +26,10 @@ class QueueListenerTest extends TestCase
     public function testListenerStopsWhenMemoryIsExceeded()
     {
         $process = m::mock(Process::class)->makePartial();
-        $process->shouldReceive('run')->once();
+        $process->expects('run');
         $listener = m::mock(Listener::class)->makePartial();
-        $listener->shouldReceive('memoryExceeded')->once()->with(1)->andReturn(true);
-        $listener->shouldReceive('stop')->once();
+        $listener->expects('memoryExceeded')->with(1)->andReturn(true);
+        $listener->expects('stop');
 
         $listener->runProcess($process, 1);
     }

@@ -87,7 +87,7 @@ class ReleaseMiddlewareTest extends TestCase
         $job->shouldReceive('hasFailed')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
-        $job->shouldReceive('delete')->once();
+        $job->expects('delete');
         $job->shouldReceive('release')->never();
 
         $instance->call($job, [
@@ -107,7 +107,7 @@ class ReleaseMiddlewareTest extends TestCase
         $job->shouldReceive('hasFailed')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(true);
-        $job->shouldReceive('release')->once()->with($releaseAfter);
+        $job->expects('release')->with($releaseAfter);
         $job->shouldReceive('delete')->never();
 
         $instance->call($job, [

@@ -71,8 +71,8 @@ class QueueSqsJobTest extends TestCase
     {
         $job = $this->getJob();
         $handler = m::mock(stdClass::class);
-        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler);
-        $handler->shouldReceive('fire')->once()->with($job, ['data']);
+        $job->getContainer()->expects('make')->with('foo')->andReturn($handler);
+        $handler->expects('fire')->with($job, ['data']);
         $job->fire();
     }
 
@@ -82,7 +82,7 @@ class QueueSqsJobTest extends TestCase
         $queue = m::mock(SqsQueue::class, [$this->mockedSqsClient, $this->queueName, $this->account])->makePartial();
         $queue->setContainer($this->mockedContainer);
         $job = $this->getJob();
-        $job->getSqs()->shouldReceive('deleteMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle]);
+        $job->getSqs()->expects('deleteMessage')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle]);
         $job->delete();
     }
 
@@ -92,7 +92,7 @@ class QueueSqsJobTest extends TestCase
         $queue = m::mock(SqsQueue::class, [$this->mockedSqsClient, $this->queueName, $this->account])->makePartial();
         $queue->setContainer($this->mockedContainer);
         $job = $this->getJob();
-        $job->getSqs()->shouldReceive('changeMessageVisibility')->once()->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle, 'VisibilityTimeout' => $this->releaseDelay]);
+        $job->getSqs()->expects('changeMessageVisibility')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle, 'VisibilityTimeout' => $this->releaseDelay]);
         $job->release($this->releaseDelay);
         $this->assertTrue($job->isReleased());
     }
@@ -104,7 +104,7 @@ class QueueSqsJobTest extends TestCase
         $pointerBody = json_encode(['@pointer' => $pointerPath]);
 
         $store = m::mock(CacheRepository::class);
-        $store->shouldReceive('get')->once()->with($pointerPath)->andReturn($fullPayload);
+        $store->expects('get')->with($pointerPath)->andReturn($fullPayload);
 
         $cache = m::mock(CacheFactory::class);
         $cache->shouldReceive('store')->with('database')->andReturn($store);
@@ -149,7 +149,7 @@ class QueueSqsJobTest extends TestCase
         $pointerBody = json_encode(['@pointer' => $pointerPath]);
 
         $store = m::mock(CacheRepository::class);
-        $store->shouldReceive('get')->once()->with($pointerPath)->andReturn($fullPayload);
+        $store->expects('get')->with($pointerPath)->andReturn($fullPayload);
 
         $cache = m::mock(CacheFactory::class);
         $cache->shouldReceive('store')->with('database')->andReturn($store);
@@ -177,7 +177,7 @@ class QueueSqsJobTest extends TestCase
         $pointerBody = json_encode(['@pointer' => $pointerPath]);
 
         $store = m::mock(CacheRepository::class);
-        $store->shouldReceive('forget')->once()->with($pointerPath);
+        $store->expects('forget')->with($pointerPath);
 
         $cache = m::mock(CacheFactory::class);
         $cache->shouldReceive('store')->with('database')->andReturn($store);
@@ -189,7 +189,7 @@ class QueueSqsJobTest extends TestCase
         $jobData['Body'] = $pointerBody;
 
         $sqsClient = m::mock(SqsClient::class)->makePartial();
-        $sqsClient->shouldReceive('deleteMessage')->once();
+        $sqsClient->expects('deleteMessage');
 
         $job = new SqsJob($container, $sqsClient, $jobData, 'connection-name', $this->queueUrl, [
             'enabled' => true,
@@ -209,7 +209,7 @@ class QueueSqsJobTest extends TestCase
         $jobData['Body'] = $pointerBody;
 
         $sqsClient = m::mock(SqsClient::class)->makePartial();
-        $sqsClient->shouldReceive('deleteMessage')->once();
+        $sqsClient->expects('deleteMessage');
 
         $job = new SqsJob($this->mockedContainer, $sqsClient, $jobData, 'connection-name', $this->queueUrl, [
             'enabled' => true,
@@ -223,7 +223,7 @@ class QueueSqsJobTest extends TestCase
     public function testDeleteDoesNotCleanUpWhenNoPointer()
     {
         $sqsClient = m::mock(SqsClient::class)->makePartial();
-        $sqsClient->shouldReceive('deleteMessage')->once();
+        $sqsClient->expects('deleteMessage');
 
         $job = new SqsJob($this->mockedContainer, $sqsClient, $this->mockedJobData, 'connection-name', $this->queueUrl, [
             'enabled' => true,

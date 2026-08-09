@@ -121,8 +121,8 @@ class AuthenticateSessionTest extends TestCase
 
         $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->andReturn(true);
-        $authFactory->shouldReceive('getRecallerName')->once()->andReturn('recaller-name');
-        $authFactory->shouldReceive('logoutCurrentDevice')->once()->andReturn(null);
+        $authFactory->expects('getRecallerName')->andReturn('recaller-name');
+        $authFactory->expects('logoutCurrentDevice')->andReturn(null);
         $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');
         $authFactory->shouldReceive('user')->andReturn(null);
         // expected MAC for current password (won't match cookie):
@@ -170,8 +170,8 @@ class AuthenticateSessionTest extends TestCase
 
         $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->andReturn(true);
-        $authFactory->shouldReceive('getRecallerName')->once()->andReturn('recaller-name');
-        $authFactory->shouldReceive('logoutCurrentDevice')->once();
+        $authFactory->expects('getRecallerName')->andReturn('recaller-name');
+        $authFactory->expects('logoutCurrentDevice');
         $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');
         $authFactory->shouldReceive('user')->andReturn(null);
         // expected MAC for current password (won't match cookie):
@@ -215,8 +215,8 @@ class AuthenticateSessionTest extends TestCase
 
         $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->andReturn(true);
-        $authFactory->shouldReceive('getRecallerName')->once()->andReturn('recaller-name');
-        $authFactory->shouldReceive('logoutCurrentDevice')->once()->andReturn(null);
+        $authFactory->expects('getRecallerName')->andReturn('recaller-name');
+        $authFactory->expects('logoutCurrentDevice')->andReturn(null);
         $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');
         $authFactory->shouldReceive('user')->andReturn(null);
         // expected MAC for current password (matches cookie but not session):
@@ -301,7 +301,7 @@ class AuthenticateSessionTest extends TestCase
 
         $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->andReturn(true);
-        $authFactory->shouldReceive('getRecallerName')->once()->andReturn('recaller-name');
+        $authFactory->expects('getRecallerName')->andReturn('recaller-name');
         $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');
         $authFactory->shouldReceive('user')->andReturn($user);
         // The HMAC won't match the old format, but fallback to raw hash should work
@@ -341,7 +341,7 @@ class AuthenticateSessionTest extends TestCase
 
         $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->andReturn(true);
-        $authFactory->shouldReceive('getRecallerName')->once()->andReturn('recaller-name');
+        $authFactory->expects('getRecallerName')->andReturn('recaller-name');
         $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');
         $authFactory->shouldReceive('user')->andReturn($user);
         // For legacy guards without hashPasswordForCookie method, we use fallback to raw hash

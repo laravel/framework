@@ -31,8 +31,8 @@ class DatabaseConnectorTest extends TestCase
         $connection = m::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
-        $connection->shouldReceive('exec')->once()->with('use `bar`;')->andReturn(true);
-        $connection->shouldReceive('exec')->once()->with("SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';")->andReturn(true);
+        $connection->expects('exec')->with('use `bar`;')->andReturn(true);
+        $connection->expects('exec')->with("SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';")->andReturn(true);
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -56,9 +56,9 @@ class DatabaseConnectorTest extends TestCase
         $connection = m::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
-        $connection->shouldReceive('exec')->once()->with('use `bar`;')->andReturn(true);
-        $connection->shouldReceive('exec')->once()->with('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;')->andReturn(true);
-        $connection->shouldReceive('exec')->once()->with("SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';")->andReturn(true);
+        $connection->expects('exec')->with('use `bar`;')->andReturn(true);
+        $connection->expects('exec')->with('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;')->andReturn(true);
+        $connection->expects('exec')->with("SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';")->andReturn(true);
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -94,8 +94,8 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = m::mock(PDOStatement::class);
-        $connection->shouldReceive('prepare')->once()->with($expectedSql)->andReturn($statement);
-        $statement->shouldReceive('execute')->once();
+        $connection->expects('prepare')->with($expectedSql)->andReturn($statement);
+        $statement->expects('execute');
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -180,8 +180,8 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = m::mock(PDOStatement::class);
-        $connection->shouldReceive('prepare')->once()->with('set search_path to "public", "user"')->andReturn($statement);
-        $statement->shouldReceive('execute')->once();
+        $connection->expects('prepare')->with('set search_path to "public", "user"')->andReturn($statement);
+        $statement->expects('execute');
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -244,7 +244,7 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = m::mock(PDOStatement::class);
-        $connection->shouldReceive('prepare')->once()->with('set session characteristics as transaction isolation level SERIALIZABLE')->andReturn($statement);
+        $connection->expects('prepare')->with('set session characteristics as transaction isolation level SERIALIZABLE')->andReturn($statement);
         $statement->shouldReceive('execute')->zeroOrMoreTimes();
         $connection->shouldReceive('exec')->zeroOrMoreTimes();
         $result = $connector->connect($config);

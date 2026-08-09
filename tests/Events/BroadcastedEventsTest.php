@@ -31,8 +31,8 @@ class BroadcastedEventsTest extends TestCase
         $container = m::mock(Container::class);
         $d = new Dispatcher($container);
         $broadcast = m::mock(BroadcastFactory::class);
-        $broadcast->shouldReceive('queue')->once();
-        $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
+        $broadcast->expects('queue');
+        $container->expects('make')->with(BroadcastFactory::class)->andReturn($broadcast);
 
         $d->listen(AlwaysBroadcastEvent::class, function ($payload) {
             $_SERVER['__event.test'] = $payload;
@@ -61,8 +61,8 @@ class BroadcastedEventsTest extends TestCase
         $container = m::mock(Container::class);
         $d = new Dispatcher($container);
         $broadcast = m::mock(BroadcastFactory::class);
-        $broadcast->shouldReceive('queue')->once();
-        $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
+        $broadcast->expects('queue');
+        $container->expects('make')->with(BroadcastFactory::class)->andReturn($broadcast);
 
         $event = new class implements ShouldBroadcast
         {
@@ -80,8 +80,8 @@ class BroadcastedEventsTest extends TestCase
         $container = m::mock(Container::class);
         $d = new Dispatcher($container);
         $broadcast = m::mock(BroadcastFactory::class);
-        $broadcast->shouldReceive('queue')->once();
-        $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
+        $broadcast->expects('queue');
+        $container->expects('make')->with(BroadcastFactory::class)->andReturn($broadcast);
 
         $event = new class implements ShouldBroadcast
         {
@@ -101,8 +101,8 @@ class BroadcastedEventsTest extends TestCase
         $container = m::mock(Container::class);
         $d = new Dispatcher($container);
         $broadcast = m::mock(BroadcastFactory::class);
-        $broadcast->shouldReceive('queue')->once();
-        $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
+        $broadcast->expects('queue');
+        $container->expects('make')->with(BroadcastFactory::class)->andReturn($broadcast);
 
         $event = new class implements ShouldBroadcast
         {
@@ -125,8 +125,8 @@ class BroadcastedEventsTest extends TestCase
         $container = m::mock(Container::class);
         $d = new Dispatcher($container);
         $broadcast = m::mock(BroadcastFactory::class);
-        $broadcast->shouldReceive('queue')->once();
-        $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
+        $broadcast->expects('queue');
+        $container->expects('make')->with(BroadcastFactory::class)->andReturn($broadcast);
 
         $event = new class implements ShouldBroadcast
         {
@@ -158,8 +158,8 @@ class BroadcastedEventsTest extends TestCase
         try {
             $pendingBroadcast = m::mock(PendingBroadcast::class);
 
-            $broadcast->shouldReceive('event')
-                ->once()
+            $broadcast->expects('event')
+                
                 ->with(m::on(function ($event) {
                     $this->assertInstanceOf(BroadcastableNamedArgumentsEvent::class, $event);
                     $this->assertSame('first-value', $event->first);

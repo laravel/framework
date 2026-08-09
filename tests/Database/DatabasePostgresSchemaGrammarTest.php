@@ -1252,7 +1252,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCreateDatabase()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8_foo');
+        $connection->expects('getConfig')->once()->with('charset')->andReturn('utf8_foo');
         $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_a');
 
         $this->assertSame(
@@ -1261,7 +1261,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         );
 
         $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8_bar');
+        $connection->expects('getConfig')->once()->with('charset')->andReturn('utf8_bar');
         $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_b');
 
         $this->assertSame(
@@ -1343,7 +1343,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCompileColumns()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getServerVersion')->once()->andReturn('12.0.0');
+        $connection->expects('getServerVersion')->andReturn('12.0.0');
 
         $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
 
@@ -1355,7 +1355,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCompileColumnsOnLegacyServer()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getServerVersion')->once()->andReturn('8.0.2');
+        $connection->expects('getServerVersion')->andReturn('8.0.2');
 
         $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
 

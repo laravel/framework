@@ -19,8 +19,8 @@ class TestDatabasesTest extends TestCase
 
         $container->singleton('config', function () {
             return m::mock(Config::class)
-                ->shouldReceive('get')
-                ->once()
+                ->expects('get')
+                
                 ->with('database.default', null)
                 ->andReturn('mysql')
                 ->getMock();
@@ -33,13 +33,13 @@ class TestDatabasesTest extends TestCase
     {
         DB::shouldReceive('purge')->once();
 
-        config()->shouldReceive('get')
-            ->once()
+        config()->expects('get')
+            
             ->with('database.connections.mysql.url', false)
             ->andReturn(false);
 
-        config()->shouldReceive('set')
-            ->once()
+        config()->expects('set')
+            
             ->with('database.connections.mysql.database', 'my_database_test_1');
 
         $this->switchToDatabase('my_database_test_1');
@@ -50,13 +50,13 @@ class TestDatabasesTest extends TestCase
     {
         DB::shouldReceive('purge')->once();
 
-        config()->shouldReceive('get')
-            ->once()
+        config()->expects('get')
+            
             ->with('database.connections.mysql.url', false)
             ->andReturn($url);
 
-        config()->shouldReceive('set')
-            ->once()
+        config()->expects('set')
+            
             ->with('database.connections.mysql.url', $testUrl);
 
         $this->switchToDatabase($testDatabase);

@@ -52,7 +52,7 @@ class CacheSchedulingMutexTest extends TestCase
     public function testMutexReceivesCorrectCreate()
     {
         $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 3600)->andReturn(true);
+        $this->cacheRepository->expects('add')->with($this->event->mutexName().$this->time->format('Hi'), true, 3600)->andReturn(true);
 
         $this->assertTrue($this->cacheMutex->create($this->event, $this->time));
     }
@@ -61,7 +61,7 @@ class CacheSchedulingMutexTest extends TestCase
     {
         $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
         $this->cacheFactory->shouldReceive('store')->with('test')->andReturn($this->cacheRepository);
-        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 3600)->andReturn(true);
+        $this->cacheRepository->expects('add')->with($this->event->mutexName().$this->time->format('Hi'), true, 3600)->andReturn(true);
         $this->cacheMutex->useStore('test');
 
         $this->assertTrue($this->cacheMutex->create($this->event, $this->time));
@@ -70,7 +70,7 @@ class CacheSchedulingMutexTest extends TestCase
     public function testPreventsMultipleRuns()
     {
         $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 3600)->andReturn(false);
+        $this->cacheRepository->expects('add')->with($this->event->mutexName().$this->time->format('Hi'), true, 3600)->andReturn(false);
 
         $this->assertFalse($this->cacheMutex->create($this->event, $this->time));
     }
@@ -78,7 +78,7 @@ class CacheSchedulingMutexTest extends TestCase
     public function testChecksForNonRunSchedule()
     {
         $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheRepository->shouldReceive('has')->once()->with($this->event->mutexName().$this->time->format('Hi'))->andReturn(false);
+        $this->cacheRepository->expects('has')->with($this->event->mutexName().$this->time->format('Hi'))->andReturn(false);
 
         $this->assertFalse($this->cacheMutex->exists($this->event, $this->time));
     }

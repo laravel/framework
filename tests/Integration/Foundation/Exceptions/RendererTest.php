@@ -140,7 +140,7 @@ class RendererTest extends TestCase
         $this->assertFalse($this->app->bound(ExceptionRenderer::class));
 
         $listener = m::mock(Listener::class);
-        $listener->shouldReceive('registerListeners')->once();
+        $listener->expects('registerListeners');
 
         $this->app->instance(Listener::class, $listener);
         $this->app->instance(Dispatcher::class, m::mock(Dispatcher::class));

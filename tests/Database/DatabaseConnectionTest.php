@@ -280,7 +280,7 @@ class DatabaseConnectionTest extends TestCase
         $connection->method('getName')->willReturn('name');
         $events = m::mock(Dispatcher::class);
         $connection->setEventDispatcher($events);
-        $events->shouldReceive('dispatch')->once()->with(m::type(TransactionBeginning::class));
+        $events->expects('dispatch')->with(m::type(TransactionBeginning::class));
         $connection->beginTransaction();
     }
 
@@ -291,7 +291,7 @@ class DatabaseConnectionTest extends TestCase
         $connection->method('getName')->willReturn('name');
         $events = m::mock(Dispatcher::class);
         $connection->setEventDispatcher($events);
-        $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitted::class));
+        $events->expects('dispatch')->with(m::type(TransactionCommitted::class));
         $connection->commit();
     }
 
@@ -303,8 +303,8 @@ class DatabaseConnectionTest extends TestCase
         $connection->method('transactionLevel')->willReturn(1);
         $events = m::mock(Dispatcher::class);
         $connection->setEventDispatcher($events);
-        $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitting::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitted::class));
+        $events->expects('dispatch')->with(m::type(TransactionCommitting::class));
+        $events->expects('dispatch')->with(m::type(TransactionCommitted::class));
         $connection->commit();
     }
 
@@ -316,7 +316,7 @@ class DatabaseConnectionTest extends TestCase
         $connection->beginTransaction();
         $events = m::mock(Dispatcher::class);
         $connection->setEventDispatcher($events);
-        $events->shouldReceive('dispatch')->once()->with(m::type(TransactionRolledBack::class));
+        $events->expects('dispatch')->with(m::type(TransactionRolledBack::class));
         $connection->rollBack();
     }
 
@@ -418,10 +418,10 @@ class DatabaseConnectionTest extends TestCase
         $this->expectExceptionMessage('server has gone away (Connection: , Host: , Port: , Database: , SQL: foo)');
 
         $pdo = m::mock(PDO::class);
-        $pdo->shouldReceive('beginTransaction')->once();
+        $pdo->expects('beginTransaction');
         $statement = m::mock(PDOStatement::class);
-        $pdo->shouldReceive('prepare')->once()->andReturn($statement);
-        $statement->shouldReceive('execute')->once()->andThrow(new PDOException('server has gone away'));
+        $pdo->expects('prepare')->andReturn($statement);
+        $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
 
         $connection = new Connection($pdo);
         $connection->beginTransaction();
@@ -433,8 +433,8 @@ class DatabaseConnectionTest extends TestCase
         $pdo = m::mock(PDO::class);
 
         $statement = m::mock(PDOStatement::class);
-        $statement->shouldReceive('execute')->once()->andThrow(new PDOException('server has gone away'));
-        $statement->shouldReceive('execute')->once()->andReturn(true);
+        $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
+        $statement->expects('execute')->andReturn(true);
 
         $pdo->shouldReceive('prepare')->twice()->andReturn($statement);
 
@@ -495,11 +495,11 @@ class DatabaseConnectionTest extends TestCase
     public function testPrepareBindings()
     {
         $date = m::mock(DateTime::class);
-        $date->shouldReceive('format')->once()->with('foo')->andReturn('bar');
+        $date->expects('format')->with('foo')->andReturn('bar');
         $bindings = ['test' => $date];
         $conn = $this->getMockConnection();
         $grammar = m::mock(Grammar::class);
-        $grammar->shouldReceive('getDateFormat')->once()->andReturn('foo');
+        $grammar->expects('getDateFormat')->andReturn('foo');
         $conn->setQueryGrammar($grammar);
         $result = $conn->prepareBindings($bindings);
         $this->assertEquals(['test' => 'bar'], $result);
@@ -511,7 +511,7 @@ class DatabaseConnectionTest extends TestCase
         $connection->logQuery('foo', [], time());
         $events = m::mock(Dispatcher::class);
         $connection->setEventDispatcher($events);
-        $events->shouldReceive('dispatch')->once()->with(m::type(QueryExecuted::class));
+        $events->expects('dispatch')->with(m::type(QueryExecuted::class));
         $connection->logQuery('foo', [], null);
     }
 

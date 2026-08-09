@@ -23,8 +23,8 @@ class InteractsWithIOTest extends TestCase
         $output = m::mock(OutputStyle::class, [new ArgvInput(), $bufferedOutput])->makePartial();
         $command->setOutput($output);
 
-        $output->shouldReceive('createProgressBar')
-            ->once()
+        $output->expects('createProgressBar')
+            
             ->with(count($iterable))
             ->andReturnUsing(function ($steps) use ($bufferedOutput) {
                 // we can't mock ProgressBar because it's final, so return a real one
@@ -59,8 +59,8 @@ class InteractsWithIOTest extends TestCase
 
         $totalSteps = 5;
 
-        $output->shouldReceive('createProgressBar')
-            ->once()
+        $output->expects('createProgressBar')
+            
             ->with($totalSteps)
             ->andReturnUsing(function ($steps) use ($bufferedOutput) {
                 // we can't mock ProgressBar because it's final, so return a real one

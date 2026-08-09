@@ -44,7 +44,7 @@ class CacheEventMutexTest extends TestCase
     public function testPreventOverlap()
     {
         $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheRepository->shouldReceive('add')->once();
+        $this->cacheRepository->expects('add');
 
         $this->cacheMutex->create($this->event);
     }
@@ -53,7 +53,7 @@ class CacheEventMutexTest extends TestCase
     {
         $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
         $this->cacheFactory->shouldReceive('store')->with('test')->andReturn($this->cacheRepository);
-        $this->cacheRepository->shouldReceive('add')->once();
+        $this->cacheRepository->expects('add');
         $this->cacheMutex->useStore('test');
 
         $this->cacheMutex->create($this->event);
@@ -62,7 +62,7 @@ class CacheEventMutexTest extends TestCase
     public function testPreventOverlapFails()
     {
         $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheRepository->shouldReceive('add')->once()->andReturn(false);
+        $this->cacheRepository->expects('add')->andReturn(false);
 
         $this->assertFalse($this->cacheMutex->create($this->event));
     }
@@ -70,7 +70,7 @@ class CacheEventMutexTest extends TestCase
     public function testOverlapsForNonRunningTask()
     {
         $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheRepository->shouldReceive('has')->once()->andReturn(false);
+        $this->cacheRepository->expects('has')->andReturn(false);
 
         $this->assertFalse($this->cacheMutex->exists($this->event));
     }
@@ -78,7 +78,7 @@ class CacheEventMutexTest extends TestCase
     public function testOverlapsForRunningTask()
     {
         $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheRepository->shouldReceive('has')->once()->andReturn(true);
+        $this->cacheRepository->expects('has')->andReturn(true);
 
         $this->assertTrue($this->cacheMutex->exists($this->event));
     }
@@ -86,7 +86,7 @@ class CacheEventMutexTest extends TestCase
     public function testResetOverlap()
     {
         $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheRepository->shouldReceive('forget')->once();
+        $this->cacheRepository->expects('forget');
 
         $this->cacheMutex->forget($this->event);
     }

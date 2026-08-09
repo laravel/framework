@@ -32,12 +32,12 @@ class ViewTest extends TestCase
     public function testRenderProperlyRendersView()
     {
         $view = $this->getView(['foo' => 'bar']);
-        $view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
-        $view->getFactory()->shouldReceive('callComposer')->once()->ordered()->with($view);
-        $view->getFactory()->shouldReceive('getShared')->once()->andReturn(['shared' => 'foo']);
-        $view->getEngine()->shouldReceive('get')->once()->with('path', ['foo' => 'bar', 'shared' => 'foo'])->andReturn('contents');
-        $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
-        $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->once();
+        $view->getFactory()->expects('incrementRender')->ordered();
+        $view->getFactory()->expects('callComposer')->ordered()->with($view);
+        $view->getFactory()->expects('getShared')->andReturn(['shared' => 'foo']);
+        $view->getEngine()->expects('get')->with('path', ['foo' => 'bar', 'shared' => 'foo'])->andReturn('contents');
+        $view->getFactory()->expects('decrementRender')->ordered();
+        $view->getFactory()->expects('flushStateIfDoneRendering');
 
         $callback = function (View $rendered, $contents) use ($view) {
             $this->assertEquals($view, $rendered);
@@ -80,7 +80,7 @@ class ViewTest extends TestCase
             [],
         ]);
 
-        $view->shouldReceive('render')->with(m::type(Closure::class))->once()->andReturn($sections = ['foo' => 'bar']);
+        $view->expects('render')->with(m::type(Closure::class))->andReturn($sections = ['foo' => 'bar']);
 
         $this->assertEquals($sections, $view->renderSections());
     }
@@ -102,7 +102,7 @@ class ViewTest extends TestCase
     public function testViewNestBindsASubView()
     {
         $view = $this->getView();
-        $view->getFactory()->shouldReceive('make')->once()->with('foo', ['data']);
+        $view->getFactory()->expects('make')->with('foo', ['data']);
         $result = $view->nest('key', 'foo', ['data']);
 
         $this->assertInstanceOf(View::class, $result);
@@ -111,7 +111,7 @@ class ViewTest extends TestCase
     public function testViewAcceptsArrayableImplementations()
     {
         $arrayable = m::mock(Arrayable::class);
-        $arrayable->shouldReceive('toArray')->once()->andReturn(['foo' => 'bar', 'baz' => ['qux', 'corge']]);
+        $arrayable->expects('toArray')->andReturn(['foo' => 'bar', 'baz' => ['qux', 'corge']]);
 
         $view = $this->getView($arrayable);
 
@@ -178,29 +178,29 @@ class ViewTest extends TestCase
     public function testViewGatherDataWithRenderable()
     {
         $view = $this->getView();
-        $view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
-        $view->getFactory()->shouldReceive('callComposer')->once()->ordered()->with($view);
-        $view->getFactory()->shouldReceive('getShared')->once()->andReturn(['shared' => 'foo']);
-        $view->getEngine()->shouldReceive('get')->once()->andReturn('contents');
-        $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
-        $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->once();
+        $view->getFactory()->expects('incrementRender')->ordered();
+        $view->getFactory()->expects('callComposer')->ordered()->with($view);
+        $view->getFactory()->expects('getShared')->andReturn(['shared' => 'foo']);
+        $view->getEngine()->expects('get')->andReturn('contents');
+        $view->getFactory()->expects('decrementRender')->ordered();
+        $view->getFactory()->expects('flushStateIfDoneRendering');
 
         $view->renderable = m::mock(Renderable::class);
-        $view->renderable->shouldReceive('render')->once()->andReturn('text');
+        $view->renderable->expects('render')->andReturn('text');
         $this->assertSame('contents', $view->render());
     }
 
     public function testViewRenderSections()
     {
         $view = $this->getView();
-        $view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
-        $view->getFactory()->shouldReceive('callComposer')->once()->ordered()->with($view);
-        $view->getFactory()->shouldReceive('getShared')->once()->andReturn(['shared' => 'foo']);
-        $view->getEngine()->shouldReceive('get')->once()->andReturn('contents');
-        $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
-        $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->once();
+        $view->getFactory()->expects('incrementRender')->ordered();
+        $view->getFactory()->expects('callComposer')->ordered()->with($view);
+        $view->getFactory()->expects('getShared')->andReturn(['shared' => 'foo']);
+        $view->getEngine()->expects('get')->andReturn('contents');
+        $view->getFactory()->expects('decrementRender')->ordered();
+        $view->getFactory()->expects('flushStateIfDoneRendering');
 
-        $view->getFactory()->shouldReceive('getSections')->once()->andReturn(['foo', 'bar']);
+        $view->getFactory()->expects('getSections')->andReturn(['foo', 'bar']);
         $sections = $view->renderSections();
         $this->assertSame('foo', $sections[0]);
         $this->assertSame('bar', $sections[1]);

@@ -15,16 +15,16 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $model = m::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
         $query = m::mock(stdClass::class);
         $model->shouldReceive('newModelQuery')->andReturn($query);
-        $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
-        $query->shouldReceive('update')->once()->with([
+        $query->expects('where')->with('id', '=', 1)->andReturn($query);
+        $query->expects('update')->with([
             'deleted_at' => 'date-time',
             'updated_at' => 'date-time',
         ]);
-        $model->shouldReceive('syncOriginalAttributes')->once()->with([
+        $model->expects('syncOriginalAttributes')->with([
             'deleted_at',
             'updated_at',
         ]);
-        $model->shouldReceive('usesTimestamps')->once()->andReturn(true);
+        $model->expects('usesTimestamps')->andReturn(true);
         $model->delete();
 
         $this->assertInstanceOf(Carbon::class, $model->deleted_at);
@@ -34,7 +34,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
     {
         $model = m::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(true);
-        $model->shouldReceive('save')->once();
+        $model->expects('save');
         $model->shouldReceive('fireModelEvent')->with('restored', false)->andReturn(true);
 
         $model->restore();

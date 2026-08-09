@@ -19,12 +19,12 @@ class FoundationProviderRepositoryTest extends TestCase
         $app = m::mock(Application::class);
 
         $repo = m::mock(ProviderRepository::class.'[createProvider,loadManifest,shouldRecompile]', [$app, m::mock(Filesystem::class), [__DIR__.'/services.php']]);
-        $repo->shouldReceive('loadManifest')->once()->andReturn(['eager' => ['foo'], 'deferred' => ['deferred'], 'providers' => ['providers'], 'when' => []]);
-        $repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
+        $repo->expects('loadManifest')->andReturn(['eager' => ['foo'], 'deferred' => ['deferred'], 'providers' => ['providers'], 'when' => []]);
+        $repo->expects('shouldRecompile')->andReturn(false);
 
-        $app->shouldReceive('register')->once()->with('foo');
+        $app->expects('register')->with('foo');
         $app->shouldReceive('runningInConsole')->andReturn(false);
-        $app->shouldReceive('addDeferredServices')->once()->with(['deferred']);
+        $app->expects('addDeferredServices')->with(['deferred']);
 
         $repo->load([]);
     }
@@ -35,27 +35,27 @@ class FoundationProviderRepositoryTest extends TestCase
 
         $repo = m::mock(ProviderRepository::class.'[createProvider,loadManifest,writeManifest,shouldRecompile]', [$app, m::mock(Filesystem::class), [__DIR__.'/services.php']]);
 
-        $repo->shouldReceive('loadManifest')->once()->andReturn(['eager' => [], 'deferred' => ['deferred']]);
-        $repo->shouldReceive('shouldRecompile')->once()->andReturn(true);
+        $repo->expects('loadManifest')->andReturn(['eager' => [], 'deferred' => ['deferred']]);
+        $repo->expects('shouldRecompile')->andReturn(true);
 
         // foo mock is just a deferred provider
         $fooMock = m::mock(stdClass::class);
-        $repo->shouldReceive('createProvider')->once()->with('foo')->andReturn($fooMock);
-        $fooMock->shouldReceive('isDeferred')->once()->andReturn(true);
-        $fooMock->shouldReceive('provides')->once()->andReturn(['foo.provides1', 'foo.provides2']);
-        $fooMock->shouldReceive('when')->once()->andReturn([]);
+        $repo->expects('createProvider')->with('foo')->andReturn($fooMock);
+        $fooMock->expects('isDeferred')->andReturn(true);
+        $fooMock->expects('provides')->andReturn(['foo.provides1', 'foo.provides2']);
+        $fooMock->expects('when')->andReturn([]);
 
         // bar mock is added to eagers since it's not reserved
         $barMock = m::mock(ServiceProvider::class);
-        $repo->shouldReceive('createProvider')->once()->with('bar')->andReturn($barMock);
-        $barMock->shouldReceive('isDeferred')->once()->andReturn(false);
-        $repo->shouldReceive('writeManifest')->once()->andReturnUsing(function ($manifest) {
+        $repo->expects('createProvider')->with('bar')->andReturn($barMock);
+        $barMock->expects('isDeferred')->andReturn(false);
+        $repo->expects('writeManifest')->andReturnUsing(function ($manifest) {
             return $manifest;
         });
 
-        $app->shouldReceive('register')->once()->with('bar');
+        $app->expects('register')->with('bar');
         $app->shouldReceive('runningInConsole')->andReturn(false);
-        $app->shouldReceive('addDeferredServices')->once()->with(['foo.provides1' => 'foo', 'foo.provides2' => 'foo']);
+        $app->expects('addDeferredServices')->with(['foo.provides1' => 'foo', 'foo.provides2' => 'foo']);
 
         $repo->load(['foo', 'bar']);
     }
@@ -72,8 +72,8 @@ class FoundationProviderRepositoryTest extends TestCase
     {
         $files = m::mock(Filesystem::class);
         $repo = new ProviderRepository(m::mock(ApplicationContract::class), $files, __DIR__.'/services.php');
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/services.php')->andReturn(true);
-        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/services.php')->andReturn($array = ['users' => ['dayle' => true], 'when' => []]);
+        $files->expects('exists')->with(__DIR__.'/services.php')->andReturn(true);
+        $files->expects('getRequire')->with(__DIR__.'/services.php')->andReturn($array = ['users' => ['dayle' => true], 'when' => []]);
 
         $this->assertEquals($array, $repo->loadManifest());
     }
@@ -82,7 +82,7 @@ class FoundationProviderRepositoryTest extends TestCase
     {
         $files = m::mock(Filesystem::class);
         $repo = new ProviderRepository(m::mock(ApplicationContract::class), $files, __DIR__.'/services.php');
-        $files->shouldReceive('replace')->once()->with(__DIR__.'/services.php', '<?php return '.var_export(['foo'], true).';');
+        $files->expects('replace')->with(__DIR__.'/services.php', '<?php return '.var_export(['foo'], true).';');
 
         $result = $repo->writeManifest(['foo']);
 

@@ -47,9 +47,9 @@ class CacheCommandMutexTest extends TestCase
     public function testCanCreateMutex()
     {
         $this->mockUsingCacheStore();
-        $this->cacheRepository->shouldReceive('add')
+        $this->cacheRepository->expects('add')
             ->andReturn(true)
-            ->once();
+            ;
         $actual = $this->mutex->create($this->command);
 
         $this->assertTrue($actual);
@@ -58,9 +58,9 @@ class CacheCommandMutexTest extends TestCase
     public function testCannotCreateMutexIfAlreadyExist()
     {
         $this->mockUsingCacheStore();
-        $this->cacheRepository->shouldReceive('add')
+        $this->cacheRepository->expects('add')
             ->andReturn(false)
-            ->once();
+            ;
         $actual = $this->mutex->create($this->command);
 
         $this->assertFalse($actual);
@@ -72,9 +72,9 @@ class CacheCommandMutexTest extends TestCase
         $this->cacheRepository->shouldReceive('getStore')
             ->with('test')
             ->andReturn($this->cacheRepository);
-        $this->cacheRepository->shouldReceive('add')
+        $this->cacheRepository->expects('add')
             ->andReturn(false)
-            ->once();
+            ;
         $this->mutex->useStore('test');
 
         $this->mutex->create($this->command);
@@ -96,9 +96,9 @@ class CacheCommandMutexTest extends TestCase
         $this->cacheRepository->shouldReceive('getStore')
             ->with('test')
             ->andReturn($this->cacheRepository);
-        $this->cacheRepository->shouldReceive('add')
+        $this->cacheRepository->expects('add')
             ->andReturn(false)
-            ->once();
+            ;
         $this->mutex->useStore('test');
 
         $this->mutex->create($this->command);
@@ -163,8 +163,8 @@ class CacheCommandMutexTest extends TestCase
             ->with('test')
             ->andReturn($this->cacheRepository);
 
-        $this->cacheRepository->shouldReceive('add')
-            ->once()
+        $this->cacheRepository->expects('add')
+            
             ->withArgs(function ($key) {
                 $this->assertSame('framework'.DIRECTORY_SEPARATOR.'command-command-name', $key);
 
@@ -193,8 +193,8 @@ class CacheCommandMutexTest extends TestCase
             ->with('test')
             ->andReturn($this->cacheRepository);
 
-        $this->cacheRepository->shouldReceive('add')
-            ->once()
+        $this->cacheRepository->expects('add')
+            
             ->withArgs(function ($key) {
                 $this->assertSame('framework'.DIRECTORY_SEPARATOR.'command-command-name-isolated', $key);
 

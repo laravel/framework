@@ -17,10 +17,10 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
 
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
 
-        $cache->shouldReceive('has')->once()->with('key')->andReturnFalse();
+        $cache->expects('has')->with('key')->andReturnFalse();
         $this->assertFalse($manager->active());
 
-        $cache->shouldReceive('has')->once()->with('key')->andReturnTrue();
+        $cache->expects('has')->with('key')->andReturnTrue();
         $this->assertTrue($manager->active());
     }
 
@@ -31,7 +31,7 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
 
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
 
-        $cache->shouldReceive('get')->once()->with('key')->andReturn(['payload']);
+        $cache->expects('get')->with('key')->andReturn(['payload']);
         $this->assertSame(['payload'], $manager->data());
     }
 

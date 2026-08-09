@@ -39,27 +39,27 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $httpFactory = m::mock(HttpFactory::class);
 
         $httpFactory
-            ->shouldReceive('withHeaders')
-            ->once()
+            ->expects('withHeaders')
+            
             ->with(['Add-Padding' => true])
             ->andReturn($httpFactory);
 
         $httpFactory
-            ->shouldReceive('timeout')
-            ->once()
+            ->expects('timeout')
+            
             ->with(30)
             ->andReturn($httpFactory);
 
-        $httpFactory->shouldReceive('get')
-            ->once()
+        $httpFactory->expects('get')
+            
             ->andReturn($response);
 
-        $response->shouldReceive('successful')
-            ->once()
+        $response->expects('successful')
+            
             ->andReturn(true);
 
-        $response->shouldReceive('body')
-            ->once()
+        $response->expects('body')
+            
             ->andReturn('');
 
         $verifier = new NotPwnedVerifier($httpFactory);
@@ -76,23 +76,23 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $response = m::mock(Response::class);
 
         $httpFactory
-            ->shouldReceive('withHeaders')
-            ->once()
+            ->expects('withHeaders')
+            
             ->with(['Add-Padding' => true])
             ->andReturn($httpFactory);
 
         $httpFactory
-            ->shouldReceive('timeout')
-            ->once()
+            ->expects('timeout')
+            
             ->with(30)
             ->andReturn($httpFactory);
 
-        $httpFactory->shouldReceive('get')
-            ->once()
+        $httpFactory->expects('get')
+            
             ->andReturn($response);
 
-        $response->shouldReceive('successful')
-            ->once()
+        $response->expects('successful')
+            
             ->andReturn(false);
 
         $verifier = new NotPwnedVerifier($httpFactory);
@@ -118,28 +118,28 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $response = m::mock(Response::class);
 
         $httpFactory
-            ->shouldReceive('withHeaders')
-            ->once()
+            ->expects('withHeaders')
+            
             ->with(['Add-Padding' => true])
             ->andReturn($httpFactory);
 
         $httpFactory
-            ->shouldReceive('timeout')
-            ->once()
+            ->expects('timeout')
+            
             ->with(30)
             ->andReturn($httpFactory);
 
-        $httpFactory->shouldReceive('get')
-            ->once()
+        $httpFactory->expects('get')
+            
             ->with('https://api.pwnedpasswords.com/range/'.$hashPrefix)
             ->andReturn($response);
 
-        $response->shouldReceive('successful')
-            ->once()
+        $response->expects('successful')
+            
             ->andReturn(true);
 
-        $response->shouldReceive('body')
-            ->once()
+        $response->expects('body')
+            
             ->andReturn($differentSuffix.':5');
 
         $verifier = new NotPwnedVerifier($httpFactory);
@@ -156,7 +156,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $exception = new ConnectionException();
 
         $exceptionHandler = m::mock(ExceptionHandler::class);
-        $exceptionHandler->shouldReceive('report')->once()->with($exception);
+        $exceptionHandler->expects('report')->with($exception);
         $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
             return $exceptionHandler;
         });
@@ -164,20 +164,20 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $httpFactory = m::mock(HttpFactory::class);
 
         $httpFactory
-            ->shouldReceive('withHeaders')
-            ->once()
+            ->expects('withHeaders')
+            
             ->with(['Add-Padding' => true])
             ->andReturn($httpFactory);
 
         $httpFactory
-            ->shouldReceive('timeout')
-            ->once()
+            ->expects('timeout')
+            
             ->with(30)
             ->andReturn($httpFactory);
 
         $httpFactory
-            ->shouldReceive('get')
-            ->once()
+            ->expects('get')
+            
             ->andThrow($exception);
 
         $verifier = new NotPwnedVerifier($httpFactory);

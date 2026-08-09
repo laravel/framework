@@ -55,7 +55,7 @@ class ListFailedCommandTest extends TestCase
         $failer = m::mock();
         $container->instance('queue.failer', $failer);
 
-        $failer->shouldReceive('all')->once()->andReturn($failedJobs);
+        $failer->expects('all')->andReturn($failedJobs);
 
         $command = new ListFailedCommand;
         $command->setLaravel($container);

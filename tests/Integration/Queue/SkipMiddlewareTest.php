@@ -90,7 +90,7 @@ class SkipMiddlewareTest extends TestCase
         $job->shouldReceive('hasFailed')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
-        $job->shouldReceive('delete')->once();
+        $job->expects('delete');
 
         $instance->call($job, [
             'command' => serialize($class),

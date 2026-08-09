@@ -45,11 +45,11 @@ class CommandTest extends TestCase
         $application->shouldReceive('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command, $application) {
             $commandCalled = m::mock(Command::class);
 
-            $application->shouldReceive('make')->once()->with(Command::class)->andReturn($commandCalled);
+            $application->expects('make')->with(Command::class)->andReturn($commandCalled);
 
-            $commandCalled->shouldReceive('setApplication')->once()->with(null);
-            $commandCalled->shouldReceive('setLaravel')->once()->with($application);
-            $commandCalled->shouldReceive('run')->once();
+            $commandCalled->expects('setApplication')->with(null);
+            $commandCalled->expects('setLaravel')->with($application);
+            $commandCalled->expects('run');
 
             $command->call(Command::class);
         });
@@ -179,7 +179,7 @@ class CommandTest extends TestCase
     public function testTheInputSetterOverwrite()
     {
         $input = m::mock(InputInterface::class);
-        $input->shouldReceive('hasArgument')->once()->with('foo')->andReturn(false);
+        $input->expects('hasArgument')->with('foo')->andReturn(false);
 
         $command = new Command;
         $command->setInput($input);
@@ -190,7 +190,7 @@ class CommandTest extends TestCase
     public function testTheOutputSetterOverwrite()
     {
         $output = m::mock(OutputStyle::class);
-        $output->shouldReceive('writeln')->once()->withArgs(function (...$args) {
+        $output->expects('writeln')->withArgs(function (...$args) {
             return $args[0] === '<info>foo</info>';
         });
 
@@ -255,7 +255,7 @@ class CommandTest extends TestCase
     public function testChoiceIsSingleSelectByDefault()
     {
         $output = m::mock(OutputStyle::class);
-        $output->shouldReceive('askQuestion')->once()->withArgs(function (ChoiceQuestion $question) {
+        $output->expects('askQuestion')->withArgs(function (ChoiceQuestion $question) {
             return $question->isMultiselect() === false;
         });
 
@@ -268,7 +268,7 @@ class CommandTest extends TestCase
     public function testChoiceWithMultiselect()
     {
         $output = m::mock(OutputStyle::class);
-        $output->shouldReceive('askQuestion')->once()->withArgs(function (ChoiceQuestion $question) {
+        $output->expects('askQuestion')->withArgs(function (ChoiceQuestion $question) {
             return $question->isMultiselect() === true;
         });
 

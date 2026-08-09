@@ -21,7 +21,7 @@ class SupportTimeboxTest extends TestCase
     public function testMakeWaitsForMicroseconds()
     {
         $mock = m::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
-        $mock->shouldReceive('usleep')->once();
+        $mock->expects('usleep');
 
         $mock->call(function () {
         }, 10000);
@@ -42,7 +42,7 @@ class SupportTimeboxTest extends TestCase
     public function testMakeShouldSleepWhenDontEarlyReturnHasBeenFlagged()
     {
         $mock = m::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
-        $mock->shouldReceive('usleep')->once();
+        $mock->expects('usleep');
 
         $mock->call(function ($timebox) {
             $timebox->returnEarly();
@@ -55,7 +55,7 @@ class SupportTimeboxTest extends TestCase
     public function testMakeWaitsForMicrosecondsWhenExceptionIsThrown()
     {
         $mock = m::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
-        $mock->shouldReceive('usleep')->once();
+        $mock->expects('usleep');
 
         try {
             $this->expectExceptionObject(new Exception('Exception within Timebox callback.'));

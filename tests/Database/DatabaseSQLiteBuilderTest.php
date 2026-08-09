@@ -32,7 +32,7 @@ class DatabaseSQLiteBuilderTest extends TestCase
     public function testCreateDatabase()
     {
         $connection = m::mock(Connection::class);
-        $connection->shouldReceive('getSchemaGrammar')->once();
+        $connection->expects('getSchemaGrammar');
 
         $builder = new SQLiteBuilder($connection);
 
@@ -54,7 +54,7 @@ class DatabaseSQLiteBuilderTest extends TestCase
     public function testDropDatabaseIfExists()
     {
         $connection = m::mock(Connection::class);
-        $connection->shouldReceive('getSchemaGrammar')->once();
+        $connection->expects('getSchemaGrammar');
 
         $builder = new SQLiteBuilder($connection);
 

@@ -168,9 +168,9 @@ class SupportServiceProviderTest extends TestCase
     public function testLoadTranslationsFromWithoutNamespace()
     {
         $translator = m::mock(Translator::class);
-        $translator->shouldReceive('addPath')->once()->with(__DIR__.'/translations');
+        $translator->expects('addPath')->with(__DIR__.'/translations');
 
-        $this->app->shouldReceive('afterResolving')->once()->with('translator', m::on(function ($callback) use ($translator) {
+        $this->app->expects('afterResolving')->with('translator', m::on(function ($callback) use ($translator) {
             $callback($translator);
 
             return true;
@@ -183,9 +183,9 @@ class SupportServiceProviderTest extends TestCase
     public function testLoadTranslationsFromWithNamespace()
     {
         $translator = m::mock(Translator::class);
-        $translator->shouldReceive('addNamespace')->once()->with('namespace', __DIR__.'/translations');
+        $translator->expects('addNamespace')->with('namespace', __DIR__.'/translations');
 
-        $this->app->shouldReceive('afterResolving')->once()->with('translator', m::on(function ($callback) use ($translator) {
+        $this->app->expects('afterResolving')->with('translator', m::on(function ($callback) use ($translator) {
             $callback($translator);
 
             return true;

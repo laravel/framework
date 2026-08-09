@@ -34,12 +34,12 @@ class ClearCommandTest extends TestCase
             '/views/cache/path/filehash123.php',
             '/views/cache/path/test_33',
         ];
-        $this->files->shouldReceive('glob')->once()->andReturn($globResult);
+        $this->files->expects('glob')->andReturn($globResult);
 
-        $this->files->shouldReceive('isDirectory')->once()->with($globResult[0])->andreturn(false);
-        $this->files->shouldReceive('isDirectory')->once()->with($globResult[1])->andreturn(true);
-        $this->files->shouldReceive('delete')->once()->with($globResult[0]);
-        $this->files->shouldReceive('deleteDirectory')->once()->with($globResult[1]);
+        $this->files->expects('isDirectory')->with($globResult[0])->andreturn(false);
+        $this->files->expects('isDirectory')->with($globResult[1])->andreturn(true);
+        $this->files->expects('delete')->with($globResult[0]);
+        $this->files->expects('deleteDirectory')->with($globResult[1]);
 
         $this->artisan(ViewClearCommand::class);
     }

@@ -81,12 +81,12 @@ class RateLimitedTest extends TestCase
 
         $job = m::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('release')->once()->withArgs(function ($delay) {
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('release')->withArgs(function ($delay) {
             return $delay >= 0;
         });
         $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new RateLimitedTestJob),
@@ -194,10 +194,10 @@ class RateLimitedTest extends TestCase
 
         $job = m::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
+        $job->expects('hasFailed')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
-        $job->shouldReceive('delete')->once();
+        $job->expects('isDeletedOrReleased')->andReturn(false);
+        $job->expects('delete');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -213,10 +213,10 @@ class RateLimitedTest extends TestCase
 
         $job = m::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('release')->once();
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('release');
         $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -232,10 +232,10 @@ class RateLimitedTest extends TestCase
 
         $job = m::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('release')->once()->withArgs([$releaseAfter]);
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('release')->withArgs([$releaseAfter]);
         $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -251,10 +251,10 @@ class RateLimitedTest extends TestCase
 
         $job = m::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
+        $job->expects('hasFailed')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
-        $job->shouldReceive('delete')->once();
+        $job->expects('isDeletedOrReleased')->andReturn(false);
+        $job->expects('delete');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),

@@ -17,10 +17,10 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
         $verifier = new DatabasePresenceVerifier($db);
         $verifier->setConnection('connection');
         $conn = m::mock(stdClass::class);
-        $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn);
+        $db->expects('connection')->with('connection')->andReturn($conn);
         $builder = m::mock(stdClass::class);
-        $conn->shouldReceive('table')->once()->with('table')->andReturn($builder);
-        $builder->shouldReceive('useWritePdo')->once()->andReturn($builder);
+        $conn->expects('table')->with('table')->andReturn($builder);
+        $builder->expects('useWritePdo')->andReturn($builder);
         $builder->shouldReceive('where')->with('column', '=', 'value')->andReturn($builder);
         $extra = ['foo' => 'NULL', 'bar' => 'NOT_NULL', 'baz' => 'taylor', 'faz' => true, 'not' => '!admin'];
         $builder->shouldReceive('whereNull')->with('foo');
@@ -28,7 +28,7 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
         $builder->shouldReceive('where')->with('baz', 'taylor');
         $builder->shouldReceive('where')->with('faz', true);
         $builder->shouldReceive('where')->with('not', '!=', 'admin');
-        $builder->shouldReceive('count')->once()->andReturn(100);
+        $builder->expects('count')->andReturn(100);
 
         $this->assertEquals(100, $verifier->getCount('table', 'column', 'value', null, null, $extra));
     }
@@ -39,10 +39,10 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
         $verifier = new DatabasePresenceVerifier($db);
         $verifier->setConnection('connection');
         $conn = m::mock(stdClass::class);
-        $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn);
+        $db->expects('connection')->with('connection')->andReturn($conn);
         $builder = m::mock(stdClass::class);
-        $conn->shouldReceive('table')->once()->with('table')->andReturn($builder);
-        $builder->shouldReceive('useWritePdo')->once()->andReturn($builder);
+        $conn->expects('table')->with('table')->andReturn($builder);
+        $builder->expects('useWritePdo')->andReturn($builder);
         $builder->shouldReceive('where')->with('column', '=', 'value')->andReturn($builder);
         $closure = function ($query) {
             $query->where('closure', 1);
@@ -57,7 +57,7 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
             $closure($builder);
         });
         $builder->shouldReceive('where')->with('closure', 1);
-        $builder->shouldReceive('count')->once()->andReturn(100);
+        $builder->expects('count')->andReturn(100);
 
         $this->assertEquals(100, $verifier->getCount('table', 'column', 'value', null, null, $extra));
     }
@@ -68,13 +68,13 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
         $verifier = new DatabasePresenceVerifier($db);
         $verifier->setConnection('connection');
         $conn = m::mock(stdClass::class);
-        $db->shouldReceive('connection')->once()->with('connection')->andReturn($conn);
+        $db->expects('connection')->with('connection')->andReturn($conn);
         $builder = m::mock(stdClass::class);
-        $conn->shouldReceive('table')->once()->with('table')->andReturn($builder);
-        $builder->shouldReceive('useWritePdo')->once()->andReturn($builder);
+        $conn->expects('table')->with('table')->andReturn($builder);
+        $builder->expects('useWritePdo')->andReturn($builder);
         $builder->shouldReceive('where')->with('column', '=', 'value')->andReturn($builder);
         $builder->shouldReceive('where')->with('id', '<>', 123)->andReturn($builder);
-        $builder->shouldReceive('count')->once()->andReturn(100);
+        $builder->expects('count')->andReturn(100);
 
         $this->assertEquals(100, $verifier->getCount('table', 'column', 'value', 123, 'id', []));
     }

@@ -195,13 +195,13 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
     private function assertHandldedBroadcastableEvent(BroadcastableModelEventOccurred $event, Closure $closure)
     {
         $broadcaster = m::mock(Broadcaster::class);
-        $broadcaster->shouldReceive('broadcast')->once()
+        $broadcaster->expects('broadcast')
             ->withArgs(function (array $channels, string $eventName, array $payload) use ($closure) {
                 return $closure($channels, $eventName, $payload);
             });
 
         $manager = m::mock(BroadcastingFactory::class);
-        $manager->shouldReceive('connection')->once()->with(null)->andReturn($broadcaster);
+        $manager->expects('connection')->with(null)->andReturn($broadcaster);
 
         (new BroadcastEvent($event))->handle($manager);
 

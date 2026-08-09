@@ -24,8 +24,8 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItFailsWithInvalidCipherFails(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -38,8 +38,8 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItFailsUsingCipherWithInvalidKey(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -70,8 +70,8 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItGeneratesTheEnvironmentFileWithGeneratedKey(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -93,8 +93,8 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItGeneratesTheEnvironmentFileWithUserProvidedKey(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -118,8 +118,8 @@ class EnvironmentDecryptCommandTest extends TestCase
     {
         $_SERVER['LARAVEL_ENV_ENCRYPTION_KEY'] = 'ponmlkjihgfedcbaponmlkjihgfedcba';
 
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -143,8 +143,8 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItGeneratesTheEnvironmentFileWhenForcing(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -184,8 +184,8 @@ class EnvironmentDecryptCommandTest extends TestCase
         DB_PASSWORD=
         Text;
 
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -207,8 +207,8 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItWritesTheEnvironmentFileCustomFilename(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -230,8 +230,8 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItWritesTheEnvironmentFileCustomPath(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -253,8 +253,8 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItWritesTheEnvironmentFileCustomPathAndFilename(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -287,8 +287,8 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItGeneratesTheEnvironmentFileWithInteractivelyUserProvidedKey(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -318,8 +318,8 @@ class EnvironmentDecryptCommandTest extends TestCase
         $encryptedContent = 'APP_NAME='.$encrypter->encryptString('Laravel')."\n".
                            'APP_ENV='.$encrypter->encryptString('local');
 
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -345,8 +345,8 @@ class EnvironmentDecryptCommandTest extends TestCase
         $originalContent = "APP_NAME=Laravel\nAPP_ENV=local";
         $encryptedContent = $encrypter->encrypt($originalContent);
 
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -376,8 +376,8 @@ class EnvironmentDecryptCommandTest extends TestCase
         $midpoint = (int) (strlen($encryptedContent) / 2);
         $encryptedContentWithNewline = substr($encryptedContent, 0, $midpoint)."\n".substr($encryptedContent, $midpoint);
 
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()
@@ -403,8 +403,8 @@ class EnvironmentDecryptCommandTest extends TestCase
         $encryptedContent = 'APP_KEY='.$encrypter->encryptString('base64:Ge+W23u+VZI2tbrp5QCGWrsUuxgcD65i7jtTRR2ZqfY=')."\n".
                            'APP_ENV='.$encrypter->encryptString('local');
 
-        $this->filesystem->shouldReceive('exists')
-            ->once()
+        $this->filesystem->expects('exists')
+            
             ->andReturn(true)
             ->shouldReceive('exists')
             ->once()

@@ -28,7 +28,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         $dynamoDbClient = m::mock(DynamoDbClient::class);
 
-        $dynamoDbClient->shouldReceive('putItem')->once()->with([
+        $dynamoDbClient->expects('putItem')->with([
             'TableName' => 'table',
             'Item' => [
                 'application' => ['S' => 'application'],
@@ -55,7 +55,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         $time = time();
 
-        $dynamoDbClient->shouldReceive('query')->once()->with([
+        $dynamoDbClient->expects('query')->with([
             'TableName' => 'table',
             'Select' => 'ALL_ATTRIBUTES',
             'KeyConditionExpression' => 'application = :application',
@@ -100,7 +100,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         $time = time();
 
-        $dynamoDbClient->shouldReceive('getItem')->once()->with([
+        $dynamoDbClient->expects('getItem')->with([
             'TableName' => 'table',
             'Key' => [
                 'application' => ['S' => 'application'],
@@ -139,7 +139,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
     {
         $dynamoDbClient = m::mock(DynamoDbClient::class);
 
-        $dynamoDbClient->shouldReceive('getItem')->once()->with([
+        $dynamoDbClient->expects('getItem')->with([
             'TableName' => 'table',
             'Key' => [
                 'application' => ['S' => 'application'],
@@ -158,7 +158,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
     {
         $dynamoDbClient = m::mock(DynamoDbClient::class);
 
-        $dynamoDbClient->shouldReceive('deleteItem')->once()->with([
+        $dynamoDbClient->expects('deleteItem')->with([
             'TableName' => 'table',
             'Key' => [
                 'application' => ['S' => 'application'],

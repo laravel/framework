@@ -40,7 +40,7 @@ class SupportFacadesQueueTest extends TestCase
             Queue::assertPushed(QueueJobStub::class);
         });
 
-        $this->queueManager->shouldReceive('push')->once();
+        $this->queueManager->expects('push');
 
         (new QueueForStub)->pushJob();
     }

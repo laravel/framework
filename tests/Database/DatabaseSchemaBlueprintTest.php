@@ -21,8 +21,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
     public function testToSqlRunsCommandsFromBlueprint()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('statement')->once()->with('foo');
-        $conn->shouldReceive('statement')->once()->with('bar');
+        $conn->expects('statement')->with('foo');
+        $conn->expects('statement')->with('bar');
         $blueprint = $this->getMockBuilder(Blueprint::class)->onlyMethods(['toSql'])->setConstructorArgs([$conn, 'users'])->getMock();
         $blueprint->expects($this->once())->method('toSql')->willReturn(['foo', 'bar']);
 

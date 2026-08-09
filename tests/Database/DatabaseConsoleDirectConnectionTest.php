@@ -21,10 +21,10 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
         $directConnection = m::mock(Connection::class);
         $command = new DatabaseConsoleDirectConnectionTestCommand;
 
-        $resolver->shouldReceive('getDefaultConnection')->once()->andReturn('pgsql');
-        $resolver->shouldReceive('connection')->once()->with('pgsql')->andReturn($baseConnection);
-        $baseConnection->shouldReceive('hasDirectConnection')->once()->andReturn(true);
-        $resolver->shouldReceive('connection')->once()->with('pgsql::direct')->andReturn($directConnection);
+        $resolver->expects('getDefaultConnection')->andReturn('pgsql');
+        $resolver->expects('connection')->with('pgsql')->andReturn($baseConnection);
+        $baseConnection->expects('hasDirectConnection')->andReturn(true);
+        $resolver->expects('connection')->with('pgsql::direct')->andReturn($directConnection);
 
         $this->assertSame($directConnection, $command->resolve($resolver, null));
     }
@@ -35,8 +35,8 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
         $connection = m::mock(Connection::class);
         $command = new DatabaseConsoleDirectConnectionTestCommand;
 
-        $resolver->shouldReceive('connection')->once()->with('sqlite')->andReturn($connection);
-        $connection->shouldReceive('hasDirectConnection')->once()->andReturn(false);
+        $resolver->expects('connection')->with('sqlite')->andReturn($connection);
+        $connection->expects('hasDirectConnection')->andReturn(false);
 
         $this->assertSame($connection, $command->resolve($resolver, 'sqlite'));
     }
@@ -47,8 +47,8 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
         $connection = m::mock(Connection::class);
         $command = new DatabaseConsoleDirectConnectionTestCommand;
 
-        $resolver->shouldReceive('connection')->once()->with('pgsql::write')->andReturn($connection);
-        $connection->shouldReceive('hasDirectConnection')->once()->andReturn(true);
+        $resolver->expects('connection')->with('pgsql::write')->andReturn($connection);
+        $connection->expects('hasDirectConnection')->andReturn(true);
 
         $this->assertSame($connection, $command->resolve($resolver, 'pgsql::write'));
     }

@@ -18,7 +18,7 @@ class ConcurrencyLimiterTest extends TestCase
         $connection->shouldReceive('isCluster')->andReturn(true);
 
         // acquire() calls eval → command('eval', ...) with the lock script
-        $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
+        $connection->expects('command')->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[2] === 3
                 && $args[1][0] === '{test-limiter}1'
@@ -28,7 +28,7 @@ class ConcurrencyLimiterTest extends TestCase
         }))->andReturn('{test-limiter}1');
 
         // release() also calls eval → command('eval', ...) with the release script
-        $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
+        $connection->expects('command')->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{test-limiter}1'; // released key matches acquired key
         }))->andReturn(1);
@@ -46,7 +46,7 @@ class ConcurrencyLimiterTest extends TestCase
         $connection = m::mock(PhpRedisConnection::class);
         $connection->shouldReceive('isCluster')->andReturn(false);
 
-        $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
+        $connection->expects('command')->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[2] === 2
                 && $args[1][0] === 'mylock1'
@@ -54,7 +54,7 @@ class ConcurrencyLimiterTest extends TestCase
                 && $args[1][2] === 'mylock'; // ARGV[1] = plain name
         }))->andReturn('mylock1');
 
-        $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
+        $connection->expects('command')->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === 'mylock1';
         }))->andReturn(1);
@@ -72,14 +72,14 @@ class ConcurrencyLimiterTest extends TestCase
         $connection = m::mock(PredisClusterConnection::class);
         $connection->shouldReceive('isCluster')->andReturn(true);
 
-        $connection->shouldReceive('eval')->once()->with(
+        $connection->expects('eval')->with(
             m::on(fn ($s) => str_contains($s, 'mget')),
             2,
             '{limiter}1', '{limiter}2',
             '{limiter}', m::any(), m::any()
         )->andReturn('{limiter}1');
 
-        $connection->shouldReceive('eval')->once()->with(
+        $connection->expects('eval')->with(
             m::on(fn ($s) => str_contains($s, 'del')),
             1,
             '{limiter}1', m::any()
@@ -99,12 +99,12 @@ class ConcurrencyLimiterTest extends TestCase
         $connection->shouldReceive('isCluster')->andReturn(true);
 
         // Acquire returns the slot key
-        $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
+        $connection->expects('command')->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'mget');
         }))->andReturn('{mykey}2');
 
         // Release should be called with the exact same key
-        $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
+        $connection->expects('command')->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{mykey}2';
         }))->andReturn(1);
@@ -121,14 +121,14 @@ class ConcurrencyLimiterTest extends TestCase
         $connection->shouldReceive('isCluster')->andReturn(true);
 
         // Name already has hash tags — should NOT be double-wrapped
-        $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
+        $connection->expects('command')->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[1][0] === '{mylock}1'
                 && $args[1][1] === '{mylock}2'
                 && $args[1][2] === '{mylock}'; // ARGV[1] = unchanged name with existing tags
         }))->andReturn('{mylock}1');
 
-        $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
+        $connection->expects('command')->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{mylock}1';
         }))->andReturn(1);
@@ -147,14 +147,14 @@ class ConcurrencyLimiterTest extends TestCase
         $connection->shouldReceive('isCluster')->andReturn(true);
 
         // Name has '{' but no '}' — not a valid hash tag, should be wrapped
-        $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
+        $connection->expects('command')->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[1][0] === '{my{lock}1'
                 && $args[1][1] === '{my{lock}2'
                 && $args[1][2] === '{my{lock}'; // ARGV[1] = wrapped prefix
         }))->andReturn('{my{lock}1');
 
-        $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
+        $connection->expects('command')->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{my{lock}1';
         }))->andReturn(1);
@@ -173,14 +173,14 @@ class ConcurrencyLimiterTest extends TestCase
         $connection->shouldReceive('isCluster')->andReturn(true);
 
         // Name has '{}' but that's an empty hash tag — should be wrapped
-        $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
+        $connection->expects('command')->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'mget')
                 && $args[1][0] === '{my{}lock}1'
                 && $args[1][1] === '{my{}lock}2'
                 && $args[1][2] === '{my{}lock}'; // ARGV[1] = wrapped prefix
         }))->andReturn('{my{}lock}1');
 
-        $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
+        $connection->expects('command')->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'del')
                 && $args[1][0] === '{my{}lock}1';
         }))->andReturn(1);
@@ -198,14 +198,14 @@ class ConcurrencyLimiterTest extends TestCase
         $connection = m::mock(PredisConnection::class);
         $connection->shouldReceive('isCluster')->andReturn(false);
 
-        $connection->shouldReceive('eval')->once()->with(
+        $connection->expects('eval')->with(
             m::on(fn ($s) => str_contains($s, 'mget')),
             2,
             'lock1', 'lock2',
             'lock', m::any(), m::any()
         )->andReturn('lock1');
 
-        $connection->shouldReceive('eval')->once()->with(
+        $connection->expects('eval')->with(
             m::on(fn ($s) => str_contains($s, 'del')),
             1,
             'lock1', m::any()

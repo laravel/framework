@@ -28,17 +28,17 @@ class SeedCommandTest extends TestCase
         $outputStyle = new OutputStyle($input, $output);
 
         $seeder = m::mock(Seeder::class);
-        $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
-        $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
-        $seeder->shouldReceive('__invoke')->once();
+        $seeder->expects('setContainer')->andReturnSelf();
+        $seeder->expects('setCommand')->andReturnSelf();
+        $seeder->expects('__invoke');
 
         $resolver = m::mock(ConnectionResolverInterface::class);
-        $resolver->shouldReceive('getDefaultConnection')->once();
-        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+        $resolver->expects('getDefaultConnection');
+        $resolver->expects('setDefaultConnection')->with('sqlite');
 
         $container = m::mock(Container::class);
         $container->shouldReceive('call');
-        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->expects('environment')->andReturn('testing');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
         $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
         $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
@@ -71,16 +71,16 @@ class SeedCommandTest extends TestCase
         $instance = new UserWithoutModelEventsSeeder();
 
         $seeder = m::mock($instance);
-        $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
-        $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
+        $seeder->expects('setContainer')->andReturnSelf();
+        $seeder->expects('setCommand')->andReturnSelf();
 
         $resolver = m::mock(ConnectionResolverInterface::class);
-        $resolver->shouldReceive('getDefaultConnection')->once();
-        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+        $resolver->expects('getDefaultConnection');
+        $resolver->expects('setDefaultConnection')->with('sqlite');
 
         $container = m::mock(Container::class);
         $container->shouldReceive('call');
-        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->expects('environment')->andReturn('testing');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
         $container->shouldReceive('make')->with(UserWithoutModelEventsSeeder::class)->andReturn($seeder);
         $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(

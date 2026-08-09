@@ -555,7 +555,7 @@ class RedisConnectionTest extends TestCase
             $events = m::mock(Dispatcher::class);
             $redis->setEventDispatcher($events);
 
-            $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
+            $events->expects('dispatch')->with(m::on(function ($event) {
                 $this->assertSame('get', $event->command);
                 $this->assertEquals(['foobar'], $event->parameters);
                 $this->assertSame('default', $event->connectionName);

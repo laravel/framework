@@ -32,10 +32,10 @@ class ViewFactoryTest extends TestCase
         unset($_SERVER['__test.view']);
 
         $factory = $this->getFactory();
-        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
+        $factory->getFinder()->expects('find')->with('view')->andReturn('path.php');
         $engine = m::mock(Engine::class);
-        $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine);
-        $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
+        $factory->getEngineResolver()->expects('resolve')->with('php')->andReturn($engine);
+        $factory->getFinder()->expects('addExtension')->with('php');
         $factory->setDispatcher(new Dispatcher);
         $factory->creator('view', function ($view) {
             $_SERVER['__test.view'] = $view;
@@ -52,8 +52,8 @@ class ViewFactoryTest extends TestCase
     public function testExistsPassesAndFailsViews()
     {
         $factory = $this->getFactory();
-        $factory->getFinder()->shouldReceive('find')->once()->with('foo')->andThrow(InvalidArgumentException::class);
-        $factory->getFinder()->shouldReceive('find')->once()->with('bar')->andReturn('path.php');
+        $factory->getFinder()->expects('find')->with('foo')->andThrow(InvalidArgumentException::class);
+        $factory->getFinder()->expects('find')->with('bar')->andReturn('path.php');
 
         $this->assertFalse($factory->exists('foo'));
         $this->assertTrue($factory->exists('bar'));
@@ -75,10 +75,10 @@ class ViewFactoryTest extends TestCase
 
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->twice()->with('view')->andReturn('path.php');
-        $factory->getFinder()->shouldReceive('find')->once()->with('bar')->andThrow(InvalidArgumentException::class);
+        $factory->getFinder()->expects('find')->with('bar')->andThrow(InvalidArgumentException::class);
         $engine = m::mock(Engine::class);
-        $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine);
-        $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
+        $factory->getEngineResolver()->expects('resolve')->with('php')->andReturn($engine);
+        $factory->getFinder()->expects('addExtension')->with('php');
         $factory->setDispatcher(new Dispatcher);
         $factory->creator('view', function ($view) {
             $_SERVER['__test.view'] = $view;
@@ -98,8 +98,8 @@ class ViewFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $factory = $this->getFactory();
-        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andThrow(InvalidArgumentException::class);
-        $factory->getFinder()->shouldReceive('find')->once()->with('bar')->andThrow(InvalidArgumentException::class);
+        $factory->getFinder()->expects('find')->with('view')->andThrow(InvalidArgumentException::class);
+        $factory->getFinder()->expects('find')->with('bar')->andThrow(InvalidArgumentException::class);
         $engine = m::mock(Engine::class);
         $factory->getEngineResolver()->shouldReceive('resolve')->with('php')->andReturn($engine);
         $factory->getFinder()->shouldReceive('addExtension')->with('php');
@@ -111,11 +111,11 @@ class ViewFactoryTest extends TestCase
     {
         $factory = m::mock(Factory::class.'[make]', $this->getFactoryArgs());
         $mockView1 = m::mock(stdClass::class);
-        $factory->shouldReceive('make')->once()->with('foo', ['key' => 'bar', 'value' => 'baz'])->andReturn($mockView1);
+        $factory->expects('make')->with('foo', ['key' => 'bar', 'value' => 'baz'])->andReturn($mockView1);
         $mockView2 = m::mock(stdClass::class);
-        $factory->shouldReceive('make')->once()->with('foo', ['key' => 'breeze', 'value' => 'boom'])->andReturn($mockView2);
-        $mockView1->shouldReceive('render')->once()->andReturn('dayle');
-        $mockView2->shouldReceive('render')->once()->andReturn('rees');
+        $factory->expects('make')->with('foo', ['key' => 'breeze', 'value' => 'boom'])->andReturn($mockView2);
+        $mockView1->expects('render')->andReturn('dayle');
+        $mockView2->expects('render')->andReturn('rees');
 
         $result = $factory->renderEach('foo', ['bar' => 'baz', 'breeze' => 'boom'], 'value');
 
@@ -126,8 +126,8 @@ class ViewFactoryTest extends TestCase
     {
         $factory = m::mock(Factory::class.'[make]', $this->getFactoryArgs());
         $mockView = m::mock(stdClass::class);
-        $factory->shouldReceive('make')->once()->with('foo')->andReturn($mockView);
-        $mockView->shouldReceive('render')->once()->andReturn('empty');
+        $factory->expects('make')->with('foo')->andReturn($mockView);
+        $mockView->expects('render')->andReturn('empty');
 
         $this->assertSame('empty', $factory->renderEach('view', [], 'iterator', 'foo'));
     }
@@ -145,11 +145,11 @@ class ViewFactoryTest extends TestCase
             //
         };
 
-        $factory->getFinder()->shouldReceive('addExtension')->once()->with('foo');
-        $factory->getEngineResolver()->shouldReceive('register')->once()->with('bar', $resolver);
-        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.foo');
+        $factory->getFinder()->expects('addExtension')->with('foo');
+        $factory->getEngineResolver()->expects('register')->with('bar', $resolver);
+        $factory->getFinder()->expects('find')->with('view')->andReturn('path.foo');
         $engine = m::mock(Engine::class);
-        $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('bar')->andReturn($engine);
+        $factory->getEngineResolver()->expects('resolve')->with('bar')->andReturn($engine);
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(false);
 
         $factory->addExtension('foo', 'bar', $resolver);
@@ -161,7 +161,7 @@ class ViewFactoryTest extends TestCase
     public function testAddingExtensionPrependsNotAppends()
     {
         $factory = $this->getFactory();
-        $factory->getFinder()->shouldReceive('addExtension')->once()->with('foo');
+        $factory->getFinder()->expects('addExtension')->with('foo');
 
         $factory->addExtension('foo', 'bar');
 
@@ -173,8 +173,8 @@ class ViewFactoryTest extends TestCase
     public function testPrependedExtensionOverridesExistingExtensions()
     {
         $factory = $this->getFactory();
-        $factory->getFinder()->shouldReceive('addExtension')->once()->with('foo');
-        $factory->getFinder()->shouldReceive('addExtension')->once()->with('baz');
+        $factory->getFinder()->expects('addExtension')->with('foo');
+        $factory->getFinder()->expects('addExtension')->with('baz');
 
         $factory->addExtension('foo', 'bar');
         $factory->addExtension('baz', 'bar');
@@ -189,19 +189,19 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('creating: name', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->with('creating: name', m::type('array'))
-            ->once();
+            ;
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('name');
+        $view->expects('name')->andReturn('name');
 
         $factory->creator('name', fn () => true);
 
@@ -213,19 +213,19 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('creating: namespaced::*', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->with('creating: namespaced::my-package-view', m::type('array'))
-            ->once();
+            ;
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('namespaced::my-package-view');
+        $view->expects('name')->andReturn('namespaced::my-package-view');
 
         $factory->creator('namespaced::*', fn () => true);
 
@@ -237,24 +237,24 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('creating: namespaced::*', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('creating: welcome', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->with('creating: namespaced::my-package-view', m::type('array'))
-            ->once();
+            ;
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('namespaced::my-package-view');
+        $view->expects('name')->andReturn('namespaced::my-package-view');
 
         $factory->creator(['namespaced::*', 'welcome'], fn () => true);
 
@@ -266,19 +266,19 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('creating: *', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->with('creating: name', m::type('array'))
-            ->once();
+            ;
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('name');
+        $view->expects('name')->andReturn('name');
 
         $factory->creator('*', fn () => true);
 
@@ -290,20 +290,20 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('creating: components.button', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->with('creating: components/button', m::type('array'))
-            ->once();
+            ;
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')
-            ->once()
+        $view->expects('name')
+            
             ->andReturn('components/button');
 
         $factory->creator('components.button', fn () => true);
@@ -316,19 +316,19 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('composing: name', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->with('composing: name', m::type('array'))
-            ->once();
+            ;
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('name');
+        $view->expects('name')->andReturn('name');
 
         $factory->composer('name', fn () => true);
 
@@ -340,19 +340,19 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('composing: name', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->with('composing: name', m::type('array'))
-            ->once();
+            ;
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('name');
+        $view->expects('name')->andReturn('name');
 
         $factory->composer(['name'], fn () => true);
 
@@ -364,19 +364,19 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('composing: namespaced::*', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->with('composing: namespaced::my-package-view', m::type('array'))
-            ->once();
+            ;
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('namespaced::my-package-view');
+        $view->expects('name')->andReturn('namespaced::my-package-view');
 
         $factory->composer('namespaced::*', fn () => true);
 
@@ -387,24 +387,24 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('composing: namespaced::*', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('composing: welcome', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->with('composing: namespaced::my-package-view', m::type('array'))
-            ->once();
+            ;
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('namespaced::my-package-view');
+        $view->expects('name')->andReturn('namespaced::my-package-view');
 
         $factory->composer(['namespaced::*', 'welcome'], fn () => true);
 
@@ -418,17 +418,17 @@ class ViewFactoryTest extends TestCase
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('composing: *', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->with('composing: name', m::type('array'))
-            ->once();
+            ;
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('name');
+        $view->expects('name')->andReturn('name');
 
         $factory->composer('*', fn () => true);
 
@@ -442,17 +442,17 @@ class ViewFactoryTest extends TestCase
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
-            ->shouldReceive('listen')
+            ->expects('listen')
             ->with('composing: components.button', m::type(Closure::class))
-            ->once();
+            ;
 
         $factory->getDispatcher()
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->with('composing: components/button', m::type('array'))
-            ->once();
+            ;
 
         $view = m::mock(View::class);
-        $view->shouldReceive('name')->once()->andReturn('components/button');
+        $view->expects('name')->andReturn('components/button');
 
         $factory->composer('components.button', fn () => true);
 
@@ -462,7 +462,7 @@ class ViewFactoryTest extends TestCase
     public function testComposersAreProperlyRegistered()
     {
         $factory = $this->getFactory();
-        $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type(Closure::class));
+        $factory->getDispatcher()->expects('listen')->with('composing: foo', m::type(Closure::class));
         $callback = $factory->composer('foo', function () {
             return 'bar';
         });
@@ -474,9 +474,9 @@ class ViewFactoryTest extends TestCase
     public function testComposersCanBeMassRegistered()
     {
         $factory = $this->getFactory();
-        $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: bar', m::type(Closure::class));
-        $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: qux', m::type(Closure::class));
-        $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type(Closure::class));
+        $factory->getDispatcher()->expects('listen')->with('composing: bar', m::type(Closure::class));
+        $factory->getDispatcher()->expects('listen')->with('composing: qux', m::type(Closure::class));
+        $factory->getDispatcher()->expects('listen')->with('composing: foo', m::type(Closure::class));
         $composers = $factory->composers([
             'foo' => 'bar',
             'baz@baz' => ['qux', 'foo'],
@@ -494,12 +494,12 @@ class ViewFactoryTest extends TestCase
     public function testClassCallbacks()
     {
         $factory = $this->getFactory();
-        $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type(Closure::class));
+        $factory->getDispatcher()->expects('listen')->with('composing: foo', m::type(Closure::class));
         $container = m::mock(Container::class);
         $factory->setContainer($container);
         $composer = m::mock(stdClass::class);
-        $container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer);
-        $composer->shouldReceive('compose')->once()->with('view')->andReturn('composed');
+        $container->expects('make')->with('FooComposer')->andReturn($composer);
+        $composer->expects('compose')->with('view')->andReturn('composed');
         $callback = $factory->composer('foo', 'FooComposer');
         $callback = $callback[0];
 
@@ -509,12 +509,12 @@ class ViewFactoryTest extends TestCase
     public function testClassCallbacksWithMethods()
     {
         $factory = $this->getFactory();
-        $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type(Closure::class));
+        $factory->getDispatcher()->expects('listen')->with('composing: foo', m::type(Closure::class));
         $container = m::mock(Container::class);
         $factory->setContainer($container);
         $composer = m::mock(stdClass::class);
-        $container->shouldReceive('make')->once()->with('FooComposer')->andReturn($composer);
-        $composer->shouldReceive('doComposer')->once()->with('view')->andReturn('composed');
+        $container->expects('make')->with('FooComposer')->andReturn($composer);
+        $composer->expects('doComposer')->with('view')->andReturn('composed');
         $callback = $factory->composer('foo', 'FooComposer@doComposer');
         $callback = $callback[0];
 
@@ -530,12 +530,12 @@ class ViewFactoryTest extends TestCase
 
         $dispatcher->shouldReceive('listen', m::any())->once();
 
-        $view->shouldReceive('name')->once()->andReturn('name');
+        $view->expects('name')->andReturn('name');
 
         $factory->composer('name', fn () => true);
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
-        $factory->getDispatcher()->shouldReceive('dispatch')->once()->with('composing: name', [$view]);
+        $factory->getDispatcher()->expects('dispatch')->with('composing: name', [$view]);
 
         $factory->callComposer($view);
     }
@@ -573,7 +573,7 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
         $view = m::mock(View::class);
-        $view->shouldReceive('__toString')->once()->andReturn('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;');
+        $view->expects('__toString')->andReturn('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;');
         $this->assertSame('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;', $factory->yieldContent('foo', $view));
     }
 
@@ -612,7 +612,7 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
         $view = m::mock(View::class);
-        $view->shouldReceive('__toString')->once()->andReturn('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;');
+        $view->expects('__toString')->andReturn('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;');
         $factory->startSection('foo', $view);
         $this->assertSame('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;', $factory->yieldContent('foo'));
     }
@@ -884,7 +884,7 @@ class ViewFactoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $factory = $this->getFactory();
-        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('view.foo');
+        $factory->getFinder()->expects('find')->with('view')->andReturn('view.foo');
         $factory->make('view');
     }
 
@@ -899,8 +899,8 @@ class ViewFactoryTest extends TestCase
         $engine->getCompiler()->shouldReceive('isExpired')->twice()->andReturn(false);
         $factory = $this->getFactory();
         $factory->getEngineResolver()->shouldReceive('resolve')->twice()->andReturn($engine);
-        $factory->getFinder()->shouldReceive('find')->once()->with('layout')->andReturn(__DIR__.'/fixtures/section-exception-layout.php');
-        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn(__DIR__.'/fixtures/section-exception.php');
+        $factory->getFinder()->expects('find')->with('layout')->andReturn(__DIR__.'/fixtures/section-exception-layout.php');
+        $factory->getFinder()->expects('find')->with('view')->andReturn(__DIR__.'/fixtures/section-exception.php');
         $factory->getDispatcher()->shouldReceive('hasListeners')->times(4); // 2 "creating" + 2 "composing"...
 
         $factory->make('view')->render();

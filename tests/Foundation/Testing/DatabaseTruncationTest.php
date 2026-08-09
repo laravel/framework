@@ -177,20 +177,20 @@ class DatabaseTruncationTest extends TestCase
         $actual = [];
 
         $schema = m::mock($builder ?? Builder::class);
-        $schema->shouldReceive('getTables')->with($schemas)->once()->andReturn(
+        $schema->expects('getTables')->with($schemas)->andReturn(
             empty($schemas)
                 ? $allTables
                 : array_filter($allTables, fn ($table) => in_array($table['schema'], $schemas))
         );
-        $schema->shouldReceive('getCurrentSchemaListing')->once()->andReturn($schemas);
+        $schema->expects('getCurrentSchemaListing')->andReturn($schemas);
 
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
         $dispatcher = m::mock(Dispatcher::class);
-        $connection->shouldReceive('getEventDispatcher')->once()->andReturn($dispatcher);
-        $connection->shouldReceive('unsetEventDispatcher')->once();
-        $connection->shouldReceive('setEventDispatcher')->once()->with($dispatcher);
-        $connection->shouldReceive('getSchemaBuilder')->once()->andReturn($schema);
+        $connection->expects('getEventDispatcher')->andReturn($dispatcher);
+        $connection->expects('unsetEventDispatcher');
+        $connection->expects('setEventDispatcher')->with($dispatcher);
+        $connection->expects('getSchemaBuilder')->andReturn($schema);
         $connection->shouldReceive('withoutTablePrefix')->andReturnUsing(function ($callback) use ($connection) {
             $callback($connection);
         });

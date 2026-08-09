@@ -19,8 +19,8 @@ class EventPingTest extends TestCase
     public function testPingRescuesTransferExceptions()
     {
         $this->spy(ExceptionHandler::class)
-            ->shouldReceive('report')
-            ->once()
+            ->expects('report')
+            
             ->with(m::type(ServerException::class));
 
         $httpMock = new HttpClient([

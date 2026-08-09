@@ -70,17 +70,17 @@ class ComponentsTest extends TestCase
     {
         $output = m::mock(OutputStyle::class);
 
-        $output->shouldReceive('confirm')
+        $output->expects('confirm')
             ->with('Question?', false)
-            ->once()
+            
             ->andReturnTrue();
 
         $result = (new Components\Confirm($output))->render('Question?');
         $this->assertTrue($result);
 
-        $output->shouldReceive('confirm')
+        $output->expects('confirm')
             ->with('Question?', true)
-            ->once()
+            
             ->andReturnTrue();
 
         $result = (new Components\Confirm($output))->render('Question?', true);
@@ -91,9 +91,9 @@ class ComponentsTest extends TestCase
     {
         $output = m::mock(OutputStyle::class);
 
-        $output->shouldReceive('askQuestion')
+        $output->expects('askQuestion')
             ->with(m::type(ChoiceQuestion::class))
-            ->once()
+            
             ->andReturn('a');
 
         $result = (new Components\Choice($output))->render('Question?', ['a', 'b']);

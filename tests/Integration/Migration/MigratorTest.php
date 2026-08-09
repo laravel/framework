@@ -46,7 +46,7 @@ class MigratorTest extends TestCase
         $this->expectTask('2016_10_04_000000_modify_people_table', 'DONE');
         $this->expectTask('2017_10_04_000000_add_age_to_people', 'SKIPPED');
 
-        $this->output->shouldReceive('writeln')->once();
+        $this->output->expects('writeln');
 
         $this->subject->run([__DIR__.'/fixtures']);
 
@@ -100,7 +100,7 @@ class MigratorTest extends TestCase
         $this->expectTask('2015_10_04_000000_modify_people_table', 'DONE');
         $this->expectTask('2014_10_12_000000_create_people_table', 'DONE');
 
-        $this->output->shouldReceive('writeln')->once();
+        $this->output->expects('writeln');
 
         $this->subject->rollback([__DIR__.'/fixtures']);
 
@@ -203,7 +203,7 @@ class MigratorTest extends TestCase
         $this->expectInfo('Running migrations.');
         $this->expectTask('2014_10_12_000000_create_people_is_dynamic_table', 'DONE');
 
-        $this->output->shouldReceive('writeln')->once();
+        $this->output->expects('writeln');
 
         $this->subject->run([__DIR__.'/pretending/2014_10_12_000000_create_people_is_dynamic_table.php'], ['pretend' => false]);
 
@@ -221,7 +221,7 @@ class MigratorTest extends TestCase
             'insert into "blogs" ("id", "name") values (2, \'John Doe Blog\')',
         ]);
 
-        $this->output->shouldReceive('writeln')->once();
+        $this->output->expects('writeln');
 
         $this->subject->run([__DIR__.'/pretending/2023_10_17_000000_dynamic_content_is_shown.php'], ['pretend' => true]);
 
@@ -236,7 +236,7 @@ class MigratorTest extends TestCase
         $this->expectInfo('Running migrations.');
         $this->expectTask('2014_10_12_000000_create_people_non_dynamic_table', 'DONE');
 
-        $this->output->shouldReceive('writeln')->once();
+        $this->output->expects('writeln');
 
         $this->subject->run([__DIR__.'/pretending/2014_10_12_000000_create_people_non_dynamic_table.php'], ['pretend' => false]);
 
@@ -252,7 +252,7 @@ class MigratorTest extends TestCase
             'select * from "people"',
         ]);
 
-        $this->output->shouldReceive('writeln')->once();
+        $this->output->expects('writeln');
 
         $this->subject->run([__DIR__.'/pretending/2023_10_17_000000_dynamic_content_not_shown.php'], ['pretend' => true]);
 
@@ -263,7 +263,7 @@ class MigratorTest extends TestCase
 
     protected function expectInfo($message): void
     {
-        $this->output->shouldReceive('writeln')->once()->with(m::on(
+        $this->output->expects('writeln')->with(m::on(
             fn ($argument) => (new Stringable($argument))->contains($message),
         ), m::any());
     }
@@ -283,7 +283,7 @@ class MigratorTest extends TestCase
 
     protected function expectBulletList($elements): void
     {
-        $this->output->shouldReceive('writeln')->once()->with(m::on(function ($argument) use ($elements) {
+        $this->output->expects('writeln')->with(m::on(function ($argument) use ($elements) {
             return array_all($elements, fn ($element) => (new Stringable($argument))->contains("⇂ $element"));
         }), m::any());
     }
@@ -300,11 +300,11 @@ class MigratorTest extends TestCase
             fn ($argument) => (new Stringable($argument))->contains(['ms</>']),
         ), m::any(), m::any());
 
-        $this->output->shouldReceive('write')->once()->with(m::on(
+        $this->output->expects('write')->with(m::on(
             fn ($argument) => (new Stringable($argument))->contains($description),
         ), m::any(), m::any());
 
-        $this->output->shouldReceive('writeln')->once()->with(m::on(
+        $this->output->expects('writeln')->with(m::on(
             fn ($argument) => (new Stringable($argument))->contains($result),
         ), m::any());
     }

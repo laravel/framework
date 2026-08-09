@@ -502,17 +502,17 @@ class RedisQueueTest extends TestCase
     public function testPushJobQueueingAndJobQueuedEvents($driver)
     {
         $events = m::mock(Dispatcher::class);
-        $events->shouldReceive('dispatch')->withArgs(function (JobQueueing $jobQueuing) {
+        $events->expects('dispatch')->withArgs(function (JobQueueing $jobQueuing) {
             $this->assertInstanceOf(RedisQueueIntegrationTestJob::class, $jobQueuing->job);
 
             return true;
-        })->andReturnNull()->once();
-        $events->shouldReceive('dispatch')->withArgs(function (JobQueued $jobQueued) {
+        })->andReturnNull();
+        $events->expects('dispatch')->withArgs(function (JobQueued $jobQueued) {
             $this->assertInstanceOf(RedisQueueIntegrationTestJob::class, $jobQueued->job);
             $this->assertIsString($jobQueued->id);
 
             return true;
-        })->andReturnNull()->once();
+        })->andReturnNull();
 
         $container = m::mock(Container::class);
         $container->shouldReceive('bound')->with('events')->andReturn(true)->twice();

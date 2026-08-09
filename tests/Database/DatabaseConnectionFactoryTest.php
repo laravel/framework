@@ -354,7 +354,7 @@ class DatabaseConnectionFactoryTest extends TestCase
 
         $container = m::mock(Container::class);
         $factory = new ConnectionFactory($container);
-        $container->shouldReceive('bound')->once()->andReturn(false);
+        $container->expects('bound')->andReturn(false);
         $factory->createConnector(['driver' => 'foo']);
     }
 
@@ -362,8 +362,8 @@ class DatabaseConnectionFactoryTest extends TestCase
     {
         $container = m::mock(Container::class);
         $factory = new ConnectionFactory($container);
-        $container->shouldReceive('bound')->once()->with('db.connector.foo')->andReturn(true);
-        $container->shouldReceive('make')->once()->with('db.connector.foo')->andReturn('connector');
+        $container->expects('bound')->with('db.connector.foo')->andReturn(true);
+        $container->expects('make')->with('db.connector.foo')->andReturn('connector');
 
         $this->assertSame('connector', $factory->createConnector(['driver' => 'foo']));
     }

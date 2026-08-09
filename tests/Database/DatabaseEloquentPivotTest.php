@@ -40,7 +40,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testMutatorsAreCalledFromConstructor()
     {
         $parent = m::mock(Model::class.'[getConnectionName]');
-        $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+        $parent->expects('getConnectionName')->andReturn('connection');
 
         $pivot = DatabaseEloquentPivotTestMutatorStub::fromAttributes($parent, ['foo' => 'bar'], 'table', true);
 
@@ -50,7 +50,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testFromRawAttributesDoesNotDoubleMutate()
     {
         $parent = m::mock(Model::class.'[getConnectionName]');
-        $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+        $parent->expects('getConnectionName')->andReturn('connection');
 
         $pivot = DatabaseEloquentPivotTestJsonCastStub::fromRawAttributes($parent, ['foo' => json_encode(['name' => 'Taylor'])], 'table', true);
 
@@ -60,7 +60,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testFromRawAttributesDoesNotMutate()
     {
         $parent = m::mock(Model::class.'[getConnectionName]');
-        $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+        $parent->expects('getConnectionName')->andReturn('connection');
 
         $pivot = DatabaseEloquentPivotTestMutatorStub::fromRawAttributes($parent, ['foo' => 'bar'], 'table', true);
 
@@ -70,7 +70,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testPropertiesUnchangedAreNotDirty()
     {
         $parent = m::mock(Model::class.'[getConnectionName]');
-        $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+        $parent->expects('getConnectionName')->andReturn('connection');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
 
         $this->assertSame([], $pivot->getDirty());
@@ -79,7 +79,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testPropertiesChangedAreDirty()
     {
         $parent = m::mock(Model::class.'[getConnectionName]');
-        $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+        $parent->expects('getConnectionName')->andReturn('connection');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
         $pivot->shimy = 'changed';
 
@@ -109,7 +109,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testKeysCanBeSetProperly()
     {
         $parent = m::mock(Model::class.'[getConnectionName]');
-        $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+        $parent->expects('getConnectionName')->andReturn('connection');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar'], 'table');
         $pivot->setPivotKeys('foreign', 'other');
 
@@ -124,8 +124,8 @@ class DatabaseEloquentPivotTest extends TestCase
         $pivot->foreign = 'foreign.value';
         $pivot->other = 'other.value';
         $query = m::mock(stdClass::class);
-        $query->shouldReceive('where')->once()->with(['foreign' => 'foreign.value', 'other' => 'other.value'])->andReturn($query);
-        $query->shouldReceive('delete')->once()->andReturn(true);
+        $query->expects('where')->with(['foreign' => 'foreign.value', 'other' => 'other.value'])->andReturn($query);
+        $query->expects('delete')->andReturn(true);
         $pivot->expects($this->once())->method('newQueryWithoutRelationships')->willReturn($query);
 
         $rowsAffected = $pivot->delete();

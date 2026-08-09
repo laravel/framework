@@ -107,7 +107,7 @@ class QueueSyncQueueTest extends TestCase
         $container = new Container;
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
         $transactionManager = m::mock(DatabaseTransactionsManager::class);
-        $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
+        $transactionManager->expects('addCallback')->andReturn(null);
         $transactionManager->shouldNotReceive('addCallbackForRollback');
         $container->instance('db.transactions', $transactionManager);
 
@@ -121,7 +121,7 @@ class QueueSyncQueueTest extends TestCase
         $container = new Container;
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
         $transactionManager = m::mock(DatabaseTransactionsManager::class);
-        $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
+        $transactionManager->expects('addCallback')->andReturn(null);
         $transactionManager->shouldNotReceive('addCallbackForRollback');
         $container->instance('db.transactions', $transactionManager);
 
@@ -135,8 +135,8 @@ class QueueSyncQueueTest extends TestCase
         $container = new Container;
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
         $transactionManager = m::mock(DatabaseTransactionsManager::class);
-        $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
-        $transactionManager->shouldReceive('addCallbackForRollback')->once()->andReturn(null);
+        $transactionManager->expects('addCallback')->andReturn(null);
+        $transactionManager->expects('addCallbackForRollback')->andReturn(null);
         $container->instance('db.transactions', $transactionManager);
 
         $sync->setContainer($container);
@@ -149,8 +149,8 @@ class QueueSyncQueueTest extends TestCase
         $container = new Container;
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
         $transactionManager = m::mock(DatabaseTransactionsManager::class);
-        $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
-        $transactionManager->shouldReceive('addCallbackForRollback')->once()->andReturn(null);
+        $transactionManager->expects('addCallback')->andReturn(null);
+        $transactionManager->expects('addCallbackForRollback')->andReturn(null);
         $container->instance('db.transactions', $transactionManager);
 
         $sync->setContainer($container);

@@ -251,7 +251,7 @@ class EventsDispatcherTest extends TestCase
     {
         $container = m::mock(Container::class);
         $d = new Dispatcher($container);
-        $container->shouldReceive('make')->once()->with(TestEventListener::class)->andReturn(new TestEventListener);
+        $container->expects('make')->with(TestEventListener::class)->andReturn(new TestEventListener);
         $d->listen('foo', TestEventListener::class.'@onFooEvent');
         $response = $d->dispatch('foo', ['foo', 'bar']);
 
@@ -729,8 +729,8 @@ class EventsDispatcherTest extends TestCase
         Container::setInstance($container);
 
         try {
-            $events->shouldReceive('dispatch')
-                ->once()
+            $events->expects('dispatch')
+                
                 ->with(m::on(function ($event) {
                     $this->assertInstanceOf(DispatchableNamedArgumentsEvent::class, $event);
                     $this->assertSame('first-value', $event->first);

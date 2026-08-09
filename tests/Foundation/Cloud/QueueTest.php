@@ -564,7 +564,7 @@ class QueueTest extends TestCase
         $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
 
-        $client->shouldReceive('receiveMessage')->once()->andReturn(new Result([
+        $client->expects('receiveMessage')->andReturn(new Result([
             'Messages' => [[
                 'MessageId' => 'message-id',
                 'ReceiptHandle' => 'receipt-handle',
@@ -587,7 +587,7 @@ class QueueTest extends TestCase
         $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
 
-        $client->shouldReceive('receiveMessage')->once()->andReturn(new Result(['Messages' => null]));
+        $client->expects('receiveMessage')->andReturn(new Result(['Messages' => null]));
 
         $this->assertNull($queue->pop());
     }
@@ -945,7 +945,7 @@ class QueueTest extends TestCase
         $eventsFake = $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
         $client->shouldReceive('sendMessage')->times(5)->andReturn(new Result());
-        $client->shouldReceive('sendMessageBatch')->once()->andReturnUsing(fn ($args) => new Result([
+        $client->expects('sendMessageBatch')->andReturnUsing(fn ($args) => new Result([
             'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
         ]));
 
@@ -1225,7 +1225,7 @@ class QueueTest extends TestCase
         $this->app['config']->set('queue.connections.cloud.connection.after_commit', true);
         [$queue, $client] = $this->mockedQueue();
         $client->shouldReceive('sendMessage')->times(5)->andReturn(new Result());
-        $client->shouldReceive('sendMessageBatch')->once()->andReturnUsing(fn ($args) => new Result([
+        $client->expects('sendMessageBatch')->andReturnUsing(fn ($args) => new Result([
             'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
         ]));
 

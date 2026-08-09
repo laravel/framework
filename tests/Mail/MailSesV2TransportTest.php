@@ -59,11 +59,11 @@ class MailSesV2TransportTest extends TestCase
 
         $client = m::mock(SesV2Client::class);
         $sesResult = m::mock();
-        $sesResult->shouldReceive('get')
+        $sesResult->expects('get')
             ->with('MessageId')
-            ->once()
+            
             ->andReturn('ses-message-id');
-        $client->shouldReceive('sendEmail')->once()
+        $client->expects('sendEmail')
             ->with(m::on(function ($arg) {
                 return $arg['Source'] === 'myself@example.com' &&
                     $arg['Destination']['ToAddresses'] === ['me@example.com', 'you@example.com'] &&
@@ -87,11 +87,11 @@ class MailSesV2TransportTest extends TestCase
 
         $client = m::mock(SesV2Client::class);
         $sesResult = m::mock();
-        $sesResult->shouldReceive('get')
+        $sesResult->expects('get')
             ->with('MessageId')
-            ->once()
+            
             ->andReturn('ses-message-id');
-        $client->shouldReceive('sendEmail')->once()
+        $client->expects('sendEmail')
             ->with(m::on(function ($arg) {
                 return $arg['TenantName'] === 'my-tenant';
             }))
@@ -110,11 +110,11 @@ class MailSesV2TransportTest extends TestCase
 
         $client = m::mock(SesV2Client::class);
         $sesResult = m::mock();
-        $sesResult->shouldReceive('get')
+        $sesResult->expects('get')
             ->with('MessageId')
-            ->once()
+            
             ->andReturn('ses-message-id');
-        $client->shouldReceive('sendEmail')->once()
+        $client->expects('sendEmail')
             ->with(m::on(function ($arg) {
                 return ! array_key_exists('TenantName', $arg);
             }))
@@ -132,7 +132,7 @@ class MailSesV2TransportTest extends TestCase
         $message->to('me@example.com');
 
         $client = m::mock(SesV2Client::class);
-        $client->shouldReceive('sendEmail')->once()
+        $client->expects('sendEmail')
             ->andThrow(new AwsException('Email address is not verified.', new Command('sendRawEmail')));
 
         $this->expectException(TransportException::class);

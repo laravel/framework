@@ -61,8 +61,8 @@ class DatabaseMigrationsTest extends TestCase
         $kernel = m::spy(ConsoleKernel::class);
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
-        $kernel->shouldReceive('call')
-            ->once()
+        $kernel->expects('call')
+            
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => false,
@@ -79,8 +79,8 @@ class DatabaseMigrationsTest extends TestCase
         $kernel = m::spy(ConsoleKernel::class);
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
-        $kernel->shouldReceive('call')
-            ->once()
+        $kernel->expects('call')
+            
             ->with('migrate:fresh', [
                 '--drop-views' => true,
                 '--drop-types' => false,
@@ -97,8 +97,8 @@ class DatabaseMigrationsTest extends TestCase
         $kernel = m::spy(ConsoleKernel::class);
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
-        $kernel->shouldReceive('call')
-            ->once()
+        $kernel->expects('call')
+            
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => true,

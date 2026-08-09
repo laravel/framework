@@ -59,11 +59,11 @@ class MailSesTransportTest extends TestCase
 
         $client = m::mock(SesClient::class);
         $sesResult = m::mock();
-        $sesResult->shouldReceive('get')
+        $sesResult->expects('get')
             ->with('MessageId')
-            ->once()
+            
             ->andReturn('ses-message-id');
-        $client->shouldReceive('sendRawEmail')->once()
+        $client->expects('sendRawEmail')
             ->with(m::on(function ($arg) {
                 return $arg['Source'] === 'myself@example.com' &&
                     $arg['Destinations'] === ['me@example.com', 'you@example.com'] &&
@@ -85,7 +85,7 @@ class MailSesTransportTest extends TestCase
         $message->to('me@example.com');
 
         $client = m::mock(SesClient::class);
-        $client->shouldReceive('sendRawEmail')->once()
+        $client->expects('sendRawEmail')
             ->andThrow(new AwsException('Email address is not verified.', new Command('sendRawEmail')));
 
         $this->expectException(TransportException::class);

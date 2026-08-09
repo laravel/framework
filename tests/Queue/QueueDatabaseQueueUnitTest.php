@@ -39,7 +39,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->setContainer($container);
         $query = m::mock(stdClass::class);
         $database->shouldReceive('table')->with('table')->andReturn($query);
-        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) use ($uuid, $displayNameStartsWith, $jobStartsWith) {
+        $query->expects('insertGetId')->andReturnUsing(function ($array) use ($uuid, $displayNameStartsWith, $jobStartsWith) {
             $payload = json_decode($array['payload'], true);
             $this->assertSame($uuid, $payload['uuid']);
             $this->assertStringContainsString($displayNameStartsWith, $payload['displayName']);
@@ -90,7 +90,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->setContainer($container);
         $query = m::mock(stdClass::class);
         $database->shouldReceive('table')->with('table')->andReturn($query);
-        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) use ($uuid, $time) {
+        $query->expects('insertGetId')->andReturnUsing(function ($array) use ($uuid, $time) {
             $this->assertSame('default', $array['queue']);
             $this->assertSame(json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => 10]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
@@ -122,7 +122,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->setContainer($container);
         $query = m::mock(stdClass::class);
         $database->shouldReceive('table')->with('table')->andReturn($query);
-        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
+        $query->expects('insertGetId')->andReturnUsing(function ($array) {
             $payload = json_decode($array['payload'], true);
             $this->assertSame('test-batch-id', $payload['data']['batchId']);
         });
@@ -142,7 +142,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->setContainer($container);
         $query = m::mock(stdClass::class);
         $database->shouldReceive('table')->with('table')->andReturn($query);
-        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
+        $query->expects('insertGetId')->andReturnUsing(function ($array) {
             $payload = json_decode($array['payload'], true);
 
             $this->assertSame(1700, $payload['timeout']);
@@ -165,7 +165,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->setContainer($container);
         $query = m::mock(stdClass::class);
         $database->shouldReceive('table')->with('table')->andReturn($query);
-        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
+        $query->expects('insertGetId')->andReturnUsing(function ($array) {
             $payload = json_decode($array['payload'], true);
 
             $this->assertSame(40, $payload['timeout']);
@@ -228,7 +228,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->method('availableAt')->willReturn('available');
         $query = m::mock(stdClass::class);
         $database->shouldReceive('table')->with('table')->andReturn($query);
-        $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) use ($uuid, $time) {
+        $query->expects('insert')->andReturnUsing(function ($records) use ($uuid, $time) {
             $this->assertEquals([[
                 'queue' => 'queue',
                 'payload' => json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => null]),
@@ -261,7 +261,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         });
         $query = m::mock(stdClass::class);
         $database->shouldReceive('table')->with('table')->andReturn($query);
-        $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) {
+        $query->expects('insert')->andReturnUsing(function ($records) {
             $this->assertSame('available:15', $records[0]['available_at']);
         });
 
@@ -274,7 +274,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $committed = null;
 
-        $transactions->shouldReceive('addCallback')->once()->andReturnUsing(function ($callback) use (&$committed) {
+        $transactions->expects('addCallback')->andReturnUsing(function ($callback) use (&$committed) {
             $committed = $callback;
         });
 
@@ -288,8 +288,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $inserted = false;
 
         $query = m::mock(stdClass::class);
-        $database->shouldReceive('table')->with('table')->once()->andReturn($query);
-        $query->shouldReceive('insert')->once()->andReturnUsing(function () use (&$inserted) {
+        $database->expects('table')->with('table')->andReturn($query);
+        $query->expects('insert')->andReturnUsing(function () use (&$inserted) {
             $inserted = true;
         });
 
@@ -496,8 +496,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue = new DatabaseQueue($database, 'table', 'default');
 
         $pdo = m::mock(\PDO::class);
-        $pdo->shouldReceive('getAttribute')->with(\PDO::ATTR_DRIVER_NAME)->once()->andReturn('mysql');
-        $pdo->shouldReceive('getAttribute')->with(\PDO::ATTR_SERVER_VERSION)->once()->andReturn('8.0.36');
+        $pdo->expects('getAttribute')->with(\PDO::ATTR_DRIVER_NAME)->andReturn('mysql');
+        $pdo->expects('getAttribute')->with(\PDO::ATTR_SERVER_VERSION)->andReturn('8.0.36');
 
         $database->shouldReceive('getPdo')->andReturn($pdo);
         $database->shouldReceive('getConfig')->with('version')->andReturn(null);

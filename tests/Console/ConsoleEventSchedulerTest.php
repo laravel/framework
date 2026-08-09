@@ -33,8 +33,8 @@ class ConsoleEventSchedulerTest extends TestCase
 
     public function testMutexCanReceiveCustomStore()
     {
-        Container::getInstance()->make(EventMutex::class)->shouldReceive('useStore')->once()->with('test');
-        Container::getInstance()->make(SchedulingMutex::class)->shouldReceive('useStore')->once()->with('test');
+        Container::getInstance()->make(EventMutex::class)->expects('useStore')->with('test');
+        Container::getInstance()->make(SchedulingMutex::class)->expects('useStore')->with('test');
 
         $this->schedule->useCache('test');
     }

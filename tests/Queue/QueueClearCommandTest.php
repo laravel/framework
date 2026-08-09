@@ -17,7 +17,7 @@ class QueueClearCommandTest extends TestCase
     public function testClearingDefaultQueue()
     {
         $queue = m::mock(ClearableQueue::class);
-        $queue->shouldReceive('clear')->with('default')->once()->andReturn(2);
+        $queue->expects('clear')->with('default')->andReturn(2);
 
         $output = $this->runClearCommand($queue);
 
@@ -27,9 +27,9 @@ class QueueClearCommandTest extends TestCase
     public function testClearingMultipleQueues()
     {
         $queue = m::mock(ClearableQueue::class);
-        $queue->shouldReceive('clear')->with('high')->once()->andReturn(3);
-        $queue->shouldReceive('clear')->with('low')->once()->andReturn(0);
-        $queue->shouldReceive('clear')->with('emails')->once()->andReturn(1);
+        $queue->expects('clear')->with('high')->andReturn(3);
+        $queue->expects('clear')->with('low')->andReturn(0);
+        $queue->expects('clear')->with('emails')->andReturn(1);
 
         $output = $this->runClearCommand($queue, ['--queue' => 'high,low,emails']);
 
@@ -39,8 +39,8 @@ class QueueClearCommandTest extends TestCase
     public function testClearingMultipleQueuesWithWhitespace()
     {
         $queue = m::mock(ClearableQueue::class);
-        $queue->shouldReceive('clear')->with('high')->once()->andReturn(3);
-        $queue->shouldReceive('clear')->with('low')->once()->andReturn(0);
+        $queue->expects('clear')->with('high')->andReturn(3);
+        $queue->expects('clear')->with('low')->andReturn(0);
 
         $output = $this->runClearCommand($queue, ['--queue' => 'high, low']);
 
@@ -50,8 +50,8 @@ class QueueClearCommandTest extends TestCase
     public function testClearingMultipleQueuesWithEmptyValues()
     {
         $queue = m::mock(ClearableQueue::class);
-        $queue->shouldReceive('clear')->with('high')->once()->andReturn(3);
-        $queue->shouldReceive('clear')->with('low')->once()->andReturn(0);
+        $queue->expects('clear')->with('high')->andReturn(3);
+        $queue->expects('clear')->with('low')->andReturn(0);
 
         $output = $this->runClearCommand($queue, ['--queue' => 'high,,low']);
 
@@ -61,8 +61,8 @@ class QueueClearCommandTest extends TestCase
     public function testClearingMultipleQueuesWithDuplicates()
     {
         $queue = m::mock(ClearableQueue::class);
-        $queue->shouldReceive('clear')->with('high')->once()->andReturn(3);
-        $queue->shouldReceive('clear')->with('low')->once()->andReturn(0);
+        $queue->expects('clear')->with('high')->andReturn(3);
+        $queue->expects('clear')->with('low')->andReturn(0);
 
         $output = $this->runClearCommand($queue, ['--queue' => 'high,low,high']);
 

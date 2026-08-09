@@ -323,7 +323,7 @@ class FilesystemTest extends TestCase
         mkdir(self::$tempDir.'/tmp7', 0777, true);
 
         $files = m::mock(Filesystem::class)->makePartial();
-        $files->shouldReceive('deleteDirectory')->once()->andReturn(false);
+        $files->expects('deleteDirectory')->andReturn(false);
         $this->assertFalse($files->moveDirectory(self::$tempDir.'/tmp6', self::$tempDir.'/tmp7', true));
     }
 

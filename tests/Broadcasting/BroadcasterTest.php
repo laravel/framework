@@ -199,8 +199,8 @@ class BroadcasterTest extends TestCase
         });
 
         $request = m::mock(Request::class);
-        $request->shouldReceive('user')
-            ->once()
+        $request->expects('user')
+            
             ->withNoArgs()
             ->andReturn(new DummyUser);
 
@@ -217,8 +217,8 @@ class BroadcasterTest extends TestCase
         }, ['guards' => 'myguard']);
 
         $request = m::mock(Request::class);
-        $request->shouldReceive('user')
-            ->once()
+        $request->expects('user')
+            
             ->with('myguard')
             ->andReturn(new DummyUser);
 
@@ -238,8 +238,8 @@ class BroadcasterTest extends TestCase
         }, ['guards' => ['myguard2', 'myguard1']]);
 
         $request = m::mock(Request::class);
-        $request->shouldReceive('user')
-            ->once()
+        $request->expects('user')
+            
             ->with('myguard1')
             ->andReturn(null);
         $request->shouldReceive('user')
@@ -266,8 +266,8 @@ class BroadcasterTest extends TestCase
         }, ['guards' => 'myguard']);
 
         $request = m::mock(Request::class);
-        $request->shouldReceive('user')
-            ->once()
+        $request->expects('user')
+            
             ->with('myguard')
             ->andReturn(null);
         $request->shouldNotReceive('user')
@@ -283,12 +283,12 @@ class BroadcasterTest extends TestCase
         }, ['guards' => ['myguard1', 'myguard2']]);
 
         $request = m::mock(Request::class);
-        $request->shouldReceive('user')
-            ->once()
+        $request->expects('user')
+            
             ->with('myguard1')
             ->andReturn(null);
-        $request->shouldReceive('user')
-            ->once()
+        $request->expects('user')
+            
             ->with('myguard2')
             ->andReturn(null);
         $request->shouldNotReceive('user')

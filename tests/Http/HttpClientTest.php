@@ -2521,8 +2521,8 @@ class HttpClientTest extends TestCase
     public function testClonedClientsWorkSuccessfullyWithTheRequestObject()
     {
         $events = m::mock(Dispatcher::class);
-        $events->shouldReceive('dispatch')->once()->with(m::type(RequestSending::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(ResponseReceived::class));
+        $events->expects('dispatch')->with(m::type(RequestSending::class));
+        $events->expects('dispatch')->with(m::type(ResponseReceived::class));
 
         $factory = new Factory($events);
         $factory->fake(['example.com' => $factory::response('foo', 200)]);

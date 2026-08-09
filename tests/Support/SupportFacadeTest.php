@@ -21,7 +21,7 @@ class SupportFacadeTest extends TestCase
     {
         $app = new ApplicationStub;
         $app->setAttributes(['foo' => $mock = m::mock(stdClass::class)]);
-        $mock->shouldReceive('bar')->once()->andReturn('baz');
+        $mock->expects('bar')->andReturn('baz');
         FacadeStub::setFacadeApplication($app);
         $this->assertSame('baz', FacadeStub::bar());
     }

@@ -51,7 +51,7 @@ class CacheMemcachedConnectorTest extends TestCase
         ];
 
         $memcached = $this->memcachedMockWithAddServer();
-        $memcached->shouldReceive('setOptions')->once()->andReturn(true);
+        $memcached->expects('setOptions')->andReturn(true);
 
         $connector = $this->connectorMock();
         $connector->expects($this->once())
@@ -69,9 +69,9 @@ class CacheMemcachedConnectorTest extends TestCase
         $saslCredentials = ['foo', 'bar'];
 
         $memcached = $this->memcachedMockWithAddServer();
-        $memcached->shouldReceive('setOption')->once()->with(Memcached::OPT_BINARY_PROTOCOL, true)->andReturn(true);
-        $memcached->shouldReceive('setSaslAuthData')
-            ->once()->with($saslCredentials[0], $saslCredentials[1])
+        $memcached->expects('setOption')->with(Memcached::OPT_BINARY_PROTOCOL, true)->andReturn(true);
+        $memcached->expects('setSaslAuthData')
+            ->with($saslCredentials[0], $saslCredentials[1])
             ->andReturn(true);
 
         $connector = $this->connectorMock();
@@ -85,8 +85,8 @@ class CacheMemcachedConnectorTest extends TestCase
     protected function memcachedMockWithAddServer($returnedVersion = [])
     {
         $memcached = m::mock(stdClass::class);
-        $memcached->shouldReceive('addServer')->once()->with($this->getHost(), $this->getPort(), $this->getWeight());
-        $memcached->shouldReceive('getServerList')->once()->andReturn([]);
+        $memcached->expects('addServer')->with($this->getHost(), $this->getPort(), $this->getWeight());
+        $memcached->expects('getServerList')->andReturn([]);
 
         return $memcached;
     }

@@ -66,7 +66,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $job = new JobStub;
 
         $manager = m::mock(QueueManager::class);
-        $manager->shouldReceive('push')->once()->withArgs(function ($passedJob) use ($job) {
+        $manager->expects('push')->withArgs(function ($passedJob) use ($job) {
             return $passedJob === $job;
         });
 
@@ -422,7 +422,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $job = new JobStub;
 
         $manager = m::mock(QueueManager::class);
-        $manager->shouldReceive('push')->once()->withArgs(function ($passedJob) use ($job) {
+        $manager->expects('push')->withArgs(function ($passedJob) use ($job) {
             return $passedJob === $job;
         });
 
@@ -489,7 +489,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $steps = [];
 
         $manager = m::mock(QueueManager::class);
-        $manager->shouldReceive('push')->once()->withArgs(function ($passedJob, $passedData, $passedQueue) use ($job) {
+        $manager->expects('push')->withArgs(function ($passedJob, $passedData, $passedQueue) use ($job) {
             return $passedJob === $job && $passedData === ['foo' => 'bar'] && $passedQueue === 'redis';
         });
 

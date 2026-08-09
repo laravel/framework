@@ -36,13 +36,13 @@ class FoundationAuthenticationTest extends TestCase
         $guard = m::mock(Guard::class);
 
         $auth = m::mock(AuthManager::class);
-        $auth->shouldReceive('guard')
-            ->once()
+        $auth->expects('guard')
+            
             ->andReturn($guard);
 
         $this->app = m::mock(Application::class);
-        $this->app->shouldReceive('make')
-            ->once()
+        $this->app->expects('make')
+            
             ->withArgs(['auth'])
             ->andReturn($auth);
 
@@ -52,8 +52,8 @@ class FoundationAuthenticationTest extends TestCase
     public function testAssertAuthenticated()
     {
         $this->mockGuard()
-            ->shouldReceive('check')
-            ->once()
+            ->expects('check')
+            
             ->andReturn(true);
 
         $this->assertAuthenticated();
@@ -62,8 +62,8 @@ class FoundationAuthenticationTest extends TestCase
     public function testAssertGuest()
     {
         $this->mockGuard()
-            ->shouldReceive('check')
-            ->once()
+            ->expects('check')
+            
             ->andReturn(false);
 
         $this->assertGuest();
@@ -76,8 +76,8 @@ class FoundationAuthenticationTest extends TestCase
             ->andReturn('1');
 
         $this->mockGuard()
-            ->shouldReceive('user')
-            ->once()
+            ->expects('user')
+            
             ->andReturn($expected);
 
         $user = m::mock(Authenticatable::class);
@@ -102,8 +102,8 @@ class FoundationAuthenticationTest extends TestCase
             ->andReturn($this->credentials === $credentials);
 
         $this->mockGuard()
-            ->shouldReceive('getProvider')
-            ->once()
+            ->expects('getProvider')
+            
             ->andReturn($provider);
     }
 

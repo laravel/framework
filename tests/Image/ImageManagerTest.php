@@ -98,8 +98,8 @@ class ImageManagerTest extends TestCase
         $path = $file->getRealPath();
 
         $filesystem = m::mock(Filesystem::class);
-        $filesystem->shouldReceive('get')
-            ->once()
+        $filesystem->expects('get')
+            
             ->with($path)
             ->andReturn(file_get_contents($path));
 
@@ -136,14 +136,14 @@ class ImageManagerTest extends TestCase
         $contents = $this->fakeImageContents();
 
         $disk = m::mock();
-        $disk->shouldReceive('get')
-            ->once()
+        $disk->expects('get')
+            
             ->with('images/avatar.jpg')
             ->andReturn($contents);
 
         $filesystem = m::mock(FilesystemFactory::class);
-        $filesystem->shouldReceive('disk')
-            ->once()
+        $filesystem->expects('disk')
+            
             ->with('public')
             ->andReturn($disk);
 
@@ -164,14 +164,14 @@ class ImageManagerTest extends TestCase
         $contents = $this->fakeImageContents();
 
         $disk = m::mock();
-        $disk->shouldReceive('get')
-            ->once()
+        $disk->expects('get')
+            
             ->with('images/avatar.jpg')
             ->andReturn($contents);
 
         $filesystem = m::mock(FilesystemFactory::class);
-        $filesystem->shouldReceive('disk')
-            ->once()
+        $filesystem->expects('disk')
+            
             ->with('public')
             ->andReturn($disk);
 

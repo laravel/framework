@@ -31,8 +31,8 @@ class AblyBroadcasterTest extends TestCase
             return true;
         });
 
-        $this->broadcaster->shouldReceive('validAuthenticationResponse')
-            ->once();
+        $this->broadcaster->expects('validAuthenticationResponse')
+            ;
 
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('private-test')
@@ -72,8 +72,8 @@ class AblyBroadcasterTest extends TestCase
             return $returnData;
         });
 
-        $this->broadcaster->shouldReceive('validAuthenticationResponse')
-            ->once();
+        $this->broadcaster->expects('validAuthenticationResponse')
+            ;
 
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('presence-test')

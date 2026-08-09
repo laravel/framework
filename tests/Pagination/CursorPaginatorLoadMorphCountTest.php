@@ -17,7 +17,7 @@ class CursorPaginatorLoadMorphCountTest extends TestCase
         ];
 
         $items = m::mock(Collection::class);
-        $items->shouldReceive('loadMorphCount')->once()->with('parentable', $relations);
+        $items->expects('loadMorphCount')->with('parentable', $relations);
 
         $p = (new class extends AbstractCursorPaginator {
         })->setCollection($items);

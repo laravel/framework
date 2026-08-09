@@ -21,7 +21,7 @@ class LogLoggerTest extends TestCase
         $monolog = m::mock(Monolog::class);
         $writer = new Logger($monolog);
         $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
-        $monolog->shouldReceive('error')->once()->with('foo', []);
+        $monolog->expects('error')->with('foo', []);
 
         $writer->error('foo');
     }
@@ -33,7 +33,7 @@ class LogLoggerTest extends TestCase
         $writer->withContext(['bar' => 'baz']);
 
         $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
-        $monolog->shouldReceive('error')->once()->with('foo', ['bar' => 'baz']);
+        $monolog->expects('error')->with('foo', ['bar' => 'baz']);
 
         $writer->error('foo');
     }
@@ -59,7 +59,7 @@ class LogLoggerTest extends TestCase
         $writer->withoutContext(['forget']);
 
         $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
-        $monolog->shouldReceive('error')->once()->with('foo', ['bar' => 'baz']);
+        $monolog->expects('error')->with('foo', ['bar' => 'baz']);
 
         $writer->error('foo');
     }
@@ -69,7 +69,7 @@ class LogLoggerTest extends TestCase
         $monolog = m::mock(Monolog::class);
         $writer = new Logger($monolog, $events = new Dispatcher);
         $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
-        $monolog->shouldReceive('error')->once()->with('foo', []);
+        $monolog->expects('error')->with('foo', []);
 
         $events->listen(MessageLogged::class, function ($event) {
             $_SERVER['__log.level'] = $event->level;
@@ -107,7 +107,7 @@ class LogLoggerTest extends TestCase
         $callback = function () {
             return 'success';
         };
-        $events->shouldReceive('listen')->with(MessageLogged::class, $callback)->once();
+        $events->expects('listen')->with(MessageLogged::class, $callback);
 
         $writer->listen($callback);
     }
@@ -122,7 +122,7 @@ class LogLoggerTest extends TestCase
         $writer->withoutContext(['timestamp']);
 
         $monolog->shouldReceive('isHandling')->with('info')->andReturn(true);
-        $monolog->shouldReceive('info')->once()->with('User action', [
+        $monolog->expects('info')->with('User action', [
             'user_id' => 123,
             'action' => 'login',
             'ip' => '127.0.0.1',

@@ -39,10 +39,10 @@ class DatabaseSeederTest extends TestCase
         $command->shouldReceive('getOutput')->times(3)->andReturn($output);
         $seeder->setCommand($command);
         $child = m::mock(Seeder::class);
-        $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child);
-        $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
-        $child->shouldReceive('setCommand')->once()->with($command)->andReturn($child);
-        $child->shouldReceive('__invoke')->once();
+        $container->expects('make')->with('ClassName')->andReturn($child);
+        $child->expects('setContainer')->with($container)->andReturn($child);
+        $child->expects('setCommand')->with($command)->andReturn($child);
+        $child->expects('__invoke');
 
         $seeder->call('ClassName');
     }

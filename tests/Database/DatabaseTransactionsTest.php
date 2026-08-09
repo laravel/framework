@@ -61,8 +61,8 @@ class DatabaseTransactionsTest extends TestCase
     public function testTransactionIsRecordedAndCommitted()
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);
-        $transactionManager->shouldReceive('begin')->once()->with('default', 1);
-        $transactionManager->shouldReceive('commit')->once()->with('default', 1, 0);
+        $transactionManager->expects('begin')->with('default', 1);
+        $transactionManager->expects('commit')->with('default', 1, 0);
 
         $this->connection()->setTransactionManager($transactionManager);
 
@@ -80,8 +80,8 @@ class DatabaseTransactionsTest extends TestCase
     public function testTransactionIsRecordedAndCommittedUsingTheSeparateMethods()
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);
-        $transactionManager->shouldReceive('begin')->once()->with('default', 1);
-        $transactionManager->shouldReceive('commit')->once()->with('default', 1, 0);
+        $transactionManager->expects('begin')->with('default', 1);
+        $transactionManager->expects('commit')->with('default', 1, 0);
 
         $this->connection()->setTransactionManager($transactionManager);
 
@@ -99,10 +99,10 @@ class DatabaseTransactionsTest extends TestCase
     public function testNestedTransactionIsRecordedAndCommitted()
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);
-        $transactionManager->shouldReceive('begin')->once()->with('default', 1);
-        $transactionManager->shouldReceive('begin')->once()->with('default', 2);
-        $transactionManager->shouldReceive('commit')->once()->with('default', 2, 1);
-        $transactionManager->shouldReceive('commit')->once()->with('default', 1, 0);
+        $transactionManager->expects('begin')->with('default', 1);
+        $transactionManager->expects('begin')->with('default', 2);
+        $transactionManager->expects('commit')->with('default', 2, 1);
+        $transactionManager->expects('commit')->with('default', 1, 0);
 
         $this->connection()->setTransactionManager($transactionManager);
 
@@ -126,12 +126,12 @@ class DatabaseTransactionsTest extends TestCase
     public function testNestedTransactionIsRecordeForDifferentConnectionsdAndCommitted()
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);
-        $transactionManager->shouldReceive('begin')->once()->with('default', 1);
-        $transactionManager->shouldReceive('begin')->once()->with('second_connection', 1);
-        $transactionManager->shouldReceive('begin')->once()->with('second_connection', 2);
-        $transactionManager->shouldReceive('commit')->once()->with('default', 1, 0);
-        $transactionManager->shouldReceive('commit')->once()->with('second_connection', 2, 1);
-        $transactionManager->shouldReceive('commit')->once()->with('second_connection', 1, 0);
+        $transactionManager->expects('begin')->with('default', 1);
+        $transactionManager->expects('begin')->with('second_connection', 1);
+        $transactionManager->expects('begin')->with('second_connection', 2);
+        $transactionManager->expects('commit')->with('default', 1, 0);
+        $transactionManager->expects('commit')->with('second_connection', 2, 1);
+        $transactionManager->expects('commit')->with('second_connection', 1, 0);
 
         $this->connection()->setTransactionManager($transactionManager);
         $this->connection('second_connection')->setTransactionManager($transactionManager);
@@ -162,8 +162,8 @@ class DatabaseTransactionsTest extends TestCase
     public function testTransactionIsRolledBack()
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);
-        $transactionManager->shouldReceive('begin')->once()->with('default', 1);
-        $transactionManager->shouldReceive('rollback')->once()->with('default', 0);
+        $transactionManager->expects('begin')->with('default', 1);
+        $transactionManager->expects('rollback')->with('default', 0);
         $transactionManager->shouldNotReceive('commit');
 
         $this->connection()->setTransactionManager($transactionManager);
@@ -187,8 +187,8 @@ class DatabaseTransactionsTest extends TestCase
     public function testTransactionIsRolledBackUsingSeparateMethods()
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);
-        $transactionManager->shouldReceive('begin')->once()->with('default', 1);
-        $transactionManager->shouldReceive('rollback')->once()->with('default', 0);
+        $transactionManager->expects('begin')->with('default', 1);
+        $transactionManager->expects('rollback')->with('default', 0);
         $transactionManager->shouldNotReceive('commit', 1, 0);
 
         $this->connection()->setTransactionManager($transactionManager);
@@ -209,10 +209,10 @@ class DatabaseTransactionsTest extends TestCase
     public function testNestedTransactionsAreRolledBack()
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);
-        $transactionManager->shouldReceive('begin')->once()->with('default', 1);
-        $transactionManager->shouldReceive('begin')->once()->with('default', 2);
-        $transactionManager->shouldReceive('rollback')->once()->with('default', 1);
-        $transactionManager->shouldReceive('rollback')->once()->with('default', 0);
+        $transactionManager->expects('begin')->with('default', 1);
+        $transactionManager->expects('begin')->with('default', 2);
+        $transactionManager->expects('rollback')->with('default', 1);
+        $transactionManager->expects('rollback')->with('default', 0);
         $transactionManager->shouldNotReceive('commit');
 
         $this->connection()->setTransactionManager($transactionManager);

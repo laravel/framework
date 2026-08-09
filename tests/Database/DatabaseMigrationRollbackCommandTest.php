@@ -19,12 +19,12 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+        $migrator->expects('paths')->andReturn([]);
+        $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
-        $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 0, 'batch' => 0]);
+        $migrator->expects('setOutput')->andReturn($migrator);
+        $migrator->expects('rollback')->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 0, 'batch' => 0]);
 
         $this->runCommand($command);
     }
@@ -36,12 +36,12 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+        $migrator->expects('paths')->andReturn([]);
+        $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
-        $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 2, 'batch' => 0]);
+        $migrator->expects('setOutput')->andReturn($migrator);
+        $migrator->expects('rollback')->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 2, 'batch' => 0]);
 
         $this->runCommand($command, ['--step' => 2]);
     }
@@ -53,12 +53,12 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+        $migrator->expects('paths')->andReturn([]);
+        $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
-        $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], true);
+        $migrator->expects('setOutput')->andReturn($migrator);
+        $migrator->expects('rollback')->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], true);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
     }
@@ -70,12 +70,12 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $migrator->shouldReceive('paths')->once()->andReturn([]);
-        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+        $migrator->expects('paths')->andReturn([]);
+        $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
-        $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => true, 'step' => 2, 'batch' => 0]);
+        $migrator->expects('setOutput')->andReturn($migrator);
+        $migrator->expects('rollback')->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => true, 'step' => 2, 'batch' => 0]);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo', '--step' => 2]);
     }

@@ -69,7 +69,7 @@ class RoutingRedirectorTest extends TestCase
     public function testGuestPutCurrentUrlInSession()
     {
         $this->url->shouldReceive('full')->andReturn('http://foo.com/bar');
-        $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
+        $this->session->expects('put')->with('url.intended', 'http://foo.com/bar');
 
         $response = $this->redirect->guest('login');
 
@@ -78,9 +78,9 @@ class RoutingRedirectorTest extends TestCase
 
     public function testGuestPutPreviousUrlInSession()
     {
-        $this->request->shouldReceive('isMethod')->once()->with('GET')->andReturn(false);
-        $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
-        $this->url->shouldReceive('previous')->once()->andReturn('http://foo.com/bar');
+        $this->request->expects('isMethod')->with('GET')->andReturn(false);
+        $this->session->expects('put')->with('url.intended', 'http://foo.com/bar');
+        $this->url->expects('previous')->andReturn('http://foo.com/bar');
 
         $response = $this->redirect->guest('login');
 
@@ -172,7 +172,7 @@ class RoutingRedirectorTest extends TestCase
 
     public function testItSetsAndGetsValidIntendedUrl()
     {
-        $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
+        $this->session->expects('put')->with('url.intended', 'http://foo.com/bar');
         $this->session->shouldReceive('get')->andReturn('http://foo.com/bar');
 
         $result = $this->redirect->setIntendedUrl('http://foo.com/bar');

@@ -52,7 +52,7 @@ class SupportFacadesEventTest extends TestCase
             Event::assertDispatched(EventStub::class);
         });
 
-        $this->events->shouldReceive('dispatch')->once();
+        $this->events->expects('dispatch');
 
         (new FakeForStub)->dispatch();
     }

@@ -15,8 +15,8 @@ class SqlServerBuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $grammar = new SqlServerGrammar($connection);
 
-        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $connection->shouldReceive('statement')->once()->with(
+        $connection->expects('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('statement')->with(
             'create database "my_temporary_database_a"'
         )->andReturn(true);
 
@@ -29,8 +29,8 @@ class SqlServerBuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $grammar = new SqlServerGrammar($connection);
 
-        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $connection->shouldReceive('statement')->once()->with(
+        $connection->expects('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('statement')->with(
             'drop database if exists "my_temporary_database_b"'
         )->andReturn(true);
 

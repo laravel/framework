@@ -64,11 +64,11 @@ class ValidationFactoryTest extends TestCase
         $translator = m::mock(TranslatorInterface::class);
         $factory = m::mock(Factory::class.'[make]', [$translator]);
 
-        $factory->shouldReceive('make')->once()
+        $factory->expects('make')
             ->with(['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'required'], [], [])
             ->andReturn($validator);
 
-        $validator->shouldReceive('validate')->once()->andReturn(['foo' => 'bar']);
+        $validator->expects('validate')->andReturn(['foo' => 'bar']);
 
         $validated = $factory->validate(
             ['foo' => 'bar', 'baz' => 'boom'],

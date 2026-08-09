@@ -64,8 +64,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function testAssertDatabaseSupportsArrays()
     {
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->once()->andReturnSelf();
-        $builder->shouldReceive('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->once()->andReturnSelf();
+        $builder->expects('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->andReturnSelf();
+        $builder->expects('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->andReturnSelf();
         $builder->shouldReceive('exists')->twice()->andReturn(true);
 
         $this->connection->shouldReceive('table')->with($this->table)->andReturn($builder);
@@ -116,8 +116,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function testAssertDatabaseMissingSupportsArrays()
     {
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->once()->andReturnSelf();
-        $builder->shouldReceive('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->once()->andReturnSelf();
+        $builder->expects('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->andReturnSelf();
+        $builder->expects('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->andReturnSelf();
         $builder->shouldReceive('exists')->twice()->andReturn(false);
 
         $this->connection->shouldReceive('table')->with($this->table)->andReturn($builder);
@@ -213,8 +213,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function testAssertSoftDeletedSupportsArrays()
     {
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->once()->andReturnSelf();
-        $builder->shouldReceive('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->once()->andReturnSelf();
+        $builder->expects('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->andReturnSelf();
+        $builder->expects('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->andReturnSelf();
         $builder->shouldReceive('whereNotNull')->with('deleted_at')->twice()->andReturnSelf();
         $builder->shouldReceive('exists')->twice()->andReturn(true);
 
@@ -229,8 +229,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function testAssertNotSoftDeletedSupportsArrays()
     {
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->once()->andReturnSelf();
-        $builder->shouldReceive('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->once()->andReturnSelf();
+        $builder->expects('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->andReturnSelf();
+        $builder->expects('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->andReturnSelf();
         $builder->shouldReceive('whereNull')->with('deleted_at')->twice()->andReturnSelf();
         $builder->shouldReceive('exists')->twice()->andReturn(true);
 

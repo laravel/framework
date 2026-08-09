@@ -42,11 +42,11 @@ class SkipIfBatchCancelledTest extends TestCase
 
         $job = m::mock(Job::class);
 
-        $job->shouldReceive('uuid')->once()->andReturn('simple-test-uuid');
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
+        $job->expects('uuid')->andReturn('simple-test-uuid');
+        $job->expects('hasFailed')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
-        $job->shouldReceive('delete')->once();
+        $job->expects('isDeletedOrReleased')->andReturn(false);
+        $job->expects('delete');
 
         $instance->call($job, [
             'command' => serialize($command = $class),

@@ -143,11 +143,11 @@ class BusBatchTest extends TestCase
         };
 
         $connection = m::mock(stdClass::class);
-        $queue->shouldReceive('connection')->once()
+        $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
 
-        $connection->shouldReceive('bulk')->once()->with(m::on(function ($args) use ($job, $secondJob) {
+        $connection->expects('bulk')->with(m::on(function ($args) use ($job, $secondJob) {
             return
                 $args[0] == $job &&
                 $args[1] == $secondJob &&
@@ -234,11 +234,11 @@ class BusBatchTest extends TestCase
         };
 
         $connection = m::mock(stdClass::class);
-        $queue->shouldReceive('connection')->once()
+        $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
 
-        $connection->shouldReceive('bulk')->once();
+        $connection->expects('bulk');
 
         $batch = $batch->add([$job, $secondJob]);
         $this->assertEquals(2, $batch->pendingJobs);
@@ -272,19 +272,19 @@ class BusBatchTest extends TestCase
         };
 
         $connection = m::mock(stdClass::class);
-        $queue->shouldReceive('connection')->once()
+        $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
 
-        $connection->shouldReceive('bulk')->once();
+        $connection->expects('bulk');
 
         $batch = $batch->add([$job]);
 
-        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+        $events->expects('dispatch')->with(m::on(function ($event) use ($batch) {
             return $event instanceof BatchStarted && $event->batch === $batch;
         }));
 
-        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+        $events->expects('dispatch')->with(m::on(function ($event) use ($batch) {
             return $event instanceof BatchFinished && $event->batch === $batch;
         }));
 
@@ -310,19 +310,19 @@ class BusBatchTest extends TestCase
         };
 
         $connection = m::mock(stdClass::class);
-        $queue->shouldReceive('connection')->once()
+        $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
 
-        $connection->shouldReceive('bulk')->once();
+        $connection->expects('bulk');
 
         $batch = $batch->add([$job, $secondJob]);
 
-        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+        $events->expects('dispatch')->with(m::on(function ($event) use ($batch) {
             return $event instanceof BatchStarted && $event->batch === $batch;
         }));
 
-        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
+        $events->expects('dispatch')->with(m::on(function ($event) {
             return $event instanceof BatchFinished;
         }));
 
@@ -349,15 +349,15 @@ class BusBatchTest extends TestCase
         };
 
         $connection = m::mock(stdClass::class);
-        $queue->shouldReceive('connection')->once()
+        $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
 
-        $connection->shouldReceive('bulk')->once();
+        $connection->expects('bulk');
 
         $batch = $batch->add([$job, $secondJob]);
 
-        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+        $events->expects('dispatch')->with(m::on(function ($event) use ($batch) {
             return $event instanceof BatchStarted && $event->batch === $batch;
         }));
 
@@ -382,11 +382,11 @@ class BusBatchTest extends TestCase
         };
 
         $connection = m::mock(stdClass::class);
-        $queue->shouldReceive('connection')->once()
+        $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
 
-        $connection->shouldReceive('bulk')->once();
+        $connection->expects('bulk');
 
         $batch = $batch->add([$job, $secondJob]);
         $this->assertEquals(2, $batch->pendingJobs);
@@ -425,11 +425,11 @@ class BusBatchTest extends TestCase
         };
 
         $connection = m::mock(stdClass::class);
-        $queue->shouldReceive('connection')->once()
+        $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
 
-        $connection->shouldReceive('bulk')->once();
+        $connection->expects('bulk');
 
         $batch = $batch->add([$job, $secondJob]);
         $this->assertEquals(2, $batch->pendingJobs);
@@ -504,11 +504,11 @@ class BusBatchTest extends TestCase
         };
 
         $connection = m::mock(stdClass::class);
-        $queue->shouldReceive('connection')->once()
+        $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
 
-        $connection->shouldReceive('bulk')->once();
+        $connection->expects('bulk');
 
         $batch = $batch->add([$job]);
 
@@ -552,7 +552,7 @@ class BusBatchTest extends TestCase
 
         $exception = new RuntimeException('Something went wrong.');
 
-        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch, $exception) {
+        $events->expects('dispatch')->with(m::on(function ($event) use ($batch, $exception) {
             return $event instanceof BatchCanceled
                 && $event->batch->id === $batch->id
                 && $event->exception === $exception;
@@ -627,11 +627,11 @@ class BusBatchTest extends TestCase
         $thirdJob = new ThirdTestJob;
 
         $connection = m::mock(stdClass::class);
-        $queue->shouldReceive('connection')->once()
+        $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
 
-        $connection->shouldReceive('bulk')->once()->with(m::on(function ($args) use ($chainHeadJob, $secondJob, $thirdJob) {
+        $connection->expects('bulk')->with(m::on(function ($args) use ($chainHeadJob, $secondJob, $thirdJob) {
             return
                 $args[0] == $chainHeadJob
                 && serialize($secondJob) == $args[0]->chained[0]
@@ -667,11 +667,11 @@ class BusBatchTest extends TestCase
         $secondJob = (new SecondTestJob)->onQueue('custom-queue');
 
         $connection = m::mock(stdClass::class);
-        $queue->shouldReceive('connection')->once()
+        $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
 
-        $connection->shouldReceive('bulk')->once()->with(m::on(function ($args) {
+        $connection->expects('bulk')->with(m::on(function ($args) {
             return true;
         }), '', null);
 

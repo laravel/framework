@@ -700,9 +700,9 @@ class SupportCollectionTest extends TestCase
     public function testToArrayCallsToArrayOnEachItemInCollection($collection)
     {
         $item1 = m::mock(Arrayable::class);
-        $item1->shouldReceive('toArray')->once()->andReturn('foo.array');
+        $item1->expects('toArray')->andReturn('foo.array');
         $item2 = m::mock(Arrayable::class);
-        $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
+        $item2->expects('toArray')->andReturn('bar.array');
         $c = new $collection([$item1, $item2]);
         $results = $c->toArray();
 
@@ -725,9 +725,9 @@ class SupportCollectionTest extends TestCase
     public function testJsonSerializeCallsToArrayOrJsonSerializeOnEachItemInCollection($collection)
     {
         $item1 = m::mock(JsonSerializable::class);
-        $item1->shouldReceive('jsonSerialize')->once()->andReturn('foo.json');
+        $item1->expects('jsonSerialize')->andReturn('foo.json');
         $item2 = m::mock(Arrayable::class);
-        $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
+        $item2->expects('toArray')->andReturn('bar.array');
         $c = new $collection([$item1, $item2]);
         $results = $c->jsonSerialize();
 

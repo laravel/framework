@@ -566,8 +566,8 @@ class FilesystemAdapterTest extends TestCase
 
         $exceptionHandler = m::mock(ExceptionHandler::class);
 
-        $exceptionHandler->shouldReceive('report')
-            ->once()
+        $exceptionHandler->expects('report')
+            
             ->andReturnUsing(function (UnableToReadFile $e) {
                 $this->assertStringContainsString(
                     'Unable to read file from location: foo.txt.',
@@ -594,8 +594,8 @@ class FilesystemAdapterTest extends TestCase
 
         $exceptionHandler = m::mock(ExceptionHandler::class);
 
-        $exceptionHandler->shouldReceive('report')
-            ->once()
+        $exceptionHandler->expects('report')
+            
             ->andReturnUsing(function (UnableToReadFile $e) {
                 $this->assertStringContainsString(
                     'Unable to read file from location: foo.txt.',
@@ -622,8 +622,8 @@ class FilesystemAdapterTest extends TestCase
 
         $exceptionHandler = m::mock(ExceptionHandler::class);
 
-        $exceptionHandler->shouldReceive('report')
-            ->once()
+        $exceptionHandler->expects('report')
+            
             ->andReturnUsing(function (UnableToWriteFile $e) {
                 $this->assertStringContainsString(
                     'Unable to write file at location: foo.txt.',
@@ -656,8 +656,8 @@ class FilesystemAdapterTest extends TestCase
 
         $exceptionHandler = m::mock(ExceptionHandler::class);
 
-        $exceptionHandler->shouldReceive('report')
-            ->once()
+        $exceptionHandler->expects('report')
+            
             ->andReturnUsing(function (UnableToRetrieveMetadata $e) {
                 $this->assertStringContainsString(
                     'Unable to retrieve the mime_type for file at location: unknown.mime-type.',

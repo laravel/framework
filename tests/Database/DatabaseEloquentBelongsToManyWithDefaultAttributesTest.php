@@ -24,9 +24,9 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         $relation->withPivotValue(['is_admin' => 1]);
 
         $query = m::mock(stdClass::class);
-        $query->shouldReceive('from')->once()->with('club_user')->andReturn($query);
-        $query->shouldReceive('insert')->once()->with([['club_id' => 1, 'user_id' => 1, 'is_admin' => 1]])->andReturn(true);
-        $relation->getQuery()->getQuery()->shouldReceive('newQuery')->once()->andReturn($query);
+        $query->expects('from')->with('club_user')->andReturn($query);
+        $query->expects('insert')->with([['club_id' => 1, 'user_id' => 1, 'is_admin' => 1]])->andReturn(true);
+        $relation->getQuery()->getQuery()->expects('newQuery')->andReturn($query);
 
         $relation->attach(1);
     }
@@ -47,9 +47,9 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         $related->shouldReceive('getKeyName')->andReturn('id');
         $related->shouldReceive('qualifyColumn')->with('id')->andReturn('users.id');
 
-        $builder->shouldReceive('join')->once()->with('club_user', 'users.id', '=', 'club_user.user_id');
-        $builder->shouldReceive('where')->once()->with('club_user.club_id', '=', 1);
-        $builder->shouldReceive('where')->once()->with('club_user.is_admin', '=', 1, 'and');
+        $builder->expects('join')->with('club_user', 'users.id', '=', 'club_user.user_id');
+        $builder->expects('where')->with('club_user.club_id', '=', 1);
+        $builder->expects('where')->with('club_user.is_admin', '=', 1, 'and');
 
         $mockQueryBuilder = m::mock(stdClass::class);
         $builder->shouldReceive('getQuery')->andReturn($mockQueryBuilder);

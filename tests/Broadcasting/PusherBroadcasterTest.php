@@ -29,8 +29,8 @@ class PusherBroadcasterTest extends TestCase
             return true;
         });
 
-        $this->broadcaster->shouldReceive('validAuthenticationResponse')
-            ->once();
+        $this->broadcaster->expects('validAuthenticationResponse')
+            ;
 
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('private-test')
@@ -70,8 +70,8 @@ class PusherBroadcasterTest extends TestCase
             return $returnData;
         });
 
-        $this->broadcaster->shouldReceive('validAuthenticationResponse')
-            ->once();
+        $this->broadcaster->expects('validAuthenticationResponse')
+            ;
 
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('presence-test')
@@ -112,8 +112,8 @@ class PusherBroadcasterTest extends TestCase
             'auth' => 'abcd:efgh',
         ];
 
-        $this->pusher->shouldReceive('socket_auth')
-            ->once()
+        $this->pusher->expects('socket_auth')
+            
             ->andReturn(json_encode($data));
 
         $this->assertEquals(
@@ -134,8 +134,8 @@ class PusherBroadcasterTest extends TestCase
             ],
         ];
 
-        $this->pusher->shouldReceive('presence_auth')
-            ->once()
+        $this->pusher->expects('presence_auth')
+            
             ->andReturn(json_encode($data));
 
         $this->assertEquals(

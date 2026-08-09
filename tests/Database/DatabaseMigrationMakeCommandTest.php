@@ -21,7 +21,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()
+        $creator->expects('create')
             ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true)
             ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
 
@@ -38,7 +38,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()
+        $creator->expects('create')
             ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true)
             ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
 
@@ -55,7 +55,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()
+        $creator->expects('create')
             ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true)
             ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
 
@@ -72,7 +72,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()
+        $creator->expects('create')
             ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true)
             ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
 
@@ -89,7 +89,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()
+        $creator->expects('create')
             ->with('create_users_table', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true)
             ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_users_table.php');
 
@@ -106,7 +106,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $command->setLaravel($app);
         $app->setBasePath('/home/laravel');
-        $creator->shouldReceive('create')->once()
+        $creator->expects('create')
             ->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true)
             ->andReturn('/home/laravel/vendor/laravel-package/migrations/2021_04_23_110457_create_foo.php');
         $this->runCommand($command, ['name' => 'create_foo', '--path' => 'vendor/laravel-package/migrations', '--create' => 'users']);

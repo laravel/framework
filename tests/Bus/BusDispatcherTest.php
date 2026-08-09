@@ -25,7 +25,7 @@ class BusDispatcherTest extends TestCase
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
-            $mock->shouldReceive('push')->once();
+            $mock->expects('push');
 
             return $mock;
         });
@@ -45,7 +45,7 @@ class BusDispatcherTest extends TestCase
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
-            $mock->shouldReceive('push')->once();
+            $mock->expects('push');
 
             return $mock;
         });
@@ -65,7 +65,7 @@ class BusDispatcherTest extends TestCase
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
-            $mock->shouldReceive('later')->once()->with(10, m::type(BusDispatcherTestSpecificQueueAndDelayCommand::class), '', 'foo');
+            $mock->expects('later')->with(10, m::type(BusDispatcherTestSpecificQueueAndDelayCommand::class), '', 'foo');
 
             return $mock;
         });
@@ -84,7 +84,7 @@ class BusDispatcherTest extends TestCase
         $queueRoutes->shouldReceive('getConnection')->andReturn(null);
 
         $mock = m::mock(Queue::class);
-        $mock->shouldReceive('push')->once()->with(BusDispatcherQueueable::class, '', 'high-priority');
+        $mock->expects('push')->with(BusDispatcherQueueable::class, '', 'high-priority');
 
         $dispatcher = new Dispatcher($container, function () use ($mock) {
             return $mock;
@@ -143,7 +143,7 @@ class BusDispatcherTest extends TestCase
 
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
-            $mock->shouldReceive('push')->once();
+            $mock->expects('push');
 
             return $mock;
         });
@@ -165,8 +165,8 @@ class BusDispatcherTest extends TestCase
         Container::setInstance($container);
 
         $mock = m::mock(Queue::class);
-        $mock->shouldReceive('bulk')->once()->with(m::on(fn ($jobs) => count($jobs) === 2), '', null);
-        $mock->shouldReceive('bulk')->once()->with(m::on(fn ($jobs) => count($jobs) === 1), '', 'high');
+        $mock->expects('bulk')->with(m::on(fn ($jobs) => count($jobs) === 2), '', null);
+        $mock->expects('bulk')->with(m::on(fn ($jobs) => count($jobs) === 1), '', 'high');
 
         $dispatcher = new Dispatcher($container, fn () => $mock);
 

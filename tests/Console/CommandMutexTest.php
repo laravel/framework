@@ -52,12 +52,12 @@ class CommandMutexTest extends TestCase
 
     public function testCanRunIsolatedCommandIfNotBlocked()
     {
-        $this->commandMutex->shouldReceive('create')
+        $this->commandMutex->expects('create')
             ->andReturn(true)
-            ->once();
-        $this->commandMutex->shouldReceive('forget')
+            ;
+        $this->commandMutex->expects('forget')
             ->andReturn(true)
-            ->once();
+            ;
 
         $this->runCommand();
 
@@ -66,9 +66,9 @@ class CommandMutexTest extends TestCase
 
     public function testCannotRunIsolatedCommandIfBlocked()
     {
-        $this->commandMutex->shouldReceive('create')
+        $this->commandMutex->expects('create')
             ->andReturn(false)
-            ->once();
+            ;
 
         $this->runCommand();
 

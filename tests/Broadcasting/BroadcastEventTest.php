@@ -17,13 +17,13 @@ class BroadcastEventTest extends TestCase
     {
         $broadcaster = m::mock(Broadcaster::class);
 
-        $broadcaster->shouldReceive('broadcast')->once()->with(
+        $broadcaster->expects('broadcast')->with(
             ['test-channel'], TestBroadcastEvent::class, ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
         );
 
         $manager = m::mock(BroadcastingFactory::class);
 
-        $manager->shouldReceive('connection')->once()->with(null)->andReturn($broadcaster);
+        $manager->expects('connection')->with(null)->andReturn($broadcaster);
 
         $event = new TestBroadcastEvent;
 
@@ -34,13 +34,13 @@ class BroadcastEventTest extends TestCase
     {
         $broadcaster = m::mock(Broadcaster::class);
 
-        $broadcaster->shouldReceive('broadcast')->once()->with(
+        $broadcaster->expects('broadcast')->with(
             ['test-channel'], TestBroadcastEventWithManualData::class, ['name' => 'Taylor', 'socket' => null]
         );
 
         $manager = m::mock(BroadcastingFactory::class);
 
-        $manager->shouldReceive('connection')->once()->with(null)->andReturn($broadcaster);
+        $manager->expects('connection')->with(null)->andReturn($broadcaster);
 
         $event = new TestBroadcastEventWithManualData;
 
@@ -51,11 +51,11 @@ class BroadcastEventTest extends TestCase
     {
         $broadcaster = m::mock(Broadcaster::class);
 
-        $broadcaster->shouldReceive('broadcast')->once();
+        $broadcaster->expects('broadcast');
 
         $manager = m::mock(BroadcastingFactory::class);
 
-        $manager->shouldReceive('connection')->once()->with('log')->andReturn($broadcaster);
+        $manager->expects('connection')->with('log')->andReturn($broadcaster);
 
         $event = new TestBroadcastEventWithSpecificBroadcaster;
 
@@ -66,18 +66,18 @@ class BroadcastEventTest extends TestCase
     {
         $broadcaster = m::mock(Broadcaster::class);
 
-        $broadcaster->shouldReceive('broadcast')->once()->with(
+        $broadcaster->expects('broadcast')->with(
             ['first-channel'], TestBroadcastEventWithChannelsPerConnection::class, ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
         );
 
-        $broadcaster->shouldReceive('broadcast')->once()->with(
+        $broadcaster->expects('broadcast')->with(
             ['second-channel'], TestBroadcastEventWithChannelsPerConnection::class, ['firstName' => 'Taylor']
         );
 
         $manager = m::mock(BroadcastingFactory::class);
 
-        $manager->shouldReceive('connection')->once()->with('first_connection')->andReturn($broadcaster);
-        $manager->shouldReceive('connection')->once()->with('second_connection')->andReturn($broadcaster);
+        $manager->expects('connection')->with('first_connection')->andReturn($broadcaster);
+        $manager->expects('connection')->with('second_connection')->andReturn($broadcaster);
 
         $event = new TestBroadcastEventWithChannelsPerConnection;
 
@@ -88,13 +88,13 @@ class BroadcastEventTest extends TestCase
     {
         $broadcaster = m::mock(Broadcaster::class);
 
-        $broadcaster->shouldReceive('broadcast')->once()->with(
+        $broadcaster->expects('broadcast')->with(
             ['test-channel'], 'custom-name', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
         );
 
         $manager = m::mock(BroadcastingFactory::class);
 
-        $manager->shouldReceive('connection')->once()->with(null)->andReturn($broadcaster);
+        $manager->expects('connection')->with(null)->andReturn($broadcaster);
 
         $event = new TestBroadcastEventWithStringName;
 
@@ -105,13 +105,13 @@ class BroadcastEventTest extends TestCase
     {
         $broadcaster = m::mock(Broadcaster::class);
 
-        $broadcaster->shouldReceive('broadcast')->once()->with(
+        $broadcaster->expects('broadcast')->with(
             ['test-channel'], 'custom-enum-name', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
         );
 
         $manager = m::mock(BroadcastingFactory::class);
 
-        $manager->shouldReceive('connection')->once()->with(null)->andReturn($broadcaster);
+        $manager->expects('connection')->with(null)->andReturn($broadcaster);
 
         $event = new TestBroadcastEventWithEnumName;
 

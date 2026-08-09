@@ -37,7 +37,7 @@ class ListenerTest extends TestCase
     {
         $this->app->singleton('db.transactions', function () {
             $transactionManager = m::mock(DatabaseTransactionsManager::class);
-            $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
+            $transactionManager->expects('addCallback')->andReturn(null);
 
             return $transactionManager;
         });
