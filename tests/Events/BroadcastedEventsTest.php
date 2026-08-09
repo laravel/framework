@@ -14,9 +14,7 @@ class BroadcastedEventsTest extends TestCase
 {
     public function testShouldBroadcastSuccess()
     {
-        $d = m::mock(Dispatcher::class);
-
-        $d->makePartial()->shouldAllowMockingProtectedMethods();
+        $d = m::mock(Dispatcher::class)->makePartial()->shouldAllowMockingProtectedMethods();
 
         $event = new BroadcastEvent;
 
@@ -46,9 +44,7 @@ class BroadcastedEventsTest extends TestCase
 
     public function testShouldBroadcastFail()
     {
-        $d = m::mock(Dispatcher::class);
-
-        $d->makePartial()->shouldAllowMockingProtectedMethods();
+        $d = m::mock(Dispatcher::class)->makePartial()->shouldAllowMockingProtectedMethods();
 
         $event = new BroadcastFalseCondition;
 

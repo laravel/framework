@@ -12,8 +12,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 {
     public function testDeleteSetsSoftDeletedColumn()
     {
-        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
-        $model->makePartial();
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
         $model->shouldReceive('newModelQuery')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
         $query->shouldReceive('update')->once()->with([
@@ -32,8 +31,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
     public function testRestore()
     {
-        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
-        $model->makePartial();
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(true);
         $model->shouldReceive('save')->once();
         $model->shouldReceive('fireModelEvent')->with('restored', false)->andReturn(true);
@@ -45,8 +43,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
     public function testRestoreCancel()
     {
-        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
-        $model->makePartial();
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(false);
         $model->shouldReceive('save')->never();
 

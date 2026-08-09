@@ -164,8 +164,7 @@ class CacheFileStoreTest extends TestCase
 
     public function testStoreItemProperlySetsPermissions()
     {
-        $files = m::mock(Filesystem::class);
-        $files->shouldIgnoreMissing();
+        $files = m::mock(Filesystem::class)->shouldIgnoreMissing();
         $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__, 0644])->getMock();
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
@@ -184,8 +183,7 @@ class CacheFileStoreTest extends TestCase
 
     public function testStoreItemDirectoryProperlySetsPermissions()
     {
-        $files = m::mock(Filesystem::class);
-        $files->shouldIgnoreMissing();
+        $files = m::mock(Filesystem::class)->shouldIgnoreMissing();
         $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__, 0606])->getMock();
         $hash = sha1('foo');
         $cache_parent_dir = substr($hash, 0, 2);

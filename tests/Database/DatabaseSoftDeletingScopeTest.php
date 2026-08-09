@@ -114,8 +114,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
             m::mock(Grammar::class),
             m::mock(Processor::class)
         ));
-        $model = m::mock(Model::class);
-        $model->makePartial();
+        $model = m::mock(Model::class)->makePartial();
         $scope = m::mock(SoftDeletingScope::class.'[remove]');
         $scope->extend($builder);
         $callback = $builder->getMacro('onlyTrashed');
@@ -137,8 +136,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
             m::mock(Grammar::class),
             m::mock(Processor::class)
         ));
-        $model = m::mock(Model::class);
-        $model->makePartial();
+        $model = m::mock(Model::class)->makePartial();
         $scope = m::mock(SoftDeletingScope::class.'[remove]');
         $scope->extend($builder);
         $callback = $builder->getMacro('withoutTrashed');
