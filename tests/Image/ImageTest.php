@@ -1148,6 +1148,34 @@ class ImageTest extends TestCase
         $this->assertInstanceOf(\RuntimeException::class, $exception);
     }
 
+    public function test_implements_responsable()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->assertInstanceOf(\Illuminate\Contracts\Support\Responsable::class, $image);
+    }
+
+    public function test_to_response_returns_response_with_image_bytes()
+    {
+        $contents = $this->fakeImageContents();
+        $image = new Image($contents);
+
+        $response = $image->toResponse(new \Illuminate\Http\Request);
+
+        $this->assertInstanceOf(\Illuminate\Http\Response::class, $response);
+        $this->assertSame($contents, $response->getContent());
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function test_to_response_sets_content_type_header()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $response = $image->toResponse(new \Illuminate\Http\Request);
+
+        $this->assertSame('image/jpeg', $response->headers->get('Content-Type'));
+    }
+
     protected function makeImage(): Image
     {
         return new Image($this->fakeImageContents());

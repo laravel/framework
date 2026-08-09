@@ -8,6 +8,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Contracts\Image\Transformation;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Transformations\Blur;
 use Illuminate\Image\Transformations\Contain;
@@ -27,7 +29,7 @@ use Illuminate\Support\Traits\Macroable;
 use Stringable;
 use Throwable;
 
-class Image implements Stringable
+class Image implements Responsable, Stringable
 {
     use Conditionable, Macroable;
 
@@ -592,6 +594,18 @@ class Image implements Stringable
         $callback($clone);
 
         return $clone;
+    }
+
+    /**
+     * Create an HTTP response that represents the image.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     */
+    public function toResponse($request): Response
+    {
+        return new Response($this->toBytes(), 200, [
+            'Content-Type' => $this->mimeType(),
+        ]);
     }
 
     /**
