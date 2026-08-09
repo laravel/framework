@@ -79,6 +79,7 @@ class DevCommand extends Command
     protected function runViaMultiplex(array $devCommands, NodePackageManager $packageManager): int
     {
         $multiplexCommand = $this->buildMultiplexCommand($devCommands);
+
         $command = $packageManager->getExecCommand($multiplexCommand);
 
         if (extension_loaded('pcntl')) {
