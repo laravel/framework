@@ -46,7 +46,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * The maximum number of items that may be requested per page for this paginator instance.
      *
-     * @var int|null
+     * @var positive-int|null
      */
     protected $maxPerPage;
 
