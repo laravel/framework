@@ -65,17 +65,17 @@ class CacheApcStoreTest extends TestCase
         $apc = m::mock(ApcWrapper::class);
 
         $apc->expects('put')
-            
+
             ->with('foo', 'bar', 60)
             ->andReturn(true);
 
         $apc->expects('put')
-            
+
             ->with('baz', 'qux', 60)
             ->andReturn(true);
 
         $apc->expects('put')
-            
+
             ->with('bar', 'norf', 60)
             ->andReturn(true);
 

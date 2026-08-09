@@ -24,7 +24,7 @@ class InteractsWithIOTest extends TestCase
         $command->setOutput($output);
 
         $output->expects('createProgressBar')
-            
+
             ->with(count($iterable))
             ->andReturnUsing(function ($steps) use ($bufferedOutput) {
                 // we can't mock ProgressBar because it's final, so return a real one
@@ -60,7 +60,7 @@ class InteractsWithIOTest extends TestCase
         $totalSteps = 5;
 
         $output->expects('createProgressBar')
-            
+
             ->with($totalSteps)
             ->andReturnUsing(function ($steps) use ($bufferedOutput) {
                 // we can't mock ProgressBar because it's final, so return a real one

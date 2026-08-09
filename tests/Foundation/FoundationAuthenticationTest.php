@@ -37,12 +37,12 @@ class FoundationAuthenticationTest extends TestCase
 
         $auth = m::mock(AuthManager::class);
         $auth->expects('guard')
-            
+
             ->andReturn($guard);
 
         $this->app = m::mock(Application::class);
         $this->app->expects('make')
-            
+
             ->withArgs(['auth'])
             ->andReturn($auth);
 
@@ -53,7 +53,7 @@ class FoundationAuthenticationTest extends TestCase
     {
         $this->mockGuard()
             ->expects('check')
-            
+
             ->andReturn(true);
 
         $this->assertAuthenticated();
@@ -63,7 +63,7 @@ class FoundationAuthenticationTest extends TestCase
     {
         $this->mockGuard()
             ->expects('check')
-            
+
             ->andReturn(false);
 
         $this->assertGuest();
@@ -77,7 +77,7 @@ class FoundationAuthenticationTest extends TestCase
 
         $this->mockGuard()
             ->expects('user')
-            
+
             ->andReturn($expected);
 
         $user = m::mock(Authenticatable::class);
@@ -103,7 +103,7 @@ class FoundationAuthenticationTest extends TestCase
 
         $this->mockGuard()
             ->expects('getProvider')
-            
+
             ->andReturn($provider);
     }
 

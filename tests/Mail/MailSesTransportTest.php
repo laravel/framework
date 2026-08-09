@@ -61,7 +61,7 @@ class MailSesTransportTest extends TestCase
         $sesResult = m::mock();
         $sesResult->expects('get')
             ->with('MessageId')
-            
+
             ->andReturn('ses-message-id');
         $client->expects('sendRawEmail')
             ->with(m::on(function ($arg) {

@@ -20,7 +20,7 @@ class EventPingTest extends TestCase
     {
         $this->spy(ExceptionHandler::class)
             ->expects('report')
-            
+
             ->with(m::type(ServerException::class));
 
         $httpMock = new HttpClient([

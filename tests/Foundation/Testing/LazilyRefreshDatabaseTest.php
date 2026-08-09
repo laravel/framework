@@ -66,7 +66,7 @@ class LazilyRefreshDatabaseTest extends TestCase
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->expects('call')
-            
+
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => false,
@@ -97,7 +97,7 @@ class LazilyRefreshDatabaseTest extends TestCase
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->expects('call')
-            
+
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => false,

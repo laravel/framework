@@ -159,7 +159,7 @@ class BroadcastedEventsTest extends TestCase
             $pendingBroadcast = m::mock(PendingBroadcast::class);
 
             $broadcast->expects('event')
-                
+
                 ->with(m::on(function ($event) {
                     $this->assertInstanceOf(BroadcastableNamedArgumentsEvent::class, $event);
                     $this->assertSame('first-value', $event->first);

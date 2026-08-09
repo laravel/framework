@@ -19,7 +19,8 @@ class CursorPaginatorLoadMorphTest extends TestCase
         $items = m::mock(Collection::class);
         $items->expects('loadMorph')->with('parentable', $relations);
 
-        $p = (new class extends AbstractCursorPaginator {
+        $p = (new class extends AbstractCursorPaginator
+        {
         })->setCollection($items);
 
         $this->assertSame($p, $p->loadMorph('parentable', $relations));

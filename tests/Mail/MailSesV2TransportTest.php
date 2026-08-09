@@ -61,7 +61,7 @@ class MailSesV2TransportTest extends TestCase
         $sesResult = m::mock();
         $sesResult->expects('get')
             ->with('MessageId')
-            
+
             ->andReturn('ses-message-id');
         $client->expects('sendEmail')
             ->with(m::on(function ($arg) {
@@ -89,7 +89,7 @@ class MailSesV2TransportTest extends TestCase
         $sesResult = m::mock();
         $sesResult->expects('get')
             ->with('MessageId')
-            
+
             ->andReturn('ses-message-id');
         $client->expects('sendEmail')
             ->with(m::on(function ($arg) {
@@ -112,7 +112,7 @@ class MailSesV2TransportTest extends TestCase
         $sesResult = m::mock();
         $sesResult->expects('get')
             ->with('MessageId')
-            
+
             ->andReturn('ses-message-id');
         $client->expects('sendEmail')
             ->with(m::on(function ($arg) {

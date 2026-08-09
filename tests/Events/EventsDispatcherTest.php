@@ -730,7 +730,7 @@ class EventsDispatcherTest extends TestCase
 
         try {
             $events->expects('dispatch')
-                
+
                 ->with(m::on(function ($event) {
                     $this->assertInstanceOf(DispatchableNamedArgumentsEvent::class, $event);
                     $this->assertSame('first-value', $event->first);

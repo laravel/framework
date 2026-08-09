@@ -278,7 +278,7 @@ class CacheManagerTest extends TestCase
             ->andReturn(new ArrayStore);
 
         $cacheManager->expects('getDefaultDriver')
-            
+
             ->andReturn('array');
 
         foreach (['array', ['array'], null] as $option) {

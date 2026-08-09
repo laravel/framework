@@ -190,15 +190,13 @@ class ViewFactoryTest extends TestCase
 
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('creating: name', m::type(Closure::class))
-            ;
+            ->with('creating: name', m::type(Closure::class));
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
             ->expects('dispatch')
-            ->with('creating: name', m::type('array'))
-            ;
+            ->with('creating: name', m::type('array'));
 
         $view = m::mock(View::class);
         $view->expects('name')->andReturn('name');
@@ -214,15 +212,13 @@ class ViewFactoryTest extends TestCase
 
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('creating: namespaced::*', m::type(Closure::class))
-            ;
+            ->with('creating: namespaced::*', m::type(Closure::class));
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
             ->expects('dispatch')
-            ->with('creating: namespaced::my-package-view', m::type('array'))
-            ;
+            ->with('creating: namespaced::my-package-view', m::type('array'));
 
         $view = m::mock(View::class);
         $view->expects('name')->andReturn('namespaced::my-package-view');
@@ -238,20 +234,17 @@ class ViewFactoryTest extends TestCase
 
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('creating: namespaced::*', m::type(Closure::class))
-            ;
+            ->with('creating: namespaced::*', m::type(Closure::class));
 
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('creating: welcome', m::type(Closure::class))
-            ;
+            ->with('creating: welcome', m::type(Closure::class));
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
             ->expects('dispatch')
-            ->with('creating: namespaced::my-package-view', m::type('array'))
-            ;
+            ->with('creating: namespaced::my-package-view', m::type('array'));
 
         $view = m::mock(View::class);
         $view->expects('name')->andReturn('namespaced::my-package-view');
@@ -267,15 +260,13 @@ class ViewFactoryTest extends TestCase
 
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('creating: *', m::type(Closure::class))
-            ;
+            ->with('creating: *', m::type(Closure::class));
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
             ->expects('dispatch')
-            ->with('creating: name', m::type('array'))
-            ;
+            ->with('creating: name', m::type('array'));
 
         $view = m::mock(View::class);
         $view->expects('name')->andReturn('name');
@@ -291,19 +282,17 @@ class ViewFactoryTest extends TestCase
 
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('creating: components.button', m::type(Closure::class))
-            ;
+            ->with('creating: components.button', m::type(Closure::class));
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
             ->expects('dispatch')
-            ->with('creating: components/button', m::type('array'))
-            ;
+            ->with('creating: components/button', m::type('array'));
 
         $view = m::mock(View::class);
         $view->expects('name')
-            
+
             ->andReturn('components/button');
 
         $factory->creator('components.button', fn () => true);
@@ -317,15 +306,13 @@ class ViewFactoryTest extends TestCase
 
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('composing: name', m::type(Closure::class))
-            ;
+            ->with('composing: name', m::type(Closure::class));
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
             ->expects('dispatch')
-            ->with('composing: name', m::type('array'))
-            ;
+            ->with('composing: name', m::type('array'));
 
         $view = m::mock(View::class);
         $view->expects('name')->andReturn('name');
@@ -341,15 +328,13 @@ class ViewFactoryTest extends TestCase
 
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('composing: name', m::type(Closure::class))
-            ;
+            ->with('composing: name', m::type(Closure::class));
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
             ->expects('dispatch')
-            ->with('composing: name', m::type('array'))
-            ;
+            ->with('composing: name', m::type('array'));
 
         $view = m::mock(View::class);
         $view->expects('name')->andReturn('name');
@@ -365,15 +350,13 @@ class ViewFactoryTest extends TestCase
 
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('composing: namespaced::*', m::type(Closure::class))
-            ;
+            ->with('composing: namespaced::*', m::type(Closure::class));
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
             ->expects('dispatch')
-            ->with('composing: namespaced::my-package-view', m::type('array'))
-            ;
+            ->with('composing: namespaced::my-package-view', m::type('array'));
 
         $view = m::mock(View::class);
         $view->expects('name')->andReturn('namespaced::my-package-view');
@@ -388,20 +371,17 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('composing: namespaced::*', m::type(Closure::class))
-            ;
+            ->with('composing: namespaced::*', m::type(Closure::class));
 
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('composing: welcome', m::type(Closure::class))
-            ;
+            ->with('composing: welcome', m::type(Closure::class));
 
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(true);
 
         $factory->getDispatcher()
             ->expects('dispatch')
-            ->with('composing: namespaced::my-package-view', m::type('array'))
-            ;
+            ->with('composing: namespaced::my-package-view', m::type('array'));
 
         $view = m::mock(View::class);
         $view->expects('name')->andReturn('namespaced::my-package-view');
@@ -419,13 +399,11 @@ class ViewFactoryTest extends TestCase
 
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('composing: *', m::type(Closure::class))
-            ;
+            ->with('composing: *', m::type(Closure::class));
 
         $factory->getDispatcher()
             ->expects('dispatch')
-            ->with('composing: name', m::type('array'))
-            ;
+            ->with('composing: name', m::type('array'));
 
         $view = m::mock(View::class);
         $view->expects('name')->andReturn('name');
@@ -443,13 +421,11 @@ class ViewFactoryTest extends TestCase
 
         $factory->getDispatcher()
             ->expects('listen')
-            ->with('composing: components.button', m::type(Closure::class))
-            ;
+            ->with('composing: components.button', m::type(Closure::class));
 
         $factory->getDispatcher()
             ->expects('dispatch')
-            ->with('composing: components/button', m::type('array'))
-            ;
+            ->with('composing: components/button', m::type('array'));
 
         $view = m::mock(View::class);
         $view->expects('name')->andReturn('components/button');

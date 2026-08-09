@@ -99,7 +99,7 @@ class ImageManagerTest extends TestCase
 
         $filesystem = m::mock(Filesystem::class);
         $filesystem->expects('get')
-            
+
             ->with($path)
             ->andReturn(file_get_contents($path));
 
@@ -137,13 +137,13 @@ class ImageManagerTest extends TestCase
 
         $disk = m::mock();
         $disk->expects('get')
-            
+
             ->with('images/avatar.jpg')
             ->andReturn($contents);
 
         $filesystem = m::mock(FilesystemFactory::class);
         $filesystem->expects('disk')
-            
+
             ->with('public')
             ->andReturn($disk);
 
@@ -165,13 +165,13 @@ class ImageManagerTest extends TestCase
 
         $disk = m::mock();
         $disk->expects('get')
-            
+
             ->with('images/avatar.jpg')
             ->andReturn($contents);
 
         $filesystem = m::mock(FilesystemFactory::class);
         $filesystem->expects('disk')
-            
+
             ->with('public')
             ->andReturn($disk);
 
@@ -384,7 +384,8 @@ class ImageManagerTest extends TestCase
                 return $this;
             }
         };
-        $transformation = new class implements Transformation {
+        $transformation = new class implements Transformation
+        {
             //
         };
         $callback = fn () => null;
@@ -425,7 +426,8 @@ class ImageManagerTest extends TestCase
                 return $this;
             }
         };
-        $transformation = new class implements Transformation {
+        $transformation = new class implements Transformation
+        {
             //
         };
         $callback = fn () => null;

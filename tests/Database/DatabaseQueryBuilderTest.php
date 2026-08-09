@@ -5425,7 +5425,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $processor = m::mock(Processor::class);
 
         $connection->expects('update')
-            
+
             ->with(
                 'update `users` set `options` = json_set(`options`, \'$."enable"\', false), `updated_at` = ? where `id` = ?',
                 ['2015-05-26 22:02:06', 0]
@@ -5434,7 +5434,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->where('id', '=', 0)->update(['options->enable' => false, 'updated_at' => '2015-05-26 22:02:06']);
 
         $connection->expects('update')
-            
+
             ->with(
                 'update `users` set `options` = json_set(`options`, \'$."size"\', ?), `updated_at` = ? where `id` = ?',
                 [45, '2015-05-26 22:02:06', 0]

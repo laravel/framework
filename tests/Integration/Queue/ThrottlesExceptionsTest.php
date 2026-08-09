@@ -400,12 +400,12 @@ class ThrottlesExceptionsTest extends TestCase
         $expectedKey = 'laravel_throttles_exceptions:'.hash('xxh128', get_class($job));
 
         $rateLimiter->expects('tooManyAttempts')
-            
+
             ->with($expectedKey, 10)
             ->andReturn(false);
 
         $rateLimiter->expects('hit')
-            
+
             ->with($expectedKey, 600);
 
         $next = function ($job) {
@@ -442,12 +442,12 @@ class ThrottlesExceptionsTest extends TestCase
         $expectedKey = 'laravel_throttles_exceptions:'.hash('xxh128', 'App\\Actions\\ThrottlesExceptionsTestAction');
 
         $rateLimiter->expects('tooManyAttempts')
-            
+
             ->with($expectedKey, 10)
             ->andReturn(false);
 
         $rateLimiter->expects('hit')
-            
+
             ->with($expectedKey, 600);
 
         $next = function ($job) {

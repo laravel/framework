@@ -293,8 +293,7 @@ class FoundationHelpersTest extends TestCase
     {
         $app = m::mock(Application::class);
         $app->expects('abort')
-            ->with($code = 400, $message = 'Bad request', $headers = ['X-FOO' => 'BAR'])
-            ;
+            ->with($code = 400, $message = 'Bad request', $headers = ['X-FOO' => 'BAR']);
 
         Container::setInstance($app);
 
