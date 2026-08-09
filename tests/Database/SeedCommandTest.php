@@ -93,7 +93,8 @@ class SeedCommandTest extends TestCase
         $command = new SeedCommand($resolver);
         $command->setLaravel($container);
 
-        Model::setEventDispatcher($dispatcher = m::mock(Dispatcher::class));
+        $dispatcher = m::mock(Dispatcher::class);
+        Model::setEventDispatcher($dispatcher);
 
         // call run to set up IO, then fire manually.
         $command->run($input, $output);

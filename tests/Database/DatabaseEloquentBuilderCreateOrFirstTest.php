@@ -664,7 +664,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $class = get_class($model);
         $class::setConnectionResolver($resolver);
 
-        $connection->shouldReceive('getPdo')->andReturn($pdo = m::mock(PDO::class));
+        $pdo = m::mock(PDO::class);
+        $connection->shouldReceive('getPdo')->andReturn($pdo);
 
         foreach ($lastInsertIds as $id) {
             $pdo->expects('lastInsertId')->andReturn($id);

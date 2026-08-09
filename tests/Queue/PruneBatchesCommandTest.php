@@ -16,7 +16,8 @@ class PruneBatchesCommandTest extends TestCase
     public function testAllowPruningAllUnfinishedBatches()
     {
         $container = new Application;
-        $container->instance(BatchRepository::class, $repo = m::spy(DatabaseBatchRepository::class));
+        $repo = m::spy(DatabaseBatchRepository::class);
+        $container->instance(BatchRepository::class, $repo);
 
         $command = new PruneBatchesCommand;
         $command->setLaravel($container);
@@ -29,7 +30,8 @@ class PruneBatchesCommandTest extends TestCase
     public function testAllowPruningAllCancelledBatches()
     {
         $container = new Application;
-        $container->instance(BatchRepository::class, $repo = m::spy(DatabaseBatchRepository::class));
+        $repo = m::spy(DatabaseBatchRepository::class);
+        $container->instance(BatchRepository::class, $repo);
 
         $command = new PruneBatchesCommand;
         $command->setLaravel($container);

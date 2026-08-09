@@ -13,7 +13,8 @@ class DatabaseSoftDeletingTraitTest extends TestCase
     public function testDeleteSetsSoftDeletedColumn()
     {
         $model = m::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
-        $model->shouldReceive('newModelQuery')->andReturn($query = m::mock(stdClass::class));
+        $query = m::mock(stdClass::class);
+        $model->shouldReceive('newModelQuery')->andReturn($query);
         $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
         $query->shouldReceive('update')->once()->with([
             'deleted_at' => 'date-time',

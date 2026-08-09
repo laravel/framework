@@ -25,7 +25,8 @@ class PredisConnectionTest extends TestCase
         $command = 'ftSearch';
         $parameters = ['test', '*', (new SearchArguments())->dialect('3')->withScores()];
 
-        $predis = new PredisConnection($client = m::mock(Client::class));
+        $client = m::mock(Client::class);
+        $predis = new PredisConnection($client);
         $predis->setEventDispatcher($event);
 
         $client->shouldReceive($command)->with(...$parameters)->andReturnTrue();

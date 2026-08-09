@@ -278,7 +278,8 @@ class DatabaseConnectionTest extends TestCase
         $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->method('getName')->willReturn('name');
-        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $connection->setEventDispatcher($events);
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionBeginning::class));
         $connection->beginTransaction();
     }
@@ -288,7 +289,8 @@ class DatabaseConnectionTest extends TestCase
         $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->method('getName')->willReturn('name');
-        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $connection->setEventDispatcher($events);
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitted::class));
         $connection->commit();
     }
@@ -299,7 +301,8 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection(['getName', 'transactionLevel'], $pdo);
         $connection->method('getName')->willReturn('name');
         $connection->method('transactionLevel')->willReturn(1);
-        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $connection->setEventDispatcher($events);
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitted::class));
         $connection->commit();
@@ -311,7 +314,8 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->method('getName')->willReturn('name');
         $connection->beginTransaction();
-        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $connection->setEventDispatcher($events);
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionRolledBack::class));
         $connection->rollBack();
     }
@@ -321,7 +325,8 @@ class DatabaseConnectionTest extends TestCase
         $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->method('getName')->willReturn('name');
-        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $connection->setEventDispatcher($events);
         $events->shouldNotReceive('dispatch');
         $connection->rollBack();
     }
@@ -504,7 +509,8 @@ class DatabaseConnectionTest extends TestCase
     {
         $connection = $this->getMockConnection();
         $connection->logQuery('foo', [], time());
-        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $connection->setEventDispatcher($events);
         $events->shouldReceive('dispatch')->once()->with(m::type(QueryExecuted::class));
         $connection->logQuery('foo', [], null);
     }

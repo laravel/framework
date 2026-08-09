@@ -28,7 +28,8 @@ class BroadcastedEventsTest extends TestCase
     public function testShouldBroadcastAsQueuedAndCallNormalListeners()
     {
         unset($_SERVER['__event.test']);
-        $d = new Dispatcher($container = m::mock(Container::class));
+        $container = m::mock(Container::class);
+        $d = new Dispatcher($container);
         $broadcast = m::mock(BroadcastFactory::class);
         $broadcast->shouldReceive('queue')->once();
         $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
@@ -57,7 +58,8 @@ class BroadcastedEventsTest extends TestCase
 
     public function testBroadcastWithMultipleChannels()
     {
-        $d = new Dispatcher($container = m::mock(Container::class));
+        $container = m::mock(Container::class);
+        $d = new Dispatcher($container);
         $broadcast = m::mock(BroadcastFactory::class);
         $broadcast->shouldReceive('queue')->once();
         $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
@@ -75,7 +77,8 @@ class BroadcastedEventsTest extends TestCase
 
     public function testBroadcastWithCustomConnectionName()
     {
-        $d = new Dispatcher($container = m::mock(Container::class));
+        $container = m::mock(Container::class);
+        $d = new Dispatcher($container);
         $broadcast = m::mock(BroadcastFactory::class);
         $broadcast->shouldReceive('queue')->once();
         $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
@@ -95,7 +98,8 @@ class BroadcastedEventsTest extends TestCase
 
     public function testBroadcastWithCustomEventName()
     {
-        $d = new Dispatcher($container = m::mock(Container::class));
+        $container = m::mock(Container::class);
+        $d = new Dispatcher($container);
         $broadcast = m::mock(BroadcastFactory::class);
         $broadcast->shouldReceive('queue')->once();
         $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
@@ -118,7 +122,8 @@ class BroadcastedEventsTest extends TestCase
 
     public function testBroadcastWithCustomPayload()
     {
-        $d = new Dispatcher($container = m::mock(Container::class));
+        $container = m::mock(Container::class);
+        $d = new Dispatcher($container);
         $broadcast = m::mock(BroadcastFactory::class);
         $broadcast->shouldReceive('queue')->once();
         $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);

@@ -89,7 +89,8 @@ class AuthGuardTest extends TestCase
     public function testAttemptCallsRetrieveByCredentials()
     {
         $guard = $this->getGuard();
-        $guard->setDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $guard->setDispatcher($events);
         $timebox = $guard->getTimebox();
         $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback) use ($timebox) {
             return $callback($timebox);
@@ -106,7 +107,8 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
         $guard = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['login'])->setConstructorArgs(['default', $provider, $session, $request, $timebox])->getMock();
-        $guard->setDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $guard->setDispatcher($events);
         $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox->shouldReceive('returnEarly')->once()->getMock());
         });
@@ -123,7 +125,8 @@ class AuthGuardTest extends TestCase
     public function testAttemptReturnsFalseIfUserNotGiven()
     {
         $mock = $this->getGuard();
-        $mock->setDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $mock->setDispatcher($events);
         $timebox = $mock->getTimebox();
         $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox);
@@ -140,7 +143,8 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName'])->setConstructorArgs(['default', $provider, $session, $request, $timebox])->getMock();
-        $mock->setDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $mock->setDispatcher($events);
         $timebox->shouldReceive('call')->andReturnUsing(function ($callback) use ($timebox) {
             return $callback($timebox->shouldReceive('returnEarly')->getMock());
         });
@@ -186,7 +190,8 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
         $guard = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['login'])->setConstructorArgs(['default', $provider, $session, $request, $timebox])->getMock();
-        $guard->setDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $guard->setDispatcher($events);
         $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox->shouldReceive('returnEarly')->once()->getMock());
         });
@@ -206,7 +211,8 @@ class AuthGuardTest extends TestCase
         $guard = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['login'])
             ->setConstructorArgs(['default', $provider, $session, $request, $timebox, $rehashOnLogin = false])
             ->getMock();
-        $guard->setDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $guard->setDispatcher($events);
         $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox->shouldReceive('returnEarly')->once()->getMock());
         });
@@ -249,7 +255,8 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $mock->setDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $mock->setDispatcher($events);
         $user = m::mock(Authenticatable::class);
         $events->shouldReceive('dispatch')->once()->with(m::type(Login::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));
@@ -263,7 +270,8 @@ class AuthGuardTest extends TestCase
     public function testFailedAttemptFiresFailedEvent()
     {
         $guard = $this->getGuard();
-        $guard->setDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $guard->setDispatcher($events);
         $timebox = $guard->getTimebox();
         $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox);
@@ -289,7 +297,8 @@ class AuthGuardTest extends TestCase
     {
         $user = m::mock(Authenticatable::class);
         $guard = $this->getGuard();
-        $guard->setDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $guard->setDispatcher($events);
         $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));
         $guard->setUser($user);
     }
@@ -368,7 +377,8 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $mock->setCookieJar($cookies = m::mock(CookieJar::class));
+        $cookies = m::mock(CookieJar::class);
+        $mock->setCookieJar($cookies);
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getRememberToken')->once()->andReturn('a');
         $user->shouldReceive('setRememberToken')->once();
@@ -391,7 +401,8 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $mock->setCookieJar($cookies = m::mock(CookieJar::class));
+        $cookies = m::mock(CookieJar::class);
+        $mock->setCookieJar($cookies);
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getRememberToken')->andReturn(null);
         $mock->expects($this->once())->method('getRecallerName')->willReturn($recallerName = 'bar');
@@ -411,7 +422,8 @@ class AuthGuardTest extends TestCase
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['clearUserDataFromStorage'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $mock->expects($this->once())->method('clearUserDataFromStorage');
-        $mock->setDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $mock->setDispatcher($events);
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getRememberToken')->andReturn(null);
         $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));
@@ -438,7 +450,8 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $mock->setCookieJar($cookies = m::mock(CookieJar::class));
+        $cookies = m::mock(CookieJar::class);
+        $mock->setCookieJar($cookies);
         $user = m::mock(Authenticatable::class);
         $mock->expects($this->once())->method('getName')->willReturn('foo');
         $mock->expects($this->exactly(2))->method('getRecallerName')->willReturn($recallerName = 'bar');
@@ -458,7 +471,8 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $mock->setCookieJar($cookies = m::mock(CookieJar::class));
+        $cookies = m::mock(CookieJar::class);
+        $mock->setCookieJar($cookies);
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getRememberToken')->andReturn(null);
         $mock->expects($this->once())->method('getName')->willReturn('foo');
@@ -477,7 +491,8 @@ class AuthGuardTest extends TestCase
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['clearUserDataFromStorage'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $mock->expects($this->once())->method('clearUserDataFromStorage');
-        $mock->setDispatcher($events = m::mock(Dispatcher::class));
+        $events = m::mock(Dispatcher::class);
+        $mock->setDispatcher($events);
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getRememberToken')->andReturn(null);
         $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));

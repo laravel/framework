@@ -552,7 +552,8 @@ class RedisConnectionTest extends TestCase
     public function testItDispatchesQueryEvent()
     {
         foreach ($this->connections() as $redis) {
-            $redis->setEventDispatcher($events = m::mock(Dispatcher::class));
+            $events = m::mock(Dispatcher::class);
+            $redis->setEventDispatcher($events);
 
             $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
                 $this->assertSame('get', $event->command);

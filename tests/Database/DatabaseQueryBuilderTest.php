@@ -4993,8 +4993,9 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testUpdateOrInsertMethod()
     {
+        $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[where,exists,insert]', [
-            $connection = m::mock(Connection::class),
+            $connection,
             new Grammar($connection),
             m::mock(Processor::class),
         ]);
@@ -5005,8 +5006,9 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
 
+        $connection = m::mock(Connection::class);
         $builder = m::mock(Builder::class.'[where,exists,update]', [
-            $connection = m::mock(Connection::class),
+            $connection,
             new Grammar($connection),
             m::mock(Processor::class),
         ]);
@@ -5021,8 +5023,9 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testUpdateOrInsertMethodWorksWithEmptyUpdateValues()
     {
+        $connection = m::mock(Connection::class);
         $builder = m::spy(Builder::class.'[where,exists,update]', [
-            $connection = m::mock(Connection::class),
+            $connection,
             new Grammar($connection),
             m::mock(Processor::class),
         ]);

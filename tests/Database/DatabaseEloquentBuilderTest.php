@@ -893,7 +893,8 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('newInstance->orders')->once()->andReturn($relation = m::mock(stdClass::class));
+        $relation = m::mock(stdClass::class);
+        $builder->getModel()->shouldReceive('newInstance->orders')->once()->andReturn($relation);
         $relationQuery = m::mock(stdClass::class);
         $relation->shouldReceive('getQuery')->andReturn($relationQuery);
         $relationQuery->shouldReceive('with')->once()->with(['lines' => null, 'lines.details' => null]);
@@ -906,8 +907,10 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('newInstance->orders')->once()->andReturn($relation = m::mock(stdClass::class));
-        $builder->getModel()->shouldReceive('newInstance->ordersGroups')->once()->andReturn($groupsRelation = m::mock(stdClass::class));
+        $relation = m::mock(stdClass::class);
+        $builder->getModel()->shouldReceive('newInstance->orders')->once()->andReturn($relation);
+        $groupsRelation = m::mock(stdClass::class);
+        $builder->getModel()->shouldReceive('newInstance->ordersGroups')->once()->andReturn($groupsRelation);
 
         $relationQuery = m::mock(stdClass::class);
         $relation->shouldReceive('getQuery')->andReturn($relationQuery);

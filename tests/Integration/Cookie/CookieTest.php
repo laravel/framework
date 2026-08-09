@@ -44,10 +44,8 @@ class CookieTest extends TestCase
 
     protected function defineEnvironment($app)
     {
-        $app->instance(
-            ExceptionHandler::class,
-            $handler = m::mock(ExceptionHandler::class)->shouldIgnoreMissing()
-        );
+        $handler = m::mock(ExceptionHandler::class)->shouldIgnoreMissing();
+        $app->instance(ExceptionHandler::class, $handler);
 
         $handler->shouldReceive('render')->andReturn(new Response);
 

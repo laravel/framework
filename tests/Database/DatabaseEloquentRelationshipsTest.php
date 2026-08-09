@@ -431,9 +431,11 @@ class MockedConnectionModel extends Model
     public function getConnection()
     {
         $mock = m::mock(Connection::class);
-        $mock->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
+        $grammar = m::mock(Grammar::class);
+        $mock->shouldReceive('getQueryGrammar')->andReturn($grammar);
         $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
-        $mock->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
+        $processor = m::mock(Processor::class);
+        $mock->shouldReceive('getPostProcessor')->andReturn($processor);
         $mock->shouldReceive('getName')->andReturn('name');
         $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {
             return new BaseBuilder($mock, $grammar, $processor);

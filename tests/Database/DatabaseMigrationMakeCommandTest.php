@@ -15,10 +15,9 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 {
     public function testBasicCreateDumpsAutoload()
     {
-        $command = new MigrateMakeCommand(
-            $creator = m::mock(MigrationCreator::class),
-            $composer = m::mock(Composer::class)
-        );
+        $creator = m::mock(MigrationCreator::class);
+        $composer = m::mock(Composer::class);
+        $command = new MigrateMakeCommand($creator, $composer);
         $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -31,8 +30,9 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateGivesCreatorProperArguments()
     {
+        $creator = m::mock(MigrationCreator::class);
         $command = new MigrateMakeCommand(
-            $creator = m::mock(MigrationCreator::class),
+            $creator,
             m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
@@ -47,8 +47,9 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateGivesCreatorProperArgumentsWhenNameIsStudlyCase()
     {
+        $creator = m::mock(MigrationCreator::class);
         $command = new MigrateMakeCommand(
-            $creator = m::mock(MigrationCreator::class),
+            $creator,
             m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
@@ -63,8 +64,9 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateGivesCreatorProperArgumentsWhenTableIsSet()
     {
+        $creator = m::mock(MigrationCreator::class);
         $command = new MigrateMakeCommand(
-            $creator = m::mock(MigrationCreator::class),
+            $creator,
             m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
@@ -79,8 +81,9 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateGivesCreatorProperArgumentsWhenCreateTablePatternIsFound()
     {
+        $creator = m::mock(MigrationCreator::class);
         $command = new MigrateMakeCommand(
-            $creator = m::mock(MigrationCreator::class),
+            $creator,
             m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;
@@ -95,8 +98,9 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testCanSpecifyPathToCreateMigrationsIn()
     {
+        $creator = m::mock(MigrationCreator::class);
         $command = new MigrateMakeCommand(
-            $creator = m::mock(MigrationCreator::class),
+            $creator,
             m::mock(Composer::class)->shouldIgnoreMissing()
         );
         $app = new Application;

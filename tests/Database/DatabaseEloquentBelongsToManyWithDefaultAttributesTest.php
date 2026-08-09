@@ -51,7 +51,8 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         $builder->shouldReceive('where')->once()->with('club_user.club_id', '=', 1);
         $builder->shouldReceive('where')->once()->with('club_user.is_admin', '=', 1, 'and');
 
-        $builder->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock(stdClass::class));
+        $mockQueryBuilder = m::mock(stdClass::class);
+        $builder->shouldReceive('getQuery')->andReturn($mockQueryBuilder);
         $mockQueryBuilder->shouldReceive('getGrammar')->andReturn(m::mock(Grammar::class, ['isExpression' => false]));
 
         return [

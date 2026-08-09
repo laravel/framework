@@ -52,7 +52,8 @@ class ListFailedCommandTest extends TestCase
     protected function runCommandWithFailedJobs(array $failedJobs, array $arguments = []): string
     {
         $container = new Application;
-        $container->instance('queue.failer', $failer = m::mock());
+        $failer = m::mock();
+        $container->instance('queue.failer', $failer);
 
         $failer->shouldReceive('all')->once()->andReturn($failedJobs);
 

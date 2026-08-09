@@ -223,7 +223,8 @@ class NotificationSenderTest extends TestCase
 
         $notifiable = new AnonymousNotifiable;
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('driver')->andReturn($driver = m::mock());
+        $driver = m::mock();
+        $manager->shouldReceive('driver')->andReturn($driver);
         $response = m::mock(ResponseInterface::class);
         $driver->shouldReceive('send')->andThrow(new HttpTransportException('Transport error', $response));
         $bus = m::mock(BusDispatcher::class);
@@ -244,7 +245,8 @@ class NotificationSenderTest extends TestCase
     {
         $notifiable = new AnonymousNotifiable;
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('driver')->andReturn($driver = m::mock());
+        $driver = m::mock();
+        $manager->shouldReceive('driver')->andReturn($driver);
         $driver->shouldReceive('send')->once()->withArgs(function ($notifiable, $notification) {
             return $notification->channelData === 'default';
         });

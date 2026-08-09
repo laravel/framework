@@ -62,7 +62,8 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testDatabaseIsRefreshedOnInteraction()
     {
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = m::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->shouldReceive('call')
             ->once()
@@ -78,7 +79,8 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testDatabaseIsNotRefreshedWithoutInteraction()
     {
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = m::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->shouldReceive('call')
             ->never();
@@ -91,7 +93,8 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testNonDefaultConnectionTriggersRefresh()
     {
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = m::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->shouldReceive('call')
             ->once()

@@ -14,7 +14,8 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
 {
     public function testRollbackCommandCallsMigratorWithProperArguments()
     {
-        $command = new RollbackCommand($migrator = m::mock(Migrator::class));
+        $migrator = m::mock(Migrator::class);
+        $command = new RollbackCommand($migrator);
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -30,7 +31,8 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
 
     public function testRollbackCommandCallsMigratorWithStepOption()
     {
-        $command = new RollbackCommand($migrator = m::mock(Migrator::class));
+        $migrator = m::mock(Migrator::class);
+        $command = new RollbackCommand($migrator);
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -46,7 +48,8 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
 
     public function testRollbackCommandCanBePretended()
     {
-        $command = new RollbackCommand($migrator = m::mock(Migrator::class));
+        $migrator = m::mock(Migrator::class);
+        $command = new RollbackCommand($migrator);
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -62,7 +65,8 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
 
     public function testRollbackCommandCanBePretendedWithStepOption()
     {
-        $command = new RollbackCommand($migrator = m::mock(Migrator::class));
+        $migrator = m::mock(Migrator::class);
+        $command = new RollbackCommand($migrator);
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);

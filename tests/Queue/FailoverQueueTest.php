@@ -19,18 +19,18 @@ class FailoverQueueTest extends TestCase
 
     public function test_push_fails_over_on_exception()
     {
-        $failover = new FailoverQueue($queue = m::mock(QueueManager::class), $events = m::mock(Dispatcher::class), [
+        $queue = m::mock(QueueManager::class);
+        $events = m::mock(Dispatcher::class);
+        $failover = new FailoverQueue($queue, $events, [
             'redis',
             'sync',
         ]);
 
-        $queue->shouldReceive('connection')->once()->with('redis')->andReturn(
-            $redis = m::mock('stdClass'),
-        );
+        $redis = m::mock('stdClass');
+        $queue->shouldReceive('connection')->once()->with('redis')->andReturn($redis);
 
-        $queue->shouldReceive('connection')->once()->with('sync')->andReturn(
-            $sync = m::mock('stdClass'),
-        );
+        $sync = m::mock('stdClass');
+        $queue->shouldReceive('connection')->once()->with('sync')->andReturn($sync);
 
         $events->shouldReceive('dispatch')->once();
 
@@ -45,11 +45,11 @@ class FailoverQueueTest extends TestCase
 
     public function test_bulk_respects_job_delays()
     {
-        $failover = new FailoverQueue($queue = m::mock(QueueManager::class), m::mock(Dispatcher::class), ['sync']);
+        $queue = m::mock(QueueManager::class);
+        $failover = new FailoverQueue($queue, m::mock(Dispatcher::class), ['sync']);
 
-        $queue->shouldReceive('connection')->times(3)->with('sync')->andReturn(
-            $sync = m::mock('stdClass'),
-        );
+        $sync = m::mock('stdClass');
+        $queue->shouldReceive('connection')->times(3)->with('sync')->andReturn($sync);
 
         $sync->shouldReceive('later')->once()->with(15, m::type(FailoverJobWithDelayAttribute::class), '', null);
         $sync->shouldReceive('later')->once()->with(30, m::type(FailoverJobWithDelayProperty::class), '', null);

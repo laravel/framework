@@ -146,8 +146,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testNestedDefaultComponentParsing()
     {
         $container = new Container;
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
         Container::setInstance($container);
 
@@ -403,7 +405,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClassNamesCanBeGuessed()
     {
         $container = new Container;
-        $container->instance(Application::class, $app = m::mock(Application::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
         Container::setInstance($container);
 
@@ -417,7 +420,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClassNamesCanBeGuessedWithNamespaces()
     {
         $container = new Container;
-        $container->instance(Application::class, $app = m::mock(Application::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
         Container::setInstance($container);
 
@@ -537,8 +541,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClasslessComponents()
     {
         $container = new Container;
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
         $factory->shouldReceive('exists')->once()->andReturn(true);
         Container::setInstance($container);
@@ -556,8 +562,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClasslessComponentsWithIndexView()
     {
         $container = new Container;
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
         $app->shouldReceive('getNamespace')->andReturn('App\\');
         $factory->shouldReceive('exists')->andReturn(false, true);
         Container::setInstance($container);
@@ -575,8 +583,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClasslessComponentsWithComponentView()
     {
         $container = new Container;
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
         $app->shouldReceive('getNamespace')->andReturn('App\\');
         $factory->shouldReceive('exists')->andReturn(false, false, true);
         Container::setInstance($container);
@@ -594,8 +604,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testPackagesClasslessComponents()
     {
         $container = new Container;
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
         $app->shouldReceive('getNamespace')->andReturn('App\\');
         $factory->shouldReceive('exists')->andReturn(true);
         Container::setInstance($container);
@@ -614,8 +626,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
 
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
         $factory->shouldReceive('exists')->times(4)->andReturnUsing(function ($arg) {
@@ -648,8 +662,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
 
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
         $factory->shouldReceive('exists')->times(5)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
@@ -682,8 +698,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
 
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
         $factory->shouldReceive('exists')->times(6)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
@@ -716,8 +734,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
 
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
 
@@ -749,8 +769,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
 
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
 
@@ -782,8 +804,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
 
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
 
@@ -848,8 +872,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testItThrowsAnExceptionForNonExistingClass()
     {
         $container = new Container;
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
         $app->shouldReceive('getNamespace')->once()->andReturn('App\\');
         $factory->shouldReceive('exists')->times(3)->andReturn(false);
         Container::setInstance($container);
@@ -862,8 +888,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testAttributesTreatedAsPropsAreRemovedFromFinalAttributes()
     {
         $container = new Container;
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
         $container->alias(Factory::class, 'view');
         $app->shouldReceive('getNamespace')->never()->andReturn('App\\');
         $factory->shouldReceive('exists')->never();
@@ -899,8 +927,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testOriginalAttributesAreRestoredAfterRenderingChildComponentWithProps()
     {
         $container = new Container;
-        $container->instance(Application::class, $app = m::mock(Application::class));
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $app = m::mock(Application::class);
+        $container->instance(Application::class, $app);
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
         $container->alias(Factory::class, 'view');
         $app->shouldReceive('getNamespace')->never()->andReturn('App\\');
         $factory->shouldReceive('exists')->never();
@@ -949,7 +979,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     protected function mockViewFactory($existsSucceeds = true)
     {
         $container = new Container;
-        $container->instance(Factory::class, $factory = m::mock(Factory::class));
+        $factory = m::mock(Factory::class);
+        $container->instance(Factory::class, $factory);
         $container->alias(Factory::class, 'view');
         $factory->shouldReceive('exists')->andReturn($existsSucceeds);
         Container::setInstance($container);

@@ -48,7 +48,8 @@ class RefreshDatabaseTest extends TestCase
 
     public function testRefreshTestDatabaseDefault()
     {
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = m::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->shouldReceive('call')
             ->once()
@@ -65,7 +66,8 @@ class RefreshDatabaseTest extends TestCase
     {
         $this->dropViews = true;
 
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = m::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->shouldReceive('call')
             ->once()
@@ -82,7 +84,8 @@ class RefreshDatabaseTest extends TestCase
     {
         $this->dropTypes = true;
 
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = m::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->shouldReceive('call')
             ->once()

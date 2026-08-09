@@ -174,7 +174,8 @@ class TranslationTranslatorTest extends TestCase
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
         $t->expects($this->once())->method('localeForChoice')->with('foo', null)->willReturn('en');
-        $t->setSelector($selector = m::mock(MessageSelector::class));
+        $selector = m::mock(MessageSelector::class);
+        $t->setSelector($selector);
         $selector->shouldReceive('choose')->once()->with('line', 10, 'en')->andReturn('choiced');
 
         $t->choice('foo', 10, ['replace']);
@@ -185,7 +186,8 @@ class TranslationTranslatorTest extends TestCase
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
         $t->expects($this->once())->method('localeForChoice')->with('foo', null)->willReturn('en');
-        $t->setSelector($selector = m::mock(MessageSelector::class));
+        $selector = m::mock(MessageSelector::class);
+        $t->setSelector($selector);
         $selector->shouldReceive('choose')->once()->with('line', 1.2, 'en')->andReturn('choiced');
 
         $t->choice('foo', 1.2, ['replace']);
@@ -196,7 +198,8 @@ class TranslationTranslatorTest extends TestCase
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->exactly(2))->method('get')->with('foo', [], 'en')->willReturn('line');
         $t->expects($this->exactly(2))->method('localeForChoice')->with('foo', null)->willReturn('en');
-        $t->setSelector($selector = m::mock(MessageSelector::class));
+        $selector = m::mock(MessageSelector::class);
+        $t->setSelector($selector);
         $selector->shouldReceive('choose')->twice()->with('line', 3, 'en')->andReturn('choiced');
 
         $values = ['foo', 'bar', 'baz'];
@@ -212,7 +215,8 @@ class TranslationTranslatorTest extends TestCase
         $t->setFallback('en');
         $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
         $t->expects($this->once())->method('hasForLocale')->with('foo', 'cs')->willReturn(false);
-        $t->setSelector($selector = m::mock(MessageSelector::class));
+        $selector = m::mock(MessageSelector::class);
+        $t->setSelector($selector);
         $selector->shouldReceive('choose')->once()->with('line', 10, 'en')->andReturn('choiced');
 
         $t->choice('foo', 10, ['replace']);
@@ -223,7 +227,8 @@ class TranslationTranslatorTest extends TestCase
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with(':count foos', [], 'en')->willReturn('{1} :count foos|[2,*] :count foos');
         $t->expects($this->once())->method('localeForChoice')->with(':count foos', null)->willReturn('en');
-        $t->setSelector($selector = m::mock(MessageSelector::class));
+        $selector = m::mock(MessageSelector::class);
+        $t->setSelector($selector);
         $selector->shouldReceive('choose')->once()->with('{1} :count foos|[2,*] :count foos', 1234, 'en')->andReturn(':count foos');
 
         $this->assertSame('1,234 foos', $t->choice(':count foos', 1234, ['count' => '1,234']));

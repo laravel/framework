@@ -31,13 +31,15 @@ class DatabaseSeederTest extends TestCase
     public function testCallResolveTheClassAndCallsRun()
     {
         $seeder = new TestSeeder;
-        $seeder->setContainer($container = m::mock(Container::class));
+        $container = m::mock(Container::class);
+        $seeder->setContainer($container);
         $output = m::mock(OutputInterface::class);
         $output->shouldReceive('writeln')->times(3);
         $command = m::mock(Command::class);
         $command->shouldReceive('getOutput')->times(3)->andReturn($output);
         $seeder->setCommand($command);
-        $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock(Seeder::class));
+        $child = m::mock(Seeder::class);
+        $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child);
         $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
         $child->shouldReceive('setCommand')->once()->with($command)->andReturn($child);
         $child->shouldReceive('__invoke')->once();

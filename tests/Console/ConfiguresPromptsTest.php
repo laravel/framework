@@ -108,10 +108,13 @@ class ConfiguresPromptsTest extends TestCase
 
     protected function runCommand($command, $expectations)
     {
-        $command->setLaravel($application = m::mock(Application::class));
+        $application = m::mock(Application::class);
+        $command->setLaravel($application);
 
-        $application->shouldReceive('make')->withArgs(fn ($abstract) => $abstract === OutputStyle::class)->andReturn($outputStyle = m::mock(OutputStyle::class));
-        $application->shouldReceive('make')->withArgs(fn ($abstract) => $abstract === Factory::class)->andReturn($factory = m::mock(Factory::class));
+        $outputStyle = m::mock(OutputStyle::class);
+        $application->shouldReceive('make')->withArgs(fn ($abstract) => $abstract === OutputStyle::class)->andReturn($outputStyle);
+        $factory = m::mock(Factory::class);
+        $application->shouldReceive('make')->withArgs(fn ($abstract) => $abstract === Factory::class)->andReturn($factory);
         $application->shouldReceive('runningUnitTests')->andReturn(false);
         $application->shouldReceive('call')->with([$command, 'handle'])->andReturnUsing(fn ($callback) => call_user_func($callback));
         $outputStyle->shouldReceive('newLinesWritten')->andReturn(1);

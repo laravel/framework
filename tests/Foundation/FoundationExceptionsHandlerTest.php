@@ -353,8 +353,9 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->container->singleton('redirect', function () use (&$argumentActual) {
             $redirector = m::mock(Redirector::class);
 
+            $responder = m::mock(RedirectResponse::class);
             $redirector->shouldReceive('to')->once()
-                ->andReturn($responder = m::mock(RedirectResponse::class));
+                ->andReturn($responder);
 
             $responder->shouldReceive('withInput')->once()->with(m::on(
                 function ($argument) use (&$argumentActual) {

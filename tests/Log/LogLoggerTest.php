@@ -18,7 +18,8 @@ class LogLoggerTest extends TestCase
 {
     public function testMethodsPassErrorAdditionsToMonolog()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $monolog = m::mock(Monolog::class);
+        $writer = new Logger($monolog);
         $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
@@ -27,7 +28,8 @@ class LogLoggerTest extends TestCase
 
     public function testContextIsAddedToAllSubsequentLogs()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $monolog = m::mock(Monolog::class);
+        $writer = new Logger($monolog);
         $writer->withContext(['bar' => 'baz']);
 
         $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
@@ -38,7 +40,8 @@ class LogLoggerTest extends TestCase
 
     public function testContextIsFlushed()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $monolog = m::mock(Monolog::class);
+        $writer = new Logger($monolog);
         $writer->withContext(['bar' => 'baz']);
         $writer->withoutContext();
 
@@ -50,7 +53,8 @@ class LogLoggerTest extends TestCase
 
     public function testContextKeysCanBeRemovedForSubsequentLogs()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $monolog = m::mock(Monolog::class);
+        $writer = new Logger($monolog);
         $writer->withContext(['bar' => 'baz', 'forget' => 'me']);
         $writer->withoutContext(['forget']);
 
@@ -62,7 +66,8 @@ class LogLoggerTest extends TestCase
 
     public function testLoggerFiresEventsDispatcher()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);
+        $monolog = m::mock(Monolog::class);
+        $writer = new Logger($monolog, $events = new Dispatcher);
         $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
@@ -96,7 +101,8 @@ class LogLoggerTest extends TestCase
 
     public function testListenShortcut()
     {
-        $writer = new Logger(m::mock(Monolog::class), $events = m::mock(DispatcherContract::class));
+        $events = m::mock(DispatcherContract::class);
+        $writer = new Logger(m::mock(Monolog::class), $events);
 
         $callback = function () {
             return 'success';
@@ -108,7 +114,8 @@ class LogLoggerTest extends TestCase
 
     public function testComplexContextManipulation()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $monolog = m::mock(Monolog::class);
+        $writer = new Logger($monolog);
 
         $writer->withContext(['user_id' => 123, 'action' => 'login']);
         $writer->withContext(['ip' => '127.0.0.1', 'timestamp' => '1986-10-29']);

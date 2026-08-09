@@ -70,7 +70,8 @@ class QueueSqsJobTest extends TestCase
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
-        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock(stdClass::class));
+        $handler = m::mock(stdClass::class);
+        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler);
         $handler->shouldReceive('fire')->once()->with($job, ['data']);
         $job->fire();
     }
