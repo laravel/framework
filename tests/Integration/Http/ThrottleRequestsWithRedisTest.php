@@ -92,4 +92,37 @@ class ThrottleRequestsWithRedisTest extends TestCase
             $this->get('/')->assertTooManyRequests()->assertContent('ah ah ah');
         });
     }
+
+    public function testRedisPrefixIsAppliedToLimiterKeys()
+    {
+        $this->ifRedisAvailable(function () {
+            $now = Carbon::now();
+            Carbon::setTestNow($now);
+
+            Route::get('/namespaced', function () {
+                return 'yes';
+            })->middleware(NamespacedThrottleRequestsWithRedis::class.':2,1');
+
+            $this->withoutExceptionHandling()->get('/namespaced');
+            $this->withoutExceptionHandling()->get('/namespaced');
+
+            try {
+                $this->withoutExceptionHandling()->get('/namespaced');
+            } catch (Throwable $e) {
+                $this->assertEquals(429, $e->getStatusCode());
+            }
+
+            $redis = $this->app->make('redis')->connection();
+            $keys = $redis->keys('throttle:*');
+            $this->assertNotEmpty($keys);
+        });
+    }
+}
+
+class NamespacedThrottleRequestsWithRedis extends ThrottleRequestsWithRedis
+{
+    protected function redisPrefix()
+    {
+        return 'throttle:';
+    }
 }

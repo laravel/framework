@@ -93,7 +93,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     protected function tooManyAttempts($key, $maxAttempts, $decaySeconds)
     {
         $limiter = new DurationLimiter(
-            $this->getRedisConnection(), $key, $maxAttempts, $decaySeconds
+            $this->getRedisConnection(), $this->redisPrefix().$key, $maxAttempts, $decaySeconds
         );
 
         return tap($limiter->tooManyAttempts(), function () use ($key, $limiter) {
@@ -114,7 +114,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     protected function hit($key, $maxAttempts, $decaySeconds)
     {
         $limiter = new DurationLimiter(
-            $this->getRedisConnection(), $key, $maxAttempts, $decaySeconds
+            $this->getRedisConnection(), $this->redisPrefix().$key, $maxAttempts, $decaySeconds
         );
 
         $limiter->acquire();
@@ -156,5 +156,15 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     protected function getRedisConnection()
     {
         return $this->redis->connection();
+    }
+
+    /**
+     * Get the prefix that should be used for the Redis rate limiter keys.
+     *
+     * @return string
+     */
+    protected function redisPrefix()
+    {
+        return '';
     }
 }
