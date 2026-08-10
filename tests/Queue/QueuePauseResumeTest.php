@@ -192,11 +192,11 @@ class QueuePauseResumeTest extends TestCase
     {
         $dispatchedEvent = null;
 
-        $this->manager->getApplication()['events']->listen(
-            QueuesPaused::class, function ($event) use (&$dispatchedEvent) {
-                $dispatchedEvent = $event;
-            }
-        );
+        $dispatcher = $this->manager->getApplication()['events'];
+
+        $dispatcher->listen(QueuesPaused::class, function ($event) use (&$dispatchedEvent) {
+            $dispatchedEvent = $event;
+        });
 
         $this->manager->pauseAll();
 
