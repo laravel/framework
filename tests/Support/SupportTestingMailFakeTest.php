@@ -422,6 +422,24 @@ class SupportTestingMailFakeTest extends TestCase
         });
     }
 
+    public function testDefaultMailerIsAppliedToEachMailable()
+    {
+        $firstSentMailable = new MailableStub;
+        $secondSentMailable = new MailableStub;
+        $firstQueuedMailable = new MailableStub;
+        $secondQueuedMailable = new MailableStub;
+
+        $this->fake->send($firstSentMailable);
+        $this->fake->send($secondSentMailable);
+        $this->fake->queue($firstQueuedMailable);
+        $this->fake->queue($secondQueuedMailable);
+
+        $this->assertTrue($firstSentMailable->usesMailer('smtp'));
+        $this->assertTrue($secondSentMailable->usesMailer('smtp'));
+        $this->assertTrue($firstQueuedMailable->usesMailer('smtp'));
+        $this->assertTrue($secondQueuedMailable->usesMailer('smtp'));
+    }
+
     public function testDriverMethod()
     {
         $this->fake->driver('ses')->to('taylor@laravel.com')->send($this->mailable);

@@ -29,6 +29,13 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     public $manager;
 
     /**
+     * The default mailer name.
+     *
+     * @var string
+     */
+    protected $defaultMailer;
+
+    /**
      * The mailer currently being used to send a message.
      *
      * @var string
@@ -57,7 +64,8 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     public function __construct(MailManager $manager)
     {
         $this->manager = $manager;
-        $this->currentMailer = $manager->getDefaultDriver();
+        $this->defaultMailer = $manager->getDefaultDriver();
+        $this->currentMailer = $this->defaultMailer;
     }
 
     /**
@@ -526,7 +534,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             return;
         }
 
-        $view->mailer($this->currentMailer);
+        $view->mailer($this->currentMailer ?? $this->defaultMailer);
 
         if ($shouldQueue) {
             return $this->queue($view);
@@ -554,7 +562,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             $view->onQueue($queue);
         }
 
-        $view->mailer($this->currentMailer);
+        $view->mailer($this->currentMailer ?? $this->defaultMailer);
 
         $this->currentMailer = null;
 
