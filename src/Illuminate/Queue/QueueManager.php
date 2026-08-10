@@ -253,7 +253,7 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Pause job processing for every queue on every connection.
+     * Pause job processing for all queues.
      *
      * @return void
      */
@@ -261,7 +261,7 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $this->app['cache']
             ->store()
-            ->forever('illuminate:queue:paused', true);
+            ->forever('illuminate:queues:paused', true);
 
         $this->app['events']->dispatch(
             new Events\QueuesPaused
@@ -287,7 +287,9 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Resume job processing for every queue on every connection.
+     * Resume job processing for all queues.
+     *
+     * Queues paused individually are not affected.
      *
      * @return void
      */
@@ -295,7 +297,7 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $this->app['cache']
             ->store()
-            ->forget('illuminate:queue:paused');
+            ->forget('illuminate:queues:paused');
 
         $this->app['events']->dispatch(
             new Events\QueuesResumed
@@ -312,7 +314,7 @@ class QueueManager implements FactoryContract, MonitorContract
     public function isPaused($connection, $queue)
     {
         $states = $this->app['cache']->store()->many([
-            'illuminate:queue:paused',
+            'illuminate:queues:paused',
             "illuminate:queue:paused:{$connection}:{$queue}",
         ]);
 
@@ -331,10 +333,10 @@ class QueueManager implements FactoryContract, MonitorContract
         $keys = array_map(fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues);
 
         $states = $this->app['cache']->store()->many(
-            array_merge(['illuminate:queue:paused'], $keys)
+            array_merge(['illuminate:queues:paused'], $keys)
         );
 
-        if ($states['illuminate:queue:paused'] ?? false) {
+        if ($states['illuminate:queues:paused'] ?? false) {
             return array_values($queues);
         }
 
