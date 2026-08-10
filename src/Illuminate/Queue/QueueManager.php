@@ -253,7 +253,7 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Pause job processing for all queues.
+     * Pause job processing for all queues on all connections.
      *
      * @return void
      */
@@ -287,7 +287,7 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Resume job processing for all queues.
+     * Resume job processing for all queues on all connections.
      *
      * Queues paused individually are not affected.
      *
