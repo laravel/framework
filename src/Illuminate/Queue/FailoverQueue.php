@@ -32,7 +32,7 @@ class FailoverQueue extends Queue implements QueueContract
     /**
      * Get the size of the queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function size($queue = null)
@@ -43,7 +43,7 @@ class FailoverQueue extends Queue implements QueueContract
     /**
      * Get the number of pending jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function pendingSize($queue = null)
@@ -54,7 +54,7 @@ class FailoverQueue extends Queue implements QueueContract
     /**
      * Get the number of delayed jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function delayedSize($queue = null)
@@ -65,7 +65,7 @@ class FailoverQueue extends Queue implements QueueContract
     /**
      * Get the number of reserved jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function reservedSize($queue = null)
@@ -76,7 +76,7 @@ class FailoverQueue extends Queue implements QueueContract
     /**
      * Get the pending jobs for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Support\Collection
      */
     public function pendingJobs($queue = null): Collection
@@ -87,7 +87,7 @@ class FailoverQueue extends Queue implements QueueContract
     /**
      * Get the delayed jobs for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Support\Collection
      */
     public function delayedJobs($queue = null): Collection
@@ -98,7 +98,7 @@ class FailoverQueue extends Queue implements QueueContract
     /**
      * Get the reserved jobs for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Support\Collection
      */
     public function reservedJobs($queue = null): Collection
@@ -139,7 +139,7 @@ class FailoverQueue extends Queue implements QueueContract
     /**
      * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int|null
      */
     public function creationTimeOfOldestPendingJob($queue = null)
@@ -154,7 +154,7 @@ class FailoverQueue extends Queue implements QueueContract
      *
      * @param  object|string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
@@ -166,7 +166,7 @@ class FailoverQueue extends Queue implements QueueContract
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])
@@ -180,7 +180,7 @@ class FailoverQueue extends Queue implements QueueContract
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
@@ -193,7 +193,7 @@ class FailoverQueue extends Queue implements QueueContract
      *
      * @param  array  $jobs
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return void
      */
     public function bulk($jobs, $data = '', $queue = null)
@@ -212,7 +212,7 @@ class FailoverQueue extends Queue implements QueueContract
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null)
