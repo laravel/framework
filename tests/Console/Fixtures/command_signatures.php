@@ -3699,10 +3699,23 @@ return [
         'arguments' => [
             [
                 'name' => 'queue',
-                'mode' => 'required',
+                'mode' => 'optional',
                 'isArray' => false,
                 'default' => null,
                 'description' => 'The name of the queue to pause',
+            ],
+        ],
+        'options' => [
+            [
+                'name' => 'all',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => false,
+                'isArray' => false,
+                'acceptValue' => false,
+                'default' => false,
+                'description' => 'Pause job processing for every queue on every connection',
             ],
         ],
     ],
@@ -3771,10 +3784,23 @@ return [
         'arguments' => [
             [
                 'name' => 'queue',
-                'mode' => 'required',
+                'mode' => 'optional',
                 'isArray' => false,
                 'default' => null,
                 'description' => 'The name of the queue that should resume processing',
+            ],
+        ],
+        'options' => [
+            [
+                'name' => 'all',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => false,
+                'isArray' => false,
+                'acceptValue' => false,
+                'default' => false,
+                'description' => 'Resume job processing for every queue on every connection',
             ],
         ],
     ],
