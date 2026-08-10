@@ -20,7 +20,7 @@ class PauseCommand extends Command
      */
     protected $signature = 'queue:pause
                             {queue? : The name of the queue to pause}
-                            {--all : Pause job processing for all queues}';
+                            {--all : Pause job processing for all queues on all connections}';
 
     /**
      * The console command description.
@@ -45,7 +45,7 @@ class PauseCommand extends Command
         if ($this->option('all')) {
             $manager->pauseAll();
 
-            $this->components->info('Job processing on all queues has been paused.');
+            $this->components->info('Job processing on all queues across all connections has been paused.');
 
             return self::SUCCESS;
         }
