@@ -40,7 +40,7 @@ class ResumeCommand extends Command
      *
      * @return int
      */
-    public function handle(QueueManager $manager)
+    public function handle(QueueManager $manager): int
     {
         if ($this->option('all')) {
             $manager->resumeAll();

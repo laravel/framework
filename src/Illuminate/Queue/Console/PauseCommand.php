@@ -34,7 +34,7 @@ class PauseCommand extends Command
      *
      * @return int
      */
-    public function handle(QueueManager $manager)
+    public function handle(QueueManager $manager): int
     {
         if (! Worker::$pausable) {
             $this->components->error('Queue pausing is currently disabled.');
