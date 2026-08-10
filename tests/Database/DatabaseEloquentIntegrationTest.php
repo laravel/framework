@@ -398,6 +398,190 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf(LengthAwarePaginator::class, $models);
     }
 
+    public function testPaginatedModelCollectionRetrievalWithJoinAndDistinct()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
+
+        EloquentTestPost::insert([
+            ['id' => 1, 'user_id' => 1, 'parent_id' => null, 'name' => 'First Post'],
+            ['id' => 2, 'user_id' => 1, 'parent_id' => null, 'name' => 'Second Post'],
+            ['id' => 3, 'user_id' => 2, 'parent_id' => null, 'name' => 'Third Post'],
+        ]);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+
+        $models = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id')
+            ->distinct()
+            ->oldest('users.id')
+            ->paginate(10, ['users.*']);
+
+        $this->assertCount(2, $models);
+        $this->assertSame(2, $models->total());
+    }
+
+    public function testPaginatedModelCollectionRetrievalWithJoinAndDistinctAndSelect()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
+
+        EloquentTestPost::insert([
+            ['id' => 1, 'user_id' => 1, 'parent_id' => null, 'name' => 'First Post'],
+            ['id' => 2, 'user_id' => 1, 'parent_id' => null, 'name' => 'Second Post'],
+            ['id' => 3, 'user_id' => 2, 'parent_id' => null, 'name' => 'Third Post'],
+        ]);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+
+        $models = EloquentTestUser::select('users.*')
+            ->join('posts', 'users.id', '=', 'posts.user_id')
+            ->distinct()
+            ->oldest('users.id')
+            ->paginate(10);
+
+        $this->assertCount(2, $models);
+        $this->assertSame(2, $models->total());
+    }
+
+    public function testPaginatedModelCollectionRetrievalWithJoinAndDistinctAndMultipleColumns()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
+
+        EloquentTestPost::insert([
+            ['id' => 1, 'user_id' => 1, 'parent_id' => null, 'name' => 'First Post'],
+            ['id' => 2, 'user_id' => 1, 'parent_id' => null, 'name' => 'Second Post'],
+            ['id' => 3, 'user_id' => 2, 'parent_id' => null, 'name' => 'Third Post'],
+        ]);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+
+        $models = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id')
+            ->distinct()
+            ->oldest('users.id')
+            ->paginate(10, ['users.id', 'users.email']);
+
+        $this->assertCount(2, $models);
+        $this->assertSame(2, $models->total());
+    }
+
+    public function testPaginatedModelCollectionRetrievalWithJoinAndDistinctAndStringColumn()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
+
+        EloquentTestPost::insert([
+            ['id' => 1, 'user_id' => 1, 'parent_id' => null, 'name' => 'First Post'],
+            ['id' => 2, 'user_id' => 1, 'parent_id' => null, 'name' => 'Second Post'],
+            ['id' => 3, 'user_id' => 2, 'parent_id' => null, 'name' => 'Third Post'],
+        ]);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+
+        $models = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id')
+            ->distinct()
+            ->oldest('users.id')
+            ->paginate(10, 'users.*');
+
+        $this->assertCount(2, $models);
+        $this->assertSame(2, $models->total());
+    }
+
+    public function testPaginatedModelCollectionRetrievalWithJoinAndDistinctAndNullableColumn()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'name' => null, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'name' => null, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'name' => 'foo', 'email' => 'foo@gmail.com'],
+        ]);
+
+        EloquentTestPost::insert([
+            ['id' => 1, 'user_id' => 1, 'parent_id' => null, 'name' => 'First Post'],
+            ['id' => 2, 'user_id' => 1, 'parent_id' => null, 'name' => 'Second Post'],
+            ['id' => 3, 'user_id' => 2, 'parent_id' => null, 'name' => 'Third Post'],
+        ]);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+
+        $models = EloquentTestUser::select('users.*')
+            ->join('posts', 'users.id', '=', 'posts.user_id')
+            ->distinct()
+            ->oldest('users.id')
+            ->paginate(10);
+
+        $this->assertCount(2, $models);
+        $this->assertSame(2, $models->total());
+    }
+
+    public function testPaginatedModelCollectionRetrievalWithJoinAndDistinctAndForeignWildcard()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
+
+        EloquentTestPost::insert([
+            ['id' => 1, 'user_id' => 1, 'parent_id' => null, 'name' => 'First Post'],
+            ['id' => 2, 'user_id' => 1, 'parent_id' => null, 'name' => 'Second Post'],
+            ['id' => 3, 'user_id' => 2, 'parent_id' => null, 'name' => 'Third Post'],
+        ]);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+
+        $models = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id')
+            ->distinct()
+            ->oldest('users.id')
+            ->paginate(10, ['posts.*']);
+
+        $this->assertCount(3, $models);
+        $this->assertSame(3, $models->total());
+    }
+
+    public function testPaginatedModelCollectionRetrievalWithDistinctAndUnionAll()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+
+        $duplicate = EloquentTestUser::select('users.*')->distinct();
+        $models = EloquentTestUser::select('users.*')->distinct()
+            ->unionAll($duplicate)
+            ->paginate(10);
+
+        $this->assertCount(4, $models);
+        $this->assertSame(4, $models->total());
+    }
+
     public function testCountForPaginationWithGrouping()
     {
         EloquentTestUser::insert([

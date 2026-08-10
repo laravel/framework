@@ -3615,7 +3615,17 @@ class Builder implements BuilderContract
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $total = value($total) ?? $this->getCountForPagination();
+        $countColumns = ['*'];
+
+        if ($this->distinct) {
+            $resolvedColumns = Arr::wrap($columns === ['*'] ? ($this->columns ?? ['*']) : $columns);
+
+            if ($resolvedColumns !== ['*']) {
+                $countColumns = $resolvedColumns;
+            }
+        }
+
+        $total = value($total) ?? $this->getCountForPagination($countColumns);
 
         $perPage = value($perPage, $total);
 
@@ -3741,6 +3751,16 @@ class Builder implements BuilderContract
                 ->from(new Expression('('.$clone->toSql().') as '.$this->grammar->wrap('aggregate_table')))
                 ->mergeBindings($clone)
                 ->setAggregate('count', $this->withoutSelectAliases($columns))
+                ->get()->all();
+        }
+
+        if ($this->distinct && ! $this->unions && $columns !== ['*']) {
+            $clone = $this->cloneForPaginationCount();
+
+            return $this->newQuery()
+                ->from(new Expression('('.$clone->select($this->withoutSelectAliases($columns))->toSql().') as '.$this->grammar->wrap('aggregate_table')))
+                ->mergeBindings($clone)
+                ->setAggregate('count', ['*'])
                 ->get()->all();
         }
 
