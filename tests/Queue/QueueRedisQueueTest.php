@@ -428,6 +428,35 @@ class QueueRedisQueueTest extends TestCase
 
         $this->assertSame(['default', 'emails'], $queue->testAllQueueNames()->all());
     }
+
+    public function testSizeResolvesTheQueueNameFromAnEnum()
+    {
+        $queue = new RedisQueue($redis = m::mock(Factory::class), 'default');
+        $redis->shouldReceive('connection')->andReturn($redis);
+        $redis->shouldReceive('isCluster')->andReturn(false);
+        $redis->shouldReceive('eval')->once()->with(
+            LuaScripts::size(), 3, 'queues:emails', 'queues:emails:delayed', 'queues:emails:reserved'
+        )->andReturn(5);
+
+        $this->assertSame(5, $queue->size(RedisQueueName::Emails));
+    }
+
+    public function testPendingJobsResolvesTheQueueNameFromAnEnum()
+    {
+        $queue = new RedisQueue($redis = m::mock(Factory::class), 'default');
+        $redis->shouldReceive('connection')->andReturn($redis);
+        $redis->shouldReceive('isCluster')->andReturn(false);
+        $redis->shouldReceive('lrange')->once()->with('queues:emails', 0, -1)->andReturn([
+            json_encode(['uuid' => 'uuid', 'displayName' => 'foo']),
+        ]);
+
+        $this->assertSame('emails', $queue->pendingJobs(RedisQueueName::Emails)->first()->queue);
+    }
+}
+
+enum RedisQueueName: string
+{
+    case Emails = 'emails';
 }
 
 class TestableRedisQueue extends RedisQueue
