@@ -7,7 +7,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Routing\Router;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class RouteListCommandTest extends TestCase
@@ -18,11 +18,11 @@ class RouteListCommandTest extends TestCase
     {
         $this->app = new Application(
             $laravel = new \Illuminate\Foundation\Application(__DIR__),
-            m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            Mockery::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
             'testing',
         );
 
-        $router = new Router(m::mock('Illuminate\Events\Dispatcher'));
+        $router = new Router(Mockery::mock('Illuminate\Events\Dispatcher'));
 
         $kernel = new class($laravel, $router) extends Kernel
         {
@@ -250,7 +250,7 @@ class RouteListCommandTest extends TestCase
     public function testControllerRoutePathIsNull()
     {
         $laravel = new \Illuminate\Foundation\Application(__DIR__);
-        $router = new Router(m::mock('Illuminate\Events\Dispatcher'));
+        $router = new Router(Mockery::mock('Illuminate\Events\Dispatcher'));
 
         $kernel = new class($laravel, $router) extends Kernel
         {
@@ -266,7 +266,7 @@ class RouteListCommandTest extends TestCase
 
         $app = new Application(
             $laravel,
-            m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            Mockery::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
             'testing',
         );
         $app->addCommands([$command]);

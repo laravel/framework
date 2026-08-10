@@ -14,7 +14,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
-use Mockery as m;
+use Mockery;
 
 class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 {
@@ -194,14 +194,14 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
     private function assertHandldedBroadcastableEvent(BroadcastableModelEventOccurred $event, Closure $closure)
     {
-        $broadcaster = m::mock(Broadcaster::class);
-        $broadcaster->shouldReceive('broadcast')->once()
+        $broadcaster = Mockery::mock(Broadcaster::class);
+        $broadcaster->expects('broadcast')
             ->withArgs(function (array $channels, string $eventName, array $payload) use ($closure) {
                 return $closure($channels, $eventName, $payload);
             });
 
-        $manager = m::mock(BroadcastingFactory::class);
-        $manager->shouldReceive('connection')->once()->with(null)->andReturn($broadcaster);
+        $manager = Mockery::mock(BroadcastingFactory::class);
+        $manager->expects('connection')->with(null)->andReturn($broadcaster);
 
         (new BroadcastEvent($event))->handle($manager);
 

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Events;
 
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Support\Facades\Event;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class ListenerTest extends TestCase
@@ -20,7 +20,7 @@ class ListenerTest extends TestCase
     public function testClassListenerRunsNormallyIfNoTransactions()
     {
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = m::mock(DatabaseTransactionsManager::class);
+            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
             $transactionManager->shouldNotReceive('addCallback')->once()->andReturn(null);
 
             return $transactionManager;
@@ -36,8 +36,8 @@ class ListenerTest extends TestCase
     public function testClassListenerDoesntRunInsideTransaction()
     {
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = m::mock(DatabaseTransactionsManager::class);
-            $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
+            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
+            $transactionManager->expects('addCallback')->andReturn(null);
 
             return $transactionManager;
         });

@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Broadcasting;
 use Ably\AblyRest;
 use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
 use Illuminate\Http\Request;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -20,9 +20,9 @@ class AblyBroadcasterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->ably = m::mock(AblyRest::class, ['abcd:efgh']);
+        $this->ably = Mockery::mock(AblyRest::class, ['abcd:efgh']);
 
-        $this->broadcaster = m::mock(AblyBroadcaster::class, [$this->ably])->makePartial();
+        $this->broadcaster = Mockery::mock(AblyBroadcaster::class, [$this->ably])->makePartial();
     }
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
@@ -31,8 +31,7 @@ class AblyBroadcasterTest extends TestCase
             return true;
         });
 
-        $this->broadcaster->shouldReceive('validAuthenticationResponse')
-            ->once();
+        $this->broadcaster->expects('validAuthenticationResponse');
 
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('private-test')
@@ -72,8 +71,7 @@ class AblyBroadcasterTest extends TestCase
             return $returnData;
         });
 
-        $this->broadcaster->shouldReceive('validAuthenticationResponse')
-            ->once();
+        $this->broadcaster->expects('validAuthenticationResponse');
 
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('presence-test')
@@ -112,20 +110,21 @@ class AblyBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithUserForChannel($channel)
     {
-        $request = m::mock(Request::class);
-        $request->shouldReceive('all')->andReturn(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
+        $request = Mockery::mock(Request::class);
+        $request->expects('all')->times(4)->andReturn(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
 
         $request->shouldReceive('input')
             ->with('callback', false)
             ->andReturn(false);
 
-        $user = m::mock('User');
+        $user = Mockery::mock('User');
         $user->shouldReceive('getAuthIdentifierForBroadcasting')
             ->andReturn(42);
         $user->shouldReceive('getAuthIdentifier')
             ->andReturn(42);
 
-        $request->shouldReceive('user')
+        $request->expects('user')
+            ->times(2)
             ->andReturn($user);
 
         return $request;
@@ -137,10 +136,10 @@ class AblyBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithoutUserForChannel($channel)
     {
-        $request = m::mock(Request::class);
-        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
+        $request = Mockery::mock(Request::class);
+        $request->expects('all')->times(4)->andReturn(['channel_name' => $channel]);
 
-        $request->shouldReceive('user')
+        $request->expects('user')
             ->andReturn(null);
 
         return $request;

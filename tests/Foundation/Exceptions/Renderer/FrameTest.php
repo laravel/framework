@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Foundation\Exceptions\Renderer;
 
 use Illuminate\Foundation\Exceptions\Renderer\Frame;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
@@ -15,7 +15,7 @@ class FrameTest extends TestCase
     #[DataProvider('unixFileDataProvider')]
     public function test_it_normalizes_file_path_on_unix($frameData, $basePath, $expected)
     {
-        $exception = m::mock(FlattenException::class);
+        $exception = Mockery::mock(FlattenException::class);
         $classMap = [];
         $frame = new Frame($exception, $classMap, $frameData, $basePath);
 
@@ -50,7 +50,7 @@ class FrameTest extends TestCase
     #[DataProvider('windowsFileDataProvider')]
     public function test_it_normalizes_file_path_on_windows($frameData, $basePath, $expected)
     {
-        $exception = m::mock(FlattenException::class);
+        $exception = Mockery::mock(FlattenException::class);
         $classMap = [];
         $frame = new Frame($exception, $classMap, $frameData, $basePath);
 
@@ -85,7 +85,7 @@ class FrameTest extends TestCase
     #[DataProvider('unixIsFromVendorDataProvider')]
     public function test_it_determines_if_frame_is_from_vendor_on_unix($frameData, $basePath, $expected)
     {
-        $exception = m::mock(FlattenException::class);
+        $exception = Mockery::mock(FlattenException::class);
         $classMap = [];
         $frame = new Frame($exception, $classMap, $frameData, $basePath);
 
@@ -120,7 +120,7 @@ class FrameTest extends TestCase
     #[DataProvider('windowsIsFromVendorDataProvider')]
     public function test_it_determines_if_frame_is_from_vendor_on_windows($frameData, $basePath, $expected)
     {
-        $exception = m::mock(FlattenException::class);
+        $exception = Mockery::mock(FlattenException::class);
         $classMap = [];
         $frame = new Frame($exception, $classMap, $frameData, $basePath);
 

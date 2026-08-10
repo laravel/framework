@@ -7,7 +7,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
@@ -58,10 +58,10 @@ class DatabaseMigrationsTest extends TestCase
 
     public function testRefreshTestDatabaseDefault()
     {
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = Mockery::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
-        $kernel->shouldReceive('call')
-            ->once()
+        $kernel->expects('call')
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => false,
@@ -75,10 +75,10 @@ class DatabaseMigrationsTest extends TestCase
     {
         $this->dropViews = true;
 
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = Mockery::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
-        $kernel->shouldReceive('call')
-            ->once()
+        $kernel->expects('call')
             ->with('migrate:fresh', [
                 '--drop-views' => true,
                 '--drop-types' => false,
@@ -92,10 +92,10 @@ class DatabaseMigrationsTest extends TestCase
     {
         $this->dropTypes = true;
 
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = Mockery::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
-        $kernel->shouldReceive('call')
-            ->once()
+        $kernel->expects('call')
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => true,

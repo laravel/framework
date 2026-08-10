@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Testing;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
-use Mockery as m;
+use Mockery;
 use Mockery\Exception\InvalidCountException;
 use Mockery\Exception\InvalidOrderException;
 use Orchestra\Testbench\TestCase;
@@ -328,7 +328,7 @@ class ArtisanCommandTest extends TestCase
      */
     protected function verifyMockeryExpectationsNow(): void
     {
-        m::close();
+        Mockery::close();
     }
 
     /**
@@ -344,7 +344,7 @@ class ArtisanCommandTest extends TestCase
             $callback();
         } finally {
             try {
-                m::close();
+                Mockery::close();
             } catch (InvalidCountException) {
                 // Ignore mock exception from PendingCommand::expectsOutput().
             }

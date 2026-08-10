@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Support\Collection;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class NotificationSendQueuedNotificationTest extends TestCase
@@ -20,8 +20,8 @@ class NotificationSendQueuedNotificationTest extends TestCase
     {
         $notification = new TestNotification;
         $job = new SendQueuedNotifications('notifiables', $notification);
-        $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('sendNow')->once()->withArgs(function ($notifiables, $notification, $channels) {
+        $manager = Mockery::mock(ChannelManager::class);
+        $manager->expects('sendNow')->withArgs(function ($notifiables, $notification, $channels) {
             return $notifiables instanceof Collection && $notifiables->toArray() === ['notifiables']
                 && $notification instanceof TestNotification
                 && $channels === null;

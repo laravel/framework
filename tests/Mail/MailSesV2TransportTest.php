@@ -10,7 +10,7 @@ use Illuminate\Container\Container;
 use Illuminate\Mail\MailManager;
 use Illuminate\Mail\Transport\SesV2Transport;
 use Illuminate\View\Factory;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
@@ -57,14 +57,13 @@ class MailSesV2TransportTest extends TestCase
         $message->getHeaders()->add(new MetadataHeader('FooTag', 'TagValue'));
         $message->getHeaders()->addTextHeader('X-SES-LIST-MANAGEMENT-OPTIONS', 'contactListName=TestList;topicName=TestTopic');
 
-        $client = m::mock(SesV2Client::class);
-        $sesResult = m::mock();
-        $sesResult->shouldReceive('get')
+        $client = Mockery::mock(SesV2Client::class);
+        $sesResult = Mockery::mock();
+        $sesResult->expects('get')
             ->with('MessageId')
-            ->once()
             ->andReturn('ses-message-id');
-        $client->shouldReceive('sendEmail')->once()
-            ->with(m::on(function ($arg) {
+        $client->expects('sendEmail')
+            ->with(Mockery::on(function ($arg) {
                 return $arg['Source'] === 'myself@example.com' &&
                     $arg['Destination']['ToAddresses'] === ['me@example.com', 'you@example.com'] &&
                     $arg['ListManagementOptions'] === ['ContactListName' => 'TestList', 'TopicName' => 'TestTopic'] &&
@@ -85,14 +84,13 @@ class MailSesV2TransportTest extends TestCase
         $message->to('me@example.com');
         $message->getHeaders()->addTextHeader('X-SES-TENANT-NAME', 'my-tenant');
 
-        $client = m::mock(SesV2Client::class);
-        $sesResult = m::mock();
-        $sesResult->shouldReceive('get')
+        $client = Mockery::mock(SesV2Client::class);
+        $sesResult = Mockery::mock();
+        $sesResult->expects('get')
             ->with('MessageId')
-            ->once()
             ->andReturn('ses-message-id');
-        $client->shouldReceive('sendEmail')->once()
-            ->with(m::on(function ($arg) {
+        $client->expects('sendEmail')
+            ->with(Mockery::on(function ($arg) {
                 return $arg['TenantName'] === 'my-tenant';
             }))
             ->andReturn($sesResult);
@@ -108,14 +106,13 @@ class MailSesV2TransportTest extends TestCase
         $message->sender('myself@example.com');
         $message->to('me@example.com');
 
-        $client = m::mock(SesV2Client::class);
-        $sesResult = m::mock();
-        $sesResult->shouldReceive('get')
+        $client = Mockery::mock(SesV2Client::class);
+        $sesResult = Mockery::mock();
+        $sesResult->expects('get')
             ->with('MessageId')
-            ->once()
             ->andReturn('ses-message-id');
-        $client->shouldReceive('sendEmail')->once()
-            ->with(m::on(function ($arg) {
+        $client->expects('sendEmail')
+            ->with(Mockery::on(function ($arg) {
                 return ! array_key_exists('TenantName', $arg);
             }))
             ->andReturn($sesResult);
@@ -131,8 +128,8 @@ class MailSesV2TransportTest extends TestCase
         $message->sender('myself@example.com');
         $message->to('me@example.com');
 
-        $client = m::mock(SesV2Client::class);
-        $client->shouldReceive('sendEmail')->once()
+        $client = Mockery::mock(SesV2Client::class);
+        $client->expects('sendEmail')
             ->andThrow(new AwsException('Email address is not verified.', new Command('sendRawEmail')));
 
         $this->expectException(TransportException::class);

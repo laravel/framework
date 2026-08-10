@@ -6,7 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Component;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractBladeTestCase extends TestCase
@@ -31,6 +31,6 @@ abstract class AbstractBladeTestCase extends TestCase
 
     protected function getFiles()
     {
-        return m::mock(Filesystem::class);
+        return Mockery::mock(Filesystem::class);
     }
 }

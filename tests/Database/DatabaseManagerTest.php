@@ -6,7 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\DatabaseManager;
-use Mockery as m;
+use Mockery;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
@@ -14,7 +14,7 @@ class DatabaseManagerTest extends TestCase
 {
     public function testParseConnectionNameRecognizesDirectType()
     {
-        $manager = new DatabaseManagerTestManager(new Container, m::mock(ConnectionFactory::class));
+        $manager = new DatabaseManagerTestManager(new Container, Mockery::mock(ConnectionFactory::class));
 
         $this->assertSame(['pgsql', 'direct'], $manager->parseConnectionNamePublic('pgsql::direct'));
         $this->assertSame(['pgsql', 'read'], $manager->parseConnectionNamePublic('pgsql::read'));
@@ -23,7 +23,7 @@ class DatabaseManagerTest extends TestCase
 
     public function testSetPdoForDirectTypeSetsReadAndWritePdosToDirectPdo()
     {
-        $manager = new DatabaseManagerTestManager(new Container, m::mock(ConnectionFactory::class));
+        $manager = new DatabaseManagerTestManager(new Container, Mockery::mock(ConnectionFactory::class));
         $connection = new Connection(new DatabaseManagerTestMockPDO);
         $directPdo = new DatabaseManagerTestMockPDO;
 
@@ -37,7 +37,7 @@ class DatabaseManagerTest extends TestCase
 
     public function testRefreshPdoConnectionsRefreshesDirectPdo()
     {
-        $manager = new DatabaseManagerTestManager(new Container, m::mock(ConnectionFactory::class));
+        $manager = new DatabaseManagerTestManager(new Container, Mockery::mock(ConnectionFactory::class));
         $connection = new Connection(new DatabaseManagerTestMockPDO, 'database', '', ['name' => 'pgsql']);
         $freshDirectPdo = new DatabaseManagerTestMockPDO;
         $freshConnection = new Connection(new DatabaseManagerTestMockPDO, 'database', '', ['name' => 'pgsql']);
