@@ -253,6 +253,22 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Pause job processing for every queue on every connection.
+     *
+     * @return void
+     */
+    public function pauseAll()
+    {
+        $this->app['cache']
+            ->store()
+            ->forever('illuminate:queue:paused', true);
+
+        $this->app['events']->dispatch(
+            new Events\QueuesPaused
+        );
+    }
+
+    /**
      * Resume a paused queue by its connection and name.
      *
      * @param  string  $connection
@@ -271,6 +287,22 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Resume job processing for every queue on every connection.
+     *
+     * @return void
+     */
+    public function resumeAll()
+    {
+        $this->app['cache']
+            ->store()
+            ->forget('illuminate:queue:paused');
+
+        $this->app['events']->dispatch(
+            new Events\QueuesResumed
+        );
+    }
+
+    /**
      * Determine if a queue is paused.
      *
      * @param  string  $connection
@@ -279,9 +311,10 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function isPaused($connection, $queue)
     {
-        return (bool) $this->app['cache']
-            ->store()
-            ->get("illuminate:queue:paused:{$connection}:{$queue}", false);
+        $cache = $this->app['cache']->store();
+
+        return (bool) $cache->get('illuminate:queue:paused', false)
+            || (bool) $cache->get("illuminate:queue:paused:{$connection}:{$queue}", false);
     }
 
     /**
@@ -295,7 +328,13 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $keys = array_map(fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues);
 
-        $states = $this->app['cache']->store()->many($keys);
+        $states = $this->app['cache']->store()->many(
+            array_merge(['illuminate:queue:paused'], $keys)
+        );
+
+        if ($states['illuminate:queue:paused'] ?? false) {
+            return array_values($queues);
+        }
 
         return array_values(array_filter(
             $queues, fn ($queue) => $states["illuminate:queue:paused:{$connection}:{$queue}"] ?? false

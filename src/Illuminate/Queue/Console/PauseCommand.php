@@ -18,7 +18,9 @@ class PauseCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'queue:pause {queue : The name of the queue to pause}';
+    protected $signature = 'queue:pause
+                            {queue? : The name of the queue to pause}
+                            {--all : Pause job processing for every queue on every connection}';
 
     /**
      * The console command description.
@@ -34,13 +36,27 @@ class PauseCommand extends Command
      */
     public function handle(QueueManager $manager)
     {
-        [$connection, $queue] = $this->parseQueue($this->argument('queue'));
-
         if (! Worker::$pausable) {
             $this->components->error('Queue pausing is currently disabled.');
 
             return self::FAILURE;
         }
+
+        if ($this->option('all')) {
+            $manager->pauseAll();
+
+            $this->components->info('Job processing on all queues has been paused.');
+
+            return self::SUCCESS;
+        }
+
+        if (! $this->argument('queue')) {
+            $this->components->error('A queue name is required unless the --all option is used.');
+
+            return self::FAILURE;
+        }
+
+        [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 
         $manager->pause($connection, $queue);
 
