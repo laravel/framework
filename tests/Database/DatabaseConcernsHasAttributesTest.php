@@ -30,7 +30,7 @@ class DatabaseConcernsHasAttributesTest extends TestCase
         $mock = m::mock(HasAttributesWithoutConstructor::class)
             ->makePartial()
             ->shouldAllowMockingProtectedMethods()
-            ->shouldReceive('getArrayableRelations')->andReturn([
+            ->expects('getArrayableRelations')->andReturn([
                 'arrayable_relation' => new Collection(['foo' => 'bar']),
                 'invalid_relation' => 'invalid',
                 'null_relation' => null,

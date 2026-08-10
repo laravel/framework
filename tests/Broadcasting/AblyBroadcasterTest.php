@@ -111,7 +111,7 @@ class AblyBroadcasterTest extends TestCase
     protected function getMockRequestWithUserForChannel($channel)
     {
         $request = m::mock(Request::class);
-        $request->shouldReceive('all')->andReturn(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
+        $request->expects('all')->times(4)->andReturn(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
 
         $request->shouldReceive('input')
             ->with('callback', false)
@@ -123,7 +123,8 @@ class AblyBroadcasterTest extends TestCase
         $user->shouldReceive('getAuthIdentifier')
             ->andReturn(42);
 
-        $request->shouldReceive('user')
+        $request->expects('user')
+            ->times(2)
             ->andReturn($user);
 
         return $request;
@@ -136,9 +137,9 @@ class AblyBroadcasterTest extends TestCase
     protected function getMockRequestWithoutUserForChannel($channel)
     {
         $request = m::mock(Request::class);
-        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
+        $request->expects('all')->times(4)->andReturn(['channel_name' => $channel]);
 
-        $request->shouldReceive('user')
+        $request->expects('user')
             ->andReturn(null);
 
         return $request;

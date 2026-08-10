@@ -15,8 +15,7 @@ class DatabaseMySQLSchemaBuilderTest extends TestCase
     {
         $connection = m::mock(Connection::class);
         $grammar = m::mock(MySqlGrammar::class);
-        $connection->shouldReceive('getDatabaseName')->andReturn('db');
-        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $builder = new MySqlBuilder($connection);
         $grammar->expects('compileTableExists')->andReturn('sql');
         $connection->expects('getTablePrefix')->andReturn('prefix_');
@@ -30,9 +29,8 @@ class DatabaseMySQLSchemaBuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $grammar = m::mock(MySqlGrammar::class);
         $processor = m::mock(MySqlProcessor::class);
-        $connection->shouldReceive('getDatabaseName')->andReturn('db');
-        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $connection->expects('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('getPostProcessor')->andReturn($processor);
         $grammar->expects('compileColumns')->with(null, 'prefix_table')->andReturn('sql');
         $processor->expects('processColumns')->andReturn([['name' => 'column']]);
         $builder = new MySqlBuilder($connection);

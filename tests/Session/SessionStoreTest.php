@@ -734,7 +734,6 @@ class SessionStoreTest extends TestCase
     public function testRememberMethodCallsPutAndReturnsDefault()
     {
         $session = $this->getSession();
-        $session->getHandler()->shouldReceive('get')->andReturn(null);
         $result = $session->remember('foo', function () {
             return 'bar';
         });

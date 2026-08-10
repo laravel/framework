@@ -50,8 +50,7 @@ class DatabaseMySqlBuilderTest extends TestCase
         $processor = Mockery::mock(Processor::class);
         $grammar = new MySqlGrammar($connection);
 
-        $connection->shouldReceive('getDatabaseName')->andReturn('database');
-        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->expects('getTablePrefix')->times(5)->andReturn('');
 
         $builder = new Builder($connection, $grammar, $processor);
 

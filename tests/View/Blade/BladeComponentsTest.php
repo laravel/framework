@@ -64,7 +64,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
 
         $component = m::mock(Component::class);
         $component->shouldReceive('withName', 'test');
-        $component->shouldReceive('shouldRender')->andReturn(false);
+        $component->expects('shouldRender')->andReturn(false);
 
         Component::resolveComponentsUsing(fn () => $component);
 

@@ -25,13 +25,12 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->expects('paths')->andReturn([]);
-        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
+        $migrator->expects('hasRunAnyMigrations')->andReturn(true);
         $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
         $migrator->expects('setOutput')->andReturn($migrator);
         $migrator->expects('run')->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
-        $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->expects('repositoryExists')->andReturn(true);
 
         $this->runCommand($command);
@@ -46,22 +45,21 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->expects('paths')->andReturn([]);
-        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(false);
+        $migrator->expects('hasRunAnyMigrations')->andReturn(false);
         $connection = m::mock(stdClass::class);
-        $migrator->shouldReceive('resolveConnection')->andReturn($connection);
-        $connection->shouldReceive('getName')->andReturn('mysql');
+        $migrator->expects('resolveConnection')->andReturn($connection);
+        $connection->expects('getName')->andReturn('mysql');
         $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
         $migrator->expects('deleteRepository');
         $schemaState = m::mock(stdClass::class);
-        $connection->shouldReceive('getSchemaState')->andReturn($schemaState);
-        $schemaState->shouldReceive('handleOutputUsing')->andReturnSelf();
+        $connection->expects('getSchemaState')->andReturn($schemaState);
+        $schemaState->expects('handleOutputUsing')->andReturnSelf();
         $schemaState->expects('load')->with(__DIR__.'/stubs/schema.sql');
         $dispatcher->expects('dispatch')->with(m::type(SchemaLoaded::class));
         $migrator->expects('setOutput')->andReturn($migrator);
         $migrator->expects('run')->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
-        $migrator->shouldReceive('getNotes')->andReturn([]);
         $migrator->expects('repositoryExists')->andReturn(true);
 
         $this->runCommand($command, ['--schema-path' => __DIR__.'/stubs/schema.sql']);
@@ -77,7 +75,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->expects('paths')->andReturn([]);
-        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
+        $migrator->expects('hasRunAnyMigrations')->andReturn(true);
         $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
@@ -98,7 +96,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->expects('paths')->andReturn([]);
-        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
+        $migrator->expects('hasRunAnyMigrations')->andReturn(true);
         $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
@@ -118,7 +116,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->expects('paths')->andReturn([]);
-        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
+        $migrator->expects('hasRunAnyMigrations')->andReturn(true);
         $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
@@ -138,7 +136,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->expects('paths')->andReturn([]);
-        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
+        $migrator->expects('hasRunAnyMigrations')->andReturn(true);
         $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
             return $callback();
         });

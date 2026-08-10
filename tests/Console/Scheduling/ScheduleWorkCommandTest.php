@@ -83,12 +83,12 @@ class ScheduleWorkCommandTest extends TestCase
     public function test_in_flight_executions_finish_before_the_worker_quits()
     {
         $execution = m::mock(Process::class);
-        $execution->shouldReceive('getIncrementalOutput')->andReturn('scheduled task ran', '');
-        $execution->shouldReceive('getIncrementalErrorOutput')->andReturn('');
+        $execution->expects('getIncrementalOutput')->times(2)->andReturn('scheduled task ran', '');
+        $execution->expects('getIncrementalErrorOutput')->times(2)->andReturn('');
 
         // The worker should poll the running execution after the signal arrives,
         // wait for it to report finished, and flush its output before quitting.
-        $execution->shouldReceive('isRunning')->twice()->andReturn(true, false);
+        $execution->expects('isRunning')->times(2)->andReturn(true, false);
 
         $command = new ScheduleWorkCommandTestStub;
         $command->setOutput(new OutputStyle(new ArrayInput([]), $buffer = new BufferedOutput));

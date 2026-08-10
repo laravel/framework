@@ -15,8 +15,7 @@ class DatabaseMariaDbSchemaBuilderTest extends TestCase
     {
         $connection = m::mock(Connection::class);
         $grammar = m::mock(MariaDbGrammar::class);
-        $connection->shouldReceive('getDatabaseName')->andReturn('db');
-        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $builder = new MariaDbBuilder($connection);
         $grammar->expects('compileTableExists')->andReturn('sql');
         $connection->expects('getTablePrefix')->andReturn('prefix_');
@@ -30,9 +29,8 @@ class DatabaseMariaDbSchemaBuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $grammar = m::mock(MariaDbGrammar::class);
         $processor = m::mock(MariaDbProcessor::class);
-        $connection->shouldReceive('getDatabaseName')->andReturn('db');
-        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
+        $connection->expects('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('getPostProcessor')->andReturn($processor);
         $grammar->expects('compileColumns')->with(null, 'prefix_table')->andReturn('sql');
         $processor->expects('processColumns')->andReturn([['name' => 'column']]);
         $builder = new MariaDbBuilder($connection);

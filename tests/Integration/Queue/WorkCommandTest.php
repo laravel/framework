@@ -195,11 +195,11 @@ class WorkCommandTest extends QueueTestCase
 
         $cache = m::mock(Repository::class);
         $cache->shouldNotReceive('get')->with('illuminate:queue:restart');
-        $cache->shouldReceive('many')->andReturn([]);
+        $cache->expects('many')->andReturn([]);
 
         $cacheManager = m::mock(CacheManager::class);
-        $cacheManager->shouldReceive('driver')->andReturn($cache);
-        $cacheManager->shouldReceive('store')->andReturn($cache);
+        $cacheManager->expects('driver')->times(2)->andReturn($cache);
+        $cacheManager->expects('store')->andReturn($cache);
 
         $this->app->instance('cache', $cacheManager);
 
@@ -224,12 +224,12 @@ class WorkCommandTest extends QueueTestCase
 
         $cache = m::mock(Repository::class);
 
-        $cache->shouldReceive('get')->with('illuminate:queue:restart')->andReturn(null);
+        $cache->expects('get')->times(2)->with('illuminate:queue:restart')->andReturn(null);
         $cache->shouldNotReceive('many');
 
         $cacheManager = m::mock(CacheManager::class);
-        $cacheManager->shouldReceive('driver')->andReturn($cache);
-        $cacheManager->shouldReceive('store')->andReturn($cache);
+        $cacheManager->expects('driver')->times(2)->andReturn($cache);
+        $cacheManager->shouldNotReceive('store');
 
         $this->app->instance('cache', $cacheManager);
 

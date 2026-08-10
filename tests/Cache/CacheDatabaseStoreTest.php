@@ -37,7 +37,7 @@ class CacheDatabaseStoreTest extends TestCase
         $deleteQuery->expects('where')->with('expiration', '<=', m::any())->andReturn($deleteQuery);
         $deleteQuery->expects('delete')->andReturnNull();
 
-        $store->getConnection()->shouldReceive('table')->twice()->with('table')->andReturn($getQuery, $deleteQuery);
+        $store->getConnection()->expects('table')->times(2)->with('table')->andReturn($getQuery, $deleteQuery);
 
         $this->assertNull($store->get('foo'));
     }
@@ -239,9 +239,9 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock(stdClass::class);
 
-        $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
+        $store->getConnection()->expects('table')->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(0);
-        $table->shouldReceive('where')->twice()->andReturn($table);
+        $table->expects('where')->times(2)->andReturn($table);
         $table->expects('update')->with(['expiration' => $ttl])->andReturn(1);
 
         $this->assertTrue($store->touch('foo', $ttl));
@@ -254,9 +254,9 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
         $table = m::mock(stdClass::class);
 
-        $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
+        $store->getConnection()->expects('table')->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(0);
-        $table->shouldReceive('where')->twice()->andReturn($table);
+        $table->expects('where')->times(2)->andReturn($table);
         $table->expects('update')->with(['expiration' => $ttl])->andReturn(1);
 
         $this->assertTrue($store->touch('foo', $ttl));
@@ -269,9 +269,9 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getSqliteMocks())->getMock();
         $table = m::mock(stdClass::class);
 
-        $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
+        $store->getConnection()->expects('table')->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(0);
-        $table->shouldReceive('where')->twice()->andReturn($table);
+        $table->expects('where')->times(2)->andReturn($table);
         $table->expects('update')->with(['expiration' => $ttl])->andReturn(1);
 
         $this->assertTrue($store->touch('foo', $ttl));

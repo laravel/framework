@@ -267,10 +267,7 @@ class MiddlewareTest extends TestCase
         $configuration = new Middleware();
 
         $mode = m::mock(MaintenanceMode::class);
-        $mode->shouldReceive('active')->andReturn(true);
-        $mode->shouldReceive('date')->andReturn([]);
         $app = m::mock(Application::class);
-        $app->shouldReceive('maintenanceMode')->andReturn($mode);
         $middleware = new PreventRequestsDuringMaintenance($app);
 
         $reflection = new ReflectionClass($middleware);

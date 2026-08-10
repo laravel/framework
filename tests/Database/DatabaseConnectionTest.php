@@ -436,7 +436,7 @@ class DatabaseConnectionTest extends TestCase
         $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
         $statement->expects('execute')->andReturn(true);
 
-        $pdo->shouldReceive('prepare')->twice()->andReturn($statement);
+        $pdo->expects('prepare')->times(2)->andReturn($statement);
 
         $connection = new Connection($pdo);
 

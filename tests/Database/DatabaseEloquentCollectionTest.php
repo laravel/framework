@@ -199,7 +199,7 @@ class DatabaseEloquentCollectionTest extends TestCase
     public function testFindMethodFindsModelById()
     {
         $mockModel = m::mock(Model::class);
-        $mockModel->shouldReceive('getKey')->andReturn(1);
+        $mockModel->expects('getKey')->times(2)->andReturn(1);
         $c = new Collection([$mockModel]);
 
         $this->assertSame($mockModel, $c->find(1));
@@ -233,7 +233,7 @@ class DatabaseEloquentCollectionTest extends TestCase
     public function testFindOrFailFindsModelById()
     {
         $mockModel = m::mock(Model::class);
-        $mockModel->shouldReceive('getKey')->andReturn(1);
+        $mockModel->expects('getKey')->andReturn(1);
         $c = new Collection([$mockModel]);
 
         $this->assertSame($mockModel, $c->findOrFail(1));
@@ -286,7 +286,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $mockItem = m::mock(stdClass::class);
         $c->expects($this->once())->method('first')->willReturn($mockItem);
         $mockItem->expects('newQueryWithoutRelationships')->andReturn($mockItem);
-        $mockItem->shouldReceive('with')->with(['bar', 'baz'])->andReturn($mockItem);
+        $mockItem->expects('with')->with(['bar', 'baz'])->andReturn($mockItem);
         $mockItem->expects('eagerLoadRelations')->with(['foo'])->andReturn(['results']);
         $c->load('bar', 'baz');
 

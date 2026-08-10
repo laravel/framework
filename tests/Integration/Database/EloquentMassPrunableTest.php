@@ -53,7 +53,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
     public function testPrunesRecords()
     {
         app('events')
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->times(2)
             ->with(m::type(ModelsPruned::class));
 
@@ -72,7 +72,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
     public function testPrunesSoftDeletedRecords()
     {
         app('events')
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->times(3)
             ->with(m::type(ModelsPruned::class));
 

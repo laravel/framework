@@ -74,12 +74,12 @@ class CommandMutexTest extends TestCase
 
     public function testCanRunCommandAgainAfterOtherCommandFinished()
     {
-        $this->commandMutex->shouldReceive('create')
+        $this->commandMutex->expects('create')
             ->andReturn(true)
-            ->twice();
-        $this->commandMutex->shouldReceive('forget')
+            ->times(2);
+        $this->commandMutex->expects('forget')
             ->andReturn(true)
-            ->twice();
+            ->times(2);
 
         $this->runCommand();
         $this->runCommand();

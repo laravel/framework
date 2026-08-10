@@ -67,9 +67,6 @@ class CacheCommandMutexTest extends TestCase
     public function testCanCreateMutexWithCustomConnection()
     {
         $this->mockUsingCacheStore();
-        $this->cacheRepository->shouldReceive('getStore')
-            ->with('test')
-            ->andReturn($this->cacheRepository);
         $this->cacheRepository->expects('add')
             ->andReturn(false);
         $this->mutex->useStore('test');
@@ -90,9 +87,6 @@ class CacheCommandMutexTest extends TestCase
     public function testCanCreateMutexWithCustomLockProviderConnection()
     {
         $this->mockUsingCacheStore();
-        $this->cacheRepository->shouldReceive('getStore')
-            ->with('test')
-            ->andReturn($this->cacheRepository);
         $this->cacheRepository->expects('add')
             ->andReturn(false);
         $this->mutex->useStore('test');
@@ -155,10 +149,6 @@ class CacheCommandMutexTest extends TestCase
     {
         $this->mockUsingCacheStore();
 
-        $this->cacheRepository->shouldReceive('getStore')
-            ->with('test')
-            ->andReturn($this->cacheRepository);
-
         $this->cacheRepository->expects('add')
 
             ->withArgs(function ($key) {
@@ -184,10 +174,6 @@ class CacheCommandMutexTest extends TestCase
         };
 
         $this->mockUsingCacheStore();
-
-        $this->cacheRepository->shouldReceive('getStore')
-            ->with('test')
-            ->andReturn($this->cacheRepository);
 
         $this->cacheRepository->expects('add')
 

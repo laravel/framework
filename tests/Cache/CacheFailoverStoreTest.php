@@ -29,8 +29,8 @@ class CacheFailoverStoreTest extends TestCase
         $storeB->lock('lock-b', 60)->get();
 
         $cache = m::mock(CacheManager::class);
-        $cache->shouldReceive('store')->with('store-a')->andReturn(new Repository($storeA));
-        $cache->shouldReceive('store')->with('store-b')->andReturn(new Repository($storeB));
+        $cache->expects('store')->with('store-a')->andReturn(new Repository($storeA));
+        $cache->expects('store')->with('store-b')->andReturn(new Repository($storeB));
 
         $failover = new FailoverStore($cache, m::mock(Dispatcher::class), ['store-a', 'store-b']);
 

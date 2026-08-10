@@ -107,10 +107,10 @@ class QueueSqsJobTest extends TestCase
         $store->expects('get')->with($pointerPath)->andReturn($fullPayload);
 
         $cache = m::mock(CacheFactory::class);
-        $cache->shouldReceive('store')->with('database')->andReturn($store);
+        $cache->expects('store')->with('database')->andReturn($store);
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('cache')->andReturn($cache);
+        $container->expects('make')->with('cache')->andReturn($cache);
 
         $jobData = $this->mockedJobData;
         $jobData['Body'] = $pointerBody;
@@ -152,10 +152,10 @@ class QueueSqsJobTest extends TestCase
         $store->expects('get')->with($pointerPath)->andReturn($fullPayload);
 
         $cache = m::mock(CacheFactory::class);
-        $cache->shouldReceive('store')->with('database')->andReturn($store);
+        $cache->expects('store')->with('database')->andReturn($store);
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('cache')->andReturn($cache);
+        $container->expects('make')->with('cache')->andReturn($cache);
 
         $jobData = $this->mockedJobData;
         $jobData['Body'] = $pointerBody;
@@ -180,10 +180,10 @@ class QueueSqsJobTest extends TestCase
         $store->expects('forget')->with($pointerPath);
 
         $cache = m::mock(CacheFactory::class);
-        $cache->shouldReceive('store')->with('database')->andReturn($store);
+        $cache->expects('store')->with('database')->andReturn($store);
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('cache')->andReturn($cache);
+        $container->expects('make')->with('cache')->andReturn($cache);
 
         $jobData = $this->mockedJobData;
         $jobData['Body'] = $pointerBody;

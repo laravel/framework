@@ -104,7 +104,7 @@ class ImageManagerTest extends TestCase
             ->andReturn(file_get_contents($path));
 
         $app = $this->makeApp([]);
-        $app->shouldReceive('make')
+        $app->expects('make')
             ->with(Filesystem::class)
             ->andReturn($filesystem);
 
@@ -121,9 +121,6 @@ class ImageManagerTest extends TestCase
         $filesystem->shouldNotReceive('get');
 
         $app = $this->makeApp([]);
-        $app->shouldReceive('make')
-            ->with(Filesystem::class)
-            ->andReturn($filesystem);
 
         $manager = new ImageManager($app);
         $image = $manager->fromPath('/some/path.jpg');
@@ -148,7 +145,7 @@ class ImageManagerTest extends TestCase
             ->andReturn($disk);
 
         $app = $this->makeApp([]);
-        $app->shouldReceive('make')
+        $app->expects('make')
             ->with(FilesystemFactory::class)
             ->andReturn($filesystem);
 
@@ -176,7 +173,7 @@ class ImageManagerTest extends TestCase
             ->andReturn($disk);
 
         $app = $this->makeApp([]);
-        $app->shouldReceive('make')
+        $app->expects('make')
             ->with(FilesystemFactory::class)
             ->andReturn($filesystem);
 
@@ -193,9 +190,6 @@ class ImageManagerTest extends TestCase
         $filesystem->shouldNotReceive('disk');
 
         $app = $this->makeApp([]);
-        $app->shouldReceive('make')
-            ->with(FilesystemFactory::class)
-            ->andReturn($filesystem);
 
         $manager = new ImageManager($app);
         $image = $manager->fromStorage('images/avatar.jpg', 'public');
@@ -270,11 +264,11 @@ class ImageManagerTest extends TestCase
 
         $http = m::mock(HttpFactory::class);
         $response = m::mock();
-        $response->shouldReceive('body')->andReturn($contents);
-        $http->shouldReceive('get')->with('https://example.com/photo.jpg')->andReturn($response);
+        $response->expects('body')->andReturn($contents);
+        $http->expects('get')->with('https://example.com/photo.jpg')->andReturn($response);
 
         $app = $this->makeApp([]);
-        $app->shouldReceive('make')
+        $app->expects('make')
             ->with(HttpFactory::class)
             ->andReturn($http);
 
@@ -291,9 +285,6 @@ class ImageManagerTest extends TestCase
         $http->shouldNotReceive('get');
 
         $app = $this->makeApp([]);
-        $app->shouldReceive('make')
-            ->with(HttpFactory::class)
-            ->andReturn($http);
 
         $manager = new ImageManager($app);
         $image = $manager->fromUrl('https://example.com/photo.jpg');

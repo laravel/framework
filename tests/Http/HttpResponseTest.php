@@ -199,7 +199,7 @@ class HttpResponseTest extends TestCase
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $session = m::mock(Store::class);
         $response->setSession($session);
-        $session->shouldReceive('get')->with('errors', m::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
+        $session->expects('get')->with('errors', m::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
         $session->expects('flash')->with('errors', m::type(ViewErrorBag::class));
         $provider = m::mock(MessageProvider::class);
         $provider->expects('getMessageBag')->andReturn(new MessageBag);
@@ -226,7 +226,7 @@ class HttpResponseTest extends TestCase
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $session = m::mock(Store::class);
         $response->setSession($session);
-        $session->shouldReceive('get')->with('errors', m::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
+        $session->expects('get')->with('errors', m::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
         $session->expects('flash')->with('errors', m::type(ViewErrorBag::class));
         $provider = ['foo' => 'bar'];
         $response->withErrors($provider);

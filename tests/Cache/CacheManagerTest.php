@@ -272,7 +272,7 @@ class CacheManagerTest extends TestCase
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
 
-        $cacheManager->shouldReceive('resolve')
+        $cacheManager->expects('resolve')
             ->withArgs(['array'])
             ->times(4)
             ->andReturn(new ArrayStore);

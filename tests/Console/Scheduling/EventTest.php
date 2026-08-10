@@ -312,7 +312,7 @@ class EventTest extends TestCase
 
         $event->withoutOverlapping();
 
-        $mutex->shouldReceive('create')->twice()->with($event)->andReturn(false, true);
+        $mutex->expects('create')->times(2)->with($event)->andReturn(false, true);
         $mutex->expects('forget')->with($event);
 
         $event->run($container);

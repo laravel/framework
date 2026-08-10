@@ -145,7 +145,7 @@ class PusherBroadcasterTest extends TestCase
     public function testUserAuthenticationForPusher()
     {
         $this->pusher
-            ->shouldReceive('getSettings')
+            ->expects('getSettings')
             ->andReturn([
                 'auth_key' => '278d425bdf160c739803',
                 'secret' => '7ad3773142a6692b25b8',

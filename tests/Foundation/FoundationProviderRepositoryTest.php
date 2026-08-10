@@ -23,7 +23,6 @@ class FoundationProviderRepositoryTest extends TestCase
         $repo->expects('shouldRecompile')->andReturn(false);
 
         $app->expects('register')->with('foo');
-        $app->shouldReceive('runningInConsole')->andReturn(false);
         $app->expects('addDeferredServices')->with(['deferred']);
 
         $repo->load([]);
@@ -54,7 +53,6 @@ class FoundationProviderRepositoryTest extends TestCase
         });
 
         $app->expects('register')->with('bar');
-        $app->shouldReceive('runningInConsole')->andReturn(false);
         $app->expects('addDeferredServices')->with(['foo.provides1' => 'foo', 'foo.provides2' => 'foo']);
 
         $repo->load(['foo', 'bar']);

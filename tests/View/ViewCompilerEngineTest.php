@@ -18,7 +18,7 @@ class ViewCompilerEngineTest extends TestCase
     public function testViewsMayBeRecompiledAndRendered()
     {
         $engine = $this->getEngine();
-        $engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/basic.php');
+        $engine->getCompiler()->expects('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/basic.php');
         $engine->getCompiler()->expects('isExpired')->with(__DIR__.'/fixtures/foo.php')->andReturn(true);
         $engine->getCompiler()->expects('compile')->with(__DIR__.'/fixtures/foo.php');
         $results = $engine->get(__DIR__.'/fixtures/foo.php');
@@ -30,7 +30,7 @@ class ViewCompilerEngineTest extends TestCase
     public function testViewsAreNotRecompiledIfTheyAreNotExpired()
     {
         $engine = $this->getEngine();
-        $engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/basic.php');
+        $engine->getCompiler()->expects('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/basic.php');
         $engine->getCompiler()->expects('isExpired')->andReturn(false);
         $engine->getCompiler()->shouldReceive('compile')->never();
         $results = $engine->get(__DIR__.'/fixtures/foo.php');
@@ -42,7 +42,7 @@ class ViewCompilerEngineTest extends TestCase
     public function testRegularExceptionsAreReThrownAsViewExceptions()
     {
         $engine = $this->getEngine();
-        $engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/regular-exception.php');
+        $engine->getCompiler()->expects('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/regular-exception.php');
         $engine->getCompiler()->expects('isExpired')->andReturn(false);
 
         $this->expectExceptionObject(new ViewException('regular exception message'));
@@ -53,7 +53,7 @@ class ViewCompilerEngineTest extends TestCase
     public function testHttpExceptionsAreNotReThrownAsViewExceptions()
     {
         $engine = $this->getEngine();
-        $engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/http-exception.php');
+        $engine->getCompiler()->expects('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/http-exception.php');
         $engine->getCompiler()->expects('isExpired')->andReturn(false);
 
         $this->expectExceptionObject(new HttpException(403, 'http exception message'));
@@ -64,8 +64,8 @@ class ViewCompilerEngineTest extends TestCase
     public function testThatViewsAreNotAskTwiceIfTheyAreExpired()
     {
         $engine = $this->getEngine();
-        $engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/basic.php');
-        $engine->getCompiler()->shouldReceive('isExpired')->twice()->andReturn(false);
+        $engine->getCompiler()->expects('getCompiledPath')->times(4)->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/basic.php');
+        $engine->getCompiler()->expects('isExpired')->times(2)->andReturn(false);
         $engine->getCompiler()->shouldReceive('compile')->never();
 
         $engine->get(__DIR__.'/fixtures/foo.php');
@@ -103,7 +103,7 @@ class ViewCompilerEngineTest extends TestCase
             ->andReturn('compiled-content');
 
         $engine->getCompiler()
-            ->shouldReceive('getCompiledPath')
+            ->expects('getCompiledPath')
             ->times(3)
             ->with($path)
             ->andReturn($compiled);
@@ -114,8 +114,8 @@ class ViewCompilerEngineTest extends TestCase
             ->andReturn(true);
 
         $engine->getCompiler()
-            ->shouldReceive('compile')
-            ->twice()
+            ->expects('compile')
+            ->times(2)
             ->with($path);
 
         $engine->get($path);
@@ -148,7 +148,7 @@ class ViewCompilerEngineTest extends TestCase
             ->andReturn('compiled-content');
 
         $engine->getCompiler()
-            ->shouldReceive('getCompiledPath')
+            ->expects('getCompiledPath')
             ->times(3)
             ->with($path)
             ->andReturn($compiled);
@@ -159,8 +159,8 @@ class ViewCompilerEngineTest extends TestCase
             ->andReturn(true);
 
         $engine->getCompiler()
-            ->shouldReceive('compile')
-            ->twice()
+            ->expects('compile')
+            ->times(2)
             ->with($path);
 
         $engine->get($path);
@@ -195,7 +195,7 @@ class ViewCompilerEngineTest extends TestCase
             ));
 
         $engine->getCompiler()
-            ->shouldReceive('getCompiledPath')
+            ->expects('getCompiledPath')
             ->times(3)
             ->with($path)
             ->andReturn($compiled);
@@ -206,8 +206,8 @@ class ViewCompilerEngineTest extends TestCase
             ->andReturn(true);
 
         $engine->getCompiler()
-            ->shouldReceive('compile')
-            ->twice()
+            ->expects('compile')
+            ->times(2)
             ->with($path);
 
         $engine->get($path);

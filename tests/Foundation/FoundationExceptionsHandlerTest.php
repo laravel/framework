@@ -371,15 +371,11 @@ class FoundationExceptionsHandlerTest extends TestCase
         });
 
         $file = m::mock(UploadedFile::class);
-        $file->shouldReceive('getPathname')->andReturn('photo.jpg');
-        $file->shouldReceive('getClientOriginalName')->andReturn('photo.jpg');
-        $file->shouldReceive('getClientMimeType')->andReturn('application/octet-stream');
-        $file->shouldReceive('getError')->andReturn(\UPLOAD_ERR_NO_FILE);
 
         $request = Request::create('/', 'POST', $argumentExpected, [], ['photo' => $file]);
 
         $validator = m::mock(Validator::class);
-        $validator->shouldReceive('errors')->andReturn(new MessageBag(['error' => 'My custom validation exception']));
+        $validator->expects('errors')->times(2)->andReturn(new MessageBag(['error' => 'My custom validation exception']));
 
         $validationException = new ValidationException($validator);
         $validationException->redirectTo = '/';
@@ -435,7 +431,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     public function testItReturnsSpecificErrorViewIfExists()
     {
         $viewFactory = m::mock(ViewFactory::class);
-        $viewFactory->shouldReceive('exists')->with('errors::502')->andReturn(true);
+        $viewFactory->expects('exists')->with('errors::502')->andReturn(true);
 
         $this->container->instance(ViewFactory::class, $viewFactory);
 
@@ -493,7 +489,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->viewFactory->expects('exists')->with('errors::404')->andReturn(true);
         $this->viewFactory->expects('make')->withAnyArgs()->andThrow(new Exception('Rendering this view throws an exception'));
 
-        $this->config->shouldReceive('get')->with('app.debug', null)->andReturn($debug);
+        $this->config->expects('get')->with('app.debug', null)->andReturn($debug);
 
         $handler = new class($this->container) extends Handler
         {

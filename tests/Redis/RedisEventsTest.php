@@ -18,7 +18,7 @@ class RedisEventsTest extends TestCase
         $exception = new Exception('Test exception');
 
         $client = m::mock(Redis::class);
-        $client->shouldReceive('get')->with('key')->andThrow($exception);
+        $client->expects('get')->with('key')->andThrow($exception);
 
         $events = m::mock(Dispatcher::class);
         $events->expects('dispatch')->with(m::on(function ($event) use ($exception) {
@@ -41,7 +41,7 @@ class RedisEventsTest extends TestCase
         $exception = new Exception('Test exception');
 
         $client = m::mock(Redis::class);
-        $client->shouldReceive('get')->with('key')->andThrow($exception);
+        $client->expects('get')->with('key')->andThrow($exception);
 
         $events = m::mock(Dispatcher::class);
         $events->expects('dispatch')->with(m::type(CommandFailed::class));
@@ -62,7 +62,7 @@ class RedisEventsTest extends TestCase
         $exception = new Exception('Test exception');
 
         $client = m::mock(Redis::class);
-        $client->shouldReceive('get')->with('key')->andThrow($exception);
+        $client->expects('get')->with('key')->andThrow($exception);
 
         $events = m::mock(Dispatcher::class);
         $events->expects('dispatch')->with(m::on(function ($event) {

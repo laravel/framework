@@ -20,7 +20,7 @@ class LogLoggerTest extends TestCase
     {
         $monolog = m::mock(Monolog::class);
         $writer = new Logger($monolog);
-        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
+        $monolog->expects('isHandling')->with('error')->andReturn(true);
         $monolog->expects('error')->with('foo', []);
 
         $writer->error('foo');
@@ -32,7 +32,7 @@ class LogLoggerTest extends TestCase
         $writer = new Logger($monolog);
         $writer->withContext(['bar' => 'baz']);
 
-        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
+        $monolog->expects('isHandling')->with('error')->andReturn(true);
         $monolog->expects('error')->with('foo', ['bar' => 'baz']);
 
         $writer->error('foo');
@@ -45,7 +45,7 @@ class LogLoggerTest extends TestCase
         $writer->withContext(['bar' => 'baz']);
         $writer->withoutContext();
 
-        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
+        $monolog->expects('isHandling')->with('error')->andReturn(true);
         $monolog->expects('error')->with('foo', []);
 
         $writer->error('foo');
@@ -58,7 +58,7 @@ class LogLoggerTest extends TestCase
         $writer->withContext(['bar' => 'baz', 'forget' => 'me']);
         $writer->withoutContext(['forget']);
 
-        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
+        $monolog->expects('isHandling')->with('error')->andReturn(true);
         $monolog->expects('error')->with('foo', ['bar' => 'baz']);
 
         $writer->error('foo');
@@ -68,7 +68,7 @@ class LogLoggerTest extends TestCase
     {
         $monolog = m::mock(Monolog::class);
         $writer = new Logger($monolog, $events = new Dispatcher);
-        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
+        $monolog->expects('isHandling')->with('error')->andReturn(true);
         $monolog->expects('error')->with('foo', []);
 
         $events->listen(MessageLogged::class, function ($event) {
@@ -121,7 +121,7 @@ class LogLoggerTest extends TestCase
         $writer->withContext(['ip' => '127.0.0.1', 'timestamp' => '1986-10-29']);
         $writer->withoutContext(['timestamp']);
 
-        $monolog->shouldReceive('isHandling')->with('info')->andReturn(true);
+        $monolog->expects('isHandling')->with('info')->andReturn(true);
         $monolog->expects('info')->with('User action', [
             'user_id' => 123,
             'action' => 'login',

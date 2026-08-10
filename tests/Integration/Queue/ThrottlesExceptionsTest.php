@@ -60,9 +60,8 @@ class ThrottlesExceptionsTest extends TestCase
 
         $job->expects('hasFailed')->andReturn(false);
         $job->expects('release')->with(0);
-        $job->shouldReceive('isReleased')->andReturn(true);
+        $job->expects('isReleased')->times(2)->andReturn(true);
         $job->expects('isDeletedOrReleased')->andReturn(true);
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -84,9 +83,8 @@ class ThrottlesExceptionsTest extends TestCase
             // seconds elapsed since the first exception opened the circuit.
             return $delay >= 590 && $delay <= 610;
         });
-        $job->shouldReceive('isReleased')->andReturn(true);
+        $job->expects('isReleased')->times(2)->andReturn(true);
         $job->expects('isDeletedOrReleased')->andReturn(true);
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -104,10 +102,8 @@ class ThrottlesExceptionsTest extends TestCase
 
         $job->expects('hasFailed')->andReturn(false);
         $job->expects('delete');
-        $job->shouldReceive('isDeleted')->andReturn(true);
-        $job->shouldReceive('isReleased')->twice()->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
         $job->expects('isDeletedOrReleased')->andReturn(true);
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -125,10 +121,8 @@ class ThrottlesExceptionsTest extends TestCase
 
         $job->expects('hasFailed')->andReturn(true);
         $job->expects('fail');
-        $job->shouldReceive('isDeleted')->andReturn(true);
         $job->expects('isReleased')->andReturn(false);
         $job->expects('isDeletedOrReleased')->andReturn(true);
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -145,10 +139,9 @@ class ThrottlesExceptionsTest extends TestCase
         $job = m::mock(Job::class);
 
         $job->expects('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
         $job->expects('isDeletedOrReleased')->andReturn(false);
         $job->expects('delete');
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -354,8 +347,8 @@ class ThrottlesExceptionsTest extends TestCase
     public function testReportingExceptions()
     {
         $this->spy(ExceptionHandler::class)
-            ->shouldReceive('report')
-            ->twice()
+            ->expects('report')
+            ->times(2)
             ->with(m::type(RuntimeException::class));
 
         $job = new class

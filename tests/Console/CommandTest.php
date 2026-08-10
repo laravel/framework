@@ -39,10 +39,10 @@ class CommandTest extends TestCase
         $input = new ArrayInput([]);
         $output = new NullOutput;
         $outputStyle = m::mock(OutputStyle::class);
-        $application->shouldReceive('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
-        $application->shouldReceive('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(m::mock(Factory::class));
+        $application->expects('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
+        $application->expects('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(m::mock(Factory::class));
 
-        $application->shouldReceive('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command, $application) {
+        $application->expects('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command, $application) {
             $commandCalled = m::mock(Command::class);
 
             $application->expects('make')->with(Command::class)->andReturn($commandCalled);
@@ -154,10 +154,10 @@ class CommandTest extends TestCase
         ]);
         $output = new NullOutput;
         $outputStyle = m::mock(OutputStyle::class);
-        $application->shouldReceive('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
-        $application->shouldReceive('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(m::mock(Factory::class));
+        $application->expects('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
+        $application->expects('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(m::mock(Factory::class));
         $application->shouldReceive('runningUnitTests')->andReturn(true);
-        $application->shouldReceive('call')->with([$command, 'handle'])->andReturn(0);
+        $application->expects('call')->with([$command, 'handle'])->andReturn(0);
 
         $command->run($input, $output);
 

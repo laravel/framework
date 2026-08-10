@@ -71,7 +71,7 @@ class CacheRepositoryTest extends TestCase
     public function testDefaultValueIsReturned()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->times(2)->andReturn(null);
+        $repo->getStore()->expects('get')->times(2)->andReturn(null);
         $this->assertSame('bar', $repo->get('foo', 'bar'));
         $this->assertSame('baz', $repo->get('boom', function () {
             return 'baz';
@@ -118,7 +118,7 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
 
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->times(2)->andReturn(null);
+        $repo->getStore()->expects('get')->times(2)->andReturn(null);
         $repo->getStore()->expects('put')->with('foo', 'bar', 602);
         $repo->getStore()->expects('put')->with('baz', 'qux', 598);
         $result = $repo->remember('foo', Carbon::now()->addMinutes(10)->addSeconds(2), function () {
@@ -217,7 +217,7 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->never();
-        $repo->getStore()->shouldReceive('forget')->twice()->andReturn(true);
+        $repo->getStore()->expects('forget')->times(2)->andReturn(true);
         $result = $repo->put('foo', 'bar', Carbon::now()->subMinutes(10));
         $this->assertTrue($result);
         $result = $repo->put('foo', 'bar', Carbon::now());
@@ -227,8 +227,8 @@ class CacheRepositoryTest extends TestCase
     public function testPutManyWithNullTTLRemembersItemsForever()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar')->andReturn(true);
-        $repo->getStore()->shouldReceive('forever')->with('bar', 'baz')->andReturn(true);
+        $repo->getStore()->expects('forever')->with('foo', 'bar')->andReturn(true);
+        $repo->getStore()->expects('forever')->with('bar', 'baz')->andReturn(true);
         $this->assertTrue($repo->putMany(['foo' => 'bar', 'bar' => 'baz']));
     }
 
@@ -236,8 +236,8 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('add')->never();
-        $repo->getStore()->shouldReceive('get')->andReturn(null);
-        $repo->getStore()->shouldReceive('put')->andReturn(false);
+        $repo->getStore()->expects('get')->andReturn(null);
+        $repo->getStore()->expects('put')->andReturn(false);
         $this->assertFalse($repo->add('foo', 'bar', 60));
     }
 
@@ -348,7 +348,7 @@ class CacheRepositoryTest extends TestCase
     public function testSettingCache()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('put')->with($key = 'foo', $value = 'bar', 1)->andReturn(true);
+        $repo->getStore()->expects('put')->with($key = 'foo', $value = 'bar', 1)->andReturn(true);
         $result = $repo->set($key, $value, 1);
         $this->assertTrue($result);
     }
@@ -356,7 +356,7 @@ class CacheRepositoryTest extends TestCase
     public function testClearingWholeCache()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('flush')->andReturn(true);
+        $repo->getStore()->expects('flush')->andReturn(true);
         $repo->clear();
     }
 
@@ -394,7 +394,7 @@ class CacheRepositoryTest extends TestCase
         $repo = new Repository($store);
 
         $taggedCache = m::mock();
-        $taggedCache->shouldReceive('setDefaultCacheTime');
+        $taggedCache->expects('setDefaultCacheTime');
         $store->expects('tags')->with(['foo', 'bar', 'baz'])->andReturn($taggedCache);
         $repo->tags('foo', 'bar', 'baz');
     }
@@ -537,7 +537,7 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('touch')->never();
-        $repo->getStore()->shouldReceive('forget')->twice()->with('key')->andReturn(true);
+        $repo->getStore()->expects('forget')->times(2)->with('key')->andReturn(true);
 
         $this->assertTrue($repo->touch('key', Carbon::now()->subMinute()));
         $this->assertTrue($repo->touch('key', 0));

@@ -84,9 +84,9 @@ class ReleaseMiddlewareTest extends TestCase
 
         $job = m::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
+        $job->expects('isDeletedOrReleased')->andReturn(false);
         $job->expects('delete');
         $job->shouldReceive('release')->never();
 
@@ -104,9 +104,9 @@ class ReleaseMiddlewareTest extends TestCase
 
         $job = m::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->andReturn(true);
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
         $job->expects('release')->with($releaseAfter);
         $job->shouldReceive('delete')->never();
 

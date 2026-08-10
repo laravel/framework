@@ -558,10 +558,9 @@ class QueuedEventsTest extends TestCase
         $lock->expects('forceRelease');
 
         $job = m::mock(Job::class);
-        $job->shouldReceive('hasFailed')->andReturn(false);
-        $job->shouldReceive('isDeleted')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
+        $job->expects('isDeletedOrReleased')->andReturn(false);
         $job->expects('delete');
 
         $handler = new CallQueuedHandler(new BusDispatcher($container), $container);
@@ -588,17 +587,16 @@ class QueuedEventsTest extends TestCase
 
         $expectedKey = 'laravel_unique_job:'.hash('xxh128', TestDispatcherShouldBeUniqueUntilProcessing::class).':until-processing-id';
 
-        $cache->shouldReceive('lock')
+        $cache->expects('lock')
             ->with($expectedKey)
             ->andReturn($lock);
         $lock->expects('forceRelease');
 
         $job = m::mock(Job::class);
-        $job->shouldReceive('hasFailed')->andReturn(false);
-        $job->shouldReceive('isDeleted')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
-        $job->shouldReceive('attempts')->andReturn(1);
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
+        $job->expects('isDeletedOrReleased')->andReturn(false);
+        $job->expects('attempts')->andReturn(1);
         $job->expects('delete');
 
         $handler = new CallQueuedHandler(new BusDispatcher($container), $container);
@@ -880,8 +878,8 @@ class TestDispatcherShouldBeUniqueUntilProcessing implements ShouldQueue, Should
     public function handle()
     {
         $lock = m::mock(Lock::class);
-        $lock->shouldReceive('get')->andReturn(true);
-        static::$cache->shouldReceive('lock')
+        $lock->expects('get')->andReturn(true);
+        static::$cache->expects('lock')
             ->with(static::$expectedLockKey, 10)
             ->andReturn($lock);
 

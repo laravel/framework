@@ -66,7 +66,7 @@ class SendingMailNotificationsTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
-        $this->markdown->shouldReceive('theme')->twice()->with('default')->andReturn($this->markdown);
+        $this->markdown->expects('theme')->times(2)->with('default')->andReturn($this->markdown);
         $this->markdown->expects('render')->andReturn('htmlContent');
         $this->markdown->expects('renderText')->andReturn('textContent');
 
@@ -104,7 +104,7 @@ class SendingMailNotificationsTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
-        $this->markdown->shouldReceive('theme')->twice()->with('my-custom-theme')->andReturn($this->markdown);
+        $this->markdown->expects('theme')->times(2)->with('my-custom-theme')->andReturn($this->markdown);
         $this->markdown->expects('render')->andReturn('htmlContent');
         $this->markdown->expects('renderText')->andReturn('textContent');
 
@@ -178,7 +178,7 @@ class SendingMailNotificationsTest extends TestCase
             'name' => 'Taylor Otwell',
         ]);
 
-        $this->markdown->shouldReceive('theme')->twice()->with('default')->andReturn($this->markdown);
+        $this->markdown->expects('theme')->times(2)->with('default')->andReturn($this->markdown);
         $this->markdown->expects('render')->andReturn('htmlContent');
         $this->markdown->expects('renderText')->andReturn('textContent');
 
@@ -216,7 +216,7 @@ class SendingMailNotificationsTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
-        $this->markdown->shouldReceive('theme')->with('default')->twice()->andReturn($this->markdown);
+        $this->markdown->expects('theme')->with('default')->times(2)->andReturn($this->markdown);
         $this->markdown->expects('render')->andReturn('htmlContent');
         $this->markdown->expects('renderText')->andReturn('textContent');
 
@@ -244,7 +244,7 @@ class SendingMailNotificationsTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
-        $this->markdown->shouldReceive('theme')->with('default')->twice()->andReturn($this->markdown);
+        $this->markdown->expects('theme')->with('default')->times(2)->andReturn($this->markdown);
         $this->markdown->expects('render')->andReturn('htmlContent');
         $this->markdown->expects('renderText')->andReturn('textContent');
 

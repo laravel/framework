@@ -199,8 +199,8 @@ class DatabaseTruncationTest extends TestCase
                 $actual[] = $tableName;
 
                 $table = m::mock();
-                $table->shouldReceive('exists')->andReturnTrue();
-                $table->shouldReceive('truncate');
+                $table->expects('exists')->andReturnTrue();
+                $table->expects('truncate');
 
                 return $table;
             });

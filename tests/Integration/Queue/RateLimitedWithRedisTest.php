@@ -137,7 +137,7 @@ class RateLimitedWithRedisTest extends TestCase
         $job = m::mock(Job::class);
 
         $job->expects('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
         $job->expects('isDeletedOrReleased')->andReturn(false);
         $job->expects('delete');
 
@@ -157,7 +157,7 @@ class RateLimitedWithRedisTest extends TestCase
 
         $job->expects('hasFailed')->andReturn(false);
         $job->expects('release');
-        $job->shouldReceive('isReleased')->andReturn(true);
+        $job->expects('isReleased')->times(2)->andReturn(true);
         $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
@@ -175,7 +175,7 @@ class RateLimitedWithRedisTest extends TestCase
         $job = m::mock(Job::class);
 
         $job->expects('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
         $job->expects('isDeletedOrReleased')->andReturn(false);
         $job->expects('delete');
 

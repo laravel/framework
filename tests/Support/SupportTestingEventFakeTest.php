@@ -45,7 +45,7 @@ class SupportTestingEventFakeTest extends TestCase
         $listener = ListenerStub::class;
 
         $dispatcher = m::mock(Dispatcher::class);
-        $dispatcher->shouldReceive('getListeners')->andReturn([function ($event, $payload) use ($listener) {
+        $dispatcher->expects('getListeners')->andReturn([function ($event, $payload) use ($listener) {
             return $listener(...array_values($payload));
         }]);
 

@@ -75,13 +75,13 @@ class QueueClearCommandTest extends TestCase
         $container['env'] = 'testing';
 
         $config = m::mock(Repository::class, \ArrayAccess::class);
-        $config->shouldReceive('offsetGet')->with('queue.default')->andReturn('redis');
+        $config->expects('offsetGet')->with('queue.default')->andReturn('redis');
         $config->shouldReceive('get')->with('queue.connections.redis.queue', 'default')->andReturn('default');
 
         $container['config'] = $config;
 
         $queueManager = m::mock(QueueManager::class);
-        $queueManager->shouldReceive('connection')->with('redis')->andReturn($queue);
+        $queueManager->expects('connection')->with('redis')->andReturn($queue);
 
         $container['queue'] = $queueManager;
 

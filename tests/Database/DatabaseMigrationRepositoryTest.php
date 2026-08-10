@@ -18,7 +18,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $query = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
-        $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
+        $repo->getConnectionResolver()->expects('connection')->times(2)->with(null)->andReturn($connectionMock);
         $repo->getConnection()->expects('table')->with('migrations')->andReturn($query);
         $query->expects('orderBy')->with('batch', 'asc')->andReturn($query);
         $query->expects('orderBy')->with('migration', 'asc')->andReturn($query);
@@ -37,7 +37,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo->expects($this->once())->method('getLastBatchNumber')->willReturn(1);
         $query = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
-        $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
+        $repo->getConnectionResolver()->expects('connection')->times(2)->with(null)->andReturn($connectionMock);
         $repo->getConnection()->expects('table')->with('migrations')->andReturn($query);
         $query->expects('where')->with('batch', 1)->andReturn($query);
         $query->expects('orderBy')->with('migration', 'desc')->andReturn($query);
@@ -52,7 +52,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $query = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
-        $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
+        $repo->getConnectionResolver()->expects('connection')->times(2)->with(null)->andReturn($connectionMock);
         $repo->getConnection()->expects('table')->with('migrations')->andReturn($query);
         $query->expects('insert')->with(['migration' => 'bar', 'batch' => 1]);
         $query->expects('useWritePdo')->andReturn($query);
@@ -65,7 +65,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $query = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
-        $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
+        $repo->getConnectionResolver()->expects('connection')->times(2)->with(null)->andReturn($connectionMock);
         $repo->getConnection()->expects('table')->with('migrations')->andReturn($query);
         $query->expects('where')->with('migration', 'foo')->andReturn($query);
         $query->expects('delete');
@@ -90,7 +90,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $query = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
-        $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
+        $repo->getConnectionResolver()->expects('connection')->times(2)->with(null)->andReturn($connectionMock);
         $repo->getConnection()->expects('table')->with('migrations')->andReturn($query);
         $query->expects('max')->andReturn(1);
         $query->expects('useWritePdo')->andReturn($query);
@@ -103,7 +103,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $schema = m::mock(stdClass::class);
         $connectionMock = m::mock(Connection::class);
-        $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
+        $repo->getConnectionResolver()->expects('connection')->times(2)->with(null)->andReturn($connectionMock);
         $repo->getConnection()->expects('getSchemaBuilder')->andReturn($schema);
         $schema->expects('create')->with('migrations', m::type(Closure::class));
 

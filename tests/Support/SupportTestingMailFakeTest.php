@@ -31,7 +31,7 @@ class SupportTestingMailFakeTest extends TestCase
     protected function setUp(): void
     {
         $this->mailManager = m::mock(MailManager::class, function ($mock) {
-            $mock->shouldReceive('getDefaultDriver')
+            $mock->expects('getDefaultDriver')
                 ->andReturn('smtp');
         });
         $this->fake = new MailFake($this->mailManager);
@@ -389,7 +389,7 @@ class SupportTestingMailFakeTest extends TestCase
 
     public function testMissingMethodsAreForwarded()
     {
-        $this->mailManager->shouldReceive('foo')->andReturn('bar');
+        $this->mailManager->expects('foo')->andReturn('bar');
 
         $this->assertSame('bar', $this->fake->foo());
     }

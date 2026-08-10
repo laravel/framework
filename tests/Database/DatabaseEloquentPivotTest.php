@@ -17,16 +17,15 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testPropertiesAreSetCorrectly()
     {
         $parent = m::mock(Model::class.'[getConnectionName]');
-        $parent->shouldReceive('getConnectionName')->twice()->andReturn('connection');
+        $parent->expects('getConnectionName')->times(2)->andReturn('connection');
         $resolver = m::mock(ConnectionResolverInterface::class);
         $parent->setConnectionResolver($resolver);
         $connection = m::mock(Connection::class);
-        $resolver->shouldReceive('connection')->andReturn($connection);
+        $resolver->expects('connection')->times(2)->andReturn($connection);
         $grammar = m::mock(Grammar::class);
-        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
+        $connection->expects('getQueryGrammar')->times(2)->andReturn($grammar);
         $processor = m::mock(Processor::class);
-        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $parent->getConnection()->getQueryGrammar()->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
+        $parent->getConnection()->getQueryGrammar()->expects('getDateFormat')->andReturn('Y-m-d H:i:s');
         $parent->setDateFormat('Y-m-d H:i:s');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
 
@@ -89,8 +88,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testTimestampPropertyIsSetIfCreatedAtInAttributes()
     {
         $parent = m::mock(Model::class.'[getConnectionName,getDates]');
-        $parent->shouldReceive('getConnectionName')->andReturn('connection');
-        $parent->shouldReceive('getDates')->andReturn([]);
+        $parent->expects('getConnectionName')->times(2)->andReturn('connection');
         $pivot = DatabaseEloquentPivotTestDateStub::fromAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
         $this->assertTrue($pivot->timestamps);
 
@@ -101,7 +99,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testTimestampPropertyIsTrueWhenCreatingFromRawAttributes()
     {
         $parent = m::mock(Model::class.'[getConnectionName,getDates]');
-        $parent->shouldReceive('getConnectionName')->andReturn('connection');
+        $parent->expects('getConnectionName')->andReturn('connection');
         $pivot = Pivot::fromRawAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
         $this->assertTrue($pivot->timestamps);
     }
@@ -142,8 +140,8 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testPivotModelWithParentReturnsParentsTimestampColumns()
     {
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getCreatedAtColumn')->andReturn('parent_created_at');
-        $parent->shouldReceive('getUpdatedAtColumn')->andReturn('parent_updated_at');
+        $parent->expects('getCreatedAtColumn')->andReturn('parent_created_at');
+        $parent->expects('getUpdatedAtColumn')->andReturn('parent_updated_at');
 
         $pivotWithParent = new Pivot;
         $pivotWithParent->pivotParent = $parent;

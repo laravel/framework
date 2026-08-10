@@ -31,7 +31,7 @@ class TestDatabasesTest extends TestCase
 
     public function testSwitchToDatabaseWithoutUrl()
     {
-        DB::shouldReceive('purge')->once();
+        DB::expects('purge');
 
         config()->expects('get')
 
@@ -48,7 +48,7 @@ class TestDatabasesTest extends TestCase
     #[DataProvider('databaseUrls')]
     public function testSwitchToDatabaseWithUrl($testDatabase, $url, $testUrl)
     {
-        DB::shouldReceive('purge')->once();
+        DB::expects('purge');
 
         config()->expects('get')
 

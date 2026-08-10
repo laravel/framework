@@ -871,8 +871,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAddingDate()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(true);
-        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+        $conn->expects('isMaria')->andReturn(true);
+        $conn->expects('getServerVersion')->andReturn('10.3.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo');
@@ -885,8 +885,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAddingDateWithDefaultCurrent()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(true);
-        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+        $conn->expects('isMaria')->andReturn(true);
+        $conn->expects('getServerVersion')->andReturn('10.3.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo')->useCurrent();
@@ -899,8 +899,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAddingYear()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(true);
-        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+        $conn->expects('isMaria')->andReturn(true);
+        $conn->expects('getServerVersion')->andReturn('10.3.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year');
@@ -912,8 +912,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAddingYearWithDefaultCurrent()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(true);
-        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+        $conn->expects('isMaria')->andReturn(true);
+        $conn->expects('getServerVersion')->andReturn('10.3.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year')->useCurrent();
@@ -1166,7 +1166,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAddingUuidOn106()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getServerVersion')->andReturn('10.6.21');
+        $conn->expects('getServerVersion')->andReturn('10.6.21');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->uuid('foo');

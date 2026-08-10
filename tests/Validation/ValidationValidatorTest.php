@@ -1315,14 +1315,14 @@ class ValidationValidatorTest extends TestCase
     {
         // Fails when user is not logged in.
         $auth = m::mock(Guard::class);
-        $auth->shouldReceive('guard')->andReturn($auth);
-        $auth->shouldReceive('guest')->andReturn(true);
+        $auth->expects('guard')->andReturn($auth);
+        $auth->expects('guest')->andReturn(true);
 
         $hasher = m::mock(Hasher::class);
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('auth')->andReturn($auth);
-        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+        $container->expects('make')->with('auth')->andReturn($auth);
+        $container->expects('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
         $trans->shouldReceive('get')->andReturnArg(0);
@@ -1334,19 +1334,19 @@ class ValidationValidatorTest extends TestCase
 
         // Fails when password is incorrect.
         $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getAuthPassword');
+        $user->expects('getAuthPassword');
 
         $auth = m::mock(Guard::class);
-        $auth->shouldReceive('guard')->andReturn($auth);
-        $auth->shouldReceive('guest')->andReturn(false);
-        $auth->shouldReceive('user')->andReturn($user);
+        $auth->expects('guard')->andReturn($auth);
+        $auth->expects('guest')->andReturn(false);
+        $auth->expects('user')->andReturn($user);
 
         $hasher = m::mock(Hasher::class);
-        $hasher->shouldReceive('check')->andReturn(false);
+        $hasher->expects('check')->andReturn(false);
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('auth')->andReturn($auth);
-        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+        $container->expects('make')->with('auth')->andReturn($auth);
+        $container->expects('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
         $trans->shouldReceive('get')->andReturnArg(0);
@@ -1358,19 +1358,19 @@ class ValidationValidatorTest extends TestCase
 
         // Succeeds when password is correct.
         $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getAuthPassword');
+        $user->expects('getAuthPassword');
 
         $auth = m::mock(Guard::class);
-        $auth->shouldReceive('guard')->andReturn($auth);
-        $auth->shouldReceive('guest')->andReturn(false);
-        $auth->shouldReceive('user')->andReturn($user);
+        $auth->expects('guard')->andReturn($auth);
+        $auth->expects('guest')->andReturn(false);
+        $auth->expects('user')->andReturn($user);
 
         $hasher = m::mock(Hasher::class);
-        $hasher->shouldReceive('check')->andReturn(true);
+        $hasher->expects('check')->andReturn(true);
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('auth')->andReturn($auth);
-        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+        $container->expects('make')->with('auth')->andReturn($auth);
+        $container->expects('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
         $trans->shouldReceive('get')->andReturnArg(0);
@@ -1382,19 +1382,19 @@ class ValidationValidatorTest extends TestCase
 
         // We can use a specific guard.
         $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getAuthPassword');
+        $user->expects('getAuthPassword');
 
         $auth = m::mock(Guard::class);
-        $auth->shouldReceive('guard')->with('custom')->andReturn($auth);
-        $auth->shouldReceive('guest')->andReturn(false);
-        $auth->shouldReceive('user')->andReturn($user);
+        $auth->expects('guard')->with('custom')->andReturn($auth);
+        $auth->expects('guest')->andReturn(false);
+        $auth->expects('user')->andReturn($user);
 
         $hasher = m::mock(Hasher::class);
-        $hasher->shouldReceive('check')->andReturn(true);
+        $hasher->expects('check')->andReturn(true);
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('auth')->andReturn($auth);
-        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+        $container->expects('make')->with('auth')->andReturn($auth);
+        $container->expects('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
         $trans->shouldReceive('get')->andReturnArg(0);
@@ -2302,7 +2302,7 @@ class ValidationValidatorTest extends TestCase
         // If file is not successfully uploaded validation should fail with a
         // 'uploaded' error message instead of the original rule.
         $file = m::mock(UploadedFile::class);
-        $file->shouldReceive('isValid')->andReturn(false);
+        $file->expects('isValid')->andReturn(false);
         $file->shouldNotReceive('getSize');
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'Max:10']);
         $this->assertTrue($v->fails());
@@ -2318,7 +2318,7 @@ class ValidationValidatorTest extends TestCase
         // It should only fail with that rule if a validation rule implies it's
         // a file. Otherwise it should fail with the regular rule.
         $file = m::mock(UploadedFile::class);
-        $file->shouldReceive('isValid')->andReturn(false);
+        $file->expects('isValid')->andReturn(false);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'string']);
         $this->assertTrue($v->fails());
         $this->assertEquals(['validation.string'], $v->errors()->get('photo'));
@@ -4632,9 +4632,9 @@ class ValidationValidatorTest extends TestCase
             '*.email' => 'unique:users', '*.type' => 'exists:user_types',
         ]);
         $mock = m::mock(DatabasePresenceVerifierInterface::class);
-        $mock->shouldReceive('setConnection')->twice()->with(null);
-        $mock->shouldReceive('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(0);
-        $mock->shouldReceive('getCount')->with('user_types', 'type', 'bar', null, null, [])->andReturn(1);
+        $mock->expects('setConnection')->times(2)->with(null);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, null, [])->andReturn(0);
+        $mock->expects('getCount')->with('user_types', 'type', 'bar', null, null, [])->andReturn(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
@@ -4647,9 +4647,9 @@ class ValidationValidatorTest extends TestCase
             '*.type' => (new Exists('user_types'))->where($closure),
         ]);
         $mock = m::mock(DatabasePresenceVerifierInterface::class);
-        $mock->shouldReceive('setConnection')->twice()->with(null);
-        $mock->shouldReceive('getCount')->with('users', 'email', 'foo', null, 'id', [$closure])->andReturn(0);
-        $mock->shouldReceive('getCount')->with('user_types', 'type', 'bar', null, null, [$closure])->andReturn(1);
+        $mock->expects('setConnection')->times(2)->with(null);
+        $mock->expects('getCount')->with('users', 'email', 'foo', null, 'id', [$closure])->andReturn(0);
+        $mock->expects('getCount')->with('user_types', 'type', 'bar', null, null, [$closure])->andReturn(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
     }
@@ -5029,7 +5029,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidateEmailWithCustomClassCheck()
     {
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with(NoRFCWarningsValidation::class)->andReturn(new NoRFCWarningsValidation);
+        $container->expects('make')->with(NoRFCWarningsValidation::class)->andReturn(new NoRFCWarningsValidation);
 
         $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@bar '], ['x' => 'email:'.NoRFCWarningsValidation::class]);
         $v->setContainer($container);

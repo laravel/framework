@@ -112,12 +112,12 @@ class ConfiguresPromptsTest extends TestCase
         $command->setLaravel($application);
 
         $outputStyle = m::mock(OutputStyle::class);
-        $application->shouldReceive('make')->withArgs(fn ($abstract) => $abstract === OutputStyle::class)->andReturn($outputStyle);
+        $application->expects('make')->withArgs(fn ($abstract) => $abstract === OutputStyle::class)->andReturn($outputStyle);
         $factory = m::mock(Factory::class);
-        $application->shouldReceive('make')->withArgs(fn ($abstract) => $abstract === Factory::class)->andReturn($factory);
+        $application->expects('make')->withArgs(fn ($abstract) => $abstract === Factory::class)->andReturn($factory);
         $application->shouldReceive('runningUnitTests')->andReturn(false);
-        $application->shouldReceive('call')->with([$command, 'handle'])->andReturnUsing(fn ($callback) => call_user_func($callback));
-        $outputStyle->shouldReceive('newLinesWritten')->andReturn(1);
+        $application->expects('call')->with([$command, 'handle'])->andReturnUsing(fn ($callback) => call_user_func($callback));
+        $outputStyle->expects('newLinesWritten')->andReturn(1);
 
         $expectations($factory);
 

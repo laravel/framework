@@ -95,8 +95,6 @@ class ComponentTest extends TestCase
 
         $viewPath = $closure([]);
 
-        $this->viewFactory->shouldReceive('make')->with($viewPath, [], [])->andReturn('<p>Hello World</p>');
-
         $this->assertInstanceOf(Closure::class, $closure);
         $this->assertSame('__components::9cc08f5001b343c093ee1a396da820dc', $viewPath);
 
@@ -194,7 +192,7 @@ class ComponentTest extends TestCase
     {
         $component = new TestRegularViewNameViewComponent;
 
-        $this->viewFactory->shouldReceive('exists')->twice()->andReturn(true);
+        $this->viewFactory->expects('exists')->times(2)->andReturn(true);
 
         $this->assertSame('alert', $component->resolveView());
         $this->assertSame('alert', $component->resolveView());
@@ -219,13 +217,13 @@ class ComponentTest extends TestCase
     {
         $component = new TestInlineViewComponent;
 
-        $this->viewFactory->shouldReceive('exists')->twice()->andReturn(false);
+        $this->viewFactory->expects('exists')->times(2)->andReturn(false);
 
-        $this->config->shouldReceive('get')->twice()->with('view.compiled')->andReturn('/tmp');
+        $this->config->expects('get')->times(2)->with('view.compiled')->andReturn('/tmp');
 
-        $this->viewFactory->shouldReceive('addNamespace')
+        $this->viewFactory->expects('addNamespace')
             ->with('__components', '/tmp')
-            ->twice();
+            ->times(2);
 
         $compiledViewName = '__components::57b7a54afa0eb51fd9b88eec031c9e9e';
         $contents = '::Hello {{ $title }}';
@@ -255,13 +253,13 @@ class ComponentTest extends TestCase
         $componentA = new TestInlineViewComponentWhereRenderDependsOnProps('A');
         $componentB = new TestInlineViewComponentWhereRenderDependsOnProps('B');
 
-        $this->viewFactory->shouldReceive('exists')->twice()->andReturn(false);
+        $this->viewFactory->expects('exists')->times(2)->andReturn(false);
 
-        $this->config->shouldReceive('get')->twice()->with('view.compiled')->andReturn('/tmp');
+        $this->config->expects('get')->times(2)->with('view.compiled')->andReturn('/tmp');
 
-        $this->viewFactory->shouldReceive('addNamespace')
+        $this->viewFactory->expects('addNamespace')
             ->with('__components', '/tmp')
-            ->twice();
+            ->times(2);
 
         $compiledViewNameA = '__components::9b0498cbe3839becd0d496e05c553485';
         $compiledViewNameB = '__components::9d1b9bc4078a3e7274d3766ca02423f3';

@@ -324,7 +324,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingForeignID()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('getPostProcessor')->andReturn(new SQliteProcessor);
         $connection->shouldReceive('selectFromWriteConnection')->andReturn([]);
         $connection->shouldReceive('scalar')->andReturn('');
@@ -367,7 +366,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingForeignIdSpecifyingIndexNameInConstraint()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('getPostProcessor')->andReturn(new SQliteProcessor);
         $connection->shouldReceive('selectFromWriteConnection')->andReturn([]);
         $connection->shouldReceive('scalar')->andReturn('');
@@ -838,7 +836,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingForeignUuid()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('getPostProcessor')->andReturn(new SQliteProcessor);
         $connection->shouldReceive('selectFromWriteConnection')->andReturn([]);
         $connection->shouldReceive('scalar')->andReturn('');
@@ -1016,7 +1013,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testCreateTableWithVirtualAsColumnWhenJsonColumnHasArrayKey()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1074,7 +1070,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     {
         $builder = mock(SQLiteBuilder::class)
             ->makePartial()
-            ->shouldReceive('getColumns')->andReturn([
+            ->expects('getColumns')->andReturn([
                 ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
                 ['name' => 'age', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
             ])
@@ -1083,7 +1079,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             ->getMock();
 
         $connection = $this->getConnection(builder: $builder);
-        $connection->shouldReceive('scalar')->with('pragma foreign_keys')->andReturn(false);
+        $connection->expects('scalar')->with('pragma foreign_keys')->andReturn(false);
 
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->renameColumn('name', 'first_name');
@@ -1102,7 +1098,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     {
         $builder = mock(SQLiteBuilder::class)
             ->makePartial()
-            ->shouldReceive('getColumns')->andReturn([
+            ->expects('getColumns')->andReturn([
                 ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
                 ['name' => 'age', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
             ])
@@ -1111,7 +1107,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             ->getMock();
 
         $connection = $this->getConnection(builder: $builder);
-        $connection->shouldReceive('scalar')->with('pragma foreign_keys')->andReturn(false);
+        $connection->expects('scalar')->with('pragma foreign_keys')->andReturn(false);
 
         $blueprint = new Blueprint($connection, 'my_schema.users');
         $blueprint->renameColumn('name', 'first_name');

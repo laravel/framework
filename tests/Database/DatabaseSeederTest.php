@@ -34,9 +34,9 @@ class DatabaseSeederTest extends TestCase
         $container = m::mock(Container::class);
         $seeder->setContainer($container);
         $output = m::mock(OutputInterface::class);
-        $output->shouldReceive('writeln')->times(3);
+        $output->expects('writeln')->times(3);
         $command = m::mock(Command::class);
-        $command->shouldReceive('getOutput')->times(3)->andReturn($output);
+        $command->expects('getOutput')->times(3)->andReturn($output);
         $seeder->setCommand($command);
         $child = m::mock(Seeder::class);
         $container->expects('make')->with('ClassName')->andReturn($child);
@@ -64,7 +64,7 @@ class DatabaseSeederTest extends TestCase
     public function testInjectDependenciesOnRunMethod()
     {
         $container = m::mock(Container::class);
-        $container->shouldReceive('call');
+        $container->expects('call');
 
         $seeder = new TestDepsSeeder;
         $seeder->setContainer($container);
@@ -77,7 +77,7 @@ class DatabaseSeederTest extends TestCase
     public function testSendParamsOnCallMethodWithDeps()
     {
         $container = m::mock(Container::class);
-        $container->shouldReceive('call');
+        $container->expects('call');
 
         $seeder = new TestDepsSeeder;
         $seeder->setContainer($container);

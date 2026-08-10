@@ -152,13 +152,13 @@ class DatabaseEloquentMorphToTest extends TestCase
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
     {
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->with('foreign_key')->andReturn('foreign.value');
+        $parent->expects('getAttribute')->with('foreign_key')->andReturn('foreign.value');
 
         $relation = $this->getRelationAssociate($parent);
 
         $associate = m::mock(Model::class);
-        $associate->shouldReceive('getAttribute')->andReturn(1);
-        $associate->shouldReceive('getMorphClass')->andReturn('Model');
+        $associate->expects('getAttribute')->times(2)->andReturn(1);
+        $associate->expects('getMorphClass')->andReturn('Model');
 
         $parent->expects('setAttribute')->with('foreign_key', 1);
         $parent->expects('setAttribute')->with('morph_type', 'Model');
@@ -370,7 +370,7 @@ class DatabaseEloquentMorphToTest extends TestCase
 
         $builder = m::mock(Builder::class);
         $related = m::mock(Model::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $builder->expects('getModel')->andReturn($related);
 
         $parent = new EloquentMorphToModelStub;
         $parent->morph_type = 'type_1';
@@ -393,12 +393,10 @@ class DatabaseEloquentMorphToTest extends TestCase
     protected function getRelationAssociate($parent)
     {
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
+        $builder->expects('where')->with('relation.id', '=', 'foreign.value');
         $related = m::mock(Model::class);
-        $related->shouldReceive('getKey')->andReturn(1);
-        $related->shouldReceive('getTable')->andReturn('relation');
-        $related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $related->expects('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
+        $builder->expects('getModel')->andReturn($related);
 
         return new MorphTo($builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation');
     }

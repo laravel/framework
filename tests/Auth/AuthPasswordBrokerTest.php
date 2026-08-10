@@ -30,7 +30,6 @@ class AuthPasswordBrokerTest extends TestCase
         $user = m::mock(CanResetPassword::class);
         $mocks['users']->expects('retrieveByCredentials')->with(['foo'])->andReturn($user);
         $mocks['tokens']->expects('recentlyCreatedToken')->with($user)->andReturn(true);
-        $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
         $this->assertSame(PasswordBrokerContract::RESET_THROTTLED, $broker->sendResetLink(['foo']));
     }
@@ -62,7 +61,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->expects('retrieveByCredentials')->with(['foo'])->andReturn($user);
         $mocks['tokens']->expects('recentlyCreatedToken')->with($user)->andReturn(false);
         $mocks['tokens']->expects('create')->with($user)->andReturn('token');
-        $user->shouldReceive('sendPasswordResetNotification')->with('token');
+        $user->expects('sendPasswordResetNotification')->with('token');
 
         $this->assertSame(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo']));
     }
@@ -83,7 +82,7 @@ class AuthPasswordBrokerTest extends TestCase
         $broker = $this->getBroker($mocks = $this->getMocks());
         $user = m::mock(CanResetPassword::class);
         $mocks['users']->expects('retrieveByCredentials')->with(Arr::except($creds, ['token']))->andReturn($user);
-        $mocks['tokens']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
+        $mocks['tokens']->expects('exists')->with($user, 'token')->andReturn(false);
 
         $this->assertSame(PasswordBrokerContract::INVALID_TOKEN, $broker->reset($creds, function () {
             //
@@ -122,7 +121,6 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->expects('retrieveByCredentials')->with(['foo'])->andReturn($user);
         $mocks['tokens']->expects('recentlyCreatedToken')->with($user)->andReturn(false);
         $mocks['tokens']->expects('create')->with($user)->andReturn('token');
-        $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
         $this->assertEquals(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo'], $closure));
 

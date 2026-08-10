@@ -845,8 +845,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $events = m::mock(Dispatcher::class);
         $model::setEventDispatcher($events);
-        $events->shouldReceive('until');
-        $events->shouldReceive('dispatch');
+        $events->expects('until')->times(2);
+        $events->expects('dispatch')->times(2);
 
         $model->id = 1;
         $model->syncOriginal();
@@ -976,8 +976,8 @@ class DatabaseEloquentModelTest extends TestCase
         Model::setConnectionResolver($resolver);
         $mockConnection = m::mock(stdClass::class);
         $resolver->shouldReceive('connection')->andReturn($mockConnection);
-        $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
-        $mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
+        $mockConnection->expects('getQueryGrammar')->times(4)->andReturn($mockConnection);
+        $mockConnection->expects('getDateFormat')->times(4)->andReturn('Y-m-d H:i:s');
         $instance = $model->newInstance($timestamps);
         $this->assertInstanceOf(Carbon::class, $instance->updated_at);
         $this->assertInstanceOf(Carbon::class, $instance->created_at);
@@ -994,8 +994,8 @@ class DatabaseEloquentModelTest extends TestCase
         Model::setConnectionResolver($resolver);
         $mockConnection = m::mock(stdClass::class);
         $resolver->shouldReceive('connection')->andReturn($mockConnection);
-        $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
-        $mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
+        $mockConnection->expects('getQueryGrammar')->times(2)->andReturn($mockConnection);
+        $mockConnection->expects('getDateFormat')->times(2)->andReturn('Y-m-d H:i:s');
         $instance = $model->newInstance($timestamps);
 
         $instance->created_at = null;
@@ -1398,7 +1398,7 @@ class DatabaseEloquentModelTest extends TestCase
         $processor = m::mock(Processor::class);
         $resolver = m::mock(ConnectionResolverInterface::class);
         EloquentModelStub::setConnectionResolver($resolver);
-        $conn->shouldReceive('query')->andReturnUsing(function () use ($conn, $grammar, $processor) {
+        $conn->expects('query')->andReturnUsing(function () use ($conn, $grammar, $processor) {
             return new BaseBuilder($conn, $grammar, $processor);
         });
         $resolver->shouldReceive('connection')->andReturn($conn);
@@ -2375,7 +2375,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $events = m::mock(Dispatcher::class);
         EloquentModelWithObserveAttributeStub::setEventDispatcher($events);
-        $events->shouldReceive('dispatch');
+        $events->expects('dispatch')->times(2);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeStub', EloquentTestObserverStub::class.'@saved');
         $events->shouldReceive('forget');
@@ -2386,7 +2386,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $events = m::mock(Dispatcher::class);
         EloquentModelWithObserveAttributeUsingArrayStub::setEventDispatcher($events);
-        $events->shouldReceive('dispatch');
+        $events->expects('dispatch')->times(2);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeUsingArrayStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeUsingArrayStub', EloquentTestObserverStub::class.'@saved');
         $events->shouldReceive('forget');
@@ -2397,7 +2397,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $events = m::mock(Dispatcher::class);
         EloquentModelWithObserveAttributeGrandchildStub::setEventDispatcher($events);
-        $events->shouldReceive('dispatch');
+        $events->expects('dispatch')->times(2);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandchildStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandchildStub', EloquentTestObserverStub::class.'@saved');
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandchildStub', EloquentTestAnotherObserverStub::class.'@creating');
@@ -2715,9 +2715,9 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 2;
 
         $query = m::mock(stdClass::class);
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query);
-        $query->shouldReceive('where')->andReturn($query);
-        $query->shouldReceive('increment');
+        $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
+        $query->expects('where')->times(2)->andReturn($query);
+        $query->expects('increment')->times(2);
 
         // hmm
         $model->publicIncrement('foo', 1);
@@ -2738,9 +2738,9 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 2;
 
         $query = m::mock(stdClass::class);
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query);
-        $query->shouldReceive('where')->andReturn($query);
-        $query->shouldReceive('increment');
+        $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
+        $query->expects('where')->times(2)->andReturn($query);
+        $query->expects('increment')->times(2);
 
         $events = m::mock(Dispatcher::class);
         $model::setEventDispatcher($events);
@@ -2767,9 +2767,9 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 4;
 
         $query = m::mock(stdClass::class);
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query);
-        $query->shouldReceive('where')->andReturn($query);
-        $query->shouldReceive('decrement');
+        $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
+        $query->expects('where')->times(2)->andReturn($query);
+        $query->expects('decrement')->times(2);
 
         $events = m::mock(Dispatcher::class);
         $model::setEventDispatcher($events);
@@ -2797,7 +2797,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->bar = 5;
 
         $query = m::mock(stdClass::class);
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query);
+        $model->expects('newQueryWithoutScopes')->andReturn($query);
         $query->expects('where')->with('id', '=', 1)->andReturn($query);
         $query->expects('incrementEach')->with(['foo' => 1, 'bar' => 2], [])->andReturn(1);
 
@@ -2818,7 +2818,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->bar = 5;
 
         $query = m::mock(stdClass::class);
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query);
+        $model->expects('newQueryWithoutScopes')->andReturn($query);
         $query->expects('where')->with('id', '=', 1)->andReturn($query);
         $query->expects('decrementEach')->with(['foo' => 3, 'bar' => 2], [])->andReturn(1);
 
@@ -2839,9 +2839,9 @@ class DatabaseEloquentModelTest extends TestCase
         $model->bar = 5;
 
         $query = m::mock(stdClass::class);
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query);
-        $query->shouldReceive('where')->andReturn($query);
-        $query->shouldReceive('incrementEach');
+        $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
+        $query->expects('where')->times(2)->andReturn($query);
+        $query->expects('incrementEach')->times(2);
 
         $events = m::mock(Dispatcher::class);
         $model::setEventDispatcher($events);
@@ -2871,9 +2871,9 @@ class DatabaseEloquentModelTest extends TestCase
         $model->bar = 5;
 
         $query = m::mock(stdClass::class);
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query);
-        $query->shouldReceive('where')->andReturn($query);
-        $query->shouldReceive('decrementEach');
+        $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
+        $query->expects('where')->times(2)->andReturn($query);
+        $query->expects('decrementEach')->times(2);
 
         $events = m::mock(Dispatcher::class);
         $model::setEventDispatcher($events);
@@ -2932,7 +2932,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 2;
 
         $query = m::mock(stdClass::class);
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query);
+        $model->expects('newQueryWithoutScopes')->andReturn($query);
         $query->expects('where')->with('id', '=', 1)->andReturn($query);
         $query->expects('incrementEach')->with(['foo' => 5], ['category' => 'test'])->andReturn(1);
 
@@ -2952,9 +2952,9 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 1;
 
         $query = m::mock(stdClass::class);
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query);
-        $query->shouldReceive('where')->andReturn($query);
-        $query->shouldReceive('incrementEach')->andReturn(1);
+        $model->expects('newQueryWithoutScopes')->andReturn($query);
+        $query->expects('where')->andReturn($query);
+        $query->expects('incrementEach')->andReturn(1);
 
         $events = m::mock(Dispatcher::class);
         $model::setEventDispatcher($events);
@@ -2992,7 +2992,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->exists = false;
 
         $query = m::mock(stdClass::class);
-        $model->shouldReceive('newQueryWithoutRelationships')->andReturn($query);
+        $model->expects('newQueryWithoutRelationships')->andReturn($query);
         $query->expects('incrementEach')->with(['foo' => 1], [])->andReturn(5);
 
         $result = $model->publicIncrementEach(['foo' => 1]);

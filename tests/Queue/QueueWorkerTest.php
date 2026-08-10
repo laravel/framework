@@ -644,7 +644,7 @@ class QueueWorkerTest extends TestCase
         };
 
         $handler = m::mock(CallQueuedHandler::class);
-        $handler->shouldReceive('getRunningCommand')->andReturn($interruptible);
+        $handler->expects('getRunningCommand')->andReturn($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);
         $job = new WorkerFakeJob;

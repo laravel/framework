@@ -28,7 +28,7 @@ class PhpRedisClusterConnectionTest extends TestCase
     {
         $client = m::mock(\RedisCluster::class);
         $client->expects('_masters')->andReturn([['127.0.0.1', '6379']]);
-        $client->shouldReceive('scan')->twice();
+        $client->expects('scan')->times(2);
 
         $connection = new PhpRedisClusterConnection($client);
         $connection->scan(0);
@@ -51,7 +51,7 @@ class PhpRedisClusterConnectionTest extends TestCase
     {
         $client = m::mock(\RedisCluster::class);
         $client->expects('_masters')->andReturn([]);
-        $client->shouldReceive('scan');
+        $client->shouldNotReceive('scan');
 
         $this->expectExceptionObject(new InvalidArgumentException('Unable to determine default node. No master nodes found in the cluster.'));
 

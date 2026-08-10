@@ -32,8 +32,8 @@ class ConsoleScheduledEventTest extends TestCase
     public function testBasicCronCompilation()
     {
         $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
-        $app->shouldReceive('isDownForMaintenance')->andReturn(false);
-        $app->shouldReceive('environment')->andReturn('production');
+        $app->expects('isDownForMaintenance')->times(3)->andReturn(false);
+        $app->expects('environment')->times(3)->andReturn('production');
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
         $this->assertSame('* * * * *', $event->getExpression());
@@ -76,8 +76,8 @@ class ConsoleScheduledEventTest extends TestCase
     public function testEventIsDueCheck()
     {
         $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
-        $app->shouldReceive('isDownForMaintenance')->andReturn(false);
-        $app->shouldReceive('environment')->andReturn('production');
+        $app->expects('isDownForMaintenance')->times(2)->andReturn(false);
+        $app->expects('environment')->times(2)->andReturn('production');
         Carbon::setTestNow(Carbon::create(2015, 1, 1, 0, 0, 0));
 
         $event = new Event(m::mock(EventMutex::class), 'php foo');
@@ -92,8 +92,6 @@ class ConsoleScheduledEventTest extends TestCase
     public function testTimeBetweenChecks()
     {
         $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
-        $app->shouldReceive('isDownForMaintenance')->andReturn(false);
-        $app->shouldReceive('environment')->andReturn('production');
 
         Carbon::setTestNow(Carbon::today()->addHours(9));
 
@@ -119,8 +117,6 @@ class ConsoleScheduledEventTest extends TestCase
     public function testTimeBetweenChecksTimezoneCallOrder()
     {
         $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
-        $app->shouldReceive('isDownForMaintenance')->andReturn(false);
-        $app->shouldReceive('environment')->andReturn('production');
 
         Carbon::setTestNow(Carbon::parse('2024-07-01 09:00:00', 'UTC'));
 
@@ -140,8 +136,6 @@ class ConsoleScheduledEventTest extends TestCase
     public function testTimeUnlessBetweenChecks()
     {
         $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
-        $app->shouldReceive('isDownForMaintenance')->andReturn(false);
-        $app->shouldReceive('environment')->andReturn('production');
 
         Carbon::setTestNow(Carbon::today()->addHours(9));
 

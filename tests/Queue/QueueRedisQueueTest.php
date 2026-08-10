@@ -34,7 +34,7 @@ class QueueRedisQueueTest extends TestCase
         $container = m::spy(Container::class);
         $queue->setContainer($container);
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
-        $redis->shouldReceive('isCluster')->andReturn(false);
+        $redis->expects('isCluster')->andReturn(false);
         $redis->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         $id = $queue->push('foo', ['data']);
@@ -61,7 +61,7 @@ class QueueRedisQueueTest extends TestCase
         $container = m::spy(Container::class);
         $queue->setContainer($container);
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
-        $redis->shouldReceive('isCluster')->andReturn(false);
+        $redis->expects('isCluster')->andReturn(false);
         $redis->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
@@ -94,7 +94,7 @@ class QueueRedisQueueTest extends TestCase
         $container = m::spy(Container::class);
         $queue->setContainer($container);
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
-        $redis->shouldReceive('isCluster')->andReturn(false);
+        $redis->expects('isCluster')->andReturn(false);
         $redis->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
@@ -133,7 +133,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
 
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
-        $redis->shouldReceive('isCluster')->andReturn(false);
+        $redis->expects('isCluster')->andReturn(false);
         $redis->expects('eval')->with(
             LuaScripts::later(),
             1,
@@ -167,7 +167,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(5);
 
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
-        $redis->shouldReceive('isCluster')->andReturn(false);
+        $redis->expects('isCluster')->andReturn(false);
         $redis->expects('eval')->with(
             LuaScripts::later(),
             1,
@@ -210,7 +210,6 @@ class QueueRedisQueueTest extends TestCase
     {
         $redis = m::mock(Factory::class);
         $queue = new RedisQueue($redis, 'default');
-        $redis->shouldReceive('connection')->andReturn(m::mock(PhpRedisClusterConnection::class));
 
         // getQueue() should NOT add hash tags — it's unchanged
         $this->assertSame('queues:default', $queue->getQueue(null));
@@ -222,8 +221,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = m::mock(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
         $connection = m::mock(\Illuminate\Redis\Connections\Connection::class);
-        $connection->shouldReceive('isCluster')->andReturn(false);
-        $redis->shouldReceive('connection')->andReturn($connection);
+        $connection->expects('isCluster')->andReturn(false);
+        $redis->expects('connection')->andReturn($connection);
 
         $this->assertSame('queues:default', $queue->testGetQueueRedisKey(null));
         $this->assertSame('queues:emails', $queue->testGetQueueRedisKey('emails'));
@@ -234,8 +233,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = m::mock(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
-        $redis->shouldReceive('connection')->andReturn($connection);
+        $connection->expects('isCluster')->andReturn(true);
+        $redis->expects('connection')->andReturn($connection);
 
         $this->assertSame('queues:{default}', $queue->testGetQueueRedisKey(null));
         $this->assertSame('queues:{emails}', $queue->testGetQueueRedisKey('emails'));
@@ -246,8 +245,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = m::mock(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
         $connection = m::mock(PredisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
-        $redis->shouldReceive('connection')->andReturn($connection);
+        $connection->expects('isCluster')->andReturn(true);
+        $redis->expects('connection')->andReturn($connection);
 
         $this->assertSame('queues:{default}', $queue->testGetQueueRedisKey(null));
         $this->assertSame('queues:{emails}', $queue->testGetQueueRedisKey('emails'));
@@ -258,8 +257,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = m::mock(Factory::class);
         $queue = new TestableRedisQueue($redis, '{default}');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
-        $redis->shouldReceive('connection')->andReturn($connection);
+        $connection->expects('isCluster')->andReturn(true);
+        $redis->expects('connection')->andReturn($connection);
 
         $this->assertSame('queues:{default}', $queue->testGetQueueRedisKey(null));
         $this->assertSame('queues:{custom}', $queue->testGetQueueRedisKey('{custom}'));
@@ -270,8 +269,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = m::mock(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
-        $redis->shouldReceive('connection')->andReturn($connection);
+        $connection->expects('isCluster')->andReturn(true);
+        $redis->expects('connection')->andReturn($connection);
 
         // Queue name already contains hash tags — skip wrapping
         $this->assertSame('queues:process-{batch}-results', $queue->testGetQueueRedisKey('process-{batch}-results'));
@@ -282,8 +281,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = m::mock(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
-        $redis->shouldReceive('connection')->andReturn($connection);
+        $connection->expects('isCluster')->andReturn(true);
+        $redis->expects('connection')->andReturn($connection);
 
         // Empty braces '{}' are not a valid hash tag — should still get wrapped
         $this->assertSame('queues:{my{}queue}', $queue->testGetQueueRedisKey('my{}queue'));
@@ -294,8 +293,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = m::mock(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
-        $redis->shouldReceive('connection')->andReturn($connection);
+        $connection->expects('isCluster')->andReturn(true);
+        $redis->expects('connection')->andReturn($connection);
 
         // Unmatched '{' is not a valid hash tag — should still get wrapped
         $this->assertSame('queues:{my{broken}', $queue->testGetQueueRedisKey('my{broken'));
@@ -306,8 +305,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = m::mock(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
-        $redis->shouldReceive('connection')->andReturn($connection);
+        $connection->expects('isCluster')->andReturn(true);
+        $redis->expects('connection')->andReturn($connection);
 
         // Unmatched '}' is not a valid hash tag — should still get wrapped
         $this->assertSame('queues:{broken}queue}', $queue->testGetQueueRedisKey('broken}queue'));
@@ -318,8 +317,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = m::mock(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
-        $redis->shouldReceive('connection')->andReturn($connection);
+        $connection->expects('isCluster')->andReturn(true);
+        $redis->expects('connection')->andReturn($connection);
 
         // Redis spec: the first '{}' is an empty hash tag, so the whole key is hashed
         // even though '{bar}' looks valid. Must be wrapped to ensure slot affinity.
@@ -344,8 +343,8 @@ class QueueRedisQueueTest extends TestCase
         $queue->setContainer($container);
 
         $clusterConnection = m::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
-        $clusterConnection->shouldReceive('isCluster')->andReturn(true);
-        $redis->shouldReceive('connection')->andReturn($clusterConnection);
+        $clusterConnection->expects('isCluster')->andReturn(true);
+        $redis->expects('connection')->times(2)->andReturn($clusterConnection);
 
         // command() is called by eval() — assert it receives hash-tagged keys
         $clusterConnection->expects('command')->with('eval', m::on(function ($args) {
@@ -378,8 +377,8 @@ class QueueRedisQueueTest extends TestCase
         $queue->setContainer($container);
 
         $clusterConnection = m::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
-        $clusterConnection->shouldReceive('isCluster')->andReturn(true);
-        $redis->shouldReceive('connection')->andReturn($clusterConnection);
+        $clusterConnection->expects('isCluster')->andReturn(true);
+        $redis->expects('connection')->times(2)->andReturn($clusterConnection);
 
         $receivedQueue = null;
         Queue::createPayloadUsing(function ($connection, $queue) use (&$receivedQueue) {
@@ -402,8 +401,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = m::mock(Factory::class);
         $queue = new RedisQueue($redis, 'default');
         $clusterConnection = m::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
-        $clusterConnection->shouldReceive('isCluster')->andReturn(true);
-        $redis->shouldReceive('connection')->andReturn($clusterConnection);
+        $clusterConnection->expects('isCluster')->andReturn(true);
+        $redis->expects('connection')->times(2)->andReturn($clusterConnection);
 
         $clusterConnection->expects('command')->with('eval', m::on(function ($args) {
             return $args[0] === LuaScripts::size()
@@ -421,8 +420,8 @@ class QueueRedisQueueTest extends TestCase
         $redis = m::mock(Factory::class);
         $queue = new RedisQueue($redis, 'default');
         $clusterConnection = m::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
-        $clusterConnection->shouldReceive('isCluster')->andReturn(true);
-        $redis->shouldReceive('connection')->andReturn($clusterConnection);
+        $clusterConnection->expects('isCluster')->andReturn(true);
+        $redis->expects('connection')->times(2)->andReturn($clusterConnection);
 
         $clusterConnection->expects('command')->with('eval', m::on(function ($args) {
             return $args[0] === LuaScripts::clear()
@@ -454,7 +453,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $redis = m::mock(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
-        $redis->shouldReceive('connection->keys')->andReturn(['queues:{default}', 'queues:{default}:delayed', 'queues:{emails}']);
+        $redis->expects('connection->keys')->andReturn(['queues:{default}', 'queues:{default}:delayed', 'queues:{emails}']);
 
         $this->assertSame(['default', 'emails'], $queue->testAllQueueNames()->all());
     }

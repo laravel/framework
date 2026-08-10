@@ -28,7 +28,7 @@ class EloquentHasOneOrManyDeprecationTest extends TestCase
         $model2 = new HasOneOrManyDeprecationModelStub;
         $model2->id = null;
 
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) {
+        $relation->getRelated()->expects('newCollection')->andReturnUsing(function ($array) {
             return new Collection($array);
         });
 
@@ -60,14 +60,12 @@ class EloquentHasOneOrManyDeprecationTest extends TestCase
     {
         $queryBuilder = m::mock(QueryBuilder::class);
         $builder = m::mock(Builder::class, [$queryBuilder]);
-        $builder->shouldReceive('whereNotNull')->with('table.foreign_key');
-        $builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
+        $builder->expects('whereNotNull')->with('table.foreign_key');
+        $builder->expects('where')->with('table.foreign_key', '=', 1);
         $related = m::mock(Model::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $builder->expects('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
-        $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+        $parent->expects('getAttribute')->with('id')->andReturn(1);
 
         return new HasMany($builder, $parent, 'table.foreign_key', 'id');
     }
@@ -76,14 +74,12 @@ class EloquentHasOneOrManyDeprecationTest extends TestCase
     {
         $queryBuilder = m::mock(QueryBuilder::class);
         $builder = m::mock(Builder::class, [$queryBuilder]);
-        $builder->shouldReceive('whereNotNull')->with('table.foreign_key');
-        $builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
+        $builder->expects('whereNotNull')->with('table.foreign_key');
+        $builder->expects('where')->with('table.foreign_key', '=', 1);
         $related = m::mock(Model::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $builder->expects('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
-        $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+        $parent->expects('getAttribute')->with('id')->andReturn(1);
 
         return new HasOne($builder, $parent, 'table.foreign_key', 'id');
     }

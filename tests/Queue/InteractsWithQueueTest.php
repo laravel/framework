@@ -13,7 +13,7 @@ class InteractsWithQueueTest extends TestCase
     public function testCreatesAnExceptionFromString()
     {
         $queueJob = m::mock(Job::class);
-        $queueJob->shouldReceive('fail')->withArgs(function ($e) {
+        $queueJob->expects('fail')->withArgs(function ($e) {
             $this->assertInstanceOf(Exception::class, $e);
             $this->assertSame('Whoops!', $e->getMessage());
 

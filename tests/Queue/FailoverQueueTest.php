@@ -49,7 +49,7 @@ class FailoverQueueTest extends TestCase
         $failover = new FailoverQueue($queue, m::mock(Dispatcher::class), ['sync']);
 
         $sync = m::mock('stdClass');
-        $queue->shouldReceive('connection')->times(3)->with('sync')->andReturn($sync);
+        $queue->expects('connection')->times(3)->with('sync')->andReturn($sync);
 
         $sync->expects('later')->with(15, m::type(FailoverJobWithDelayAttribute::class), '', null);
         $sync->expects('later')->with(30, m::type(FailoverJobWithDelayProperty::class), '', null);

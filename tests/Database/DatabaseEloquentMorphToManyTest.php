@@ -78,7 +78,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         /** @var Builder|m\MockInterface $builder */
         $builder = $relation->getQuery();
 
-        $builder->shouldReceive('where')->with($column, '=', $value, 'and')->times(2)->andReturnSelf();
+        $builder->expects('where')->with($column, '=', $value, 'and')->times(2)->andReturnSelf();
         $relation->wherePivot($column, '=', $value);
         $relation->withPivotValue($column, $value);
 

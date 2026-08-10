@@ -37,17 +37,16 @@ class DatabaseEloquentRelationTest extends TestCase
     {
         $builder = m::mock(Builder::class);
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $parent->expects('getAttribute')->with('id')->andReturn(1);
         $related = m::mock(EloquentNoTouchingModelStub::class)->makePartial();
-        $builder->shouldReceive('getModel')->andReturn($related);
-        $builder->shouldReceive('whereNotNull');
-        $builder->shouldReceive('where');
-        $builder->shouldReceive('withoutGlobalScopes')->andReturn($builder);
+        $builder->expects('getModel')->andReturn($related);
+        $builder->expects('whereNotNull');
+        $builder->expects('where');
+        $builder->expects('withoutGlobalScopes')->andReturn($builder);
         $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
-        $related->shouldReceive('getTable')->andReturn('table');
-        $related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+        $related->expects('getUpdatedAtColumn')->andReturn('updated_at');
         $now = Carbon::now();
-        $related->shouldReceive('freshTimestampString')->andReturn($now);
+        $related->expects('freshTimestampString')->andReturn($now);
         $builder->expects('update')->with(['updated_at' => $now]);
 
         $relation->touch();
@@ -68,11 +67,10 @@ class DatabaseEloquentRelationTest extends TestCase
             $builder = m::mock(Builder::class);
             $parent = m::mock(Model::class);
 
-            $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-            $builder->shouldReceive('getModel')->andReturn($related);
-            $builder->shouldReceive('whereNotNull');
-            $builder->shouldReceive('where');
-            $builder->shouldReceive('withoutGlobalScopes')->andReturn($builder);
+            $parent->expects('getAttribute')->with('id')->andReturn(1);
+            $builder->expects('getModel')->andReturn($related);
+            $builder->expects('whereNotNull');
+            $builder->expects('where');
             $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
             $builder->shouldReceive('update')->never();
 
@@ -100,11 +98,10 @@ class DatabaseEloquentRelationTest extends TestCase
             $builder = m::mock(Builder::class);
             $parent = m::mock(Model::class);
 
-            $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-            $builder->shouldReceive('getModel')->andReturn($related);
-            $builder->shouldReceive('whereNotNull');
-            $builder->shouldReceive('where');
-            $builder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
+            $parent->expects('getAttribute')->with('id')->andReturn(1);
+            $builder->expects('getModel')->andReturn($related);
+            $builder->expects('whereNotNull');
+            $builder->expects('where');
             $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
             $builder->shouldReceive('update')->never();
 
@@ -113,14 +110,14 @@ class DatabaseEloquentRelationTest extends TestCase
             $anotherBuilder = m::mock(Builder::class);
             $anotherParent = m::mock(Model::class);
 
-            $anotherParent->shouldReceive('getAttribute')->with('id')->andReturn(2);
-            $anotherBuilder->shouldReceive('getModel')->andReturn($anotherRelated);
-            $anotherBuilder->shouldReceive('whereNotNull');
-            $anotherBuilder->shouldReceive('where');
-            $anotherBuilder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
+            $anotherParent->expects('getAttribute')->with('id')->andReturn(2);
+            $anotherBuilder->expects('getModel')->andReturn($anotherRelated);
+            $anotherBuilder->expects('whereNotNull');
+            $anotherBuilder->expects('where');
+            $anotherBuilder->expects('withoutGlobalScopes')->andReturnSelf();
             $anotherRelation = new HasOne($anotherBuilder, $anotherParent, 'foreign_key', 'id');
             $now = Carbon::now();
-            $anotherRelated->shouldReceive('freshTimestampString')->andReturn($now);
+            $anotherRelated->expects('freshTimestampString')->andReturn($now);
             $anotherBuilder->expects('update')->with(['updated_at' => $now]);
 
             $anotherRelation->touch();
@@ -150,11 +147,10 @@ class DatabaseEloquentRelationTest extends TestCase
             $builder = m::mock(Builder::class);
             $parent = m::mock(Model::class);
 
-            $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-            $builder->shouldReceive('getModel')->andReturn($related);
-            $builder->shouldReceive('whereNotNull');
-            $builder->shouldReceive('where');
-            $builder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
+            $parent->expects('getAttribute')->with('id')->andReturn(1);
+            $builder->expects('getModel')->andReturn($related);
+            $builder->expects('whereNotNull');
+            $builder->expects('where');
             $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
             $builder->shouldReceive('update')->never();
 
@@ -163,11 +159,10 @@ class DatabaseEloquentRelationTest extends TestCase
             $anotherBuilder = m::mock(Builder::class);
             $anotherParent = m::mock(Model::class);
 
-            $anotherParent->shouldReceive('getAttribute')->with('id')->andReturn(2);
-            $anotherBuilder->shouldReceive('getModel')->andReturn($relatedChild);
-            $anotherBuilder->shouldReceive('whereNotNull');
-            $anotherBuilder->shouldReceive('where');
-            $anotherBuilder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
+            $anotherParent->expects('getAttribute')->with('id')->andReturn(2);
+            $anotherBuilder->expects('getModel')->andReturn($relatedChild);
+            $anotherBuilder->expects('whereNotNull');
+            $anotherBuilder->expects('where');
             $anotherRelation = new HasOne($anotherBuilder, $anotherParent, 'foreign_key', 'id');
             $anotherBuilder->shouldReceive('update')->never();
 

@@ -48,7 +48,7 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
 
         $html = m::mock(Htmlable::class);
-        $html->shouldReceive('toHtml')->andReturn($str);
+        $html->expects('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
     }
 

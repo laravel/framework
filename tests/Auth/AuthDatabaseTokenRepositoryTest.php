@@ -18,12 +18,12 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $repo = $this->getRepo();
         $repo->getHasher()->expects('make')->andReturn('hashed-token');
         $query = m::mock(stdClass::class);
-        $repo->getConnection()->shouldReceive('table')->times(2)->with('table')->andReturn($query);
+        $repo->getConnection()->expects('table')->times(2)->with('table')->andReturn($query);
         $query->expects('where')->with('email', 'email')->andReturn($query);
         $query->expects('delete');
         $query->expects('insert');
         $user = m::mock(CanResetPassword::class);
-        $user->shouldReceive('getEmailForPasswordReset')->times(2)->andReturn('email');
+        $user->expects('getEmailForPasswordReset')->times(2)->andReturn('email');
 
         $results = $repo->create($user);
 

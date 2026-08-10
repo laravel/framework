@@ -26,11 +26,11 @@ class NotificationSenderTest extends TestCase
     {
         $notifiable = m::mock(Notifiable::class);
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('getContainer')->andReturn(app());
-        $manager->shouldReceive('resolveQueueFromQueueRoute')->andReturn(null);
-        $manager->shouldReceive('resolveConnectionFromQueueRoute')->andReturn(null);
+        $manager->expects('getContainer')->andReturn(app());
+        $manager->expects('resolveQueueFromQueueRoute')->andReturn(null);
+        $manager->expects('resolveConnectionFromQueueRoute')->andReturn(null);
         $bus = m::mock(BusDispatcher::class);
-        $bus->shouldReceive('dispatch');
+        $bus->expects('dispatch');
         $events = m::mock(EventDispatcher::class);
         $events->expects('listen');
 
@@ -43,7 +43,7 @@ class NotificationSenderTest extends TestCase
     {
         $notifiable = m::mock(Notifiable::class);
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('getContainer')->andReturn(app());
+        $manager->expects('getContainer')->times(2)->andReturn(app());
         $bus = m::mock(BusDispatcher::class);
         $bus->expects('dispatch')
 
@@ -82,7 +82,6 @@ class NotificationSenderTest extends TestCase
     {
         $notifiable = new AnonymousNotifiable;
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('getContainer')->andReturn(app());
         $bus = m::mock(BusDispatcher::class);
         $bus->shouldNotReceive('dispatch');
         $events = m::mock(EventDispatcher::class);
@@ -98,15 +97,15 @@ class NotificationSenderTest extends TestCase
         $notifiable = m::mock(Notifiable::class);
         $manager = m::mock(ChannelManager::class);
         $bus = m::mock(BusDispatcher::class);
-        $bus->shouldReceive('dispatch')
+        $bus->expects('dispatch')
             ->withArgs(function ($job) {
                 return $job->middleware[0] instanceof TestNotificationMiddleware;
             });
         $events = m::mock(EventDispatcher::class);
         $events->expects('listen');
-        $manager->shouldReceive('getContainer')->andReturn(app());
-        $manager->shouldReceive('resolveQueueFromQueueRoute')->andReturn(null);
-        $manager->shouldReceive('resolveConnectionFromQueueRoute')->andReturn(null);
+        $manager->expects('getContainer')->andReturn(app());
+        $manager->expects('resolveQueueFromQueueRoute')->andReturn(null);
+        $manager->expects('resolveConnectionFromQueueRoute')->andReturn(null);
 
         $sender = new NotificationSender($manager, $bus, $events);
 
@@ -117,9 +116,9 @@ class NotificationSenderTest extends TestCase
     {
         $notifiable = m::mock(Notifiable::class);
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('getContainer')->andReturn(app());
-        $manager->shouldReceive('resolveQueueFromQueueRoute')->andReturn(null);
-        $manager->shouldReceive('resolveConnectionFromQueueRoute')->andReturn(null);
+        $manager->expects('getContainer')->times(3)->andReturn(app());
+        $manager->expects('resolveQueueFromQueueRoute')->times(3)->andReturn(null);
+        $manager->expects('resolveConnectionFromQueueRoute')->times(3)->andReturn(null);
         $bus = m::mock(BusDispatcher::class);
         $bus->expects('dispatch')
 
@@ -148,7 +147,7 @@ class NotificationSenderTest extends TestCase
     {
         $notifiable = new AnonymousNotifiable;
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('getContainer')->andReturn(app());
+        $manager->expects('getContainer')->times(2)->andReturn(app());
         $bus = m::mock(BusDispatcher::class);
         $bus->expects('dispatch')
 
@@ -173,7 +172,7 @@ class NotificationSenderTest extends TestCase
     {
         $notifiable = new AnonymousNotifiable;
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('getContainer')->andReturn(app());
+        $manager->expects('getContainer')->times(2)->andReturn(app());
         $bus = m::mock(BusDispatcher::class);
         $bus->expects('dispatch')
 
@@ -198,9 +197,9 @@ class NotificationSenderTest extends TestCase
     {
         $notifiable = new AnonymousNotifiable;
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('getContainer')->andReturn(app());
-        $manager->shouldReceive('resolveQueueFromQueueRoute')->andReturn('notification-queue');
-        $manager->shouldReceive('resolveConnectionFromQueueRoute')->andReturn('notification-connection');
+        $manager->expects('getContainer')->andReturn(app());
+        $manager->expects('resolveQueueFromQueueRoute')->andReturn('notification-queue');
+        $manager->expects('resolveConnectionFromQueueRoute')->andReturn('notification-connection');
 
         $bus = m::mock(BusDispatcher::class);
         $bus->expects('dispatch')
@@ -224,14 +223,14 @@ class NotificationSenderTest extends TestCase
         $notifiable = new AnonymousNotifiable;
         $manager = m::mock(ChannelManager::class);
         $driver = m::mock();
-        $manager->shouldReceive('driver')->andReturn($driver);
+        $manager->expects('driver')->andReturn($driver);
         $response = m::mock(ResponseInterface::class);
-        $driver->shouldReceive('send')->andThrow(new HttpTransportException('Transport error', $response));
+        $driver->expects('send')->andThrow(new HttpTransportException('Transport error', $response));
         $bus = m::mock(BusDispatcher::class);
 
         $events = m::mock(EventDispatcher::class);
         $events->expects('listen');
-        $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
+        $events->expects('until')->with(m::type(NotificationSending::class))->andReturn(true);
         $events->expects('dispatch')->withArgs(function ($event) {
             return $event instanceof NotificationFailed && $event->data['exception'] instanceof TransportException;
         });
@@ -246,7 +245,7 @@ class NotificationSenderTest extends TestCase
         $notifiable = new AnonymousNotifiable;
         $manager = m::mock(ChannelManager::class);
         $driver = m::mock();
-        $manager->shouldReceive('driver')->andReturn($driver);
+        $manager->expects('driver')->andReturn($driver);
         $driver->expects('send')->withArgs(function ($notifiable, $notification) {
             return $notification->channelData === 'default';
         });
@@ -254,7 +253,7 @@ class NotificationSenderTest extends TestCase
 
         $events = m::mock(EventDispatcher::class);
         $events->expects('listen');
-        $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
+        $events->expects('until')->with(m::type(NotificationSending::class))->andReturn(true);
         $events->expects('dispatch');
 
         $sender = new NotificationSender($manager, $bus, $events);
@@ -278,12 +277,11 @@ class NotificationSenderTest extends TestCase
 
         $notifiable = m::mock(Notifiable::class);
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('getContainer')->andReturn(app());
-        $manager->shouldReceive('resolveQueueFromQueueRoute')->andReturn(null);
-        $manager->shouldReceive('resolveConnectionFromQueueRoute')->andReturn(null);
+        $manager->expects('getContainer')->andReturn(app());
+        $manager->expects('resolveConnectionFromQueueRoute')->andReturn(null);
 
         $events = m::mock(EventDispatcher::class);
-        $events->shouldReceive('listen');
+        $events->expects('listen');
 
         $bus = m::mock(BusDispatcher::class);
         $bus->expects('dispatch')
@@ -311,12 +309,11 @@ class NotificationSenderTest extends TestCase
 
         $notifiable = m::mock(Notifiable::class);
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('getContainer')->andReturn(app());
-        $manager->shouldReceive('resolveQueueFromQueueRoute')->andReturn(null);
-        $manager->shouldReceive('resolveConnectionFromQueueRoute')->andReturn(null);
+        $manager->expects('getContainer')->andReturn(app());
+        $manager->expects('resolveConnectionFromQueueRoute')->andReturn(null);
 
         $events = m::mock(EventDispatcher::class);
-        $events->shouldReceive('listen');
+        $events->expects('listen');
 
         $bus = m::mock(BusDispatcher::class);
         $bus->expects('dispatch')
@@ -349,12 +346,11 @@ class NotificationSenderTest extends TestCase
 
         $notifiable = m::mock(Notifiable::class);
         $manager = m::mock(ChannelManager::class);
-        $manager->shouldReceive('getContainer')->andReturn(app());
-        $manager->shouldReceive('resolveQueueFromQueueRoute')->andReturn(null);
-        $manager->shouldReceive('resolveConnectionFromQueueRoute')->andReturn(null);
+        $manager->expects('getContainer')->andReturn(app());
+        $manager->expects('resolveConnectionFromQueueRoute')->andReturn(null);
 
         $events = m::mock(EventDispatcher::class);
-        $events->shouldReceive('listen');
+        $events->expects('listen');
 
         $bus = m::mock(BusDispatcher::class);
         $bus->expects('dispatch')

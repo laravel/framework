@@ -566,8 +566,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Application::class, $app);
         $factory = m::mock(Factory::class);
         $container->instance(Factory::class, $factory);
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->andReturn(false, true);
+        $app->expects('getNamespace')->andReturn('App\\');
+        $factory->expects('exists')->times(2)->andReturn(false, true);
         Container::setInstance($container);
 
         $result = $this->compiler()->compileTags('<x-anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
@@ -587,8 +587,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Application::class, $app);
         $factory = m::mock(Factory::class);
         $container->instance(Factory::class, $factory);
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->andReturn(false, false, true);
+        $app->expects('getNamespace')->andReturn('App\\');
+        $factory->expects('exists')->times(3)->andReturn(false, false, true);
         Container::setInstance($container);
 
         $result = $this->compiler()->compileTags('<x-anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
@@ -608,8 +608,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Application::class, $app);
         $factory = m::mock(Factory::class);
         $container->instance(Factory::class, $factory);
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->andReturn(true);
+        $app->expects('getNamespace')->andReturn('App\\');
+        $factory->expects('exists')->andReturn(true);
         Container::setInstance($container);
 
         $result = $this->compiler()->compileTags('<x-package::anonymous-component :name="\'Taylor\'" :age="31" wire:model="foo" />');
@@ -632,7 +632,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Factory::class, $factory);
 
         $app->expects('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->times(4)->andReturnUsing(function ($arg) {
+        $factory->expects('exists')->times(4)->andReturnUsing(function ($arg) {
             // In our test, we'll do as if the 'public.frontend.anonymous-component'
             // view exists and not the others.
             return $arg === 'public.frontend.anonymous-component';
@@ -668,7 +668,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Factory::class, $factory);
 
         $app->expects('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->times(5)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
+        $factory->expects('exists')->times(5)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
             // In our test, we'll do as if the 'public.frontend.anonymous-component'
             // view exists and not the others.
             return $viewNameBeingCheckedForExistence === 'admin.auth.components.anonymous-component.index';
@@ -704,7 +704,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $container->instance(Factory::class, $factory);
 
         $app->expects('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->times(6)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
+        $factory->expects('exists')->times(6)->andReturnUsing(function (string $viewNameBeingCheckedForExistence) {
             // In our test, we'll do as if the 'public.frontend.anonymous-component'
             // view exists and not the others.
             return $viewNameBeingCheckedForExistence === 'admin.auth.components.anonymous-component.anonymous-component';
@@ -741,7 +741,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $app->expects('getNamespace')->andReturn('App\\');
 
-        $factory->shouldReceive('exists')->andReturnUsing(function ($arg) {
+        $factory->expects('exists')->times(5)->andReturnUsing(function ($arg) {
             return $arg === hash('xxh128', 'test-directory').'::panel.index';
         });
 
@@ -776,7 +776,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $app->expects('getNamespace')->andReturn('App\\');
 
-        $factory->shouldReceive('exists')->andReturnUsing(function ($arg) {
+        $factory->expects('exists')->times(6)->andReturnUsing(function ($arg) {
             return $arg === md5('test-directory').'::panel.panel';
         });
 
@@ -811,7 +811,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $app->expects('getNamespace')->andReturn('App\\');
 
-        $factory->shouldReceive('exists')->andReturnUsing(function ($arg) {
+        $factory->expects('exists')->times(4)->andReturnUsing(function ($arg) {
             return $arg === hash('xxh128', 'test-directory').'::panel';
         });
 
@@ -877,7 +877,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $factory = m::mock(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->andReturn('App\\');
-        $factory->shouldReceive('exists')->times(3)->andReturn(false);
+        $factory->expects('exists')->times(3)->andReturn(false);
         Container::setInstance($container);
 
         $this->expectException(InvalidArgumentException::class);
@@ -959,8 +959,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         });
 
         $__env = m::mock(\Illuminate\View\Factory::class);
-        $__env->shouldReceive('startComponent')->twice();
-        $__env->shouldReceive('renderComponent')->twice();
+        $__env->expects('startComponent')->times(2);
+        $__env->expects('renderComponent')->times(2);
 
         $template = $this->compiler([
             'container' => TestContainerComponent::class,

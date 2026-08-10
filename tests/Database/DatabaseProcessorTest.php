@@ -19,7 +19,7 @@ class DatabaseProcessorTest extends TestCase
         $connection->expects('insert')->with('sql', ['foo']);
         $connection->expects('getPdo')->andReturn($pdo);
         $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getConnection')->andReturn($connection);
+        $builder->expects('getConnection')->twice()->andReturn($connection);
         $processor = new Processor;
         $result = $processor->processInsertGetId($builder, 'sql', ['foo'], 'id');
         $this->assertSame(1, $result);

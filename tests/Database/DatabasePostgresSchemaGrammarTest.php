@@ -101,7 +101,6 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testAddColumnsWithMultipleAutoIncrementStartingValue()
     {
         $builder = $this->getBuilder();
-        $builder->shouldReceive('parseSchemaAndTable')->andReturn([null, 'users']);
 
         $blueprint = new Blueprint($this->getConnection(builder: $builder), 'users');
         $blueprint->id()->from(100);

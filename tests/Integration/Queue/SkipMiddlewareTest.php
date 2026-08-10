@@ -87,9 +87,9 @@ class SkipMiddlewareTest extends TestCase
 
         $job = m::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->andReturn(false);
+        $job->expects('hasFailed')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+        $job->expects('isDeletedOrReleased')->andReturn(false);
         $job->expects('delete');
 
         $instance->call($job, [

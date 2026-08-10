@@ -50,12 +50,12 @@ class ViewTest extends TestCase
     public function testRenderHandlingCallbackReturnValues()
     {
         $view = $this->getView();
-        $view->getFactory()->shouldReceive('incrementRender');
-        $view->getFactory()->shouldReceive('callComposer');
-        $view->getFactory()->shouldReceive('getShared')->andReturn(['shared' => 'foo']);
-        $view->getEngine()->shouldReceive('get')->andReturn('contents');
-        $view->getFactory()->shouldReceive('decrementRender');
-        $view->getFactory()->shouldReceive('flushStateIfDoneRendering');
+        $view->getFactory()->expects('incrementRender')->times(3);
+        $view->getFactory()->expects('callComposer')->times(3);
+        $view->getFactory()->expects('getShared')->times(3)->andReturn(['shared' => 'foo']);
+        $view->getEngine()->expects('get')->times(3)->andReturn('contents');
+        $view->getFactory()->expects('decrementRender')->times(3);
+        $view->getFactory()->expects('flushStateIfDoneRendering')->times(3);
 
         $this->assertSame('new contents', $view->render(function () {
             return 'new contents';
@@ -88,12 +88,12 @@ class ViewTest extends TestCase
     public function testSectionsAreNotFlushedWhenNotDoneRendering()
     {
         $view = $this->getView(['foo' => 'bar']);
-        $view->getFactory()->shouldReceive('incrementRender')->twice();
-        $view->getFactory()->shouldReceive('callComposer')->twice()->with($view);
-        $view->getFactory()->shouldReceive('getShared')->twice()->andReturn(['shared' => 'foo']);
-        $view->getEngine()->shouldReceive('get')->twice()->with('path', ['foo' => 'bar', 'shared' => 'foo'])->andReturn('contents');
-        $view->getFactory()->shouldReceive('decrementRender')->twice();
-        $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->twice();
+        $view->getFactory()->expects('incrementRender')->times(2);
+        $view->getFactory()->expects('callComposer')->times(2)->with($view);
+        $view->getFactory()->expects('getShared')->times(2)->andReturn(['shared' => 'foo']);
+        $view->getEngine()->expects('get')->times(2)->with('path', ['foo' => 'bar', 'shared' => 'foo'])->andReturn('contents');
+        $view->getFactory()->expects('decrementRender')->times(2);
+        $view->getFactory()->expects('flushStateIfDoneRendering')->times(2);
 
         $this->assertSame('contents', $view->render());
         $this->assertSame('contents', (string) $view);

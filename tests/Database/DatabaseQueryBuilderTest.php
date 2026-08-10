@@ -54,7 +54,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testBasicSelectWithGetColumns()
     {
         $builder = $this->getBuilder();
-        $builder->getProcessor()->shouldReceive('processSelect');
+        $builder->getProcessor()->expects('processSelect')->times(3);
         $builder->getConnection()->expects('select')->andReturnUsing(function ($sql) {
             $this->assertSame('select * from "users"', $sql);
         });
@@ -2235,7 +2235,6 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $expected = 'select count(*) as `aggregate` from (select (select `count(*)` from `videos` where `posts`.`id` = `videos`.`post_id`) as `videos_count` from `posts` having `videos_count` > ?) as `temp_table`';
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->getConnection()->expects('select')->with($expected, [0 => 1], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->expects('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
@@ -2804,7 +2803,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $query = 'select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?';
         $builder->getConnection()->expects('select')->with($query, ['popular', 3], true, [])->andReturn([['category' => 'rock', 'total' => 5]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->expects('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
         });
         $builder->from('item');
@@ -2815,7 +2814,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $query = 'select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > 3';
         $builder->getConnection()->expects('select')->with($query, ['popular'], true, [])->andReturn([['category' => 'rock', 'total' => 5]]);
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->expects('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
         });
         $builder->from('item');
@@ -3810,17 +3809,14 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testStraightJoin()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->select('*')->from('users')->straightJoin('contacts', 'users.id', 'contacts.id');
         $this->assertSame('select * from `users` straight_join `contacts` on `users`.`id` = `contacts`.`id`', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->select('*')->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->straightJoin('photos', 'users.id', '=', 'photos.id');
         $this->assertSame('select * from `users` inner join `contacts` on `users`.`id` = `contacts`.`id` straight_join `photos` on `users`.`id` = `photos`.`id`', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->select('*')->from('users')->straightJoinWhere('photos', 'users.id', '=', 'bar')->joinWhere('photos', 'users.id', '=', 'foo');
         $this->assertSame('select * from `users` straight_join `photos` on `users`.`id` = ? inner join `photos` on `users`.`id` = ?', $builder->toSql());
         $this->assertEquals(['bar', 'foo'], $builder->getBindings());
@@ -3837,7 +3833,6 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testStraightJoinSub()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->from('users')->straightJoinSub($this->getBuilder()->from('contacts'), 'sub', 'users.id', '=', 'sub.id');
         $this->assertSame('select * from `users` straight_join (select * from "contacts") as `sub` on `users`.`id` = `sub`.`id`', $builder->toSql());
 
@@ -3857,35 +3852,28 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinLateral()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->from('users')->joinLateral('select * from `contacts` where `contracts`.`user_id` = `users`.`id`', 'sub');
         $this->assertSame('select * from `users` inner join lateral (select * from `contacts` where `contracts`.`user_id` = `users`.`id`) as `sub` on true', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->from('users')->joinLateral(function ($q) {
             $q->from('contacts')->whereColumn('contracts.user_id', 'users.id');
         }, 'sub');
         $this->assertSame('select * from `users` inner join lateral (select * from `contacts` where `contracts`.`user_id` = `users`.`id`) as `sub` on true', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $sub = $this->getMySqlBuilder();
-        $sub->getConnection()->shouldReceive('getDatabaseName');
         $eloquentBuilder = new EloquentBuilder($sub->from('contacts')->whereColumn('contracts.user_id', 'users.id'));
         $builder->from('users')->joinLateral($eloquentBuilder, 'sub');
         $this->assertSame('select * from `users` inner join lateral (select * from `contacts` where `contracts`.`user_id` = `users`.`id`) as `sub` on true', $builder->toSql());
 
         $sub1 = $this->getMySqlBuilder();
-        $sub1->getConnection()->shouldReceive('getDatabaseName');
         $sub1 = $sub1->from('contacts')->whereColumn('contracts.user_id', 'users.id')->where('name', 'foo');
 
         $sub2 = $this->getMySqlBuilder();
-        $sub2->getConnection()->shouldReceive('getDatabaseName');
         $sub2 = $sub2->from('contacts')->whereColumn('contracts.user_id', 'users.id')->where('name', 'bar');
 
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->from('users')->joinLateral($sub1, 'sub1')->joinLateral($sub2, 'sub2');
 
         $expected = 'select * from `users` ';
@@ -3904,7 +3892,6 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
         $builder = $this->getMariaDbBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->from('users')->joinLateral(function ($q) {
             $q->from('contacts')->whereColumn('contracts.user_id', 'users.id');
         }, 'sub')->toSql();
@@ -3914,7 +3901,6 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->from('users')->joinLateral(function ($q) {
             $q->from('contacts')->whereColumn('contracts.user_id', 'users.id');
         }, 'sub')->toSql();
@@ -3923,7 +3909,6 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinLateralPostgres()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->from('users')->joinLateral(function ($q) {
             $q->from('contacts')->whereColumn('contracts.user_id', 'users.id');
         }, 'sub');
@@ -3933,7 +3918,6 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinLateralSqlServer()
     {
         $builder = $this->getSqlServerBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->from('users')->joinLateral(function ($q) {
             $q->from('contacts')->whereColumn('contracts.user_id', 'users.id');
         }, 'sub');
@@ -3950,10 +3934,8 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testLeftJoinLateral()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
 
         $sub = $this->getMySqlBuilder();
-        $sub->getConnection()->shouldReceive('getDatabaseName');
 
         $builder->from('users')->leftJoinLateral($sub->from('contacts')->whereColumn('contracts.user_id', 'users.id'), 'sub');
         $this->assertSame('select * from `users` left join lateral (select * from `contacts` where `contracts`.`user_id` = `users`.`id`) as `sub` on true', $builder->toSql());
@@ -3966,7 +3948,6 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testLeftJoinLateralSqlServer()
     {
         $builder = $this->getSqlServerBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->from('users')->leftJoinLateral(function ($q) {
             $q->from('contacts')->whereColumn('contracts.user_id', 'users.id');
         }, 'sub');
@@ -4179,13 +4160,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testExistsOr()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 1]]);
+        $builder->getConnection()->expects('select')->andReturn([['exists' => 1]]);
         $results = $builder->from('users')->doesntExistOr(function () {
             return 123;
         });
         $this->assertSame(123, $results);
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 0]]);
+        $builder->getConnection()->expects('select')->andReturn([['exists' => 0]]);
         $results = $builder->from('users')->doesntExistOr(function () {
             throw new RuntimeException;
         });
@@ -4195,13 +4176,13 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testDoesntExistsOr()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 0]]);
+        $builder->getConnection()->expects('select')->andReturn([['exists' => 0]]);
         $results = $builder->from('users')->existsOr(function () {
             return 123;
         });
         $this->assertSame(123, $results);
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->andReturn([['exists' => 1]]);
+        $builder->getConnection()->expects('select')->andReturn([['exists' => 1]]);
         $results = $builder->from('users')->existsOr(function () {
             throw new RuntimeException;
         });
@@ -4214,7 +4195,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->expects('select')->with('select count(*) as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getConnection()->expects('select')->with('select sum("id") as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 2]]);
         $builder->getConnection()->expects('select')->with('select "column1", "column2" from "users"', [], true, [])->andReturn([['column1' => 'foo', 'column2' => 'bar']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->expects('processSelect')->times(3)->andReturnUsing(function ($builder, $results) {
             return $results;
         });
         $builder->from('users')->select('column1', 'column2');
@@ -4231,7 +4212,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->expects('select')->with('select count("column1") as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getConnection()->expects('select')->with('select "column2", "column3" from "users"', [], true, [])->andReturn([['column2' => 'foo', 'column3' => 'bar']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->expects('processSelect')->times(2)->andReturnUsing(function ($builder, $results) {
             return $results;
         });
         $builder->from('users');
@@ -4246,7 +4227,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->expects('select')->with('select count("column1") as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getConnection()->expects('select')->with('select "column2", "column3" from "users"', [], true, [])->andReturn([['column2' => 'foo', 'column3' => 'bar']]);
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
+        $builder->getProcessor()->expects('processSelect')->times(2)->andReturnUsing(function ($builder, $results) {
             return $results;
         });
         $builder->from('users');
@@ -4562,7 +4543,6 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testMySqlInsertOrIgnoreUsingMethod()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->getConnection()->expects('affectingStatement')->with('insert ignore into `table1` (`foo`) select `bar` from `table2` where `foreign_id` = ?', [0 => 5])->andReturn(1);
 
         $result = $builder->from('table1')->insertOrIgnoreUsing(
@@ -4578,7 +4558,6 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testMySqlInsertOrIgnoreUsingWithEmptyColumns()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->getConnection()->expects('affectingStatement')->with('insert ignore into `table1` select * from `table2` where `foreign_id` = ?', [0 => 5])->andReturn(1);
 
         $result = $builder->from('table1')->insertOrIgnoreUsing(
@@ -4638,7 +4617,6 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSQLiteInsertOrIgnoreUsingMethod()
     {
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->getConnection()->expects('affectingStatement')->with('insert or ignore into "table1" ("foo") select "bar" from "table2" where "foreign_id" = ?', [5])->andReturn(1);
 
         $result = $builder->from('table1')->insertOrIgnoreUsing(
@@ -4654,7 +4632,6 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSQLiteInsertOrIgnoreUsingWithEmptyColumns()
     {
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->getConnection()->expects('affectingStatement')->with('insert or ignore into "table1" select * from "table2" where "foreign_id" = ?', [5])->andReturn(1);
 
         $result = $builder->from('table1')->insertOrIgnoreUsing(
@@ -4742,14 +4719,14 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()
-            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(false)
+            ->expects('getConfig')->with('use_upsert_alias')->andReturn(false)
             ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) on duplicate key update `email` = values(`email`), `name` = values(`name`)', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
         $this->assertEquals(2, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()
-            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(true)
+            ->expects('getConfig')->with('use_upsert_alias')->andReturn(true)
             ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) as laravel_upsert_alias on duplicate key update `email` = `laravel_upsert_alias`.`email`, `name` = `laravel_upsert_alias`.`name`', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
         $this->assertEquals(2, $result);
@@ -4774,14 +4751,14 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()
-            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(false)
+            ->expects('getConfig')->with('use_upsert_alias')->andReturn(false)
             ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) on duplicate key update `name` = values(`name`)', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email', ['name']);
         $this->assertEquals(2, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()
-            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(true)
+            ->expects('getConfig')->with('use_upsert_alias')->andReturn(true)
             ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) as laravel_upsert_alias on duplicate key update `name` = `laravel_upsert_alias`.`name`', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email', ['name']);
         $this->assertEquals(2, $result);
@@ -5015,7 +4992,6 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder->expects('where')->with(['email' => 'foo'])->andReturn(m::self());
         $builder->expects('exists')->andReturn(true);
-        $builder->shouldReceive('take')->andReturnSelf();
         $builder->expects('update')->with(['name' => 'bar'])->andReturn(1);
 
         $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
@@ -5156,7 +5132,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->truncate();
 
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('getSchemaBuilder->parseSchemaAndTable')->andReturn([null, 'users']);
+        $builder->getConnection()->expects('getSchemaBuilder->parseSchemaAndTable')->andReturn([null, 'users']);
         $builder->from('users');
         $this->assertEquals([
             'delete from sqlite_sequence where name = ?' => ['users'],
@@ -5172,7 +5148,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->truncate();
 
         $builder = $this->getSQLiteBuilder(prefix: 'prefix_');
-        $builder->getConnection()->shouldReceive('getSchemaBuilder->parseSchemaAndTable')->andReturn([null, 'users']);
+        $builder->getConnection()->expects('getSchemaBuilder->parseSchemaAndTable')->andReturn([null, 'users']);
         $builder->from('users');
         $this->assertEquals([
             'delete from sqlite_sequence where name = ?' => ['prefix_users'],
@@ -5188,7 +5164,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('my_schema.users')->truncate();
 
         $builder = $this->getSQLiteBuilder(prefix: 'prefix_');
-        $builder->getConnection()->shouldReceive('getSchemaBuilder->parseSchemaAndTable')->andReturn(['my_schema', 'users']);
+        $builder->getConnection()->expects('getSchemaBuilder->parseSchemaAndTable')->andReturn(['my_schema', 'users']);
         $builder->from('my_schema.users');
         $this->assertEquals([
             'delete from "my_schema".sqlite_sequence where name = ?' => ['prefix_users'],
@@ -5260,7 +5236,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()
-            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(false)
+            ->expects('getConfig')->with('use_upsert_alias')->andReturn(false)
             ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`) values (?) on duplicate key update `email` = values(`email`)', ['foo']);
         $builder->beforeQuery(function ($builder) {
             $builder->from('users');
@@ -5269,7 +5245,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()
-            ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(true)
+            ->expects('getConfig')->with('use_upsert_alias')->andReturn(true)
             ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`) values (?) as laravel_upsert_alias on duplicate key update `email` = `laravel_upsert_alias`.`email`', ['foo']);
         $builder->beforeQuery(function ($builder) {
             $builder->from('users');
@@ -5454,12 +5430,12 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testPostgresUpdateWrappingJson()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('update')
+        $builder->getConnection()->expects('update')
             ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"name","first_name"}\', ?)', ['"John"']);
         $builder->from('users')->update(['users.options->name->first_name' => 'John']);
 
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('update')
+        $builder->getConnection()->expects('update')
             ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"language"}\', \'null\')', []);
         $builder->from('users')->update(['options->language' => new Raw("'null'")]);
     }
@@ -5467,7 +5443,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testPostgresUpdateWrappingJsonArray()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('update')
+        $builder->getConnection()->expects('update')
             ->with('update "users" set "options" = ?, "meta" = jsonb_set("meta"::jsonb, \'{"tags"}\', ?), "group_id" = 45, "created_at" = ?', [
                 json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
                 json_encode(['white', 'large']),
@@ -5485,7 +5461,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testPostgresUpdateWrappingJsonPathArrayIndex()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('update')
+        $builder->getConnection()->expects('update')
             ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{1,"2fa"}\', ?), "meta" = jsonb_set("meta"::jsonb, \'{"tags",0,2}\', ?) where ("options"->1->\'2fa\')::jsonb = \'true\'::jsonb', [
                 'false',
                 '"large"',
@@ -5501,7 +5477,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getSQLiteBuilder();
 
-        $builder->getConnection()->shouldReceive('update')
+        $builder->getConnection()->expects('update')
             ->with('update "users" set "options" = ?, "group_id" = 45, "created_at" = ?', [
                 json_encode(['2fa' => false, 'presets' => ['laravel', 'vue']]),
                 new DateTime('2019-08-06'),
@@ -5517,7 +5493,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSQLiteUpdateWrappingNestedJsonArray()
     {
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('update')
+        $builder->getConnection()->expects('update')
             ->with('update "users" set "group_id" = 45, "created_at" = ?, "options" = json_patch(ifnull("options", json(\'{}\')), json(?))', [
                 new DateTime('2019-08-06'),
                 json_encode(['name' => 'Taylor', 'security' => ['2fa' => false, 'presets' => ['laravel', 'vue']], 'sharing' => ['twitter' => 'username']]),
@@ -5535,7 +5511,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSQLiteUpdateWrappingJsonPathArrayIndex()
     {
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('update')
+        $builder->getConnection()->expects('update')
             ->with('update "users" set "options" = json_patch(ifnull("options", json(\'{}\')), json(?)), "meta" = json_patch(ifnull("meta", json(\'{}\')), json(?)) where json_extract("options", \'$[1]."2fa"\') = true', [
                 '{"[1]":{"2fa":false}}',
                 '{"tags[0][2]":"large"}',
@@ -5636,7 +5612,7 @@ SQL;
         // resulting path is still nested within a single quoted string literal,
         // so single quotes must be escaped there as well...
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('update')
+        $builder->getConnection()->expects('update')
             ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"\'\'))#"}\', ?)', ['"John"']);
         $builder->from('users')->update(["options->'))#" => 'John']);
     }
@@ -5902,8 +5878,6 @@ SQL;
         $this->expectException(BadMethodCallException::class);
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select');
-        $builder->getProcessor()->shouldReceive('processSelect')->andReturn([]);
 
         $builder->noValidMethodHere();
     }
@@ -6160,8 +6134,8 @@ SQL;
         $builder->expects('offset')->with(0)->andReturnSelf();
         $builder->expects('offset')->with(2)->andReturnSelf();
         $builder->expects('offset')->with(4)->andReturnSelf();
-        $builder->shouldReceive('limit')->times(3)->with(2)->andReturnSelf();
-        $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
+        $builder->expects('limit')->times(3)->with(2)->andReturnSelf();
+        $builder->expects('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
         $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
@@ -6185,8 +6159,8 @@ SQL;
         $builder->expects('getLimit')->andReturnNull();
         $builder->expects('offset')->with(0)->andReturnSelf();
         $builder->expects('offset')->with(2)->andReturnSelf();
-        $builder->shouldReceive('limit')->twice()->with(2)->andReturnSelf();
-        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+        $builder->expects('limit')->times(2)->with(2)->andReturnSelf();
+        $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
 
         $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
@@ -6208,7 +6182,7 @@ SQL;
         $builder->expects('getLimit')->andReturnNull();
         $builder->expects('offset')->with(0)->andReturnSelf();
         $builder->expects('limit')->with(2)->andReturnSelf();
-        $builder->shouldReceive('get')->times(1)->andReturn($chunk1);
+        $builder->expects('get')->times(1)->andReturn($chunk1);
 
         $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
@@ -6248,7 +6222,7 @@ SQL;
         $builder->expects('forPageAfterId')->with(2, 0, 'someIdField')->andReturnSelf();
         $builder->expects('forPageAfterId')->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->expects('forPageAfterId')->with(2, 11, 'someIdField')->andReturnSelf();
-        $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
+        $builder->expects('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
         $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
@@ -6271,7 +6245,7 @@ SQL;
         $builder->expects('forPageAfterId')->with(2, 0, 'someIdField')->andReturnSelf();
         $builder->expects('forPageAfterId')->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->expects('forPageAfterId')->with(2, 11, 'someIdField')->andReturnSelf();
-        $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
+        $builder->expects('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
         $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
@@ -6292,7 +6266,7 @@ SQL;
         $chunk2 = collect([(object) ['someIdField' => 10]]);
         $builder->expects('forPageAfterId')->with(2, 0, 'someIdField')->andReturnSelf();
         $builder->expects('forPageAfterId')->with(2, 2, 'someIdField')->andReturnSelf();
-        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+        $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
 
         $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
@@ -6325,7 +6299,7 @@ SQL;
         $chunk2 = collect([]);
         $builder->expects('forPageAfterId')->with(2, 0, 'table.id')->andReturnSelf();
         $builder->expects('forPageAfterId')->with(2, 10, 'table.id')->andReturnSelf();
-        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+        $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
 
         $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
@@ -6345,7 +6319,7 @@ SQL;
         $chunk2 = collect([]);
         $builder->expects('forPageBeforeId')->with(2, 0, 'someIdField')->andReturnSelf();
         $builder->expects('forPageBeforeId')->with(2, 1, 'someIdField')->andReturnSelf();
-        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+        $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
 
         $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
@@ -6502,7 +6476,7 @@ SQL;
         $cursor = new Cursor(['test' => 'bar']);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->orderBy('test');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -6540,7 +6514,7 @@ SQL;
         $cursor = new Cursor(['test' => 'bar', 'another' => 'foo']);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->orderBy('test')->orderBy('another');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -6578,7 +6552,7 @@ SQL;
         $cursor = new Cursor(['test' => 'bar']);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->orderBy('test');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -6648,7 +6622,7 @@ SQL;
         $cursor = new Cursor(['id' => 2]);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->orderBy('id');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -6686,7 +6660,7 @@ SQL;
         $cursor = new Cursor(['foo' => 1, 'bar' => 2, 'baz' => 3]);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->orderBy('foo')->orderByDesc('bar')->orderBy('baz');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -6724,7 +6698,7 @@ SQL;
         $cursor = new Cursor(['test' => 'bar']);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->select('*')->selectRaw('(CONCAT(firstname, \' \', lastname)) as test')->orderBy('test');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -6765,7 +6739,7 @@ SQL;
         $cursor = new Cursor(['test' => 'bar']);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->select('*')->selectRaw('(CAST(CONCAT(firstname, \' \', lastname) as VARCHAR)) as test')->orderBy('test');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -6806,7 +6780,7 @@ SQL;
         $cursor = new Cursor(['test' => 'bar']);
         $builder = $this->getMockQueryBuilder();
         $builder->from('foobar')->select('*')->selectSub('CONCAT(firstname, \' \', lastname)', 'test')->orderBy('test');
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -6853,7 +6827,7 @@ SQL;
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
         $builder->orderBy('created_at');
 
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -6901,7 +6875,7 @@ SQL;
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'podcast' as type")->from('podcasts')->where('extra', 'second'));
         $builder->orderBy('created_at');
 
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -6950,7 +6924,7 @@ SQL;
         $builder->union($this->getBuilder()->select('id', 'created_at', 'type')->from('podcasts')->where('extra', 'third'));
         $builder->orderBy('id')->orderByDesc('created_at')->orderBy('type');
 
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -6999,7 +6973,7 @@ SQL;
         $builder->union($this->getBuilder()->select('id', 'is_published', 'created_at')->selectRaw("'news' as type")->where('is_published', true)->from('news'));
         $builder->orderByRaw('case when (id = 3 and type="news" then 0 else 1 end)')->orderBy('created_at');
 
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -7046,7 +7020,7 @@ SQL;
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
         $builder->orderBy('created_at');
 
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -7093,7 +7067,7 @@ SQL;
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
         $builder->orderByDesc('created_at')->orderBy('id');
 
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -7141,7 +7115,7 @@ SQL;
         $builder->union($this->getBuilder()->select('id', 'init_at as created_at')->selectRaw("'podcast' as type")->from('podcasts'));
         $builder->orderBy('created_at');
 
-        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
             return new Builder($builder->connection, $builder->grammar, $builder->processor);
         });
 
@@ -7810,11 +7784,11 @@ SQL;
     public function testToRawSql()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('prepareBindings')
+        $connection->expects('prepareBindings')
             ->with(['foo'])
             ->andReturn(['foo']);
         $grammar = m::mock(Grammar::class, [$connection])->makePartial();
-        $grammar->shouldReceive('substituteBindingsIntoRawSql')
+        $grammar->expects('substituteBindingsIntoRawSql')
             ->with('select * from "users" where "email" = ?', ['foo'])
             ->andReturn('select * from "users" where "email" = \'foo\'');
         $builder = new Builder($connection, $grammar, m::mock(Processor::class));

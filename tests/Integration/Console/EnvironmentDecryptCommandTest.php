@@ -52,7 +52,7 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItFailsWhenEncryptionFileCannotBeFound(): void
     {
-        $this->filesystem->shouldReceive('exists')->andReturn(true);
+        $this->filesystem->expects('exists')->times(2)->andReturn(true);
 
         $this->artisan('env:decrypt', ['--key' => 'secret-key'])
             ->expectsOutputToContain('Environment file already exists.')
@@ -61,7 +61,7 @@ class EnvironmentDecryptCommandTest extends TestCase
 
     public function testItFailsWhenEnvironmentFileExists(): void
     {
-        $this->filesystem->shouldReceive('exists')->andReturn(false);
+        $this->filesystem->expects('exists')->andReturn(false);
 
         $this->artisan('env:decrypt', ['--key' => 'secret-key'])
             ->expectsOutputToContain('Encrypted environment file not found.')

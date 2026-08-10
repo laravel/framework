@@ -123,7 +123,7 @@ class MigratorTest extends TestCase
         $this->expectTwoColumnDetail('2016_10_04_000000_modify_people_table');
         $this->expectBulletList(['alter table "people" add column "last_name" varchar']);
 
-        $this->output->shouldReceive('writeln')->times(3);
+        $this->output->expects('writeln')->times(3);
 
         $this->subject->run([__DIR__.'/fixtures'], ['pretend' => true]);
 
@@ -270,7 +270,7 @@ class MigratorTest extends TestCase
 
     protected function expectTwoColumnDetail($first, $second = null)
     {
-        $this->output->shouldReceive('writeln')->with(m::on(function ($argument) use ($first, $second) {
+        $this->output->expects('writeln')->with(m::on(function ($argument) use ($first, $second) {
             $result = (new Stringable($argument))->contains($first);
 
             if ($result && $second) {
@@ -291,12 +291,12 @@ class MigratorTest extends TestCase
     protected function expectTask($description, $result): void
     {
         // Ignore dots...
-        $this->output->shouldReceive('write')->with(m::on(
+        $this->output->expects('write')->with(m::on(
             fn ($argument) => (new Stringable($argument))->contains(['<fg=gray></>', '<fg=gray>.</>']),
         ), m::any(), m::any());
 
         // Ignore duration...
-        $this->output->shouldReceive('write')->with(m::on(
+        $this->output->expects('write')->with(m::on(
             fn ($argument) => (new Stringable($argument))->contains(['ms</>']),
         ), m::any(), m::any());
 

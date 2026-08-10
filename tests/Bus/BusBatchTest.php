@@ -61,7 +61,7 @@ class BusBatchTest extends TestCase
 
             $dispatcher->shouldReceive('batch')->zeroOrMoreTimes()->andReturnUsing(function ($jobs) {
                 $pendingBatch = m::mock(PendingBatch::class);
-                $pendingBatch->shouldReceive('name')->andReturnSelf();
+                $pendingBatch->expects('name')->andReturnSelf();
                 $pendingBatch->shouldReceive('dispatch')->zeroOrMoreTimes()->andReturn(m::mock(Batch::class));
 
                 return $pendingBatch;
@@ -717,9 +717,9 @@ class BusBatchTest extends TestCase
         $connection = m::spy(PostgresConnection::class);
         $builder = m::spy(Builder::class);
 
-        $connection->shouldReceive('table')->andReturn($builder);
-        $builder->shouldReceive('useWritePdo')->andReturnSelf();
-        $builder->shouldReceive('where')->andReturnSelf();
+        $connection->expects('table')->times(2)->andReturn($builder);
+        $builder->expects('useWritePdo')->andReturnSelf();
+        $builder->expects('where')->andReturnSelf();
 
         $repository = new DatabaseBatchRepository(
             new BatchFactory(m::mock(Factory::class)), $connection, 'job_batches'
@@ -742,7 +742,7 @@ class BusBatchTest extends TestCase
 
         $connection = m::spy(PostgresConnection::class);
 
-        $connection->shouldReceive('table->useWritePdo->where->first')
+        $connection->expects('table->useWritePdo->where->first')
             ->andReturn($m = (object) [
                 'id' => '',
                 'name' => '',
@@ -758,7 +758,7 @@ class BusBatchTest extends TestCase
 
         $batch = (new DatabaseBatchRepository($factory, $connection, 'job_batches'));
 
-        $factory->shouldReceive('make')
+        $factory->expects('make')
             ->withSomeOfArgs($batch, '', '', '', '', '', '', $options);
 
         $batch->find('1');

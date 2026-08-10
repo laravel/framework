@@ -61,7 +61,7 @@ class BroadcasterTest extends TestCase
         $container = new Container;
         Container::setInstance($container);
         $binder = m::mock(BindingRegistrar::class);
-        $binder->shouldReceive('getBindingCallback')->times(2)->with('model')->andReturn(function () {
+        $binder->expects('getBindingCallback')->times(2)->with('model')->andReturn(function () {
             return 'bound';
         });
         $container->instance(BindingRegistrar::class, $binder);
@@ -86,7 +86,7 @@ class BroadcasterTest extends TestCase
         $binder = m::mock(BindingRegistrar::class);
         $callback = RouteBinding::forModel($container, BroadcasterTestEloquentModelStub::class);
 
-        $binder->shouldReceive('getBindingCallback')->times(2)->with('model')->andReturn($callback);
+        $binder->expects('getBindingCallback')->times(2)->with('model')->andReturn($callback);
         $container->instance(BindingRegistrar::class, $binder);
         $callback = function ($user, $model) {
             //
@@ -242,8 +242,8 @@ class BroadcasterTest extends TestCase
 
             ->with('myguard1')
             ->andReturn(null);
-        $request->shouldReceive('user')
-            ->twice()
+        $request->expects('user')
+            ->times(2)
             ->with('myguard2')
             ->andReturn(new DummyUser)
             ->ordered('user');

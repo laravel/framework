@@ -128,7 +128,7 @@ class MailMailerTest extends TestCase
     public function testMailerSendSendsMessageWithProperPlainViewContent(): void
     {
         $view = m::mock(Factory::class);
-        $view->shouldReceive('make')->twice()->andReturn($view);
+        $view->expects('make')->times(2)->andReturn($view);
         $view->expects('render')->andReturn('rendered.view');
         $view->expects('render')->andReturn('rendered.plain');
 
@@ -160,7 +160,7 @@ class MailMailerTest extends TestCase
     public function testMailerSendSendsMessageWithProperPlainViewContentWhenExplicit(): void
     {
         $view = m::mock(Factory::class);
-        $view->shouldReceive('make')->twice()->andReturn($view);
+        $view->expects('make')->times(2)->andReturn($view);
         $view->expects('render')->andReturn('rendered.view');
         $view->expects('render')->andReturn('rendered.plain');
 

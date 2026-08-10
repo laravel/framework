@@ -37,14 +37,14 @@ class SeedCommandTest extends TestCase
         $resolver->expects('setDefaultConnection')->with('sqlite');
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('call');
+        $container->expects('call');
         $container->expects('environment')->andReturn('testing');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
-        $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
-        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+        $container->expects('make')->with('DatabaseSeeder')->andReturn($seeder);
+        $container->expects('make')->with(OutputStyle::class, m::any())->andReturn(
             $outputStyle
         );
-        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+        $container->expects('make')->with(Factory::class, m::any())->andReturn(
             new Factory($outputStyle)
         );
 
@@ -79,14 +79,14 @@ class SeedCommandTest extends TestCase
         $resolver->expects('setDefaultConnection')->with('sqlite');
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('call');
+        $container->expects('call');
         $container->expects('environment')->andReturn('testing');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
-        $container->shouldReceive('make')->with(UserWithoutModelEventsSeeder::class)->andReturn($seeder);
-        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+        $container->expects('make')->with(UserWithoutModelEventsSeeder::class)->andReturn($seeder);
+        $container->expects('make')->with(OutputStyle::class, m::any())->andReturn(
             $outputStyle
         );
-        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+        $container->expects('make')->with(Factory::class, m::any())->andReturn(
             new Factory($outputStyle)
         );
 
@@ -114,12 +114,12 @@ class SeedCommandTest extends TestCase
         $resolver = m::mock(ConnectionResolverInterface::class);
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('call');
+        $container->expects('call');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
-        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+        $container->expects('make')->with(OutputStyle::class, m::any())->andReturn(
             $outputStyle
         );
-        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+        $container->expects('make')->with(Factory::class, m::any())->andReturn(
             new Factory($outputStyle)
         );
 

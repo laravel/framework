@@ -116,7 +116,7 @@ class AuthGuardTest extends TestCase
         $events->expects('dispatch')->with(m::type(Validated::class));
         $user = $this->createStub(Authenticatable::class);
         $guard->getProvider()->expects('retrieveByCredentials')->andReturn($user);
-        $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
+        $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->expects('rehashPasswordIfRequired')->with($user, ['foo']);
         $guard->expects($this->once())->method('login')->with($user);
         $this->assertTrue($guard->attempt(['foo']));
@@ -149,17 +149,17 @@ class AuthGuardTest extends TestCase
             return $callback($timebox->shouldReceive('returnEarly')->getMock());
         });
         $user = m::mock(Authenticatable::class);
-        $events->shouldReceive('dispatch')->times(3)->with(m::type(Attempting::class));
+        $events->expects('dispatch')->times(3)->with(m::type(Attempting::class));
         $events->expects('dispatch')->with(m::type(Login::class));
         $events->expects('dispatch')->with(m::type(Authenticated::class));
-        $events->shouldReceive('dispatch')->twice()->with(m::type(Validated::class));
-        $events->shouldReceive('dispatch')->twice()->with(m::type(Failed::class));
+        $events->expects('dispatch')->times(2)->with(m::type(Validated::class));
+        $events->expects('dispatch')->times(2)->with(m::type(Failed::class));
         $mock->expects($this->once())->method('getName')->willReturn('foo');
         $user->expects('getAuthIdentifier')->andReturn('bar');
         $mock->getSession()->expects('put')->with('foo', 'bar');
         $session->expects('regenerate');
-        $mock->getProvider()->shouldReceive('retrieveByCredentials')->times(3)->with(['foo'])->andReturn($user);
-        $mock->getProvider()->shouldReceive('validateCredentials')->twice()->andReturnTrue();
+        $mock->getProvider()->expects('retrieveByCredentials')->times(3)->with(['foo'])->andReturn($user);
+        $mock->getProvider()->expects('validateCredentials')->times(2)->andReturnTrue();
         $mock->getProvider()->expects('validateCredentials')->andReturnFalse();
         $mock->getProvider()->expects('rehashPasswordIfRequired')->with($user, ['foo']);
 
@@ -199,7 +199,7 @@ class AuthGuardTest extends TestCase
         $events->expects('dispatch')->with(m::type(Validated::class));
         $user = $this->createStub(Authenticatable::class);
         $guard->getProvider()->expects('retrieveByCredentials')->andReturn($user);
-        $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
+        $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->expects('rehashPasswordIfRequired')->with($user, ['foo']);
         $guard->expects($this->once())->method('login')->with($user);
         $this->assertTrue($guard->attempt(['foo']));
@@ -220,7 +220,7 @@ class AuthGuardTest extends TestCase
         $events->expects('dispatch')->with(m::type(Validated::class));
         $user = $this->createStub(Authenticatable::class);
         $guard->getProvider()->expects('retrieveByCredentials')->andReturn($user);
-        $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
+        $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
         $guard->expects($this->once())->method('login')->with($user);
         $this->assertTrue($guard->attempt(['foo']));
@@ -404,12 +404,12 @@ class AuthGuardTest extends TestCase
         $cookies = m::mock(CookieJar::class);
         $mock->setCookieJar($cookies);
         $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getRememberToken')->andReturn(null);
+        $user->expects('getRememberToken')->andReturn(null);
         $mock->expects($this->once())->method('getRecallerName')->willReturn($recallerName = 'bar');
         $mock->expects($this->once())->method('getName')->willReturn('foo');
         $mock->expects($this->once())->method('recaller')->willReturn(null);
 
-        $cookies->shouldReceive('unqueue')->with($recallerName);
+        $cookies->expects('unqueue')->with($recallerName);
 
         $mock->getSession()->expects('remove')->with('foo');
         $mock->setUser($user);
@@ -425,7 +425,7 @@ class AuthGuardTest extends TestCase
         $events = m::mock(Dispatcher::class);
         $mock->setDispatcher($events);
         $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getRememberToken')->andReturn(null);
+        $user->expects('getRememberToken')->andReturn(null);
         $events->expects('dispatch')->with(m::type(Authenticated::class));
         $mock->setUser($user);
         $events->expects('dispatch')->with(m::type(Logout::class));
@@ -438,7 +438,7 @@ class AuthGuardTest extends TestCase
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['clearUserDataFromStorage'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $user = m::mock(Authenticatable::class);
 
-        $user->shouldReceive('getRememberToken')->andReturn(null);
+        $user->expects('getRememberToken')->andReturn(null);
         $user->shouldNotReceive('setRememberToken');
         $provider->shouldNotReceive('updateRememberToken');
 
@@ -474,7 +474,6 @@ class AuthGuardTest extends TestCase
         $cookies = m::mock(CookieJar::class);
         $mock->setCookieJar($cookies);
         $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getRememberToken')->andReturn(null);
         $mock->expects($this->once())->method('getName')->willReturn('foo');
         $mock->expects($this->once())->method('getRecallerName')->willReturn($recallerName = 'bar');
         $mock->expects($this->once())->method('recaller')->willReturn(null);
@@ -494,7 +493,6 @@ class AuthGuardTest extends TestCase
         $events = m::mock(Dispatcher::class);
         $mock->setDispatcher($events);
         $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getRememberToken')->andReturn(null);
         $events->expects('dispatch')->with(m::type(Authenticated::class));
         $mock->setUser($user);
         $events->expects('dispatch')->with(m::type(CurrentDeviceLogout::class));
@@ -513,9 +511,9 @@ class AuthGuardTest extends TestCase
         $guard->getSession()->expects('put')->with($guard->getName(), 'foo');
         $session->expects('regenerate');
         $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getAuthIdentifier')->andReturn('foo');
-        $user->shouldReceive('getAuthPassword')->andReturn('bar');
-        $user->shouldReceive('getRememberToken')->andReturn('recaller');
+        $user->expects('getAuthIdentifier')->times(2)->andReturn('foo');
+        $user->expects('getAuthPassword')->andReturn('bar');
+        $user->expects('getRememberToken')->times(2)->andReturn('recaller');
         $user->shouldReceive('setRememberToken')->never();
         $provider->shouldReceive('updateRememberToken')->never();
         $guard->login($user, true);
@@ -534,9 +532,9 @@ class AuthGuardTest extends TestCase
         $guard->getSession()->expects('put')->with($guard->getName(), 'foo');
         $session->expects('regenerate');
         $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getAuthIdentifier')->andReturn('foo');
-        $user->shouldReceive('getAuthPassword')->andReturn('bar');
-        $user->shouldReceive('getRememberToken')->andReturn('recaller');
+        $user->expects('getAuthIdentifier')->times(2)->andReturn('foo');
+        $user->expects('getAuthPassword')->andReturn('bar');
+        $user->expects('getRememberToken')->times(2)->andReturn('recaller');
         $user->shouldReceive('setRememberToken')->never();
         $provider->shouldReceive('updateRememberToken')->never();
         $guard->login($user, true);
@@ -553,9 +551,9 @@ class AuthGuardTest extends TestCase
         $guard->getSession()->expects('put')->with($guard->getName(), 'foo');
         $session->expects('regenerate');
         $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getAuthIdentifier')->andReturn('foo');
-        $user->shouldReceive('getAuthPassword')->andReturn('foo');
-        $user->shouldReceive('getRememberToken')->andReturn(null);
+        $user->expects('getAuthIdentifier')->times(2)->andReturn('foo');
+        $user->expects('getAuthPassword')->andReturn('foo');
+        $user->expects('getRememberToken')->times(2)->andReturn(null);
         $user->expects('setRememberToken');
         $provider->expects('updateRememberToken');
         $guard->login($user, true);

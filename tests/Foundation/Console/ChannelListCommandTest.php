@@ -43,7 +43,7 @@ class ChannelListCommandTest extends TestCase
         $laravel = new FoundationApplication(__DIR__);
 
         $broadcaster = m::mock(BroadcasterContract::class);
-        $broadcaster->shouldReceive('getChannels')->andReturn(new Collection($channels));
+        $broadcaster->expects('getChannels')->andReturn(new Collection($channels));
 
         $laravel->instance(BroadcasterContract::class, $broadcaster);
 

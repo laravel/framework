@@ -240,7 +240,7 @@ class PruneCommandTest extends TestCase
                 $event->models === [Pruning\Models\PrunableTestModelWithPrunableRecords::class];
         });
         $dispatcher->expects('listen')->with(ModelsPruned::class, m::type(Closure::class));
-        $dispatcher->shouldReceive('dispatch')->twice()->with(m::type(ModelsPruned::class));
+        $dispatcher->expects('dispatch')->times(2)->with(m::type(ModelsPruned::class));
         $dispatcher->expects('dispatch')->withArgs(function ($event) {
             return get_class($event) === ModelPruningFinished::class &&
                 $event->models === [Pruning\Models\PrunableTestModelWithPrunableRecords::class];

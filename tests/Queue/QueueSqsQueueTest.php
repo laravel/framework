@@ -790,10 +790,10 @@ class QueueSqsQueueTest extends TestCase
         $store->expects('put')->with($expectedPath, $largePayload);
 
         $cache = m::mock(CacheFactory::class);
-        $cache->shouldReceive('store')->with('database')->andReturn($store);
+        $cache->expects('store')->with('database')->andReturn($store);
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('cache')->andReturn($cache);
+        $container->expects('make')->with('cache')->andReturn($cache);
 
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
             'enabled' => true,
@@ -840,10 +840,10 @@ class QueueSqsQueueTest extends TestCase
         $store->expects('put')->with($expectedPath, $smallPayload);
 
         $cache = m::mock(CacheFactory::class);
-        $cache->shouldReceive('store')->with('database')->andReturn($store);
+        $cache->expects('store')->with('database')->andReturn($store);
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('cache')->andReturn($cache);
+        $container->expects('make')->with('cache')->andReturn($cache);
 
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
             'enabled' => true,
@@ -1024,7 +1024,7 @@ class QueueSqsQueueTest extends TestCase
 
         $batchSizes = [];
 
-        $this->sqs->shouldReceive('sendMessageBatch')->twice()->with(m::on(function ($args) use (&$batchSizes) {
+        $this->sqs->expects('sendMessageBatch')->times(2)->with(m::on(function ($args) use (&$batchSizes) {
             $batchSizes[] = count($args['Entries']);
 
             return true;
@@ -1049,7 +1049,7 @@ class QueueSqsQueueTest extends TestCase
 
         $batchSizes = [];
 
-        $this->sqs->shouldReceive('sendMessageBatch')->twice()->with(m::on(function ($args) use (&$batchSizes) {
+        $this->sqs->expects('sendMessageBatch')->times(2)->with(m::on(function ($args) use (&$batchSizes) {
             $batchSizes[] = count($args['Entries']);
 
             return true;
@@ -1064,14 +1064,14 @@ class QueueSqsQueueTest extends TestCase
     {
         $events = m::mock(\Illuminate\Contracts\Events\Dispatcher::class);
         $dispatched = [];
-        $events->shouldReceive('dispatch')->andReturnUsing(function ($event) use (&$dispatched) {
+        $events->expects('dispatch')->times(4)->andReturnUsing(function ($event) use (&$dispatched) {
             $dispatched[] = $event;
         });
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('bound')->with('events')->andReturn(true);
-        $container->shouldReceive('bound')->with('db.transactions')->andReturn(false);
-        $container->shouldReceive('offsetGet')->with('events')->andReturn($events);
+        $container->expects('bound')->times(4)->with('events')->andReturn(true);
+        $container->expects('bound')->with('db.transactions')->andReturn(false);
+        $container->expects('offsetGet')->times(4)->with('events')->andReturn($events);
 
         $queue = $this->getMockBuilder(SqsQueue::class)
             ->onlyMethods(['getQueue', 'createPayload'])
@@ -1203,7 +1203,7 @@ class QueueSqsQueueTest extends TestCase
 
         $captured = [];
 
-        $this->sqs->shouldReceive('sendMessageBatch')->twice()->with(m::on(function ($args) use (&$captured) {
+        $this->sqs->expects('sendMessageBatch')->times(2)->with(m::on(function ($args) use (&$captured) {
             $captured[] = $args;
 
             return true;
@@ -1249,9 +1249,9 @@ class QueueSqsQueueTest extends TestCase
         });
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('bound')->with('db.transactions')->andReturn(true);
-        $container->shouldReceive('bound')->with('events')->andReturn(false);
-        $container->shouldReceive('make')->with('db.transactions')->andReturn($transactions);
+        $container->expects('bound')->with('db.transactions')->andReturn(true);
+        $container->expects('bound')->with('events')->andReturn(false);
+        $container->expects('make')->with('db.transactions')->andReturn($transactions);
 
         $queue = $this->getMockBuilder(SqsQueue::class)
             ->onlyMethods(['getQueue', 'createPayload'])
@@ -1293,8 +1293,8 @@ class QueueSqsQueueTest extends TestCase
         $transactions->expects('addCallback');
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('bound')->with('db.transactions')->andReturn(true);
-        $container->shouldReceive('make')->with('db.transactions')->andReturn($transactions);
+        $container->expects('bound')->with('db.transactions')->andReturn(true);
+        $container->expects('make')->times(2)->with('db.transactions')->andReturn($transactions);
 
         $queue = $this->getMockBuilder(SqsQueue::class)
             ->onlyMethods(['getQueue', 'createPayload'])
@@ -1316,11 +1316,11 @@ class QueueSqsQueueTest extends TestCase
         $store->expects('put')->with(m::type('string'), 'original-payload');
 
         $cache = m::mock(CacheFactory::class);
-        $cache->shouldReceive('store')->with('sqs-overflow')->andReturn($store);
+        $cache->expects('store')->with('sqs-overflow')->andReturn($store);
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('bound')->andReturn(false);
-        $container->shouldReceive('make')->with('cache')->andReturn($cache);
+        $container->expects('bound')->times(2)->andReturn(false);
+        $container->expects('make')->with('cache')->andReturn($cache);
 
         $queue = $this->getMockBuilder(SqsQueue::class)
             ->onlyMethods(['getQueue', 'createPayload'])
@@ -1350,14 +1350,14 @@ class QueueSqsQueueTest extends TestCase
     {
         $events = m::mock(\Illuminate\Contracts\Events\Dispatcher::class);
         $dispatched = [];
-        $events->shouldReceive('dispatch')->andReturnUsing(function ($event) use (&$dispatched) {
+        $events->expects('dispatch')->times(25)->andReturnUsing(function ($event) use (&$dispatched) {
             $dispatched[] = $event;
         });
 
         $container = m::mock(Container::class);
-        $container->shouldReceive('bound')->with('events')->andReturn(true);
-        $container->shouldReceive('bound')->with('db.transactions')->andReturn(false);
-        $container->shouldReceive('offsetGet')->with('events')->andReturn($events);
+        $container->expects('bound')->times(25)->with('events')->andReturn(true);
+        $container->expects('bound')->with('db.transactions')->andReturn(false);
+        $container->expects('offsetGet')->times(25)->with('events')->andReturn($events);
 
         $queue = $this->getMockBuilder(SqsQueue::class)
             ->onlyMethods(['getQueue', 'createPayload'])
@@ -1370,7 +1370,7 @@ class QueueSqsQueueTest extends TestCase
 
         $calls = 0;
 
-        $this->sqs->shouldReceive('sendMessageBatch')->twice()->andReturnUsing(function ($args) use (&$calls) {
+        $this->sqs->expects('sendMessageBatch')->times(2)->andReturnUsing(function ($args) use (&$calls) {
             if ($calls++ === 0) {
                 return new Result([
                     'Successful' => array_map(

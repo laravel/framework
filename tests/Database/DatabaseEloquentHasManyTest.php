@@ -298,7 +298,7 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $model = m::mock(Model::class);
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array = []) {
+        $relation->getRelated()->expects('newCollection')->andReturnUsing(function ($array = []) {
             return new Collection($array);
         });
         $model->expects('setRelation')->with('foo', m::type(Collection::class));
@@ -351,7 +351,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $model3 = new EloquentHasManyModelStub;
         $model3->id = 3;
 
-        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) {
+        $relation->getRelated()->expects('newCollection')->times(2)->andReturnUsing(function ($array) {
             return new Collection($array);
         });
         $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2, $result3]), 'foo');
@@ -402,7 +402,7 @@ class DatabaseEloquentHasManyTest extends TestCase
     protected function expectNewModel($relation, $attributes = null)
     {
         $model = $this->getMockBuilder(Model::class)->onlyMethods(['setAttribute', 'save'])->getMock();
-        $relation->getRelated()->shouldReceive('newInstance')->with($attributes)->andReturn($model);
+        $relation->getRelated()->expects('newInstance')->with($attributes)->andReturn($model);
         $model->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
 
         return $model;
@@ -421,7 +421,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $attributes[$relation->getForeignKeyName()] = $relation->getParentKey();
 
         $model = m::mock(Model::class);
-        $model->shouldReceive('getAttribute')->with($relation->getForeignKeyName())->andReturn($relation->getParentKey());
+        $model->expects('getAttribute')->with($relation->getForeignKeyName())->andReturn($relation->getParentKey());
 
         $relation->getRelated()->expects('forceCreate')->with($attributes)->andReturn($model);
 

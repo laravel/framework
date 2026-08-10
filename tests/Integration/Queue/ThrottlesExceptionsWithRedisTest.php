@@ -68,7 +68,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
 
         $job->expects('hasFailed')->andReturn(false);
         $job->expects('release')->with(0);
-        $job->shouldReceive('isReleased')->andReturn(true);
+        $job->expects('isReleased')->times(2)->andReturn(true);
         $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
@@ -91,7 +91,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
             // seconds elapsed since the first exception opened the circuit.
             return $delay >= 590 && $delay <= 610;
         });
-        $job->shouldReceive('isReleased')->andReturn(true);
+        $job->expects('isReleased')->times(2)->andReturn(true);
         $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
@@ -109,7 +109,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $job = m::mock(Job::class);
 
         $job->expects('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
         $job->expects('isDeletedOrReleased')->andReturn(false);
         $job->expects('delete');
 
@@ -123,8 +123,8 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
     public function testReportingExceptions()
     {
         $this->spy(ExceptionHandler::class)
-            ->shouldReceive('report')
-            ->twice()
+            ->expects('report')
+            ->times(2)
             ->with(m::type(RuntimeException::class));
 
         $job = new class

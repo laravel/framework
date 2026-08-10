@@ -72,7 +72,7 @@ class FoundationAuthenticationTest extends TestCase
     public function testAssertAuthenticatedAs()
     {
         $expected = m::mock(Authenticatable::class);
-        $expected->shouldReceive('getAuthIdentifier')
+        $expected->expects('getAuthIdentifier')
             ->andReturn('1');
 
         $this->mockGuard()
@@ -81,7 +81,7 @@ class FoundationAuthenticationTest extends TestCase
             ->andReturn($expected);
 
         $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getAuthIdentifier')
+        $user->expects('getAuthIdentifier')
             ->andReturn('1');
 
         $this->assertAuthenticatedAs($user);
@@ -93,11 +93,11 @@ class FoundationAuthenticationTest extends TestCase
 
         $provider = m::mock(UserProvider::class);
 
-        $provider->shouldReceive('retrieveByCredentials')
+        $provider->expects('retrieveByCredentials')
             ->with($credentials)
             ->andReturn($user);
 
-        $provider->shouldReceive('validateCredentials')
+        $provider->expects('validateCredentials')
             ->with($user, $credentials)
             ->andReturn($this->credentials === $credentials);
 

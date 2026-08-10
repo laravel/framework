@@ -95,7 +95,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     {
         $relation = $this->getRelation();
         $instance = $this->getMockBuilder(Model::class)->onlyMethods(['save', 'newInstance', 'setAttribute'])->getMock();
-        $relation->getRelated()->shouldReceive('newInstance')->with(['name' => 'taylor'])->andReturn($instance);
+        $relation->getRelated()->expects('newInstance')->with(['name' => 'taylor'])->andReturn($instance);
         $instance->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
         $instance->expects($this->never())->method('save');
 
@@ -130,7 +130,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $attributes = ['name' => 'taylor', $relation->getForeignKeyName() => $relation->getParentKey()];
 
         $created = m::mock(Model::class);
-        $created->shouldReceive('getAttribute')->with($relation->getForeignKeyName())->andReturn($relation->getParentKey());
+        $created->expects('getAttribute')->with($relation->getForeignKeyName())->andReturn($relation->getParentKey());
 
         $relation->getRelated()->expects('forceCreate')->with($attributes)->andReturn($created);
 
@@ -209,7 +209,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $builder->expects('getQuery')->andReturn($parentQuery);
 
         $builder->expects('select')->with(m::type(Expression::class))->andReturnSelf();
-        $relation->getParent()->shouldReceive('qualifyColumn')->andReturn('table.id');
+        $relation->getParent()->expects('qualifyColumn')->andReturn('table.id');
         $builder->expects('whereColumn')->with('table.id', '=', 'table.foreign_key')->andReturn($baseQuery);
         $baseQuery->expects('setBindings')->with([], 'select');
 

@@ -16,8 +16,8 @@ class DatabaseSqliteSchemaStateTest extends TestCase
     {
         $config = ['driver' => 'sqlite', 'database' => 'database/database.sqlite', 'prefix' => '', 'foreign_key_constraints' => true, 'name' => 'sqlite'];
         $connection = m::mock(SQLiteConnection::class);
-        $connection->shouldReceive('getConfig')->andReturn($config);
-        $connection->shouldReceive('getDatabaseName')->andReturn($config['database']);
+        $connection->expects('getConfig')->andReturn($config);
+        $connection->expects('getDatabaseName')->andReturn($config['database']);
 
         $process = m::spy(Process::class);
         $command = null;
@@ -42,13 +42,12 @@ class DatabaseSqliteSchemaStateTest extends TestCase
     {
         $config = ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '', 'foreign_key_constraints' => true, 'name' => 'sqlite'];
         $connection = m::mock(SQLiteConnection::class);
-        $connection->shouldReceive('getConfig')->andReturn($config);
-        $connection->shouldReceive('getDatabaseName')->andReturn($config['database']);
+        $connection->expects('getDatabaseName')->andReturn($config['database']);
         $pdo = m::spy(PDO::class);
-        $connection->shouldReceive('getPdo')->andReturn($pdo);
+        $connection->expects('getPdo')->andReturn($pdo);
 
         $files = m::mock(Filesystem::class);
-        $files->shouldReceive('get')->andReturn('CREATE TABLE IF NOT EXISTS "migrations" ("id" integer not null primary key autoincrement, "migration" varchar not null, "batch" integer not null);');
+        $files->expects('get')->andReturn('CREATE TABLE IF NOT EXISTS "migrations" ("id" integer not null primary key autoincrement, "migration" varchar not null, "batch" integer not null);');
 
         $schemaState = new SqliteSchemaState($connection, $files);
         $schemaState->load('database/schema/sqlite-schema.dump');

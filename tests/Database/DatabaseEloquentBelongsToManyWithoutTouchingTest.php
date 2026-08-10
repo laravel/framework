@@ -27,13 +27,13 @@ class DatabaseEloquentBelongsToManyWithoutTouchingTest extends TestCase
             $this->assertTrue($related::isIgnoringTouch());
 
             $builder = m::mock(Builder::class);
-            $builder->shouldReceive('join');
+            $builder->expects('join');
             $parent = m::mock(User::class);
 
-            $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-            $builder->shouldReceive('getModel')->andReturn($related);
-            $builder->shouldReceive('where');
-            $builder->shouldReceive('getQuery')->andReturn(
+            $parent->expects('getAttribute')->with('id')->andReturn(1);
+            $builder->expects('getModel')->andReturn($related);
+            $builder->expects('where');
+            $builder->expects('getQuery')->times(2)->andReturn(
                 m::mock(stdClass::class, ['getGrammar' => m::mock(Grammar::class, ['isExpression' => false])])
             );
             $relation = new BelongsToMany($builder, $parent, 'article_users', 'user_id', 'article_id', 'id', 'id');

@@ -59,11 +59,11 @@ class RateLimitedTest extends TestCase
     public function testRateLimitedJobsAreNotExecutedOnLimitReached2()
     {
         $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->andReturn(0, 1, null);
-        $cache->shouldReceive('add')->andReturn(true, true);
-        $cache->shouldReceive('increment')->andReturn(1);
-        $cache->shouldReceive('has')->andReturn(true);
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache->expects('get')->times(3)->andReturn(0, 1, null);
+        $cache->expects('add')->times(2)->andReturn(true, true);
+        $cache->expects('increment')->andReturn(1);
+        $cache->expects('has')->andReturn(true);
+        $cache->expects('getStore')->times(3)->andReturn(new ArrayStore);
 
         $rateLimiter = new RateLimiter($cache);
         $this->app->instance(RateLimiter::class, $rateLimiter);
@@ -85,7 +85,7 @@ class RateLimitedTest extends TestCase
         $job->expects('release')->withArgs(function ($delay) {
             return $delay >= 0;
         });
-        $job->shouldReceive('isReleased')->andReturn(true);
+        $job->expects('isReleased')->times(2)->andReturn(true);
         $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
@@ -195,7 +195,7 @@ class RateLimitedTest extends TestCase
         $job = m::mock(Job::class);
 
         $job->expects('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
         $job->expects('isDeletedOrReleased')->andReturn(false);
         $job->expects('delete');
 
@@ -215,7 +215,7 @@ class RateLimitedTest extends TestCase
 
         $job->expects('hasFailed')->andReturn(false);
         $job->expects('release');
-        $job->shouldReceive('isReleased')->andReturn(true);
+        $job->expects('isReleased')->times(2)->andReturn(true);
         $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
@@ -234,7 +234,7 @@ class RateLimitedTest extends TestCase
 
         $job->expects('hasFailed')->andReturn(false);
         $job->expects('release')->withArgs([$releaseAfter]);
-        $job->shouldReceive('isReleased')->andReturn(true);
+        $job->expects('isReleased')->times(2)->andReturn(true);
         $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
@@ -252,7 +252,7 @@ class RateLimitedTest extends TestCase
         $job = m::mock(Job::class);
 
         $job->expects('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
         $job->expects('isDeletedOrReleased')->andReturn(false);
         $job->expects('delete');
 

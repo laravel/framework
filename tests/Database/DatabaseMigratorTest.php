@@ -46,7 +46,7 @@ class DatabaseMigratorTest extends TestCase
         $resolver = m::mock(ConnectionResolverInterface::class);
         $connection = m::mock(Connection::class);
 
-        $resolver->shouldReceive('connection')->twice()->with('sqlite')->andReturn($connection);
+        $resolver->expects('connection')->times(2)->with('sqlite')->andReturn($connection);
         $connection->expects('hasDirectConnection')->andReturn(false);
 
         $this->assertSame($connection, $this->migrator($resolver)->resolveConnection('sqlite'));

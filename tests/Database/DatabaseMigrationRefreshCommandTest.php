@@ -37,13 +37,13 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $resetCommand = m::mock(ResetCommand::class);
         $migrateCommand = m::mock(MigrateCommand::class);
 
-        $console->shouldReceive('find')->with('migrate:reset')->andReturn($resetCommand);
-        $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
+        $console->expects('find')->with('migrate:reset')->andReturn($resetCommand);
+        $console->expects('find')->with('migrate')->andReturn($migrateCommand);
         $dispatcher->expects('dispatch')->with(m::type(DatabaseRefreshed::class));
 
         $quote = DIRECTORY_SEPARATOR === '\\' ? '"' : "'";
-        $resetCommand->shouldReceive('run')->with(new InputMatcher("--force=1 {$quote}migrate:reset{$quote}"), m::any());
-        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--force=1 migrate'), m::any());
+        $resetCommand->expects('run')->with(new InputMatcher("--force=1 {$quote}migrate:reset{$quote}"), m::any());
+        $migrateCommand->expects('run')->with(new InputMatcher('--force=1 migrate'), m::any());
 
         $this->runCommand($command);
     }
@@ -63,13 +63,13 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $rollbackCommand = m::mock(RollbackCommand::class);
         $migrateCommand = m::mock(MigrateCommand::class);
 
-        $console->shouldReceive('find')->with('migrate:rollback')->andReturn($rollbackCommand);
-        $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
+        $console->expects('find')->with('migrate:rollback')->andReturn($rollbackCommand);
+        $console->expects('find')->with('migrate')->andReturn($migrateCommand);
         $dispatcher->expects('dispatch')->with(m::type(DatabaseRefreshed::class));
 
         $quote = DIRECTORY_SEPARATOR === '\\' ? '"' : "'";
-        $rollbackCommand->shouldReceive('run')->with(new InputMatcher("--step=2 --force=1 {$quote}migrate:rollback{$quote}"), m::any());
-        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--force=1 migrate'), m::any());
+        $rollbackCommand->expects('run')->with(new InputMatcher("--step=2 --force=1 {$quote}migrate:rollback{$quote}"), m::any());
+        $migrateCommand->expects('run')->with(new InputMatcher('--force=1 migrate'), m::any());
 
         $this->runCommand($command, ['--step' => 2]);
     }

@@ -213,7 +213,7 @@ class CacheEventsTest extends TestCase
     {
         $dispatcher = $this->getDispatcher();
         $store = m::mock(Store::class);
-        $store->shouldReceive('forget')->andReturn(false);
+        $store->expects('forget')->andReturn(false);
         $repository = new Repository($store);
         $repository->setEventDispatcher($dispatcher);
 
@@ -266,7 +266,7 @@ class CacheEventsTest extends TestCase
 
         // Create a store that fails to flush
         $failingStore = m::mock(Store::class);
-        $failingStore->shouldReceive('flush')->andReturn(false);
+        $failingStore->expects('flush')->andReturn(false);
 
         $repository = new Repository($failingStore, ['store' => 'array']);
         $repository->setEventDispatcher($dispatcher);
@@ -291,7 +291,7 @@ class CacheEventsTest extends TestCase
 
         // Create a store that fails to flush locks
         $failingStore = m::mock(ArrayStore::class);
-        $failingStore->shouldReceive('flushLocks')->andReturn(false);
+        $failingStore->expects('flushLocks')->andReturn(false);
 
         $repository = new Repository($failingStore, ['store' => 'array']);
         $repository->setEventDispatcher($dispatcher);

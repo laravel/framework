@@ -67,7 +67,7 @@ class CacheRedisStoreTest extends TestCase
         $redis = $this->getRedis();
         /** @var m\MockInterface $connection */
         $connection = $redis->getRedis();
-        $connection->shouldReceive('connection')->with('default')->andReturn($redis->getRedis());
+        $connection->expects('connection')->with('default')->andReturn($redis->getRedis());
         $connection->expects('multi');
         $redis->getRedis()->expects('setex')->with('prefix:foo', 60, serialize('bar'))->andReturn('OK');
         $redis->getRedis()->expects('setex')->with('prefix:baz', 60, serialize('qux'))->andReturn('OK');
