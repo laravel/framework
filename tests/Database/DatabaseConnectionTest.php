@@ -279,8 +279,8 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->method('getName')->willReturn('name');
         $events = m::mock(Dispatcher::class);
-        $connection->setEventDispatcher($events);
         $events->expects('dispatch')->with(m::type(TransactionBeginning::class));
+        $connection->setEventDispatcher($events);
         $connection->beginTransaction();
     }
 
@@ -290,8 +290,8 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->method('getName')->willReturn('name');
         $events = m::mock(Dispatcher::class);
-        $connection->setEventDispatcher($events);
         $events->expects('dispatch')->with(m::type(TransactionCommitted::class));
+        $connection->setEventDispatcher($events);
         $connection->commit();
     }
 
@@ -302,9 +302,9 @@ class DatabaseConnectionTest extends TestCase
         $connection->method('getName')->willReturn('name');
         $connection->method('transactionLevel')->willReturn(1);
         $events = m::mock(Dispatcher::class);
-        $connection->setEventDispatcher($events);
         $events->expects('dispatch')->with(m::type(TransactionCommitting::class));
         $events->expects('dispatch')->with(m::type(TransactionCommitted::class));
+        $connection->setEventDispatcher($events);
         $connection->commit();
     }
 
@@ -315,8 +315,8 @@ class DatabaseConnectionTest extends TestCase
         $connection->method('getName')->willReturn('name');
         $connection->beginTransaction();
         $events = m::mock(Dispatcher::class);
-        $connection->setEventDispatcher($events);
         $events->expects('dispatch')->with(m::type(TransactionRolledBack::class));
+        $connection->setEventDispatcher($events);
         $connection->rollBack();
     }
 
@@ -510,8 +510,8 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection();
         $connection->logQuery('foo', [], time());
         $events = m::mock(Dispatcher::class);
-        $connection->setEventDispatcher($events);
         $events->expects('dispatch')->with(m::type(QueryExecuted::class));
+        $connection->setEventDispatcher($events);
         $connection->logQuery('foo', [], null);
     }
 

@@ -175,8 +175,8 @@ class TranslationTranslatorTest extends TestCase
         $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
         $t->expects($this->once())->method('localeForChoice')->with('foo', null)->willReturn('en');
         $selector = m::mock(MessageSelector::class);
-        $t->setSelector($selector);
         $selector->expects('choose')->with('line', 10, 'en')->andReturn('choiced');
+        $t->setSelector($selector);
 
         $t->choice('foo', 10, ['replace']);
     }
@@ -187,8 +187,8 @@ class TranslationTranslatorTest extends TestCase
         $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
         $t->expects($this->once())->method('localeForChoice')->with('foo', null)->willReturn('en');
         $selector = m::mock(MessageSelector::class);
-        $t->setSelector($selector);
         $selector->expects('choose')->with('line', 1.2, 'en')->andReturn('choiced');
+        $t->setSelector($selector);
 
         $t->choice('foo', 1.2, ['replace']);
     }
@@ -216,8 +216,8 @@ class TranslationTranslatorTest extends TestCase
         $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
         $t->expects($this->once())->method('hasForLocale')->with('foo', 'cs')->willReturn(false);
         $selector = m::mock(MessageSelector::class);
-        $t->setSelector($selector);
         $selector->expects('choose')->with('line', 10, 'en')->andReturn('choiced');
+        $t->setSelector($selector);
 
         $t->choice('foo', 10, ['replace']);
     }
@@ -228,8 +228,8 @@ class TranslationTranslatorTest extends TestCase
         $t->expects($this->once())->method('get')->with(':count foos', [], 'en')->willReturn('{1} :count foos|[2,*] :count foos');
         $t->expects($this->once())->method('localeForChoice')->with(':count foos', null)->willReturn('en');
         $selector = m::mock(MessageSelector::class);
-        $t->setSelector($selector);
         $selector->expects('choose')->with('{1} :count foos|[2,*] :count foos', 1234, 'en')->andReturn(':count foos');
+        $t->setSelector($selector);
 
         $this->assertSame('1,234 foos', $t->choice(':count foos', 1234, ['count' => '1,234']));
     }

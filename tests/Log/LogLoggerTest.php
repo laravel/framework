@@ -19,9 +19,9 @@ class LogLoggerTest extends TestCase
     public function testMethodsPassErrorAdditionsToMonolog()
     {
         $monolog = m::mock(Monolog::class);
-        $writer = new Logger($monolog);
         $monolog->expects('isHandling')->with('error')->andReturn(true);
         $monolog->expects('error')->with('foo', []);
+        $writer = new Logger($monolog);
 
         $writer->error('foo');
     }
@@ -67,9 +67,9 @@ class LogLoggerTest extends TestCase
     public function testLoggerFiresEventsDispatcher()
     {
         $monolog = m::mock(Monolog::class);
-        $writer = new Logger($monolog, $events = new Dispatcher);
         $monolog->expects('isHandling')->with('error')->andReturn(true);
         $monolog->expects('error')->with('foo', []);
+        $writer = new Logger($monolog, $events = new Dispatcher);
 
         $events->listen(MessageLogged::class, function ($event) {
             $_SERVER['__log.level'] = $event->level;

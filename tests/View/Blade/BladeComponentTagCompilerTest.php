@@ -406,8 +406,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
         $app = m::mock(Application::class);
-        $container->instance(Application::class, $app);
         $app->expects('getNamespace')->andReturn('App\\');
+        $container->instance(Application::class, $app);
         Container::setInstance($container);
 
         $result = $this->compiler()->guessClassName('alert');

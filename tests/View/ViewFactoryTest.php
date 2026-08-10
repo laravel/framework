@@ -700,8 +700,8 @@ class ViewFactoryTest extends TestCase
     {
         $container = new Container;
         $translator = m::mock(stdClass::class);
-        $container->instance('translator', $translator);
         $translator->expects('get')->with('Foo', ['name' => 'taylor'])->andReturn('Bar');
+        $container->instance('translator', $translator);
         $factory = $this->getFactory();
         $factory->setContainer($container);
         $factory->startTranslation(['name' => 'taylor']);

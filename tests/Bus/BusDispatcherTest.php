@@ -19,9 +19,9 @@ class BusDispatcherTest extends TestCase
     {
         $container = new Container;
         $queueRoutes = m::mock();
-        $container->instance('queue.routes', $queueRoutes);
         $queueRoutes->expects('getQueue')->andReturn(null);
         $queueRoutes->expects('getConnection')->andReturn(null);
+        $container->instance('queue.routes', $queueRoutes);
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
@@ -39,8 +39,8 @@ class BusDispatcherTest extends TestCase
     {
         $container = new Container;
         $queueRoutes = m::mock();
-        $container->instance('queue.routes', $queueRoutes);
         $queueRoutes->expects('getConnection')->andReturn(null);
+        $container->instance('queue.routes', $queueRoutes);
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
@@ -58,8 +58,8 @@ class BusDispatcherTest extends TestCase
     {
         $container = new Container;
         $queueRoutes = m::mock();
-        $container->instance('queue.routes', $queueRoutes);
         $queueRoutes->expects('getConnection')->andReturn(null);
+        $container->instance('queue.routes', $queueRoutes);
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
@@ -77,9 +77,9 @@ class BusDispatcherTest extends TestCase
     {
         Container::setInstance($container = new Container);
         $queueRoutes = m::mock();
-        $container->instance('queue.routes', $queueRoutes);
         $queueRoutes->expects('getQueue')->andReturn('high-priority');
         $queueRoutes->expects('getConnection')->andReturn(null);
+        $container->instance('queue.routes', $queueRoutes);
 
         $mock = m::mock(Queue::class);
         $mock->expects('push')->with(BusDispatcherQueueable::class, '', 'high-priority');
@@ -134,8 +134,8 @@ class BusDispatcherTest extends TestCase
             ]);
         });
         $queueRoutes = m::mock();
-        $container->instance('queue.routes', $queueRoutes);
         $queueRoutes->expects('getQueue')->andReturn(null);
+        $container->instance('queue.routes', $queueRoutes);
         Container::setInstance($container);
 
         $dispatcher = new Dispatcher($container, function () {
@@ -156,9 +156,9 @@ class BusDispatcherTest extends TestCase
     {
         $container = new Container;
         $queueRoutes = m::mock();
-        $container->instance('queue.routes', $queueRoutes);
         $queueRoutes->expects('getQueue')->times(2)->andReturn(null);
         $queueRoutes->expects('getConnection')->times(3)->andReturn(null);
+        $container->instance('queue.routes', $queueRoutes);
         Container::setInstance($container);
 
         $mock = m::mock(Queue::class);

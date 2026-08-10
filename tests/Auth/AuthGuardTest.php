@@ -298,8 +298,8 @@ class AuthGuardTest extends TestCase
         $user = m::mock(Authenticatable::class);
         $guard = $this->getGuard();
         $events = m::mock(Dispatcher::class);
-        $guard->setDispatcher($events);
         $events->expects('dispatch')->with(m::type(Authenticated::class));
+        $guard->setDispatcher($events);
         $guard->setUser($user);
     }
 

@@ -185,7 +185,6 @@ class QueueRedisQueueTest extends TestCase
     public function testBulkRespectsDelayAttributeWhenPushingOntoRedis()
     {
         $redis = m::mock(Factory::class);
-        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['later', 'push'])->setConstructorArgs([$redis, 'default'])->getMock();
         $redis->expects('connection')->andReturn($redis);
         $redis->expects('pipeline')->andReturnUsing(function ($callback) {
             $callback();
@@ -193,6 +192,7 @@ class QueueRedisQueueTest extends TestCase
         $redis->expects('transaction')->andReturnUsing(function ($callback) {
             $callback();
         });
+        $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['later', 'push'])->setConstructorArgs([$redis, 'default'])->getMock();
         $queue->expects($this->once())->method('later')->with(15, $this->isInstanceOf(RedisJobWithDelayAttribute::class), ['data'], null);
 
         $queue->bulk([new RedisJobWithDelayAttribute], ['data']);
@@ -452,8 +452,8 @@ class QueueRedisQueueTest extends TestCase
     public function testAllQueueNamesStripsClusterBraces()
     {
         $redis = m::mock(Factory::class);
-        $queue = new TestableRedisQueue($redis, 'default');
         $redis->expects('connection->keys')->andReturn(['queues:{default}', 'queues:{default}:delayed', 'queues:{emails}']);
+        $queue = new TestableRedisQueue($redis, 'default');
 
         $this->assertSame(['default', 'emails'], $queue->testAllQueueNames()->all());
     }

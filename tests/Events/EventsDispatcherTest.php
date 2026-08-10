@@ -250,8 +250,8 @@ class EventsDispatcherTest extends TestCase
     public function testContainerResolutionOfEventHandlers()
     {
         $container = m::mock(Container::class);
-        $d = new Dispatcher($container);
         $container->expects('make')->with(TestEventListener::class)->andReturn(new TestEventListener);
+        $d = new Dispatcher($container);
         $d->listen('foo', TestEventListener::class.'@onFooEvent');
         $response = $d->dispatch('foo', ['foo', 'bar']);
 

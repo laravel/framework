@@ -69,9 +69,9 @@ class FoundationProviderRepositoryTest extends TestCase
     public function testLoadManifestReturnsParsedJSON()
     {
         $files = m::mock(Filesystem::class);
-        $repo = new ProviderRepository(m::mock(ApplicationContract::class), $files, __DIR__.'/services.php');
         $files->expects('exists')->with(__DIR__.'/services.php')->andReturn(true);
         $files->expects('getRequire')->with(__DIR__.'/services.php')->andReturn($array = ['users' => ['dayle' => true], 'when' => []]);
+        $repo = new ProviderRepository(m::mock(ApplicationContract::class), $files, __DIR__.'/services.php');
 
         $this->assertEquals($array, $repo->loadManifest());
     }
@@ -79,8 +79,8 @@ class FoundationProviderRepositoryTest extends TestCase
     public function testWriteManifestStoresToProperLocation()
     {
         $files = m::mock(Filesystem::class);
-        $repo = new ProviderRepository(m::mock(ApplicationContract::class), $files, __DIR__.'/services.php');
         $files->expects('replace')->with(__DIR__.'/services.php', '<?php return '.var_export(['foo'], true).';');
+        $repo = new ProviderRepository(m::mock(ApplicationContract::class), $files, __DIR__.'/services.php');
 
         $result = $repo->writeManifest(['foo']);
 
@@ -93,8 +93,8 @@ class FoundationProviderRepositoryTest extends TestCase
         $this->expectExceptionMessageMatches('/^The (.*) directory must be present and writable.$/');
 
         $files = m::mock(Filesystem::class);
-        $repo = new ProviderRepository(m::mock(ApplicationContract::class), $files, __DIR__.'/cache/services.php');
         $files->shouldReceive('replace')->never();
+        $repo = new ProviderRepository(m::mock(ApplicationContract::class), $files, __DIR__.'/cache/services.php');
 
         $repo->writeManifest(['foo']);
     }
