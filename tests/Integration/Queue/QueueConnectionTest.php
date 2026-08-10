@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Bus;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Throwable;
@@ -28,7 +28,7 @@ class QueueConnectionTest extends TestCase
     public function testJobWontGetDispatchedInsideATransaction()
     {
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = m::mock(DatabaseTransactionsManager::class);
+            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
             $transactionManager->expects('addCallback')->andReturn(null);
             $transactionManager->shouldNotReceive('addCallbackForRollback');
 
@@ -41,7 +41,7 @@ class QueueConnectionTest extends TestCase
     public function testJobWillGetDispatchedInsideATransactionWhenExplicitlyIndicated()
     {
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = m::mock(DatabaseTransactionsManager::class);
+            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
             $transactionManager->shouldNotReceive('addCallback')->andReturn(null);
             $transactionManager->shouldNotReceive('addCallbackForRollback');
 
@@ -60,7 +60,7 @@ class QueueConnectionTest extends TestCase
         $this->app['config']->set('queue.connections.sqs.after_commit', false);
 
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = m::mock(DatabaseTransactionsManager::class);
+            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
             $transactionManager->expects('addCallback')->andReturn(null);
             $transactionManager->shouldNotReceive('addCallbackForRollback');
 
@@ -77,7 +77,7 @@ class QueueConnectionTest extends TestCase
     public function testUniqueJobWontGetDispatchedInsideATransaction()
     {
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = m::mock(DatabaseTransactionsManager::class);
+            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
             $transactionManager->expects('addCallback')->andReturn(null);
             $transactionManager->expects('addCallbackForRollback')->andReturn(null);
 
@@ -90,7 +90,7 @@ class QueueConnectionTest extends TestCase
     public function testUniqueJobWillGetDispatchedInsideATransactionWhenExplicitlyIndicated()
     {
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = m::mock(DatabaseTransactionsManager::class);
+            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
             $transactionManager->shouldNotReceive('addCallback')->andReturn(null);
             $transactionManager->shouldNotReceive('addCallbackForRollback')->andReturn(null);
 
@@ -109,7 +109,7 @@ class QueueConnectionTest extends TestCase
         $this->app['config']->set('queue.connections.sqs.after_commit', false);
 
         $this->app->singleton('db.transactions', function () {
-            $transactionManager = m::mock(DatabaseTransactionsManager::class);
+            $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
             $transactionManager->expects('addCallback')->andReturn(null);
             $transactionManager->expects('addCallbackForRollback')->andReturn(null);
 

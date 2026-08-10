@@ -6,15 +6,15 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\PostgresBuilder;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresSchemaBuilderTest extends TestCase
 {
     public function testHasTable()
     {
-        $connection = m::mock(Connection::class);
-        $grammar = m::mock(PostgresGrammar::class);
+        $connection = Mockery::mock(Connection::class);
+        $grammar = Mockery::mock(PostgresGrammar::class);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $builder = new PostgresBuilder($connection);
         $grammar->expects('compileTableExists')->times(2)->andReturn('sql');
@@ -27,9 +27,9 @@ class DatabasePostgresSchemaBuilderTest extends TestCase
 
     public function testGetColumnListing()
     {
-        $connection = m::mock(Connection::class);
-        $grammar = m::mock(PostgresGrammar::class);
-        $processor = m::mock(PostgresProcessor::class);
+        $connection = Mockery::mock(Connection::class);
+        $grammar = Mockery::mock(PostgresGrammar::class);
+        $processor = Mockery::mock(PostgresProcessor::class);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('getPostProcessor')->andReturn($processor);
         $grammar->expects('compileColumns')->with(null, 'prefix_table')->andReturn('sql');

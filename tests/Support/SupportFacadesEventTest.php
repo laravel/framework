@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SupportFacadesEventTest extends TestCase
@@ -27,7 +27,7 @@ class SupportFacadesEventTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->events = m::mock(Dispatcher::class);
+        $this->events = Mockery::mock(Dispatcher::class);
 
         $container = new Container;
         $container->instance('events', $this->events);

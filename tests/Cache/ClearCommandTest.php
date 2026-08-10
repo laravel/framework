@@ -9,7 +9,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -41,9 +41,9 @@ class ClearCommandTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->cacheManager = m::mock(CacheManager::class);
-        $this->files = m::mock(Filesystem::class);
-        $this->cacheRepository = m::mock(Repository::class);
+        $this->cacheManager = Mockery::mock(CacheManager::class);
+        $this->files = Mockery::mock(Filesystem::class);
+        $this->cacheRepository = Mockery::mock(Repository::class);
         $this->command = new ClearCommandTestStub($this->cacheManager, $this->files);
 
         $app = new Application;

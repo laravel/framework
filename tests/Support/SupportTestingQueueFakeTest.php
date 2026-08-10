@@ -11,7 +11,7 @@ use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -65,7 +65,7 @@ class SupportTestingQueueFakeTest extends TestCase
     {
         $job = new JobStub;
 
-        $manager = m::mock(QueueManager::class);
+        $manager = Mockery::mock(QueueManager::class);
         $manager->expects('push')->withArgs(function ($passedJob) use ($job) {
             return $passedJob === $job;
         });
@@ -421,7 +421,7 @@ class SupportTestingQueueFakeTest extends TestCase
     {
         $job = new JobStub;
 
-        $manager = m::mock(QueueManager::class);
+        $manager = Mockery::mock(QueueManager::class);
         $manager->expects('push')->withArgs(function ($passedJob) use ($job) {
             return $passedJob === $job;
         });
@@ -488,7 +488,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $job = new JobStub;
         $steps = [];
 
-        $manager = m::mock(QueueManager::class);
+        $manager = Mockery::mock(QueueManager::class);
         $manager->expects('push')->withArgs(function ($passedJob, $passedData, $passedQueue) use ($job) {
             return $passedJob === $job && $passedData === ['foo' => 'bar'] && $passedQueue === 'redis';
         });

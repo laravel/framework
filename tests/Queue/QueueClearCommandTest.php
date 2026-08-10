@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\ClearCommand;
 use Illuminate\Queue\QueueManager;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -16,7 +16,7 @@ class QueueClearCommandTest extends TestCase
 {
     public function testClearingDefaultQueue()
     {
-        $queue = m::mock(ClearableQueue::class);
+        $queue = Mockery::mock(ClearableQueue::class);
         $queue->expects('clear')->with('default')->andReturn(2);
 
         $output = $this->runClearCommand($queue);
@@ -26,7 +26,7 @@ class QueueClearCommandTest extends TestCase
 
     public function testClearingMultipleQueues()
     {
-        $queue = m::mock(ClearableQueue::class);
+        $queue = Mockery::mock(ClearableQueue::class);
         $queue->expects('clear')->with('high')->andReturn(3);
         $queue->expects('clear')->with('low')->andReturn(0);
         $queue->expects('clear')->with('emails')->andReturn(1);
@@ -38,7 +38,7 @@ class QueueClearCommandTest extends TestCase
 
     public function testClearingMultipleQueuesWithWhitespace()
     {
-        $queue = m::mock(ClearableQueue::class);
+        $queue = Mockery::mock(ClearableQueue::class);
         $queue->expects('clear')->with('high')->andReturn(3);
         $queue->expects('clear')->with('low')->andReturn(0);
 
@@ -49,7 +49,7 @@ class QueueClearCommandTest extends TestCase
 
     public function testClearingMultipleQueuesWithEmptyValues()
     {
-        $queue = m::mock(ClearableQueue::class);
+        $queue = Mockery::mock(ClearableQueue::class);
         $queue->expects('clear')->with('high')->andReturn(3);
         $queue->expects('clear')->with('low')->andReturn(0);
 
@@ -60,7 +60,7 @@ class QueueClearCommandTest extends TestCase
 
     public function testClearingMultipleQueuesWithDuplicates()
     {
-        $queue = m::mock(ClearableQueue::class);
+        $queue = Mockery::mock(ClearableQueue::class);
         $queue->expects('clear')->with('high')->andReturn(3);
         $queue->expects('clear')->with('low')->andReturn(0);
 
@@ -74,13 +74,13 @@ class QueueClearCommandTest extends TestCase
         $container = new Application;
         $container['env'] = 'testing';
 
-        $config = m::mock(Repository::class, \ArrayAccess::class);
+        $config = Mockery::mock(Repository::class, \ArrayAccess::class);
         $config->expects('offsetGet')->with('queue.default')->andReturn('redis');
         $config->shouldReceive('get')->with('queue.connections.redis.queue', 'default')->andReturn('default');
 
         $container['config'] = $config;
 
-        $queueManager = m::mock(QueueManager::class);
+        $queueManager = Mockery::mock(QueueManager::class);
         $queueManager->expects('connection')->with('redis')->andReturn($queue);
 
         $container['queue'] = $queueManager;

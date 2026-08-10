@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class CacheRedisStoreTest extends TestCase
@@ -65,7 +65,7 @@ class CacheRedisStoreTest extends TestCase
     public function testSetMultipleMethodProperlyCallsRedis()
     {
         $redis = $this->getRedis();
-        /** @var m\MockInterface $connection */
+        /** @var Mockery\MockInterface $connection */
         $connection = $redis->getRedis();
         $connection->expects('connection')->with('default')->andReturn($redis->getRedis());
         $connection->expects('multi');
@@ -168,6 +168,6 @@ class CacheRedisStoreTest extends TestCase
 
     protected function getRedis()
     {
-        return new RedisStore(m::mock(Factory::class), 'prefix:');
+        return new RedisStore(Mockery::mock(Factory::class), 'prefix:');
     }
 }

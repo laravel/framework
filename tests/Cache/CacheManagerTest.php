@@ -12,7 +12,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Events\Dispatcher as Event;
 use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -109,7 +109,7 @@ class CacheManagerTest extends TestCase
     {
         $disk = new ArrayFilesystem;
 
-        $filesystem = m::mock();
+        $filesystem = Mockery::mock();
         $filesystem->expects('disk')->with('s3')->andReturn($disk);
 
         $app = $this->getApp([
@@ -268,7 +268,7 @@ class CacheManagerTest extends TestCase
 
     public function testForgetDriver()
     {
-        $cacheManager = m::mock(CacheManager::class)
+        $cacheManager = Mockery::mock(CacheManager::class)
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
 

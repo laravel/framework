@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Session;
 
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Session\CacheBasedSessionHandler;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class CacheBasedSessionHandlerTest extends TestCase
@@ -15,7 +15,7 @@ class CacheBasedSessionHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->cacheMock = m::mock(CacheContract::class);
+        $this->cacheMock = Mockery::mock(CacheContract::class);
         $this->sessionHandler = new CacheBasedSessionHandler(cache: $this->cacheMock, minutes: 10);
     }
 

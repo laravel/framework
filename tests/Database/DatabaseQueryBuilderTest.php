@@ -32,7 +32,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -3975,7 +3975,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testFindOrReturnsFirstResultByID()
     {
         $builder = $this->getMockQueryBuilder();
-        $data = m::mock(stdClass::class);
+        $data = Mockery::mock(stdClass::class);
         $builder->expects('first')->andReturn($data);
         $builder->expects('first')->with(['column'])->andReturn($data);
         $builder->expects('first')->andReturn(null);
@@ -4970,27 +4970,27 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testUpdateOrInsertMethod()
     {
-        $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[where,exists,insert]', [
+        $connection = Mockery::mock(Connection::class);
+        $builder = Mockery::mock(Builder::class.'[where,exists,insert]', [
             $connection,
             new Grammar($connection),
-            m::mock(Processor::class),
+            Mockery::mock(Processor::class),
         ]);
 
-        $builder->expects('where')->with(['email' => 'foo'])->andReturn(m::self());
+        $builder->expects('where')->with(['email' => 'foo'])->andReturn(Mockery::self());
         $builder->expects('exists')->andReturn(false);
         $builder->expects('insert')->with(['email' => 'foo', 'name' => 'bar'])->andReturn(true);
 
         $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
 
-        $connection = m::mock(Connection::class);
-        $builder = m::mock(Builder::class.'[where,exists,update]', [
+        $connection = Mockery::mock(Connection::class);
+        $builder = Mockery::mock(Builder::class.'[where,exists,update]', [
             $connection,
             new Grammar($connection),
-            m::mock(Processor::class),
+            Mockery::mock(Processor::class),
         ]);
 
-        $builder->expects('where')->with(['email' => 'foo'])->andReturn(m::self());
+        $builder->expects('where')->with(['email' => 'foo'])->andReturn(Mockery::self());
         $builder->expects('exists')->andReturn(true);
         $builder->expects('update')->with(['name' => 'bar'])->andReturn(1);
 
@@ -4999,14 +4999,14 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testUpdateOrInsertMethodWorksWithEmptyUpdateValues()
     {
-        $connection = m::mock(Connection::class);
-        $builder = m::spy(Builder::class.'[where,exists,update]', [
+        $connection = Mockery::mock(Connection::class);
+        $builder = Mockery::spy(Builder::class.'[where,exists,update]', [
             $connection,
             new Grammar($connection),
-            m::mock(Processor::class),
+            Mockery::mock(Processor::class),
         ]);
 
-        $builder->expects('where')->with(['email' => 'foo'])->andReturn(m::self());
+        $builder->expects('where')->with(['email' => 'foo'])->andReturn(Mockery::self());
         $builder->expects('exists')->andReturn(true);
 
         $this->assertTrue($builder->updateOrInsert(['email' => 'foo']));
@@ -5312,7 +5312,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $grammar = new MySqlGrammar($connection);
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
 
         $connection->expects($this->once())
             ->method('update')
@@ -5330,7 +5330,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $grammar = new MySqlGrammar($connection);
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
 
         $connection->expects($this->once())
             ->method('update')
@@ -5348,7 +5348,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $grammar = new MySqlGrammar($connection);
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
 
         $connection->expects($this->once())
             ->method('update')
@@ -5375,7 +5375,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $grammar = new MySqlGrammar($connection);
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
 
         $connection->expects($this->once())
             ->method('update')
@@ -5398,7 +5398,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $connection = $this->getConnection();
         $grammar = new MySqlGrammar($connection);
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
 
         $connection->expects('update')
 
@@ -5843,7 +5843,7 @@ SQL;
     {
         $method = 'whereFooBarAndBazOrQux';
         $parameters = ['corge', 'waldo', 'fred'];
-        $builder = m::mock(Builder::class)->makePartial();
+        $builder = Mockery::mock(Builder::class)->makePartial();
 
         $builder->expects('where')->with('foo_bar', '=', $parameters[0], 'and')->andReturnSelf();
         $builder->expects('where')->with('baz', '=', $parameters[1], 'and')->andReturnSelf();
@@ -5856,7 +5856,7 @@ SQL;
     {
         $method = 'whereIosVersionAndAndroidVersionOrOrientation';
         $parameters = ['6.1', '4.2', 'Vertical'];
-        $builder = m::mock(Builder::class)->makePartial();
+        $builder = Mockery::mock(Builder::class)->makePartial();
 
         $builder->expects('where')->with('ios_version', '=', '6.1', 'and')->andReturnSelf();
         $builder->expects('where')->with('android_version', '=', '4.2', 'and')->andReturnSelf();
@@ -5940,12 +5940,12 @@ SQL;
     {
         $builder = $this->getMySqlBuilderWithProcessor();
         $builder->getConnection()->expects('select')
-            ->with(m::any(), m::any(), false, []);
+            ->with(Mockery::any(), Mockery::any(), false, []);
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock()->get();
 
         $builder = $this->getMySqlBuilderWithProcessor();
         $builder->getConnection()->expects('select')
-            ->with(m::any(), m::any(), false, []);
+            ->with(Mockery::any(), Mockery::any(), false, []);
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false)->get();
     }
 
@@ -6137,7 +6137,7 @@ SQL;
         $builder->expects('limit')->times(3)->with(2)->andReturnSelf();
         $builder->expects('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor = Mockery::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
         $callbackAssertor->expects('doSomething')->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
@@ -6162,7 +6162,7 @@ SQL;
         $builder->expects('limit')->times(2)->with(2)->andReturnSelf();
         $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor = Mockery::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
         $callbackAssertor->expects('doSomething')->with($chunk2);
 
@@ -6184,7 +6184,7 @@ SQL;
         $builder->expects('limit')->with(2)->andReturnSelf();
         $builder->expects('get')->times(1)->andReturn($chunk1);
 
-        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor = Mockery::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 
@@ -6224,7 +6224,7 @@ SQL;
         $builder->expects('forPageAfterId')->with(2, 11, 'someIdField')->andReturnSelf();
         $builder->expects('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor = Mockery::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
         $callbackAssertor->expects('doSomething')->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
@@ -6247,7 +6247,7 @@ SQL;
         $builder->expects('forPageAfterId')->with(2, 11, 'someIdField')->andReturnSelf();
         $builder->expects('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor = Mockery::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
         $callbackAssertor->expects('doSomething')->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
@@ -6268,7 +6268,7 @@ SQL;
         $builder->expects('forPageAfterId')->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor = Mockery::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
         $callbackAssertor->expects('doSomething')->with($chunk2);
 
@@ -6301,7 +6301,7 @@ SQL;
         $builder->expects('forPageAfterId')->with(2, 10, 'table.id')->andReturnSelf();
         $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor = Mockery::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 
@@ -6321,7 +6321,7 @@ SQL;
         $builder->expects('forPageBeforeId')->with(2, 1, 'someIdField')->andReturnSelf();
         $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor = Mockery::mock(stdClass::class);
         $callbackAssertor->expects('doSomething')->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 
@@ -7787,11 +7787,11 @@ SQL;
         $connection->expects('prepareBindings')
             ->with(['foo'])
             ->andReturn(['foo']);
-        $grammar = m::mock(Grammar::class, [$connection])->makePartial();
+        $grammar = Mockery::mock(Grammar::class, [$connection])->makePartial();
         $grammar->expects('substituteBindingsIntoRawSql')
             ->with('select * from "users" where "email" = ?', ['foo'])
             ->andReturn('select * from "users" where "email" = \'foo\'');
-        $builder = new Builder($connection, $grammar, m::mock(Processor::class));
+        $builder = new Builder($connection, $grammar, Mockery::mock(Processor::class));
         $builder->select('*')->from('users')->where('email', 'foo');
 
         $this->assertSame('select * from "users" where "email" = \'foo\'', $builder->toRawSql());
@@ -7799,7 +7799,7 @@ SQL;
 
     protected function getConnection(string $prefix = '')
     {
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
 
@@ -7810,7 +7810,7 @@ SQL;
     {
         $connection = $this->getConnection(prefix: $prefix);
         $grammar = new Grammar($connection);
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
 
         return new Builder($connection, $grammar, $processor);
     }
@@ -7819,7 +7819,7 @@ SQL;
     {
         $connection = $this->getConnection(prefix: $prefix);
         $grammar = new PostgresGrammar($connection);
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
 
         return new Builder($connection, $grammar, $processor);
     }
@@ -7828,7 +7828,7 @@ SQL;
     {
         $connection = $this->getConnection(prefix: $prefix);
         $grammar = new MySqlGrammar($connection);
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
 
         return new Builder($connection, $grammar, $processor);
     }
@@ -7837,7 +7837,7 @@ SQL;
     {
         $connection = $this->getConnection(prefix: $prefix);
         $grammar = new MariaDbGrammar($connection);
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
 
         return new Builder($connection, $grammar, $processor);
     }
@@ -7846,7 +7846,7 @@ SQL;
     {
         $connection = $this->getConnection(prefix: $prefix);
         $grammar = new SQLiteGrammar($connection);
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
 
         return new Builder($connection, $grammar, $processor);
     }
@@ -7855,7 +7855,7 @@ SQL;
     {
         $connection = $this->getConnection(prefix: $prefix);
         $grammar = new SqlServerGrammar($connection);
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
 
         return new Builder($connection, $grammar, $processor);
     }
@@ -7883,10 +7883,10 @@ SQL;
      */
     protected function getMockQueryBuilder()
     {
-        return m::mock(Builder::class, [
+        return Mockery::mock(Builder::class, [
             $connection = $this->getConnection(),
             new Grammar($connection),
-            m::mock(Processor::class),
+            Mockery::mock(Processor::class),
         ])->makePartial();
     }
 }

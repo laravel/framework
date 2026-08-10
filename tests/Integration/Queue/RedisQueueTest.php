@@ -13,7 +13,7 @@ use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -56,7 +56,7 @@ class RedisQueueTest extends TestCase
     private function setQueue($driver, $default = 'default', $connection = null, $retryAfter = 60, $blockFor = null)
     {
         $this->queue = new RedisQueue($this->redis[$driver], $default, $connection, $retryAfter, $blockFor);
-        $this->container = m::spy(Container::class);
+        $this->container = Mockery::spy(Container::class);
         $this->queue->setContainer($this->container);
     }
 
@@ -501,7 +501,7 @@ class RedisQueueTest extends TestCase
     #[DataProvider('redisDriverProvider')]
     public function testPushJobQueueingAndJobQueuedEvents($driver)
     {
-        $events = m::mock(Dispatcher::class);
+        $events = Mockery::mock(Dispatcher::class);
         $events->expects('dispatch')->withArgs(function (JobQueueing $jobQueuing) {
             $this->assertInstanceOf(RedisQueueIntegrationTestJob::class, $jobQueuing->job);
 
@@ -514,7 +514,7 @@ class RedisQueueTest extends TestCase
             return true;
         })->andReturnNull();
 
-        $container = m::mock(Container::class);
+        $container = Mockery::mock(Container::class);
         $container->expects('bound')->with('events')->andReturn(true)->times(2);
         $container->expects('offsetGet')->with('events')->andReturn($events)->times(2);
 
@@ -531,11 +531,11 @@ class RedisQueueTest extends TestCase
     #[DataProvider('redisDriverProvider')]
     public function testBulkJobQueuedEvent($driver)
     {
-        $events = m::mock(Dispatcher::class);
-        $events->expects('dispatch')->with(m::type(JobQueueing::class))->andReturnNull()->times(3);
-        $events->expects('dispatch')->with(m::type(JobQueued::class))->andReturnNull()->times(3);
+        $events = Mockery::mock(Dispatcher::class);
+        $events->expects('dispatch')->with(Mockery::type(JobQueueing::class))->andReturnNull()->times(3);
+        $events->expects('dispatch')->with(Mockery::type(JobQueued::class))->andReturnNull()->times(3);
 
-        $container = m::mock(Container::class);
+        $container = Mockery::mock(Container::class);
         $container->expects('bound')->with('events')->andReturn(true)->times(6);
         $container->expects('offsetGet')->with('events')->andReturn($events)->times(6);
 

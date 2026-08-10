@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationshipsTest extends TestCase
@@ -430,11 +430,11 @@ class MockedConnectionModel extends Model
 {
     public function getConnection()
     {
-        $mock = m::mock(Connection::class);
-        $grammar = m::mock(Grammar::class);
+        $mock = Mockery::mock(Connection::class);
+        $grammar = Mockery::mock(Grammar::class);
         $mock->shouldReceive('getQueryGrammar')->andReturn($grammar);
         $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
-        $processor = m::mock(Processor::class);
+        $processor = Mockery::mock(Processor::class);
         $mock->shouldReceive('getPostProcessor')->andReturn($processor);
         $mock->shouldReceive('getName')->andReturn('name');
         $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {

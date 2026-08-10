@@ -4,14 +4,14 @@ namespace Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Grammars\MariaDbGrammar;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMariaDbQueryGrammarTest extends TestCase
 {
     public function testToRawSql()
     {
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $connection->expects('escape')->with('foo', false)->andReturn("'foo'");
         $grammar = new MariaDbGrammar($connection);
 

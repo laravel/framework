@@ -5,14 +5,14 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
 use Illuminate\Database\Schema\MariaDbBuilder;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMariaDbBuilderTest extends TestCase
 {
     public function testCreateDatabase()
     {
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $grammar = new MariaDbGrammar($connection);
 
         $connection->expects('getConfig')->with('charset')->andReturn('utf8mb4');
@@ -28,7 +28,7 @@ class DatabaseMariaDbBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $grammar = new MariaDbGrammar($connection);
 
         $connection->expects('getSchemaGrammar')->andReturn($grammar);

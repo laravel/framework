@@ -7,7 +7,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
@@ -20,9 +20,9 @@ class DatabaseMigratorTest extends TestCase
 
     public function testResolveConnectionUsesDirectVariantWhenConfigured()
     {
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $baseConnection = m::mock(Connection::class);
-        $directConnection = m::mock(Connection::class);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $baseConnection = Mockery::mock(Connection::class);
+        $directConnection = Mockery::mock(Connection::class);
 
         $resolver->expects('connection')->with('pgsql')->andReturn($baseConnection);
         $baseConnection->expects('hasDirectConnection')->andReturn(true);
@@ -33,8 +33,8 @@ class DatabaseMigratorTest extends TestCase
 
     public function testResolveConnectionLeavesExplicitSuffixesUntouched()
     {
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $connection = m::mock(Connection::class);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $connection = Mockery::mock(Connection::class);
 
         $resolver->expects('connection')->with('pgsql::write')->andReturn($connection);
 
@@ -43,8 +43,8 @@ class DatabaseMigratorTest extends TestCase
 
     public function testResolveConnectionPassesThroughWhenDirectConnectionIsNotConfigured()
     {
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $connection = m::mock(Connection::class);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $connection = Mockery::mock(Connection::class);
 
         $resolver->expects('connection')->times(2)->with('sqlite')->andReturn($connection);
         $connection->expects('hasDirectConnection')->andReturn(false);
@@ -54,8 +54,8 @@ class DatabaseMigratorTest extends TestCase
 
     public function testCustomConnectionResolverCallbackKeepsPriority()
     {
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $connection = m::mock(Connection::class);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $connection = Mockery::mock(Connection::class);
 
         Migrator::resolveConnectionsUsing(function ($resolver, $name) use ($connection) {
             $this->assertSame('pgsql', $name);
@@ -68,9 +68,9 @@ class DatabaseMigratorTest extends TestCase
 
     public function testSetConnectionUsesDirectVariantForRepositoryAndDefaultConnection()
     {
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $repository = m::mock(MigrationRepositoryInterface::class);
-        $baseConnection = m::mock(Connection::class);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $repository = Mockery::mock(MigrationRepositoryInterface::class);
+        $baseConnection = Mockery::mock(Connection::class);
 
         $resolver->expects('connection')->with('pgsql')->andReturn($baseConnection);
         $baseConnection->expects('hasDirectConnection')->andReturn(true);
@@ -85,9 +85,9 @@ class DatabaseMigratorTest extends TestCase
 
     public function testSetConnectionNullPreservesDefaultConnectionBehaviorWithoutDirectConnection()
     {
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $repository = m::mock(MigrationRepositoryInterface::class);
-        $connection = m::mock(Connection::class);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $repository = Mockery::mock(MigrationRepositoryInterface::class);
+        $connection = Mockery::mock(Connection::class);
 
         $resolver->expects('getDefaultConnection')->andReturn('sqlite');
         $resolver->expects('connection')->with('sqlite')->andReturn($connection);
@@ -103,9 +103,9 @@ class DatabaseMigratorTest extends TestCase
 
     public function testSetConnectionNullUsesDirectVariantWhenDefaultConnectionHasDirectConnection()
     {
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $repository = m::mock(MigrationRepositoryInterface::class);
-        $connection = m::mock(Connection::class);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $repository = Mockery::mock(MigrationRepositoryInterface::class);
+        $connection = Mockery::mock(Connection::class);
 
         $resolver->expects('getDefaultConnection')->andReturn('pgsql');
         $resolver->expects('connection')->with('pgsql')->andReturn($connection);
@@ -123,7 +123,7 @@ class DatabaseMigratorTest extends TestCase
     {
         $resolver = new DatabaseMigratorTestResolver;
         $migrator = $this->migrator($resolver);
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $connection->expects('getNameWithReadWriteType')->andReturn('pgsql::direct');
 
         $migration = new class($resolver, $this)
@@ -166,7 +166,7 @@ class DatabaseMigratorTest extends TestCase
     protected function migrator($resolver, $repository = null)
     {
         return new DatabaseMigratorTestMigrator(
-            $repository ?: m::mock(MigrationRepositoryInterface::class),
+            $repository ?: Mockery::mock(MigrationRepositoryInterface::class),
             $resolver,
             new Filesystem
         );

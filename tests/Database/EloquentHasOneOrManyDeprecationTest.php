@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class EloquentHasOneOrManyDeprecationTest extends TestCase
@@ -58,13 +58,13 @@ class EloquentHasOneOrManyDeprecationTest extends TestCase
 
     protected function getHasManyRelation(): HasMany
     {
-        $queryBuilder = m::mock(QueryBuilder::class);
-        $builder = m::mock(Builder::class, [$queryBuilder]);
+        $queryBuilder = Mockery::mock(QueryBuilder::class);
+        $builder = Mockery::mock(Builder::class, [$queryBuilder]);
         $builder->expects('whereNotNull')->with('table.foreign_key');
         $builder->expects('where')->with('table.foreign_key', '=', 1);
-        $related = m::mock(Model::class);
+        $related = Mockery::mock(Model::class);
         $builder->expects('getModel')->andReturn($related);
-        $parent = m::mock(Model::class);
+        $parent = Mockery::mock(Model::class);
         $parent->expects('getAttribute')->with('id')->andReturn(1);
 
         return new HasMany($builder, $parent, 'table.foreign_key', 'id');
@@ -72,13 +72,13 @@ class EloquentHasOneOrManyDeprecationTest extends TestCase
 
     protected function getHasOneRelation(): HasOne
     {
-        $queryBuilder = m::mock(QueryBuilder::class);
-        $builder = m::mock(Builder::class, [$queryBuilder]);
+        $queryBuilder = Mockery::mock(QueryBuilder::class);
+        $builder = Mockery::mock(Builder::class, [$queryBuilder]);
         $builder->expects('whereNotNull')->with('table.foreign_key');
         $builder->expects('where')->with('table.foreign_key', '=', 1);
-        $related = m::mock(Model::class);
+        $related = Mockery::mock(Model::class);
         $builder->expects('getModel')->andReturn($related);
-        $parent = m::mock(Model::class);
+        $parent = Mockery::mock(Model::class);
         $parent->expects('getAttribute')->with('id')->andReturn(1);
 
         return new HasOne($builder, $parent, 'table.foreign_key', 'id');

@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\View;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Console\ViewClearCommand;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class ClearCommandTest extends TestCase
@@ -16,7 +16,7 @@ class ClearCommandTest extends TestCase
     {
         parent::setUp();
 
-        $this->files = m::mock(Filesystem::class);
+        $this->files = Mockery::mock(Filesystem::class);
         Container::setInstance($this->app);
         $this->app->instance('files', $this->files);
     }

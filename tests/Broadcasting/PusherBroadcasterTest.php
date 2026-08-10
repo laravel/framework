@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Broadcasting;
 
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Http\Request;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -19,8 +19,8 @@ class PusherBroadcasterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->pusher = m::mock('Pusher\Pusher');
-        $this->broadcaster = m::mock(PusherBroadcaster::class, [$this->pusher])->makePartial();
+        $this->pusher = Mockery::mock('Pusher\Pusher');
+        $this->broadcaster = Mockery::mock(PusherBroadcaster::class, [$this->pusher])->makePartial();
     }
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
@@ -173,14 +173,14 @@ class PusherBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithUserForChannel($channel)
     {
-        $request = m::mock(Request::class);
+        $request = Mockery::mock(Request::class);
         $request->shouldReceive('all')->andReturn(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
 
         $request->shouldReceive('input')
             ->with('callback', false)
             ->andReturn(false);
 
-        $user = m::mock('User');
+        $user = Mockery::mock('User');
         $user->shouldReceive('getAuthIdentifierForBroadcasting')
             ->andReturn(42);
         $user->shouldReceive('getAuthIdentifier')
@@ -198,7 +198,7 @@ class PusherBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithoutUserForChannel($channel)
     {
-        $request = m::mock(Request::class);
+        $request = Mockery::mock(Request::class);
         $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
 
         $request->shouldReceive('user')

@@ -12,7 +12,7 @@ use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -233,14 +233,14 @@ class PruneCommandTest extends TestCase
 
     public function testTheCommandDispatchesEvents()
     {
-        $dispatcher = m::mock(DispatcherContract::class);
+        $dispatcher = Mockery::mock(DispatcherContract::class);
 
         $dispatcher->expects('dispatch')->withArgs(function ($event) {
             return get_class($event) === ModelPruningStarting::class &&
                 $event->models === [Pruning\Models\PrunableTestModelWithPrunableRecords::class];
         });
-        $dispatcher->expects('listen')->with(ModelsPruned::class, m::type(Closure::class));
-        $dispatcher->expects('dispatch')->times(2)->with(m::type(ModelsPruned::class));
+        $dispatcher->expects('listen')->with(ModelsPruned::class, Mockery::type(Closure::class));
+        $dispatcher->expects('dispatch')->times(2)->with(Mockery::type(ModelsPruned::class));
         $dispatcher->expects('dispatch')->withArgs(function ($event) {
             return get_class($event) === ModelPruningFinished::class &&
                 $event->models === [Pruning\Models\PrunableTestModelWithPrunableRecords::class];

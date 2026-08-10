@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -32,7 +32,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $container->singleton(Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
         });
-        $app = m::mock(Application::class);
+        $app = Mockery::mock(Application::class);
         $app->shouldReceive('getNamespace')->andReturn('App\\');
         $container->instance(Application::class, $app);
 
@@ -720,7 +720,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_nested_model_name_from_factory()
     {
-        $app = m::mock(Application::class);
+        $app = Mockery::mock(Application::class);
         $app->shouldReceive('getNamespace')->andReturn('Illuminate\\Tests\\Database\\Fixtures\\');
         Container::getInstance()->instance(Application::class, $app);
 
@@ -733,7 +733,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_non_app_nested_model_factories()
     {
-        $app = m::mock(Application::class);
+        $app = Mockery::mock(Application::class);
         $app->shouldReceive('getNamespace')->andReturn('Foo\\');
         Container::getInstance()->instance(Application::class, $app);
 

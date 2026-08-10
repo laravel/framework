@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Foundation\Testing\TestCase as TestingTestCase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\Concerns\CreatesApplication;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -30,7 +30,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->connection = m::mock(Connection::class);
+        $this->connection = Mockery::mock(Connection::class);
     }
 
     public function testSeeInDatabaseFindsResults()
@@ -63,7 +63,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testAssertDatabaseSupportsArrays()
     {
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
         $builder->expects('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->andReturnSelf();
         $builder->expects('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->andReturnSelf();
         $builder->expects('exists')->times(2)->andReturn(true);
@@ -115,7 +115,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testAssertDatabaseMissingSupportsArrays()
     {
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
         $builder->expects('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->andReturnSelf();
         $builder->expects('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->andReturnSelf();
         $builder->expects('exists')->times(2)->andReturn(false);
@@ -193,7 +193,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testAssertDatabaseEmptySupportsArrays()
     {
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
         $builder->expects('count')->times(2)->andReturn(0);
 
         $this->connection->shouldReceive('table')->with($this->table)->andReturn($builder);
@@ -212,7 +212,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testAssertSoftDeletedSupportsArrays()
     {
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
         $builder->expects('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->andReturnSelf();
         $builder->expects('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->andReturnSelf();
         $builder->expects('whereNotNull')->with('deleted_at')->times(2)->andReturnSelf();
@@ -228,7 +228,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testAssertNotSoftDeletedSupportsArrays()
     {
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
         $builder->expects('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->andReturnSelf();
         $builder->expects('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->andReturnSelf();
         $builder->expects('whereNull')->with('deleted_at')->times(2)->andReturnSelf();
@@ -244,7 +244,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testAssertSoftDeletedTableSupportsIterablesWithCustomDeletedAtColumn()
     {
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
         $builder->expects('where')->with($this->data)->times(2)->andReturnSelf();
         $builder->expects('whereNotNull')->with('removed_at')->times(2)->andReturnSelf();
         $builder->expects('exists')->times(2)->andReturn(true);
@@ -257,7 +257,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testAssertNotSoftDeletedTableSupportsIterablesWithCustomDeletedAtColumn()
     {
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
         $builder->expects('where')->with($this->data)->times(2)->andReturnSelf();
         $builder->expects('whereNull')->with('removed_at')->times(2)->andReturnSelf();
         $builder->expects('exists')->times(2)->andReturn(true);
@@ -589,7 +589,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     protected function mockCountBuilder($existsResult, $deletedAtColumn = 'deleted_at', $countResult = null)
     {
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
 
         $countResult = Arr::wrap($countResult);
         $countResult = ! empty($countResult) ? $countResult : [$existsResult ? 1 : 0];

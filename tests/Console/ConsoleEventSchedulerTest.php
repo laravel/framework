@@ -10,7 +10,7 @@ use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class ConsoleEventSchedulerTest extends TestCase
@@ -24,11 +24,11 @@ class ConsoleEventSchedulerTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $container->instance(EventMutex::class, m::mock(CacheEventMutex::class));
+        $container->instance(EventMutex::class, Mockery::mock(CacheEventMutex::class));
 
-        $container->instance(SchedulingMutex::class, m::mock(CacheSchedulingMutex::class));
+        $container->instance(SchedulingMutex::class, Mockery::mock(CacheSchedulingMutex::class));
 
-        $container->instance(Schedule::class, $this->schedule = new Schedule(m::mock(EventMutex::class)));
+        $container->instance(Schedule::class, $this->schedule = new Schedule(Mockery::mock(EventMutex::class)));
     }
 
     public function testMutexCanReceiveCustomStore()

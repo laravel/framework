@@ -5,14 +5,14 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SqlServerBuilderTest extends TestCase
 {
     public function testCreateDatabase()
     {
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $grammar = new SqlServerGrammar($connection);
 
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
@@ -26,7 +26,7 @@ class SqlServerBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $grammar = new SqlServerGrammar($connection);
 
         $connection->expects('getSchemaGrammar')->andReturn($grammar);

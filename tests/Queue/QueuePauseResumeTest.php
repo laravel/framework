@@ -10,7 +10,7 @@ use Illuminate\Queue\Events\QueuePaused;
 use Illuminate\Queue\Events\QueueResumed;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class QueuePauseResumeTest extends TestCase
@@ -23,7 +23,7 @@ class QueuePauseResumeTest extends TestCase
         $this->cache = new Repository(new ArrayStore);
 
         // Mock the cache facade to return our cache repository
-        $cacheMock = m::mock();
+        $cacheMock = Mockery::mock();
         $cacheMock->shouldReceive('store')->andReturn($this->cache);
 
         $app = [

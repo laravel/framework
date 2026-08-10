@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 use Illuminate\Database\Seeder;
-use Mockery as m;
+use Mockery;
 use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -31,14 +31,14 @@ class DatabaseSeederTest extends TestCase
     public function testCallResolveTheClassAndCallsRun()
     {
         $seeder = new TestSeeder;
-        $container = m::mock(Container::class);
+        $container = Mockery::mock(Container::class);
         $seeder->setContainer($container);
-        $output = m::mock(OutputInterface::class);
+        $output = Mockery::mock(OutputInterface::class);
         $output->expects('writeln')->times(3);
-        $command = m::mock(Command::class);
+        $command = Mockery::mock(Command::class);
         $command->expects('getOutput')->times(3)->andReturn($output);
         $seeder->setCommand($command);
-        $child = m::mock(Seeder::class);
+        $child = Mockery::mock(Seeder::class);
         $container->expects('make')->with('ClassName')->andReturn($child);
         $child->expects('setContainer')->with($container)->andReturn($child);
         $child->expects('setCommand')->with($command)->andReturn($child);
@@ -50,20 +50,20 @@ class DatabaseSeederTest extends TestCase
     public function testSetContainer()
     {
         $seeder = new TestSeeder;
-        $container = m::mock(Container::class);
+        $container = Mockery::mock(Container::class);
         $this->assertEquals($seeder->setContainer($container), $seeder);
     }
 
     public function testSetCommand()
     {
         $seeder = new TestSeeder;
-        $command = m::mock(Command::class);
+        $command = Mockery::mock(Command::class);
         $this->assertEquals($seeder->setCommand($command), $seeder);
     }
 
     public function testInjectDependenciesOnRunMethod()
     {
-        $container = m::mock(Container::class);
+        $container = Mockery::mock(Container::class);
         $container->expects('call');
 
         $seeder = new TestDepsSeeder;
@@ -76,7 +76,7 @@ class DatabaseSeederTest extends TestCase
 
     public function testSendParamsOnCallMethodWithDeps()
     {
-        $container = m::mock(Container::class);
+        $container = Mockery::mock(Container::class);
         $container->expects('call');
 
         $seeder = new TestDepsSeeder;

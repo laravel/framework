@@ -22,7 +22,7 @@ use Illuminate\Cache\Events\WritingManyKeys;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class CacheEventsTest extends TestCase
@@ -212,7 +212,7 @@ class CacheEventsTest extends TestCase
     public function testForgetDoesTriggerFailedEventOnFailure()
     {
         $dispatcher = $this->getDispatcher();
-        $store = m::mock(Store::class);
+        $store = Mockery::mock(Store::class);
         $store->expects('forget')->andReturn(false);
         $repository = new Repository($store);
         $repository->setEventDispatcher($dispatcher);
@@ -265,7 +265,7 @@ class CacheEventsTest extends TestCase
         $dispatcher = $this->getDispatcher();
 
         // Create a store that fails to flush
-        $failingStore = m::mock(Store::class);
+        $failingStore = Mockery::mock(Store::class);
         $failingStore->expects('flush')->andReturn(false);
 
         $repository = new Repository($failingStore, ['store' => 'array']);
@@ -290,7 +290,7 @@ class CacheEventsTest extends TestCase
         $dispatcher = $this->getDispatcher();
 
         // Create a store that fails to flush locks
-        $failingStore = m::mock(ArrayStore::class);
+        $failingStore = Mockery::mock(ArrayStore::class);
         $failingStore->expects('flushLocks')->andReturn(false);
 
         $repository = new Repository($failingStore, ['store' => 'array']);
@@ -312,7 +312,7 @@ class CacheEventsTest extends TestCase
 
     protected function assertEventMatches($eventClass, $properties = [])
     {
-        return m::on(function ($event) use ($eventClass, $properties) {
+        return Mockery::on(function ($event) use ($eventClass, $properties) {
             if (! $event instanceof $eventClass) {
                 return false;
             }
@@ -323,7 +323,7 @@ class CacheEventsTest extends TestCase
 
     protected function getDispatcher()
     {
-        return m::mock(Dispatcher::class);
+        return Mockery::mock(Dispatcher::class);
     }
 
     protected function getRepository($dispatcher)

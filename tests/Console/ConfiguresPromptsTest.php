@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
 use Laravel\Prompts\Prompt;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -108,12 +108,12 @@ class ConfiguresPromptsTest extends TestCase
 
     protected function runCommand($command, $expectations)
     {
-        $application = m::mock(Application::class);
+        $application = Mockery::mock(Application::class);
         $command->setLaravel($application);
 
-        $outputStyle = m::mock(OutputStyle::class);
+        $outputStyle = Mockery::mock(OutputStyle::class);
         $application->expects('make')->withArgs(fn ($abstract) => $abstract === OutputStyle::class)->andReturn($outputStyle);
-        $factory = m::mock(Factory::class);
+        $factory = Mockery::mock(Factory::class);
         $application->expects('make')->withArgs(fn ($abstract) => $abstract === Factory::class)->andReturn($factory);
         $application->shouldReceive('runningUnitTests')->andReturn(false);
         $application->expects('call')->with([$command, 'handle'])->andReturnUsing(fn ($callback) => call_user_func($callback));

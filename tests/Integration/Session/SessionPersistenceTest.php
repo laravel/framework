@@ -9,7 +9,7 @@ use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class SessionPersistenceTest extends TestCase
@@ -33,7 +33,7 @@ class SessionPersistenceTest extends TestCase
 
     protected function defineEnvironment($app)
     {
-        $handler = m::mock(ExceptionHandler::class)->shouldIgnoreMissing();
+        $handler = Mockery::mock(ExceptionHandler::class)->shouldIgnoreMissing();
         $app->instance(ExceptionHandler::class, $handler);
 
         $handler->expects('render')->andReturn(new Response);

@@ -8,7 +8,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Console\Concerns\InteractsWithPooledConnections;
 use Illuminate\Database\Console\DbCommand;
 use Illuminate\Foundation\Application;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -16,9 +16,9 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
 {
     public function testInteractsWithPooledConnectionsUsesDirectVariantWhenConfigured()
     {
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $baseConnection = m::mock(Connection::class);
-        $directConnection = m::mock(Connection::class);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $baseConnection = Mockery::mock(Connection::class);
+        $directConnection = Mockery::mock(Connection::class);
         $command = new DatabaseConsoleDirectConnectionTestCommand;
 
         $resolver->expects('getDefaultConnection')->andReturn('pgsql');
@@ -31,8 +31,8 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
 
     public function testInteractsWithPooledConnectionsPassesThroughWhenNoDirectVariantIsConfigured()
     {
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $connection = m::mock(Connection::class);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $connection = Mockery::mock(Connection::class);
         $command = new DatabaseConsoleDirectConnectionTestCommand;
 
         $resolver->expects('connection')->with('sqlite')->andReturn($connection);
@@ -43,8 +43,8 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
 
     public function testInteractsWithPooledConnectionsPassesThroughExplicitSuffixes()
     {
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $connection = m::mock(Connection::class);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $connection = Mockery::mock(Connection::class);
         $command = new DatabaseConsoleDirectConnectionTestCommand;
 
         $resolver->expects('connection')->with('pgsql::write')->andReturn($connection);

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\MemcachedConnector;
 use Memcached;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -84,7 +84,7 @@ class CacheMemcachedConnectorTest extends TestCase
 
     protected function memcachedMockWithAddServer($returnedVersion = [])
     {
-        $memcached = m::mock(stdClass::class);
+        $memcached = Mockery::mock(stdClass::class);
         $memcached->expects('addServer')->with($this->getHost(), $this->getPort(), $this->getWeight());
         $memcached->expects('getServerList')->andReturn([]);
 

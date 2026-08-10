@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Pagination;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\AbstractPaginator;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class PaginatorLoadMorphTest extends TestCase
@@ -16,7 +16,7 @@ class PaginatorLoadMorphTest extends TestCase
             'App\\Company' => ['employees', 'calendars'],
         ];
 
-        $items = m::mock(Collection::class);
+        $items = Mockery::mock(Collection::class);
         $items->expects('loadMorph')->with('parentable', $relations);
 
         $p = (new class extends AbstractPaginator {

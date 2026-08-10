@@ -6,7 +6,7 @@ use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Auth\Passwords\PasswordBrokerManager;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class AuthPasswordBrokerManagerTest extends TestCase
@@ -15,9 +15,9 @@ class AuthPasswordBrokerManagerTest extends TestCase
     {
         $app = $this->getApp();
 
-        $broker = m::mock(PasswordBroker::class);
+        $broker = Mockery::mock(PasswordBroker::class);
 
-        $manager = m::mock(PasswordBrokerManager::class, [$app])->makePartial()->shouldAllowMockingProtectedMethods();
+        $manager = Mockery::mock(PasswordBrokerManager::class, [$app])->makePartial()->shouldAllowMockingProtectedMethods();
         $manager->expects('resolve')->with('users')->andReturn($broker);
 
         $result1 = $manager->broker(PasswordBrokerName::Users);

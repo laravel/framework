@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as BaseBuilder;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasOneTest extends TestCase
@@ -129,7 +129,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $relation = $this->getRelation();
         $attributes = ['name' => 'taylor', $relation->getForeignKeyName() => $relation->getParentKey()];
 
-        $created = m::mock(Model::class);
+        $created = Mockery::mock(Model::class);
         $created->expects('getAttribute')->with($relation->getForeignKeyName())->andReturn($relation->getParentKey());
 
         $relation->getRelated()->expects('forceCreate')->with($attributes)->andReturn($created);
@@ -141,7 +141,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
-        $model = m::mock(Model::class);
+        $model = Mockery::mock(Model::class);
         $model->expects('setRelation')->with('foo', null);
         $models = $relation->initRelation([$model], 'foo');
 
@@ -198,17 +198,17 @@ class DatabaseEloquentHasOneTest extends TestCase
     public function testRelationCountQueryCanBeBuilt()
     {
         $relation = $this->getRelation();
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
 
-        $baseQuery = m::mock(BaseBuilder::class);
+        $baseQuery = Mockery::mock(BaseBuilder::class);
         $baseQuery->from = 'one';
-        $parentQuery = m::mock(BaseBuilder::class);
+        $parentQuery = Mockery::mock(BaseBuilder::class);
         $parentQuery->from = 'two';
 
         $builder->expects('getQuery')->andReturn($baseQuery);
         $builder->expects('getQuery')->andReturn($parentQuery);
 
-        $builder->expects('select')->with(m::type(Expression::class))->andReturnSelf();
+        $builder->expects('select')->with(Mockery::type(Expression::class))->andReturnSelf();
         $relation->getParent()->expects('qualifyColumn')->andReturn('table.id');
         $builder->expects('whereColumn')->with('table.id', '=', 'table.foreign_key')->andReturn($baseQuery);
         $baseQuery->expects('setBindings')->with([], 'select');
@@ -233,7 +233,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->related->expects('getTable')->andReturn('table');
         $this->related->expects('getConnectionName')->andReturn('connection');
 
-        $model = m::mock(Model::class);
+        $model = Mockery::mock(Model::class);
         $model->expects('getAttribute')->with('foreign_key')->andReturn(1);
         $model->expects('getTable')->andReturn('table');
         $model->expects('getConnectionName')->andReturn('connection');
@@ -248,7 +248,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->related->expects('getTable')->andReturn('table');
         $this->related->expects('getConnectionName')->andReturn('connection');
 
-        $model = m::mock(Model::class);
+        $model = Mockery::mock(Model::class);
         $model->expects('getAttribute')->with('foreign_key')->andReturn('1');
         $model->expects('getTable')->andReturn('table');
         $model->expects('getConnectionName')->andReturn('connection');
@@ -263,7 +263,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->related->shouldReceive('getTable')->never();
         $this->related->shouldReceive('getConnectionName')->never();
 
-        $model = m::mock(Model::class);
+        $model = Mockery::mock(Model::class);
         $model->expects('getAttribute')->with('foreign_key')->andReturn(null);
         $model->shouldReceive('getTable')->never();
         $model->shouldReceive('getConnectionName')->never();
@@ -278,7 +278,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->related->shouldReceive('getTable')->never();
         $this->related->shouldReceive('getConnectionName')->never();
 
-        $model = m::mock(Model::class);
+        $model = Mockery::mock(Model::class);
         $model->expects('getAttribute')->with('foreign_key')->andReturn(2);
         $model->shouldReceive('getTable')->never();
         $model->shouldReceive('getConnectionName')->never();
@@ -293,7 +293,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->related->expects('getTable')->andReturn('table');
         $this->related->shouldReceive('getConnectionName')->never();
 
-        $model = m::mock(Model::class);
+        $model = Mockery::mock(Model::class);
         $model->expects('getAttribute')->with('foreign_key')->andReturn(1);
         $model->expects('getTable')->andReturn('table.two');
         $model->shouldReceive('getConnectionName')->never();
@@ -308,7 +308,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->related->expects('getTable')->andReturn('table');
         $this->related->expects('getConnectionName')->andReturn('connection');
 
-        $model = m::mock(Model::class);
+        $model = Mockery::mock(Model::class);
         $model->expects('getAttribute')->with('foreign_key')->andReturn(1);
         $model->expects('getTable')->andReturn('table');
         $model->expects('getConnectionName')->andReturn('connection.two');
@@ -318,12 +318,12 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     protected function getRelation()
     {
-        $this->builder = m::mock(Builder::class);
+        $this->builder = Mockery::mock(Builder::class);
         $this->builder->shouldReceive('whereNotNull')->with('table.foreign_key');
         $this->builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
-        $this->related = m::mock(Model::class);
+        $this->related = Mockery::mock(Model::class);
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
-        $this->parent = m::mock(Model::class);
+        $this->parent = Mockery::mock(Model::class);
         $this->parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $this->parent->shouldReceive('getAttribute')->with('username')->andReturn('taylor');
         $this->parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');

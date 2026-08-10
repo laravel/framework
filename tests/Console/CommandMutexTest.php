@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\CommandMutex;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Foundation\Application;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\Concerns\InteractsWithMockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -38,7 +38,7 @@ class CommandMutexTest extends TestCase
             }
         };
 
-        $this->commandMutex = m::mock(CommandMutex::class);
+        $this->commandMutex = Mockery::mock(CommandMutex::class);
 
         $app = new Application;
         $app->instance(CommandMutex::class, $this->commandMutex);

@@ -15,7 +15,7 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class RateLimitedTest extends TestCase
@@ -58,7 +58,7 @@ class RateLimitedTest extends TestCase
 
     public function testRateLimitedJobsAreNotExecutedOnLimitReached2()
     {
-        $cache = m::mock(Cache::class);
+        $cache = Mockery::mock(Cache::class);
         $cache->expects('get')->times(3)->andReturn(0, 1, null);
         $cache->expects('add')->times(2)->andReturn(true, true);
         $cache->expects('increment')->andReturn(1);
@@ -79,7 +79,7 @@ class RateLimitedTest extends TestCase
         RateLimitedTestJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
         $job->expects('hasFailed')->andReturn(false);
         $job->expects('release')->withArgs(function ($delay) {
@@ -192,7 +192,7 @@ class RateLimitedTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
         $job->expects('hasFailed')->andReturn(false);
         $job->expects('isReleased')->times(2)->andReturn(false);
@@ -211,7 +211,7 @@ class RateLimitedTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
         $job->expects('hasFailed')->andReturn(false);
         $job->expects('release');
@@ -230,7 +230,7 @@ class RateLimitedTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
         $job->expects('hasFailed')->andReturn(false);
         $job->expects('release')->withArgs([$releaseAfter]);
@@ -249,7 +249,7 @@ class RateLimitedTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
         $job->expects('hasFailed')->andReturn(false);
         $job->expects('isReleased')->times(2)->andReturn(false);

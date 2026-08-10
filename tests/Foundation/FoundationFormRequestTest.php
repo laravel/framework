@@ -19,7 +19,7 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator as TranslatorConcrete;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\ValidationException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class FoundationFormRequestTest extends TestCase
@@ -624,7 +624,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createValidationFactory($container)
     {
-        $translator = m::mock(Translator::class)->shouldReceive('get')
+        $translator = Mockery::mock(Translator::class)->shouldReceive('get')
             ->zeroOrMoreTimes()->andReturn('error')->shouldReceive('choice')
             ->zeroOrMoreTimes()->andReturn('error')->getMock();
 
@@ -639,7 +639,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createMockRedirector($request)
     {
-        $redirector = $this->mocks['redirector'] = m::mock(Redirector::class);
+        $redirector = $this->mocks['redirector'] = Mockery::mock(Redirector::class);
 
         $redirector->shouldReceive('getUrlGenerator')->zeroOrMoreTimes()
             ->andReturn($generator = $this->createMockUrlGenerator());
@@ -660,7 +660,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createMockUrlGenerator()
     {
-        return $this->mocks['generator'] = m::mock(UrlGenerator::class);
+        return $this->mocks['generator'] = Mockery::mock(UrlGenerator::class);
     }
 
     /**
@@ -670,7 +670,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createMockRedirectResponse()
     {
-        return $this->mocks['redirect'] = m::mock(RedirectResponse::class);
+        return $this->mocks['redirect'] = Mockery::mock(RedirectResponse::class);
     }
 }
 

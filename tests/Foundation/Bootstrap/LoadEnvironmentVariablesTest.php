@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Foundation\Bootstrap;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class LoadEnvironmentVariablesTest extends TestCase
@@ -17,7 +17,7 @@ class LoadEnvironmentVariablesTest extends TestCase
 
     protected function getAppMock($file)
     {
-        $app = m::mock(Application::class);
+        $app = Mockery::mock(Application::class);
 
         $app->expects('configurationIsCached')
             ->with()->andReturn(false);

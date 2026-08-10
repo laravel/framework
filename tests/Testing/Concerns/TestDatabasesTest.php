@@ -6,7 +6,7 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Concerns\TestDatabases;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -18,7 +18,7 @@ class TestDatabasesTest extends TestCase
         Container::setInstance($container = new Container);
 
         $container->singleton('config', function () {
-            return m::mock(Config::class)
+            return Mockery::mock(Config::class)
                 ->expects('get')
 
                 ->with('database.default', null)

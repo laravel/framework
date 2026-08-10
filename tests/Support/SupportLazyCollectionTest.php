@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Sleep;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SupportLazyCollectionTest extends TestCase
@@ -184,7 +184,7 @@ class SupportLazyCollectionTest extends TestCase
     {
         $timeout = Carbon::now();
 
-        $mock = m::mock(LazyCollection::class.'[now]');
+        $mock = Mockery::mock(LazyCollection::class.'[now]');
 
         $timedOutWith = [];
 

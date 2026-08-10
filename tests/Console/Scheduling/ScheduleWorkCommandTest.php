@@ -7,8 +7,8 @@ use Illuminate\Console\Scheduling\ScheduleWorkCommand;
 use Illuminate\Console\Signals;
 use Illuminate\Support\Carbon;
 use Illuminate\Tests\Console\Fixtures\FakeSignalsRegistry;
+use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -82,7 +82,7 @@ class ScheduleWorkCommandTest extends TestCase
 
     public function test_in_flight_executions_finish_before_the_worker_quits()
     {
-        $execution = m::mock(Process::class);
+        $execution = Mockery::mock(Process::class);
         $execution->expects('getIncrementalOutput')->times(2)->andReturn('scheduled task ran', '');
         $execution->expects('getIncrementalErrorOutput')->times(2)->andReturn('');
 

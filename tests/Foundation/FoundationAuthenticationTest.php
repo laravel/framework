@@ -8,7 +8,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class FoundationAuthenticationTest extends TestCase
@@ -33,14 +33,14 @@ class FoundationAuthenticationTest extends TestCase
      */
     protected function mockGuard()
     {
-        $guard = m::mock(Guard::class);
+        $guard = Mockery::mock(Guard::class);
 
-        $auth = m::mock(AuthManager::class);
+        $auth = Mockery::mock(AuthManager::class);
         $auth->expects('guard')
 
             ->andReturn($guard);
 
-        $this->app = m::mock(Application::class);
+        $this->app = Mockery::mock(Application::class);
         $this->app->expects('make')
 
             ->withArgs(['auth'])
@@ -71,7 +71,7 @@ class FoundationAuthenticationTest extends TestCase
 
     public function testAssertAuthenticatedAs()
     {
-        $expected = m::mock(Authenticatable::class);
+        $expected = Mockery::mock(Authenticatable::class);
         $expected->expects('getAuthIdentifier')
             ->andReturn('1');
 
@@ -80,7 +80,7 @@ class FoundationAuthenticationTest extends TestCase
 
             ->andReturn($expected);
 
-        $user = m::mock(Authenticatable::class);
+        $user = Mockery::mock(Authenticatable::class);
         $user->expects('getAuthIdentifier')
             ->andReturn('1');
 
@@ -89,9 +89,9 @@ class FoundationAuthenticationTest extends TestCase
 
     protected function setupProvider(array $credentials)
     {
-        $user = m::mock(Authenticatable::class);
+        $user = Mockery::mock(Authenticatable::class);
 
-        $provider = m::mock(UserProvider::class);
+        $provider = Mockery::mock(UserProvider::class);
 
         $provider->expects('retrieveByCredentials')
             ->with($credentials)

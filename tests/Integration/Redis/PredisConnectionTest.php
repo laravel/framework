@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Redis;
 use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\Events\CommandExecuted;
 use Illuminate\Support\Facades\Event;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Predis\Client;
@@ -25,7 +25,7 @@ class PredisConnectionTest extends TestCase
         $command = 'ftSearch';
         $parameters = ['test', '*', (new SearchArguments())->dialect('3')->withScores()];
 
-        $client = m::mock(Client::class);
+        $client = Mockery::mock(Client::class);
         $predis = new PredisConnection($client);
         $predis->setEventDispatcher($event);
 

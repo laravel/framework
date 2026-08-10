@@ -12,7 +12,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class ViewTest extends TestCase
@@ -72,15 +72,15 @@ class ViewTest extends TestCase
 
     public function testRenderSectionsReturnsEnvironmentSections()
     {
-        $view = m::mock(View::class.'[render]', [
-            m::mock(Factory::class),
-            m::mock(Engine::class),
+        $view = Mockery::mock(View::class.'[render]', [
+            Mockery::mock(Factory::class),
+            Mockery::mock(Engine::class),
             'view',
             'path',
             [],
         ]);
 
-        $view->expects('render')->with(m::type(Closure::class))->andReturn($sections = ['foo' => 'bar']);
+        $view->expects('render')->with(Mockery::type(Closure::class))->andReturn($sections = ['foo' => 'bar']);
 
         $this->assertEquals($sections, $view->renderSections());
     }
@@ -110,7 +110,7 @@ class ViewTest extends TestCase
 
     public function testViewAcceptsArrayableImplementations()
     {
-        $arrayable = m::mock(Arrayable::class);
+        $arrayable = Mockery::mock(Arrayable::class);
         $arrayable->expects('toArray')->andReturn(['foo' => 'bar', 'baz' => ['qux', 'corge']]);
 
         $view = $this->getView($arrayable);
@@ -185,7 +185,7 @@ class ViewTest extends TestCase
         $view->getFactory()->expects('decrementRender')->ordered();
         $view->getFactory()->expects('flushStateIfDoneRendering');
 
-        $view->renderable = m::mock(Renderable::class);
+        $view->renderable = Mockery::mock(Renderable::class);
         $view->renderable->expects('render')->andReturn('text');
         $this->assertSame('contents', $view->render());
     }
@@ -230,8 +230,8 @@ class ViewTest extends TestCase
     protected function getView($data = [])
     {
         return new View(
-            m::mock(Factory::class),
-            m::mock(Engine::class),
+            Mockery::mock(Factory::class),
+            Mockery::mock(Engine::class),
             'view',
             'path',
             $data

@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Schema\SqliteSchemaState;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Filesystem\Filesystem;
-use Mockery as m;
+use Mockery;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -15,11 +15,11 @@ class DatabaseSqliteSchemaStateTest extends TestCase
     public function testLoadSchemaToDatabase(): void
     {
         $config = ['driver' => 'sqlite', 'database' => 'database/database.sqlite', 'prefix' => '', 'foreign_key_constraints' => true, 'name' => 'sqlite'];
-        $connection = m::mock(SQLiteConnection::class);
+        $connection = Mockery::mock(SQLiteConnection::class);
         $connection->expects('getConfig')->andReturn($config);
         $connection->expects('getDatabaseName')->andReturn($config['database']);
 
-        $process = m::spy(Process::class);
+        $process = Mockery::spy(Process::class);
         $command = null;
         $processFactory = function ($givenCommand) use ($process, &$command) {
             $command = $givenCommand;
@@ -41,12 +41,12 @@ class DatabaseSqliteSchemaStateTest extends TestCase
     public function testLoadSchemaToInMemory(): void
     {
         $config = ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '', 'foreign_key_constraints' => true, 'name' => 'sqlite'];
-        $connection = m::mock(SQLiteConnection::class);
+        $connection = Mockery::mock(SQLiteConnection::class);
         $connection->expects('getDatabaseName')->andReturn($config['database']);
-        $pdo = m::spy(PDO::class);
+        $pdo = Mockery::spy(PDO::class);
         $connection->expects('getPdo')->andReturn($pdo);
 
-        $files = m::mock(Filesystem::class);
+        $files = Mockery::mock(Filesystem::class);
         $files->expects('get')->andReturn('CREATE TABLE IF NOT EXISTS "migrations" ("id" integer not null primary key autoincrement, "migration" varchar not null, "batch" integer not null);');
 
         $schemaState = new SqliteSchemaState($connection, $files);

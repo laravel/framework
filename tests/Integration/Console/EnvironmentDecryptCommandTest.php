@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Console;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class EnvironmentDecryptCommandTest extends TestCase
@@ -16,7 +16,7 @@ class EnvironmentDecryptCommandTest extends TestCase
     {
         parent::setUp();
 
-        $this->filesystem = m::spy(Filesystem::class);
+        $this->filesystem = Mockery::spy(Filesystem::class);
         $this->filesystem->shouldReceive('put')
             ->andReturn(true);
         File::swap($this->filesystem);

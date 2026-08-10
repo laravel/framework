@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Http;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MissingValue;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class JsonResourceTest extends TestCase
@@ -35,7 +35,7 @@ class JsonResourceTest extends TestCase
         $model = new class extends Model {
         };
 
-        $resource = m::mock(JsonResource::class, ['resource' => $model])
+        $resource = Mockery::mock(JsonResource::class, ['resource' => $model])
             ->makePartial()
             ->expects('jsonSerialize')->andReturn(['foo' => 'bar'])
             ->getMock();
@@ -52,7 +52,7 @@ class JsonResourceTest extends TestCase
         $model = new class extends Model {
         };
 
-        $resource = m::mock(JsonResource::class, ['resource' => $model])
+        $resource = Mockery::mock(JsonResource::class, ['resource' => $model])
             ->makePartial()
             ->expects('jsonSerialize')->times(3)->andReturn(['foo' => 'bar', 'bar' => 'foo', 'number' => 123])
             ->getMock();

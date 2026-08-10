@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\SkipIfBatchCancelled;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class SkipIfBatchCancelledTest extends TestCase
@@ -40,7 +40,7 @@ class SkipIfBatchCancelledTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
         $job->expects('uuid')->andReturn('simple-test-uuid');
         $job->expects('hasFailed')->andReturn(false);

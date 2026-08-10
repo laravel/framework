@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Exception;
 use Illuminate\Support\Timebox;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SupportTimeboxTest extends TestCase
@@ -20,7 +20,7 @@ class SupportTimeboxTest extends TestCase
 
     public function testMakeWaitsForMicroseconds()
     {
-        $mock = m::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock = Mockery::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
         $mock->expects('usleep');
 
         $mock->call(function () {
@@ -31,7 +31,7 @@ class SupportTimeboxTest extends TestCase
 
     public function testMakeShouldNotSleepWhenEarlyReturnHasBeenFlagged()
     {
-        $mock = m::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock = Mockery::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
         $mock->call(function ($timebox) {
             $timebox->returnEarly();
         }, 10000);
@@ -41,7 +41,7 @@ class SupportTimeboxTest extends TestCase
 
     public function testMakeShouldSleepWhenDontEarlyReturnHasBeenFlagged()
     {
-        $mock = m::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock = Mockery::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
         $mock->expects('usleep');
 
         $mock->call(function ($timebox) {
@@ -54,7 +54,7 @@ class SupportTimeboxTest extends TestCase
 
     public function testMakeWaitsForMicrosecondsWhenExceptionIsThrown()
     {
-        $mock = m::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock = Mockery::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
         $mock->expects('usleep');
 
         try {
@@ -70,7 +70,7 @@ class SupportTimeboxTest extends TestCase
 
     public function testMakeShouldNotSleepWhenEarlyReturnHasBeenFlaggedAndExceptionIsThrown()
     {
-        $mock = m::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock = Mockery::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
 
         try {
             $this->expectExceptionObject(new Exception('Exception within Timebox callback.'));

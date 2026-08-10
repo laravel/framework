@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Validation;
 use Closure;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Validation\DatabasePresenceVerifier;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -13,12 +13,12 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
 {
     public function testBasicCount()
     {
-        $db = m::mock(ConnectionResolverInterface::class);
+        $db = Mockery::mock(ConnectionResolverInterface::class);
         $verifier = new DatabasePresenceVerifier($db);
         $verifier->setConnection('connection');
-        $conn = m::mock(stdClass::class);
+        $conn = Mockery::mock(stdClass::class);
         $db->expects('connection')->with('connection')->andReturn($conn);
-        $builder = m::mock(stdClass::class);
+        $builder = Mockery::mock(stdClass::class);
         $conn->expects('table')->with('table')->andReturn($builder);
         $builder->expects('useWritePdo')->andReturn($builder);
         $builder->expects('where')->with('column', '=', 'value')->andReturn($builder);
@@ -35,12 +35,12 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
 
     public function testBasicCountWithClosures()
     {
-        $db = m::mock(ConnectionResolverInterface::class);
+        $db = Mockery::mock(ConnectionResolverInterface::class);
         $verifier = new DatabasePresenceVerifier($db);
         $verifier->setConnection('connection');
-        $conn = m::mock(stdClass::class);
+        $conn = Mockery::mock(stdClass::class);
         $db->expects('connection')->with('connection')->andReturn($conn);
-        $builder = m::mock(stdClass::class);
+        $builder = Mockery::mock(stdClass::class);
         $conn->expects('table')->with('table')->andReturn($builder);
         $builder->expects('useWritePdo')->andReturn($builder);
         $builder->expects('where')->with('column', '=', 'value')->andReturn($builder);
@@ -53,7 +53,7 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
         $builder->expects('where')->with('baz', 'taylor');
         $builder->expects('where')->with('faz', true);
         $builder->expects('where')->with('not', '!=', 'admin');
-        $builder->expects('where')->with(m::type(Closure::class))->andReturnUsing(function () use ($builder, $closure) {
+        $builder->expects('where')->with(Mockery::type(Closure::class))->andReturnUsing(function () use ($builder, $closure) {
             $closure($builder);
         });
         $builder->expects('where')->with('closure', 1);
@@ -64,12 +64,12 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
 
     public function testGetCountWithValidExcludeId()
     {
-        $db = m::mock(ConnectionResolverInterface::class);
+        $db = Mockery::mock(ConnectionResolverInterface::class);
         $verifier = new DatabasePresenceVerifier($db);
         $verifier->setConnection('connection');
-        $conn = m::mock(stdClass::class);
+        $conn = Mockery::mock(stdClass::class);
         $db->expects('connection')->with('connection')->andReturn($conn);
-        $builder = m::mock(stdClass::class);
+        $builder = Mockery::mock(stdClass::class);
         $conn->expects('table')->with('table')->andReturn($builder);
         $builder->expects('useWritePdo')->andReturn($builder);
         $builder->expects('where')->with('column', '=', 'value')->andReturn($builder);

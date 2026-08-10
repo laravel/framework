@@ -11,7 +11,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
-use Mockery as m;
+use Mockery;
 
 class EloquentMassPrunableTest extends DatabaseTestCase
 {
@@ -20,7 +20,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         parent::setUp();
 
         $this->app->singleton(Dispatcher::class, function () {
-            return m::mock(Dispatcher::class);
+            return Mockery::mock(Dispatcher::class);
         });
 
         $this->app->alias(Dispatcher::class, 'events');
@@ -55,7 +55,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         app('events')
             ->expects('dispatch')
             ->times(2)
-            ->with(m::type(ModelsPruned::class));
+            ->with(Mockery::type(ModelsPruned::class));
 
         collect(range(1, 5000))->map(function ($id) {
             return ['name' => 'foo'];
@@ -74,7 +74,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         app('events')
             ->expects('dispatch')
             ->times(3)
-            ->with(m::type(ModelsPruned::class));
+            ->with(Mockery::type(ModelsPruned::class));
 
         collect(range(1, 5000))->map(function ($id) {
             return ['deleted_at' => Carbon::now()];

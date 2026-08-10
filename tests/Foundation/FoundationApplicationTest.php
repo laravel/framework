@@ -8,7 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Support\ServiceProvider;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -20,13 +20,13 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application;
 
-        $app['config'] = $config = m::mock(stdClass::class);
+        $app['config'] = $config = Mockery::mock(stdClass::class);
         $config->expects('get')->with('app.locale')->andReturn('bar');
         $config->expects('set')->with('app.locale', 'foo');
-        $app['translator'] = $trans = m::mock(stdClass::class);
+        $app['translator'] = $trans = Mockery::mock(stdClass::class);
         $trans->expects('setLocale')->with('foo');
-        $app['events'] = $events = m::mock(stdClass::class);
-        $events->expects('dispatch')->with(m::on(function (LocaleUpdated $event) {
+        $app['events'] = $events = Mockery::mock(stdClass::class);
+        $events->expects('dispatch')->with(Mockery::on(function (LocaleUpdated $event) {
             return $event->locale === 'foo' && $event->previousLocale === 'bar';
         }));
 
@@ -35,7 +35,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testServiceProvidersAreCorrectlyRegistered()
     {
-        $provider = m::mock(ApplicationBasicServiceProviderStub::class);
+        $provider = Mockery::mock(ApplicationBasicServiceProviderStub::class);
         $class = get_class($provider);
         $provider->expects('register');
         $app = new Application;
@@ -88,7 +88,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotFilled()
     {
-        $provider = m::mock(ServiceProvider::class);
+        $provider = Mockery::mock(ServiceProvider::class);
         $class = get_class($provider);
         $provider->expects('register');
         $app = new Application;
@@ -99,7 +99,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testServiceProvidersCouldBeLoaded()
     {
-        $provider = m::mock(ServiceProvider::class);
+        $provider = Mockery::mock(ServiceProvider::class);
         $class = get_class($provider);
         $provider->expects('register');
         $app = new Application;

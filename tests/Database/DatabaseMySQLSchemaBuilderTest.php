@@ -6,15 +6,15 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\MySqlBuilder;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMySQLSchemaBuilderTest extends TestCase
 {
     public function testHasTable()
     {
-        $connection = m::mock(Connection::class);
-        $grammar = m::mock(MySqlGrammar::class);
+        $connection = Mockery::mock(Connection::class);
+        $grammar = Mockery::mock(MySqlGrammar::class);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $builder = new MySqlBuilder($connection);
         $grammar->expects('compileTableExists')->andReturn('sql');
@@ -26,9 +26,9 @@ class DatabaseMySQLSchemaBuilderTest extends TestCase
 
     public function testGetColumnListing()
     {
-        $connection = m::mock(Connection::class);
-        $grammar = m::mock(MySqlGrammar::class);
-        $processor = m::mock(MySqlProcessor::class);
+        $connection = Mockery::mock(Connection::class);
+        $grammar = Mockery::mock(MySqlGrammar::class);
+        $processor = Mockery::mock(MySqlProcessor::class);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('getPostProcessor')->andReturn($processor);
         $grammar->expects('compileColumns')->with(null, 'prefix_table')->andReturn('sql');

@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Console\View;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components;
 use Illuminate\Database\Migrations\MigrationResult;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
@@ -68,7 +68,7 @@ class ComponentsTest extends TestCase
 
     public function testConfirm()
     {
-        $output = m::mock(OutputStyle::class);
+        $output = Mockery::mock(OutputStyle::class);
 
         $output->expects('confirm')
             ->with('Question?', false)
@@ -89,10 +89,10 @@ class ComponentsTest extends TestCase
 
     public function testChoice()
     {
-        $output = m::mock(OutputStyle::class);
+        $output = Mockery::mock(OutputStyle::class);
 
         $output->expects('askQuestion')
-            ->with(m::type(ChoiceQuestion::class))
+            ->with(Mockery::type(ChoiceQuestion::class))
 
             ->andReturn('a');
 

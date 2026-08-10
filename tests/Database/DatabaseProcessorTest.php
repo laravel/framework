@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Processors\Processor;
-use Mockery as m;
+use Mockery;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
@@ -15,10 +15,10 @@ class DatabaseProcessorTest extends TestCase
     {
         $pdo = $this->createMock(ProcessorTestPDOStub::class);
         $pdo->expects($this->once())->method('lastInsertId')->with('id')->willReturn('1');
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $connection->expects('insert')->with('sql', ['foo']);
         $connection->expects('getPdo')->andReturn($pdo);
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
         $builder->expects('getConnection')->twice()->andReturn($connection);
         $processor = new Processor;
         $result = $processor->processInsertGetId($builder, 'sql', ['foo'], 'id');

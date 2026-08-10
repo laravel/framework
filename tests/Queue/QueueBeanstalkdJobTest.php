@@ -8,7 +8,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Queue\Jobs\Job;
-use Mockery as m;
+use Mockery;
 use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Contract\PheanstalkManagerInterface;
 use Pheanstalk\Contract\PheanstalkPublisherInterface;
@@ -23,7 +23,7 @@ class QueueBeanstalkdJobTest extends TestCase
     {
         $job = $this->getJob();
         $job->getPheanstalkJob()->expects('getData')->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
-        $handler = m::mock(stdClass::class);
+        $handler = Mockery::mock(stdClass::class);
         $job->getContainer()->expects('make')->with('foo')->andReturn($handler);
         $handler->expects('fire')->with($job, ['data']);
 
@@ -34,13 +34,13 @@ class QueueBeanstalkdJobTest extends TestCase
     {
         $job = $this->getJob();
         $job->getPheanstalkJob()->expects('getData')->times(2)->andReturn(json_encode(['job' => 'foo', 'uuid' => 'test-uuid', 'data' => ['data']]));
-        $handler = m::mock(BeanstalkdJobTestFailedTest::class);
+        $handler = Mockery::mock(BeanstalkdJobTestFailedTest::class);
         $job->getContainer()->expects('make')->with('foo')->andReturn($handler);
         $job->getPheanstalk()->expects('delete')->with($job->getPheanstalkJob())->andReturnSelf();
-        $handler->expects('failed')->with(['data'], m::type(Exception::class), 'test-uuid', m::type(Job::class));
-        $events = m::mock(Dispatcher::class);
+        $handler->expects('failed')->with(['data'], Mockery::type(Exception::class), 'test-uuid', Mockery::type(Job::class));
+        $events = Mockery::mock(Dispatcher::class);
         $job->getContainer()->expects('make')->with(Dispatcher::class)->andReturn($events);
-        $events->expects('dispatch')->with(m::type(JobFailed::class))->andReturnNull();
+        $events->expects('dispatch')->with(Mockery::type(JobFailed::class))->andReturnNull();
 
         $job->fail(new Exception);
     }
@@ -72,9 +72,9 @@ class QueueBeanstalkdJobTest extends TestCase
     protected function getJob()
     {
         return new BeanstalkdJob(
-            m::mock(Container::class),
-            m::mock(implode(',', [PheanstalkManagerInterface::class, PheanstalkPublisherInterface::class, PheanstalkSubscriberInterface::class])),
-            m::mock(JobIdInterface::class),
+            Mockery::mock(Container::class),
+            Mockery::mock(implode(',', [PheanstalkManagerInterface::class, PheanstalkPublisherInterface::class, PheanstalkSubscriberInterface::class])),
+            Mockery::mock(JobIdInterface::class),
             'connection-name',
             'default'
         );

@@ -9,7 +9,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\Attributes\WithMigration;
 use PDOException;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -146,13 +146,13 @@ class DatabaseLockTest extends DatabaseTestCase
     #[TestWith(['Table does not exist', 1146, false])]
     public function testIgnoresConcurrencyException(string $message, int $code, bool $hasConcurrenyError)
     {
-        $connection = m::mock(Connection::class);
-        $insertBuilder = m::mock(Builder::class);
-        $deleteBuilder = m::mock(Builder::class);
+        $connection = Mockery::mock(Connection::class);
+        $insertBuilder = Mockery::mock(Builder::class);
+        $deleteBuilder = Mockery::mock(Builder::class);
 
         $insertBuilder->expects('insert')->andReturn(true);
 
-        $deleteBuilder->expects('where')->with('expiration', '<=', m::any())->andReturnSelf();
+        $deleteBuilder->expects('where')->with('expiration', '<=', Mockery::any())->andReturnSelf();
         $deleteBuilder->expects('delete')->andThrow(
             new QueryException(
                 'mysql',
@@ -178,8 +178,8 @@ class DatabaseLockTest extends DatabaseTestCase
     #[TestWith(['Table does not exist', 1146, false])]
     public function testReleaseIgnoresConcurrencyException(string $message, int $code, bool $hasConcurrencyError)
     {
-        $connection = m::mock(Connection::class);
-        $deleteBuilder = m::mock(Builder::class);
+        $connection = Mockery::mock(Connection::class);
+        $deleteBuilder = Mockery::mock(Builder::class);
 
         $owner = 'owner-123';
 

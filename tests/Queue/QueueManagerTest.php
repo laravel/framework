@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Queue\QueueManager;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -17,12 +17,12 @@ class QueueManagerTest extends TestCase
                 'queue.default' => 'sync',
                 'queue.connections.sync' => ['driver' => 'sync'],
             ],
-            'encrypter' => $encrypter = m::mock(Encrypter::class),
+            'encrypter' => $encrypter = Mockery::mock(Encrypter::class),
         ];
 
         $manager = new QueueManager($app);
-        $connector = m::mock(stdClass::class);
-        $queue = m::mock(stdClass::class);
+        $connector = Mockery::mock(stdClass::class);
+        $queue = Mockery::mock(stdClass::class);
         $queue->expects('setConnectionName')->with('sync')->andReturnSelf();
         $connector->expects('connect')->with(['driver' => 'sync'])->andReturn($queue);
         $manager->addConnector('sync', function () use ($connector) {
@@ -40,12 +40,12 @@ class QueueManagerTest extends TestCase
                 'queue.default' => 'sync',
                 'queue.connections.foo' => ['driver' => 'bar'],
             ],
-            'encrypter' => $encrypter = m::mock(Encrypter::class),
+            'encrypter' => $encrypter = Mockery::mock(Encrypter::class),
         ];
 
         $manager = new QueueManager($app);
-        $connector = m::mock(stdClass::class);
-        $queue = m::mock(stdClass::class);
+        $connector = Mockery::mock(stdClass::class);
+        $queue = Mockery::mock(stdClass::class);
         $queue->expects('setConnectionName')->with('foo')->andReturnSelf();
         $connector->expects('connect')->with(['driver' => 'bar'])->andReturn($queue);
         $manager->addConnector('bar', function () use ($connector) {
@@ -62,12 +62,12 @@ class QueueManagerTest extends TestCase
             'config' => [
                 'queue.default' => 'null',
             ],
-            'encrypter' => $encrypter = m::mock(Encrypter::class),
+            'encrypter' => $encrypter = Mockery::mock(Encrypter::class),
         ];
 
         $manager = new QueueManager($app);
-        $connector = m::mock(stdClass::class);
-        $queue = m::mock(stdClass::class);
+        $connector = Mockery::mock(stdClass::class);
+        $queue = Mockery::mock(stdClass::class);
         $queue->expects('setConnectionName')->with('null')->andReturnSelf();
         $connector->expects('connect')->with(['driver' => 'null'])->andReturn($queue);
         $manager->addConnector('null', function () use ($connector) {
@@ -85,12 +85,12 @@ class QueueManagerTest extends TestCase
                 'queue.default' => 'sync',
                 'queue.connections.sync' => ['driver' => 'sync'],
             ],
-            'encrypter' => $encrypter = m::mock(Encrypter::class),
+            'encrypter' => $encrypter = Mockery::mock(Encrypter::class),
         ];
 
         $manager = new QueueManager($app);
-        $connector = m::mock(stdClass::class);
-        $queue = m::mock(stdClass::class);
+        $connector = Mockery::mock(stdClass::class);
+        $queue = Mockery::mock(stdClass::class);
         $queue->expects('setConnectionName')->with('sync')->andReturnSelf();
         $connector->expects('connect')->with(['driver' => 'sync'])->andReturn($queue);
         $manager->addConnector('sync', function () use ($connector) {
@@ -108,12 +108,12 @@ class QueueManagerTest extends TestCase
                 'queue.default' => 'sync',
                 'queue.connections.sync' => ['driver' => 'sync'],
             ],
-            'encrypter' => $encrypter = m::mock(Encrypter::class),
+            'encrypter' => $encrypter = Mockery::mock(Encrypter::class),
         ];
 
         $manager = new QueueManager($app);
-        $connector = m::mock(stdClass::class);
-        $queue = m::mock(stdClass::class);
+        $connector = Mockery::mock(stdClass::class);
+        $queue = Mockery::mock(stdClass::class);
         $queue->expects('setConnectionName')->with('sync')->andReturnSelf();
         $connector->expects('connect')->with(['driver' => 'sync'])->andReturn($queue);
         $manager->addConnector('sync', function () use ($connector) {

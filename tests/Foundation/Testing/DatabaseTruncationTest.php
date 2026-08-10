@@ -8,7 +8,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseTruncationTest extends TestCase
@@ -176,7 +176,7 @@ class DatabaseTruncationTest extends TestCase
     ): Connection {
         $actual = [];
 
-        $schema = m::mock($builder ?? Builder::class);
+        $schema = Mockery::mock($builder ?? Builder::class);
         $schema->expects('getTables')->with($schemas)->andReturn(
             empty($schemas)
                 ? $allTables
@@ -184,9 +184,9 @@ class DatabaseTruncationTest extends TestCase
         );
         $schema->expects('getCurrentSchemaListing')->andReturn($schemas);
 
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
-        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher = Mockery::mock(Dispatcher::class);
         $connection->expects('getEventDispatcher')->andReturn($dispatcher);
         $connection->expects('unsetEventDispatcher');
         $connection->expects('setEventDispatcher')->with($dispatcher);
@@ -198,7 +198,7 @@ class DatabaseTruncationTest extends TestCase
             ->andReturnUsing(function (string $tableName) use (&$actual) {
                 $actual[] = $tableName;
 
-                $table = m::mock();
+                $table = Mockery::mock();
                 $table->expects('exists')->andReturnTrue();
                 $table->expects('truncate');
 

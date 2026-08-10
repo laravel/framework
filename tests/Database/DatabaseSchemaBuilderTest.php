@@ -6,7 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\Grammar;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -14,8 +14,8 @@ class DatabaseSchemaBuilderTest extends TestCase
 {
     public function testCreateDatabase()
     {
-        $connection = m::mock(Connection::class);
-        $grammar = m::mock(stdClass::class);
+        $connection = Mockery::mock(Connection::class);
+        $grammar = Mockery::mock(stdClass::class);
         $grammar->expects('compileCreateDatabase')->andReturn('sql');
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('statement')->with('sql')->andReturnTrue();
@@ -26,8 +26,8 @@ class DatabaseSchemaBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $connection = m::mock(Connection::class);
-        $grammar = m::mock(stdClass::class);
+        $connection = Mockery::mock(Connection::class);
+        $grammar = Mockery::mock(stdClass::class);
         $grammar->expects('compileDropDatabaseIfExists')->andReturn('sql');
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('statement')->with('sql')->andReturnTrue();
@@ -38,9 +38,9 @@ class DatabaseSchemaBuilderTest extends TestCase
 
     public function testHasTableCorrectlyCallsGrammar()
     {
-        $connection = m::mock(Connection::class);
-        $grammar = m::mock(Grammar::class);
-        $processor = m::mock(Processor::class);
+        $connection = Mockery::mock(Connection::class);
+        $grammar = Mockery::mock(Grammar::class);
+        $processor = Mockery::mock(Processor::class);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('getPostProcessor')->andReturn($processor);
         $builder = new Builder($connection);
@@ -55,10 +55,10 @@ class DatabaseSchemaBuilderTest extends TestCase
 
     public function testTableHasColumns()
     {
-        $connection = m::mock(Connection::class);
-        $grammar = m::mock(stdClass::class);
+        $connection = Mockery::mock(Connection::class);
+        $grammar = Mockery::mock(stdClass::class);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $builder = m::mock(Builder::class.'[getColumnListing]', [$connection]);
+        $builder = Mockery::mock(Builder::class.'[getColumnListing]', [$connection]);
         $builder->expects('getColumnListing')->with('users')->times(2)->andReturn(['id', 'firstname']);
 
         $this->assertTrue($builder->hasColumns('users', ['id', 'firstname']));
@@ -67,9 +67,9 @@ class DatabaseSchemaBuilderTest extends TestCase
 
     public function testGetColumnTypeAddsPrefix()
     {
-        $connection = m::mock(Connection::class);
-        $grammar = m::mock(Grammar::class);
-        $processor = m::mock(Processor::class);
+        $connection = Mockery::mock(Connection::class);
+        $grammar = Mockery::mock(Grammar::class);
+        $processor = Mockery::mock(Processor::class);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('getPostProcessor')->andReturn($processor);
         $processor->expects('processColumns')->andReturn([['name' => 'id', 'type_name' => 'integer']]);

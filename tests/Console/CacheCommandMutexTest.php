@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository;
-use Mockery as m;
+use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -35,8 +35,8 @@ class CacheCommandMutexTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->cacheFactory = m::mock(Factory::class);
-        $this->cacheRepository = m::mock(Repository::class);
+        $this->cacheFactory = Mockery::mock(Factory::class);
+        $this->cacheRepository = Mockery::mock(Repository::class);
         $this->mutex = new CacheCommandMutex($this->cacheFactory);
         $this->command = new class extends Command
         {
@@ -105,7 +105,7 @@ class CacheCommandMutexTest extends TestCase
 
     public function testCanCreateMutexWithCustomConnectionWithLockProvider()
     {
-        $lock = m::mock(LockProvider::class);
+        $lock = Mockery::mock(LockProvider::class);
         $this->cacheFactory->expects('store')->once()->with('test')->andReturn($this->cacheRepository);
         $this->cacheRepository->expects('getStore')->twice()->andReturn($lock);
 
@@ -124,9 +124,9 @@ class CacheCommandMutexTest extends TestCase
         $this->cacheRepository->expects('getStore')->andReturn(null);
     }
 
-    private function mockUsingLockProvider(): m\MockInterface
+    private function mockUsingLockProvider(): MockInterface
     {
-        $lock = m::mock(LockProvider::class);
+        $lock = Mockery::mock(LockProvider::class);
         $this->cacheFactory->expects('store')->once()->andReturn($this->cacheRepository);
         $this->cacheRepository->expects('getStore')->twice()->andReturn($lock);
 
@@ -137,7 +137,7 @@ class CacheCommandMutexTest extends TestCase
     {
         $lock->expects('lock')
             ->once()
-            ->with(m::type('string'), m::type('int'))
+            ->with(Mockery::type('string'), Mockery::type('int'))
             ->andReturns($lock);
 
         $lock->expects('get')

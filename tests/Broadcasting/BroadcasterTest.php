@@ -9,7 +9,7 @@ use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\RouteBinding;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -60,7 +60,7 @@ class BroadcasterTest extends TestCase
         // Test Explicit Binding...
         $container = new Container;
         Container::setInstance($container);
-        $binder = m::mock(BindingRegistrar::class);
+        $binder = Mockery::mock(BindingRegistrar::class);
         $binder->expects('getBindingCallback')->times(2)->with('model')->andReturn(function () {
             return 'bound';
         });
@@ -83,7 +83,7 @@ class BroadcasterTest extends TestCase
     {
         $container = new Container;
         Container::setInstance($container);
-        $binder = m::mock(BindingRegistrar::class);
+        $binder = Mockery::mock(BindingRegistrar::class);
         $callback = RouteBinding::forModel($container, BroadcasterTestEloquentModelStub::class);
 
         $binder->expects('getBindingCallback')->times(2)->with('model')->andReturn($callback);
@@ -198,7 +198,7 @@ class BroadcasterTest extends TestCase
             //
         });
 
-        $request = m::mock(Request::class);
+        $request = Mockery::mock(Request::class);
         $request->expects('user')
 
             ->withNoArgs()
@@ -216,7 +216,7 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => 'myguard']);
 
-        $request = m::mock(Request::class);
+        $request = Mockery::mock(Request::class);
         $request->expects('user')
 
             ->with('myguard')
@@ -237,7 +237,7 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => ['myguard2', 'myguard1']]);
 
-        $request = m::mock(Request::class);
+        $request = Mockery::mock(Request::class);
         $request->expects('user')
 
             ->with('myguard1')
@@ -265,7 +265,7 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => 'myguard']);
 
-        $request = m::mock(Request::class);
+        $request = Mockery::mock(Request::class);
         $request->expects('user')
 
             ->with('myguard')
@@ -282,7 +282,7 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => ['myguard1', 'myguard2']]);
 
-        $request = m::mock(Request::class);
+        $request = Mockery::mock(Request::class);
         $request->expects('user')
 
             ->with('myguard1')

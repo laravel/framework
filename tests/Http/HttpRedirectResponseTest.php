@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 
@@ -31,7 +31,7 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $session = m::mock(Store::class);
+        $session = Mockery::mock(Store::class);
         $response->setSession($session);
         $session->expects('flash')->times(2);
         $response->with(['name', 'age']);
@@ -66,7 +66,7 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $session = m::mock(Store::class);
+        $session = Mockery::mock(Store::class);
         $session->expects('flashInput')->with(['name' => 'Taylor', 'age' => 26]);
         $response->setSession($session);
         $response->withInput();
@@ -88,7 +88,7 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $session = m::mock(Store::class);
+        $session = Mockery::mock(Store::class);
         $session->expects('flashInput')->with(['name' => 'Taylor']);
         $response->setSession($session);
         $response->onlyInput('name');
@@ -98,7 +98,7 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $session = m::mock(Store::class);
+        $session = Mockery::mock(Store::class);
         $session->expects('flashInput')->with(['name' => 'Taylor']);
         $response->setSession($session);
         $response->exceptInput('age');
@@ -108,11 +108,11 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $session = m::mock(Store::class);
-        $session->expects('get')->with('errors', m::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
-        $session->expects('flash')->with('errors', m::type(ViewErrorBag::class));
+        $session = Mockery::mock(Store::class);
+        $session->expects('get')->with('errors', Mockery::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
+        $session->expects('flash')->with('errors', Mockery::type(ViewErrorBag::class));
         $response->setSession($session);
-        $provider = m::mock(MessageProvider::class);
+        $provider = Mockery::mock(MessageProvider::class);
         $provider->expects('getMessageBag')->andReturn(new MessageBag);
         $response->withErrors($provider);
     }
@@ -187,7 +187,7 @@ class HttpRedirectResponseTest extends TestCase
         $this->assertNull($response->getSession());
 
         $request = Request::create('/', 'GET');
-        $session = m::mock(Store::class);
+        $session = Mockery::mock(Store::class);
         $response->setRequest($request);
         $response->setSession($session);
         $this->assertSame($request, $response->getRequest());
@@ -198,9 +198,9 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $session = m::mock(Store::class);
-        $session->expects('get')->with('errors', m::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
-        $session->expects('flash')->with('errors', m::type(ViewErrorBag::class));
+        $session = Mockery::mock(Store::class);
+        $session->expects('get')->with('errors', Mockery::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
+        $session->expects('flash')->with('errors', Mockery::type(ViewErrorBag::class));
         $response->setSession($session);
         $provider = ['foo' => 'bar'];
         $response->withErrors($provider);
@@ -210,7 +210,7 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $session = m::mock(Store::class);
+        $session = Mockery::mock(Store::class);
         $session->expects('flash')->with('foo', 'bar');
         $response->setSession($session);
         $response->withFoo('bar');

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\Grammars\Grammar;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -16,7 +16,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
     public function testModelsAreProperlyMatchedToParents()
     {
         $relation = $this->getRelation();
-        $model1 = m::mock(Model::class);
+        $model1 = Mockery::mock(Model::class);
         $model1->shouldReceive('hasAttribute')->passthru();
         $model1->shouldReceive('getAttribute')->with('parent_key')->andReturn(1);
         $model1->shouldReceive('getAttribute')->with('foo')->passthru();
@@ -26,7 +26,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $model1->shouldReceive('getCasts')->andReturn([]);
         $model1->shouldReceive('getRelationValue', 'relationLoaded', 'relationResolver', 'setRelation', 'isRelation')->passthru();
 
-        $model2 = m::mock(Model::class);
+        $model2 = Mockery::mock(Model::class);
         $model2->shouldReceive('hasAttribute')->passthru();
         $model2->shouldReceive('getAttribute')->with('parent_key')->andReturn(2);
         $model2->shouldReceive('getAttribute')->with('foo')->passthru();
@@ -56,15 +56,15 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
 
     protected function getRelation()
     {
-        $builder = m::mock(Builder::class);
-        $related = m::mock(Model::class);
+        $builder = Mockery::mock(Builder::class);
+        $related = Mockery::mock(Model::class);
         $related->shouldReceive('newCollection')->passthru();
         $related->shouldReceive('resolveCollectionFromAttribute')->passthru();
         $builder->shouldReceive('getModel')->andReturn($related);
         $related->shouldReceive('qualifyColumn');
         $builder->shouldReceive('join', 'where');
         $builder->shouldReceive('getQuery')->andReturn(
-            m::mock(stdClass::class, ['getGrammar' => m::mock(Grammar::class, ['isExpression' => false])])
+            Mockery::mock(stdClass::class, ['getGrammar' => Mockery::mock(Grammar::class, ['isExpression' => false])])
         );
 
         return new BelongsToMany(

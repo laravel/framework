@@ -7,7 +7,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
@@ -58,7 +58,7 @@ class DatabaseMigrationsTest extends TestCase
 
     public function testRefreshTestDatabaseDefault()
     {
-        $kernel = m::spy(ConsoleKernel::class);
+        $kernel = Mockery::spy(ConsoleKernel::class);
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->expects('call')
@@ -76,7 +76,7 @@ class DatabaseMigrationsTest extends TestCase
     {
         $this->dropViews = true;
 
-        $kernel = m::spy(ConsoleKernel::class);
+        $kernel = Mockery::spy(ConsoleKernel::class);
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->expects('call')
@@ -94,7 +94,7 @@ class DatabaseMigrationsTest extends TestCase
     {
         $this->dropTypes = true;
 
-        $kernel = m::spy(ConsoleKernel::class);
+        $kernel = Mockery::spy(ConsoleKernel::class);
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->expects('call')

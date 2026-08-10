@@ -15,7 +15,7 @@ use Illuminate\Image\ImageException;
 use Illuminate\Image\ImageManager;
 use Illuminate\Image\ImagePipeline;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class ImageManagerTest extends TestCase
@@ -42,7 +42,7 @@ class ImageManagerTest extends TestCase
     {
         $app = $this->makeApp(['images.default' => 'custom']);
 
-        $mockDriver = m::mock(Driver::class);
+        $mockDriver = Mockery::mock(Driver::class);
 
         $manager = new ImageManager($app);
         $manager->extend('custom', function ($app) use ($mockDriver) {
@@ -56,7 +56,7 @@ class ImageManagerTest extends TestCase
     {
         $app = $this->makeApp([]);
 
-        $mockDriver = m::mock(Driver::class);
+        $mockDriver = Mockery::mock(Driver::class);
 
         $manager = new ImageManager($app);
         $manager->extend('custom', function () use ($mockDriver) {
@@ -97,7 +97,7 @@ class ImageManagerTest extends TestCase
         $file = UploadedFile::fake()->image('test.jpg', 100, 100);
         $path = $file->getRealPath();
 
-        $filesystem = m::mock(Filesystem::class);
+        $filesystem = Mockery::mock(Filesystem::class);
         $filesystem->expects('get')
 
             ->with($path)
@@ -117,7 +117,7 @@ class ImageManagerTest extends TestCase
 
     public function test_from_path_is_lazy()
     {
-        $filesystem = m::mock(Filesystem::class);
+        $filesystem = Mockery::mock(Filesystem::class);
         $filesystem->shouldNotReceive('get');
 
         $app = $this->makeApp([]);
@@ -132,13 +132,13 @@ class ImageManagerTest extends TestCase
     {
         $contents = $this->fakeImageContents();
 
-        $disk = m::mock();
+        $disk = Mockery::mock();
         $disk->expects('get')
 
             ->with('images/avatar.jpg')
             ->andReturn($contents);
 
-        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem = Mockery::mock(FilesystemFactory::class);
         $filesystem->expects('disk')
 
             ->with('public')
@@ -160,13 +160,13 @@ class ImageManagerTest extends TestCase
     {
         $contents = $this->fakeImageContents();
 
-        $disk = m::mock();
+        $disk = Mockery::mock();
         $disk->expects('get')
 
             ->with('images/avatar.jpg')
             ->andReturn($contents);
 
-        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem = Mockery::mock(FilesystemFactory::class);
         $filesystem->expects('disk')
 
             ->with('public')
@@ -186,7 +186,7 @@ class ImageManagerTest extends TestCase
 
     public function test_from_storage_is_lazy()
     {
-        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem = Mockery::mock(FilesystemFactory::class);
         $filesystem->shouldNotReceive('disk');
 
         $app = $this->makeApp([]);
@@ -262,8 +262,8 @@ class ImageManagerTest extends TestCase
     {
         $contents = $this->fakeImageContents();
 
-        $http = m::mock(HttpFactory::class);
-        $response = m::mock();
+        $http = Mockery::mock(HttpFactory::class);
+        $response = Mockery::mock();
         $response->expects('body')->andReturn($contents);
         $http->expects('get')->with('https://example.com/photo.jpg')->andReturn($response);
 
@@ -281,7 +281,7 @@ class ImageManagerTest extends TestCase
 
     public function test_from_url_is_lazy()
     {
-        $http = m::mock(HttpFactory::class);
+        $http = Mockery::mock(HttpFactory::class);
         $http->shouldNotReceive('get');
 
         $app = $this->makeApp([]);
@@ -320,8 +320,8 @@ class ImageManagerTest extends TestCase
     {
         $app = $this->makeApp([]);
 
-        $firstDriver = m::mock(Driver::class);
-        $secondDriver = m::mock(Driver::class);
+        $firstDriver = Mockery::mock(Driver::class);
+        $secondDriver = Mockery::mock(Driver::class);
 
         $manager = new ImageManager($app);
         $manager->extend('custom', fn () => $firstDriver);
@@ -334,8 +334,8 @@ class ImageManagerTest extends TestCase
     {
         $app = $this->makeApp([]);
 
-        $driver1 = m::mock(Driver::class);
-        $driver2 = m::mock(Driver::class);
+        $driver1 = Mockery::mock(Driver::class);
+        $driver2 = Mockery::mock(Driver::class);
 
         $manager = new ImageManager($app);
         $manager->extend('one', fn () => $driver1);
@@ -438,7 +438,7 @@ class ImageManagerTest extends TestCase
 
     protected function makeApp(array $config): Application
     {
-        $app = m::mock(Application::class, \ArrayAccess::class);
+        $app = Mockery::mock(Application::class, \ArrayAccess::class);
 
         $configRepo = new Repository($config);
 

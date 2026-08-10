@@ -7,7 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Stringable;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -24,7 +24,7 @@ class MigratorTest extends TestCase
     {
         parent::setUp();
 
-        $this->output = m::mock(OutputInterface::class);
+        $this->output = Mockery::mock(OutputInterface::class);
         $this->subject = $this->app->make('migrator');
         $this->subject->setOutput($this->output);
         $this->subject->getRepository()->createRepository();
@@ -263,14 +263,14 @@ class MigratorTest extends TestCase
 
     protected function expectInfo($message): void
     {
-        $this->output->expects('writeln')->with(m::on(
+        $this->output->expects('writeln')->with(Mockery::on(
             fn ($argument) => (new Stringable($argument))->contains($message),
-        ), m::any());
+        ), Mockery::any());
     }
 
     protected function expectTwoColumnDetail($first, $second = null)
     {
-        $this->output->expects('writeln')->with(m::on(function ($argument) use ($first, $second) {
+        $this->output->expects('writeln')->with(Mockery::on(function ($argument) use ($first, $second) {
             $result = (new Stringable($argument))->contains($first);
 
             if ($result && $second) {
@@ -278,34 +278,34 @@ class MigratorTest extends TestCase
             }
 
             return $result;
-        }), m::any());
+        }), Mockery::any());
     }
 
     protected function expectBulletList($elements): void
     {
-        $this->output->expects('writeln')->with(m::on(function ($argument) use ($elements) {
+        $this->output->expects('writeln')->with(Mockery::on(function ($argument) use ($elements) {
             return array_all($elements, fn ($element) => (new Stringable($argument))->contains("⇂ $element"));
-        }), m::any());
+        }), Mockery::any());
     }
 
     protected function expectTask($description, $result): void
     {
         // Ignore dots...
-        $this->output->expects('write')->with(m::on(
+        $this->output->expects('write')->with(Mockery::on(
             fn ($argument) => (new Stringable($argument))->contains(['<fg=gray></>', '<fg=gray>.</>']),
-        ), m::any(), m::any());
+        ), Mockery::any(), Mockery::any());
 
         // Ignore duration...
-        $this->output->expects('write')->with(m::on(
+        $this->output->expects('write')->with(Mockery::on(
             fn ($argument) => (new Stringable($argument))->contains(['ms</>']),
-        ), m::any(), m::any());
+        ), Mockery::any(), Mockery::any());
 
-        $this->output->expects('write')->with(m::on(
+        $this->output->expects('write')->with(Mockery::on(
             fn ($argument) => (new Stringable($argument))->contains($description),
-        ), m::any(), m::any());
+        ), Mockery::any(), Mockery::any());
 
-        $this->output->expects('writeln')->with(m::on(
+        $this->output->expects('writeln')->with(Mockery::on(
             fn ($argument) => (new Stringable($argument))->contains($result),
-        ), m::any());
+        ), Mockery::any());
     }
 }

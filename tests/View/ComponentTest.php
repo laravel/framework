@@ -14,7 +14,7 @@ use Illuminate\View\Component;
 use Illuminate\View\ComponentSlot;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class ComponentTest extends TestCase
@@ -25,11 +25,11 @@ class ComponentTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->config = m::mock(Config::class);
+        $this->config = Mockery::mock(Config::class);
 
         $container = new Container;
 
-        $this->viewFactory = m::mock(Factory::class);
+        $this->viewFactory = Mockery::mock(Factory::class);
 
         $container->instance('view', $this->viewFactory);
         $container->alias('view', FactoryContract::class);
@@ -60,7 +60,7 @@ class ComponentTest extends TestCase
 
     public function testRegularViewsGetReturnedUsingViewHelper()
     {
-        $view = m::mock(View::class);
+        $view = Mockery::mock(View::class);
         $this->viewFactory->expects('make')->with('alert', [], [])->andReturn($view);
 
         $component = new TestRegularViewComponentUsingViewHelper;
@@ -104,7 +104,7 @@ class ComponentTest extends TestCase
 
     public function testRegularViewsGetReturnedUsingViewMethod()
     {
-        $view = m::mock(View::class);
+        $view = Mockery::mock(View::class);
         $this->viewFactory->expects('make')->with('alert', [], [])->andReturn($view);
 
         $component = new TestRegularViewComponentUsingViewMethod;
