@@ -1584,19 +1584,18 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         ?MySqlBuilder $builder = null,
         string $prefix = ''
     ) {
-        $connection = Mockery::mock(Connection::class)
-            ->shouldReceive('getTablePrefix')->andReturn($prefix)
-            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
-            ->shouldReceive('isMaria')->andReturn(false)
-            ->getMock();
+        $connection = Mockery::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
+        $connection->shouldReceive('isMaria')->andReturn(false);
 
         $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return $connection
-            ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
-            ->shouldReceive('getSchemaBuilder')->andReturn($builder)
-            ->getMock();
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn($builder);
+
+        return $connection;
     }
 
     public function testAddingColumnWithAlgorithm()

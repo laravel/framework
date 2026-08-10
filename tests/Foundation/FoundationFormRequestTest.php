@@ -624,9 +624,9 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createValidationFactory($container)
     {
-        $translator = Mockery::mock(Translator::class)->shouldReceive('get')
-            ->zeroOrMoreTimes()->andReturn('error')->shouldReceive('choice')
-            ->zeroOrMoreTimes()->andReturn('error')->getMock();
+        $translator = Mockery::mock(Translator::class);
+        $translator->shouldReceive('get')->zeroOrMoreTimes()->andReturn('error');
+        $translator->shouldReceive('choice')->zeroOrMoreTimes()->andReturn('error');
 
         return new ValidationFactory($translator, $container);
     }

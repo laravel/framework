@@ -1382,18 +1382,17 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         ?PostgresBuilder $builder = null,
         string $prefix = ''
     ) {
-        $connection = Mockery::mock(Connection::class)
-            ->shouldReceive('getTablePrefix')->andReturn($prefix)
-            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
-            ->getMock();
+        $connection = Mockery::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
 
         $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return $connection
-            ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
-            ->shouldReceive('getSchemaBuilder')->andReturn($builder)
-            ->getMock();
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn($builder);
+
+        return $connection;
     }
 
     public function getGrammar(?Connection $connection = null)

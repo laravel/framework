@@ -710,10 +710,9 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     protected function getConnection(?string $grammar = null, string $prefix = '')
     {
-        $connection = Mockery::mock(Connection::class)
-            ->shouldReceive('getTablePrefix')->andReturn($prefix)
-            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true)
-            ->getMock();
+        $connection = Mockery::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true);
 
         $grammar ??= 'MySql';
         $grammarClass = 'Illuminate\Database\Schema\Grammars\\'.$grammar.'Grammar';

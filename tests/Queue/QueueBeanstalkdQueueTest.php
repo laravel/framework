@@ -97,8 +97,8 @@ class QueueBeanstalkdQueueTest extends TestCase
         $tube = new TubeName('default');
 
         $pheanstalk = $this->queue->getPheanstalk();
-        $pheanstalk->expects('watch')->with(Mockery::type(TubeName::class))
-            ->shouldReceive('listTubesWatched')->once()->andReturn(new TubeList($tube));
+        $pheanstalk->expects('watch')->with(Mockery::type(TubeName::class));
+        $pheanstalk->expects('listTubesWatched')->andReturn(new TubeList($tube));
 
         $jobId = Mockery::mock(JobIdInterface::class);
         $jobId->expects('getId');
@@ -116,8 +116,8 @@ class QueueBeanstalkdQueueTest extends TestCase
         $tube = new TubeName('default');
 
         $pheanstalk = $this->queue->getPheanstalk();
-        $pheanstalk->expects('watch')->with(Mockery::type(TubeName::class))
-            ->shouldReceive('listTubesWatched')->once()->andReturn(new TubeList($tube));
+        $pheanstalk->expects('watch')->with(Mockery::type(TubeName::class));
+        $pheanstalk->expects('listTubesWatched')->andReturn(new TubeList($tube));
 
         $jobId = Mockery::mock(JobIdInterface::class);
         $jobId->expects('getId');
