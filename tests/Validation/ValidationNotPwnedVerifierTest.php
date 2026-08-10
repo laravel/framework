@@ -40,26 +40,21 @@ class ValidationNotPwnedVerifierTest extends TestCase
 
         $httpFactory
             ->expects('withHeaders')
-
             ->with(['Add-Padding' => true])
             ->andReturn($httpFactory);
 
         $httpFactory
             ->expects('timeout')
-
             ->with(30)
             ->andReturn($httpFactory);
 
         $httpFactory->expects('get')
-
             ->andReturn($response);
 
         $response->expects('successful')
-
             ->andReturn(true);
 
         $response->expects('body')
-
             ->andReturn('');
 
         $verifier = new NotPwnedVerifier($httpFactory);
@@ -77,22 +72,18 @@ class ValidationNotPwnedVerifierTest extends TestCase
 
         $httpFactory
             ->expects('withHeaders')
-
             ->with(['Add-Padding' => true])
             ->andReturn($httpFactory);
 
         $httpFactory
             ->expects('timeout')
-
             ->with(30)
             ->andReturn($httpFactory);
 
         $httpFactory->expects('get')
-
             ->andReturn($response);
 
         $response->expects('successful')
-
             ->andReturn(false);
 
         $verifier = new NotPwnedVerifier($httpFactory);
@@ -119,27 +110,22 @@ class ValidationNotPwnedVerifierTest extends TestCase
 
         $httpFactory
             ->expects('withHeaders')
-
             ->with(['Add-Padding' => true])
             ->andReturn($httpFactory);
 
         $httpFactory
             ->expects('timeout')
-
             ->with(30)
             ->andReturn($httpFactory);
 
         $httpFactory->expects('get')
-
             ->with('https://api.pwnedpasswords.com/range/'.$hashPrefix)
             ->andReturn($response);
 
         $response->expects('successful')
-
             ->andReturn(true);
 
         $response->expects('body')
-
             ->andReturn($differentSuffix.':5');
 
         $verifier = new NotPwnedVerifier($httpFactory);
@@ -165,19 +151,16 @@ class ValidationNotPwnedVerifierTest extends TestCase
 
         $httpFactory
             ->expects('withHeaders')
-
             ->with(['Add-Padding' => true])
             ->andReturn($httpFactory);
 
         $httpFactory
             ->expects('timeout')
-
             ->with(30)
             ->andReturn($httpFactory);
 
         $httpFactory
             ->expects('get')
-
             ->andThrow($exception);
 
         $verifier = new NotPwnedVerifier($httpFactory);

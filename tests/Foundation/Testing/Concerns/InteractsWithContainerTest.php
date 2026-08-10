@@ -99,7 +99,6 @@ class InteractsWithContainerTest extends TestCase
     {
         $this->mock(InstanceStub::class)
             ->expects('execute')
-
             ->andReturn('bar');
 
         $this->assertSame('bar', $this->app->make(InstanceStub::class)->execute());

@@ -200,7 +200,6 @@ class BroadcasterTest extends TestCase
 
         $request = Mockery::mock(Request::class);
         $request->expects('user')
-
             ->withNoArgs()
             ->andReturn(new DummyUser);
 
@@ -218,7 +217,6 @@ class BroadcasterTest extends TestCase
 
         $request = Mockery::mock(Request::class);
         $request->expects('user')
-
             ->with('myguard')
             ->andReturn(new DummyUser);
 
@@ -239,7 +237,6 @@ class BroadcasterTest extends TestCase
 
         $request = Mockery::mock(Request::class);
         $request->expects('user')
-
             ->with('myguard1')
             ->andReturn(null);
         $request->expects('user')
@@ -267,7 +264,6 @@ class BroadcasterTest extends TestCase
 
         $request = Mockery::mock(Request::class);
         $request->expects('user')
-
             ->with('myguard')
             ->andReturn(null);
         $request->shouldNotReceive('user')
@@ -284,11 +280,9 @@ class BroadcasterTest extends TestCase
 
         $request = Mockery::mock(Request::class);
         $request->expects('user')
-
             ->with('myguard1')
             ->andReturn(null);
         $request->expects('user')
-
             ->with('myguard2')
             ->andReturn(null);
         $request->shouldNotReceive('user')

@@ -46,12 +46,10 @@ class NotificationSenderTest extends TestCase
         $manager->expects('getContainer')->times(2)->andReturn(app());
         $bus = Mockery::mock(BusDispatcher::class);
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return $job->queue === 'dummy' && $job->channels === ['database'] && $job->connection === 'redis';
             });
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return $job->queue === 'dummy' && $job->channels === ['mail'] && $job->connection === 'redis';
             });
@@ -121,17 +119,14 @@ class NotificationSenderTest extends TestCase
         $manager->expects('resolveConnectionFromQueueRoute')->times(3)->andReturn(null);
         $bus = Mockery::mock(BusDispatcher::class);
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return $job->middleware[0] instanceof TestMailNotificationMiddleware;
             });
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return $job->middleware[0] instanceof TestDatabaseNotificationMiddleware;
             });
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return empty($job->middleware);
             });
@@ -150,12 +145,10 @@ class NotificationSenderTest extends TestCase
         $manager->expects('getContainer')->times(2)->andReturn(app());
         $bus = Mockery::mock(BusDispatcher::class);
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return $job->connection === 'sync' && $job->channels === ['database'] && $job->queue === 'dummy';
             });
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return $job->connection === 'redis' && $job->channels === ['mail'] && $job->queue === 'dummy';
             });
@@ -175,12 +168,10 @@ class NotificationSenderTest extends TestCase
         $manager->expects('getContainer')->times(2)->andReturn(app());
         $bus = Mockery::mock(BusDispatcher::class);
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return $job->queue === 'dummy' && $job->channels === ['database'] && $job->connection === 'redis';
             });
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return $job->queue === 'admin_notifications' && $job->channels === ['mail'] && $job->connection === 'redis';
             });
@@ -203,7 +194,6 @@ class NotificationSenderTest extends TestCase
 
         $bus = Mockery::mock(BusDispatcher::class);
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return $job->queue === 'notification-queue' && $job->channels === ['mail'] && $job->connection === 'notification-connection';
             });
@@ -285,7 +275,6 @@ class NotificationSenderTest extends TestCase
 
         $bus = Mockery::mock(BusDispatcher::class);
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return $job->queue === 'manual-queue';
             });
@@ -317,7 +306,6 @@ class NotificationSenderTest extends TestCase
 
         $bus = Mockery::mock(BusDispatcher::class);
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return $job->queue === 'attribute-queue';
             });
@@ -354,7 +342,6 @@ class NotificationSenderTest extends TestCase
 
         $bus = Mockery::mock(BusDispatcher::class);
         $bus->expects('dispatch')
-
             ->withArgs(function ($job) {
                 return $job->queue === 'constructor-override-queue';
             });

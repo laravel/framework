@@ -150,7 +150,6 @@ class CacheCommandMutexTest extends TestCase
         $this->mockUsingCacheStore();
 
         $this->cacheRepository->expects('add')
-
             ->withArgs(function ($key) {
                 $this->assertSame('framework'.DIRECTORY_SEPARATOR.'command-command-name', $key);
 
@@ -176,7 +175,6 @@ class CacheCommandMutexTest extends TestCase
         $this->mockUsingCacheStore();
 
         $this->cacheRepository->expects('add')
-
             ->withArgs(function ($key) {
                 $this->assertSame('framework'.DIRECTORY_SEPARATOR.'command-command-name-isolated', $key);
 

@@ -314,7 +314,6 @@ class TranslationTranslatorTest extends TestCase
         $t = new Translator($this->getLoader(), 'en');
         $t->getLoader()
             ->expects('load')
-
             ->with('en', '*', '*')
             ->andReturn(['test' => 'the date is :date']);
 
@@ -339,7 +338,6 @@ class TranslationTranslatorTest extends TestCase
         $t = new Translator($this->getLoader(), 'en');
         $t->getLoader()
             ->expects('load')
-
             ->with('en', '*', '*')
             ->andReturn([
                 'string_backed_enum' => 'Laravel 12 was released in :month 2025',

@@ -61,7 +61,6 @@ class MailSesV2TransportTest extends TestCase
         $sesResult = Mockery::mock();
         $sesResult->expects('get')
             ->with('MessageId')
-
             ->andReturn('ses-message-id');
         $client->expects('sendEmail')
             ->with(Mockery::on(function ($arg) {
@@ -89,7 +88,6 @@ class MailSesV2TransportTest extends TestCase
         $sesResult = Mockery::mock();
         $sesResult->expects('get')
             ->with('MessageId')
-
             ->andReturn('ses-message-id');
         $client->expects('sendEmail')
             ->with(Mockery::on(function ($arg) {
@@ -112,7 +110,6 @@ class MailSesV2TransportTest extends TestCase
         $sesResult = Mockery::mock();
         $sesResult->expects('get')
             ->with('MessageId')
-
             ->andReturn('ses-message-id');
         $client->expects('sendEmail')
             ->with(Mockery::on(function ($arg) {

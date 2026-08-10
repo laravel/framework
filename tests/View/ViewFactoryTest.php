@@ -291,7 +291,6 @@ class ViewFactoryTest extends TestCase
 
         $view = Mockery::mock(View::class);
         $view->expects('name')
-
             ->andReturn('components/button');
 
         $factory->creator('components.button', fn () => true);

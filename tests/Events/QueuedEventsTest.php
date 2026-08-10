@@ -482,7 +482,6 @@ class QueuedEventsTest extends TestCase
         $expectedKey = 'laravel_unique_job:'.hash('xxh128', TestDispatcherShouldBeUnique::class).':unique-listener-id';
 
         $cache->expects('lock')
-
             ->with($expectedKey, 60)
             ->andReturn($lock);
         $cache->expects('getStore')->andReturn(Mockery::mock(LockProvider::class));
@@ -518,7 +517,6 @@ class QueuedEventsTest extends TestCase
         $expectedKey = 'laravel_unique_job:'.hash('xxh128', TestDispatcherShouldBeUniqueWithCustomCache::class).':unique-listener-id';
 
         $uniqueCache->expects('lock')
-
             ->with($expectedKey, 60)
             ->andReturn($lock);
         $uniqueCache->expects('getStore')->andReturn(Mockery::mock(LockProvider::class));
@@ -552,7 +550,6 @@ class QueuedEventsTest extends TestCase
         $expectedKey = 'laravel_unique_job:'.hash('xxh128', TestDispatcherShouldBeUnique::class).':unique-listener-id';
 
         $cache->expects('lock')
-
             ->with($expectedKey)
             ->andReturn($lock);
         $lock->expects('forceRelease');

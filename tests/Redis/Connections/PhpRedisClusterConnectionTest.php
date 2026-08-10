@@ -16,7 +16,6 @@ class PhpRedisClusterConnectionTest extends TestCase
         $client = Mockery::mock(\RedisCluster::class);
         $client->expects('_masters')->andReturn([['127.0.0.1', '6379']]);
         $client->expects('scan')
-
             ->with(0, ['127.0.0.1', '6379'], '*', 10)
             ->andReturn(['key']);
 
@@ -39,7 +38,6 @@ class PhpRedisClusterConnectionTest extends TestCase
     {
         $client = Mockery::mock(\RedisCluster::class);
         $client->expects('scan')
-
             ->with(0, 'option-node', '*', 10)
             ->andReturn(['key']);
 
@@ -64,7 +62,6 @@ class PhpRedisClusterConnectionTest extends TestCase
         $client = Mockery::mock(\RedisCluster::class);
         $client->expects('_masters')->andReturn([['127.0.0.1', '6379']]);
         $client->expects('scan')
-
             ->with(0, ['127.0.0.1', '6379'], '*', 10)
             ->andReturn(false);
 

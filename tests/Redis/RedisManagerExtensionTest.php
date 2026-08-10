@@ -73,7 +73,6 @@ class RedisManagerExtensionTest extends TestCase
         $redis->extend('my_custom_driver', function () use ($config) {
             return Mockery::mock(Connector::class)
                 ->expects('connectToCluster')
-
                 ->withArgs(function ($configArg) use ($config) {
                     return $config === $configArg;
                 })

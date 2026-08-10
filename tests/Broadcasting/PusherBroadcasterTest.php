@@ -111,7 +111,6 @@ class PusherBroadcasterTest extends TestCase
         ];
 
         $this->pusher->expects('socket_auth')
-
             ->andReturn(json_encode($data));
 
         $this->assertEquals(
@@ -133,7 +132,6 @@ class PusherBroadcasterTest extends TestCase
         ];
 
         $this->pusher->expects('presence_auth')
-
             ->andReturn(json_encode($data));
 
         $this->assertEquals(

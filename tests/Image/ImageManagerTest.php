@@ -99,7 +99,6 @@ class ImageManagerTest extends TestCase
 
         $filesystem = Mockery::mock(Filesystem::class);
         $filesystem->expects('get')
-
             ->with($path)
             ->andReturn(file_get_contents($path));
 
@@ -134,13 +133,11 @@ class ImageManagerTest extends TestCase
 
         $disk = Mockery::mock();
         $disk->expects('get')
-
             ->with('images/avatar.jpg')
             ->andReturn($contents);
 
         $filesystem = Mockery::mock(FilesystemFactory::class);
         $filesystem->expects('disk')
-
             ->with('public')
             ->andReturn($disk);
 
@@ -162,13 +159,11 @@ class ImageManagerTest extends TestCase
 
         $disk = Mockery::mock();
         $disk->expects('get')
-
             ->with('images/avatar.jpg')
             ->andReturn($contents);
 
         $filesystem = Mockery::mock(FilesystemFactory::class);
         $filesystem->expects('disk')
-
             ->with('public')
             ->andReturn($disk);
 

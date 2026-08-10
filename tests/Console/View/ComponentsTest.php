@@ -72,7 +72,6 @@ class ComponentsTest extends TestCase
 
         $output->expects('confirm')
             ->with('Question?', false)
-
             ->andReturnTrue();
 
         $result = (new Components\Confirm($output))->render('Question?');
@@ -80,7 +79,6 @@ class ComponentsTest extends TestCase
 
         $output->expects('confirm')
             ->with('Question?', true)
-
             ->andReturnTrue();
 
         $result = (new Components\Confirm($output))->render('Question?', true);
@@ -93,7 +91,6 @@ class ComponentsTest extends TestCase
 
         $output->expects('askQuestion')
             ->with(Mockery::type(ChoiceQuestion::class))
-
             ->andReturn('a');
 
         $result = (new Components\Choice($output))->render('Question?', ['a', 'b']);
