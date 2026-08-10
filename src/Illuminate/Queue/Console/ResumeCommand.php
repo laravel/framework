@@ -19,7 +19,7 @@ class ResumeCommand extends Command
      */
     protected $signature = 'queue:resume
                             {queue? : The name of the queue that should resume processing}
-                            {--all : Resume job processing for every queue on every connection}';
+                            {--all : Resume job processing for all queues}';
 
     /**
      * The console command name aliases.

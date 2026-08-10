@@ -20,7 +20,7 @@ class PauseCommand extends Command
      */
     protected $signature = 'queue:pause
                             {queue? : The name of the queue to pause}
-                            {--all : Pause job processing for every queue on every connection}';
+                            {--all : Pause job processing for all queues}';
 
     /**
      * The console command description.
