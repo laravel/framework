@@ -311,10 +311,12 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function isPaused($connection, $queue)
     {
-        $cache = $this->app['cache']->store();
+        $states = $this->app['cache']->store()->many([
+            'illuminate:queue:paused',
+            "illuminate:queue:paused:{$connection}:{$queue}",
+        ]);
 
-        return (bool) $cache->get('illuminate:queue:paused', false)
-            || (bool) $cache->get("illuminate:queue:paused:{$connection}:{$queue}", false);
+        return (bool) array_filter($states);
     }
 
     /**
