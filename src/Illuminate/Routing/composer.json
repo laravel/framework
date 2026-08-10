@@ -27,11 +27,11 @@
         "illuminate/reflection": "^13.0",
         "illuminate/session": "^13.0",
         "illuminate/support": "^13.0",
-        "symfony/http-foundation": "^7.4.13 || ^8.0.13",
-        "symfony/http-kernel": "^7.4.12 || ^8.0.12",
+        "symfony/http-foundation": "^7.4.0 || ^8.0.0",
+        "symfony/http-kernel": "^7.4.0 || ^8.0.0",
         "symfony/polyfill-php84": "^1.36",
         "symfony/polyfill-php85": "^1.36",
-        "symfony/routing": "^7.4.13 || ^8.0.13"
+        "symfony/routing": "^7.4.0 || ^8.0.0"
     },
     "suggest": {
         "illuminate/console": "Required to use the make commands (^13.0).",
