@@ -460,10 +460,10 @@ class QueueRedisQueueTest extends TestCase
 
     public function testSizeResolvesTheQueueNameFromAnEnum()
     {
-        $queue = new RedisQueue($redis = m::mock(Factory::class), 'default');
-        $redis->shouldReceive('connection')->andReturn($redis);
-        $redis->shouldReceive('isCluster')->andReturn(false);
-        $redis->shouldReceive('eval')->once()->with(
+        $queue = new RedisQueue($redis = Mockery::mock(Factory::class), 'default');
+        $redis->expects('connection')->times(2)->andReturn($redis);
+        $redis->expects('isCluster')->andReturn(false);
+        $redis->expects('eval')->with(
             LuaScripts::size(), 3, 'queues:emails', 'queues:emails:delayed', 'queues:emails:reserved'
         )->andReturn(5);
 
@@ -472,10 +472,10 @@ class QueueRedisQueueTest extends TestCase
 
     public function testPendingJobsResolvesTheQueueNameFromAnEnum()
     {
-        $queue = new RedisQueue($redis = m::mock(Factory::class), 'default');
-        $redis->shouldReceive('connection')->andReturn($redis);
-        $redis->shouldReceive('isCluster')->andReturn(false);
-        $redis->shouldReceive('lrange')->once()->with('queues:emails', 0, -1)->andReturn([
+        $queue = new RedisQueue($redis = Mockery::mock(Factory::class), 'default');
+        $redis->expects('connection')->times(2)->andReturn($redis);
+        $redis->expects('isCluster')->andReturn(false);
+        $redis->expects('lrange')->with('queues:emails', 0, -1)->andReturn([
             json_encode(['uuid' => 'uuid', 'displayName' => 'foo']),
         ]);
 
