@@ -13,7 +13,6 @@ use PDOStatement;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class DatabaseConnectorTest extends TestCase
 {
@@ -69,7 +68,7 @@ class DatabaseConnectorTest extends TestCase
         $dsn = 'pgsql:host=foo;dbname=\'bar\';port=111;client_encoding=\'utf8\'';
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Mockery::mock(PDOStatement::class);
@@ -90,7 +89,7 @@ class DatabaseConnectorTest extends TestCase
         $dsn = 'pgsql:host=foo;dbname=\'bar\';client_encoding=\'utf8\'';
         $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => $searchPath, 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Mockery::mock(PDOStatement::class);
@@ -176,7 +175,7 @@ class DatabaseConnectorTest extends TestCase
         $dsn = 'pgsql:host=foo;dbname=\'bar\';client_encoding=\'utf8\'';
         $config = ['host' => 'foo', 'database' => 'bar', 'schema' => ['public', '"user"'], 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Mockery::mock(PDOStatement::class);
@@ -192,7 +191,7 @@ class DatabaseConnectorTest extends TestCase
         $dsn = 'pgsql:host=foo;dbname=\'bar\';client_encoding=\'utf8\';application_name=\'Laravel App\'';
         $config = ['host' => 'foo', 'database' => 'bar', 'charset' => 'utf8', 'application_name' => 'Laravel App'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Mockery::mock(PDOStatement::class);
@@ -208,7 +207,7 @@ class DatabaseConnectorTest extends TestCase
         $dsn = 'pgsql:dbname=\'baz\'';
         $config = ['database' => 'bar', 'connect_via_database' => 'baz'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Mockery::mock(PDOStatement::class);
@@ -224,7 +223,7 @@ class DatabaseConnectorTest extends TestCase
         $dsn = 'pgsql:dbname=\'baz\';port=2345';
         $config = ['database' => 'bar', 'connect_via_database' => 'baz', 'port' => 5432, 'connect_via_port' => 2345];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Mockery::mock(PDOStatement::class);
@@ -257,7 +256,7 @@ class DatabaseConnectorTest extends TestCase
         $dsn = 'sqlite::memory:';
         $config = ['database' => ':memory:'];
         $connector = $this->getMockBuilder(SQLiteConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $result = $connector->connect($config);
@@ -270,7 +269,7 @@ class DatabaseConnectorTest extends TestCase
         $dsn = 'sqlite:file:mydb?mode=memory&cache=shared';
         $config = ['database' => 'file:mydb?mode=memory&cache=shared'];
         $connector = $this->getMockBuilder(SQLiteConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $result = $connector->connect($config);
@@ -283,7 +282,7 @@ class DatabaseConnectorTest extends TestCase
         $dsn = 'sqlite:'.__DIR__;
         $config = ['database' => __DIR__];
         $connector = $this->getMockBuilder(SQLiteConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $result = $connector->connect($config);
@@ -296,7 +295,7 @@ class DatabaseConnectorTest extends TestCase
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111];
         $dsn = $this->getDsn($config);
         $connector = $this->getMockBuilder(SqlServerConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $result = $connector->connect($config);
@@ -309,7 +308,7 @@ class DatabaseConnectorTest extends TestCase
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'readonly' => true, 'charset' => 'utf-8', 'pooling' => false, 'appname' => 'baz'];
         $dsn = $this->getDsn($config);
         $connector = $this->getMockBuilder(SqlServerConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $result = $connector->connect($config);
@@ -323,7 +322,7 @@ class DatabaseConnectorTest extends TestCase
         $config = ['odbc' => true, 'odbc_datasource_name' => 'server=localhost;database=test;'];
         $dsn = $this->getDsn($config);
         $connector = $this->getMockBuilder(SqlServerConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $result = $connector->connect($config);

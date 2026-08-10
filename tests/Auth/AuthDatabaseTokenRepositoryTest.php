@@ -6,10 +6,10 @@ use Illuminate\Auth\Passwords\DatabaseTokenRepository;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class AuthDatabaseTokenRepositoryTest extends TestCase
 {
@@ -17,7 +17,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
     {
         $repo = $this->getRepo();
         $repo->getHasher()->expects('make')->andReturn('hashed-token');
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $repo->getConnection()->expects('table')->times(2)->with('table')->andReturn($query);
         $query->expects('where')->with('email', 'email')->andReturn($query);
         $query->expects('delete');
@@ -34,7 +34,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
     public function testExistReturnsFalseIfNoRowFoundForUser()
     {
         $repo = $this->getRepo();
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $repo->getConnection()->expects('table')->with('table')->andReturn($query);
         $query->expects('where')->with('email', 'email')->andReturn($query);
         $query->expects('first')->andReturn(null);
@@ -47,7 +47,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
     public function testExistReturnsFalseIfRecordIsExpired()
     {
         $repo = $this->getRepo();
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $repo->getConnection()->expects('table')->with('table')->andReturn($query);
         $query->expects('where')->with('email', 'email')->andReturn($query);
         $date = Carbon::now()->subSeconds(300000)->toDateTimeString();
@@ -62,7 +62,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
     {
         $repo = $this->getRepo();
         $repo->getHasher()->expects('check')->with('token', 'hashed-token')->andReturn(true);
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $repo->getConnection()->expects('table')->with('table')->andReturn($query);
         $query->expects('where')->with('email', 'email')->andReturn($query);
         $date = Carbon::now()->subMinutes(10)->toDateTimeString();
@@ -77,7 +77,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
     {
         $repo = $this->getRepo();
         $repo->getHasher()->expects('check')->with('wrong-token', 'hashed-token')->andReturn(false);
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $repo->getConnection()->expects('table')->with('table')->andReturn($query);
         $query->expects('where')->with('email', 'email')->andReturn($query);
         $date = Carbon::now()->subMinutes(10)->toDateTimeString();
@@ -91,7 +91,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
     public function testRecentlyCreatedReturnsFalseIfNoRowFoundForUser()
     {
         $repo = $this->getRepo();
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $repo->getConnection()->expects('table')->with('table')->andReturn($query);
         $query->expects('where')->with('email', 'email')->andReturn($query);
         $query->expects('first')->andReturn(null);
@@ -106,7 +106,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         Carbon::setTestNow($now = Carbon::now());
 
         $repo = $this->getRepo();
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $repo->getConnection()->expects('table')->with('table')->andReturn($query);
         $query->expects('where')->with('email', 'email')->andReturn($query);
         $date = $now->subSeconds(59)->toDateTimeString();
@@ -122,7 +122,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         Carbon::setTestNow($now = Carbon::now());
 
         $repo = $this->getRepo();
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $repo->getConnection()->expects('table')->with('table')->andReturn($query);
         $query->expects('where')->with('email', 'email')->andReturn($query);
         $date = $now->subSeconds(61)->toDateTimeString();
@@ -136,7 +136,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
     public function testDeleteMethodDeletesByToken()
     {
         $repo = $this->getRepo();
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $repo->getConnection()->expects('table')->with('table')->andReturn($query);
         $query->expects('where')->with('email', 'email')->andReturn($query);
         $query->expects('delete');
@@ -149,7 +149,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
     public function testDeleteExpiredMethodDeletesExpiredTokens()
     {
         $repo = $this->getRepo();
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $repo->getConnection()->expects('table')->with('table')->andReturn($query);
         $query->expects('where')->with('created_at', '<', Mockery::any())->andReturn($query);
         $query->expects('delete');

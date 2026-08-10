@@ -6,17 +6,18 @@ use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Collection;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class DatabaseMigrationRepositoryTest extends TestCase
 {
     public function testGetRanMigrationsListMigrationsByPackage()
     {
         $repo = $this->getRepository();
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $connectionMock = Mockery::mock(Connection::class);
         $repo->getConnectionResolver()->expects('connection')->times(2)->with(null)->andReturn($connectionMock);
         $repo->getConnection()->expects('table')->with('migrations')->andReturn($query);
@@ -35,7 +36,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
             $resolver, 'migrations',
         ])->getMock();
         $repo->expects($this->once())->method('getLastBatchNumber')->willReturn(1);
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $connectionMock = Mockery::mock(Connection::class);
         $repo->getConnectionResolver()->expects('connection')->times(2)->with(null)->andReturn($connectionMock);
         $repo->getConnection()->expects('table')->with('migrations')->andReturn($query);
@@ -50,7 +51,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     public function testLogMethodInsertsRecordIntoMigrationTable()
     {
         $repo = $this->getRepository();
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $connectionMock = Mockery::mock(Connection::class);
         $repo->getConnectionResolver()->expects('connection')->times(2)->with(null)->andReturn($connectionMock);
         $repo->getConnection()->expects('table')->with('migrations')->andReturn($query);
@@ -63,7 +64,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     public function testDeleteMethodRemovesAMigrationFromTheTable()
     {
         $repo = $this->getRepository();
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $connectionMock = Mockery::mock(Connection::class);
         $repo->getConnectionResolver()->expects('connection')->times(2)->with(null)->andReturn($connectionMock);
         $repo->getConnection()->expects('table')->with('migrations')->andReturn($query);
@@ -88,7 +89,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     public function testGetLastBatchNumberReturnsMaxBatch()
     {
         $repo = $this->getRepository();
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $connectionMock = Mockery::mock(Connection::class);
         $repo->getConnectionResolver()->expects('connection')->times(2)->with(null)->andReturn($connectionMock);
         $repo->getConnection()->expects('table')->with('migrations')->andReturn($query);
@@ -101,7 +102,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     public function testCreateRepositoryCreatesProperDatabaseTable()
     {
         $repo = $this->getRepository();
-        $schema = Mockery::mock(stdClass::class);
+        $schema = Mockery::mock(SchemaBuilder::class);
         $connectionMock = Mockery::mock(Connection::class);
         $repo->getConnectionResolver()->expects('connection')->times(2)->with(null)->andReturn($connectionMock);
         $repo->getConnection()->expects('getSchemaBuilder')->andReturn($schema);

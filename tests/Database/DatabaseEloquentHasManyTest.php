@@ -11,7 +11,6 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class DatabaseEloquentHasManyTest extends TestCase
 {
@@ -65,11 +64,11 @@ class DatabaseEloquentHasManyTest extends TestCase
     public function testFindOrNewMethodFindsModel()
     {
         $relation = $this->getRelation();
-        $model = Mockery::mock(stdClass::class);
+        $model = Mockery::mock(Model::class);
         $relation->getQuery()->expects('find')->with('foo', ['*'])->andReturn($model);
         $model->shouldReceive('setAttribute')->never();
 
-        $this->assertInstanceOf(stdClass::class, $relation->findOrNew('foo'));
+        $this->assertInstanceOf(Model::class, $relation->findOrNew('foo'));
     }
 
     public function testFindOrNewMethodReturnsNewModelWithForeignKeySet()
@@ -87,23 +86,23 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getQuery()->expects('where')->with(['foo'])->andReturn($relation->getQuery());
-        $model = Mockery::mock(stdClass::class);
+        $model = Mockery::mock(Model::class);
         $relation->getQuery()->expects('first')->with()->andReturn($model);
         $model->shouldReceive('setAttribute')->never();
 
-        $this->assertInstanceOf(stdClass::class, $relation->firstOrNew(['foo']));
+        $this->assertInstanceOf(Model::class, $relation->firstOrNew(['foo']));
     }
 
     public function testFirstOrNewMethodWithValuesFindsFirstModel()
     {
         $relation = $this->getRelation();
         $relation->getQuery()->expects('where')->with(['foo' => 'bar'])->andReturn($relation->getQuery());
-        $model = Mockery::mock(stdClass::class);
+        $model = Mockery::mock(Model::class);
         $relation->getQuery()->expects('first')->with()->andReturn($model);
         $relation->getRelated()->shouldReceive('newInstance')->never();
         $model->shouldReceive('setAttribute')->never();
 
-        $this->assertInstanceOf(stdClass::class, $relation->firstOrNew(['foo' => 'bar'], ['baz' => 'qux']));
+        $this->assertInstanceOf(Model::class, $relation->firstOrNew(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
     public function testFirstOrNewMethodReturnsNewModelWithForeignKeySet()
@@ -130,26 +129,26 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getQuery()->expects('where')->with(['foo'])->andReturn($relation->getQuery());
-        $model = Mockery::mock(stdClass::class);
+        $model = Mockery::mock(Model::class);
         $relation->getQuery()->expects('first')->with()->andReturn($model);
         $relation->getRelated()->shouldReceive('newInstance')->never();
         $model->shouldReceive('setAttribute')->never();
         $model->shouldReceive('save')->never();
 
-        $this->assertInstanceOf(stdClass::class, $relation->firstOrCreate(['foo']));
+        $this->assertInstanceOf(Model::class, $relation->firstOrCreate(['foo']));
     }
 
     public function testFirstOrCreateMethodWithValuesFindsFirstModel()
     {
         $relation = $this->getRelation();
         $relation->getQuery()->expects('where')->with(['foo' => 'bar'])->andReturn($relation->getQuery());
-        $model = Mockery::mock(stdClass::class);
+        $model = Mockery::mock(Model::class);
         $relation->getQuery()->expects('first')->with()->andReturn($model);
         $relation->getRelated()->shouldReceive('newInstance')->never();
         $model->shouldReceive('setAttribute')->never();
         $model->shouldReceive('save')->never();
 
-        $this->assertInstanceOf(stdClass::class, $relation->firstOrCreate(['foo' => 'bar'], ['baz' => 'qux']));
+        $this->assertInstanceOf(Model::class, $relation->firstOrCreate(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
     public function testFirstOrCreateMethodCreatesNewModelWithForeignKeySet()
@@ -190,10 +189,10 @@ class DatabaseEloquentHasManyTest extends TestCase
         });
         $relation->getQuery()->expects('useWritePdo')->andReturn($relation->getQuery());
         $relation->getQuery()->expects('where')->with(['foo' => 'bar'])->andReturn($relation->getQuery());
-        $model = Mockery::mock(stdClass::class);
+        $model = Mockery::mock(Model::class);
         $relation->getQuery()->expects('first')->with()->andReturn($model);
 
-        $this->assertInstanceOf(stdClass::class, $found = $relation->createOrFirst(['foo' => 'bar'], ['baz' => 'qux']));
+        $this->assertInstanceOf(Model::class, $found = $relation->createOrFirst(['foo' => 'bar'], ['baz' => 'qux']));
         $this->assertSame($model, $found);
     }
 
@@ -228,7 +227,7 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getQuery()->expects('where')->with(['foo'])->andReturn($relation->getQuery());
-        $model = Mockery::mock(stdClass::class);
+        $model = Mockery::mock(Model::class);
         $relation->getQuery()->expects('first')->with()->andReturn($model);
         $relation->getRelated()->shouldReceive('newInstance')->never();
 
@@ -236,7 +235,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $model->expects('fill')->with(['bar'])->andReturn($model);
         $model->expects('save');
 
-        $this->assertInstanceOf(stdClass::class, $relation->updateOrCreate(['foo'], ['bar']));
+        $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
 
     public function testUpdateOrCreateMethodCreatesNewModelWithForeignKeySet()

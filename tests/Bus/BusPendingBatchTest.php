@@ -52,7 +52,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertSame(123, $pendingBatch->options['extra-option']);
 
         $repository = Mockery::mock(BatchRepository::class);
-        $storedBatch = Mockery::mock(stdClass::class);
+        $storedBatch = Mockery::mock(Batch::class);
         $repository->expects('store')->with($pendingBatch)->andReturn($storedBatch);
         $batch = Mockery::mock(Batch::class);
         $storedBatch->expects('add')->with(Mockery::type(Collection::class))->andReturn($batch);
@@ -75,7 +75,7 @@ class BusPendingBatchTest extends TestCase
 
         $repository = Mockery::mock(BatchRepository::class);
 
-        $batch = Mockery::mock(stdClass::class);
+        $batch = Mockery::mock(Batch::class);
         $repository->expects('store')->with($pendingBatch)->andReturn($batch);
 
         $batch->id = 'test-id';
@@ -107,7 +107,7 @@ class BusPendingBatchTest extends TestCase
         $pendingBatch = new PendingBatch($container, new Collection([$job]));
 
         $repository = Mockery::mock(BatchRepository::class);
-        $storedBatch = Mockery::mock(stdClass::class);
+        $storedBatch = Mockery::mock(Batch::class);
         $repository->expects('store')->andReturn($storedBatch);
         $batch = Mockery::mock(Batch::class);
         $storedBatch->expects('add')->andReturn($batch);
@@ -158,7 +158,7 @@ class BusPendingBatchTest extends TestCase
         $pendingBatch = new PendingBatch($container, new Collection([$job]));
 
         $repository = Mockery::mock(BatchRepository::class);
-        $storedBatch = Mockery::mock(stdClass::class);
+        $storedBatch = Mockery::mock(Batch::class);
         $repository->expects('store')->andReturn($storedBatch);
         $batch = Mockery::mock(Batch::class);
         $storedBatch->expects('add')->andReturn($batch);
@@ -216,7 +216,7 @@ class BusPendingBatchTest extends TestCase
         })->onConnection('test-connection')->onQueue('test-queue');
 
         $repository = Mockery::mock(BatchRepository::class);
-        $storedBatch = Mockery::mock(stdClass::class);
+        $storedBatch = Mockery::mock(Batch::class);
         $repository->expects('store')->with($pendingBatch)->andReturn($storedBatch);
         $batch = Mockery::mock(Batch::class);
         $storedBatch->expects('add')->with(Mockery::type(Collection::class))->andReturn($batch);

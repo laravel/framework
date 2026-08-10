@@ -7,7 +7,6 @@ use Memcached;
 use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class CacheMemcachedConnectorTest extends TestCase
 {
@@ -84,7 +83,7 @@ class CacheMemcachedConnectorTest extends TestCase
 
     protected function memcachedMockWithAddServer($returnedVersion = [])
     {
-        $memcached = Mockery::mock(stdClass::class);
+        $memcached = Mockery::mock(Memcached::class);
         $memcached->expects('addServer')->with($this->getHost(), $this->getPort(), $this->getWeight());
         $memcached->expects('getServerList')->andReturn([]);
 

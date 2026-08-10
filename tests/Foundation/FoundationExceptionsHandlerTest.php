@@ -36,7 +36,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use RuntimeException;
-use stdClass;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -62,7 +61,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $this->viewFactory = Mockery::mock(ViewFactory::class);
 
-        $this->request = Mockery::mock(stdClass::class);
+        $this->request = Mockery::mock(Request::class);
 
         $this->container = Container::setInstance(new Container);
 

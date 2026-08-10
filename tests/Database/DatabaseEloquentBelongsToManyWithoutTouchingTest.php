@@ -7,10 +7,10 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class DatabaseEloquentBelongsToManyWithoutTouchingTest extends TestCase
 {
@@ -34,7 +34,7 @@ class DatabaseEloquentBelongsToManyWithoutTouchingTest extends TestCase
             $builder->expects('getModel')->andReturn($related);
             $builder->expects('where');
             $builder->expects('getQuery')->times(2)->andReturn(
-                Mockery::mock(stdClass::class, ['getGrammar' => Mockery::mock(Grammar::class, ['isExpression' => false])])
+                Mockery::mock(QueryBuilder::class, ['getGrammar' => Mockery::mock(Grammar::class, ['isExpression' => false])])
             );
             $relation = new BelongsToMany($builder, $parent, 'article_users', 'user_id', 'article_id', 'id', 'id');
             $builder->shouldReceive('update')->never();

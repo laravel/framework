@@ -4,13 +4,14 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Console\CommandMutex;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Database\Schema\SchemaState;
 use Illuminate\Foundation\Application;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
@@ -46,14 +47,14 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $command->setLaravel($app);
         $migrator->expects('paths')->andReturn([]);
         $migrator->expects('hasRunAnyMigrations')->andReturn(false);
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(Connection::class);
         $migrator->expects('resolveConnection')->andReturn($connection);
         $connection->expects('getName')->andReturn('mysql');
         $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
         $migrator->expects('deleteRepository');
-        $schemaState = Mockery::mock(stdClass::class);
+        $schemaState = Mockery::mock(SchemaState::class);
         $connection->expects('getSchemaState')->andReturn($schemaState);
         $schemaState->expects('handleOutputUsing')->andReturnSelf();
         $schemaState->expects('load')->with(__DIR__.'/stubs/schema.sql');

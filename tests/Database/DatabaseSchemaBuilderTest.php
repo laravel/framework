@@ -8,14 +8,13 @@ use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class DatabaseSchemaBuilderTest extends TestCase
 {
     public function testCreateDatabase()
     {
         $connection = Mockery::mock(Connection::class);
-        $grammar = Mockery::mock(stdClass::class);
+        $grammar = Mockery::mock(Grammar::class);
         $grammar->expects('compileCreateDatabase')->andReturn('sql');
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('statement')->with('sql')->andReturnTrue();
@@ -27,7 +26,7 @@ class DatabaseSchemaBuilderTest extends TestCase
     public function testDropDatabaseIfExists()
     {
         $connection = Mockery::mock(Connection::class);
-        $grammar = Mockery::mock(stdClass::class);
+        $grammar = Mockery::mock(Grammar::class);
         $grammar->expects('compileDropDatabaseIfExists')->andReturn('sql');
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('statement')->with('sql')->andReturnTrue();
@@ -56,7 +55,7 @@ class DatabaseSchemaBuilderTest extends TestCase
     public function testTableHasColumns()
     {
         $connection = Mockery::mock(Connection::class);
-        $grammar = Mockery::mock(stdClass::class);
+        $grammar = Mockery::mock(Grammar::class);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $builder = Mockery::mock(Builder::class.'[getColumnListing]', [$connection]);
         $builder->expects('getColumnListing')->with('users')->times(2)->andReturn(['id', 'firstname']);

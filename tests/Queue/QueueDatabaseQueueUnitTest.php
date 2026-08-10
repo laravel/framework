@@ -6,6 +6,7 @@ use Illuminate\Bus\Batchable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\FailOnTimeout;
@@ -37,7 +38,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->method('currentTime')->willReturn('time');
         $container = Mockery::spy(Container::class);
         $queue->setContainer($container);
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('insertGetId')->andReturnUsing(function ($array) use ($uuid, $displayNameStartsWith, $jobStartsWith) {
             $payload = json_decode($array['payload'], true);
@@ -88,7 +89,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->method('currentTime')->willReturn('time');
         $container = Mockery::spy(Container::class);
         $queue->setContainer($container);
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('insertGetId')->andReturnUsing(function ($array) use ($uuid, $time) {
             $this->assertSame('default', $array['queue']);
@@ -120,7 +121,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->method('currentTime')->willReturn('time');
         $container = Mockery::spy(Container::class);
         $queue->setContainer($container);
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('insertGetId')->andReturnUsing(function ($array) {
             $payload = json_decode($array['payload'], true);
@@ -140,7 +141,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue = new DatabaseQueue($database, 'table', 'default');
         $container = Mockery::spy(Container::class);
         $queue->setContainer($container);
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('insertGetId')->andReturnUsing(function ($array) {
             $payload = json_decode($array['payload'], true);
@@ -163,7 +164,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue = new DatabaseQueue($database, 'table', 'default');
         $container = Mockery::spy(Container::class);
         $queue->setContainer($container);
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('insertGetId')->andReturnUsing(function ($array) {
             $payload = json_decode($array['payload'], true);
@@ -226,7 +227,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
         $queue->method('currentTime')->willReturn('created');
         $queue->method('availableAt')->willReturn('available');
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('insert')->andReturnUsing(function ($records) use ($uuid, $time) {
             $this->assertEquals([[
@@ -259,7 +260,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->method('availableAt')->willReturnCallback(function ($delay = 0) {
             return 'available:'.$delay;
         });
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('insert')->andReturnUsing(function ($records) {
             $this->assertSame('available:15', $records[0]['available_at']);
@@ -287,7 +288,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $inserted = false;
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('insert')->andReturnUsing(function () use (&$inserted) {
             $inserted = true;
@@ -319,7 +320,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $payload = json_encode(['uuid' => 'test-uuid', 'displayName' => 'MyTestJob', 'job' => 'foo', 'data' => [], 'createdAt' => 1000000]);
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('where')->with('queue', 'default')->andReturnSelf();
         $query->expects('whereNull')->with('reserved_at')->andReturnSelf();
@@ -346,7 +347,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $payload = json_encode(['uuid' => 'test-uuid', 'displayName' => 'MyDelayedJob', 'job' => 'foo', 'data' => [], 'createdAt' => 1000000]);
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('where')->with('queue', 'default')->andReturnSelf();
         $query->expects('whereNull')->with('reserved_at')->andReturnSelf();
@@ -373,7 +374,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $payload = json_encode(['uuid' => 'test-uuid', 'displayName' => 'MyTestJob', 'job' => 'foo', 'data' => [], 'createdAt' => 1000000]);
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('where')->with('queue', 'default')->andReturnSelf();
         $query->expects('whereNotNull')->with('reserved_at')->andReturnSelf();
@@ -400,7 +401,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $payload1 = json_encode(['uuid' => 'uuid-1', 'displayName' => 'JobA', 'job' => 'foo', 'data' => [], 'createdAt' => 1000000]);
         $payload2 = json_encode(['uuid' => 'uuid-2', 'displayName' => 'JobB', 'job' => 'foo', 'data' => [], 'createdAt' => 1000001]);
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('whereNull')->with('reserved_at')->andReturnSelf();
         $query->expects('where')->with('available_at', '<=', Mockery::any())->andReturnSelf();
@@ -433,7 +434,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $payload1 = json_encode(['uuid' => 'uuid-1', 'displayName' => 'JobA', 'job' => 'foo', 'data' => [], 'createdAt' => 1000000]);
         $payload2 = json_encode(['uuid' => 'uuid-2', 'displayName' => 'JobB', 'job' => 'foo', 'data' => [], 'createdAt' => 1000001]);
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('whereNull')->with('reserved_at')->andReturnSelf();
         $query->expects('where')->with('available_at', '>', Mockery::any())->andReturnSelf();
@@ -466,7 +467,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $payload1 = json_encode(['uuid' => 'uuid-1', 'displayName' => 'JobA', 'job' => 'foo', 'data' => [], 'createdAt' => 1000000]);
         $payload2 = json_encode(['uuid' => 'uuid-2', 'displayName' => 'JobB', 'job' => 'foo', 'data' => [], 'createdAt' => 1000001]);
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('whereNotNull')->with('reserved_at')->andReturnSelf();
         $query->expects('get')->andReturn(collect([

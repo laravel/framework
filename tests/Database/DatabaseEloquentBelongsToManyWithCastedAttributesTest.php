@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
 {
@@ -64,7 +64,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $related->shouldReceive('qualifyColumn');
         $builder->shouldReceive('join', 'where');
         $builder->shouldReceive('getQuery')->andReturn(
-            Mockery::mock(stdClass::class, ['getGrammar' => Mockery::mock(Grammar::class, ['isExpression' => false])])
+            Mockery::mock(QueryBuilder::class, ['getGrammar' => Mockery::mock(Grammar::class, ['isExpression' => false])])
         );
 
         return new BelongsToMany(

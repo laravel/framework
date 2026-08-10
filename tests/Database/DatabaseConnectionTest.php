@@ -25,14 +25,13 @@ use PDOException;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use stdClass;
 
 class DatabaseConnectionTest extends TestCase
 {
     public function testSettingDefaultCallsGetDefaultGrammar()
     {
         $connection = $this->getMockConnection();
-        $mock = Mockery::mock(stdClass::class);
+        $mock = Mockery::mock(Grammar::class);
         $connection->expects($this->once())->method('getDefaultQueryGrammar')->willReturn($mock);
         $connection->useDefaultQueryGrammar();
         $this->assertEquals($mock, $connection->getQueryGrammar());
@@ -41,7 +40,7 @@ class DatabaseConnectionTest extends TestCase
     public function testSettingDefaultCallsGetDefaultPostProcessor()
     {
         $connection = $this->getMockConnection();
-        $mock = Mockery::mock(stdClass::class);
+        $mock = Mockery::mock(Processor::class);
         $connection->expects($this->once())->method('getDefaultPostProcessor')->willReturn($mock);
         $connection->useDefaultPostProcessor();
         $this->assertEquals($mock, $connection->getPostProcessor());

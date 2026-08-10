@@ -3,11 +3,12 @@
 namespace Illuminate\Tests\Validation;
 
 use Closure;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Validation\DatabasePresenceVerifier;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class ValidationDatabasePresenceVerifierTest extends TestCase
 {
@@ -16,9 +17,9 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
         $db = Mockery::mock(ConnectionResolverInterface::class);
         $verifier = new DatabasePresenceVerifier($db);
         $verifier->setConnection('connection');
-        $conn = Mockery::mock(stdClass::class);
+        $conn = Mockery::mock(ConnectionInterface::class);
         $db->expects('connection')->with('connection')->andReturn($conn);
-        $builder = Mockery::mock(stdClass::class);
+        $builder = Mockery::mock(Builder::class);
         $conn->expects('table')->with('table')->andReturn($builder);
         $builder->expects('useWritePdo')->andReturn($builder);
         $builder->expects('where')->with('column', '=', 'value')->andReturn($builder);
@@ -38,9 +39,9 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
         $db = Mockery::mock(ConnectionResolverInterface::class);
         $verifier = new DatabasePresenceVerifier($db);
         $verifier->setConnection('connection');
-        $conn = Mockery::mock(stdClass::class);
+        $conn = Mockery::mock(ConnectionInterface::class);
         $db->expects('connection')->with('connection')->andReturn($conn);
-        $builder = Mockery::mock(stdClass::class);
+        $builder = Mockery::mock(Builder::class);
         $conn->expects('table')->with('table')->andReturn($builder);
         $builder->expects('useWritePdo')->andReturn($builder);
         $builder->expects('where')->with('column', '=', 'value')->andReturn($builder);
@@ -67,9 +68,9 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
         $db = Mockery::mock(ConnectionResolverInterface::class);
         $verifier = new DatabasePresenceVerifier($db);
         $verifier->setConnection('connection');
-        $conn = Mockery::mock(stdClass::class);
+        $conn = Mockery::mock(ConnectionInterface::class);
         $db->expects('connection')->with('connection')->andReturn($conn);
-        $builder = Mockery::mock(stdClass::class);
+        $builder = Mockery::mock(Builder::class);
         $conn->expects('table')->with('table')->andReturn($builder);
         $builder->expects('useWritePdo')->andReturn($builder);
         $builder->expects('where')->with('column', '=', 'value')->andReturn($builder);

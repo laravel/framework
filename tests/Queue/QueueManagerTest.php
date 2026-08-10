@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Queue\Connectors\ConnectorInterface;
 use Illuminate\Queue\QueueManager;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -21,7 +22,7 @@ class QueueManagerTest extends TestCase
         ];
 
         $manager = new QueueManager($app);
-        $connector = Mockery::mock(stdClass::class);
+        $connector = Mockery::mock(ConnectorInterface::class);
         $queue = Mockery::mock(stdClass::class);
         $queue->expects('setConnectionName')->with('sync')->andReturnSelf();
         $connector->expects('connect')->with(['driver' => 'sync'])->andReturn($queue);
@@ -44,7 +45,7 @@ class QueueManagerTest extends TestCase
         ];
 
         $manager = new QueueManager($app);
-        $connector = Mockery::mock(stdClass::class);
+        $connector = Mockery::mock(ConnectorInterface::class);
         $queue = Mockery::mock(stdClass::class);
         $queue->expects('setConnectionName')->with('foo')->andReturnSelf();
         $connector->expects('connect')->with(['driver' => 'bar'])->andReturn($queue);
@@ -66,7 +67,7 @@ class QueueManagerTest extends TestCase
         ];
 
         $manager = new QueueManager($app);
-        $connector = Mockery::mock(stdClass::class);
+        $connector = Mockery::mock(ConnectorInterface::class);
         $queue = Mockery::mock(stdClass::class);
         $queue->expects('setConnectionName')->with('null')->andReturnSelf();
         $connector->expects('connect')->with(['driver' => 'null'])->andReturn($queue);
@@ -89,7 +90,7 @@ class QueueManagerTest extends TestCase
         ];
 
         $manager = new QueueManager($app);
-        $connector = Mockery::mock(stdClass::class);
+        $connector = Mockery::mock(ConnectorInterface::class);
         $queue = Mockery::mock(stdClass::class);
         $queue->expects('setConnectionName')->with('sync')->andReturnSelf();
         $connector->expects('connect')->with(['driver' => 'sync'])->andReturn($queue);
@@ -112,7 +113,7 @@ class QueueManagerTest extends TestCase
         ];
 
         $manager = new QueueManager($app);
-        $connector = Mockery::mock(stdClass::class);
+        $connector = Mockery::mock(ConnectorInterface::class);
         $queue = Mockery::mock(stdClass::class);
         $queue->expects('setConnectionName')->with('sync')->andReturnSelf();
         $connector->expects('connect')->with(['driver' => 'sync'])->andReturn($queue);

@@ -11,7 +11,6 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class DatabaseSoftDeletingScopeTest extends TestCase
 {
@@ -38,7 +37,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $callback = $builder->getMacro('restore');
         $givenBuilder = Mockery::mock(EloquentBuilder::class);
         $givenBuilder->expects('withTrashed');
-        $model = Mockery::mock(stdClass::class);
+        $model = Mockery::mock(Model::class);
         $givenBuilder->expects('getModel')->andReturn($model);
         $model->expects('getDeletedAtColumn')->andReturn('deleted_at');
         $givenBuilder->expects('update')->with(['deleted_at' => null]);
@@ -122,7 +121,6 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope->extend($builder);
         $callback = $builder->getMacro('onlyTrashed');
         $givenBuilder = Mockery::mock(EloquentBuilder::class);
-        $query = Mockery::mock(stdClass::class);
         $givenBuilder->expects('getModel')->andReturn($model);
         $givenBuilder->expects('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
         $model->expects('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
@@ -144,7 +142,6 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope->extend($builder);
         $callback = $builder->getMacro('withoutTrashed');
         $givenBuilder = Mockery::mock(EloquentBuilder::class);
-        $query = Mockery::mock(stdClass::class);
         $givenBuilder->expects('getModel')->andReturn($model);
         $givenBuilder->expects('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
         $model->expects('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');

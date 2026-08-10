@@ -10,7 +10,6 @@ use Illuminate\Foundation\ProviderRepository;
 use Illuminate\Support\ServiceProvider;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class FoundationProviderRepositoryTest extends TestCase
 {
@@ -38,7 +37,7 @@ class FoundationProviderRepositoryTest extends TestCase
         $repo->expects('shouldRecompile')->andReturn(true);
 
         // foo mock is just a deferred provider
-        $fooMock = Mockery::mock(stdClass::class);
+        $fooMock = Mockery::mock(ServiceProvider::class);
         $repo->expects('createProvider')->with('foo')->andReturn($fooMock);
         $fooMock->expects('isDeferred')->andReturn(true);
         $fooMock->expects('provides')->andReturn(['foo.provides1', 'foo.provides2']);

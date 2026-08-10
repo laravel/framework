@@ -2,18 +2,18 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class DatabaseSoftDeletingTraitTest extends TestCase
 {
     public function testDeleteSetsSoftDeletedColumn()
     {
         $model = Mockery::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $model->expects('newModelQuery')->andReturn($query);
         $query->expects('where')->with('id', '=', 1)->andReturn($query);
         $query->expects('update')->with([

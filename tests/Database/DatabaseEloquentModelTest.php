@@ -974,7 +974,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentDateModelStub;
         $resolver = Mockery::mock(ConnectionResolverInterface::class);
         Model::setConnectionResolver($resolver);
-        $mockConnection = Mockery::mock(stdClass::class);
+        $mockConnection = Mockery::mock(Connection::class);
         $resolver->shouldReceive('connection')->andReturn($mockConnection);
         $mockConnection->expects('getQueryGrammar')->times(4)->andReturn($mockConnection);
         $mockConnection->expects('getDateFormat')->times(4)->andReturn('Y-m-d H:i:s');
@@ -992,7 +992,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentDateModelStub;
         $resolver = Mockery::mock(ConnectionResolverInterface::class);
         Model::setConnectionResolver($resolver);
-        $mockConnection = Mockery::mock(stdClass::class);
+        $mockConnection = Mockery::mock(Connection::class);
         $resolver->shouldReceive('connection')->andReturn($mockConnection);
         $mockConnection->expects('getQueryGrammar')->times(2)->andReturn($mockConnection);
         $mockConnection->expects('getDateFormat')->times(2)->andReturn('Y-m-d H:i:s');
@@ -1842,7 +1842,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $resolver = Mockery::mock(Resolver::class);
         EloquentModelStub::setConnectionResolver($resolver);
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(Connection::class);
         $resolver->shouldReceive('connection')->andReturn($connection);
         $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
 
@@ -1876,7 +1876,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $resolver = Mockery::mock(Resolver::class);
         EloquentModelStub::setConnectionResolver($resolver);
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(Connection::class);
         $resolver->shouldReceive('connection')->andReturn($connection);
         $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
 
@@ -1896,7 +1896,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $resolver = Mockery::mock(Resolver::class);
         EloquentModelStub::setConnectionResolver($resolver);
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(Connection::class);
         $resolver->shouldReceive('connection')->andReturn($connection);
         $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
 
@@ -2714,7 +2714,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
         $query->expects('where')->times(2)->andReturn($query);
         $query->expects('increment')->times(2);
@@ -2737,7 +2737,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
         $query->expects('where')->times(2)->andReturn($query);
         $query->expects('increment')->times(2);
@@ -2766,7 +2766,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 4;
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
         $query->expects('where')->times(2)->andReturn($query);
         $query->expects('decrement')->times(2);
@@ -2796,7 +2796,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 2;
         $model->bar = 5;
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $model->expects('newQueryWithoutScopes')->andReturn($query);
         $query->expects('where')->with('id', '=', 1)->andReturn($query);
         $query->expects('incrementEach')->with(['foo' => 1, 'bar' => 2], [])->andReturn(1);
@@ -2817,7 +2817,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 10;
         $model->bar = 5;
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $model->expects('newQueryWithoutScopes')->andReturn($query);
         $query->expects('where')->with('id', '=', 1)->andReturn($query);
         $query->expects('decrementEach')->with(['foo' => 3, 'bar' => 2], [])->andReturn(1);
@@ -2838,7 +2838,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 2;
         $model->bar = 5;
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
         $query->expects('where')->times(2)->andReturn($query);
         $query->expects('incrementEach')->times(2);
@@ -2870,7 +2870,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 10;
         $model->bar = 5;
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
         $query->expects('where')->times(2)->andReturn($query);
         $query->expects('decrementEach')->times(2);
@@ -2931,7 +2931,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $model->expects('newQueryWithoutScopes')->andReturn($query);
         $query->expects('where')->with('id', '=', 1)->andReturn($query);
         $query->expects('incrementEach')->with(['foo' => 5], ['category' => 'test'])->andReturn(1);
@@ -2951,7 +2951,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 1;
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $model->expects('newQueryWithoutScopes')->andReturn($query);
         $query->expects('where')->andReturn($query);
         $query->expects('incrementEach')->andReturn(1);
@@ -2991,7 +2991,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
         $model->exists = false;
 
-        $query = Mockery::mock(stdClass::class);
+        $query = Mockery::mock(Builder::class);
         $model->expects('newQueryWithoutRelationships')->andReturn($query);
         $query->expects('incrementEach')->with(['foo' => 1], [])->andReturn(5);
 
@@ -4295,7 +4295,7 @@ class EloquentModelDestroyStub extends Model
     {
         $mock = Mockery::mock(Builder::class);
         $mock->expects('whereIn')->with('id', [1, 2, 3])->andReturn($mock);
-        $model = Mockery::mock(stdClass::class);
+        $model = Mockery::mock(Model::class);
         $mock->expects('get')->andReturn([$model]);
         $model->expects('delete');
 

@@ -6,6 +6,7 @@ use Closure;
 use ErrorException;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Events\Dispatcher;
@@ -109,9 +110,9 @@ class ViewFactoryTest extends TestCase
     public function testRenderEachCreatesViewForEachItemInArray()
     {
         $factory = Mockery::mock(Factory::class.'[make]', $this->getFactoryArgs());
-        $mockView1 = Mockery::mock(stdClass::class);
+        $mockView1 = Mockery::mock(ViewContract::class);
         $factory->expects('make')->with('foo', ['key' => 'bar', 'value' => 'baz'])->andReturn($mockView1);
-        $mockView2 = Mockery::mock(stdClass::class);
+        $mockView2 = Mockery::mock(ViewContract::class);
         $factory->expects('make')->with('foo', ['key' => 'breeze', 'value' => 'boom'])->andReturn($mockView2);
         $mockView1->expects('render')->andReturn('dayle');
         $mockView2->expects('render')->andReturn('rees');
@@ -124,7 +125,7 @@ class ViewFactoryTest extends TestCase
     public function testEmptyViewsCanBeReturnedFromRenderEach()
     {
         $factory = Mockery::mock(Factory::class.'[make]', $this->getFactoryArgs());
-        $mockView = Mockery::mock(stdClass::class);
+        $mockView = Mockery::mock(ViewContract::class);
         $factory->expects('make')->with('foo')->andReturn($mockView);
         $mockView->expects('render')->andReturn('empty');
 
@@ -698,7 +699,7 @@ class ViewFactoryTest extends TestCase
     public function testTranslation()
     {
         $container = new Container;
-        $translator = Mockery::mock(stdClass::class);
+        $translator = Mockery::mock(Translator::class);
         $translator->expects('get')->with('Foo', ['name' => 'taylor'])->andReturn('Bar');
         $container->instance('translator', $translator);
         $factory = $this->getFactory();

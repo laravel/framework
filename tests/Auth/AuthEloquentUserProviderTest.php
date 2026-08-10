@@ -27,7 +27,7 @@ class AuthEloquentUserProviderTest extends TestCase
 
     public function testRetrieveByTokenReturnsUser()
     {
-        $mockUser = Mockery::mock(stdClass::class);
+        $mockUser = Mockery::mock(Authenticatable::class);
         $mockUser->expects('getRememberToken')->andReturn('a');
 
         $provider = $this->getProviderMock();
@@ -66,7 +66,7 @@ class AuthEloquentUserProviderTest extends TestCase
 
     public function testRetrieveByBadTokenReturnsNull()
     {
-        $mockUser = Mockery::mock(stdClass::class);
+        $mockUser = Mockery::mock(Authenticatable::class);
         $mockUser->expects('getRememberToken')->andReturn(null);
 
         $provider = $this->getProviderMock();

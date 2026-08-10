@@ -17,6 +17,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\Factory;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
@@ -33,7 +34,6 @@ use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use stdClass;
 
 class BusBatchTest extends TestCase
 {
@@ -142,7 +142,7 @@ class BusBatchTest extends TestCase
         $thirdJob = function () {
         };
 
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(QueueContract::class);
         $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
@@ -233,7 +233,7 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(QueueContract::class);
         $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
@@ -271,7 +271,7 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(QueueContract::class);
         $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
@@ -309,7 +309,7 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(QueueContract::class);
         $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
@@ -348,7 +348,7 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(QueueContract::class);
         $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
@@ -381,7 +381,7 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(QueueContract::class);
         $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
@@ -424,7 +424,7 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(QueueContract::class);
         $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
@@ -503,7 +503,7 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(QueueContract::class);
         $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
@@ -626,7 +626,7 @@ class BusBatchTest extends TestCase
 
         $thirdJob = new ThirdTestJob;
 
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(QueueContract::class);
         $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);
@@ -666,7 +666,7 @@ class BusBatchTest extends TestCase
         $firstJob = (new ChainHeadJob)->onQueue('custom-queue');
         $secondJob = (new SecondTestJob)->onQueue('custom-queue');
 
-        $connection = Mockery::mock(stdClass::class);
+        $connection = Mockery::mock(QueueContract::class);
         $queue->expects('connection')
             ->with('test-connection')
             ->andReturn($connection);

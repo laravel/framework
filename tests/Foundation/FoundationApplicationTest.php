@@ -3,7 +3,9 @@
 namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Config\Repository;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Events\LocaleUpdated;
@@ -20,12 +22,12 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application;
 
-        $app['config'] = $config = Mockery::mock(stdClass::class);
+        $app['config'] = $config = Mockery::mock(Repository::class);
         $config->expects('get')->with('app.locale')->andReturn('bar');
         $config->expects('set')->with('app.locale', 'foo');
-        $app['translator'] = $trans = Mockery::mock(stdClass::class);
+        $app['translator'] = $trans = Mockery::mock(Translator::class);
         $trans->expects('setLocale')->with('foo');
-        $app['events'] = $events = Mockery::mock(stdClass::class);
+        $app['events'] = $events = Mockery::mock(Dispatcher::class);
         $events->expects('dispatch')->with(Mockery::on(function (LocaleUpdated $event) {
             return $event->locale === 'foo' && $event->previousLocale === 'bar';
         }));

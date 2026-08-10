@@ -891,9 +891,9 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
-        $relation = Mockery::mock(stdClass::class);
+        $relation = Mockery::mock(Relation::class);
         $builder->getModel()->expects('newInstance->orders')->andReturn($relation);
-        $relationQuery = Mockery::mock(stdClass::class);
+        $relationQuery = Mockery::mock(Builder::class);
         $relation->expects('getQuery')->andReturn($relationQuery);
         $relationQuery->expects('with')->with(['lines' => null, 'lines.details' => null]);
         $builder->setEagerLoads(['orders' => null, 'orders.lines' => null, 'orders.lines.details' => null]);
@@ -905,15 +905,15 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
-        $relation = Mockery::mock(stdClass::class);
+        $relation = Mockery::mock(Relation::class);
         $builder->getModel()->expects('newInstance->orders')->andReturn($relation);
-        $groupsRelation = Mockery::mock(stdClass::class);
+        $groupsRelation = Mockery::mock(Relation::class);
         $builder->getModel()->expects('newInstance->ordersGroups')->andReturn($groupsRelation);
 
-        $relationQuery = Mockery::mock(stdClass::class);
+        $relationQuery = Mockery::mock(Builder::class);
         $relation->shouldReceive('getQuery')->andReturn($relationQuery);
 
-        $groupRelationQuery = Mockery::mock(stdClass::class);
+        $groupRelationQuery = Mockery::mock(Builder::class);
         $groupsRelation->expects('getQuery')->andReturn($groupRelationQuery);
         $groupRelationQuery->expects('with')->with(['lines' => null, 'lines.details' => null]);
 
