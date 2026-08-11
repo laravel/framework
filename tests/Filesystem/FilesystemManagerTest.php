@@ -2,7 +2,8 @@
 
 namespace Illuminate\Tests\Filesystem;
 
-use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
@@ -14,6 +15,17 @@ use stdClass;
 
 class FilesystemManagerTest extends TestCase
 {
+    protected array $temporaryDirectories = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->temporaryDirectories as $directory) {
+            (new Filesystem)->deleteDirectory($directory);
+        }
+
+        parent::tearDown();
+    }
+
     public function testExceptionThrownOnUnsupportedDriver()
     {
         $this->expectExceptionObject(new InvalidArgumentException('Disk [local] does not have a configured driver.'));
@@ -29,9 +41,9 @@ class FilesystemManagerTest extends TestCase
     {
         $filesystem = new FilesystemManager(new Application);
 
-        $this->assertInstanceOf(Filesystem::class, $filesystem->build('my-custom-path'));
+        $this->assertInstanceOf(FilesystemContract::class, $filesystem->build('my-custom-path'));
 
-        $this->assertInstanceOf(Filesystem::class, $filesystem->build([
+        $this->assertInstanceOf(FilesystemContract::class, $filesystem->build([
             'driver' => 'local',
             'root' => 'my-custom-path',
             'url' => 'my-custom-url',
@@ -217,6 +229,85 @@ class FilesystemManagerTest extends TestCase
         }
     }
 
+    public function testCanBuildReadThroughDisks()
+    {
+        $filesystem = $this->readThroughFilesystemManager();
+        $primary = $filesystem->disk('primary');
+        $fallback = $filesystem->disk('fallback');
+        $readThrough = $filesystem->disk('read-through');
+
+        $fallback->put('fallback.txt', 'fallback contents');
+        $fallback->put('hidden-from-listing.txt', 'contents');
+        $primary->put('primary.txt', 'primary contents');
+        $primary->put('preferred.txt', 'primary version');
+        $fallback->put('preferred.txt', 'fallback version');
+
+        $this->assertTrue($readThrough->exists('fallback.txt'));
+        $this->assertSame(strlen('fallback contents'), $readThrough->size('fallback.txt'));
+        $this->assertTrue($primary->missing('fallback.txt'));
+        $this->assertSame(['preferred.txt', 'primary.txt'], $readThrough->files());
+
+        $this->assertSame('fallback contents', $readThrough->get('fallback.txt'));
+        $this->assertSame('fallback contents', $primary->get('fallback.txt'));
+        $this->assertSame('primary version', $readThrough->get('preferred.txt'));
+
+        $readThrough->put('written.txt', 'written contents');
+
+        $this->assertSame('written contents', $primary->get('written.txt'));
+        $this->assertTrue($fallback->missing('written.txt'));
+    }
+
+    public function testReadThroughDisksPromoteStreams()
+    {
+        $filesystem = $this->readThroughFilesystemManager();
+        $primary = $filesystem->disk('primary');
+        $fallback = $filesystem->disk('fallback');
+        $readThrough = $filesystem->disk('read-through');
+
+        $fallback->put('stream.txt', 'stream contents');
+
+        $stream = $readThrough->readStream('stream.txt');
+
+        $this->assertSame('stream contents', stream_get_contents($stream));
+        $this->assertSame('stream contents', $primary->get('stream.txt'));
+
+        fclose($stream);
+    }
+
+    public function testReadThroughDiskPromotionFailuresAreBestEffortByDefault()
+    {
+        $filesystem = $this->readThroughFilesystemManager([
+            'primary' => [
+                'driver' => 'local',
+                'root' => $this->temporaryDirectory('primary'),
+                'read-only' => true,
+            ],
+        ]);
+
+        $filesystem->disk('fallback')->put('fallback.txt', 'fallback contents');
+
+        $this->assertSame('fallback contents', $filesystem->disk('read-through')->get('fallback.txt'));
+    }
+
+    public function testReadThroughDiskCanThrowOnPromotionFailures()
+    {
+        $filesystem = $this->readThroughFilesystemManager([
+            'primary' => [
+                'driver' => 'local',
+                'root' => $this->temporaryDirectory('primary'),
+                'read-only' => true,
+            ],
+            'throw' => true,
+            'throw_on_promotion_failure' => true,
+        ]);
+
+        $filesystem->disk('fallback')->put('fallback.txt', 'fallback contents');
+
+        $this->expectException(UnableToReadFile::class);
+
+        $filesystem->disk('read-through')->get('fallback.txt');
+    }
+
     public function testCustomDriverClosureBoundObjectIsFilesystemManager()
     {
         $manager = new FilesystemManager(tap(new Application, function ($app) {
@@ -286,6 +377,35 @@ class FilesystemManagerTest extends TestCase
     //         rmdir(__DIR__.'/../../to-be-scoped');
     //     }
     // }
+
+    protected function readThroughFilesystemManager(array $readThroughConfig = []): FilesystemManager
+    {
+        $primary = $this->temporaryDirectory('primary');
+        $fallback = $this->temporaryDirectory('fallback');
+
+        return new FilesystemManager(tap(new Application, function ($app) use ($primary, $fallback, $readThroughConfig) {
+            $app['config'] = [
+                'filesystems.disks.primary' => [
+                    'driver' => 'local',
+                    'root' => $primary,
+                ],
+                'filesystems.disks.fallback' => [
+                    'driver' => 'local',
+                    'root' => $fallback,
+                ],
+                'filesystems.disks.read-through' => array_replace([
+                    'driver' => 'read-through',
+                    'primary' => 'primary',
+                    'fallback' => 'fallback',
+                ], $readThroughConfig),
+            ];
+        }));
+    }
+
+    protected function temporaryDirectory(string $name): string
+    {
+        return $this->temporaryDirectories[] = sys_get_temp_dir().'/laravel-read-through-'.$name.'-'.uniqid();
+    }
 }
 
 class CustomFilesystemDriver
