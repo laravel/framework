@@ -1,6 +1,12 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.65.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.66.0...12.x)
+
+## [v12.66.0](https://github.com/laravel/framework/compare/v12.65.0...v12.66.0) - 2026-08-11
+
+* [12.x] Isolate cloud agent requests from global HTTP client configuration by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/61068
+* [12.x] Configure a socket timeout for the Cloud log driver by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/61082
+* [12.x] ColumnDefinition::unsigned takes a parameter, which should be documented by [@afk11](https://github.com/afk11) in https://github.com/laravel/framework/pull/61123
 
 ## [v12.65.0](https://github.com/laravel/framework/compare/v12.64.0...v12.65.0) - 2026-08-05
 
