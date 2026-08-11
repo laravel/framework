@@ -14,6 +14,7 @@ use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\JobReleased;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\WorkerIdle;
 use Illuminate\Queue\Events\WorkerStarting;
@@ -465,6 +466,20 @@ class QueueWorkerTest extends TestCase
         $this->assertFalse($job->hasFailed());
         $this->assertFalse($job->isReleased());
         $this->assertTrue($job->isDeleted());
+    }
+
+    public function testJobReleasedEventIsRaisedWhenJobReleasesItself()
+    {
+        $job = new WorkerFakeJob(function ($job) {
+            $job->release(10);
+        });
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions());
+
+        $this->assertTrue($job->isReleased());
+        $this->assertFalse($job->isDeleted());
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobReleased::class))->once();
     }
 
     public function testWorkerPicksJobUsingCustomCallbacks()
