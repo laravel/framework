@@ -71,6 +71,8 @@ function test(
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Builder\User>', $query->lazyById());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Builder\User>', $query->lazyByIdDesc());
     assertType('Illuminate\Support\Collection<(int|string), mixed>', $query->pluck('foo'));
+    assertType('Illuminate\Support\Collection<int, (int|string)>', $query->pluckModelKeys());
+    assertType('array<int, (int|string)>', $query->modelKeys());
     assertType('Illuminate\Database\Eloquent\Relations\Relation<Illuminate\Database\Eloquent\Model, Illuminate\Types\Builder\User, *>', $query->getRelation('foo'));
     assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Builder\Post>', $query->setModel(new Post()));
 

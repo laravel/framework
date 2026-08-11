@@ -307,6 +307,8 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = new Collection([$one, $two, $three]);
 
         $this->assertEquals([1, 2, 3], $c->modelKeys());
+        $this->assertInstanceOf(BaseCollection::class, $c->pluckModelKeys());
+        $this->assertEquals([1, 2, 3], $c->pluckModelKeys()->all());
     }
 
     public function testCollectionMergesWithGivenCollection()

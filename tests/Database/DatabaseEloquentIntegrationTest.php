@@ -24,6 +24,7 @@ use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
@@ -1031,6 +1032,19 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame([1, 2], EloquentTestUser::oldest('id')->modelKeys());
     }
 
+    public function testPluckModelKeys()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $keys = EloquentTestUser::oldest('id')->pluckModelKeys();
+
+        $this->assertInstanceOf(BaseCollection::class, $keys);
+        $this->assertSame([1, 2], $keys->all());
+    }
+
     public function testModelKeysWithCastPrimaryKey()
     {
         EloquentTestUserWithStringCastId::insert([
@@ -1039,6 +1053,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         ]);
 
         $this->assertSame(['1', '2'], EloquentTestUserWithStringCastId::oldest('id')->modelKeys());
+        $this->assertSame(['1', '2'], EloquentTestUserWithStringCastId::oldest('id')->pluckModelKeys()->all());
     }
 
     public function testModelKeysWithCustomPrimaryKey()
@@ -1049,6 +1064,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         ]);
 
         $this->assertSame(['first', 'second'], EloquentTestUniqueUserWithCustomKey::orderBy('screen_name')->modelKeys());
+        $this->assertSame(['first', 'second'], EloquentTestUniqueUserWithCustomKey::orderBy('screen_name')->pluckModelKeys()->all());
     }
 
     public function testModelKeysWithQueryConstraints()
@@ -1061,6 +1077,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertSame([2, 3], EloquentTestUser::where('id', '>', 1)->oldest('id')->modelKeys());
         $this->assertSame([1], EloquentTestUser::oldest('id')->take(1)->modelKeys());
+        $this->assertSame([2, 3], EloquentTestUser::where('id', '>', 1)->oldest('id')->pluckModelKeys()->all());
+        $this->assertSame([1], EloquentTestUser::oldest('id')->take(1)->pluckModelKeys()->all());
     }
 
     public function testModelKeysWithRelationshipAndJoin()
@@ -1073,10 +1091,12 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user2->posts()->create(['id' => 3, 'name' => 'Third post']);
 
         $this->assertEquals([1, 2], $user1->posts()->oldest('id')->modelKeys());
+        $this->assertEquals([1, 2], $user1->posts()->oldest('id')->pluckModelKeys()->all());
 
         $join = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id')->where('users.id', 1);
 
         $this->assertEquals([1, 1], $join->modelKeys());
+        $this->assertEquals([1, 1], $join->pluckModelKeys()->all());
     }
 
     public function testFindOrFail()

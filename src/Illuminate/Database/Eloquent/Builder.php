@@ -1108,13 +1108,23 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get a collection of primary keys from the query result.
+     *
+     * @return \Illuminate\Support\Collection<int, array-key>
+     */
+    public function pluckModelKeys()
+    {
+        return $this->pluck($this->model->getQualifiedKeyName());
+    }
+
+    /**
      * Get an array of primary keys from the query result.
      *
      * @return array<int, array-key>
      */
     public function modelKeys()
     {
-        return $this->pluck($this->model->getQualifiedKeyName())->all();
+        return $this->pluckModelKeys()->all();
     }
 
     /**

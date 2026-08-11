@@ -378,13 +378,23 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Get a collection of primary keys.
+     *
+     * @return \Illuminate\Support\Collection<int, array-key>
+     */
+    public function pluckModelKeys()
+    {
+        return new BaseCollection(array_map(fn ($model) => $model->getKey(), $this->items));
+    }
+
+    /**
      * Get the array of primary keys.
      *
      * @return array<int, array-key>
      */
     public function modelKeys()
     {
-        return array_map(fn ($model) => $model->getKey(), $this->items);
+        return $this->pluckModelKeys()->all();
     }
 
     /**
