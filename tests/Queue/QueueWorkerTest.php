@@ -479,7 +479,7 @@ class QueueWorkerTest extends TestCase
 
         $this->assertTrue($job->isReleased());
         $this->assertFalse($job->isDeleted());
-        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobReleased::class))->once();
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobReleased::class))->once();
     }
 
     public function testWorkerPicksJobUsingCustomCallbacks()
