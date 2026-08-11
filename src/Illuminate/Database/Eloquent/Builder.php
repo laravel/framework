@@ -208,12 +208,12 @@ class Builder implements BuilderContract
     /**
      * Remove a registered global scope.
      *
-     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
+     * @param  \Illuminate\Database\Eloquent\Scope|string|int  $scope
      * @return $this
      */
     public function withoutGlobalScope($scope)
     {
-        if (! is_string($scope)) {
+        if (! is_string($scope) && ! is_int($scope)) {
             $scope = get_class($scope);
         }
 
