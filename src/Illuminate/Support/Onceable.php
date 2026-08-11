@@ -68,7 +68,7 @@ class Onceable
                 }
 
                 if (is_object($argument)) {
-                    return spl_object_hash($argument);
+                    return spl_object_id($argument);
                 }
 
                 return $argument;

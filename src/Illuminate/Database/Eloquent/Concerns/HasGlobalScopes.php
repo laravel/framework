@@ -65,7 +65,7 @@ trait HasGlobalScopes
         if (is_string($scope) && ($implementation instanceof Closure || $implementation instanceof Scope)) {
             return static::$globalScopes[static::class][$scope] = $implementation;
         } elseif ($scope instanceof Closure) {
-            return static::$globalScopes[static::class][spl_object_hash($scope)] = $scope;
+            return static::$globalScopes[static::class][spl_object_id($scope)] = $scope;
         } elseif ($scope instanceof Scope) {
             return static::$globalScopes[static::class][get_class($scope)] = $scope;
         } elseif (is_string($scope) && class_exists($scope) && is_subclass_of($scope, Scope::class)) {
