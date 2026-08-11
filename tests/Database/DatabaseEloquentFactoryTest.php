@@ -1113,6 +1113,13 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(1, $users->where('name', 'shaedrich'));
     }
 
+    public function test_factory_can_insert_zero_models()
+    {
+        (new FactoryTestPostFactory())->count(0)->insert();
+
+        $this->assertCount(0, FactoryTestPost::all());
+    }
+
     public function test_factory_can_insert_with_hidden()
     {
         (new FactoryTestUserFactory())->forEachSequence(['name' => Name::Taylor, 'options' => 'abc'])->insert();
