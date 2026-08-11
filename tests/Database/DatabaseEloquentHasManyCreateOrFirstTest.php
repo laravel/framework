@@ -399,6 +399,31 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $this->assertSame('bar', $result->val);
     }
 
+    public function testFirstOrNewDoesNotModifyExistingRelationQuery(): void
+    {
+        $model = new HasManyCreateOrFirstTestParentModel();
+        $model->id = 123;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])
+            ->andReturn([]);
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null', [123], true, [])
+            ->andReturn([]);
+
+        $relation = $model->children();
+
+        $relation->firstOrNew(['attr' => 'foo']);
+
+        $this->assertCount(0, $relation->get());
+    }
+
     public static function createOrFirstValues(): array
     {
         return [

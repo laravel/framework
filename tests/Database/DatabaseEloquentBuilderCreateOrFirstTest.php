@@ -638,6 +638,30 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $this->assertSame('bar', $result->val);
     }
 
+    public function testFirstOrNewDoesNotModifyExistingQuery(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([]);
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table"', [], true, [])
+            ->andReturn([]);
+
+        $query = $model->newQuery();
+
+        $query->firstOrNew(['attr' => 'foo']);
+
+        $this->assertCount(0, $query->get());
+    }
+
     public static function createOrFirstValues(): array
     {
         return [

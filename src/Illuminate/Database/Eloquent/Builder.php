@@ -693,7 +693,7 @@ class Builder implements BuilderContract
      */
     public function firstOrNew(array $attributes = [], Closure|array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (! is_null($instance = (clone $this)->where($attributes)->first())) {
             return $instance;
         }
 

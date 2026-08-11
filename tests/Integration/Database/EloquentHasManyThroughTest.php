@@ -166,6 +166,25 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertSame('Tony', $user1->name);
     }
 
+    public function testFirstOrNewAcceptsClosureValuesOnMissingRecord()
+    {
+        $taylor = User::create(['name' => 'Taylor', 'slug' => 'taylor']);
+        $team = Team::create(['owner_id' => $taylor->id]);
+        $callCount = 0;
+
+        $user = $taylor->teamMates()->firstOrNew(['slug' => 'tony'], function () use (&$callCount, $team) {
+            $callCount++;
+
+            return ['name' => 'Tony', 'team_id' => $team->id];
+        });
+
+        $this->assertSame(1, $callCount);
+        $this->assertFalse($user->exists);
+        $this->assertEquals($team->id, $user->team_id);
+        $this->assertSame('tony', $user->slug);
+        $this->assertSame('Tony', $user->name);
+    }
+
     public function testFirstOrNewWhenRecordExists()
     {
         $taylor = User::create(['name' => 'Taylor', 'slug' => 'taylor']);
@@ -185,6 +204,37 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $this->assertTrue($existingTony->is($newTony));
         $this->assertSame('tony', $existingTony->refresh()->slug);
         $this->assertSame('Tony Messias', $existingTony->name);
+    }
+
+    public function testFirstOrNewDoesNotInvokeClosureValuesWhenRecordExists()
+    {
+        $taylor = User::create(['name' => 'Taylor', 'slug' => 'taylor']);
+        $team = Team::create(['owner_id' => $taylor->id]);
+        $existingTony = $team->members()->create(['name' => 'Tony Messias', 'slug' => 'tony']);
+        $callCount = 0;
+
+        $user = $taylor->teamMates()->firstOrNew(['slug' => 'tony'], function () use (&$callCount) {
+            $callCount++;
+
+            return ['name' => 'Tony'];
+        });
+
+        $this->assertSame(0, $callCount);
+        $this->assertTrue($existingTony->is($user));
+        $this->assertSame('Tony Messias', $user->name);
+    }
+
+    public function testFirstOrNewDoesNotModifyExistingRelationQuery()
+    {
+        $taylor = User::create(['name' => 'Taylor', 'slug' => 'taylor']);
+        $team = Team::create(['owner_id' => $taylor->id]);
+        $john = $team->members()->create(['name' => 'John', 'slug' => 'john']);
+
+        $relation = $taylor->teamMates();
+
+        $relation->firstOrNew(['slug' => 'tony']);
+
+        $this->assertTrue($john->is($relation->sole()));
     }
 
     public function testFirstOrCreateWhenModelDoesntExist()
