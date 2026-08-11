@@ -1,6 +1,66 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.24.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.25.0...13.x)
+
+## [v13.25.0](https://github.com/laravel/framework/compare/v13.24.0...v13.25.0) - 2026-08-11
+
+* [12.x] Prevent fatal errors when logging deprecations fails by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/60907
+* [12.x] Fix Factory::insert() with a count of zero by [@alies-dev](https://github.com/alies-dev) in https://github.com/laravel/framework/pull/60911
+* [12.x] Fix schedule:list timezone conversion for range, step, and wildcard cron expressions by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/60913
+* [12.x] Fix getMigrationBatches return type annotation by [@wouterj](https://github.com/wouterj) in https://github.com/laravel/framework/pull/60973
+* [13.x] Add foreignUlidFor schema helper by [@talaridisTh](https://github.com/talaridisTh) in https://github.com/laravel/framework/pull/61036
+* [13.x] Improve return type for `Arr::prependKeysWith()` by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/61034
+* [13.x] Add uuid to queue fake for inspection methods by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60966
+* [13.x] Respect after-commit dispatch when bulk pushing to DatabaseQueue by [@Faiyajz](https://github.com/Faiyajz) in https://github.com/laravel/framework/pull/60996
+* [13.x] Add a UniqueJobSkipped event by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61039
+* [13.x] Ensure Container::call cleans up build stack after exceptions by [@Faiyajz](https://github.com/Faiyajz) in https://github.com/laravel/framework/pull/61041
+* [13.x] Reject non-stream resources in HTTP fake response bodies by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/61047
+* [13.x] Fix incorrect image dimensions for HEIC by [@zachiler](https://github.com/zachiler) in https://github.com/laravel/framework/pull/61010
+* [13.x] Simplify most of the exceptions expectations by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/61049
+* [13.x] Fix Str::numbers() type annotation by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/61053
+* [13.x] Fix flaky Str::random distribution test by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/61052
+* [13.x] Normalize enum keys in typed cache getters by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/61056
+* Simplify remaining exception expectations by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/61058
+* Apply fixes from StyleCI by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/61059
+* [13.x] Isolate cloud agent requests from global HTTP client configuration by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/61064
+* [13.x] Fix flaky circuit breaker release delay assertions by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/61062
+* [13.x] Bump minimum versions by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/61033
+* [13.x] Configure a socket timeout for the Cloud log driver by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/61065
+* [13.x] Fix:  add missing check for `#[WithoutTimestamps]` on model ignore touch by [@bram-pkg](https://github.com/bram-pkg) in https://github.com/laravel/framework/pull/61073
+* [12.x] Isolate cloud agent requests from global HTTP client configuration by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/61068
+* [13.x] Fix getRememberToken return type documentation by [@keibass](https://github.com/keibass) in https://github.com/laravel/framework/pull/61067
+* [13.x] Respect backed enum queue names when queueing mailables by [@Faiyajz](https://github.com/Faiyajz) in https://github.com/laravel/framework/pull/61066
+* [13.x] Restore missing model deletion for broadcast events by [@Faiyajz](https://github.com/Faiyajz) in https://github.com/laravel/framework/pull/61074
+* [13.x] Use new Collection instead of Collection::make in tests by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/61079
+* [13.x] Add the timeout in JobTimedOut by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61060
+* [12.x] Configure a socket timeout for the Cloud log driver by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/61082
+* [13.x] Move Testbench-based tests to tests/Integration by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/61080
+* Use serve defaults for dev command by [@n3crosis](https://github.com/n3crosis) in https://github.com/laravel/framework/pull/61090
+* [13.x] Skip unsupported values in LazyCollection::flip() by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/61081
+* [13.x] Preserve default denial response for Gate::forUser by [@Faiyajz](https://github.com/Faiyajz) in https://github.com/laravel/framework/pull/61087
+* [13.x] Support fail on timeout for notifications by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61072
+* [13.x] Fix QueueFakeTest by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61091
+* [13.x] Prefer consitent assertions by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/61093
+* [13.x] Clean up test teardown by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/61078
+* Prefer text input on dynamic access by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/61099
+* [13.x] feat: make Image::toFormat() public by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/61110
+* [13.x] Pass the HTTP method to retry callbacks for asynchronous HTTP requests by [@Button99](https://github.com/Button99) in https://github.com/laravel/framework/pull/61106
+* [13.x] Add `withoutCookies` method by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61115
+* [13.x] feat: implement Responsable on Image class by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/61111
+* [13.x] feat: add Image::fromStream method by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/61109
+* [13.x] Run `artisan dev` through `@laravel/multiplex` by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/framework/pull/61100
+* [13.x] Restore array support in Str::substrReplace by [@Faiyajz](https://github.com/Faiyajz) in https://github.com/laravel/framework/pull/61105
+* Revert "[13.x] Bump minimum versions" by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/61118
+* [12.x] ColumnDefinition::unsigned takes a parameter, which should be documented by [@afk11](https://github.com/afk11) in https://github.com/laravel/framework/pull/61123
+* [13.x] Ensure Queue drivers work for enums matching the Fake by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61116
+* [13.x] Preserve queue resolution on queued mailables in MailFake by [@hamdyelbatal122](https://github.com/hamdyelbatal122) in https://github.com/laravel/framework/pull/61114
+* [13.x] Handle cache maintenance mode deactivation races by [@Faiyajz](https://github.com/Faiyajz) in https://github.com/laravel/framework/pull/61121
+* [13.x] Fix nullable return types on the route binding registrar by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/61124
+* [13.x] Mockery cleanup by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/61117
+* Merge branch '12.x'  by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61130
+* [13.x] Support brick math ^0.19 by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61133
+* Improve signed URL support for Vapor by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/61129
+* [13.x] Add a global pause switch for queues by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61126
 
 ## [v13.24.0](https://github.com/laravel/framework/compare/v13.23.0...v13.24.0) - 2026-08-04
 
