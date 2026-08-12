@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\Prohibitable;
 use Illuminate\Foundation\DevCommandMode;
 use Illuminate\Foundation\DevCommands;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\NodePackageManager;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -176,7 +177,10 @@ class DevCommand extends Command
 
         $this->line('');
 
-        passthru($command, $exitCode);
+        $exitCode = Process::forever()
+            ->options(['create_process_group' => true])
+            ->run($command, fn ($type, $output) => $this->output->write($output))
+            ->exitCode();
 
         $columns === false ? putenv('COLUMNS') : putenv("COLUMNS={$columns}");
 
