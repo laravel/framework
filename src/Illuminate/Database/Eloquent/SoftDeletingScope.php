@@ -72,7 +72,7 @@ class SoftDeletingScope implements Scope
      */
     protected function addRestore(Builder $builder)
     {
-        $builder->macro('restore', function (Builder $builder) {
+        $builder->macro('restore', static function (Builder $builder) {
             $builder->withTrashed();
 
             return $builder->update([$builder->getModel()->getDeletedAtColumn() => null]);
@@ -87,10 +87,10 @@ class SoftDeletingScope implements Scope
      */
     protected function addRestoreOrCreate(Builder $builder)
     {
-        $builder->macro('restoreOrCreate', function (Builder $builder, array $attributes = [], array $values = []) {
+        $builder->macro('restoreOrCreate', static function (Builder $builder, array $attributes = [], array $values = []) {
             $builder->withTrashed();
 
-            return tap($builder->firstOrCreate($attributes, $values), function ($instance) {
+            return tap($builder->firstOrCreate($attributes, $values), static function ($instance) {
                 $instance->restore();
             });
         });
@@ -104,10 +104,10 @@ class SoftDeletingScope implements Scope
      */
     protected function addCreateOrRestore(Builder $builder)
     {
-        $builder->macro('createOrRestore', function (Builder $builder, array $attributes = [], array $values = []) {
+        $builder->macro('createOrRestore', static function (Builder $builder, array $attributes = [], array $values = []) {
             $builder->withTrashed();
 
-            return tap($builder->createOrFirst($attributes, $values), function ($instance) {
+            return tap($builder->createOrFirst($attributes, $values), static function ($instance) {
                 $instance->restore();
             });
         });

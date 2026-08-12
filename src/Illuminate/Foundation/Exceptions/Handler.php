@@ -277,7 +277,7 @@ class Handler implements ExceptionHandlerContract
     public function map($from, $to = null)
     {
         if (is_string($to)) {
-            $to = fn ($exception) => new $to('', 0, $exception);
+            $to = static fn ($exception) => new $to('', 0, $exception);
         }
 
         if (is_callable($from) && is_null($to)) {
@@ -378,11 +378,11 @@ class Handler implements ExceptionHandlerContract
      */
     public function shouldStopRetries(Throwable $e)
     {
-        if (! is_null(Arr::first($this->dontRetry, fn ($type) => $e instanceof $type))) {
+        if (! is_null(Arr::first($this->dontRetry, static fn ($type) => $e instanceof $type))) {
             return true;
         }
 
-        return array_any($this->dontRetryCallbacks, fn ($dontRetryCallback) => $dontRetryCallback($e) === true);
+        return array_any($this->dontRetryCallbacks, static fn ($dontRetryCallback) => $dontRetryCallback($e) === true);
     }
 
     /**
@@ -516,7 +516,7 @@ class Handler implements ExceptionHandlerContract
 
         $dontReport = array_merge($this->dontReport, $this->internalDontReport);
 
-        if (! is_null(Arr::first($dontReport, fn ($type) => $e instanceof $type))) {
+        if (! is_null(Arr::first($dontReport, static fn ($type) => $e instanceof $type))) {
             return true;
         }
 
@@ -538,7 +538,7 @@ class Handler implements ExceptionHandlerContract
             return ! $this->container->make(RateLimiter::class)->attempt(
                 with($throttle->key ?: 'illuminate:foundation:exceptions:'.$e::class, fn ($key) => $this->hashThrottleKeys ? hash('xxh128', $key) : $key),
                 $throttle->maxAttempts,
-                fn () => true,
+                static fn () => true,
                 $throttle->decaySeconds
             );
         }), rescue: false, report: false);
@@ -1127,7 +1127,7 @@ class Handler implements ExceptionHandlerContract
             'exception' => get_class($e),
             'file' => $e->getFile(),
             'line' => $e->getLine(),
-            'trace' => (new Collection($e->getTrace()))->map(fn ($trace) => Arr::except($trace, ['args']))->all(),
+            'trace' => (new Collection($e->getTrace()))->map(static fn ($trace) => Arr::except($trace, ['args']))->all(),
         ] : [
             'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
         ];
@@ -1196,7 +1196,7 @@ class Handler implements ExceptionHandlerContract
     protected function mapLogLevel(Throwable $e)
     {
         return Arr::first(
-            $this->levels, fn ($level, $type) => $e instanceof $type, LogLevel::ERROR
+            $this->levels, static fn ($level, $type) => $e instanceof $type, LogLevel::ERROR
         );
     }
 

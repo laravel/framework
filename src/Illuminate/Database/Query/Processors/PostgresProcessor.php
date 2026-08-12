@@ -33,7 +33,7 @@ class PostgresProcessor extends Processor
     /** @inheritDoc */
     public function processTypes($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             return [
@@ -77,7 +77,7 @@ class PostgresProcessor extends Processor
     /** @inheritDoc */
     public function processColumns($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             $autoincrement = $result->default !== null && str_starts_with($result->default, 'nextval(');
@@ -106,7 +106,7 @@ class PostgresProcessor extends Processor
     /** @inheritDoc */
     public function processIndexes($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             return [
@@ -122,7 +122,7 @@ class PostgresProcessor extends Processor
     /** @inheritDoc */
     public function processForeignKeys($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             return [

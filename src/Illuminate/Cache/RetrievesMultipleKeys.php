@@ -19,7 +19,7 @@ trait RetrievesMultipleKeys
         $return = [];
 
         $keys = (new Collection($keys))
-            ->mapWithKeys(fn ($value, $key) => [is_string($key) ? $key : $value => is_string($key) ? $value : null])
+            ->mapWithKeys(static fn ($value, $key) => [is_string($key) ? $key : $value => is_string($key) ? $value : null])
             ->all();
 
         foreach ($keys as $key => $default) {

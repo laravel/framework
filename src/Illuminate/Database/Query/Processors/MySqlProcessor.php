@@ -16,7 +16,7 @@ class MySqlProcessor extends Processor
      */
     public function processColumnListing($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             return ((object) $result)->column_name;
         }, $results);
     }
@@ -42,7 +42,7 @@ class MySqlProcessor extends Processor
     /** @inheritDoc */
     public function processColumns($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             return [
@@ -69,7 +69,7 @@ class MySqlProcessor extends Processor
     /** @inheritDoc */
     public function processIndexes($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             return [
@@ -85,7 +85,7 @@ class MySqlProcessor extends Processor
     /** @inheritDoc */
     public function processForeignKeys($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             return [

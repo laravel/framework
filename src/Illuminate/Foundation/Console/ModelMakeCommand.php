@@ -315,6 +315,6 @@ class ModelMakeCommand extends GeneratorCommand
             'migration' => 'Migration',
             'policy' => 'Policy',
             'resource' => 'Resource Controller',
-        ])))->each(fn ($option) => $input->setOption($option, true));
+        ])))->each(static fn ($option) => $input->setOption($option, true));
     }
 }

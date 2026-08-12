@@ -310,7 +310,7 @@ class Kernel implements KernelContract
      */
     protected function scheduleCache()
     {
-        return $this->app['config']->get('cache.schedule_store', Env::get('SCHEDULE_CACHE_DRIVER', function () {
+        return $this->app['config']->get('cache.schedule_store', Env::get('SCHEDULE_CACHE_DRIVER', static function () {
             return Env::get('SCHEDULE_CACHE_STORE');
         }));
     }
@@ -336,7 +336,7 @@ class Kernel implements KernelContract
     {
         $command = new ClosureCommand($signature, $callback);
 
-        Artisan::starting(function ($artisan) use ($command) {
+        Artisan::starting(static function ($artisan) use ($command) {
             $artisan->add($command);
         });
 
@@ -353,7 +353,7 @@ class Kernel implements KernelContract
     {
         $paths = array_unique(Arr::wrap($paths));
 
-        $paths = array_filter($paths, function ($path) {
+        $paths = array_filter($paths, static function ($path) {
             return is_dir($path);
         });
 
@@ -374,7 +374,7 @@ class Kernel implements KernelContract
 
             $possibleCommands[$file] = $commandClassName;
 
-            $command = rescue(fn () => new ReflectionClass($commandClassName), null, false);
+            $command = rescue(static fn () => new ReflectionClass($commandClassName), null, false);
 
             return $command instanceof ReflectionClass
                 && $command->isSubClassOf(Command::class)
@@ -382,7 +382,7 @@ class Kernel implements KernelContract
         };
 
         foreach ($this->findCommands($paths)->filter($filterCommands) as $file) {
-            Artisan::starting(function ($artisan) use ($file, $possibleCommands) {
+            Artisan::starting(static function ($artisan) use ($file, $possibleCommands) {
                 $artisan->resolve($possibleCommands[$file]);
             });
         }
@@ -534,7 +534,7 @@ class Kernel implements KernelContract
     {
         $this->app->bootstrapWith(
             (new Collection($this->bootstrappers()))
-                ->reject(fn ($bootstrapper) => $bootstrapper === \Illuminate\Foundation\Bootstrap\BootProviders::class)
+                ->reject(static fn ($bootstrapper) => $bootstrapper === \Illuminate\Foundation\Bootstrap\BootProviders::class)
                 ->all()
         );
     }

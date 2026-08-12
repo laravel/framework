@@ -358,7 +358,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             ->make(ViewFactory::class)
             ->make($component->resolveView(), $data);
 
-        return tap($view->render(), function () use ($view, $deleteCachedView) {
+        return tap($view->render(), static function () use ($view, $deleteCachedView) {
             if ($deleteCachedView) {
                 @unlink($view->getPath());
             }
@@ -739,25 +739,25 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $this->conditions[$name] = $callback;
 
-        $this->directive($name, function ($expression) use ($name) {
+        $this->directive($name, static function ($expression) use ($name) {
             return $expression !== ''
                 ? "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
                 : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
-        $this->directive('unless'.$name, function ($expression) use ($name) {
+        $this->directive('unless'.$name, static function ($expression) use ($name) {
             return $expression !== ''
                 ? "<?php if (! \Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
                 : "<?php if (! \Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
-        $this->directive('else'.$name, function ($expression) use ($name) {
+        $this->directive('else'.$name, static function ($expression) use ($name) {
             return $expression !== ''
                 ? "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
                 : "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
-        $this->directive('end'.$name, function () {
+        $this->directive('end'.$name, static function () {
             return '<?php endif; ?>';
         });
     }
@@ -791,7 +791,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         if (is_null($alias)) {
             $alias = str_contains($class, '\\View\\Components\\')
                 ? (new Stringable($class))->after('\\View\\Components\\')->explode('\\')
-                    ->map(fn ($segment) => Str::kebab($segment))
+                    ->map(static fn ($segment) => Str::kebab($segment))
                     ->implode(':')
                 : Str::kebab(class_basename($class));
         }
@@ -923,13 +923,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $alias = $alias ?: Arr::last(explode('.', $path));
 
-        $this->directive($alias, function ($expression) use ($path) {
+        $this->directive($alias, static function ($expression) use ($path) {
             return $expression
                 ? "<?php \$__env->startComponent('{$path}', {$expression}); ?>"
                 : "<?php \$__env->startComponent('{$path}'); ?>";
         });
 
-        $this->directive('end'.$alias, function ($expression) {
+        $this->directive('end'.$alias, static function ($expression) {
             return '<?php echo $__env->renderComponent(); ?>';
         });
     }

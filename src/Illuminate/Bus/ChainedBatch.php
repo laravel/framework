@@ -59,7 +59,7 @@ class ChainedBatch implements ShouldQueue
      */
     public static function prepareNestedBatches(Collection $jobs): Collection
     {
-        return $jobs->filter()->values()->map(fn ($job) => match (true) {
+        return $jobs->filter()->values()->map(static fn ($job) => match (true) {
             is_array($job) => static::prepareNestedBatches(new Collection($job))->all(),
             $job instanceof Collection => static::prepareNestedBatches($job),
             $job instanceof PendingBatch => new ChainedBatch($job),
@@ -100,7 +100,7 @@ class ChainedBatch implements ShouldQueue
         }
 
         foreach ($this->chainCatchCallbacks ?? [] as $callback) {
-            $batch->catch(function (Batch $batch, ?Throwable $exception) use ($callback) {
+            $batch->catch(static function (Batch $batch, ?Throwable $exception) use ($callback) {
                 if (! $batch->allowsFailures()) {
                     $callback($exception);
                 }
@@ -130,7 +130,7 @@ class ChainedBatch implements ShouldQueue
             $next->chainQueue = $this->chainQueue;
             $next->chainCatchCallbacks = $this->chainCatchCallbacks;
 
-            $batch->finally(function (Batch $batch) use ($next) {
+            $batch->finally(static function (Batch $batch) use ($next) {
                 if (! $batch->cancelled()) {
                     Container::getInstance()->make(Dispatcher::class)->dispatch($next);
                 }

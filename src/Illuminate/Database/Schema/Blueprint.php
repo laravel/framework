@@ -183,7 +183,7 @@ class Blueprint
     protected function commandsNamed(array $names)
     {
         return (new Collection($this->commands))
-            ->filter(fn ($command) => in_array($command->name, $names));
+            ->filter(static fn ($command) => in_array($command->name, $names));
     }
 
     /**
@@ -327,7 +327,7 @@ class Blueprint
     public function creating()
     {
         return (new Collection($this->commands))
-            ->contains(fn ($command) => ! $command instanceof ColumnDefinition && $command->name === 'create');
+            ->contains(static fn ($command) => ! $command instanceof ColumnDefinition && $command->name === 'create');
     }
 
     /**
@@ -1168,7 +1168,7 @@ class Blueprint
      */
     public function enum($column, array $allowed)
     {
-        $allowed = array_map(fn ($value) => enum_value($value), $allowed);
+        $allowed = array_map(static fn ($value) => enum_value($value), $allowed);
 
         return $this->addColumn('enum', $column, ['allowed' => $allowed]);
     }
@@ -1889,11 +1889,11 @@ class Blueprint
      */
     public function removeColumn($name)
     {
-        $this->columns = array_values(array_filter($this->columns, function ($c) use ($name) {
+        $this->columns = array_values(array_filter($this->columns, static function ($c) use ($name) {
             return $c['name'] != $name;
         }));
 
-        $this->commands = array_values(array_filter($this->commands, function ($c) use ($name) {
+        $this->commands = array_values(array_filter($this->commands, static function ($c) use ($name) {
             return ! $c instanceof ColumnDefinition || $c['name'] != $name;
         }));
 
@@ -1995,7 +1995,7 @@ class Blueprint
      */
     public function getAddedColumns()
     {
-        return array_filter($this->columns, function ($column) {
+        return array_filter($this->columns, static function ($column) {
             return ! $column->change;
         });
     }
@@ -2009,7 +2009,7 @@ class Blueprint
      */
     public function getChangedColumns()
     {
-        return array_filter($this->columns, function ($column) {
+        return array_filter($this->columns, static function ($column) {
             return (bool) $column->change;
         });
     }

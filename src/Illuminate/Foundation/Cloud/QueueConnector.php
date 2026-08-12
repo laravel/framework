@@ -67,9 +67,9 @@ class QueueConnector implements ConnectorInterface
      */
     protected function registerErrorHandling(SqsClient $sqs, Queue $queue): void
     {
-        $sqs->getHandlerList()->appendSign(function (callable $handler) use ($queue) {
-            return function (CommandInterface $command, RequestInterface $request) use ($handler, $queue) {
-                return $handler($command, $request)->otherwise(function ($reason) use ($command, $queue) {
+        $sqs->getHandlerList()->appendSign(static function (callable $handler) use ($queue) {
+            return static function (CommandInterface $command, RequestInterface $request) use ($handler, $queue) {
+                return $handler($command, $request)->otherwise(static function ($reason) use ($command, $queue) {
                     if ($reason instanceof AwsException &&
                         $reason->getAwsErrorCode() === 'AWS.SimpleQueueService.NonExistentQueue') {
                         $name = $queue->normalizeQueue($command['QueueUrl'] ?? null);
@@ -90,7 +90,7 @@ class QueueConnector implements ConnectorInterface
      */
     protected function configureQueue(Queue $queue): void
     {
-        $this->app['events']->listen(fn (JobQueued $event) => $event->connectionName === $queue->getConnectionName()
+        $this->app['events']->listen(static fn (JobQueued $event) => $event->connectionName === $queue->getConnectionName()
             ? $queue->finishQueueingJob($event->queue)
             : null);
     }
@@ -106,17 +106,17 @@ class QueueConnector implements ConnectorInterface
         // Exit the worker (and restart the pod) when the agent socket is unreachable...
         $this->app->extend(
             LostConnectionDetector::class,
-            fn ($detector) => new AgentAwareLostConnectionDetector($detector),
+            static fn ($detector) => new AgentAwareLostConnectionDetector($detector),
         );
 
-        $this->app['events']->listen(fn (WorkerStopping $event) => match ($event->reason) {
+        $this->app['events']->listen(static fn (WorkerStopping $event) => match ($event->reason) {
             WorkerStopReason::TimedOut => $queue->finishProcessingJob(default: 'released'),
             default => $queue->finishProcessingJob(),
         });
 
         static::$reservedMemory = str_repeat('x', 32768);
 
-        register_shutdown_function(function () use ($queue) {
+        register_shutdown_function(static function () use ($queue) {
             static::$reservedMemory = null;
 
             if (! is_null($error = error_get_last()) && in_array($error['type'], [E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE])) {

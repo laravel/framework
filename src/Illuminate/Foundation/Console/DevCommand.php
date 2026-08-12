@@ -100,7 +100,7 @@ class DevCommand extends Command
     protected function buildMultiplexCommand(array $devCommands): string
     {
         $args = collect($devCommands)
-            ->map(fn ($devCommand) => implode(',', [
+            ->map(static fn ($devCommand) => implode(',', [
                 $devCommand['name'].'@'.$devCommand['color'],
                 $devCommand['command'],
             ]));
@@ -121,7 +121,7 @@ class DevCommand extends Command
         ])
             ->filter()
             ->keys()
-            ->map(fn ($flag) => "--$flag");
+            ->map(static fn ($flag) => "--$flag");
 
         if ($bufferSize = $this->option('buffer-size') ?? DevCommands::getBufferSize()) {
             $flags->push('--buffer-size='.escapeshellarg($bufferSize));

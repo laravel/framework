@@ -49,8 +49,8 @@ class TableCommand extends DatabaseInspectionCommand
 
         $tableName = $this->argument('table') ?: search(
             'Which table would you like to inspect?',
-            fn (string $query) => $tableNames
-                ->filter(fn ($table) => str_contains(strtolower($table), strtolower($query)))
+            static fn (string $query) => $tableNames
+                ->filter(static fn ($table) => str_contains(strtolower($table), strtolower($query)))
                 ->values()
                 ->all()
         );
@@ -58,8 +58,8 @@ class TableCommand extends DatabaseInspectionCommand
         $table = $tables[$tableName] ?? (new Collection($tables))->when(
             Arr::wrap($connection->getSchemaBuilder()->getCurrentSchemaListing()
                 ?? $connection->getSchemaBuilder()->getCurrentSchemaName()),
-            fn (Collection $collection, array $currentSchemas) => $collection->sortBy(
-                function (array $table) use ($currentSchemas) {
+            static fn (Collection $collection, array $currentSchemas) => $collection->sortBy(
+                static function (array $table) use ($currentSchemas) {
                     $index = array_search($table['schema'], $currentSchemas);
 
                     return $index === false ? PHP_INT_MAX : $index;
@@ -180,7 +180,7 @@ class TableCommand extends DatabaseInspectionCommand
      */
     protected function foreignKeys(Builder $schema, string $table)
     {
-        return (new Collection($schema->getForeignKeys($table)))->map(fn ($foreignKey) => [
+        return (new Collection($schema->getForeignKeys($table)))->map(static fn ($foreignKey) => [
             'name' => $foreignKey['name'],
             'columns' => new Collection($foreignKey['columns']),
             'foreign_schema' => $foreignKey['foreign_schema'],

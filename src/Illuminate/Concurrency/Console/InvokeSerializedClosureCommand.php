@@ -48,7 +48,7 @@ class InvokeSerializedClosureCommand extends Command
                     isset($_SERVER['LARAVEL_INVOKABLE_CLOSURE']) => unserialize(
                         base64_decode($_SERVER['LARAVEL_INVOKABLE_CLOSURE'])
                     ),
-                    default => fn () => null,
+                    default => static fn () => null,
                 })),
             ]));
         } catch (Throwable $e) {

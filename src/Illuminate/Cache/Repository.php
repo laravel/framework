@@ -165,7 +165,7 @@ class Repository implements ArrayAccess, CacheContract
         $this->event(new RetrievingManyKeys($this->getName(), $keys));
 
         $values = $this->store->many((new Collection($keys))
-            ->map(fn ($value, $key) => is_string($key) ? $key : enum_value($value))
+            ->map(static fn ($value, $key) => is_string($key) ? $key : enum_value($value))
             ->values()
             ->all()
         );

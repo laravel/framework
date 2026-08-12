@@ -481,7 +481,7 @@ class SqlServerGrammar extends Grammar
     {
         $cleanBindings = Arr::except($bindings, 'select');
 
-        $values = Arr::flatten(array_map(fn ($value) => value($value), $values));
+        $values = Arr::flatten(array_map(static fn ($value) => value($value), $values));
 
         return array_values(
             array_merge($values, Arr::flatten($cleanBindings))

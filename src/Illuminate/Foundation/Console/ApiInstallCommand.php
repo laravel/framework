@@ -126,7 +126,7 @@ class ApiInstallCommand extends Command
             'laravel/sanctum:^4.0',
         ]);
 
-        $migrationPublished = (new Collection(scandir($this->laravel->databasePath('migrations'))))->contains(function ($migration) {
+        $migrationPublished = (new Collection(scandir($this->laravel->databasePath('migrations'))))->contains(static function ($migration) {
             return preg_match('/\d{4}_\d{2}_\d{2}_\d{6}_create_personal_access_tokens_table.php/', $migration);
         });
 

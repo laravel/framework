@@ -97,8 +97,8 @@ trait DatabaseTruncation
                     return $tables->reject(fn (array $table) => $this->tableExistsIn($table, $exceptTables));
                 }
             )
-            ->each(function (array $table) use ($connection) {
-                $connection->withoutTablePrefix(function ($connection) use ($table) {
+            ->each(static function (array $table) use ($connection) {
+                $connection->withoutTablePrefix(static function ($connection) use ($table) {
                     $table = $connection->table($table['schema_qualified_name']);
 
                     if ($table->exists()) {

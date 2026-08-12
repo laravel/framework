@@ -42,7 +42,7 @@ trait LazilyRefreshDatabase
             $database->connection($connection)->beforeExecuting($callback);
         }
 
-        $this->beforeApplicationDestroyed(function () {
+        $this->beforeApplicationDestroyed(static function () {
             RefreshDatabaseState::$lazilyRefreshed = false;
         });
     }

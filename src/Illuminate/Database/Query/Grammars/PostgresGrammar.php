@@ -656,7 +656,7 @@ class PostgresGrammar extends Grammar
 
         $cleanBindings = Arr::except($bindings, 'select');
 
-        $values = Arr::flatten(array_map(fn ($value) => value($value), $values));
+        $values = Arr::flatten(array_map(static fn ($value) => value($value), $values));
 
         return array_values(
             array_merge($values, Arr::flatten($cleanBindings))
@@ -779,7 +779,7 @@ class PostgresGrammar extends Grammar
         return (new Collection($path))
             ->map(fn ($attribute) => $this->parseJsonPathArrayKeys($attribute))
             ->collapse()
-            ->map(function ($attribute) use ($quote) {
+            ->map(static function ($attribute) use ($quote) {
                 if (filter_var($attribute, FILTER_VALIDATE_INT) !== false) {
                     return $attribute;
                 }

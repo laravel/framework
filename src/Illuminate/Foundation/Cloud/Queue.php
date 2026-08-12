@@ -293,13 +293,13 @@ class Queue implements QueueContract, ClearableQueue
             $this->agentRequest()
                 ->timeout(10)
                 ->throw()
-                ->retry(3, 100, fn ($exception) => $exception instanceof ConnectionException)
+                ->retry(3, 100, static fn ($exception) => $exception instanceof ConnectionException)
                 ->post('/result', array_filter([
                     'messageId' => $messageId,
                     'receiptHandle' => $receiptHandle,
                     'status' => $status,
                     'delay' => $delay,
-                ], fn ($value) => $value !== null));
+                ], static fn ($value) => $value !== null));
         } catch (ConnectionException $e) {
             throw new AgentUnreachableException(
                 'The Laravel Cloud agent runtime socket is unreachable.', previous: $e
@@ -520,8 +520,8 @@ class Queue implements QueueContract, ClearableQueue
         $suffix = $this->config['connection']['suffix'] ?? null;
 
         return (new Stringable($this->queue->getQueue($queue)))
-            ->when($prefix, fn ($str) => $str->chopStart($prefix.'/'))
-            ->when($suffix, fn ($str) => $str->endsWith('.fifo')
+            ->when($prefix, static fn ($str) => $str->chopStart($prefix.'/'))
+            ->when($suffix, static fn ($str) => $str->endsWith('.fifo')
                 ? $str->chopEnd('.fifo')->chopEnd($suffix)->append('.fifo')
                 : $str->chopEnd($suffix))
             ->toString();

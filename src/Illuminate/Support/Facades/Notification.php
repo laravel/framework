@@ -52,7 +52,7 @@ class Notification extends Facade
      */
     public static function fake()
     {
-        return tap(new NotificationFake, function ($fake) {
+        return tap(new NotificationFake, static function ($fake) {
             static::swap($fake);
         });
     }

@@ -464,7 +464,7 @@ class PendingBatch
     {
         $batch = $repository->store($this);
 
-        (new Collection($this->beforeCallbacks()))->each(function ($handler) use ($batch) {
+        (new Collection($this->beforeCallbacks()))->each(static function ($handler) use ($batch) {
             try {
                 return $handler($batch);
             } catch (Throwable $e) {

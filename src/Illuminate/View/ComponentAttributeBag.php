@@ -150,7 +150,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
      */
     public function whereStartsWith($needles)
     {
-        return $this->filter(function ($value, $key) use ($needles) {
+        return $this->filter(static function ($value, $key) use ($needles) {
             return Str::startsWith($key, $needles);
         });
     }
@@ -163,7 +163,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
      */
     public function whereDoesntStartWith($needles)
     {
-        return $this->filter(function ($value, $key) use ($needles) {
+        return $this->filter(static function ($value, $key) use ($needles) {
             return ! Str::startsWith($key, $needles);
         });
     }
@@ -243,7 +243,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
         }, $attributeDefaults);
 
         [$appendableAttributes, $nonAppendableAttributes] = (new Collection($this->attributes))
-            ->partition(function ($value, $key) use ($attributeDefaults) {
+            ->partition(static function ($value, $key) use ($attributeDefaults) {
                 return $key === 'class' || $key === 'style' || (
                     isset($attributeDefaults[$key]) &&
                     $attributeDefaults[$key] instanceof AppendableAttributeValue

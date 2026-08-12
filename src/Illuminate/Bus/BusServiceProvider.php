@@ -20,8 +20,8 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function register()
     {
-        $this->app->singleton(Dispatcher::class, function ($app) {
-            return new Dispatcher($app, function ($connection = null) {
+        $this->app->singleton(Dispatcher::class, static function ($app) {
+            return new Dispatcher($app, static function ($connection = null) {
                 return Container::getInstance()->make(QueueFactoryContract::class)->connection($connection);
             });
         });
@@ -44,7 +44,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function registerBatchServices()
     {
-        $this->app->singleton(BatchRepository::class, function ($app) {
+        $this->app->singleton(BatchRepository::class, static function ($app) {
             $driver = $app->config->get('queue.batching.driver', 'database');
 
             return $driver === 'dynamodb'
@@ -52,7 +52,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
                 : $app->make(DatabaseBatchRepository::class);
         });
 
-        $this->app->singleton(DatabaseBatchRepository::class, function ($app) {
+        $this->app->singleton(DatabaseBatchRepository::class, static function ($app) {
             return new DatabaseBatchRepository(
                 $app->make(BatchFactory::class),
                 $app->make('db')->connection($app->config->get('queue.batching.database')),
@@ -60,7 +60,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
             );
         });
 
-        $this->app->singleton(DynamoBatchRepository::class, function ($app) {
+        $this->app->singleton(DynamoBatchRepository::class, static function ($app) {
             $config = $app->config->get('queue.batching');
 
             $dynamoConfig = [

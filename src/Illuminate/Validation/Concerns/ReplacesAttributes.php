@@ -979,17 +979,17 @@ trait ReplacesAttributes
      */
     private function replaceWhileKeepingCase(string $message, array $mapping): string
     {
-        $fn = [fn ($v) => $v, Str::upper(...), Str::ucfirst(...)];
+        $fn = [static fn ($v) => $v, Str::upper(...), Str::ucfirst(...)];
 
         $cases = array_reduce(
             array_keys($mapping),
-            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => ':'.$fn($placeholder), $fn)],
+            static fn (array $carry, string $placeholder) => [...$carry, ...array_map(static fn (callable $fn) => ':'.$fn($placeholder), $fn)],
             [],
         );
 
         $replacements = array_reduce(
             array_values($mapping),
-            fn (array $carry, string $parameter) => [...$carry, ...array_map(fn (callable $fn) => $fn($parameter), $fn)],
+            static fn (array $carry, string $parameter) => [...$carry, ...array_map(static fn (callable $fn) => $fn($parameter), $fn)],
             [],
         );
 

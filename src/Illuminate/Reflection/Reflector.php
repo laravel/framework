@@ -93,7 +93,7 @@ class Reflector
 
         do {
             $attributes[$reflectionClass->name] = new Collection(array_map(
-                fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance(),
+                static fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance(),
                 $reflectionClass->getAttributes($attribute)
             ));
         } while ($includeParents && false !== $reflectionClass = $reflectionClass->getParentClass());

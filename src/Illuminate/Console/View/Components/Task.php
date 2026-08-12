@@ -40,7 +40,7 @@ class Task extends Component
         $result = TaskResult::Failure->value;
 
         try {
-            $result = ($task ?: fn () => TaskResult::Success->value)();
+            $result = ($task ?: static fn () => TaskResult::Success->value)();
         } catch (Throwable $e) {
             throw $e;
         } finally {

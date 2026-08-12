@@ -29,11 +29,11 @@ class AddLinkHeadersForPreloadedAssets
      */
     public function handle($request, $next, $limit = null)
     {
-        return tap($next($request), function ($response) use ($limit) {
+        return tap($next($request), static function ($response) use ($limit) {
             if ($response instanceof Response && Vite::preloadedAssets() !== []) {
                 $response->header('Link', (new Collection(Vite::preloadedAssets()))
-                    ->when($limit, fn ($assets, $limit) => $assets->take($limit))
-                    ->map(fn ($attributes, $url) => "<{$url}>; ".implode('; ', $attributes))
+                    ->when($limit, static fn ($assets, $limit) => $assets->take($limit))
+                    ->map(static fn ($attributes, $url) => "<{$url}>; ".implode('; ', $attributes))
                     ->join(', '), false);
             }
         });

@@ -42,9 +42,9 @@ trait HasGlobalScopes
         $isEloquentGrandchild = is_subclass_of(static::class, Model::class)
             && get_parent_class(static::class) !== Model::class;
 
-        return $attributes->map(fn ($attribute) => $attribute->getArguments())
+        return $attributes->map(static fn ($attribute) => $attribute->getArguments())
             ->flatten()
-            ->when($isEloquentGrandchild, function (Collection $attributes) {
+            ->when($isEloquentGrandchild, static function (Collection $attributes) {
                 return (new Collection(get_parent_class(static::class)::resolveGlobalScopeAttributes()))
                     ->merge($attributes);
             })

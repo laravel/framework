@@ -334,7 +334,7 @@ class Sleep
 
         $seconds = (int) $remaining->totalSeconds;
 
-        $while = $this->while ?: function () {
+        $while = $this->while ?: static function () {
             static $return = [true, false];
 
             return array_shift($return);
@@ -437,7 +437,7 @@ class Sleep
 
             (new Collection($sequence))
                 ->zip(static::$sequence)
-                ->eachSpread(function (?Sleep $expected, CarbonInterval $actual) {
+                ->eachSpread(static function (?Sleep $expected, CarbonInterval $actual) {
                     if ($expected === null) {
                         return;
                     }

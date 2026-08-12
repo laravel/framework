@@ -95,7 +95,7 @@ class FakeProcessDescription
     public function replaceOutput(string $output)
     {
         $this->output = (new Collection($this->output))
-            ->reject(fn ($output) => $output['type'] === 'out')
+            ->reject(static fn ($output) => $output['type'] === 'out')
             ->values()
             ->all();
 
@@ -118,7 +118,7 @@ class FakeProcessDescription
     public function replaceErrorOutput(string $output)
     {
         $this->output = (new Collection($this->output))
-            ->reject(fn ($output) => $output['type'] === 'err')
+            ->reject(static fn ($output) => $output['type'] === 'err')
             ->values()
             ->all();
 
@@ -204,7 +204,7 @@ class FakeProcessDescription
     protected function resolveOutput()
     {
         $output = (new Collection($this->output))
-            ->filter(fn ($output) => $output['type'] === 'out');
+            ->filter(static fn ($output) => $output['type'] === 'out');
 
         return $output->isNotEmpty()
             ? rtrim($output->map->buffer->implode(''), "\n")."\n"
@@ -219,7 +219,7 @@ class FakeProcessDescription
     protected function resolveErrorOutput()
     {
         $output = (new Collection($this->output))
-            ->filter(fn ($output) => $output['type'] === 'err');
+            ->filter(static fn ($output) => $output['type'] === 'err');
 
         return $output->isNotEmpty()
             ? rtrim($output->map->buffer->implode(''), "\n")."\n"

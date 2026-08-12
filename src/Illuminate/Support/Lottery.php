@@ -143,8 +143,8 @@ class Lottery
     protected function runCallback(...$args)
     {
         return $this->wins()
-            ? ($this->winner ?? fn () => true)(...$args)
-            : ($this->loser ?? fn () => false)(...$args);
+            ? ($this->winner ?? static fn () => true)(...$args)
+            : ($this->loser ?? static fn () => false)(...$args);
     }
 
     /**
@@ -164,7 +164,7 @@ class Lottery
      */
     protected static function resultFactory()
     {
-        return static::$resultFactory ?? fn ($chances, $outOf) => $outOf === null
+        return static::$resultFactory ?? static fn ($chances, $outOf) => $outOf === null
             ? random_int(0, PHP_INT_MAX) / PHP_INT_MAX <= $chances
             : random_int(1, $outOf) <= $chances;
     }
@@ -177,7 +177,7 @@ class Lottery
      */
     public static function alwaysWin($callback = null)
     {
-        self::setResultFactory(fn () => true);
+        self::setResultFactory(static fn () => true);
 
         if ($callback === null) {
             return;
@@ -196,7 +196,7 @@ class Lottery
      */
     public static function alwaysLose($callback = null)
     {
-        self::setResultFactory(fn () => false);
+        self::setResultFactory(static fn () => false);
 
         if ($callback === null) {
             return;
@@ -230,7 +230,7 @@ class Lottery
     {
         $next = 0;
 
-        $whenMissing ??= function ($chances, $outOf) use (&$next) {
+        $whenMissing ??= static function ($chances, $outOf) use (&$next) {
             $factoryCache = static::$resultFactory;
 
             static::$resultFactory = null;
@@ -244,7 +244,7 @@ class Lottery
             return $result;
         };
 
-        static::setResultFactory(function ($chances, $outOf) use (&$next, $sequence, $whenMissing) {
+        static::setResultFactory(static function ($chances, $outOf) use (&$next, $sequence, $whenMissing) {
             if (array_key_exists($next, $sequence)) {
                 return $sequence[$next++];
             }

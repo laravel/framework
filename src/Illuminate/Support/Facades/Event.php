@@ -57,7 +57,7 @@ class Event extends Facade
             ? static::getFacadeRoot()->dispatcher
             : static::getFacadeRoot();
 
-        return tap(new EventFake($actualDispatcher, $eventsToFake), function ($fake) {
+        return tap(new EventFake($actualDispatcher, $eventsToFake), static function ($fake) {
             static::swap($fake);
 
             Model::setEventDispatcher($fake);
@@ -74,7 +74,7 @@ class Event extends Facade
     public static function fakeExcept($eventsToAllow)
     {
         return static::fake([
-            function ($eventName) use ($eventsToAllow) {
+            static function ($eventName) use ($eventsToAllow) {
                 return ! in_array($eventName, (array) $eventsToAllow);
             },
         ]);

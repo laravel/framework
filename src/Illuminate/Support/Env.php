@@ -101,7 +101,7 @@ class Env
      */
     public static function get($key, $default = null)
     {
-        return self::getOption($key)->getOrCall(fn () => value($default));
+        return self::getOption($key)->getOrCall(static fn () => value($default));
     }
 
     /**
@@ -252,7 +252,7 @@ class Env
     protected static function getOption($key)
     {
         return Option::fromValue(static::getRepository()->get($key))
-            ->map(function ($value) {
+            ->map(static function ($value) {
                 switch (strtolower($value)) {
                     case 'true':
                     case '(true)':

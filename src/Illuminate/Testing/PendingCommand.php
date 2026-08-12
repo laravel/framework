@@ -572,7 +572,7 @@ class PendingCommand
                 });
         }
 
-        $this->app->bind(OutputStyle::class, function () use ($mock) {
+        $this->app->bind(OutputStyle::class, static function () use ($mock) {
             return $mock;
         });
 
@@ -616,7 +616,7 @@ class PendingCommand
             $mock->shouldReceive('doWrite')
                 ->atLeast()
                 ->times(0)
-                ->withArgs(fn ($output) => str_contains($output, $text))
+                ->withArgs(static fn ($output) => str_contains($output, $text))
                 ->andReturnUsing(function () use ($i) {
                     unset($this->test->expectedOutputSubstrings[$i]);
                 });
@@ -637,7 +637,7 @@ class PendingCommand
             $mock->shouldReceive('doWrite')
                 ->atLeast()
                 ->times(0)
-                ->withArgs(fn ($output) => str_contains($output, $text))
+                ->withArgs(static fn ($output) => str_contains($output, $text))
                 ->andReturnUsing(function () use ($text) {
                     $this->test->unexpectedOutputSubstrings[$text] = true;
                 });

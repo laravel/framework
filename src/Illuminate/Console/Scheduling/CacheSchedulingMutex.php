@@ -69,7 +69,7 @@ class CacheSchedulingMutex implements SchedulingMutex, CacheAware
         if ($this->shouldUseLocks($this->cache->store($this->store)->getStore())) {
             return ! $this->cache->store($this->store)->getStore()
                 ->lock($mutexName, 3600)
-                ->get(fn () => true);
+                ->get(static fn () => true);
         }
 
         return $this->cache->store($this->store)->has($mutexName);

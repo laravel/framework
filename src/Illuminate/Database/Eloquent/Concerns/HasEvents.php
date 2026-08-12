@@ -38,7 +38,7 @@ trait HasEvents
      */
     public static function bootHasEvents()
     {
-        static::whenBooted(fn () => static::observe(static::resolveObserveAttributes()));
+        static::whenBooted(static fn () => static::observe(static::resolveObserveAttributes()));
     }
 
     /**
@@ -54,9 +54,9 @@ trait HasEvents
             && get_parent_class(static::class) !== Model::class;
 
         return (new Collection($reflectionClass->getAttributes(ObservedBy::class)))
-            ->map(fn ($attribute) => $attribute->getArguments())
+            ->map(static fn ($attribute) => $attribute->getArguments())
             ->flatten()
-            ->when($isEloquentGrandchild, function (Collection $attributes) {
+            ->when($isEloquentGrandchild, static function (Collection $attributes) {
                 return (new Collection(get_parent_class(static::class)::resolveObserveAttributes()))
                     ->merge($attributes);
             })
@@ -255,7 +255,7 @@ trait HasEvents
     protected function filterModelEventResults($result)
     {
         if (is_array($result)) {
-            $result = array_filter($result, function ($response) {
+            $result = array_filter($result, static function ($response) {
                 return ! is_null($response);
             });
         }

@@ -120,7 +120,7 @@ class ScheduleWorkCommand extends Command
      */
     protected function listenForSignals()
     {
-        $this->trap(fn () => [SIGINT, SIGTERM, SIGQUIT], function () {
+        $this->trap(static fn () => [SIGINT, SIGTERM, SIGQUIT], function () {
             $this->shouldQuit = true;
         });
     }

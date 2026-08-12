@@ -77,7 +77,7 @@ trait ResolvesJsonApiElements
                 'relationships' => $this->resolveResourceRelationshipIdentifiers($request),
                 'links' => $this->resolveResourceLinks($request),
                 'meta' => $this->resolveResourceMetaInformation($request),
-            ]))->filter()->map(fn ($value) => (object) $value),
+            ]))->filter()->map(static fn ($value) => (object) $value),
         ];
     }
 
@@ -150,8 +150,8 @@ trait ResolvesJsonApiElements
 
         $data = (new Collection($data))
             ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => $this->resource->{$value}] : [$key => $value])
-            ->when($usesSparseFieldset, fn ($attributes) => $attributes->only($sparseFieldset))
-            ->transform(fn ($value) => value($value, $request))
+            ->when($usesSparseFieldset, static fn ($attributes) => $attributes->only($sparseFieldset))
+            ->transform(static fn ($value) => value($value, $request))
             ->all();
 
         return $this->filter($data);
@@ -174,7 +174,7 @@ trait ResolvesJsonApiElements
 
         return [
             ...(new Collection($this->filter($this->loadedRelationshipIdentifiers)))
-                ->map(function ($relation) {
+                ->map(static function ($relation) {
                     return ! is_null($relation) ? $relation : ['data' => null];
                 })->all(),
         ];
@@ -195,8 +195,8 @@ trait ResolvesJsonApiElements
         };
 
         $resourceRelationships = (new Collection($this->toRelationships($request)))
-            ->transform(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
-            ->mapWithKeys(fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
+            ->transform(static fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
+            ->mapWithKeys(static fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
             ->only($sparseIncluded);
 
         $resourceRelationshipKeys = $resourceRelationships->keys();
@@ -252,7 +252,7 @@ trait ResolvesJsonApiElements
             $isUnique = ! $relationship instanceof BelongsToMany;
 
             yield $relationName => ['data' => $relatedModels->map(function ($relatedModel) use ($request, $resourceClass, $isUnique) {
-                $relatedResource = rescue(fn () => $relatedModel->toResource($resourceClass), new JsonApiResource($relatedModel));
+                $relatedResource = rescue(static fn () => $relatedModel->toResource($resourceClass), new JsonApiResource($relatedModel));
 
                 return transform(
                     [$relatedResource->resolveResourceType($request), $relatedResource->resolveResourceIdentifier($request)],
@@ -284,7 +284,7 @@ trait ResolvesJsonApiElements
             return;
         }
 
-        $relatedResource = rescue(fn () => $relatedModel->toResource($resourceClass), new JsonApiResource($relatedModel));
+        $relatedResource = rescue(static fn () => $relatedModel->toResource($resourceClass), new JsonApiResource($relatedModel));
 
         yield $relationName => ['data' => transform(
             [$relatedResource->resolveResourceType($request), $relatedResource->resolveResourceIdentifier($request)],

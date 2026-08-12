@@ -73,7 +73,7 @@ class AnonymousEvent implements ShouldBroadcast
         $this->payload = $payload instanceof Arrayable
             ? $payload->toArray()
             : (new Collection($payload))->map(
-                fn ($p) => $p instanceof Arrayable ? $p->toArray() : $p
+                static fn ($p) => $p instanceof Arrayable ? $p->toArray() : $p
             )->all();
 
         return $this;

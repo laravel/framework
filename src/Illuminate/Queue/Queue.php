@@ -420,7 +420,7 @@ abstract class Queue
 
         return (new Collection($jobs))
             ->partition(fn ($job) => $this->shouldDispatchAfterCommit($job))
-            ->map(fn ($jobs) => $jobs->values()->all())
+            ->map(static fn ($jobs) => $jobs->values()->all())
             ->all();
     }
 

@@ -71,7 +71,7 @@ class RateLimiter
             return;
         }
 
-        return function (...$args) use ($limiter) {
+        return static function (...$args) use ($limiter) {
             $result = $limiter(...$args);
 
             if (! is_array($result)) {

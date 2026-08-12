@@ -37,7 +37,7 @@ class FailOnException
     protected function failForExceptions(array $exceptions)
     {
         return static function (Throwable $throwable) use ($exceptions) {
-            return array_any($exceptions, fn ($exception) => $throwable instanceof $exception);
+            return array_any($exceptions, static fn ($exception) => $throwable instanceof $exception);
         };
     }
 

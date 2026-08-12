@@ -159,7 +159,7 @@ abstract class Component
             return $this->extractBladeViewFromString($view);
         };
 
-        return $view instanceof Closure ? function (array $data = []) use ($view, $resolver) {
+        return $view instanceof Closure ? static function (array $data = []) use ($view, $resolver) {
             return $resolver($view($data));
         }
         : $resolver($view);
@@ -242,7 +242,7 @@ abstract class Component
 
             static::$propertyCache[$class] = (new Collection($reflection->getProperties(ReflectionProperty::IS_PUBLIC)))
                 ->reject(fn (ReflectionProperty $property) => $property->isStatic() || $this->shouldIgnore($property->getName()))
-                ->map(fn (ReflectionProperty $property) => $property->getName())
+                ->map(static fn (ReflectionProperty $property) => $property->getName())
                 ->all();
         }
 
@@ -269,7 +269,7 @@ abstract class Component
 
             static::$methodCache[$class] = (new Collection($reflection->getMethods(ReflectionMethod::IS_PUBLIC)))
                 ->reject(fn (ReflectionMethod $method) => $this->shouldIgnore($method->getName()))
-                ->map(fn (ReflectionMethod $method) => $method->getName());
+                ->map(static fn (ReflectionMethod $method) => $method->getName());
         }
 
         $values = [];

@@ -33,7 +33,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
      */
     public function invoke(): void
     {
-        $this->invokeWhen(fn () => true);
+        $this->invokeWhen(static fn () => true);
     }
 
     /**
@@ -44,7 +44,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
      */
     public function invokeWhen(?Closure $when = null): void
     {
-        $when ??= fn () => true;
+        $when ??= static fn () => true;
 
         $this->forgetDuplicates();
 
@@ -66,7 +66,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
     public function forget(string $name): void
     {
         $this->callbacks = (new Collection($this->callbacks))
-            ->reject(fn ($callback) => $callback->name === $name)
+            ->reject(static fn ($callback) => $callback->name === $name)
             ->values()
             ->all();
     }
@@ -80,7 +80,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
     {
         $this->callbacks = (new Collection($this->callbacks))
             ->reverse()
-            ->unique(fn ($c) => $c->name)
+            ->unique(static fn ($c) => $c->name)
             ->reverse()
             ->values()
             ->all();

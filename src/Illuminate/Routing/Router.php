@@ -792,7 +792,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function runRoute(Request $request, Route $route)
     {
-        $request->setRouteResolver(fn () => $route);
+        $request->setRouteResolver(static fn () => $route);
 
         $this->events->dispatch(new RouteMatched($route, $request));
 
@@ -856,7 +856,7 @@ class Router implements BindingRegistrar, RegistrarContract
             ->flatten()
             ->when(
                 ! empty($excluded),
-                fn ($collection) => $collection->reject(function ($name) use ($excluded) {
+                static fn ($collection) => $collection->reject(static function ($name) use ($excluded) {
                     if ($name instanceof Closure) {
                         return false;
                     }
@@ -872,7 +872,7 @@ class Router implements BindingRegistrar, RegistrarContract
                     $reflection = new ReflectionClass($name);
 
                     return (new Collection($excluded))->contains(
-                        fn ($exclude) => class_exists($exclude) && $reflection->isSubclassOf($exclude)
+                        static fn ($exclude) => class_exists($exclude) && $reflection->isSubclassOf($exclude)
                     );
                 })
             )

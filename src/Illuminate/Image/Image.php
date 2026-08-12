@@ -213,7 +213,7 @@ class Image implements Responsable, Stringable
      */
     public function transform(Transformation $transformation): static
     {
-        return $this->withClone(fn (Image $image) => $image->pipeline->add($transformation));
+        return $this->withClone(static fn (Image $image) => $image->pipeline->add($transformation));
     }
 
     /**
@@ -233,7 +233,7 @@ class Image implements Responsable, Stringable
      */
     public function quality(int $quality): static
     {
-        return $this->withOutput(fn (ImageOutputOptions $output) => $output->quality = max(1, min(100, $quality)));
+        return $this->withOutput(static fn (ImageOutputOptions $output) => $output->quality = max(1, min(100, $quality)));
     }
 
     /**
@@ -313,7 +313,7 @@ class Image implements Responsable, Stringable
 
         $format = $format === 'heif' ? 'heic' : $format;
 
-        return $this->withOutput(fn (ImageOutputOptions $output) => $output->format = $format);
+        return $this->withOutput(static fn (ImageOutputOptions $output) => $output->format = $format);
     }
 
     /**
@@ -581,7 +581,7 @@ class Image implements Responsable, Stringable
      */
     protected function withOutput(Closure $callback): static
     {
-        return $this->withClone(fn (Image $image) => $callback($image->pipeline->output));
+        return $this->withClone(static fn (Image $image) => $callback($image->pipeline->output));
     }
 
     /**

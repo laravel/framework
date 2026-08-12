@@ -48,7 +48,7 @@ class ConfigPublishCommand extends Command
 
         $name = (string) (is_null($this->argument('name')) ? select(
             label: 'Which configuration file would you like to publish?',
-            options: (new Collection($config))->map(fn (string $path) => basename($path, '.php')),
+            options: (new Collection($config))->map(static fn (string $path) => basename($path, '.php')),
         ) : $this->argument('name'));
 
         if (! is_null($name) && ! isset($config[$name])) {

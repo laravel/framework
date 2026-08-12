@@ -87,7 +87,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     public function ids($queue = null)
     {
         return (new Collection($this->all()))
-            ->when(! is_null($queue), fn ($collect) => $collect->where('queue', $queue))
+            ->when(! is_null($queue), static fn ($collect) => $collect->where('queue', $queue))
             ->pluck('id')
             ->all();
     }
@@ -110,8 +110,8 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
         ]);
 
         return (new Collection($results['Items']))
-            ->sortByDesc(fn ($result) => (int) $result['failed_at']['N'])
-            ->map(function ($result) {
+            ->sortByDesc(static fn ($result) => (int) $result['failed_at']['N'])
+            ->map(static function ($result) {
                 return (object) [
                     'id' => $result['uuid']['S'],
                     'connection' => $result['connection']['S'],

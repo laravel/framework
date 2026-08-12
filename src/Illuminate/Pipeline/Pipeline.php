@@ -149,7 +149,7 @@ class Pipeline implements PipelineContract
      */
     public function thenReturn()
     {
-        return $this->then(function ($passable) {
+        return $this->then(static function ($passable) {
             return $passable;
         });
     }

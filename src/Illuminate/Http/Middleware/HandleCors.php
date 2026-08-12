@@ -113,7 +113,7 @@ class HandleCors
     {
         $paths = $this->container['config']->get('cors.paths', []);
 
-        return $paths[$host] ?? array_filter($paths, function ($path) {
+        return $paths[$host] ?? array_filter($paths, static function ($path) {
             return is_string($path);
         });
     }

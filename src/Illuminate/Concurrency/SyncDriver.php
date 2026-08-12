@@ -18,7 +18,7 @@ class SyncDriver implements Driver
     public function run(Closure|array $tasks, CarbonInterval|int|null $timeout = null): array
     {
         return Collection::wrap($tasks)->map(
-            fn ($task) => $task()
+            static fn ($task) => $task()
         )->all();
     }
 
@@ -27,6 +27,6 @@ class SyncDriver implements Driver
      */
     public function defer(Closure|array $tasks): DeferredCallback
     {
-        return defer(fn () => Collection::wrap($tasks)->each(fn ($task) => $task()));
+        return defer(static fn () => Collection::wrap($tasks)->each(static fn ($task) => $task()));
     }
 }

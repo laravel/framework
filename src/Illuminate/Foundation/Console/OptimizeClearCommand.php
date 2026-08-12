@@ -35,13 +35,13 @@ class OptimizeClearCommand extends Command
         $this->components->info('Clearing cached bootstrap files.');
 
         $exceptions = (new Stringable($this->option('except') ?? ''))->explode(',')
-            ->map(fn ($except) => trim($except))
+            ->map(static fn ($except) => trim($except))
             ->filter()
             ->unique()
             ->flip();
 
         $tasks = Collection::wrap($this->getOptimizeClearTasks())
-            ->reject(fn ($command, $key) => $exceptions->hasAny([$command, $key]))
+            ->reject(static fn ($command, $key) => $exceptions->hasAny([$command, $key]))
             ->toArray();
 
         foreach ($tasks as $description => $command) {

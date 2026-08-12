@@ -181,7 +181,7 @@ class Dispatcher implements DispatcherContract
      */
     public function hasWildcardListeners($eventName)
     {
-        return array_any($this->wildcards, fn ($listeners, $key) => Str::is($key, $eventName));
+        return array_any($this->wildcards, static fn ($listeners, $key) => Str::is($key, $eventName));
     }
 
     /**
@@ -485,7 +485,7 @@ class Dispatcher implements DispatcherContract
             return $this->createClassListener($listener, $wildcard);
         }
 
-        return function ($event, $payload) use ($listener, $wildcard) {
+        return static function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
                 return $listener($event, $payload);
             }
@@ -582,7 +582,7 @@ class Dispatcher implements DispatcherContract
     protected function createQueuedHandlerCallable($class, $method)
     {
         return function () use ($class, $method) {
-            $arguments = array_map(function ($a) {
+            $arguments = array_map(static function ($a) {
                 return is_object($a) ? clone $a : $a;
             }, func_get_args());
 
@@ -618,7 +618,7 @@ class Dispatcher implements DispatcherContract
             $payload = func_get_args();
 
             $this->resolveTransactionManager()->addCallback(
-                function () use ($listener, $method, $payload) {
+                static function () use ($listener, $method, $payload) {
                     $listener->$method(...$payload);
                 }
             );

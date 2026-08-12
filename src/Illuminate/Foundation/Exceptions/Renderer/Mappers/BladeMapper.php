@@ -150,7 +150,7 @@ class BladeMapper
      */
     protected function filterViewData(array $data)
     {
-        return array_filter($data, function ($value, $key) {
+        return array_filter($data, static function ($value, $key) {
             if ($key === 'app') {
                 return ! $value instanceof Application;
             }

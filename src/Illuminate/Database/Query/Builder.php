@@ -1039,7 +1039,7 @@ class Builder implements BuilderContract
      */
     protected function addArrayOfWheres($column, $boolean, $method = 'where')
     {
-        return $this->whereNested(function ($query) use ($column, $method, $boolean) {
+        return $this->whereNested(static function ($query) use ($column, $method, $boolean) {
             foreach ($column as $key => $value) {
                 if (is_numeric($key) && is_array($value)) {
                     $query->{$method}(...array_values($value), boolean: $boolean);
@@ -1139,7 +1139,7 @@ class Builder implements BuilderContract
     public function whereNot($column, $operator = null, $value = null, $boolean = 'and')
     {
         if (is_array($column)) {
-            return $this->whereNested(function ($query) use ($column, $operator, $value, $boolean) {
+            return $this->whereNested(static function ($query) use ($column, $operator, $value, $boolean) {
                 $query->where($column, $operator, $value, $boolean);
             }, $boolean.' not');
         }
@@ -2577,7 +2577,7 @@ class Builder implements BuilderContract
             $value, $operator, func_num_args() === 2
         );
 
-        $this->whereNested(function ($query) use ($columns, $operator, $value) {
+        $this->whereNested(static function ($query) use ($columns, $operator, $value) {
             foreach ($columns as $column) {
                 $query->where($column, $operator, $value, 'and');
             }
@@ -2614,7 +2614,7 @@ class Builder implements BuilderContract
             $value, $operator, func_num_args() === 2
         );
 
-        $this->whereNested(function ($query) use ($columns, $operator, $value) {
+        $this->whereNested(static function ($query) use ($columns, $operator, $value) {
             foreach ($columns as $column) {
                 $query->where($column, $operator, $value, 'or');
             }
@@ -3294,7 +3294,7 @@ class Builder implements BuilderContract
     protected function removeExistingOrdersFor($column)
     {
         return (new Collection($this->orders))
-            ->reject(fn ($order) => isset($order['column']) && $order['column'] === $column)
+            ->reject(static fn ($order) => isset($order['column']) && $order['column'] === $column)
             ->values()
             ->all();
     }
@@ -3592,7 +3592,7 @@ class Builder implements BuilderContract
             $keysToRemove[] = '@laravel_group := '.$this->grammar->wrap('pivot_'.$column);
         }
 
-        $items->each(function ($item) use ($keysToRemove) {
+        $items->each(static function ($item) use ($keysToRemove) {
             foreach ($keysToRemove as $key) {
                 unset($item->$key);
             }
@@ -3678,7 +3678,7 @@ class Builder implements BuilderContract
             $this->enforceOrderBy();
         }
 
-        $reverseDirection = function ($order) {
+        $reverseDirection = static function ($order) {
             if (! isset($order['direction'])) {
                 return $order;
             }
@@ -3696,7 +3696,7 @@ class Builder implements BuilderContract
         $orders = ! empty($this->unionOrders) ? $this->unionOrders : $this->orders;
 
         return (new Collection($orders))
-            ->filter(fn ($order) => Arr::has($order, 'direction'))
+            ->filter(static fn ($order) => Arr::has($order, 'direction'))
             ->values();
     }
 
@@ -3771,7 +3771,7 @@ class Builder implements BuilderContract
      */
     protected function withoutSelectAliases(array $columns)
     {
-        return array_map(function ($column) {
+        return array_map(static function ($column) {
             return is_string($column) && ($aliasPosition = stripos($column, ' as ')) !== false
                 ? substr($column, 0, $aliasPosition)
                 : $column;
@@ -3795,7 +3795,7 @@ class Builder implements BuilderContract
             );
         }))->map(function ($item) {
             return $this->applyAfterQueryCallbacks(new Collection([$item]))->first();
-        })->reject(fn ($item) => is_null($item));
+        })->reject(static fn ($item) => is_null($item));
     }
 
     /**
@@ -4313,13 +4313,13 @@ class Builder implements BuilderContract
 
             [$query, $bindings] = $this->parseSub($value);
 
-            return ['value' => new Expression("({$query})"), 'bindings' => fn () => $bindings];
+            return ['value' => new Expression("({$query})"), 'bindings' => static fn () => $bindings];
         });
 
-        $sql = $this->grammar->compileUpdate($this, $values->map(fn ($value) => $value['value'])->all());
+        $sql = $this->grammar->compileUpdate($this, $values->map(static fn ($value) => $value['value'])->all());
 
         return $this->connection->update($sql, $this->cleanBindings(
-            $this->grammar->prepareBindingsForUpdate($this->bindings, $values->map(fn ($value) => $value['bindings'])->all())
+            $this->grammar->prepareBindingsForUpdate($this->bindings, $values->map(static fn ($value) => $value['bindings'])->all())
         ));
     }
 
@@ -4406,7 +4406,7 @@ class Builder implements BuilderContract
         $bindings = $this->cleanBindings(array_merge(
             Arr::flatten($values, 1),
             (new Collection($update))
-                ->reject(fn ($value, $key) => is_int($key))
+                ->reject(static fn ($value, $key) => is_int($key))
                 ->all()
         ));
 
@@ -4727,7 +4727,7 @@ class Builder implements BuilderContract
     public function cleanBindings(array $bindings)
     {
         return (new Collection($bindings))
-            ->reject(function ($binding) {
+            ->reject(static function ($binding) {
                 return $binding instanceof ExpressionContract;
             })
             ->map($this->castBinding(...))
@@ -4856,7 +4856,7 @@ class Builder implements BuilderContract
      */
     public function cloneWithout(array $properties)
     {
-        return tap($this->clone(), function ($clone) use ($properties) {
+        return tap($this->clone(), static function ($clone) use ($properties) {
             foreach ($properties as $property) {
                 $clone->{$property} = null;
             }
@@ -4870,7 +4870,7 @@ class Builder implements BuilderContract
      */
     public function cloneWithoutBindings(array $except)
     {
-        return tap($this->clone(), function ($clone) use ($except) {
+        return tap($this->clone(), static function ($clone) use ($except) {
             foreach ($except as $type) {
                 $clone->bindings[$type] = [];
             }

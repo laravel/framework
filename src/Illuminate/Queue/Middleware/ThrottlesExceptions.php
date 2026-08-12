@@ -164,7 +164,7 @@ class ThrottlesExceptions
     public function deleteWhen(callable|string $callback)
     {
         $this->deleteWhenCallbacks[] = is_string($callback)
-            ? fn (Throwable $e) => $e instanceof $callback
+            ? static fn (Throwable $e) => $e instanceof $callback
             : $callback;
 
         return $this;
@@ -179,7 +179,7 @@ class ThrottlesExceptions
     public function failWhen(callable|string $callback)
     {
         $this->failWhenCallbacks[] = is_string($callback)
-            ? fn (Throwable $e) => $e instanceof $callback
+            ? static fn (Throwable $e) => $e instanceof $callback
             : $callback;
 
         return $this;
@@ -193,7 +193,7 @@ class ThrottlesExceptions
      */
     protected function shouldDelete(Throwable $throwable): bool
     {
-        return array_any($this->deleteWhenCallbacks, fn ($callback) => call_user_func($callback, $throwable));
+        return array_any($this->deleteWhenCallbacks, static fn ($callback) => call_user_func($callback, $throwable));
     }
 
     /**
@@ -204,7 +204,7 @@ class ThrottlesExceptions
      */
     protected function shouldFail(Throwable $throwable): bool
     {
-        return array_any($this->failWhenCallbacks, fn ($callback) => call_user_func($callback, $throwable));
+        return array_any($this->failWhenCallbacks, static fn ($callback) => call_user_func($callback, $throwable));
     }
 
     /**
@@ -302,7 +302,7 @@ class ThrottlesExceptions
      */
     public function report(?callable $callback = null)
     {
-        $this->reportCallback = $callback ?? fn () => true;
+        $this->reportCallback = $callback ?? static fn () => true;
 
         return $this;
     }

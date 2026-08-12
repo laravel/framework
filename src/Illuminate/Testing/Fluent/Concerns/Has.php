@@ -96,9 +96,9 @@ trait Has
         $this->interactsWith($key);
 
         if (! is_null($callback)) {
-            return $this->has($key, function (self $scope) use ($length, $callback) {
+            return $this->has($key, static function (self $scope) use ($length, $callback) {
                 return $scope
-                    ->tap(function (self $scope) use ($length) {
+                    ->tap(static function (self $scope) use ($length) {
                         if (! is_null($length)) {
                             $scope->count($length);
                         }

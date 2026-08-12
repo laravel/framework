@@ -190,12 +190,12 @@ class ViewMakeCommand extends GeneratorCommand
             (new Stringable($name))
                 ->replace('/', ' ')
                 ->explode(' ')
-                ->map(fn ($part) => (new Stringable($part))->ucfirst())
+                ->map(static fn ($part) => (new Stringable($part))->ucfirst())
                 ->implode('\\')
         ))
             ->replace(['-', '_'], ' ')
             ->explode(' ')
-            ->map(fn ($part) => (new Stringable($part))->ucfirst())
+            ->map(static fn ($part) => (new Stringable($part))->ucfirst())
             ->implode('');
 
         return 'Tests\\Feature\\View\\'.$namespacedName;

@@ -75,7 +75,7 @@ class StatusCommand extends BaseCommand
             $batches = $this->migrator->getRepository()->getMigrationBatches();
 
             $migrations = $this->getStatusFor($ran, $batches)
-                ->when($this->option('pending') !== false, fn ($collection) => $collection->filter(function ($migration) {
+                ->when($this->option('pending') !== false, static fn ($collection) => $collection->filter(static function ($migration) {
                     return (new Stringable($migration[1]))->contains('Pending');
                 }));
 
@@ -96,7 +96,7 @@ class StatusCommand extends BaseCommand
                 $this->components->info('No migrations found');
             }
 
-            if ($this->option('pending') && $migrations->some(fn ($m) => (new Stringable($m[1]))->contains('Pending'))) {
+            if ($this->option('pending') && $migrations->some(static fn ($m) => (new Stringable($m[1]))->contains('Pending'))) {
                 return $this->option('pending');
             }
         });

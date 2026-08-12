@@ -238,7 +238,7 @@ class RouteListCommand extends Command
     protected function getMiddleware($route)
     {
         return (new Collection($this->router->gatherRouteMiddleware($route)))
-            ->map(fn ($middleware) => $middleware instanceof Closure ? 'Closure' : $middleware)
+            ->map(static fn ($middleware) => $middleware instanceof Closure ? 'Closure' : $middleware)
             ->implode("\n");
     }
 
@@ -385,7 +385,7 @@ class RouteListCommand extends Command
     protected function asJson($routes)
     {
         return $routes
-            ->map(function ($route) {
+            ->map(static function ($route) {
                 $route['middleware'] = empty($route['middleware']) ? [] : explode("\n", $route['middleware']);
 
                 return $route;
@@ -426,8 +426,8 @@ class RouteListCommand extends Command
             ] = $route;
 
             $middleware = (new Stringable($middleware))->explode("\n")->filter()->whenNotEmpty(
-                fn ($collection) => $collection->map(
-                    fn ($middleware) => sprintf('         %s⇂ %s', str_repeat(' ', $maxMethod), $middleware)
+                static fn ($collection) => $collection->map(
+                    static fn ($middleware) => sprintf('         %s⇂ %s', str_repeat(' ', $maxMethod), $middleware)
                 )
             )->implode("\n");
 

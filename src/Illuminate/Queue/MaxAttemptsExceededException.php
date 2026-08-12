@@ -21,7 +21,7 @@ class MaxAttemptsExceededException extends RuntimeException
      */
     public static function forJob($job)
     {
-        return tap(new static($job->resolveName().' has been attempted too many times.'), function ($e) use ($job) {
+        return tap(new static($job->resolveName().' has been attempted too many times.'), static function ($e) use ($job) {
             $e->job = $job;
         });
     }

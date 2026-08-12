@@ -318,7 +318,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             if ($value instanceof Closure) {
                 $line = preg_replace_callback(
                     '/<'.$key.'>(.*?)<\/'.$key.'>/',
-                    fn ($args) => $value($args[1]),
+                    static fn ($args) => $value($args[1]),
                     $line
                 );
 
@@ -494,7 +494,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $locales = array_filter([$locale ?: $this->locale, $this->fallback]);
 
-        $determined = call_user_func($this->determineLocalesUsing ?: fn () => $locales, $locales);
+        $determined = call_user_func($this->determineLocalesUsing ?: static fn () => $locales, $locales);
 
         return array_values(array_unique($determined));
     }

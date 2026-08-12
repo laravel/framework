@@ -140,7 +140,7 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
                 return $this->prefix.$key;
             }, $keys))
             ->get()
-            ->map(function ($value) {
+            ->map(static function ($value) {
                 return is_array($value) ? (object) $value : $value;
             });
 
@@ -149,7 +149,7 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
         // If this cache expiration date is past the current time, we will remove this
         // item from the cache. Then we will return a null value since the cache is
         // expired. We will use "Carbon" to make this comparison with the column.
-        [$values, $expired] = $values->partition(function ($cache) use ($currentTime) {
+        [$values, $expired] = $values->partition(static function ($cache) use ($currentTime) {
             return $cache->expiration > $currentTime;
         });
 
@@ -243,7 +243,7 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
      */
     public function increment($key, $value = 1)
     {
-        return $this->incrementOrDecrement($key, $value, function ($current, $value) {
+        return $this->incrementOrDecrement($key, $value, static function ($current, $value) {
             return $current + $value;
         });
     }
@@ -257,7 +257,7 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
      */
     public function decrement($key, $value = 1)
     {
-        return $this->incrementOrDecrement($key, $value, function ($current, $value) {
+        return $this->incrementOrDecrement($key, $value, static function ($current, $value) {
             return $current - $value;
         });
     }

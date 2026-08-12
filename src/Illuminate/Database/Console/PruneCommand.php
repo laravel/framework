@@ -140,7 +140,7 @@ class PruneCommand extends Command
                     Str::after($model->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
                 );
             })
-            ->when(! empty($except), fn ($models) => $models->reject(fn ($model) => in_array($model, $except)))
+            ->when(! empty($except), static fn ($models) => $models->reject(static fn ($model) => in_array($model, $except)))
             ->filter(fn ($model) => $this->isPrunable($model))
             ->values();
     }
@@ -154,7 +154,7 @@ class PruneCommand extends Command
     {
         if (! empty($path = $this->option('path'))) {
             return (new Collection($path))
-                ->map(fn ($path) => base_path($path))
+                ->map(static fn ($path) => base_path($path))
                 ->all();
         }
 
@@ -172,7 +172,7 @@ class PruneCommand extends Command
         $instance = new $model;
 
         $count = $instance->prunable()
-            ->when($model::isSoftDeletable(), function ($query) {
+            ->when($model::isSoftDeletable(), static function ($query) {
                 $query->withTrashed();
             })->count();
 

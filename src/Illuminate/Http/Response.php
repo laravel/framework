@@ -46,7 +46,7 @@ class Response extends SymfonyResponse
     #[\Override]
     public function getContent(): string|false
     {
-        return transform(parent::getContent(), fn ($content) => $content, '');
+        return transform(parent::getContent(), static fn ($content) => $content, '');
     }
 
     /**

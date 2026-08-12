@@ -37,7 +37,7 @@ class Contains implements Stringable
      */
     public function __toString()
     {
-        $values = array_map(function ($value) {
+        $values = array_map(static function ($value) {
             $value = enum_value($value);
 
             return '"'.str_replace('"', '""', (string) $value).'"';

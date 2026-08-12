@@ -38,7 +38,7 @@ class FilesystemServiceProvider extends ServiceProvider
      */
     protected function registerNativeFilesystem()
     {
-        $this->app->singleton('files', function () {
+        $this->app->singleton('files', static function () {
             return new Filesystem;
         });
     }
@@ -68,7 +68,7 @@ class FilesystemServiceProvider extends ServiceProvider
      */
     protected function registerManager()
     {
-        $this->app->singleton('filesystem', function ($app) {
+        $this->app->singleton('filesystem', static function ($app) {
             return new FilesystemManager($app);
         });
     }
@@ -93,7 +93,7 @@ class FilesystemServiceProvider extends ServiceProvider
                 continue;
             }
 
-            $this->app->booted(function ($app) use ($disk, $config, &$served) {
+            $this->app->booted(static function ($app) use ($disk, $config, &$served) {
                 $uri = isset($config['url'])
                     ? rtrim(parse_url($config['url'])['path'], '/')
                     : '/storage';
@@ -108,7 +108,7 @@ class FilesystemServiceProvider extends ServiceProvider
 
                 $isProduction = $app->isProduction();
 
-                Route::get($uri.'/{path}', function (Request $request, string $path) use ($disk, $config, $isProduction) {
+                Route::get($uri.'/{path}', static function (Request $request, string $path) use ($disk, $config, $isProduction) {
                     return (new ServeFile(
                         $disk,
                         $config,
@@ -116,7 +116,7 @@ class FilesystemServiceProvider extends ServiceProvider
                     ))($request, $path);
                 })->where('path', '.*')->name('storage.'.$disk);
 
-                Route::put($uri.'/{path}', function (Request $request, string $path) use ($disk, $config, $isProduction) {
+                Route::put($uri.'/{path}', static function (Request $request, string $path) use ($disk, $config, $isProduction) {
                     return (new ReceiveFile(
                         $disk,
                         $config,

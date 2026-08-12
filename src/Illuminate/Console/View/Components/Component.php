@@ -66,7 +66,7 @@ abstract class Component
 
         include __DIR__."/../../resources/views/components/$view.php";
 
-        return tap(ob_get_contents(), function () {
+        return tap(ob_get_contents(), static function () {
             ob_end_clean();
         });
     }

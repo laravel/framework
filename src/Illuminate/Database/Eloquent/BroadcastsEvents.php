@@ -13,25 +13,25 @@ trait BroadcastsEvents
      */
     public static function bootBroadcastsEvents()
     {
-        static::created(function ($model) {
+        static::created(static function ($model) {
             $model->broadcastCreated();
         });
 
-        static::updated(function ($model) {
+        static::updated(static function ($model) {
             $model->broadcastUpdated();
         });
 
         if (method_exists(static::class, 'bootSoftDeletes')) {
-            static::softDeleted(function ($model) {
+            static::softDeleted(static function ($model) {
                 $model->broadcastTrashed();
             });
 
-            static::restored(function ($model) {
+            static::restored(static function ($model) {
                 $model->broadcastRestored();
             });
         }
 
-        static::deleted(function ($model) {
+        static::deleted(static function ($model) {
             $model->broadcastDeleted();
         });
     }

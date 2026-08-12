@@ -600,7 +600,7 @@ abstract class Factory
 
                 return $attribute;
             })
-            ->map(function ($attribute, $key) use (&$definition, $evaluateRelations) {
+            ->map(static function ($attribute, $key) use (&$definition, $evaluateRelations) {
                 if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
                     $attribute = $attribute($definition);
                 }
@@ -728,7 +728,7 @@ abstract class Factory
      */
     public function hasAttached($factory, $pivot = [], $relationship = null)
     {
-        if (is_array($pivot) && $pivot !== [] && array_is_list($pivot) && array_all($pivot, fn ($p) => is_array($p))) {
+        if (is_array($pivot) && $pivot !== [] && array_is_list($pivot) && array_all($pivot, static fn ($p) => is_array($p))) {
             $factory = $factory instanceof Factory && $factory->count === null
                 ? $factory->count(count($pivot))
                 : $factory;
@@ -781,7 +781,7 @@ abstract class Factory
                 ->merge(
                     Collection::wrap($model instanceof Model ? func_get_args() : $model)
                         ->flatten()
-                )->groupBy(fn ($model) => get_class($model)),
+                )->groupBy(static fn ($model) => get_class($model)),
         ]);
     }
 
@@ -849,7 +849,7 @@ abstract class Factory
     protected function callAfterMaking(Collection $instances)
     {
         $instances->each(function ($model) {
-            $this->afterMaking->each(function ($callback) use ($model) {
+            $this->afterMaking->each(static function ($callback) use ($model) {
                 $callback($model);
             });
         });
@@ -865,7 +865,7 @@ abstract class Factory
     protected function callAfterCreating(Collection $instances, ?Model $parent = null)
     {
         $instances->each(function ($model) use ($parent) {
-            $this->afterCreating->each(function ($callback) use ($model, $parent) {
+            $this->afterCreating->each(static function ($callback) use ($model, $parent) {
                 $callback($model, $parent);
             });
         });
@@ -972,7 +972,7 @@ abstract class Factory
             return $this->model;
         }
 
-        $resolver = static::$modelNameResolvers[static::class] ?? static::$modelNameResolvers[self::class] ?? static::$modelNameResolver ?? function (self $factory) {
+        $resolver = static::$modelNameResolvers[static::class] ?? static::$modelNameResolvers[self::class] ?? static::$modelNameResolver ?? static function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
                 'Factory', '', Str::replaceFirst(static::$namespace, '', $factory::class)
             );
@@ -1081,7 +1081,7 @@ abstract class Factory
      */
     public static function resolveFactoryName(string $modelName)
     {
-        $resolver = static::$factoryNameResolver ?? function (string $modelName) {
+        $resolver = static::$factoryNameResolver ?? static function (string $modelName) {
             $appNamespace = static::appNamespace();
 
             $modelName = Str::startsWith($modelName, $appNamespace.'Models\\')
@@ -1160,7 +1160,7 @@ abstract class Factory
         if (str_starts_with($method, 'for')) {
             return $this->for($factory->state($parameters[0] ?? []), $relationship);
         } elseif (str_starts_with($method, 'has')) {
-            if (count($parameters) > 1 && array_all($parameters, fn ($p) => is_array($p))) {
+            if (count($parameters) > 1 && array_all($parameters, static fn ($p) => is_array($p))) {
                 return $this->has($factory->forEachSequence(...$parameters), $relationship);
             }
 

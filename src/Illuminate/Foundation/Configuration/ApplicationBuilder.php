@@ -221,7 +221,7 @@ class ApplicationBuilder
             }
 
             if (is_string($health)) {
-                Route::get($health, function (Request $request) {
+                Route::get($health, static function (Request $request) {
                     $exception = null;
 
                     try {
@@ -288,7 +288,7 @@ class ApplicationBuilder
     {
         $this->app->afterResolving(HttpKernel::class, function ($kernel) use ($callback) {
             $middleware = (new Middleware)
-                ->redirectGuestsTo(fn () => route('login'));
+                ->redirectGuestsTo(static fn () => route('login'));
 
             if (! is_null($callback)) {
                 $callback($middleware);
@@ -316,7 +316,7 @@ class ApplicationBuilder
             }
         });
 
-        $this->app->afterResolving(ConsoleKernel::class, function () use ($callback) {
+        $this->app->afterResolving(ConsoleKernel::class, static function () use ($callback) {
             if (! is_null($callback)) {
                 $callback(new Middleware);
             }
@@ -338,8 +338,8 @@ class ApplicationBuilder
         }
 
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($commands) {
-            [$commands, $paths] = (new Collection($commands))->partition(fn ($command) => class_exists($command));
-            [$routes, $paths] = $paths->partition(fn ($path) => is_file($path));
+            [$commands, $paths] = (new Collection($commands))->partition(static fn ($command) => class_exists($command));
+            [$routes, $paths] = $paths->partition(static fn ($path) => is_file($path));
 
             $this->app->booted(static function () use ($kernel, $commands, $paths, $routes) {
                 $kernel->addCommands($commands->all());
@@ -360,7 +360,7 @@ class ApplicationBuilder
     protected function withCommandRouting(array $paths)
     {
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($paths) {
-            $this->app->booted(fn () => $kernel->addCommandRoutePaths($paths));
+            $this->app->booted(static fn () => $kernel->addCommandRoutePaths($paths));
         });
 
         return $this;
@@ -375,7 +375,7 @@ class ApplicationBuilder
     public function withSchedule(callable $callback)
     {
         Artisan::starting(function () use ($callback) {
-            $this->app->afterResolving(Schedule::class, fn ($schedule) => $callback($schedule));
+            $this->app->afterResolving(Schedule::class, static fn ($schedule) => $callback($schedule));
 
             if ($this->app->resolved(Schedule::class)) {
                 $callback($this->app->make(Schedule::class));
@@ -401,7 +401,7 @@ class ApplicationBuilder
         if ($using !== null) {
             $this->app->afterResolving(
                 \Illuminate\Foundation\Exceptions\Handler::class,
-                fn ($handler) => $using(new Exceptions($handler)),
+                static fn ($handler) => $using(new Exceptions($handler)),
             );
         }
 
@@ -416,7 +416,7 @@ class ApplicationBuilder
      */
     public function withBindings(array $bindings)
     {
-        return $this->registered(function ($app) use ($bindings) {
+        return $this->registered(static function ($app) use ($bindings) {
             foreach ($bindings as $abstract => $concrete) {
                 $app->bind($abstract, $concrete);
             }
@@ -431,7 +431,7 @@ class ApplicationBuilder
      */
     public function withSingletons(array $singletons)
     {
-        return $this->registered(function ($app) use ($singletons) {
+        return $this->registered(static function ($app) use ($singletons) {
             foreach ($singletons as $abstract => $concrete) {
                 if (is_string($abstract)) {
                     $app->singleton($abstract, $concrete);
@@ -450,7 +450,7 @@ class ApplicationBuilder
      */
     public function withScopedSingletons(array $scopedSingletons)
     {
-        return $this->registered(function ($app) use ($scopedSingletons) {
+        return $this->registered(static function ($app) use ($scopedSingletons) {
             foreach ($scopedSingletons as $abstract => $concrete) {
                 if (is_string($abstract)) {
                     $app->scoped($abstract, $concrete);

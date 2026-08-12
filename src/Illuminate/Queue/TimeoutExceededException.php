@@ -12,7 +12,7 @@ class TimeoutExceededException extends MaxAttemptsExceededException
      */
     public static function forJob($job)
     {
-        return tap(new static($job->resolveName().' has timed out.'), function ($e) use ($job) {
+        return tap(new static($job->resolveName().' has timed out.'), static function ($e) use ($job) {
             $e->job = $job;
         });
     }

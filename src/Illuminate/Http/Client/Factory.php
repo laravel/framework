@@ -303,7 +303,7 @@ class Factory
      */
     public static function failedConnection($message = null)
     {
-        return function ($request) use ($message) {
+        return static function ($request) use ($message) {
             return Create::rejectionFor(new ConnectException(
                 $message ?? "cURL error 6: Could not resolve host: {$request->toPsrRequest()->getUri()->getHost()} (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for {$request->toPsrRequest()->getUri()}.",
                 $request->toPsrRequest(),
@@ -335,7 +335,7 @@ class Factory
         $this->recorded = [];
 
         if (is_null($callback)) {
-            $callback = function () {
+            $callback = static function () {
                 return static::response();
             };
         }
@@ -349,7 +349,7 @@ class Factory
         }
 
         $this->stubCallbacks = $this->stubCallbacks->merge(new Collection([
-            function ($request, $options) use ($callback) {
+            static function ($request, $options) use ($callback) {
                 $response = $callback;
 
                 while ($response instanceof Closure) {
@@ -394,7 +394,7 @@ class Factory
      */
     public function stubUrl($url, $callback)
     {
-        return $this->fake(function ($request, $options) use ($url, $callback) {
+        return $this->fake(static function ($request, $options) use ($url, $callback) {
             if (! Str::is(Str::start($url, '*'), $request->url())) {
                 return;
             }
@@ -512,7 +512,7 @@ class Factory
         $this->assertSentCount(count($callbacks));
 
         foreach ($callbacks as $index => $url) {
-            $callback = is_callable($url) ? $url : function ($request) use ($url) {
+            $callback = is_callable($url) ? $url : static function ($request) use ($url) {
                 return $request->url() == $url;
             };
 
@@ -591,7 +591,7 @@ class Factory
         $collect = new Collection($this->recorded);
 
         if ($callback) {
-            return $collect->filter(fn ($pair) => $callback($pair[0], $pair[1]));
+            return $collect->filter(static fn ($pair) => $callback($pair[0], $pair[1]));
         }
 
         return $collect;

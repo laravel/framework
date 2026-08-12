@@ -69,7 +69,7 @@ class MonitorCommand extends Command
         $queues = $this->parseQueues($this->argument('queues'));
 
         if ($this->option('json')) {
-            $this->output->writeln((new Collection($queues))->map(function ($queue) {
+            $this->output->writeln((new Collection($queues))->map(static function ($queue) {
                 return array_merge($queue, [
                     'status' => str_contains($queue['status'], 'ALERT') ? 'ALERT' : 'OK',
                 ]);

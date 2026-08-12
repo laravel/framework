@@ -98,7 +98,7 @@ trait QueriesRelationships
             $count = 1;
         }
 
-        $closure = function ($q) use (&$closure, &$relations, $operator, $count, $callback, $initialRelations) {
+        $closure = static function ($q) use (&$closure, &$relations, $operator, $count, $callback, $initialRelations) {
             // If the same closure is called multiple times, reset the relation array to loop through them again...
             if ($count === 1 && empty($relations)) {
                 $relations = [...$initialRelations];
@@ -186,7 +186,7 @@ trait QueriesRelationships
     public function withWhereHas($relation, ?Closure $callback = null, $operator = '>=', $count = 1)
     {
         return $this->whereHas(Str::before($relation, ':'), $callback, $operator, $count)
-            ->with($callback ? [$relation => fn ($query) => $callback($query)] : $relation);
+            ->with($callback ? [$relation => static fn ($query) => $callback($query)] : $relation);
     }
 
     /**
@@ -263,7 +263,7 @@ trait QueriesRelationships
         if ($types === ['*']) {
             $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())
                 ->filter()
-                ->map(fn ($item) => enum_value($item))
+                ->map(static fn ($item) => enum_value($item))
                 ->all();
         }
 
@@ -281,7 +281,7 @@ trait QueriesRelationships
                     $belongsTo = $this->getBelongsToRelation($relation, $type);
 
                     if ($callback) {
-                        $callback = function ($query) use ($callback, $type) {
+                        $callback = static function ($query) use ($callback, $type) {
                             return $callback($query, $type);
                         };
                     }
@@ -291,7 +291,7 @@ trait QueriesRelationships
                 });
             }
 
-            $query->when($checkMorphNull, fn (self $query) => $query->orWhereMorphedTo($relation, null));
+            $query->when($checkMorphNull, static fn (self $query) => $query->orWhereMorphedTo($relation, null));
         }, null, null, $boolean);
     }
 
@@ -439,7 +439,7 @@ trait QueriesRelationships
      */
     public function whereRelation($relation, $column, $operator = null, $value = null)
     {
-        return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
+        return $this->whereHas($relation, static function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
             } else {
@@ -461,7 +461,7 @@ trait QueriesRelationships
     {
         return $this->whereRelation($relation, $column, $operator, $value)
             ->with([
-                $relation => fn ($query) => $column instanceof Closure
+                $relation => static fn ($query) => $column instanceof Closure
                     ? $column($query)
                     : $query->where($column, $operator, $value),
             ]);
@@ -480,7 +480,7 @@ trait QueriesRelationships
      */
     public function orWhereRelation($relation, $column, $operator = null, $value = null)
     {
-        return $this->orWhereHas($relation, function ($query) use ($column, $operator, $value) {
+        return $this->orWhereHas($relation, static function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
             } else {
@@ -502,7 +502,7 @@ trait QueriesRelationships
      */
     public function whereDoesntHaveRelation($relation, $column, $operator = null, $value = null)
     {
-        return $this->whereDoesntHave($relation, function ($query) use ($column, $operator, $value) {
+        return $this->whereDoesntHave($relation, static function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
             } else {
@@ -524,7 +524,7 @@ trait QueriesRelationships
      */
     public function orWhereDoesntHaveRelation($relation, $column, $operator = null, $value = null)
     {
-        return $this->orWhereDoesntHave($relation, function ($query) use ($column, $operator, $value) {
+        return $this->orWhereDoesntHave($relation, static function ($query) use ($column, $operator, $value) {
             if ($column instanceof Closure) {
                 $column($query);
             } else {
@@ -547,7 +547,7 @@ trait QueriesRelationships
      */
     public function whereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
-        return $this->whereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+        return $this->whereHasMorph($relation, $types, static function ($query) use ($column, $operator, $value) {
             $query->where($column, $operator, $value);
         });
     }
@@ -566,7 +566,7 @@ trait QueriesRelationships
      */
     public function orWhereMorphRelation($relation, $types, $column, $operator = null, $value = null)
     {
-        return $this->orWhereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+        return $this->orWhereHasMorph($relation, $types, static function ($query) use ($column, $operator, $value) {
             $query->where($column, $operator, $value);
         });
     }
@@ -585,7 +585,7 @@ trait QueriesRelationships
      */
     public function whereMorphDoesntHaveRelation($relation, $types, $column, $operator = null, $value = null)
     {
-        return $this->whereDoesntHaveMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+        return $this->whereDoesntHaveMorph($relation, $types, static function ($query) use ($column, $operator, $value) {
             $query->where($column, $operator, $value);
         });
     }
@@ -604,7 +604,7 @@ trait QueriesRelationships
      */
     public function orWhereMorphDoesntHaveRelation($relation, $types, $column, $operator = null, $value = null)
     {
-        return $this->orWhereDoesntHaveMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+        return $this->orWhereDoesntHaveMorph($relation, $types, static function ($query) use ($column, $operator, $value) {
             $query->where($column, $operator, $value);
         });
     }
@@ -644,9 +644,9 @@ trait QueriesRelationships
             throw new InvalidArgumentException('Collection given to whereMorphedTo method may not be empty.');
         }
 
-        return $this->where(function ($query) use ($relation, $models) {
-            $models->groupBy(fn ($model) => $model->getMorphClass())->each(function ($models) use ($query, $relation) {
-                $query->orWhere(function ($query) use ($relation, $models) {
+        return $this->where(static function ($query) use ($relation, $models) {
+            $models->groupBy(static fn ($model) => $model->getMorphClass())->each(static function ($models) use ($query, $relation) {
+                $query->orWhere(static function ($query) use ($relation, $models) {
                     $query->where($relation->qualifyColumn($relation->getMorphType()), $models->first()->getMorphClass())
                         ->whereIn($relation->qualifyColumn($relation->getForeignKeyName()), $models->map->getKey());
                 });
@@ -676,7 +676,7 @@ trait QueriesRelationships
                 $model = array_search($model, $morphMap, true);
             }
 
-            return $this->whereNot(fn ($query) => $query->whereNullSafeEquals(
+            return $this->whereNot(static fn ($query) => $query->whereNullSafeEquals(
                 $relation->qualifyColumn($relation->getMorphType()), $model
             ), null, null, $boolean);
         }
@@ -687,9 +687,9 @@ trait QueriesRelationships
             throw new InvalidArgumentException('Collection given to whereNotMorphedTo method may not be empty.');
         }
 
-        return $this->whereNot(function ($query) use ($relation, $models) {
-            $models->groupBy(fn ($model) => $model->getMorphClass())->each(function ($models) use ($query, $relation) {
-                $query->orWhere(function ($query) use ($relation, $models) {
+        return $this->whereNot(static function ($query) use ($relation, $models) {
+            $models->groupBy(static fn ($model) => $model->getMorphClass())->each(static function ($models) use ($query, $relation) {
+                $query->orWhere(static function ($query) use ($relation, $models) {
                     $query->whereNullSafeEquals($relation->qualifyColumn($relation->getMorphType()), $models->first()->getMorphClass())
                         ->whereIn($relation->qualifyColumn($relation->getForeignKeyName()), $models->map->getKey());
                 });
@@ -819,7 +819,7 @@ trait QueriesRelationships
         $this->has(
             $relationshipName,
             boolean: $boolean,
-            callback: fn (Builder $query) => $query->whereKey($relatedCollection->pluck($related->getKeyName())),
+            callback: static fn (Builder $query) => $query->whereKey($relatedCollection->pluck($related->getKeyName())),
         );
 
         return $this;
@@ -1082,8 +1082,8 @@ trait QueriesRelationships
      */
     protected function requalifyWhereTables(array $wheres, string $from, string $to): array
     {
-        return (new BaseCollection($wheres))->map(function ($where) use ($from, $to) {
-            return (new BaseCollection($where))->map(function ($value) use ($from, $to) {
+        return (new BaseCollection($wheres))->map(static function ($where) use ($from, $to) {
+            return (new BaseCollection($where))->map(static function ($value) use ($from, $to) {
                 return is_string($value) && str_starts_with($value, $from.'.')
                     ? $to.'.'.Str::afterLast($value, '.')
                     : $value;

@@ -585,7 +585,7 @@ class Repository
      */
     public function dehydrating($callback)
     {
-        $this->events->listen(fn (Dehydrating $event) => $callback($event->context));
+        $this->events->listen(static fn (Dehydrating $event) => $callback($event->context));
 
         return $this;
     }
@@ -598,7 +598,7 @@ class Repository
      */
     public function hydrated($callback)
     {
-        $this->events->listen(fn (Hydrated $event) => $callback($event->context));
+        $this->events->listen(static fn (Hydrated $event) => $callback($event->context));
 
         return $this;
     }
@@ -644,7 +644,7 @@ class Repository
 
         $instance->events->dispatch(new Dehydrating($instance));
 
-        $serialize = fn ($value) => serialize($instance->getSerializedPropertyValue($value, withRelations: false));
+        $serialize = static fn ($value) => serialize($instance->getSerializedPropertyValue($value, withRelations: false));
 
         return $instance->isEmpty() ? null : [
             'data' => array_map($serialize, $instance->all()),
@@ -666,7 +666,7 @@ class Repository
     {
         $unserialize = function ($value, $key, $hidden) {
             try {
-                return tap($this->getRestoredPropertyValue(unserialize($value)), function ($value) {
+                return tap($this->getRestoredPropertyValue(unserialize($value)), static function ($value) {
                     if ($value instanceof __PHP_Incomplete_Class) {
                         throw new RuntimeException('Value is incomplete class: '.json_encode($value));
                     }
@@ -689,8 +689,8 @@ class Repository
         };
 
         [$data, $hidden] = [
-            (new Collection($context['data'] ?? []))->map(fn ($value, $key) => $unserialize($value, $key, false))->all(),
-            (new Collection($context['hidden'] ?? []))->map(fn ($value, $key) => $unserialize($value, $key, true))->all(),
+            (new Collection($context['data'] ?? []))->map(static fn ($value, $key) => $unserialize($value, $key, false))->all(),
+            (new Collection($context['hidden'] ?? []))->map(static fn ($value, $key) => $unserialize($value, $key, true))->all(),
         ];
 
         $this->events->dispatch(new Hydrated(

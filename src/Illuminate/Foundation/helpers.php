@@ -523,7 +523,7 @@ if (! function_exists('fake') && class_exists(\Faker\Factory::class)) {
         $abstract = \Faker\Generator::class.':'.$locale;
 
         if (! app()->bound($abstract)) {
-            app()->singleton($abstract, fn () => \Faker\Factory::create($locale));
+            app()->singleton($abstract, static fn () => \Faker\Factory::create($locale));
         }
 
         return app()->make($abstract);
@@ -662,11 +662,11 @@ if (! function_exists('precognitive')) {
      */
     function precognitive($callable = null)
     {
-        $callable ??= function () {
+        $callable ??= static function () {
             //
         };
 
-        $payload = $callable(function ($default, $precognition = null) {
+        $payload = $callable(static function ($default, $precognition = null) {
             $response = request()->isPrecognitive()
                 ? ($precognition ?? $default)
                 : $default;

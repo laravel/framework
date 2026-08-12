@@ -222,7 +222,7 @@ trait ManagesAttributes
      */
     public function when($callback)
     {
-        $this->filters[] = Reflector::isCallable($callback) ? $callback : function () use ($callback) {
+        $this->filters[] = Reflector::isCallable($callback) ? $callback : static function () use ($callback) {
             return $callback;
         };
 
@@ -237,7 +237,7 @@ trait ManagesAttributes
      */
     public function skip($callback)
     {
-        $this->rejects[] = Reflector::isCallable($callback) ? $callback : function () use ($callback) {
+        $this->rejects[] = Reflector::isCallable($callback) ? $callback : static function () use ($callback) {
             return $callback;
         };
 

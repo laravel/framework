@@ -146,10 +146,10 @@ class EventServiceProvider extends ServiceProvider
     public function discoverEvents()
     {
         return (new LazyCollection($this->discoverEventsWithin()))
-            ->flatMap(function ($directory) {
+            ->flatMap(static function ($directory) {
                 return glob($directory, GLOB_ONLYDIR);
             })
-            ->reject(function ($directory) {
+            ->reject(static function ($directory) {
                 return ! is_dir($directory);
             })
             ->pipe(fn ($directories) => DiscoverEvents::within(

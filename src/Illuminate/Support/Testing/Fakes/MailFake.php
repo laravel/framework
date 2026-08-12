@@ -79,7 +79,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
 
         if (is_array($callback) || is_string($callback)) {
             foreach (Arr::wrap($callback) as $address) {
-                $callback = fn ($mail) => $mail->hasTo($address);
+                $callback = static fn ($mail) => $mail->hasTo($address);
 
                 PHPUnit::assertTrue(
                     $this->sent($mailable, $callback)->isNotEmpty(),
@@ -141,7 +141,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     {
         if (is_string($callback) || is_array($callback)) {
             foreach (Arr::wrap($callback) as $address) {
-                $callback = fn ($mail) => $mail->hasTo($address);
+                $callback = static fn ($mail) => $mail->hasTo($address);
 
                 PHPUnit::assertCount(
                     0, $this->sent($mailable, $callback),
@@ -179,7 +179,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     public function assertNothingSent()
     {
         $mailableNames = (new Collection($this->mailables))->map(
-            fn ($mailable) => get_class($mailable)
+            static fn ($mailable) => get_class($mailable)
         )->join("\n- ");
 
         PHPUnit::assertEmpty($this->mailables, "The following mailables were sent unexpectedly:\n\n- $mailableNames\n");
@@ -202,7 +202,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
 
         if (is_string($callback) || is_array($callback)) {
             foreach (Arr::wrap($callback) as $address) {
-                $callback = fn ($mail) => $mail->hasTo($address);
+                $callback = static fn ($mail) => $mail->hasTo($address);
 
                 PHPUnit::assertTrue(
                     $this->queued($mailable, $callback)->isNotEmpty(),
@@ -251,7 +251,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     {
         if (is_string($callback) || is_array($callback)) {
             foreach (Arr::wrap($callback) as $address) {
-                $callback = fn ($mail) => $mail->hasTo($address);
+                $callback = static fn ($mail) => $mail->hasTo($address);
 
                 PHPUnit::assertCount(
                     0, $this->queued($mailable, $callback),
@@ -278,7 +278,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     public function assertNothingQueued()
     {
         $mailableNames = (new Collection($this->queuedMailables))->map(
-            fn ($mailable) => get_class($mailable)
+            static fn ($mailable) => get_class($mailable)
         )->join("\n- ");
 
         PHPUnit::assertEmpty($this->queuedMailables, "The following mailables were queued unexpectedly:\n\n- $mailableNames\n");
@@ -349,9 +349,9 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: static fn () => true;
 
-        return $this->mailablesOf($mailable)->filter(fn ($mailable) => $callback($mailable));
+        return $this->mailablesOf($mailable)->filter(static fn ($mailable) => $callback($mailable));
     }
 
     /**
@@ -380,9 +380,9 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: static fn () => true;
 
-        return $this->queuedMailablesOf($mailable)->filter(fn ($mailable) => $callback($mailable));
+        return $this->queuedMailablesOf($mailable)->filter(static fn ($mailable) => $callback($mailable));
     }
 
     /**
@@ -404,7 +404,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     protected function mailablesOf($type)
     {
-        return (new Collection($this->mailables))->filter(fn ($mailable) => $mailable instanceof $type);
+        return (new Collection($this->mailables))->filter(static fn ($mailable) => $mailable instanceof $type);
     }
 
     /**
@@ -415,7 +415,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      */
     protected function queuedMailablesOf($type)
     {
-        return (new Collection($this->queuedMailables))->filter(fn ($mailable) => $mailable instanceof $type);
+        return (new Collection($this->queuedMailables))->filter(static fn ($mailable) => $mailable instanceof $type);
     }
 
     /**

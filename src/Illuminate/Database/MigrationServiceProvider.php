@@ -58,7 +58,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected function registerRepository()
     {
-        $this->app->singleton('migration.repository', function ($app) {
+        $this->app->singleton('migration.repository', static function ($app) {
             $migrations = $app['config']['database.migrations'];
 
             $table = is_array($migrations) ? ($migrations['table'] ?? null) : $migrations;
@@ -77,13 +77,13 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
         // The migrator is responsible for actually running and rollback the migration
         // files in the application. We'll pass in our database connection resolver
         // so the migrator can resolve any of these connections when it needs to.
-        $this->app->singleton('migrator', function ($app) {
+        $this->app->singleton('migrator', static function ($app) {
             $repository = $app['migration.repository'];
 
             return new Migrator($repository, $app['db'], $app['files'], $app['events']);
         });
 
-        $this->app->bind(Migrator::class, fn ($app) => $app['migrator']);
+        $this->app->bind(Migrator::class, static fn ($app) => $app['migrator']);
     }
 
     /**
@@ -93,7 +93,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected function registerCreator()
     {
-        $this->app->singleton('migration.creator', function ($app) {
+        $this->app->singleton('migration.creator', static function ($app) {
             return new MigrationCreator($app['files'], $app->basePath('stubs'));
         });
     }
@@ -120,7 +120,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected function registerMigrateCommand()
     {
-        $this->app->singleton(MigrateCommand::class, function ($app) {
+        $this->app->singleton(MigrateCommand::class, static function ($app) {
             return new MigrateCommand($app['migrator'], $app[Dispatcher::class]);
         });
     }
@@ -132,7 +132,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected function registerMigrateFreshCommand()
     {
-        $this->app->singleton(FreshCommand::class, function ($app) {
+        $this->app->singleton(FreshCommand::class, static function ($app) {
             return new FreshCommand($app['migrator']);
         });
     }
@@ -144,7 +144,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected function registerMigrateInstallCommand()
     {
-        $this->app->singleton(InstallCommand::class, function ($app) {
+        $this->app->singleton(InstallCommand::class, static function ($app) {
             return new InstallCommand($app['migration.repository']);
         });
     }
@@ -156,7 +156,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected function registerMigrateMakeCommand()
     {
-        $this->app->singleton(MigrateMakeCommand::class, function ($app) {
+        $this->app->singleton(MigrateMakeCommand::class, static function ($app) {
             // Once we have the migration creator registered, we will create the command
             // and inject the creator. The creator is responsible for the actual file
             // creation of the migrations, and may be extended by these developers.
@@ -185,7 +185,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected function registerMigrateResetCommand()
     {
-        $this->app->singleton(ResetCommand::class, function ($app) {
+        $this->app->singleton(ResetCommand::class, static function ($app) {
             return new ResetCommand($app['migrator']);
         });
     }
@@ -197,7 +197,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected function registerMigrateRollbackCommand()
     {
-        $this->app->singleton(RollbackCommand::class, function ($app) {
+        $this->app->singleton(RollbackCommand::class, static function ($app) {
             return new RollbackCommand($app['migrator']);
         });
     }
@@ -209,7 +209,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
      */
     protected function registerMigrateStatusCommand()
     {
-        $this->app->singleton(StatusCommand::class, function ($app) {
+        $this->app->singleton(StatusCommand::class, static function ($app) {
             return new StatusCommand($app['migrator']);
         });
     }

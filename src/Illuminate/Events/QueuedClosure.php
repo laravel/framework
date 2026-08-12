@@ -165,7 +165,7 @@ class QueuedClosure
                 'closure' => new SerializableClosure($this->closure),
                 'arguments' => $arguments,
                 'catch' => (new Collection($this->catchCallbacks))
-                    ->map(fn ($callback) => new SerializableClosure($callback))
+                    ->map(static fn ($callback) => new SerializableClosure($callback))
                     ->all(),
             ]))
                 ->onConnection($this->connection)

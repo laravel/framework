@@ -146,7 +146,7 @@ class ListFailedCommand extends Command
      */
     protected function displayFailedJobsAsJson(array $jobs)
     {
-        $this->output->writeln((new Collection($jobs))->values()->map(fn ($job) => [
+        $this->output->writeln((new Collection($jobs))->values()->map(static fn ($job) => [
             'id' => $job[0],
             'connection' => $job[1],
             'queue' => $job[2],

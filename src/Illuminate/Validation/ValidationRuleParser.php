@@ -349,7 +349,7 @@ class ValidationRuleParser
      */
     public static function filterConditionalRules($rules, array $data = [])
     {
-        return (new Collection($rules))->mapWithKeys(function ($attributeRules, $attribute) use ($data) {
+        return (new Collection($rules))->mapWithKeys(static function ($attributeRules, $attribute) use ($data) {
             if (! is_array($attributeRules) &&
                 ! $attributeRules instanceof ConditionalRules) {
                 return [$attribute => $attributeRules];
@@ -361,7 +361,7 @@ class ValidationRuleParser
                     : array_filter($attributeRules->defaultRules($data)), ];
             }
 
-            return [$attribute => (new Collection($attributeRules))->map(function ($rule) use ($data) {
+            return [$attribute => (new Collection($attributeRules))->map(static function ($rule) use ($data) {
                 if (! $rule instanceof ConditionalRules) {
                     return [$rule];
                 }

@@ -122,11 +122,11 @@ class ModelInspector
 
         return (new BaseCollection($class->getMethods()))
             ->reject(
-                fn (ReflectionMethod $method) => $method->isStatic()
+                static fn (ReflectionMethod $method) => $method->isStatic()
                     || $method->isAbstract()
                     || $method->getDeclaringClass()->getName() === Model::class
             )
-            ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
+            ->mapWithKeys(static function (ReflectionMethod $method) use ($model) {
                 if (preg_match('/^get(.+)Attribute$/', $method->getName(), $matches) === 1) {
                     return [Str::snake($matches[1]) => 'accessor'];
                 } elseif ($model->hasAttributeMutator($method->getName())) {
@@ -135,7 +135,7 @@ class ModelInspector
                     return [];
                 }
             })
-            ->reject(fn ($cast, $name) => (new BaseCollection($columns))->contains('name', $name))
+            ->reject(static fn ($cast, $name) => (new BaseCollection($columns))->contains('name', $name))
             ->map(fn ($cast, $name) => [
                 'name' => $name,
                 'type' => null,
@@ -160,9 +160,9 @@ class ModelInspector
     protected function getRelations($model)
     {
         return (new BaseCollection(get_class_methods($model)))
-            ->map(fn ($method) => new ReflectionMethod($model, $method))
+            ->map(static fn ($method) => new ReflectionMethod($model, $method))
             ->reject(
-                fn (ReflectionMethod $method) => $method->isStatic()
+                static fn (ReflectionMethod $method) => $method->isStatic()
                     || $method->isAbstract()
                     || $method->getDeclaringClass()->getName() === Model::class
                     || $method->getNumberOfParameters() > 0
@@ -182,9 +182,9 @@ class ModelInspector
                 }
 
                 return (new BaseCollection($this->relationMethods))
-                    ->contains(fn ($relationMethod) => str_contains($code, '$this->'.$relationMethod.'('));
+                    ->contains(static fn ($relationMethod) => str_contains($code, '$this->'.$relationMethod.'('));
             })
-            ->map(function (ReflectionMethod $method) use ($model) {
+            ->map(static function (ReflectionMethod $method) use ($model) {
                 $relation = $method->invoke($model);
 
                 if (! $relation instanceof Relation) {
@@ -223,7 +223,7 @@ class ModelInspector
     protected function getEvents($model)
     {
         return (new BaseCollection($model->dispatchesEvents()))
-            ->map(fn (string $class, string $event) => [
+            ->map(static fn (string $class, string $event) => [
                 'event' => $event,
                 'class' => $class,
             ])->values();
@@ -242,12 +242,12 @@ class ModelInspector
         $listeners = $this->app->make('events')->getRawListeners();
 
         // Get the Eloquent observers for this model...
-        $listeners = array_filter($listeners, function ($v, $key) use ($model) {
+        $listeners = array_filter($listeners, static function ($v, $key) use ($model) {
             return Str::startsWith($key, 'eloquent.') && Str::endsWith($key, $model::class);
         }, ARRAY_FILTER_USE_BOTH);
 
         // Format listeners Eloquent verb => Observer methods...
-        $extractVerb = function ($key) {
+        $extractVerb = static function ($key) {
             preg_match('/eloquent.([a-zA-Z]+)\: /', $key, $matches);
 
             return $matches[1] ?? '?';
@@ -258,7 +258,7 @@ class ModelInspector
         foreach ($listeners as $key => $observerMethods) {
             $formatted[] = [
                 'event' => $extractVerb($key),
-                'observer' => array_map(fn ($obs) => is_string($obs) ? $obs : 'Closure', $observerMethods),
+                'observer' => array_map(static fn ($obs) => is_string($obs) ? $obs : 'Closure', $observerMethods),
             ];
         }
 
@@ -360,7 +360,7 @@ class ModelInspector
         return (new BaseCollection($model->getDates()))
             ->filter()
             ->flip()
-            ->map(fn () => 'datetime')
+            ->map(static fn () => 'datetime')
             ->merge($model->getCasts());
     }
 
@@ -408,7 +408,7 @@ class ModelInspector
     protected function columnIsUnique($column, $indexes)
     {
         return (new BaseCollection($indexes))->contains(
-            fn ($index) => count($index['columns']) === 1 && $index['columns'][0] === $column && $index['unique']
+            static fn ($index) => count($index['columns']) === 1 && $index['columns'][0] === $column && $index['unique']
         );
     }
 }

@@ -434,12 +434,12 @@ class SQLiteGrammar extends Grammar
         $values = (new Collection($values))
             ->reject(fn ($value, $key) => $this->isJsonSelector($key))
             ->merge($groups)
-            ->map(fn ($value) => is_array($value) ? json_encode($value) : $value)
+            ->map(static fn ($value) => is_array($value) ? json_encode($value) : $value)
             ->all();
 
         $cleanBindings = Arr::except($bindings, 'select');
 
-        $values = Arr::flatten(array_map(fn ($value) => value($value), $values));
+        $values = Arr::flatten(array_map(static fn ($value) => value($value), $values));
 
         return array_values(
             array_merge($values, Arr::flatten($cleanBindings))

@@ -52,7 +52,7 @@ class NotPwnedVerifier implements UncompromisedVerifier
         [$hash, $hashPrefix] = $this->getHash($value);
 
         return ! $this->search($hashPrefix)
-            ->contains(function ($line) use ($hash, $hashPrefix, $threshold) {
+            ->contains(static function ($line) use ($hash, $hashPrefix, $threshold) {
                 [$hashSuffix, $count] = explode(':', $line);
 
                 return $hashPrefix.$hashSuffix === $hash && $count > $threshold;
@@ -96,7 +96,7 @@ class NotPwnedVerifier implements UncompromisedVerifier
             ? $response->body()
             : '';
 
-        return (new Stringable($body))->trim()->explode("\n")->filter(function ($line) {
+        return (new Stringable($body))->trim()->explode("\n")->filter(static function ($line) {
             return str_contains($line, ':');
         });
     }

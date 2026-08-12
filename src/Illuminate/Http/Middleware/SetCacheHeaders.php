@@ -25,7 +25,7 @@ class SetCacheHeaders
         }
 
         return (new Collection($options))
-            ->map(function ($value, $key) {
+            ->map(static function ($value, $key) {
                 if (is_bool($value)) {
                     return $value ? $key : null;
                 }
@@ -33,8 +33,8 @@ class SetCacheHeaders
                 return is_int($key) ? $value : "{$key}={$value}";
             })
             ->filter()
-            ->map(fn ($value) => Str::finish($value, ';'))
-            ->pipe(fn ($options) => rtrim(static::class.':'.$options->implode(''), ';'));
+            ->map(static fn ($value) => Str::finish($value, ';'))
+            ->pipe(static fn ($options) => rtrim(static::class.':'.$options->implode(''), ';'));
     }
 
     /**
@@ -89,7 +89,7 @@ class SetCacheHeaders
      */
     protected function parseOptions($options)
     {
-        return (new Stringable(rtrim($options, ';')))->explode(';')->mapWithKeys(function ($option) {
+        return (new Stringable(rtrim($options, ';')))->explode(';')->mapWithKeys(static function ($option) {
             $data = explode('=', $option, 2);
 
             return [$data[0] => $data[1] ?? true];

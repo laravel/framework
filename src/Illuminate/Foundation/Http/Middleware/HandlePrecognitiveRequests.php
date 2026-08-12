@@ -65,8 +65,8 @@ class HandlePrecognitiveRequests
     {
         $request->attributes->set('precognitive', true);
 
-        $this->container->bind(CallableDispatcherContract::class, fn ($app) => new PrecognitionCallableDispatcher($app));
-        $this->container->bind(ControllerDispatcherContract::class, fn ($app) => new PrecognitionControllerDispatcher($app));
+        $this->container->bind(CallableDispatcherContract::class, static fn ($app) => new PrecognitionCallableDispatcher($app));
+        $this->container->bind(ControllerDispatcherContract::class, static fn ($app) => new PrecognitionControllerDispatcher($app));
     }
 
     /**
@@ -78,7 +78,7 @@ class HandlePrecognitiveRequests
      */
     protected function appendVaryHeader($request, $response)
     {
-        return tap($response, fn () => $response->headers->set('Vary', implode(', ', array_filter([
+        return tap($response, static fn () => $response->headers->set('Vary', implode(', ', array_filter([
             $response->headers->get('Vary'),
             'Precognition',
         ]))));

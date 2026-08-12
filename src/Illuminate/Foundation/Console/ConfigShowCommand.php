@@ -93,7 +93,7 @@ class ConfigShowCommand extends Command
     protected function formatKey($key)
     {
         return preg_replace_callback(
-            '/(.*)\.(.*)$/', fn ($matches) => sprintf(
+            '/(.*)\.(.*)$/', static fn ($matches) => sprintf(
                 '<fg=gray>%s ⇁</> %s',
                 str_replace('.', ' ⇁ ', $matches[1]),
                 $matches[2]

@@ -285,7 +285,7 @@ class Builder
     {
         $tableColumns = array_map(strtolower(...), $this->getColumnListing($table));
 
-        return array_all($columns, fn ($column) => in_array(strtolower($column), $tableColumns));
+        return array_all($columns, static fn ($column) => in_array(strtolower($column), $tableColumns));
     }
 
     /**
@@ -299,7 +299,7 @@ class Builder
     public function whenTableHasColumn(string $table, string $column, Closure $callback)
     {
         if ($this->hasColumn($table, $column)) {
-            $this->table($table, fn (Blueprint $table) => $callback($table));
+            $this->table($table, static fn (Blueprint $table) => $callback($table));
         }
     }
 
@@ -314,7 +314,7 @@ class Builder
     public function whenTableDoesntHaveColumn(string $table, string $column, Closure $callback)
     {
         if (! $this->hasColumn($table, $column)) {
-            $this->table($table, fn (Blueprint $table) => $callback($table));
+            $this->table($table, static fn (Blueprint $table) => $callback($table));
         }
     }
 
@@ -330,7 +330,7 @@ class Builder
     public function whenTableHasIndex(string $table, string|array $index, Closure $callback, ?string $type = null)
     {
         if ($this->hasIndex($table, $index, $type)) {
-            $this->table($table, fn (Blueprint $table) => $callback($table));
+            $this->table($table, static fn (Blueprint $table) => $callback($table));
         }
     }
 
@@ -346,7 +346,7 @@ class Builder
     public function whenTableDoesntHaveIndex(string $table, string|array $index, Closure $callback, ?string $type = null)
     {
         if (! $this->hasIndex($table, $index, $type)) {
-            $this->table($table, fn (Blueprint $table) => $callback($table));
+            $this->table($table, static fn (Blueprint $table) => $callback($table));
         }
     }
 
@@ -517,7 +517,7 @@ class Builder
      */
     public function create($table, Closure $callback)
     {
-        $this->build(tap($this->createBlueprint($table), function ($blueprint) use ($callback) {
+        $this->build(tap($this->createBlueprint($table), static function ($blueprint) use ($callback) {
             $blueprint->create();
 
             $callback($blueprint);
@@ -532,7 +532,7 @@ class Builder
      */
     public function drop($table)
     {
-        $this->build(tap($this->createBlueprint($table), function ($blueprint) {
+        $this->build(tap($this->createBlueprint($table), static function ($blueprint) {
             $blueprint->drop();
         }));
     }
@@ -545,7 +545,7 @@ class Builder
      */
     public function dropIfExists($table)
     {
-        $this->build(tap($this->createBlueprint($table), function ($blueprint) {
+        $this->build(tap($this->createBlueprint($table), static function ($blueprint) {
             $blueprint->dropIfExists();
         }));
     }
@@ -559,7 +559,7 @@ class Builder
      */
     public function dropColumns($table, $columns)
     {
-        $this->table($table, function (Blueprint $blueprint) use ($columns) {
+        $this->table($table, static function (Blueprint $blueprint) use ($columns) {
             $blueprint->dropColumn($columns);
         });
     }
@@ -609,7 +609,7 @@ class Builder
      */
     public function rename($from, $to)
     {
-        $this->build(tap($this->createBlueprint($from), function ($blueprint) use ($to) {
+        $this->build(tap($this->createBlueprint($from), static function ($blueprint) use ($to) {
             $blueprint->rename($to);
         }));
     }

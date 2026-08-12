@@ -105,7 +105,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     public function registerConsoleSchedule()
     {
-        $this->app->singleton(Schedule::class, function ($app) {
+        $this->app->singleton(Schedule::class, static function ($app) {
             return $app->make(ConsoleKernel::class)->resolveConsoleSchedule();
         });
     }
@@ -200,7 +200,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     protected function registerUriUrlGeneration()
     {
-        Uri::setUrlGeneratorResolver(fn () => app('url'));
+        Uri::setUrlGeneratorResolver(static fn () => app('url'));
     }
 
     /**
@@ -212,16 +212,16 @@ class FoundationServiceProvider extends AggregateServiceProvider
     {
         $this->app->scoped(DeferredCallbackCollection::class);
 
-        $this->app['events']->listen(function (CommandFinished $event) {
-            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => app()->runningInConsole() && ($event->exitCode === 0 || $callback->always));
+        $this->app['events']->listen(static function (CommandFinished $event) {
+            app(DeferredCallbackCollection::class)->invokeWhen(static fn ($callback) => app()->runningInConsole() && ($event->exitCode === 0 || $callback->always));
         });
 
-        $this->app['events']->listen(function (JobAttempted $event) {
+        $this->app['events']->listen(static function (JobAttempted $event) {
             if (in_array($event->connectionName, ['sync', 'deferred'])) {
                 return;
             }
 
-            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => ($event->successful() || $callback->always));
+            app(DeferredCallbackCollection::class)->invokeWhen(static fn ($callback) => ($event->successful() || $callback->always));
         });
     }
 
@@ -264,7 +264,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
 
         $this->loadViewsFrom(__DIR__.'/../resources/exceptions/renderer', 'laravel-exceptions-renderer');
 
-        $this->app->singleton(Renderer::class, function (Application $app) {
+        $this->app->singleton(Renderer::class, static function (Application $app) {
             $errorRenderer = new HtmlErrorRenderer(
                 $app['config']->get('app.debug'),
             );

@@ -103,7 +103,7 @@ class HandleExceptions
 
             $options = static::$app['config']->get('logging.deprecations') ?? [];
 
-            with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
+            with($logger->channel('deprecations'), static function ($log) use ($message, $file, $line, $level, $options) {
                 if ($options['trace'] ?? false) {
                     $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
                 } else {

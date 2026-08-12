@@ -155,7 +155,7 @@ class Request implements ArrayAccess
             return false;
         }
 
-        return (new Collection($this->data))->contains(function ($file) use ($name, $value, $filename) {
+        return (new Collection($this->data))->contains(static function ($file) use ($name, $value, $filename) {
             return $file['name'] == $name &&
                 (! $value || $file['contents'] == $value) &&
                 (! $filename || $file['filename'] == $filename);

@@ -256,7 +256,7 @@ trait InteractsWithInput
             return null;
         }
 
-        return new Image(fn () => $file->getContent(), $file);
+        return new Image(static fn () => $file->getContent(), $file);
     }
 
     /**

@@ -104,7 +104,7 @@ trait ResolvesRouteDependencies
      */
     protected function alreadyInParameters($class, array $parameters)
     {
-        return ! is_null(Arr::first($parameters, fn ($value) => $value instanceof $class));
+        return ! is_null(Arr::first($parameters, static fn ($value) => $value instanceof $class));
     }
 
     /**

@@ -110,8 +110,8 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
                 '%s %s',
                 $attribute['name'],
                 (new Collection(['increments', 'unique', 'nullable', 'fillable', 'hidden', 'appended']))
-                    ->filter(fn ($property) => $attribute[$property])
-                    ->map(fn ($property) => sprintf('<fg=gray>%s</>', $property))
+                    ->filter(static fn ($property) => $attribute[$property])
+                    ->map(static fn ($property) => sprintf('<fg=gray>%s</>', $property))
                     ->implode('<fg=gray>,</> ')
             ));
 

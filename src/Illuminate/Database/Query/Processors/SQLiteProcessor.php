@@ -9,7 +9,7 @@ class SQLiteProcessor extends Processor
     {
         $hasPrimaryKey = array_sum(array_column($results, 'primary')) === 1;
 
-        return array_map(function ($result) use ($hasPrimaryKey, $sql) {
+        return array_map(static function ($result) use ($hasPrimaryKey, $sql) {
             $result = (object) $result;
 
             $type = strtolower($result->type);
@@ -56,7 +56,7 @@ class SQLiteProcessor extends Processor
     {
         $primaryCount = 0;
 
-        $indexes = array_map(function ($result) use (&$primaryCount) {
+        $indexes = array_map(static function ($result) use (&$primaryCount) {
             $result = (object) $result;
 
             if ($isPrimary = (bool) $result->primary) {
@@ -73,7 +73,7 @@ class SQLiteProcessor extends Processor
         }, $results);
 
         if ($primaryCount > 1) {
-            $indexes = array_filter($indexes, fn ($index) => $index['name'] !== 'primary');
+            $indexes = array_filter($indexes, static fn ($index) => $index['name'] !== 'primary');
         }
 
         return $indexes;
@@ -82,7 +82,7 @@ class SQLiteProcessor extends Processor
     /** @inheritDoc */
     public function processForeignKeys($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             return [

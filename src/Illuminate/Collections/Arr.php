@@ -186,7 +186,7 @@ class Arr
     {
         $results = [];
 
-        $flatten = function ($data, $prefix, $currentDepth) use (&$results, &$flatten, $depth): void {
+        $flatten = static function ($data, $prefix, $currentDepth) use (&$results, &$flatten, $depth): void {
             foreach ($data as $key => $value) {
                 $newKey = $prefix.$key;
 
@@ -249,7 +249,7 @@ class Arr
     {
         $values = (array) $values;
 
-        return array_filter($array, function ($value) use ($values, $strict) {
+        return array_filter($array, static function ($value) use ($values, $strict) {
             return ! in_array($value, $values, $strict);
         });
     }
@@ -562,7 +562,7 @@ class Arr
             return false;
         }
 
-        return array_all($keys, fn ($key) => static::has($array, $key));
+        return array_all($keys, static fn ($key) => static::has($array, $key));
     }
 
     /**
@@ -588,7 +588,7 @@ class Arr
             return false;
         }
 
-        return array_any($keys, fn ($key) => static::has($array, $key));
+        return array_any($keys, static fn ($key) => static::has($array, $key));
     }
 
     /**
@@ -729,7 +729,7 @@ class Arr
      */
     public static function prependKeysWith($array, $prependWith)
     {
-        return static::mapWithKeys($array, fn ($item, $key) => [$prependWith.$key => $item]);
+        return static::mapWithKeys($array, static fn ($item, $key) => [$prependWith.$key => $item]);
     }
 
     /**
@@ -756,7 +756,7 @@ class Arr
     {
         $values = (array) $values;
 
-        return array_filter($array, function ($value) use ($values, $strict) {
+        return array_filter($array, static function ($value) use ($values, $strict) {
             return in_array($value, $values, $strict);
         });
     }
@@ -772,7 +772,7 @@ class Arr
     {
         $keys = static::wrap($keys);
 
-        return static::map($array, function ($item) use ($keys) {
+        return static::map($array, static function ($item) use ($keys) {
             $result = [];
 
             foreach ($keys as $key) {
@@ -904,7 +904,7 @@ class Arr
      */
     public static function mapSpread(array $array, callable $callback)
     {
-        return static::map($array, function ($chunk, $key) use ($callback) {
+        return static::map($array, static function ($chunk, $key) use ($callback) {
             $chunk[] = $key;
 
             return $callback(...$chunk);
@@ -1271,7 +1271,7 @@ class Arr
      */
     public static function reject($array, callable $callback)
     {
-        return static::where($array, fn ($value, $key) => ! $callback($value, $key));
+        return static::where($array, static fn ($value, $key) => ! $callback($value, $key));
     }
 
     /**
@@ -1311,7 +1311,7 @@ class Arr
      */
     public static function whereNotNull($array)
     {
-        return static::where($array, fn ($value) => ! is_null($value));
+        return static::where($array, static fn ($value) => ! is_null($value));
     }
 
     /**

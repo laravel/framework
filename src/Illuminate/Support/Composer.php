@@ -68,14 +68,14 @@ class Composer
             'require',
             ...$packages,
         ]))
-            ->when($dev, function ($command) {
+            ->when($dev, static function ($command) {
                 $command->push('--dev');
             })->all();
 
         return 0 === $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
             ->run(
                 $output instanceof OutputInterface
-                    ? function ($type, $line) use ($output) {
+                    ? static function ($type, $line) use ($output) {
                         $output->write('    '.$line);
                     } : $output
             );
@@ -97,14 +97,14 @@ class Composer
             'remove',
             ...$packages,
         ]))
-            ->when($dev, function ($command) {
+            ->when($dev, static function ($command) {
                 $command->push('--dev');
             })->all();
 
         return 0 === $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
             ->run(
                 $output instanceof OutputInterface
-                    ? function ($type, $line) use ($output) {
+                    ? static function ($type, $line) use ($output) {
                         $output->write('    '.$line);
                     } : $output
             );

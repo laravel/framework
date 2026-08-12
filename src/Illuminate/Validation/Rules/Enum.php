@@ -159,7 +159,7 @@ class Enum implements Rule, ValidatorAwareRule, Stringable
             ? $this->only
             : array_filter($this->type::cases(), fn ($case) => ! in_array($case, $this->except, true));
 
-        $values = array_map(function ($case) {
+        $values = array_map(static function ($case) {
             $value = enum_value($case);
 
             return '"'.str_replace('"', '""', (string) $value).'"';

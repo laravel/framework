@@ -130,7 +130,7 @@ class ResponseFactory implements FactoryContract
      */
     public function eventStream(Closure $callback, array $headers = [], StreamedEvent|string|null $endStreamWith = '</stream>')
     {
-        return $this->stream(function () use ($callback, $endStreamWith) {
+        return $this->stream(static function () use ($callback, $endStreamWith) {
             try {
                 foreach ($callback() as $message) {
                     if (connection_aborted()) {
@@ -204,10 +204,10 @@ class ResponseFactory implements FactoryContract
                 ))->setCallback($callback);
             }
 
-            return new StreamedResponse(function () use ($callback) {
+            return new StreamedResponse(static function () use ($callback) {
                 foreach ($callback() as $chunk) {
                     echo $chunk;
-                    when(ob_get_level() > 0, fn () => ob_flush());
+                    when(ob_get_level() > 0, static fn () => ob_flush());
                     flush();
                 }
             }, $status, array_merge($headers, ['X-Accel-Buffering' => 'no']));
@@ -243,7 +243,7 @@ class ResponseFactory implements FactoryContract
      */
     public function streamDownload($callback, $name = null, array $headers = [], $disposition = 'attachment')
     {
-        $withWrappedException = function () use ($callback) {
+        $withWrappedException = static function () use ($callback) {
             try {
                 $callback();
             } catch (Throwable $e) {

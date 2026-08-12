@@ -470,7 +470,7 @@ class Builder implements BuilderContract
     {
         $instance = $this->newModelInstance();
 
-        return $instance->newCollection(array_map(function ($item) use ($items, $instance) {
+        return $instance->newCollection(array_map(static function ($item) use ($items, $instance) {
             $model = $instance->newFromBuilder($item);
 
             if (count($items) > 1) {
@@ -534,7 +534,7 @@ class Builder implements BuilderContract
             foreach ($values as $key => $rowValues) {
                 $values[$key] = tap(
                     $this->newModelInstance($rowValues),
-                    fn ($model) => $model->setUniqueIds()
+                    static fn ($model) => $model->setUniqueIds()
                 )->getAttributes();
             }
         });
@@ -743,7 +743,7 @@ class Builder implements BuilderContract
      */
     public function updateOrCreate(array $attributes, Closure|array $values = [])
     {
-        return tap($this->firstOrCreate($attributes, $values), function ($instance) use ($values) {
+        return tap($this->firstOrCreate($attributes, $values), static function ($instance) use ($values) {
             if (! $instance->wasRecentlyCreated) {
                 $instance->fill(value($values))->save();
             }
@@ -762,7 +762,7 @@ class Builder implements BuilderContract
      */
     public function incrementOrCreate(array $attributes, string $column = 'count', $default = 1, $step = 1, array $extra = [])
     {
-        return tap($this->firstOrCreate($attributes, [$column => $default]), function ($instance) use ($column, $step, $extra) {
+        return tap($this->firstOrCreate($attributes, [$column => $default]), static function ($instance) use ($column, $step, $extra) {
             if (! $instance->wasRecentlyCreated) {
                 $instance->increment($column, $step, $extra);
             }
@@ -1061,7 +1061,7 @@ class Builder implements BuilderContract
             $model = $this->newModelInstance()->newFromBuilder($record);
 
             return $this->applyAfterQueryCallbacks($this->newModelInstance()->newCollection([$model]))->first();
-        })->reject(fn ($model) => is_null($model));
+        })->reject(static fn ($model) => is_null($model));
     }
 
     /**
@@ -1201,7 +1201,7 @@ class Builder implements BuilderContract
             $this->enforceOrderBy();
         }
 
-        $reverseDirection = function ($order) {
+        $reverseDirection = static function ($order) {
             if (! isset($order['direction'])) {
                 return $order;
             }
@@ -1219,7 +1219,7 @@ class Builder implements BuilderContract
         $orders = ! empty($this->query->unionOrders) ? $this->query->unionOrders : $this->query->orders;
 
         return (new BaseCollection($orders))
-            ->filter(fn ($order) => Arr::has($order, 'direction'))
+            ->filter(static fn ($order) => Arr::has($order, 'direction'))
             ->values();
     }
 
@@ -1231,7 +1231,7 @@ class Builder implements BuilderContract
      */
     public function create(array $attributes = [])
     {
-        return tap($this->newModelInstance($attributes), function ($instance) {
+        return tap($this->newModelInstance($attributes), static function ($instance) {
             $instance->save();
         });
     }
@@ -1322,7 +1322,7 @@ class Builder implements BuilderContract
         $time = $this->model->freshTimestamp();
 
         if ($column) {
-            $columns = (new BaseCollection(Arr::wrap($column)))->mapWithKeys(fn ($column) => [$column => $time])->all();
+            $columns = (new BaseCollection(Arr::wrap($column)))->mapWithKeys(static fn ($column) => [$column => $time])->all();
 
             return $this->toBase()->update($columns);
         }
@@ -1707,7 +1707,7 @@ class Builder implements BuilderContract
         // Here we'll check if the given subset of where clauses contains any "or"
         // booleans and in this case create a nested where expression. That way
         // we don't add any unnecessary nesting thus keeping the query clean.
-        if ($whereBooleans->contains(fn ($logicalOperator) => str_contains($logicalOperator, 'or'))) {
+        if ($whereBooleans->contains(static fn ($logicalOperator) => str_contains($logicalOperator, 'or'))) {
             $query->wheres[] = $this->createNestedWhere(
                 $whereSlice, str_replace(' not', '', $whereBooleans->first())
             );
@@ -1882,7 +1882,7 @@ class Builder implements BuilderContract
      */
     protected function combineConstraints(array $constraints)
     {
-        return function ($builder) use ($constraints) {
+        return static function ($builder) use ($constraints) {
             foreach ($constraints as $constraint) {
                 $builder = $constraint($builder) ?? $builder;
             }

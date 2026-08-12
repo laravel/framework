@@ -406,7 +406,7 @@ class Str
 
         return array_reduce(
             $characters,
-            fn ($carry, $character) => preg_replace('/'.preg_quote($character, '/').'+/u', $character, $carry),
+            static fn ($carry, $character) => preg_replace('/'.preg_quote($character, '/').'+/u', $character, $carry),
             $string
         );
     }
@@ -471,15 +471,15 @@ class Str
         $start = ltrim($matches[1]);
 
         $start = (new Stringable(mb_substr($start, max(mb_strlen($start, 'UTF-8') - $radius, 0), $radius, 'UTF-8')))->ltrim()->unless(
-            fn ($startWithRadius) => $startWithRadius->exactly($start),
-            fn ($startWithRadius) => $startWithRadius->prepend($omission),
+            static fn ($startWithRadius) => $startWithRadius->exactly($start),
+            static fn ($startWithRadius) => $startWithRadius->prepend($omission),
         );
 
         $end = rtrim($matches[3]);
 
         $end = (new Stringable(mb_substr($end, 0, $radius, 'UTF-8')))->rtrim()->unless(
-            fn ($endWithRadius) => $endWithRadius->exactly($end),
-            fn ($endWithRadius) => $endWithRadius->append($omission),
+            static fn ($endWithRadius) => $endWithRadius->exactly($end),
+            static fn ($endWithRadius) => $endWithRadius->append($omission),
         );
 
         return $start->append($matches[2], $end)->toString();
@@ -1104,13 +1104,13 @@ class Str
             'spaces' => $spaces === true ? [' '] : null,
         ]))
             ->filter()
-            ->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)]))
+            ->each(static fn ($c) => $password->push($c[random_int(0, count($c) - 1)]))
             ->flatten();
 
         $length = $length - $password->count();
 
         return $password->merge($options->pipe(
-            fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->count() - 1)])
+            static fn ($c) => Collection::times($length, static fn () => $c[random_int(0, $c->count() - 1)])
         ))->shuffle()->implode('');
     }
 
@@ -1136,7 +1136,7 @@ class Str
      */
     public static function random($length = 16)
     {
-        return (static::$randomStringFactory ?? function ($length) {
+        return (static::$randomStringFactory ?? static function ($length) {
             $string = '';
 
             while (($len = strlen($string)) < $length) {
@@ -1175,7 +1175,7 @@ class Str
     {
         $next = 0;
 
-        $whenMissing ??= function ($length) use (&$next) {
+        $whenMissing ??= static function ($length) use (&$next) {
             $factoryCache = static::$randomStringFactory;
 
             static::$randomStringFactory = null;
@@ -1189,7 +1189,7 @@ class Str
             return $randomString;
         };
 
-        static::createRandomStringsUsing(function ($length) use (&$next, $sequence, $whenMissing) {
+        static::createRandomStringsUsing(static function ($length) use (&$next, $sequence, $whenMissing) {
             if (array_key_exists($next, $sequence)) {
                 return $sequence[$next++];
             }
@@ -1330,7 +1330,7 @@ class Str
 
             $subject = static::isAscii($term)
                 ? str_ireplace($term, $replacement, $subject)
-                : preg_replace_callback('/'.preg_quote($term, '/').'/iu', fn () => $replacement, $subject);
+                : preg_replace_callback('/'.preg_quote($term, '/').'/iu', static fn () => $replacement, $subject);
         }
 
         return $subject;
@@ -1546,7 +1546,7 @@ class Str
     {
         $parts = preg_split('/\s+/u', $value, -1, PREG_SPLIT_NO_EMPTY);
 
-        $parts = array_map(fn ($part) => mb_substr($part, 0, 1), $parts);
+        $parts = array_map(static fn ($part) => mb_substr($part, 0, 1), $parts);
 
         $initials = implode('', $parts);
 
@@ -1584,7 +1584,7 @@ class Str
             if (str_contains($lowercaseWord, '-')) {
                 $hyphenatedWords = explode('-', $lowercaseWord);
 
-                $hyphenatedWords = array_map(function ($part) use ($minorWords) {
+                $hyphenatedWords = array_map(static function ($part) use ($minorWords) {
                     return (in_array($part, $minorWords) && mb_strlen($part) <= 3)
                         ? $part
                         : mb_strtoupper(mb_substr($part, 0, 1)).mb_substr($part, 1);
@@ -1793,7 +1793,7 @@ class Str
         if ($normalize) {
             $value = preg_replace_callback(
                 '/(^|[-_ \s])([A-Z]+)(?=[-_ \s]|$)/u',
-                fn ($m) => $m[1].static::lower($m[2]),
+                static fn ($m) => $m[1].static::lower($m[2]),
                 $value
             );
         }
@@ -1806,7 +1806,7 @@ class Str
 
         $words = preg_split('/\s+/u', static::replace(['-', '_'], ' ', $value), -1, PREG_SPLIT_NO_EMPTY);
 
-        $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
+        $studlyWords = array_map(static fn ($word) => static::ucfirst($word), $words);
 
         return static::$studlyCache[$key] = implode('', $studlyWords);
     }
@@ -1870,7 +1870,7 @@ class Str
             return substr_replace($string, $replace, $offset, $length);
         }
 
-        $replaceSubstring = function ($string, $replace, $offset, $length) {
+        $replaceSubstring = static function ($string, $replace, $offset, $length) {
             if ($length === null) {
                 $length = static::length($string);
             }
@@ -1994,7 +1994,7 @@ class Str
     {
         $pattern = '/(^|['.preg_quote($separators, '/').'])(\p{Ll})/u';
 
-        return preg_replace_callback($pattern, function ($matches) {
+        return preg_replace_callback($pattern, static function ($matches) {
             return $matches[1].mb_strtoupper($matches[2]);
         }, $string);
     }
@@ -2043,7 +2043,7 @@ class Str
 
         $replaced = [];
 
-        $skeleton = preg_replace_callback('/[\x80-\xFF][\x80-\xBF]*|\x1A/', function ($match) use (&$replaced) {
+        $skeleton = preg_replace_callback('/[\x80-\xFF][\x80-\xBF]*|\x1A/', static function ($match) use (&$replaced) {
             $replaced[] = $match[0];
 
             return "\x1A";
@@ -2057,8 +2057,8 @@ class Str
 
         $index = 0;
 
-        return implode($break, array_map(function ($segment) use (&$replaced, &$index) {
-            return preg_replace_callback('/\x1A/', function () use (&$replaced, &$index) {
+        return implode($break, array_map(static function ($segment) use (&$replaced, &$index) {
+            return preg_replace_callback('/\x1A/', static function () use (&$replaced, &$index) {
                 return $replaced[$index++];
             }, $segment);
         }, explode($breakToken, wordwrap($skeleton, $characters, $breakToken, $cutLongWords))));
@@ -2136,7 +2136,7 @@ class Str
     {
         $next = 0;
 
-        $whenMissing ??= function () use (&$next) {
+        $whenMissing ??= static function () use (&$next) {
             $factoryCache = static::$uuidFactory;
 
             static::$uuidFactory = null;
@@ -2150,7 +2150,7 @@ class Str
             return $uuid;
         };
 
-        static::createUuidsUsing(function () use (&$next, $sequence, $whenMissing) {
+        static::createUuidsUsing(static function () use (&$next, $sequence, $whenMissing) {
             if (array_key_exists($next, $sequence)) {
                 return $sequence[$next++];
             }
@@ -2169,7 +2169,7 @@ class Str
     {
         $uuid = Str::uuid();
 
-        Str::createUuidsUsing(fn () => $uuid);
+        Str::createUuidsUsing(static fn () => $uuid);
 
         if ($callback !== null) {
             try {
@@ -2243,7 +2243,7 @@ class Str
     {
         $next = 0;
 
-        $whenMissing ??= function () use (&$next) {
+        $whenMissing ??= static function () use (&$next) {
             $factoryCache = static::$ulidFactory;
 
             static::$ulidFactory = null;
@@ -2257,7 +2257,7 @@ class Str
             return $ulid;
         };
 
-        static::createUlidsUsing(function () use (&$next, $sequence, $whenMissing) {
+        static::createUlidsUsing(static function () use (&$next, $sequence, $whenMissing) {
             if (array_key_exists($next, $sequence)) {
                 return $sequence[$next++];
             }
@@ -2276,7 +2276,7 @@ class Str
     {
         $ulid = Str::ulid();
 
-        Str::createUlidsUsing(fn () => $ulid);
+        Str::createUlidsUsing(static fn () => $ulid);
 
         if ($callback !== null) {
             try {

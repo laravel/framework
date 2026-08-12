@@ -18,8 +18,8 @@ class Benchmark
      */
     public static function measure(Closure|array $benchmarkables, int $iterations = 1): array|float
     {
-        return Collection::wrap($benchmarkables)->map(function ($callback) use ($iterations) {
-            return Collection::range(1, $iterations)->map(function () use ($callback) {
+        return Collection::wrap($benchmarkables)->map(static function ($callback) use ($iterations) {
+            return Collection::range(1, $iterations)->map(static function () use ($callback) {
                 gc_collect_cycles();
 
                 $start = hrtime(true);
@@ -30,8 +30,8 @@ class Benchmark
             })->average();
         })->when(
             $benchmarkables instanceof Closure,
-            fn ($c) => $c->first(),
-            fn ($c) => $c->all(),
+            static fn ($c) => $c->first(),
+            static fn ($c) => $c->all(),
         );
     }
 
@@ -64,8 +64,8 @@ class Benchmark
     public static function dd(Closure|array $benchmarkables, int $iterations = 1): never
     {
         $result = (new Collection(static::measure(Arr::wrap($benchmarkables), $iterations)))
-            ->map(fn ($average) => number_format($average, 3).'ms')
-            ->when($benchmarkables instanceof Closure, fn ($c) => $c->first(), fn ($c) => $c->all());
+            ->map(static fn ($average) => number_format($average, 3).'ms')
+            ->when($benchmarkables instanceof Closure, static fn ($c) => $c->first(), static fn ($c) => $c->all());
 
         dd($result);
     }

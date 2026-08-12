@@ -709,7 +709,7 @@ class BelongsToMany extends Relation
      */
     public function updateOrCreate(array $attributes, Closure|array $values = [], array $joining = [], $touch = true)
     {
-        return tap($this->firstOrCreate($attributes, $values, $joining, $touch), function ($instance) use ($values) {
+        return tap($this->firstOrCreate($attributes, $values, $joining, $touch), static function ($instance) use ($values) {
             if (! $instance->wasRecentlyCreated) {
                 $instance->fill(value($values));
 
@@ -1091,7 +1091,7 @@ class BelongsToMany extends Relation
      */
     public function eachById(callable $callback, $count = 1000, $column = null, $alias = null)
     {
-        return $this->chunkById($count, function ($results, $page) use ($callback, $count) {
+        return $this->chunkById($count, static function ($results, $page) use ($callback, $count) {
             foreach ($results as $key => $value) {
                 if ($callback($value, (($page - 1) * $count) + $key) === false) {
                     return false;
@@ -1134,7 +1134,7 @@ class BelongsToMany extends Relation
      */
     public function each(callable $callback, $count = 1000)
     {
-        return $this->chunk($count, function ($results) use ($callback) {
+        return $this->chunk($count, static function ($results) use ($callback) {
             foreach ($results as $key => $value) {
                 if ($callback($value, $key) === false) {
                     return false;

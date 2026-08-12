@@ -268,7 +268,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         return (new Collection(Finder::create()->files()->depth(0)->in($eventPath)))
-            ->map(fn ($file) => $file->getBasename('.php'))
+            ->map(static fn ($file) => $file->getBasename('.php'))
             ->sort()
             ->values()
             ->all();
@@ -460,7 +460,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         $name = strtolower($name);
 
         return (new Collection($this->reservedNames))
-            ->contains(fn ($reservedName) => strtolower($reservedName) === $name);
+            ->contains(static fn ($reservedName) => strtolower($reservedName) === $name);
     }
 
     /**

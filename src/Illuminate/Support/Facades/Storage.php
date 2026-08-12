@@ -114,12 +114,12 @@ class Storage extends Facade
             self::buildDiskConfiguration($disk, $config, root: $root)
         ));
 
-        return tap($fake, function ($fake) {
-            $fake->buildTemporaryUrlsUsing(function ($path, $expiration) {
+        return tap($fake, static function ($fake) {
+            $fake->buildTemporaryUrlsUsing(static function ($path, $expiration) {
                 return URL::to($path.'?expiration='.$expiration->getTimestamp());
             });
 
-            $fake->buildTemporaryUploadUrlsUsing(function ($path, $expiration) {
+            $fake->buildTemporaryUploadUrlsUsing(static function ($path, $expiration) {
                 return ['url' => URL::to($path.'?expiration='.$expiration->getTimestamp()), 'headers' => []];
             });
         });

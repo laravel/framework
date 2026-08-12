@@ -94,7 +94,7 @@ class Headers
     public function referencesString(): string
     {
         return (new Collection($this->references))
-            ->map(fn ($messageId) => (new Stringable($messageId))->start('<')->finish('>')->value())
+            ->map(static fn ($messageId) => (new Stringable($messageId))->start('<')->finish('>')->value())
             ->implode(' ');
     }
 }

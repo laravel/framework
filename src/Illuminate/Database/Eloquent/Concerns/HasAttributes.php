@@ -748,7 +748,7 @@ trait HasAttributes
 
         $attribute = $this->{Str::camel($key)}();
 
-        $value = call_user_func($attribute->get ?: function ($value) {
+        $value = call_user_func($attribute->get ?: static function ($value) {
             return $value;
         }, $value, $this->attributes);
 
@@ -813,7 +813,7 @@ trait HasAttributes
     {
         foreach ($casts as $attribute => $cast) {
             $casts[$attribute] = match (true) {
-                is_object($cast) => value(function () use ($cast, $attribute) {
+                is_object($cast) => value(static function () use ($cast, $attribute) {
                     if ($cast instanceof Stringable) {
                         return (string) $cast;
                     }
@@ -822,7 +822,7 @@ trait HasAttributes
                         "The cast object for the {$attribute} attribute must implement Stringable."
                     );
                 }),
-                is_array($cast) => value(function () use ($cast) {
+                is_array($cast) => value(static function () use ($cast) {
                     if (count($cast) === 1) {
                         return $cast[0];
                     }
@@ -1346,7 +1346,7 @@ trait HasAttributes
      */
     protected function getArrayAttributeWithValue($path, $key, $value)
     {
-        return tap($this->getArrayAttributeByKey($key), function (&$array) use ($path, $value) {
+        return tap($this->getArrayAttributeByKey($key), static function (&$array) use ($path, $value) {
             Arr::set($array, str_replace('->', '.', $path), $value);
         });
     }
@@ -2541,12 +2541,12 @@ trait HasAttributes
         $class = $reflection->getName();
 
         static::$getAttributeMutatorCache[$class] = (new Collection($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance)))
-            ->mapWithKeys(fn ($match) => [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true])
+            ->mapWithKeys(static fn ($match) => [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true])
             ->all();
 
         static::$mutatorCache[$class] = (new Collection(static::getMutatorMethods($class)))
             ->merge($attributeMutatorMethods)
-            ->map(fn ($match) => lcfirst(static::$snakeAttributes ? Str::snake($match) : $match))
+            ->map(static fn ($match) => lcfirst(static::$snakeAttributes ? Str::snake($match) : $match))
             ->all();
     }
 
@@ -2573,7 +2573,7 @@ trait HasAttributes
     {
         $instance = is_object($class) ? $class : new $class;
 
-        return (new Collection((new ReflectionClass($instance))->getMethods()))->filter(function ($method) use ($instance) {
+        return (new Collection((new ReflectionClass($instance))->getMethods()))->filter(static function ($method) use ($instance) {
             $returnType = $method->getReturnType();
 
             if ($returnType instanceof ReflectionNamedType &&

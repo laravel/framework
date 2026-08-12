@@ -92,7 +92,7 @@ class MessageSelector
     private function stripConditions($segments)
     {
         return (new Collection($segments))
-            ->map(fn ($part) => preg_replace('/^[\{\[][-?\d|*,\.*]*[\}\]]/', '', $part))
+            ->map(static fn ($part) => preg_replace('/^[\{\[][-?\d|*,\.*]*[\}\]]/', '', $part))
             ->all();
     }
 

@@ -81,12 +81,12 @@ class DatabaseTransactionsManager
         // shouldn't be any pending transactions, but going to clear them here anyways just
         // in case. This method could be refactored to receive a level in the future too.
         $this->pendingTransactions = $this->pendingTransactions->reject(
-            fn ($transaction) => $transaction->connection === $connection &&
+            static fn ($transaction) => $transaction->connection === $connection &&
                 $transaction->level >= $levelBeingCommitted
         )->values();
 
         [$forThisConnection, $forOtherConnections] = $this->committedTransactions->partition(
-            fn ($transaction) => $transaction->connection == $connection
+            static fn ($transaction) => $transaction->connection == $connection
         );
 
         $this->committedTransactions = $forOtherConnections->values();
@@ -107,13 +107,13 @@ class DatabaseTransactionsManager
     {
         $this->committedTransactions = $this->committedTransactions->merge(
             $this->pendingTransactions->filter(
-                fn ($transaction) => $transaction->connection === $connection &&
+                static fn ($transaction) => $transaction->connection === $connection &&
                                      $transaction->level >= $levelBeingCommitted
             )
         );
 
         $this->pendingTransactions = $this->pendingTransactions->reject(
-            fn ($transaction) => $transaction->connection === $connection &&
+            static fn ($transaction) => $transaction->connection === $connection &&
                                  $transaction->level >= $levelBeingCommitted
         );
     }
@@ -131,7 +131,7 @@ class DatabaseTransactionsManager
             $this->removeAllTransactionsForConnection($connection);
         } else {
             $this->pendingTransactions = $this->pendingTransactions->reject(
-                fn ($transaction) => $transaction->connection == $connection &&
+                static fn ($transaction) => $transaction->connection == $connection &&
                                      $transaction->level > $newTransactionLevel
             )->values();
 
@@ -159,7 +159,7 @@ class DatabaseTransactionsManager
     protected function removeAllTransactionsForConnection($connection)
     {
         $transactions = $this->committedTransactions->filter(
-            fn ($transaction) => $transaction->connection == $connection
+            static fn ($transaction) => $transaction->connection == $connection
         );
 
         for ($transaction = $this->currentTransaction[$connection] ?? null; isset($transaction); $transaction = $transaction->parent) {
@@ -167,17 +167,17 @@ class DatabaseTransactionsManager
         }
 
         $transactions
-            ->sortByDesc(fn ($transaction) => $transaction->level)
-            ->each(fn ($transaction) => $transaction->executeCallbacksForRollback());
+            ->sortByDesc(static fn ($transaction) => $transaction->level)
+            ->each(static fn ($transaction) => $transaction->executeCallbacksForRollback());
 
         $this->currentTransaction[$connection] = null;
 
         $this->pendingTransactions = $this->pendingTransactions->reject(
-            fn ($transaction) => $transaction->connection == $connection
+            static fn ($transaction) => $transaction->connection == $connection
         )->values();
 
         $this->committedTransactions = $this->committedTransactions->reject(
-            fn ($transaction) => $transaction->connection == $connection
+            static fn ($transaction) => $transaction->connection == $connection
         )->values();
     }
 
@@ -201,7 +201,7 @@ class DatabaseTransactionsManager
             fn ($transaction) => $this->removeCommittedTransactionsThatAreChildrenOf($transaction)
         );
 
-        $removedTransactions->each(fn ($transaction) => $transaction->executeCallbacksForRollback());
+        $removedTransactions->each(static fn ($transaction) => $transaction->executeCallbacksForRollback());
     }
 
     /**

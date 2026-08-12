@@ -31,7 +31,7 @@ class ProcessPoolResults implements ArrayAccess
      */
     public function successful()
     {
-        return $this->collect()->every(fn ($p) => $p->successful());
+        return $this->collect()->every(static fn ($p) => $p->successful());
     }
 
     /**

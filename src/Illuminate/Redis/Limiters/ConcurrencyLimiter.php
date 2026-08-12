@@ -111,7 +111,7 @@ class ConcurrencyLimiter
     {
         $prefix = $this->getPrefix();
 
-        $slots = array_map(function ($i) use ($prefix) {
+        $slots = array_map(static function ($i) use ($prefix) {
             return $prefix.$i;
         }, range(1, $this->maxLocks));
 

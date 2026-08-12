@@ -91,8 +91,8 @@ trait BuildsQueries
     {
         $collection = new Collection;
 
-        $this->chunk($count, function ($items) use ($collection, $callback) {
-            $items->each(function ($item) use ($collection, $callback) {
+        $this->chunk($count, static function ($items) use ($collection, $callback) {
+            $items->each(static function ($item) use ($collection, $callback) {
                 $collection->push($callback($item));
             });
         });
@@ -111,7 +111,7 @@ trait BuildsQueries
      */
     public function each(callable $callback, $count = 1000)
     {
-        return $this->chunk($count, function ($results) use ($callback) {
+        return $this->chunk($count, static function ($results) use ($callback) {
             foreach ($results as $key => $value) {
                 if ($callback($value, $key) === false) {
                     return false;
@@ -233,7 +233,7 @@ trait BuildsQueries
      */
     public function eachById(callable $callback, $count = 1000, $column = null, $alias = null)
     {
-        return $this->chunkById($count, function ($results, $page) use ($callback, $count) {
+        return $this->chunkById($count, static function ($results, $page) use ($callback, $count) {
             foreach ($results as $key => $value) {
                 if ($callback($value, (($page - 1) * $count) + $key) === false) {
                     return false;
@@ -468,7 +468,7 @@ trait BuildsQueries
                     );
 
                     if ($i < $orders->count() - 1) {
-                        $secondBuilder->orWhere(function (self $thirdBuilder) use ($addCursorConditions, $column, $originalColumn, $i) {
+                        $secondBuilder->orWhere(static function (self $thirdBuilder) use ($addCursorConditions, $column, $originalColumn, $i) {
                             $addCursorConditions($thirdBuilder, $column, $originalColumn, $i + 1);
                         });
                     }
@@ -485,7 +485,7 @@ trait BuildsQueries
                             );
 
                             if ($i < $orders->count() - 1) {
-                                $unionBuilder->orWhere(function (self $fourthBuilder) use ($addCursorConditions, $column, $originalColumn, $i) {
+                                $unionBuilder->orWhere(static function (self $fourthBuilder) use ($addCursorConditions, $column, $originalColumn, $i) {
                                     $addCursorConditions($fourthBuilder, $column, $originalColumn, $i + 1);
                                 });
                             }

@@ -50,7 +50,7 @@ class ScheduleTestCommand extends Command
         if (! empty($name = $this->option('name'))) {
             $commandBinary = $phpBinary.' '.Application::artisanBinary();
 
-            $matches = array_filter($commandNames, function ($commandName) use ($commandBinary, $name) {
+            $matches = array_filter($commandNames, static function ($commandName) use ($commandBinary, $name) {
                 return trim(str_replace($commandBinary, '', $commandName)) === $name;
             });
 
@@ -100,7 +100,7 @@ class ScheduleTestCommand extends Command
     {
         if (count($commandNames) !== count(array_unique($commandNames))) {
             // Some commands (likely closures) have the same name, append unique indexes to each one...
-            $uniqueCommandNames = array_map(function ($index, $value) {
+            $uniqueCommandNames = array_map(static function ($index, $value) {
                 return "$value [$index]";
             }, array_keys($commandNames), $commandNames);
 

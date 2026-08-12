@@ -26,7 +26,7 @@ if (! function_exists('Illuminate\Support\defer')) {
 
         return tap(
             new DeferredCallback($callback, $name, $always),
-            fn ($deferred) => app(DeferredCallbackCollection::class)[] = $deferred
+            static fn ($deferred) => app(DeferredCallbackCollection::class)[] = $deferred
         );
     }
 }

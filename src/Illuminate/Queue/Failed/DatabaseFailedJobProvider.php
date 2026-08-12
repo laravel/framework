@@ -72,7 +72,7 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
     public function ids($queue = null)
     {
         return $this->getTable()
-            ->when(! is_null($queue), fn ($query) => $query->where('queue', $queue))
+            ->when(! is_null($queue), static fn ($query) => $query->where('queue', $queue))
             ->orderBy('id', 'desc')
             ->pluck('id')
             ->all();
@@ -118,7 +118,7 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
      */
     public function flush($hours = null)
     {
-        $this->getTable()->when($hours, function ($query, $hours) {
+        $this->getTable()->when($hours, static function ($query, $hours) {
             $query->where('failed_at', '<=', Date::now()->subHours($hours));
         })->delete();
     }
@@ -154,8 +154,8 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
     public function count($connection = null, $queue = null)
     {
         return $this->getTable()
-            ->when($connection, fn ($builder) => $builder->whereConnection($connection))
-            ->when($queue, fn ($builder) => $builder->whereQueue($queue))
+            ->when($connection, static fn ($builder) => $builder->whereConnection($connection))
+            ->when($queue, static fn ($builder) => $builder->whereQueue($queue))
             ->count();
     }
 

@@ -166,7 +166,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $name = enum_value($queue) ?: $this->default;
 
         return (new Collection($this->getConnection()->lrange($this->getQueueRedisKey($queue), 0, -1)))
-            ->map(fn ($payload) => InspectedJob::fromPayload($payload, queue: $name));
+            ->map(static fn ($payload) => InspectedJob::fromPayload($payload, queue: $name));
     }
 
     /**
@@ -180,7 +180,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $name = enum_value($queue) ?: $this->default;
 
         return (new Collection($this->getConnection()->zrange($this->getQueueRedisKey($queue).':delayed', 0, -1)))
-            ->map(fn ($payload) => InspectedJob::fromPayload($payload, queue: $name));
+            ->map(static fn ($payload) => InspectedJob::fromPayload($payload, queue: $name));
     }
 
     /**
@@ -194,7 +194,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $name = enum_value($queue) ?: $this->default;
 
         return (new Collection($this->getConnection()->zrange($this->getQueueRedisKey($queue).':reserved', 0, -1)))
-            ->map(fn ($payload) => InspectedJob::fromPayload($payload, queue: $name));
+            ->map(static fn ($payload) => InspectedJob::fromPayload($payload, queue: $name));
     }
 
     /**
@@ -236,7 +236,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         return (new Collection($this->getConnection()->keys('queues:*')))
             // Trim to ensure clusters get their braces removed...
-            ->map(fn ($key) => trim(Str::between($key, 'queues:', ':'), '{}'))
+            ->map(static fn ($key) => trim(Str::between($key, 'queues:', ':'), '{}'))
             ->unique()
             ->values();
     }
@@ -289,7 +289,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         } elseif ($connection instanceof PredisClusterConnection) {
             $connection->pipeline($bulk);
         } else {
-            $connection->pipeline(fn () => $connection->transaction($bulk));
+            $connection->pipeline(static fn () => $connection->transaction($bulk));
         }
     }
 

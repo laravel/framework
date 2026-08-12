@@ -33,7 +33,7 @@ trait InteractsWithDatabase
             return $this;
         }
 
-        if ($data !== [] && array_is_list($data) && array_all($data, fn ($row) => is_array($row))) {
+        if ($data !== [] && array_is_list($data) && array_all($data, static fn ($row) => is_array($row))) {
             foreach ($data as $row) {
                 $this->assertDatabaseHas($table, $row, $connection);
             }
@@ -73,7 +73,7 @@ trait InteractsWithDatabase
             return $this;
         }
 
-        if ($data !== [] && array_is_list($data) && array_all($data, fn ($row) => is_array($row))) {
+        if ($data !== [] && array_is_list($data) && array_all($data, static fn ($row) => is_array($row))) {
             foreach ($data as $row) {
                 $this->assertDatabaseMissing($table, $row, $connection);
             }
@@ -166,7 +166,7 @@ trait InteractsWithDatabase
             );
         }
 
-        if ($data !== [] && array_is_list($data) && array_all($data, fn ($row) => is_array($row))) {
+        if ($data !== [] && array_is_list($data) && array_all($data, static fn ($row) => is_array($row))) {
             foreach ($data as $row) {
                 $this->assertSoftDeleted($table, $row, $connection, $deletedAtColumn);
             }
@@ -214,7 +214,7 @@ trait InteractsWithDatabase
             );
         }
 
-        if ($data !== [] && array_is_list($data) && array_all($data, fn ($row) => is_array($row))) {
+        if ($data !== [] && array_is_list($data) && array_all($data, static fn ($row) => is_array($row))) {
             foreach ($data as $row) {
                 $this->assertNotSoftDeleted($table, $row, $connection, $deletedAtColumn);
             }
@@ -269,7 +269,7 @@ trait InteractsWithDatabase
 
         $actual = 0;
 
-        $connectionInstance->listen(function (QueryExecuted $event) use (&$actual, $connectionInstance, $connection) {
+        $connectionInstance->listen(static function (QueryExecuted $event) use (&$actual, $connectionInstance, $connection) {
             if (is_null($connection) || $connectionInstance === $event->connection) {
                 $actual++;
             }

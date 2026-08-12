@@ -82,7 +82,7 @@ trait CallsCommands
      */
     protected function createInputFromArguments(array $arguments)
     {
-        return tap(new ArrayInput(array_merge($this->context(), $arguments)), function ($input) {
+        return tap(new ArrayInput(array_merge($this->context(), $arguments)), static function ($input) {
             if ($input->getParameterOption('--no-interaction')) {
                 $input->setInteractive(false);
             }
@@ -105,7 +105,7 @@ trait CallsCommands
                 'verbose',
             ])
             ->filter()
-            ->mapWithKeys(fn ($value, $key) => ["--{$key}" => $value])
+            ->mapWithKeys(static fn ($value, $key) => ["--{$key}" => $value])
             ->all();
     }
 }

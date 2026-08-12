@@ -162,7 +162,7 @@ class RedisTaggedCache extends TaggedCache
         $prefix = $this->store->getPrefix();
 
         $entries = $this->tags->entries()
-            ->map(fn (string $key) => $prefix.$key)
+            ->map(static fn (string $key) => $prefix.$key)
             ->chunk(1000);
 
         foreach ($entries as $keysToBeDeleted) {
@@ -206,14 +206,14 @@ class RedisTaggedCache extends TaggedCache
         $prefix = $this->store->getPrefix();
 
         $entries = $this->tags->entries()
-            ->map(fn (string $key) => $prefix.$key)
+            ->map(static fn (string $key) => $prefix.$key)
             ->chunk(1000);
 
         $connection = $this->store->connection();
 
         foreach ($entries as $cacheKeys) {
             if ($connection instanceof PredisClusterConnection) {
-                $connection->pipeline(function ($connection) use ($cacheKeys) {
+                $connection->pipeline(static function ($connection) use ($cacheKeys) {
                     foreach ($cacheKeys as $cacheKey) {
                         $connection->del($cacheKey);
                     }

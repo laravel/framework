@@ -169,7 +169,7 @@ class MailMakeCommand extends GeneratorCommand
             $name = str_replace('\\', '/', $this->argument('name'));
 
             $view = 'mail.'.(new Stringable($name))->explode('/')
-                ->map(fn ($part) => Str::kebab($part))
+                ->map(static fn ($part) => Str::kebab($part))
                 ->implode('.');
         }
 

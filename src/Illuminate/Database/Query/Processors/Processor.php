@@ -44,7 +44,7 @@ class Processor
      */
     public function processSchemas($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             return [
@@ -63,7 +63,7 @@ class Processor
      */
     public function processTables($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             return [
@@ -86,7 +86,7 @@ class Processor
      */
     public function processViews($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             return [

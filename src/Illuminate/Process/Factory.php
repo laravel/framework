@@ -91,7 +91,7 @@ class Factory
         $this->recording = true;
 
         if (is_null($callback)) {
-            $this->fakeHandlers = ['*' => fn () => new FakeProcessResult];
+            $this->fakeHandlers = ['*' => static fn () => new FakeProcessResult];
 
             return $this;
         }
@@ -105,7 +105,7 @@ class Factory
         foreach ($callback as $command => $handler) {
             $this->fakeHandlers[is_numeric($command) ? '*' : $command] = $handler instanceof Closure
                 ? $handler
-                : fn () => $handler;
+                : static fn () => $handler;
         }
 
         return $this;
@@ -182,10 +182,10 @@ class Factory
      */
     public function assertRan(Closure|string $callback)
     {
-        $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
+        $callback = is_string($callback) ? static fn ($process) => $process->command === $callback : $callback;
 
         PHPUnit::assertTrue(
-            (new Collection($this->recorded))->contains(function ($pair) use ($callback) {
+            (new Collection($this->recorded))->contains(static function ($pair) use ($callback) {
                 return $callback($pair[0], $pair[1]);
             }),
             'An expected process was not invoked.'
@@ -203,10 +203,10 @@ class Factory
      */
     public function assertRanTimes(Closure|string $callback, int $times = 1)
     {
-        $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
+        $callback = is_string($callback) ? static fn ($process) => $process->command === $callback : $callback;
 
         $count = (new Collection($this->recorded))
-            ->filter(fn ($pair) => $callback($pair[0], $pair[1]))
+            ->filter(static fn ($pair) => $callback($pair[0], $pair[1]))
             ->count();
 
         PHPUnit::assertSame(
@@ -225,10 +225,10 @@ class Factory
      */
     public function assertNotRan(Closure|string $callback)
     {
-        $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
+        $callback = is_string($callback) ? static fn ($process) => $process->command === $callback : $callback;
 
         PHPUnit::assertTrue(
-            (new Collection($this->recorded))->doesntContain(function ($pair) use ($callback) {
+            (new Collection($this->recorded))->doesntContain(static function ($pair) use ($callback) {
                 return $callback($pair[0], $pair[1]);
             }),
             'An unexpected process was invoked.'
@@ -283,8 +283,8 @@ class Factory
     public function pipe(callable|array $callback, ?callable $output = null)
     {
         return is_array($callback)
-            ? (new Pipe($this, fn ($pipe) => (new Collection($callback))->each(
-                fn ($command) => $pipe->command($command)
+            ? (new Pipe($this, static fn ($pipe) => (new Collection($callback))->each(
+                static fn ($command) => $pipe->command($command)
             )))->run(output: $output)
             : (new Pipe($this, $callback))->run(output: $output);
     }

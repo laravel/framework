@@ -46,7 +46,7 @@ class Bind
         $this->concrete = $concrete;
 
         $this->environments = array_map(
-            fn ($environment) => enum_value($environment),
+            static fn ($environment) => enum_value($environment),
             $environments,
         );
     }

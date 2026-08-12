@@ -358,7 +358,7 @@ trait Queueable
      */
     public function invokeChainCatchCallbacks($e)
     {
-        (new Collection($this->chainCatchCallbacks))->each(function ($callback) use ($e) {
+        (new Collection($this->chainCatchCallbacks))->each(static function ($callback) use ($e) {
             $callback($e);
         });
     }
@@ -376,10 +376,10 @@ trait Queueable
             'The expected chain can not be empty.'
         );
 
-        if ((new Collection($expectedChain))->contains(fn ($job) => is_object($job))) {
-            $expectedChain = (new Collection($expectedChain))->map(fn ($job) => serialize($job))->all();
+        if ((new Collection($expectedChain))->contains(static fn ($job) => is_object($job))) {
+            $expectedChain = (new Collection($expectedChain))->map(static fn ($job) => serialize($job))->all();
         } else {
-            $chain = (new Collection($this->chained))->map(fn ($job) => get_class(unserialize($job)))->all();
+            $chain = (new Collection($this->chained))->map(static fn ($job) => get_class(unserialize($job)))->all();
         }
 
         PHPUnit::assertTrue(

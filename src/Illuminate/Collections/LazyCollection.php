@@ -100,7 +100,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             throw new InvalidArgumentException('Step value cannot be zero.');
         }
 
-        return new static(function () use ($from, $to, $step) {
+        return new static(static function () use ($from, $to, $step) {
             if ($from <= $to) {
                 for (; $from <= $to; $from += abs($step)) {
                     yield $from;
@@ -150,7 +150,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 
         $cache = [];
 
-        return new static(function () use ($iterator, &$iteratorIndex, &$cache) {
+        return new static(static function () use ($iterator, &$iteratorIndex, &$cache) {
             for ($index = 0; true; $index++) {
                 if (array_key_exists($index, $cache)) {
                     yield $cache[$index][0] => $cache[$index][1];
@@ -275,7 +275,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function containsStrict($key, $value = null)
     {
         if (func_num_args() === 2) {
-            return $this->contains(fn ($item) => data_get($item, $key) === $value);
+            return $this->contains(static fn ($item) => data_get($item, $key) === $value);
         }
 
         if ($this->useAsCallable($key)) {
@@ -443,7 +443,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function filter(?callable $callback = null)
     {
         if (is_null($callback)) {
-            $callback = fn ($value) => (bool) $value;
+            $callback = static fn ($value) => (bool) $value;
         }
 
         return new static(function () use ($callback) {
@@ -1101,7 +1101,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         /** @var (callable(TValue,TKey): bool) $predicate */
         $predicate = $this->useAsCallable($value)
             ? $value
-            : function ($item) use ($value, $strict) {
+            : static function ($item) use ($value, $strict) {
                 return $strict ? $item === $value : $item == $value;
             };
 
@@ -1128,7 +1128,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         /** @var (callable(TValue,TKey): bool) $predicate */
         $predicate = $this->useAsCallable($value)
             ? $value
-            : function ($item) use ($value, $strict) {
+            : static function ($item) use ($value, $strict) {
                 return $strict ? $item === $value : $item == $value;
             };
 
@@ -1157,7 +1157,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         /** @var (callable(TValue,TKey): bool) $predicate */
         $predicate = $this->useAsCallable($value)
             ? $value
-            : function ($item) use ($value, $strict) {
+            : static function ($item) use ($value, $strict) {
                 return $strict ? $item === $value : $item == $value;
             };
 
@@ -1209,7 +1209,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                 $chunk[$iterator->key()] = $iterator->current();
 
                 if (count($chunk) == $size) {
-                    yield (new static($chunk))->tap(function () use (&$chunk, $step) {
+                    yield (new static($chunk))->tap(static function () use (&$chunk, $step) {
                         $chunk = array_slice($chunk, $step, null, true);
                     });
 
@@ -1405,8 +1405,8 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         }
 
         $add = match ($preserveKeys) {
-            true => fn (array &$chunk, Traversable $iterator) => $chunk[$iterator->key()] = $iterator->current(),
-            false => fn (array &$chunk, Traversable $iterator) => $chunk[] = $iterator->current(),
+            true => static fn (array &$chunk, Traversable $iterator) => $chunk[$iterator->key()] = $iterator->current(),
+            false => static fn (array &$chunk, Traversable $iterator) => $chunk[] = $iterator->current(),
         };
 
         return new static(function () use ($size, $add) {
@@ -1663,7 +1663,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         /** @var callable(TValue, TKey): bool $callback */
         $callback = $this->useAsCallable($value) ? $value : $this->equality($value);
 
-        return $this->takeUntil(fn ($item, $key) => ! $callback($item, $key));
+        return $this->takeUntil(static fn ($item, $key) => ! $callback($item, $key));
     }
 
     /**

@@ -50,7 +50,7 @@ trait ReflectsClosures
         $reflection = new ReflectionFunction($closure);
 
         $types = (new Collection($reflection->getParameters()))
-            ->mapWithKeys(function ($parameter) {
+            ->mapWithKeys(static function ($parameter) {
                 if ($parameter->isVariadic()) {
                     return [$parameter->getName() => null];
                 }
@@ -85,7 +85,7 @@ trait ReflectsClosures
         $reflection = new ReflectionFunction($closure);
 
         return (new Collection($reflection->getParameters()))
-            ->mapWithKeys(function ($parameter) {
+            ->mapWithKeys(static function ($parameter) {
                 if ($parameter->isVariadic()) {
                     return [$parameter->getName() => null];
                 }
@@ -117,8 +117,8 @@ trait ReflectsClosures
             : [$reflection->getReturnType()];
 
         return (new Collection($types))
-            ->reject(fn ($type) => $type->isBuiltin() || in_array($type->getName(), ['static', 'self']))
-            ->map(fn ($type) => $type->getName())
+            ->reject(static fn ($type) => $type->isBuiltin() || in_array($type->getName(), ['static', 'self']))
+            ->map(static fn ($type) => $type->getName())
             ->values()
             ->all();
     }

@@ -63,7 +63,7 @@ trait RunsInParallel
             $output = new ParallelConsoleOutput($output);
         }
 
-        $runnerResolver = static::$runnerResolver ?: function ($options, OutputInterface $output) {
+        $runnerResolver = static::$runnerResolver ?: static function ($options, OutputInterface $output) {
             $wrapperRunnerClass = class_exists(\ParaTest\WrapperRunner\WrapperRunner::class)
                 ? \ParaTest\WrapperRunner\WrapperRunner::class
                 : \ParaTest\Runners\PHPUnit\WrapperRunner::class;
@@ -109,14 +109,14 @@ trait RunsInParallel
 
         (new PhpHandler())->handle($configuration->php());
 
-        $this->forEachProcess(function () {
+        $this->forEachProcess(static function () {
             ParallelTesting::callSetUpProcessCallbacks();
         });
 
         try {
             $potentialExitCode = $this->runner->run();
         } finally {
-            $this->forEachProcess(function () {
+            $this->forEachProcess(static function () {
                 ParallelTesting::callTearDownProcessCallbacks();
             });
         }
@@ -147,8 +147,8 @@ trait RunsInParallel
             : $this->options->processes();
 
         Collection::range(1, $processes)->each(function ($token) use ($callback) {
-            tap($this->createApplication(), function ($app) use ($callback, $token) {
-                ParallelTesting::resolveTokenUsing(fn () => $token);
+            tap($this->createApplication(), static function ($app) use ($callback, $token) {
+                ParallelTesting::resolveTokenUsing(static fn () => $token);
 
                 $callback($app);
             })->flush();

@@ -64,11 +64,11 @@ class ClearCommand extends Command
         }
 
         $queues = (new Stringable($queueName))->explode(',')
-            ->map(fn ($queue) => trim($queue))
+            ->map(static fn ($queue) => trim($queue))
             ->filter()
             ->unique();
 
-        $count = $queues->reduce(fn ($carry, $name) => $carry + $queue->clear($name), 0);
+        $count = $queues->reduce(static fn ($carry, $name) => $carry + $queue->clear($name), 0);
 
         $this->components->info(
             sprintf('Cleared %s %s from the [%s] %s', $count, Str::plural('job', $count), $queues->implode(', '), Str::plural('queue', $queues->count()))

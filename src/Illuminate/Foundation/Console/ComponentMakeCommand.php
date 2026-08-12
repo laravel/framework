@@ -137,7 +137,7 @@ class ComponentMakeCommand extends GeneratorCommand
         $path[] = $name;
 
         return (new Collection($path))
-            ->map(fn ($segment) => Str::kebab($segment))
+            ->map(static fn ($segment) => Str::kebab($segment))
             ->implode('.');
     }
 

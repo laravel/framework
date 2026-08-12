@@ -132,7 +132,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public static function calculateDynamicConnectionName(array $config)
     {
-        return 'dynamic_'.md5((new Collection($config))->map(function ($value, $key) {
+        return 'dynamic_'.md5((new Collection($config))->map(static function ($value, $key) {
             return $key.(is_string($value) || is_int($value) ? $value : '');
         })->implode(''));
     }

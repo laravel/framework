@@ -367,7 +367,7 @@ class BusFake implements Fake, QueueingDispatcher
 
             $command = ChainedBatch::class;
 
-            $callback = fn ($job) => $instance($job->toPendingBatch());
+            $callback = static fn ($job) => $instance($job->toPendingBatch());
         } elseif (! is_string($command)) {
             $instance = $command;
 
@@ -404,7 +404,7 @@ class BusFake implements Fake, QueueingDispatcher
      */
     protected function resetChainPropertiesToDefaults($job)
     {
-        return tap(clone $job, function ($job) {
+        return tap(clone $job, static function ($job) {
             $job->chainConnection = null;
             $job->chainQueue = null;
             $job->chainCatchCallbacks = null;
@@ -507,7 +507,7 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function assertBatched(callable|array $callback)
     {
-        $callback = is_array($callback) ? fn (PendingBatchFake $batch) => $batch->hasJobs($callback) : $callback;
+        $callback = is_array($callback) ? static fn (PendingBatchFake $batch) => $batch->hasJobs($callback) : $callback;
 
         PHPUnit::assertTrue(
             $this->batched($callback)->isNotEmpty(),
@@ -536,7 +536,7 @@ class BusFake implements Fake, QueueingDispatcher
     public function assertNothingBatched()
     {
         $jobNames = (new Collection($this->batches))
-            ->map(fn ($batch) => $batch->jobs->map(fn ($job) => get_class($job)))
+            ->map(static fn ($batch) => $batch->jobs->map(static fn ($job) => get_class($job)))
             ->flatten()
             ->join("\n- ");
 
@@ -567,9 +567,9 @@ class BusFake implements Fake, QueueingDispatcher
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: static fn () => true;
 
-        return (new Collection($this->commands[$command]))->filter(fn ($command) => $callback($command));
+        return (new Collection($this->commands[$command]))->filter(static fn ($command) => $callback($command));
     }
 
     /**
@@ -585,9 +585,9 @@ class BusFake implements Fake, QueueingDispatcher
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: static fn () => true;
 
-        return (new Collection($this->commandsSync[$command]))->filter(fn ($command) => $callback($command));
+        return (new Collection($this->commandsSync[$command]))->filter(static fn ($command) => $callback($command));
     }
 
     /**
@@ -603,9 +603,9 @@ class BusFake implements Fake, QueueingDispatcher
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: static fn () => true;
 
-        return (new Collection($this->commandsAfterResponse[$command]))->filter(fn ($command) => $callback($command));
+        return (new Collection($this->commandsAfterResponse[$command]))->filter(static fn ($command) => $callback($command));
     }
 
     /**
@@ -620,7 +620,7 @@ class BusFake implements Fake, QueueingDispatcher
             return new Collection;
         }
 
-        return (new Collection($this->batches))->filter(fn ($batch) => $callback($batch));
+        return (new Collection($this->batches))->filter(static fn ($batch) => $callback($batch));
     }
 
     /**
@@ -826,7 +826,7 @@ class BusFake implements Fake, QueueingDispatcher
         }
 
         return (new Collection($this->jobsToFake))
-            ->contains(function ($job) use ($command) {
+            ->contains(static function ($job) use ($command) {
                 return $job instanceof Closure
                     ? $job($command)
                     : $job === get_class($command);
@@ -842,7 +842,7 @@ class BusFake implements Fake, QueueingDispatcher
     protected function shouldDispatchCommand($command)
     {
         return (new Collection($this->jobsToDispatch))
-            ->contains(function ($job) use ($command) {
+            ->contains(static function ($job) use ($command) {
                 return $job instanceof Closure
                     ? $job($command)
                     : $job === get_class($command);

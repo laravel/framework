@@ -217,8 +217,8 @@ class Event
             $this->buildCommand(), base_path(), ['__LARAVEL_CONTEXT' => $context], null, null
         )->run(
             laravel_cloud()
-                ? fn ($type, $line) => fwrite($type === 'out' ? STDOUT : STDERR, $line)
-                : fn () => true
+                ? static fn ($type, $line) => fwrite($type === 'out' ? STDOUT : STDERR, $line)
+                : static fn () => true
         );
     }
 
@@ -876,7 +876,7 @@ class Event
      */
     public function createMutexNameUsing(Closure|string $mutexName)
     {
-        $this->mutexNameResolver = is_string($mutexName) ? fn () => $mutexName : $mutexName;
+        $this->mutexNameResolver = is_string($mutexName) ? static fn () => $mutexName : $mutexName;
 
         return $this;
     }

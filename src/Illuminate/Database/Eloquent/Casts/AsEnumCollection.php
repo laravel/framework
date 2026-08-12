@@ -44,7 +44,7 @@ class AsEnumCollection implements Castable
 
                 $enumClass = $this->arguments[0];
 
-                return (new Collection($data))->map(function ($value) use ($enumClass) {
+                return (new Collection($data))->map(static function ($value) use ($enumClass) {
                     return is_subclass_of($enumClass, BackedEnum::class)
                         ? $enumClass::from($value)
                         : constant($enumClass.'::'.$value);

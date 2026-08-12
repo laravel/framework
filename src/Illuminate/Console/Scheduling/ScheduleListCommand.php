@@ -104,7 +104,7 @@ class ScheduleListCommand extends Command
                 }
             }
 
-            return (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))->map(fn ($expression) => [
+            return (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))->map(static fn ($expression) => [
                 'expression' => $expression,
                 'command' => $command,
                 'description' => $event->description ?? null,
@@ -152,10 +152,10 @@ class ScheduleListCommand extends Command
      */
     private function getCronExpressionSpacing($events, DateTimeZone $timezone)
     {
-        $rows = $events->flatMap(fn ($event) => (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))
-            ->map(fn ($expression) => array_map(mb_strlen(...), preg_split("/\s+/", $expression))));
+        $rows = $events->flatMap(static fn ($event) => (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))
+            ->map(static fn ($expression) => array_map(mb_strlen(...), preg_split("/\s+/", $expression))));
 
-        return (new Collection($rows[0] ?? []))->keys()->map(fn ($key) => $rows->max($key))->all();
+        return (new Collection($rows[0] ?? []))->keys()->map(static fn ($key) => $rows->max($key))->all();
     }
 
     /**
@@ -323,7 +323,7 @@ class ScheduleListCommand extends Command
         $expressions = preg_split("/\s+/", $expression);
 
         return (new Collection($spacing))
-            ->map(fn ($length, $index) => str_pad($expressions[$index], $length))
+            ->map(static fn ($length, $index) => str_pad($expressions[$index], $length))
             ->implode(' ');
     }
 

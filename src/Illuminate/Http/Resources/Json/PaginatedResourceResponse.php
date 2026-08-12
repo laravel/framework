@@ -27,7 +27,7 @@ class PaginatedResourceResponse extends ResourceResponse
             [],
             $this->resource->jsonOptions()
         ), function ($response) use ($request) {
-            $response->original = $this->resource->resource->map(function ($item) {
+            $response->original = $this->resource->resource->map(static function ($item) {
                 if (is_array($item)) {
                     return Arr::get($item, 'resource');
                 } elseif (is_object($item)) {

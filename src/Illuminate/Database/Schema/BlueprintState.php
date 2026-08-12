@@ -66,7 +66,7 @@ class BlueprintState
         $schema = $connection->getSchemaBuilder();
         $table = $blueprint->getTable();
 
-        $this->columns = (new Collection($schema->getColumns($table)))->map(fn ($column) => new ColumnDefinition([
+        $this->columns = (new Collection($schema->getColumns($table)))->map(static fn ($column) => new ColumnDefinition([
             'name' => $column['name'],
             'type' => $column['type_name'],
             'full_type_definition' => $column['type'],
@@ -83,7 +83,7 @@ class BlueprintState
                 : null,
         ]))->all();
 
-        [$primary, $indexes] = (new Collection($schema->getIndexes($table)))->map(fn ($index) => new IndexDefinition([
+        [$primary, $indexes] = (new Collection($schema->getIndexes($table)))->map(static fn ($index) => new IndexDefinition([
             'name' => match (true) {
                 $index['primary'] => 'primary',
                 $index['unique'] => 'unique',
@@ -91,12 +91,12 @@ class BlueprintState
             },
             'index' => $index['name'],
             'columns' => $index['columns'],
-        ]))->partition(fn ($index) => $index->name === 'primary');
+        ]))->partition(static fn ($index) => $index->name === 'primary');
 
         $this->indexes = $indexes->all();
         $this->primaryKey = $primary->first();
 
-        $this->foreignKeys = (new Collection($schema->getForeignKeys($table)))->map(fn ($foreignKey) => new ForeignKeyDefinition([
+        $this->foreignKeys = (new Collection($schema->getForeignKeys($table)))->map(static fn ($foreignKey) => new ForeignKeyDefinition([
             'columns' => $foreignKey['columns'],
             'on' => new Expression($foreignKey['foreign_table']),
             'references' => $foreignKey['foreign_columns'],
@@ -196,7 +196,7 @@ class BlueprintState
 
             case 'dropColumn':
                 $this->columns = array_values(
-                    array_filter($this->columns, fn ($column) => ! in_array($column->name, $command->columns))
+                    array_filter($this->columns, static fn ($column) => ! in_array($column->name, $command->columns))
                 );
 
                 break;
@@ -231,14 +231,14 @@ class BlueprintState
             case 'dropIndex':
             case 'dropUnique':
                 $this->indexes = array_values(
-                    array_filter($this->indexes, fn ($index) => $index->index !== $command->index)
+                    array_filter($this->indexes, static fn ($index) => $index->index !== $command->index)
                 );
 
                 break;
 
             case 'dropForeign':
                 $this->foreignKeys = array_values(
-                    array_filter($this->foreignKeys, fn ($fk) => $fk->columns !== $command->columns)
+                    array_filter($this->foreignKeys, static fn ($fk) => $fk->columns !== $command->columns)
                 );
 
                 break;

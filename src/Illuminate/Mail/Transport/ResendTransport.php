@@ -134,7 +134,7 @@ class ResendTransport extends AbstractTransport
      */
     protected function getRecipients(Email $email, Envelope $envelope): array
     {
-        return array_filter($envelope->getRecipients(), function (Address $address) use ($email) {
+        return array_filter($envelope->getRecipients(), static function (Address $address) use ($email) {
             return in_array($address, array_merge($email->getCc(), $email->getBcc()), true) === false;
         });
     }

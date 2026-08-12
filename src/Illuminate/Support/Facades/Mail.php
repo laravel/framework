@@ -76,7 +76,7 @@ class Mail extends Facade
             ? static::getFacadeRoot()->manager
             : static::getFacadeRoot();
 
-        return tap(new MailFake($actualMailManager), function ($fake) {
+        return tap(new MailFake($actualMailManager), static function ($fake) {
             static::swap($fake);
         });
     }

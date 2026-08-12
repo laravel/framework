@@ -88,7 +88,7 @@ class PackageManifest
     public function config($key)
     {
         return (new Collection($this->getManifest()))
-            ->flatMap(fn ($configuration) => (array) ($configuration[$key] ?? []))
+            ->flatMap(static fn ($configuration) => (array) ($configuration[$key] ?? []))
             ->filter()
             ->all();
     }
@@ -131,9 +131,9 @@ class PackageManifest
 
         $this->write((new Collection($packages))->mapWithKeys(function ($package) {
             return [$this->format($package['name']) => $package['extra']['laravel'] ?? []];
-        })->each(function ($configuration) use (&$ignore) {
+        })->each(static function ($configuration) use (&$ignore) {
             $ignore = array_merge($ignore, $configuration['dont-discover'] ?? []);
-        })->reject(function ($configuration, $package) use ($ignore, $ignoreAll) {
+        })->reject(static function ($configuration, $package) use ($ignore, $ignoreAll) {
             return $ignoreAll || in_array($package, $ignore) || empty($configuration);
         })->all());
     }

@@ -96,7 +96,7 @@ EOF;
             return '';
         }
 
-        return '@props('.'[\''.implode('\',\'', (new Collection($bindings))->map(function ($dataKey) {
+        return '@props('.'[\''.implode('\',\'', (new Collection($bindings))->map(static function ($dataKey) {
             return Str::camel($dataKey);
         })->all()).'\']'.')';
     }
@@ -110,7 +110,7 @@ EOF;
     protected function compileBindings(array $bindings)
     {
         return (new Collection($bindings))
-            ->map(fn ($key) => ':'.$key.'="$'.Str::camel(str_replace([':', '.'], ' ', $key)).'"')
+            ->map(static fn ($key) => ':'.$key.'="$'.Str::camel(str_replace([':', '.'], ' ', $key)).'"')
             ->implode(' ');
     }
 
@@ -123,8 +123,8 @@ EOF;
     protected function compileSlots(array $slots)
     {
         return (new Collection($slots))
-            ->reject(fn ($slot, $name) => $name === '__default')
-            ->map(fn ($slot, $name) => '<x-slot name="'.$name.'" '.((string) $slot->attributes).'>{{ $'.$name.' }}</x-slot>')
+            ->reject(static fn ($slot, $name) => $name === '__default')
+            ->map(static fn ($slot, $name) => '<x-slot name="'.$name.'" '.((string) $slot->attributes).'>{{ $'.$name.' }}</x-slot>')
             ->implode(PHP_EOL);
     }
 

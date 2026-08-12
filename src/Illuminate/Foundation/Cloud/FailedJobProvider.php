@@ -114,7 +114,7 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
 
         $response = Http::connectTimeout(10)
             ->timeout(10)
-            ->retry(3, 1000, fn ($exception) => $exception instanceof ConnectionException)
+            ->retry(3, 1000, static fn ($exception) => $exception instanceof ConnectionException)
             ->throw()
             ->get($id);
 

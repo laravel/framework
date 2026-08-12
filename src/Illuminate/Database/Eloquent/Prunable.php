@@ -22,10 +22,10 @@ trait Prunable
         $total = 0;
 
         $this->prunable()
-            ->when(static::isSoftDeletable(), function ($query) {
+            ->when(static::isSoftDeletable(), static function ($query) {
                 $query->withTrashed();
-            })->chunkById($chunkSize, function ($models) use (&$total) {
-                $models->each(function ($model) use (&$total) {
+            })->chunkById($chunkSize, static function ($models) use (&$total) {
+                $models->each(static function ($model) use (&$total) {
                     try {
                         $model->prune();
 

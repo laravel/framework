@@ -395,16 +395,16 @@ class Schedule
      */
     public function compileArrayInput($key, $value)
     {
-        $value = (new Collection($value))->map(function ($value) {
+        $value = (new Collection($value))->map(static function ($value) {
             return ProcessUtils::escapeArgument($value);
         });
 
         if (str_starts_with($key, '--')) {
-            $value = $value->map(function ($value) use ($key) {
+            $value = $value->map(static function ($value) use ($key) {
                 return "{$key}={$value}";
             });
         } elseif (str_starts_with($key, '-')) {
-            $value = $value->map(function ($value) use ($key) {
+            $value = $value->map(static function ($value) use ($key) {
                 return "{$key} {$value}";
             });
         }

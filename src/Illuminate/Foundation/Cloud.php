@@ -21,10 +21,10 @@ class Cloud
     public static function bootstrapperBootstrapping(Application $app, string $bootstrapper): void
     {
         (match ($bootstrapper) {
-            BootProviders::class => function () use ($app) {
+            BootProviders::class => static function () use ($app) {
                 static::bootManagedQueues($app);
             },
-            default => fn () => true,
+            default => static fn () => true,
         })();
     }
 
@@ -34,16 +34,16 @@ class Cloud
     public static function bootstrapperBootstrapped(Application $app, string $bootstrapper): void
     {
         (match ($bootstrapper) {
-            LoadConfiguration::class => function () use ($app) {
+            LoadConfiguration::class => static function () use ($app) {
                 static::configureDisks($app);
                 static::configureUnpooledPostgresConnection($app);
                 static::ensureMigrationsUseUnpooledConnection($app);
                 static::configureManagedQueues($app);
             },
-            HandleExceptions::class => function () use ($app) {
+            HandleExceptions::class => static function () use ($app) {
                 static::configureCloudLogging($app);
             },
-            default => fn () => true,
+            default => static fn () => true,
         })();
     }
 
@@ -121,7 +121,7 @@ class Cloud
             return;
         }
 
-        Migrator::resolveConnectionsUsing(function ($resolver, $connection) use ($app) {
+        Migrator::resolveConnectionsUsing(static function ($resolver, $connection) use ($app) {
             $connection ??= $app['config']->get('database.default');
 
             return $resolver->connection(
@@ -164,15 +164,15 @@ class Cloud
             return;
         }
 
-        $app->singleton(Events::class, fn () => new Events(Cloud::socket()));
-        $app->bind(QueueConnector::class, fn ($app) => new QueueConnector(new SqsConnector, $app));
+        $app->singleton(Events::class, static fn () => new Events(Cloud::socket()));
+        $app->bind(QueueConnector::class, static fn ($app) => new QueueConnector(new SqsConnector, $app));
 
         $app['queue']->addConnector('cloud', $app->factory(QueueConnector::class));
 
         $failer = $app['queue.failer'];
         unset($app['queue.failer']);
 
-        $app->singleton('queue.failer', fn ($app) => new FailedJobProvider(
+        $app->singleton('queue.failer', static fn ($app) => new FailedJobProvider(
             $failer, $app[Events::class], $app['encrypter'],
         ));
     }

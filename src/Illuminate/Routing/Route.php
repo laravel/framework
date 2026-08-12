@@ -512,7 +512,7 @@ class Route
      */
     public function parametersWithoutNulls()
     {
-        return array_filter($this->parameters(), fn ($p) => ! is_null($p));
+        return array_filter($this->parameters(), static fn ($p) => ! is_null($p));
     }
 
     /**
@@ -534,7 +534,7 @@ class Route
     {
         preg_match_all('/\{(.*?)\}/', $this->getDomain().$this->uri, $matches);
 
-        return array_map(fn ($m) => trim($m, '?'), $matches[1]);
+        return array_map(static fn ($m) => trim($m, '?'), $matches[1]);
     }
 
     /**
@@ -923,7 +923,7 @@ class Route
             return false;
         }
 
-        return array_any($patterns, fn ($pattern) => Str::is($pattern, $routeName));
+        return array_any($patterns, static fn ($pattern) => Str::is($pattern, $routeName));
     }
 
     /**
@@ -1154,12 +1154,12 @@ class Route
     protected function staticallyProvidedControllerMiddleware(string $class, string $method)
     {
         return (new Collection($class::middleware()))
-            ->map(function ($middleware) {
+            ->map(static function ($middleware) {
                 return $middleware instanceof Middleware
                     ? $middleware
                     : new Middleware($middleware);
             })
-            ->reject(function ($middleware) use ($method) {
+            ->reject(static function ($middleware) use ($method) {
                 return static::methodExcludedByOptions(
                     $method, ['only' => $middleware->only, 'except' => $middleware->except],
                 );
@@ -1203,7 +1203,7 @@ class Route
 
         return $attributes->merge(
             $reflectionMethod->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF)
-        )->map(function (ReflectionAttribute $attribute) use ($method) {
+        )->map(static function (ReflectionAttribute $attribute) use ($method) {
             $instance = $attribute->newInstance();
 
             return static::methodExcludedByOptions(
@@ -1268,7 +1268,7 @@ class Route
 
         return $attributes->merge(
             $reflectionMethod->getAttributes(WithoutMiddleware::class, ReflectionAttribute::IS_INSTANCEOF)
-        )->map(function (ReflectionAttribute $attribute) use ($method) {
+        )->map(static function (ReflectionAttribute $attribute) use ($method) {
             $instance = $attribute->newInstance();
 
             return static::methodExcludedByOptions(

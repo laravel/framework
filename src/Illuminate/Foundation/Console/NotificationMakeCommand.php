@@ -154,7 +154,7 @@ class NotificationMakeCommand extends GeneratorCommand
 
         if ($wantsMarkdownView) {
             $defaultMarkdownView = (new Stringable($this->argument('name')))->replace('\\', '/')->explode('/')
-                ->map(fn ($path) => Str::kebab($path))
+                ->map(static fn ($path) => Str::kebab($path))
                 ->prepend('mail')
                 ->implode('.');
 

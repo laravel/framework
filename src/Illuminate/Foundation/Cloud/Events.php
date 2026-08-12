@@ -104,7 +104,7 @@ class Events
      */
     protected function format(array $payloads): string
     {
-        return array_reduce($payloads, function (string $carry, array $line) {
+        return array_reduce($payloads, static function (string $carry, array $line) {
             if ($carry !== '') {
                 $carry .= "\n";
             }
@@ -202,7 +202,7 @@ class Events
 
         $meta = stream_get_meta_data($this->socket);
 
-        return $prefix.array_reduce(array_keys($meta), function ($carry, $key) use ($meta) {
+        return $prefix.array_reduce(array_keys($meta), static function ($carry, $key) use ($meta) {
             try {
                 return $carry.$key.': '.match ($meta[$key]) {
                     true => 'true',

@@ -639,7 +639,7 @@ class Gate implements GateContract
             return $this->abilities[$ability];
         }
 
-        return function () {
+        return static function () {
             //
         };
     }
@@ -718,14 +718,14 @@ class Gate implements GateContract
 
         $classDirnameSegments = explode('\\', $classDirname);
 
-        return Arr::wrap(Collection::times(count($classDirnameSegments), function ($index) use ($class, $classDirnameSegments) {
+        return Arr::wrap(Collection::times(count($classDirnameSegments), static function ($index) use ($class, $classDirnameSegments) {
             $classDirname = implode('\\', array_slice($classDirnameSegments, 0, $index));
 
             return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
-        })->when(str_contains($classDirname, '\\Models\\'), function ($collection) use ($class, $classDirname) {
+        })->when(str_contains($classDirname, '\\Models\\'), static function ($collection) use ($class, $classDirname) {
             return $collection->concat([str_replace('\\Models\\', '\\Policies\\', $classDirname).'\\'.class_basename($class).'Policy'])
                 ->concat([str_replace('\\Models\\', '\\Models\\Policies\\', $classDirname).'\\'.class_basename($class).'Policy']);
-        })->reverse()->values()->first(function ($class) {
+        })->reverse()->values()->first(static function ($class) {
             return class_exists($class);
         }) ?: [$classDirname.'\\Policies\\'.class_basename($class).'Policy']);
     }
@@ -860,7 +860,7 @@ class Gate implements GateContract
     {
         $gate = new static(
             $this->container,
-            fn () => $user,
+            static fn () => $user,
             $this->abilities,
             $this->policies,
             $this->beforeCallbacks,

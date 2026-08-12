@@ -40,7 +40,7 @@ class ImageManager extends Manager
     public function fromStream(mixed $stream): Image
     {
         return new Image(
-            fn () => stream_get_contents($stream) ?: throw new ImageException('Invalid stream image data.'),
+            static fn () => stream_get_contents($stream) ?: throw new ImageException('Invalid stream image data.'),
         );
     }
 
@@ -50,7 +50,7 @@ class ImageManager extends Manager
     public function fromBase64(string $base64): Image
     {
         return new Image(
-            fn () => base64_decode($base64, true) ?: throw new ImageException('Invalid base64 image data.'),
+            static fn () => base64_decode($base64, true) ?: throw new ImageException('Invalid base64 image data.'),
         );
     }
 
@@ -81,7 +81,7 @@ class ImageManager extends Manager
      */
     public function fromUpload(UploadedFile $file): Image
     {
-        return new Image(fn () => $file->getContent(), $file);
+        return new Image(static fn () => $file->getContent(), $file);
     }
 
     /**

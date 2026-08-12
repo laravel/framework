@@ -94,7 +94,7 @@ trait SerializesAndRestoresModelIdentifiers
 
         return (new $collectionClass(
             (new Collection($value->id))
-                ->map(fn ($id) => $collection[$id] ?? null)
+                ->map(static fn ($id) => $collection[$id] ?? null)
                 ->filter()
         ))->loadMissing($value->relations ?? []);
     }

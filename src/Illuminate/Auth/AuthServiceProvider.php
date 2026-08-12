@@ -34,9 +34,9 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function registerAuthenticator()
     {
-        $this->app->singleton('auth', fn ($app) => new AuthManager($app));
+        $this->app->singleton('auth', static fn ($app) => new AuthManager($app));
 
-        $this->app->singleton('auth.driver', fn ($app) => $app['auth']->guard());
+        $this->app->singleton('auth.driver', static fn ($app) => $app['auth']->guard());
     }
 
     /**
@@ -46,7 +46,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function registerUserResolver()
     {
-        $this->app->bind(AuthenticatableContract::class, fn ($app) => call_user_func($app['auth']->userResolver()));
+        $this->app->bind(AuthenticatableContract::class, static fn ($app) => call_user_func($app['auth']->userResolver()));
     }
 
     /**
@@ -56,8 +56,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function registerAccessGate()
     {
-        $this->app->singleton(GateContract::class, function ($app) {
-            return new Gate($app, fn () => call_user_func($app['auth']->userResolver()));
+        $this->app->singleton(GateContract::class, static function ($app) {
+            return new Gate($app, static fn () => call_user_func($app['auth']->userResolver()));
         });
     }
 
@@ -68,7 +68,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function registerRequirePassword()
     {
-        $this->app->bind(RequirePassword::class, function ($app) {
+        $this->app->bind(RequirePassword::class, static function ($app) {
             return new RequirePassword(
                 $app[ResponseFactory::class],
                 $app[UrlGenerator::class],
@@ -84,8 +84,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function registerRequestRebindHandler()
     {
-        $this->app->rebinding('request', function ($app, $request) {
-            $request->setUserResolver(function ($guard = null) use ($app) {
+        $this->app->rebinding('request', static function ($app, $request) {
+            $request->setUserResolver(static function ($guard = null) use ($app) {
                 return call_user_func($app['auth']->userResolver(), $guard);
             });
         });
@@ -98,7 +98,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function registerEventRebindHandler()
     {
-        $this->app->rebinding('events', function ($app, $dispatcher) {
+        $this->app->rebinding('events', static function ($app, $dispatcher) {
             if (! $app->resolved('auth') ||
                 $app['auth']->hasResolvedGuards() === false) {
                 return;

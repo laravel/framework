@@ -168,7 +168,7 @@ class Filesystem
             );
         }
 
-        return new LazyCollection(function () use ($path) {
+        return new LazyCollection(static function () use ($path) {
             $file = new SplFileObject($path);
 
             $file->setFlags(SplFileObject::DROP_NEW_LINE);

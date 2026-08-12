@@ -58,7 +58,7 @@ class SqlServerProcessor extends Processor
     /** @inheritDoc */
     public function processColumns($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             $type = match ($typeName = $result->type_name) {
@@ -88,7 +88,7 @@ class SqlServerProcessor extends Processor
     /** @inheritDoc */
     public function processIndexes($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             return [
@@ -104,7 +104,7 @@ class SqlServerProcessor extends Processor
     /** @inheritDoc */
     public function processForeignKeys($results)
     {
-        return array_map(function ($result) {
+        return array_map(static function ($result) {
             $result = (object) $result;
 
             return [

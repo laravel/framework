@@ -183,7 +183,7 @@ trait InteractsWithPivotTable
      */
     public function syncWithPivotValues($ids, array $values, bool $detaching = true)
     {
-        return $this->sync((new BaseCollection($this->parseIds($ids)))->mapWithKeys(function ($id) use ($values) {
+        return $this->sync((new BaseCollection($this->parseIds($ids)))->mapWithKeys(static function ($id) use ($values) {
             return [$id => $values];
         }), $detaching);
     }
@@ -211,7 +211,7 @@ trait InteractsWithPivotTable
      */
     protected function formatRecordsList(array $records)
     {
-        return (new BaseCollection($records))->mapWithKeys(function ($attributes, $id) {
+        return (new BaseCollection($records))->mapWithKeys(static function ($attributes, $id) {
             if (! is_array($attributes)) {
                 [$id, $attributes] = [$attributes, []];
             }
@@ -572,7 +572,7 @@ trait InteractsWithPivotTable
     protected function detachUsingCustomClass($ids)
     {
         return $this->getCurrentlyAttachedPivotsForIds($ids)
-            ->reduce(fn ($carry, $record) => $carry + $record->delete(), 0);
+            ->reduce(static fn ($carry, $record) => $carry + $record->delete(), 0);
     }
 
     /**

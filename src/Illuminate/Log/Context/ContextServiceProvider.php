@@ -21,7 +21,7 @@ class ContextServiceProvider extends ServiceProvider
         $this->app->scoped(Repository::class);
 
         if ($this->app->runningInConsole()) {
-            $this->app->resolving(Repository::class, function (Repository $repository) {
+            $this->app->resolving(Repository::class, static function (Repository $repository) {
                 $context = Env::get('__LARAVEL_CONTEXT');
 
                 if ($context && $context = json_decode($context, associative: true)) {
@@ -30,7 +30,7 @@ class ContextServiceProvider extends ServiceProvider
             });
         }
 
-        $this->app->bind(ContextLogProcessorContract::class, fn () => new ContextLogProcessor());
+        $this->app->bind(ContextLogProcessorContract::class, static fn () => new ContextLogProcessor());
     }
 
     /**
@@ -40,7 +40,7 @@ class ContextServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Queue::createPayloadUsing(function ($connection, $queue, $payload) {
+        Queue::createPayloadUsing(static function ($connection, $queue, $payload) {
             /** @phpstan-ignore staticMethod.notFound */
             $context = Context::dehydrate();
 
@@ -50,7 +50,7 @@ class ContextServiceProvider extends ServiceProvider
             ];
         });
 
-        $this->app['events']->listen(function (JobProcessing $event) {
+        $this->app['events']->listen(static function (JobProcessing $event) {
             /** @phpstan-ignore staticMethod.notFound */
             Context::hydrate($event->job->payload()['illuminate:log:context'] ?? null);
         });

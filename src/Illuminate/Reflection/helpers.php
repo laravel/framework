@@ -36,7 +36,7 @@ if (! function_exists('lazy')) {
 
         $reflectionClass = new ReflectionClass($class);
 
-        $instance = $reflectionClass->newLazyGhost(function ($instance) use ($callback) {
+        $instance = $reflectionClass->newLazyGhost(static function ($instance) use ($callback) {
             $result = $callback($instance);
 
             if (is_array($result)) {
@@ -86,7 +86,7 @@ if (! function_exists('proxy')) {
 
         $reflectionClass = new ReflectionClass($class);
 
-        $proxy = $reflectionClass->newLazyProxy(function () use ($callback, $eager, &$proxy) {
+        $proxy = $reflectionClass->newLazyProxy(static function () use ($callback, $eager, &$proxy) {
             $instance = $callback($proxy, $eager);
 
             return $instance;

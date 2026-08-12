@@ -54,7 +54,7 @@ trait HasFactory
 
             $factory = $useFactory->factoryClass::new();
 
-            $factory->guessModelNamesUsing(fn () => static::class);
+            $factory->guessModelNamesUsing(static fn () => static::class);
 
             return $factory;
         }

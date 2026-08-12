@@ -89,7 +89,7 @@ class CloudflareTransport extends AbstractTransport
             'text' => $email->getTextBody(),
             'headers' => $this->getCustomHeaders($email),
             'attachments' => $this->getAttachments($email),
-        ], fn ($value) => $value !== null && $value !== [] && $value !== '');
+        ], static fn ($value) => $value !== null && $value !== [] && $value !== '');
     }
 
     /**
@@ -97,7 +97,7 @@ class CloudflareTransport extends AbstractTransport
      */
     protected function getRecipients(Email $email, Envelope $envelope): array
     {
-        return array_filter($envelope->getRecipients(), function (Address $address) use ($email) {
+        return array_filter($envelope->getRecipients(), static function (Address $address) use ($email) {
             return in_array($address, array_merge($email->getCc(), $email->getBcc()), true) === false;
         });
     }
@@ -173,7 +173,7 @@ class CloudflareTransport extends AbstractTransport
      */
     protected function stringifyAddresses(array $addresses): array
     {
-        return array_map(fn (Address $a) => $a->getAddress(), $addresses);
+        return array_map(static fn (Address $a) => $a->getAddress(), $addresses);
     }
 
     /**

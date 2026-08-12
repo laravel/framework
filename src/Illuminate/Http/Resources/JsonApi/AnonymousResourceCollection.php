@@ -23,10 +23,10 @@ class AnonymousResourceCollection extends BaseAnonymousResourceCollection
     {
         return array_filter([
             'included' => $this->collection
-                ->map(fn ($resource) => $resource->resolveIncludedResourceObjects($request))
+                ->map(static fn ($resource) => $resource->resolveIncludedResourceObjects($request))
                 ->flatten(depth: 1)
                 ->uniqueStrict('_uniqueKey')
-                ->map(fn ($included) => Arr::except($included, ['_uniqueKey']))
+                ->map(static fn ($included) => Arr::except($included, ['_uniqueKey']))
                 ->values()
                 ->all(),
             ...($implementation = JsonApiResource::$jsonApiInformation)
@@ -45,7 +45,7 @@ class AnonymousResourceCollection extends BaseAnonymousResourceCollection
     public function toAttributes(Request $request)
     {
         return $this->collection
-            ->map(fn ($resource) => $resource->resolveResourceData($request))
+            ->map(static fn ($resource) => $resource->resolveResourceData($request))
             ->all();
     }
 

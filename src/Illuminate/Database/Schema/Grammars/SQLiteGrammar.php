@@ -345,7 +345,7 @@ class SQLiteGrammar extends Grammar
             })->all();
 
         $indexes = (new Collection($blueprint->getState()->getIndexes()))
-            ->reject(fn ($index) => str_starts_with('sqlite_', $index->index))
+            ->reject(static fn ($index) => str_starts_with('sqlite_', $index->index))
             ->map(fn ($index) => $this->{'compile'.ucfirst($index->name)}($blueprint, $index))
             ->all();
 
@@ -534,7 +534,7 @@ class SQLiteGrammar extends Grammar
 
         $columns = $this->prefixArray('drop column', $this->wrapArray($command->columns));
 
-        return (new Collection($columns))->map(fn ($column) => 'alter table '.$table.' '.$column)->all();
+        return (new Collection($columns))->map(static fn ($column) => 'alter table '.$table.' '.$column)->all();
     }
 
     /**
@@ -637,7 +637,7 @@ class SQLiteGrammar extends Grammar
     {
         $indexes = $this->connection->getSchemaBuilder()->getIndexes($blueprint->getTable());
 
-        $index = Arr::first($indexes, fn ($index) => $index['name'] === $command->from);
+        $index = Arr::first($indexes, static fn ($index) => $index['name'] === $command->from);
 
         if (! $index) {
             throw new RuntimeException("Index [{$command->from}] does not exist.");

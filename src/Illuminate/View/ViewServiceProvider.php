@@ -81,7 +81,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerViewFinder()
     {
-        $this->app->bind('view.finder', function ($app) {
+        $this->app->bind('view.finder', static function ($app) {
             return new FileViewFinder($app['files'], $app['config']['view.paths']);
         });
     }
@@ -93,7 +93,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerBladeCompiler()
     {
-        $this->app->singleton('blade.compiler', function ($app) {
+        $this->app->singleton('blade.compiler', static function ($app) {
             return tap(new BladeCompiler(
                 $app['files'],
                 $app['config']['view.compiled'],
@@ -101,7 +101,7 @@ class ViewServiceProvider extends ServiceProvider
                 $app['config']->get('view.cache', true),
                 $app['config']->get('view.compiled_extension', 'php'),
                 $app['config']->get('view.check_cache_timestamps', true),
-            ), function ($blade) {
+            ), static function ($blade) {
                 $blade->component('dynamic-component', DynamicComponent::class);
             });
         });
@@ -136,7 +136,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerFileEngine($resolver)
     {
-        $resolver->register('file', function () {
+        $resolver->register('file', static function () {
             return new FileEngine(Container::getInstance()->make('files'));
         });
     }
@@ -149,7 +149,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerPhpEngine($resolver)
     {
-        $resolver->register('php', function () {
+        $resolver->register('php', static function () {
             return new PhpEngine(Container::getInstance()->make('files'));
         });
     }
@@ -162,7 +162,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerBladeEngine($resolver)
     {
-        $resolver->register('blade', function () {
+        $resolver->register('blade', static function () {
             $app = Container::getInstance();
 
             $compiler = new CompilerEngine(

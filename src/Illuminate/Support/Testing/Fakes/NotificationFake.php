@@ -164,8 +164,8 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     public function assertNothingSent()
     {
         $notificationNames = (new Collection($this->notifications))
-            ->map(fn ($notifiableModels) => (new Collection($notifiableModels))
-                ->map(fn ($notifiables) => (new Collection($notifiables))->keys())
+            ->map(static fn ($notifiableModels) => (new Collection($notifiableModels))
+                ->map(static fn ($notifiables) => (new Collection($notifiables))->keys())
             )
             ->flatten()->join("\n- ");
 
@@ -211,7 +211,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     {
         $actualCount = (new Collection($this->notifications))
             ->flatten(1)
-            ->reduce(fn ($count, $sent) => $count + count($sent[$notification] ?? []), 0);
+            ->reduce(static fn ($count, $sent) => $count + count($sent[$notification] ?? []), 0);
 
         PHPUnit::assertSame(
             $expectedCount, $actualCount,
@@ -253,12 +253,12 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: static fn () => true;
 
         $notifications = new Collection($this->notificationsFor($notifiable, $notification));
 
         return $notifications->filter(
-            fn ($arguments) => $callback(...array_values($arguments))
+            static fn ($arguments) => $callback(...array_values($arguments))
         )->pluck('notification');
     }
 
@@ -322,7 +322,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
             if (method_exists($notification, 'shouldSend')) {
                 $notifiableChannels = array_filter(
                     $notifiableChannels,
-                    fn ($channel) => $notification->shouldSend($notifiable, $channel) !== false
+                    static fn ($channel) => $notification->shouldSend($notifiable, $channel) !== false
                 );
             }
 
@@ -336,7 +336,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                     : $notification,
                 'channels' => $notifiableChannels,
                 'notifiable' => $notifiable,
-                'locale' => $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
+                'locale' => $notification->locale ?? $this->locale ?? value(static function () use ($notifiable) {
                     if ($notifiable instanceof HasLocalePreference) {
                         return $notifiable->preferredLocale();
                     }

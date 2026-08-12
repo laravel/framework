@@ -15,8 +15,8 @@ trait MassPrunable
      */
     public function pruneAll(int $chunkSize = 1000)
     {
-        $query = tap($this->prunable(), function ($query) use ($chunkSize) {
-            $query->when(! $query->getQuery()->limit, function ($query) use ($chunkSize) {
+        $query = tap($this->prunable(), static function ($query) use ($chunkSize) {
+            $query->when(! $query->getQuery()->limit, static function ($query) use ($chunkSize) {
                 $query->limit($chunkSize);
             });
         });

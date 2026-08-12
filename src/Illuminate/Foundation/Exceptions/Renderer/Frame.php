@@ -174,7 +174,7 @@ class Frame
             return [];
         }
 
-        return array_map(function ($argument) {
+        return array_map(static function ($argument) {
             [$key, $value] = $argument;
 
             return match ($key) {

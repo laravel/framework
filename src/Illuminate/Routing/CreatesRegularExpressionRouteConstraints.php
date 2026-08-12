@@ -75,7 +75,7 @@ trait CreatesRegularExpressionRouteConstraints
         return $this->assignExpressionToParameters(
             $parameters,
             (new Collection($values))
-                ->map(fn ($value) => enum_value($value))
+                ->map(static fn ($value) => enum_value($value))
                 ->implode('|')
         );
     }
@@ -90,7 +90,7 @@ trait CreatesRegularExpressionRouteConstraints
     protected function assignExpressionToParameters($parameters, $expression)
     {
         return $this->where(Collection::wrap($parameters)
-            ->mapWithKeys(fn ($parameter) => [$parameter => $expression])
+            ->mapWithKeys(static fn ($parameter) => [$parameter => $expression])
             ->all());
     }
 }

@@ -281,7 +281,7 @@ class AssertableJsonString implements ArrayAccess, Countable
         if ($exact) {
             PHPUnit::assertIsArray($this->decoded);
 
-            $keys = (new Collection($structure))->map(fn ($value, $key) => is_array($value) ? $key : $value)->values();
+            $keys = (new Collection($structure))->map(static fn ($value, $key) => is_array($value) ? $key : $value)->values();
 
             if ($keys->all() !== ['*']) {
                 PHPUnit::assertEquals($keys->sort()->values()->all(), (new Collection($this->decoded))->keys()->sort()->values()->all());

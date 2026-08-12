@@ -58,7 +58,7 @@ class Exceptions extends Facade
             ? static::getFacadeRoot()->handler()
             : static::getFacadeRoot();
 
-        return tap(new ExceptionHandlerFake($exceptionHandler, Arr::wrap($exceptions)), function ($fake) {
+        return tap(new ExceptionHandlerFake($exceptionHandler, Arr::wrap($exceptions)), static function ($fake) {
             static::swap($fake);
         });
     }

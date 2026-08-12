@@ -470,7 +470,7 @@ class UrlGenerator implements UrlGeneratorContract
             : '/'.$request->path();
 
         $queryString = (new Stringable((string) ($request->server->get('VAPOR_RAW_QUERY_STRING') ?? $request->server->get('QUERY_STRING'))))->explode('&')
-            ->reject(function ($parameter) use ($ignoreQuery) {
+            ->reject(static function ($parameter) use ($ignoreQuery) {
                 $parameter = Str::before($parameter, '=');
 
                 if ($parameter === 'signature') {
@@ -491,7 +491,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         $keys = is_array($keys) ? $keys : [$keys];
 
-        return array_any($keys, fn ($key) => hash_equals(
+        return array_any($keys, static fn ($key) => hash_equals(
             hash_hmac('sha256', $original, $key),
             $signature
         ));
@@ -825,7 +825,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function pathFormatter()
     {
-        return $this->formatPathUsing ?: function ($path) {
+        return $this->formatPathUsing ?: static function ($path) {
             return $path;
         };
     }

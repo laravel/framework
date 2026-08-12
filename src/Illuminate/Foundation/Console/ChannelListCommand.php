@@ -74,7 +74,7 @@ class ChannelListCommand extends Command
      */
     protected function forCli($channels)
     {
-        $maxChannelName = $channels->keys()->max(function ($channelName) {
+        $maxChannelName = $channels->keys()->max(static function ($channelName) {
             return mb_strlen($channelName);
         });
 
@@ -82,7 +82,7 @@ class ChannelListCommand extends Command
 
         $channelCount = $this->determineChannelCountOutput($channels, $terminalWidth);
 
-        return $channels->map(function ($channel, $channelName) use ($maxChannelName, $terminalWidth) {
+        return $channels->map(static function ($channel, $channelName) use ($maxChannelName, $terminalWidth) {
             $resolver = $channel instanceof Closure ? 'Closure' : $channel;
 
             $spaces = str_repeat(' ', max($maxChannelName + 6 - mb_strlen($channelName), 0));

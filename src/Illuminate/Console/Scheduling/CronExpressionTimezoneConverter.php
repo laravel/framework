@@ -173,7 +173,7 @@ class CronExpressionTimezoneConverter
             return null;
         }
 
-        return array_map(function ($group) use ($parts) {
+        return array_map(static function ($group) use ($parts) {
             [$parts[2], $parts[3]] = $group;
 
             return implode(' ', $parts);
@@ -248,7 +248,7 @@ class CronExpressionTimezoneConverter
             $groups[implode(',', $days)][] = $month;
         }
 
-        return (new Collection($groups))->map(function ($months, $days) {
+        return (new Collection($groups))->map(static function ($months, $days) {
             sort($months);
 
             return [
@@ -295,7 +295,7 @@ class CronExpressionTimezoneConverter
             $groups = [0 => static::mergeGroups($groups)];
         }
 
-        return array_map(fn ($group) => static::collapse($group, $min, $max), $groups);
+        return array_map(static fn ($group) => static::collapse($group, $min, $max), $groups);
     }
 
     /**
@@ -368,7 +368,7 @@ class CronExpressionTimezoneConverter
             $groups[$carry][] = $value + $offset - $carry * $mod;
         }
 
-        return array_map(function ($group) {
+        return array_map(static function ($group) {
             sort($group);
 
             return $group;
@@ -387,7 +387,7 @@ class CronExpressionTimezoneConverter
     protected static function shiftWrapped(array $values, int $offset, int $mod, int $min = 0)
     {
         $shifted = array_values(array_unique(array_map(
-            fn ($value) => (($value + $offset - $min) % $mod + $mod) % $mod + $min, $values
+            static fn ($value) => (($value + $offset - $min) % $mod + $mod) % $mod + $min, $values
         )));
 
         sort($shifted);
@@ -430,7 +430,7 @@ class CronExpressionTimezoneConverter
 
         $steps = (new Collection($values))
             ->sliding(2)
-            ->map(fn ($pair) => $pair->last() - $pair->first())
+            ->map(static fn ($pair) => $pair->last() - $pair->first())
             ->unique();
 
         if (count($values) < 3 || $steps->count() > 1) {
@@ -457,8 +457,8 @@ class CronExpressionTimezoneConverter
     protected static function collapseRuns(array $values)
     {
         return (new Collection($values))
-            ->chunkWhile(fn ($value, $key, $chunk) => $value === $chunk->last() + 1)
-            ->map(fn ($run) => $run->count() >= 3 ? $run->first().'-'.$run->last() : $run->implode(','))
+            ->chunkWhile(static fn ($value, $key, $chunk) => $value === $chunk->last() + 1)
+            ->map(static fn ($run) => $run->count() >= 3 ? $run->first().'-'.$run->last() : $run->implode(','))
             ->implode(',');
     }
 }

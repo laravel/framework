@@ -13,7 +13,7 @@ class Bun implements NodePackageManager
      */
     public static function matches(): bool
     {
-        return array_any(['bun.lock', 'bun.lockb'], fn ($lockFile) => file_exists(getcwd().'/'.$lockFile));
+        return array_any(['bun.lock', 'bun.lockb'], static fn ($lockFile) => file_exists(getcwd().'/'.$lockFile));
     }
 
     /**

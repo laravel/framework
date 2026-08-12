@@ -320,7 +320,7 @@ class BroadcastingInstallCommand extends Command
             ];
         }
 
-        $filePath = array_filter($filePaths, function ($path) {
+        $filePath = array_filter($filePaths, static function ($path) {
             return file_exists($path);
         })[0] ?? null;
 

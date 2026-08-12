@@ -236,7 +236,7 @@ class ComponentTagCompiler
 
         [$data, $attributes] = $this->partitionDataAndAttributes($class, $attributes);
 
-        $data = $data->mapWithKeys(function ($value, $key) {
+        $data = $data->mapWithKeys(static function ($value, $key) {
             return [Str::camel($key) => $value];
         });
 
@@ -363,7 +363,7 @@ class ComponentTagCompiler
     protected function guessAnonymousComponentUsingNamespaces(Factory $viewFactory, string $component)
     {
         return (new Collection($this->blade->getAnonymousComponentNamespaces()))
-            ->filter(function ($directory, $prefix) use ($component) {
+            ->filter(static function ($directory, $prefix) use ($component) {
                 return Str::startsWith($component, $prefix.'::');
             })
             ->prepend('components', $component)
@@ -440,7 +440,7 @@ class ComponentTagCompiler
      */
     public function formatClassName(string $component)
     {
-        $componentPieces = array_map(function ($componentPiece) {
+        $componentPieces = array_map(static function ($componentPiece) {
             return ucfirst(Str::camel($componentPiece));
         }, explode('.', $component));
 
@@ -492,7 +492,7 @@ class ComponentTagCompiler
             : [];
 
         return (new Collection($attributes))
-            ->partition(fn ($value, $key) => in_array(Str::camel($key), $parameterNames))
+            ->partition(static fn ($value, $key) => in_array(Str::camel($key), $parameterNames))
             ->all();
     }
 
@@ -660,7 +660,7 @@ class ComponentTagCompiler
     {
         $pattern = "/\s\:\\\$(\w+)/x";
 
-        return preg_replace_callback($pattern, function (array $matches) {
+        return preg_replace_callback($pattern, static function (array $matches) {
             return " :{$matches[1]}=\"\${$matches[1]}\"";
         }, $value);
     }
@@ -690,7 +690,7 @@ class ComponentTagCompiler
     protected function parseComponentTagClassStatements(string $attributeString)
     {
         return preg_replace_callback(
-            '/@(class)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
+            '/@(class)(\( ( (?>[^()]+) | (?2) )* \))/x', static function ($match) {
                 if ($match[1] === 'class') {
                     $match[2] = str_replace('"', "'", $match[2]);
 
@@ -711,7 +711,7 @@ class ComponentTagCompiler
     protected function parseComponentTagStyleStatements(string $attributeString)
     {
         return preg_replace_callback(
-            '/@(style)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
+            '/@(style)(\( ( (?>[^()]+) | (?2) )* \))/x', static function ($match) {
                 if ($match[1] === 'style') {
                     $match[2] = str_replace('"', "'", $match[2]);
 
@@ -769,7 +769,7 @@ class ComponentTagCompiler
      */
     protected function escapeSingleQuotesOutsideOfPhpBlocks(string $value)
     {
-        return (new Collection(token_get_all($value)))->map(function ($token) {
+        return (new Collection(token_get_all($value)))->map(static function ($token) {
             if (! is_array($token)) {
                 return $token;
             }

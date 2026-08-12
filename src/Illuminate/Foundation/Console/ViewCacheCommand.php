@@ -78,9 +78,9 @@ class ViewCacheCommand extends Command
     protected function bladeFilesIn(array $paths)
     {
         $extensions = (new Collection($this->laravel['view']->getExtensions()))
-            ->filter(fn ($value) => $value === 'blade')
+            ->filter(static fn ($value) => $value === 'blade')
             ->keys()
-            ->map(fn ($extension) => "*.{$extension}")
+            ->map(static fn ($extension) => "*.{$extension}")
             ->all();
 
         return new Collection(
@@ -105,7 +105,7 @@ class ViewCacheCommand extends Command
             (new Collection($finder->getHints()))->flatten()
         )->unique();
 
-        return $paths->reject(fn ($path) => $paths->contains(function ($existing) use ($path) {
+        return $paths->reject(static fn ($path) => $paths->contains(static function ($existing) use ($path) {
             return $existing !== $path && str_starts_with(realpath($path) ?: $path, realpath($existing) ?: $existing);
         }))->values();
     }

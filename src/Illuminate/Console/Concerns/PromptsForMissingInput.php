@@ -40,7 +40,7 @@ trait PromptsForMissingInput
     protected function promptForMissingArguments(InputInterface $input, OutputInterface $output)
     {
         $prompted = (new Collection($this->getDefinition()->getArguments()))
-            ->filter(fn (InputArgument $argument) => $argument->getName() !== 'command' && $argument->isRequired() && match (true) {
+            ->filter(static fn (InputArgument $argument) => $argument->getName() !== 'command' && $argument->isRequired() && match (true) {
                 $argument->isArray() => empty($input->getArgument($argument->getName())),
                 default => is_null($input->getArgument($argument->getName())),
             })
@@ -59,7 +59,7 @@ trait PromptsForMissingInput
                 $answer = text(
                     label: $label,
                     placeholder: $placeholder ?? '',
-                    validate: fn ($value) => empty($value) ? "The {$argument->getName()} is required." : null,
+                    validate: static fn ($value) => empty($value) ? "The {$argument->getName()} is required." : null,
                 );
 
                 $input->setArgument($argument->getName(), $argument->isArray() ? [$answer] : $answer);
@@ -102,6 +102,6 @@ trait PromptsForMissingInput
     protected function didReceiveOptions(InputInterface $input)
     {
         return (new Collection($this->getDefinition()->getOptions()))
-            ->contains(fn ($option) => $input->getOption($option->getName()) !== $option->getDefault());
+            ->contains(static fn ($option) => $input->getOption($option->getName()) !== $option->getDefault());
     }
 }

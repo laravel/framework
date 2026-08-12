@@ -64,7 +64,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function mget(array $keys)
     {
-        return array_map(function ($value) {
+        return array_map(static function ($value) {
             return $value !== false ? $value : null;
         }, $this->command('mget', [$keys]));
     }
@@ -457,7 +457,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function subscribe($channels, Closure $callback)
     {
-        $this->client->subscribe((array) $channels, function ($redis, $channel, $message) use ($callback) {
+        $this->client->subscribe((array) $channels, static function ($redis, $channel, $message) use ($callback) {
             $callback($message, $channel);
         });
     }
@@ -471,7 +471,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function psubscribe($channels, Closure $callback)
     {
-        $this->client->psubscribe((array) $channels, function ($redis, $pattern, $channel, $message) use ($callback) {
+        $this->client->psubscribe((array) $channels, static function ($redis, $pattern, $channel, $message) use ($callback) {
             $callback($message, $channel);
         });
     }

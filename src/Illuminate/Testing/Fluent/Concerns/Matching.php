@@ -208,8 +208,8 @@ trait Matching
         );
 
         $missing = (new Collection($expected))
-            ->map(fn ($search) => enum_value($search))
-            ->reject(function ($search) use ($key, $actual) {
+            ->map(static fn ($search) => enum_value($search))
+            ->reject(static function ($search) use ($key, $actual) {
                 if ($actual->containsStrict($key, $search)) {
                     return true;
                 }
@@ -217,7 +217,7 @@ trait Matching
                 return $actual->containsStrict($search);
             });
 
-        if ($missing->contains(fn ($search) => $search instanceof Closure)) {
+        if ($missing->contains(static fn ($search) => $search instanceof Closure)) {
             PHPUnit::assertEmpty(
                 $missing->toArray(),
                 sprintf(

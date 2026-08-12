@@ -1431,7 +1431,7 @@ class Grammar extends BaseGrammar
     {
         $cleanBindings = Arr::except($bindings, ['select', 'join']);
 
-        $values = Arr::flatten(array_map(fn ($value) => value($value), $values));
+        $values = Arr::flatten(array_map(static fn ($value) => value($value), $values));
 
         return array_values(
             array_merge($bindings['join'], $values, Arr::flatten($cleanBindings))
@@ -1595,7 +1595,7 @@ class Grammar extends BaseGrammar
      */
     protected function concatenate($segments)
     {
-        return implode(' ', array_filter($segments, function ($value) {
+        return implode(' ', array_filter($segments, static function ($value) {
             return (string) $value !== '';
         }));
     }

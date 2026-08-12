@@ -96,11 +96,11 @@ trait TestDatabases
         $testDatabase = $this->testDatabase($database);
 
         try {
-            $this->usingDatabase($testDatabase, function () {
+            $this->usingDatabase($testDatabase, static function () {
                 Schema::hasTable('dummy');
             });
         } catch (QueryException) {
-            $this->usingDatabase($database, function () use ($testDatabase) {
+            $this->usingDatabase($database, static function () use ($testDatabase) {
                 Schema::dropDatabaseIfExists($testDatabase);
                 Schema::createDatabase($testDatabase);
             });

@@ -126,7 +126,7 @@ class Exception
     public function frames()
     {
         return once(function () {
-            $classMap = array_map(function ($path) {
+            $classMap = array_map(static function ($path) {
                 return (string) realpath($path);
             }, array_values(ClassLoader::getRegisteredLoaders())[0]->getClassMap());
 
@@ -140,7 +140,7 @@ class Exception
             }
 
             $trace = array_values(array_filter(
-                $trace, fn ($trace) => isset($trace['file']),
+                $trace, static fn ($trace) => isset($trace['file']),
             ));
 
             if (($trace[1]['class'] ?? '') === HandleExceptions::class) {
@@ -212,7 +212,7 @@ class Exception
      */
     public function requestHeaders()
     {
-        return array_map(function (array $header) {
+        return array_map(static function (array $header) {
             return implode(', ', $header);
         }, $this->request()->headers->all());
     }
@@ -245,7 +245,7 @@ class Exception
         return $route ? array_filter([
             'controller' => $route->getActionName(),
             'route name' => $route->getName() ?: null,
-            'middleware' => implode(', ', array_map(function ($middleware) {
+            'middleware' => implode(', ', array_map(static function ($middleware) {
                 return $middleware instanceof Closure ? 'Closure' : $middleware;
             }, $route->gatherMiddleware())),
         ]) : [];
@@ -261,7 +261,7 @@ class Exception
         $parameters = $this->request()->route()?->parameters();
 
         return $parameters ? json_encode(array_map(
-            fn ($value) => $value instanceof Model ? $value->withoutRelations() : $value,
+            static fn ($value) => $value instanceof Model ? $value->withoutRelations() : $value,
             $parameters
         ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : null;
     }
@@ -273,7 +273,7 @@ class Exception
      */
     public function applicationQueries()
     {
-        return array_map(function (array $query) {
+        return array_map(static function (array $query) {
             $sql = $query['sql'];
 
             foreach ($query['bindings'] as $binding) {

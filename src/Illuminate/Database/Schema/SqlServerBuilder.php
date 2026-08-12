@@ -35,6 +35,6 @@ class SqlServerBuilder extends Builder
      */
     public function getCurrentSchemaName()
     {
-        return Arr::first($this->getSchemas(), fn ($schema) => $schema['default'])['name'];
+        return Arr::first($this->getSchemas(), static fn ($schema) => $schema['default'])['name'];
     }
 }

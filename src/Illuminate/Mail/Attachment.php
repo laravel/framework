@@ -55,7 +55,7 @@ class Attachment
      */
     public static function fromPath($path)
     {
-        return new static(fn ($attachment, $pathStrategy) => $pathStrategy($path, $attachment));
+        return new static(static fn ($attachment, $pathStrategy) => $pathStrategy($path, $attachment));
     }
 
     /**
@@ -83,7 +83,7 @@ class Attachment
     public static function fromData(Closure $data, $name = null)
     {
         return (new static(
-            fn ($attachment, $pathStrategy, $dataStrategy) => $dataStrategy($data, $attachment)
+            static fn ($attachment, $pathStrategy, $dataStrategy) => $dataStrategy($data, $attachment)
         ))->as($name);
     }
 
@@ -95,12 +95,12 @@ class Attachment
      */
     public static function fromUploadedFile(UploadedFile $file)
     {
-        return new static(function ($attachment, $pathStrategy, $dataStrategy) use ($file) {
+        return new static(static function ($attachment, $pathStrategy, $dataStrategy) use ($file) {
             $attachment
                 ->as($file->getClientOriginalName())
                 ->withMime($file->getMimeType() ?? $file->getClientMimeType());
 
-            return $dataStrategy(fn () => $file->get(), $attachment);
+            return $dataStrategy(static fn () => $file->get(), $attachment);
         });
     }
 
@@ -124,7 +124,7 @@ class Attachment
      */
     public static function fromStorageDisk($disk, $path)
     {
-        return new static(function ($attachment, $pathStrategy, $dataStrategy) use ($disk, $path) {
+        return new static(static function ($attachment, $pathStrategy, $dataStrategy) use ($disk, $path) {
             $storage = Container::getInstance()->make(
                 FilesystemFactory::class
             )->disk($disk);
@@ -133,7 +133,7 @@ class Attachment
                 ->as($attachment->as ?? basename($path))
                 ->withMime($attachment->mime ?? $storage->mimeType($path));
 
-            return $dataStrategy(fn () => $storage->get($path), $attachment);
+            return $dataStrategy(static fn () => $storage->get($path), $attachment);
         });
     }
 
@@ -235,8 +235,8 @@ class Attachment
             fn ($path) => [$path, ['as' => $this->as, 'mime' => $this->mime]],
             fn ($data) => [$data(), ['as' => $this->as, 'mime' => $this->mime]],
         ) === $attachment->attachWith(
-            fn ($path) => [$path, $newOptions],
-            fn ($data) => [$data(), $newOptions],
+            static fn ($path) => [$path, $newOptions],
+            static fn ($data) => [$data(), $newOptions],
         );
     }
 }

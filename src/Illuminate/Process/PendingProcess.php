@@ -361,7 +361,7 @@ class PendingProcess
     protected function fakeFor(string $command)
     {
         return (new Collection($this->fakeHandlers))
-            ->first(fn ($handler, $pattern) => $pattern === '*' || Str::is($pattern, $command));
+            ->first(static fn ($handler, $pattern) => $pattern === '*' || Str::is($pattern, $command));
     }
 
     /**
@@ -390,7 +390,7 @@ class PendingProcess
             $result instanceof ProcessResult => $result,
             $result instanceof FakeProcessResult => $result->withCommand($command),
             $result instanceof FakeProcessDescription => $result->toProcessResult($command),
-            $result instanceof FakeProcessSequence => $this->resolveSynchronousFake($command, fn () => $result()),
+            $result instanceof FakeProcessSequence => $this->resolveSynchronousFake($command, static fn () => $result()),
             $result instanceof \Throwable => throw $result,
             default => throw new LogicException('Unsupported synchronous process fake result provided.'),
         };
@@ -435,7 +435,7 @@ class PendingProcess
         } elseif ($result instanceof FakeProcessDescription) {
             return (new FakeInvokedProcess($command, $result))->withOutputHandler($output);
         } elseif ($result instanceof FakeProcessSequence) {
-            return $this->resolveAsynchronousFake($command, $output, fn () => $result());
+            return $this->resolveAsynchronousFake($command, $output, static fn () => $result());
         }
 
         throw new LogicException('Unsupported asynchronous process fake result provided.');

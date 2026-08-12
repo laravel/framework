@@ -433,7 +433,7 @@ abstract class Grammar extends BaseGrammar
      */
     protected function getCommandsByName(Blueprint $blueprint, $name)
     {
-        return array_filter($blueprint->getCommands(), function ($value) use ($name) {
+        return array_filter($blueprint->getCommands(), static function ($value) use ($name) {
             return $value->name == $name;
         });
     }
@@ -465,7 +465,7 @@ abstract class Grammar extends BaseGrammar
      */
     public function prefixArray($prefix, array $values)
     {
-        return array_map(function ($value) use ($prefix) {
+        return array_map(static function ($value) use ($prefix) {
             return $prefix.' '.$value;
         }, $values);
     }

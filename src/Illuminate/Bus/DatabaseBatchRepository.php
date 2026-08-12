@@ -60,7 +60,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
         return $this->connection->table($this->table)
             ->orderByDesc('id')
             ->limit($limit)
-            ->when($before, fn ($q) => $q->where('id', '<', $before))
+            ->when($before, static fn ($q) => $q->where('id', '<', $before))
             ->get()
             ->map(function ($batch) {
                 return $this->toBatch($batch);
@@ -137,7 +137,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      */
     public function decrementPendingJobs(string $batchId, string $jobId)
     {
-        $values = $this->updateAtomicValues($batchId, function ($batch) use ($jobId) {
+        $values = $this->updateAtomicValues($batchId, static function ($batch) use ($jobId) {
             return [
                 'pending_jobs' => $batch->pending_jobs - 1,
                 'failed_jobs' => $batch->failed_jobs,
@@ -160,7 +160,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      */
     public function incrementFailedJobs(string $batchId, string $jobId)
     {
-        $values = $this->updateAtomicValues($batchId, function ($batch) use ($jobId) {
+        $values = $this->updateAtomicValues($batchId, static function ($batch) use ($jobId) {
             return [
                 'pending_jobs' => $batch->pending_jobs,
                 'failed_jobs' => $batch->failed_jobs + 1,
@@ -311,7 +311,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      */
     public function transaction(Closure $callback)
     {
-        return $this->connection->transaction(fn () => $callback());
+        return $this->connection->transaction(static fn () => $callback());
     }
 
     /**

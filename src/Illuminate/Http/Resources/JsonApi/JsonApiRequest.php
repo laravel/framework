@@ -25,7 +25,7 @@ class JsonApiRequest extends Request
     {
         if (is_null($this->cachedSparseFields)) {
             $this->cachedSparseFields = (new Collection($this->array('fields')))
-                ->transform(fn ($fieldsets) => empty($fieldsets) ? [] : explode(',', $fieldsets))
+                ->transform(static fn ($fieldsets) => empty($fieldsets) ? [] : explode(',', $fieldsets))
                 ->all();
         }
 
@@ -53,7 +53,7 @@ class JsonApiRequest extends Request
             $included = (string) $this->string('include', '');
 
             $this->cachedSparseIncluded = (new Collection(empty($included) ? [] : explode(',', $included)))
-                ->transform(function ($item) {
+                ->transform(static function ($item) {
                     $with = null;
 
                     if (str_contains($item, '.')) {
@@ -63,7 +63,7 @@ class JsonApiRequest extends Request
                     }
 
                     return ['relation' => $relation, 'with' => $with];
-                })->mapToGroups(fn ($item) => [$item['relation'] => $item['with']])
+                })->mapToGroups(static fn ($item) => [$item['relation'] => $item['with']])
                 ->toArray();
         }
 
@@ -71,9 +71,9 @@ class JsonApiRequest extends Request
             return array_keys($this->cachedSparseIncluded);
         }
 
-        return transform($this->cachedSparseIncluded[$key] ?? null, function ($value) {
+        return transform($this->cachedSparseIncluded[$key] ?? null, static function ($value) {
             return Collection::wrap($value)
-                ->transform(function ($item) {
+                ->transform(static function ($item) {
                     if (! is_string($item) || $item === '') {
                         return null;
                     }

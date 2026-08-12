@@ -98,12 +98,12 @@ class Cache extends Facade
             $instance = static::getFacadeRoot();
 
             if ($class && $instance) {
-                return tap(Mockery::spy($instance)->makePartial(), function ($spy) {
+                return tap(Mockery::spy($instance)->makePartial(), static function ($spy) {
                     static::swap($spy);
                 });
             }
 
-            return tap($class ? Mockery::spy($class) : Mockery::spy(), function ($spy) {
+            return tap($class ? Mockery::spy($class) : Mockery::spy(), static function ($spy) {
                 static::swap($spy);
             });
         }

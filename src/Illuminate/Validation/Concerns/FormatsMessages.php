@@ -389,7 +389,7 @@ trait FormatsMessages
     protected function replacePositionPlaceholder($message, $attribute)
     {
         return $this->replaceIndexOrPositionPlaceholder(
-            $message, $attribute, 'position', fn ($segment) => $segment + 1
+            $message, $attribute, 'position', static fn ($segment) => $segment + 1
         );
     }
 
@@ -407,7 +407,7 @@ trait FormatsMessages
         }
 
         return $this->replaceIndexOrPositionPlaceholder(
-            $message, $attribute, 'ordinal-position', fn ($segment) => Number::ordinal($segment + 1)
+            $message, $attribute, 'ordinal-position', static fn ($segment) => Number::ordinal($segment + 1)
         );
     }
 
@@ -429,7 +429,7 @@ trait FormatsMessages
 
         $segments = explode('.', $attribute);
 
-        $modifier ??= fn ($value) => $value;
+        $modifier ??= static fn ($value) => $value;
 
         $numericIndex = 1;
 

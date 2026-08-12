@@ -38,7 +38,7 @@ class ServeFile
 
             return tap(
                 Storage::disk($this->disk)->serve($request, $path, headers: $headers),
-                function ($response) use ($headers) {
+                static function ($response) use ($headers) {
                     if (! $response->headers->has('Content-Security-Policy')) {
                         $response->headers->replace($headers);
                     }

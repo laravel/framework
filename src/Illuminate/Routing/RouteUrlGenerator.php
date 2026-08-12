@@ -293,13 +293,13 @@ class RouteUrlGenerator
         // Any remaining values in $parameters are unnamed query string parameters...
         $parameters = array_merge($namedParameters, $namedQueryParameters, $parameters);
 
-        $parameters = Collection::wrap($parameters)->map(function ($value, $key) use ($route) {
+        $parameters = Collection::wrap($parameters)->map(static function ($value, $key) use ($route) {
             return $value instanceof UrlRoutable && $route->bindingFieldFor($key)
                     ? $value->{$route->bindingFieldFor($key)}
                     : $value;
         })->all();
 
-        array_walk_recursive($parameters, function (&$item) {
+        array_walk_recursive($parameters, static function (&$item) {
             $item = enum_value($item);
         });
 
@@ -334,7 +334,7 @@ class RouteUrlGenerator
     {
         $path = $this->replaceNamedParameters($path, $parameters);
 
-        $path = preg_replace_callback('/\{.*?\}/', function ($match) use (&$parameters) {
+        $path = preg_replace_callback('/\{.*?\}/', static function ($match) use (&$parameters) {
             // Reset only the numeric keys...
             $parameters = array_merge($parameters);
 

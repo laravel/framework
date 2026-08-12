@@ -264,7 +264,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             isset($_SERVER['APP_BASE_PATH']) => $_SERVER['APP_BASE_PATH'],
             default => dirname(array_values(array_filter(
                 array_keys(ClassLoader::getRegisteredLoaders()),
-                fn ($path) => ! str_starts_with($path, 'phar://'),
+                static fn ($path) => ! str_starts_with($path, 'phar://'),
             ))[0]),
         };
     }
@@ -870,7 +870,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function registerConfiguredProviders()
     {
         $providers = (new Collection($this->make('config')->get('app.providers')))
-            ->partition(fn ($provider) => str_starts_with($provider, 'Illuminate\\'));
+            ->partition(static fn ($provider) => str_starts_with($provider, 'Illuminate\\'));
 
         $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
 
@@ -954,7 +954,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $name = is_string($provider) ? $provider : get_class($provider);
 
-        return Arr::where($this->serviceProviders, fn ($value) => $value instanceof $name);
+        return Arr::where($this->serviceProviders, static fn ($value) => $value instanceof $name);
     }
 
     /**

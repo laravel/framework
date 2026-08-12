@@ -616,7 +616,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function priority($level = 3)
     {
-        $this->callbacks[] = function ($message) use ($level) {
+        $this->callbacks[] = static function ($message) use ($level) {
             $message->priority($level);
         };
 
@@ -808,7 +808,7 @@ class Mailable implements MailableContract, Renderable
     {
         if (is_array($recipient)) {
             if (array_values($recipient) === $recipient) {
-                return (object) array_map(function ($email) {
+                return (object) array_map(static function ($email) {
                     return ['email' => $email];
                 }, $recipient);
             }
@@ -852,7 +852,7 @@ class Mailable implements MailableContract, Renderable
             return true;
         }
 
-        return (new Collection($this->{$property}))->contains(function ($actual) use ($expected) {
+        return (new Collection($this->{$property}))->contains(static function ($actual) use ($expected) {
             if (! isset($expected['name'])) {
                 return $actual['address'] == $expected['address'];
             }
@@ -1044,7 +1044,7 @@ class Mailable implements MailableContract, Renderable
 
         if ($file instanceof Attachment) {
             $parts = $file->attachWith(
-                fn ($path) => [$path, [
+                static fn ($path) => [$path, [
                     'as' => $options['as'] ?? $file->as,
                     'mime' => $options['mime'] ?? $file->mime,
                 ]],
@@ -1061,7 +1061,7 @@ class Mailable implements MailableContract, Renderable
         }
 
         return (new Collection($this->attachments))->contains(
-            fn ($attachment) => $attachment['file'] === $file && array_filter($attachment['options']) === array_filter($options)
+            static fn ($attachment) => $attachment['file'] === $file && array_filter($attachment['options']) === array_filter($options)
         );
     }
 
@@ -1081,8 +1081,8 @@ class Mailable implements MailableContract, Renderable
         $attachments = $this->attachments();
 
         return (new Collection(is_object($attachments) ? [$attachments] : $attachments))
-            ->map(fn ($attached) => $attached instanceof Attachable ? $attached->toMailAttachment() : $attached)
-            ->contains(fn ($attached) => $attached->isEquivalent($attachment, $options));
+            ->map(static fn ($attached) => $attached instanceof Attachable ? $attached->toMailAttachment() : $attached)
+            ->contains(static fn ($attached) => $attached->isEquivalent($attachment, $options));
     }
 
     /**
@@ -1115,7 +1115,7 @@ class Mailable implements MailableContract, Renderable
             'name' => $name ?? basename($path),
             'options' => $options,
         ])
-            ->unique(fn ($file) => $file['name'].$file['disk'].$file['path'])
+            ->unique(static fn ($file) => $file['name'].$file['disk'].$file['path'])
             ->all();
 
         return $this;
@@ -1146,7 +1146,7 @@ class Mailable implements MailableContract, Renderable
     public function hasAttachmentFromStorageDisk($disk, $path, $name = null, array $options = [])
     {
         return (new Collection($this->diskAttachments))->contains(
-            fn ($attachment) => $attachment['disk'] === $disk
+            static fn ($attachment) => $attachment['disk'] === $disk
                 && $attachment['path'] === $path
                 && $attachment['name'] === ($name ?? basename($path))
                 && $attachment['options'] === $options
@@ -1165,7 +1165,7 @@ class Mailable implements MailableContract, Renderable
     {
         $this->rawAttachments = (new Collection($this->rawAttachments))
             ->push(['data' => $data, 'name' => $name, 'options' => $options])
-            ->unique(fn ($file) => $file['name'].$file['data'])
+            ->unique(static fn ($file) => $file['name'].$file['data'])
             ->all();
 
         return $this;
@@ -1182,7 +1182,7 @@ class Mailable implements MailableContract, Renderable
     public function hasAttachedData($data, $name, array $options = [])
     {
         return (new Collection($this->rawAttachments))->contains(
-            fn ($attachment) => $attachment['data'] === $data
+            static fn ($attachment) => $attachment['data'] === $data
                 && $attachment['name'] === $name
                 && array_filter($attachment['options']) === array_filter($options)
         );
@@ -1398,7 +1398,7 @@ class Mailable implements MailableContract, Renderable
             return 'none';
         }
 
-        return (new Collection($recipients))->map(function ($recipient) {
+        return (new Collection($recipients))->map(static function ($recipient) {
             $formatted = $recipient['address'];
             if (! empty($recipient['name'])) {
                 $formatted .= ' ('.$recipient['name'].')';
@@ -1481,7 +1481,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function assertSeeInOrderInHtml($strings, $escape = true)
     {
-        $strings = $escape ? array_map(function ($string) {
+        $strings = $escape ? array_map(static function ($string) {
             return EncodedHtmlString::convert($string, withQuote: true);
         }, $strings) : $strings;
 
@@ -1755,7 +1755,7 @@ class Mailable implements MailableContract, Renderable
 
         $headers = $this->headers();
 
-        $this->withSymfonyMessage(function ($message) use ($headers) {
+        $this->withSymfonyMessage(static function ($message) use ($headers) {
             if ($headers->messageId) {
                 $message->getHeaders()->addIdHeader('Message-Id', $headers->messageId);
             }

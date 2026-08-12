@@ -552,7 +552,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return true;
         }
 
-        return array_any(static::$ignoreOnTouch, fn ($ignoredClass) => $class === $ignoredClass || is_subclass_of($class, $ignoredClass));
+        return array_any(static::$ignoreOnTouch, static fn ($ignoredClass) => $class === $ignoredClass || is_subclass_of($class, $ignoredClass));
     }
 
     /**
@@ -2117,7 +2117,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         );
 
         $this->load((new BaseCollection($this->relations))->reject(
-            fn ($relation) => $relation instanceof Pivot
+            static fn ($relation) => $relation instanceof Pivot
                 || (is_object($relation) && isset(class_uses_recursive($relation)[AsPivot::class]))
         )->keys()->all());
 

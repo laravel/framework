@@ -274,7 +274,7 @@ class Vite implements Htmlable
     public function useScriptTagAttributes($attributes)
     {
         if (! is_callable($attributes)) {
-            $attributes = fn () => $attributes;
+            $attributes = static fn () => $attributes;
         }
 
         $this->scriptTagAttributesResolvers[] = $attributes;
@@ -291,7 +291,7 @@ class Vite implements Htmlable
     public function useStyleTagAttributes($attributes)
     {
         if (! is_callable($attributes)) {
-            $attributes = fn () => $attributes;
+            $attributes = static fn () => $attributes;
         }
 
         $this->styleTagAttributesResolvers[] = $attributes;
@@ -308,7 +308,7 @@ class Vite implements Htmlable
     public function usePreloadTagAttributes($attributes)
     {
         if (! is_callable($attributes)) {
-            $attributes = fn () => $attributes;
+            $attributes = static fn () => $attributes;
         }
 
         $this->preloadTagAttributesResolvers[] = $attributes;
@@ -463,7 +463,7 @@ class Vite implements Htmlable
             }
         }
 
-        [$stylesheets, $scripts] = $tags->unique()->partition(fn ($tag) => str_starts_with($tag, '<link'));
+        [$stylesheets, $scripts] = $tags->unique()->partition(static fn ($tag) => str_starts_with($tag, '<link'));
 
         $preloads = $preloads->unique()
             ->sortByDesc(fn ($args) => $this->isCssPath($args[1]))
@@ -479,11 +479,11 @@ class Vite implements Htmlable
 
         return (new Collection($entrypoints))
             ->flatMap(fn ($entrypoint) => (new Collection($manifest[$entrypoint]['dynamicImports'] ?? []))
-                ->map(fn ($import) => $manifest[$import])
-                ->filter(fn ($chunk) => str_ends_with($chunk['file'], '.js') || str_ends_with($chunk['file'], '.css'))
-                ->flatMap($f = function ($chunk) use (&$f, $manifest, &$discoveredImports) {
+                ->map(static fn ($import) => $manifest[$import])
+                ->filter(static fn ($chunk) => str_ends_with($chunk['file'], '.js') || str_ends_with($chunk['file'], '.css'))
+                ->flatMap($f = static function ($chunk) use (&$f, $manifest, &$discoveredImports) {
                     return (new Collection([...$chunk['imports'] ?? [], ...$chunk['dynamicImports'] ?? []]))
-                        ->reject(function ($import) use (&$discoveredImports) {
+                        ->reject(static function ($import) use (&$discoveredImports) {
                             if (isset($discoveredImports[$import])) {
                                 return true;
                             }
@@ -491,11 +491,11 @@ class Vite implements Htmlable
                             return ! $discoveredImports[$import] = true;
                         })
                         ->reduce(
-                            fn ($chunks, $import) => $chunks->merge(
+                            static fn ($chunks, $import) => $chunks->merge(
                                 $f($manifest[$import])
                             ), new Collection([$chunk]))
                         ->merge((new Collection($chunk['css'] ?? []))->map(
-                            fn ($css) => (new Collection($manifest))->first(fn ($chunk) => $chunk['file'] === $css) ?? [
+                            static fn ($css) => (new Collection($manifest))->first(static fn ($chunk) => $chunk['file'] === $css) ?? [
                                 'file' => $css,
                             ],
                         ));
@@ -512,8 +512,8 @@ class Vite implements Htmlable
                         'fetchpriority' => 'low',
                         'href' => $url,
                     ]))->reject(
-                        fn ($value) => in_array($value, [null, false], true)
-                    )->mapWithKeys(fn ($value, $key) => [
+                        static fn ($value) => in_array($value, [null, false], true)
+                    )->mapWithKeys(static fn ($value, $key) => [
                         $key = (is_int($key) ? $value : $key) => $value === true ? $key : $value,
                     ])->all();
                 })
@@ -827,9 +827,9 @@ class Vite implements Htmlable
     protected function parseAttributes($attributes)
     {
         return (new Collection($attributes))
-            ->reject(fn ($value, $key) => in_array($value, [false, null], true))
-            ->flatMap(fn ($value, $key) => $value === true ? [$key] : [$key => $value])
-            ->map(fn ($value, $key) => is_int($key) ? $value : $key.'="'.$value.'"')
+            ->reject(static fn ($value, $key) => in_array($value, [false, null], true))
+            ->flatMap(static fn ($value, $key) => $value === true ? [$key] : [$key => $value])
+            ->map(static fn ($value, $key) => is_int($key) ? $value : $key.'="'.$value.'"')
             ->values()
             ->all();
     }
@@ -1090,7 +1090,7 @@ class Vite implements Htmlable
 
             $fonts->ensureValidFamilies($aliases, $manifest);
 
-            $preloads = array_filter($preloads, fn ($preload) => in_array($preload['alias'] ?? null, $aliases, true));
+            $preloads = array_filter($preloads, static fn ($preload) => in_array($preload['alias'] ?? null, $aliases, true));
         }
 
         $fonts->ensureValidPreloads($preloads, $isHot);

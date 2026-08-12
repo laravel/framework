@@ -297,7 +297,7 @@ class FakeInvokedProcess implements InvokedProcessContract
         $shouldStop = false;
 
         $this->outputHandler = $output
-            ? function ($type, $buffer) use ($output, &$shouldStop) {
+            ? static function ($type, $buffer) use ($output, &$shouldStop) {
                 $shouldStop = call_user_func($output, $type, $buffer);
             }
         : $this->outputHandler;

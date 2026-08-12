@@ -87,7 +87,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     public function ids($queue = null)
     {
         return (new Collection($this->all()))
-            ->when(! is_null($queue), fn ($collect) => $collect->where('queue', $queue))
+            ->when(! is_null($queue), static fn ($collect) => $collect->where('queue', $queue))
             ->pluck('id')
             ->all();
     }
@@ -111,7 +111,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     public function find($id)
     {
         return (new Collection($this->read()))
-            ->first(fn ($job) => $job->id === $id);
+            ->first(static fn ($job) => $job->id === $id);
     }
 
     /**
@@ -124,7 +124,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     {
         return $this->lock(function () use ($id) {
             $this->write($pruned = (new Collection($jobs = $this->read()))
-                ->reject(fn ($job) => $job->id === $id)
+                ->reject(static fn ($job) => $job->id === $id)
                 ->values()
                 ->all());
 
@@ -155,7 +155,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
             $jobs = $this->read();
 
             $this->write($prunedJobs = (new Collection($jobs))
-                ->reject(fn ($job) => $job->failed_at_timestamp <= $before->getTimestamp())
+                ->reject(static fn ($job) => $job->failed_at_timestamp <= $before->getTimestamp())
                 ->values()
                 ->all()
             );
@@ -180,7 +180,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
 
         return ($this->lockProviderResolver)()
             ->lock('laravel-failed-jobs', 5)
-            ->block(10, function () use ($callback) {
+            ->block(10, static function () use ($callback) {
                 return $callback();
             });
     }
@@ -235,7 +235,7 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
         }
 
         return (new Collection($this->read()))
-            ->filter(fn ($job) => $job->connection === ($connection ?? $job->connection) && $job->queue === ($queue ?? $job->queue))
+            ->filter(static fn ($job) => $job->connection === ($connection ?? $job->connection) && $job->queue === ($queue ?? $job->queue))
             ->count();
     }
 }

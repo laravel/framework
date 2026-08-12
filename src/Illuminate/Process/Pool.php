@@ -71,13 +71,13 @@ class Pool
 
         return new InvokedProcessPool(
             (new Collection($this->pendingProcesses))
-                ->each(function ($pendingProcess) {
+                ->each(static function ($pendingProcess) {
                     if (! $pendingProcess instanceof PendingProcess) {
                         throw new InvalidArgumentException('Process pool must only contain pending processes.');
                     }
                 })
-                ->mapWithKeys(function ($pendingProcess, $key) use ($output) {
-                    return [$key => $pendingProcess->start(output: $output ? function ($type, $buffer) use ($key, $output) {
+                ->mapWithKeys(static function ($pendingProcess, $key) use ($output) {
+                    return [$key => $pendingProcess->start(output: $output ? static function ($type, $buffer) use ($key, $output) {
                         $output($type, $buffer, $key);
                     } : null)];
                 })

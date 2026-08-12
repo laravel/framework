@@ -82,12 +82,12 @@ class AboutCommand extends Command
                     }
 
                     return (new Collection($this->laravel->call($value)))
-                        ->map(fn ($value, $key) => [$key, $value])
+                        ->map(static fn ($value, $key) => [$key, $value])
                         ->values()
                         ->all();
                 })->flatten(1)
             )
-            ->sortBy(function ($data, $key) {
+            ->sortBy(static function ($data, $key) {
                 $index = array_search($key, ['Environment', 'Cache', 'Drivers']);
 
                 return $index === false ? 99 : $index;
@@ -126,7 +126,7 @@ class AboutCommand extends Command
 
             $this->components->twoColumnDetail('  <fg=green;options=bold>'.$section.'</>');
 
-            $data->pipe(fn ($data) => $section !== 'Environment' ? $data->sort() : $data)->each(function ($detail) {
+            $data->pipe(static fn ($data) => $section !== 'Environment' ? $data->sort() : $data)->each(function ($detail) {
                 [$label, $value] = $detail;
 
                 $this->components->twoColumnDetail($label, value($value, false));
@@ -162,9 +162,9 @@ class AboutCommand extends Command
     {
         self::$data = [];
 
-        $formatEnabledStatus = fn ($value) => $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
-        $formatCachedStatus = fn ($value) => $value ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>';
-        $formatStorageLinkedStatus = fn ($value) => $value ? '<fg=green;options=bold>LINKED</>' : '<fg=yellow;options=bold>NOT LINKED</>';
+        $formatEnabledStatus = static fn ($value) => $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
+        $formatCachedStatus = static fn ($value) => $value ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>';
+        $formatStorageLinkedStatus = static fn ($value) => $value ? '<fg=green;options=bold>LINKED</>' : '<fg=yellow;options=bold>NOT LINKED</>';
 
         static::addToSection('Environment', fn () => [
             'Application Name' => config('app.name'),
@@ -186,9 +186,9 @@ class AboutCommand extends Command
             'Views' => static::format($this->hasPhpFiles(config('view.compiled')), console: $formatCachedStatus),
         ]);
 
-        static::addToSection('Drivers', fn () => array_filter([
+        static::addToSection('Drivers', static fn () => array_filter([
             'Broadcasting' => config('broadcasting.default'),
-            'Cache' => function ($json) {
+            'Cache' => static function ($json) {
                 $cacheStore = config('cache.default');
 
                 if (config('cache.stores.'.$cacheStore.'.driver') === 'failover') {
@@ -196,15 +196,15 @@ class AboutCommand extends Command
 
                     return value(static::format(
                         value: $cacheStore,
-                        console: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
-                        json: fn () => $secondary->all(),
+                        console: static fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
+                        json: static fn () => $secondary->all(),
                     ), $json);
                 }
 
                 return $cacheStore;
             },
             'Database' => config('database.default'),
-            'Logs' => function ($json) {
+            'Logs' => static function ($json) {
                 $logChannel = config('logging.default');
 
                 if (config('logging.channels.'.$logChannel.'.driver') === 'stack') {
@@ -212,8 +212,8 @@ class AboutCommand extends Command
 
                     return value(static::format(
                         value: $logChannel,
-                        console: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
-                        json: fn () => $secondary->all(),
+                        console: static fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
+                        json: static fn () => $secondary->all(),
                     ), $json);
                 } else {
                     $logs = $logChannel;
@@ -221,7 +221,7 @@ class AboutCommand extends Command
 
                 return $logs;
             },
-            'Mail' => function ($json) {
+            'Mail' => static function ($json) {
                 $mailMailer = config('mail.default');
 
                 if (in_array(config('mail.mailers.'.$mailMailer.'.transport'), ['failover', 'roundrobin'])) {
@@ -229,15 +229,15 @@ class AboutCommand extends Command
 
                     return value(static::format(
                         value: $mailMailer,
-                        console: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
-                        json: fn () => $secondary->all(),
+                        console: static fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
+                        json: static fn () => $secondary->all(),
                     ), $json);
                 }
 
                 return $mailMailer;
             },
             'Octane' => config('octane.server'),
-            'Queue' => function ($json) {
+            'Queue' => static function ($json) {
                 $queueConnection = config('queue.default');
 
                 if (config('queue.connections.'.$queueConnection.'.driver') === 'failover') {
@@ -245,8 +245,8 @@ class AboutCommand extends Command
 
                     return value(static::format(
                         value: $queueConnection,
-                        console: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
-                        json: fn () => $secondary->all(),
+                        console: static fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
+                        json: static fn () => $secondary->all(),
                     ), $json);
                 }
 
@@ -272,7 +272,7 @@ class AboutCommand extends Command
     protected function determineStoragePathLinkStatus(callable $formatStorageLinkedStatus): array
     {
         return (new Collection(config('filesystems.links', [])))
-            ->mapWithKeys(function ($target, $link) use ($formatStorageLinkedStatus) {
+            ->mapWithKeys(static function ($target, $link) use ($formatStorageLinkedStatus) {
                 $path = Str::replace(public_path(), '', $link);
 
                 return [public_path($path) => static::format(file_exists($link), console: $formatStorageLinkedStatus)];
@@ -301,7 +301,7 @@ class AboutCommand extends Command
      */
     public static function add(string $section, $data, ?string $value = null)
     {
-        static::$customDataResolvers[] = fn () => static::addToSection($section, $data, $value);
+        static::$customDataResolvers[] = static fn () => static::addToSection($section, $data, $value);
     }
 
     /**
@@ -348,7 +348,7 @@ class AboutCommand extends Command
      */
     public static function format($value, ?Closure $console = null, ?Closure $json = null)
     {
-        return function ($isJson) use ($value, $console, $json) {
+        return static function ($isJson) use ($value, $console, $json) {
             if ($isJson === true && $json instanceof Closure) {
                 return value($json, $value);
             } elseif ($isJson === false && $console instanceof Closure) {

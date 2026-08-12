@@ -271,7 +271,7 @@ class PendingRequest
             'timeout' => 30,
         ];
 
-        $this->beforeSendingCallbacks = new Collection([function (Request $request, array $options, PendingRequest $pendingRequest) {
+        $this->beforeSendingCallbacks = new Collection([static function (Request $request, array $options, PendingRequest $pendingRequest) {
             $pendingRequest->request = $request;
             $pendingRequest->cookies = $options['cookies'];
 
@@ -779,7 +779,7 @@ class PendingRequest
      */
     public function throw(?callable $callback = null)
     {
-        $this->throwCallback = $callback ?: fn () => null;
+        $this->throwCallback = $callback ?: static fn () => null;
 
         return $this;
     }
@@ -819,7 +819,7 @@ class PendingRequest
     {
         $values = func_get_args();
 
-        return $this->beforeSending(function (Request $request, array $options) use ($values) {
+        return $this->beforeSending(static function (Request $request, array $options) use ($values) {
             foreach (array_merge($values, [$request, $options]) as $value) {
                 VarDumper::dump($value);
             }
@@ -835,7 +835,7 @@ class PendingRequest
     {
         $values = func_get_args();
 
-        return $this->beforeSending(function (Request $request, array $options) use ($values) {
+        return $this->beforeSending(static function (Request $request, array $options) use ($values) {
             foreach (array_merge($values, [$request, $options]) as $value) {
                 VarDumper::dump($value);
             }
@@ -1011,10 +1011,10 @@ class PendingRequest
         };
 
         (new EachPromise($promiseGenerator(), [
-            'fulfilled' => function ($result, $key) use (&$results) {
+            'fulfilled' => static function ($result, $key) use (&$results) {
                 $results[$key] = $result;
             },
-            'rejected' => function ($reason, $key) use (&$results) {
+            'rejected' => static function ($reason, $key) use (&$results) {
                 $results[$key] = $reason;
             },
             'concurrency' => $concurrency,
@@ -1165,7 +1165,7 @@ class PendingRequest
         }
 
         return (new Collection($options))
-            ->map(function ($value, $key) {
+            ->map(static function ($value, $key) {
                 if ($key === 'json' && $value instanceof JsonSerializable) {
                     return $value;
                 }
@@ -1184,7 +1184,7 @@ class PendingRequest
     protected function parseMultipartBodyFormat(array $data)
     {
         return (new Collection($data))
-            ->map(function ($value, $key) {
+            ->map(static function ($value, $key) {
                 // If the array has 'name' and 'contents' keys, it's already formatted for multipart...
                 if (is_array($value) && isset($value['name'], $value['contents'])) {
                     return $value;
@@ -1701,7 +1701,7 @@ class PendingRequest
     public function pushHandlers($handlerStack)
     {
         return tap($handlerStack, function ($stack) {
-            $this->middleware->each(function ($middleware) use ($stack) {
+            $this->middleware->each(static function ($middleware) use ($stack) {
                 $stack->push($middleware);
             });
 
@@ -1801,7 +1801,7 @@ class PendingRequest
      */
     protected function sinkStubHandler($sink)
     {
-        return function ($response) use ($sink) {
+        return static function ($response) use ($sink) {
             $body = $response->getBody()->getContents();
 
             if (is_string($sink)) {
@@ -1947,7 +1947,7 @@ class PendingRequest
             return true;
         }
 
-        return array_any($this->allowedStrayRequestUrls, fn ($pattern) => Str::is($pattern, $url));
+        return array_any($this->allowedStrayRequestUrls, static fn ($pattern) => Str::is($pattern, $url));
     }
 
     /**

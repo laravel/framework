@@ -335,11 +335,11 @@ class QueueManager implements FactoryContract, MonitorContract
         }
 
         $states = $cache->many(
-            array_map(fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues)
+            array_map(static fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues)
         );
 
         return array_values(array_filter(
-            $queues, fn ($queue) => $states["illuminate:queue:paused:{$connection}:{$queue}"] ?? false
+            $queues, static fn ($queue) => $states["illuminate:queue:paused:{$connection}:{$queue}"] ?? false
         ));
     }
 

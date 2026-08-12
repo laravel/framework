@@ -72,7 +72,7 @@ class EncodedHtmlString extends HtmlString
             $value = $value->value;
         }
 
-        return (static::$encodeUsingFactory ?? function ($value, $doubleEncode) {
+        return (static::$encodeUsingFactory ?? static function ($value, $doubleEncode) {
             return static::convert($value, doubleEncode: $doubleEncode);
         })($value, $this->doubleEncode);
     }

@@ -143,7 +143,7 @@ trait CompilesEchos
     {
         $value = (new Stringable($value))
             ->trim()
-            ->when(str_ends_with($value, ';'), function ($str) {
+            ->when(str_ends_with($value, ';'), static function ($str) {
                 return $str->beforeLast(';');
             });
 

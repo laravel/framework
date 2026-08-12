@@ -111,7 +111,7 @@ class Envelope
     protected function normalizeAddresses($addresses)
     {
         return (new Collection($addresses))
-            ->map(fn ($address) => is_string($address) ? new Address($address) : $address)
+            ->map(static fn ($address) => is_string($address) ? new Address($address) : $address)
             ->all();
     }
 
@@ -334,7 +334,7 @@ class Envelope
      */
     protected function hasRecipient(array $recipients, string $address, ?string $name = null)
     {
-        return (new Collection($recipients))->contains(function ($recipient) use ($address, $name) {
+        return (new Collection($recipients))->contains(static function ($recipient) use ($address, $name) {
             if (is_null($name)) {
                 return $recipient->address === $address;
             }

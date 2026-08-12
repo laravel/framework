@@ -514,7 +514,7 @@ class MySqlGrammar extends Grammar
     {
         $values = (new Collection($values))
             ->reject(fn ($value, $column) => $this->isJsonSelector($column) && is_bool($value))
-            ->map(fn ($value) => is_array($value) ? json_encode($value) : $value)
+            ->map(static fn ($value) => is_array($value) ? json_encode($value) : $value)
             ->all();
 
         return parent::prepareBindingsForUpdate($bindings, $values);

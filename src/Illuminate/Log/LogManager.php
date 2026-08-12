@@ -153,7 +153,7 @@ class LogManager implements LoggerInterface
                 return $this->channels[$name] = $loggerWithContext;
             });
         } catch (Throwable $e) {
-            return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
+            return tap($this->createEmergencyLogger(), static function ($logger) use ($e) {
                 $logger->emergency('Unable to create configured logger. Using emergency logger.', [
                     'exception' => $e,
                 ]);
@@ -438,7 +438,7 @@ class LogManager implements LoggerInterface
             );
         }
 
-        (new Collection($config['processors'] ?? []))->each(function ($processor) {
+        (new Collection($config['processors'] ?? []))->each(static function ($processor) {
             $processor = $processor['processor'] ?? $processor;
 
             if (! is_a($processor, ProcessorInterface::class, true)) {

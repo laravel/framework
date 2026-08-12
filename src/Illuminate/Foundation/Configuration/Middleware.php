@@ -539,7 +539,7 @@ class Middleware
     public function redirectGuestsTo(callable|string|null $redirect)
     {
         if (is_null($redirect)) {
-            $redirect = fn () => null;
+            $redirect = static fn () => null;
         }
 
         return $this->redirectTo(guests: $redirect);
@@ -565,8 +565,8 @@ class Middleware
      */
     public function redirectTo(callable|string|null $guests = null, callable|string|null $users = null)
     {
-        $guests = is_string($guests) ? fn () => $guests : $guests;
-        $users = is_string($users) ? fn () => $users : $users;
+        $guests = is_string($guests) ? static fn () => $guests : $guests;
+        $users = is_string($users) ? static fn () => $users : $users;
 
         if ($guests) {
             Authenticate::redirectUsing($guests);
@@ -648,7 +648,7 @@ class Middleware
      */
     public function convertEmptyStringsToNull(array $except = [])
     {
-        (new Collection($except))->each(fn (Closure $callback) => ConvertEmptyStringsToNull::skipWhen($callback));
+        (new Collection($except))->each(static fn (Closure $callback) => ConvertEmptyStringsToNull::skipWhen($callback));
 
         return $this;
     }
@@ -661,9 +661,9 @@ class Middleware
      */
     public function trimStrings(array $except = [])
     {
-        [$skipWhen, $except] = (new Collection($except))->partition(fn ($value) => $value instanceof Closure);
+        [$skipWhen, $except] = (new Collection($except))->partition(static fn ($value) => $value instanceof Closure);
 
-        $skipWhen->each(fn (Closure $callback) => TrimStrings::skipWhen($callback));
+        $skipWhen->each(static fn (Closure $callback) => TrimStrings::skipWhen($callback));
 
         TrimStrings::except($except->all());
 

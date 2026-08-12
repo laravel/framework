@@ -347,7 +347,7 @@ class DevCommands
     protected static function getColor(array $commands): string
     {
         $available = array_values(array_diff(
-            $colors = array_map(fn ($color) => $color->value, DevCommandColor::cases()),
+            $colors = array_map(static fn ($color) => $color->value, DevCommandColor::cases()),
             $existing = array_values(array_filter(array_column($commands, 'color')))
         ));
 

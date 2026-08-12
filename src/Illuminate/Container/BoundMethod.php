@@ -32,7 +32,7 @@ class BoundMethod
             return static::callClass($container, $callback, $parameters, $defaultMethod);
         }
 
-        return static::callBoundMethod($container, $callback, function () use ($container, $callback, $parameters) {
+        return static::callBoundMethod($container, $callback, static function () use ($container, $callback, $parameters) {
             return $callback(...array_values(static::getMethodDependencies($container, $callback, $parameters)));
         });
     }

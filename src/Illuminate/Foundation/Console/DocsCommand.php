@@ -236,16 +236,16 @@ class DocsCommand extends Command
         $choice = suggest(
             label: 'Which page would you like to open?',
             options: fn ($value) => $this->pages()
-                ->mapWithKeys(fn ($option) => [
+                ->mapWithKeys(static fn ($option) => [
                     Str::lower($option['title']) => $option['title'],
                 ])
-                ->filter(fn ($title) => str_contains(Str::lower($title), Str::lower($value)))
+                ->filter(static fn ($title) => str_contains(Str::lower($title), Str::lower($value)))
                 ->all(),
             placeholder: 'E.g. Collections'
         );
 
         return $this->pages()->filter(
-            fn ($page) => $page['title'] === $choice || Str::lower($page['title']) === $choice
+            static fn ($page) => $page['title'] === $choice || Str::lower($page['title']) === $choice
         )->keys()->first() ?: $this->guessPage($choice);
     }
 
@@ -257,14 +257,14 @@ class DocsCommand extends Command
     protected function guessPage($search)
     {
         return $this->pages()
-            ->filter(fn ($page) => str_starts_with(
+            ->filter(static fn ($page) => str_starts_with(
                 Str::slug($page['title'], ' '),
                 Str::slug($search, ' ')
-            ))->keys()->first() ?? $this->pages()->map(fn ($page) => similar_text(
+            ))->keys()->first() ?? $this->pages()->map(static fn ($page) => similar_text(
                 Str::slug($page['title'], ' '),
                 Str::slug($search, ' '),
             ))
-            ->filter(fn ($score) => $score >= min(3, Str::length($search)))
+            ->filter(static fn ($score) => $score >= min(3, Str::length($search)))
             ->sortDesc()
             ->keys()
             ->sortByDesc(fn ($slug) => Str::contains(
@@ -388,7 +388,7 @@ class DocsCommand extends Command
         $binary = (new Collection(match ($this->systemOsFamily) {
             'Darwin' => ['open'],
             'Linux' => ['xdg-open', 'wslview'],
-        }))->first(fn ($binary) => (new ExecutableFinder)->find($binary) !== null);
+        }))->first(static fn ($binary) => (new ExecutableFinder)->find($binary) !== null);
 
         if ($binary === null) {
             $this->components->warn('Unable to open the URL on your system. You will need to open it yourself or create a custom opener for your system.');

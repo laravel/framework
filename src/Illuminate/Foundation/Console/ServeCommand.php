@@ -200,7 +200,7 @@ class ServeCommand extends Command
             return $this->shouldPassThroughEnvironmentVariable($key) ? [$key => $value] : [$key => false];
         })->merge(['PHP_CLI_SERVER_WORKERS' => $this->phpServerWorkers])->all());
 
-        $this->trap(fn () => [SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], function ($signal) use ($process) {
+        $this->trap(static fn () => [SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], static function ($signal) use ($process) {
             if ($process->isRunning()) {
                 $process->stop(10, $signal);
             }
@@ -336,7 +336,7 @@ class ServeCommand extends Command
         $this->outputBuffer = (string) $lines->pop();
 
         $lines
-            ->map(fn ($line) => trim($line))
+            ->map(static fn ($line) => trim($line))
             ->filter()
             ->each(function ($line) {
                 if ((new Stringable($line))->contains('Development Server (http')) {

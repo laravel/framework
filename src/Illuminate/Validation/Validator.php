@@ -433,7 +433,7 @@ class Validator implements ValidatorContract
      */
     protected function replaceDotPlaceholderInParameters(array $parameters)
     {
-        return array_map(function ($field) {
+        return array_map(static function ($field) {
             return str_replace('__dot__'.static::$placeholderHash, '.', $field);
         }, $parameters);
     }
@@ -571,7 +571,7 @@ class Validator implements ValidatorContract
      */
     protected function shouldBeExcluded($attribute)
     {
-        return array_any($this->excludeAttributes, fn ($excludeAttribute) => $attribute === $excludeAttribute ||
+        return array_any($this->excludeAttributes, static fn ($excludeAttribute) => $attribute === $excludeAttribute ||
             Str::startsWith($attribute, $excludeAttribute.'.'));
     }
 
@@ -794,7 +794,7 @@ class Validator implements ValidatorContract
      */
     protected function replaceDotInParameters(array $parameters)
     {
-        return array_map(function ($field) {
+        return array_map(static function ($field) {
             return static::encodeAttributeWithPlaceholder((string) ($field ?? ''));
         }, $parameters);
     }
@@ -808,7 +808,7 @@ class Validator implements ValidatorContract
      */
     protected function replaceAsterisksInParameters(array $parameters, array $keys)
     {
-        return array_map(function ($field) use ($keys) {
+        return array_map(static function ($field) use ($keys) {
             return vsprintf(str_replace('*', '%s', $field), $keys);
         }, $parameters);
     }
@@ -1090,7 +1090,7 @@ class Validator implements ValidatorContract
     protected function attributesThatHaveMessages()
     {
         return (new Collection($this->messages()->toArray()))
-            ->map(fn ($message, $key) => explode('.', $key)[0])
+            ->map(static fn ($message, $key) => explode('.', $key)[0])
             ->unique()
             ->flip()
             ->all();
@@ -1252,7 +1252,7 @@ class Validator implements ValidatorContract
     public function getRulesWithoutPlaceholders()
     {
         return (new Collection($this->rules))
-            ->mapWithKeys(fn ($value, $key) => [
+            ->mapWithKeys(static fn ($value, $key) => [
                 static::decodeAttributeWithPlaceholder($key) => $value,
             ])
             ->all();
@@ -1267,7 +1267,7 @@ class Validator implements ValidatorContract
     public function setRules(array $rules)
     {
         $rules = (new Collection($rules))
-            ->mapWithKeys(function ($value, $key) {
+            ->mapWithKeys(static function ($value, $key) {
                 return [static::encodeAttributeWithPlaceholder($key) => $value];
             })
             ->toArray();
@@ -1290,7 +1290,7 @@ class Validator implements ValidatorContract
     public function appendRules(array $rules)
     {
         $rules = (new Collection($rules))
-            ->map(function ($value) {
+            ->map(static function ($value) {
                 return is_string($value) ? explode('|', $value) : $value;
             })
             ->all();

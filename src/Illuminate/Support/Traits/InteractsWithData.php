@@ -55,7 +55,7 @@ trait InteractsWithData
 
         $data = $this->all();
 
-        return array_all($keys, fn ($value) => Arr::has($data, $value));
+        return array_all($keys, static fn ($value) => Arr::has($data, $value));
     }
 
     /**
@@ -401,7 +401,7 @@ trait InteractsWithData
         }
 
         return $this->collect($key)
-            ->map(fn ($value) => $enumClass::tryFrom($value))
+            ->map(static fn ($value) => $enumClass::tryFrom($value))
             ->filter()
             ->all();
     }

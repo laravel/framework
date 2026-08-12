@@ -291,13 +291,13 @@ trait ConfiguresPrompts
         $answers = $this->components->choice($label, $options, $default, null, true);
 
         if (! array_is_list($options)) {
-            $answers = array_map(fn ($value) => $value === (string) (int) $value ? (int) $value : $value, $answers);
+            $answers = array_map(static fn ($value) => $value === (string) (int) $value ? (int) $value : $value, $answers);
         }
 
         if ($required === false) {
             return array_is_list($options)
-                ? array_values(array_filter($answers, fn ($value) => $value !== 'None'))
-                : array_filter($answers, fn ($value) => $value !== '');
+                ? array_values(array_filter($answers, static fn ($value) => $value !== 'None'))
+                : array_filter($answers, static fn ($value) => $value !== '');
         }
 
         return $answers;
