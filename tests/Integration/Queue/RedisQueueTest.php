@@ -173,8 +173,8 @@ class RedisQueueTest extends TestCase
         $result = $this->redis[$driver]->connection()->zrangebyscore("$redisKey:reserved", -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = (int) $result[$reservedJob];
-        $this->assertLessThanOrEqual($score, $before + 60);
-        $this->assertGreaterThanOrEqual($score, $after + 60);
+        $this->assertLessThanOrEqual($score, $before + 70);
+        $this->assertGreaterThanOrEqual($score, $after + 70);
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
@@ -182,10 +182,10 @@ class RedisQueueTest extends TestCase
      * @param  string  $driver
      */
     #[DataProvider('redisDriverProvider')]
-    public function testPopReservesJobsBasedOnTheJobTimeoutWhenExpireAfterTimeoutIsEnabled($driver)
+    public function testPopReservesJobsBasedOnTheJobTimeout($driver)
     {
         $default = config('queue.connections.redis.queue', 'default');
-        $this->queue = new RedisQueue($this->redis[$driver], $default, null, 90, expireAfterTimeout: true);
+        $this->queue = new RedisQueue($this->redis[$driver], $default, null, 90);
         $this->queue->setContainer($this->container = m::spy(Container::class));
         $redisKey = $this->getQueueRedisKey($default);
 
@@ -207,20 +207,36 @@ class RedisQueueTest extends TestCase
         $this->queue->push($job);
         $this->assertSame($time->getTimestamp() + 25 + 10, $getJobExpirationTimestamp());
 
-        // No timeout on the job, no timeout shared by the queue worker: retry_after is used
+        // No timeout on the job, no timeout shared by the queue worker: the default worker timeout is used
         $this->queue->push(new RedisQueueIntegrationTestJob(123));
-        $this->assertSame($time->getTimestamp() + 90, $getJobExpirationTimestamp());
+        $this->assertSame($time->getTimestamp() + 60 + 10, $getJobExpirationTimestamp());
 
-        // Timeout of 0 on the job is ignored: retry_after is used
+        // Timeout of 0 on the job means it is never killed: reserved effectively forever
         $job = new RedisQueueIntegrationTestJob(123);
         $job->timeout = 0;
         $this->queue->push($job);
-        $this->assertSame($time->getTimestamp() + 90, $getJobExpirationTimestamp());
+        $this->assertSame($time->getTimestamp() + 999999999 + 10, $getJobExpirationTimestamp());
+
+        // A negative timeout on the job is treated the same as zero
+        $job = new RedisQueueIntegrationTestJob(123);
+        $job->timeout = -5;
+        $this->queue->push($job);
+        $this->assertSame($time->getTimestamp() + 999999999 + 10, $getJobExpirationTimestamp());
 
         // No timeout on the job, the queue worker's timeout is used
         $this->queue->setWorkerTimeout(15);
         $this->queue->push(new RedisQueueIntegrationTestJob(123));
         $this->assertSame($time->getTimestamp() + 15 + 10, $getJobExpirationTimestamp());
+
+        // A worker timeout of 0 means jobs are never killed: reserved effectively forever
+        $this->queue->setWorkerTimeout(0);
+        $this->queue->push(new RedisQueueIntegrationTestJob(123));
+        $this->assertSame($time->getTimestamp() + 999999999 + 10, $getJobExpirationTimestamp());
+
+        // A null worker timeout resets the queue to the default worker timeout
+        $this->queue->setWorkerTimeout(null);
+        $this->queue->push(new RedisQueueIntegrationTestJob(123));
+        $this->assertSame($time->getTimestamp() + 60 + 10, $getJobExpirationTimestamp());
 
         // Timeout on the job takes precedence over the queue worker timeout
         $this->queue->setWorkerTimeout(15);
@@ -255,8 +271,8 @@ class RedisQueueTest extends TestCase
         $result = $this->redis[$driver]->connection()->zrangebyscore("$redisKey:reserved", -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = (int) $result[$reservedJob];
-        $this->assertLessThanOrEqual($score, $before + 60);
-        $this->assertGreaterThanOrEqual($score, $after + 60);
+        $this->assertLessThanOrEqual($score, $before + 70);
+        $this->assertGreaterThanOrEqual($score, $after + 70);
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
@@ -286,8 +302,8 @@ class RedisQueueTest extends TestCase
         $result = $this->redis[$driver]->connection()->zrangebyscore("$redisKey:reserved", -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = (int) $result[$reservedJob];
-        $this->assertLessThanOrEqual($score, $before);
-        $this->assertGreaterThanOrEqual($score, $after);
+        $this->assertLessThanOrEqual($score, $before + 70);
+        $this->assertGreaterThanOrEqual($score, $after + 70);
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
@@ -385,11 +401,11 @@ class RedisQueueTest extends TestCase
             $score = (int) $score;
 
             if ($command->i == 10) {
-                $this->assertLessThanOrEqual($score, $before);
-                $this->assertGreaterThanOrEqual($score, $after);
+                $this->assertLessThanOrEqual($score, $before + 70);
+                $this->assertGreaterThanOrEqual($score, $after + 70);
             } else {
-                $this->assertLessThanOrEqual($score, $beforeFailPop);
-                $this->assertGreaterThanOrEqual($score, $afterFailPop);
+                $this->assertLessThanOrEqual($score, $beforeFailPop + 70);
+                $this->assertGreaterThanOrEqual($score, $afterFailPop + 70);
             }
         }
     }
@@ -419,8 +435,8 @@ class RedisQueueTest extends TestCase
         $result = $this->redis[$driver]->connection()->zrangebyscore("$redisKey:reserved", -INF, INF, ['withscores' => true]);
         $reservedJob = array_keys($result)[0];
         $score = (int) $result[$reservedJob];
-        $this->assertLessThanOrEqual($score, $before + 30);
-        $this->assertGreaterThanOrEqual($score, $after + 30);
+        $this->assertLessThanOrEqual($score, $before + 70);
+        $this->assertGreaterThanOrEqual($score, $after + 70);
         $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
@@ -792,6 +808,8 @@ class RedisQueueTest extends TestCase
 class RedisQueueIntegrationTestJob
 {
     public $i;
+
+    public $timeout;
 
     public function __construct($i)
     {

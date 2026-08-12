@@ -47,8 +47,7 @@ class RedisConnector implements ConnectorInterface
             $config['retry_after'] ?? 60,
             $config['block_for'] ?? null,
             $config['after_commit'] ?? null,
-            $config['migration_batch_size'] ?? -1,
-            $config['expire_after_timeout'] ?? false
+            $config['migration_batch_size'] ?? -1
         );
     }
 }

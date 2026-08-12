@@ -43,4 +43,36 @@ class FailoverQueueTest extends TestCase
 
         $failover->push('some-job');
     }
+
+    public function test_set_worker_timeout_is_forwarded_to_underlying_connections()
+    {
+        $failover = new FailoverQueue($queue = m::mock(QueueManager::class), m::mock(Dispatcher::class), [
+            'redis',
+            'sync',
+        ]);
+
+        $queue->shouldReceive('connection')->once()->with('redis')->andReturn(
+            $redis = new FailoverQueueTestFakeConnection,
+        );
+
+        // Connections without the method are skipped instead of failing
+        $queue->shouldReceive('connection')->once()->with('sync')->andReturn(
+            new \stdClass,
+        );
+
+        $this->assertSame($failover, $failover->setWorkerTimeout(90));
+        $this->assertSame(90, $redis->workerTimeout);
+    }
+}
+
+class FailoverQueueTestFakeConnection
+{
+    public $workerTimeout = false;
+
+    public function setWorkerTimeout($timeout)
+    {
+        $this->workerTimeout = $timeout;
+
+        return $this;
+    }
 }

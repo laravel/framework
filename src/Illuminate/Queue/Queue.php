@@ -499,12 +499,16 @@ abstract class Queue
     /**
      * Set the job timeout of the worker processing the queue.
      *
-     * @param  int|null  $timeout
+     * @param  int|string|null  $timeout
      * @return $this
      */
     public function setWorkerTimeout($timeout)
     {
-        $this->workerTimeout = $timeout > 0 ? (int) $timeout : null;
+        $this->workerTimeout = match (true) {
+            ! is_numeric($timeout) => null,
+            $timeout <= 0 => 999999999,
+            default => (int) $timeout,
+        };
 
         return $this;
     }

@@ -659,6 +659,25 @@ class QueueWorkerTest extends TestCase
         $this->assertSame(15, $interruptible->receivedSignal);
     }
 
+    public function testWorkerSharesItsTimeoutWithTheConnectionWhenRunningTheNextJob()
+    {
+        $connection = new WorkerFakeConnection('default', ['queue' => [$job = new WorkerFakeJob]]);
+
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', $connection),
+            $this->events,
+            $this->exceptionHandler,
+            function () {
+                return false;
+            }
+        );
+
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['timeout' => 123]));
+
+        $this->assertSame(123, $connection->workerTimeout);
+        $this->assertTrue($job->fired);
+    }
+
     /**
      * Helpers...
      */
@@ -756,6 +775,7 @@ class WorkerFakeConnection
 {
     public $connectionName;
     public $jobs = [];
+    public $workerTimeout = false;
 
     public function __construct($connectionName, $jobs)
     {
@@ -766,6 +786,13 @@ class WorkerFakeConnection
     public function pop($queue)
     {
         return array_shift($this->jobs[$queue]);
+    }
+
+    public function setWorkerTimeout($timeout)
+    {
+        $this->workerTimeout = $timeout;
+
+        return $this;
     }
 
     public function getConnectionName()

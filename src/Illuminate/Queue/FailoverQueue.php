@@ -199,6 +199,25 @@ class FailoverQueue extends Queue implements QueueContract
     }
 
     /**
+     * Set the job timeout of the worker processing the queue.
+     *
+     * @param  int|string|null  $timeout
+     * @return $this
+     */
+    public function setWorkerTimeout($timeout)
+    {
+        foreach ($this->connections as $connection) {
+            $connection = $this->manager->connection($connection);
+
+            if (method_exists($connection, 'setWorkerTimeout')) {
+                $connection->setWorkerTimeout($timeout);
+            }
+        }
+
+        return parent::setWorkerTimeout($timeout);
+    }
+
+    /**
      * Attempt the given method on all connections.
      *
      * @param  mixed  $job

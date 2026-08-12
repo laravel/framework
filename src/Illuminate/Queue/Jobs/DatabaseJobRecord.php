@@ -45,7 +45,7 @@ class DatabaseJobRecord
      */
     public function touch($offset = 0)
     {
-        $this->record->reserved_at = $this->currentTime() + $offset;
+        $this->record->reserved_at = min($this->currentTime() + $offset, 2147483647);
 
         return $this->record->reserved_at;
     }

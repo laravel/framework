@@ -156,11 +156,11 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $this->assertEquals(1, $popped_job->attempts(), 'The "attempts" attribute of the Job object was not updated by pop!');
     }
 
-    public function testPoppedJobsAreReservedBasedOnTheJobTimeoutWhenExpireAfterTimeoutIsEnabled()
+    public function testPoppedJobsAreReservedBasedOnTheJobTimeout()
     {
         Carbon::setTestNow($time = Carbon::now());
 
-        $queue = new DatabaseQueue($this->connection(), $this->table, 'default', 90, expireAfterTimeout: true);
+        $queue = new DatabaseQueue($this->connection(), $this->table, 'default', 90);
         $queue->setContainer($this->container);
 
         $getJobReservedAt = function ($timeout) use ($queue) {
@@ -185,17 +185,29 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         // "reserved_at" holds the expiry (job timeout + 10-second buffer) minus the retry_after window
         $this->assertSame($time->getTimestamp() + 600 + 10 - 90, $getJobReservedAt(timeout: 600));
 
-        // No timeout on the job, no worker timeout known
-        $this->assertSame($time->getTimestamp(), $getJobReservedAt(timeout: null));
-        $this->assertSame($time->getTimestamp(), $getJobReservedAt(timeout: 0));
+        // No timeout on the job, no worker timeout known: the default worker timeout is used
+        $this->assertSame($time->getTimestamp() + 60 + 10 - 90, $getJobReservedAt(timeout: null));
+
+        // Timeout of 0 on the job means it is never killed: reserved effectively forever
+        $this->assertSame(2147483647, $getJobReservedAt(timeout: 0));
 
         // Worker timeout is used if the job doesn't define a timeout
         $queue->setWorkerTimeout(120);
         $this->assertSame($time->getTimestamp() + 120 + 10 - 90, $getJobReservedAt(timeout: null));
-        $this->assertSame($time->getTimestamp() + 120 + 10 - 90, $getJobReservedAt(timeout: 0));
+
+        // Timeout of 0 on the job wins over the worker timeout
+        $this->assertSame(2147483647, $getJobReservedAt(timeout: 0));
 
         // Timeout on the job takes precedence over the queue worker timeout
         $this->assertSame($time->getTimestamp() + 45 + 10 - 90, $getJobReservedAt(timeout: 45));
+
+        // A worker timeout of 0 means jobs are never killed: reserved effectively forever
+        $queue->setWorkerTimeout(0);
+        $this->assertSame(2147483647, $getJobReservedAt(timeout: null));
+
+        // A null worker timeout resets the queue to the default worker timeout
+        $queue->setWorkerTimeout(null);
+        $this->assertSame($time->getTimestamp() + 60 + 10 - 90, $getJobReservedAt(timeout: null));
 
         Carbon::setTestNow();
     }

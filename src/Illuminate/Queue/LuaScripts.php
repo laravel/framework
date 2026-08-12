@@ -63,7 +63,7 @@ LUA;
      * KEYS[2] - The queue to place reserved jobs on, for example: queues:foo:reserved
      * KEYS[3] - The notify queue
      * ARGV[1] - The time at which the reserved job will expire
-     * ARGV[2] - The base time for expiring jobs based on their own timeout
+     * ARGV[2] - The base time, including the grace buffer, for expiring jobs based on their payload timeout
      *
      * @return string
      */
@@ -80,9 +80,14 @@ if(job ~= false) then
     reserved['attempts'] = reserved['attempts'] + 1
 
     local expiration = ARGV[1]
+    local timeout = tonumber(reserved['timeout'])
 
-    if(tonumber(ARGV[2]) and type(reserved['timeout']) == 'number' and reserved['timeout'] > 0) then
-        expiration = reserved['timeout'] + ARGV[2]
+    if(tonumber(ARGV[2]) and timeout) then
+        if(timeout <= 0) then
+            timeout = 999999999
+        end
+
+        expiration = timeout + ARGV[2]
     end
 
     reserved = cjson.encode(reserved)
