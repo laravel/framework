@@ -62,8 +62,8 @@ LUA;
      * KEYS[1] - The queue to pop jobs from, for example: queues:foo
      * KEYS[2] - The queue to place reserved jobs on, for example: queues:foo:reserved
      * KEYS[3] - The notify queue
-     * ARGV[1] - When the reservation expires if the job has no timeout
-     * ARGV[2] - If the job has a timeout this is added to get the expiration
+     * ARGV[1] - The current UNIX timestamp
+     * ARGV[2] - The timeout of the worker popping the job
      *
      * @return string
      */
@@ -79,20 +79,13 @@ if(job ~= false) then
     reserved = cjson.decode(job)
     reserved['attempts'] = reserved['attempts'] + 1
 
-    local expiration
+    local timeout = tonumber(reserved['timeout']) or tonumber(ARGV[2])
 
-    local jobTimeout = tonumber(reserved['timeout'])
-
-    if(jobTimeout) then
-        if(jobTimeout <= 0) then
-            jobTimeout = 9999999999
-        end
-
-        expiration = jobTimeout + ARGV[2]
-    else
-        -- No timeout on the job, base the expiration on the worker's timeout
-        expiration = ARGV[1]
+    if(timeout <= 0) then
+        timeout = 9999999999
     end
+
+    local expiration = ARGV[1] + timeout + 10
 
     reserved = cjson.encode(reserved)
     redis.call('zadd', KEYS[2], expiration, reserved)
