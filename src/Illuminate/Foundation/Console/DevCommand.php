@@ -177,10 +177,15 @@ class DevCommand extends Command
 
         $this->line('');
 
-        $exitCode = Process::forever()
+        $process = Process::forever()
             ->options(['create_process_group' => true])
-            ->run($command, fn ($type, $output) => $this->output->write($output))
-            ->exitCode();
+            ->start($command, fn ($type, $output) => $this->output->write($output));
+
+        sapi_windows_set_ctrl_handler($handler = fn () => $process->stop());
+
+        $exitCode = $process->wait()->exitCode();
+
+        sapi_windows_set_ctrl_handler($handler, false);
 
         $columns === false ? putenv('COLUMNS') : putenv("COLUMNS={$columns}");
 
