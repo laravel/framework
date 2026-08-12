@@ -8,9 +8,9 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
-use Illuminate\Queue\Events\JobQueuePaused;
-use Illuminate\Queue\Events\JobQueueResumed;
 use Illuminate\Queue\Events\JobReleasedAfterException;
+use Illuminate\Queue\Events\WorkerQueuePaused;
+use Illuminate\Queue\Events\WorkerQueueResumed;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
@@ -205,11 +205,11 @@ class WorkCommand extends Command
             $this->logFailedJob($event);
         });
 
-        $this->laravel['events']->listen(JobQueuePaused::class, function ($event) {
+        $this->laravel['events']->listen(WorkerQueuePaused::class, function ($event) {
             $this->writeQueueStatus($event->queue, 'paused');
         });
 
-        $this->laravel['events']->listen(JobQueueResumed::class, function ($event) {
+        $this->laravel['events']->listen(WorkerQueueResumed::class, function ($event) {
             $this->writeQueueStatus($event->queue, 'resumed');
         });
 

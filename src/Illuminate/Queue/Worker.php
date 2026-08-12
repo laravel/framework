@@ -14,8 +14,6 @@ use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
-use Illuminate\Queue\Events\JobQueuePaused;
-use Illuminate\Queue\Events\JobQueueResumed;
 use Illuminate\Queue\Events\JobReleased;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\JobTimedOut;
@@ -23,6 +21,8 @@ use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerIdle;
 use Illuminate\Queue\Events\WorkerInterrupted;
 use Illuminate\Queue\Events\WorkerPausing;
+use Illuminate\Queue\Events\WorkerQueuePaused;
+use Illuminate\Queue\Events\WorkerQueueResumed;
 use Illuminate\Queue\Events\WorkerResuming;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
@@ -513,11 +513,11 @@ class Worker
     protected function raisePausedQueueEvents($connectionName, array $paused)
     {
         foreach (array_diff($paused, $this->pausedQueues) as $queue) {
-            $this->events->dispatch(new JobQueuePaused($connectionName, $queue));
+            $this->events->dispatch(new WorkerQueuePaused($connectionName, $queue));
         }
 
         foreach (array_diff($this->pausedQueues, $paused) as $queue) {
-            $this->events->dispatch(new JobQueueResumed($connectionName, $queue));
+            $this->events->dispatch(new WorkerQueueResumed($connectionName, $queue));
         }
 
         $this->pausedQueues = $paused;
