@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\RebindsCallbacksToSelf;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter as AwsS3PortableVisibilityConverter;
@@ -149,7 +150,7 @@ class FilesystemManager implements FactoryContract
             return $this->callCustomCreator($config);
         }
 
-        $driverMethod = 'create'.ucfirst($driver).'Driver';
+        $driverMethod = 'create'.Str::studly($driver).'Driver';
 
         if (! method_exists($this, $driverMethod)) {
             throw new InvalidArgumentException("Driver [{$driver}] is not supported.");
@@ -263,6 +264,48 @@ class FilesystemManager implements FactoryContract
 
         return new AwsS3V3Adapter(
             $this->createFlysystem($adapter, $config), $adapter, $s3Config, $client
+        );
+    }
+
+    /**
+     * Create a read-through filesystem driver.
+     *
+     * @param  array  $config
+     * @param  string  $name
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function createReadThroughDriver(array $config, string $name = 'read-through')
+    {
+        if (empty($config['primary'])) {
+            throw new InvalidArgumentException('Read-through disk is missing "primary" configuration option.');
+        } elseif (empty($config['fallback'])) {
+            throw new InvalidArgumentException('Read-through disk is missing "fallback" configuration option.');
+        } elseif ($config['primary'] === $config['fallback']) {
+            throw new InvalidArgumentException('Read-through disk requires distinct "primary" and "fallback" disks.');
+        } elseif ($config['primary'] === $name || $config['fallback'] === $name) {
+            throw new InvalidArgumentException("Read-through disk [{$name}] cannot reference itself.");
+        }
+
+        $primary = is_array($config['primary'])
+            ? $this->build($config['primary'])
+            : $this->disk($config['primary']);
+
+        $fallback = is_array($config['fallback'])
+            ? $this->build($config['fallback'])
+            : $this->disk($config['fallback']);
+
+        $adapter = new ReadThroughFilesystemAdapter(
+            $primary->getDriver(),
+            $fallback->getDriver(),
+            $config['throw_on_promotion_failure'] ?? false,
+        );
+
+        return new ReadThroughFilesystem(
+            $this->createFlysystem($adapter, $config),
+            $primary->getAdapter(),
+            array_replace($primary->getConfig(), $config),
+            $primary,
+            $fallback,
         );
     }
 
