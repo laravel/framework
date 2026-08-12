@@ -458,7 +458,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $nextJob = $this->getConnection()->eval(
             LuaScripts::pop(), 3, $queue, $queue.':reserved', $queue.':notify',
-            $this->availableAt(($this->workerTimeout ?? 60) + 10),
+            $this->availableAt($this->workerTimeout + 10),
             $this->availableAt(10)
         );
 

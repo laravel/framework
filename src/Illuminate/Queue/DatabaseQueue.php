@@ -524,9 +524,9 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
         $timeout = json_decode($job->payload, true)['timeout'] ?? null;
 
         if (! is_numeric($timeout)) {
-            $timeout = $this->workerTimeout ?? 60;
+            $timeout = $this->workerTimeout;
         } elseif ($timeout <= 0) {
-            $timeout = 999999999;
+            $timeout = 9999999999;
         }
 
         $reservationOffset = (int) $timeout + 10 - $this->retryAfter;

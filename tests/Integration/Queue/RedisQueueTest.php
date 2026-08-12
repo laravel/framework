@@ -215,13 +215,13 @@ class RedisQueueTest extends TestCase
         $job = new RedisQueueIntegrationTestJob(123);
         $job->timeout = 0;
         $this->queue->push($job);
-        $this->assertSame($time->getTimestamp() + 999999999 + 10, $getJobExpirationTimestamp());
+        $this->assertSame($time->getTimestamp() + 9999999999 + 10, $getJobExpirationTimestamp());
 
         // A negative timeout on the job is treated the same as zero
         $job = new RedisQueueIntegrationTestJob(123);
         $job->timeout = -5;
         $this->queue->push($job);
-        $this->assertSame($time->getTimestamp() + 999999999 + 10, $getJobExpirationTimestamp());
+        $this->assertSame($time->getTimestamp() + 9999999999 + 10, $getJobExpirationTimestamp());
 
         // No timeout on the job, the queue worker's timeout is used
         $this->queue->setWorkerTimeout(15);
@@ -231,7 +231,7 @@ class RedisQueueTest extends TestCase
         // A worker timeout of 0 means jobs are never killed: reserved effectively forever
         $this->queue->setWorkerTimeout(0);
         $this->queue->push(new RedisQueueIntegrationTestJob(123));
-        $this->assertSame($time->getTimestamp() + 999999999 + 10, $getJobExpirationTimestamp());
+        $this->assertSame($time->getTimestamp() + 9999999999 + 10, $getJobExpirationTimestamp());
 
         // A null worker timeout resets the queue to the default worker timeout
         $this->queue->setWorkerTimeout(null);

@@ -63,9 +63,9 @@ abstract class Queue
     /**
      * The job timeout set on the worker processing the queue.
      *
-     * @var int|null
+     * @var int
      */
-    protected $workerTimeout;
+    protected $workerTimeout = 60;
 
     /**
      * The create payload callbacks.
@@ -505,8 +505,8 @@ abstract class Queue
     public function setWorkerTimeout($timeout)
     {
         $this->workerTimeout = match (true) {
-            ! is_numeric($timeout) => null,
-            $timeout <= 0 => 999999999,
+            ! is_numeric($timeout) => 60,
+            $timeout <= 0 => 9999999999,
             default => (int) $timeout,
         };
 
