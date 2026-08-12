@@ -528,6 +528,18 @@ class Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get the names of the managed queues configured for this connection.
+     *
+     * @return array<int, string>
+     */
+    public function managedQueues()
+    {
+        $queues = $this->config['queues'] ?? [];
+
+        return array_is_list($queues) ? $queues : array_keys($queues);
+    }
+
+    /**
      * Dynamically pass method calls to the underlying queue.
      *
      * @param  string  $method

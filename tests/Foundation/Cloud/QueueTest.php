@@ -1539,6 +1539,27 @@ class QueueTest extends TestCase
         $this->assertSame('orders.fifo', $eventsFake->emitted[0]['queue']);
     }
 
+    public function testManagedQueuesReturnsTheConfiguredQueueNames()
+    {
+        config(['queue.connections.cloud.queues' => ['default', 'emails']]);
+        $this->fakeEvents();
+        [$queue] = $this->mockedQueue();
+
+        $this->assertSame(['default', 'emails'], $queue->managedQueues());
+    }
+
+    public function testManagedQueuesReturnsTheKeysWhenConfiguredAsAMap()
+    {
+        config(['queue.connections.cloud.queues' => [
+            'default' => ['timeout' => 10],
+            'emails' => ['timeout' => 1],
+        ]]);
+        $this->fakeEvents();
+        [$queue] = $this->mockedQueue();
+
+        $this->assertSame(['default', 'emails'], $queue->managedQueues());
+    }
+
     /**
      * @return array{Queue, MockInterface<SqsClient>}
      */
