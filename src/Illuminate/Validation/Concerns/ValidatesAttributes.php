@@ -1559,7 +1559,7 @@ trait ValidatesAttributes
             return array_diff($value, $parameters) === [];
         }
 
-        return ! is_array($value) && in_array((string) $value, $parameters);
+        return ! is_array($value) && in_array((string) $value, $parameters, true);
     }
 
     /**
