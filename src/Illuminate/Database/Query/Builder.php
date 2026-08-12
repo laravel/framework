@@ -3083,7 +3083,7 @@ class Builder implements BuilderContract
      * Add an "order by" clause to order results by a given sequence of values.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|array<\UnitEnum|string|int|float|bool>  $values
      * @return $this
      */
     public function inOrderOf($column, $values)
