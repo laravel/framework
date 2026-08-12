@@ -44,16 +44,11 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * The expiration time of a job.
      *
+     * @deprecated No longer necessary, reservations are now based on the job timeout.
+     *
      * @var int|null
      */
     protected $retryAfter = 60;
-
-    /**
-     * Indicates if jobs should be reserved until their timeout instead of the retry_after value.
-     *
-     * @var bool
-     */
-    protected $expireAfterTimeout = false;
 
     /**
      * The cached lock type for popping jobs.
@@ -70,7 +65,6 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $default
      * @param  int  $retryAfter
      * @param  bool  $dispatchAfterCommit
-     * @param  bool  $expireAfterTimeout
      */
     public function __construct(
         Connection $database,
@@ -78,14 +72,12 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
         $default = 'default',
         $retryAfter = 60,
         $dispatchAfterCommit = false,
-        $expireAfterTimeout = false,
     ) {
         $this->table = $table;
         $this->default = $default;
         $this->database = $database;
         $this->retryAfter = $retryAfter;
         $this->dispatchAfterCommit = $dispatchAfterCommit;
-        $this->expireAfterTimeout = $expireAfterTimeout;
     }
 
     /**
@@ -607,19 +599,15 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function markJobAsReserved($job)
     {
-        $reservationOffset = 0;
+        $timeout = json_decode($job->payload, true)['timeout'] ?? null;
 
-        if ($this->expireAfterTimeout) {
-            $timeout = json_decode($job->payload, true)['timeout'] ?? null;
-
-            if (! is_numeric($timeout) || (int) $timeout <= 0) {
-                $timeout = $this->workerTimeout;
-            }
-
-            if (! is_null($timeout)) {
-                $reservationOffset = (int) $timeout + 10 - $this->retryAfter;
-            }
+        if (! is_numeric($timeout)) {
+            $timeout = $this->workerTimeout ?? 60;
+        } elseif ($timeout <= 0) {
+            $timeout = 999999999;
         }
+
+        $reservationOffset = (int) $timeout + 10 - $this->retryAfter;
 
         $this->database->table($this->table)->where('id', $job->id)->update([
             'reserved_at' => $job->touch($reservationOffset),
