@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Illuminate\Queue\Console\Concerns\ParsesQueue;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:resume', aliases: ['queue:continue'])]
@@ -20,7 +21,7 @@ class ResumeCommand extends Command
     protected $signature = 'queue:resume
                             {queue? : The name of the queue that should resume processing}
                             {--all : Resume job processing for all queues on all connections}
-                            {--exclude=* : Queue names to exclude from resuming}';
+                            {--exclude= : Queue names to exclude from resuming}';
 
     /**
      * The console command name aliases.
@@ -43,13 +44,16 @@ class ResumeCommand extends Command
      */
     public function handle(QueueManager $manager): int
     {
-        $excludedQueues = $this->option('exclude');
+        $excludedQueues = (new Stringable($this->option('exclude') ?? ''))->explode(',')
+            ->map(fn ($queue) => trim($queue));
 
-        if (array_filter($excludedQueues, fn ($queue) => ! is_string($queue) || trim($queue) === '')) {
+        if ($this->input->hasParameterOption('--exclude') && $excludedQueues->contains('')) {
             $this->components->error('The --exclude option requires a queue name.');
 
             return self::FAILURE;
         }
+
+        $excludedQueues = $excludedQueues->filter()->unique()->values()->all();
 
         if ($this->option('all')) {
             $manager->resumeAll($excludedQueues);

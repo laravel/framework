@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Illuminate\Queue\Console\Concerns\ParsesQueue;
 use Illuminate\Queue\Worker;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:pause')]
@@ -21,7 +22,7 @@ class PauseCommand extends Command
     protected $signature = 'queue:pause
                             {queue? : The name of the queue to pause}
                             {--all : Pause job processing for all queues on all connections}
-                            {--exclude=* : Queue names to exclude from pausing}';
+                            {--exclude= : Queue names to exclude from pausing}';
 
     /**
      * The console command description.
@@ -37,7 +38,8 @@ class PauseCommand extends Command
      */
     public function handle(QueueManager $manager): int
     {
-        $excludedQueues = $this->option('exclude');
+        $excludedQueues = (new Stringable($this->option('exclude') ?? ''))->explode(',')
+            ->map(fn ($queue) => trim($queue));
 
         if (! Worker::$pausable) {
             $this->components->error('Queue pausing is currently disabled.');
@@ -45,11 +47,13 @@ class PauseCommand extends Command
             return self::FAILURE;
         }
 
-        if (array_filter($excludedQueues, fn ($queue) => ! is_string($queue) || trim($queue) === '')) {
+        if ($this->input->hasParameterOption('--exclude') && $excludedQueues->contains('')) {
             $this->components->error('The --exclude option requires a queue name.');
 
             return self::FAILURE;
         }
+
+        $excludedQueues = $excludedQueues->filter()->unique()->values()->all();
 
         if ($this->option('all')) {
             $manager->pauseAll($excludedQueues);

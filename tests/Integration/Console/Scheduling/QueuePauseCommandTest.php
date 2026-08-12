@@ -32,22 +32,27 @@ class QueuePauseCommandTest extends TestCase
 
     public function testPauseAllCanExcludeQueues()
     {
-        $this->artisan('queue:pause', [
-            '--all' => true,
-            '--exclude' => ['payments', 'notifications'],
-        ])->expectsOutputToContain('Job processing on all queues except [payments, notifications] across all connections has been paused.')
+        Event::fake();
+
+        $this->artisan('queue:pause --all --exclude=payments,notifications')
+            ->expectsOutputToContain('Job processing on all queues except [payments, notifications] across all connections has been paused.')
             ->assertSuccessful();
 
-        $this->assertTrue(Queue::isPaused('redis', 'default'));
-        $this->assertFalse(Queue::isPaused('redis', 'payments'));
-        $this->assertFalse(Queue::isPaused('database', 'notifications'));
+        Event::assertDispatched(
+            QueuesPaused::class,
+            fn ($event) => $event->except === ['payments', 'notifications']
+        );
+        $this->assertSame(
+            ['default', 'emails'],
+            Queue::getPausedQueues('redis', ['default', 'payments', 'emails', 'notifications'])
+        );
     }
 
     public function testExcludeRequiresAllOption()
     {
         $this->artisan('queue:pause', [
             'queue' => 'default',
-            '--exclude' => ['payments'],
+            '--exclude' => 'payments',
         ])->assertFailed();
 
         $this->assertFalse(Queue::isPaused('redis', 'default'));
@@ -73,15 +78,20 @@ class QueuePauseCommandTest extends TestCase
     {
         $this->artisan('queue:pause --all')->assertSuccessful();
 
-        $this->artisan('queue:resume', [
-            '--all' => true,
-            '--exclude' => ['payments', 'notifications'],
-        ])->expectsOutputToContain('Job processing on all queues except [payments, notifications] across all connections has been resumed.')
+        Event::fake();
+
+        $this->artisan('queue:resume --all --exclude="payments, notifications,payments"')
+            ->expectsOutputToContain('Job processing on all queues except [payments, notifications] across all connections has been resumed.')
             ->assertSuccessful();
 
-        $this->assertFalse(Queue::isPaused('redis', 'default'));
-        $this->assertTrue(Queue::isPaused('redis', 'payments'));
-        $this->assertTrue(Queue::isPaused('database', 'notifications'));
+        Event::assertDispatched(
+            QueuesResumed::class,
+            fn ($event) => $event->except === ['payments', 'notifications']
+        );
+        $this->assertSame(
+            ['payments', 'notifications'],
+            Queue::getPausedQueues('redis', ['default', 'payments', 'emails', 'notifications'])
+        );
     }
 
     public function testResumeExcludeRequiresAllOption()
@@ -90,7 +100,7 @@ class QueuePauseCommandTest extends TestCase
 
         $this->artisan('queue:resume', [
             'queue' => 'default',
-            '--exclude' => ['payments'],
+            '--exclude' => 'payments',
         ])->assertFailed();
 
         $this->assertTrue(Queue::isPaused(Queue::getDefaultDriver(), 'default'));
