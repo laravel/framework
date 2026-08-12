@@ -8,6 +8,8 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\JobQueuePaused;
+use Illuminate\Queue\Events\JobQueueResumed;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
@@ -203,6 +205,14 @@ class WorkCommand extends Command
             $this->logFailedJob($event);
         });
 
+        $this->laravel['events']->listen(JobQueuePaused::class, function ($event) {
+            $this->writeQueueStatus($event->queue, 'paused');
+        });
+
+        $this->laravel['events']->listen(JobQueueResumed::class, function ($event) {
+            $this->writeQueueStatus($event->queue, 'resumed');
+        });
+
         static::$hasRegisteredListeners = true;
     }
 
@@ -223,6 +233,40 @@ class WorkCommand extends Command
         $this->outputUsingJson()
             ? $this->writeOutputAsJson($job, $status, $exception)
             : $this->writeOutputForCli($job, $status);
+    }
+
+    /**
+     * Write the status output for a paused or resumed queue.
+     *
+     * @param  string  $queue
+     * @param  string  $status
+     * @return void
+     */
+    protected function writeQueueStatus($queue, $status)
+    {
+        if ($this->output->isQuiet() || $this->output->isSilent()) {
+            return;
+        }
+
+        if ($this->outputUsingJson()) {
+            $this->output->writeln(json_encode([
+                'level' => 'warning',
+                'queue' => $queue,
+                'status' => $status,
+                'timestamp' => $this->now()->format('Y-m-d\TH:i:s.uP'),
+            ]));
+
+            return;
+        }
+
+        $this->output->writeln(sprintf(
+            '  <fg=gray>%s</> Queue <fg=blue>%s</> %s',
+            $this->now()->format('Y-m-d H:i:s'),
+            $queue,
+            $status === 'paused'
+                ? '<fg=yellow;options=bold>PAUSED</>'
+                : '<fg=green;options=bold>RESUMED</>',
+        ));
     }
 
     /**
