@@ -42,6 +42,7 @@ use InvalidArgumentException;
 use Mockery\MockInterface;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\TestWith;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use Throwable;
@@ -1539,21 +1540,11 @@ class QueueTest extends TestCase
         $this->assertSame('orders.fifo', $eventsFake->emitted[0]['queue']);
     }
 
-    public function testManagedQueuesReturnsTheConfiguredQueueNames()
+    #[TestWith([['default', 'emails']], 'standard list')]
+    #[TestWith([['default' => ['timeout' => 10], 'emails' => ['timeout' => 1]]], 'map keyed by name')]
+    public function testManagedQueuesReturnsTheConfiguredQueueNames($queues)
     {
-        config(['queue.connections.cloud.queues' => ['default', 'emails']]);
-        $this->fakeEvents();
-        [$queue] = $this->mockedQueue();
-
-        $this->assertSame(['default', 'emails'], $queue->managedQueues());
-    }
-
-    public function testManagedQueuesReturnsTheKeysWhenConfiguredAsAMap()
-    {
-        config(['queue.connections.cloud.queues' => [
-            'default' => ['timeout' => 10],
-            'emails' => ['timeout' => 1],
-        ]]);
+        config(['queue.connections.cloud.queues' => $queues]);
         $this->fakeEvents();
         [$queue] = $this->mockedQueue();
 
