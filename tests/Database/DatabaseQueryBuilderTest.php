@@ -2549,6 +2549,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([true, 'pending', 'approved'], $builder->getBindings());
     }
 
+    public function testInOrderOfWithBackedEnumValues()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->inOrderOf('status', [StringStatus::pending, StringStatus::done, StringStatus::draft]);
+        $this->assertSame('select * from "users" order by case when "status" = ? then 0 when "status" = ? then 1 when "status" = ? then 2 else 3 end', $builder->toSql());
+        $this->assertEquals(['pending', 'done', 'draft'], $builder->getBindings());
+    }
+
+    public function testInOrderOfWithIntegerBackedEnumValues()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->inOrderOf('status', [IntegerStatus::done, IntegerStatus::pending]);
+        $this->assertSame('select * from "users" order by case when "status" = ? then 0 when "status" = ? then 1 else 2 end', $builder->toSql());
+        $this->assertEquals([2, 1], $builder->getBindings());
+    }
+
     public function testOrderBysSqlServer()
     {
         $builder = $this->getSqlServerBuilder();

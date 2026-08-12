@@ -3092,7 +3092,7 @@ class Builder implements BuilderContract
             $values = $values->toArray();
         }
 
-        $values = array_values($values);
+        $values = array_map(enum_value(...), array_values($values));
 
         if (empty($values)) {
             return $this;
