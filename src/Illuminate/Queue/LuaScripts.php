@@ -62,8 +62,8 @@ LUA;
      * KEYS[1] - The queue to pop jobs from, for example: queues:foo
      * KEYS[2] - The queue to place reserved jobs on, for example: queues:foo:reserved
      * KEYS[3] - The notify queue
-     * ARGV[1] - The time at which the reserved job will expire
-     * ARGV[2] - The base time, including the grace buffer, for expiring jobs based on their payload timeout
+     * ARGV[1] - When the reservation expires if the job has no timeout
+     * ARGV[2] - If the job has a timeout this is added to get the expiration
      *
      * @return string
      */
@@ -82,9 +82,9 @@ if(job ~= false) then
     local expiration = ARGV[1]
     local timeout = tonumber(reserved['timeout'])
 
-    if(tonumber(ARGV[2]) and timeout) then
+    if(timeout) then
         if(timeout <= 0) then
-            timeout = 999999999
+            timeout = 9999999999
         end
 
         expiration = timeout + ARGV[2]
