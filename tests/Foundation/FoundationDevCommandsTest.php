@@ -8,8 +8,10 @@ use Illuminate\Foundation\DevCommandColor;
 use Illuminate\Foundation\DevCommandMode;
 use Illuminate\Foundation\DevCommands;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use stdClass;
 
 class FoundationDevCommandsTest extends TestCase
 {
@@ -301,8 +303,13 @@ class FoundationDevCommandsTest extends TestCase
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RunInSeparateProcess]
     public function testRegisterDefaultsRegistersExpectedCommands()
     {
+        if (! class_exists('Laravel\Pail\PailServiceProvider')) {
+            class_alias(stdClass::class, 'Laravel\Pail\PailServiceProvider');
+        }
+
         DevCommands::registerDefaults();
 
         $commands = DevCommands::commands();
