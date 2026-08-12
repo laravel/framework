@@ -298,6 +298,7 @@ class FilesystemManager implements FactoryContract
             $primary->getDriver(),
             $fallback->getDriver(),
             $config['throw_on_promotion_failure'] ?? false,
+            $config['copy'] ?? true,
         );
 
         return new ReadThroughFilesystem(

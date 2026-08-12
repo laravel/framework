@@ -18,6 +18,7 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
         protected FilesystemOperator $primary,
         protected FilesystemOperator $fallback,
         protected bool $throwOnPromotionFailure = false,
+        protected bool $copy = true,
     ) {
     }
 
@@ -64,6 +65,10 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
 
         $contents = $this->fallback->read($path);
 
+        if (! $this->copy) {
+            return $contents;
+        }
+
         if ($this->primary->fileExists($path)) {
             return $this->primary->read($path);
         }
@@ -84,6 +89,10 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
     {
         if ($this->primary->fileExists($path)) {
             return $this->primary->readStream($path);
+        }
+
+        if (! $this->copy) {
+            return $this->fallback->readStream($path);
         }
 
         $source = $this->fallback->readStream($path);
