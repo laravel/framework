@@ -13,6 +13,7 @@ use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Carbon;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class QueuePauseResumeTest extends TestCase
 {
@@ -23,9 +24,14 @@ class QueuePauseResumeTest extends TestCase
     {
         $this->cache = new Repository(new ArrayStore);
 
+        $this->manager = $this->createManager($this->cache);
+    }
+
+    protected function createManager($cache)
+    {
         // Mock the cache facade to return our cache repository
         $cacheMock = Mockery::mock();
-        $cacheMock->shouldReceive('store')->andReturn($this->cache);
+        $cacheMock->shouldReceive('store')->andReturn($cache);
 
         $app = [
             'config' => [
@@ -37,7 +43,7 @@ class QueuePauseResumeTest extends TestCase
             'events' => new Dispatcher(),
         ];
 
-        $this->manager = new QueueManager($app);
+        return new QueueManager($app);
     }
 
     public function testPauseQueueWithConnection()
@@ -186,6 +192,31 @@ class QueuePauseResumeTest extends TestCase
 
         $this->assertFalse($this->manager->isPaused('redis', 'default'));
         $this->assertSame([], $this->manager->getPausedQueues('redis', ['default', 'emails']));
+    }
+
+    public function testPauseChecksDoNotBatchTheGlobalKeyWithQueueKeys()
+    {
+        $store = new class extends ArrayStore
+        {
+            public function many(array $keys)
+            {
+                if (count($keys) > 1 && in_array('illuminate:queues:paused', $keys)) {
+                    throw new RuntimeException("CROSSSLOT Keys in request don't hash to the same slot");
+                }
+
+                return parent::many($keys);
+            }
+        };
+
+        $manager = $this->createManager(new Repository($store));
+
+        $this->assertFalse($manager->isPaused('redis', 'default'));
+        $this->assertSame([], $manager->getPausedQueues('redis', ['default']));
+
+        $manager->pauseAll();
+
+        $this->assertTrue($manager->isPaused('redis', 'default'));
+        $this->assertSame(['default'], $manager->getPausedQueues('redis', ['default']));
     }
 
     public function testPauseAllDispatchesQueuesPausedEvent()
