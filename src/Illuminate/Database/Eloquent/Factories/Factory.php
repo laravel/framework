@@ -601,7 +601,7 @@ abstract class Factory
                 return $attribute;
             })
             ->map(function ($attribute, $key) use (&$definition, $evaluateRelations) {
-                if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
+                if (! is_string($attribute) && ! is_array($attribute) && is_callable($attribute)) {
                     $attribute = $attribute($definition);
                 }
 

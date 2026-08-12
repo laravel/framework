@@ -108,6 +108,25 @@ class DatabaseEloquentFactoryTest extends TestCase
         Container::setInstance(null);
     }
 
+    public function test_string_attributes_are_not_passed_to_is_callable()
+    {
+        $autoloaded = [];
+        $spy = function ($class) use (&$autoloaded) {
+            $autoloaded[] = $class;
+        };
+
+        spl_autoload_register($spy);
+
+        try {
+            $user = FactoryTestUserFactory::new()->makeOne(['name' => '\::someMethod']);
+        } finally {
+            spl_autoload_unregister($spy);
+        }
+
+        $this->assertSame('\::someMethod', $user->name);
+        $this->assertNotContains('', $autoloaded);
+    }
+
     public function test_basic_model_can_be_created()
     {
         $user = FactoryTestUserFactory::new()->create();
