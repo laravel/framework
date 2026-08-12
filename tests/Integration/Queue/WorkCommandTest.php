@@ -196,6 +196,7 @@ class WorkCommandTest extends QueueTestCase
         $cache = Mockery::mock(Repository::class);
         $cache->shouldNotReceive('get')->with('illuminate:queue:restart');
         $cache->expects('get')->with('illuminate:queues:paused')->andReturn(null);
+        $cache->expects('get')->with('illuminate:queues:paused:except', [])->andReturn([]);
         $cache->expects('many')->andReturn([]);
 
         $cacheManager = Mockery::mock(CacheManager::class);

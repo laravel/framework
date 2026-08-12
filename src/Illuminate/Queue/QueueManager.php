@@ -257,14 +257,24 @@ class QueueManager implements FactoryContract, MonitorContract
      *
      * @return void
      */
-    public function pauseAll()
+    public function pauseAll(array $except = [])
     {
-        $this->app['cache']
-            ->store()
-            ->forever('illuminate:queues:paused', true);
+        $cache = $this->app['cache']->store();
+        $globallyPaused = (bool) $cache->get('illuminate:queues:paused');
+        $exceptions = $cache->get('illuminate:queues:paused:except', []);
+        $exceptions = array_values(array_filter(
+            $except,
+            fn ($queue) => (in_array($queue, $exceptions, true) ? ! $globallyPaused : $globallyPaused) !== true
+        ));
+
+        $cache->forever('illuminate:queues:paused', true);
+
+        $exceptions
+            ? $cache->forever('illuminate:queues:paused:except', $exceptions)
+            : $cache->forget('illuminate:queues:paused:except');
 
         $this->app['events']->dispatch(
-            new Events\QueuesPaused
+            new Events\QueuesPaused($except)
         );
     }
 
@@ -293,14 +303,24 @@ class QueueManager implements FactoryContract, MonitorContract
      *
      * @return void
      */
-    public function resumeAll()
+    public function resumeAll(array $except = [])
     {
-        $this->app['cache']
-            ->store()
-            ->forget('illuminate:queues:paused');
+        $cache = $this->app['cache']->store();
+        $globallyPaused = (bool) $cache->get('illuminate:queues:paused');
+        $exceptions = $cache->get('illuminate:queues:paused:except', []);
+        $exceptions = array_values(array_filter(
+            $except,
+            fn ($queue) => (in_array($queue, $exceptions, true) ? ! $globallyPaused : $globallyPaused) !== false
+        ));
+
+        $cache->forget('illuminate:queues:paused');
+
+        $exceptions
+            ? $cache->forever('illuminate:queues:paused:except', $exceptions)
+            : $cache->forget('illuminate:queues:paused:except');
 
         $this->app['events']->dispatch(
-            new Events\QueuesResumed
+            new Events\QueuesResumed($except)
         );
     }
 
@@ -314,9 +334,11 @@ class QueueManager implements FactoryContract, MonitorContract
     public function isPaused($connection, $queue)
     {
         $cache = $this->app['cache']->store();
+        $globallyPaused = (bool) $cache->get('illuminate:queues:paused');
+        $exceptions = $cache->get('illuminate:queues:paused:except', []);
 
-        return (bool) ($cache->get('illuminate:queues:paused')
-            ?: $cache->get("illuminate:queue:paused:{$connection}:{$queue}"));
+        return (bool) ((in_array($queue, $exceptions, true) ? ! $globallyPaused : $globallyPaused)
+            || $cache->get("illuminate:queue:paused:{$connection}:{$queue}"));
     }
 
     /**
@@ -329,8 +351,10 @@ class QueueManager implements FactoryContract, MonitorContract
     public function getPausedQueues($connection, $queues)
     {
         $cache = $this->app['cache']->store();
+        $globallyPaused = (bool) $cache->get('illuminate:queues:paused');
+        $exceptions = $cache->get('illuminate:queues:paused:except', []);
 
-        if ($cache->get('illuminate:queues:paused')) {
+        if ($globallyPaused && $exceptions === []) {
             return array_values($queues);
         }
 
@@ -339,7 +363,8 @@ class QueueManager implements FactoryContract, MonitorContract
         );
 
         return array_values(array_filter(
-            $queues, fn ($queue) => $states["illuminate:queue:paused:{$connection}:{$queue}"] ?? false
+            $queues, fn ($queue) => (in_array($queue, $exceptions, true) ? ! $globallyPaused : $globallyPaused)
+                || ($states["illuminate:queue:paused:{$connection}:{$queue}"] ?? false)
         ));
     }
 

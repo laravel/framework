@@ -9,6 +9,7 @@ use Illuminate\Queue\Console\Concerns\ParsesQueue;
 use Illuminate\Queue\Events\QueuePaused;
 use Illuminate\Queue\Events\QueueResumed;
 use Illuminate\Queue\Events\QueuesPaused;
+use Illuminate\Queue\Events\QueuesResumed;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Carbon;
 use Mockery;
@@ -194,6 +195,75 @@ class QueuePauseResumeTest extends TestCase
         $this->assertSame([], $this->manager->getPausedQueues('redis', ['default', 'emails']));
     }
 
+    public function testPauseAllCanExcludeQueues()
+    {
+        $this->manager->pauseAll(['payments', 'notifications']);
+
+        $this->assertFalse($this->manager->isPaused('redis', 'payments'));
+        $this->assertFalse($this->manager->isPaused('database', 'notifications'));
+        $this->assertSame(
+            ['default', 'emails'],
+            $this->manager->getPausedQueues('redis', ['default', 'payments', 'emails', 'notifications'])
+        );
+    }
+
+    public function testIndividuallyPausedQueueRemainsPausedWhenExcludedFromPauseAll()
+    {
+        $this->manager->pause('redis', 'payments');
+        $this->manager->pauseAll(['payments']);
+
+        $this->assertSame(
+            ['payments', 'default'],
+            $this->manager->getPausedQueues('redis', ['payments', 'default'])
+        );
+    }
+
+    public function testPauseAllPreservesGlobalStateOfExcludedQueues()
+    {
+        $this->manager->pauseAll();
+        $this->manager->pauseAll(['payments']);
+
+        $this->assertSame(
+            ['payments', 'default'],
+            $this->manager->getPausedQueues('redis', ['payments', 'default'])
+        );
+    }
+
+    public function testResumeAllCanExcludeQueues()
+    {
+        $this->manager->pauseAll();
+        $this->manager->resumeAll(['payments', 'notifications']);
+
+        $this->assertSame(
+            ['payments', 'notifications'],
+            $this->manager->getPausedQueues('redis', ['default', 'payments', 'emails', 'notifications'])
+        );
+    }
+
+    public function testResumeAllPreservesGlobalStateOfExcludedQueues()
+    {
+        $this->manager->resumeAll(['payments']);
+
+        $this->assertSame([], $this->manager->getPausedQueues('redis', ['payments', 'default']));
+
+        $this->manager->pauseAll(['payments']);
+        $this->manager->resumeAll(['default']);
+
+        $this->assertSame(['default'], $this->manager->getPausedQueues('redis', ['payments', 'default']));
+    }
+
+    public function testIndividuallyPausedQueueRemainsPausedAfterResumeAllWithExclusions()
+    {
+        $this->manager->pause('redis', 'emails');
+        $this->manager->pauseAll();
+        $this->manager->resumeAll(['payments']);
+
+        $this->assertSame(
+            ['payments', 'emails'],
+            $this->manager->getPausedQueues('redis', ['default', 'payments', 'emails'])
+        );
+    }
+
     public function testPauseChecksDoNotBatchTheGlobalKeyWithQueueKeys()
     {
         $store = new class extends ArrayStore
@@ -219,6 +289,19 @@ class QueuePauseResumeTest extends TestCase
         $this->assertSame(['default'], $manager->getPausedQueues('redis', ['default']));
     }
 
+    public function testGlobalPauseKeyRemainsBooleanWhenUsingExclusions()
+    {
+        $this->manager->pauseAll(['payments']);
+
+        $this->assertTrue($this->cache->get('illuminate:queues:paused'));
+        $this->assertSame(['payments'], $this->cache->get('illuminate:queues:paused:except'));
+
+        $this->manager->resumeAll(['default']);
+
+        $this->assertNull($this->cache->get('illuminate:queues:paused'));
+        $this->assertSame(['default'], $this->cache->get('illuminate:queues:paused:except'));
+    }
+
     public function testPauseAllDispatchesQueuesPausedEvent()
     {
         $dispatchedEvent = null;
@@ -229,9 +312,26 @@ class QueuePauseResumeTest extends TestCase
             $dispatchedEvent = $event;
         });
 
-        $this->manager->pauseAll();
+        $this->manager->pauseAll(['payments']);
 
         $this->assertInstanceOf(QueuesPaused::class, $dispatchedEvent);
+        $this->assertSame(['payments'], $dispatchedEvent->except);
+    }
+
+    public function testResumeAllDispatchesQueuesResumedEvent()
+    {
+        $dispatchedEvent = null;
+
+        $dispatcher = $this->manager->getApplication()['events'];
+
+        $dispatcher->listen(QueuesResumed::class, function ($event) use (&$dispatchedEvent) {
+            $dispatchedEvent = $event;
+        });
+
+        $this->manager->resumeAll(['payments']);
+
+        $this->assertInstanceOf(QueuesResumed::class, $dispatchedEvent);
+        $this->assertSame(['payments'], $dispatchedEvent->except);
     }
 
     public function testParsingQueueString()

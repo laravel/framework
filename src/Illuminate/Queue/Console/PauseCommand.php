@@ -20,7 +20,8 @@ class PauseCommand extends Command
      */
     protected $signature = 'queue:pause
                             {queue? : The name of the queue to pause}
-                            {--all : Pause job processing for all queues on all connections}';
+                            {--all : Pause job processing for all queues on all connections}
+                            {--exclude=* : Queue names to exclude from pausing}';
 
     /**
      * The console command description.
@@ -36,18 +37,38 @@ class PauseCommand extends Command
      */
     public function handle(QueueManager $manager): int
     {
+        $excludedQueues = $this->option('exclude');
+
         if (! Worker::$pausable) {
             $this->components->error('Queue pausing is currently disabled.');
 
             return self::FAILURE;
         }
 
+        if (array_filter($excludedQueues, fn ($queue) => ! is_string($queue) || trim($queue) === '')) {
+            $this->components->error('The --exclude option requires a queue name.');
+
+            return self::FAILURE;
+        }
+
         if ($this->option('all')) {
-            $manager->pauseAll();
+            $manager->pauseAll($excludedQueues);
+
+            if ($excludedQueues) {
+                $this->components->info('Job processing on all queues except ['.implode(', ', $excludedQueues).'] across all connections has been paused.');
+
+                return self::SUCCESS;
+            }
 
             $this->components->info('Job processing on all queues across all connections has been paused.');
 
             return self::SUCCESS;
+        }
+
+        if ($excludedQueues) {
+            $this->components->error('The --exclude option may only be used with the --all option.');
+
+            return self::FAILURE;
         }
 
         if (! $this->argument('queue')) {
