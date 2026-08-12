@@ -300,10 +300,12 @@ class FilesystemManager implements FactoryContract
             $config['throw_on_promotion_failure'] ?? false,
         );
 
-        return new FilesystemAdapter(
+        return new ReadThroughFilesystem(
             $this->createFlysystem($adapter, $config),
             $primary->getAdapter(),
             array_replace($primary->getConfig(), $config),
+            $primary,
+            $fallback,
         );
     }
 

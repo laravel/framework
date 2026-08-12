@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
@@ -308,6 +309,39 @@ class FilesystemManagerTest extends TestCase
         $filesystem->disk('read-through')->get('fallback.txt');
     }
 
+    public function testReadThroughDisksDelegateUrlsToTheDiskContainingTheFile()
+    {
+        $filesystem = $this->readThroughFilesystemManager([], [
+            'url' => 'https://primary.test',
+        ], [
+            'url' => 'https://fallback.test',
+        ]);
+        $primary = $filesystem->disk('primary');
+        $fallback = $filesystem->disk('fallback');
+        $readThrough = $filesystem->disk('read-through');
+        $expiration = Carbon::create(2026, 8, 11);
+
+        $primary->put('primary.txt', 'primary contents');
+        $fallback->put('fallback.txt', 'fallback contents');
+        $primary->buildTemporaryUrlsUsing(fn ($path, $expiration, $options) => 'primary/'.$path.'/'.$options['version']);
+        $fallback->buildTemporaryUrlsUsing(fn ($path, $expiration, $options) => 'fallback/'.$path.'/'.$options['version']);
+        $primary->buildTemporaryUploadUrlsUsing(fn ($path, $expiration, $options) => [
+            'url' => 'upload/'.$path.'/'.$options['version'],
+            'headers' => ['X-Test' => 'header'],
+        ]);
+
+        $this->assertSame('https://primary.test/primary.txt', $readThrough->url('primary.txt'));
+        $this->assertSame('https://fallback.test/fallback.txt', $readThrough->url('fallback.txt'));
+        $this->assertTrue($readThrough->providesTemporaryUrls());
+        $this->assertSame('primary/primary.txt/1', $readThrough->temporaryUrl('primary.txt', $expiration, ['version' => 1]));
+        $this->assertSame('fallback/fallback.txt/1', $readThrough->temporaryUrl('fallback.txt', $expiration, ['version' => 1]));
+        $this->assertTrue($readThrough->providesTemporaryUploadUrls());
+        $this->assertSame([
+            'url' => 'upload/file.txt/1',
+            'headers' => ['X-Test' => 'header'],
+        ], $readThrough->temporaryUploadUrl('file.txt', $expiration, ['version' => 1]));
+    }
+
     public function testCustomDriverClosureBoundObjectIsFilesystemManager()
     {
         $manager = new FilesystemManager(tap(new Application, function ($app) {
@@ -378,21 +412,24 @@ class FilesystemManagerTest extends TestCase
     //     }
     // }
 
-    protected function readThroughFilesystemManager(array $readThroughConfig = []): FilesystemManager
-    {
+    protected function readThroughFilesystemManager(
+        array $readThroughConfig = [],
+        array $primaryConfig = [],
+        array $fallbackConfig = [],
+    ): FilesystemManager {
         $primary = $this->temporaryDirectory('primary');
         $fallback = $this->temporaryDirectory('fallback');
 
-        return new FilesystemManager(tap(new Application, function ($app) use ($primary, $fallback, $readThroughConfig) {
+        return new FilesystemManager(tap(new Application, function ($app) use ($primary, $fallback, $readThroughConfig, $primaryConfig, $fallbackConfig) {
             $app['config'] = [
-                'filesystems.disks.primary' => [
+                'filesystems.disks.primary' => array_replace([
                     'driver' => 'local',
                     'root' => $primary,
-                ],
-                'filesystems.disks.fallback' => [
+                ], $primaryConfig),
+                'filesystems.disks.fallback' => array_replace([
                     'driver' => 'local',
                     'root' => $fallback,
-                ],
+                ], $fallbackConfig),
                 'filesystems.disks.read-through' => array_replace([
                     'driver' => 'read-through',
                     'primary' => 'primary',
