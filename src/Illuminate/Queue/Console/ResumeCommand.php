@@ -21,7 +21,7 @@ class ResumeCommand extends Command
     protected $signature = 'queue:resume
                             {queue? : The name of the queue that should resume processing}
                             {--all : Resume job processing for all queues on all connections}
-                            {--exclude= : Queue names to exclude from resuming}';
+                            {--except= : Queue names to exclude from resuming}';
 
     /**
      * The console command name aliases.
@@ -44,22 +44,22 @@ class ResumeCommand extends Command
      */
     public function handle(QueueManager $manager): int
     {
-        $excludedQueues = (new Stringable($this->option('exclude') ?? ''))->explode(',')
+        $except = (new Stringable($this->option('except') ?? ''))->explode(',')
             ->map(fn ($queue) => trim($queue));
 
-        if ($this->input->hasParameterOption('--exclude') && $excludedQueues->contains('')) {
-            $this->components->error('The --exclude option requires a queue name.');
+        if ($this->input->hasParameterOption('--except') && $except->contains('')) {
+            $this->components->error('The --except option requires a queue name.');
 
             return self::FAILURE;
         }
 
-        $excludedQueues = $excludedQueues->filter()->unique()->values()->all();
+        $except = $except->filter()->unique()->values()->all();
 
         if ($this->option('all')) {
-            $manager->resumeAll($excludedQueues);
+            $manager->resumeAll($except);
 
-            if ($excludedQueues) {
-                $this->components->info('Job processing on all queues except ['.implode(', ', $excludedQueues).'] across all connections has been resumed.');
+            if ($except) {
+                $this->components->info('Job processing on all queues except ['.implode(', ', $except).'] across all connections has been resumed.');
 
                 return self::SUCCESS;
             }
@@ -69,8 +69,8 @@ class ResumeCommand extends Command
             return self::SUCCESS;
         }
 
-        if ($excludedQueues) {
-            $this->components->error('The --exclude option may only be used with the --all option.');
+        if ($except) {
+            $this->components->error('The --except option may only be used with the --all option.');
 
             return self::FAILURE;
         }

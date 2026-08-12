@@ -3718,7 +3718,7 @@ return [
                 'description' => 'Pause job processing for all queues on all connections',
             ],
             [
-                'name' => 'exclude',
+                'name' => 'except',
                 'shortcut' => null,
                 'negatable' => false,
                 'valueRequired' => false,
@@ -3814,7 +3814,7 @@ return [
                 'description' => 'Resume job processing for all queues on all connections',
             ],
             [
-                'name' => 'exclude',
+                'name' => 'except',
                 'shortcut' => null,
                 'negatable' => false,
                 'valueRequired' => false,

@@ -30,11 +30,11 @@ class QueuePauseCommandTest extends TestCase
         Event::assertDispatched(QueuesPaused::class);
     }
 
-    public function testPauseAllCanExcludeQueues()
+    public function testPauseAllCanExceptQueues()
     {
         Event::fake();
 
-        $this->artisan('queue:pause --all --exclude=payments,notifications')
+        $this->artisan('queue:pause --all --except=payments,notifications')
             ->expectsOutputToContain('Job processing on all queues except [payments, notifications] across all connections has been paused.')
             ->assertSuccessful();
 
@@ -48,19 +48,19 @@ class QueuePauseCommandTest extends TestCase
         );
     }
 
-    public function testExcludeRequiresAllOption()
+    public function testExceptRequiresAllOption()
     {
         $this->artisan('queue:pause', [
             'queue' => 'default',
-            '--exclude' => 'payments',
+            '--except' => 'payments',
         ])->assertFailed();
 
         $this->assertFalse(Queue::isPaused('redis', 'default'));
     }
 
-    public function testPauseExcludeRequiresQueueName()
+    public function testPauseExceptRequiresQueueName()
     {
-        $this->artisan('queue:pause --all --exclude')->assertFailed();
+        $this->artisan('queue:pause --all --except')->assertFailed();
 
         $this->assertFalse(Queue::isPaused('redis', 'default'));
     }
@@ -74,13 +74,13 @@ class QueuePauseCommandTest extends TestCase
         Event::assertDispatched(QueuesResumed::class);
     }
 
-    public function testResumeAllCanExcludeQueues()
+    public function testResumeAllCanExceptQueues()
     {
         $this->artisan('queue:pause --all')->assertSuccessful();
 
         Event::fake();
 
-        $this->artisan('queue:resume --all --exclude="payments, notifications,payments"')
+        $this->artisan('queue:resume --all --except="payments, notifications,payments"')
             ->expectsOutputToContain('Job processing on all queues except [payments, notifications] across all connections has been resumed.')
             ->assertSuccessful();
 
@@ -94,23 +94,23 @@ class QueuePauseCommandTest extends TestCase
         );
     }
 
-    public function testResumeExcludeRequiresAllOption()
+    public function testResumeExceptRequiresAllOption()
     {
         $this->artisan('queue:pause default')->assertSuccessful();
 
         $this->artisan('queue:resume', [
             'queue' => 'default',
-            '--exclude' => 'payments',
+            '--except' => 'payments',
         ])->assertFailed();
 
         $this->assertTrue(Queue::isPaused(Queue::getDefaultDriver(), 'default'));
     }
 
-    public function testResumeExcludeRequiresQueueName()
+    public function testResumeExceptRequiresQueueName()
     {
         $this->artisan('queue:pause --all')->assertSuccessful();
 
-        $this->artisan('queue:resume --all --exclude=')->assertFailed();
+        $this->artisan('queue:resume --all --except=')->assertFailed();
 
         $this->assertTrue(Queue::isPaused('redis', 'default'));
     }
