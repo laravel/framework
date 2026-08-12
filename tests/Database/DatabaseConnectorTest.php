@@ -303,6 +303,19 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
+    public function testSqlServerConnectDoesNotSetApplicationIntentForFalseReadonly()
+    {
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'readonly' => false];
+        $dsn = $this->getDsn($config);
+        $connector = $this->getMockBuilder(SqlServerConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = Mockery::mock(PDO::class);
+        $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
     public function testSqlServerConnectCallsCreateConnectionWithOptionalArguments()
     {
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'readonly' => true, 'charset' => 'utf-8', 'pooling' => false, 'appname' => 'baz'];
@@ -345,7 +358,7 @@ class DatabaseConnectorTest extends TestCase
         if (in_array('sqlsrv', $availableDrivers)) {
             $port = isset($config['port']) ? ','.$port : '';
             $appname = isset($config['appname']) ? ';APP='.$config['appname'] : '';
-            $readonly = isset($config['readonly']) ? ';ApplicationIntent=ReadOnly' : '';
+            $readonly = ($config['readonly'] ?? false) ? ';ApplicationIntent=ReadOnly' : '';
             $pooling = (isset($config['pooling']) && $config['pooling'] == false) ? ';ConnectionPooling=0' : '';
 
             return "sqlsrv:Server={$host}{$port};Database={$database}{$readonly}{$pooling}{$appname}";

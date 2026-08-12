@@ -133,7 +133,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             $arguments['Database'] = $config['database'];
         }
 
-        if (isset($config['readonly'])) {
+        if ($config['readonly'] ?? false) {
             $arguments['ApplicationIntent'] = 'ReadOnly';
         }
 
