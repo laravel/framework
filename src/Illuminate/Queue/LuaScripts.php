@@ -79,15 +79,19 @@ if(job ~= false) then
     reserved = cjson.decode(job)
     reserved['attempts'] = reserved['attempts'] + 1
 
-    local expiration = ARGV[1]
-    local timeout = tonumber(reserved['timeout'])
+    local expiration
 
-    if(timeout) then
-        if(timeout <= 0) then
-            timeout = 9999999999
+    local jobTimeout = tonumber(reserved['timeout'])
+
+    if(jobTimeout) then
+        if(jobTimeout <= 0) then
+            jobTimeout = 9999999999
         end
 
-        expiration = timeout + ARGV[2]
+        expiration = jobTimeout + ARGV[2]
+    else
+        -- No timeout on the job, base the expiration on the worker's timeout
+        expiration = ARGV[1]
     end
 
     reserved = cjson.encode(reserved)
