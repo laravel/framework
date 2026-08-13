@@ -304,7 +304,6 @@ class FoundationDevCommandsTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRegisterDefaultsRegistersExpectedCommands()
     {
-        // Pretend the "laravel/pail" package is installed to prove it registers...
         $provider = Mockery::mock('alias:Laravel\Pail\PailServiceProvider');
         $provider->shouldReceive('register');
 
