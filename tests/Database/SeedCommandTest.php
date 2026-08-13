@@ -15,8 +15,10 @@ use Illuminate\Database\Seeder;
 use Illuminate\Events\NullDispatcher;
 use Illuminate\Testing\Assert;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class SeedCommandTest extends TestCase
@@ -105,6 +107,93 @@ class SeedCommandTest extends TestCase
         $container->shouldHaveReceived('call')->with([$command, 'handle']);
     }
 
+    public function testHandleReportsProgressWhenSeederClassIsRequestedExplicitely()
+    {
+        $input = new ArrayInput([
+            '--force' => true,
+            '--database' => 'sqlite',
+            '--class' => UserSeeder::class,
+        ]);
+        $output = new BufferedOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $resolver->expects('getDefaultConnection');
+        $resolver->expects('setDefaultConnection')->with('sqlite');
+
+        $container = Mockery::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->expects('environment')->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->expects('make')->with(UserSeeder::class)->andReturn(new UserSeeder);
+        $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(
+            $outputStyle
+        );
+        $container->expects('make')->with(Factory::class, Mockery::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+        $command->handle();
+
+        $result = $output->fetch();
+
+        Assert::assertStringContainsString(UserSeeder::class, $result);
+        Assert::assertStringContainsString('RUNNING', $result);
+        Assert::assertStringContainsString('DONE', $result);
+    }
+
+    public static function defaultSeederDataProvider()
+    {
+        return [
+            'no default class given' => [[]],
+            'default class given' => [['--class' => 'Database\\Seeders\\DatabaseSeeder']],
+        ];
+    }
+
+    #[DataProvider('defaultSeederDataProvider')]
+    public function testHandleDoesNotReportProgressForTheDefaultSeederClass($parameters)
+    {
+        $input = new ArrayInput($parameters + ['--force' => true, '--database' => 'sqlite']);
+        $output = new BufferedOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $seeder = Mockery::mock(Seeder::class);
+        $seeder->expects('setContainer')->andReturnSelf();
+        $seeder->expects('setCommand')->andReturnSelf();
+        $seeder->expects('__invoke');
+
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $resolver->expects('getDefaultConnection');
+        $resolver->expects('setDefaultConnection')->with('sqlite');
+
+        $container = Mockery::mock(Container::class);
+        $container->expects('call');
+        $container->expects('environment')->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->expects('make')->with('DatabaseSeeder')->andReturn($seeder);
+        $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(
+            $outputStyle
+        );
+        $container->expects('make')->with(Factory::class, Mockery::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+        $command->handle();
+
+        $result = $output->fetch();
+
+        Assert::assertStringNotContainsString('RUNNING', $result);
+        Assert::assertStringNotContainsString('DONE', $result);
+    }
+
     public function testProhibitable()
     {
         $input = new ArrayInput([]);
@@ -139,6 +228,14 @@ class SeedCommandTest extends TestCase
         SeedCommand::prohibit(false);
 
         Model::unsetEventDispatcher();
+    }
+}
+
+class UserSeeder extends Seeder
+{
+    public function run()
+    {
+        //
     }
 }
 
