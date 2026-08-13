@@ -8,7 +8,7 @@ assertType('Illuminate\Foundation\Application', app());
 assertType('mixed', app('foo'));
 assertType('Illuminate\Config\Repository', app(Repository::class));
 
-assertType('Illuminate\Contracts\Auth\Factory', auth());
+assertType('Illuminate\Auth\AuthManager', auth());
 assertType('Illuminate\Contracts\Auth\Guard', auth('foo'));
 
 assertType('Illuminate\Cache\CacheManager', cache());
