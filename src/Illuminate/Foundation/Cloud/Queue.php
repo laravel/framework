@@ -255,6 +255,7 @@ class Queue implements QueueContract, ClearableQueue
         try {
             $response = $this->agentRequest()
                 ->timeout(65)
+                ->retry([0, 500], throw: false)
                 ->get('/next');
         } catch (ConnectionException $e) {
             throw new AgentUnreachableException(
