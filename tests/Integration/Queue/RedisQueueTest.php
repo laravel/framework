@@ -185,7 +185,7 @@ class RedisQueueTest extends TestCase
     public function testPopReservesJobsBasedOnTheJobTimeout($driver)
     {
         $default = config('queue.connections.redis.queue', 'default');
-        $this->queue = new RedisQueue($this->redis[$driver], $default, null, 90);
+        $this->queue = new RedisQueue($this->redis[$driver], $default, null, retryAfter: 12345);
         $this->queue->setContainer($this->container = m::spy(Container::class));
         $redisKey = $this->getQueueRedisKey($default);
 
@@ -207,7 +207,7 @@ class RedisQueueTest extends TestCase
         $this->queue->push($job);
         $this->assertSame($time->getTimestamp() + 25 + 10, $getJobExpirationTimestamp());
 
-        // No timeout on the job, no timeout shared by the queue worker: the default worker timeout is used
+        // No timeout on the job, worker timeout unknown: the default worker timeout is used
         $this->queue->push(new RedisQueueIntegrationTestJob(123));
         $this->assertSame($time->getTimestamp() + 60 + 10, $getJobExpirationTimestamp());
 
