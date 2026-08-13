@@ -323,6 +323,22 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertContains('vite', $names);
     }
 
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testRegisterDefaultsExcludesPailWhenNotInstalled()
+    {
+        DevCommands::registerDefaults();
+
+        $commands = DevCommands::commands();
+
+        $this->assertCount(3, $commands);
+
+        $names = array_column($commands, 'name');
+        $this->assertContains('server', $names);
+        $this->assertContains('queue', $names);
+        $this->assertContains('vite', $names);
+        $this->assertNotContains('logs', $names);
+    }
+
     #[RequiresOperatingSystem('Windows')]
     public function testRegisterDefaultsExcludesPailOnWindows()
     {
