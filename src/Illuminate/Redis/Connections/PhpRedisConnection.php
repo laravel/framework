@@ -16,6 +16,70 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     use PacksPhpRedisValues;
 
     /**
+     * The commands that may be safely retried after reconnecting.
+     *
+     * @var list<string>
+     */
+    protected const RETRYABLE_COMMANDS = [
+        'bitcount',
+        'bitpos',
+        'dbsize',
+        'dump',
+        'exists',
+        'geodist',
+        'geohash',
+        'geopos',
+        'geosearch',
+        'get',
+        'getbit',
+        'getrange',
+        'hexists',
+        'hget',
+        'hgetall',
+        'hkeys',
+        'hlen',
+        'hmget',
+        'hmset',
+        'hstrlen',
+        'hvals',
+        'keys',
+        'lindex',
+        'llen',
+        'lpos',
+        'lrange',
+        'mget',
+        'mset',
+        'ping',
+        'pttl',
+        'randomkey',
+        'scard',
+        'sdiff',
+        'sinter',
+        'sismember',
+        'smembers',
+        'smismember',
+        'srandmember',
+        'strlen',
+        'sunion',
+        'time',
+        'ttl',
+        'type',
+        'xinfo',
+        'xlen',
+        'xpending',
+        'xrange',
+        'xrevrange',
+        'zcard',
+        'zcount',
+        'zlexcount',
+        'zmscore',
+        'zrange',
+        'zrank',
+        'zrevrank',
+        'zscore',
+    ];
+
+    /**
      * The connection creation callback.
      *
      * @var callable
@@ -527,15 +591,44 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function command($method, array $parameters = [])
     {
-        try {
-            return parent::command($method, $parameters);
-        } catch (RedisException $e) {
-            if (Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'READONLY', 'Connection lost'])) {
-                $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
-            }
+        $retries = max(
+            $this->isRetryable($method, $parameters) ? 1 : 0,
+            (int) ($this->config['command_retries'] ?? 0),
+        );
 
-            throw $e;
+        while (true) {
+            try {
+                return parent::command($method, $parameters);
+            } catch (RedisException $e) {
+                if (! Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'READONLY', 'Connection lost'])) {
+                    throw $e;
+                }
+
+                $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+
+                if ($retries-- === 0) {
+                    throw $e;
+                }
+            }
         }
+    }
+
+    /**
+     * Determine whether the command may be safely retried.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function isRetryable($method, array $parameters)
+    {
+        $method = strtolower($method);
+
+        if ($method === 'set') {
+            return ! isset($parameters[2]);
+        }
+
+        return in_array($method, static::RETRYABLE_COMMANDS, true);
     }
 
     /**

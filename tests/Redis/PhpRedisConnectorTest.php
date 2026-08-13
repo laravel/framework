@@ -319,8 +319,97 @@ class PhpRedisConnectorTest extends TestCase
             //
         }
 
-        $this->assertSame(2, $connector->created);
+        $this->assertSame(3, $connector->created);
         $this->assertNotSame($original, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionAutomaticallyRetriesReadOnlyCommandAfterRebuildingItsClient()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('get')->with('foo')->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('get')->with('foo')->willReturn('bar');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->assertSame('bar', $connection->command('get', ['foo']));
+        $this->assertSame($healthyClient, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionAutomaticallyRetriesIdempotentWriteAfterRebuildingItsClient()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('set')->with('foo', 'bar')->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('set')->with('foo', 'bar')->willReturn(true);
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->assertTrue($connection->command('set', ['foo', 'bar']));
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionDoesNotAutomaticallyRetryNonIdempotentWrite()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('incr')->with('foo')->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->never())->method('incr');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->expectExceptionObject(new RedisException('Connection lost'));
+
+        $connection->command('incr', ['foo']);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionDoesNotAutomaticallyRetrySetWithOptions()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('set')->with('foo', 'bar', ['ex' => 60])->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->never())->method('set');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->expectExceptionObject(new RedisException('Connection lost'));
+
+        $connection->command('set', ['foo', 'bar', ['ex' => 60]]);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionStopsRetryingAfterConfiguredAttempts()
+    {
+        $clients = [];
+
+        for ($i = 0; $i < 4; $i++) {
+            $clients[$i] = $this->createMock(\Redis::class);
+
+            if ($i < 3) {
+                $clients[$i]->expects($this->once())->method('get')->with('foo')->willThrowException(new RedisException('Connection lost'));
+            }
+        }
+
+        $reconnects = 0;
+        $connection = new PhpRedisConnection($clients[0], function () use (&$reconnects, $clients) {
+            return $clients[++$reconnects];
+        }, ['command_retries' => 2]);
+
+        try {
+            $connection->command('get', ['foo']);
+            $this->fail('Expected RedisException was not thrown.');
+        } catch (RedisException $e) {
+            $this->assertSame('Connection lost', $e->getMessage());
+        }
+
+        $this->assertSame(3, $reconnects);
     }
 }
 
