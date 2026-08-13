@@ -368,6 +368,7 @@ class PhpRedisConnector implements Connector
         return match ($algorithm) {
             'default' => Redis::BACKOFF_ALGORITHM_DEFAULT,
             'decorrelated_jitter' => Redis::BACKOFF_ALGORITHM_DECORRELATED_JITTER,
+            'full_jitter' => Redis::BACKOFF_ALGORITHM_FULL_JITTER,
             'equal_jitter' => Redis::BACKOFF_ALGORITHM_EQUAL_JITTER,
             'exponential' => Redis::BACKOFF_ALGORITHM_EXPONENTIAL,
             'uniform' => Redis::BACKOFF_ALGORITHM_UNIFORM,

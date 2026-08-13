@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Redis;
 
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connectors\PhpRedisConnector;
+use Illuminate\Support\Sleep;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -12,6 +13,13 @@ use ReflectionProperty;
 
 class PhpRedisConnectorTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Sleep::fake(false);
+
+        parent::tearDown();
+    }
+
     public function testNormalizeContextWrapsFlatArrayInStream()
     {
         $connector = new TestablePhpRedisConnector;
@@ -213,6 +221,7 @@ class PhpRedisConnectorTest extends TestCase
 
         $this->assertSame(\Redis::BACKOFF_ALGORITHM_DEFAULT, $connector->testParseBackoffAlgorithm('default'));
         $this->assertSame(\Redis::BACKOFF_ALGORITHM_DECORRELATED_JITTER, $connector->testParseBackoffAlgorithm('decorrelated_jitter'));
+        $this->assertSame(\Redis::BACKOFF_ALGORITHM_FULL_JITTER, $connector->testParseBackoffAlgorithm('full_jitter'));
         $this->assertSame(\Redis::BACKOFF_ALGORITHM_EQUAL_JITTER, $connector->testParseBackoffAlgorithm('equal_jitter'));
         $this->assertSame(\Redis::BACKOFF_ALGORITHM_EXPONENTIAL, $connector->testParseBackoffAlgorithm('exponential'));
         $this->assertSame(\Redis::BACKOFF_ALGORITHM_UNIFORM, $connector->testParseBackoffAlgorithm('uniform'));
@@ -411,6 +420,234 @@ class PhpRedisConnectorTest extends TestCase
 
         $this->assertSame(3, $reconnects);
     }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionRetriesWithBackoffDelaysAcrossFailover()
+    {
+        Sleep::fake();
+
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->exactly(2))->method('get')->with('foo')->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('get')->with('foo')->willReturn('bar');
+
+        $reconnects = 0;
+        $connection = new PhpRedisConnection($failedClient, function () use (&$reconnects, $healthyClient) {
+            if (++$reconnects === 1) {
+                throw new RedisException('Connection refused');
+            }
+
+            return $healthyClient;
+        }, ['command_retries' => 2, 'backoff_algorithm' => 'constant', 'backoff_base' => 100, 'backoff_cap' => 1000]);
+
+        $this->assertSame('bar', $connection->command('get', ['foo']));
+        $this->assertSame(2, $reconnects);
+        $this->assertSame($healthyClient, $connection->client());
+
+        Sleep::assertSleptTimes(2);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionRetriesNameResolutionErrors()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('get')->with('foo')->willThrowException(
+            new RedisException('php_network_getaddresses: getaddrinfo for redis-master failed: Name or service not known')
+        );
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('get')->with('foo')->willReturn('bar');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->assertSame('bar', $connection->command('get', ['foo']));
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionThrowsOriginalExceptionWhenReconnectionKeepsFailing()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->exactly(2))->method('get')->with('foo')->willThrowException(new RedisException('Connection lost'));
+
+        $connection = new PhpRedisConnection($failedClient, function () {
+            throw new RedisException('Connection refused');
+        }, ['command_retries' => 1]);
+
+        try {
+            $connection->command('get', ['foo']);
+            $this->fail('Expected RedisException was not thrown.');
+        } catch (RedisException $e) {
+            $this->assertSame('Connection lost', $e->getMessage());
+        }
+
+        $this->assertSame($failedClient, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionDoesNotRetryNonIdempotentCommandOnNewlyMatchedErrors()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('incr')->with('foo')->willThrowException(new RedisException('Connection refused'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->never())->method('incr');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->expectExceptionObject(new RedisException('Connection refused'));
+
+        $connection->command('incr', ['foo']);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testScanIsRetriedAfterTransientError()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('scan')->willThrowException(new RedisException('read error on connection'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('scan')->willReturn(['foo']);
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->assertSame([0, ['foo']], $connection->scan(0));
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testPipelineIsRetriedWhenCommandRetriesAreConfigured()
+    {
+        $pipeline = $this->createMock(\Redis::class);
+        $pipeline->expects($this->once())->method('exec')->willReturn(['ok']);
+
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('pipeline')->willThrowException(new RedisException('went away'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('pipeline')->willReturn($pipeline);
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient, ['command_retries' => 1]);
+
+        $this->assertSame(['ok'], $connection->pipeline(function ($pipe) {
+            //
+        }));
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testPipelineIsNotRetriedByDefault()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('pipeline')->willThrowException(new RedisException('went away'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->never())->method('pipeline');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        try {
+            $connection->pipeline(function ($pipe) {
+                //
+            });
+            $this->fail('Expected RedisException was not thrown.');
+        } catch (RedisException $e) {
+            $this->assertSame('went away', $e->getMessage());
+        }
+
+        $this->assertSame($healthyClient, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testSubscribeResubscribesAfterTransientError()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('subscribe')->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('subscribe')->with(['channel'], $this->isInstanceOf(\Closure::class));
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient, ['command_retries' => 1]);
+
+        $connection->subscribe('channel', function () {
+            //
+        });
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testBackoffDelayIsZeroWithoutConfiguredBase()
+    {
+        $connection = new TestablePhpRedisConnection($this->createStub(\Redis::class), null, [
+            'backoff_algorithm' => 'constant',
+        ]);
+
+        $this->assertSame(0, $connection->testBackoffDelay(0, 0));
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testBackoffDelayForConstantAlgorithm()
+    {
+        $connection = new TestablePhpRedisConnection($this->createStub(\Redis::class), null, [
+            'backoff_algorithm' => 'constant', 'backoff_base' => 100, 'backoff_cap' => 1000,
+        ]);
+
+        $this->assertSame(100, $connection->testBackoffDelay(0, 0));
+        $this->assertSame(100, $connection->testBackoffDelay(5, 100));
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testBackoffDelayForExponentialAlgorithmIsCapped()
+    {
+        $connection = new TestablePhpRedisConnection($this->createStub(\Redis::class), null, [
+            'backoff_algorithm' => 'exponential', 'backoff_base' => 100, 'backoff_cap' => 1000,
+        ]);
+
+        $this->assertSame(100, $connection->testBackoffDelay(0, 0));
+        $this->assertSame(200, $connection->testBackoffDelay(1, 0));
+        $this->assertSame(800, $connection->testBackoffDelay(3, 0));
+        $this->assertSame(1000, $connection->testBackoffDelay(4, 0));
+        $this->assertSame(1000, $connection->testBackoffDelay(20, 0));
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testBackoffDelayForDefaultAlgorithmUsesBaseAfterFirstRetry()
+    {
+        $connection = new TestablePhpRedisConnection($this->createStub(\Redis::class), null, [
+            'backoff_base' => 100, 'backoff_cap' => 1000,
+        ]);
+
+        $first = $connection->testBackoffDelay(0, 0);
+
+        $this->assertGreaterThanOrEqual(0, $first);
+        $this->assertLessThanOrEqual(100, $first);
+        $this->assertSame(100, $connection->testBackoffDelay(1, $first));
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testBackoffDelayForDecorrelatedJitterAlgorithmStaysWithinBounds()
+    {
+        $connection = new TestablePhpRedisConnection($this->createStub(\Redis::class), null, [
+            'backoff_algorithm' => 'decorrelated_jitter', 'backoff_base' => 100, 'backoff_cap' => 1000,
+        ]);
+
+        $delay = $connection->testBackoffDelay(0, 0);
+
+        $this->assertGreaterThanOrEqual(0, $delay);
+        $this->assertLessThanOrEqual(100, $delay);
+
+        $next = $connection->testBackoffDelay(1, 400);
+
+        $this->assertGreaterThanOrEqual(100, $next);
+        $this->assertLessThanOrEqual(1000, $next);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testBackoffDelayAcceptsPhpRedisAlgorithmConstants()
+    {
+        $connection = new TestablePhpRedisConnection($this->createStub(\Redis::class), null, [
+            'backoff_algorithm' => \Redis::BACKOFF_ALGORITHM_CONSTANT, 'backoff_base' => 100, 'backoff_cap' => 1000,
+        ]);
+
+        $this->assertSame(100, $connection->testBackoffDelay(3, 0));
+    }
 }
 
 class ClusterStubPhpRedisConnector extends PhpRedisConnector
@@ -428,6 +665,14 @@ class ClusterStubPhpRedisConnector extends PhpRedisConnector
                 throw new RedisException('Connection lost');
             }
         };
+    }
+}
+
+class TestablePhpRedisConnection extends PhpRedisConnection
+{
+    public function testBackoffDelay(int $attempt, int $previousDelay): int
+    {
+        return $this->backoffDelay($attempt, $previousDelay);
     }
 }
 

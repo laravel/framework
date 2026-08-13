@@ -5,8 +5,11 @@ namespace Illuminate\Redis\Connections;
 use Closure;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Redis;
 use RedisException;
+use Throwable;
 
 /**
  * @mixin \Redis
@@ -40,6 +43,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         'hlen',
         'hmget',
         'hmset',
+        'hscan',
         'hstrlen',
         'hvals',
         'keys',
@@ -52,6 +56,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         'ping',
         'pttl',
         'randomkey',
+        'scan',
         'scard',
         'sdiff',
         'sinter',
@@ -59,6 +64,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         'smembers',
         'smismember',
         'srandmember',
+        'sscan',
         'strlen',
         'sunion',
         'time',
@@ -76,7 +82,31 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         'zrange',
         'zrank',
         'zrevrank',
+        'zscan',
         'zscore',
+    ];
+
+    /**
+     * The error messages that indicate a transient connection failure.
+     *
+     * @var list<string>
+     */
+    protected const TRANSIENT_ERROR_MESSAGES = [
+        "can't write against a read only replica",
+        'connection closed',
+        'connection lost',
+        'connection refused',
+        'connection timed out',
+        'error while reading',
+        'failed while reconnecting',
+        'getaddrinfo',
+        'loading',
+        'name or service not known',
+        'php_network_getaddresses',
+        'read error on connection',
+        'readonly',
+        'socket',
+        'went away',
     ];
 
     /**
@@ -376,16 +406,18 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function scan($cursor, $options = [])
     {
-        $result = $this->client->scan($cursor,
-            $options['match'] ?? '*',
-            $options['count'] ?? 10
-        );
+        return $this->retryOnTransientErrors($this->commandRetries('scan'), function () use ($cursor, $options) {
+            $result = $this->client->scan($cursor,
+                $options['match'] ?? '*',
+                $options['count'] ?? 10
+            );
 
-        if ($result === false) {
-            $result = [];
-        }
+            if ($result === false) {
+                $result = [];
+            }
 
-        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+            return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+        });
     }
 
     /**
@@ -398,16 +430,18 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function zscan($key, $cursor, $options = [])
     {
-        $result = $this->client->zscan($key, $cursor,
-            $options['match'] ?? '*',
-            $options['count'] ?? 10
-        );
+        return $this->retryOnTransientErrors($this->commandRetries('zscan'), function () use ($key, $cursor, $options) {
+            $result = $this->client->zscan($key, $cursor,
+                $options['match'] ?? '*',
+                $options['count'] ?? 10
+            );
 
-        if ($result === false) {
-            $result = [];
-        }
+            if ($result === false) {
+                $result = [];
+            }
 
-        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+            return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+        });
     }
 
     /**
@@ -420,16 +454,18 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function hscan($key, $cursor, $options = [])
     {
-        $result = $this->client->hscan($key, $cursor,
-            $options['match'] ?? '*',
-            $options['count'] ?? 10
-        );
+        return $this->retryOnTransientErrors($this->commandRetries('hscan'), function () use ($key, $cursor, $options) {
+            $result = $this->client->hscan($key, $cursor,
+                $options['match'] ?? '*',
+                $options['count'] ?? 10
+            );
 
-        if ($result === false) {
-            $result = [];
-        }
+            if ($result === false) {
+                $result = [];
+            }
 
-        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+            return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+        });
     }
 
     /**
@@ -442,16 +478,18 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function sscan($key, $cursor, $options = [])
     {
-        $result = $this->client->sscan($key, $cursor,
-            $options['match'] ?? '*',
-            $options['count'] ?? 10
-        );
+        return $this->retryOnTransientErrors($this->commandRetries('sscan'), function () use ($key, $cursor, $options) {
+            $result = $this->client->sscan($key, $cursor,
+                $options['match'] ?? '*',
+                $options['count'] ?? 10
+            );
 
-        if ($result === false) {
-            $result = [];
-        }
+            if ($result === false) {
+                $result = [];
+            }
 
-        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+            return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+        });
     }
 
     /**
@@ -462,11 +500,13 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function pipeline(?callable $callback = null)
     {
-        $pipeline = $this->client()->pipeline();
+        return $this->retryOnTransientErrors((int) ($this->config['command_retries'] ?? 0), function () use ($callback) {
+            $pipeline = $this->client()->pipeline();
 
-        return is_null($callback)
-            ? $pipeline
-            : tap($pipeline, $callback)->exec();
+            return is_null($callback)
+                ? $pipeline
+                : tap($pipeline, $callback)->exec();
+        });
     }
 
     /**
@@ -477,11 +517,13 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function transaction(?callable $callback = null)
     {
-        $transaction = $this->client()->multi();
+        return $this->retryOnTransientErrors((int) ($this->config['command_retries'] ?? 0), function () use ($callback) {
+            $transaction = $this->client()->multi();
 
-        return is_null($callback)
-            ? $transaction
-            : tap($transaction, $callback)->exec();
+            return is_null($callback)
+                ? $transaction
+                : tap($transaction, $callback)->exec();
+        });
     }
 
     /**
@@ -521,8 +563,10 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function subscribe($channels, Closure $callback)
     {
-        $this->client->subscribe((array) $channels, function ($redis, $channel, $message) use ($callback) {
-            $callback($message, $channel);
+        $this->retryOnTransientErrors((int) ($this->config['command_retries'] ?? 0), function () use ($channels, $callback) {
+            $this->client->subscribe((array) $channels, function ($redis, $channel, $message) use ($callback) {
+                $callback($message, $channel);
+            });
         });
     }
 
@@ -535,8 +579,10 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function psubscribe($channels, Closure $callback)
     {
-        $this->client->psubscribe((array) $channels, function ($redis, $pattern, $channel, $message) use ($callback) {
-            $callback($message, $channel);
+        $this->retryOnTransientErrors((int) ($this->config['command_retries'] ?? 0), function () use ($channels, $callback) {
+            $this->client->psubscribe((array) $channels, function ($redis, $pattern, $channel, $message) use ($callback) {
+                $callback($message, $channel);
+            });
         });
     }
 
@@ -591,26 +637,58 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function command($method, array $parameters = [])
     {
-        $retries = max(
-            $this->isRetryable($method, $parameters) ? 1 : 0,
-            (int) ($this->config['command_retries'] ?? 0),
+        return $this->retryOnTransientErrors(
+            $this->commandRetries($method, $parameters),
+            fn () => parent::command($method, $parameters)
         );
+    }
+
+    /**
+     * Run the given callback, retrying when a transient connection failure occurs.
+     *
+     * @param  int  $retries
+     * @param  callable  $callback
+     * @return mixed
+     *
+     * @throws \RedisException
+     */
+    protected function retryOnTransientErrors($retries, callable $callback)
+    {
+        $attempts = 0;
+        $delay = 0;
 
         while (true) {
             try {
-                return parent::command($method, $parameters);
+                return $callback();
             } catch (RedisException $e) {
-                if (! Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'READONLY', 'Connection lost'])) {
+                if (! $this->causedByTransientError($e)) {
                     throw $e;
                 }
 
-                $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+                $this->reconnect();
 
-                if ($retries-- === 0) {
+                if ($attempts >= $retries) {
                     throw $e;
                 }
+
+                $delay = $this->backoff($attempts++, $delay);
             }
         }
+    }
+
+    /**
+     * Determine the number of times the given command may be retried.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return int
+     */
+    protected function commandRetries($method, array $parameters = [])
+    {
+        return max(
+            $this->isRetryable($method, $parameters) ? 1 : 0,
+            (int) ($this->config['command_retries'] ?? 0),
+        );
     }
 
     /**
@@ -629,6 +707,119 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         }
 
         return in_array($method, static::RETRYABLE_COMMANDS, true);
+    }
+
+    /**
+     * Determine if the given exception was caused by a transient connection failure.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function causedByTransientError(Throwable $e)
+    {
+        return Str::contains($e->getMessage(), static::TRANSIENT_ERROR_MESSAGES, true);
+    }
+
+    /**
+     * Reconnect to the Redis server, replacing the underlying client.
+     *
+     * @return void
+     */
+    protected function reconnect()
+    {
+        if (! $this->connector) {
+            return;
+        }
+
+        try {
+            $this->disconnect();
+        } catch (Throwable) {
+            //
+        }
+
+        try {
+            $this->client = call_user_func($this->connector);
+        } catch (RedisException) {
+            //
+        } catch (Throwable $e) {
+            if (! $this->causedByTransientError($e)) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Pause execution before the next retry attempt.
+     *
+     * @param  int  $attempt
+     * @param  int  $previousDelay
+     * @return int
+     */
+    protected function backoff($attempt, $previousDelay)
+    {
+        $delay = $this->backoffDelay($attempt, $previousDelay);
+
+        if ($delay > 0) {
+            Sleep::usleep($delay * 1000);
+        }
+
+        return $delay;
+    }
+
+    /**
+     * Calculate the backoff delay in milliseconds for the given retry attempt.
+     *
+     * Mirrors the backoff algorithms provided by PhpRedis using the same
+     * "backoff_algorithm", "backoff_base", and "backoff_cap" options.
+     *
+     * @param  int  $attempt
+     * @param  int  $previousDelay
+     * @return int
+     */
+    protected function backoffDelay($attempt, $previousDelay)
+    {
+        $base = (int) ($this->config['backoff_base'] ?? 0);
+        $cap = (int) ($this->config['backoff_cap'] ?? 1000);
+
+        if ($base <= 0) {
+            return 0;
+        }
+
+        $exponential = min($cap, $base * (1 << min($attempt, 10)));
+
+        return match ($this->backoffAlgorithm()) {
+            Redis::BACKOFF_ALGORITHM_DECORRELATED_JITTER => min($cap, random_int(min($base, $previousDelay * 3), max($base, $previousDelay * 3))),
+            Redis::BACKOFF_ALGORITHM_FULL_JITTER => random_int(0, $exponential),
+            Redis::BACKOFF_ALGORITHM_EQUAL_JITTER => intdiv($exponential, 2) + intdiv(random_int(0, $exponential), 2),
+            Redis::BACKOFF_ALGORITHM_EXPONENTIAL => $exponential,
+            Redis::BACKOFF_ALGORITHM_UNIFORM => min($cap, random_int(0, $base)),
+            Redis::BACKOFF_ALGORITHM_CONSTANT => min($cap, $base),
+            default => $attempt > 0 ? min($cap, $base) : min($cap, random_int(0, $base)),
+        };
+    }
+
+    /**
+     * Get the backoff algorithm used when retrying commands.
+     *
+     * @return int
+     */
+    protected function backoffAlgorithm()
+    {
+        $algorithm = $this->config['backoff_algorithm'] ?? Redis::BACKOFF_ALGORITHM_DEFAULT;
+
+        if (is_int($algorithm)) {
+            return $algorithm;
+        }
+
+        return match ($algorithm) {
+            'decorrelated_jitter' => Redis::BACKOFF_ALGORITHM_DECORRELATED_JITTER,
+            'full_jitter' => Redis::BACKOFF_ALGORITHM_FULL_JITTER,
+            'equal_jitter' => Redis::BACKOFF_ALGORITHM_EQUAL_JITTER,
+            'exponential' => Redis::BACKOFF_ALGORITHM_EXPONENTIAL,
+            'uniform' => Redis::BACKOFF_ALGORITHM_UNIFORM,
+            'constant' => Redis::BACKOFF_ALGORITHM_CONSTANT,
+            default => Redis::BACKOFF_ALGORITHM_DEFAULT,
+        };
     }
 
     /**
