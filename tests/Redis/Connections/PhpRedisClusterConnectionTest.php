@@ -16,11 +16,11 @@ class PhpRedisClusterConnectionTest extends TestCase
         $client = Mockery::mock(\RedisCluster::class);
         $client->expects('_masters')->andReturn([['127.0.0.1', '6379']]);
         $client->expects('scan')
-            ->with(null, ['127.0.0.1', '6379'], '*', 10)
+            ->with(0, ['127.0.0.1', '6379'], '*', 10)
             ->andReturn(['key']);
 
         $connection = new PhpRedisClusterConnection($client);
-        $this->assertEquals(['1:', ['key']], $connection->scan(0));
+        $this->assertEquals([0, ['key']], $connection->scan(0));
     }
 
     public function testItScansUsingOptionNode()
@@ -51,7 +51,7 @@ class PhpRedisClusterConnectionTest extends TestCase
         $client = Mockery::mock(\RedisCluster::class);
         $client->expects('_masters')->andReturn([['127.0.0.1', '6379']]);
         $client->expects('scan')
-            ->with(null, ['127.0.0.1', '6379'], '*', 10)
+            ->with(0, ['127.0.0.1', '6379'], '*', 10)
             ->andReturn(false);
 
         $connection = new PhpRedisClusterConnection($client);
@@ -92,30 +92,49 @@ class PhpRedisClusterConnectionTest extends TestCase
 
         $client = Mockery::mock(\RedisCluster::class);
         $client->allows('_masters')->andReturn($masters);
-        $client->expects('scan')->with(null, $masters[0], '*', 10)->andReturn(['a']);
-        $client->expects('scan')->with(null, $masters[1], '*', 10)->andReturn(['b']);
-        $client->expects('scan')->with(null, $masters[2], '*', 10)->andReturn(['c']);
+        $client->expects('scan')->with(0, $masters[0], '*', 10)->andReturn(['a']);
+        $client->expects('scan')->with(0, $masters[1], '*', 10)->andReturn(['b']);
+        $client->expects('scan')->with(0, $masters[2], '*', 10)->andReturn(['c']);
 
         $connection = new PhpRedisClusterConnection($client);
 
-        $this->assertEquals(['1:', ['a']], $connection->scan(0));
-        $this->assertEquals(['2:', ['b']], $connection->scan('1:'));
-        $this->assertEquals(['3:', ['c']], $connection->scan('2:'));
-        $this->assertFalse($connection->scan('3:'));
+        [$cursor, $keys] = $connection->scan(0);
+        $this->assertSame(['a'], $keys);
+
+        [$cursor, $keys] = $connection->scan($cursor);
+        $this->assertSame(['b'], $keys);
+
+        $this->assertSame([0, ['c']], $connection->scan($cursor));
     }
 
     public function testItResumesAMasterFromTheEncodedCursor()
     {
-        $masters = [['127.0.0.1', '6379'], ['127.0.0.2', '6379']];
+        $masters = [['127.0.0.1', '6379']];
 
         $client = Mockery::mock(\RedisCluster::class);
         $client->allows('_masters')->andReturn($masters);
         $client->expects('scan')
-            ->with(42, $masters[1], '*', 10)
-            ->andReturn(['key']);
+            ->with(0, $masters[0], '*', 10)
+            ->andReturnUsing(function (&$cursor) {
+                $cursor = 42;
+
+                return ['first'];
+            });
+        $client->expects('scan')
+            ->with(42, $masters[0], '*', 10)
+            ->andReturnUsing(function (&$cursor) {
+                $cursor = 0;
+
+                return ['last'];
+            });
 
         $connection = new PhpRedisClusterConnection($client);
-        $this->assertEquals(['1:42', ['key']], $connection->scan('1:42'));
+
+        [$cursor, $keys] = $connection->scan(0);
+
+        $this->assertStringStartsWith('laravel:', $cursor);
+        $this->assertSame(['first'], $keys);
+        $this->assertSame([0, ['last']], $connection->scan($cursor));
     }
 
     public function testItKeepsScanningWhenAMasterReturnsNoKeys()
@@ -124,10 +143,77 @@ class PhpRedisClusterConnectionTest extends TestCase
 
         $client = Mockery::mock(\RedisCluster::class);
         $client->allows('_masters')->andReturn($masters);
-        $client->expects('scan')->with(null, $masters[0], '*', 10)->andReturn([]);
-        $client->expects('scan')->with(null, $masters[1], '*', 10)->andReturn(['key']);
+        $client->expects('scan')->with(0, $masters[0], '*', 10)->andReturn([]);
+        $client->expects('scan')->with(0, $masters[1], '*', 10)->andReturn(['key']);
 
         $connection = new PhpRedisClusterConnection($client);
-        $this->assertEquals(['2:', ['key']], $connection->scan(0));
+        $this->assertEquals([0, ['key']], $connection->scan(0));
+    }
+
+    public function testItPreservesLargeStringCursors()
+    {
+        $master = ['127.0.0.1', '6379'];
+        $largeCursor = '18446744073709551615';
+
+        $client = Mockery::mock(\RedisCluster::class);
+        $client->allows('_masters')->andReturn([$master]);
+        $client->expects('scan')
+            ->with(null, $master, '*', 10)
+            ->andReturnUsing(function (&$cursor) use ($largeCursor) {
+                $cursor = $largeCursor;
+
+                return ['first'];
+            });
+        $client->expects('scan')
+            ->with($largeCursor, $master, '*', 10)
+            ->andReturnUsing(function (&$cursor) {
+                $cursor = '0';
+
+                return ['last'];
+            });
+
+        $connection = new PhpRedisClusterConnection($client);
+
+        [$cursor] = $connection->scan(null);
+
+        $this->assertSame([null, ['last']], $connection->scan($cursor));
+    }
+
+    public function testItKeepsNodeAffinityWhenMastersAreReordered()
+    {
+        $masters = [['127.0.0.1', '6379'], ['127.0.0.2', '6379']];
+
+        $client = Mockery::mock(\RedisCluster::class);
+        $client->expects('_masters')->twice()->andReturn($masters, array_reverse($masters));
+        $client->expects('scan')->with(0, $masters[0], '*', 10)->andReturn(['a']);
+        $client->expects('scan')->with(0, $masters[1], '*', 10)->andReturn(['b']);
+
+        $connection = new PhpRedisClusterConnection($client);
+
+        [$cursor] = $connection->scan(0);
+
+        $this->assertSame([0, ['b']], $connection->scan($cursor));
+    }
+
+    public function testItContinuesWithAnotherMasterWhenTheCurrentMasterDisappears()
+    {
+        $masters = [['127.0.0.1', '6379'], ['127.0.0.2', '6379']];
+
+        $client = Mockery::mock(\RedisCluster::class);
+        $client->expects('_masters')->twice()->andReturn($masters, [$masters[1]]);
+        $client->expects('scan')
+            ->with(0, $masters[0], '*', 10)
+            ->andReturnUsing(function (&$cursor) {
+                $cursor = 42;
+
+                return ['a'];
+            });
+        $client->expects('scan')->with(0, $masters[1], '*', 10)->andReturn(['b']);
+
+        $connection = new PhpRedisClusterConnection($client);
+
+        [$cursor] = $connection->scan(0);
+
+        $this->assertSame([0, ['b']], $connection->scan($cursor));
     }
 }

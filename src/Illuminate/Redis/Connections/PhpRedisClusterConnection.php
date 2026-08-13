@@ -45,31 +45,61 @@ class PhpRedisClusterConnection extends PhpRedisConnection
             throw new InvalidArgumentException('No master nodes found in the cluster.');
         }
 
-        [$master, $cursor] = is_string($cursor) && str_contains($cursor, ':')
-            ? explode(':', $cursor, 2)
-            : [0, ''];
+        if (is_string($cursor) && str_starts_with($cursor, 'laravel:')) {
+            [$scanned, $node, $cursor, $initialCursor] = json_decode(
+                base64_decode(substr($cursor, 8), true), true, flags: JSON_THROW_ON_ERROR
+            );
+        } else {
+            $scanned = [];
+            $node = null;
+            $initialCursor = $cursor;
+        }
 
-        $master = (int) $master;
-        $cursor = $cursor === '' ? null : (int) $cursor;
+        if ($node !== null && ! in_array($node, $masters, true)) {
+            $node = null;
+            $cursor = $initialCursor;
+        }
 
-        while ($master < count($masters)) {
+        while (true) {
+            if ($node === null) {
+                $node = current(array_filter($masters, fn ($master) => ! in_array($master, $scanned, true)));
+
+                if ($node === false) {
+                    return false;
+                }
+
+                $cursor = $initialCursor;
+            }
+
             $result = $this->client->scan($cursor,
-                $masters[$master],
+                $node,
                 $options['match'] ?? '*',
                 $options['count'] ?? 10
             );
 
-            if ((int) $cursor === 0) {
-                $master++;
-                $cursor = null;
+            if ((string) $cursor === '0') {
+                $scanned[] = $node;
+                $node = null;
             }
 
             if (! empty($result)) {
-                return [$master.':'.$cursor, $result];
+                $remainingMasters = array_filter($masters, fn ($master) => ! in_array($master, $scanned, true));
+
+                if ($node === null && empty($remainingMasters)) {
+                    return [$initialCursor, $result];
+                }
+
+                return ['laravel:'.base64_encode(json_encode([
+                    $scanned, $node, $cursor, $initialCursor,
+                ], JSON_THROW_ON_ERROR)), $result];
+            }
+
+            if ($node !== null) {
+                return ['laravel:'.base64_encode(json_encode([
+                    $scanned, $node, $cursor, $initialCursor,
+                ], JSON_THROW_ON_ERROR)), []];
             }
         }
-
-        return false;
     }
 
     /**
