@@ -45,24 +45,22 @@ class FailoverQueueTest extends TestCase
 
     public function test_set_worker_timeout_is_forwarded_to_underlying_connections()
     {
-        $failover = new FailoverQueue($queue = m::mock(QueueManager::class), m::mock(Dispatcher::class), [
+        $queue = Mockery::mock(QueueManager::class);
+        $failover = new FailoverQueue($queue, Mockery::mock(Dispatcher::class), [
             'redis',
             'sync',
         ]);
 
-        $queue->shouldReceive('connection')->once()->with('redis')->andReturn(
-            $redis = new FailoverQueueTestFakeConnection,
-        );
+        $redis = new FailoverQueueTestFakeConnection;
+        $queue->expects('connection')->with('redis')->andReturn($redis);
 
         // Connections without the method are skipped instead of failing
-        $queue->shouldReceive('connection')->once()->with('sync')->andReturn(
-            new \stdClass,
-        );
+        $queue->expects('connection')->with('sync')->andReturn(new \stdClass);
 
         $this->assertSame($failover, $failover->setWorkerTimeout(90));
         $this->assertSame(90, $redis->workerTimeout);
     }
-  
+
     public function test_bulk_respects_job_delays()
     {
         $queue = Mockery::mock(QueueManager::class);
@@ -88,7 +86,7 @@ class FailoverQueueTestFakeConnection
         $this->workerTimeout = $timeout;
 
         return $this;
-    }   
+    }
 }
 
 #[Delay(15)]

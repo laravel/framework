@@ -184,7 +184,7 @@ class RedisQueueTest extends TestCase
     {
         $default = config('queue.connections.redis.queue', 'default');
         $this->queue = new RedisQueue($this->redis[$driver], $default, null, retryAfter: 12345);
-        $this->queue->setContainer($this->container = m::spy(Container::class));
+        $this->queue->setContainer($this->container = Mockery::spy(Container::class));
         $redisKey = $this->getQueueRedisKey($default);
 
         $getJobExpirationTimestamp = function () use ($driver, $redisKey) {
