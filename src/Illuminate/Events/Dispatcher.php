@@ -697,6 +697,7 @@ class Dispatcher implements DispatcherContract
             );
 
             $job->debounceOwner = $debounce['owner'];
+
             $delay ??= $debounce['maxWaitExceeded'] ? 0 : $debounceFor;
         }
 
