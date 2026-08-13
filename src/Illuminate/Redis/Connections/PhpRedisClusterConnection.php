@@ -14,13 +14,6 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     protected $client;
 
     /**
-     * The default node to use from the cluster.
-     *
-     * @var string|array
-     */
-    protected $defaultNode;
-
-    /**
      * Scan all keys based on the given options.
      *
      * @param  mixed  $cursor
@@ -32,17 +25,51 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     #[\Override]
     public function scan($cursor, $options = [])
     {
-        $result = $this->client->scan($cursor,
-            $options['node'] ?? $this->defaultNode(),
-            $options['match'] ?? '*',
-            $options['count'] ?? 10
-        );
+        if (isset($options['node'])) {
+            $result = $this->client->scan($cursor,
+                $options['node'],
+                $options['match'] ?? '*',
+                $options['count'] ?? 10
+            );
 
-        if ($result === false) {
-            $result = [];
+            if ($result === false) {
+                $result = [];
+            }
+
+            return $cursor === 0 && empty($result) ? false : [$cursor, $result];
         }
 
-        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+        $masters = $this->client->_masters();
+
+        if (empty($masters)) {
+            throw new InvalidArgumentException('No master nodes found in the cluster.');
+        }
+
+        [$master, $cursor] = is_string($cursor) && str_contains($cursor, ':')
+            ? explode(':', $cursor, 2)
+            : [0, ''];
+
+        $master = (int) $master;
+        $cursor = $cursor === '' ? null : (int) $cursor;
+
+        while ($master < count($masters)) {
+            $result = $this->client->scan($cursor,
+                $masters[$master],
+                $options['match'] ?? '*',
+                $options['count'] ?? 10
+            );
+
+            if ((int) $cursor === 0) {
+                $master++;
+                $cursor = null;
+            }
+
+            if (! empty($result)) {
+                return [$master.':'.$cursor, $result];
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -61,22 +88,6 @@ class PhpRedisClusterConnection extends PhpRedisConnection
                 ? $this->command('rawCommand', [$master, 'flushdb', 'async'])
                 : $this->command('flushdb', [$master]);
         }
-    }
-
-    /**
-     * Return default node to use for cluster.
-     *
-     * @return string|array
-     *
-     * @throws \InvalidArgumentException
-     */
-    private function defaultNode()
-    {
-        if (! isset($this->defaultNode)) {
-            $this->defaultNode = $this->client->_masters()[0] ?? throw new InvalidArgumentException('Unable to determine default node. No master nodes found in the cluster.');
-        }
-
-        return $this->defaultNode;
     }
 
     /**
