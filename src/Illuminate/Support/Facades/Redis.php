@@ -187,7 +187,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Redis|int|false pfcount(array|string $key_or_keys)
  * @method static \Redis|bool pfmerge(string $dst, array $srckeys)
  * @method static \Redis|string|bool ping(string|null $message = null)
- * @method static mixed pipeline(?callable $callback = null)
+ * @method static \Redis|bool pipeline()
  * @method static \Redis|bool psetex(string $key, int $expire, mixed $value)
  * @method static \Redis|int|false pttl(string $key)
  * @method static \Redis|int|false publish(string $channel, string $message)
