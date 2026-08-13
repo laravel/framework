@@ -14,26 +14,60 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     protected $client;
 
     /**
-     * The default node to use from the cluster.
-     *
-     * @var string|array
-     */
-    protected $defaultNode;
-
-    /**
      * Scan all keys based on the given options.
+     *
+     * SCAN is per-node, so the cursor encodes the master being iterated and its own cursor.
      *
      * @param  mixed  $cursor
      * @param  array  $options
-     * @return mixed
+     * @return array|false
      *
      * @throws \InvalidArgumentException
      */
     #[\Override]
     public function scan($cursor, $options = [])
     {
+        if (isset($options['node'])) {
+            return $this->scanNode($cursor, $options['node'], $options);
+        }
+
+        $masters = $this->masters();
+
+        [$node, $nodeCursor] = $this->parseScanCursor($cursor);
+
+        while ($node < count($masters)) {
+            $keys = $this->client->scan(
+                $nodeCursor,
+                $masters[$node],
+                $options['match'] ?? '*',
+                $options['count'] ?? 10
+            );
+
+            if ((int) $nodeCursor === 0) {
+                $node++;
+                $nodeCursor = $this->freshScanCursor();
+            }
+
+            if (! empty($keys)) {
+                return [$node.':'.$nodeCursor, $keys];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Scan a single node of the cluster.
+     *
+     * @param  mixed  $cursor
+     * @param  string|array  $node
+     * @param  array  $options
+     * @return array|false
+     */
+    protected function scanNode($cursor, $node, array $options)
+    {
         $result = $this->client->scan($cursor,
-            $options['node'] ?? $this->defaultNode(),
+            $node,
             $options['match'] ?? '*',
             $options['count'] ?? 10
         );
@@ -43,6 +77,45 @@ class PhpRedisClusterConnection extends PhpRedisConnection
         }
 
         return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+    }
+
+    /**
+     * Split a scan() cursor into a master index and that master's cursor.
+     *
+     * @param  mixed  $cursor
+     * @return array
+     */
+    protected function parseScanCursor($cursor)
+    {
+        if (is_string($cursor) && str_contains($cursor, ':')) {
+            [$node, $nodeCursor] = explode(':', $cursor, 2);
+
+            return [(int) $node, $nodeCursor === '' ? $this->freshScanCursor() : (int) $nodeCursor];
+        }
+
+        return [0, $this->freshScanCursor()];
+    }
+
+    /**
+     * Get the cursor value that starts a fresh iteration of a node.
+     *
+     * @return string|null
+     */
+    protected function freshScanCursor()
+    {
+        return version_compare(phpversion('redis'), '6.1.0', '>=') ? null : '0';
+    }
+
+    /**
+     * Get the master nodes of the cluster.
+     *
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function masters()
+    {
+        return $this->client->_masters() ?: throw new InvalidArgumentException('No master nodes found in the cluster.');
     }
 
     /**
@@ -61,22 +134,6 @@ class PhpRedisClusterConnection extends PhpRedisConnection
                 ? $this->command('rawCommand', [$master, 'flushdb', 'async'])
                 : $this->command('flushdb', [$master]);
         }
-    }
-
-    /**
-     * Return default node to use for cluster.
-     *
-     * @return string|array
-     *
-     * @throws \InvalidArgumentException
-     */
-    private function defaultNode()
-    {
-        if (! isset($this->defaultNode)) {
-            $this->defaultNode = $this->client->_masters()[0] ?? throw new InvalidArgumentException('Unable to determine default node. No master nodes found in the cluster.');
-        }
-
-        return $this->defaultNode;
     }
 
     /**
