@@ -42,7 +42,7 @@ class DevCommandTest extends TestCase
     public function testMultiplexCommandDefaultsToTabs()
     {
         $this->assertSame(
-            "@laravel/multiplex@0.4.2 --title 'artisan dev · my-app' "
+            "@laravel/multiplex --title 'artisan dev · my-app' "
                 ."'server@#93c5fd,php artisan serve' 'vite@#fcd34d,npm run dev'",
             $this->command()->buildMultiplexCommandForTesting($this->devCommands())
         );
