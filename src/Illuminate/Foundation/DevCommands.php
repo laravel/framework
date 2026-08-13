@@ -97,7 +97,7 @@ class DevCommands
         self::artisan('serve', 'server');
         self::artisan('queue:listen --tries=1 --timeout=0', 'queue');
 
-        if (function_exists('pcntl_fork') && class_exists(PailServiceProvider::class)) {
+        if (function_exists('pcntl_fork') && app()->providerIsLoaded(PailServiceProvider::class)) {
             self::artisan('pail --timeout=0', 'logs');
         }
 
