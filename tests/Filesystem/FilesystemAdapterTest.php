@@ -19,7 +19,7 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -47,8 +47,6 @@ class FilesystemAdapterTest extends TestCase
         $filesystem->deleteDirectory(basename($this->tempDir));
 
         unset($this->tempDir, $this->filesystem, $this->adapter);
-
-        parent::tearDown();
     }
 
     public function testResponse()
@@ -70,7 +68,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
-        $files = m::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
+        $files = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
         $files->shouldReceive('mimeType')->never();
 
         $files->response('file.txt', null, [
@@ -82,7 +80,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
-        $files = m::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
+        $files = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
         $files->shouldReceive('size')->never();
 
         $files->response('file.txt', null, [
@@ -94,7 +92,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
-        $files = m::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])
+        $files = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
         $files->shouldReceive('fallbackName')->never();
@@ -566,10 +564,9 @@ class FilesystemAdapterTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = m::mock(ExceptionHandler::class);
+        $exceptionHandler = Mockery::mock(ExceptionHandler::class);
 
-        $exceptionHandler->shouldReceive('report')
-            ->once()
+        $exceptionHandler->expects('report')
             ->andReturnUsing(function (UnableToReadFile $e) {
                 $this->assertStringContainsString(
                     'Unable to read file from location: foo.txt.',
@@ -594,10 +591,9 @@ class FilesystemAdapterTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = m::mock(ExceptionHandler::class);
+        $exceptionHandler = Mockery::mock(ExceptionHandler::class);
 
-        $exceptionHandler->shouldReceive('report')
-            ->once()
+        $exceptionHandler->expects('report')
             ->andReturnUsing(function (UnableToReadFile $e) {
                 $this->assertStringContainsString(
                     'Unable to read file from location: foo.txt.',
@@ -622,10 +618,9 @@ class FilesystemAdapterTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = m::mock(ExceptionHandler::class);
+        $exceptionHandler = Mockery::mock(ExceptionHandler::class);
 
-        $exceptionHandler->shouldReceive('report')
-            ->once()
+        $exceptionHandler->expects('report')
             ->andReturnUsing(function (UnableToWriteFile $e) {
                 $this->assertStringContainsString(
                     'Unable to write file at location: foo.txt.',
@@ -656,10 +651,9 @@ class FilesystemAdapterTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = m::mock(ExceptionHandler::class);
+        $exceptionHandler = Mockery::mock(ExceptionHandler::class);
 
-        $exceptionHandler->shouldReceive('report')
-            ->once()
+        $exceptionHandler->expects('report')
             ->andReturnUsing(function (UnableToRetrieveMetadata $e) {
                 $this->assertStringContainsString(
                     'Unable to retrieve the mime_type for file at location: unknown.mime-type.',
@@ -835,6 +829,17 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->providesTemporaryUploadUrls());
     }
 
+    public function testProvidesTemporaryUploadUrlsForS3Adapter()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $filesystemAdapter = $filesystem->createS3Driver([
+            'region' => 'us-west-1',
+            'bucket' => 'laravel',
+        ]);
+
+        $this->assertTrue($filesystemAdapter->providesTemporaryUploadUrls());
+    }
+
     public function testProvidesTemporaryUploadUrlsForAdapterWithoutTemporaryUploadUrlSupport()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -854,8 +859,7 @@ class FilesystemAdapterTest extends TestCase
         $this->filesystem->write('foo/file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Disk is not empty.');
+        $this->expectExceptionObject(new ExpectationFailedException('Disk is not empty.'));
 
         $filesystemAdapter->assertEmpty();
     }

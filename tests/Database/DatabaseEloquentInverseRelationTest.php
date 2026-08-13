@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsInverseRelations;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Stringable;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -18,8 +18,8 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 {
     public function testBuilderCallbackIsNotAppliedWhenInverseRelationIsNotSet()
     {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationRelatedStub());
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->andReturn(new HasInverseRelationRelatedStub());
         $builder->shouldReceive('afterQuery')->never();
 
         new HasInverseRelationStub($builder, new HasInverseRelationParentStub());
@@ -27,8 +27,8 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
     public function testBuilderCallbackIsNotSetIfInverseRelationIsEmptyString()
     {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationRelatedStub());
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->times(2)->andReturn(new HasInverseRelationRelatedStub());
         $builder->shouldReceive('afterQuery')->never();
 
         $this->expectException(RelationNotFoundException::class);
@@ -38,8 +38,8 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
     public function testBuilderCallbackIsNotSetIfInverseRelationshipDoesNotExist()
     {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationRelatedStub());
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->times(3)->andReturn(new HasInverseRelationRelatedStub());
         $builder->shouldReceive('afterQuery')->never();
 
         $this->expectException(RelationNotFoundException::class);
@@ -49,9 +49,9 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
     public function testWithoutInverseMethodRemovesInverseRelation()
     {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationRelatedStub());
-        $builder->shouldReceive('afterQuery')->once()->andReturnSelf();
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->times(2)->andReturn(new HasInverseRelationRelatedStub());
+        $builder->expects('afterQuery')->andReturnSelf();
 
         $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub()));
         $this->assertNull($relation->getInverseRelationship());
@@ -67,27 +67,27 @@ class DatabaseEloquentInverseRelationTest extends TestCase
     {
         $parent = new HasInverseRelationParentStub();
 
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationRelatedStub());
-        $builder->shouldReceive('afterQuery')->withArgs(function (\Closure $callback) use ($parent) {
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->times(2)->andReturn(new HasInverseRelationRelatedStub());
+        $builder->expects('afterQuery')->withArgs(function (\Closure $callback) use ($parent) {
             $relation = (new \ReflectionFunction($callback))->getClosureThis();
 
             return $relation instanceof HasInverseRelationStub && $relation->getParent() === $parent;
-        })->once()->andReturnSelf();
+        })->andReturnSelf();
 
         (new HasInverseRelationStub($builder, $parent))->inverse('test');
     }
 
     public function testBuilderCallbackAppliesInverseRelationToAllModelsInResult()
     {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationRelatedStub());
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->times(2)->andReturn(new HasInverseRelationRelatedStub());
 
         // Capture the callback so that we can manually call it.
         $afterQuery = null;
-        $builder->shouldReceive('afterQuery')->withArgs(function (\Closure $callback) use (&$afterQuery) {
+        $builder->expects('afterQuery')->withArgs(function (\Closure $callback) use (&$afterQuery) {
             return (bool) $afterQuery = $callback;
-        })->once()->andReturnSelf();
+        })->andReturnSelf();
 
         $parent = new HasInverseRelationParentStub();
         (new HasInverseRelationStub($builder, $parent))->inverse('test');
@@ -110,14 +110,14 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
     public function testInverseRelationIsNotSetIfInverseRelationIsUnset()
     {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationRelatedStub());
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->times(2)->andReturn(new HasInverseRelationRelatedStub());
 
         // Capture the callback so that we can manually call it.
         $afterQuery = null;
-        $builder->shouldReceive('afterQuery')->withArgs(function (\Closure $callback) use (&$afterQuery) {
+        $builder->expects('afterQuery')->withArgs(function (\Closure $callback) use (&$afterQuery) {
             return (bool) $afterQuery = $callback;
-        })->once()->andReturnSelf();
+        })->andReturnSelf();
 
         $parent = new HasInverseRelationParentStub();
         $relation = (new HasInverseRelationStub($builder, $parent));
@@ -147,7 +147,7 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
     public function testProvidesPossibleInverseRelationBasedOnParent()
     {
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
         $builder->shouldReceive('getModel')->andReturn(new HasOneInverseChildModel);
 
         $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub));
@@ -158,31 +158,31 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
     public function testProvidesPossibleInverseRelationBasedOnForeignKey()
     {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationParentStub);
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->times(2)->andReturn(new HasInverseRelationParentStub);
 
         $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub, 'test_id'));
 
-        $this->assertTrue(in_array('test', $relation->exposeGetPossibleInverseRelations()));
+        $this->assertContains('test', $relation->exposeGetPossibleInverseRelations());
     }
 
     public function testProvidesPossibleRecursiveRelationsIfRelatedIsTheSameClassAsParent()
     {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn(new HasInverseRelationParentStub);
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->times(2)->andReturn(new HasInverseRelationParentStub);
 
         $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub));
 
-        $this->assertTrue(in_array('parent', $relation->exposeGetPossibleInverseRelations()));
+        $this->assertContains('parent', $relation->exposeGetPossibleInverseRelations());
     }
 
     #[DataProvider('guessedParentRelationsDataProvider')]
     public function testGuessesInverseRelationBasedOnParent($guessedRelation)
     {
-        $related = m::mock(Model::class);
+        $related = Mockery::mock(Model::class);
         $related->shouldReceive('isRelation')->andReturnUsing(fn ($relation) => $relation === $guessedRelation);
 
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
         $builder->shouldReceive('getModel')->andReturn($related);
 
         $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub));
@@ -192,11 +192,11 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
     public function testGuessesPossibleInverseRelationBasedOnForeignKey()
     {
-        $related = m::mock(Model::class);
-        $related->shouldReceive('isRelation')->andReturnUsing(fn ($relation) => $relation === 'test');
+        $related = Mockery::mock(Model::class);
+        $related->expects('isRelation')->andReturnUsing(fn ($relation) => $relation === 'test');
 
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->times(3)->andReturn($related);
 
         $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub, 'test_id'));
 
@@ -205,15 +205,15 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
     public function testGuessesRecursiveInverseRelationsIfRelatedIsSameClassAsParent()
     {
-        $related = m::mock(Model::class);
-        $related->shouldReceive('isRelation')->andReturnUsing(fn ($relation) => $relation === 'parent');
+        $related = Mockery::mock(Model::class);
+        $related->expects('isRelation')->times(4)->andReturnUsing(fn ($relation) => $relation === 'parent');
 
         $parent = clone $related;
-        $parent->shouldReceive('getForeignKey')->andReturn('recursive_parent_id');
-        $parent->shouldReceive('getKeyName')->andReturn('id');
+        $parent->expects('getForeignKey')->andReturn('recursive_parent_id');
+        $parent->expects('getKeyName')->andReturn('id');
 
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->times(6)->andReturn($related);
 
         $relation = (new HasInverseRelationStub($builder, $parent));
 
@@ -223,12 +223,12 @@ class DatabaseEloquentInverseRelationTest extends TestCase
     #[DataProvider('guessedParentRelationsDataProvider')]
     public function testSetsGuessedInverseRelationBasedOnParent($guessedRelation)
     {
-        $related = m::mock(Model::class);
+        $related = Mockery::mock(Model::class);
         $related->shouldReceive('isRelation')->andReturnUsing(fn ($relation) => $relation === $guessedRelation);
 
-        $builder = m::mock(Builder::class);
+        $builder = Mockery::mock(Builder::class);
         $builder->shouldReceive('getModel')->andReturn($related);
-        $builder->shouldReceive('afterQuery')->once()->andReturnSelf();
+        $builder->expects('afterQuery')->andReturnSelf();
 
         $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub))->inverse();
 
@@ -237,16 +237,16 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
     public function testSetsRecursiveInverseRelationsIfRelatedIsSameClassAsParent()
     {
-        $related = m::mock(Model::class);
-        $related->shouldReceive('isRelation')->andReturnUsing(fn ($relation) => $relation === 'parent');
+        $related = Mockery::mock(Model::class);
+        $related->expects('isRelation')->times(5)->andReturnUsing(fn ($relation) => $relation === 'parent');
 
         $parent = clone $related;
-        $parent->shouldReceive('getForeignKey')->andReturn('recursive_parent_id');
-        $parent->shouldReceive('getKeyName')->andReturn('id');
+        $parent->expects('getForeignKey')->andReturn('recursive_parent_id');
+        $parent->expects('getKeyName')->andReturn('id');
 
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
-        $builder->shouldReceive('afterQuery')->once()->andReturnSelf();
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->times(7)->andReturn($related);
+        $builder->expects('afterQuery')->andReturnSelf();
 
         $relation = (new HasInverseRelationStub($builder, $parent))->inverse();
 
@@ -255,12 +255,12 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
     public function testSetsGuessedInverseRelationBasedOnForeignKey()
     {
-        $related = m::mock(Model::class);
-        $related->shouldReceive('isRelation')->andReturnUsing(fn ($relation) => $relation === 'test');
+        $related = Mockery::mock(Model::class);
+        $related->expects('isRelation')->times(2)->andReturnUsing(fn ($relation) => $relation === 'test');
 
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
-        $builder->shouldReceive('afterQuery')->once()->andReturnSelf();
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('getModel')->times(4)->andReturn($related);
+        $builder->expects('afterQuery')->andReturnSelf();
 
         $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub, 'test_id'))->inverse();
 
@@ -269,9 +269,9 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
     public function testOnlyHydratesInverseRelationOnModels()
     {
-        $relation = m::mock(HasInverseRelationStub::class)->shouldAllowMockingProtectedMethods()->makePartial();
-        $relation->shouldReceive('getParent')->andReturn(new HasInverseRelationParentStub);
-        $relation->shouldReceive('applyInverseRelationToModel')->times(6);
+        $relation = Mockery::mock(HasInverseRelationStub::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $relation->expects('getParent')->andReturn(new HasInverseRelationParentStub);
+        $relation->expects('applyInverseRelationToModel')->times(6);
         $relation->exposeApplyInverseRelationToCollection([
             new HasInverseRelationRelatedStub(),
             12345,

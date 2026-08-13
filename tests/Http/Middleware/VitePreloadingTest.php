@@ -17,8 +17,6 @@ class VitePreloadingTest extends TestCase
     {
         Facade::setFacadeApplication(null);
         Facade::clearResolvedInstances();
-
-        parent::tearDown();
     }
 
     public function testItDoesNotSetLinkTagWhenNoTagsHaveBeenPreloaded()

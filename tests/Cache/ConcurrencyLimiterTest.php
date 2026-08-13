@@ -19,8 +19,6 @@ class ConcurrencyLimiterTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->repository = new Repository(new ArrayStore);
     }
 
@@ -237,13 +235,12 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testFunnelThrowsExceptionWhenStoreDoesNotSupportLocks()
     {
-        $store = $this->createMock(Store::class);
+        $store = $this->createStub(Store::class);
         $repository = new Repository($store);
 
         $this->assertNotInstanceOf(LockProvider::class, $store);
 
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('This cache store does not support locks.');
+        $this->expectExceptionObject(new BadMethodCallException('This cache store does not support locks.'));
 
         $repository->funnel('test');
     }

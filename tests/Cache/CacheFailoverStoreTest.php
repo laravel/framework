@@ -8,16 +8,11 @@ use Illuminate\Cache\FailoverStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Events\Dispatcher;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class CacheFailoverStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testImplementsCanFlushLocks()
     {
         $store = $this->makeFailoverStore([]);
@@ -33,11 +28,11 @@ class CacheFailoverStoreTest extends TestCase
         $storeA->lock('lock-a', 60)->get();
         $storeB->lock('lock-b', 60)->get();
 
-        $cache = m::mock(CacheManager::class);
-        $cache->shouldReceive('store')->with('store-a')->andReturn(new Repository($storeA));
-        $cache->shouldReceive('store')->with('store-b')->andReturn(new Repository($storeB));
+        $cache = Mockery::mock(CacheManager::class);
+        $cache->expects('store')->with('store-a')->andReturn(new Repository($storeA));
+        $cache->expects('store')->with('store-b')->andReturn(new Repository($storeB));
 
-        $failover = new FailoverStore($cache, m::mock(Dispatcher::class), ['store-a', 'store-b']);
+        $failover = new FailoverStore($cache, Mockery::mock(Dispatcher::class), ['store-a', 'store-b']);
 
         $result = $failover->flushLocks();
 
@@ -56,8 +51,8 @@ class CacheFailoverStoreTest extends TestCase
     protected function makeFailoverStore(array $stores): FailoverStore
     {
         return new FailoverStore(
-            m::mock(CacheManager::class),
-            m::mock(Dispatcher::class),
+            Mockery::mock(CacheManager::class),
+            Mockery::mock(Dispatcher::class),
             $stores
         );
     }

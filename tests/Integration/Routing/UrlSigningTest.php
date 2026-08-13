@@ -9,6 +9,7 @@ use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 
@@ -69,8 +70,7 @@ class UrlSigningTest extends TestCase
 
     public function testTemporarySignedUrlsWithExpiresParameter()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('reserved');
+        $this->expectExceptionObject(new InvalidArgumentException('reserved'));
 
         Route::get('/foo/{id}', function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';
@@ -136,6 +136,44 @@ class UrlSigningTest extends TestCase
 
         $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]));
         $this->assertSame('invalid', $this->get($url.'&appended')->original);
+    }
+
+    public function testSignedUrlPrefersVaporRawQueryStringOverQueryString()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]));
+        $originalQueryString = Str::after($url, '?');
+
+        $this->withServerVariables(['VAPOR_RAW_QUERY_STRING' => $originalQueryString]);
+
+        $this->assertSame('valid', $this->get($url.'&tampered=1')->original);
+    }
+
+    public function testSignedUrlIsInvalidWhenVaporRawQueryStringDoesNotMatch()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1, 'extra' => 'value']));
+
+        $this->withServerVariables(['VAPOR_RAW_QUERY_STRING' => str_replace('extra=value', 'extra=tampered', Str::after($url, '?'))]);
+
+        $this->assertSame('invalid', $this->get($url)->original);
+    }
+
+    public function testSignedUrlFallsBackToQueryStringWhenVaporRawQueryStringIsAbsent()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]));
+
+        $this->assertSame('valid', $this->get($url)->original);
     }
 
     public function testSignedUrlParametersParsedCorrectly()

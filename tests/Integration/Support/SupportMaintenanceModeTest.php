@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Support;
+namespace Illuminate\Tests\Integration\Support;
 
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use Illuminate\Support\Facades\MaintenanceMode;

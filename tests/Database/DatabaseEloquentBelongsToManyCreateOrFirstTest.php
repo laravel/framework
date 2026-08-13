@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Mockery;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -24,13 +24,6 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
     protected function setUp(): void
     {
         Carbon::setTestNow('2023-01-01 00:00:00');
-    }
-
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
     }
 
     #[DataProvider('createOrFirstValues')]
@@ -295,7 +288,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = m::mock(BelongsToMany::class)->makePartial();
+                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -368,7 +361,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = m::mock(BelongsToMany::class)->makePartial();
+                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -410,7 +403,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = m::mock(BelongsToMany::class)->makePartial();
+                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -462,7 +455,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = m::mock(BelongsToMany::class)->makePartial();
+                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -512,7 +505,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = m::mock(BelongsToMany::class)->makePartial();
+                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -579,7 +572,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
         $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
         $processor = new $processorClass;
-        $connection = m::mock(Connection::class, ['getPostProcessor' => $processor]);
+        $connection = Mockery::mock(Connection::class, ['getPostProcessor' => $processor]);
         $grammar = new $grammarClass($connection);
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
@@ -587,7 +580,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             return new BaseBuilder($connection, $grammar, $processor);
         });
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
-        $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
 
         foreach ($models as $model) {
             /** @var Model $model */
@@ -595,7 +588,8 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             $class::setConnectionResolver($resolver);
         }
 
-        $connection->shouldReceive('getPdo')->andReturn($pdo = m::mock(PDO::class));
+        $pdo = Mockery::mock(PDO::class);
+        $connection->shouldReceive('getPdo')->andReturn($pdo);
 
         foreach ($lastInsertIds as $id) {
             $pdo->expects('lastInsertId')->andReturn($id);

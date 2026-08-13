@@ -532,11 +532,11 @@ class PendingCommand
             $this->test->fail('Output does not contain "'.Arr::first($this->test->expectedOutputSubstrings).'".');
         }
 
-        if ($output = array_search(true, $this->test->unexpectedOutput)) {
+        if (($output = array_search(true, $this->test->unexpectedOutput)) !== false) {
             $this->test->fail('Output "'.$output.'" was printed.');
         }
 
-        if ($output = array_search(true, $this->test->unexpectedOutputSubstrings)) {
+        if (($output = array_search(true, $this->test->unexpectedOutputSubstrings)) !== false) {
             $this->test->fail('Output "'.$output.'" was printed.');
         }
     }

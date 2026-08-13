@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Mail;
+namespace Illuminate\Tests\Integration\Mail;
 
 use InvalidArgumentException;
 use Orchestra\Testbench\Attributes\WithConfig;
@@ -24,8 +24,7 @@ class MailManagerTest extends TestCase
             'timeout' => null,
         ]);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Unsupported mail transport [{$transport}]");
+        $this->expectExceptionObject(new InvalidArgumentException("Unsupported mail transport [{$transport}]"));
         $this->app['mail.manager']->mailer('custom_smtp');
     }
 
@@ -192,7 +191,9 @@ class MailManagerTest extends TestCase
     public static function emptyTransportConfigDataProvider()
     {
         return [
-            [null], [''], [' '],
+            [null],
+            [''],
+            [' '],
         ];
     }
 }

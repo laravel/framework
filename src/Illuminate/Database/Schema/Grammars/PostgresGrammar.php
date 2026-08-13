@@ -4,8 +4,8 @@ namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Stringable;
 use LogicException;
 
 class PostgresGrammar extends Grammar
@@ -287,7 +287,7 @@ class PostgresGrammar extends Grammar
     {
         $column = $command->column;
 
-        $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column)];
+        $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column).($column->using ? ' using '.$column->using : '')];
 
         foreach ($this->modifiers as $modifier) {
             if ($modifier === 'Collate') {
@@ -758,7 +758,7 @@ class PostgresGrammar extends Grammar
     public function escapeNames($names)
     {
         return array_map(
-            fn ($name) => (new Collection(explode('.', $name)))->map($this->wrapValue(...))->implode('.'),
+            fn ($name) => (new Stringable($name))->explode('.')->map($this->wrapValue(...))->implode('.'),
             $names
         );
     }

@@ -11,7 +11,8 @@ use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
-use Mockery as m;
+use InvalidArgumentException;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -20,8 +21,6 @@ class PruneCommandTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         Application::setInstance($container = new Application(__DIR__.'/Pruning'));
 
         Closure::bind(
@@ -41,8 +40,7 @@ class PruneCommandTest extends TestCase
 
     public function testPrunableModelAndExceptWithEachOther(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The --model and --except options cannot be combined.');
+        $this->expectExceptionObject(new InvalidArgumentException('The --model and --except options cannot be combined.'));
 
         $this->artisan([
             '--model' => Pruning\Models\PrunableTestModelWithPrunableRecords::class,
@@ -235,19 +233,19 @@ class PruneCommandTest extends TestCase
 
     public function testTheCommandDispatchesEvents()
     {
-        $dispatcher = m::mock(DispatcherContract::class);
+        $dispatcher = Mockery::mock(DispatcherContract::class);
 
-        $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
+        $dispatcher->expects('dispatch')->withArgs(function ($event) {
             return get_class($event) === ModelPruningStarting::class &&
                 $event->models === [Pruning\Models\PrunableTestModelWithPrunableRecords::class];
         });
-        $dispatcher->shouldReceive('listen')->once()->with(ModelsPruned::class, m::type(Closure::class));
-        $dispatcher->shouldReceive('dispatch')->twice()->with(m::type(ModelsPruned::class));
-        $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
+        $dispatcher->expects('listen')->with(ModelsPruned::class, Mockery::type(Closure::class));
+        $dispatcher->expects('dispatch')->times(2)->with(Mockery::type(ModelsPruned::class));
+        $dispatcher->expects('dispatch')->withArgs(function ($event) {
             return get_class($event) === ModelPruningFinished::class &&
                 $event->models === [Pruning\Models\PrunableTestModelWithPrunableRecords::class];
         });
-        $dispatcher->shouldReceive('forget')->once()->with(ModelsPruned::class);
+        $dispatcher->expects('forget')->with(ModelsPruned::class);
 
         Application::getInstance()->instance(DispatcherContract::class, $dispatcher);
 
@@ -269,7 +267,5 @@ class PruneCommandTest extends TestCase
     protected function tearDown(): void
     {
         Application::setInstance(null);
-
-        parent::tearDown();
     }
 }

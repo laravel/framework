@@ -143,7 +143,9 @@ abstract class Queue
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new InvalidPayloadException(
-                'Unable to JSON encode payload. Error ('.json_last_error().'): '.json_last_error_msg(), $value
+                sprintf('Unable to JSON encode payload for job [%s] on queue [%s]. Error (%d): %s',
+                    $value['displayName'] ?? 'unknown', $queue, json_last_error(), json_last_error_msg()
+                ), $value
             );
         }
 
@@ -409,6 +411,24 @@ abstract class Queue
         }
 
         return $this->dispatchAfterCommit ?? false;
+    }
+
+    /**
+     * Partition the given jobs by whether they should be deferred until the active database transaction commits.
+     *
+     * @param  array  $jobs
+     * @return array{0: array, 1: array}
+     */
+    protected function partitionJobsByAfterCommit(array $jobs)
+    {
+        if (! isset($this->container) || ! $this->container->bound('db.transactions')) {
+            return [[], $jobs];
+        }
+
+        return (new Collection($jobs))
+            ->partition(fn ($job) => $this->shouldDispatchAfterCommit($job))
+            ->map(fn ($jobs) => $jobs->values()->all())
+            ->all();
     }
 
     /**

@@ -105,8 +105,6 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     protected function tearDown(): void
     {
         $this->schema()->drop('jobs');
-
-        parent::tearDown();
     }
 
     /**

@@ -18,8 +18,6 @@ use function Orchestra\Testbench\phpunit_version_compare;
 
 class BladeTest extends TestCase
 {
-    /** {@inheritdoc} */
-    #[\Override]
     protected function tearDown(): void
     {
         artisan($this, 'view:clear');
@@ -252,7 +250,7 @@ class BladeTest extends TestCase
         View::addNamespace('components', join_paths(__DIR__, 'templates', 'components'));
 
         $compiler = Mockery::mock(app('blade.compiler'))->makePartial();
-        $compiler->shouldReceive('compile')->with(realpath(__DIR__.'/templates/components/panel.blade.php'))->once();
+        $compiler->expects('compile')->with(realpath(__DIR__.'/templates/components/panel.blade.php'));
 
         $this->instance('blade.compiler', $compiler);
 

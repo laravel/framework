@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Query;
 
-use BackedEnum;
 use Closure;
 use DatePeriod;
 use DateTimeInterface;
@@ -24,6 +23,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -503,7 +503,7 @@ class Builder implements BuilderContract
         $this->ensureConnectionSupportsVectors();
 
         if (is_string($vector)) {
-            $vector = Str::of($vector)->toEmbeddings(cache: true);
+            $vector = (new Stringable($vector))->toEmbeddings(cache: true);
         }
 
         $this->addBinding(
@@ -1222,7 +1222,7 @@ class Builder implements BuilderContract
     public function whereVectorSimilarTo($column, $vector, $minSimilarity = 0.6, $order = true)
     {
         if (is_string($vector)) {
-            $vector = Str::of($vector)->toEmbeddings(cache: true);
+            $vector = (new Stringable($vector))->toEmbeddings(cache: true);
         }
 
         $this->whereVectorDistanceLessThan($column, $vector, 1 - $minSimilarity);
@@ -1250,7 +1250,7 @@ class Builder implements BuilderContract
         $this->ensureConnectionSupportsVectors();
 
         if (is_string($vector)) {
-            $vector = Str::of($vector)->toEmbeddings(cache: true);
+            $vector = (new Stringable($vector))->toEmbeddings(cache: true);
         }
 
         return $this->whereRaw(
@@ -1512,7 +1512,7 @@ class Builder implements BuilderContract
         $values = Arr::flatten($values);
 
         foreach ($values as &$value) {
-            $value = (int) ($value instanceof BackedEnum ? $value->value : $value);
+            $value = (int) enum_value($value);
         }
 
         $this->wheres[] = ['type' => $type, 'column' => $column, 'values' => $values, 'boolean' => $boolean];
@@ -3047,7 +3047,7 @@ class Builder implements BuilderContract
         $this->ensureConnectionSupportsVectors();
 
         if (is_string($vector)) {
-            $vector = Str::of($vector)->toEmbeddings(cache: true);
+            $vector = (new Stringable($vector))->toEmbeddings(cache: true);
         }
 
         $this->addBinding(
@@ -3083,7 +3083,7 @@ class Builder implements BuilderContract
      * Add an "order by" clause to order results by a given sequence of values.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|array<\UnitEnum|string|int|float|bool>  $values
      * @return $this
      */
     public function inOrderOf($column, $values)
@@ -3092,7 +3092,7 @@ class Builder implements BuilderContract
             $values = $values->toArray();
         }
 
-        $values = array_values($values);
+        $values = array_map(enum_value(...), array_values($values));
 
         if (empty($values)) {
             return $this;

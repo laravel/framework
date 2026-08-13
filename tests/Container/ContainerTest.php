@@ -11,6 +11,8 @@ use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Container\SelfBuilding;
+use LogicException;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -18,11 +20,16 @@ use TypeError;
 
 class ContainerTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        if (version_compare(PHP_VERSION, '8.5.0', '>=')) {
+            require_once __DIR__.'/Fixtures/ContainerBindWhenFixtures.php';
+        }
+    }
+
     protected function tearDown(): void
     {
         Container::setInstance(null);
-
-        parent::tearDown();
     }
 
     public function testContainerSingleton()
@@ -327,7 +334,7 @@ class ContainerTest extends TestCase
         $container = new Container;
         $instance = $container->make(ContainerClassWithDefaultValueStub::class);
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->noDefault);
-        $this->assertSame(null, $instance->default);
+        $this->assertNull($instance->default);
 
         $container->bind(ContainerConcreteStub::class, fn () => new ContainerConcreteStub);
         $instance = $container->make(ContainerClassWithDefaultValueStub::class);
@@ -432,8 +439,7 @@ class ContainerTest extends TestCase
 
     public function testInternalClassWithDefaultParameters()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class Illuminate\Tests\Container\ContainerMixedPrimitiveStub');
+        $this->expectExceptionObject(new BindingResolutionException('Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class Illuminate\Tests\Container\ContainerMixedPrimitiveStub'));
 
         $container = new Container;
         $container->make(ContainerMixedPrimitiveStub::class, []);
@@ -441,8 +447,7 @@ class ContainerTest extends TestCase
 
     public function testBindingResolutionExceptionMessage()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable.');
+        $this->expectExceptionObject(new BindingResolutionException('Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable.'));
 
         $container = new Container;
         $container->make(IContainerContractStub::class, []);
@@ -450,8 +455,7 @@ class ContainerTest extends TestCase
 
     public function testBindingResolutionExceptionMessageIncludesBuildStack()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable while building [Illuminate\Tests\Container\ContainerDependentStub].');
+        $this->expectExceptionObject(new BindingResolutionException('Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable while building [Illuminate\Tests\Container\ContainerDependentStub].'));
 
         $container = new Container;
         $container->make(ContainerDependentStub::class, []);
@@ -459,8 +463,7 @@ class ContainerTest extends TestCase
 
     public function testBindingResolutionExceptionMessageWhenClassDoesNotExist()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Target class [Foo\Bar\Baz\DummyClass] does not exist.');
+        $this->expectExceptionObject(new BindingResolutionException('Target class [Foo\Bar\Baz\DummyClass] does not exist.'));
 
         $container = new Container;
         $container->build('Foo\Bar\Baz\DummyClass');
@@ -568,11 +571,33 @@ class ContainerTest extends TestCase
 
     public function testItThrowsExceptionWhenAbstractIsSameAsAlias()
     {
-        $this->expectException('LogicException');
-        $this->expectExceptionMessage('[name] is aliased to itself.');
+        $this->expectExceptionObject(new LogicException('[name] is aliased to itself.'));
 
         $container = new Container;
         $container->alias('name', 'name');
+    }
+
+    public function testItThrowsExceptionOnCircularAliasReference(): void
+    {
+        $this->expectExceptionObject(new LogicException('Circular alias reference for [a].'));
+
+        $container = new Container;
+        $container->alias('a', 'b');
+        $container->alias('b', 'a');
+
+        $container->getAlias('a');
+    }
+
+    public function testItThrowsExceptionOnIndirectCircularAliasReference(): void
+    {
+        $this->expectExceptionObject(new LogicException('Circular alias reference for [a].'));
+
+        $container = new Container;
+        $container->alias('a', 'b');
+        $container->alias('b', 'c');
+        $container->alias('c', 'a');
+
+        $container->getAlias('a');
     }
 
     public function testContainerGetFactory()
@@ -817,6 +842,23 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(WildcardConcrete::class, $instance);
     }
 
+    public function testBindAttributeIsRecheckedAfterEnvironmentResolverIsSet(): void
+    {
+        $container = new Container;
+
+        try {
+            $container->make(WildcardOnlyInterface::class);
+
+            $this->fail('Expected binding resolution to fail without an environment resolver.');
+        } catch (BindingResolutionException) {
+            // Continue after the expected first resolution failure.
+        }
+
+        $container->resolveEnvironmentUsing(fn () => true);
+
+        $this->assertInstanceOf(WildcardConcrete::class, $container->make(WildcardOnlyInterface::class));
+    }
+
     public function testChecksForMoreSpecificEnvironmentBeforeFallingBackToDefault(): void
     {
         $container = new Container;
@@ -873,6 +915,88 @@ class ContainerTest extends TestCase
 
         $second = $container->make(MultiEnvInterface::class);
         $this->assertInstanceOf(DevConcrete::class, $second);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenBindsFirstConditionThatPasses(): void
+    {
+        $container = new Container;
+
+        $instance = $container->make(BindWhenInterface::class);
+
+        $this->assertInstanceOf(BindWhenTrueConcrete::class, $instance);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenSingletonAttribute(): void
+    {
+        $container = new Container;
+
+        $first = $container->make(BindWhenSingletonInterface::class);
+        $second = $container->make(BindWhenSingletonInterface::class);
+
+        $this->assertInstanceOf(BindWhenSingletonConcrete::class, $first);
+        $this->assertSame($first, $second);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenThrowsWhenNoConditionPasses(): void
+    {
+        $this->expectException(BindingResolutionException::class);
+
+        $container = new Container;
+        $container->make(BindWhenNoMatchInterface::class);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenIsReevaluatedAfterAnInitialMiss(): void
+    {
+        $container = new Container;
+
+        try {
+            $container->make(BindWhenConditionalInterface::class);
+
+            $this->fail('Expected binding resolution to fail when the BindWhen condition does not match.');
+        } catch (BindingResolutionException) {
+            // Continue after the expected first resolution failure.
+        }
+
+        $container->instance(BindWhenCondition::class, new BindWhenCondition);
+
+        $this->assertInstanceOf(BindWhenConditionalConcrete::class, $container->make(BindWhenConditionalInterface::class));
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenTakesPrecedenceOverBind(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => true);
+
+        $instance = $container->make(BindWhenAndBindInterface::class);
+
+        $this->assertInstanceOf(BindWhenWinsConcrete::class, $instance);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindWhenFallsThroughToBind(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => true);
+
+        $instance = $container->make(BindWhenFallbackInterface::class);
+
+        $this->assertInstanceOf(BindFallbackConcrete::class, $instance);
+    }
+
+    #[RequiresPhp('>= 8.5.0')]
+    public function testBindAndBindWhenResolveInDeclarationOrder(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => in_array('foobar', (array) $environments));
+
+        $instance = $container->make(BindBeforeBindWhenInterface::class);
+
+        $this->assertInstanceOf(BindBeforeConcrete::class, $instance);
     }
 
     public function testNoMatchingEnvironmentAndNoWildcardThrowsBindingResolutionException(): void

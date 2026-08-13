@@ -16,8 +16,6 @@ use function Orchestra\Testbench\default_skeleton_path;
 #[WithConfig('database.connections.sqlite.journal_mode', 'wal')]
 class MigrateFreshCommandWithJournalModeWalTest extends DatabaseTestCase
 {
-    /** {@inheritDoc} */
-    #[\Override]
     protected function setUp(): void
     {
         $files = new Filesystem;

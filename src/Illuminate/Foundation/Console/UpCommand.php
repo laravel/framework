@@ -11,11 +11,11 @@ use Symfony\Component\Console\Attribute\AsCommand;
 class UpCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'up';
+    protected $signature = 'up';
 
     /**
      * The console command description.
@@ -35,7 +35,7 @@ class UpCommand extends Command
             if (! $this->laravel->maintenanceMode()->active()) {
                 $this->components->info('Application is already up.');
 
-                return 0;
+                return self::SUCCESS;
             }
 
             $this->laravel->maintenanceMode()->deactivate();
@@ -55,9 +55,9 @@ class UpCommand extends Command
                 $e->getMessage(),
             ));
 
-            return 1;
+            return self::FAILURE;
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 }

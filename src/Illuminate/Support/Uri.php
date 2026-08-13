@@ -7,6 +7,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Stringable as SupportStringable;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\Macroable;
@@ -357,7 +358,7 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
      */
     public function toStringable()
     {
-        return Str::of($this->value());
+        return new SupportStringable($this->value());
     }
 
     /**

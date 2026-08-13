@@ -217,7 +217,7 @@ trait Matching
                 return $actual->containsStrict($search);
             });
 
-        if ($missing->whereInstanceOf('Closure')->isNotEmpty()) {
+        if ($missing->contains(fn ($search) => $search instanceof Closure)) {
             PHPUnit::assertEmpty(
                 $missing->toArray(),
                 sprintf(

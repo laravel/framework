@@ -5,6 +5,9 @@ namespace Illuminate\Foundation;
 use Illuminate\Support\NodePackageManager;
 use ReflectionClass;
 
+/**
+ * @phpstan-type DevCommandArray array{'name': string, 'command': string, 'source': array{'file': string, 'line': int, 'class'?: string, 'function'?: string}, 'color': string}
+ */
 class DevCommands
 {
     /**
@@ -15,7 +18,7 @@ class DevCommands
     protected static ?NodePackageManager $packageManager = null;
 
     /**
-     * Counter to keep track of how many colors have been assigned,.
+     * Counter to keep track of how many colors have been assigned.
      *
      * Used to ensure colors are reused only after all have been used at least once.
      *
@@ -45,6 +48,41 @@ class DevCommands
     protected static $except = [];
 
     /**
+     * The mode in which the "dev" command should run.
+     *
+     * @var DevCommandMode
+     */
+    protected static DevCommandMode $mode = DevCommandMode::TABS;
+
+    /**
+     * Whether to include timestamps in the output of the "dev" command.
+     *
+     * @var bool
+     */
+    protected static $withTimestamps = false;
+
+    /**
+     * Whether to automatically restart a "dev" command when it fails.
+     *
+     * @var bool
+     */
+    protected static $autoRestart = true;
+
+    /**
+     * How many lines of output to buffer for each command when running in tabbed mode.
+     *
+     * @var int|null
+     */
+    protected static ?int $bufferSize = null;
+
+    /**
+     * How many lines of output to buffer total when running in stream mode.
+     *
+     * @var int|null
+     */
+    protected static ?int $streamBufferSize = null;
+
+    /**
      * Register the default development commands.
      *
      * @return void
@@ -55,9 +93,13 @@ class DevCommands
             return;
         }
 
-        self::artisan('serve --host=localhost', 'server');
+        self::artisan('serve', 'server');
         self::artisan('queue:listen --tries=1 --timeout=0', 'queue');
-        self::artisan('pail --timeout=0', 'logs');
+
+        if (function_exists('pcntl_fork')) {
+            self::artisan('pail --timeout=0', 'logs');
+        }
+
         self::node('dev', 'vite');
     }
 
@@ -128,7 +170,7 @@ class DevCommands
     /**
      * Get the registered development commands.
      *
-     * @return array{'name': string, 'command': string, 'source': array{'file': string, 'line': int, 'class'?: string, 'function'?: string}, 'color': string}[]
+     * @return DevCommandArray[]
      */
     public static function commands(): array
     {
@@ -145,6 +187,138 @@ class DevCommands
         }
 
         return self::fillInEmptyColors($commands);
+    }
+
+    /**
+     * Set the mode to inline, where all commands are run in the same terminal window.
+     *
+     * No-op on Windows.
+     *
+     * @return void
+     */
+    public static function inline(): void
+    {
+        self::$mode = DevCommandMode::INLINE;
+    }
+
+    /**
+     * Set the mode to stream, where all commands are run in the same terminal window, but their output is interactive within a TUI.
+     *
+     * No-op on Windows.
+     *
+     * @return void
+     */
+    public static function stream(): void
+    {
+        self::$mode = DevCommandMode::STREAM;
+    }
+
+    /**
+     * Set the mode to tabs, where each command is run in its own terminal tab.
+     *
+     * No-op on Windows.
+     *
+     * @return void
+     */
+    public static function tabs(): void
+    {
+        self::$mode = DevCommandMode::TABS;
+    }
+
+    /**
+     * Get the mode in which the "dev" command should run.
+     *
+     * @return DevCommandMode
+     */
+    public static function mode(): DevCommandMode
+    {
+        return self::$mode;
+    }
+
+    /**
+     * Enable timestamps in the output of the "dev" command.
+     *
+     * @return void
+     */
+    public static function withTimestamps(): void
+    {
+        self::$withTimestamps = true;
+    }
+
+    /**
+     * Determine if timestamps should be included in the output of the "dev" command.
+     *
+     * @return bool
+     */
+    public static function shouldIncludeTimestamps(): bool
+    {
+        return self::$withTimestamps;
+    }
+
+    /**
+     * Disable automatic restart of a "dev" command when it fails.
+     *
+     * @return void
+     */
+    public static function disableAutoRestart(): void
+    {
+        self::$autoRestart = false;
+    }
+
+    /**
+     * Determine if a "dev" command should automatically restart when it fails.
+     *
+     * @return bool
+     */
+    public static function shouldAutoRestart(): bool
+    {
+        return self::$autoRestart;
+    }
+
+    /**
+     * Set the number of lines of output to buffer for each command when running in tabbed mode.
+     *
+     * No-op on Windows.
+     *
+     * @param  int  $lines
+     * @return void
+     */
+    public static function bufferSize(int $lines): void
+    {
+        self::$bufferSize = $lines;
+    }
+
+    /**
+     * Get the number of lines of output to buffer for each command when running in tabbed mode.
+     *
+     * @return int|null
+     */
+    public static function getBufferSize(): ?int
+    {
+        return self::$bufferSize;
+    }
+
+    /**
+     * Set the number of lines of output to buffer total when running in stream mode.
+     *
+     * No-op on Windows.
+     *
+     * @param  int  $lines
+     * @return void
+     */
+    public static function streamBufferSize(int $lines): void
+    {
+        self::$streamBufferSize = $lines;
+    }
+
+    /**
+     * Get the number of lines of output to buffer total when running in stream mode.
+     *
+     * @return int|null
+     */
+    public static function getStreamBufferSize(): ?int
+    {
+        return self::$streamBufferSize;
     }
 
     /**

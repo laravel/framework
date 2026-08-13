@@ -13,9 +13,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\Events\UniqueJobSkipped;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
@@ -52,6 +54,26 @@ class UniqueJobTest extends QueueTestCase
         $this->assertFalse(
             $this->app->get(Cache::class)->lock($this->getLockKey(UniqueTestJob::class), 10)->get()
         );
+    }
+
+    public function testUniqueJobEmitsUniqueJobSkippedEventWhenAlreadyAcquired()
+    {
+        Bus::fake();
+
+        $skipped = [];
+
+        Event::listen(UniqueJobSkipped::class, function ($event) use (&$skipped) {
+            $skipped[] = $event->job;
+        });
+
+        UniqueTestJob::dispatch();
+
+        $this->assertSame([], $skipped);
+
+        UniqueTestJob::dispatch();
+
+        $this->assertCount(1, $skipped);
+        $this->assertInstanceOf(UniqueTestJob::class, $skipped[0]);
     }
 
     public function testUniqueJobWithViaDispatched()
@@ -145,28 +167,38 @@ class UniqueJobTest extends QueueTestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
-    public function testRetryOfUniqueUntilProcessingJobDoesNotForceReleaseSubsequentLock()
+    public function testRetryOfUniqueUntilProcessingJobDoesNotReleaseSubsequentLock()
     {
         $this->markTestSkippedWhenUsingSyncQueueDriver();
 
         dispatch($job = new UniqueUntilProcessingRetryJob);
 
-        // Lock acquired at dispatch time.
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
 
-        $this->runQueueWorkerCommand(['--once' => true]); // attempt 1: releases lock, then fails
+        $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertTrue($job::$handled);
-
-        // Lock was correctly released before attempt 1 ran. Simulate a subsequent external dispatch
-        // acquiring it (asserts it was free and holds it for the rest of the test).
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 60)->get());
 
-        // Attempt 2 (the retry) must not force-release the lock it did not acquire.
         UniqueUntilProcessingRetryJob::$handled = false;
-        $this->runQueueWorkerCommand(['--once' => true]); // attempt 2
+        $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertTrue($job::$handled);
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+    }
+
+    public function testRetryOfOwnerlessUniqueUntilProcessingJobDoesNotReleaseSubsequentLock()
+    {
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
+
+        dispatch($job = new OwnerlessUniqueUntilProcessingRetryJob);
+
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 60)->get());
+
+        $this->runQueueWorkerCommand(['--once' => true]);
+
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
@@ -190,6 +222,31 @@ class UniqueJobTest extends QueueTestCase
             $this->assertModelMissing($user);
             $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
         }
+    }
+
+    public function testModelNotFoundExceptionDoesNotReleaseSubsequentLock()
+    {
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
+
+        /** @var \Illuminate\Foundation\Auth\User */
+        $user = UserFactory::new()->create();
+        $job = new UniqueTestSerializesModelsJob($user);
+        $cache = $this->app->get(Cache::class);
+        $lock = new UniqueLock($cache);
+
+        dispatch($job);
+
+        $lock->release($job);
+
+        $replacement = new UniqueTestSerializesModelsJob($user);
+        $this->assertTrue($lock->acquire($replacement));
+
+        $user->delete();
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertFalse($cache->lock($this->getLockKey($job), 10)->get());
+
+        $lock->release($replacement);
     }
 
     public function testQueueFakeReleasesUniqueJobLocksBetweenFakes()
@@ -339,6 +396,20 @@ class UniqueUntilProcessingRetryJob implements ShouldQueue, ShouldBeUniqueUntilP
     {
         static::$handled = true;
 
+        if ($this->attempts() === 1) {
+            throw new Exception('First attempt failure.');
+        }
+    }
+}
+
+class OwnerlessUniqueUntilProcessingRetryJob implements ShouldQueue, ShouldBeUniqueUntilProcessing
+{
+    use InteractsWithQueue, Dispatchable;
+
+    public $tries = 2;
+
+    public function handle()
+    {
         if ($this->attempts() === 1) {
             throw new Exception('First attempt failure.');
         }

@@ -7,17 +7,17 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class DatabaseEloquentBelongsToManyWithoutTouchingTest extends TestCase
 {
     public function testItWillNotTouchRelatedModelsWhenUpdatingChild(): void
     {
         /** @var Article $related */
-        $related = m::mock(Article::class)->makePartial();
+        $related = Mockery::mock(Article::class)->makePartial();
         $related->shouldReceive('getUpdatedAtColumn')->never();
         $related->shouldReceive('freshTimestampString')->never();
 
@@ -26,15 +26,15 @@ class DatabaseEloquentBelongsToManyWithoutTouchingTest extends TestCase
         Model::withoutTouching(function () use ($related) {
             $this->assertTrue($related::isIgnoringTouch());
 
-            $builder = m::mock(Builder::class);
-            $builder->shouldReceive('join');
-            $parent = m::mock(User::class);
+            $builder = Mockery::mock(Builder::class);
+            $builder->expects('join');
+            $parent = Mockery::mock(User::class);
 
-            $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-            $builder->shouldReceive('getModel')->andReturn($related);
-            $builder->shouldReceive('where');
-            $builder->shouldReceive('getQuery')->andReturn(
-                m::mock(stdClass::class, ['getGrammar' => m::mock(Grammar::class, ['isExpression' => false])])
+            $parent->expects('getAttribute')->with('id')->andReturn(1);
+            $builder->expects('getModel')->andReturn($related);
+            $builder->expects('where');
+            $builder->expects('getQuery')->times(2)->andReturn(
+                Mockery::mock(QueryBuilder::class, ['getGrammar' => Mockery::mock(Grammar::class, ['isExpression' => false])])
             );
             $relation = new BelongsToMany($builder, $parent, 'article_users', 'user_id', 'article_id', 'id', 'id');
             $builder->shouldReceive('update')->never();

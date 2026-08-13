@@ -15,9 +15,10 @@
     },
     "require": {
         "php": "^8.3",
+        "illuminate/conditionable": "^13.0",
         "illuminate/contracts": "^13.0",
         "illuminate/support": "^13.0",
-        "monolog/monolog": "^3.0",
+        "monolog/monolog": "^3.10",
         "psr/log": "^1.0 || ^2.0 || ^3.0"
     },
     "provide": {

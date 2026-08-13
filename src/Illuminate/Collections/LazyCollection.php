@@ -90,7 +90,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @param  int  $from
      * @param  int  $to
      * @param  int  $step
-     * @return ($step is zero ? never : static<int, int>)
+     * @return ($step is 0 ? never : static<int, int>)
      *
      * @throws \InvalidArgumentException
      */
@@ -517,7 +517,9 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     {
         return new static(function () {
             foreach ($this as $key => $value) {
-                yield $value => $key;
+                if (is_string($value) || is_int($value)) {
+                    yield $value => $key;
+                }
             }
         });
     }
@@ -571,7 +573,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                     $resolvedKey = enum_value($resolvedKey);
                 }
 
-                if (is_object($resolvedKey)) {
+                if (is_object($resolvedKey) || is_null($resolvedKey)) {
                     $resolvedKey = (string) $resolvedKey;
                 }
 

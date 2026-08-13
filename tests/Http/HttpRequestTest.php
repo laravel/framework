@@ -11,10 +11,9 @@ use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Stringable;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -671,8 +670,8 @@ class HttpRequestTest extends TestCase
             'empty_str' => '',
             'null' => null,
         ]);
-        $this->assertTrue($request->string('int') instanceof Stringable);
-        $this->assertTrue($request->string('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $request->string('int'));
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $request->string('unknown_key'));
         $this->assertSame('123', $request->string('int')->value());
         $this->assertSame('456', $request->string('int_str')->value());
         $this->assertSame('123.456', $request->string('float')->value());
@@ -1369,6 +1368,16 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['foo' => ['bar' => 'baz', 'photo' => $file], 'boom' => 'breeze'], $request->all());
     }
 
+    public function testAllInputPrefersInputOverFilesForCollidingKeys()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'email.txt');
+        $request = Request::create('/', 'POST', ['email' => 'taylor@laravel.com'], [], ['email' => $file]);
+
+        $this->assertSame(['email' => 'taylor@laravel.com'], $request->all());
+        $this->assertSame(['email' => 'taylor@laravel.com'], $request->only('email'));
+        $this->assertInstanceOf(UploadedFile::class, $request->file('email'));
+    }
+
     public function testAllInputReturnsInputAfterReplace()
     {
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']]);
@@ -1426,8 +1435,8 @@ class HttpRequestTest extends TestCase
     public function testOldMethodCallsSession()
     {
         $request = Request::create('/');
-        $session = m::mock(Store::class);
-        $session->shouldReceive('getOldInput')->once()->with('foo', 'bar')->andReturn('boom');
+        $session = Mockery::mock(Store::class);
+        $session->expects('getOldInput')->with('foo', 'bar')->andReturn('boom');
         $request->setLaravelSession($session);
         $this->assertSame('boom', $request->old('foo', 'bar'));
     }
@@ -1435,8 +1444,8 @@ class HttpRequestTest extends TestCase
     public function testOldMethodCallsSessionWhenDefaultIsArray()
     {
         $request = Request::create('/');
-        $session = m::mock(Store::class);
-        $session->shouldReceive('getOldInput')->once()->with('foo', ['bar'])->andReturn(['bar']);
+        $session = Mockery::mock(Store::class);
+        $session->expects('getOldInput')->with('foo', ['bar'])->andReturn(['bar']);
         $request->setLaravelSession($session);
         $this->assertSame(['bar'], $request->old('foo', ['bar']));
     }
@@ -1444,10 +1453,10 @@ class HttpRequestTest extends TestCase
     public function testOldMethodCanGetDefaultValueFromModelByKey()
     {
         $request = Request::create('/');
-        $model = m::mock(Price::class);
-        $model->shouldReceive('getAttribute')->once()->with('name')->andReturn('foobar');
-        $session = m::mock(Store::class);
-        $session->shouldReceive('getOldInput')->once()->with('name', 'foobar')->andReturn('foobar');
+        $model = Mockery::mock(Price::class);
+        $model->expects('getAttribute')->with('name')->andReturn('foobar');
+        $session = Mockery::mock(Store::class);
+        $session->expects('getOldInput')->with('name', 'foobar')->andReturn('foobar');
         $request->setLaravelSession($session);
         $this->assertSame('foobar', $request->old('name', $model));
     }
@@ -1455,8 +1464,8 @@ class HttpRequestTest extends TestCase
     public function testFlushMethodCallsSession()
     {
         $request = Request::create('/');
-        $session = m::mock(Store::class);
-        $session->shouldReceive('flashInput')->once();
+        $session = Mockery::mock(Store::class);
+        $session->expects('flashInput');
         $request->setLaravelSession($session);
         $request->flush();
     }
@@ -1533,6 +1542,19 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $this->assertFalse($request->acceptsMarkdown());
+    }
+
+    public function testMatchesType()
+    {
+        $this->assertTrue(Request::matchesType('application/json', 'application/json'));
+
+        $this->assertTrue(Request::matchesType('application/json', 'application/vnd.api+json'));
+        $this->assertTrue(Request::matchesType('application/xml', 'application/atom+xml'));
+
+        $this->assertFalse(Request::matchesType('application/vnd.api+json', 'application/json'));
+        $this->assertFalse(Request::matchesType('application/json', 'application/xml'));
+        $this->assertFalse(Request::matchesType('application/json', 'text/json'));
+        $this->assertFalse(Request::matchesType('json', 'application/json'));
     }
 
     public function testFormatReturnsAcceptsJson()
@@ -1717,8 +1739,7 @@ class HttpRequestTest extends TestCase
 
     public function testSessionMethod()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Session store not set on request.');
+        $this->expectExceptionObject(new RuntimeException('Session store not set on request.'));
 
         $request = Request::create('/');
         $request->session();
@@ -1730,7 +1751,7 @@ class HttpRequestTest extends TestCase
 
         $this->assertFalse($request->hasSession());
 
-        $session = m::mock(Store::class);
+        $session = Mockery::mock(Store::class);
         $request->setLaravelSession($session);
 
         $this->assertTrue($request->hasSession());
@@ -1740,20 +1761,19 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/');
 
-        $laravelSession = m::mock(Store::class);
+        $laravelSession = Mockery::mock(Store::class);
         $request->setLaravelSession($laravelSession);
 
         $session = $request->getSession();
         $this->assertInstanceOf(SessionInterface::class, $session);
 
-        $laravelSession->shouldReceive('start')->once()->andReturn(true);
+        $laravelSession->expects('start')->andReturn(true);
         $session->start();
     }
 
     public function testGetSessionMethodWithoutLaravelSession()
     {
-        $this->expectException(SessionNotFoundException::class);
-        $this->expectExceptionMessage('There is currently no session available.');
+        $this->expectExceptionObject(new SessionNotFoundException('There is currently no session available.'));
 
         $request = Request::create('/');
 
@@ -1784,8 +1804,7 @@ class HttpRequestTest extends TestCase
 
     public function testFingerprintWithoutRoute()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to generate fingerprint. Route unavailable.');
+        $this->expectExceptionObject(new RuntimeException('Unable to generate fingerprint. Route unavailable.'));
 
         $request = Request::create('/', 'GET', [], [], [], []);
         $request->fingerprint();
@@ -1907,10 +1926,38 @@ class HttpRequestTest extends TestCase
         $this->assertEmpty($request->undefined);
     }
 
+    public function testMagicMethodsPreferInputOverFilesForCollidingKeys()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'email.txt');
+        $request = Request::create('/', 'POST', ['email' => 'taylor@laravel.com'], [], ['email' => $file]);
+
+        $this->assertSame('taylor@laravel.com', $request->email);
+        $this->assertSame('taylor@laravel.com', $request['email']);
+    }
+
+    public function testMagicMethodsMergeNestedInputAndFilesWhilePreferringInput()
+    {
+        $avatar = new SymfonyUploadedFile(__FILE__, 'avatar.jpg');
+        $collision = new SymfonyUploadedFile(__FILE__, 'name.txt');
+        $request = Request::create('/', 'POST', [
+            'profile' => ['name' => 'Taylor'],
+        ], [], [
+            'profile' => ['name' => $collision, 'avatar' => $avatar],
+        ]);
+
+        $expected = [
+            'name' => 'Taylor',
+            'avatar' => $request->file('profile.avatar'),
+        ];
+
+        $this->assertSame($expected, $request->profile);
+        $this->assertSame(['profile' => $expected], $request->all());
+    }
+
     public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
     {
-        $session = m::mock(Store::class);
-        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor', 'email' => 'foo']);
+        $session = Mockery::mock(Store::class);
+        $session->expects('flashInput')->with(['name' => 'Taylor', 'email' => 'foo']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);
         $request->flash();
@@ -1918,8 +1965,8 @@ class HttpRequestTest extends TestCase
 
     public function testHttpRequestFlashOnlyCallsFlashWithProperParameters()
     {
-        $session = m::mock(Store::class);
-        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
+        $session = Mockery::mock(Store::class);
+        $session->expects('flashInput')->with(['name' => 'Taylor']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);
         $request->flashOnly(['name']);
@@ -1927,8 +1974,8 @@ class HttpRequestTest extends TestCase
 
     public function testHttpRequestFlashExceptCallsFlashWithProperParameters()
     {
-        $session = m::mock(Store::class);
-        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
+        $session = Mockery::mock(Store::class);
+        $session->expects('flashInput')->with(['name' => 'Taylor']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);
         $request->flashExcept(['email']);
@@ -1995,7 +2042,7 @@ class HttpRequestTest extends TestCase
 
         Request::create('', 'GET')->json();
 
-        $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
+        $this->assertSame(json_last_error(), JSON_ERROR_NONE);
     }
 
     public function testItClampsValues()

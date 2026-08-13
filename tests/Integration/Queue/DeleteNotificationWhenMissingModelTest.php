@@ -38,7 +38,6 @@ class DeleteNotificationWhenMissingModelTest extends QueueTestCase
         Schema::dropIfExists('delete_notification_test_models');
     }
 
-    #[\Override]
     protected function tearDown(): void
     {
         DeleteWhenMissingNotification::$sent = false;

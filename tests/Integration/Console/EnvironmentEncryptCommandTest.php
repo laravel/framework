@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Console;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class EnvironmentEncryptCommandTest extends TestCase
@@ -16,22 +16,16 @@ class EnvironmentEncryptCommandTest extends TestCase
     {
         parent::setUp();
 
-        $this->filesystem = m::spy(Filesystem::class);
-        $this->filesystem->shouldReceive('get')
-            ->andReturn(true)
-            ->shouldReceive('put')
-            ->andReturn('APP_NAME=Laravel');
+        $this->filesystem = Mockery::spy(Filesystem::class);
+        $this->filesystem->shouldReceive('get')->andReturn(true);
+        $this->filesystem->shouldReceive('put')->andReturn('APP_NAME=Laravel');
         File::swap($this->filesystem);
     }
 
     public function testItFailsWithInvalidCipherFails(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
-            ->andReturn(true)
-            ->shouldReceive('exists')
-            ->once()
-            ->andReturn(false);
+        $this->filesystem->expects('exists')->andReturn(true);
+        $this->filesystem->expects('exists')->andReturn(false);
 
         $this->artisan('env:encrypt', ['--cipher' => 'invalid'])
             ->expectsQuestion('What encryption key would you like to use?', 'generate')
@@ -41,12 +35,8 @@ class EnvironmentEncryptCommandTest extends TestCase
 
     public function testItFailsUsingCipherWithInvalidKey(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
-            ->andReturn(true)
-            ->shouldReceive('exists')
-            ->once()
-            ->andReturn(false);
+        $this->filesystem->expects('exists')->andReturn(true);
+        $this->filesystem->expects('exists')->andReturn(false);
 
         $this->artisan('env:encrypt', ['--cipher' => 'aes-128-cbc', '--key' => 'invalid'])
             ->expectsOutputToContain('incorrect key length')
@@ -55,12 +45,8 @@ class EnvironmentEncryptCommandTest extends TestCase
 
     public function testItGeneratesTheCorrectFileWhenUsingEnvironment(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
-            ->andReturn(true)
-            ->shouldReceive('exists')
-            ->once()
-            ->andReturn(false);
+        $this->filesystem->expects('exists')->andReturn(true);
+        $this->filesystem->expects('exists')->andReturn(false);
 
         $this->artisan('env:encrypt', ['--env' => 'production'])
             ->expectsQuestion('What encryption key would you like to use?', 'generate')
@@ -68,18 +54,14 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.env.production.encrypted'), m::any());
+            ->with(base_path('.env.production.encrypted'), Mockery::any());
     }
 
     public function testItGeneratesTheCorrectFileWhenNotUsingEnvironment(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
-            ->andReturn(true)
-            ->shouldReceive('exists')
-            ->once()
-            ->andReturn(false)
-            ->shouldReceive('get');
+        $this->filesystem->expects('exists')->andReturn(true);
+        $this->filesystem->expects('exists')->andReturn(false);
+        $this->filesystem->shouldReceive('get');
 
         $this->artisan('env:encrypt')
             ->expectsQuestion('What encryption key would you like to use?', 'generate')
@@ -87,12 +69,12 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.env.encrypted'), m::any());
+            ->with(base_path('.env.encrypted'), Mockery::any());
     }
 
     public function testItFailsWhenEnvironmentFileCannotBeFound(): void
     {
-        $this->filesystem->shouldReceive('exists')->andReturn(false);
+        $this->filesystem->expects('exists')->andReturn(false);
 
         $this->artisan('env:encrypt')
             ->expectsQuestion('What encryption key would you like to use?', 'generate')
@@ -102,7 +84,7 @@ class EnvironmentEncryptCommandTest extends TestCase
 
     public function testItFailsWhenEncryptionFileExists(): void
     {
-        $this->filesystem->shouldReceive('exists')->andReturn(true);
+        $this->filesystem->expects('exists')->times(2)->andReturn(true);
 
         $this->artisan('env:encrypt')
             ->expectsQuestion('What encryption key would you like to use?', 'generate')
@@ -112,12 +94,8 @@ class EnvironmentEncryptCommandTest extends TestCase
 
     public function testItGeneratesTheEncryptionFileWhenForcing(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
-            ->andReturn(true)
-            ->shouldReceive('exists')
-            ->once()
-            ->andReturn(true);
+        $this->filesystem->expects('exists')->andReturn(true);
+        $this->filesystem->expects('exists')->andReturn(true);
 
         $this->artisan('env:encrypt', ['--force' => true])
             ->expectsQuestion('What encryption key would you like to use?', 'generate')
@@ -125,17 +103,13 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.env.encrypted'), m::any());
+            ->with(base_path('.env.encrypted'), Mockery::any());
     }
 
     public function testItEncryptsWithGivenKeyAndDisplaysIt(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
-            ->andReturn(true)
-            ->shouldReceive('exists')
-            ->once()
-            ->andReturn(false);
+        $this->filesystem->expects('exists')->andReturn(true);
+        $this->filesystem->expects('exists')->andReturn(false);
 
         $this->artisan('env:encrypt', ['--key' => $key = 'ANvVbPbE0tWMHpUySh6liY4WaCmAYKXP'])
             ->expectsOutputToContain('Environment successfully encrypted')
@@ -146,12 +120,8 @@ class EnvironmentEncryptCommandTest extends TestCase
 
     public function testItEncryptsWithGivenGeneratedBase64KeyAndDisplaysIt(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
-            ->andReturn(true)
-            ->shouldReceive('exists')
-            ->once()
-            ->andReturn(false);
+        $this->filesystem->expects('exists')->andReturn(true);
+        $this->filesystem->expects('exists')->andReturn(false);
 
         $key = Encrypter::generateKey('AES-256-CBC');
 
@@ -164,22 +134,18 @@ class EnvironmentEncryptCommandTest extends TestCase
 
     public function testItEncryptsInReadableFormat(): void
     {
-        $filesystem = m::mock(Filesystem::class);
-        $filesystem->shouldReceive('exists')
+        $filesystem = Mockery::mock(Filesystem::class);
+        $filesystem->expects('exists')
             ->with(base_path('.env'))
-            ->once()
             ->andReturn(true);
-        $filesystem->shouldReceive('exists')
+        $filesystem->expects('exists')
             ->with(base_path('.env.encrypted'))
-            ->once()
             ->andReturn(false);
-        $filesystem->shouldReceive('get')
+        $filesystem->expects('get')
             ->with(base_path('.env'))
-            ->once()
             ->andReturn("APP_NAME=Laravel\nAPP_ENV=local");
-        $filesystem->shouldReceive('put')
-            ->once()
-            ->with(base_path('.env.encrypted'), m::on(function ($content) {
+        $filesystem->expects('put')
+            ->with(base_path('.env.encrypted'), Mockery::on(function ($content) {
                 $lines = explode("\n", rtrim($content));
 
                 return count($lines) === 2
@@ -196,22 +162,18 @@ class EnvironmentEncryptCommandTest extends TestCase
 
     public function testItSkipsCommentsAndBlankLinesInReadableFormat(): void
     {
-        $filesystem = m::mock(Filesystem::class);
-        $filesystem->shouldReceive('exists')
+        $filesystem = Mockery::mock(Filesystem::class);
+        $filesystem->expects('exists')
             ->with(base_path('.env'))
-            ->once()
             ->andReturn(true);
-        $filesystem->shouldReceive('exists')
+        $filesystem->expects('exists')
             ->with(base_path('.env.encrypted'))
-            ->once()
             ->andReturn(false);
-        $filesystem->shouldReceive('get')
+        $filesystem->expects('get')
             ->with(base_path('.env'))
-            ->once()
             ->andReturn("# Comment\nAPP_NAME=Laravel\n\nAPP_ENV=local");
-        $filesystem->shouldReceive('put')
-            ->once()
-            ->with(base_path('.env.encrypted'), m::on(function ($content) {
+        $filesystem->expects('put')
+            ->with(base_path('.env.encrypted'), Mockery::on(function ($content) {
                 $lines = explode("\n", rtrim($content));
 
                 // Comments and blank lines are skipped
@@ -243,22 +205,18 @@ ENV;
 
         $encryptedOutput = null;
 
-        $filesystem = m::mock(Filesystem::class);
-        $filesystem->shouldReceive('exists')
+        $filesystem = Mockery::mock(Filesystem::class);
+        $filesystem->expects('exists')
             ->with(base_path('.env'))
-            ->once()
             ->andReturn(true);
-        $filesystem->shouldReceive('exists')
+        $filesystem->expects('exists')
             ->with(base_path('.env.encrypted'))
-            ->once()
             ->andReturn(false);
-        $filesystem->shouldReceive('get')
+        $filesystem->expects('get')
             ->with(base_path('.env'))
-            ->once()
             ->andReturn($originalContent);
-        $filesystem->shouldReceive('put')
-            ->once()
-            ->with(base_path('.env.encrypted'), m::on(function ($content) use (&$encryptedOutput) {
+        $filesystem->expects('put')
+            ->with(base_path('.env.encrypted'), Mockery::on(function ($content) use (&$encryptedOutput) {
                 $encryptedOutput = $content;
 
                 return true;
@@ -297,22 +255,18 @@ ENV;
 
         $encryptedOutput = null;
 
-        $filesystem = m::mock(Filesystem::class);
-        $filesystem->shouldReceive('exists')
+        $filesystem = Mockery::mock(Filesystem::class);
+        $filesystem->expects('exists')
             ->with(base_path('.env'))
-            ->once()
             ->andReturn(true);
-        $filesystem->shouldReceive('exists')
+        $filesystem->expects('exists')
             ->with(base_path('.env.encrypted'))
-            ->once()
             ->andReturn(false);
-        $filesystem->shouldReceive('get')
+        $filesystem->expects('get')
             ->with(base_path('.env'))
-            ->once()
             ->andReturn($originalContent);
-        $filesystem->shouldReceive('put')
-            ->once()
-            ->with(base_path('.env.encrypted'), m::on(function ($content) use (&$encryptedOutput) {
+        $filesystem->expects('put')
+            ->with(base_path('.env.encrypted'), Mockery::on(function ($content) use (&$encryptedOutput) {
                 $encryptedOutput = $content;
 
                 return true;
@@ -352,22 +306,18 @@ ENV;
 
         $encryptedOutput = null;
 
-        $filesystem = m::mock(Filesystem::class);
-        $filesystem->shouldReceive('exists')
+        $filesystem = Mockery::mock(Filesystem::class);
+        $filesystem->expects('exists')
             ->with(base_path('.env'))
-            ->once()
             ->andReturn(true);
-        $filesystem->shouldReceive('exists')
+        $filesystem->expects('exists')
             ->with(base_path('.env.encrypted'))
-            ->once()
             ->andReturn(false);
-        $filesystem->shouldReceive('get')
+        $filesystem->expects('get')
             ->with(base_path('.env'))
-            ->once()
             ->andReturn($originalContent);
-        $filesystem->shouldReceive('put')
-            ->once()
-            ->with(base_path('.env.encrypted'), m::on(function ($content) use (&$encryptedOutput) {
+        $filesystem->expects('put')
+            ->with(base_path('.env.encrypted'), Mockery::on(function ($content) use (&$encryptedOutput) {
                 $encryptedOutput = $content;
 
                 return true;
@@ -406,22 +356,18 @@ ENV;
 
         $encryptedOutput = null;
 
-        $filesystem = m::mock(Filesystem::class);
-        $filesystem->shouldReceive('exists')
+        $filesystem = Mockery::mock(Filesystem::class);
+        $filesystem->expects('exists')
             ->with(base_path('.env'))
-            ->once()
             ->andReturn(true);
-        $filesystem->shouldReceive('exists')
+        $filesystem->expects('exists')
             ->with(base_path('.env.encrypted'))
-            ->once()
             ->andReturn(false);
-        $filesystem->shouldReceive('get')
+        $filesystem->expects('get')
             ->with(base_path('.env'))
-            ->once()
             ->andReturn($originalContent);
-        $filesystem->shouldReceive('put')
-            ->once()
-            ->with(base_path('.env.encrypted'), m::on(function ($content) use (&$encryptedOutput) {
+        $filesystem->expects('put')
+            ->with(base_path('.env.encrypted'), Mockery::on(function ($content) use (&$encryptedOutput) {
                 $encryptedOutput = $content;
 
                 return true;
@@ -453,12 +399,8 @@ ENV;
 
     public function testItCanRemoveTheOriginalFile(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
-            ->andReturn(true)
-            ->shouldReceive('exists')
-            ->once()
-            ->andReturn(false);
+        $this->filesystem->expects('exists')->andReturn(true);
+        $this->filesystem->expects('exists')->andReturn(false);
 
         $this->artisan('env:encrypt', ['--prune' => true])
             ->expectsQuestion('What encryption key would you like to use?', 'generate')
@@ -466,7 +408,7 @@ ENV;
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.env.encrypted'), m::any());
+            ->with(base_path('.env.encrypted'), Mockery::any());
 
         $this->filesystem->shouldHaveReceived('delete')
             ->with(base_path('.env'));
@@ -474,12 +416,8 @@ ENV;
 
     public function testItEncryptsWithInteractivelyGivenKeyAndDisplaysIt(): void
     {
-        $this->filesystem->shouldReceive('exists')
-            ->once()
-            ->andReturn(true)
-            ->shouldReceive('exists')
-            ->once()
-            ->andReturn(false);
+        $this->filesystem->expects('exists')->andReturn(true);
+        $this->filesystem->expects('exists')->andReturn(false);
 
         $this->artisan('env:encrypt')
             ->expectsQuestion('What encryption key would you like to use?', 'ask')

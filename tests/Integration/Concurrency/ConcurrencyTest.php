@@ -119,8 +119,7 @@ PHP);
 
     public function testRunHandlerProcessErrorWithDefaultExceptionWithoutParam()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('This is a different exception');
+        $this->expectExceptionObject(new Exception('This is a different exception'));
 
         Concurrency::run([
             fn () => throw new Exception(
@@ -131,8 +130,7 @@ PHP);
 
     public function testRunHandlerProcessErrorWithCustomExceptionWithoutParam()
     {
-        $this->expectException(ExceptionWithoutParam::class);
-        $this->expectExceptionMessage('Test');
+        $this->expectExceptionObject(new ExceptionWithoutParam('Test'));
         Concurrency::run([
             fn () => throw new ExceptionWithoutParam('Test'),
         ]);
@@ -150,6 +148,31 @@ PHP);
                 'Invalid payload'
             ),
         ]);
+    }
+
+    #[DataProvider('falseyExceptionParameters')]
+    public function testRunHandlerProcessErrorWithFalseyParam(int|bool|string $value)
+    {
+        try {
+            Concurrency::run([
+                fn () => throw new ExceptionWithFalseyParam($value),
+            ]);
+        } catch (ExceptionWithFalseyParam $e) {
+            $this->assertSame($value, $e->value);
+
+            return;
+        }
+
+        $this->fail('The expected exception was not thrown.');
+    }
+
+    public static function falseyExceptionParameters(): array
+    {
+        return [
+            'zero' => [0],
+            'false' => [false],
+            'empty string' => [''],
+        ];
     }
 
     public static function getConcurrencyDrivers(): array
@@ -207,5 +230,13 @@ class ExceptionWithParam extends Exception
         public string|array $responseBody = '',
     ) {
         parent::__construct("API request to {$uri} failed with status $statusCode $reason");
+    }
+}
+
+class ExceptionWithFalseyParam extends Exception
+{
+    public function __construct(public int|bool|string $value)
+    {
+        parent::__construct('Exception with falsey parameter');
     }
 }

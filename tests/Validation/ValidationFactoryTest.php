@@ -7,21 +7,27 @@ use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
 use Illuminate\Validation\Factory;
 use Illuminate\Validation\PresenceVerifierInterface;
 use Illuminate\Validation\Validator;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 class ValidationFactoryTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Validator::flushState();
+    }
+
     public function testMakeMethodCreatesValidValidator()
     {
-        $translator = m::mock(TranslatorInterface::class);
+        $translator = Mockery::mock(TranslatorInterface::class);
         $factory = new Factory($translator);
         $validator = $factory->make(['foo' => 'bar'], ['baz' => 'boom']);
         $this->assertEquals($translator, $validator->getTranslator());
         $this->assertEquals(['foo' => 'bar'], $validator->getData());
         $this->assertEquals(['baz' => ['boom']], $validator->getRules());
 
-        $presence = m::mock(PresenceVerifierInterface::class);
+        $presence = Mockery::mock(PresenceVerifierInterface::class);
         $noop1 = function () {
             //
         };
@@ -41,7 +47,7 @@ class ValidationFactoryTest extends TestCase
         $this->assertEquals(['replacer' => $noop3], $validator->replacers);
         $this->assertEquals($presence, $validator->getPresenceVerifier());
 
-        $presence = m::mock(PresenceVerifierInterface::class);
+        $presence = Mockery::mock(PresenceVerifierInterface::class);
         $factory->extend('foo', $noop1, 'foo!');
         $factory->extendImplicit('implicit', $noop2, 'implicit!');
         $factory->extendImplicit('dependent', $noop3, 'dependent!');
@@ -54,15 +60,15 @@ class ValidationFactoryTest extends TestCase
 
     public function testValidateCallsValidateOnTheValidator()
     {
-        $validator = m::mock(Validator::class);
-        $translator = m::mock(TranslatorInterface::class);
-        $factory = m::mock(Factory::class.'[make]', [$translator]);
+        $validator = Mockery::mock(Validator::class);
+        $translator = Mockery::mock(TranslatorInterface::class);
+        $factory = Mockery::mock(Factory::class.'[make]', [$translator]);
 
-        $factory->shouldReceive('make')->once()
+        $factory->expects('make')
             ->with(['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'required'], [], [])
             ->andReturn($validator);
 
-        $validator->shouldReceive('validate')->once()->andReturn(['foo' => 'bar']);
+        $validator->expects('validate')->andReturn(['foo' => 'bar']);
 
         $validated = $factory->validate(
             ['foo' => 'bar', 'baz' => 'boom'],
@@ -75,7 +81,7 @@ class ValidationFactoryTest extends TestCase
     public function testCustomResolverIsCalled()
     {
         unset($_SERVER['__validator.factory']);
-        $translator = m::mock(TranslatorInterface::class);
+        $translator = Mockery::mock(TranslatorInterface::class);
         $factory = new Factory($translator);
         $factory->resolver(function ($translator, $data, $rules) {
             $_SERVER['__validator.factory'] = true;
@@ -93,7 +99,7 @@ class ValidationFactoryTest extends TestCase
 
     public function testValidateMethodCanBeCalledPublicly()
     {
-        $translator = m::mock(TranslatorInterface::class);
+        $translator = Mockery::mock(TranslatorInterface::class);
         $factory = new Factory($translator);
         $factory->extend('foo', function ($attribute, $value, $parameters, $validator) {
             return $validator->validateArray($attribute, $value);
@@ -105,7 +111,7 @@ class ValidationFactoryTest extends TestCase
 
     public function testExcludeAndIncludeUnvalidatedArrayKeys()
     {
-        $translator = m::mock(TranslatorInterface::class);
+        $translator = Mockery::mock(TranslatorInterface::class);
 
         $factory = new Factory($translator);
         // check the default behaviour.
@@ -138,12 +144,19 @@ class ValidationFactoryTest extends TestCase
 
     public function testSetContainer()
     {
-        $translator = m::mock(TranslatorInterface::class);
+        $translator = Mockery::mock(TranslatorInterface::class);
         $container = new Container;
         $factory = new Factory($translator);
 
         $this->assertNull($factory->getContainer());
 
         $this->assertSame($container, $factory->setContainer($container)->getContainer());
+    }
+
+    public function testFakeDnsLookupsDelegatesToTheValidator()
+    {
+        (new Factory(Mockery::mock(TranslatorInterface::class)))->fakeDnsLookups();
+
+        $this->assertTrue((new ReflectionProperty(Validator::class, 'fakeDnsLookups'))->getValue());
     }
 }

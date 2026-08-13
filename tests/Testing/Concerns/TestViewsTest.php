@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\ParallelTesting as ParallelTestingFacade;
 use Illuminate\Testing\Concerns\TestViews;
 use Illuminate\Testing\ParallelTesting;
 use Illuminate\View\Compilers\BladeCompiler;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use ReflectionProperty;
@@ -19,8 +19,6 @@ class TestViewsTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         Container::setInstance($container = new Container);
 
         Facade::setFacadeApplication($container);
@@ -43,8 +41,6 @@ class TestViewsTest extends TestCase
         Facade::setFacadeApplication(null);
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
-
-        parent::tearDown();
     }
 
     public function testCompiledViewPathAppendsToken()
@@ -89,7 +85,7 @@ class TestViewsTest extends TestCase
     public function testSwitchToCompiledViewPathUpdatesCompilerCachePath()
     {
         $container = Container::getInstance();
-        $compiler = new BladeCompiler(m::mock(Filesystem::class), '/original/path');
+        $compiler = new BladeCompiler(Mockery::mock(Filesystem::class), '/original/path');
 
         $container->instance('blade.compiler', $compiler);
 

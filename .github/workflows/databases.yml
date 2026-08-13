@@ -29,27 +29,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
-          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -75,27 +62,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
-          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -120,27 +94,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
-          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -166,27 +127,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
-          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -214,27 +162,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
-          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -262,27 +197,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
-          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -308,27 +230,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
-          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -355,27 +264,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
-          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
@@ -393,27 +289,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
         with:
-          php-version: 8.3
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, :php-psr
 
       - name: Setup SQLite Database
         run: php vendor/bin/testbench package:create-sqlite-db

@@ -45,7 +45,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '13.19.0';
+    const VERSION = '13.25.0';
 
     /**
      * The base path for the Laravel installation.
@@ -209,6 +209,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $absoluteCachePathPrefixes = ['/', '\\'];
 
     /**
+     * The application builder class.
+     *
+     * @var class-string<Configuration\ApplicationBuilder>
+     */
+    protected static string $applicationBuilder = Configuration\ApplicationBuilder::class;
+
+    /**
      * Create a new Illuminate application instance.
      *
      * @param  string|null  $basePath
@@ -238,7 +245,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             default => static::inferBasePath(),
         };
 
-        return (new Configuration\ApplicationBuilder(new static($basePath)))
+        return (new static::$applicationBuilder(new static($basePath)))
             ->withKernels()
             ->withEvents()
             ->withCommands()

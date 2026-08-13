@@ -119,8 +119,7 @@ class DebouncedJobTest extends QueueTestCase
 
     public function testDebouncedAndUniqueThrowsLogicException()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('debounced job cannot also implement ShouldBeUnique');
+        $this->expectExceptionObject(new LogicException('debounced job cannot also implement ShouldBeUnique'));
 
         DebouncedAndUniqueTestJob::dispatch('entity-1');
     }
@@ -203,7 +202,7 @@ class DebouncedJobTest extends QueueTestCase
         $lock->release($jobA, $ownerA);
 
         // B should still be the current owner.
-        $this->assertTrue($lock->getCurrentOwner($jobB) === $ownerB);
+        $this->assertSame($lock->getCurrentOwner($jobB), $ownerB);
     }
 
     public function testReleaseClearsMaxWaitTimestamp()

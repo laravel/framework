@@ -14,12 +14,15 @@ use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\JobReleased;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\JobTimedOut;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerIdle;
 use Illuminate\Queue\Events\WorkerInterrupted;
 use Illuminate\Queue\Events\WorkerPausing;
+use Illuminate\Queue\Events\WorkerQueuePaused;
+use Illuminate\Queue\Events\WorkerQueueResumed;
 use Illuminate\Queue\Events\WorkerResuming;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
@@ -124,6 +127,13 @@ class Worker
      * @var bool
      */
     public $paused = false;
+
+    /**
+     * The queues the worker last observed to be paused.
+     *
+     * @var array<int, string>
+     */
+    protected $pausedQueues = [];
 
     /**
      * The callbacks used to pop jobs from queues.
@@ -311,7 +321,7 @@ class Worker
                 );
 
                 $this->events->dispatch(new JobTimedOut(
-                    $job->getConnectionName(), $job
+                    $job->getConnectionName(), $job, $this->timeoutForJob($job, $options)
                 ));
             }
 
@@ -467,7 +477,11 @@ class Worker
 
             $queues = explode(',', $queue);
 
-            $paused = array_flip($this->getPausedQueues($connection->getConnectionName(), $queues));
+            $paused = $this->getPausedQueues($connection->getConnectionName(), $queues);
+
+            $this->raisePausedQueueEvents($connection->getConnectionName(), $paused);
+
+            $paused = array_flip($paused);
 
             foreach ($queues as $index => $queue) {
                 if (isset($paused[$queue])) {
@@ -507,6 +521,26 @@ class Worker
         }
 
         return $this->manager->getPausedQueues($connectionName, $queues);
+    }
+
+    /**
+     * Raise events for any queues that have been paused or resumed since the last check.
+     *
+     * @param  string  $connectionName
+     * @param  array  $paused
+     * @return void
+     */
+    protected function raisePausedQueueEvents($connectionName, array $paused)
+    {
+        foreach (array_diff($paused, $this->pausedQueues) as $queue) {
+            $this->events->dispatch(new WorkerQueuePaused($connectionName, $queue));
+        }
+
+        foreach (array_diff($this->pausedQueues, $paused) as $queue) {
+            $this->events->dispatch(new WorkerQueueResumed($connectionName, $queue));
+        }
+
+        $this->pausedQueues = $paused;
     }
 
     /**
@@ -579,6 +613,12 @@ class Worker
             $job->fire();
 
             $this->raiseAfterJobEvent($connectionName, $job);
+
+            if ($job->isReleased() && ! $job->isDeleted()) {
+                $this->events->dispatch(new JobReleased(
+                    $connectionName, $job
+                ));
+            }
         } catch (Throwable $e) {
             $exceptionOccurred = $e;
 
@@ -634,7 +674,7 @@ class Worker
                 $job->release($backoff);
 
                 $this->events->dispatch(new JobReleasedAfterException(
-                    $connectionName, $job, $backoff
+                    $connectionName, $job, $backoff, $e
                 ));
             }
         }

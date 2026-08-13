@@ -5,10 +5,10 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
 {
@@ -23,37 +23,48 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         $relation = $this->getMockBuilder(BelongsToMany::class)->onlyMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withPivotValue(['is_admin' => 1]);
 
-        $query = m::mock(stdClass::class);
-        $query->shouldReceive('from')->once()->with('club_user')->andReturn($query);
-        $query->shouldReceive('insert')->once()->with([['club_id' => 1, 'user_id' => 1, 'is_admin' => 1]])->andReturn(true);
-        $relation->getQuery()->getQuery()->shouldReceive('newQuery')->once()->andReturn($query);
+        $query = Mockery::mock(QueryBuilder::class);
+        $query->expects('from')->with('club_user')->andReturn($query);
+        $query->expects('insert')->with([['club_id' => 1, 'user_id' => 1, 'is_admin' => 1]])->andReturn(true);
+        $relation->getQuery()->getQuery()->expects('newQuery')->andReturn($query);
 
         $relation->attach(1);
     }
 
     public function getRelationArguments()
     {
-        $parent = m::mock(Model::class);
+        $parent = Mockery::mock(Model::class);
         $parent->shouldReceive('getKey')->andReturn(1);
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
 
-        $builder = m::mock(Builder::class);
-        $related = m::mock(Model::class);
+        $builder = Mockery::mock(Builder::class);
+        $related = Mockery::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
 
         $related->shouldReceive('getTable')->andReturn('users');
         $related->shouldReceive('getKeyName')->andReturn('id');
         $related->shouldReceive('qualifyColumn')->with('id')->andReturn('users.id');
 
-        $builder->shouldReceive('join')->once()->with('club_user', 'users.id', '=', 'club_user.user_id');
-        $builder->shouldReceive('where')->once()->with('club_user.club_id', '=', 1);
-        $builder->shouldReceive('where')->once()->with('club_user.is_admin', '=', 1, 'and');
+        $builder->expects('join')->with('club_user', 'users.id', '=', 'club_user.user_id');
+        $builder->expects('where')->with('club_user.club_id', '=', 1);
+        $builder->expects('where')->with('club_user.is_admin', '=', 1, 'and');
 
-        $builder->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock(stdClass::class));
-        $mockQueryBuilder->shouldReceive('getGrammar')->andReturn(m::mock(Grammar::class, ['isExpression' => false]));
+        $mockQueryBuilder = Mockery::mock(QueryBuilder::class);
+        $builder->shouldReceive('getQuery')->andReturn($mockQueryBuilder);
+        $mockQueryBuilder->shouldReceive('getGrammar')->andReturn(Mockery::mock(Grammar::class, ['isExpression' => false]));
 
-        return [$builder, $parent, 'club_user', 'club_id', 'user_id', 'id', 'id', null, false];
+        return [
+            $builder,
+            $parent,
+            'club_user',
+            'club_id',
+            'user_id',
+            'id',
+            'id',
+            null,
+            false,
+        ];
     }
 }

@@ -20,6 +20,7 @@ use Illuminate\Image\Transformations\Rotate;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
 use Intervention\Image\Interfaces\ImageInterface;
+use PHPUnit\Framework\Attributes\RequiresFunction;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -63,6 +64,62 @@ class GdDriverTest extends TestCase
         $this->assertSame(IMAGETYPE_JPEG, getimagesizefromstring($result)[2]);
     }
 
+    public function test_processes_optimize_to_png()
+    {
+        $driver = new GdDriver;
+
+        $pipeline = $this->pipeline(format: 'png');
+
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
+
+        $this->assertSame(IMAGETYPE_PNG, getimagesizefromstring($result)[2]);
+    }
+
+    public function test_processes_optimize_to_gif()
+    {
+        $driver = new GdDriver;
+
+        $pipeline = $this->pipeline(format: 'gif');
+
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
+
+        $this->assertSame(IMAGETYPE_GIF, getimagesizefromstring($result)[2]);
+    }
+
+    #[RequiresFunction('imageavif')]
+    public function test_processes_optimize_to_avif(): void
+    {
+        $driver = new GdDriver;
+
+        $pipeline = $this->pipeline(format: 'avif');
+
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
+
+        $this->assertSame(IMAGETYPE_AVIF, getimagesizefromstring($result)[2]);
+    }
+
+    #[RequiresFunction('imageavif')]
+    public function test_processes_avif_input(): void
+    {
+        $driver = new GdDriver;
+        $contents = $driver->process($this->fakeImageContents(), $this->pipeline(format: 'avif'));
+
+        $result = $driver->process($contents, $this->pipeline(new Cover(50, 25), format: 'jpg'));
+
+        $this->assertSame([50, 25], array_slice(getimagesizefromstring($result), 0, 2));
+    }
+
+    public function test_processes_optimize_to_bmp()
+    {
+        $driver = new GdDriver;
+
+        $pipeline = $this->pipeline(format: 'bmp');
+
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
+
+        $this->assertSame(IMAGETYPE_BMP, getimagesizefromstring($result)[2]);
+    }
+
     public function test_processes_cover_and_optimize_together()
     {
         $driver = new GdDriver;
@@ -92,6 +149,37 @@ class GdDriverTest extends TestCase
 
         $this->assertSame(200, $width);
         $this->assertSame(200, $height);
+    }
+
+    public function test_processes_contain_with_dominant_background()
+    {
+        $driver = new GdDriver;
+        $contents = $this->solidColorImageContents(255, 0, 0, 400, 200);
+
+        $pipeline = $this->pipeline(new Contain(200, 200, 'dominant'));
+
+        $result = $driver->process($contents, $pipeline);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(200, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_dominant_color_returns_hex_for_solid_image()
+    {
+        $driver = new GdDriver;
+        $contents = $this->solidColorImageContents(0, 128, 255);
+
+        $this->assertSame('#0080ff', $driver->dominantColor($contents));
+    }
+
+    public function test_dominant_color_ignores_alpha_channel(): void
+    {
+        $driver = new GdDriver;
+        $contents = $this->semiTransparentColorImageContents(0, 128, 255, 128);
+
+        $this->assertSame('#0080ff', $driver->dominantColor($contents));
     }
 
     public function test_processes_crop()
@@ -137,6 +225,19 @@ class GdDriverTest extends TestCase
 
         $this->assertSame(50, $width);
         $this->assertSame(100, $height);
+    }
+
+    public function test_processes_rotate_with_dominant_background()
+    {
+        $driver = new GdDriver;
+        $contents = $this->solidColorImageContents(0, 255, 0, 100, 50);
+
+        $pipeline = $this->pipeline(new Rotate(45, 'dominant'));
+
+        $result = $driver->process($contents, $pipeline);
+
+        $this->assertNotEmpty($result);
+        $this->assertNotFalse(getimagesizefromstring($result));
     }
 
     public function test_processes_scale()
@@ -334,8 +435,7 @@ class GdDriverTest extends TestCase
     {
         $driver = new GdDriver;
 
-        $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('The image format [text/plain] is not supported.');
+        $this->expectExceptionObject(new ImageException('The image format [text/plain] is not supported.'));
 
         $driver->process('not-an-image', new ImagePipeline);
     }
@@ -376,11 +476,46 @@ class GdDriverTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function test_dimensions_returns_the_decoded_size()
+    {
+        $driver = new GdDriver;
+        $contents = $driver->process($this->fakeImageContents(320, 240), $this->pipeline(new Cover(200, 150), format: 'png'));
+
+        $this->assertSame([200, 150], $driver->dimensions($contents));
+    }
+
     protected function fakeImageContents(int $width = 100, int $height = 100): string
     {
         $file = UploadedFile::fake()->image('test.jpg', $width, $height);
 
         return file_get_contents($file->getRealPath());
+    }
+
+    protected function solidColorImageContents(int $red, int $green, int $blue, int $width = 100, int $height = 100): string
+    {
+        $image = imagecreatetruecolor($width, $height);
+        $color = imagecolorallocate($image, $red, $green, $blue);
+        imagefill($image, 0, 0, $color);
+
+        ob_start();
+        imagepng($image);
+
+        return ob_get_clean();
+    }
+
+    protected function semiTransparentColorImageContents(int $red, int $green, int $blue, int $alpha, int $width = 100, int $height = 100): string
+    {
+        $image = imagecreatetruecolor($width, $height);
+        imagesavealpha($image, true);
+        // GD alpha runs 0 (opaque) to 127 (fully transparent), the inverse of a 0-255 alpha channel.
+        $gdAlpha = (int) round((255 - $alpha) / 255 * 127);
+        $color = imagecolorallocatealpha($image, $red, $green, $blue, $gdAlpha);
+        imagefill($image, 0, 0, $color);
+
+        ob_start();
+        imagepng($image);
+
+        return ob_get_clean();
     }
 
     protected function pipeline(?Transformation $transformation = null, ?string $format = null, ?int $quality = null): ImagePipeline

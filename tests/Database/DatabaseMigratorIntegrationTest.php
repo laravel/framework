@@ -10,7 +10,7 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Str;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMigratorIntegrationTest extends TestCase
@@ -58,7 +58,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
             new Filesystem
         );
 
-        $output = m::mock(OutputStyle::class);
+        $output = Mockery::mock(OutputStyle::class);
         $output->shouldReceive('write');
         $output->shouldReceive('writeln');
         $output->shouldReceive('newLinesWritten');
@@ -81,8 +81,6 @@ class DatabaseMigratorIntegrationTest extends TestCase
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 
     public function testBasicMigrationOfSingleFolder()
@@ -92,8 +90,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertTrue($this->db::schema()->hasTable('users'));
         $this->assertTrue($this->db::schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($ran[0], 'users'));
-        $this->assertTrue(str_contains($ran[1], 'password_resets'));
+        $this->assertStringContainsString('users', $ran[0]);
+        $this->assertStringContainsString('password_resets', $ran[1]);
     }
 
     public function testMigrationsDefaultConnectionCanBeChanged()
@@ -154,8 +152,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertFalse($this->db::schema()->hasTable('users'));
         $this->assertFalse($this->db::schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
-        $this->assertTrue(str_contains($rolledBack[1], 'users'));
+        $this->assertStringContainsString('password_resets', $rolledBack[0]);
+        $this->assertStringContainsString('users', $rolledBack[1]);
     }
 
     public function testMigrationsCanBeResetUsingAnString()
@@ -167,8 +165,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertFalse($this->db::schema()->hasTable('users'));
         $this->assertFalse($this->db::schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
-        $this->assertTrue(str_contains($rolledBack[1], 'users'));
+        $this->assertStringContainsString('password_resets', $rolledBack[0]);
+        $this->assertStringContainsString('users', $rolledBack[1]);
     }
 
     public function testMigrationsCanBeResetUsingAnArray()
@@ -180,8 +178,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertFalse($this->db::schema()->hasTable('users'));
         $this->assertFalse($this->db::schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
-        $this->assertTrue(str_contains($rolledBack[1], 'users'));
+        $this->assertStringContainsString('password_resets', $rolledBack[0]);
+        $this->assertStringContainsString('users', $rolledBack[1]);
     }
 
     public function testNoErrorIsThrownWhenNoOutstandingMigrationsExist()

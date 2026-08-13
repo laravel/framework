@@ -497,7 +497,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileJoinLateral(JoinLateralClause $join, string $expression): string
     {
-        $type = $join->type == 'left' ? 'outer' : 'cross';
+        $type = $join->type === 'left' ? 'outer' : 'cross';
 
         return trim("{$type} apply {$expression}");
     }

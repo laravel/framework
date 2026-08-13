@@ -10,7 +10,6 @@ use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
@@ -23,11 +22,15 @@ class ServeCommand extends Command
     use InteractsWithTime;
 
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'serve';
+    protected $signature = 'serve
+                    {--host= : The host address to serve the application on}
+                    {--port= : The port to serve the application on}
+                    {--tries=10 : The max number of ports to attempt to serve from}
+                    {--no-reload : Do not reload the development server on .env file changes}';
 
     /**
      * The console command description.
@@ -92,6 +95,15 @@ class ServeCommand extends Command
         'XDEBUG_MODE',
         'XDEBUG_SESSION',
     ];
+
+    #[\Override]
+    protected function configureDefaults(): void
+    {
+        // The host and port default to whatever is configured via the environment, so
+        // they can't be expressed as static defaults in the signature above.
+        $this->getDefinition()->getOption('host')->setDefault(Env::get('SERVER_HOST', '127.0.0.1'));
+        $this->getDefinition()->getOption('port')->setDefault(Env::get('SERVER_PORT'));
+    }
 
     /** {@inheritdoc} */
     #[\Override]
@@ -257,7 +269,7 @@ class ServeCommand extends Command
      */
     protected function getHostAndPort()
     {
-        if (preg_match('/(\[.*\]):?([0-9]+)?/', $this->input->getOption('host'), $matches) !== false) {
+        if (preg_match('/(\[.*\]):?([0-9]+)?/', $this->input->getOption('host'), $matches) === 1) {
             return [
                 $matches[1] ?? $this->input->getOption('host'),
                 $matches[2] ?? null,
@@ -435,20 +447,5 @@ class ServeCommand extends Command
         }
 
         return (int) $matches[2];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on', Env::get('SERVER_HOST', '127.0.0.1')],
-            ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', Env::get('SERVER_PORT')],
-            ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
-            ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
-        ];
     }
 }

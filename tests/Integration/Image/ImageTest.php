@@ -47,6 +47,25 @@ class ImageTest extends TestCase
         $this->assertSame(200, $height);
     }
 
+    public function test_contain_with_dominant_background()
+    {
+        $image = new Image($this->solidColorImageContents(255, 0, 0, 400, 200));
+
+        $result = $image->contain(200, 200, 'dominant')->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(200, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_dominant_color_returns_hex()
+    {
+        $image = new Image($this->solidColorImageContents(0, 128, 255));
+
+        $this->assertSame('#0080ff', $image->dominantColor());
+    }
+
     public function test_crop_and_to_bytes()
     {
         $image = new Image($this->fakeImageContents(400, 200));
@@ -81,6 +100,16 @@ class ImageTest extends TestCase
 
         $this->assertSame(50, $width);
         $this->assertSame(100, $height);
+    }
+
+    public function test_rotate_with_dominant_background()
+    {
+        $image = new Image($this->solidColorImageContents(0, 255, 0, 100, 50));
+
+        $result = $image->rotate(45, 'dominant')->toBytes();
+
+        $this->assertNotEmpty($result);
+        $this->assertNotFalse(getimagesizefromstring($result));
     }
 
     public function test_to_png_and_to_bytes()
@@ -477,6 +506,21 @@ class ImageTest extends TestCase
         $this->assertSame(100, $height);
     }
 
+    public function test_branching_after_to_bytes_does_not_reapply_stale_transformations(): void
+    {
+        $image = new Image($this->fakeImageContents(100, 50));
+
+        $rotatedOnce = $image->rotate(90);
+        $rotatedOnce->toBytes();
+
+        $rotatedTwice = $rotatedOnce->rotate(90);
+
+        [$width, $height] = getimagesizefromstring($rotatedTwice->toBytes());
+
+        $this->assertSame(100, $width);
+        $this->assertSame(50, $height);
+    }
+
     public function test_store_as_with_name_only()
     {
         Storage::fake('local');
@@ -750,5 +794,17 @@ class ImageTest extends TestCase
         $file = UploadedFile::fake()->image('test.jpg', $width, $height);
 
         return file_get_contents($file->getRealPath());
+    }
+
+    protected function solidColorImageContents(int $red, int $green, int $blue, int $width = 100, int $height = 100): string
+    {
+        $image = imagecreatetruecolor($width, $height);
+        $color = imagecolorallocate($image, $red, $green, $blue);
+        imagefill($image, 0, 0, $color);
+
+        ob_start();
+        imagepng($image);
+
+        return ob_get_clean();
     }
 }

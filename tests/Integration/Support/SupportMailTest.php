@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Support;
+namespace Illuminate\Tests\Integration\Support;
 
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;

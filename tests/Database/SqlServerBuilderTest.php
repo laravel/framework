@@ -5,18 +5,18 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SqlServerBuilderTest extends TestCase
 {
     public function testCreateDatabase()
     {
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $grammar = new SqlServerGrammar($connection);
 
-        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $connection->shouldReceive('statement')->once()->with(
+        $connection->expects('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('statement')->with(
             'create database "my_temporary_database_a"'
         )->andReturn(true);
 
@@ -26,11 +26,11 @@ class SqlServerBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $grammar = new SqlServerGrammar($connection);
 
-        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $connection->shouldReceive('statement')->once()->with(
+        $connection->expects('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('statement')->with(
             'drop database if exists "my_temporary_database_b"'
         )->andReturn(true);
 

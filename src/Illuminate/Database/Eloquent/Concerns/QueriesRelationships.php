@@ -1120,7 +1120,7 @@ trait QueriesRelationships
      */
     protected function getRelationWithoutConstraints($relation)
     {
-        return Relation::noConstraints(function () use ($relation) {
+        return Relation::noConstraintsForRelation(function () use ($relation) {
             return $this->getModel()->{$relation}();
         });
     }

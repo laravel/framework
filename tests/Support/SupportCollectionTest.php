@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use JsonSerializable;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
@@ -699,10 +699,10 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testToArrayCallsToArrayOnEachItemInCollection($collection)
     {
-        $item1 = m::mock(Arrayable::class);
-        $item1->shouldReceive('toArray')->once()->andReturn('foo.array');
-        $item2 = m::mock(Arrayable::class);
-        $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
+        $item1 = Mockery::mock(Arrayable::class);
+        $item1->expects('toArray')->andReturn('foo.array');
+        $item2 = Mockery::mock(Arrayable::class);
+        $item2->expects('toArray')->andReturn('bar.array');
         $c = new $collection([$item1, $item2]);
         $results = $c->toArray();
 
@@ -724,10 +724,10 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testJsonSerializeCallsToArrayOrJsonSerializeOnEachItemInCollection($collection)
     {
-        $item1 = m::mock(JsonSerializable::class);
-        $item1->shouldReceive('jsonSerialize')->once()->andReturn('foo.json');
-        $item2 = m::mock(Arrayable::class);
-        $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
+        $item1 = Mockery::mock(JsonSerializable::class);
+        $item1->expects('jsonSerialize')->andReturn('foo.json');
+        $item2 = Mockery::mock(Arrayable::class);
+        $item2->expects('toArray')->andReturn('bar.array');
         $c = new $collection([$item1, $item2]);
         $results = $c->jsonSerialize();
 
@@ -2297,8 +2297,28 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testFlip($collection)
     {
+        $this->assertSame([], (new $collection)->flip()->all());
+        $this->assertSame(['taylor' => 'name'], (new $collection(['name' => 'taylor']))->flip()->all());
+
         $data = new $collection(['name' => 'taylor', 'framework' => 'laravel']);
         $this->assertEquals(['taylor' => 'name', 'laravel' => 'framework'], $data->flip()->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testFlipSkipsUnsupportedValues($collection)
+    {
+        $data = new $collection([
+            'string' => 'taylor',
+            'integer' => 1,
+            'null' => null,
+            'false' => false,
+            'true' => true,
+            'float' => 1.5,
+            'array' => [],
+            'object' => new stdClass,
+        ]);
+
+        $this->assertSame(['taylor' => 'string', 1 => 'integer'], @$data->flip()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -3439,8 +3459,7 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testNthThrowsExceptionForInvalidStep($collection)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Step value must be at least 1.');
+        $this->expectExceptionObject(new InvalidArgumentException('Step value must be at least 1.'));
 
         (new $collection([1, 2, 3]))->nth(0)->all();
     }
@@ -3448,8 +3467,7 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testNthThrowsExceptionForNegativeStep($collection)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Step value must be at least 1.');
+        $this->expectExceptionObject(new InvalidArgumentException('Step value must be at least 1.'));
 
         (new $collection([1, 2, 3]))->nth(-1)->all();
     }
@@ -3457,8 +3475,7 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testSplitThrowsExceptionForInvalidNumberOfGroups($collection)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Number of groups must be at least 1.');
+        $this->expectExceptionObject(new InvalidArgumentException('Number of groups must be at least 1.'));
 
         (new $collection([1, 2, 3]))->split(0);
     }
@@ -3466,8 +3483,7 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testSplitThrowsExceptionForNegativeNumberOfGroups($collection)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Number of groups must be at least 1.');
+        $this->expectExceptionObject(new InvalidArgumentException('Number of groups must be at least 1.'));
 
         (new $collection([1, 2, 3]))->split(-1);
     }
@@ -3475,8 +3491,7 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testSplitInThrowsExceptionForInvalidNumberOfGroups($collection)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Number of groups must be at least 1.');
+        $this->expectExceptionObject(new InvalidArgumentException('Number of groups must be at least 1.'));
 
         (new $collection([1, 2, 3]))->splitIn(0);
     }
@@ -3484,8 +3499,7 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testSplitInThrowsExceptionForNegativeNumberOfGroups($collection)
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Number of groups must be at least 1.');
+        $this->expectExceptionObject(new InvalidArgumentException('Number of groups must be at least 1.'));
 
         (new $collection([1, 2, 3]))->splitIn(-1);
     }
@@ -3751,6 +3765,19 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testGroupByNull($collection)
+    {
+        $data = new $collection($payload = [
+            ['name' => 'a', 'url' => '1'],
+            ['name' => 'b', 'url' => null],
+            ['name' => 'c', 'url' => null],
+        ]);
+
+        $result = $data->groupBy('url');
+        $this->assertEquals(['1' => [$payload[0]], '' => [$payload[1], $payload[2]]], $result->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testKeyByAttribute($collection)
     {
         $data = new $collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => '2'], ['rating' => 3, 'name' => '3']]);
@@ -3808,6 +3835,15 @@ class SupportCollectionTest extends TestCase
             '[0,"Taylor","Otwell"]' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
             '[1,"Lucas","Michot"]' => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
         ], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testKeyByNull($collection)
+    {
+        $data = new $collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => null]]);
+
+        $result = $data->keyBy('name');
+        $this->assertEquals(['1' => ['rating' => 1, 'name' => '1'], '' => ['rating' => 2, 'name' => null]], $result->all());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -5808,8 +5844,7 @@ class SupportCollectionTest extends TestCase
     public function testItThrowsExceptionWhenTryingToAccessNoProxyProperty($collection)
     {
         $data = new $collection;
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Property [foo] does not exist on this collection instance.');
+        $this->expectExceptionObject(new Exception('Property [foo] does not exist on this collection instance.'));
         $data->foo;
     }
 
@@ -6013,8 +6048,7 @@ class SupportCollectionTest extends TestCase
         $data->ensure('int');
 
         $data = $collection::make([1, 2, 3, 'foo']);
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage("Collection should only include [int] items, but 'string' found at position 3.");
+        $this->expectExceptionObject(new UnexpectedValueException("Collection should only include [int] items, but 'string' found at position 3."));
         $data->ensure('int');
     }
 
@@ -6025,8 +6059,7 @@ class SupportCollectionTest extends TestCase
         $data->ensure(stdClass::class);
 
         $data = $collection::make([new stdClass, new stdClass, new stdClass, $collection]);
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage(sprintf('Collection should only include [%s] items, but \'%s\' found at position %d.', class_basename(new stdClass()), gettype($collection), 3));
+        $this->expectExceptionObject(new UnexpectedValueException(sprintf('Collection should only include [%s] items, but \'%s\' found at position %d.', class_basename(new stdClass()), gettype($collection), 3)));
         $data->ensure(stdClass::class);
     }
 
@@ -6038,8 +6071,7 @@ class SupportCollectionTest extends TestCase
 
         $wrongType = new $collection;
         $data = $collection::make([new \Error, new \Error, $wrongType]);
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage(sprintf("Collection should only include [%s] items, but '%s' found at position %d.", \Throwable::class, get_class($wrongType), 2));
+        $this->expectExceptionObject(new UnexpectedValueException(sprintf("Collection should only include [%s] items, but '%s' found at position %d.", \Throwable::class, get_class($wrongType), 2)));
         $data->ensure(\Throwable::class);
     }
 
@@ -6051,8 +6083,7 @@ class SupportCollectionTest extends TestCase
 
         $wrongType = new $collection;
         $data = $collection::make([new \Error, new \Error, $wrongType]);
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage(sprintf('Collection should only include [%s] items, but \'%s\' found at position %d.', implode(', ', [\Throwable::class, 'int']), get_class($wrongType), 2));
+        $this->expectExceptionObject(new UnexpectedValueException(sprintf('Collection should only include [%s] items, but \'%s\' found at position %d.', implode(', ', [\Throwable::class, 'int']), get_class($wrongType), 2)));
         $data->ensure([\Throwable::class, 'int']);
     }
 

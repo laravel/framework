@@ -9,6 +9,8 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
+use Illuminate\Queue\Events\WorkerQueuePaused;
+use Illuminate\Queue\Events\WorkerQueueResumed;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
@@ -203,6 +205,14 @@ class WorkCommand extends Command
             $this->logFailedJob($event);
         });
 
+        $this->laravel['events']->listen(WorkerQueuePaused::class, function ($event) {
+            $this->writeQueueStatus($event->queue, 'paused');
+        });
+
+        $this->laravel['events']->listen(WorkerQueueResumed::class, function ($event) {
+            $this->writeQueueStatus($event->queue, 'resumed');
+        });
+
         static::$hasRegisteredListeners = true;
     }
 
@@ -226,6 +236,40 @@ class WorkCommand extends Command
     }
 
     /**
+     * Write the status output for a paused or resumed queue.
+     *
+     * @param  string  $queue
+     * @param  string  $status
+     * @return void
+     */
+    protected function writeQueueStatus($queue, $status)
+    {
+        if ($this->output->isQuiet() || $this->output->isSilent()) {
+            return;
+        }
+
+        if ($this->outputUsingJson()) {
+            $this->output->writeln(json_encode([
+                'level' => 'warning',
+                'queue' => $queue,
+                'status' => $status,
+                'timestamp' => $this->now()->format('Y-m-d\TH:i:s.uP'),
+            ]));
+
+            return;
+        }
+
+        $this->output->writeln(sprintf(
+            '  <fg=gray>%s</> Queue <fg=blue>%s</> %s',
+            $this->now()->format('Y-m-d H:i:s'),
+            $queue,
+            $status === 'paused'
+                ? '<fg=yellow;options=bold>PAUSED</>'
+                : '<fg=green;options=bold>RESUMED</>',
+        ));
+    }
+
+    /**
      * Write the status output for the queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -245,7 +289,7 @@ class WorkCommand extends Command
                 : ''
         )));
 
-        if ($status == 'starting') {
+        if ($status === 'starting') {
             $this->latestStartedAt = microtime(true);
 
             $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (

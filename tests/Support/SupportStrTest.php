@@ -10,17 +10,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
+use TypeError;
 use ValueError;
 
 class SupportStrTest extends TestCase
 {
-    /** {@inheritdoc} */
-    #[\Override]
-    protected function tearDown(): void
-    {
-        Str::createRandomStringsNormally();
-    }
-
     public function testStringCanBeLimitedByWords(): void
     {
         $this->assertSame('Taylor...', Str::words('Taylor Otwell', 1));
@@ -874,18 +868,21 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
-    public function testWhetherTheNumberOfGeneratedCharactersIsEquallyDistributed()
+    public function testWhetherTheNumberOfGeneratedCharactersIsEquallyDistributed(): void
     {
         $results = [];
-        // take 6.200.000 samples, because there are 62 different characters
-        for ($i = 0; $i < 620000; $i++) {
+
+        // take 620.000 samples, because there are 62 different characters
+        for ($i = 0; $i < 620_000; $i++) {
             $random = Str::random(1);
             $results[$random] = ($results[$random] ?? 0) + 1;
         }
 
-        // each character should occur 100.000 times with a variance of 5%.
+        // Each character should occur close to 10_000 times. The expected count is
+        // binomially distributed with a standard deviation of ~100, so allow a
+        // generous margin to avoid flaky failures from ordinary sampling noise.
         foreach ($results as $result) {
-            $this->assertEqualsWithDelta(10000, $result, 500);
+            $this->assertEqualsWithDelta(10_000, $result, 800);
         }
     }
 
@@ -928,7 +925,7 @@ class SupportStrTest extends TestCase
         Str::random();
 
         try {
-            $this->expectExceptionMessage('Out of random strings.');
+            $this->expectExceptionObject(new Exception('Out of random strings.'));
             Str::random();
             $this->fail();
         } finally {
@@ -945,6 +942,20 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo/bar/baz', Str::replace(' ', '/', 'foo bar baz'));
         $this->assertSame('foo bar baz', Str::replace(['?1', '?2', '?3'], ['foo', 'bar', 'baz'], '?1 ?2 ?3'));
         $this->assertSame(['foo', 'bar', 'baz'], Str::replace(collect(['?1', '?2', '?3']), collect(['foo', 'bar', 'baz']), collect(['?1', '?2', '?3'])));
+
+        $this->assertSame('Xltý kôň', Str::replace('ž', 'X', 'Žltý kôň', false));
+        $this->assertSame('žltý pes', Str::replace('KÔŇ', 'pes', 'žltý kôň', false));
+        $this->assertSame('Xltý pes', Str::replace(['ž', 'KÔŇ'], ['X', 'pes'], 'Žltý kôň', false));
+        $this->assertSame(['Xltý', 'kôň'], Str::replace('ž', 'X', ['Žltý', 'kôň'], false));
+        $this->assertSame('ſ Yito X', Str::replace(['s', 'ž'], ['X', 'Y'], 'ſ žito s', false));
+        $this->assertSame("caf\xC3 X", Str::replace('ž', 'X', "caf\xC3 ž", false));
+    }
+
+    public function testReplaceThrowsForScalarSearchAndArrayReplacement()
+    {
+        $this->expectException(\TypeError::class);
+
+        Str::replace('ž', ['X'], 'Ž', false);
     }
 
     public function testReplaceArray()
@@ -1026,6 +1037,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('Fooar', Str::remove(['f', 'b'], 'Foobar'));
         $this->assertSame('ooar', Str::remove(['f', 'b'], 'Foobar', false));
         $this->assertSame('Foobar', Str::remove(['f', '|'], 'Foo|bar'));
+
+        $this->assertSame('ltý', Str::remove('ž', 'Žltý', false));
+        $this->assertSame('žltý ', Str::remove('KÔŇ', 'žltý kôň', false));
     }
 
     public function testReverse()
@@ -1372,6 +1386,62 @@ class SupportStrTest extends TestCase
         $this->assertSame('kenga', Str::substrReplace('kenka', 'ng', -3, 2));
     }
 
+    public function testSubstrReplaceWithArrays()
+    {
+        $this->assertSame(
+            ['INV-****', 'INV-****'],
+            Str::substrReplace(['INV-1234', 'INV-5678'], ['****', '****'], [4, 4], [4, 4])
+        );
+
+        $this->assertSame(
+            ['first' => 'aXc', 'second' => 'Yef', 'third' => ''],
+            Str::substrReplace(
+                ['first' => 'abc', 'second' => 'def', 'third' => 'ghi'],
+                ['X', 'Y'],
+                [1],
+                [1, 1]
+            )
+        );
+
+        $this->assertSame('kengä', Str::substrReplace('kenkä', ['ng'], -3, 2));
+        $this->assertSame('ac', Str::substrReplace('abc', [], 1, 1));
+        $this->assertSame(
+            ['kengä', 'БXДЖ'],
+            Str::substrReplace(['kenkä', 'БГДЖ'], ['ng', 'X'], [-3, 1], [2, 1])
+        );
+        $this->assertSame(
+            ['kXnkä', 'БXДЖ'],
+            Str::substrReplace(['kenkä', 'БГДЖ'], 'X', 1, 1)
+        );
+        $this->assertSame(
+            ['keX', 'БГX'],
+            Str::substrReplace(['kenkä', 'БГДЖ'], 'X', 2)
+        );
+        $this->assertSame(
+            ['first' => 'aXc', 'second' => 'deY'],
+            Str::substrReplace(
+                ['first' => 'abc', 'second' => 'def'],
+                ['second' => 'X', 'first' => 'Y'],
+                [10 => 1, 20 => 2],
+                [30 => 1, 40 => 1]
+            )
+        );
+    }
+
+    public function testSubstrReplaceWithArrayOffsetRequiresArraySubject()
+    {
+        $this->expectException(TypeError::class);
+
+        Str::substrReplace('abc', 'X', [1], 1);
+    }
+
+    public function testSubstrReplaceWithArrayLengthRequiresArraySubject()
+    {
+        $this->expectException(TypeError::class);
+
+        Str::substrReplace('abc', 'X', 1, [1]);
+    }
+
     public function testTake()
     {
         $this->assertSame('ab', Str::take('abcdef', 2));
@@ -1501,6 +1571,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('Hel<br />lo<br />Wor<br />ld', Str::wordWrap('Hello World', 3, '<br />', true));
 
         $this->assertSame('❤Multi<br />Byte☆❤☆❤☆❤', Str::wordWrap('❤Multi Byte☆❤☆❤☆❤', 3, '<br />'));
+
+        $this->assertSame('žltý kôň', Str::wordWrap('žltý kôň', 8, "\n"));
+        $this->assertSame("žltý\nkôň", Str::wordWrap('žltý kôň', 4, "\n", true));
+        $this->assertSame("žl\ntý", Str::wordWrap('žltý', 2, "\n", true));
+        $this->assertSame("😀😀\n😀😀", Str::wordWrap('😀😀😀😀', 2, "\n", true));
+        $this->assertSame("éA\x1ABé", Str::wordWrap('é é', 1, "A\x1AB"));
+        $this->assertSame('❤Mu<br />lti<br />Byt<br />e☆❤<br />☆❤☆<br />❤', Str::wordWrap('❤Multi Byte☆❤☆❤☆❤', 3, '<br />', true));
     }
 
     public static function validUuidList()
@@ -1617,6 +1694,7 @@ class SupportStrTest extends TestCase
             ['Taylor Otwell', ['taylor'], true, true],
             ['Taylor Otwell', ['taylor', 'xxx'], false, false],
             ['Taylor Otwell', ['taylor', 'xxx'], false, true],
+            ['Taylor Otwell', [], false, false],
         ];
     }
 
@@ -1761,16 +1839,16 @@ class SupportStrTest extends TestCase
         $this->assertSame((string) $first, (string) $retrieved);
 
         $retrieved = Str::uuid();
-        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
-        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+        $this->assertNotContains($retrieved, [$zeroth, $first, $third]);
+        $this->assertNotContains((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third]);
 
         $retrieved = Str::uuid();
         $this->assertSame($third, $retrieved);
         $this->assertSame((string) $third, (string) $retrieved);
 
         $retrieved = Str::uuid();
-        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
-        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+        $this->assertNotContains($retrieved, [$zeroth, $first, $third]);
+        $this->assertNotContains((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third]);
 
         Str::createUuidsNormally();
     }
@@ -1782,7 +1860,7 @@ class SupportStrTest extends TestCase
         Str::uuid();
 
         try {
-            $this->expectExceptionMessage('Out of Uuids.');
+            $this->expectExceptionObject(new Exception('Out of Uuids.'));
             Str::uuid();
             $this->fail();
         } finally {
@@ -1863,16 +1941,16 @@ class SupportStrTest extends TestCase
         $this->assertSame((string) $first, (string) $retrieved);
 
         $retrieved = Str::ulid();
-        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
-        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+        $this->assertNotContains($retrieved, [$zeroth, $first, $third]);
+        $this->assertNotContains((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third]);
 
         $retrieved = Str::ulid();
         $this->assertSame($third, $retrieved);
         $this->assertSame((string) $third, (string) $retrieved);
 
         $retrieved = Str::ulid();
-        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
-        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+        $this->assertNotContains($retrieved, [$zeroth, $first, $third]);
+        $this->assertNotContains((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third]);
 
         Str::createUlidsNormally();
     }
@@ -1887,7 +1965,7 @@ class SupportStrTest extends TestCase
         Str::ulid();
 
         try {
-            $this->expectExceptionMessage('Out of Ulids');
+            $this->expectExceptionObject(new Exception('Out of Ulids'));
             Str::ulid();
             $this->fail();
         } finally {
@@ -1897,7 +1975,7 @@ class SupportStrTest extends TestCase
 
     public function testPasswordCreation()
     {
-        $this->assertTrue(strlen(Str::password()) === 32);
+        $this->assertSame(strlen(Str::password()), 32);
 
         $this->assertStringNotContainsString(' ', Str::password());
         $this->assertStringContainsString(' ', Str::password(spaces: true));

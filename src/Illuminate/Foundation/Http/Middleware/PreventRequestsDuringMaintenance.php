@@ -9,6 +9,7 @@ use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
 use Illuminate\Foundation\Http\Middleware\Concerns\ExcludesPaths;
 use Illuminate\Support\Arr;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use TypeError;
 
 class PreventRequestsDuringMaintenance
 {
@@ -64,7 +65,7 @@ class PreventRequestsDuringMaintenance
         if ($this->app->maintenanceMode()->active()) {
             try {
                 $data = $this->app->maintenanceMode()->data();
-            } catch (ErrorException $exception) {
+            } catch (ErrorException|TypeError $exception) {
                 if (! $this->app->maintenanceMode()->active()) {
                     return $next($request);
                 }
@@ -72,7 +73,7 @@ class PreventRequestsDuringMaintenance
                 throw $exception;
             }
 
-            if (isset($data['secret']) && $request->path() === $data['secret']) {
+            if (is_string($data['secret'] ?? null) && hash_equals($data['secret'], $request->path())) {
                 return $this->bypassResponse($data['secret']);
             }
 

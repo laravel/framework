@@ -8,6 +8,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Contracts\Image\Transformation;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Transformations\Blur;
 use Illuminate\Image\Transformations\Contain;
@@ -27,7 +29,7 @@ use Illuminate\Support\Traits\Macroable;
 use Stringable;
 use Throwable;
 
-class Image implements Stringable
+class Image implements Responsable, Stringable
 {
     use Conditionable, Macroable;
 
@@ -259,15 +261,57 @@ class Image implements Stringable
     }
 
     /**
+     * Convert the image to PNG format.
+     */
+    public function toPng(): static
+    {
+        return $this->toFormat('png');
+    }
+
+    /**
+     * Convert the image to GIF format.
+     */
+    public function toGif(): static
+    {
+        return $this->toFormat('gif');
+    }
+
+    /**
+     * Convert the image to AVIF format.
+     */
+    public function toAvif(): static
+    {
+        return $this->toFormat('avif');
+    }
+
+    /**
+     * Convert the image to HEIC format.
+     */
+    public function toHeic(): static
+    {
+        return $this->toFormat('heic');
+    }
+
+    /**
+     * Convert the image to BMP format.
+     */
+    public function toBmp(): static
+    {
+        return $this->toFormat('bmp');
+    }
+
+    /**
      * Set the output format.
      *
      * @throws ImageException
      */
-    protected function toFormat(string $format): static
+    public function toFormat(string $format): static
     {
-        if (! in_array($format, ['webp', 'jpg', 'jpeg'])) {
+        if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'heic', 'heif', 'bmp'])) {
             throw new ImageException("The [{$format}] format is not supported.");
         }
+
+        $format = $format === 'heif' ? 'heic' : $format;
 
         return $this->withOutput(fn (ImageOutputOptions $output) => $output->format = $format);
     }
@@ -358,6 +402,7 @@ class Image implements Stringable
                 throw new ImageException("Failed to process image: {$e->getMessage()}", 0, $e);
             }
 
+            $this->pipeline = new ImagePipeline;
             $this->processed = true;
         }
 
@@ -390,6 +435,8 @@ class Image implements Stringable
             'image/png' => 'png',
             'image/gif' => 'gif',
             'image/webp' => 'webp',
+            'image/avif', 'image/x-avif' => 'avif',
+            'image/heic', 'image/x-heic', 'image/heif' => 'heic',
             'image/bmp' => 'bmp',
             'image/svg+xml' => 'svg',
             'image/tiff' => 'tiff',
@@ -415,7 +462,18 @@ class Image implements Stringable
     public function dimensions(): array
     {
         return once(function () {
-            $size = @getimagesizefromstring($this->toBytes());
+            $contents = $this->toBytes();
+
+            // getimagesize() misreports HEIC's coded / padded frame size, so read HEIC via the driver...
+            if (in_array($this->mimeType(), ['image/heic', 'image/heif', 'image/x-heic'], true)) {
+                try {
+                    return $this->resolveDriver()->dimensions($contents);
+                } catch (Throwable) {
+                    // The driver can't decode this image; fall back to the native reader below...
+                }
+            }
+
+            $size = @getimagesizefromstring($contents);
 
             if ($size === false) {
                 throw new ImageException('Unable to determine the dimensions of the image.');
@@ -439,6 +497,22 @@ class Image implements Stringable
     public function height(): int
     {
         return $this->dimensions()[1];
+    }
+
+    /**
+     * Get the dominant (average) color of the image as a hex string.
+     */
+    public function dominantColor(): string
+    {
+        return once(function () {
+            $contents = value($this->contents);
+
+            if ($this->pipeline->hasChanges() && ! $this->processed) {
+                $contents = $this->resolveDriver()->process($contents, clone $this->pipeline);
+            }
+
+            return $this->resolveDriver()->dominantColor($contents);
+        });
     }
 
     /**
@@ -523,8 +597,19 @@ class Image implements Stringable
     }
 
     /**
-     * Prevent serialization of the image.
+     * Create an HTTP response that represents the image.
      *
+     * @param  \Illuminate\Http\Request  $request
+     */
+    public function toResponse($request): Response
+    {
+        return new Response($this->toBytes(), 200, [
+            'Content-Type' => $this->mimeType(),
+        ]);
+    }
+
+    /**
+     * Prevent serialization of the image.
      *
      * @throws ImageException
      */

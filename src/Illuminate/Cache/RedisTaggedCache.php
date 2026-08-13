@@ -94,6 +94,8 @@ class RedisTaggedCache extends TaggedCache
      */
     public function decrement($key, $value = 1)
     {
+        $key = enum_value($key);
+
         $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
 
         return parent::decrement($key, $value);
@@ -157,8 +159,10 @@ class RedisTaggedCache extends TaggedCache
             end
         LUA;
 
+        $prefix = $this->store->getPrefix();
+
         $entries = $this->tags->entries()
-            ->map(fn (string $key) => $this->store->getPrefix().$key)
+            ->map(fn (string $key) => $prefix.$key)
             ->chunk(1000);
 
         foreach ($entries as $keysToBeDeleted) {
@@ -199,8 +203,10 @@ class RedisTaggedCache extends TaggedCache
      */
     protected function flushValues()
     {
+        $prefix = $this->store->getPrefix();
+
         $entries = $this->tags->entries()
-            ->map(fn (string $key) => $this->store->getPrefix().$key)
+            ->map(fn (string $key) => $prefix.$key)
             ->chunk(1000);
 
         $connection = $this->store->connection();

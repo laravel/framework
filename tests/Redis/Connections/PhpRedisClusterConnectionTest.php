@@ -3,7 +3,8 @@
 namespace Illuminate\Tests\Redis\Connections;
 
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
-use Mockery as m;
+use InvalidArgumentException;
+use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -12,10 +13,9 @@ class PhpRedisClusterConnectionTest extends TestCase
 {
     public function testItScansUsingDefaultNode()
     {
-        $client = m::mock(\RedisCluster::class);
-        $client->shouldReceive('_masters')->once()->andReturn([['127.0.0.1', '6379']]);
-        $client->shouldReceive('scan')
-            ->once()
+        $client = Mockery::mock(\RedisCluster::class);
+        $client->expects('_masters')->andReturn([['127.0.0.1', '6379']]);
+        $client->expects('scan')
             ->with(0, ['127.0.0.1', '6379'], '*', 10)
             ->andReturn(['key']);
 
@@ -25,9 +25,9 @@ class PhpRedisClusterConnectionTest extends TestCase
 
     public function testItOnlyFetchesDefaultNodeOnce()
     {
-        $client = m::mock(\RedisCluster::class);
-        $client->shouldReceive('_masters')->once()->andReturn([['127.0.0.1', '6379']]);
-        $client->shouldReceive('scan')->twice();
+        $client = Mockery::mock(\RedisCluster::class);
+        $client->expects('_masters')->andReturn([['127.0.0.1', '6379']]);
+        $client->expects('scan')->times(2);
 
         $connection = new PhpRedisClusterConnection($client);
         $connection->scan(0);
@@ -36,9 +36,8 @@ class PhpRedisClusterConnectionTest extends TestCase
 
     public function testItScansUsingOptionNode()
     {
-        $client = m::mock(\RedisCluster::class);
-        $client->shouldReceive('scan')
-            ->once()
+        $client = Mockery::mock(\RedisCluster::class);
+        $client->expects('scan')
             ->with(0, 'option-node', '*', 10)
             ->andReturn(['key']);
 
@@ -48,11 +47,11 @@ class PhpRedisClusterConnectionTest extends TestCase
 
     public function testItThrowsExceptionWithoutNodes()
     {
-        $client = m::mock(\RedisCluster::class);
-        $client->shouldReceive('_masters')->once()->andReturn([]);
-        $client->shouldReceive('scan');
+        $client = Mockery::mock(\RedisCluster::class);
+        $client->expects('_masters')->andReturn([]);
+        $client->shouldNotReceive('scan');
 
-        $this->expectExceptionMessage('Unable to determine default node. No master nodes found in the cluster.');
+        $this->expectExceptionObject(new InvalidArgumentException('Unable to determine default node. No master nodes found in the cluster.'));
 
         $connection = new PhpRedisClusterConnection($client);
         $connection->scan(0);
@@ -60,10 +59,9 @@ class PhpRedisClusterConnectionTest extends TestCase
 
     public function testItReturnsFalseWhenCursorIsZeroAndResultIsEmpty()
     {
-        $client = m::mock(\RedisCluster::class);
-        $client->shouldReceive('_masters')->once()->andReturn([['127.0.0.1', '6379']]);
-        $client->shouldReceive('scan')
-            ->once()
+        $client = Mockery::mock(\RedisCluster::class);
+        $client->expects('_masters')->andReturn([['127.0.0.1', '6379']]);
+        $client->expects('scan')
             ->with(0, ['127.0.0.1', '6379'], '*', 10)
             ->andReturn(false);
 
@@ -73,13 +71,13 @@ class PhpRedisClusterConnectionTest extends TestCase
 
     public function testItFlushesAllMasterNodes()
     {
-        $client = m::mock(\RedisCluster::class);
-        $client->shouldReceive('_masters')->once()->andReturn([
+        $client = Mockery::mock(\RedisCluster::class);
+        $client->expects('_masters')->andReturn([
             ['127.0.0.1', '6379'],
             ['127.0.0.2', '6379'],
         ]);
-        $client->shouldReceive('flushdb')->once()->with(['127.0.0.1', '6379']);
-        $client->shouldReceive('flushdb')->once()->with(['127.0.0.2', '6379']);
+        $client->expects('flushdb')->with(['127.0.0.1', '6379']);
+        $client->expects('flushdb')->with(['127.0.0.2', '6379']);
 
         $connection = new PhpRedisClusterConnection($client);
         $connection->flushdb();
@@ -87,13 +85,13 @@ class PhpRedisClusterConnectionTest extends TestCase
 
     public function testItFlushesAllMasterNodesAsync()
     {
-        $client = m::mock(\RedisCluster::class);
-        $client->shouldReceive('_masters')->once()->andReturn([
+        $client = Mockery::mock(\RedisCluster::class);
+        $client->expects('_masters')->andReturn([
             ['127.0.0.1', '6379'],
             ['127.0.0.2', '6379'],
         ]);
-        $client->shouldReceive('rawCommand')->once()->with(['127.0.0.1', '6379'], 'flushdb', 'async');
-        $client->shouldReceive('rawCommand')->once()->with(['127.0.0.2', '6379'], 'flushdb', 'async');
+        $client->expects('rawCommand')->with(['127.0.0.1', '6379'], 'flushdb', 'async');
+        $client->expects('rawCommand')->with(['127.0.0.2', '6379'], 'flushdb', 'async');
 
         $connection = new PhpRedisClusterConnection($client);
         $connection->flushdb('ASYNC');

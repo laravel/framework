@@ -22,6 +22,7 @@
         "illuminate/database": "^13.0",
         "illuminate/filesystem": "^13.0",
         "illuminate/pipeline": "^13.0",
+        "illuminate/reflection": "^13.0",
         "illuminate/support": "^13.0",
         "laravel/serializable-closure": "^2.0.10",
         "ramsey/uuid": "^4.7",

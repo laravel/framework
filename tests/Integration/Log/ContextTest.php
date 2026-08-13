@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Log;
+namespace Illuminate\Tests\Integration\Log;
 
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -22,7 +22,6 @@ class ContextTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
-    #[\Override]
     protected function tearDown(): void
     {
         MyAddContextProcessor::$wasConstructed = false;
@@ -152,8 +151,8 @@ class ContextTest extends TestCase
                 'array' => 'a:3:{i:0;i:1;i:1;i:2;i:2;i:3;}',
                 'hash' => 'a:1:{s:3:"foo";s:3:"bar";}',
                 'object' => 'O:8:"stdClass":1:{s:3:"foo";s:3:"bar";}',
-                'enum' => 'E:31:"Illuminate\Tests\Log\Suit:Clubs";',
-                'backed_enum' => 'E:43:"Illuminate\Tests\Log\StringBackedSuit:Clubs";',
+                'enum' => 'E:43:"Illuminate\Tests\Integration\Log\Suit:Clubs";',
+                'backed_enum' => 'E:55:"Illuminate\Tests\Integration\Log\StringBackedSuit:Clubs";',
             ],
             'hidden' => [
                 'number' => 'i:55;',
@@ -166,10 +165,10 @@ class ContextTest extends TestCase
         Context::hydrate($dehydrated);
 
         $this->assertSame('string', Context::get('string'));
-        $this->assertSame(false, Context::get('bool'));
+        $this->assertFalse(Context::get('bool'));
         $this->assertSame(5, Context::get('int'));
         $this->assertSame(5.5, Context::get('float'));
-        $this->assertSame(null, Context::get('null'));
+        $this->assertNull(Context::get('null'));
         $this->assertSame([1, 2, 3], Context::get('array'));
         $this->assertSame(['foo' => 'bar'], Context::get('hash'));
         $this->assertEquals(Context::get('object'), (object) ['foo' => 'bar']);
@@ -191,8 +190,7 @@ class ContextTest extends TestCase
     {
         Context::add('breadcrumbs', 'foo');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to push value onto context stack for key [breadcrumbs].');
+        $this->expectExceptionObject(new RuntimeException('Unable to push value onto context stack for key [breadcrumbs].'));
         Context::push('breadcrumbs', 'bar');
     }
 
@@ -200,8 +198,7 @@ class ContextTest extends TestCase
     {
         Context::add('breadcrumbs', ['foo' => 'bar']);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to push value onto context stack for key [breadcrumbs].');
+        $this->expectExceptionObject(new RuntimeException('Unable to push value onto context stack for key [breadcrumbs].'));
         Context::push('breadcrumbs', 'bar');
     }
 
@@ -219,8 +216,7 @@ class ContextTest extends TestCase
         Context::push('breadcrumbs', 'bar');
         Context::pop('breadcrumbs');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to pop value from context stack for key [breadcrumbs].');
+        $this->expectExceptionObject(new RuntimeException('Unable to pop value from context stack for key [breadcrumbs].'));
 
         Context::pop('breadcrumbs');
     }
@@ -229,8 +225,7 @@ class ContextTest extends TestCase
     {
         Context::add('breadcrumbs', ['foo' => 'bar']);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to pop value from context stack for key [breadcrumbs].');
+        $this->expectExceptionObject(new RuntimeException('Unable to pop value from context stack for key [breadcrumbs].'));
         Context::pop('breadcrumbs');
     }
 
@@ -248,8 +243,7 @@ class ContextTest extends TestCase
         Context::pushHidden('breadcrumbs', 'bar');
         Context::popHidden('breadcrumbs');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to pop value from hidden context stack for key [breadcrumbs].');
+        $this->expectExceptionObject(new RuntimeException('Unable to pop value from hidden context stack for key [breadcrumbs].'));
 
         Context::popHidden('breadcrumbs');
     }
@@ -258,8 +252,7 @@ class ContextTest extends TestCase
     {
         Context::addHidden('breadcrumbs', ['foo' => 'bar']);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to pop value from hidden context stack for key [breadcrumbs].');
+        $this->expectExceptionObject(new RuntimeException('Unable to pop value from hidden context stack for key [breadcrumbs].'));
         Context::popHidden('breadcrumbs');
     }
 
@@ -495,8 +488,7 @@ class ContextTest extends TestCase
 
         Context::addHidden('foo', 'bar');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to push value onto hidden context stack for key [foo].');
+        $this->expectExceptionObject(new RuntimeException('Unable to push value onto hidden context stack for key [foo].'));
         Context::pushHidden('foo', 2);
     }
 

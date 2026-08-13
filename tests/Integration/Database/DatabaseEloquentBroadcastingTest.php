@@ -14,7 +14,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
-use Mockery as m;
+use Mockery;
 
 class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 {
@@ -40,7 +40,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
             return $event->model instanceof TestEloquentBroadcastUser
                     && count($event->broadcastOn()) === 1
                     && $event->model->name === 'Taylor'
-                    && $event->broadcastOn()[0]->name == "private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{$event->model->id}";
+                    && $event->broadcastOn()[0]->name === "private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{$event->model->id}";
         });
     }
 
@@ -63,10 +63,10 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof SoftDeletableTestEloquentBroadcastUser
-                && $event->event() == 'trashed'
+                && $event->event() === 'trashed'
                 && count($event->broadcastOn()) === 1
                 && $event->model->name === 'Bean'
-                && $event->broadcastOn()[0]->name == "private-Illuminate.Tests.Integration.Database.SoftDeletableTestEloquentBroadcastUser.{$event->model->id}";
+                && $event->broadcastOn()[0]->name === "private-Illuminate.Tests.Integration.Database.SoftDeletableTestEloquentBroadcastUser.{$event->model->id}";
         });
     }
 
@@ -80,10 +80,10 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUserOnSpecificEventsOnly
-                && $event->event() == 'created'
+                && $event->event() === 'created'
                 && count($event->broadcastOn()) === 1
                 && $event->model->name === 'James'
-                && $event->broadcastOn()[0]->name == "private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUserOnSpecificEventsOnly.{$event->model->id}";
+                && $event->broadcastOn()[0]->name === "private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUserOnSpecificEventsOnly.{$event->model->id}";
         });
 
         $model->name = 'Graham';
@@ -92,7 +92,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
         Event::assertNotDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUserOnSpecificEventsOnly
                 && $event->model->name === 'Graham'
-                && $event->event() == 'updated';
+                && $event->event() === 'updated';
         });
     }
 
@@ -194,14 +194,14 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
     private function assertHandldedBroadcastableEvent(BroadcastableModelEventOccurred $event, Closure $closure)
     {
-        $broadcaster = m::mock(Broadcaster::class);
-        $broadcaster->shouldReceive('broadcast')->once()
+        $broadcaster = Mockery::mock(Broadcaster::class);
+        $broadcaster->expects('broadcast')
             ->withArgs(function (array $channels, string $eventName, array $payload) use ($closure) {
                 return $closure($channels, $eventName, $payload);
             });
 
-        $manager = m::mock(BroadcastingFactory::class);
-        $manager->shouldReceive('connection')->once()->with(null)->andReturn($broadcaster);
+        $manager = Mockery::mock(BroadcastingFactory::class);
+        $manager->expects('connection')->with(null)->andReturn($broadcaster);
 
         (new BroadcastEvent($event))->handle($manager);
 

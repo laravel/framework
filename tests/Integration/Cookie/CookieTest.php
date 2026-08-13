@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class CookieTest extends TestCase
@@ -36,18 +36,16 @@ class CookieTest extends TestCase
             return 'hello world';
         })->middleware('web');
 
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $response = $this->get('/');
         $this->assertCount(2, $response->headers->getCookies());
-        $this->assertEquals(Carbon::now()->addMinute()->getTimestamp(), $response->headers->getCookies()[1]->getExpiresTime());
+        $this->assertEquals($now->addMinute()->getTimestamp(), $response->headers->getCookies()[1]->getExpiresTime());
     }
 
     protected function defineEnvironment($app)
     {
-        $app->instance(
-            ExceptionHandler::class,
-            $handler = m::mock(ExceptionHandler::class)->shouldIgnoreMissing()
-        );
+        $handler = Mockery::mock(ExceptionHandler::class)->shouldIgnoreMissing();
+        $app->instance(ExceptionHandler::class, $handler);
 
         $handler->shouldReceive('render')->andReturn(new Response);
 

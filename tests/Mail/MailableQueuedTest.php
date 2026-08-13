@@ -16,7 +16,7 @@ use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Laravel\SerializableClosure\SerializableClosure;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
@@ -239,9 +239,54 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals($mailable->deduplicationId(...), $pushedJob->deduplicator->getClosure());
     }
 
+    public function testQueueSetsBackedEnumQueueOnMailable(): void
+    {
+        $queueFake = new QueueFake(new Application);
+        $mailer = new Mailer(...$this->getMocks());
+        $mailer->setQueue($queueFake);
+
+        $mailer->queue(new MailableQueueableStub, MailableQueue::Emails);
+
+        $queueFake->assertPushedOn('emails', SendQueuedMailable::class);
+    }
+
+    public function testLaterSetsQueueOnMailable(): void
+    {
+        $queueFake = new QueueFake(new Application);
+        $mailer = $this->getMockBuilder(Mailer::class)
+            ->setConstructorArgs($this->getMocks())
+            ->onlyMethods(['createMessage', 'to'])
+            ->getMock();
+        $mailer->setQueue($queueFake);
+
+        $mailable = new MailableQueueableStub;
+        $mailer->later(60, $mailable, 'emails');
+
+        $queueFake->assertPushed(SendQueuedMailable::class, function ($job) {
+            return $job->queue === 'emails';
+        });
+    }
+
+    public function testLaterWithoutQueueUsesDefault(): void
+    {
+        $queueFake = new QueueFake(new Application);
+        $mailer = $this->getMockBuilder(Mailer::class)
+            ->setConstructorArgs($this->getMocks())
+            ->onlyMethods(['createMessage', 'to'])
+            ->getMock();
+        $mailer->setQueue($queueFake);
+
+        $mailable = new MailableQueueableStub;
+        $mailer->later(60, $mailable);
+
+        $queueFake->assertPushed(SendQueuedMailable::class, function ($job) {
+            return $job->queue === null;
+        });
+    }
+
     protected function getMocks()
     {
-        return ['smtp', m::mock(Factory::class), m::mock(TransportInterface::class)];
+        return ['smtp', Mockery::mock(Factory::class), Mockery::mock(TransportInterface::class)];
     }
 }
 
@@ -258,6 +303,11 @@ class MailableQueueableStub extends Mailable implements ShouldQueue
 
         return $this;
     }
+}
+
+enum MailableQueue: string
+{
+    case Emails = 'emails';
 }
 
 class MailableQueueableStubWithMessageGroup extends Mailable implements ShouldQueue

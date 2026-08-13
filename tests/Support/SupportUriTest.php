@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
 use PHPUnit\Framework\TestCase;
 
@@ -127,6 +128,17 @@ class SupportUriTest extends TestCase
         $this->assertEquals($expected, (string) $uri);
         $this->assertEquals($expected, $uri->value());
         $this->assertEquals($expected, $uri->toString());
+    }
+
+    public function test_to_stringable()
+    {
+        $uri = Uri::of('https://laravel.com/docs/installation?version=1#hello');
+
+        $stringable = $uri->toStringable();
+
+        $this->assertInstanceOf(Stringable::class, $stringable);
+        $this->assertSame('https://laravel.com/docs/installation?version=1#hello', (string) $stringable);
+        $this->assertSame($uri->value(), (string) $stringable);
     }
 
     public function test_complicated_query_string_manipulation()
@@ -268,15 +280,15 @@ class SupportUriTest extends TestCase
 
         $uri = Uri::of('https://laravel.com/one/two/three?foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertCount(3, $uri->pathSegments());
 
         $uri = Uri::of('https://laravel.com/one/two/three/?foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertCount(3, $uri->pathSegments());
 
         $uri = Uri::of('https://laravel.com/one/two/three/#foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertCount(3, $uri->pathSegments());
     }
 
     public function test_macroable()

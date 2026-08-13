@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Events\NullDispatcher;
 use Illuminate\Testing\Assert;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -27,24 +27,24 @@ class SeedCommandTest extends TestCase
         $output = new NullOutput;
         $outputStyle = new OutputStyle($input, $output);
 
-        $seeder = m::mock(Seeder::class);
-        $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
-        $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
-        $seeder->shouldReceive('__invoke')->once();
+        $seeder = Mockery::mock(Seeder::class);
+        $seeder->expects('setContainer')->andReturnSelf();
+        $seeder->expects('setCommand')->andReturnSelf();
+        $seeder->expects('__invoke');
 
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $resolver->shouldReceive('getDefaultConnection')->once();
-        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $resolver->expects('getDefaultConnection');
+        $resolver->expects('setDefaultConnection')->with('sqlite');
 
-        $container = m::mock(Container::class);
-        $container->shouldReceive('call');
-        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container = Mockery::mock(Container::class);
+        $container->expects('call');
+        $container->expects('environment')->andReturn('testing');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
-        $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
-        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+        $container->expects('make')->with('DatabaseSeeder')->andReturn($seeder);
+        $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(
             $outputStyle
         );
-        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+        $container->expects('make')->with(Factory::class, Mockery::any())->andReturn(
             new Factory($outputStyle)
         );
 
@@ -70,30 +70,31 @@ class SeedCommandTest extends TestCase
 
         $instance = new UserWithoutModelEventsSeeder();
 
-        $seeder = m::mock($instance);
-        $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
-        $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
+        $seeder = Mockery::mock($instance);
+        $seeder->expects('setContainer')->andReturnSelf();
+        $seeder->expects('setCommand')->andReturnSelf();
 
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $resolver->shouldReceive('getDefaultConnection')->once();
-        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $resolver->expects('getDefaultConnection');
+        $resolver->expects('setDefaultConnection')->with('sqlite');
 
-        $container = m::mock(Container::class);
-        $container->shouldReceive('call');
-        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container = Mockery::mock(Container::class);
+        $container->expects('call');
+        $container->expects('environment')->andReturn('testing');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
-        $container->shouldReceive('make')->with(UserWithoutModelEventsSeeder::class)->andReturn($seeder);
-        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+        $container->expects('make')->with(UserWithoutModelEventsSeeder::class)->andReturn($seeder);
+        $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(
             $outputStyle
         );
-        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+        $container->expects('make')->with(Factory::class, Mockery::any())->andReturn(
             new Factory($outputStyle)
         );
 
         $command = new SeedCommand($resolver);
         $command->setLaravel($container);
 
-        Model::setEventDispatcher($dispatcher = m::mock(Dispatcher::class));
+        $dispatcher = Mockery::mock(Dispatcher::class);
+        Model::setEventDispatcher($dispatcher);
 
         // call run to set up IO, then fire manually.
         $command->run($input, $output);
@@ -110,15 +111,15 @@ class SeedCommandTest extends TestCase
         $output = new NullOutput;
         $outputStyle = new OutputStyle($input, $output);
 
-        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
 
-        $container = m::mock(Container::class);
-        $container->shouldReceive('call');
+        $container = Mockery::mock(Container::class);
+        $container->expects('call');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
-        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+        $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(
             $outputStyle
         );
-        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+        $container->expects('make')->with(Factory::class, Mockery::any())->andReturn(
             new Factory($outputStyle)
         );
 
@@ -138,8 +139,6 @@ class SeedCommandTest extends TestCase
         SeedCommand::prohibit(false);
 
         Model::unsetEventDispatcher();
-
-        parent::tearDown();
     }
 }
 

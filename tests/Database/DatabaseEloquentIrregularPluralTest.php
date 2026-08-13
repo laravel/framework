@@ -58,10 +58,6 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
         $this->schema()->drop('irregular_plural_tokens');
         $this->schema()->drop('irregular_plural_humans');
         $this->schema()->drop('irregular_plural_human_irregular_plural_token');
-
-        Carbon::setTestNow();
-
-        parent::tearDown();
     }
 
     protected function schema()

@@ -13,8 +13,6 @@ class WormholeTest extends TestCase
     protected function tearDown(): void
     {
         Date::useDefault();
-
-        parent::tearDown();
     }
 
     public function testCanTravelBackToPresent()

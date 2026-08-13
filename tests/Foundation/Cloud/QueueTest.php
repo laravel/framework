@@ -42,6 +42,7 @@ use InvalidArgumentException;
 use Mockery\MockInterface;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\TestWith;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use Throwable;
@@ -203,8 +204,7 @@ class QueueTest extends TestCase
 
         Cloud::bootManagedQueues($this->app);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The [cloud] queue connection has not been configured.');
+        $this->expectExceptionObject(new InvalidArgumentException('The [cloud] queue connection has not been configured.'));
         $this->app['queue']->connection('cloud');
     }
 
@@ -227,6 +227,35 @@ class QueueTest extends TestCase
         $queue->pop();
 
         $this->assertSame([], $eventsFake->emitted);
+    }
+
+    public function testAgentRequestsIgnoreGlobalClientConfiguration()
+    {
+        $options = null;
+        $hasGlobalHeader = null;
+
+        $this->fakeEvents();
+        Http::globalOptions([
+            'force_ip_resolve' => 'v4',
+            'connect_timeout' => 5,
+            'timeout' => 30,
+        ]);
+        Http::globalRequestMiddleware(fn ($request) => $request->withHeader('X-Global', 'Foo'));
+        Http::fake(function ($request, $requestOptions) use (&$options, &$hasGlobalHeader) {
+            if (str_ends_with($request->url(), '/next')) {
+                $options = $requestOptions;
+                $hasGlobalHeader = $request->hasHeader('X-Global');
+            }
+        });
+
+        [$queue] = $this->fakeQueue();
+
+        $queue->pop();
+
+        $this->assertIsArray($options);
+        $this->assertArrayNotHasKey('force_ip_resolve', $options);
+        $this->assertSame(10, $options['connect_timeout']);
+        $this->assertFalse($hasGlobalHeader);
     }
 
     public function testItEmitsStartedEventWhenJobIsSuccessfullyPopped()
@@ -536,7 +565,7 @@ class QueueTest extends TestCase
         $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
 
-        $client->shouldReceive('receiveMessage')->once()->andReturn(new Result([
+        $client->expects('receiveMessage')->andReturn(new Result([
             'Messages' => [[
                 'MessageId' => 'message-id',
                 'ReceiptHandle' => 'receipt-handle',
@@ -559,7 +588,7 @@ class QueueTest extends TestCase
         $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
 
-        $client->shouldReceive('receiveMessage')->once()->andReturn(new Result(['Messages' => null]));
+        $client->expects('receiveMessage')->andReturn(new Result(['Messages' => null]));
 
         $this->assertNull($queue->pop());
     }
@@ -916,8 +945,8 @@ class QueueTest extends TestCase
         Cloud::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(5)->andReturn(new Result());
-        $client->shouldReceive('sendMessageBatch')->once()->andReturnUsing(fn ($args) => new Result([
+        $client->expects('sendMessage')->times(5)->andReturn(new Result());
+        $client->expects('sendMessageBatch')->andReturnUsing(fn ($args) => new Result([
             'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
         ]));
 
@@ -1196,8 +1225,8 @@ class QueueTest extends TestCase
         $eventsFake = $this->fakeEvents();
         $this->app['config']->set('queue.connections.cloud.connection.after_commit', true);
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(5)->andReturn(new Result());
-        $client->shouldReceive('sendMessageBatch')->once()->andReturnUsing(fn ($args) => new Result([
+        $client->expects('sendMessage')->times(5)->andReturn(new Result());
+        $client->expects('sendMessageBatch')->andReturnUsing(fn ($args) => new Result([
             'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
         ]));
 
@@ -1476,8 +1505,7 @@ class QueueTest extends TestCase
 
         $queue = $this->app['queue']->connection('cloud');
 
-        $this->expectException(ManagedQueueNotFoundException::class);
-        $this->expectExceptionMessage('Managed queue [missing-queue] does not exist.');
+        $this->expectExceptionObject(new ManagedQueueNotFoundException('Managed queue [missing-queue] does not exist.'));
 
         $queue->push(new FakeJob, queue: 'missing-queue');
     }
@@ -1488,7 +1516,7 @@ class QueueTest extends TestCase
         Cloud::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(1)->andReturn(new Result());
+        $client->expects('sendMessage')->times(1)->andReturn(new Result());
 
         unset($_SERVER['SQS_PREFIX'], $_SERVER['SQS_SUFFIX']);
 
@@ -1503,7 +1531,7 @@ class QueueTest extends TestCase
         Cloud::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(1)->andReturn(new Result());
+        $client->expects('sendMessage')->times(1)->andReturn(new Result());
 
         $queue->push(new FakeJob, queue: 'orders.fifo');
 
@@ -1512,13 +1540,24 @@ class QueueTest extends TestCase
         $this->assertSame('orders.fifo', $eventsFake->emitted[0]['queue']);
     }
 
+    #[TestWith([['default', 'emails']], 'standard list')]
+    #[TestWith([['default' => ['timeout' => 10], 'emails' => ['timeout' => 1]]], 'map keyed by name')]
+    public function testManagedQueuesReturnsTheConfiguredQueueNames($queues)
+    {
+        config(['queue.connections.cloud.queues' => $queues]);
+        $this->fakeEvents();
+        [$queue] = $this->mockedQueue();
+
+        $this->assertSame(['default', 'emails'], $queue->managedQueues());
+    }
+
     /**
      * @return array{Queue, MockInterface<SqsClient>}
      */
     private function mockedQueue()
     {
         $client = $this->mock(SqsClient::class);
-        $client->shouldReceive('getHandlerList')->andReturn(new HandlerList());
+        $client->expects('getHandlerList')->andReturn(new HandlerList());
 
         $this->app->instance(QueueConnector::class, new QueueConnector(new class($client) implements ConnectorInterface
         {

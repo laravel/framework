@@ -3,6 +3,10 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use DateTimeInterface;
+use Illuminate\Contracts\Cache\Factory;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Foundation\MaintenanceMode;
+use Illuminate\Foundation\CacheBasedMaintenanceMode;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Events\MaintenanceModeDisabled;
@@ -12,6 +16,7 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -44,6 +49,24 @@ class MaintenanceModeTest extends TestCase
         $response->assertStatus(503);
         $response->assertHeader('Retry-After', '60');
         $response->assertHeader('Refresh', '60');
+    }
+
+    public function testCacheMaintenanceModeAllowsRequestWhenDeactivatedWhileReadingPayload()
+    {
+        $cache = m::mock(Factory::class, Repository::class);
+        $cache->shouldReceive('store')->with('maintenance')->andReturnSelf();
+        $cache->shouldReceive('has')->with('framework:down')->andReturn(true, false);
+        $cache->shouldReceive('get')->once()->with('framework:down')->andReturnNull();
+
+        $this->app->instance(MaintenanceMode::class, new CacheBasedMaintenanceMode(
+            $cache, 'maintenance', 'framework:down'
+        ));
+
+        Route::get('/foo', fn () => 'Hello World')->middleware(PreventRequestsDuringMaintenance::class);
+
+        $this->get('/foo')
+            ->assertOk()
+            ->assertSeeText('Hello World');
     }
 
     public function testMaintenanceModeCanHaveCustomStatus()
@@ -268,8 +291,6 @@ class MaintenanceModeTest extends TestCase
 
         $expectedDate = Carbon::parse($datetime)->format(DateTimeInterface::RFC7231);
         $this->assertSame($expectedDate, $data['retry']);
-
-        Carbon::setTestNow();
     }
 
     public static function retryAfterDatetimeProvider(): array

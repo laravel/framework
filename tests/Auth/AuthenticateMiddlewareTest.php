@@ -12,7 +12,7 @@ use Illuminate\Config\Repository;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -34,8 +34,6 @@ class AuthenticateMiddlewareTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
-
-        parent::tearDown();
     }
 
     public function testItCanGenerateDefinitionViaStaticMethod()
@@ -64,8 +62,7 @@ class AuthenticateMiddlewareTest extends TestCase
 
     public function testDefaultUnauthenticatedThrows()
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Unauthenticated.');
+        $this->expectExceptionObject(new AuthenticationException('Unauthenticated.'));
 
         $this->registerAuthDriver('default', false);
 
@@ -109,8 +106,7 @@ class AuthenticateMiddlewareTest extends TestCase
 
     public function testMultipleDriversUnauthenticatedThrows()
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Unauthenticated.');
+        $this->expectExceptionObject(new AuthenticationException('Unauthenticated.'));
 
         $this->registerAuthDriver('default', false);
 
@@ -248,7 +244,7 @@ class AuthenticateMiddlewareTest extends TestCase
     {
         return new RequestGuard(function () use ($authenticated) {
             return $authenticated ? new stdClass : null;
-        }, m::mock(Request::class), m::mock(EloquentUserProvider::class));
+        }, Mockery::mock(Request::class), Mockery::mock(EloquentUserProvider::class));
     }
 
     /**
@@ -261,7 +257,7 @@ class AuthenticateMiddlewareTest extends TestCase
      */
     protected function authenticate(...$guards)
     {
-        $request = m::mock(Request::class);
+        $request = Mockery::mock(Request::class);
 
         $request->shouldReceive('expectsJson')->andReturn(false);
 

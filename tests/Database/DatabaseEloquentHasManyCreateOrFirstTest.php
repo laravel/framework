@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Mockery;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -21,13 +21,6 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
     protected function setUp(): void
     {
         Carbon::setTestNow('2023-01-01 00:00:00');
-    }
-
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
     }
 
     #[DataProvider('createOrFirstValues')]
@@ -419,7 +412,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
         $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
         $processor = new $processorClass;
-        $connection = m::mock(Connection::class, ['getPostProcessor' => $processor]);
+        $connection = Mockery::mock(Connection::class, ['getPostProcessor' => $processor]);
         $grammar = new $grammarClass($connection);
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
@@ -427,12 +420,13 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
             return new Builder($connection, $grammar, $processor);
         });
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
-        $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
 
         $class = get_class($model);
         $class::setConnectionResolver($resolver);
 
-        $connection->shouldReceive('getPdo')->andReturn($pdo = m::mock(PDO::class));
+        $pdo = Mockery::mock(PDO::class);
+        $connection->shouldReceive('getPdo')->andReturn($pdo);
 
         foreach ($lastInsertIds as $id) {
             $pdo->expects('lastInsertId')->andReturn($id);

@@ -1,19 +1,19 @@
 <?php
 
-namespace Illuminate\Tests\Mail;
+namespace Illuminate\Tests\Integration\Mail;
 
 use Orchestra\Testbench\TestCase;
-use Symfony\Component\Mailer\Transport\FailoverTransport;
+use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 
-class MailFailoverTransportTest extends TestCase
+class MailRoundRobinTransportTest extends TestCase
 {
-    public function testGetFailoverTransportWithConfiguredTransports(): void
+    public function testGetRoundRobinTransportWithConfiguredTransports(): void
     {
-        $this->app['config']->set('mail.default', 'failover');
+        $this->app['config']->set('mail.default', 'roundrobin');
 
         $this->app['config']->set('mail.mailers', [
-            'failover' => [
-                'transport' => 'failover',
+            'roundrobin' => [
+                'transport' => 'roundrobin',
                 'mailers' => [
                     'sendmail',
                     'array',
@@ -31,12 +31,12 @@ class MailFailoverTransportTest extends TestCase
         ]);
 
         $transport = app('mailer')->getSymfonyTransport();
-        $this->assertInstanceOf(FailoverTransport::class, $transport);
+        $this->assertInstanceOf(RoundRobinTransport::class, $transport);
     }
 
-    public function testGetFailoverTransportWithLaravel6StyleMailConfiguration(): void
+    public function testGetRoundRobinTransportWithLaravel6StyleMailConfiguration(): void
     {
-        $this->app['config']->set('mail.driver', 'failover');
+        $this->app['config']->set('mail.driver', 'roundrobin');
 
         $this->app['config']->set('mail.mailers', [
             'sendmail',
@@ -46,6 +46,6 @@ class MailFailoverTransportTest extends TestCase
         $this->app['config']->set('mail.sendmail', '/usr/sbin/sendmail -bs');
 
         $transport = app('mailer')->getSymfonyTransport();
-        $this->assertInstanceOf(FailoverTransport::class, $transport);
+        $this->assertInstanceOf(RoundRobinTransport::class, $transport);
     }
 }
