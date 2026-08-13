@@ -2,10 +2,13 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connectors\PhpRedisConnector;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use RedisException;
+use ReflectionProperty;
 
 class PhpRedisConnectorTest extends TestCase
 {
@@ -288,6 +291,54 @@ class PhpRedisConnectorTest extends TestCase
             'host' => null,
             'scheme' => 'tls',
         ]);
+    }
+
+    public function testConnectToClusterPassesAConnectorToTheConnection()
+    {
+        $connector = new ClusterStubPhpRedisConnector;
+
+        $connection = $connector->connectToCluster([['host' => '127.0.0.1', 'port' => 6379]], [], []);
+
+        $property = new ReflectionProperty(PhpRedisConnection::class, 'connector');
+
+        $this->assertIsCallable($property->getValue($connection));
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectToClusterAllowsTheConnectionToRebuildItsClient()
+    {
+        $connector = new ClusterStubPhpRedisConnector;
+
+        $connection = $connector->connectToCluster([['host' => '127.0.0.1', 'port' => 6379]], [], []);
+
+        $original = $connection->client();
+
+        try {
+            $connection->command('get', ['foo']);
+        } catch (RedisException) {
+            //
+        }
+
+        $this->assertSame(2, $connector->created);
+        $this->assertNotSame($original, $connection->client());
+    }
+}
+
+class ClusterStubPhpRedisConnector extends PhpRedisConnector
+{
+    public int $created = 0;
+
+    protected function createRedisClusterInstance(array $servers, array $options)
+    {
+        $this->created++;
+
+        return new class
+        {
+            public function get($key)
+            {
+                throw new RedisException('Connection lost');
+            }
+        };
     }
 }
 
