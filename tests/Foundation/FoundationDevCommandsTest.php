@@ -7,6 +7,7 @@ use Illuminate\Foundation\DevCommand;
 use Illuminate\Foundation\DevCommandColor;
 use Illuminate\Foundation\DevCommandMode;
 use Illuminate\Foundation\DevCommands;
+use Mockery;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -303,6 +304,11 @@ class FoundationDevCommandsTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRegisterDefaultsRegistersExpectedCommands()
     {
+        $provider = Mockery::mock('alias:Laravel\Pail\PailServiceProvider');
+        $provider->shouldReceive('register');
+
+        Application::getInstance()->register($provider);
+
         DevCommands::registerDefaults();
 
         $commands = DevCommands::commands();

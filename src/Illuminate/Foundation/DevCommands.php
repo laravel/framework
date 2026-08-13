@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation;
 
 use Illuminate\Support\NodePackageManager;
+use Laravel\Pail\PailServiceProvider;
 use ReflectionClass;
 
 /**
@@ -96,7 +97,7 @@ class DevCommands
         self::artisan('serve', 'server');
         self::artisan('queue:listen --tries=1 --timeout=0', 'queue');
 
-        if (function_exists('pcntl_fork')) {
+        if (function_exists('pcntl_fork') && app()->providerIsLoaded(PailServiceProvider::class)) {
             self::artisan('pail --timeout=0', 'logs');
         }
 
