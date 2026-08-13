@@ -275,6 +275,30 @@ class FilesystemManagerTest extends TestCase
         fclose($stream);
     }
 
+    public function testReadThroughDisksDoNotCopyWhenDisabled()
+    {
+        $filesystem = $this->readThroughFilesystemManager([
+            'copy' => false,
+        ]);
+        $primary = $filesystem->disk('primary');
+        $fallback = $filesystem->disk('fallback');
+        $readThrough = $filesystem->disk('read-through');
+
+        $fallback->put('fallback.txt', 'fallback contents');
+
+        $this->assertSame('fallback contents', $readThrough->get('fallback.txt'));
+        $this->assertTrue($primary->missing('fallback.txt'));
+
+        $fallback->put('stream.txt', 'stream contents');
+
+        $stream = $readThrough->readStream('stream.txt');
+
+        $this->assertSame('stream contents', stream_get_contents($stream));
+        $this->assertTrue($primary->missing('stream.txt'));
+
+        fclose($stream);
+    }
+
     public function testReadThroughDiskPromotionFailuresAreBestEffortByDefault()
     {
         $filesystem = $this->readThroughFilesystemManager([
