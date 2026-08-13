@@ -45,6 +45,7 @@ class PhpRedisClusterConnection extends PhpRedisConnection
             throw new InvalidArgumentException('No master nodes found in the cluster.');
         }
 
+        // Restore the active node and its untouched phpredis cursor between calls...
         if (is_string($cursor) && str_starts_with($cursor, 'laravel:')) {
             [$scanned, $node, $cursor, $initialCursor] = json_decode(
                 base64_decode(substr($cursor, 8), true), true, flags: JSON_THROW_ON_ERROR
@@ -55,12 +56,14 @@ class PhpRedisClusterConnection extends PhpRedisConnection
             $initialCursor = $cursor;
         }
 
+        // Continue with an unscanned master if the active node disappeared during a failover...
         if ($node !== null && ! in_array($node, $masters, true)) {
             $node = null;
             $cursor = $initialCursor;
         }
 
         while (true) {
+            // Advance to the next unscanned master and start its node-local cursor...
             if ($node === null) {
                 $node = current(array_filter($masters, fn ($master) => ! in_array($master, $scanned, true)));
 
@@ -85,6 +88,7 @@ class PhpRedisClusterConnection extends PhpRedisConnection
             if (! empty($result)) {
                 $remainingMasters = array_filter($masters, fn ($master) => ! in_array($master, $scanned, true));
 
+                // Preserve the caller's null or zero sentinel so existing scan loops terminate...
                 if ($node === null && empty($remainingMasters)) {
                     return [$initialCursor, $result];
                 }
