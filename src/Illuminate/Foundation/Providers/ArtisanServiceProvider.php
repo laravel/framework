@@ -100,6 +100,7 @@ use Illuminate\Queue\Console\ClearCommand as QueueClearCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Queue\Console\FlushFailedCommand as FlushFailedQueueCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand as ForgetFailedQueueCommand;
+use Illuminate\Queue\Console\ListCommand as QueueListCommand;
 use Illuminate\Queue\Console\ListenCommand as QueueListenCommand;
 use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
 use Illuminate\Queue\Console\MonitorCommand as QueueMonitorCommand;
@@ -157,6 +158,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueFlush' => FlushFailedQueueCommand::class,
         'QueueForget' => ForgetFailedQueueCommand::class,
         'QueueListen' => QueueListenCommand::class,
+        'QueueList' => QueueListCommand::class,
         'QueueMonitor' => QueueMonitorCommand::class,
         'QueuePause' => QueuePauseCommand::class,
         'QueuePruneBatches' => QueuePruneBatchesCommand::class,
@@ -685,6 +687,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(QueueListenCommand::class, function ($app) {
             return new QueueListenCommand($app['queue.listener']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueueListCommand()
+    {
+        $this->app->singleton(QueueListCommand::class, function ($app) {
+            return new QueueListCommand($app['files']);
         });
     }
 

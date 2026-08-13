@@ -3534,6 +3534,9 @@ return [
             ],
         ],
     ],
+    \Illuminate\Queue\Console\ListCommand::class => [
+        'name' => 'queue:list',
+    ],
     \Illuminate\Queue\Console\ListenCommand::class => [
         'name' => 'queue:listen',
         'arguments' => [
