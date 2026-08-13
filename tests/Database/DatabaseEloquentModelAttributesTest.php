@@ -6,6 +6,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Connection;
 use Illuminate\Database\Eloquent\Attributes\DateFormat;
+use Illuminate\Database\Eloquent\Attributes\Defaults;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -198,6 +199,42 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $model = new ModelWithDateFormatAttributeOverride;
 
         $this->assertSame('Y-m-d', $model->getDateFormat());
+    }
+
+    public function test_defaults_attribute(): void
+    {
+        $model = new ModelWithDefaultsAttribute;
+
+        $this->assertSame(['status' => 'pending', 'active' => true], $model->getAttributes());
+        $this->assertSame(['status' => 'pending', 'active' => true], $model->getOriginal());
+        $this->assertFalse($model->isDirty());
+    }
+
+    public function test_defaults_property_takes_precedence(): void
+    {
+        $model = new ModelWithDefaultsAttributeAndProperty;
+
+        $this->assertSame([
+            'status' => 'approved',
+            'active' => true,
+            'name' => 'Taylor',
+        ], $model->getAttributes());
+    }
+
+    public function test_constructor_attributes_override_defaults(): void
+    {
+        $model = new ModelWithDefaultsAttribute(['status' => 'published']);
+
+        $this->assertSame('published', $model->status);
+        $this->assertSame('pending', $model->getOriginal('status'));
+        $this->assertTrue($model->isDirty('status'));
+    }
+
+    public function test_defaults_attribute_is_inherited(): void
+    {
+        $model = new ModelExtendingDefaultsParent;
+
+        $this->assertSame(['status' => 'pending'], $model->getAttributes());
     }
 
     public function test_dedicated_without_timestamps_attribute(): void
@@ -795,6 +832,32 @@ class ModelWithTouchesAttributeVariadic extends Model
 
 #[DateFormat('Y-m-d')]
 class ModelWithDedicatedDateFormatAttribute extends Model
+{
+    //
+}
+
+#[Defaults(['status' => 'pending', 'active' => true])]
+class ModelWithDefaultsAttribute extends Model
+{
+    protected $guarded = [];
+}
+
+#[Defaults(['status' => 'pending', 'active' => true])]
+class ModelWithDefaultsAttributeAndProperty extends Model
+{
+    protected $attributes = [
+        'status' => 'approved',
+        'name' => 'Taylor',
+    ];
+}
+
+#[Defaults(['status' => 'pending'])]
+class ModelWithDefaultsParent extends Model
+{
+    //
+}
+
+class ModelExtendingDefaultsParent extends ModelWithDefaultsParent
 {
     //
 }

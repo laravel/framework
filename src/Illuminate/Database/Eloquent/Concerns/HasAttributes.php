@@ -15,6 +15,7 @@ use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\DateFormat;
+use Illuminate\Database\Eloquent\Attributes\Defaults;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -215,6 +216,11 @@ trait HasAttributes
             ?? null;
 
         $this->mergeAppends(static::resolveClassAttribute(Appends::class, 'columns') ?? []);
+
+        $this->attributes = array_merge(
+            static::resolveClassAttribute(Defaults::class, 'attributes') ?? [],
+            $this->attributes,
+        );
     }
 
     /**
