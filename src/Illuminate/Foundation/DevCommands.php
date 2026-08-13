@@ -101,7 +101,9 @@ class DevCommands
             self::artisan('pail --timeout=0', 'logs');
         }
 
-        self::node('dev', 'vite');
+        if (is_file(base_path('package.json'))) {
+            self::node('dev', 'vite');
+        }
     }
 
     /**
