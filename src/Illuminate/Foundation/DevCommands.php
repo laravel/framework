@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\NodePackageManager;
 use Laravel\Pail\PailServiceProvider;
 use ReflectionClass;
@@ -101,7 +102,9 @@ class DevCommands
             self::artisan('pail --timeout=0', 'logs');
         }
 
-        self::node('dev', 'vite');
+        if (File::exists(base_path('package.json'))) {
+            self::node('dev', 'vite');
+        }
     }
 
     /**

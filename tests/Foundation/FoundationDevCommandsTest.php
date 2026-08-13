@@ -2,11 +2,15 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\DevCommand;
 use Illuminate\Foundation\DevCommandColor;
 use Illuminate\Foundation\DevCommandMode;
 use Illuminate\Foundation\DevCommands;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\File;
 use Mockery;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
@@ -34,6 +38,16 @@ class FoundationDevCommandsTest extends TestCase
 
         $app = new Application(__DIR__);
         $app['env'] = 'testing';
+
+        File::swap(new Filesystem);
+    }
+
+    protected function tearDown(): void
+    {
+        Facade::clearResolvedInstances();
+        Container::setInstance(null);
+
+        parent::tearDown();
     }
 
     public function testRegisterAddsCommand()
@@ -304,6 +318,8 @@ class FoundationDevCommandsTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRegisterDefaultsRegistersExpectedCommands()
     {
+        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnTrue();
+
         $provider = Mockery::mock('alias:Laravel\Pail\PailServiceProvider');
         $provider->shouldReceive('register');
 
@@ -326,6 +342,8 @@ class FoundationDevCommandsTest extends TestCase
     #[RequiresOperatingSystem('Windows')]
     public function testRegisterDefaultsExcludesPailOnWindows()
     {
+        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnTrue();
+
         DevCommands::registerDefaults();
 
         $commands = DevCommands::commands();
@@ -337,6 +355,19 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertContains('queue', $names);
         $this->assertContains('vite', $names);
         $this->assertNotContains('logs', $names);
+    }
+
+    public function testRegisterDefaultsExcludesViteWithoutPackageJson()
+    {
+        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnFalse();
+
+        DevCommands::registerDefaults();
+
+        $names = array_column(DevCommands::commands(), 'name');
+
+        $this->assertContains('server', $names);
+        $this->assertContains('queue', $names);
+        $this->assertNotContains('vite', $names);
     }
 
     public function testRegisteredCommandIncludesSource()

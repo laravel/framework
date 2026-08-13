@@ -24,7 +24,7 @@ class DevCommand extends Command
      *
      * @var string
      */
-    protected const MULTIPLEX_VERSION = '0.4';
+    protected const MULTIPLEX_VERSION = '0.4.2';
 
     /**
      * The name and signature of the console command.
