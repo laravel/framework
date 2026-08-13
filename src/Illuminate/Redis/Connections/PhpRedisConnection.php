@@ -7,6 +7,7 @@ use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use RedisException;
+use Throwable;
 
 /**
  * @mixin \Redis
@@ -402,7 +403,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
 
         return is_null($callback)
             ? $pipeline
-            : tap($pipeline, $callback)->exec();
+            : $this->executeQueuedCommands($pipeline, $callback);
     }
 
     /**
@@ -417,7 +418,43 @@ class PhpRedisConnection extends Connection implements ConnectionContract
 
         return is_null($callback)
             ? $transaction
-            : tap($transaction, $callback)->exec();
+            : $this->executeQueuedCommands($transaction, $callback);
+    }
+
+    /**
+     * Queue the commands built by the callback and execute them.
+     *
+     * @param  \Redis  $client
+     * @param  callable  $callback
+     * @return array
+     */
+    protected function executeQueuedCommands($client, callable $callback)
+    {
+        try {
+            $callback($client);
+
+            return $client->exec();
+        } catch (Throwable $e) {
+            $this->discardQueuedCommands();
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Discard any commands left queued by an aborted pipeline or transaction.
+     *
+     * @return void
+     */
+    protected function discardQueuedCommands()
+    {
+        try {
+            $this->client()->discard();
+        } catch (Throwable $e) {
+            // The connection is already broken, so there is nothing left to discard and
+            // the exception that got us here is the one worth reporting. Swallowing
+            // this keeps it from replacing the failure the caller cares about...
+        }
     }
 
     /**
