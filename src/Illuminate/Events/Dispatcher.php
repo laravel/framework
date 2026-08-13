@@ -4,6 +4,7 @@ namespace Illuminate\Events;
 
 use Closure;
 use Exception;
+use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
@@ -20,6 +21,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
@@ -35,6 +37,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReadsClassAttributes;
 use Illuminate\Support\Traits\ReflectsClosures;
+use LogicException;
 use ReflectionClass;
 
 use function Illuminate\Support\enum_value;
@@ -650,10 +653,18 @@ class Dispatcher implements DispatcherContract
      * @param  string  $method
      * @param  array  $arguments
      * @return void
+     *
+     * @throws \LogicException
      */
     protected function queueHandler($class, $method, $arguments)
     {
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
+
+        $debounceFor = $this->getAttributeValue($listener, DebounceFor::class, 'debounceFor');
+
+        if (! is_null($debounceFor) && $job->shouldBeUnique) {
+            throw new LogicException('A debounced listener cannot also implement ShouldBeUnique.');
+        }
 
         if ($job->shouldBeUnique &&
             ! (new UniqueLock($this->container->make(Cache::class)))->acquire($job)) {
@@ -678,6 +689,15 @@ class Dispatcher implements DispatcherContract
 
         if (is_null($queue)) {
             $queue = $this->resolveQueueFromQueueRoute($listener) ?? null;
+        }
+
+        if (! is_null($debounceFor)) {
+            $debounce = (new DebounceLock($this->container->make(Cache::class)))->acquire(
+                $job, $debounceFor, $this->getAttributeInstance($listener, DebounceFor::class)?->maxWait
+            );
+
+            $job->debounceOwner = $debounce['owner'];
+            $delay ??= $debounce['maxWaitExceeded'] ? 0 : $debounceFor;
         }
 
         is_null($delay)
@@ -754,6 +774,12 @@ class Dispatcher implements DispatcherContract
                 $job->uniqueFor = method_exists($listener, 'uniqueFor')
                     ? $listener->uniqueFor(...$data)
                     : ($this->getAttributeValue($listener, UniqueFor::class, 'uniqueFor') ?? 0);
+            }
+
+            if (! is_null($this->getAttributeValue($listener, DebounceFor::class, 'debounceFor'))) {
+                $job->debounceId = method_exists($listener, 'debounceId')
+                    ? $listener->debounceId(...$data)
+                    : ($listener->debounceId ?? null);
             }
         });
     }
