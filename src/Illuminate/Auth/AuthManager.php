@@ -14,7 +14,6 @@ use function Illuminate\Support\enum_value;
 /**
  * @mixin \Illuminate\Contracts\Auth\Guard
  * @mixin \Illuminate\Contracts\Auth\StatefulGuard
- * @mixin \Illuminate\Auth\SessionGuard
  */
 class AuthManager implements FactoryContract
 {
