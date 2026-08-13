@@ -342,6 +342,8 @@ class FoundationDevCommandsTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRegisterDefaultsExcludesPailWhenNotInstalled()
     {
+        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnTrue();
+
         DevCommands::registerDefaults();
 
         $commands = DevCommands::commands();
