@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\QueueRoutes;
 use PHPUnit\Framework\TestCase;
 
@@ -79,6 +80,67 @@ class QueueRoutesTest extends TestCase
         $this->assertNull($defaults->getConnection(new FinanceNotification));
     }
 
+    public function testRouteQueueRewritesName()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->setQueue('reports', 'audit');
+
+        $this->assertSame('audit', $defaults->resolveQueue('reports'));
+        $this->assertSame('audit', $defaults->resolveQueue('reports', 'cloud'));
+        $this->assertSame('other', $defaults->resolveQueue('other'));
+    }
+
+    public function testRouteQueueIsScopedToConnection()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->setQueue('reports', 'audit', 'cloud');
+
+        $this->assertSame('audit', $defaults->resolveQueue('reports', 'cloud'));
+        $this->assertSame('reports', $defaults->resolveQueue('reports', 'redis'));
+        $this->assertSame('reports', $defaults->resolveQueue('reports'));
+    }
+
+    public function testRouteQueueWithoutDestinationKeepsName()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->setQueue('reports', connection: 'cloud');
+
+        $this->assertSame('reports', $defaults->resolveQueue('reports', 'cloud'));
+    }
+
+    public function testRouteQueueRoutesConnectionByQueueName()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->setQueue('reports', 'audit', 'cloud');
+
+        $this->assertSame('cloud', $defaults->getConnection((new SomeJob)->onQueue('reports')));
+        $this->assertNull($defaults->getConnection((new SomeJob)->onQueue('other')));
+        $this->assertNull($defaults->getConnection(new SomeJob));
+    }
+
+    public function testRouteQueueMatchesQueueAttribute()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->setQueue('reports', 'audit', 'cloud');
+
+        $this->assertSame('cloud', $defaults->getConnection(new AttributeRoutedJob));
+    }
+
+    public function testRouteQueueResolvesEnums()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->setQueue(QueueName::payments, 'settlements', ConnectionName::redis);
+
+        $this->assertSame('settlements', $defaults->resolveQueue('payments', 'redis'));
+        $this->assertSame('payments', $defaults->resolveQueue('payments', 'sqs'));
+    }
+
     public function testEnumsAreResolved()
     {
         $defaults = new QueueRoutes();
@@ -112,6 +174,12 @@ trait CustomTrait
 class SomeJob
 {
     use Queueable, CustomTrait;
+}
+
+#[QueueAttribute('reports')]
+class AttributeRoutedJob
+{
+    use Queueable;
 }
 
 class BaseNotification
