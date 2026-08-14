@@ -84,6 +84,26 @@ class QueueRoutes
     }
 
     /**
+     * Get the queue the given queue has been forwarded to.
+     *
+     * @param  string  $queue
+     * @param  string|null  $connection
+     * @return string
+     */
+    public function forwardedQueue($queue, $connection = null)
+    {
+        if (! isset($this->forwards[$queue])) {
+            return $queue;
+        }
+
+        [$forwardConnection, $forwardQueue] = $this->forwards[$queue];
+
+        return is_null($forwardConnection) || $forwardConnection === $connection
+            ? $forwardQueue ?? $queue
+            : $queue;
+    }
+
+    /**
      * Get the route for a given queueable instance.
      *
      * @param  object  $queueable
@@ -131,24 +151,14 @@ class QueueRoutes
     }
 
     /**
-     * Get all registered queue routes.
-     *
-     * @return array<class-string, array|string>
-     */
-    public function all()
-    {
-        return $this->routes;
-    }
-
-    /**
      * Register a forward for the given queue.
      *
-     * @param  array<string, \UnitEnum|string>|\UnitEnum|string  $queue
+     * @param  \UnitEnum|array<string, \UnitEnum|string>|string  $queue
      * @param  \UnitEnum|string|null  $to
      * @param  \UnitEnum|string|null  $connection
      * @return void
      */
-    public function forward(array|string|UnitEnum $queue, $to = null, $connection = null)
+    public function forward(UnitEnum|array|string $queue, $to = null, $connection = null)
     {
         $forwards = is_array($queue) ? $queue : [enum_value($queue) => $to];
 
@@ -158,22 +168,12 @@ class QueueRoutes
     }
 
     /**
-     * Get the queue the given queue has been forwarded to.
+     * Get all registered queue routes.
      *
-     * @param  string  $queue
-     * @param  string|null  $connection
-     * @return string
+     * @return array<class-string, array|string>
      */
-    public function forwardedQueue($queue, $connection = null)
+    public function all()
     {
-        if (! isset($this->forwards[$queue])) {
-            return $queue;
-        }
-
-        [$forwardConnection, $forwardQueue] = $this->forwards[$queue];
-
-        return is_null($forwardConnection) || $forwardConnection === $connection
-            ? $forwardQueue ?? $queue
-            : $queue;
+        return $this->routes;
     }
 }
