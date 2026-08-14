@@ -132,12 +132,14 @@ class DatabaseLockTest extends DatabaseTestCase
         $firstLock->release();
     }
 
-    public function testExpiredLockCannotBeRefreshedByPreviousOwner()
+    public function testExpiredLockCannotBeRefreshedByPreviousOwner(): void
     {
+        Carbon::setTestNow($now = Carbon::now());
+
         $lock = Cache::driver('database')->lock('foo', 10);
         $this->assertTrue($lock->get());
 
-        DB::table('cache_locks')->update(['expiration' => now()->subDay()->getTimestamp()]);
+        DB::table('cache_locks')->update(['expiration' => $now->subDay()->getTimestamp()]);
 
         $this->assertFalse($lock->refresh(20));
     }
