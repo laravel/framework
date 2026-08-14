@@ -24,13 +24,14 @@ use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Throwable;
 
 abstract class Queue
 {
-    use InteractsWithTime, ReadsQueueAttributes;
+    use InteractsWithTime, ReadsQueueAttributes, ResolvesQueueRoutes;
 
     /**
      * The IoC container instance.
@@ -484,6 +485,17 @@ abstract class Queue
 
             $this->container['events']->dispatch(new JobQueued($this->connectionName, $queue, $jobId, $job, $payload, $delay));
         }
+    }
+
+    /**
+     * Get the routed queue name for the given queue.
+     *
+     * @param  string  $queue
+     * @return string
+     */
+    protected function resolveQueue($queue)
+    {
+        return $this->queueRoutes()->forwardedQueue($queue, $this->connectionName);
     }
 
     /**

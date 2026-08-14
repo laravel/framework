@@ -57,6 +57,18 @@ class BroadcastManagerTest extends TestCase
         Queue::connection('broadcast-connection')->assertPushedOn('broadcast-queue', BroadcastEvent::class);
     }
 
+    public function testEventsCanBeBroadcastWhenForwardingQueue()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        Queue::forward('broadcast-queue', 'events', 'broadcast-connection');
+
+        Broadcast::queue(new TestForwardedEvent);
+        Bus::assertNotDispatched(BroadcastEvent::class);
+        Queue::connection('broadcast-connection')->assertPushedOn('broadcast-queue', BroadcastEvent::class);
+    }
+
     public function testEventsCanBeRescued()
     {
         Bus::fake();
@@ -310,6 +322,21 @@ enum BroadcastConnectionName: string
 
 class TestEvent implements ShouldBroadcast
 {
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return \Illuminate\Broadcasting\Channel|\Illuminate\Broadcasting\Channel[]
+     */
+    public function broadcastOn()
+    {
+        //
+    }
+}
+
+class TestForwardedEvent implements ShouldBroadcast
+{
+    public $queue = 'broadcast-queue';
+
     /**
      * Get the channels the event should broadcast on.
      *

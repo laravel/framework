@@ -625,7 +625,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function getQueue($queue)
     {
-        return enum_value($queue) ?: $this->default;
+        return $this->resolveQueue(enum_value($queue) ?: $this->default);
     }
 
     /**

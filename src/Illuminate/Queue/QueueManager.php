@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use InvalidArgumentException;
+use UnitEnum;
 
 use function Illuminate\Support\enum_value;
 
@@ -136,6 +137,19 @@ class QueueManager implements FactoryContract, MonitorContract
     public function route(array|string $class, $queue = null, $connection = null)
     {
         $this->queueRoutes()->set($class, $queue, $connection);
+    }
+
+    /**
+     * Forward the given queue to another queue and/or connection.
+     *
+     * @param  array<string, \UnitEnum|string>|\UnitEnum|string  $queue
+     * @param  \UnitEnum|string|null  $to
+     * @param  \UnitEnum|string|null  $connection
+     * @return void
+     */
+    public function forward(array|string|UnitEnum $queue, $to = null, $connection = null)
+    {
+        $this->queueRoutes()->forward($queue, $to, $connection);
     }
 
     /**
