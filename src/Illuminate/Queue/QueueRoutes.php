@@ -44,9 +44,24 @@ class QueueRoutes
             return null;
         }
 
-        $queue = $this->getAttributeValue($queueable, QueueAttribute::class, 'queue');
+        return $this->connectionForQueue(
+            $this->getAttributeValue($queueable, QueueAttribute::class, 'queue')
+        );
+    }
 
-        return is_null($queue) ? null : ($this->queueRoutes[enum_value($queue)][0] ?? null);
+    /**
+     * Get the connection that the given queue name has been forwarded to.
+     *
+     * @param  \UnitEnum|string|null  $queue
+     * @return string|null
+     */
+    protected function connectionForQueue($queue)
+    {
+        if (is_null($queue)) {
+            return null;
+        }
+
+        return $this->queueRoutes[enum_value($queue)][0] ?? null;
     }
 
     /**
