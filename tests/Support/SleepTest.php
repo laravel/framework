@@ -270,12 +270,12 @@ class SleepTest extends TestCase
         ]);
     }
 
-    public function testItSleepsForZeroTimeWithNegativeDateTime()
+    public function testItSleepsForZeroTimeWithNegativeDateTime(): void
     {
         Sleep::fake();
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
-        Sleep::until(Carbon::now()->subMinutes(100));
+        Sleep::until($now->copy()->subMinutes(100));
 
         Sleep::assertSequence([
             Sleep::for(0)->seconds(),

@@ -24,7 +24,6 @@ use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
@@ -2196,7 +2195,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
     }
 
-    public function testTimestampsUsingOldSqlServerDateFormatFallbackToDefaultParsing()
+    public function testTimestampsUsingOldSqlServerDateFormatFallbackToDefaultParsing(): void
     {
         $model = new EloquentTestUser;
         $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
@@ -2209,8 +2208,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('2017-11-14 08:23:19.000', $model->fromDateTime($date), 'the format should trims it');
         // No longer throwing exception since Laravel 7,
         // but Date::hasFormat() can be used instead to check date formatting:
-        $this->assertTrue(Date::hasFormat('2017-11-14 08:23:19.000', $model->getDateFormat()));
-        $this->assertFalse(Date::hasFormat('2017-11-14 08:23:19.734', $model->getDateFormat()));
+        $this->assertTrue(Carbon::hasFormat('2017-11-14 08:23:19.000', $model->getDateFormat()));
+        $this->assertFalse(Carbon::hasFormat('2017-11-14 08:23:19.734', $model->getDateFormat()));
     }
 
     public function testSpecialFormats()

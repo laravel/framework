@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Filesystem;
 
-use Carbon\Carbon;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Carbon;
 use InvalidArgumentException;
-use League\Flysystem\PathPrefixing\PathPrefixedAdapter;
 use League\Flysystem\UnableToReadFile;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
