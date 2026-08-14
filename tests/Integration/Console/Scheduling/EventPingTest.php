@@ -8,9 +8,9 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Console\Scheduling\Event;
-use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
 use Mockery;
 use Orchestra\Testbench\TestCase;
 
@@ -30,7 +30,7 @@ class EventPingTest extends TestCase
 
         $this->swap(HttpClient::class, $httpMock);
 
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $thenCalled = false;
 
