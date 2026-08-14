@@ -80,7 +80,7 @@ class QueueRoutesTest extends TestCase
         $this->assertNull($defaults->getConnection(new FinanceNotification));
     }
 
-    public function testRouteQueueRewritesName()
+    public function testForwardRewritesName()
     {
         $defaults = new QueueRoutes();
 
@@ -91,7 +91,7 @@ class QueueRoutesTest extends TestCase
         $this->assertSame('other', $defaults->resolveQueue('other'));
     }
 
-    public function testRouteQueueIsScopedToConnection()
+    public function testForwardIsScopedToConnection()
     {
         $defaults = new QueueRoutes();
 
@@ -102,7 +102,7 @@ class QueueRoutesTest extends TestCase
         $this->assertSame('reports', $defaults->resolveQueue('reports'));
     }
 
-    public function testRouteQueueWithoutDestinationKeepsName()
+    public function testForwardWithoutDestinationKeepsName()
     {
         $defaults = new QueueRoutes();
 
@@ -111,7 +111,7 @@ class QueueRoutesTest extends TestCase
         $this->assertSame('reports', $defaults->resolveQueue('reports', 'cloud'));
     }
 
-    public function testRouteQueueRoutesConnectionByQueueName()
+    public function testForwardSetsConnectionByQueueName()
     {
         $defaults = new QueueRoutes();
 
@@ -122,16 +122,30 @@ class QueueRoutesTest extends TestCase
         $this->assertNull($defaults->getConnection(new SomeJob));
     }
 
-    public function testRouteQueueMatchesQueueAttribute()
+    public function testForwardMatchesQueueAttribute()
     {
         $defaults = new QueueRoutes();
 
         $defaults->setQueue('reports', 'audit', 'cloud');
 
-        $this->assertSame('cloud', $defaults->getConnection(new AttributeRoutedJob));
+        $this->assertSame('cloud', $defaults->getConnection(new AttributeForwardedJob));
     }
 
-    public function testRouteQueueResolvesEnums()
+    public function testForwardAcceptsArray()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->setQueue([
+            'reports' => 'audit',
+            'emails' => 'mail',
+        ], connection: 'cloud');
+
+        $this->assertSame('audit', $defaults->resolveQueue('reports', 'cloud'));
+        $this->assertSame('mail', $defaults->resolveQueue('emails', 'cloud'));
+        $this->assertSame('reports', $defaults->resolveQueue('reports', 'redis'));
+    }
+
+    public function testForwardResolvesEnums()
     {
         $defaults = new QueueRoutes();
 
@@ -177,7 +191,7 @@ class SomeJob
 }
 
 #[QueueAttribute('reports')]
-class AttributeRoutedJob
+class AttributeForwardedJob
 {
     use Queueable;
 }

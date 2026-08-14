@@ -181,7 +181,7 @@ class QueuedEventsTest extends TestCase
         Container::setInstance(null);
     }
 
-    public function testConnectionIsSetUsingRoutedQueueName()
+    public function testConnectionIsSetUsingForwardedQueue()
     {
         $container = new Container;
         $d = new Dispatcher($container);
@@ -198,7 +198,7 @@ class QueuedEventsTest extends TestCase
             return $fakeQueue;
         });
 
-        $d->listen('some.event', TestDispatcherRoutedQueue::class.'@handle');
+        $d->listen('some.event', TestDispatcherForwardedQueue::class.'@handle');
         $d->dispatch('some.event', ['foo', 'bar']);
 
         $fakeQueue->connection('cloud')->assertPushedOn('reports', CallQueuedListener::class);
@@ -1024,7 +1024,7 @@ class TestDispatcherQueueRoutes implements ShouldQueue
     }
 }
 
-class TestDispatcherRoutedQueue implements ShouldQueue
+class TestDispatcherForwardedQueue implements ShouldQueue
 {
     public $queue = 'reports';
 

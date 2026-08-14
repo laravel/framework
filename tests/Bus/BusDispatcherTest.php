@@ -94,7 +94,7 @@ class BusDispatcherTest extends TestCase
         Container::setInstance(null);
     }
 
-    public function testCommandsAreRoutedToConnectionByQueueName()
+    public function testCommandsAreForwardedToConnectionByQueueName()
     {
         Container::setInstance($container = new Container);
         $queueRoutes = new QueueRoutes;
@@ -119,7 +119,7 @@ class BusDispatcherTest extends TestCase
         Container::setInstance(null);
     }
 
-    public function testExplicitConnectionWinsOverQueueRoute()
+    public function testExplicitConnectionWinsOverForwardedQueue()
     {
         Container::setInstance($container = new Container);
         $queueRoutes = new QueueRoutes;

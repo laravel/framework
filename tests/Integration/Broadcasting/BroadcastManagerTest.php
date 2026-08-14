@@ -57,14 +57,14 @@ class BroadcastManagerTest extends TestCase
         Queue::connection('broadcast-connection')->assertPushedOn('broadcast-queue', BroadcastEvent::class);
     }
 
-    public function testEventsCanBeBroadcastRoutingByQueueName()
+    public function testEventsCanBeBroadcastWhenForwardingQueue()
     {
         Bus::fake();
         Queue::fake();
 
-        Queue::routeQueue('broadcast-queue', 'events', 'broadcast-connection');
+        Queue::forward('broadcast-queue', 'events', 'broadcast-connection');
 
-        Broadcast::queue(new TestRoutedEvent);
+        Broadcast::queue(new TestForwardedEvent);
         Bus::assertNotDispatched(BroadcastEvent::class);
         Queue::connection('broadcast-connection')->assertPushedOn('broadcast-queue', BroadcastEvent::class);
     }
@@ -333,7 +333,7 @@ class TestEvent implements ShouldBroadcast
     }
 }
 
-class TestRoutedEvent implements ShouldBroadcast
+class TestForwardedEvent implements ShouldBroadcast
 {
     public $queue = 'broadcast-queue';
 

@@ -140,14 +140,14 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Register the route for the given queue name.
+     * Forward the given queue to another queue and/or connection.
      *
      * @param  array<string, \UnitEnum|string>|\UnitEnum|string  $queue
      * @param  \UnitEnum|string|null  $to
      * @param  \UnitEnum|string|null  $connection
      * @return void
      */
-    public function routeQueue(array|string|UnitEnum $queue, $to = null, $connection = null)
+    public function forward(array|string|UnitEnum $queue, $to = null, $connection = null)
     {
         $this->queueRoutes()->setQueue($queue, $to, $connection);
     }

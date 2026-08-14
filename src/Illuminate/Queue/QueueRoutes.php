@@ -22,7 +22,7 @@ class QueueRoutes
     /**
      * The mapping of queue names to their routes.
      *
-     * @var array<string, array{0: string|null, 1: string|null}>
+     * @var array<string, array>
      */
     protected $queueRoutes = [];
 

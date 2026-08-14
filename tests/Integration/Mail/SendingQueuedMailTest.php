@@ -41,13 +41,13 @@ class SendingQueuedMailTest extends TestCase
         Queue::connection('mail-connection')->assertPushedOn('mail-queue', SendQueuedMailable::class);
     }
 
-    public function testMailIsSentWhenRoutingByQueueName()
+    public function testMailIsSentWhenForwardingQueue()
     {
         Queue::fake();
 
-        Queue::routeQueue('mail-queue', 'main', 'mail-connection');
+        Queue::forward('mail-queue', 'main', 'mail-connection');
 
-        Mail::to('test@mail.com')->queue(new SendingQueuedRoutedMailTestMail);
+        Mail::to('test@mail.com')->queue(new SendingQueuedForwardedMailTestMail);
 
         Queue::connection('mail-connection')->assertPushedOn('mail-queue', SendQueuedMailable::class);
     }
@@ -84,7 +84,7 @@ class SendingQueuedMailTestMail extends Mailable
     }
 }
 
-class SendingQueuedRoutedMailTestMail extends Mailable
+class SendingQueuedForwardedMailTestMail extends Mailable
 {
     public $queue = 'mail-queue';
 
