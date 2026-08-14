@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Mail;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Mail\Events\MessageFailed;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Mail\Mailer;
@@ -13,6 +14,8 @@ use Illuminate\Support\HtmlString;
 use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 
 class MailMailerTest extends TestCase
@@ -332,6 +335,45 @@ class MailMailerTest extends TestCase
         $mailer->send('foo', ['data'], function (Message $message) {
             $message->to('taylor@laravel.com')->from('hello@laravel.com');
         });
+    }
+
+    public function testFailedEventIsDispatchedWhenSendingFails(): void
+    {
+        $view = Mockery::mock(Factory::class);
+        $view->expects('make')->andReturn($view);
+        $view->expects('render')->andReturn('rendered.view');
+
+        $exception = new RuntimeException('Connection could not be established.');
+
+        $transport = Mockery::mock(TransportInterface::class);
+        $transport->expects('send')->andThrow($exception);
+
+        $event = null;
+
+        $events = Mockery::mock(Dispatcher::class);
+        $events->expects('until')->with(Mockery::type(MessageSending::class));
+        $events->expects('dispatch')
+            ->with(Mockery::type(MessageFailed::class))
+            ->andReturnUsing(function ($dispatched) use (&$event) {
+                $event = $dispatched;
+            });
+
+        $mailer = new Mailer('array', $view, $transport, $events);
+
+        try {
+            $mailer->send('foo', ['data'], function (Message $message) {
+                $message->to('taylor@laravel.com')->from('hello@laravel.com');
+            });
+
+            $this->fail('The transport exception was not re-thrown.');
+        } catch (RuntimeException $e) {
+            $this->assertSame($exception, $e);
+        }
+
+        $this->assertInstanceOf(MessageFailed::class, $event);
+        $this->assertSame($exception, $event->exception);
+        $this->assertSame('taylor@laravel.com', $event->message->getTo()[0]->getAddress());
+        $this->assertSame('array', $event->data['mailer']);
     }
 
     public function testMacroable(): void

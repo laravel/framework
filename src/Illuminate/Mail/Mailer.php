@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\Factory as QueueContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Mail\Events\MessageFailed;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Mail\Mailables\Address;
@@ -21,6 +22,7 @@ use InvalidArgumentException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
+use Throwable;
 
 class Mailer implements MailerContract, MailQueueContract
 {
@@ -329,7 +331,13 @@ class Mailer implements MailerContract, MailQueueContract
         $symfonyMessage = $message->getSymfonyMessage();
 
         if ($this->shouldSendMessage($symfonyMessage, $data)) {
-            $symfonySentMessage = $this->sendSymfonyMessage($symfonyMessage);
+            try {
+                $symfonySentMessage = $this->sendSymfonyMessage($symfonyMessage);
+            } catch (Throwable $e) {
+                $this->dispatchFailedEvent($symfonyMessage, $e, $data);
+
+                throw $e;
+            }
 
             if ($symfonySentMessage) {
                 $sentMessage = new SentMessage($symfonySentMessage);
@@ -621,6 +629,21 @@ class Mailer implements MailerContract, MailQueueContract
     {
         $this->events?->dispatch(
             new MessageSent($message, $data)
+        );
+    }
+
+    /**
+     * Dispatch the message failed event.
+     *
+     * @param  \Symfony\Component\Mime\Email  $message
+     * @param  \Throwable  $exception
+     * @param  array  $data
+     * @return void
+     */
+    protected function dispatchFailedEvent($message, $exception, $data = [])
+    {
+        $this->events?->dispatch(
+            new MessageFailed($message, $exception, $data)
         );
     }
 
