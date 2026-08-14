@@ -488,7 +488,7 @@ abstract class Queue
     }
 
     /**
-     * Get the aliased name for the given queue.
+     * Get the routed queue name for the given queue.
      *
      * @param  string  $queue
      * @return string

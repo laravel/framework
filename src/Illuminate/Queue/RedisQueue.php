@@ -542,7 +542,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function getQueue($queue)
     {
-        return 'queues:'.(enum_value($queue) ?: $this->default);
+        return 'queues:'.$this->resolveQueue(enum_value($queue) ?: $this->default);
     }
 
     /**
@@ -553,11 +553,11 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function getQueueRedisKey($queue = null)
     {
-        $queue = enum_value($queue) ?: $this->default;
+        $queue = $this->resolveQueue(enum_value($queue) ?: $this->default);
 
         return $this->isClusterConnection() && ! Connection::hasHashTag($queue)
-            ? $this->getQueue('{'.$queue.'}')
-            : $this->getQueue($queue);
+            ? 'queues:{'.$queue.'}'
+            : 'queues:'.$queue;
     }
 
     /**
