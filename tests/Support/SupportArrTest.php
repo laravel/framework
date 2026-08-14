@@ -71,6 +71,98 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['category' => ['type' => 'Table']], Arr::add(['category' => ['type' => 'Table']], 'category.type', 'Chair'));
     }
 
+    public function testBeforeReturnsItemBeforeTheGivenItem()
+    {
+        $array = [1, 2, 3, 4, 5, 2, 5, 'name' => 'taylor', 'framework' => 'laravel'];
+
+        $this->assertEquals(1, Arr::before($array, 2));
+        $this->assertEquals(1, Arr::before($array, '2'));
+        $this->assertEquals(5, Arr::before($array, 'taylor'));
+        $this->assertSame('taylor', Arr::before($array, 'laravel'));
+        $this->assertEquals(4, Arr::before($array, fn ($value) => $value > 4));
+        $this->assertEquals(5, Arr::before($array, fn ($value) => ! is_numeric($value)));
+    }
+
+    public function testBeforeInStrictMode()
+    {
+        $array = [false, 0, 1, [], ''];
+
+        $this->assertNull(Arr::before($array, 'false', true));
+        $this->assertNull(Arr::before($array, '1', true));
+        $this->assertNull(Arr::before($array, false, true));
+        $this->assertEquals(false, Arr::before($array, 0, true));
+        $this->assertEquals(0, Arr::before($array, 1, true));
+        $this->assertEquals(1, Arr::before($array, [], true));
+        $this->assertSame([], Arr::before($array, '', true));
+    }
+
+    public function testBeforeReturnsNullWhenItemIsNotFound()
+    {
+        $array = [1, 2, 3, 4, 5, 'foo' => 'bar'];
+
+        $this->assertNull(Arr::before($array, 6));
+        $this->assertNull(Arr::before($array, 'foo'));
+        $this->assertNull(Arr::before($array, fn ($value) => $value < 1 && is_numeric($value)));
+        $this->assertNull(Arr::before($array, fn ($value) => $value === 'nope'));
+    }
+
+    public function testBeforeReturnsNullWhenItemOnTheFirstItem()
+    {
+        $array = [1, 2, 3, 4, 5, 'foo' => 'bar'];
+
+        $this->assertNull(Arr::before($array, 1));
+        $this->assertNull(Arr::before($array, fn ($value) => $value < 2 && is_numeric($value)));
+
+        $this->assertNull(Arr::before(['foo' => 'bar', 1, 2, 3, 4, 5], 'bar'));
+    }
+
+    public function testAfterReturnsItemAfterTheGivenItem()
+    {
+        $array = [1, 2, 3, 4, 2, 5, 'name' => 'taylor', 'framework' => 'laravel'];
+
+        $this->assertEquals(2, Arr::after($array, 1));
+        $this->assertEquals(3, Arr::after($array, 2));
+        $this->assertEquals(4, Arr::after($array, 3));
+        $this->assertEquals(2, Arr::after($array, 4));
+        $this->assertSame('taylor', Arr::after($array, 5));
+        $this->assertSame('laravel', Arr::after($array, 'taylor'));
+
+        $this->assertEquals(4, Arr::after($array, fn ($value) => $value > 2));
+        $this->assertSame('laravel', Arr::after($array, fn ($value) => ! is_numeric($value)));
+    }
+
+    public function testAfterInStrictMode()
+    {
+        $array = [false, 0, 1, [], ''];
+
+        $this->assertNull(Arr::after($array, 'false', true));
+        $this->assertNull(Arr::after($array, '1', true));
+        $this->assertNull(Arr::after($array, '', true));
+        $this->assertEquals(0, Arr::after($array, false, true));
+        $this->assertSame([], Arr::after($array, 1, true));
+        $this->assertSame('', Arr::after($array, [], true));
+    }
+
+    public function testAfterReturnsNullWhenItemIsNotFound()
+    {
+        $array = [1, 2, 3, 4, 5, 'foo' => 'bar'];
+
+        $this->assertNull(Arr::after($array, 6));
+        $this->assertNull(Arr::after($array, 'foo'));
+        $this->assertNull(Arr::after($array, fn ($value) => $value < 1 && is_numeric($value)));
+        $this->assertNull(Arr::after($array, fn ($value) => $value === 'nope'));
+    }
+
+    public function testAfterReturnsNullWhenItemOnTheLastItem()
+    {
+        $array = [1, 2, 3, 4, 5, 'foo' => 'bar'];
+
+        $this->assertNull(Arr::after($array, 'bar'));
+        $this->assertNull(Arr::after($array, fn ($value) => $value > 4 && ! is_numeric($value)));
+
+        $this->assertNull(Arr::after(['foo' => 'bar', 1, 2, 3, 4, 5], 5));
+    }
+
     public function testPush()
     {
         $array = [];

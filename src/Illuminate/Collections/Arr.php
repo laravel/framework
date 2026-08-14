@@ -75,6 +75,70 @@ class Arr
     }
 
     /**
+     * Get the item before the given item.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  TValue|(callable(TValue, TKey): bool)  $value
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public static function before($array, $value, $strict = false)
+    {
+        $key = ! is_string($value) && is_callable($value)
+            ? array_find_key($array, $value)
+            : array_search($value, $array, $strict);
+
+        if ($key === false || $key === null) {
+            return null;
+        }
+
+        $keys = array_keys($array);
+
+        $position = array_search($key, $keys, true);
+
+        if ($position === 0) {
+            return null;
+        }
+
+        return $array[$keys[$position - 1]];
+    }
+
+    /**
+     * Get the item after the given item.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  TValue|(callable(TValue, TKey): bool)  $value
+     * @param  bool  $strict
+     * @return TValue|null
+     */
+    public static function after($array, $value, $strict = false)
+    {
+        $key = ! is_string($value) && is_callable($value)
+            ? array_find_key($array, $value)
+            : array_search($value, $array, $strict);
+
+        if ($key === false || $key === null) {
+            return null;
+        }
+
+        $keys = array_keys($array);
+
+        $position = array_search($key, $keys, true);
+
+        if ($position === count($keys) - 1) {
+            return null;
+        }
+
+        return $array[$keys[$position + 1]];
+    }
+
+    /**
      * Get an array item from an array using "dot" notation.
      *
      * @throws \InvalidArgumentException
