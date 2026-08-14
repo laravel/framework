@@ -652,6 +652,52 @@ class ProcessTest extends TestCase
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testGeneralTimeoutsCanBeDistinguishedFromIdleTimeouts()
+    {
+        $factory = new Factory;
+
+        try {
+            $factory->timeout(1)->path(__DIR__)->run('sleep 2;');
+
+            $this->fail('The process did not time out.');
+        } catch (ProcessTimedOutException $e) {
+            $this->assertTrue($e->isGeneralTimeout());
+            $this->assertFalse($e->isIdleTimeout());
+            $this->assertSame(1.0, $e->exceededTimeout());
+        }
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testIdleTimeoutsCanBeDistinguishedFromGeneralTimeouts()
+    {
+        $factory = new Factory;
+
+        try {
+            $factory->timeout(10)->idleTimeout(1)->path(__DIR__)->run('sleep 5;');
+
+            $this->fail('The process did not time out.');
+        } catch (ProcessTimedOutException $e) {
+            $this->assertTrue($e->isIdleTimeout());
+            $this->assertFalse($e->isGeneralTimeout());
+            $this->assertSame(1.0, $e->exceededTimeout());
+        }
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testTimedOutProcessesStillExposeTheirResult()
+    {
+        $factory = new Factory;
+
+        try {
+            $factory->timeout(1)->path(__DIR__)->run('echo "Hello World"; sleep 2;');
+
+            $this->fail('The process did not time out.');
+        } catch (ProcessTimedOutException $e) {
+            $this->assertStringContainsString('Hello World', $e->result->output());
+        }
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRealProcessesCanThrowIfTrue()
     {
         $this->expectException(ProcessFailedException::class);
