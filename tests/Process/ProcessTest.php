@@ -114,6 +114,48 @@ class ProcessTest extends TestCase
         $this->assertStringContainsString('ProcessTest.php', $poolResults[1]->output());
     }
 
+    public function testInvokedProcessPoolCanBeIterated()
+    {
+        $factory = new Factory;
+
+        $pool = $factory->pool(function ($pool) {
+            return [
+                $pool->as('first')->path(__DIR__)->command($this->ls()),
+                $pool->as('second')->path(__DIR__)->command($this->ls()),
+            ];
+        })->start();
+
+        $keys = [];
+
+        foreach ($pool as $key => $process) {
+            $keys[] = $key;
+        }
+
+        $pool->wait();
+
+        $this->assertSame(['first', 'second'], $keys);
+    }
+
+    public function testProcessPoolResultsCanBeIterated()
+    {
+        $factory = new Factory;
+
+        $results = $factory->pool(function ($pool) {
+            return [
+                $pool->as('first')->path(__DIR__)->command($this->ls()),
+                $pool->as('second')->path(__DIR__)->command($this->ls()),
+            ];
+        })->wait();
+
+        $iterated = [];
+
+        foreach ($results as $key => $result) {
+            $iterated[$key] = $result->successful();
+        }
+
+        $this->assertSame(['first' => true, 'second' => true], $iterated);
+    }
+
     public function testProcessPoolResultsCanBeEvaluatedByName()
     {
         $factory = new Factory;

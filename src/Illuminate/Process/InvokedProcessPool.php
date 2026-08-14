@@ -2,10 +2,13 @@
 
 namespace Illuminate\Process;
 
+use ArrayIterator;
 use Countable;
 use Illuminate\Support\Collection;
+use IteratorAggregate;
+use Traversable;
 
-class InvokedProcessPool implements Countable
+class InvokedProcessPool implements Countable, IteratorAggregate
 {
     /**
      * The array of invoked processes.
@@ -65,6 +68,16 @@ class InvokedProcessPool implements Countable
     public function wait()
     {
         return new ProcessPoolResults((new Collection($this->invokedProcesses))->map->wait()->all());
+    }
+
+    /**
+     * Get an iterator for the invoked processes.
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->invokedProcesses);
     }
 
     /**
