@@ -234,6 +234,20 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Pause many queues.
+     *
+     * @param  string  $connection
+     * @param  string[]  $queues
+     * @return void
+     */
+    public function pauseMany($connection, $queues)
+    {
+        foreach ($queues as $queue) {
+            $this->pause($connection, $queue);
+        }
+    }
+
+    /**
      * Pause a queue by its connection and name for a given amount of time.
      *
      * @param  string  $connection
@@ -250,6 +264,20 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['events']->dispatch(
             new Events\QueuePaused($connection, $queue, $ttl)
         );
+    }
+
+    /**
+     * Pause many queues for a given amount of time.
+     *
+     * @param  string  $connection
+     * @param  array<string, \DateTimeInterface|\DateInterval|int>  $queues
+     * @return void
+     */
+    public function pauseManyFor($connection, $queues)
+    {
+        foreach ($queues as $queue => $ttl) {
+            $this->pauseFor($connection, $queue, $ttl);
+        }
     }
 
     /**
@@ -284,6 +312,20 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['events']->dispatch(
             new Events\QueueResumed($connection, $queue)
         );
+    }
+
+    /**
+     * Resume many queues.
+     *
+     * @param  string  $connection
+     * @param  string[]  $queues
+     * @return void
+     */
+    public function resumeMany($connection, $queues)
+    {
+        foreach ($queues as $queue) {
+            $this->resume($connection, $queue);
+        }
     }
 
     /**

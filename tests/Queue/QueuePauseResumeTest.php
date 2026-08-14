@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use DateInterval;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Events\Dispatcher;
@@ -80,6 +81,76 @@ class QueuePauseResumeTest extends TestCase
 
         $this->manager->resume('redis', 'default');
         $this->assertFalse($this->manager->isPaused('redis', 'default'));
+    }
+
+    public function testPauseManyQueues(): void
+    {
+        $this->manager->pauseMany('redis', ['emails', 'notifications']);
+
+        $this->assertTrue($this->manager->isPaused('redis', 'emails'));
+        $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
+        $this->assertFalse($this->manager->isPaused('redis', 'default'));
+    }
+
+    public function testPauseManyQueuesForTTL(): void
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $this->manager->pauseManyFor('redis', ['emails' => 30, 'notifications' => 60]);
+
+        $this->assertTrue($this->manager->isPaused('redis', 'emails'));
+        $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
+
+        Carbon::setTestNow($now->addSeconds(45));
+        $this->assertFalse($this->manager->isPaused('redis', 'emails'));
+        $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
+    }
+
+    public function testPauseManyQueuesForDateTimeInterfaceTTL(): void
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $this->manager->pauseManyFor('redis', [
+            'emails' => $now->copy()->addSeconds(30),
+            'notifications' => $now->copy()->addSeconds(60),
+        ]);
+
+        $this->assertTrue($this->manager->isPaused('redis', 'emails'));
+        $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
+
+        Carbon::setTestNow($now->addSeconds(45));
+        $this->assertFalse($this->manager->isPaused('redis', 'emails'));
+        $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
+    }
+
+    public function testPauseManyQueuesForDateIntervalTTL(): void
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $this->manager->pauseManyFor('redis', [
+            'emails' => new DateInterval('PT30S'),
+            'notifications' => new DateInterval('PT60S'),
+        ]);
+
+        $this->assertTrue($this->manager->isPaused('redis', 'emails'));
+        $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
+
+        Carbon::setTestNow($now->addSeconds(45));
+        $this->assertFalse($this->manager->isPaused('redis', 'emails'));
+        $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
+    }
+
+    public function testResumeManyQueues(): void
+    {
+        $this->manager->pauseMany('redis', ['emails', 'notifications']);
+
+        $this->assertTrue($this->manager->isPaused('redis', 'emails'));
+        $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
+
+        $this->manager->resumeMany('redis', ['emails', 'notifications']);
+
+        $this->assertFalse($this->manager->isPaused('redis', 'emails'));
+        $this->assertFalse($this->manager->isPaused('redis', 'notifications'));
     }
 
     public function testPausingQueueOnOneConnectionDoesNotAffectAnother()
