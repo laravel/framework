@@ -4,7 +4,6 @@ namespace Illuminate\Foundation;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\NodePackageManager;
-use Laravel\Pail\PailServiceProvider;
 use ReflectionClass;
 
 /**
@@ -97,10 +96,6 @@ class DevCommands
 
         self::artisan('serve', 'server');
         self::artisan('queue:listen --tries=1 --timeout=0', 'queue');
-
-        if (function_exists('pcntl_fork') && app()->providerIsLoaded(PailServiceProvider::class)) {
-            self::artisan('pail --timeout=0', 'logs');
-        }
 
         if (File::exists(base_path('package.json'))) {
             self::node('dev', 'vite');
