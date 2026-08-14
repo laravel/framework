@@ -249,6 +249,58 @@ class Factory
     }
 
     /**
+     * Assert how many processes have been recorded.
+     *
+     * @param  int  $count
+     * @return $this
+     */
+    public function assertRanCount(int $count)
+    {
+        PHPUnit::assertCount($count, $this->recorded);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given processes were run in the given order.
+     *
+     * @param  list<\Closure|string>  $callbacks
+     * @return $this
+     */
+    public function assertRanInOrder(array $callbacks)
+    {
+        $this->assertRanCount(count($callbacks));
+
+        foreach ($callbacks as $index => $callback) {
+            $callback = $callback instanceof Closure
+                ? $callback
+                : fn ($process) => $process->command === $callback;
+
+            PHPUnit::assertTrue(
+                $callback($this->recorded[$index][0], $this->recorded[$index][1]),
+                'An expected process (#'.($index + 1).') was not invoked.'
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get a collection of the process / result pairs matching the given truth test.
+     *
+     * @param  \Closure|null  $callback
+     * @return \Illuminate\Support\Collection<int, array{0: \Illuminate\Process\PendingProcess, 1: \Illuminate\Contracts\Process\ProcessResult}>
+     */
+    public function recorded(?Closure $callback = null)
+    {
+        $recorded = new Collection($this->recorded);
+
+        return $callback
+            ? $recorded->filter(fn ($pair) => $callback($pair[0], $pair[1]))->values()
+            : $recorded;
+    }
+
+    /**
      * Assert that no processes were recorded.
      *
      * @return $this
