@@ -149,7 +149,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function forward(array|string|UnitEnum $queue, $to = null, $connection = null)
     {
-        $this->queueRoutes()->setQueue($queue, $to, $connection);
+        $this->queueRoutes()->forward($queue, $to, $connection);
     }
 
     /**

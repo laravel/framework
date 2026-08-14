@@ -339,11 +339,11 @@ class QueueSqsQueueTest extends TestCase
         $this->assertEquals($queueUrl, $queue->getQueue('test.fifo'));
     }
 
-    public function testRoutedQueueNameIsUsedWhenPushing()
+    public function testForwardedQueueNameIsUsedWhenPushing()
     {
         Container::setInstance($container = new Container);
         $routes = new QueueRoutes;
-        $routes->setQueue('jobs', 'processing', 'sqs');
+        $routes->forward('jobs', 'processing', 'sqs');
         $container->instance('queue.routes', $routes);
 
         $queue = new SqsQueue($this->sqs, 'default', $this->prefix);

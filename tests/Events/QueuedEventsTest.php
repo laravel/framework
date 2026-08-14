@@ -187,7 +187,7 @@ class QueuedEventsTest extends TestCase
         $d = new Dispatcher($container);
 
         $queueRoutes = new QueueRoutes;
-        $queueRoutes->setQueue('reports', 'processing', 'cloud');
+        $queueRoutes->forward('reports', 'processing', 'cloud');
         $container->instance('queue.routes', $queueRoutes);
 
         $fakeQueue = new QueueFake($container);

@@ -98,7 +98,7 @@ class BusDispatcherTest extends TestCase
     {
         Container::setInstance($container = new Container);
         $queueRoutes = new QueueRoutes;
-        $queueRoutes->setQueue('reports', 'processing', 'cloud');
+        $queueRoutes->forward('reports', 'processing', 'cloud');
         $container->instance('queue.routes', $queueRoutes);
 
         $mock = Mockery::mock(Queue::class);
@@ -123,7 +123,7 @@ class BusDispatcherTest extends TestCase
     {
         Container::setInstance($container = new Container);
         $queueRoutes = new QueueRoutes;
-        $queueRoutes->setQueue('reports', 'processing', 'cloud');
+        $queueRoutes->forward('reports', 'processing', 'cloud');
         $container->instance('queue.routes', $queueRoutes);
 
         $mock = Mockery::mock(Queue::class);

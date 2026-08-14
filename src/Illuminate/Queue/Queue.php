@@ -495,7 +495,7 @@ abstract class Queue
      */
     protected function resolveQueue($queue)
     {
-        return $this->queueRoutes()->resolveQueue($queue, $this->connectionName);
+        return $this->queueRoutes()->forwardedQueue($queue, $this->connectionName);
     }
 
     /**

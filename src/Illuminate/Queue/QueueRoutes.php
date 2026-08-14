@@ -20,11 +20,11 @@ class QueueRoutes
     protected $routes = [];
 
     /**
-     * The mapping of queue names to their routes.
+     * The queues that have been forwarded to another queue and/or connection.
      *
      * @var array<string, array>
      */
-    protected $queueRoutes = [];
+    protected $forwards = [];
 
     /**
      * Get the queue connection that a given queueable instance should be routed to.
@@ -40,28 +40,28 @@ class QueueRoutes
             return is_string($route) ? null : $route[0];
         }
 
-        if (empty($this->queueRoutes)) {
+        if (empty($this->forwards)) {
             return null;
         }
 
-        return $this->connectionForQueue(
+        return $this->forwardedConnection(
             $this->getAttributeValue($queueable, QueueAttribute::class, 'queue')
         );
     }
 
     /**
-     * Get the connection that the given queue name has been forwarded to.
+     * Get the connection the given queue has been forwarded to.
      *
      * @param  \UnitEnum|string|null  $queue
      * @return string|null
      */
-    protected function connectionForQueue($queue)
+    protected function forwardedConnection($queue)
     {
         if (is_null($queue)) {
             return null;
         }
 
-        return $this->queueRoutes[enum_value($queue)][0] ?? null;
+        return $this->forwards[enum_value($queue)][0] ?? null;
     }
 
     /**
@@ -141,39 +141,39 @@ class QueueRoutes
     }
 
     /**
-     * Register the queue route for the given queue name.
+     * Register a forward for the given queue.
      *
      * @param  array<string, \UnitEnum|string>|\UnitEnum|string  $queue
      * @param  \UnitEnum|string|null  $to
      * @param  \UnitEnum|string|null  $connection
      * @return void
      */
-    public function setQueue(array|string|UnitEnum $queue, $to = null, $connection = null)
+    public function forward(array|string|UnitEnum $queue, $to = null, $connection = null)
     {
-        $routes = is_array($queue) ? $queue : [enum_value($queue) => $to];
+        $forwards = is_array($queue) ? $queue : [enum_value($queue) => $to];
 
-        foreach ($routes as $from => $destination) {
-            $this->queueRoutes[enum_value($from)] = [enum_value($connection), enum_value($destination)];
+        foreach ($forwards as $from => $destination) {
+            $this->forwards[enum_value($from)] = [enum_value($connection), enum_value($destination)];
         }
     }
 
     /**
-     * Get the routed name for the given queue and connection.
+     * Get the queue the given queue has been forwarded to.
      *
      * @param  string  $queue
      * @param  string|null  $connection
      * @return string
      */
-    public function resolveQueue($queue, $connection = null)
+    public function forwardedQueue($queue, $connection = null)
     {
-        if (! isset($this->queueRoutes[$queue])) {
+        if (! isset($this->forwards[$queue])) {
             return $queue;
         }
 
-        [$routeConnection, $routeQueue] = $this->queueRoutes[$queue];
+        [$forwardConnection, $forwardQueue] = $this->forwards[$queue];
 
-        return is_null($routeConnection) || $routeConnection === $connection
-            ? $routeQueue ?? $queue
+        return is_null($forwardConnection) || $forwardConnection === $connection
+            ? $forwardQueue ?? $queue
             : $queue;
     }
 }

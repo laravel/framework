@@ -84,38 +84,38 @@ class QueueRoutesTest extends TestCase
     {
         $defaults = new QueueRoutes();
 
-        $defaults->setQueue('reports', 'audit');
+        $defaults->forward('reports', 'audit');
 
-        $this->assertSame('audit', $defaults->resolveQueue('reports'));
-        $this->assertSame('audit', $defaults->resolveQueue('reports', 'cloud'));
-        $this->assertSame('other', $defaults->resolveQueue('other'));
+        $this->assertSame('audit', $defaults->forwardedQueue('reports'));
+        $this->assertSame('audit', $defaults->forwardedQueue('reports', 'cloud'));
+        $this->assertSame('other', $defaults->forwardedQueue('other'));
     }
 
     public function testForwardIsScopedToConnection()
     {
         $defaults = new QueueRoutes();
 
-        $defaults->setQueue('reports', 'audit', 'cloud');
+        $defaults->forward('reports', 'audit', 'cloud');
 
-        $this->assertSame('audit', $defaults->resolveQueue('reports', 'cloud'));
-        $this->assertSame('reports', $defaults->resolveQueue('reports', 'redis'));
-        $this->assertSame('reports', $defaults->resolveQueue('reports'));
+        $this->assertSame('audit', $defaults->forwardedQueue('reports', 'cloud'));
+        $this->assertSame('reports', $defaults->forwardedQueue('reports', 'redis'));
+        $this->assertSame('reports', $defaults->forwardedQueue('reports'));
     }
 
     public function testForwardWithJustConnectionKeepsName()
     {
         $defaults = new QueueRoutes();
 
-        $defaults->setQueue('reports', connection: 'cloud');
+        $defaults->forward('reports', connection: 'cloud');
 
-        $this->assertSame('reports', $defaults->resolveQueue('reports', 'cloud'));
+        $this->assertSame('reports', $defaults->forwardedQueue('reports', 'cloud'));
     }
 
     public function testForwardSetsConnectionByQueueName()
     {
         $defaults = new QueueRoutes();
 
-        $defaults->setQueue('reports', 'audit', 'cloud');
+        $defaults->forward('reports', 'audit', 'cloud');
 
         $this->assertSame('cloud', $defaults->getConnection((new SomeJob)->onQueue('reports')));
         $this->assertNull($defaults->getConnection((new SomeJob)->onQueue('other')));
@@ -126,7 +126,7 @@ class QueueRoutesTest extends TestCase
     {
         $defaults = new QueueRoutes();
 
-        $defaults->setQueue('reports', 'audit', 'cloud');
+        $defaults->forward('reports', 'audit', 'cloud');
 
         $this->assertSame('cloud', $defaults->getConnection(new AttributeForwardedJob));
     }
@@ -135,24 +135,24 @@ class QueueRoutesTest extends TestCase
     {
         $defaults = new QueueRoutes();
 
-        $defaults->setQueue([
+        $defaults->forward([
             'reports' => 'audit',
             'emails' => 'mail',
         ], connection: 'cloud');
 
-        $this->assertSame('audit', $defaults->resolveQueue('reports', 'cloud'));
-        $this->assertSame('mail', $defaults->resolveQueue('emails', 'cloud'));
-        $this->assertSame('reports', $defaults->resolveQueue('reports', 'redis'));
+        $this->assertSame('audit', $defaults->forwardedQueue('reports', 'cloud'));
+        $this->assertSame('mail', $defaults->forwardedQueue('emails', 'cloud'));
+        $this->assertSame('reports', $defaults->forwardedQueue('reports', 'redis'));
     }
 
     public function testForwardResolvesEnums()
     {
         $defaults = new QueueRoutes();
 
-        $defaults->setQueue(QueueName::payments, 'settlements', ConnectionName::redis);
+        $defaults->forward(QueueName::payments, 'settlements', ConnectionName::redis);
 
-        $this->assertSame('settlements', $defaults->resolveQueue('payments', 'redis'));
-        $this->assertSame('payments', $defaults->resolveQueue('payments', 'sqs'));
+        $this->assertSame('settlements', $defaults->forwardedQueue('payments', 'redis'));
+        $this->assertSame('payments', $defaults->forwardedQueue('payments', 'sqs'));
     }
 
     public function testEnumsAreResolved()
