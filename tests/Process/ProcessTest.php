@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Process;
 use Carbon\CarbonInterval;
 use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Process\Exceptions\ProcessFailedException;
+use Illuminate\Process\Exceptions\ProcessIdleTimedOutException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
 use OutOfBoundsException;
@@ -652,7 +653,7 @@ class ProcessTest extends TestCase
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
-    public function testGeneralTimeoutsCanBeDistinguishedFromIdleTimeouts()
+    public function testGeneralTimeoutsThrowTheBaseException()
     {
         $factory = new Factory;
 
@@ -661,14 +662,13 @@ class ProcessTest extends TestCase
 
             $this->fail('The process did not time out.');
         } catch (ProcessTimedOutException $e) {
-            $this->assertTrue($e->isGeneralTimeout());
-            $this->assertFalse($e->isIdleTimeout());
+            $this->assertNotInstanceOf(ProcessIdleTimedOutException::class, $e);
             $this->assertSame(1.0, $e->exceededTimeout());
         }
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
-    public function testIdleTimeoutsCanBeDistinguishedFromGeneralTimeouts()
+    public function testIdleTimeoutsThrowTheIdleException()
     {
         $factory = new Factory;
 
@@ -676,11 +676,18 @@ class ProcessTest extends TestCase
             $factory->timeout(10)->idleTimeout(1)->path(__DIR__)->run('sleep 5;');
 
             $this->fail('The process did not time out.');
-        } catch (ProcessTimedOutException $e) {
-            $this->assertTrue($e->isIdleTimeout());
-            $this->assertFalse($e->isGeneralTimeout());
+        } catch (ProcessIdleTimedOutException $e) {
             $this->assertSame(1.0, $e->exceededTimeout());
         }
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testIdleTimeoutsAreStillCaughtByTheBaseException()
+    {
+        $this->expectException(ProcessTimedOutException::class);
+
+        $factory = new Factory;
+        $factory->timeout(10)->idleTimeout(1)->path(__DIR__)->run('sleep 5;');
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]

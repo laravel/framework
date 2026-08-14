@@ -37,23 +37,17 @@ class ProcessTimedOutException extends RuntimeException
     }
 
     /**
-     * Determine if the process exceeded its total allotted time.
+     * Create a new exception instance for the type of timeout that occurred.
      *
-     * @return bool
+     * @param  \Symfony\Component\Process\Exception\ProcessTimedOutException  $original
+     * @param  \Illuminate\Contracts\Process\ProcessResult  $result
+     * @return \Illuminate\Process\Exceptions\ProcessTimedOutException
      */
-    public function isGeneralTimeout()
+    public static function make(SymfonyTimeoutException $original, ProcessResult $result)
     {
-        return $this->original->isGeneralTimeout();
-    }
-
-    /**
-     * Determine if the process went too long without returning any output.
-     *
-     * @return bool
-     */
-    public function isIdleTimeout()
-    {
-        return $this->original->isIdleTimeout();
+        return $original->isIdleTimeout()
+            ? new ProcessIdleTimedOutException($original, $result)
+            : new ProcessTimedOutException($original, $result);
     }
 
     /**
