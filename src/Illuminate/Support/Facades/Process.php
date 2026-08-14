@@ -32,6 +32,7 @@ use Illuminate\Process\Factory;
  * @method static bool preventingStrayProcesses()
  * @method static \Illuminate\Process\Factory assertRan(\Closure|string $callback)
  * @method static \Illuminate\Process\Factory assertRanTimes(\Closure|string $callback, int $times = 1)
+ * @method static \Illuminate\Process\Factory assertRanInOrder(array $callbacks)
  * @method static \Illuminate\Process\Factory assertNotRan(\Closure|string $callback)
  * @method static \Illuminate\Process\Factory assertDidntRun(\Closure|string $callback)
  * @method static \Illuminate\Process\Factory assertNothingRan()
