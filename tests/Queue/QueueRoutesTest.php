@@ -102,7 +102,7 @@ class QueueRoutesTest extends TestCase
         $this->assertSame('reports', $defaults->resolveQueue('reports'));
     }
 
-    public function testForwardWithoutDestinationKeepsName()
+    public function testForwardWithJustConnectionKeepsName()
     {
         $defaults = new QueueRoutes();
 
