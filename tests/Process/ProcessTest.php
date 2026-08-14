@@ -1215,6 +1215,20 @@ class ProcessTest extends TestCase
         $factory->assertRanInOrder(['git fetch', 'composer install']);
     }
 
+    public function testFakeAssertionsWithArrayCommands()
+    {
+        $factory = new Factory;
+        $factory->fake();
+
+        $factory->run(['php', 'artisan', 'migrate']);
+
+        $factory->assertRan(['php', 'artisan', 'migrate']);
+        $factory->assertRanTimes(['php', 'artisan', 'migrate'], 1);
+        $factory->assertNotRan(['php', 'artisan', 'migrate:rollback']);
+        $factory->assertDidntRun(['php', 'artisan', 'migrate:rollback']);
+        $factory->assertRanInOrder([['php', 'artisan', 'migrate']]);
+    }
+
     public function testAssertingThatNothingRan()
     {
         $factory = new Factory;
