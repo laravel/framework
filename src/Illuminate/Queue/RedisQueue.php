@@ -264,11 +264,48 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function allQueueNames(): Collection
     {
-        return (new Collection($this->getConnection()->keys('queues:*')))
+        return (new Collection($this->scanQueueKeys()))
             // Trim to ensure clusters get their braces removed...
             ->map(fn ($key) => trim(Str::between($key, 'queues:', ':'), '{}'))
             ->unique()
             ->values();
+    }
+
+    /**
+     * Get all of the queue keys from the underlying connection.
+     *
+     * @return array<int, string>
+     */
+    protected function scanQueueKeys(): array
+    {
+        $connection = $this->getConnection();
+
+        if (! $connection instanceof PhpRedisClusterConnection) {
+            return $connection->keys('queues:*');
+        }
+
+        // Unlike keys(), phpredis does not apply the connection prefix to a SCAN match pattern...
+        $match = $connection->_prefix('queues:*');
+
+        $keys = [];
+        $cursor = version_compare(phpversion('redis'), '6.1.0', '>=') ? null : '0';
+        $defaultCursorValue = $cursor;
+
+        do {
+            $result = $connection->scan($cursor, ['match' => $match, 'count' => 1000]);
+
+            if (! is_array($result)) {
+                break;
+            }
+
+            [$cursor, $batch] = $result;
+
+            if (is_array($batch)) {
+                $keys = array_merge($keys, $batch);
+            }
+        } while (((string) $cursor) !== ((string) $defaultCursorValue));
+
+        return array_values(array_unique($keys));
     }
 
     /**
@@ -315,11 +352,68 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         };
 
         if ($connection instanceof PhpRedisClusterConnection) {
-            $connection->transaction($bulk);
+            // A cluster MULTI must target a single node, but transaction()/multi() is node-less
+            // while the pushes inside route to the queue's own {hash tag} slot, so the
+            // transaction silently fails and drops every job. Since every job in the bulk
+            // targets the same queue - and therefore the same slot - the payloads are pushed
+            // in single slot Lua scripts instead, which the cluster routes correctly...
+            $this->bulkOnClusterConnection($jobs, $data, $queue);
         } elseif ($connection instanceof PredisClusterConnection) {
             $connection->pipeline($bulk);
         } else {
             $connection->pipeline(fn () => $connection->transaction($bulk));
+        }
+    }
+
+    /**
+     * Push an array of jobs onto the queue on a cluster connection.
+     *
+     * Every job in the bulk targets the same queue - and therefore the same key
+     * slot - so the payloads are collected and pushed with a single slot Lua
+     * script, keeping the events of pushing each job. Delayed jobs use a separate
+     * key and after-commit jobs must wait for their transaction to commit, so
+     * both are pushed through the usual per-job path.
+     *
+     * @param  array  $jobs
+     * @param  mixed  $data
+     * @param  \UnitEnum|string|null  $queue
+     * @return void
+     */
+    protected function bulkOnClusterConnection($jobs, $data = '', $queue = null)
+    {
+        $payloads = [];
+
+        foreach ((array) $jobs as $job) {
+            $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
+
+            if (isset($delay)) {
+                $this->later($delay, $job, $data, $queue);
+            } elseif ($this->shouldDispatchAfterCommit($job)) {
+                $this->push($job, $data, $queue);
+            } else {
+                $this->enqueueUsing(
+                    $job,
+                    $this->createPayload($job, $this->getQueue($queue), $data),
+                    $queue,
+                    null,
+                    function ($payload) use (&$payloads) {
+                        $payloads[] = $payload;
+
+                        return json_decode($payload, true)['id'] ?? null;
+                    }
+                );
+            }
+        }
+
+        if (! empty($payloads)) {
+            $queueKey = $this->getQueueRedisKey($queue);
+
+            // Push the payloads in chunks so one very large bulk cannot occupy the node...
+            foreach (array_chunk($payloads, 1000) as $chunk) {
+                $this->getConnection()->eval(
+                    LuaScripts::bulkPush(), 2, $queueKey, $queueKey.':notify', ...$chunk
+                );
+            }
         }
     }
 
