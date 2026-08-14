@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
@@ -789,6 +790,48 @@ class RedisConnectionTest extends TestCase
                 'foo',
                 $redis->foo()
             );
+        }
+    }
+
+    public function testItKeepsTheConnectionUsableWhenATransactionFails()
+    {
+        foreach ($this->connections() as $redis) {
+            $redis->set('name', 'taylor');
+
+            try {
+                $redis->transaction(function ($transaction) {
+                    $transaction->set('name', 'mohamed');
+
+                    throw new Exception('Something went wrong.');
+                });
+            } catch (Exception) {
+                //
+            }
+
+            $this->assertSame('taylor', $redis->get('name'));
+
+            $redis->flushall();
+        }
+    }
+
+    public function testItKeepsTheConnectionUsableWhenAPipelineFails()
+    {
+        foreach ($this->connections() as $redis) {
+            $redis->set('name', 'taylor');
+
+            try {
+                $redis->pipeline(function ($pipeline) {
+                    $pipeline->set('name', 'mohamed');
+
+                    throw new Exception('Something went wrong.');
+                });
+            } catch (Exception) {
+                //
+            }
+
+            $this->assertSame('taylor', $redis->get('name'));
+
+            $redis->flushall();
         }
     }
 

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use RedisException;
+use Throwable;
 
 /**
  * @mixin \Redis
@@ -464,9 +465,17 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     {
         $pipeline = $this->client()->pipeline();
 
-        return is_null($callback)
-            ? $pipeline
-            : tap($pipeline, $callback)->exec();
+        if (is_null($callback)) {
+            return $pipeline;
+        }
+
+        try {
+            return tap($pipeline, $callback)->exec();
+        } catch (Throwable $e) {
+            rescue(fn () => $this->client()->discard(), null, false);
+
+            throw $e;
+        }
     }
 
     /**
@@ -479,9 +488,17 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     {
         $transaction = $this->client()->multi();
 
-        return is_null($callback)
-            ? $transaction
-            : tap($transaction, $callback)->exec();
+        if (is_null($callback)) {
+            return $transaction;
+        }
+
+        try {
+            return tap($transaction, $callback)->exec();
+        } catch (Throwable $e) {
+            rescue(fn () => $this->client()->discard(), null, false);
+
+            throw $e;
+        }
     }
 
     /**
