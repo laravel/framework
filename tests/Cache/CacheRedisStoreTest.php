@@ -4,7 +4,9 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Mockery;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 class CacheRedisStoreTest extends TestCase
@@ -164,6 +166,29 @@ class CacheRedisStoreTest extends TestCase
         $this->assertSame('foo', $redis->getPrefix());
         $redis->setPrefix(null);
         $this->assertEmpty($redis->getPrefix());
+    }
+
+    #[RequiresPhpExtension('redis', '>= 6.1.0')]
+    public function testFlushStaleTagsStopsScanningWhenTheCursorReturnsToItsStartingValue()
+    {
+        $calls = 0;
+
+        $connection = Mockery::mock(PhpRedisConnection::class);
+        $connection->allows('_prefix')->with('')->andReturn('');
+        $connection->allows('zremrangebyscore');
+        $connection->allows('scan')->andReturnUsing(function () use (&$calls) {
+            $calls++;
+
+            // A second call means the loop did not recognise the cursor it started with.
+            return $calls > 1 ? false : [null, ['prefix:tag:foo:entries']];
+        });
+
+        $redis = $this->getRedis();
+        $redis->getRedis()->allows('connection')->with('default')->andReturn($connection);
+
+        $redis->flushStaleTags();
+
+        $this->assertSame(1, $calls);
     }
 
     protected function getRedis()
