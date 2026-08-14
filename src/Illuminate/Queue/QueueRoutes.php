@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue;
 
+use UnitEnum;
+
 use function Illuminate\Support\enum_value;
 
 class QueueRoutes
@@ -14,6 +16,13 @@ class QueueRoutes
     protected $routes = [];
 
     /**
+     * The mapping of queue names to their routes.
+     *
+     * @var array<string, array{0: string|null, 1: string|null}>
+     */
+    protected $queueRoutes = [];
+
+    /**
      * Get the queue connection that a given queueable instance should be routed to.
      *
      * @param  object  $queueable
@@ -23,13 +32,13 @@ class QueueRoutes
     {
         $route = $this->getRoute($queueable);
 
-        if (is_null($route)) {
-            return;
+        if (! is_null($route)) {
+            return is_string($route) ? null : $route[0];
         }
 
-        return is_string($route)
-            ? null
-            : $route[0];
+        $queue = isset($queueable->queue) ? enum_value($queueable->queue) : null;
+
+        return $this->queueRoutes[$queue][0] ?? null;
     }
 
     /**
@@ -106,5 +115,42 @@ class QueueRoutes
     public function all()
     {
         return $this->routes;
+    }
+
+    /**
+     * Register the route for the given queue name.
+     *
+     * @param  array<string, \UnitEnum|string>|\UnitEnum|string  $queue
+     * @param  \UnitEnum|string|null  $to
+     * @param  \UnitEnum|string|null  $connection
+     * @return void
+     */
+    public function routeQueue(array|string|UnitEnum $queue, $to = null, $connection = null)
+    {
+        $routes = is_array($queue) ? $queue : [enum_value($queue) => $to];
+
+        foreach ($routes as $from => $destination) {
+            $this->queueRoutes[enum_value($from)] = [enum_value($connection), enum_value($destination)];
+        }
+    }
+
+    /**
+     * Get the routed name for the given queue and connection.
+     *
+     * @param  string  $queue
+     * @param  string|null  $connection
+     * @return string
+     */
+    public function resolveQueue($queue, $connection = null)
+    {
+        if (! isset($this->queueRoutes[$queue])) {
+            return $queue;
+        }
+
+        [$routeConnection, $routeQueue] = $this->queueRoutes[$queue];
+
+        return is_null($routeConnection) || $routeConnection === $connection
+            ? $routeQueue ?? $queue
+            : $queue;
     }
 }
