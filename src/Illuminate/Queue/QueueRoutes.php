@@ -2,12 +2,16 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Queue\Attributes\Queue as QueueAttribute;
+use Illuminate\Support\Traits\ReadsClassAttributes;
 use UnitEnum;
 
 use function Illuminate\Support\enum_value;
 
 class QueueRoutes
 {
+    use ReadsClassAttributes;
+
     /**
      * The mapping of class names to their default routes.
      *
@@ -36,9 +40,13 @@ class QueueRoutes
             return is_string($route) ? null : $route[0];
         }
 
-        $queue = isset($queueable->queue) ? enum_value($queueable->queue) : null;
+        if (empty($this->queueRoutes)) {
+            return null;
+        }
 
-        return $this->queueRoutes[$queue][0] ?? null;
+        $queue = $this->getAttributeValue($queueable, QueueAttribute::class, 'queue');
+
+        return is_null($queue) ? null : ($this->queueRoutes[enum_value($queue)][0] ?? null);
     }
 
     /**
@@ -118,14 +126,14 @@ class QueueRoutes
     }
 
     /**
-     * Register the route for the given queue name.
+     * Register the queue route for the given queue name.
      *
      * @param  array<string, \UnitEnum|string>|\UnitEnum|string  $queue
      * @param  \UnitEnum|string|null  $to
      * @param  \UnitEnum|string|null  $connection
      * @return void
      */
-    public function routeQueue(array|string|UnitEnum $queue, $to = null, $connection = null)
+    public function setQueue(array|string|UnitEnum $queue, $to = null, $connection = null)
     {
         $routes = is_array($queue) ? $queue : [enum_value($queue) => $to];
 
