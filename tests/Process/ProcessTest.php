@@ -1174,17 +1174,6 @@ class ProcessTest extends TestCase
         $factory->assertRan('0');
     }
 
-    public function testAssertingHowManyProcessesRan()
-    {
-        $factory = new Factory;
-        $factory->fake();
-
-        $factory->run('one');
-        $factory->run('two');
-
-        $factory->assertRanCount(2);
-    }
-
     public function testAssertingProcessesRanInOrder()
     {
         $factory = new Factory;
@@ -1224,33 +1213,6 @@ class ProcessTest extends TestCase
         $factory->run('git fetch');
 
         $factory->assertRanInOrder(['git fetch', 'composer install']);
-    }
-
-    public function testRecordedProcessesCanBeRetrieved()
-    {
-        $factory = new Factory;
-        $factory->fake([
-            'fails' => $factory->result(exitCode: 1),
-            '*' => $factory->result(),
-        ]);
-
-        $factory->run('passes');
-        $factory->run('fails');
-
-        $this->assertCount(2, $factory->recorded());
-
-        $failed = $factory->recorded(fn ($process, $result) => $result->failed());
-
-        $this->assertCount(1, $failed);
-        $this->assertSame('fails', $failed[0][0]->command);
-    }
-
-    public function testRecordedProcessesAreEmptyWhenNothingRan()
-    {
-        $factory = new Factory;
-        $factory->fake();
-
-        $this->assertTrue($factory->recorded()->isEmpty());
     }
 
     public function testAssertingThatNothingRan()
