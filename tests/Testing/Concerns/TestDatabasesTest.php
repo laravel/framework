@@ -6,7 +6,7 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Concerns\TestDatabases;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -18,9 +18,8 @@ class TestDatabasesTest extends TestCase
         Container::setInstance($container = new Container);
 
         $container->singleton('config', function () {
-            return m::mock(Config::class)
-                ->shouldReceive('get')
-                ->once()
+            return Mockery::mock(Config::class)
+                ->expects('get')
                 ->with('database.default', null)
                 ->andReturn('mysql')
                 ->getMock();
@@ -31,15 +30,13 @@ class TestDatabasesTest extends TestCase
 
     public function testSwitchToDatabaseWithoutUrl()
     {
-        DB::shouldReceive('purge')->once();
+        DB::expects('purge');
 
-        config()->shouldReceive('get')
-            ->once()
+        config()->expects('get')
             ->with('database.connections.mysql.url', false)
             ->andReturn(false);
 
-        config()->shouldReceive('set')
-            ->once()
+        config()->expects('set')
             ->with('database.connections.mysql.database', 'my_database_test_1');
 
         $this->switchToDatabase('my_database_test_1');
@@ -48,15 +45,13 @@ class TestDatabasesTest extends TestCase
     #[DataProvider('databaseUrls')]
     public function testSwitchToDatabaseWithUrl($testDatabase, $url, $testUrl)
     {
-        DB::shouldReceive('purge')->once();
+        DB::expects('purge');
 
-        config()->shouldReceive('get')
-            ->once()
+        config()->expects('get')
             ->with('database.connections.mysql.url', false)
             ->andReturn($url);
 
-        config()->shouldReceive('set')
-            ->once()
+        config()->expects('set')
             ->with('database.connections.mysql.url', $testUrl);
 
         $this->switchToDatabase($testDatabase);

@@ -25,7 +25,7 @@ use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponse;
 use JsonSerializable;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -3217,7 +3217,7 @@ EOT
     private function makeMockResponse($content)
     {
         $baseResponse = tap(new Response, function ($response) use ($content) {
-            $response->setContent(m::mock(View::class, $content));
+            $response->setContent(Mockery::mock(View::class, $content));
         });
 
         return TestResponse::fromBaseResponse($baseResponse);

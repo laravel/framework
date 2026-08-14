@@ -12,7 +12,7 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\ThrottlesExceptions;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 
@@ -56,13 +56,12 @@ class ThrottlesExceptionsTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('release')->with(0)->once();
-        $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('release')->with(0);
+        $job->expects('isReleased')->times(2)->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -76,17 +75,16 @@ class ThrottlesExceptionsTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('release')->withArgs(function ($delay) {
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('release')->withArgs(function ($delay) {
             // The delay is the remainder of the decay window, less wall clock
             // seconds elapsed since the first exception opened the circuit.
             return $delay >= 590 && $delay <= 610;
-        })->once();
-        $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        });
+        $job->expects('isReleased')->times(2)->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -100,14 +98,12 @@ class ThrottlesExceptionsTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('delete')->once();
-        $job->shouldReceive('isDeleted')->andReturn(true);
-        $job->shouldReceive('isReleased')->twice()->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('delete');
+        $job->expects('isReleased')->times(2)->andReturn(false);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -121,14 +117,12 @@ class ThrottlesExceptionsTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(true);
-        $job->shouldReceive('fail')->once();
-        $job->shouldReceive('isDeleted')->andReturn(true);
-        $job->shouldReceive('isReleased')->once()->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        $job->expects('hasFailed')->andReturn(true);
+        $job->expects('fail');
+        $job->expects('isReleased')->andReturn(false);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -142,13 +136,12 @@ class ThrottlesExceptionsTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
-        $job->shouldReceive('delete')->once();
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
+        $job->expects('isDeletedOrReleased')->andReturn(false);
+        $job->expects('delete');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -354,9 +347,9 @@ class ThrottlesExceptionsTest extends TestCase
     public function testReportingExceptions()
     {
         $this->spy(ExceptionHandler::class)
-            ->shouldReceive('report')
-            ->twice()
-            ->with(m::type(RuntimeException::class));
+            ->expects('report')
+            ->times(2)
+            ->with(Mockery::type(RuntimeException::class));
 
         $job = new class
         {
@@ -399,13 +392,11 @@ class ThrottlesExceptionsTest extends TestCase
 
         $expectedKey = 'laravel_throttles_exceptions:'.hash('xxh128', get_class($job));
 
-        $rateLimiter->shouldReceive('tooManyAttempts')
-            ->once()
+        $rateLimiter->expects('tooManyAttempts')
             ->with($expectedKey, 10)
             ->andReturn(false);
 
-        $rateLimiter->shouldReceive('hit')
-            ->once()
+        $rateLimiter->expects('hit')
             ->with($expectedKey, 600);
 
         $next = function ($job) {
@@ -441,13 +432,11 @@ class ThrottlesExceptionsTest extends TestCase
 
         $expectedKey = 'laravel_throttles_exceptions:'.hash('xxh128', 'App\\Actions\\ThrottlesExceptionsTestAction');
 
-        $rateLimiter->shouldReceive('tooManyAttempts')
-            ->once()
+        $rateLimiter->expects('tooManyAttempts')
             ->with($expectedKey, 10)
             ->andReturn(false);
 
-        $rateLimiter->shouldReceive('hit')
-            ->once()
+        $rateLimiter->expects('hit')
             ->with($expectedKey, 600);
 
         $next = function ($job) {

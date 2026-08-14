@@ -11,7 +11,7 @@ use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\SQLiteBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -324,7 +324,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingForeignID()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('getPostProcessor')->andReturn(new SQliteProcessor);
         $connection->shouldReceive('selectFromWriteConnection')->andReturn([]);
         $connection->shouldReceive('scalar')->andReturn('');
@@ -367,7 +366,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingForeignIdSpecifyingIndexNameInConstraint()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('getPostProcessor')->andReturn(new SQliteProcessor);
         $connection->shouldReceive('selectFromWriteConnection')->andReturn([]);
         $connection->shouldReceive('scalar')->andReturn('');
@@ -579,14 +577,12 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function testAddingNativeJson()
     {
-        $connection = m::mock(Connection::class);
-        $connection
-            ->shouldReceive('getTablePrefix')->andReturn('')
-            ->shouldReceive('getConfig')->once()->with('use_native_json')->andReturn(true)
-            ->shouldReceive('getSchemaGrammar')->andReturn($this->getGrammar($connection))
-            ->shouldReceive('getSchemaBuilder')->andReturn($this->getBuilder())
-            ->shouldReceive('getServerVersion')->andReturn('3.35')
-            ->getMock();
+        $connection = Mockery::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->expects('getConfig')->with('use_native_json')->andReturn(true);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($this->getGrammar($connection));
+        $connection->shouldReceive('getSchemaBuilder')->andReturn($this->getBuilder());
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
 
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->json('foo');
@@ -608,14 +604,12 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function testAddingNativeJsonb()
     {
-        $connection = m::mock(Connection::class);
-        $connection
-            ->shouldReceive('getTablePrefix')->andReturn('')
-            ->shouldReceive('getConfig')->once()->with('use_native_jsonb')->andReturn(true)
-            ->shouldReceive('getSchemaGrammar')->andReturn($this->getGrammar($connection))
-            ->shouldReceive('getSchemaBuilder')->andReturn($this->getBuilder())
-            ->shouldReceive('getServerVersion')->andReturn('3.35')
-            ->getMock();
+        $connection = Mockery::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->expects('getConfig')->with('use_native_jsonb')->andReturn(true);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($this->getGrammar($connection));
+        $connection->shouldReceive('getSchemaBuilder')->andReturn($this->getBuilder());
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
 
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->jsonb('foo');
@@ -838,7 +832,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingForeignUuid()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $connection->shouldReceive('getPostProcessor')->andReturn(new SQliteProcessor);
         $connection->shouldReceive('selectFromWriteConnection')->andReturn([]);
         $connection->shouldReceive('scalar')->andReturn('');
@@ -1016,7 +1009,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testCreateTableWithVirtualAsColumnWhenJsonColumnHasArrayKey()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1072,18 +1064,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function testRenamingAndChangingColumnsWork()
     {
-        $builder = mock(SQLiteBuilder::class)
-            ->makePartial()
-            ->shouldReceive('getColumns')->andReturn([
-                ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
-                ['name' => 'age', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
-            ])
-            ->shouldReceive('getIndexes')->andReturn([])
-            ->shouldReceive('getForeignKeys')->andReturn([])
-            ->getMock();
+        $builder = mock(SQLiteBuilder::class)->makePartial();
+        $builder->expects('getColumns')->andReturn([
+            ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
+            ['name' => 'age', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
+        ]);
+        $builder->expects('getIndexes')->andReturn([]);
+        $builder->expects('getForeignKeys')->andReturn([]);
 
         $connection = $this->getConnection(builder: $builder);
-        $connection->shouldReceive('scalar')->with('pragma foreign_keys')->andReturn(false);
+        $connection->expects('scalar')->with('pragma foreign_keys')->andReturn(false);
 
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->renameColumn('name', 'first_name');
@@ -1100,18 +1090,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function testRenamingAndChangingColumnsWorkWithSchema()
     {
-        $builder = mock(SQLiteBuilder::class)
-            ->makePartial()
-            ->shouldReceive('getColumns')->andReturn([
-                ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
-                ['name' => 'age', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
-            ])
-            ->shouldReceive('getIndexes')->andReturn([])
-            ->shouldReceive('getForeignKeys')->andReturn([])
-            ->getMock();
+        $builder = mock(SQLiteBuilder::class)->makePartial();
+        $builder->expects('getColumns')->andReturn([
+            ['name' => 'name', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
+            ['name' => 'age', 'type_name' => 'varchar', 'type' => 'varchar', 'collation' => null, 'nullable' => false, 'default' => null, 'auto_increment' => false, 'comment' => null, 'generation' => null],
+        ]);
+        $builder->expects('getIndexes')->andReturn([]);
+        $builder->expects('getForeignKeys')->andReturn([]);
 
         $connection = $this->getConnection(builder: $builder);
-        $connection->shouldReceive('scalar')->with('pragma foreign_keys')->andReturn(false);
+        $connection->expects('scalar')->with('pragma foreign_keys')->andReturn(false);
 
         $blueprint = new Blueprint($connection, 'my_schema.users');
         $blueprint->renameColumn('name', 'first_name');
@@ -1131,17 +1119,17 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         ?SQLiteBuilder $builder = null,
         $prefix = ''
     ) {
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return $connection
-            ->shouldReceive('getTablePrefix')->andReturn($prefix)
-            ->shouldReceive('getConfig')->andReturn(null)
-            ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
-            ->shouldReceive('getSchemaBuilder')->andReturn($builder)
-            ->shouldReceive('getServerVersion')->andReturn('3.35')
-            ->getMock();
+        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
+        $connection->shouldReceive('getConfig')->andReturn(null);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn($builder);
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
+
+        return $connection;
     }
 
     public function getGrammar(?Connection $connection = null)
@@ -1151,11 +1139,11 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function getBuilder()
     {
-        return mock(SQLiteBuilder::class)
-            ->makePartial()
-            ->shouldReceive('getColumns')->andReturn([])
-            ->shouldReceive('getIndexes')->andReturn([])
-            ->shouldReceive('getForeignKeys')->andReturn([])
-            ->getMock();
+        $builder = mock(SQLiteBuilder::class)->makePartial();
+        $builder->shouldReceive('getColumns')->andReturn([]);
+        $builder->shouldReceive('getIndexes')->andReturn([]);
+        $builder->shouldReceive('getForeignKeys')->andReturn([]);
+
+        return $builder;
     }
 }

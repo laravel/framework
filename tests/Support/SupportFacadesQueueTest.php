@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\Factory as QueueContract;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SupportFacadesQueueTest extends TestCase
@@ -17,7 +17,7 @@ class SupportFacadesQueueTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->queueManager = m::mock(Factory::class);
+        $this->queueManager = Mockery::mock(Factory::class);
 
         $container = new Container;
         $container->instance('queue', $this->queueManager);
@@ -40,7 +40,7 @@ class SupportFacadesQueueTest extends TestCase
             Queue::assertPushed(QueueJobStub::class);
         });
 
-        $this->queueManager->shouldReceive('push')->once();
+        $this->queueManager->expects('push');
 
         (new QueueForStub)->pushJob();
     }

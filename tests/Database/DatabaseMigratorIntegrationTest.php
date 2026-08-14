@@ -10,7 +10,7 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Str;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMigratorIntegrationTest extends TestCase
@@ -58,7 +58,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
             new Filesystem
         );
 
-        $output = m::mock(OutputStyle::class);
+        $output = Mockery::mock(OutputStyle::class);
         $output->shouldReceive('write');
         $output->shouldReceive('writeln');
         $output->shouldReceive('newLinesWritten');

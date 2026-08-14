@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -32,8 +32,9 @@ class DatabaseEloquentFactoryTest extends TestCase
         $container->singleton(Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
         });
-        $container->instance(Application::class, $app = m::mock(Application::class));
+        $app = Mockery::mock(Application::class);
         $app->shouldReceive('getNamespace')->andReturn('App\\');
+        $container->instance(Application::class, $app);
 
         $db = new DB;
 
@@ -719,8 +720,9 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_nested_model_name_from_factory()
     {
-        Container::getInstance()->instance(Application::class, $app = m::mock(Application::class));
+        $app = Mockery::mock(Application::class);
         $app->shouldReceive('getNamespace')->andReturn('Illuminate\\Tests\\Database\\Fixtures\\');
+        Container::getInstance()->instance(Application::class, $app);
 
         Factory::useNamespace('Illuminate\\Tests\\Database\\Fixtures\\Factories\\');
 
@@ -731,8 +733,9 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_non_app_nested_model_factories()
     {
-        Container::getInstance()->instance(Application::class, $app = m::mock(Application::class));
+        $app = Mockery::mock(Application::class);
         $app->shouldReceive('getNamespace')->andReturn('Foo\\');
+        Container::getInstance()->instance(Application::class, $app);
 
         Factory::useNamespace('Factories\\');
 
@@ -1108,6 +1111,13 @@ class DatabaseEloquentFactoryTest extends TestCase
         );
         $this->assertCount(1, $users->where('name', 'totwell'));
         $this->assertCount(1, $users->where('name', 'shaedrich'));
+    }
+
+    public function test_factory_can_insert_zero_models()
+    {
+        (new FactoryTestPostFactory())->count(0)->insert();
+
+        $this->assertCount(0, FactoryTestPost::all());
     }
 
     public function test_factory_can_insert_with_hidden()

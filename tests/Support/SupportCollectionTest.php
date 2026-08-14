@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use JsonSerializable;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
@@ -699,10 +699,10 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testToArrayCallsToArrayOnEachItemInCollection($collection)
     {
-        $item1 = m::mock(Arrayable::class);
-        $item1->shouldReceive('toArray')->once()->andReturn('foo.array');
-        $item2 = m::mock(Arrayable::class);
-        $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
+        $item1 = Mockery::mock(Arrayable::class);
+        $item1->expects('toArray')->andReturn('foo.array');
+        $item2 = Mockery::mock(Arrayable::class);
+        $item2->expects('toArray')->andReturn('bar.array');
         $c = new $collection([$item1, $item2]);
         $results = $c->toArray();
 
@@ -724,10 +724,10 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testJsonSerializeCallsToArrayOrJsonSerializeOnEachItemInCollection($collection)
     {
-        $item1 = m::mock(JsonSerializable::class);
-        $item1->shouldReceive('jsonSerialize')->once()->andReturn('foo.json');
-        $item2 = m::mock(Arrayable::class);
-        $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
+        $item1 = Mockery::mock(JsonSerializable::class);
+        $item1->expects('jsonSerialize')->andReturn('foo.json');
+        $item2 = Mockery::mock(Arrayable::class);
+        $item2->expects('toArray')->andReturn('bar.array');
         $c = new $collection([$item1, $item2]);
         $results = $c->jsonSerialize();
 

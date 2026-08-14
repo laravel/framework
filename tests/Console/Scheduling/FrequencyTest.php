@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Console\Scheduling;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class FrequencyTest extends TestCase
@@ -16,7 +16,7 @@ class FrequencyTest extends TestCase
     protected function setUp(): void
     {
         $this->event = new Event(
-            m::mock(EventMutex::class),
+            Mockery::mock(EventMutex::class),
             'php foo'
         );
     }

@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Console\Scheduling\CallbackEvent;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Support\Stringable;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class CallbackEventTest extends TestCase
@@ -15,7 +15,7 @@ class CallbackEventTest extends TestCase
     {
         $success = null;
 
-        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = (new CallbackEvent(Mockery::mock(EventMutex::class), function () {
         }))->onSuccess(function () use (&$success) {
             $success = true;
         })->onFailure(function () use (&$success) {
@@ -31,7 +31,7 @@ class CallbackEventTest extends TestCase
     {
         $success = null;
 
-        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = (new CallbackEvent(Mockery::mock(EventMutex::class), function () {
             return false;
         }))->onSuccess(function () use (&$success) {
             $success = true;
@@ -48,7 +48,7 @@ class CallbackEventTest extends TestCase
     {
         $success = null;
 
-        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = (new CallbackEvent(Mockery::mock(EventMutex::class), function () {
             throw new Exception;
         }))->onSuccess(function () use (&$success) {
             $success = true;
@@ -66,7 +66,7 @@ class CallbackEventTest extends TestCase
 
     public function testExceptionBubbles()
     {
-        $event = new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = new CallbackEvent(Mockery::mock(EventMutex::class), function () {
             throw new Exception;
         });
 
@@ -79,7 +79,7 @@ class CallbackEventTest extends TestCase
     {
         $callbackEvent = null;
 
-        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = (new CallbackEvent(Mockery::mock(EventMutex::class), function () {
         }))->onSuccess(function (CallbackEvent $event) use (&$callbackEvent) {
             $callbackEvent = $event;
         });
@@ -93,7 +93,7 @@ class CallbackEventTest extends TestCase
     {
         $callbackEvent = null;
 
-        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = (new CallbackEvent(Mockery::mock(EventMutex::class), function () {
             return false;
         }))->onFailure(function (CallbackEvent $event) use (&$callbackEvent) {
             $callbackEvent = $event;
@@ -109,7 +109,7 @@ class CallbackEventTest extends TestCase
         $callbackEvent = null;
         $outputValue = null;
 
-        $event = (new CallbackEvent(m::mock(EventMutex::class), function () {
+        $event = (new CallbackEvent(Mockery::mock(EventMutex::class), function () {
         }))->onSuccess(function (Stringable $output, CallbackEvent $event) use (&$callbackEvent, &$outputValue) {
             $callbackEvent = $event;
             $outputValue = (string) $output;

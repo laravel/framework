@@ -78,7 +78,7 @@ class RedisTagSet extends TagSet
                     foreach ($entries as $entry) {
                         yield $entry;
                     }
-                } while (((string) $cursor) !== $defaultCursorValue);
+                } while (((string) $cursor) !== ((string) $defaultCursorValue));
             }
         });
     }

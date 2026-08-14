@@ -36,12 +36,14 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use InvalidArgumentException;
 use Mockery\MockInterface;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\TestWith;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use Throwable;
@@ -564,7 +566,7 @@ class QueueTest extends TestCase
         $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
 
-        $client->shouldReceive('receiveMessage')->once()->andReturn(new Result([
+        $client->expects('receiveMessage')->andReturn(new Result([
             'Messages' => [[
                 'MessageId' => 'message-id',
                 'ReceiptHandle' => 'receipt-handle',
@@ -587,7 +589,7 @@ class QueueTest extends TestCase
         $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
 
-        $client->shouldReceive('receiveMessage')->once()->andReturn(new Result(['Messages' => null]));
+        $client->expects('receiveMessage')->andReturn(new Result(['Messages' => null]));
 
         $this->assertNull($queue->pop());
     }
@@ -896,6 +898,7 @@ class QueueTest extends TestCase
 
     public function testPopThrowsWhenTheAgentSocketIsUnreachable()
     {
+        Sleep::fake();
         $this->fakeEvents();
         [$queue] = $this->fakeQueue();
 
@@ -905,6 +908,53 @@ class QueueTest extends TestCase
         $this->expectException(AgentUnreachableException::class);
 
         $queue->pop();
+    }
+
+    public function testPopRetriesATimedOutLongPollImmediately()
+    {
+        Sleep::fake();
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+
+        // A worker that scaled to zero mid long-poll wakes with its request
+        // deadline lapsed, so the poll times out even though the agent is
+        // healthy. The poll is retried transparently - and without any backoff,
+        // since the agent typically answers the fresh attempt at once.
+        $agent->nextExceptions = [$this->pollTimeoutException()];
+        $agent->pushJob(['messageId' => 'message-id', 'body' => 'job-body']);
+
+        $job = $queue->pop();
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame('message-id', $job->getJobId());
+        $this->assertSame(2, $agent->nextRequests);
+        Sleep::assertNeverSlept();
+    }
+
+    public function testPopThrowsWhenEveryLongPollAttemptTimesOut()
+    {
+        Sleep::fake();
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+
+        // Timeouts across the original attempt and both retries mean the agent is
+        // live but wedged - the socket accepts, yet nothing answers - so it
+        // escalates to restart the pod. The second retry backs off to give an
+        // agent that is itself still waking a moment to recover.
+        $agent->nextExceptions = [
+            $this->pollTimeoutException(),
+            $this->pollTimeoutException(),
+            $this->pollTimeoutException(),
+        ];
+
+        try {
+            $queue->pop();
+
+            $this->fail('AgentUnreachableException was not thrown.');
+        } catch (AgentUnreachableException) {
+            $this->assertSame(3, $agent->nextRequests);
+            Sleep::assertSequence([Sleep::usleep(500_000)]);
+        }
     }
 
     public function testAgentAwareDetectorTreatsAnUnreachableAgentAsALostConnection()
@@ -944,8 +994,8 @@ class QueueTest extends TestCase
         Cloud::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(5)->andReturn(new Result());
-        $client->shouldReceive('sendMessageBatch')->once()->andReturnUsing(fn ($args) => new Result([
+        $client->expects('sendMessage')->times(5)->andReturn(new Result());
+        $client->expects('sendMessageBatch')->andReturnUsing(fn ($args) => new Result([
             'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
         ]));
 
@@ -1224,8 +1274,8 @@ class QueueTest extends TestCase
         $eventsFake = $this->fakeEvents();
         $this->app['config']->set('queue.connections.cloud.connection.after_commit', true);
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(5)->andReturn(new Result());
-        $client->shouldReceive('sendMessageBatch')->once()->andReturnUsing(fn ($args) => new Result([
+        $client->expects('sendMessage')->times(5)->andReturn(new Result());
+        $client->expects('sendMessageBatch')->andReturnUsing(fn ($args) => new Result([
             'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
         ]));
 
@@ -1515,7 +1565,7 @@ class QueueTest extends TestCase
         Cloud::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(1)->andReturn(new Result());
+        $client->expects('sendMessage')->times(1)->andReturn(new Result());
 
         unset($_SERVER['SQS_PREFIX'], $_SERVER['SQS_SUFFIX']);
 
@@ -1530,7 +1580,7 @@ class QueueTest extends TestCase
         Cloud::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(1)->andReturn(new Result());
+        $client->expects('sendMessage')->times(1)->andReturn(new Result());
 
         $queue->push(new FakeJob, queue: 'orders.fifo');
 
@@ -1539,13 +1589,24 @@ class QueueTest extends TestCase
         $this->assertSame('orders.fifo', $eventsFake->emitted[0]['queue']);
     }
 
+    #[TestWith([['default', 'emails']], 'standard list')]
+    #[TestWith([['default' => ['timeout' => 10], 'emails' => ['timeout' => 1]]], 'map keyed by name')]
+    public function testManagedQueuesReturnsTheConfiguredQueueNames($queues)
+    {
+        config(['queue.connections.cloud.queues' => $queues]);
+        $this->fakeEvents();
+        [$queue] = $this->mockedQueue();
+
+        $this->assertSame(['default', 'emails'], $queue->managedQueues());
+    }
+
     /**
      * @return array{Queue, MockInterface<SqsClient>}
      */
     private function mockedQueue()
     {
         $client = $this->mock(SqsClient::class);
-        $client->shouldReceive('getHandlerList')->andReturn(new HandlerList());
+        $client->expects('getHandlerList')->andReturn(new HandlerList());
 
         $this->app->instance(QueueConnector::class, new QueueConnector(new class($client) implements ConnectorInterface
         {
@@ -1694,6 +1755,16 @@ class QueueTest extends TestCase
 
             public $nextResponse = null;
 
+            /**
+             * Exceptions GET /next throws, one per request, before serving jobs.
+             */
+            public array $nextExceptions = [];
+
+            /**
+             * The number of GET /next requests the agent has received.
+             */
+            public int $nextRequests = 0;
+
             public function pushJob(array $job = []): array
             {
                 $job = array_merge([
@@ -1714,6 +1785,12 @@ class QueueTest extends TestCase
 
         Http::fake(function ($request) use ($agent) {
             if (str_ends_with($request->url(), '/next')) {
+                $agent->nextRequests++;
+
+                if ($exception = array_shift($agent->nextExceptions)) {
+                    throw $exception;
+                }
+
                 if ($agent->nextResponse !== null) {
                     return $agent->nextResponse;
                 }
@@ -1737,6 +1814,18 @@ class QueueTest extends TestCase
         });
 
         return $agent;
+    }
+
+    /**
+     * Build the exception a timed-out GET /next long-poll surfaces as. The
+     * message mirrors the curl handler's format, which the client preserves
+     * when wrapping Guzzle's ConnectException.
+     */
+    private function pollTimeoutException(): ConnectionException
+    {
+        return new ConnectionException(
+            'cURL error 28: Operation timed out after 76900 milliseconds with 0 bytes received (see https://curl.se/libcurl/c/libcurl-errors.html) for http://localhost/next'
+        );
     }
 
     private function fakeFailer()

@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\MemcachedStore;
 use Illuminate\Support\Carbon;
 use Memcached;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -75,8 +75,8 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testIncrementMethodProperlyCallsMemcache()
     {
-        $memcached = m::mock(Memcached::class);
-        $memcached->shouldReceive('increment')->with('foo', 5)->once()->andReturn(5);
+        $memcached = Mockery::mock(Memcached::class);
+        $memcached->expects('increment')->with('foo', 5)->andReturn(5);
 
         $store = new MemcachedStore($memcached);
         $store->increment('foo', 5);
@@ -84,8 +84,8 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testDecrementMethodProperlyCallsMemcache()
     {
-        $memcached = m::mock(Memcached::class);
-        $memcached->shouldReceive('decrement')->with('foo', 5)->once()->andReturn(0);
+        $memcached = Mockery::mock(Memcached::class);
+        $memcached->expects('decrement')->with('foo', 5)->andReturn(0);
 
         $store = new MemcachedStore($memcached);
         $store->decrement('foo', 5);

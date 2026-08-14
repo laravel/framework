@@ -6,7 +6,7 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Translation\Translator;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SupportServiceProviderTest extends TestCase
@@ -19,8 +19,8 @@ class SupportServiceProviderTest extends TestCase
         ServiceProvider::$publishes = [];
         ServiceProvider::$publishGroups = [];
 
-        $this->app = $app = m::mock(Application::class)->makePartial();
-        $config = m::mock(Config::class)->makePartial();
+        $this->app = $app = Mockery::mock(Application::class)->makePartial();
+        $config = Mockery::mock(Config::class)->makePartial();
 
         $config = new Config();
 
@@ -167,10 +167,10 @@ class SupportServiceProviderTest extends TestCase
 
     public function testLoadTranslationsFromWithoutNamespace()
     {
-        $translator = m::mock(Translator::class);
-        $translator->shouldReceive('addPath')->once()->with(__DIR__.'/translations');
+        $translator = Mockery::mock(Translator::class);
+        $translator->expects('addPath')->with(__DIR__.'/translations');
 
-        $this->app->shouldReceive('afterResolving')->once()->with('translator', m::on(function ($callback) use ($translator) {
+        $this->app->expects('afterResolving')->with('translator', Mockery::on(function ($callback) use ($translator) {
             $callback($translator);
 
             return true;
@@ -182,10 +182,10 @@ class SupportServiceProviderTest extends TestCase
 
     public function testLoadTranslationsFromWithNamespace()
     {
-        $translator = m::mock(Translator::class);
-        $translator->shouldReceive('addNamespace')->once()->with('namespace', __DIR__.'/translations');
+        $translator = Mockery::mock(Translator::class);
+        $translator->expects('addNamespace')->with('namespace', __DIR__.'/translations');
 
-        $this->app->shouldReceive('afterResolving')->once()->with('translator', m::on(function ($callback) use ($translator) {
+        $this->app->expects('afterResolving')->with('translator', Mockery::on(function ($callback) use ($translator) {
             $callback($translator);
 
             return true;

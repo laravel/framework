@@ -6,7 +6,7 @@ use Error;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class EventsDispatcherTest extends TestCase
@@ -249,8 +249,9 @@ class EventsDispatcherTest extends TestCase
 
     public function testContainerResolutionOfEventHandlers()
     {
-        $d = new Dispatcher($container = m::mock(Container::class));
-        $container->shouldReceive('make')->once()->with(TestEventListener::class)->andReturn(new TestEventListener);
+        $container = Mockery::mock(Container::class);
+        $container->expects('make')->with(TestEventListener::class)->andReturn(new TestEventListener);
+        $d = new Dispatcher($container);
         $d->listen('foo', TestEventListener::class.'@onFooEvent');
         $response = $d->dispatch('foo', ['foo', 'bar']);
 
@@ -721,16 +722,15 @@ class EventsDispatcherTest extends TestCase
     public function testEventDispatchesUsingNamedArguments()
     {
         $container = new Container;
-        $events = m::mock(Dispatcher::class);
+        $events = Mockery::mock(Dispatcher::class);
         $container->instance('events', $events);
 
         $originalContainer = Container::getInstance();
         Container::setInstance($container);
 
         try {
-            $events->shouldReceive('dispatch')
-                ->once()
-                ->with(m::on(function ($event) {
+            $events->expects('dispatch')
+                ->with(Mockery::on(function ($event) {
                     $this->assertInstanceOf(DispatchableNamedArgumentsEvent::class, $event);
                     $this->assertSame('first-value', $event->first);
                     $this->assertSame('second-value', $event->second);

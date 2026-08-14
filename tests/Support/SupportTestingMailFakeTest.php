@@ -2,12 +2,13 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\MailManager;
 use Illuminate\Support\Testing\Fakes\MailFake;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -30,8 +31,8 @@ class SupportTestingMailFakeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mailManager = m::mock(MailManager::class, function ($mock) {
-            $mock->shouldReceive('getDefaultDriver')
+        $this->mailManager = Mockery::mock(MailManager::class, function ($mock) {
+            $mock->expects('getDefaultDriver')
                 ->andReturn('smtp');
         });
         $this->fake = new MailFake($this->mailManager);
@@ -389,7 +390,7 @@ class SupportTestingMailFakeTest extends TestCase
 
     public function testMissingMethodsAreForwarded()
     {
-        $this->mailManager->shouldReceive('foo')->andReturn('bar');
+        $this->mailManager->expects('foo')->andReturn('bar');
 
         $this->assertSame('bar', $this->fake->foo());
     }
@@ -444,6 +445,59 @@ class SupportTestingMailFakeTest extends TestCase
                 $mail->usesMailer('mailjet');
         });
     }
+
+    public function testQueueSetsQueueOnMailable()
+    {
+        $mailable1 = new QueueableMailableStub;
+        $this->fake->queue($mailable1, 'podcasts');
+
+        $this->fake->assertQueued(QueueableMailableStub::class, function ($mail) {
+            return $mail->queue === 'podcasts';
+        });
+
+        $mailable2 = new QueueableMailableStub;
+        $this->fake->queue($mailable2, MailTestQueueEnum::Emails);
+
+        $this->fake->assertQueued(QueueableMailableStub::class, function ($mail) {
+            return $mail->queue === 'emails';
+        });
+
+        $mailable3 = new QueueableMailableStub;
+        $this->fake->onQueue('podcasts', $mailable3);
+
+        $this->fake->assertQueued(QueueableMailableStub::class, function ($mail) {
+            return $mail->queue === 'podcasts';
+        });
+
+        $mailable4 = new QueueableMailableStub;
+        $this->fake->queueOn('videos', $mailable4);
+
+        $this->fake->assertQueued(QueueableMailableStub::class, function ($mail) {
+            return $mail->queue === 'videos';
+        });
+    }
+
+    public function testLaterSetsQueueOnMailable()
+    {
+        $mailable1 = new QueueableMailableStub;
+        $this->fake->later(15, $mailable1, 'podcasts');
+
+        $this->fake->assertQueued(QueueableMailableStub::class, function ($mail) {
+            return $mail->queue === 'podcasts';
+        });
+
+        $mailable2 = new QueueableMailableStub;
+        $this->fake->laterOn('videos', 45, $mailable2);
+
+        $this->fake->assertQueued(QueueableMailableStub::class, function ($mail) {
+            return $mail->queue === 'videos';
+        });
+    }
+}
+
+enum MailTestQueueEnum: string
+{
+    case Emails = 'emails';
 }
 
 class MailableStub extends Mailable
@@ -466,6 +520,8 @@ class MailableStub extends Mailable
 
 class QueueableMailableStub extends Mailable implements ShouldQueue
 {
+    use Queueable;
+
     public $framework = 'Laravel';
 
     protected $version = '6.0';

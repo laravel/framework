@@ -17,7 +17,7 @@
         "php": "^8.3",
         "ext-filter": "*",
         "ext-mbstring": "*",
-        "brick/math": "^0.14.2 || ^0.15 || ^0.16 || ^0.17 || ^0.18",
+        "brick/math": "^0.14.2 || ^0.15 || ^0.16 || ^0.17 || ^0.18 || ^0.19",
         "egulias/email-validator": "^4.0",
         "illuminate/collections": "^13.0",
         "illuminate/conditionable": "^13.0",
@@ -26,8 +26,8 @@
         "illuminate/macroable": "^13.0",
         "illuminate/support": "^13.0",
         "illuminate/translation": "^13.0",
-        "symfony/http-foundation": "^7.4.13 || ^8.0.13",
-        "symfony/mime": "^7.4.12 || ^8.0.12"
+        "symfony/http-foundation": "^7.4.0 || ^8.0.0",
+        "symfony/mime": "^7.4.0 || ^8.0.0"
     },
     "suggest": {
         "illuminate/database": "Required to use the database presence verifier (^13.0).",

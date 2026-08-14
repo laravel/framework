@@ -2,10 +2,13 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connectors\PhpRedisConnector;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use RedisException;
+use ReflectionProperty;
 
 class PhpRedisConnectorTest extends TestCase
 {
@@ -288,6 +291,143 @@ class PhpRedisConnectorTest extends TestCase
             'host' => null,
             'scheme' => 'tls',
         ]);
+    }
+
+    public function testConnectToClusterPassesAConnectorToTheConnection()
+    {
+        $connector = new ClusterStubPhpRedisConnector;
+
+        $connection = $connector->connectToCluster([['host' => '127.0.0.1', 'port' => 6379]], [], []);
+
+        $property = new ReflectionProperty(PhpRedisConnection::class, 'connector');
+
+        $this->assertIsCallable($property->getValue($connection));
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectToClusterAllowsTheConnectionToRebuildItsClient()
+    {
+        $connector = new ClusterStubPhpRedisConnector;
+
+        $connection = $connector->connectToCluster([['host' => '127.0.0.1', 'port' => 6379]], [], []);
+
+        $original = $connection->client();
+
+        try {
+            $connection->command('get', ['foo']);
+        } catch (RedisException) {
+            //
+        }
+
+        $this->assertSame(3, $connector->created);
+        $this->assertNotSame($original, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionAutomaticallyRetriesReadOnlyCommandAfterRebuildingItsClient()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('get')->with('foo')->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('get')->with('foo')->willReturn('bar');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->assertSame('bar', $connection->command('get', ['foo']));
+        $this->assertSame($healthyClient, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionAutomaticallyRetriesIdempotentWriteAfterRebuildingItsClient()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('set')->with('foo', 'bar')->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('set')->with('foo', 'bar')->willReturn(true);
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->assertTrue($connection->command('set', ['foo', 'bar']));
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionDoesNotAutomaticallyRetryNonIdempotentWrite()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('incr')->with('foo')->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->never())->method('incr');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->expectExceptionObject(new RedisException('Connection lost'));
+
+        $connection->command('incr', ['foo']);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionDoesNotAutomaticallyRetrySetWithOptions()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('set')->with('foo', 'bar', ['ex' => 60])->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->never())->method('set');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->expectExceptionObject(new RedisException('Connection lost'));
+
+        $connection->command('set', ['foo', 'bar', ['ex' => 60]]);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionStopsRetryingAfterConfiguredAttempts()
+    {
+        $clients = [];
+
+        for ($i = 0; $i < 4; $i++) {
+            $clients[$i] = $this->createMock(\Redis::class);
+
+            if ($i < 3) {
+                $clients[$i]->expects($this->once())->method('get')->with('foo')->willThrowException(new RedisException('Connection lost'));
+            }
+        }
+
+        $reconnects = 0;
+        $connection = new PhpRedisConnection($clients[0], function () use (&$reconnects, $clients) {
+            return $clients[++$reconnects];
+        }, ['command_retries' => 2]);
+
+        try {
+            $connection->command('get', ['foo']);
+            $this->fail('Expected RedisException was not thrown.');
+        } catch (RedisException $e) {
+            $this->assertSame('Connection lost', $e->getMessage());
+        }
+
+        $this->assertSame(3, $reconnects);
+    }
+}
+
+class ClusterStubPhpRedisConnector extends PhpRedisConnector
+{
+    public int $created = 0;
+
+    protected function createRedisClusterInstance(array $servers, array $options)
+    {
+        $this->created++;
+
+        return new class
+        {
+            public function get($key)
+            {
+                throw new RedisException('Connection lost');
+            }
+        };
     }
 }
 
