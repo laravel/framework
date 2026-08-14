@@ -9,6 +9,7 @@ use Illuminate\Process\Exceptions\ProcessIdleTimedOutException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
 use OutOfBoundsException;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -1171,6 +1172,47 @@ class ProcessTest extends TestCase
         $factory->start('0')->wait();
 
         $factory->assertRan('0');
+    }
+
+    public function testAssertingProcessesRanInOrder()
+    {
+        $factory = new Factory;
+        $factory->fake();
+
+        $factory->run('git fetch');
+        $factory->run('git reset --hard origin/main');
+        $factory->run('composer install --no-dev');
+
+        $factory->assertRanInOrder([
+            'git fetch',
+            'git reset --hard origin/main',
+            fn ($process) => str_starts_with($process->command, 'composer install'),
+        ]);
+    }
+
+    public function testAssertingProcessesRanInOrderFailsWhenOutOfOrder()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $factory = new Factory;
+        $factory->fake();
+
+        $factory->run('composer install');
+        $factory->run('git fetch');
+
+        $factory->assertRanInOrder(['git fetch', 'composer install']);
+    }
+
+    public function testAssertingProcessesRanInOrderFailsWhenCountDiffers()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $factory = new Factory;
+        $factory->fake();
+
+        $factory->run('git fetch');
+
+        $factory->assertRanInOrder(['git fetch', 'composer install']);
     }
 
     public function testAssertingThatNothingRan()

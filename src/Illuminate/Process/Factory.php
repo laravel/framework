@@ -218,6 +218,43 @@ class Factory
     }
 
     /**
+     * Assert that the given processes were run in the given order.
+     *
+     * @param  list<\Closure|string>  $callbacks
+     * @return $this
+     */
+    public function assertRanInOrder(array $callbacks)
+    {
+        $this->assertRanCount(count($callbacks));
+
+        foreach ($callbacks as $index => $callback) {
+            $callback = $callback instanceof Closure
+                ? $callback
+                : fn ($process) => $process->command === $callback;
+
+            PHPUnit::assertTrue(
+                $callback($this->recorded[$index][0], $this->recorded[$index][1]),
+                'An expected process (#'.($index + 1).') was not invoked.'
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert how many processes have been recorded.
+     *
+     * @param  int  $count
+     * @return $this
+     */
+    protected function assertRanCount(int $count)
+    {
+        PHPUnit::assertCount($count, $this->recorded);
+
+        return $this;
+    }
+
+    /**
      * Assert that a process was not recorded matching a given truth test.
      *
      * @param  \Closure|string  $callback
