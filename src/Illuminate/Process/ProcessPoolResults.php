@@ -58,16 +58,6 @@ class ProcessPoolResults implements ArrayAccess, IteratorAggregate
     }
 
     /**
-     * Get an iterator for the results.
-     *
-     * @return \ArrayIterator
-     */
-    public function getIterator(): Traversable
-    {
-        return new ArrayIterator($this->results);
-    }
-
-    /**
      * Determine if the given array offset exists.
      *
      * @param  int  $offset
@@ -110,5 +100,15 @@ class ProcessPoolResults implements ArrayAccess, IteratorAggregate
     public function offsetUnset($offset): void
     {
         unset($this->results[$offset]);
+    }
+
+    /**
+     * Get an iterator for the results.
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->results);
     }
 }

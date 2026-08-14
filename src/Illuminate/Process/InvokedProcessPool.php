@@ -71,16 +71,6 @@ class InvokedProcessPool implements Countable, IteratorAggregate
     }
 
     /**
-     * Get an iterator for the invoked processes.
-     *
-     * @return \ArrayIterator
-     */
-    public function getIterator(): Traversable
-    {
-        return new ArrayIterator($this->invokedProcesses);
-    }
-
-    /**
      * Get the total number of processes.
      *
      * @return int
@@ -88,5 +78,15 @@ class InvokedProcessPool implements Countable, IteratorAggregate
     public function count(): int
     {
         return count($this->invokedProcesses);
+    }
+
+    /**
+     * Get an iterator for the invoked processes.
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->invokedProcesses);
     }
 }
