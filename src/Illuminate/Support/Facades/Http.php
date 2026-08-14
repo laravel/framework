@@ -9,6 +9,8 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Factory globalRequestMiddleware(callable $middleware)
  * @method static \Illuminate\Http\Client\Factory globalResponseMiddleware(callable $middleware)
  * @method static \Illuminate\Http\Client\Factory globalOptions(\Closure|array $options)
+ * @method static \Illuminate\Http\Client\Factory globalPersistentTransport(\Illuminate\Http\Client\PersistentTransport $mode)
+ * @method static callable newHandler()
  * @method static mixed withoutGlobalConfiguration(\Closure $callback)
  * @method static \GuzzleHttp\Promise\PromiseInterface response(\Psr\Http\Message\StreamInterface|array|string|resource|null $body = null, int $status = 200, array $headers = [])
  * @method static \GuzzleHttp\Psr7\Response psr7Response(\Psr\Http\Message\StreamInterface|array|string|resource|null $body = null, int $status = 200, array $headers = [])
