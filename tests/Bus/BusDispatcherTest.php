@@ -9,6 +9,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\QueueRoutes;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -89,6 +90,56 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherQueueable);
+
+        Container::setInstance(null);
+    }
+
+    public function testCommandsAreRoutedToConnectionByQueueName()
+    {
+        Container::setInstance($container = new Container);
+        $queueRoutes = new QueueRoutes;
+        $queueRoutes->setQueue('reports', 'processing', 'cloud');
+        $container->instance('queue.routes', $queueRoutes);
+
+        $mock = Mockery::mock(Queue::class);
+        $mock->expects('push')->with(Mockery::type(BusDispatcherQueueable::class), '', 'reports');
+
+        $usedConnection = false;
+
+        $dispatcher = new Dispatcher($container, function ($connection) use ($mock, &$usedConnection) {
+            $usedConnection = $connection;
+
+            return $mock;
+        });
+
+        $dispatcher->dispatch((new BusDispatcherQueueable)->onQueue('reports'));
+
+        $this->assertSame('cloud', $usedConnection);
+
+        Container::setInstance(null);
+    }
+
+    public function testExplicitConnectionWinsOverQueueRoute()
+    {
+        Container::setInstance($container = new Container);
+        $queueRoutes = new QueueRoutes;
+        $queueRoutes->setQueue('reports', 'processing', 'cloud');
+        $container->instance('queue.routes', $queueRoutes);
+
+        $mock = Mockery::mock(Queue::class);
+        $mock->expects('push')->with(Mockery::type(BusDispatcherQueueable::class), '', 'reports');
+
+        $usedConnection = false;
+
+        $dispatcher = new Dispatcher($container, function ($connection) use ($mock, &$usedConnection) {
+            $usedConnection = $connection;
+
+            return $mock;
+        });
+
+        $dispatcher->dispatch((new BusDispatcherQueueable)->onConnection('redis')->onQueue('reports'));
+
+        $this->assertSame('redis', $usedConnection);
 
         Container::setInstance(null);
     }

@@ -181,6 +181,31 @@ class QueuedEventsTest extends TestCase
         Container::setInstance(null);
     }
 
+    public function testConnectionIsSetUsingRoutedQueueName()
+    {
+        $container = new Container;
+        $d = new Dispatcher($container);
+
+        $queueRoutes = new QueueRoutes;
+        $queueRoutes->setQueue('reports', 'processing', 'cloud');
+        $container->instance('queue.routes', $queueRoutes);
+
+        $fakeQueue = new QueueFake($container);
+
+        Container::setInstance($container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherRoutedQueue::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->connection('cloud')->assertPushedOn('reports', CallQueuedListener::class);
+
+        Container::setInstance(null);
+    }
+
     public function testDelayIsSetByWithDelayDynamically()
     {
         $d = new Dispatcher;
@@ -993,6 +1018,16 @@ class TestDispatcherViaQueueSupportsEnum implements ShouldQueue
 
 class TestDispatcherQueueRoutes implements ShouldQueue
 {
+    public function handle()
+    {
+        //
+    }
+}
+
+class TestDispatcherRoutedQueue implements ShouldQueue
+{
+    public $queue = 'reports';
+
     public function handle()
     {
         //

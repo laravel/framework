@@ -41,6 +41,17 @@ class SendingQueuedMailTest extends TestCase
         Queue::connection('mail-connection')->assertPushedOn('mail-queue', SendQueuedMailable::class);
     }
 
+    public function testMailIsSentWhenRoutingByQueueName()
+    {
+        Queue::fake();
+
+        Queue::routeQueue('mail-queue', 'main', 'mail-connection');
+
+        Mail::to('test@mail.com')->queue(new SendingQueuedRoutedMailTestMail);
+
+        Queue::connection('mail-connection')->assertPushedOn('mail-queue', SendQueuedMailable::class);
+    }
+
     public function testMailIsSentWithDelay()
     {
         Queue::fake();
@@ -70,5 +81,20 @@ class SendingQueuedMailTestMail extends Mailable
     public function middleware()
     {
         return [new RateLimited('limiter')];
+    }
+}
+
+class SendingQueuedRoutedMailTestMail extends Mailable
+{
+    public $queue = 'mail-queue';
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        return $this->view('view');
     }
 }
