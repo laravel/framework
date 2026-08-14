@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http\Client;
 
+use GuzzleHttp\Utils;
+
 /**
  * @mixin \Illuminate\Http\Client\Factory
  */
@@ -36,7 +38,7 @@ class Pool
     public function __construct(?Factory $factory = null)
     {
         $this->factory = $factory ?: new Factory();
-        $this->handler = $this->factory->newHandler();
+        $this->handler = Utils::chooseHandler();
     }
 
     /**
