@@ -10,7 +10,9 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
+use Illuminate\Queue\Events\QueueForwarded;
 use Illuminate\Queue\Queue;
+use Illuminate\Queue\QueueRoutes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
@@ -287,5 +289,29 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
         $this->assertIsArray($jobQueuedEvent->payload());
         $this->assertSame('expected-job-uuid', $jobQueuedEvent->payload()['uuid']);
+    }
+
+    public function testQueueForwardedEventIsDispatchedWhenQueueIsForwarded()
+    {
+        $queueForwardedEvent = null;
+
+        Container::setInstance($this->container);
+
+        $this->container->instance('queue.routes', tap(new QueueRoutes, function ($routes) {
+            $routes->forward('jobs', 'processing');
+        }));
+
+        $this->container['events']->listen(function (QueueForwarded $e) use (&$queueForwardedEvent) {
+            $queueForwardedEvent = $e;
+        });
+
+        $this->queue->push('MyJob', [
+            'laravel' => 'Framework',
+        ], 'jobs');
+
+        $this->assertSame('jobs', $queueForwardedEvent->from);
+        $this->assertSame('processing', $queueForwardedEvent->to);
+
+        Container::setInstance(null);
     }
 }

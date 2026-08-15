@@ -21,6 +21,7 @@ use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
+use Illuminate\Queue\Events\QueueForwarded;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
@@ -28,6 +29,8 @@ use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Throwable;
+
+use function Illuminate\Support\enum_value;
 
 abstract class Queue
 {
@@ -372,6 +375,8 @@ abstract class Queue
 
             return $this->container->make('db.transactions')->addCallback(
                 function () use ($queue, $job, $payload, $delay, $callback) {
+                    $this->raiseQueueForwardedEvent($queue);
+
                     $this->raiseJobQueueingEvent($queue, $job, $payload, $delay);
 
                     return tap($callback($payload, $queue, $delay), function ($jobId) use ($queue, $job, $payload, $delay) {
@@ -380,6 +385,8 @@ abstract class Queue
                 }
             );
         }
+
+        $this->raiseQueueForwardedEvent($queue);
 
         $this->raiseJobQueueingEvent($queue, $job, $payload, $delay);
 
@@ -484,6 +491,27 @@ abstract class Queue
             $delay = ! is_null($delay) ? $this->secondsUntil($delay) : $delay;
 
             $this->container['events']->dispatch(new JobQueued($this->connectionName, $queue, $jobId, $job, $payload, $delay));
+        }
+    }
+
+    /**
+     * Raise the queue forwarded event.
+     *
+     * @param  \UnitEnum|string|null  $queue
+     * @return void
+     */
+    protected function raiseQueueForwardedEvent($queue)
+    {
+        $from = enum_value($queue) ?: ($this->default ?? null);
+
+        if (is_null($from)) {
+            return;
+        }
+
+        $to = $this->resolveQueue($from);
+
+        if ($to !== $from && $this->container->bound('events')) {
+            $this->container['events']->dispatch(new QueueForwarded($this->connectionName, $from, $to));
         }
     }
 
