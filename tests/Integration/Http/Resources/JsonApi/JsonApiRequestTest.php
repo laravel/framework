@@ -42,6 +42,18 @@ class JsonApiRequestTest extends TestCase
         $this->assertFalse($request->hasSparseFieldset('posts'));
     }
 
+    public function testItIgnoresNonStringSparseFields()
+    {
+        $request = JsonApiRequest::create(uri: '/?'.http_build_query([
+            'fields' => [
+                'users' => ['name', 'email'],
+            ],
+        ]));
+
+        $this->assertSame([], $request->sparseFields('users'));
+        $this->assertTrue($request->hasSparseFieldset('users'));
+    }
+
     public function testItCanResolveSparseIncluded()
     {
         $request = JsonApiRequest::create(uri: '/?'.http_build_query([
@@ -73,5 +85,15 @@ class JsonApiRequestTest extends TestCase
         $request = JsonApiRequest::create(uri: '/');
 
         $this->assertSame([], $request->sparseIncluded());
+    }
+
+    public function testItIgnoresNonStringSparseIncluded()
+    {
+        $request = JsonApiRequest::create(uri: '/?'.http_build_query([
+            'include' => ['teams', 'posts'],
+        ]));
+
+        $this->assertSame([], $request->sparseIncluded());
+        $this->assertSame([], $request->sparseIncluded('teams'));
     }
 }
