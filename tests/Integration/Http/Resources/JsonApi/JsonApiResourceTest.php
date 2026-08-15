@@ -809,4 +809,31 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonPath('included.1.id', (string) $user->getKey())
             ->assertJsonCount(2, 'included');
     }
+
+    public function testItDoesNotIncludeEagerLoadedNestedRelationshipsThatWereNotRequested()
+    {
+        $user = User::factory()->create();
+
+        $post = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $comment = Comment::factory()->create([
+            'post_id' => $post->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        // The route hands the resource a model with "comments.commenter" already loaded, while
+        // the request only asks for "comments". The commenter was never requested, so it should
+        // neither show up in "included" nor as a relationship of the comment.
+        $response = $this->getJson("/posts/{$post->getKey()}/with-nested-eager-loaded-relations?".http_build_query(['include' => 'comments']))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertJsonPath('data.id', (string) $post->getKey())
+            ->assertJsonPath('data.relationships.comments.data.0.id', (string) $comment->getKey());
+
+        $included = $response->json('included');
+
+        $this->assertSame(['comments'], array_column($included, 'type'));
+        $this->assertArrayNotHasKey('relationships', $included[0]);
+    }
 }

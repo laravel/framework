@@ -49,6 +49,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             return Post::find($postId)->toResource();
         });
 
+        $router->get('posts/{postId}/with-nested-eager-loaded-relations', function ($postId) {
+            return Post::find($postId)->load('comments.commenter')->toResource();
+        });
+
         $router->get('things/{id}', function ($id) {
             return new ArrayBackedJsonApiResource(['id' => (int) $id, 'name' => 'test']);
         });
