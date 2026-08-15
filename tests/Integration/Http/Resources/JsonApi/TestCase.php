@@ -41,6 +41,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             return User::find($userId)->load('chaperonePosts')->toResource();
         });
 
+        $router->get('users/{userId}/with-previously-loaded-chaperone-posts', function ($userId) {
+            return User::find($userId)->load('chaperonePosts')->toResource()->includePreviouslyLoadedRelationships();
+        });
+
         $router->get('posts', function () {
             return Post::paginate(5)->toResourceCollection();
         });
@@ -51,6 +55,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $router->get('posts/{postId}/with-nested-eager-loaded-relations', function ($postId) {
             return Post::find($postId)->load('comments.commenter')->toResource();
+        });
+
+        $router->get('posts/{postId}/with-previously-loaded-relations', function ($postId) {
+            return Post::find($postId)->load('comments.commenter')->toResource()->includePreviouslyLoadedRelationships();
         });
 
         $router->get('things/{id}', function ($id) {

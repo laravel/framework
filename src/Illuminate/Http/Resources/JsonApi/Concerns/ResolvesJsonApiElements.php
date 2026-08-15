@@ -36,9 +36,14 @@ trait ResolvesJsonApiElements
     protected bool $includesPreviouslyLoadedRelationships = false;
 
     /**
+     * The relationship paths that may be included for the resource.
+     */
+    protected ?array $includedRelationshipPaths = null;
+
+    /**
      * Cached loaded relationships map.
      *
-     * @var array<int, array{0: \Illuminate\Http\Resources\JsonApi\JsonApiResource, 1: string, 2: string, 3: bool}>|null
+     * @var array<int, array{0: \Illuminate\Http\Resources\JsonApi\JsonApiResource, 1: string, 2: string, 3: bool, 4?: array<int, string>|null}>|null
      */
     public $loadedRelationshipsMap;
 
@@ -191,6 +196,8 @@ trait ResolvesJsonApiElements
 
         $sparseIncluded = match (true) {
             $this->includesPreviouslyLoadedRelationships => array_keys($this->resource->getRelations()),
+            ! is_null($this->includedRelationshipPaths) => (new Collection($this->includedRelationshipPaths))
+                ->map(fn ($path) => Str::before($path, '.'))->all(),
             default => $request->sparseIncluded(),
         };
 
@@ -209,10 +216,9 @@ trait ResolvesJsonApiElements
             foreach ($resourceRelationships as $relationName => $relationResolver) {
                 $relatedModels = $relationResolver->handle($this->resource);
 
-                if (! is_null($relatedModels) && $this->includesPreviouslyLoadedRelationships === false) {
-                    if (! empty($relations = $request->sparseIncluded($relationName))) {
-                        $relatedModels->loadMissing($relations);
-                    }
+                if (! is_null($relatedModels) &&
+                    ! empty($relations = $this->nestedRelationshipPaths($request, $relationName))) {
+                    $relatedModels->loadMissing($relations);
                 }
 
                 yield from $this->compileResourceRelationshipUsingResolver(
@@ -236,6 +242,7 @@ trait ResolvesJsonApiElements
     ): Generator {
         $relationName = $relationResolver->relationName;
         $resourceClass = $relationResolver->resourceClass();
+        $includedPaths = $this->nestedRelationshipPaths($request, $relationName);
 
         // Relationship is a collection of models...
         if ($relatedModels instanceof Collection) {
@@ -251,13 +258,13 @@ trait ResolvesJsonApiElements
 
             $isUnique = ! $relationship instanceof BelongsToMany;
 
-            yield $relationName => ['data' => $relatedModels->map(function ($relatedModel) use ($request, $resourceClass, $isUnique) {
+            yield $relationName => ['data' => $relatedModels->map(function ($relatedModel) use ($request, $resourceClass, $isUnique, $includedPaths) {
                 $relatedResource = rescue(fn () => $relatedModel->toResource($resourceClass), new JsonApiResource($relatedModel));
 
                 return transform(
                     [$relatedResource->resolveResourceType($request), $relatedResource->resolveResourceIdentifier($request)],
-                    function ($uniqueKey) use ($relatedResource, $isUnique) {
-                        $this->loadedRelationshipsMap[] = [$relatedResource, ...$uniqueKey, $isUnique];
+                    function ($uniqueKey) use ($relatedResource, $isUnique, $includedPaths) {
+                        $this->loadedRelationshipsMap[] = [$relatedResource, ...$uniqueKey, $isUnique, $includedPaths];
 
                         return [
                             'id' => $uniqueKey[1],
@@ -288,8 +295,8 @@ trait ResolvesJsonApiElements
 
         yield $relationName => ['data' => transform(
             [$relatedResource->resolveResourceType($request), $relatedResource->resolveResourceIdentifier($request)],
-            function ($uniqueKey) use ($relatedResource) {
-                $this->loadedRelationshipsMap[] = [$relatedResource, ...$uniqueKey, true];
+            function ($uniqueKey) use ($relatedResource, $includedPaths) {
+                $this->loadedRelationshipsMap[] = [$relatedResource, ...$uniqueKey, true, $includedPaths];
 
                 return [
                     'id' => $uniqueKey[1],
@@ -297,6 +304,30 @@ trait ResolvesJsonApiElements
                 ];
             }
         )];
+    }
+
+    /**
+     * Get the relationship paths that may be included for the given relationship.
+     *
+     * Returns `null` when every previously loaded relationship should be included.
+     *
+     * @return array<int, string>|null
+     */
+    protected function nestedRelationshipPaths(JsonApiRequest $request, string $relationName): ?array
+    {
+        if ($this->includesPreviouslyLoadedRelationships) {
+            return null;
+        }
+
+        if (is_null($this->includedRelationshipPaths)) {
+            return $request->sparseIncluded($relationName);
+        }
+
+        return (new Collection($this->includedRelationshipPaths))
+            ->filter(fn ($path) => str_starts_with($path, $relationName.'.'))
+            ->map(fn ($path) => Str::after($path, '.'))
+            ->values()
+            ->all();
     }
 
     /**
@@ -326,6 +357,10 @@ trait ResolvesJsonApiElements
         while ($index < count($this->loadedRelationshipsMap)) {
             [$resourceInstance, $type, $id, $isUnique] = $this->loadedRelationshipsMap[$index];
 
+            // A map assembled by hand may hold the original four element tuples, which carry no
+            // relationship paths. Those resources keep including everything they have loaded.
+            $includedPaths = $this->loadedRelationshipsMap[$index][4] ?? null;
+
             $underlyingResource = $resourceInstance->resource;
 
             if (is_object($underlyingResource)) {
@@ -343,8 +378,9 @@ trait ResolvesJsonApiElements
                 $resourceInstance = new JsonApiResource($resourceInstance->resource);
             }
 
-            $relationsData = $resourceInstance
-                ->includePreviouslyLoadedRelationships()
+            $relationsData = (is_null($includedPaths)
+                ? $resourceInstance->includePreviouslyLoadedRelationships()
+                : $resourceInstance->includeRelationshipPaths($includedPaths))
                 ->resolve($request);
 
             array_push($this->loadedRelationshipsMap, ...($resourceInstance->loadedRelationshipsMap ?? []));
@@ -415,6 +451,21 @@ trait ResolvesJsonApiElements
     public function includePreviouslyLoadedRelationships()
     {
         $this->includesPreviouslyLoadedRelationships = true;
+
+        return $this;
+    }
+
+    /**
+     * Determine the relationship paths the resource may include.
+     *
+     * @internal
+     *
+     * @param  array<int, string>  $paths
+     * @return $this
+     */
+    public function includeRelationshipPaths(array $paths)
+    {
+        $this->includedRelationshipPaths = $paths;
 
         return $this;
     }

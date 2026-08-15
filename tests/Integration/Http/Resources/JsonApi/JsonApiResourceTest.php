@@ -687,14 +687,15 @@ class JsonApiResourceTest extends TestCase
             'user_id' => $user->getKey(),
         ]);
 
-        // The /with-chaperone-posts route loads chaperonePosts which uses chaperone()
-        // to automatically set the inverse 'author' relationship on each Post,
-        // creating circular object references (User -> Post -> User same instance).
+        // The /with-previously-loaded-chaperone-posts route loads chaperonePosts which uses
+        // chaperone() to automatically set the inverse 'author' relationship on each Post,
+        // creating circular object references (User -> Post -> User same instance). The
+        // resource includes previously loaded relationships, so nothing bounds the traversal.
         // Without the fix, this would hang forever due to infinite loop.
         // The same User model appears twice in included: once as "posts" (the Post)
         // and once as "authors" (Post's author via chaperone) - this is correct
         // because different resource types should not be deduplicated.
-        $this->getJson("/users/{$user->getKey()}/with-chaperone-posts?".http_build_query(['include' => 'chaperonePosts']))
+        $this->getJson("/users/{$user->getKey()}/with-previously-loaded-chaperone-posts")
             ->assertHeader('Content-type', 'application/vnd.api+json')
             ->assertJsonPath('data.id', (string) $user->getKey())
             ->assertJsonPath('data.type', 'users')
@@ -835,5 +836,31 @@ class JsonApiResourceTest extends TestCase
 
         $this->assertSame(['comments'], array_column($included, 'type'));
         $this->assertArrayNotHasKey('relationships', $included[0]);
+    }
+
+    public function testItIncludesPreviouslyLoadedNestedRelationshipsWhenAskedTo()
+    {
+        $user = User::factory()->create();
+
+        $post = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $comment = Comment::factory()->create([
+            'post_id' => $post->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        // The route opts into "includePreviouslyLoadedRelationships", so the eager loaded
+        // commenter is included even though the request asks for nothing. The opt-in
+        // applies to the whole tree, not only to the relationships of the root.
+        $response = $this->getJson("/posts/{$post->getKey()}/with-previously-loaded-relations")
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertJsonPath('data.relationships.comments.data.0.id', (string) $comment->getKey());
+
+        $included = $response->json('included');
+
+        $this->assertSame(['comments', 'users'], array_column($included, 'type'));
+        $this->assertSame((string) $user->getKey(), $included[0]['relationships']['commenter']['data']['id']);
     }
 }
