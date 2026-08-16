@@ -13,6 +13,7 @@ use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Events\QueueForwarded;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Queue\SqsQueue;
@@ -1120,6 +1121,37 @@ class QueueSqsQueueTest extends TestCase
         $this->assertCount(2, $queueingEvents);
         $this->assertCount(2, $queuedEvents);
         $this->assertSame(['mid-0', 'mid-1'], array_map(fn ($e) => $e->id, array_values($queuedEvents)));
+    }
+
+    public function testBulkRaisesQueueForwardedEventOnceForTheBatch()
+    {
+        Container::setInstance($container = new Container);
+        $routes = new QueueRoutes;
+        $routes->forward($this->queueName, 'processing', 'sqs');
+        $container->instance('queue.routes', $routes);
+
+        $forwarded = [];
+        $events = Mockery::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+        $events->allows('dispatch')->andReturnUsing(function ($event) use (&$forwarded) {
+            if ($event instanceof QueueForwarded) {
+                $forwarded[] = $event;
+            }
+        });
+        $container->instance('events', $events);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
+        $queue->setContainer($container);
+        $queue->setConnectionName('sqs');
+
+        $this->sqs->expects('sendMessageBatch')->andReturn(new Result(['Successful' => [], 'Failed' => []]));
+
+        $queue->bulk(['a', 'b'], 'data', $this->queueName);
+
+        $this->assertCount(1, $forwarded);
+        $this->assertSame($this->queueName, $forwarded[0]->from);
+        $this->assertSame('processing', $forwarded[0]->to);
+
+        Container::setInstance(null);
     }
 
     public function testBulkHonoursPerJobDelay()
