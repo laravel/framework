@@ -298,6 +298,55 @@ class FilesystemManagerTest extends TestCase
         fclose($stream);
     }
 
+    public function testReadThroughDisksDeleteFilesFromBothDisks()
+    {
+        $filesystem = $this->readThroughFilesystemManager();
+        $primary = $filesystem->disk('primary');
+        $fallback = $filesystem->disk('fallback');
+        $readThrough = $filesystem->disk('read-through');
+
+        $fallback->put('file.txt', 'contents');
+        $readThrough->get('file.txt');
+
+        $this->assertTrue($readThrough->delete('file.txt'));
+        $this->assertTrue($primary->missing('file.txt'));
+        $this->assertTrue($fallback->missing('file.txt'));
+        $this->assertTrue($readThrough->missing('file.txt'));
+    }
+
+    public function testReadThroughDisksDeleteDirectoriesFromBothDisks()
+    {
+        $filesystem = $this->readThroughFilesystemManager();
+        $primary = $filesystem->disk('primary');
+        $fallback = $filesystem->disk('fallback');
+        $readThrough = $filesystem->disk('read-through');
+
+        $primary->put('directory/primary.txt', 'primary contents');
+        $fallback->put('directory/fallback.txt', 'fallback contents');
+
+        $this->assertTrue($readThrough->deleteDirectory('directory'));
+        $this->assertTrue($primary->directoryMissing('directory'));
+        $this->assertTrue($fallback->directoryMissing('directory'));
+        $this->assertTrue($readThrough->directoryMissing('directory'));
+    }
+
+    public function testReadThroughDisksDoNotResurrectMovedFiles()
+    {
+        $filesystem = $this->readThroughFilesystemManager();
+        $primary = $filesystem->disk('primary');
+        $fallback = $filesystem->disk('fallback');
+        $readThrough = $filesystem->disk('read-through');
+
+        $fallback->put('source.txt', 'contents');
+        $readThrough->get('source.txt');
+
+        $this->assertTrue($readThrough->move('source.txt', 'destination.txt'));
+        $this->assertSame('contents', $primary->get('destination.txt'));
+        $this->assertTrue($primary->missing('source.txt'));
+        $this->assertTrue($fallback->missing('source.txt'));
+        $this->assertTrue($readThrough->missing('source.txt'));
+    }
+
     public function testReadThroughDiskPromotionFailuresAreBestEffortByDefault()
     {
         $filesystem = $this->readThroughFilesystemManager([

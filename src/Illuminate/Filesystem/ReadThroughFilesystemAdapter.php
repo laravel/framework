@@ -7,6 +7,7 @@ use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
 
 class ReadThroughFilesystemAdapter implements FilesystemAdapter
@@ -131,18 +132,26 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
     }
 
     /**
-     * Delete a file from the primary filesystem.
+     * Delete a file from both filesystems.
      */
     public function delete(string $path): void
     {
+        if ($this->fallback->fileExists($path)) {
+            $this->fallback->delete($path);
+        }
+
         $this->primary->delete($path);
     }
 
     /**
-     * Delete a directory from the primary filesystem.
+     * Delete a directory from both filesystems.
      */
     public function deleteDirectory(string $path): void
     {
+        if ($this->fallback->directoryExists($path)) {
+            $this->fallback->deleteDirectory($path);
+        }
+
         $this->primary->deleteDirectory($path);
     }
 
@@ -203,11 +212,19 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
     }
 
     /**
-     * Move a file on the primary filesystem.
+     * Move a file on the primary filesystem and remove its fallback source.
      */
     public function move(string $source, string $destination, Config $config): void
     {
         $this->primary->move($source, $destination, $config->toArray());
+
+        try {
+            if ($this->fallback->fileExists($source)) {
+                $this->fallback->delete($source);
+            }
+        } catch (FilesystemException $exception) {
+            throw UnableToMoveFile::fromLocationTo($source, $destination, $exception);
+        }
     }
 
     /**
