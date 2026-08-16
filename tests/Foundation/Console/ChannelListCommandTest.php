@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Foundation\Console;
 
 use Illuminate\Console\Application;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Foundation\Console\ChannelListCommand;
 use Illuminate\Support\Collection;
@@ -49,7 +48,7 @@ class ChannelListCommandTest extends TestCase
 
         $artisan = new Application(
             $laravel,
-            Mockery::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            new \Illuminate\Events\Dispatcher($laravel),
             'testing'
         );
 

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Foundation\Providers\FoundationServiceProvider;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
@@ -102,7 +103,7 @@ class RendererTest extends TestCase
         $listener->shouldReceive('registerListeners')->never();
 
         $this->app->instance(Listener::class, $listener);
-        $this->app->instance(Dispatcher::class, Mockery::mock(Dispatcher::class));
+        Event::swap(Mockery::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
@@ -127,7 +128,7 @@ class RendererTest extends TestCase
         $listener->shouldReceive('registerListeners')->never();
 
         $this->app->instance(Listener::class, $listener);
-        $this->app->instance(Dispatcher::class, Mockery::mock(Dispatcher::class));
+        Event::swap(Mockery::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
@@ -143,7 +144,7 @@ class RendererTest extends TestCase
         $listener->expects('registerListeners');
 
         $this->app->instance(Listener::class, $listener);
-        $this->app->instance(Dispatcher::class, Mockery::mock(Dispatcher::class));
+        Event::swap(Mockery::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();

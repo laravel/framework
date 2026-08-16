@@ -133,8 +133,8 @@ class ConsoleApplicationTest extends TestCase
     public function testCallFullyStringCommandLine()
     {
         $artisan = new Application(
-            Mockery::mock(ApplicationContract::class, ['version' => '6.0']),
-            Mockery::mock(Dispatcher::class, ['dispatch' => null]),
+            $app = Mockery::mock(ApplicationContract::class, ['version' => '6.0']),
+            new EventsDispatcher($app),
             'testing'
         );
 
@@ -161,7 +161,7 @@ class ConsoleApplicationTest extends TestCase
     {
         $artisan = new Application(
             $laravel = new FoundationApplication(__DIR__),
-            Mockery::mock(Dispatcher::class, ['dispatch' => null]),
+            new EventsDispatcher($laravel),
             'testing'
         );
 
@@ -179,8 +179,8 @@ class ConsoleApplicationTest extends TestCase
     public function testCommandInputDoesntPromptWhenRequiredArgumentIsPassed()
     {
         $artisan = new Application(
-            new FoundationApplication(__DIR__),
-            Mockery::mock(Dispatcher::class, ['dispatch' => null]),
+            $laravel = new FoundationApplication(__DIR__),
+            new EventsDispatcher($laravel),
             'testing'
         );
 
@@ -199,7 +199,7 @@ class ConsoleApplicationTest extends TestCase
     {
         $artisan = new Application(
             $laravel = new FoundationApplication(__DIR__),
-            Mockery::mock(Dispatcher::class, ['dispatch' => null]),
+            new EventsDispatcher($laravel),
             'testing'
         );
 
@@ -217,8 +217,8 @@ class ConsoleApplicationTest extends TestCase
     public function testCommandInputDoesntPromptWhenRequiredArgumentsArePassed()
     {
         $artisan = new Application(
-            new FoundationApplication(__DIR__),
-            Mockery::mock(Dispatcher::class, ['dispatch' => null]),
+            $laravel = new FoundationApplication(__DIR__),
+            new EventsDispatcher($laravel),
             'testing'
         );
 
@@ -237,7 +237,7 @@ class ConsoleApplicationTest extends TestCase
     {
         $artisan = new Application(
             $laravel = new FoundationApplication(__DIR__),
-            Mockery::mock(Dispatcher::class, ['dispatch' => null]),
+            new EventsDispatcher($laravel),
             'testing'
         );
 

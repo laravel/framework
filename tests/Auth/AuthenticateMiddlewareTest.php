@@ -244,7 +244,7 @@ class AuthenticateMiddlewareTest extends TestCase
     {
         return new RequestGuard(function () use ($authenticated) {
             return $authenticated ? new stdClass : null;
-        }, Mockery::mock(Request::class), Mockery::mock(EloquentUserProvider::class));
+        }, new Request, Mockery::mock(EloquentUserProvider::class));
     }
 
     /**

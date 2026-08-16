@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Cookie;
 
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Response;
 use Illuminate\Session\NullSessionHandler;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
-use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class CookieTest extends TestCase
@@ -44,10 +43,7 @@ class CookieTest extends TestCase
 
     protected function defineEnvironment($app)
     {
-        $handler = Mockery::mock(ExceptionHandler::class)->shouldIgnoreMissing();
-        $app->instance(ExceptionHandler::class, $handler);
-
-        $handler->shouldReceive('render')->andReturn(new Response);
+        Exceptions::spy()->shouldReceive('render')->andReturn(new Response);
 
         $app['config']->set('app.key', Str::random(32));
         $app['config']->set('session.driver', 'fake-null');

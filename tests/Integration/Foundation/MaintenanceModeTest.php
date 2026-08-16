@@ -16,7 +16,7 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -53,7 +53,7 @@ class MaintenanceModeTest extends TestCase
 
     public function testCacheMaintenanceModeAllowsRequestWhenDeactivatedWhileReadingPayload()
     {
-        $cache = m::mock(Factory::class, Repository::class);
+        $cache = Mockery::mock(Factory::class, Repository::class);
         $cache->shouldReceive('store')->with('maintenance')->andReturnSelf();
         $cache->shouldReceive('has')->with('framework:down')->andReturn(true, false);
         $cache->shouldReceive('get')->once()->with('framework:down')->andReturnNull();
