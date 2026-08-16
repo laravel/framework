@@ -382,6 +382,8 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function sendBatchedMessages(array $messages, $queue)
     {
+        $this->raiseQueueForwardedEvent($queue);
+
         $entries = [];
 
         foreach ($messages as $id => $message) {
