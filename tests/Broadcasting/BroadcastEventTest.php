@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastAfterCommit;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -150,6 +151,97 @@ class BroadcastEventTest extends TestCase
         $job = new BroadcastEvent($event);
 
         $this->assertFalse($job->deleteWhenMissingModels);
+    }
+
+    public function testEventWithoutContractDefersToTheQueueConnectionDefault()
+    {
+        $job = new BroadcastEvent(new TestBroadcastEvent);
+
+        $this->assertNull($job->afterCommit);
+    }
+
+    public function testEventWithoutContractRespectsAfterCommit()
+    {
+        $event = new class
+        {
+            public $afterCommit = true;
+        };
+
+        $job = new BroadcastEvent($event);
+
+        $this->assertTrue($job->afterCommit);
+    }
+
+    public function testEventWithoutContractRespectsBeforeCommit()
+    {
+        $event = new class
+        {
+            public $afterCommit = false;
+        };
+
+        $job = new BroadcastEvent($event);
+
+        $this->assertFalse($job->afterCommit);
+    }
+
+    public function testEventWithoutContractAndNullAfterCommitDefersToTheQueueConnectionDefault()
+    {
+        $event = new class
+        {
+            public $afterCommit = null;
+        };
+
+        $job = new BroadcastEvent($event);
+
+        $this->assertNull($job->afterCommit);
+    }
+
+    public function testEventWithContractDefaultsToAfterCommit()
+    {
+        $event = new class extends TestBroadcastEvent implements ShouldBroadcastAfterCommit
+        {
+            //
+        };
+
+        $job = new BroadcastEvent($event);
+
+        $this->assertTrue($job->afterCommit);
+    }
+
+    public function testEventWithContractAndAfterCommitFalseRespectsBeforeCommit()
+    {
+        $event = new class extends TestBroadcastEvent implements ShouldBroadcastAfterCommit
+        {
+            public $afterCommit = false;
+        };
+
+        $job = new BroadcastEvent($event);
+
+        $this->assertFalse($job->afterCommit);
+    }
+
+    public function testEventWithContractAndExplicitAfterCommitTrueStillBroadcastsAfterCommit()
+    {
+        $event = new class extends TestBroadcastEvent implements ShouldBroadcastAfterCommit
+        {
+            public $afterCommit = true;
+        };
+
+        $job = new BroadcastEvent($event);
+
+        $this->assertTrue($job->afterCommit);
+    }
+
+    public function testEventWithContractAndNullAfterCommitStillBroadcastsAfterCommit()
+    {
+        $event = new class extends TestBroadcastEvent implements ShouldBroadcastAfterCommit
+        {
+            public $afterCommit = null;
+        };
+
+        $job = new BroadcastEvent($event);
+
+        $this->assertTrue($job->afterCommit);
     }
 
     public function testMiddlewareProxiesFailedHandlerFromUnderlyingEvent()
