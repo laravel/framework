@@ -198,9 +198,12 @@ class BroadcastEventTest extends TestCase
 
     public function testEventWithContractDefaultsToAfterCommit()
     {
-        $event = new class extends TestBroadcastEvent implements ShouldBroadcastAfterCommit
+        $event = new class implements ShouldBroadcastAfterCommit
         {
-            //
+            public function broadcastOn()
+            {
+                return ['test-channel'];
+            }
         };
 
         $job = new BroadcastEvent($event);
