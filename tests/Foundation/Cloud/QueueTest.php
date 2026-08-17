@@ -562,6 +562,30 @@ class QueueTest extends TestCase
         );
     }
 
+    public function testItSanitizesInvalidUtf8InTheExceptionField()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failerFake = $this->fakeFailer();
+        $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+        $this->app[FailedJobProvider::class] = $failedJobProvider;
+
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
+        Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
+        $failedJobProvider->log('cloud', 'default', ['payload' => 'here'], new RuntimeException("Bad byte: \xFF"));
+        Str::createUuidsNormally();
+        $queue->pop();
+
+        $this->assertTrue(mb_check_encoding($eventsFake->stream, 'UTF-8'));
+        $this->assertTrue(mb_check_encoding($eventsFake->emitted[1]['exception'], 'UTF-8'));
+        $this->assertStringContainsString('Bad byte: �', $eventsFake->emitted[1]['exception']);
+        $this->assertStringContainsString('Bad byte: �', $eventsFake->emitted[1]['exception_preview']);
+    }
+
     public function testItEmitsFailedJobEventsWithJobDisplayName()
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
@@ -1664,16 +1688,23 @@ class QueueTest extends TestCase
     {
         return $this->app->instance(Events::class, new class('test-socket') extends Events
         {
-            public array $emitted = [];
+                public array $emitted = [];
+                public string $stream = '';
 
-            public function emitMany(array $payloads): void
-            {
-                $this->emitted = [
-                    ...$this->emitted,
-                    ...$payloads,
-                ];
-            }
-        });
+                protected function connected(): bool
+                {
+                    return true;
+                }
+
+                protected function write(string $payload): void
+                {
+                    $this->stream .= $payload;
+
+                    foreach (explode("\n", rtrim($payload, "\n")) as $write) {
+                        $this->emitted[] = json_decode($write, associative: true);
+                    }
+                }
+            });
     }
 
     /**

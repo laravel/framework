@@ -69,7 +69,6 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
             'started_at' => $processingJobDetails['started_at']->toDateTimeString('microsecond'),
             'attempts' => $processingJobDetails['attempts'],
             'payload' => $payload,
-            'exception' => (string) mb_convert_encoding($exception, 'UTF-8'),
             'exception_preview' => Str::limit(
                     value: $exception->getMessage()
                         ? $exception::class.': '.$exception->getMessage().' in '.$exception->getFile().':'.$exception->getLine()
@@ -77,6 +76,7 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
                 limit: 1000,
                 end: '[truncated due size...]'),
             'job_name' => $payload['displayName'] ?? '',
+            'exception' => (string) $exception,
         ]);
 
         $this->queue->finishProcessingJob(timestamp: $timestamp);
