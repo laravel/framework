@@ -413,8 +413,6 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->guessClassName('alert');
 
         $this->assertSame("App\View\Components\Alert", trim($result));
-
-        Container::setInstance(null);
     }
 
     public function testClassNamesCanBeGuessedWithNamespaces()
@@ -428,8 +426,6 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->guessClassName('base.alert');
 
         $this->assertSame("App\View\Components\Base\Alert", trim($result));
-
-        Container::setInstance(null);
     }
 
     public function testComponentsCanBeCompiledWithHyphenAttributes()
@@ -846,10 +842,12 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
             }
         };
 
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
 
-        $paginator = new class extends AbstractPaginator {
+        $paginator = new class extends AbstractPaginator
+        {
         };
 
         $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute('<hi>'));

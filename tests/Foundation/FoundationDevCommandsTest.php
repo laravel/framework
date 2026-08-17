@@ -2,14 +2,12 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\DevCommand;
 use Illuminate\Foundation\DevCommandColor;
 use Illuminate\Foundation\DevCommandMode;
 use Illuminate\Foundation\DevCommands;
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\File;
 use Mockery;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
@@ -40,14 +38,6 @@ class FoundationDevCommandsTest extends TestCase
         $app['env'] = 'testing';
 
         File::swap(new Filesystem);
-    }
-
-    protected function tearDown(): void
-    {
-        Facade::clearResolvedInstances();
-        Container::setInstance(null);
-
-        parent::tearDown();
     }
 
     public function testRegisterAddsCommand()

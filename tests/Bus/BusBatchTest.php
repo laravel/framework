@@ -112,12 +112,6 @@ class BusBatchTest extends TestCase
      */
     protected function tearDown(): void
     {
-        if (Facade::getFacadeApplication()) {
-            Facade::setFacadeApplication(null);
-        }
-
-        Container::setInstance(null);
-
         unset($_SERVER['__finally.batch'], $_SERVER['__progress.batch'], $_SERVER['__then.batch'], $_SERVER['__catch.batch'], $_SERVER['__catch.exception']);
 
         $this->schema()->drop('job_batches');

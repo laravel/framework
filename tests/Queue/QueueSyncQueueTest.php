@@ -19,11 +19,6 @@ use PHPUnit\Framework\TestCase;
 
 class QueueSyncQueueTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-    }
-
     public function testPushShouldFireJobInstantly()
     {
         unset($_SERVER['__sync.test']);
@@ -55,8 +50,6 @@ class QueueSyncQueueTest extends TestCase
         } catch (Exception) {
             $this->assertTrue($_SERVER['__sync.failed']);
         }
-
-        Container::setInstance();
     }
 
     public function testFailedJobHasAccessToJobInstance()

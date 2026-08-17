@@ -46,11 +46,6 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->container->instance(Registrar::class, $this->router);
     }
 
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-    }
-
     public function testItCanGenerateDefinitionViaStaticMethod()
     {
         $signature = Authorize::using('ability');

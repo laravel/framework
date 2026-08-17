@@ -13,11 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationNotPwnedVerifierTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-    }
-
     public function testEmptyValues()
     {
         $httpFactory = Mockery::mock(HttpFactory::class);
