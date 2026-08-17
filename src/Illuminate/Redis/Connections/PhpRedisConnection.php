@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use RedisClusterException;
 use RedisException;
 use Throwable;
 
@@ -604,6 +605,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  array  $parameters
      * @return mixed
      *
+     * @throws \RedisClusterException
      * @throws \RedisException
      */
     public function command($method, array $parameters = [])
@@ -616,8 +618,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         while (true) {
             try {
                 return parent::command($method, $parameters);
-            } catch (RedisException $e) {
-                if (! Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'READONLY', 'Connection lost'])) {
+            } catch (RedisClusterException|RedisException $e) {
+                if (! Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'READONLY', 'Connection lost', 'Error processing response from Redis node'])) {
                     throw $e;
                 }
 

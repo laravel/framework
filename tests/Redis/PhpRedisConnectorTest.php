@@ -411,6 +411,21 @@ class PhpRedisConnectorTest extends TestCase
 
         $this->assertSame(3, $reconnects);
     }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionRebuildsItsClientAfterAClusterResponseError()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('get')->with('foo')->willThrowException(new \RedisClusterException('Error processing response from Redis node!'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('get')->with('foo')->willReturn('bar');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->assertSame('bar', $connection->command('get', ['foo']));
+        $this->assertSame($healthyClient, $connection->client());
+    }
 }
 
 class ClusterStubPhpRedisConnector extends PhpRedisConnector
