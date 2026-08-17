@@ -439,6 +439,16 @@ abstract class Relation implements BuilderContract
     }
 
     /**
+     * Get the class name of the related model.
+     *
+     * @return class-string<TRelatedModel>
+     */
+    public function getRelatedClass()
+    {
+        return $this->related::class;
+    }
+
+    /**
      * Get the name of the "created at" column.
      *
      * @return string
