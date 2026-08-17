@@ -44,13 +44,13 @@ jobs:
           DB_CONNECTION: mysql
           DB_COLLATION: utf8mb4_unicode_ci
 
-  mysql_8:
+  mysql_84:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
 
     services:
       mysql:
-        image: mysql:8
+        image: mysql:8.4
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: laravel
@@ -58,7 +58,39 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
-    name: MySQL 8
+    name: MySQL 8.4
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
+        with:
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+
+      - name: Execute tests
+        run: vendor/bin/phpunit tests/Integration/Database
+        env:
+          DB_CONNECTION: mysql
+
+  mysql_97:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    services:
+      mysql:
+        image: mysql:9.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: laravel
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    name: MySQL 9.7
 
     steps:
       - name: Checkout code
