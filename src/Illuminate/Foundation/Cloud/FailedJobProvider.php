@@ -70,9 +70,9 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
             'attempts' => $processingJobDetails['attempts'],
             'payload' => $payload,
             'exception_preview' => Str::limit(
-                    value: $exception->getMessage()
-                        ? $exception::class.': '.$exception->getMessage().' in '.$exception->getFile().':'.$exception->getLine()
-                        : $exception::class.' in '.$exception->getFile().':'.$exception->getLine(),
+                value: $exception->getMessage()
+                    ? $exception::class.': '.$exception->getMessage().' in '.$exception->getFile().':'.$exception->getLine()
+                    : $exception::class.' in '.$exception->getFile().':'.$exception->getLine(),
                 limit: 1000,
                 end: '[truncated due size...]'),
             'job_name' => (json_decode($payload, associative: true) ?? [])['displayName'] ?? '',
