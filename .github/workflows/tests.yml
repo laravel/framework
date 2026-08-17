@@ -50,7 +50,7 @@ jobs:
           - php: 8.3
             phpunit: '13.0.3'
 
-    name: PHP ${{ matrix.php }} - PHPUnit ~${{ matrix.phpunit }} - ${{ matrix.stability }}
+    name: PHP ${{ matrix.php }} - PHPUnit ^${{ matrix.phpunit }} - ${{ matrix.stability }}
 
     steps:
       - name: Checkout code
@@ -66,7 +66,7 @@ jobs:
           ini-values: error_reporting=E_ALL
           redis-configure-opts: --enable-redis --enable-redis-igbinary --enable-redis-msgpack --enable-redis-lzf --with-liblzf --enable-redis-zstd --with-libzstd --enable-redis-lz4 --with-liblz4
           redis-libs: liblz4-dev, liblzf-dev, libzstd-dev
-          composer-command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}"
+          composer-command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:^${{ matrix.phpunit }}"
 
       - name: Execute tests
         run: vendor/bin/phpunit --display-deprecation ${{ matrix.stability == 'prefer-stable' && '--fail-on-deprecation' || '' }} --no-coverage
@@ -100,7 +100,7 @@ jobs:
           - php: 8.3
             phpunit: '13.0.3'
 
-    name: PHP ${{ matrix.php }} - PHPUnit ~${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
+    name: PHP ${{ matrix.php }} - PHPUnit ^${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
 
     steps:
       - name: Set git to use LF
@@ -118,7 +118,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, redis, memcached, gmp, intl, :php-psr
-          composer-command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}"
+          composer-command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:^${{ matrix.phpunit }}"
 
       - name: Execute tests
         run: vendor/bin/phpunit --no-coverage
