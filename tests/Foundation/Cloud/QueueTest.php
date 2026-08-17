@@ -1657,23 +1657,23 @@ class QueueTest extends TestCase
     {
         return $this->app->instance(Events::class, new class('test-socket') extends Events
         {
-                public array $emitted = [];
-                public string $stream = '';
+            public array $emitted = [];
+            public string $stream = '';
 
-                protected function connected(): bool
-                {
-                    return true;
+            protected function connected(): bool
+            {
+                return true;
+            }
+
+            protected function write(string $payload): void
+            {
+                $this->stream .= $payload;
+
+                foreach (explode("\n", rtrim($payload, "\n")) as $write) {
+                    $this->emitted[] = json_decode($write, associative: true);
                 }
-
-                protected function write(string $payload): void
-                {
-                    $this->stream .= $payload;
-
-                    foreach (explode("\n", rtrim($payload, "\n")) as $write) {
-                        $this->emitted[] = json_decode($write, associative: true);
-                    }
-                }
-            });
+            }
+        });
     }
 
     /**
