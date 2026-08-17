@@ -621,7 +621,12 @@ class PhpRedisConnection extends Connection implements ConnectionContract
                     throw $e;
                 }
 
-                $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+                try {
+                    // Rebuilding can fail on the same outage, so keep the client and report the original error...
+                    $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+                } catch (Throwable) {
+                    //
+                }
 
                 if ($retries-- === 0) {
                     throw $e;

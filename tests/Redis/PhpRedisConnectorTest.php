@@ -411,6 +411,43 @@ class PhpRedisConnectorTest extends TestCase
 
         $this->assertSame(3, $reconnects);
     }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionReportsTheOriginalExceptionWhenRebuildingItsClientFails()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('incr')->with('foo')->willThrowException(new RedisException('Connection lost'));
+
+        $connection = new PhpRedisConnection($failedClient, function () {
+            throw new RedisException('Cluster is down');
+        });
+
+        $this->expectExceptionObject(new RedisException('Connection lost'));
+
+        $connection->command('incr', ['foo']);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionRetriesWithTheExistingClientWhenRebuildingItFails()
+    {
+        $calls = 0;
+
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->exactly(2))->method('get')->with('foo')->willReturnCallback(function () use (&$calls) {
+            if ($calls++ === 0) {
+                throw new RedisException('Connection lost');
+            }
+
+            return 'bar';
+        });
+
+        $connection = new PhpRedisConnection($failedClient, function () {
+            throw new RedisException('Cluster is down');
+        });
+
+        $this->assertSame('bar', $connection->command('get', ['foo']));
+        $this->assertSame($failedClient, $connection->client());
+    }
 }
 
 class ClusterStubPhpRedisConnector extends PhpRedisConnector
