@@ -622,7 +622,7 @@ class QueueTest extends TestCase
         $this->assertTrue(mb_check_encoding($eventsFake->stream, 'UTF-8'));
         $this->assertTrue(mb_check_encoding($eventsFake->emitted[1]['exception'], 'UTF-8'));
         $this->assertStringContainsString('Bad byte: �', $eventsFake->emitted[1]['exception']);
-        if (version_compare(PHP_VERSION, '8.2', '>')) {
+        if (version_compare(PHP_VERSION, '8.3', '<')) {
             $this->assertStringContainsString('Bad byte: �', $eventsFake->emitted[1]['exception_preview']);
         } else {
             $this->assertStringContainsString('Bad byte: ?', $eventsFake->emitted[1]['exception_preview']);
