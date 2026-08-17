@@ -476,8 +476,8 @@ class QueueTest extends TestCase
         $job = $queue->pop();
         $job->fail();
         Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
-        $failedJobProvider->log('cloud', 'default', ['payload' => 'here'], new RuntimeException('Whoops!'));
         $line = __LINE__ + 1;
+        $failedJobProvider->log('cloud', 'default', ['payload' => 'here', 'displayName' => 'App\\Jobs\\ProcessPodcast'], new RuntimeException('Whoops!'));
         Str::createUuidsNormally();
         $queue->pop();
 
@@ -497,8 +497,10 @@ class QueueTest extends TestCase
                 'attempts' => 1,
                 'payload' => [
                     'payload' => 'here',
+                    'displayName' => 'App\\Jobs\\ProcessPodcast',
                 ],
                 'exception_preview' => 'RuntimeException: Whoops! in '.__FILE__.':'.$line,
+                'job_name' => 'App\\Jobs\\ProcessPodcast',
             ],
             [
                 '_cloud_event' => 'queue',
@@ -559,6 +561,55 @@ class QueueTest extends TestCase
             $eventsFake->emitted[1]['exception_preview'],
         );
     }
+
+    public function testItEmitsFailedJobEventsWithJobDisplayName()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failerFake = $this->fakeFailer();
+        $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+        $this->app[FailedJobProvider::class] = $failedJobProvider;
+
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
+        Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
+        $failedJobProvider->log('cloud', 'default', ['displayName' => 'App\\Jobs\\ProcessPodcast'], new RuntimeException('Whoops!'));
+        Str::createUuidsNormally();
+        $queue->pop();
+
+        $this->assertSame(
+            'App\\Jobs\\ProcessPodcast',
+            $eventsFake->emitted[1]['job_name'],
+        );
+    }
+
+    public function testItEmitsFailedJobEventsWithoutJobDisplayName()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failerFake = $this->fakeFailer();
+        $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+        $this->app[FailedJobProvider::class] = $failedJobProvider;
+
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
+        Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
+        $failedJobProvider->log('cloud', 'default', ['payload' => 'here'], new RuntimeException('Whoops!'));
+        Str::createUuidsNormally();
+        $queue->pop();
+
+        $this->assertSame(
+            '',
+            $eventsFake->emitted[1]['job_name'],
+        );
+    }
+
     public function testItEmitsReleasedJobEvents()
     {
         $this->travelTo('2000-01-02 03:04:05.060708');

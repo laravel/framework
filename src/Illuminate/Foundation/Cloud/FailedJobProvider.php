@@ -76,6 +76,7 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
                         : $exception::class.' in '.$exception->getFile().':'.$exception->getLine(),
                 limit: 1000,
                 end: '[truncated due size...]'),
+            'job_name' => $payload['displayName'] ?? '',
         ]);
 
         $this->queue->finishProcessingJob(timestamp: $timestamp);
