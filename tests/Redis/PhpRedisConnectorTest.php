@@ -411,6 +411,46 @@ class PhpRedisConnectorTest extends TestCase
 
         $this->assertSame(3, $reconnects);
     }
+
+    #[RequiresPhpExtension('redis')]
+    public function testTransactionRebuildsTheClientWhenDiscardingQueuedCommandsReturnsFalse()
+    {
+        $client = $this->createMock(\Redis::class);
+        $client->method('multi')->willReturnSelf();
+        $client->expects($this->once())->method('discard')->willReturn(false);
+
+        $rebuilt = $this->createStub(\Redis::class);
+        $connection = new PhpRedisConnection($client, fn () => $rebuilt);
+
+        try {
+            $connection->transaction(fn () => throw new RedisException('Something went wrong.'));
+            $this->fail('Expected RedisException was not thrown.');
+        } catch (RedisException $e) {
+            $this->assertSame('Something went wrong.', $e->getMessage());
+        }
+
+        $this->assertSame($rebuilt, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testPipelineRebuildsTheClientWhenDiscardingQueuedCommandsThrows()
+    {
+        $client = $this->createMock(\Redis::class);
+        $client->method('pipeline')->willReturnSelf();
+        $client->expects($this->once())->method('discard')->willThrowException(new RedisException('Connection lost'));
+
+        $rebuilt = $this->createStub(\Redis::class);
+        $connection = new PhpRedisConnection($client, fn () => $rebuilt);
+
+        try {
+            $connection->pipeline(fn () => throw new RedisException('Something went wrong.'));
+            $this->fail('Expected RedisException was not thrown.');
+        } catch (RedisException $e) {
+            $this->assertSame('Something went wrong.', $e->getMessage());
+        }
+
+        $this->assertSame($rebuilt, $connection->client());
+    }
 }
 
 class ClusterStubPhpRedisConnector extends PhpRedisConnector

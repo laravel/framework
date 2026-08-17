@@ -472,7 +472,10 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         try {
             return tap($pipeline, $callback)->exec();
         } catch (Throwable $e) {
-            rescue(fn () => $this->client()->discard(), null, false);
+            // Anything but a clean discard leaves queued commands on the client, so rebuild it...
+            if (rescue(fn () => $this->client()->discard(), false, false) !== true && $this->connector) {
+                $this->client = rescue(fn () => call_user_func($this->connector), $this->client, false);
+            }
 
             throw $e;
         }
@@ -495,7 +498,10 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         try {
             return tap($transaction, $callback)->exec();
         } catch (Throwable $e) {
-            rescue(fn () => $this->client()->discard(), null, false);
+            // Anything but a clean discard leaves the client in MULTI, so rebuild it...
+            if (rescue(fn () => $this->client()->discard(), false, false) !== true && $this->connector) {
+                $this->client = rescue(fn () => call_user_func($this->connector), $this->client, false);
+            }
 
             throw $e;
         }
