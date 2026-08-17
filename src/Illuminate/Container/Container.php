@@ -926,45 +926,47 @@ class Container implements ArrayAccess, ContainerContract
 
         $this->with[] = $parameters;
 
-        if (is_null($concrete)) {
-            $concrete = $this->getConcrete($abstract);
+        try {
+            if (is_null($concrete)) {
+                $concrete = $this->getConcrete($abstract);
+            }
+
+            // We're ready to instantiate an instance of the concrete type registered for
+            // the binding. This will instantiate the types, as well as resolve any of
+            // its "nested" dependencies recursively until all have gotten resolved.
+            $object = $this->isBuildable($concrete, $abstract)
+                ? $this->build($concrete)
+                : $this->make($concrete);
+
+            // If we defined any extenders for this type, we'll need to spin through them
+            // and apply them to the object being built. This allows for the extension
+            // of services, such as changing configuration or decorating the object.
+            foreach ($this->getExtenders($abstract) as $extender) {
+                $object = $extender($object, $this);
+            }
+
+            // If the requested type is registered as a singleton we'll want to cache off
+            // the instances in "memory" so we can return it later without creating an
+            // entirely new instance of an object on each subsequent request for it.
+            if ($this->isShared($abstract) && ! $needsContextualBuild) {
+                $this->instances[$abstract] = $object;
+            }
+
+            if ($raiseEvents) {
+                $this->fireResolvingCallbacks($abstract, $object);
+            }
+
+            // Before returning, we will also set the resolved flag to "true" and pop off
+            // the parameter overrides for this build. After those two things are done
+            // we will be ready to return back the fully constructed class instance.
+            if (! $needsContextualBuild) {
+                $this->resolved[$abstract] = true;
+            }
+
+            return $object;
+        } finally {
+            array_pop($this->with);
         }
-
-        // We're ready to instantiate an instance of the concrete type registered for
-        // the binding. This will instantiate the types, as well as resolve any of
-        // its "nested" dependencies recursively until all have gotten resolved.
-        $object = $this->isBuildable($concrete, $abstract)
-            ? $this->build($concrete)
-            : $this->make($concrete);
-
-        // If we defined any extenders for this type, we'll need to spin through them
-        // and apply them to the object being built. This allows for the extension
-        // of services, such as changing configuration or decorating the object.
-        foreach ($this->getExtenders($abstract) as $extender) {
-            $object = $extender($object, $this);
-        }
-
-        // If the requested type is registered as a singleton we'll want to cache off
-        // the instances in "memory" so we can return it later without creating an
-        // entirely new instance of an object on each subsequent request for it.
-        if ($this->isShared($abstract) && ! $needsContextualBuild) {
-            $this->instances[$abstract] = $object;
-        }
-
-        if ($raiseEvents) {
-            $this->fireResolvingCallbacks($abstract, $object);
-        }
-
-        // Before returning, we will also set the resolved flag to "true" and pop off
-        // the parameter overrides for this build. After those two things are done
-        // we will be ready to return back the fully constructed class instance.
-        if (! $needsContextualBuild) {
-            $this->resolved[$abstract] = true;
-        }
-
-        array_pop($this->with);
-
-        return $object;
     }
 
     /**
@@ -1364,8 +1366,6 @@ class Container implements ArrayAccess, ContainerContract
         // dependency similarly to how we handle scalar values in this situation.
         catch (BindingResolutionException $e) {
             if ($parameter->isVariadic()) {
-                array_pop($this->with);
-
                 return [];
             }
 
