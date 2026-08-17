@@ -50,7 +50,7 @@ jobs:
           - php: 8.3
             phpunit: '13.0.3'
 
-    name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
+    name: PHP ${{ matrix.php }} - PHPUnit ~${{ matrix.phpunit }} - ${{ matrix.stability }}
 
     steps:
       - name: Checkout code
@@ -100,7 +100,7 @@ jobs:
           - php: 8.3
             phpunit: '13.0.3'
 
-    name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
+    name: PHP ${{ matrix.php }} - PHPUnit ~${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
 
     steps:
       - name: Set git to use LF
