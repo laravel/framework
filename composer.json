@@ -92,8 +92,10 @@
         "resend/resend-php": "^1.0",
         "symfony/cache": "^7.4.0 || ^8.0.0",
         "symfony/http-client": "^7.4.0 || ^8.0.0",
+        "symfony/mercure": "^0.8.0",
         "symfony/psr-http-message-bridge": "^7.4.0 || ^8.0.0",
-        "symfony/translation": "^7.4.0 || ^8.0.0"
+        "symfony/translation": "^7.4.0 || ^8.0.0",
+        "web-token/jwt-library": "^4.1"
     },
     "replace": {
         "illuminate/auth": "self.version",
@@ -177,8 +179,10 @@
         "symfony/filesystem": "Required to enable support for relative symbolic links (^7.4 || ^8.0).",
         "symfony/http-client": "Required to enable support for the Symfony API mail transports (^7.4 || ^8.0).",
         "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^7.4 || ^8.0).",
+        "symfony/mercure": "Required to use the Mercure broadcast driver (^0.8).",
         "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^7.4 || ^8.0).",
-        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^7.4 || ^8.0)."
+        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^7.4 || ^8.0).",
+        "web-token/jwt-library": "Required to sign Mercure JWTs and use end-to-end encrypted channels (^4.1)."
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
