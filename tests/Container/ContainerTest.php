@@ -469,6 +469,21 @@ class ContainerTest extends TestCase
         $container->build('Foo\Bar\Baz\DummyClass');
     }
 
+    public function testParameterOverridesDoNotLeakWhenResolutionFails()
+    {
+        $container = new Container;
+
+        try {
+            $container->make(ContainerLeakedOverrideStub::class, ['first' => 'leaked']);
+
+            $this->fail('Resolution should have failed on the second parameter.');
+        } catch (BindingResolutionException) {
+            //
+        }
+
+        $this->assertSame('default', $container->build(ContainerLeakedOverrideTargetStub::class)->first);
+    }
+
     public function testForgetInstanceForgetsInstance()
     {
         $container = new Container;
@@ -1152,6 +1167,20 @@ class ContainerMixedPrimitiveStub
         $this->stub = $stub;
         $this->last = $last;
         $this->first = $first;
+    }
+}
+
+class ContainerLeakedOverrideStub
+{
+    public function __construct(public string $first, public string $second)
+    {
+    }
+}
+
+class ContainerLeakedOverrideTargetStub
+{
+    public function __construct(public string $first = 'default')
+    {
     }
 }
 
