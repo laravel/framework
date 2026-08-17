@@ -808,9 +808,11 @@ class PendingRequest
      */
     public function throwUnless($condition)
     {
-        return $this->throwIf(is_callable($condition)
-            ? fn ($response) => ! $condition($response)
-            : ! $condition);
+        return $this->throwIf(
+            is_callable($condition)
+                ? fn ($response) => ! $condition($response)
+                : ! $condition
+        );
     }
 
     /**
