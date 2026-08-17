@@ -438,7 +438,7 @@ class QueueTest extends TestCase
         $job->fail();
         Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
         $line = __LINE__ + 1;
-        $failedJobProvider->log('cloud', 'default', ['payload' => 'here', 'displayName' => 'App\\Jobs\\ProcessPodcast'], new RuntimeException('Whoops!'));
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here', 'displayName' => 'App\\Jobs\\ProcessPodcast']), new RuntimeException('Whoops!'));
         Str::createUuidsNormally();
         $queue->pop();
 
@@ -456,10 +456,7 @@ class QueueTest extends TestCase
                 'queue' => 'default',
                 'started_at' => '2000-01-02 03:04:05.060708',
                 'attempts' => 1,
-                'payload' => [
-                    'payload' => 'here',
-                    'displayName' => 'App\\Jobs\\ProcessPodcast',
-                ],
+                'payload' => json_encode(['payload' => 'here', 'displayName' => 'App\\Jobs\\ProcessPodcast']),
                 'exception_preview' => 'RuntimeException: Whoops! in '.__FILE__.':'.$line,
                 'job_name' => 'App\\Jobs\\ProcessPodcast',
             ],
@@ -488,7 +485,7 @@ class QueueTest extends TestCase
         $job->fail();
         Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
         $line = __LINE__ + 1;
-        $failedJobProvider->log('cloud', 'default', ['payload' => 'here'], new RuntimeException('Whoops!'));
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here']), new RuntimeException('Whoops!'));
         Str::createUuidsNormally();
         $queue->pop();
 
@@ -513,7 +510,7 @@ class QueueTest extends TestCase
         $job->fail();
         Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
         $line = __LINE__ + 1;
-        $failedJobProvider->log('cloud', 'default', ['payload' => 'here'], new RuntimeException);
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here']), new RuntimeException);
         Str::createUuidsNormally();
         $queue->pop();
 
@@ -537,7 +534,7 @@ class QueueTest extends TestCase
         $job = $queue->pop();
         $job->fail();
         Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
-        $failedJobProvider->log('cloud', 'default', ['payload' => 'here'], new RuntimeException("Bad byte: \xFF"));
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here']), new RuntimeException("Bad byte: \xFF"));
         Str::createUuidsNormally();
         $queue->pop();
 
@@ -561,7 +558,7 @@ class QueueTest extends TestCase
         $job = $queue->pop();
         $job->fail();
         Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
-        $failedJobProvider->log('cloud', 'default', ['displayName' => 'App\\Jobs\\ProcessPodcast'], new RuntimeException('Whoops!'));
+        $failedJobProvider->log('cloud', 'default', json_encode(['displayName' => 'App\\Jobs\\ProcessPodcast']), new RuntimeException('Whoops!'));
         Str::createUuidsNormally();
         $queue->pop();
 
@@ -585,7 +582,7 @@ class QueueTest extends TestCase
         $job = $queue->pop();
         $job->fail();
         Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
-        $failedJobProvider->log('cloud', 'default', ['payload' => 'here'], new RuntimeException('Whoops!'));
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here']), new RuntimeException('Whoops!'));
         Str::createUuidsNormally();
         $queue->pop();
 
