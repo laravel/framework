@@ -98,7 +98,7 @@ class PendingCommand
      * Specify an expected question that will be asked when the command runs.
      *
      * @param  string  $question
-     * @param  string|bool  $answer
+     * @param  string|array|bool  $answer
      * @return $this
      */
     public function expectsQuestion($question, $answer)
