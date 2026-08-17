@@ -1122,7 +1122,7 @@ class QueueSqsQueueTest extends TestCase
         $this->assertSame(['mid-0', 'mid-1'], array_map(fn ($e) => $e->id, array_values($queuedEvents)));
     }
 
-    public function testBulkHonoursPerJobDelay()
+    public function testBulkHonoursPerJobDelay(): void
     {
         $jobA = new FakeSqsJob;
         $jobA->delay = 30;
@@ -1136,7 +1136,7 @@ class QueueSqsQueueTest extends TestCase
         $queue->setContainer(Mockery::spy(Container::class));
         $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
         $queue->method('createPayload')->willReturnCallback(fn ($job, $q, $data, $delay) => 'payload-'.($delay ?? 'none'));
-        $queue->method('secondsUntil')->with(30)->willReturn(30);
+        $queue->expects($this->once())->method('secondsUntil')->with(30)->willReturn(30);
 
         $captured = null;
 
@@ -1152,7 +1152,7 @@ class QueueSqsQueueTest extends TestCase
         $this->assertArrayNotHasKey('DelaySeconds', $captured['Entries'][1]);
     }
 
-    public function testBulkHonoursDelayAttribute()
+    public function testBulkHonoursDelayAttribute(): void
     {
         $queue = $this->getMockBuilder(SqsQueue::class)
             ->onlyMethods(['getQueue', 'createPayload', 'secondsUntil'])
@@ -1161,7 +1161,7 @@ class QueueSqsQueueTest extends TestCase
         $queue->setContainer(Mockery::spy(Container::class));
         $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
         $queue->method('createPayload')->willReturnCallback(fn ($job, $q, $data, $delay) => 'payload-'.($delay ?? 'none'));
-        $queue->method('secondsUntil')->with(15)->willReturn(15);
+        $queue->expects($this->once())->method('secondsUntil')->with(15)->willReturn(15);
 
         $captured = null;
 
