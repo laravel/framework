@@ -560,6 +560,48 @@ class QueueTest extends TestCase
         );
     }
 
+    public function testItTruncatesLongExceptionPreviews()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failerFake = $this->fakeFailer();
+        $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+        $this->app[FailedJobProvider::class] = $failedJobProvider;
+
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here']), new RuntimeException(str_repeat('a', 2000)));
+        $queue->pop();
+
+        $this->assertSame(1001, mb_strlen($eventsFake->emitted[1]['exception_preview']));
+        $this->assertSame('RuntimeException: '.str_repeat('a', 1001 - strlen('RuntimeException: ')), $eventsFake->emitted[1]['exception_preview']);
+    }
+
+    public function testItTruncatesExceptionPreviewsByWidthNotByteCountForMultibyteMessages()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failerFake = $this->fakeFailer();
+        $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+        $this->app[FailedJobProvider::class] = $failedJobProvider;
+
+        $message = str_repeat('😎', 4).str_repeat('a', 2000);
+
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here']), new RuntimeException($message));
+        $queue->pop();
+
+        $this->assertSame(1001, mb_strlen($eventsFake->emitted[1]['exception_preview']));
+        $this->assertSame('RuntimeException: '.str_repeat('😎', 4).str_repeat('a', 1001 - 4 - strlen('RuntimeException: ')), $eventsFake->emitted[1]['exception_preview']);
+    }
+
     public function testItSanitizesInvalidUtf8InTheExceptionField()
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
@@ -581,7 +623,7 @@ class QueueTest extends TestCase
         $this->assertTrue(mb_check_encoding($eventsFake->stream, 'UTF-8'));
         $this->assertTrue(mb_check_encoding($eventsFake->emitted[1]['exception'], 'UTF-8'));
         $this->assertStringContainsString('Bad byte: �', $eventsFake->emitted[1]['exception']);
-        $this->assertStringContainsString('Bad byte: �', $eventsFake->emitted[1]['exception_preview']);
+        $this->assertStringContainsString('Bad byte: ?', $eventsFake->emitted[1]['exception_preview']);
     }
 
     public function testItEmitsFailedJobEventsWithJobDisplayName()
