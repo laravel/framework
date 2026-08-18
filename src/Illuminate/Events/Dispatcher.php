@@ -19,6 +19,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Queue\Attributes\AfterCommit;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Connection;
 use Illuminate\Queue\Attributes\DebounceFor;
@@ -603,7 +604,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
     {
-        return (($listener->afterCommit ?? null) ||
+        return ($this->getAttributeValue($listener, AfterCommit::class, 'afterCommit') ||
                 $listener instanceof ShouldHandleEventsAfterCommit) &&
                 $this->resolveTransactionManager();
     }
@@ -742,7 +743,7 @@ class Dispatcher implements DispatcherContract
             if ($listener instanceof ShouldQueueAfterCommit) {
                 $job->afterCommit = true;
             } else {
-                $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
+                $job->afterCommit = $this->getAttributeValue($listener, AfterCommit::class, 'afterCommit');
             }
 
             $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : $this->getAttributeValue($listener, Backoff::class, 'backoff');
