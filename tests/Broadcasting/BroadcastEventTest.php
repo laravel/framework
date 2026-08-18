@@ -7,7 +7,7 @@ use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastAfterCommit;
+use Illuminate\Queue\Attributes\AfterCommit;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -153,26 +153,14 @@ class BroadcastEventTest extends TestCase
         $this->assertFalse($job->deleteWhenMissingModels);
     }
 
-    public function testEventWithoutContractDefersToTheQueueConnectionDefault()
+    public function testEventWithoutAttributeDefersToTheQueueConnectionDefault()
     {
         $job = new BroadcastEvent(new TestBroadcastEvent);
 
         $this->assertNull($job->afterCommit);
     }
 
-    public function testEventWithoutContractRespectsAfterCommit()
-    {
-        $event = new class
-        {
-            public $afterCommit = true;
-        };
-
-        $job = new BroadcastEvent($event);
-
-        $this->assertTrue($job->afterCommit);
-    }
-
-    public function testEventWithoutContractRespectsBeforeCommit()
+    public function testEventWithoutAttributeRespectsBeforeCommit()
     {
         $event = new class
         {
@@ -184,26 +172,18 @@ class BroadcastEventTest extends TestCase
         $this->assertFalse($job->afterCommit);
     }
 
-    public function testEventWithoutContractAndNullAfterCommitDefersToTheQueueConnectionDefault()
+    public function testEventWithAttributeBroadcastsAfterCommit()
     {
-        $event = new class
-        {
-            public $afterCommit = null;
-        };
+        $job = new BroadcastEvent(new TestBroadcastEventWithAfterCommitAttribute);
 
-        $job = new BroadcastEvent($event);
-
-        $this->assertNull($job->afterCommit);
+        $this->assertTrue($job->afterCommit);
     }
 
-    public function testEventWithContractDefaultsToAfterCommit()
+    public function testEventInheritingTheAttributeBroadcastsAfterCommit()
     {
-        $event = new class implements ShouldBroadcastAfterCommit
+        $event = new class extends TestBroadcastEventWithAfterCommitAttribute
         {
-            public function broadcastOn()
-            {
-                return ['test-channel'];
-            }
+            //
         };
 
         $job = new BroadcastEvent($event);
@@ -211,9 +191,9 @@ class BroadcastEventTest extends TestCase
         $this->assertTrue($job->afterCommit);
     }
 
-    public function testEventWithContractAndAfterCommitFalseRespectsBeforeCommit()
+    public function testEventInheritingTheAttributeCanOptOutOfWaitingForTheCommit()
     {
-        $event = new class extends TestBroadcastEvent implements ShouldBroadcastAfterCommit
+        $event = new class extends TestBroadcastEventWithAfterCommitAttribute
         {
             public $afterCommit = false;
         };
@@ -221,30 +201,6 @@ class BroadcastEventTest extends TestCase
         $job = new BroadcastEvent($event);
 
         $this->assertFalse($job->afterCommit);
-    }
-
-    public function testEventWithContractAndExplicitAfterCommitTrueStillBroadcastsAfterCommit()
-    {
-        $event = new class extends TestBroadcastEvent implements ShouldBroadcastAfterCommit
-        {
-            public $afterCommit = true;
-        };
-
-        $job = new BroadcastEvent($event);
-
-        $this->assertTrue($job->afterCommit);
-    }
-
-    public function testEventWithContractAndNullAfterCommitStillBroadcastsAfterCommit()
-    {
-        $event = new class extends TestBroadcastEvent implements ShouldBroadcastAfterCommit
-        {
-            public $afterCommit = null;
-        };
-
-        $job = new BroadcastEvent($event);
-
-        $this->assertTrue($job->afterCommit);
     }
 
     public function testMiddlewareProxiesFailedHandlerFromUnderlyingEvent()
@@ -282,6 +238,12 @@ class TestBroadcastEvent
     {
         return ['test-channel'];
     }
+}
+
+#[AfterCommit]
+class TestBroadcastEventWithAfterCommitAttribute extends TestBroadcastEvent
+{
+    //
 }
 
 class TestBroadcastEventWithStringName extends TestBroadcastEvent

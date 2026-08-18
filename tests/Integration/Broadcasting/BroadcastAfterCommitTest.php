@@ -6,8 +6,8 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastAfterCommit;
 use Illuminate\Database\DatabaseTransactionsManager;
+use Illuminate\Queue\Attributes\AfterCommit;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase;
@@ -45,7 +45,7 @@ class BroadcastAfterCommitTest extends TestCase
         $this->app->instance('db.transactions', $this->transactions = new DatabaseTransactionsManager);
     }
 
-    public function testEventWithoutContractIsBroadcastInsideATransaction()
+    public function testEventWithoutAttributeIsBroadcastInsideATransaction()
     {
         $this->transactions->begin('testing', 1);
 
@@ -54,7 +54,7 @@ class BroadcastAfterCommitTest extends TestCase
         $this->assertSame(1, static::$broadcasts);
     }
 
-    public function testEventWithContractIsNotBroadcastUntilTheTransactionCommits()
+    public function testEventWithAttributeIsNotBroadcastUntilTheTransactionCommits()
     {
         $this->transactions->begin('testing', 1);
 
@@ -67,7 +67,7 @@ class BroadcastAfterCommitTest extends TestCase
         $this->assertSame(1, static::$broadcasts);
     }
 
-    public function testEventWithContractIsNeverBroadcastWhenTheTransactionRollsBack()
+    public function testEventWithAttributeIsNeverBroadcastWhenTheTransactionRollsBack()
     {
         $this->transactions->begin('testing', 1);
 
@@ -78,14 +78,14 @@ class BroadcastAfterCommitTest extends TestCase
         $this->assertSame(0, static::$broadcasts);
     }
 
-    public function testEventWithContractIsBroadcastImmediatelyWithoutATransaction()
+    public function testEventWithAttributeIsBroadcastImmediatelyWithoutATransaction()
     {
         Event::dispatch(new BroadcastAfterCommitTestEventAfterCommit);
 
         $this->assertSame(1, static::$broadcasts);
     }
 
-    public function testEventWithContractCanOptOutOfWaitingForTheTransactionToCommit()
+    public function testEventWithAttributeCanOptOutOfWaitingForTheTransactionToCommit()
     {
         $this->transactions->begin('testing', 1);
 
@@ -94,7 +94,7 @@ class BroadcastAfterCommitTest extends TestCase
         $this->assertSame(1, static::$broadcasts);
     }
 
-    public function testEventWithContractIsOnlyBroadcastWhenTheOuterTransactionCommits()
+    public function testEventWithAttributeIsOnlyBroadcastWhenTheOuterTransactionCommits()
     {
         $this->transactions->begin('testing', 1);
         $this->transactions->begin('testing', 2);
@@ -110,7 +110,7 @@ class BroadcastAfterCommitTest extends TestCase
         $this->assertSame(1, static::$broadcasts);
     }
 
-    public function testUniqueEventWithContractIsNotBroadcastUntilTheTransactionCommits()
+    public function testUniqueEventWithAttributeIsNotBroadcastUntilTheTransactionCommits()
     {
         $this->transactions->begin('testing', 1);
 
@@ -150,7 +150,8 @@ class BroadcastAfterCommitTestEvent implements ShouldBroadcast
     }
 }
 
-class BroadcastAfterCommitTestEventAfterCommit extends BroadcastAfterCommitTestEvent implements ShouldBroadcastAfterCommit
+#[AfterCommit]
+class BroadcastAfterCommitTestEventAfterCommit extends BroadcastAfterCommitTestEvent
 {
     //
 }
