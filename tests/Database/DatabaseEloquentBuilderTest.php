@@ -33,7 +33,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $builder->setModel($model);
         $model->expects('getKeyType')->andReturn('int');
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar', 'and');
+        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
         $builder->expects('first')->with(['column'])->andReturn('baz');
 
         $result = $builder->find('bar', ['column']);
@@ -46,7 +46,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $builder->setModel($model);
         $model->expects('getKeyType')->andReturn('int');
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar', 'and');
+        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
         $builder->expects('sole')->with(['column'])->andReturn('baz');
 
         $result = $builder->findSole('bar', ['column']);
@@ -60,7 +60,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $model->expects('getKeyType')->andReturn('int');
         $builder->setModel($model);
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', ['one', 'two'], 'and', false);
+        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', ['one', 'two']);
         $builder->expects('get')->with(['column'])->andReturn(['baz']);
 
         $result = $builder->findMany(['one', 'two'], ['column']);
@@ -98,7 +98,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
         $builder->setModel($model);
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar', 'and');
+        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
         $builder->expects('first')->with(['column'])->andReturn('baz');
 
         $expected = $model->findOrNew('bar', ['column']);
@@ -114,7 +114,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
         $builder->setModel($model);
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar', 'and');
+        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
         $builder->expects('first')->with(['column'])->andReturn(null);
 
         $result = $model->findOrNew('bar', ['column']);
@@ -131,7 +131,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $model->expects('getKeyType')->andReturn('int');
         $builder->setModel($model);
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar', 'and');
+        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
         $builder->expects('first')->with(['column'])->andReturn(null);
         $builder->findOrFail('bar', ['column']);
     }
@@ -164,7 +164,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $builder->setModel($model);
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2], 'and', false);
+        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2]);
         $builder->expects('get')->with(['column'])->andReturn(new Collection([$model]));
         $builder->findOrFail([1, 2], ['column']);
     }
@@ -179,7 +179,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $builder->setModel($model);
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2], 'and', false);
+        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2]);
         $builder->expects('get')->with(['column'])->andReturn(new Collection([$model]));
         $builder->findOrFail(new Collection([1, 2]), ['column']);
     }
@@ -190,8 +190,8 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $model->expects('getKeyType')->times(3)->andReturn('int');
         $builder->setModel($model);
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 1, 'and')->times(2);
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 2, 'and');
+        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 1)->times(2);
+        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 2);
         $builder->expects('first')->andReturn($model);
         $builder->expects('first')->with(['column'])->andReturn($model);
         $builder->expects('first')->andReturn(null);
@@ -209,8 +209,8 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model1->expects('getKeyType')->times(3)->andReturn('int');
         $model2->shouldReceive('getKeyType')->andReturn('int');
         $builder->setModel($model1);
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2], 'and', false)->times(2);
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2, 3], 'and', false);
+        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2])->times(2);
+        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2, 3]);
         $builder->expects('get')->andReturn(new Collection([$model1, $model2]));
         $builder->expects('get')->with(['column'])->andReturn(new Collection([$model1, $model2]));
         $builder->expects('get')->andReturn(null);
@@ -237,8 +237,8 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model1->expects('getKeyType')->times(3)->andReturn('int');
         $model2->shouldReceive('getKeyType')->andReturn('int');
         $builder->setModel($model1);
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2], 'and', false)->times(2);
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2, 3], 'and', false);
+        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2])->times(2);
+        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2, 3]);
         $builder->expects('get')->andReturn(new Collection([$model1, $model2]));
         $builder->expects('get')->with(['column'])->andReturn(new Collection([$model1, $model2]));
         $builder->expects('get')->andReturn(null);
@@ -272,7 +272,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $model = $this->getMockModel();
         $model->expects('getKeyType')->andReturn('int');
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2], 'and', false);
+        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2]);
         $builder->setModel($model);
         $builder->expects('get')->with(['column'])->andReturn('baz');
 
@@ -286,7 +286,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $model = $this->getMockModel();
         $model->expects('getKeyType')->andReturn('int');
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2], 'and', false);
+        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2]);
         $builder->setModel($model);
         $builder->expects('get')->with(['column'])->andReturn('baz');
 
@@ -384,7 +384,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $model->expects('getKeyType')->andReturn('int');
         $builder->setModel($model);
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar', 'and');
+        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
         $builder->expects('first')->with(['column'])->andReturn(null);
         $builder->whereKey('bar')->valueOrFail('column');
     }
@@ -2293,7 +2293,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $int = 1;
 
         $model->expects('getKeyType')->andReturn('int');
-        $builder->getQuery()->expects('where')->with($keyName, '=', $int, 'and');
+        $builder->getQuery()->expects('where')->with($keyName, '=', $int);
 
         $builder->whereKey($int);
     }
@@ -2306,7 +2306,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $int = 0;
 
-        $builder->getQuery()->expects('where')->with($keyName, '=', (string) $int, 'and');
+        $builder->getQuery()->expects('where')->with($keyName, '=', (string) $int);
 
         $builder->whereKey($int);
     }
@@ -2319,7 +2319,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder->getQuery()->expects('where')->with($keyName, '=', Mockery::on(function ($argument) {
             return $argument === null;
-        }), 'and');
+        }));
 
         $builder->whereKey(null);
     }
@@ -2333,7 +2333,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $array = [1, 2, 3];
 
-        $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $array, 'and', false);
+        $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $array);
 
         $builder->whereKey($array);
     }
@@ -2347,7 +2347,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $collection = new Collection([1, 2, 3]);
 
-        $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $collection, 'and', false);
+        $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $collection);
 
         $builder->whereKey($collection);
     }
@@ -2360,7 +2360,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder->getQuery()->expects('where')->with($keyName, '=', Mockery::on(function ($argument) {
             return $argument === '1';
-        }), 'and');
+        }));
 
         $builder->whereKey(new class extends Model
         {
@@ -2376,7 +2376,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $int = 0;
 
-        $builder->getQuery()->expects('where')->with($keyName, '!=', (string) $int, 'and');
+        $builder->getQuery()->expects('where')->with($keyName, '!=', (string) $int);
 
         $builder->whereKeyNot($int);
     }
@@ -2389,7 +2389,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder->getQuery()->expects('where')->with($keyName, '!=', Mockery::on(function ($argument) {
             return $argument === null;
-        }), 'and');
+        }));
 
         $builder->whereKeyNot(null);
     }
@@ -2403,7 +2403,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $int = 1;
 
         $model->expects('getKeyType')->andReturn('int');
-        $builder->getQuery()->expects('where')->with($keyName, '!=', $int, 'and');
+        $builder->getQuery()->expects('where')->with($keyName, '!=', $int);
 
         $builder->whereKeyNot($int);
     }
@@ -2417,7 +2417,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $array = [1, 2, 3];
 
-        $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $array, 'and', true);
+        $builder->getQuery()->expects('whereIntegerNotInRaw')->with($keyName, $array);
 
         $builder->whereKeyNot($array);
     }
@@ -2431,7 +2431,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $collection = new Collection([1, 2, 3]);
 
-        $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $collection, 'and', true);
+        $builder->getQuery()->expects('whereIntegerNotInRaw')->with($keyName, $collection);
 
         $builder->whereKeyNot($collection);
     }
@@ -2444,7 +2444,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder->getQuery()->expects('where')->with($keyName, '!=', Mockery::on(function ($argument) {
             return $argument === '1';
-        }), 'and');
+        }));
 
         $builder->whereKeyNot(new class extends Model
         {
@@ -2454,86 +2454,79 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testOrWhereKeyMethodWithInt()
     {
-        $model = $this->getMockModel();
-        $builder = $this->getBuilder()->setModel($model);
-        $keyName = $model->getQualifiedKeyName();
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
 
-        $int = 1;
+        $query = $model->newQuery()->whereKey(1)->orWhereKey(2);
 
-        $model->expects('getKeyType')->andReturn('int');
-        $builder->getQuery()->expects('where')->with($keyName, '=', $int, 'or');
-
-        $builder->orWhereKey($int);
+        $this->assertSame('select * from "table" where "table"."id" = ? or ("table"."id" = ?)', $query->toSql());
+        $this->assertEquals([1, 2], $query->getBindings());
     }
 
     public function testOrWhereKeyMethodWithArray()
     {
-        $model = $this->getMockModel();
-        $model->expects('getKeyType')->andReturn('int');
-        $builder = $this->getBuilder()->setModel($model);
-        $keyName = $model->getQualifiedKeyName();
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
 
-        $array = [1, 2, 3];
+        $query = $model->newQuery()->whereKey(1)->orWhereKey([2, 3]);
 
-        $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $array, 'or', false);
-
-        $builder->orWhereKey($array);
+        $this->assertSame('select * from "table" where "table"."id" = ? or ("table"."id" in (2, 3))', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
     }
 
     public function testOrWhereKeyMethodWithCollection()
     {
-        $model = $this->getMockModel();
-        $model->expects('getKeyType')->andReturn('int');
-        $builder = $this->getBuilder()->setModel($model);
-        $keyName = $model->getQualifiedKeyName();
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
 
-        $collection = new Collection([1, 2, 3]);
+        $query = $model->newQuery()->whereKey(1)->orWhereKey(new Collection([2, 3]));
 
-        $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $collection, 'or', false);
-
-        $builder->orWhereKey($collection);
+        $this->assertSame('select * from "table" where "table"."id" = ? or ("table"."id" in (2, 3))', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
     }
 
     public function testOrWhereKeyNotMethodWithInt()
     {
-        $model = $this->getMockModel();
-        $builder = $this->getBuilder()->setModel($model);
-        $keyName = $model->getQualifiedKeyName();
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
 
-        $int = 1;
+        $query = $model->newQuery()->whereKey(1)->orWhereKeyNot(2);
 
-        $model->expects('getKeyType')->andReturn('int');
-        $builder->getQuery()->expects('where')->with($keyName, '!=', $int, 'or');
-
-        $builder->orWhereKeyNot($int);
+        $this->assertSame('select * from "table" where "table"."id" = ? or ("table"."id" != ?)', $query->toSql());
+        $this->assertEquals([1, 2], $query->getBindings());
     }
 
     public function testOrWhereKeyNotMethodWithArray()
     {
-        $model = $this->getMockModel();
-        $model->expects('getKeyType')->andReturn('int');
-        $builder = $this->getBuilder()->setModel($model);
-        $keyName = $model->getQualifiedKeyName();
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
 
-        $array = [1, 2, 3];
+        $query = $model->newQuery()->whereKey(1)->orWhereKeyNot([2, 3]);
 
-        $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $array, 'or', true);
-
-        $builder->orWhereKeyNot($array);
+        $this->assertSame('select * from "table" where "table"."id" = ? or ("table"."id" not in (2, 3))', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
     }
 
     public function testOrWhereKeyNotMethodWithCollection()
     {
-        $model = $this->getMockModel();
-        $model->expects('getKeyType')->andReturn('int');
-        $builder = $this->getBuilder()->setModel($model);
-        $keyName = $model->getQualifiedKeyName();
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
 
-        $collection = new Collection([1, 2, 3]);
+        $query = $model->newQuery()->whereKey(1)->orWhereKeyNot(new Collection([2, 3]));
 
-        $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $collection, 'or', true);
+        $this->assertSame('select * from "table" where "table"."id" = ? or ("table"."id" not in (2, 3))', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
+    }
 
-        $builder->orWhereKeyNot($collection);
+    public function testWhereKeyOverriddenWithLegacySignatureIsHonoredByOrVariants()
+    {
+        $model = new EloquentBuilderTestWhereKeyOverrideStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->whereKey(1)->orWhereKey(2)->orWhereKeyNot(3);
+
+        $this->assertSame('select * from "table" where ("tenant_id" = ? and "local_id" = ?) or (("tenant_id" = ? and "local_id" = ?)) or (not ("tenant_id" = ? and "local_id" = ?))', $query->toSql());
+        $this->assertEquals([1, 1, 2, 2, 3, 3], $query->getBindings());
     }
 
     public function testExceptMethodWithModel()
@@ -2544,7 +2537,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder->getQuery()->expects('where')->with($keyName, '!=', Mockery::on(function ($argument) {
             return $argument === '1';
-        }), 'and');
+        }));
 
         $builder->except(new class extends Model
         {
@@ -2558,9 +2551,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder()->setModel($model);
         $keyName = $model->getQualifiedKeyName();
 
-        $builder->getQuery()->expects('whereIn')->with($keyName, Mockery::on(function ($argument) {
+        $builder->getQuery()->expects('whereNotIn')->with($keyName, Mockery::on(function ($argument) {
             return $argument === [1, 2];
-        }), 'and', true);
+        }));
 
         $models = new Collection([
             new class extends Model
@@ -2582,9 +2575,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder()->setModel($model);
         $keyName = $model->getQualifiedKeyName();
 
-        $builder->getQuery()->expects('whereIn')->with($keyName, Mockery::on(function ($argument) {
+        $builder->getQuery()->expects('whereNotIn')->with($keyName, Mockery::on(function ($argument) {
             return $argument === [1, 2];
-        }), 'and', true);
+        }));
 
         $models = [
             new class extends Model
@@ -3325,6 +3318,29 @@ class EloquentBuilderTestStubStringPrimaryKey extends Model
     protected $table = 'foo_table';
 
     protected $keyType = 'string';
+}
+
+class EloquentBuilderTestWhereKeyOverrideStub extends Model
+{
+    protected $table = 'table';
+
+    public function newEloquentBuilder($query)
+    {
+        return new EloquentBuilderTestWhereKeyOverrideBuilder($query);
+    }
+}
+
+class EloquentBuilderTestWhereKeyOverrideBuilder extends Builder
+{
+    public function whereKey($id)
+    {
+        return $this->where(fn ($query) => $query->where('tenant_id', '=', $id)->where('local_id', '=', $id));
+    }
+
+    public function whereKeyNot($id)
+    {
+        return $this->whereNot(fn ($query) => $query->where('tenant_id', '=', $id)->where('local_id', '=', $id));
+    }
 }
 
 class EloquentBuilderTestWhereBelongsToStub extends Model

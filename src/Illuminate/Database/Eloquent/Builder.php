@@ -271,9 +271,10 @@ class Builder implements BuilderContract
     /**
      * Add a where clause on the primary key to the query.
      *
+     * @param  mixed  $id
      * @return $this
      */
-    public function whereKey(mixed $id, string $boolean = 'and', bool $not = false): static
+    public function whereKey($id)
     {
         if ($id instanceof Model) {
             $id = $id->getKey();
@@ -281,9 +282,9 @@ class Builder implements BuilderContract
 
         if (is_array($id) || $id instanceof Arrayable) {
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
-                $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id, $boolean, $not);
+                $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
-                $this->query->whereIn($this->model->getQualifiedKeyName(), $id, $boolean, $not);
+                $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
             }
 
             return $this;
@@ -293,37 +294,58 @@ class Builder implements BuilderContract
             $id = (string) $id;
         }
 
-        return $this->where($this->model->getQualifiedKeyName(), $not ? '!=' : '=', $id, $boolean);
+        return $this->where($this->model->getQualifiedKeyName(), '=', $id);
     }
 
     /**
      * Add a where clause on the primary key to the query.
      *
+     * @param  mixed  $id
      * @return $this
      */
-    public function whereKeyNot(mixed $id, string $boolean = 'and'): static
+    public function whereKeyNot($id)
     {
-        return $this->whereKey($id, $boolean, true);
+        if ($id instanceof Model) {
+            $id = $id->getKey();
+        }
+
+        if (is_array($id) || $id instanceof Arrayable) {
+            if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
+                $this->query->whereIntegerNotInRaw($this->model->getQualifiedKeyName(), $id);
+            } else {
+                $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
+            }
+
+            return $this;
+        }
+
+        if ($id !== null && $this->model->getKeyType() === 'string') {
+            $id = (string) $id;
+        }
+
+        return $this->where($this->model->getQualifiedKeyName(), '!=', $id);
     }
 
     /**
      * Add an "or where" clause on the primary key to the query.
      *
+     * @param  mixed  $id
      * @return $this
      */
-    public function orWhereKey(mixed $id): static
+    public function orWhereKey($id)
     {
-        return $this->whereKey($id, 'or');
+        return $this->where(fn (self $query) => $query->whereKey($id), null, null, 'or');
     }
 
     /**
      * Add an "or where not" clause on the primary key to the query.
      *
+     * @param  mixed  $id
      * @return $this
      */
-    public function orWhereKeyNot(mixed $id): static
+    public function orWhereKeyNot($id)
     {
-        return $this->whereKeyNot($id, 'or');
+        return $this->where(fn (self $query) => $query->whereKeyNot($id), null, null, 'or');
     }
 
     /**
