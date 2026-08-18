@@ -548,6 +548,59 @@ class ProcessTest extends TestCase
         $this->assertSame("Hello World\n", $result->errorOutput());
     }
 
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testQuietProcessesReturnEmptyOutput()
+    {
+        $factory = new Factory;
+        $result = $factory->quietly()->path(__DIR__)->run('echo "Hello World"; echo "Hello World" >&2; exit 1;');
+
+        $this->assertFalse($result->successful());
+        $this->assertSame(1, $result->exitCode());
+        $this->assertSame('', $result->output());
+        $this->assertSame('', $result->errorOutput());
+        $this->assertFalse($result->seeInOutput('Hello World'));
+        $this->assertFalse($result->seeInErrorOutput('Hello World'));
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testQuietProcessesCanThrow()
+    {
+        $factory = new Factory;
+        $result = $factory->quietly()->path(__DIR__)->run('echo "Hello World" >&2; exit 1;');
+
+        try {
+            $result->throw();
+
+            $this->fail('A ProcessFailedException was not thrown.');
+        } catch (ProcessFailedException $e) {
+            $this->assertSame(<<<'EOT'
+                The command "echo "Hello World" >&2; exit 1;" failed.
+
+                Exit Code: 1
+                EOT, $e->getMessage()
+            );
+
+            $this->assertSame(1, $e->getCode());
+            $this->assertSame($result, $e->result);
+        }
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testQuietProcessesInPoolsCanThrow()
+    {
+        $this->expectException(ProcessFailedException::class);
+
+        $factory = new Factory;
+
+        $results = $factory->concurrently(fn ($pool) => [
+            $pool->quietly()->path(__DIR__)->command('exit 1;'),
+        ]);
+
+        $this->assertTrue($results->failed());
+
+        $results[0]->throw();
+    }
+
     public function testFakeProcessesCanThrowWithoutOutput()
     {
         $this->expectException(ProcessFailedException::class);
