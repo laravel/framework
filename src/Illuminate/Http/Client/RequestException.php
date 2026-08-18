@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use GuzzleHttp\Psr7\Message;
+use GuzzleHttp\Psr7\Utils;
 
 class RequestException extends HttpClientException
 {
@@ -113,7 +114,15 @@ class RequestException extends HttpClientException
         $summary = null;
 
         if (is_int($truncateExceptionsAt)) {
-            $summary = Message::bodySummary($psrResponse, $truncateExceptionsAt);
+            $bodySummary = Message::bodySummary($psrResponse, $truncateExceptionsAt);
+
+            // Keep status line + headers while truncating body only.
+            // Fixes "dontTruncate" vs "truncateAt" message shape inconsistency.
+            if (! is_null($bodySummary)) {
+                $psrResponseWithoutBody = $psrResponse->withBody(Utils::streamFor(''));
+
+                $summary = Message::toString($psrResponseWithoutBody).$bodySummary;
+            }
         } elseif (($body = $psrResponse->getBody())->isSeekable() && $body->isReadable()) {
             $summary = Message::toString($psrResponse);
         }
