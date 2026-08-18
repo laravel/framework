@@ -1378,6 +1378,22 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf(UploadedFile::class, $request->file('email'));
     }
 
+    public function testAllInputPreservesInputKeyOrderWhenFilesAreMerged()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'photo.jpg');
+        $request = Request::create('/', 'POST', [
+            'items' => [0 => ['name' => 'first'], 1 => ['name' => 'second']],
+        ], [], [
+            'items' => [1 => ['photo' => $file]],
+        ]);
+
+        $items = $request->all()['items'];
+
+        $this->assertSame([0, 1], array_keys($items));
+        $this->assertSame('second', $items[1]['name']);
+        $this->assertInstanceOf(UploadedFile::class, $items[1]['photo']);
+    }
+
     public function testAllInputReturnsInputAfterReplace()
     {
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']]);
