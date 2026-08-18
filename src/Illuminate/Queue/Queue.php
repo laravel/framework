@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Bus\DebounceLock;
+use Illuminate\Bus\Queueable;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -434,8 +435,19 @@ abstract class Queue
     protected function registerRollbackCallbacksForJobsThatDispatchAfterCommit($job)
     {
         if ($job instanceof ShouldBeUnique) {
+            // Jobs pushed directly onto the queue never acquire the unique lock, so an
+            // empty owner means this job is not holding one. Releasing it here would
+            // force release a lock that another dispatch of the job is holding.
+            $owner = isset(class_uses_recursive($job)[Queueable::class])
+                ? ($job->uniqueLockOwner ?? '')
+                : null;
+
             $this->container->make('db.transactions')->addCallbackForRollback(
-                function () use ($job) {
+                function () use ($job, $owner) {
+                    if ($owner === '') {
+                        return;
+                    }
+
                     (new UniqueLock($this->container->make(Cache::class)))->release($job);
                 }
             );
