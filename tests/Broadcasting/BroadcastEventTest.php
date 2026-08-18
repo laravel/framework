@@ -181,8 +181,7 @@ class BroadcastEventTest extends TestCase
 
     public function testEventInheritingTheAttributeBroadcastsAfterCommit()
     {
-        $event = new class extends TestBroadcastEventWithAfterCommitAttribute
-        {
+        $event = new class extends TestBroadcastEventWithAfterCommitAttribute {
             //
         };
 
