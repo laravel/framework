@@ -258,6 +258,49 @@ class BusBatchTest extends TestCase
         $this->assertEquals(1, $_SERVER['__then.count']);
     }
 
+    public function test_finally_callbacks_run_when_then_callback_deletes_batch()
+    {
+        $queue = Mockery::mock(Factory::class);
+
+        $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
+
+        $pendingBatch = (new PendingBatch(new Container, collect()))
+            ->then(function (Batch $batch) {
+                $_SERVER['__then.count']++;
+
+                $batch->delete();
+            })
+            ->finally(function (Batch $batch) {
+                $_SERVER['__finally.batch'] = $batch;
+                $_SERVER['__finally.count']++;
+            })
+            ->onConnection('test-connection')
+            ->onQueue('test-queue');
+
+        $batch = $repository->store($pendingBatch);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $connection = Mockery::mock(QueueContract::class);
+        $queue->expects('connection')
+            ->with('test-connection')
+            ->andReturn($connection);
+
+        $connection->expects('bulk');
+
+        $batch = $batch->add([$job]);
+
+        $batch->recordSuccessfulJob('test-id');
+
+        $this->assertEquals(1, $_SERVER['__then.count']);
+        $this->assertEquals(1, $_SERVER['__finally.count']);
+        $this->assertInstanceOf(Batch::class, $_SERVER['__finally.batch']);
+        $this->assertNull($batch->fresh());
+    }
+
     public function test_batch_finished_event_is_dispatched()
     {
         $events = Mockery::mock(EventDispatcher::class);

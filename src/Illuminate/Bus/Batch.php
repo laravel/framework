@@ -284,7 +284,7 @@ class Batch implements Arrayable, JsonSerializable
      */
     protected function invokeCallbacks(string $type, ?Throwable $e = null): void
     {
-        $batch = $this->fresh();
+        $batch = $this->fresh() ?? $this;
 
         foreach ($this->options[$type] ?? [] as $handler) {
             $this->invokeHandlerCallback($handler, $batch, $e);
