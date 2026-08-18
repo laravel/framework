@@ -116,6 +116,36 @@ class BeanstalkdQueue extends Queue implements QueueContract
     }
 
     /**
+     * Get the number of pending jobs across every queue.
+     *
+     * @return int
+     */
+    public function allPendingSize()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the number of delayed jobs across every queue.
+     *
+     * @return int
+     */
+    public function allDelayedSize()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the number of reserved jobs across every queue.
+     *
+     * @return int
+     */
+    public function allReservedSize()
+    {
+        return 0;
+    }
+
+    /**
      * Get the pending jobs for the given queue.
      *
      * @param  \UnitEnum|string|null  $queue

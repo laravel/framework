@@ -156,6 +156,36 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get the number of pending jobs across every queue.
+     *
+     * @return int
+     */
+    public function allPendingSize()
+    {
+        return $this->allQueueNames()->sum(fn ($name) => $this->pendingSize($name));
+    }
+
+    /**
+     * Get the number of delayed jobs across every queue.
+     *
+     * @return int
+     */
+    public function allDelayedSize()
+    {
+        return $this->allQueueNames()->sum(fn ($name) => $this->delayedSize($name));
+    }
+
+    /**
+     * Get the number of reserved jobs across every queue.
+     *
+     * @return int
+     */
+    public function allReservedSize()
+    {
+        return $this->allQueueNames()->sum(fn ($name) => $this->reservedSize($name));
+    }
+
+    /**
      * Get the pending jobs for the given queue.
      *
      * @param  \UnitEnum|string|null  $queue

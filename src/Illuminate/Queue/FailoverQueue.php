@@ -74,6 +74,36 @@ class FailoverQueue extends Queue implements QueueContract
     }
 
     /**
+     * Get the number of pending jobs across every queue.
+     *
+     * @return int
+     */
+    public function allPendingSize()
+    {
+        return $this->manager->connection($this->connections[0])->allPendingSize();
+    }
+
+    /**
+     * Get the number of delayed jobs across every queue.
+     *
+     * @return int
+     */
+    public function allDelayedSize()
+    {
+        return $this->manager->connection($this->connections[0])->allDelayedSize();
+    }
+
+    /**
+     * Get the number of reserved jobs across every queue.
+     *
+     * @return int
+     */
+    public function allReservedSize()
+    {
+        return $this->manager->connection($this->connections[0])->allReservedSize();
+    }
+
+    /**
      * Get the pending jobs for the given queue.
      *
      * @param  \UnitEnum|string|null  $queue

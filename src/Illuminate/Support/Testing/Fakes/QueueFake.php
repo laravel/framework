@@ -504,6 +504,36 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
+     * Get the number of pending jobs across every queue.
+     *
+     * @return int
+     */
+    public function allPendingSize()
+    {
+        return $this->allPendingJobs()->count();
+    }
+
+    /**
+     * Get the number of delayed jobs across every queue.
+     *
+     * @return int
+     */
+    public function allDelayedSize()
+    {
+        return $this->allDelayedJobs()->count();
+    }
+
+    /**
+     * Get the number of reserved jobs across every queue.
+     *
+     * @return int
+     */
+    public function allReservedSize()
+    {
+        return $this->allReservedJobs()->count();
+    }
+
+    /**
      * Get the pending jobs for the given queue.
      *
      * @param  \UnitEnum|string|null  $queue
