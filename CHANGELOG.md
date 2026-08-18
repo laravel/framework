@@ -1,6 +1,10 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.26.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.26.1...13.x)
+
+## [v13.26.1](https://github.com/laravel/framework/compare/v13.26.0...v13.26.1) - 2026-08-18
+
+* Revert "[13.x] feat: add orWhereKey and orWhereKeyNot to Eloquent Builder" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/61236
 
 ## [v13.26.0](https://github.com/laravel/framework/compare/v13.25.0...v13.26.0) - 2026-08-18
 
