@@ -1,6 +1,15 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.66.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.67.0...12.x)
+
+## [v12.67.0](https://github.com/laravel/framework/compare/v12.66.0...v12.67.0) - 2026-08-18
+
+* [12.x] Stricten `upload` to be fetch only from request's query string for temporary upload urls by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61145
+* [12.x] Improves `in` validation rule from getting bypass via loose comparison by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61146
+* [12.x] Retry timed-out cloud agent long-polls by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/61178
+* [12.x] Escape single quotes in Postgres JSON path attributes by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61192
+* [12.x] Promote nested data to top-level managed queue event by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/61225
+* [12.x] Backport #60908: Avoid quadratic wildcard rule expansion by [@OutlawPlz](https://github.com/OutlawPlz) in https://github.com/laravel/framework/pull/61232
 
 ## [v12.66.0](https://github.com/laravel/framework/compare/v12.65.0...v12.66.0) - 2026-08-11
 
