@@ -727,6 +727,41 @@ class RedisQueueTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $reserved->first()->createdAt);
         $this->assertSame([$default, 'emails'], $reserved->pluck('queue')->sort()->values()->all());
     }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testAllPendingSize($driver)
+    {
+        $this->setQueue($driver, config('queue.connections.redis.queue', 'default'));
+
+        $this->queue->push(new RedisQueueIntegrationTestJob(1));
+        $this->queue->pushOn('emails', new RedisQueueIntegrationTestJob(2));
+
+        $this->assertSame(2, $this->queue->allPendingSize());
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testAllDelayedSize($driver)
+    {
+        $this->setQueue($driver, config('queue.connections.redis.queue', 'default'));
+
+        $this->queue->later(60, new RedisQueueIntegrationTestJob(1));
+        $this->queue->laterOn('emails', 60, new RedisQueueIntegrationTestJob(2));
+
+        $this->assertSame(2, $this->queue->allDelayedSize());
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testAllReservedSize($driver)
+    {
+        $this->setQueue($driver, config('queue.connections.redis.queue', 'default'));
+
+        $this->queue->push(new RedisQueueIntegrationTestJob(1));
+        $this->queue->pushOn('emails', new RedisQueueIntegrationTestJob(2));
+        $this->queue->pop();
+        $this->queue->pop('emails');
+
+        $this->assertSame(2, $this->queue->allReservedSize());
+    }
 }
 
 class RedisQueueIntegrationTestJob
