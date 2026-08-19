@@ -5,6 +5,9 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Models\Relationships\UserWithCreated;
+use Illuminate\Tests\App\Models\Relationships\UserWithCreatedAndUpdated;
+use Illuminate\Tests\App\Models\Relationships\UserWithUpdated;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -297,36 +300,4 @@ class DatabaseEloquentTimestampsTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
-}
-
-/**
- * Eloquent Models...
- */
-class UserWithCreatedAndUpdated extends Eloquent
-{
-    protected $table = 'users';
-
-    protected $guarded = [];
-}
-
-class UserWithCreated extends Eloquent
-{
-    public const UPDATED_AT = null;
-
-    protected $table = 'users_created_at';
-
-    protected $guarded = [];
-
-    protected $dateFormat = 'U';
-}
-
-class UserWithUpdated extends Eloquent
-{
-    public const CREATED_AT = null;
-
-    protected $table = 'users_updated_at';
-
-    protected $guarded = [];
-
-    protected $dateFormat = 'U';
 }

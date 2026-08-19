@@ -2,9 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphOneIsTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\MorphOneIsAttachment as Attachment;
+use Illuminate\Tests\App\Models\Relationships\MorphOneIsPost as Post;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphOneIsTest extends DatabaseTestCase
@@ -83,18 +84,5 @@ class EloquentMorphOneIsTest extends DatabaseTestCase
 
         $this->assertFalse($parent->attachment()->is($child));
         $this->assertTrue($parent->attachment()->isNot($child));
-    }
-}
-
-class Attachment extends Model
-{
-    public $timestamps = false;
-}
-
-class Post extends Model
-{
-    public function attachment()
-    {
-        return $this->morphOne(Attachment::class, 'attachable');
     }
 }

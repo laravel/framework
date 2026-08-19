@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\MySql;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\DatabaseEloquentMySqlIntegrationUser;
 
 class DatabaseEloquentMySqlIntegrationTest extends MySqlTestCase
 {
@@ -74,11 +74,4 @@ class DatabaseEloquentMySqlIntegrationTest extends MySqlTestCase
             $this->assertNull($user2->name);
         });
     }
-}
-
-class DatabaseEloquentMySqlIntegrationUser extends Model
-{
-    protected $table = 'database_eloquent_mysql_integration_users';
-
-    protected $guarded = [];
 }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Tests\App\Models\Relationships\EloquentHasOneModelStub;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -332,9 +333,4 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         return new HasOne($this->builder, $this->parent, 'table.foreign_key', 'id');
     }
-}
-
-class EloquentHasOneModelStub extends Model
-{
-    public $foreign_key = 'foreign.value';
 }

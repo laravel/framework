@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel;
-use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithGuessableResource;
-use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithUseResourceAttribute;
-use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceTestJsonResource;
+use Illuminate\Tests\App\Http\Resources\EloquentResourceTestJsonResource;
+use Illuminate\Tests\App\Models\EloquentResourceTestResourceModel;
+use Illuminate\Tests\App\Models\EloquentResourceTestResourceModelWithGuessableResource;
+use Illuminate\Tests\App\Models\EloquentResourceTestResourceModelWithUseResourceAttribute;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
@@ -22,7 +22,7 @@ class DatabaseEloquentResourceModelTest extends TestCase
 
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
-        $this->expectExceptionObject(new LogicException('Failed to find resource class for model [Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel].'));
+        $this->expectExceptionObject(new LogicException('Failed to find resource class for model [Illuminate\Tests\App\Models\EloquentResourceTestResourceModel].'));
 
         $model = new EloquentResourceTestResourceModel();
         $model->toResource();
@@ -32,7 +32,7 @@ class DatabaseEloquentResourceModelTest extends TestCase
     {
         $model = new EloquentResourceTestResourceModelWithGuessableResource();
 
-        class_alias(EloquentResourceTestJsonResource::class, 'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModelWithGuessableResourceResource');
+        class_alias(EloquentResourceTestJsonResource::class, 'Illuminate\Tests\App\Http\Resources\EloquentResourceTestResourceModelWithGuessableResourceResource');
 
         $resource = $model->toResource();
 
@@ -44,7 +44,7 @@ class DatabaseEloquentResourceModelTest extends TestCase
     {
         $model = new EloquentResourceTestResourceModelWithGuessableResource();
 
-        class_alias(EloquentResourceTestJsonResource::class, 'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModelWithGuessableResource');
+        class_alias(EloquentResourceTestJsonResource::class, 'Illuminate\Tests\App\Http\Resources\EloquentResourceTestResourceModelWithGuessableResource');
 
         $resource = $model->toResource();
 
@@ -56,8 +56,8 @@ class DatabaseEloquentResourceModelTest extends TestCase
     {
         $model = new EloquentResourceTestResourceModel();
         $this->assertEquals([
-            'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModelResource',
-            'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModel',
+            'Illuminate\Tests\App\Http\Resources\EloquentResourceTestResourceModelResource',
+            'Illuminate\Tests\App\Http\Resources\EloquentResourceTestResourceModel',
         ], $model::guessResourceName());
     }
 

@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToGlobalScopesTest;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\Comment;
+use Illuminate\Tests\App\Models\Relationships\SoftDeletingMorphToPost as Post;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
@@ -66,21 +66,4 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
 
         $this->assertNotNull($post);
     }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-}
-
-class Post extends Model
-{
-    use SoftDeletes;
-
-    public $timestamps = false;
 }

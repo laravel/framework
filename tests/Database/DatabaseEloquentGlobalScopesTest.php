@@ -3,10 +3,17 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Tests\App\Models\Scopes\EloquentClassNameGlobalScopesTestModel;
+use Illuminate\Tests\App\Models\Scopes\EloquentClosureGlobalScopesTestModel;
+use Illuminate\Tests\App\Models\Scopes\EloquentClosureGlobalScopesWithOrTestModel;
+use Illuminate\Tests\App\Models\Scopes\EloquentGlobalScopeInAttributeChildTestModel;
+use Illuminate\Tests\App\Models\Scopes\EloquentGlobalScopeInAttributeTestModel;
+use Illuminate\Tests\App\Models\Scopes\EloquentGlobalScopeInInheritedAttributeTestModel;
+use Illuminate\Tests\App\Models\Scopes\EloquentGlobalScopesArrayTestModel;
+use Illuminate\Tests\App\Models\Scopes\EloquentGlobalScopesTestModel;
+use Illuminate\Tests\App\Models\Scopes\EloquentGlobalScopesWithRelationModel;
+use Illuminate\Tests\App\Scopes\ActiveScope;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentGlobalScopesTest extends TestCase
@@ -203,140 +210,4 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertSame('select * from "table" where "foo" = ? and (("approved" = ? or "should_approve" = ?)) order by "name" asc', $query->toSql());
         $this->assertEquals(['foo', 1, 0], $query->getBindings());
     }
-}
-
-class EloquentClosureGlobalScopesTestModel extends Model
-{
-    protected $table = 'table';
-
-    public static function boot()
-    {
-        static::addGlobalScope(function ($query) {
-            $query->orderBy('name');
-        });
-
-        static::addGlobalScope('active_scope', function ($query) {
-            $query->where('active', 1);
-        });
-
-        parent::boot();
-    }
-
-    public function scopeApproved($query)
-    {
-        return $query->where('approved', 1)->orWhere('should_approve', 0);
-    }
-
-    public function scopeNotApproved($query)
-    {
-        return $query->where('approved', 0)->orWhere('should_approve', 1)->withoutGlobalScope('active_scope');
-    }
-
-    public function scopeOrApproved($query)
-    {
-        return $query->orWhere('approved', 1)->orWhere('should_approve', 0);
-    }
-}
-
-class EloquentGlobalScopesWithRelationModel extends EloquentClosureGlobalScopesTestModel
-{
-    protected $table = 'table2';
-
-    public function related()
-    {
-        return $this->hasMany(EloquentGlobalScopesTestModel::class, 'related_id')->where('foo', 'bar');
-    }
-}
-
-class EloquentClosureGlobalScopesWithOrTestModel extends EloquentClosureGlobalScopesTestModel
-{
-    public static function boot()
-    {
-        static::addGlobalScope('or_scope', function ($query) {
-            $query->where('email', 'taylor@gmail.com')->orWhere('email', 'someone@else.com');
-        });
-
-        static::addGlobalScope(function ($query) {
-            $query->select('email', 'password');
-        });
-
-        parent::boot();
-    }
-}
-
-class EloquentGlobalScopesTestModel extends Model
-{
-    protected $table = 'table';
-
-    public static function boot()
-    {
-        static::addGlobalScope(new ActiveScope);
-
-        parent::boot();
-    }
-}
-
-class EloquentClassNameGlobalScopesTestModel extends Model
-{
-    protected $table = 'table';
-
-    public static function boot()
-    {
-        static::addGlobalScope(ActiveScope::class);
-
-        parent::boot();
-    }
-}
-
-class EloquentGlobalScopesArrayTestModel extends Model
-{
-    protected $table = 'table';
-
-    public static function boot()
-    {
-        static::addGlobalScopes([
-            'active_scope' => new ActiveScope,
-            fn ($query) => $query->orderBy('name'),
-        ]);
-
-        parent::boot();
-    }
-}
-
-#[ScopedBy(ActiveScope::class)]
-class EloquentGlobalScopeInAttributeTestModel extends Model
-{
-    protected $table = 'table';
-}
-
-class ActiveScope implements Scope
-{
-    public function apply(Builder $builder, Model $model)
-    {
-        return $builder->where('active', 1);
-    }
-}
-
-#[ScopedBy(ActiveScope::class)]
-trait EloquentGlobalScopeInInheritedAttributeTestTrait
-{
-    //
-}
-
-class EloquentGlobalScopeInInheritedAttributeTestModel extends Model
-{
-    use EloquentGlobalScopeInInheritedAttributeTestTrait;
-
-    protected $table = 'table';
-}
-
-#[ScopedBy(ActiveScope::class)]
-class EloquentGlobalScopeInAttributeParentTestModel extends Model
-{
-    protected $table = 'table';
-}
-
-class EloquentGlobalScopeInAttributeChildTestModel extends EloquentGlobalScopeInAttributeParentTestModel
-{
-    //
 }

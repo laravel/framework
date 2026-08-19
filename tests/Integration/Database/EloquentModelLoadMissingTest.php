@@ -3,10 +3,11 @@
 namespace Illuminate\Tests\Integration\Database\EloquentModelLoadMissingTest;
 
 use DB;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\ModelLoadMissingComment as Comment;
+use Illuminate\Tests\App\Models\Relationships\ModelLoadMissingPost as Post;
+use Illuminate\Tests\App\Models\Relationships\ModelLoadMissingUser as User;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelLoadMissingTest extends DatabaseTestCase
@@ -71,54 +72,4 @@ class EloquentModelLoadMissingTest extends DatabaseTestCase
 
         $this->assertCount(1, DB::getQueryLog());
     }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function parent()
-    {
-        return $this->belongsTo(self::class);
-    }
-
-    public function mentionsUsers()
-    {
-        return $this->belongsToMany(User::class, 'comment_mentions_users');
-    }
-
-    public function content(): Attribute
-    {
-        return new Attribute(function (?string $value) {
-            return preg_replace_callback('/<u:(\d+)>/', function ($matches) {
-                return '@'.$this->mentionsUsers->find($matches[1])?->name;
-            }, $value);
-        });
-    }
-}
-
-class Post extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function comments()
-    {
-        return $this->hasMany(Comment::class);
-    }
-
-    public function firstComment()
-    {
-        return $this->belongsTo(Comment::class, 'first_comment_id');
-    }
-}
-
-class User extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
 }

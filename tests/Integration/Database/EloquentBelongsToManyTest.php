@@ -12,6 +12,15 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Models\Relationships\PostStringPrimaryKey;
+use Illuminate\Tests\App\Models\Relationships\PostTagPivot;
+use Illuminate\Tests\App\Models\Relationships\Tag;
+use Illuminate\Tests\App\Models\Relationships\TagsPost;
+use Illuminate\Tests\App\Models\Relationships\TagStringPrimaryKey;
+use Illuminate\Tests\App\Models\Relationships\TagWithCustomPivot;
+use Illuminate\Tests\App\Models\Relationships\TouchingTag;
+use Illuminate\Tests\App\Models\Relationships\UniqueTag;
+use Illuminate\Tests\App\Models\Relationships\UuidPivotJoinUser;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentBelongsToManyTest extends DatabaseTestCase
@@ -76,7 +85,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         Carbon::setTestNow('2017-10-10 10:10:10');
 
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()]);
@@ -111,7 +120,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testRefreshOnOtherModelWorks()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
         $tag = Tag::create(['name' => $tagName = Str::random()]);
 
         $post->tags()->sync([
@@ -141,7 +150,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         Carbon::setTestNow('2017-10-10 10:10:10');
 
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = TagWithCustomPivot::create(['name' => Str::random()]);
 
@@ -171,7 +180,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         Carbon::setTestNow('2017-10-10 10:10:10');
 
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = TagWithCustomPivot::create(['name' => Str::random()]);
 
@@ -196,7 +205,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         Carbon::setTestNow('2017-10-10 10:10:10');
 
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
         $tag = TagWithCustomPivot::create(['name' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -223,7 +232,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         Carbon::setTestNow('2017-10-10 10:10:10');
 
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
         $tag = TagWithCustomPivot::create(['name' => Str::random()]);
 
         DB::table('posts_tags')->insert([
@@ -255,7 +264,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testAttachMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()]);
@@ -295,7 +304,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testDetachMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()]);
@@ -338,7 +347,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testDetachMethodWithCustomPivot()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()]);
@@ -381,7 +390,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
 
@@ -394,14 +403,14 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         $this->expectException(ModelNotFoundException::class);
 
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $post->tags()->firstOrFail(['id']);
     }
 
     public function testFindMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()]);
@@ -459,7 +468,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindSoleMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
 
@@ -482,9 +491,9 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrFailMethod()
     {
-        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10'));
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\App\Models\Relationships\Tag] 10'));
 
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         Tag::create(['name' => Str::random()]);
 
@@ -495,9 +504,9 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrFailMethodWithMany()
     {
-        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10, 11'));
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\App\Models\Relationships\Tag] 10, 11'));
 
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         Tag::create(['name' => Str::random()]);
 
@@ -508,9 +517,9 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrFailMethodWithManyUsingCollection()
     {
-        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10, 11'));
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\App\Models\Relationships\Tag] 10, 11'));
 
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         Tag::create(['name' => Str::random()]);
 
@@ -521,7 +530,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrNewMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
 
@@ -535,7 +544,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
         $post->tags()->create(['name' => Str::random()]);
 
         $result = $post->tags()->findOr(1, fn () => 'callback result');
@@ -554,7 +563,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrMethodWithMany()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
         $post->tags()->createMany([
             ['name' => Str::random()],
             ['name' => Str::random()],
@@ -580,7 +589,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrMethodWithManyUsingCollection()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
         $post->tags()->createMany([
             ['name' => Str::random()],
             ['name' => Str::random()],
@@ -606,7 +615,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstOrNewMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
 
@@ -620,7 +629,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     // public function testFirstOrNewUnrelatedExisting()
     // {
-    //     $post = Post::create(['title' => Str::random()]);
+    //     $post = TagsPost::create(['title' => Str::random()]);
 
     //     $name = Str::random();
     //     $tag = Tag::create(['name' => $name]);
@@ -633,7 +642,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstOrCreateMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
 
@@ -648,7 +657,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstOrCreateUnrelatedExisting()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $name = Str::random();
         $tag = Tag::create(['name' => $name]);
@@ -661,7 +670,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testCreateOrFirst()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = UniqueTag::create(['name' => Str::random()]);
 
@@ -676,7 +685,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testCreateOrFirstUnrelatedExisting()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $name = Str::random();
         $tag = UniqueTag::create(['name' => $name]);
@@ -689,7 +698,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testCreateOrFirstWithinTransaction()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = UniqueTag::create(['name' => Str::random()]);
 
@@ -702,7 +711,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstOrNewMethodWithValues()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
         $tag = Tag::create(['name' => Str::random()]);
         $post->tags()->attach(Tag::all());
 
@@ -732,7 +741,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstOrCreateMethodWithValues()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
         $tag = Tag::create(['name' => Str::random()]);
         $post->tags()->attach(Tag::all());
 
@@ -764,7 +773,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testUpdateOrCreateMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
 
@@ -779,7 +788,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testUpdateOrCreateUnrelatedExisting()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => 'foo']);
 
@@ -793,7 +802,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testUpdateOrCreateMethodCreate()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $post->tags()->updateOrCreate(['name' => 'wavez'], ['type' => 'featured']);
 
@@ -805,7 +814,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testSyncMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()]);
@@ -848,7 +857,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testSyncMethodWithModels()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()]);
@@ -886,7 +895,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testSyncWithoutDetachingMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()]);
@@ -908,7 +917,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testSyncMethodWithEmptyValueDoesNotQueryWhenDetachingDisabled()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::enableQueryLog();
 
@@ -929,7 +938,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testToggleMethod()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()]);
@@ -959,7 +968,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testTouchingParent()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = TouchingTag::create(['name' => Str::random()]);
 
@@ -980,7 +989,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         $tag = TouchingTag::create(['name' => Str::random()]);
 
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $this->assertNotSame('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
         $this->assertNotSame('2017-10-10 10:10:10', $tag->fresh()->updated_at->toDateTimeString());
@@ -997,7 +1006,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         $tag = Tag::create(['name' => Str::random()]);
 
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $this->assertNotSame('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
         $this->assertNotSame('2017-10-10 10:10:10', $tag->fresh()->updated_at->toDateTimeString());
@@ -1012,7 +1021,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testCanRetrieveRelatedIds()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('tags')->insert([
             ['name' => 'excluded'],
@@ -1030,7 +1039,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testCanTouchRelatedModels()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('tags')->insert([
             ['name' => Str::random()],
@@ -1057,7 +1066,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testWherePivotOnString()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
@@ -1074,7 +1083,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         $tag1 = Tag::create(['name' => Str::random()])->fresh();
         $tag2 = Tag::create(['name' => Str::random()])->fresh();
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
@@ -1094,7 +1103,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $tag1 = Tag::create(['name' => Str::random()])->fresh();
         $tag2 = Tag::create(['name' => Str::random()])->fresh();
         $tag3 = Tag::create(['name' => Str::random()])->fresh();
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
@@ -1114,7 +1123,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testFirstWhere()
     {
         $tag = Tag::create(['name' => 'foo'])->fresh();
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
@@ -1130,7 +1139,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testWherePivotOnBoolean()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => true],
@@ -1146,7 +1155,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testOrWherePivotOnBoolean()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => true, 'isActive' => false],
@@ -1159,7 +1168,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testWherePivotNotBetween()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => true, 'isActive' => false],
@@ -1176,7 +1185,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testWherePivotInMethod()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'foo'],
@@ -1191,7 +1200,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $tag1 = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()]);
         $tag3 = Tag::create(['name' => Str::random()]);
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
@@ -1211,7 +1220,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         $tag1 = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()])->fresh();
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
@@ -1229,7 +1238,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $tag1 = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()]);
         $tag3 = Tag::create(['name' => Str::random()]);
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
@@ -1249,7 +1258,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         $tag1 = Tag::create(['name' => Str::random()]);
         $tag2 = Tag::create(['name' => Str::random()])->fresh();
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
@@ -1266,7 +1275,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         $tag1 = Tag::create(['name' => Str::random()])->fresh();
         $tag2 = Tag::create(['name' => Str::random()]);
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo', 'isActive' => true],
@@ -1282,7 +1291,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testCanUpdateExistingPivot()
     {
         $tag = Tag::create(['name' => Str::random()]);
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty'],
@@ -1301,7 +1310,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $tag1 = Tag::create(['name' => Str::random()]),
             $tag2 = Tag::create(['name' => Str::random()]),
         ]);
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'empty'],
@@ -1318,7 +1327,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testCanUpdateExistingPivotUsingModel()
     {
         $tag = Tag::create(['name' => Str::random()]);
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty'],
@@ -1333,7 +1342,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testCustomRelatedKey()
     {
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $tag = $post->tagsWithCustomRelatedKey()->create(['name' => Str::random()]);
         $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_name);
@@ -1355,7 +1364,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     public function testGlobalScopeColumns()
     {
         $tag = Tag::create(['name' => Str::random()]);
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty'],
@@ -1368,9 +1377,9 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testPivotDoesntHavePrimaryKey()
     {
-        $user = User::create(['name' => Str::random()]);
-        $post1 = Post::create(['title' => Str::random()]);
-        $post2 = Post::create(['title' => Str::random()]);
+        $user = UuidPivotJoinUser::create(['name' => Str::random()]);
+        $post1 = TagsPost::create(['title' => Str::random()]);
+        $post2 = TagsPost::create(['title' => Str::random()]);
 
         $user->postsWithCustomPivot()->sync([$post1->uuid]);
         $this->assertEquals($user->uuid, $user->postsWithCustomPivot()->first()->pivot->user_uuid);
@@ -1392,7 +1401,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $tag2 = Tag::create(['name' => Str::random()])->fresh();
         $tag3 = Tag::create(['name' => Str::random()])->fresh();
         $tag4 = Tag::create(['name' => Str::random()]);
-        $post = Post::create(['title' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         DB::table('posts_tags')->insert([
             ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo3'],
@@ -1410,12 +1419,12 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstOrMethod()
     {
-        $user1 = User::create(['name' => Str::random()]);
-        $user2 = User::create(['name' => Str::random()]);
-        $user3 = User::create(['name' => Str::random()]);
-        $post1 = Post::create(['title' => Str::random()]);
-        $post2 = Post::create(['title' => Str::random()]);
-        $post3 = Post::create(['title' => Str::random()]);
+        $user1 = UuidPivotJoinUser::create(['name' => Str::random()]);
+        $user2 = UuidPivotJoinUser::create(['name' => Str::random()]);
+        $user3 = UuidPivotJoinUser::create(['name' => Str::random()]);
+        $post1 = TagsPost::create(['title' => Str::random()]);
+        $post2 = TagsPost::create(['title' => Str::random()]);
+        $post3 = TagsPost::create(['title' => Str::random()]);
 
         $user1->posts()->sync([$post1->uuid, $post2->uuid]);
         $user2->posts()->sync([$post1->uuid, $post2->uuid]);
@@ -1423,7 +1432,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals(
             $post1->id,
             $user2->posts()->firstOr(function () {
-                return Post::create(['title' => Str::random()]);
+                return TagsPost::create(['title' => Str::random()]);
             })->id
         );
 
@@ -1437,8 +1446,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testUpdateOrCreateQueryBuilderIsolation()
     {
-        $user = User::create(['name' => Str::random()]);
-        $post = Post::create(['title' => Str::random()]);
+        $user = UuidPivotJoinUser::create(['name' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $user->postsWithCustomPivot()->attach($post);
 
@@ -1455,8 +1464,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFirstOrCreateQueryBuilderIsolation()
     {
-        $user = User::create(['name' => Str::random()]);
-        $post = Post::create(['title' => Str::random()]);
+        $user = UuidPivotJoinUser::create(['name' => Str::random()]);
+        $post = TagsPost::create(['title' => Str::random()]);
 
         $user->postsWithCustomPivot()->attach($post);
 
@@ -1469,247 +1478,5 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             'user_uuid',
             $instance->toArray(),
         );
-    }
-}
-
-class User extends Model
-{
-    public $table = 'users';
-    public $timestamps = true;
-    protected $guarded = [];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            $model->setAttribute('uuid', Str::random());
-        });
-    }
-
-    public function posts()
-    {
-        return $this->belongsToMany(Post::class, 'users_posts', 'user_uuid', 'post_uuid', 'uuid', 'uuid')
-            ->withPivot('is_draft')
-            ->withTimestamps();
-    }
-
-    public function postsWithCustomPivot()
-    {
-        return $this->belongsToMany(Post::class, 'users_posts', 'user_uuid', 'post_uuid', 'uuid', 'uuid')
-            ->using(UserPostPivot::class)
-            ->withPivot('is_draft')
-            ->withTimestamps();
-    }
-}
-
-class PostStringPrimaryKey extends Model
-{
-    public $incrementing = false;
-
-    public $timestamps = false;
-
-    protected $table = 'post_string_key';
-
-    protected $keyType = 'string';
-
-    protected $fillable = ['title', 'id'];
-
-    public function tags()
-    {
-        return $this->belongsToMany(TagStringPrimaryKey::class, 'post_tag_string_key', 'post_id', 'tag_id');
-    }
-}
-
-class TagStringPrimaryKey extends Model
-{
-    public $incrementing = false;
-
-    public $timestamps = false;
-
-    protected $table = 'tag_string_key';
-
-    protected $keyType = 'string';
-
-    protected $fillable = ['title', 'id'];
-
-    public function posts()
-    {
-        return $this->belongsToMany(PostStringPrimaryKey::class, 'post_tag_string_key', 'tag_id', 'post_id');
-    }
-}
-
-class Post extends Model
-{
-    public $table = 'posts';
-    public $timestamps = true;
-    protected $guarded = [];
-    protected $touches = ['touchingTags'];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            $model->setAttribute('uuid', Str::random());
-        });
-    }
-
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'users_posts', 'post_uuid', 'user_uuid', 'uuid', 'uuid')
-            ->withPivot('is_draft')
-            ->withTimestamps();
-    }
-
-    public function tags()
-    {
-        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id')
-            ->withPivot('flag')
-            ->withTimestamps()
-            ->wherePivot('flag', '<>', 'exclude');
-    }
-
-    public function tagsUnique()
-    {
-        return $this->belongsToMany(UniqueTag::class, 'posts_unique_tags', 'post_id', 'tag_id')
-            ->withPivot('flag')
-            ->withTimestamps()
-            ->wherePivot('flag', '<>', 'exclude');
-    }
-
-    public function tagsWithExtraPivot()
-    {
-        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id')
-            ->withPivot('flag');
-    }
-
-    public function touchingTags()
-    {
-        return $this->belongsToMany(TouchingTag::class, 'posts_tags', 'post_id', 'tag_id')
-            ->withTimestamps();
-    }
-
-    public function tagsWithCustomPivot()
-    {
-        return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
-            ->using(PostTagPivot::class)
-            ->withTimestamps();
-    }
-
-    public function tagsWithCustomExtraPivot()
-    {
-        return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
-            ->using(PostTagPivot::class)
-            ->withTimestamps()
-            ->withPivot('flag');
-    }
-
-    public function tagsWithCustomPivotClass()
-    {
-        return $this->belongsToMany(TagWithCustomPivot::class, PostTagPivot::class, 'post_id', 'tag_id');
-    }
-
-    public function tagsWithCustomAccessor()
-    {
-        return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
-            ->using(PostTagPivot::class)
-            ->as('tag');
-    }
-
-    public function tagsWithCustomRelatedKey()
-    {
-        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_name', 'id', 'name')
-            ->withPivot('flag');
-    }
-
-    public function tagsWithGlobalScope()
-    {
-        return $this->belongsToMany(TagWithGlobalScope::class, 'posts_tags', 'post_id', 'tag_id');
-    }
-}
-
-class Tag extends Model
-{
-    public $table = 'tags';
-    public $timestamps = true;
-    protected $fillable = ['name', 'type'];
-
-    public function posts()
-    {
-        return $this->belongsToMany(Post::class, 'posts_tags', 'tag_id', 'post_id');
-    }
-}
-
-class UniqueTag extends Model
-{
-    public $table = 'unique_tags';
-    public $timestamps = true;
-    protected $fillable = ['name', 'type'];
-
-    public function posts()
-    {
-        return $this->belongsToMany(Post::class, 'posts_unique_tags', 'tag_id', 'post_id');
-    }
-}
-
-class TouchingTag extends Model
-{
-    public $table = 'tags';
-    public $timestamps = true;
-    protected $guarded = [];
-    protected $touches = ['posts'];
-
-    public function posts()
-    {
-        return $this->belongsToMany(Post::class, 'posts_tags', 'tag_id', 'post_id');
-    }
-}
-
-class TagWithCustomPivot extends Model
-{
-    public $table = 'tags';
-    public $timestamps = true;
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->belongsToMany(Post::class, 'posts_tags', 'tag_id', 'post_id');
-    }
-}
-
-class UserPostPivot extends Pivot
-{
-    protected $table = 'users_posts';
-}
-
-class PostTagPivot extends Pivot
-{
-    protected $table = 'posts_tags';
-
-    public function getCreatedAtAttribute($value)
-    {
-        return Carbon::parse($value)->format('U');
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('flag', 'foo');
-    }
-}
-
-class TagWithGlobalScope extends Model
-{
-    public $table = 'tags';
-    public $timestamps = true;
-    protected $guarded = [];
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope(function ($query) {
-            $query->select('tags.id');
-        });
     }
 }

@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManyChunkByIdTestTestArticle;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManyChunkByIdTestTestUser;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
@@ -126,25 +128,4 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
-}
-
-class BelongsToManyChunkByIdTestTestUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $fillable = ['id', 'email'];
-    public $timestamps = false;
-
-    public function articles()
-    {
-        return $this->belongsToMany(BelongsToManyChunkByIdTestTestArticle::class, 'article_user', 'user_id', 'article_id');
-    }
-}
-
-class BelongsToManyChunkByIdTestTestArticle extends Eloquent
-{
-    protected $table = 'articles';
-    protected $keyType = 'string';
-    public $incrementing = false;
-    public $timestamps = false;
-    protected $fillable = ['id', 'title'];
 }

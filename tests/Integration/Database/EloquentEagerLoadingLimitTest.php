@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentEagerLoadingLimitTest;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\EagerLoadingLimitComment;
+use Illuminate\Tests\App\Models\Relationships\EagerLoadingLimitPost;
+use Illuminate\Tests\App\Models\Relationships\EagerLoadingLimitUser;
+use Illuminate\Tests\App\Models\Relationships\Role;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentEagerLoadingLimitTest extends DatabaseTestCase
@@ -42,22 +42,22 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
             $table->unsignedBigInteger('user_id');
         });
 
-        User::create();
-        User::create();
+        EagerLoadingLimitUser::create();
+        EagerLoadingLimitUser::create();
 
-        Post::create(['user_id' => 1, 'created_at' => new Carbon('2024-01-01 00:00:01')]);
-        Post::create(['user_id' => 1, 'created_at' => new Carbon('2024-01-01 00:00:02')]);
-        Post::create(['user_id' => 1, 'created_at' => new Carbon('2024-01-01 00:00:03')]);
-        Post::create(['user_id' => 2, 'created_at' => new Carbon('2024-01-01 00:00:04')]);
-        Post::create(['user_id' => 2, 'created_at' => new Carbon('2024-01-01 00:00:05')]);
-        Post::create(['user_id' => 2, 'created_at' => new Carbon('2024-01-01 00:00:06')]);
+        EagerLoadingLimitPost::create(['user_id' => 1, 'created_at' => new Carbon('2024-01-01 00:00:01')]);
+        EagerLoadingLimitPost::create(['user_id' => 1, 'created_at' => new Carbon('2024-01-01 00:00:02')]);
+        EagerLoadingLimitPost::create(['user_id' => 1, 'created_at' => new Carbon('2024-01-01 00:00:03')]);
+        EagerLoadingLimitPost::create(['user_id' => 2, 'created_at' => new Carbon('2024-01-01 00:00:04')]);
+        EagerLoadingLimitPost::create(['user_id' => 2, 'created_at' => new Carbon('2024-01-01 00:00:05')]);
+        EagerLoadingLimitPost::create(['user_id' => 2, 'created_at' => new Carbon('2024-01-01 00:00:06')]);
 
-        Comment::create(['post_id' => 1, 'created_at' => new Carbon('2024-01-01 00:00:01')]);
-        Comment::create(['post_id' => 2, 'created_at' => new Carbon('2024-01-01 00:00:02')]);
-        Comment::create(['post_id' => 3, 'created_at' => new Carbon('2024-01-01 00:00:03')]);
-        Comment::create(['post_id' => 4, 'created_at' => new Carbon('2024-01-01 00:00:04')]);
-        Comment::create(['post_id' => 5, 'created_at' => new Carbon('2024-01-01 00:00:05')]);
-        Comment::create(['post_id' => 6, 'created_at' => new Carbon('2024-01-01 00:00:06')]);
+        EagerLoadingLimitComment::create(['post_id' => 1, 'created_at' => new Carbon('2024-01-01 00:00:01')]);
+        EagerLoadingLimitComment::create(['post_id' => 2, 'created_at' => new Carbon('2024-01-01 00:00:02')]);
+        EagerLoadingLimitComment::create(['post_id' => 3, 'created_at' => new Carbon('2024-01-01 00:00:03')]);
+        EagerLoadingLimitComment::create(['post_id' => 4, 'created_at' => new Carbon('2024-01-01 00:00:04')]);
+        EagerLoadingLimitComment::create(['post_id' => 5, 'created_at' => new Carbon('2024-01-01 00:00:05')]);
+        EagerLoadingLimitComment::create(['post_id' => 6, 'created_at' => new Carbon('2024-01-01 00:00:06')]);
 
         Role::create(['created_at' => new Carbon('2024-01-01 00:00:01')]);
         Role::create(['created_at' => new Carbon('2024-01-01 00:00:02')]);
@@ -78,7 +78,7 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
 
     public function testBelongsToMany(): void
     {
-        $users = User::with(['roles' => fn ($query) => $query->latest()->limit(2)])
+        $users = EagerLoadingLimitUser::with(['roles' => fn ($query) => $query->latest()->limit(2)])
             ->orderBy('id')
             ->get();
 
@@ -90,7 +90,7 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
 
     public function testBelongsToManyWithOffset(): void
     {
-        $users = User::with(['roles' => fn ($query) => $query->latest()->limit(2)->offset(1)])
+        $users = EagerLoadingLimitUser::with(['roles' => fn ($query) => $query->latest()->limit(2)->offset(1)])
             ->orderBy('id')
             ->get();
 
@@ -100,7 +100,7 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
 
     public function testHasMany(): void
     {
-        $users = User::with(['posts' => fn ($query) => $query->latest()->limit(2)])
+        $users = EagerLoadingLimitUser::with(['posts' => fn ($query) => $query->latest()->limit(2)])
             ->orderBy('id')
             ->get();
 
@@ -112,7 +112,7 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
 
     public function testHasManyWithOffset(): void
     {
-        $users = User::with(['posts' => fn ($query) => $query->latest()->limit(2)->offset(1)])
+        $users = EagerLoadingLimitUser::with(['posts' => fn ($query) => $query->latest()->limit(2)->offset(1)])
             ->orderBy('id')
             ->get();
 
@@ -122,7 +122,7 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
 
     public function testHasManyThrough(): void
     {
-        $users = User::with(['comments' => fn ($query) => $query->latest('comments.created_at')->limit(2)])
+        $users = EagerLoadingLimitUser::with(['comments' => fn ($query) => $query->latest('comments.created_at')->limit(2)])
             ->orderBy('id')
             ->get();
 
@@ -134,50 +134,11 @@ class EloquentEagerLoadingLimitTest extends DatabaseTestCase
 
     public function testHasManyThroughWithOffset(): void
     {
-        $users = User::with(['comments' => fn ($query) => $query->latest('comments.created_at')->limit(2)->offset(1)])
+        $users = EagerLoadingLimitUser::with(['comments' => fn ($query) => $query->latest('comments.created_at')->limit(2)->offset(1)])
             ->orderBy('id')
             ->get();
 
         $this->assertEquals([2, 1], $users[0]->comments->pluck('id')->all());
         $this->assertEquals([5, 4], $users[1]->comments->pluck('id')->all());
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-}
-
-class Post extends Model
-{
-    protected $guarded = [];
-}
-
-class Role extends Model
-{
-    protected $guarded = [];
-}
-
-class User extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function comments(): HasManyThrough
-    {
-        return $this->hasManyThrough(Comment::class, Post::class);
-    }
-
-    public function posts(): HasMany
-    {
-        return $this->hasMany(Post::class);
-    }
-
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class);
     }
 }

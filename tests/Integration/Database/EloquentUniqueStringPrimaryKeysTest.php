@@ -2,12 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Concerns\HasUlids;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Models\Keys\ModelUpsertWithUuidPrimaryKey;
+use Illuminate\Tests\App\Models\Keys\ModelWithCustomUuidPrimaryKeyName;
+use Illuminate\Tests\App\Models\Keys\ModelWithoutUuidPrimaryKey;
+use Illuminate\Tests\App\Models\Keys\ModelWithUlidPrimaryKey;
+use Illuminate\Tests\App\Models\Keys\ModelWithUuidPrimaryKey;
 
 class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
 {
@@ -132,71 +134,4 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
 
         $this->assertEquals(3, ModelUpsertWithUuidPrimaryKey::count());
     }
-}
-
-class ModelWithUuidPrimaryKey extends Eloquent
-{
-    use HasUuids;
-
-    protected $table = 'users';
-
-    protected $guarded = [];
-
-    public function uniqueIds()
-    {
-        return [$this->getKeyName(), 'foo', 'bar'];
-    }
-}
-
-class ModelUpsertWithUuidPrimaryKey extends Eloquent
-{
-    use HasUuids;
-
-    protected $table = 'foo';
-
-    protected $guarded = [];
-
-    public function uniqueIds()
-    {
-        return [$this->getKeyName()];
-    }
-}
-
-class ModelWithUlidPrimaryKey extends Eloquent
-{
-    use HasUlids;
-
-    protected $table = 'posts';
-
-    protected $guarded = [];
-
-    public function uniqueIds()
-    {
-        return [$this->getKeyName(), 'foo', 'bar'];
-    }
-}
-
-class ModelWithoutUuidPrimaryKey extends Eloquent
-{
-    use HasUuids;
-
-    protected $table = 'songs';
-
-    protected $guarded = [];
-
-    public function uniqueIds()
-    {
-        return ['foo', 'bar'];
-    }
-}
-
-class ModelWithCustomUuidPrimaryKeyName extends Eloquent
-{
-    use HasUuids;
-
-    protected $table = 'pictures';
-
-    protected $guarded = [];
-
-    protected $primaryKey = 'uuid';
 }

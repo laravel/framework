@@ -10,7 +10,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\SQLiteBuilder;
-use Illuminate\Tests\Database\Fixtures\Enums\Foo;
+use Illuminate\Tests\App\Enums\Foo;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

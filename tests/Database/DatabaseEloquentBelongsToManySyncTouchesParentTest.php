@@ -4,8 +4,9 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Relations\Pivot as EloquentPivot;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Models\Relationships\DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticle;
+use Illuminate\Tests\App\Models\Relationships\DatabaseEloquentBelongsToManySyncTouchesParentTestTestUser;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManySyncTouchesParentTest extends TestCase
@@ -120,54 +121,5 @@ class DatabaseEloquentBelongsToManySyncTouchesParentTest extends TestCase
     protected function schema()
     {
         return $this->connection()->getSchemaBuilder();
-    }
-}
-
-class DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticle extends Eloquent
-{
-    protected $table = 'articles';
-    protected $keyType = 'string';
-    public $incrementing = false;
-    protected $fillable = ['id', 'title'];
-
-    public function users()
-    {
-        return $this
-            ->belongsToMany(DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticle::class, 'article_user', 'article_id', 'user_id')
-            ->using(DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticleUser::class)
-            ->withTimestamps();
-    }
-}
-
-class DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticleUser extends EloquentPivot
-{
-    protected $table = 'article_user';
-    protected $fillable = ['article_id', 'user_id'];
-    protected $touches = ['article'];
-
-    public function article()
-    {
-        return $this->belongsTo(DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticle::class, 'article_id', 'id');
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(DatabaseEloquentBelongsToManySyncTouchesParentTestTestUser::class, 'user_id', 'id');
-    }
-}
-
-class DatabaseEloquentBelongsToManySyncTouchesParentTestTestUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $keyType = 'string';
-    public $incrementing = false;
-    protected $fillable = ['id', 'email'];
-
-    public function articles()
-    {
-        return $this
-            ->belongsToMany(DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticle::class, 'article_user', 'user_id', 'article_id')
-            ->using(DatabaseEloquentBelongsToManySyncTouchesParentTestTestArticleUser::class)
-            ->withTimestamps();
     }
 }

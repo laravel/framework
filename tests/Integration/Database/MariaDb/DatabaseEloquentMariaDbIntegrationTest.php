@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\MariaDb;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\DatabaseEloquentMariaDbIntegrationUser;
 
 class DatabaseEloquentMariaDbIntegrationTest extends MariaDbTestCase
 {
@@ -74,11 +74,4 @@ class DatabaseEloquentMariaDbIntegrationTest extends MariaDbTestCase
             $this->assertNull($user2->name);
         });
     }
-}
-
-class DatabaseEloquentMariaDbIntegrationUser extends Model
-{
-    protected $table = 'database_eloquent_mariadb_integration_users';
-
-    protected $guarded = [];
 }

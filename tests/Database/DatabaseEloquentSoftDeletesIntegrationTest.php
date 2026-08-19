@@ -6,13 +6,18 @@ use BadMethodCallException;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Models\SoftDeletes\SoftDeletesTestCommentWithTrashed;
+use Illuminate\Tests\App\Models\SoftDeletes\SoftDeletesTestGroup;
+use Illuminate\Tests\App\Models\SoftDeletes\SoftDeletesTestUser;
+use Illuminate\Tests\App\Models\SoftDeletes\SoftDeletesTestUserWithTrashedPosts;
+use Illuminate\Tests\App\Models\SoftDeletes\TestCommentWithoutSoftDelete;
+use Illuminate\Tests\App\Models\SoftDeletes\TestUserWithoutSoftDelete;
 use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
@@ -1033,149 +1038,5 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     protected function schema()
     {
         return $this->connection()->getSchemaBuilder();
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class TestUserWithoutSoftDelete extends Eloquent
-{
-    protected $table = 'users';
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasMany(SoftDeletesTestPost::class, 'user_id');
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class SoftDeletesTestUser extends Eloquent
-{
-    use SoftDeletes;
-
-    protected $table = 'users';
-    protected $guarded = [];
-
-    public function self_referencing()
-    {
-        return $this->hasMany(SoftDeletesTestUser::class, 'user_id')->onlyTrashed();
-    }
-
-    public function posts()
-    {
-        return $this->hasMany(SoftDeletesTestPost::class, 'user_id');
-    }
-
-    public function address()
-    {
-        return $this->hasOne(SoftDeletesTestAddress::class, 'user_id');
-    }
-
-    public function group()
-    {
-        return $this->belongsTo(SoftDeletesTestGroup::class, 'group_id');
-    }
-}
-
-class SoftDeletesTestUserWithTrashedPosts extends Eloquent
-{
-    use SoftDeletes;
-
-    protected $table = 'users';
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasMany(SoftDeletesTestPost::class, 'user_id')->withTrashed();
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class SoftDeletesTestPost extends Eloquent
-{
-    use SoftDeletes;
-
-    protected $table = 'posts';
-    protected $guarded = [];
-
-    public function comments()
-    {
-        return $this->hasMany(SoftDeletesTestComment::class, 'post_id');
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class TestCommentWithoutSoftDelete extends Eloquent
-{
-    protected $table = 'comments';
-    protected $guarded = [];
-
-    public function owner()
-    {
-        return $this->morphTo();
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class SoftDeletesTestComment extends Eloquent
-{
-    use SoftDeletes;
-
-    protected $table = 'comments';
-    protected $guarded = [];
-
-    public function owner()
-    {
-        return $this->morphTo();
-    }
-}
-
-class SoftDeletesTestCommentWithTrashed extends Eloquent
-{
-    use SoftDeletes;
-
-    protected $table = 'comments';
-    protected $guarded = [];
-
-    public function owner()
-    {
-        return $this->morphTo();
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class SoftDeletesTestAddress extends Eloquent
-{
-    use SoftDeletes;
-
-    protected $table = 'addresses';
-    protected $guarded = [];
-}
-
-/**
- * Eloquent Models...
- */
-class SoftDeletesTestGroup extends Eloquent
-{
-    use SoftDeletes;
-
-    protected $table = 'groups';
-    protected $guarded = [];
-
-    public function users()
-    {
-        $this->hasMany(SoftDeletesTestUser::class);
     }
 }

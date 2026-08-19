@@ -2,11 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelCustomEventsTest;
 
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Events\CustomEvent;
+use Illuminate\Tests\App\Models\Events\CustomEventsTestModel as TestModel1;
+use Illuminate\Tests\App\Models\Events\EloquentModelStubWithCustomEventFromTrait;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelCustomEventsTest extends DatabaseTestCase
@@ -64,50 +65,4 @@ class EloquentModelCustomEventsTest extends DatabaseTestCase
         $this->assertTrue($model->custom_attribute);
         $this->assertTrue($model->observer_attribute);
     }
-}
-
-class TestModel1 extends Model
-{
-    public $dispatchesEvents = ['created' => CustomEvent::class];
-    public $table = 'test_model1';
-    public $timestamps = false;
-    protected $guarded = [];
-}
-
-class CustomEvent
-{
-    //
-}
-
-trait CustomEventTrait
-{
-    public function completeCustomAction()
-    {
-        $this->custom_attribute = true;
-
-        $this->fireModelEvent('customEvent');
-    }
-
-    public function initializeCustomEventTrait()
-    {
-        $this->addObservableEvents([
-            'customEvent',
-        ]);
-    }
-}
-
-class CustomObserver
-{
-    public function customEvent(EloquentModelStubWithCustomEventFromTrait $model)
-    {
-        $model->observer_attribute = true;
-    }
-}
-
-#[ObservedBy(CustomObserver::class)]
-class EloquentModelStubWithCustomEventFromTrait extends Model
-{
-    use CustomEventTrait;
-
-    public $timestamps = false;
 }

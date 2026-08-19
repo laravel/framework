@@ -2,13 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\Fixtures\Post;
-use Illuminate\Tests\Integration\Database\Fixtures\PostStringyKey;
+use Illuminate\Tests\App\Models\Keys\PostStringyKey;
+use Illuminate\Tests\App\Models\Relationships\DeletableComment as Comment;
+use Illuminate\Tests\App\Models\Relationships\GenericPost as Post;
+use Illuminate\Tests\App\Models\Relationships\RoleObserver;
+use Illuminate\Tests\App\Models\Relationships\SoftDeletingRole as Role;
 
 class EloquentDeleteTest extends DatabaseTestCase
 {
@@ -190,28 +191,5 @@ class EloquentDeleteTest extends DatabaseTestCase
         PostStringyKey::reguard();
         unset($_SERVER['destroy']);
         Schema::drop('my_posts');
-    }
-}
-
-class Comment extends Model
-{
-    public $table = 'comments';
-    protected $fillable = ['post_id'];
-}
-
-class Role extends Model
-{
-    use SoftDeletes;
-    public $table = 'roles';
-    protected $guarded = [];
-}
-
-class RoleObserver
-{
-    public static $model;
-
-    public function forceDeleted($model)
-    {
-        static::$model = $model;
     }
 }

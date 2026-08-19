@@ -4,12 +4,16 @@ namespace Illuminate\Tests\Database;
 
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Models\Relationships\EloquentNoTouchingAnotherModelStub;
+use Illuminate\Tests\App\Models\Relationships\EloquentNoTouchingChildModelStub;
+use Illuminate\Tests\App\Models\Relationships\EloquentNoTouchingModelStub;
+use Illuminate\Tests\App\Models\Relationships\EloquentRelationAndAttributeModelStub;
+use Illuminate\Tests\App\Models\Relationships\EloquentRelationResetModelStub;
+use Illuminate\Tests\App\Models\Relationships\EloquentRelationStub;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -320,88 +324,5 @@ class DatabaseEloquentRelationTest extends TestCase
 
         $this->assertTrue($model->isRelation('parent'));
         $this->assertFalse($model->isRelation('field'));
-    }
-}
-
-class EloquentRelationResetModelStub extends Model
-{
-    protected $table = 'reset';
-
-    // Override method call which would normally go through __call()
-
-    public function getQuery()
-    {
-        return $this->newQuery()->getQuery();
-    }
-}
-
-class EloquentRelationStub extends Relation
-{
-    public function addConstraints()
-    {
-        //
-    }
-
-    public function addEagerConstraints(array $models)
-    {
-        //
-    }
-
-    public function initRelation(array $models, $relation)
-    {
-        //
-    }
-
-    public function match(array $models, Collection $results, $relation)
-    {
-        //
-    }
-
-    public function getResults()
-    {
-        //
-    }
-}
-
-class EloquentNoTouchingModelStub extends Model
-{
-    protected $table = 'table';
-    protected $attributes = [
-        'id' => 1,
-    ];
-}
-
-class EloquentNoTouchingChildModelStub extends EloquentNoTouchingModelStub
-{
-    //
-}
-
-class EloquentNoTouchingAnotherModelStub extends Model
-{
-    protected $table = 'another_table';
-    protected $attributes = [
-        'id' => 2,
-    ];
-}
-
-class EloquentRelationAndAttributeModelStub extends Model
-{
-    protected $table = 'one_more_table';
-
-    public function field(): Attribute
-    {
-        return new Attribute(
-            function ($value) {
-                return $value;
-            },
-            function ($value) {
-                return $value;
-            },
-        );
-    }
-
-    public function parent()
-    {
-        return $this->belongsTo(self::class);
     }
 }

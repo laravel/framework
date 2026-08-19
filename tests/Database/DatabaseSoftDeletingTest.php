@@ -2,9 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Models\SoftDeletes\SoftDeletingModel;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSoftDeletingTest extends TestCase
@@ -58,13 +57,4 @@ class DatabaseSoftDeletingTest extends TestCase
 
         $this->assertSame('2018-12-29 13:59:39', $model->deleted_at);
     }
-}
-
-class SoftDeletingModel extends Model
-{
-    use SoftDeletes;
-
-    protected $guarded = [];
-
-    protected $dateFormat = 'Y-m-d H:i:s';
 }

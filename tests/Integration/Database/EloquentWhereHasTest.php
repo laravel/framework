@@ -3,11 +3,14 @@
 namespace Illuminate\Tests\Integration\Database\EloquentWhereHasTest;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\Comment;
+use Illuminate\Tests\App\Models\Relationships\Text;
+use Illuminate\Tests\App\Models\Relationships\WhereHasPost as Post;
+use Illuminate\Tests\App\Models\Relationships\WhereHasUser as User;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -250,61 +253,5 @@ class EloquentWhereHasTest extends DatabaseTestCase
         })->get();
 
         $this->assertEquals([1], $users->pluck('id')->all());
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-}
-
-class Post extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    protected $withCount = ['comments'];
-
-    public function comments()
-    {
-        return $this->morphMany(Comment::class, 'commentable');
-    }
-
-    public function texts()
-    {
-        return $this->hasMany(Text::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-}
-
-class Text extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function post()
-    {
-        return $this->belongsTo(Post::class);
-    }
-}
-
-class User extends Model
-{
-    public $timestamps = false;
-
-    public function posts()
-    {
-        return $this->hasMany(Post::class);
     }
 }

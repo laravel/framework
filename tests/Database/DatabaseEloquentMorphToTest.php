@@ -7,7 +7,10 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Tests\Database\stubs\TestEnum;
+use Illuminate\Tests\App\Enums\TestEnum;
+use Illuminate\Tests\App\Models\Relationships\EloquentMorphToAccessibleStub;
+use Illuminate\Tests\App\Models\Relationships\EloquentMorphToModelStub;
+use Illuminate\Tests\App\Models\Relationships\EloquentMorphToRelatedStub;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -413,30 +416,5 @@ class DatabaseEloquentMorphToTest extends TestCase
         $parent = $parent ?: new EloquentMorphToModelStub;
 
         return Mockery::mock(MorphTo::class.'[createModelByType]', [$this->builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
-    }
-}
-
-class EloquentMorphToModelStub extends Model
-{
-    public $foreign_key = 'foreign.value';
-
-    public $table = 'eloquent_morph_to_model_stubs';
-
-    public function relation()
-    {
-        return $this->morphTo();
-    }
-}
-
-class EloquentMorphToRelatedStub extends Model
-{
-    public $table = 'eloquent_morph_to_related_stubs';
-}
-
-class EloquentMorphToAccessibleStub extends MorphTo
-{
-    public function callMatchToMorphParents($type, EloquentCollection $results): void
-    {
-        $this->matchToMorphParents($type, $results);
     }
 }

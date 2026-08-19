@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\CommentX;
+use Illuminate\Tests\App\Models\Relationships\PostX;
+use Illuminate\Tests\App\Models\Relationships\UserX;
 
 class EloquentPushTest extends DatabaseTestCase
 {
@@ -51,35 +53,4 @@ class EloquentPushTest extends DatabaseTestCase
         $this->assertSame(1, CommentX::count());
         $this->assertSame('Test comment 1', CommentX::firstOrFail()->comment);
     }
-}
-
-class UserX extends Model
-{
-    public $timestamps = false;
-    protected $guarded = [];
-    protected $table = 'users';
-
-    public function posts()
-    {
-        return $this->hasMany(PostX::class, 'user_id');
-    }
-}
-
-class PostX extends Model
-{
-    public $timestamps = false;
-    protected $guarded = [];
-    protected $table = 'posts';
-
-    public function comments()
-    {
-        return $this->hasMany(CommentX::class, 'post_id');
-    }
-}
-
-class CommentX extends Model
-{
-    public $timestamps = false;
-    protected $guarded = [];
-    protected $table = 'comments';
 }

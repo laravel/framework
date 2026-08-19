@@ -3,15 +3,17 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Exception;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Prunable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Prunable\PrunableSoftDeleteTestModel;
+use Illuminate\Tests\App\Models\Prunable\PrunableTestModel;
+use Illuminate\Tests\App\Models\Prunable\PrunableTestModelMissingPrunableMethod;
+use Illuminate\Tests\App\Models\Prunable\PrunableWithCustomPruneMethodTestModel;
+use Illuminate\Tests\App\Models\Prunable\PrunableWithException;
 use LogicException;
 
 class EloquentPrunableTest extends DatabaseTestCase
@@ -119,63 +121,4 @@ class EloquentPrunableTest extends DatabaseTestCase
         Exceptions::assertReportedCount(1);
         Exceptions::assertReported(fn (Exception $exception) => $exception->getMessage() === 'foo bar');
     }
-}
-
-class PrunableTestModel extends Model
-{
-    use Prunable;
-
-    public function prunable()
-    {
-        return $this->where('id', '<=', 1500);
-    }
-}
-
-class PrunableSoftDeleteTestModel extends Model
-{
-    use Prunable, SoftDeletes;
-
-    public function prunable()
-    {
-        return $this->where('id', '<=', 3000);
-    }
-}
-
-class PrunableWithCustomPruneMethodTestModel extends Model
-{
-    use Prunable;
-
-    public function prunable()
-    {
-        return $this->where('id', '<=', 1000);
-    }
-
-    public function prune()
-    {
-        $this->forceFill([
-            'pruned' => true,
-        ])->save();
-    }
-}
-
-class PrunableWithException extends Model
-{
-    use Prunable;
-
-    public function prunable()
-    {
-        return $this->where('id', '<=', 1000);
-    }
-
-    public function prune()
-    {
-        if ($this->id === 500) {
-            throw new Exception('foo bar');
-        }
-    }
-}
-
-class PrunableTestModelMissingPrunableMethod extends Model
-{
-    use Prunable;
 }

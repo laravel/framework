@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Models\Relationships\TestUpdateModel1;
+use Illuminate\Tests\App\Models\Relationships\TestUpdateModel2;
+use Illuminate\Tests\App\Models\Relationships\TestUpdateModel3;
+use Illuminate\Tests\App\Models\Relationships\TestUpdateModel4;
 
 class EloquentUpdateTest extends DatabaseTestCase
 {
@@ -284,37 +286,4 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertArrayHasKey('views', $post->getChanges());
         $this->assertArrayHasKey('likes', $post->getChanges());
     }
-}
-
-class TestUpdateModel1 extends Model
-{
-    public $table = 'test_model1';
-    public $timestamps = false;
-    protected $guarded = [];
-}
-
-class TestUpdateModel2 extends Model
-{
-    use SoftDeletes;
-
-    public $table = 'test_model2';
-    protected $fillable = ['name'];
-}
-
-class TestUpdateModel3 extends Model
-{
-    use SoftDeletes;
-
-    public $table = 'test_model3';
-    protected $fillable = ['counter'];
-    protected $casts = ['deleted_at' => 'datetime'];
-}
-
-class TestUpdateModel4 extends Model
-{
-    use SoftDeletes;
-
-    public $table = 'test_model4';
-    protected $fillable = ['views', 'likes', 'name'];
-    protected $casts = ['deleted_at' => 'datetime'];
 }

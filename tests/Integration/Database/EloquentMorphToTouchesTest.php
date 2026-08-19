@@ -3,9 +3,10 @@
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToTouchesTest;
 
 use DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\TouchesComment as Comment;
+use Illuminate\Tests\App\Models\Relationships\TouchesPost as Post;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphToTouchesTest extends DatabaseTestCase
@@ -44,21 +45,4 @@ class EloquentMorphToTouchesTest extends DatabaseTestCase
 
         $this->assertCount(1, DB::getQueryLog());
     }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    protected $touches = ['commentable'];
-
-    public function commentable()
-    {
-        return $this->morphTo(null, null, null, 'id');
-    }
-}
-
-class Post extends Model
-{
-    //
 }

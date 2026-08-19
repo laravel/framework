@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Casts\DecimalCastingTestModel;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelDecimalCastingTest extends DatabaseTestCase
@@ -158,7 +159,7 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
 
     public function testDecimalsAreCastable()
     {
-        $user = TestModel1::create([
+        $user = DecimalCastingTestModel::create([
             'decimal_field_2' => '12',
             'decimal_field_4' => '1234',
         ]);
@@ -217,16 +218,4 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
         $model->amount = '-0.8989898989';
         $this->assertSame('-0.90', $model->amount);
     }
-}
-
-class TestModel1 extends Model
-{
-    public $table = 'test_model1';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public $casts = [
-        'decimal_field_2' => 'decimal:2',
-        'decimal_field_4' => 'decimal:4',
-    ];
 }

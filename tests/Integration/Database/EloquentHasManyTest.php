@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Models\Relationships\EloquentHasManyTestLogin;
+use Illuminate\Tests\App\Models\Relationships\EloquentHasManyTestUser;
 
 class EloquentHasManyTest extends DatabaseTestCase
 {
@@ -113,41 +113,4 @@ class EloquentHasManyTest extends DatabaseTestCase
 
         $this->assertCount(1, $user->posts()->get());
     }
-}
-
-class EloquentHasManyTestUser extends Model
-{
-    protected $guarded = [];
-    public $timestamps = false;
-
-    public function logins(): HasMany
-    {
-        return $this->hasMany(EloquentHasManyTestLogin::class);
-    }
-
-    public function latestLogin(): HasOne
-    {
-        return $this->logins()->one()->latestOfMany('login_time');
-    }
-
-    public function oldestLogin(): HasOne
-    {
-        return $this->logins()->one()->oldestOfMany('login_time');
-    }
-
-    public function posts(): HasMany
-    {
-        return $this->hasMany(EloquentHasManyTestPost::class);
-    }
-}
-
-class EloquentHasManyTestLogin extends Model
-{
-    protected $guarded = [];
-    public $timestamps = false;
-}
-
-class EloquentHasManyTestPost extends Model
-{
-    protected $guarded = [];
 }

@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Tests\App\Models\Relationships\DatabaseEloquentPivotTestDateStub;
+use Illuminate\Tests\App\Models\Relationships\DatabaseEloquentPivotTestJsonCastStub;
+use Illuminate\Tests\App\Models\Relationships\DatabaseEloquentPivotTestMutatorStub;
+use Illuminate\Tests\App\Models\Relationships\DummyModel;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -184,41 +188,4 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertNull($pivot->pivotParent);
         $this->assertFalse($pivot->relationLoaded('bar'));
     }
-}
-
-class DatabaseEloquentPivotTestDateStub extends Pivot
-{
-    public function getDates()
-    {
-        return [];
-    }
-}
-
-class DatabaseEloquentPivotTestMutatorStub extends Pivot
-{
-    private $mutatorCalled = false;
-
-    public function setFooAttribute($value)
-    {
-        $this->mutatorCalled = true;
-
-        return $value;
-    }
-
-    public function getMutatorCalled()
-    {
-        return $this->mutatorCalled;
-    }
-}
-
-class DatabaseEloquentPivotTestJsonCastStub extends Pivot
-{
-    protected $casts = [
-        'foo' => 'json',
-    ];
-}
-
-class DummyModel extends Model
-{
-    //
 }

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Models\Casts\Time;
+use Illuminate\Tests\App\Models\Casts\UniqueTime;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentWithCastsTest extends TestCase
@@ -111,22 +113,4 @@ class DatabaseEloquentWithCastsTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
-}
-
-class Time extends Eloquent
-{
-    protected $guarded = [];
-
-    protected $casts = [
-        'time' => 'datetime',
-    ];
-}
-
-class UniqueTime extends Eloquent
-{
-    protected $guarded = [];
-
-    protected $casts = [
-        'time' => 'datetime',
-    ];
 }

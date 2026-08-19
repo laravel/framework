@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Tests\App\Models\Relationships\HasOneOrManyDeprecationModelStub;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -83,9 +84,4 @@ class EloquentHasOneOrManyDeprecationTest extends TestCase
 
         return new HasOne($builder, $parent, 'table.foreign_key', 'id');
     }
-}
-
-class HasOneOrManyDeprecationModelStub extends Model
-{
-    public $foreign_key;
 }

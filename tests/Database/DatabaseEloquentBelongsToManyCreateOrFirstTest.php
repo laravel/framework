@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManyCreateOrFirstTestRelatedModel;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManyCreateOrFirstTestSourceModel;
 use Mockery;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -594,33 +596,5 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         foreach ($lastInsertIds as $id) {
             $pdo->expects('lastInsertId')->andReturn($id);
         }
-    }
-}
-
-/**
- * @property int $id
- */
-class BelongsToManyCreateOrFirstTestRelatedModel extends Model
-{
-    protected $table = 'related_table';
-    protected $guarded = [];
-}
-
-/**
- * @property int $id
- */
-class BelongsToManyCreateOrFirstTestSourceModel extends Model
-{
-    protected $table = 'source_table';
-    protected $guarded = [];
-
-    public function related(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            BelongsToManyCreateOrFirstTestRelatedModel::class,
-            'pivot_table',
-            'source_id',
-            'related_id',
-        );
     }
 }

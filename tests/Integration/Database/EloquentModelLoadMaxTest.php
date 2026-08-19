@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelLoadMaxTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\LoadMaxBaseModel as BaseModel;
+use Illuminate\Tests\App\Models\Relationships\LoadMaxRelated1 as Related1;
+use Illuminate\Tests\App\Models\Relationships\LoadMaxRelated2 as Related2;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelLoadMaxTest extends DatabaseTestCase
@@ -59,46 +61,5 @@ class EloquentModelLoadMaxTest extends DatabaseTestCase
         $this->assertCount(1, DB::getQueryLog());
         $this->assertEquals(11, $model->related1_max_number);
         $this->assertEquals(13, $model->related2_max_number);
-    }
-}
-
-class BaseModel extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function related1()
-    {
-        return $this->hasMany(Related1::class);
-    }
-
-    public function related2()
-    {
-        return $this->hasMany(Related2::class);
-    }
-}
-
-class Related1 extends Model
-{
-    public $timestamps = false;
-
-    protected $fillable = ['base_model_id', 'number'];
-
-    public function parent()
-    {
-        return $this->belongsTo(BaseModel::class);
-    }
-}
-
-class Related2 extends Model
-{
-    public $timestamps = false;
-
-    protected $fillable = ['base_model_id', 'number'];
-
-    public function parent()
-    {
-        return $this->belongsTo(BaseModel::class);
     }
 }

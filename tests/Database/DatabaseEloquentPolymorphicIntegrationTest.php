@@ -4,6 +4,12 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Tests\App\Models\Relationships\PolymorphicIntegrationTestPost as TestPost;
+use Illuminate\Tests\App\Models\Relationships\PolymorphicIntegrationTestUser as TestUser;
+use Illuminate\Tests\App\Models\Relationships\TestComment;
+use Illuminate\Tests\App\Models\Relationships\TestLike;
+use Illuminate\Tests\App\Models\Relationships\TestLikeWithNestedWith;
+use Illuminate\Tests\App\Models\Relationships\TestLikeWithSingleWith;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
@@ -192,103 +198,5 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
     protected function schema()
     {
         return $this->connection()->getSchemaBuilder();
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class TestUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasMany(TestPost::class, 'user_id');
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class TestPost extends Eloquent
-{
-    protected $table = 'posts';
-    protected $guarded = [];
-
-    public function comments()
-    {
-        return $this->morphMany(TestComment::class, 'commentable');
-    }
-
-    public function owner()
-    {
-        return $this->belongsTo(TestUser::class, 'user_id');
-    }
-
-    public function likes()
-    {
-        return $this->morphMany(TestLike::class, 'likeable');
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class TestComment extends Eloquent
-{
-    protected $table = 'comments';
-    protected $guarded = [];
-    protected $with = ['commentable'];
-
-    public function owner()
-    {
-        return $this->belongsTo(TestUser::class, 'user_id');
-    }
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-
-    public function likes()
-    {
-        return $this->morphMany(TestLike::class, 'likeable');
-    }
-}
-
-class TestLike extends Eloquent
-{
-    protected $table = 'likes';
-    protected $guarded = [];
-
-    public function likeable()
-    {
-        return $this->morphTo();
-    }
-}
-
-class TestLikeWithSingleWith extends Eloquent
-{
-    protected $table = 'likes';
-    protected $guarded = [];
-    protected $with = ['likeable'];
-
-    public function likeable()
-    {
-        return $this->morphTo();
-    }
-}
-
-class TestLikeWithNestedWith extends Eloquent
-{
-    protected $table = 'likes';
-    protected $guarded = [];
-    protected $with = ['likeable.owner'];
-
-    public function likeable()
-    {
-        return $this->morphTo();
     }
 }

@@ -3,9 +3,15 @@
 namespace Illuminate\Tests\Integration\Database\EloquentCollectionLoadMissingTest;
 
 use DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\LoadMissingComment;
+use Illuminate\Tests\App\Models\Relationships\LoadMissingPost;
+use Illuminate\Tests\App\Models\Relationships\LoadMissingUser;
+use Illuminate\Tests\App\Models\Relationships\PostRelation;
+use Illuminate\Tests\App\Models\Relationships\PostSubRelation;
+use Illuminate\Tests\App\Models\Relationships\PostSubSubRelation;
+use Illuminate\Tests\App\Models\Relationships\Revision;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentCollectionLoadMissingTest extends DatabaseTestCase
@@ -47,14 +53,14 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
             $table->unsignedInteger('post_sub_relation_id');
         });
 
-        User::create();
+        LoadMissingUser::create();
 
-        Post::insert([
+        LoadMissingPost::insert([
             ['user_id' => 1],
             ['user_id' => 1],
         ]);
 
-        Comment::insert([
+        LoadMissingComment::insert([
             ['parent_id' => null, 'post_id' => 1],
             ['parent_id' => 1, 'post_id' => 1],
             ['parent_id' => 2, 'post_id' => 1],
@@ -69,7 +75,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
     public function testLoadMissing()
     {
-        $posts = Post::with('comments', 'user')->get();
+        $posts = LoadMissingPost::with('comments', 'user')->get();
 
         DB::enableQueryLog();
 
@@ -83,7 +89,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
     public function testLoadMissingWithClosure()
     {
-        $posts = Post::with('comments')->get();
+        $posts = LoadMissingPost::with('comments')->get();
 
         DB::enableQueryLog();
 
@@ -98,7 +104,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
     public function testLoadMissingWithDuplicateRelationName()
     {
-        $posts = Post::with('comments')->get();
+        $posts = LoadMissingPost::with('comments')->get();
 
         DB::enableQueryLog();
 
@@ -111,7 +117,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
     public function testLoadMissingWithoutInitialLoad()
     {
-        $user = User::first();
+        $user = LoadMissingUser::first();
         $user->loadMissing('posts.postRelation.postSubRelations.postSubSubRelations');
 
         $this->assertEquals(2, $user->posts->count());
@@ -125,7 +131,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
     public function testLoadMissingWithNestedArraySyntax()
     {
-        $posts = Post::with('user')->get();
+        $posts = LoadMissingPost::with('user')->get();
 
         DB::enableQueryLog();
 
@@ -141,7 +147,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
     public function testLoadMissingWithMultipleDotNotationRelations()
     {
-        $posts = Post::with('comments')->get();
+        $posts = LoadMissingPost::with('comments')->get();
 
         DB::enableQueryLog();
 
@@ -158,7 +164,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
     public function testLoadMissingWithNestedArrayWithColon()
     {
-        $posts = Post::with('comments')->get();
+        $posts = LoadMissingPost::with('comments')->get();
 
         DB::enableQueryLog();
 
@@ -171,7 +177,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
     public function testLoadMissingWithNestedArray()
     {
-        $posts = Post::with('comments')->get();
+        $posts = LoadMissingPost::with('comments')->get();
 
         DB::enableQueryLog();
 
@@ -183,7 +189,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
     public function testLoadMissingWithNestedArrayWithClosure()
     {
-        $posts = Post::with('comments')->get();
+        $posts = LoadMissingPost::with('comments')->get();
 
         DB::enableQueryLog();
 
@@ -198,7 +204,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
     public function testLoadMissingWithMultipleNestedArrays()
     {
-        $users = User::get();
+        $users = LoadMissingUser::get();
         $users->loadMissing([
             'posts' => [
                 'postRelation' => [
@@ -221,7 +227,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
     public function testLoadMissingWithMultipleNestedArraysCombinedWithDotNotation()
     {
-        $users = User::get();
+        $users = LoadMissingUser::get();
         $users->loadMissing([
             'posts' => [
                 'postRelation' => [
@@ -238,93 +244,5 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
         $this->assertInstanceOf(PostSubRelation::class, $user->posts[1]->postRelation->postSubRelations[0]);
         $this->assertEquals(1, $user->posts[1]->postRelation->postSubRelations[0]->postSubSubRelations->count());
         $this->assertInstanceOf(PostSubSubRelation::class, $user->posts[1]->postRelation->postSubRelations[0]->postSubSubRelations[0]);
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function parent()
-    {
-        return $this->belongsTo(self::class);
-    }
-
-    public function revisions()
-    {
-        return $this->hasMany(Revision::class);
-    }
-}
-
-class Post extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function comments()
-    {
-        return $this->hasMany(Comment::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function postRelation()
-    {
-        return $this->hasOne(PostRelation::class);
-    }
-}
-
-class PostRelation extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function postSubRelations()
-    {
-        return $this->hasMany(PostSubRelation::class);
-    }
-}
-
-class PostSubRelation extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function postSubSubRelations()
-    {
-        return $this->hasMany(PostSubSubRelation::class);
-    }
-}
-
-class PostSubSubRelation extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-}
-
-class Revision extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-}
-
-class User extends Model
-{
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasMany(Post::class);
     }
 }

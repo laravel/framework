@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Casts\AsBinary;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\BinaryCodec;
+use Illuminate\Tests\App\Models\Casts\AsBinaryTestModel;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -102,20 +102,5 @@ class DatabaseEloquentAsBinaryCastTest extends TestCase
     public function testOfHelperMethod()
     {
         $this->assertSame(AsBinary::class.':custom', AsBinary::of('custom'));
-    }
-}
-
-class AsBinaryTestModel extends Model
-{
-    protected $guarded = [];
-
-    protected function casts(): array
-    {
-        return [
-            'uuid' => AsBinary::class.':uuid',
-            'ulid' => AsBinary::class.':ulid',
-            'no_format' => AsBinary::class,
-            'invalid_format' => AsBinary::class.':invalid',
-        ];
     }
 }

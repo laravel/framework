@@ -2,12 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
-use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Casts\EloquentModelEnumCastingTestModel;
+use Illuminate\Tests\App\Models\Casts\EloquentModelEnumCastingUniqueTestModel;
 use ValueError;
 
 include_once 'Enums.php';
@@ -323,32 +322,4 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         $this->assertTrue($model1->is($model2));
         $this->assertEquals(StringStatus::done, $model3->string_status);
     }
-}
-
-class EloquentModelEnumCastingTestModel extends Model
-{
-    public $timestamps = false;
-    protected $guarded = [];
-    protected $table = 'enum_casts';
-
-    public $casts = [
-        'string_status' => StringStatus::class,
-        'string_status_collection' => AsEnumCollection::class.':'.StringStatus::class,
-        'string_status_array' => AsEnumArrayObject::class.':'.StringStatus::class,
-        'integer_status' => IntegerStatus::class,
-        'integer_status_collection' => AsEnumCollection::class.':'.IntegerStatus::class,
-        'integer_status_array' => AsEnumArrayObject::class.':'.IntegerStatus::class,
-        'arrayable_status' => ArrayableStatus::class,
-    ];
-}
-
-class EloquentModelEnumCastingUniqueTestModel extends Model
-{
-    public $timestamps = false;
-    protected $guarded = [];
-    protected $table = 'unique_enum_casts';
-
-    public $casts = [
-        'string_status' => StringStatus::class,
-    ];
 }

@@ -3,10 +3,12 @@
 namespace Illuminate\Tests\Integration\Database\EloquentModelLoadCountTest;
 
 use DB;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\LoadCountBaseModel as BaseModel;
+use Illuminate\Tests\App\Models\Relationships\LoadCountDeletedRelated as DeletedRelated;
+use Illuminate\Tests\App\Models\Relationships\LoadCountRelated1 as Related1;
+use Illuminate\Tests\App\Models\Relationships\LoadCountRelated2 as Related2;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelLoadCountTest extends DatabaseTestCase
@@ -85,65 +87,5 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
         $model->loadCount('deletedrelated');
 
         $this->assertEquals(0, $model->deletedrelated_count);
-    }
-}
-
-class BaseModel extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function related1()
-    {
-        return $this->hasMany(Related1::class);
-    }
-
-    public function related2()
-    {
-        return $this->hasMany(Related2::class);
-    }
-
-    public function deletedrelated()
-    {
-        return $this->hasMany(DeletedRelated::class);
-    }
-}
-
-class Related1 extends Model
-{
-    public $timestamps = false;
-
-    protected $fillable = ['base_model_id'];
-
-    public function parent()
-    {
-        return $this->belongsTo(BaseModel::class);
-    }
-}
-
-class Related2 extends Model
-{
-    public $timestamps = false;
-
-    protected $fillable = ['base_model_id'];
-
-    public function parent()
-    {
-        return $this->belongsTo(BaseModel::class);
-    }
-}
-
-class DeletedRelated extends Model
-{
-    use SoftDeletes;
-
-    public $timestamps = false;
-
-    protected $fillable = ['base_model_id'];
-
-    public function parent()
-    {
-        return $this->belongsTo(BaseModel::class);
     }
 }

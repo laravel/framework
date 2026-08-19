@@ -3,10 +3,11 @@
 namespace Illuminate\Tests\Integration\Database\EloquentModelDateCastingTest;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Casts\DateCastingTestModel1 as TestModel1;
+use Illuminate\Tests\App\Models\Casts\DateCastingTestModel2 as TestModel2;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelDateCastingTest extends DatabaseTestCase
@@ -148,32 +149,4 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
             ], $user->attributesToArray());
         });
     }
-}
-
-class TestModel1 extends Model
-{
-    public $table = 'test_model1';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public $casts = [
-        'date_field' => 'date:Y-m',
-        'datetime_field' => 'datetime:Y-m H:i',
-        'immutable_date_field' => 'date:Y-m',
-        'immutable_datetime_field' => 'datetime:Y-m H:i',
-    ];
-}
-
-class TestModel2 extends Model
-{
-    public $table = 'test_model2';
-    const UPDATED_AT = null;
-    protected $guarded = [];
-
-    public $casts = [
-        'date_field' => 'date:Y-m',
-        'datetime_field' => 'datetime:Y-m H:i',
-        'immutable_date_field' => 'date:Y-m',
-        'immutable_datetime_field' => 'datetime:Y-m H:i',
-    ];
 }

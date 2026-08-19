@@ -3,12 +3,13 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Collection as DatabaseCollection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphPivot;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\PivotSerializationTestClass;
+use Illuminate\Tests\App\Models\Relationships\PivotSerializationTestCollectionClass;
+use Illuminate\Tests\App\Models\Relationships\PivotSerializationTestProject;
+use Illuminate\Tests\App\Models\Relationships\PivotSerializationTestTag;
+use Illuminate\Tests\App\Models\Relationships\PivotSerializationTestUser;
 
 class EloquentPivotSerializationTest extends DatabaseTestCase
 {
@@ -119,76 +120,4 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $this->assertEquals($project->tags[1]->pivot->taggable_id, $class->pivots[1]->taggable_id);
         $this->assertEquals($project->tags[1]->pivot->taggable_type, $class->pivots[1]->taggable_type);
     }
-}
-
-class PivotSerializationTestClass
-{
-    use SerializesModels;
-
-    public $pivot;
-
-    public function __construct($pivot)
-    {
-        $this->pivot = $pivot;
-    }
-}
-
-class PivotSerializationTestCollectionClass
-{
-    use SerializesModels;
-
-    public $pivots;
-
-    public function __construct($pivots)
-    {
-        $this->pivots = $pivots;
-    }
-}
-
-class PivotSerializationTestUser extends Model
-{
-    public $table = 'users';
-}
-
-class PivotSerializationTestProject extends Model
-{
-    public $table = 'projects';
-
-    public function collaborators()
-    {
-        return $this->belongsToMany(
-            PivotSerializationTestUser::class, 'project_users', 'project_id', 'user_id'
-        )->using(PivotSerializationTestCollaborator::class);
-    }
-
-    public function tags()
-    {
-        return $this->morphToMany(PivotSerializationTestTag::class, 'taggable', 'taggables', 'taggable_id', 'tag_id')
-            ->using(PivotSerializationTestTagAttachment::class);
-    }
-}
-
-class PivotSerializationTestTag extends Model
-{
-    public $table = 'tags';
-
-    public function projects()
-    {
-        return $this->morphedByMany(PivotSerializationTestProject::class, 'taggable', 'taggables', 'tag_id', 'taggable_id')
-            ->using(PivotSerializationTestTagAttachment::class);
-    }
-}
-
-class PivotSerializationTestCollaborator extends Pivot
-{
-    public $table = 'project_users';
-
-    public $timestamps = false;
-}
-
-class PivotSerializationTestTagAttachment extends MorphPivot
-{
-    public $table = 'taggables';
-
-    public $timestamps = false;
 }

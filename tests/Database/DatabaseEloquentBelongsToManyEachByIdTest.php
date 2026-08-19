@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManyEachByIdTestTestArticle;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManyEachByIdTestTestUser;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyEachByIdTest extends TestCase
@@ -110,25 +112,4 @@ class DatabaseEloquentBelongsToManyEachByIdTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
-}
-
-class BelongsToManyEachByIdTestTestUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $fillable = ['id', 'email'];
-    public $timestamps = false;
-
-    public function articles()
-    {
-        return $this->belongsToMany(BelongsToManyEachByIdTestTestArticle::class, 'article_user', 'user_id', 'article_id');
-    }
-}
-
-class BelongsToManyEachByIdTestTestArticle extends Eloquent
-{
-    protected $table = 'articles';
-    protected $keyType = 'string';
-    public $incrementing = false;
-    public $timestamps = false;
-    protected $fillable = ['id', 'title'];
 }

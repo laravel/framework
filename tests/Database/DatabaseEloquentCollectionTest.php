@@ -9,6 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Tests\App\Models\Relationships\EloquentAppendingTestUserModel;
+use Illuminate\Tests\App\Models\Relationships\EloquentTestArticleModel;
+use Illuminate\Tests\App\Models\Relationships\EloquentTestCommentModel;
+use Illuminate\Tests\App\Models\Relationships\EloquentTestKey;
+use Illuminate\Tests\App\Models\Relationships\EloquentTestUserModel;
+use Illuminate\Tests\App\Models\Relationships\TestEloquentCollectionModel;
 use LogicException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -255,7 +261,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c->push($model2);
         $this->assertCount(2, $c->findOrFail([1, 2]));
 
-        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\TestEloquentCollectionModel] 3'));
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\App\Models\Relationships\TestEloquentCollectionModel] 3'));
 
         $c->findOrFail([1, 2, 3]);
     }
@@ -266,7 +272,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c = new Collection([$model]);
 
-        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\TestEloquentCollectionModel] 2'));
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\App\Models\Relationships\TestEloquentCollectionModel] 2'));
 
         $c->findOrFail(2);
     }
@@ -821,82 +827,5 @@ class DatabaseEloquentCollectionTest extends TestCase
     protected function schema()
     {
         return $this->connection()->getSchemaBuilder();
-    }
-}
-
-class TestEloquentCollectionModel extends Model
-{
-    protected $visible = ['visible'];
-    protected $hidden = ['hidden'];
-
-    public function getTestAttribute()
-    {
-        return 'test';
-    }
-}
-
-class EloquentTestUserModel extends Model
-{
-    protected $table = 'users';
-    protected $guarded = [];
-    public $timestamps = false;
-
-    public function articles()
-    {
-        return $this->hasMany(EloquentTestArticleModel::class, 'user_id');
-    }
-}
-
-class EloquentTestArticleModel extends Model
-{
-    protected $table = 'articles';
-    protected $guarded = [];
-    public $timestamps = false;
-
-    public function comments()
-    {
-        return $this->hasMany(EloquentTestCommentModel::class, 'article_id');
-    }
-}
-
-class EloquentTestCommentModel extends Model
-{
-    protected $table = 'comments';
-    protected $guarded = [];
-    public $timestamps = false;
-}
-
-class EloquentTestKey
-{
-    public function __construct(private readonly string $key)
-    {
-    }
-
-    public function __toString()
-    {
-        return $this->key;
-    }
-}
-
-class EloquentAppendingTestUserModel extends Model
-{
-    protected $table = 'users';
-    protected $guarded = [];
-    public $timestamps = false;
-    protected $appends = ['appended_field'];
-
-    public function getAppendedFieldAttribute()
-    {
-        return 'hello';
-    }
-
-    public function getOtherAppendedFieldAttribute()
-    {
-        return 'bye';
-    }
-
-    public function articles()
-    {
-        return $this->hasMany(EloquentTestArticleModel::class, 'user_id');
     }
 }

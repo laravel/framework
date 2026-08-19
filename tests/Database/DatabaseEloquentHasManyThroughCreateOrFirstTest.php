@@ -9,10 +9,10 @@ use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Models\Relationships\HasManyThroughCreateOrFirstTestParentModel;
 use Mockery;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -406,44 +406,5 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         foreach ($lastInsertIds as $id) {
             $pdo->expects('lastInsertId')->andReturn($id);
         }
-    }
-}
-
-/**
- * @property int $id
- * @property int $pivot_id
- */
-class HasManyThroughCreateOrFirstTestChildModel extends Model
-{
-    protected $table = 'child';
-    protected $guarded = [];
-}
-
-/**
- * @property int $id
- * @property int $parent_id
- */
-class HasManyThroughCreateOrFirstTestPivotModel extends Model
-{
-    protected $table = 'pivot';
-    protected $guarded = [];
-}
-
-/**
- * @property int $id
- */
-class HasManyThroughCreateOrFirstTestParentModel extends Model
-{
-    protected $table = 'parent';
-    protected $guarded = [];
-
-    public function children(): HasManyThrough
-    {
-        return $this->hasManyThrough(
-            HasManyThroughCreateOrFirstTestChildModel::class,
-            HasManyThroughCreateOrFirstTestPivotModel::class,
-            'parent_id',
-            'pivot_id',
-        );
     }
 }

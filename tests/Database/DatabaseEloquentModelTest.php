@@ -22,16 +22,6 @@ use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
-use Illuminate\Database\Eloquent\Casts\AsArrayObject;
-use Illuminate\Database\Eloquent\Casts\AsCollection;
-use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
-use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
-use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
-use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
-use Illuminate\Database\Eloquent\Casts\AsFluent;
-use Illuminate\Database\Eloquent\Casts\AsHtmlString;
-use Illuminate\Database\Eloquent\Casts\AsStringable;
-use Illuminate\Database\Eloquent\Casts\AsUri;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -54,8 +44,11 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
-use Illuminate\Tests\Database\stubs\TestCast;
-use Illuminate\Tests\Database\stubs\TestValueObject;
+use Illuminate\Tests\App\Casts\CustomCollection;
+use Illuminate\Tests\App\Casts\StringableCastBuilder;
+use Illuminate\Tests\App\Models\Casts\EloquentModelCastingStub;
+use Illuminate\Tests\App\Models\Casts\EloquentModelEnumCastingStub;
+use Illuminate\Tests\App\ValueObjects\TestValueObject;
 use InvalidArgumentException;
 use LogicException;
 use Mockery;
@@ -63,7 +56,6 @@ use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
-use Stringable as NativeStringable;
 
 include_once 'Enums.php';
 
@@ -3179,7 +3171,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelAttributeCastingFailsOnUnencodableData()
     {
-        $this->expectExceptionObject(new JsonEncodingException('Unable to encode attribute [objectAttribute] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.'));
+        $this->expectExceptionObject(new JsonEncodingException('Unable to encode attribute [objectAttribute] for model [Illuminate\Tests\App\Models\Casts\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.'));
 
         $model = new EloquentModelCastingStub;
         $model->objectAttribute = ['foo' => "b\xF8r"];
@@ -3192,7 +3184,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelJsonCastingFailsOnUnencodableData()
     {
-        $this->expectExceptionObject(new JsonEncodingException('Unable to encode attribute [jsonAttribute] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.'));
+        $this->expectExceptionObject(new JsonEncodingException('Unable to encode attribute [jsonAttribute] for model [Illuminate\Tests\App\Models\Casts\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.'));
 
         $model = new EloquentModelCastingStub;
         $model->jsonAttribute = ['foo' => "b\xF8r"];
@@ -3202,7 +3194,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelAttributeCastingFailsOnUnencodableDataWithUnicode()
     {
-        $this->expectExceptionObject(new JsonEncodingException('Unable to encode attribute [jsonAttributeWithUnicode] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.'));
+        $this->expectExceptionObject(new JsonEncodingException('Unable to encode attribute [jsonAttributeWithUnicode] for model [Illuminate\Tests\App\Models\Casts\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.'));
 
         $model = new EloquentModelCastingStub;
         $model->jsonAttributeWithUnicode = ['foo' => "b\xF8r"];
@@ -4438,72 +4430,6 @@ class EloquentModelGetMutatorsStub extends Model
     }
 }
 
-class EloquentModelCastingStub extends Model
-{
-    protected $casts = [
-        'floatAttribute' => 'float',
-        'boolAttribute' => 'bool',
-        'objectAttribute' => 'object',
-        'jsonAttribute' => 'json',
-        'jsonAttributeWithUnicode' => 'json:unicode',
-        'dateAttribute' => 'date',
-        'timestampAttribute' => 'timestamp',
-        'ascollectionAttribute' => AsCollection::class,
-        'asCustomCollectionAsArrayAttribute' => [AsCollection::class, CustomCollection::class],
-        'asEncryptedCollectionAttribute' => AsEncryptedCollection::class,
-        'asEnumCollectionAttribute' => AsEnumCollection::class.':'.StringStatus::class,
-        'asEnumArrayObjectAttribute' => AsEnumArrayObject::class.':'.StringStatus::class,
-        'duplicatedAttribute' => 'string',
-    ];
-
-    protected function casts(): array
-    {
-        return [
-            'intAttribute' => 'int',
-            'stringAttribute' => 'string',
-            'booleanAttribute' => 'boolean',
-            'arrayAttribute' => 'array',
-            'collectionAttribute' => 'collection',
-            'datetimeAttribute' => 'datetime',
-            'asarrayobjectAttribute' => AsArrayObject::class,
-            'asStringableAttribute' => AsStringable::class,
-            'asHtmlStringAttribute' => AsHtmlString::class,
-            'asUriAttribute' => AsUri::class,
-            'asFluentAttribute' => AsFluent::class,
-            'asCustomCollectionAttribute' => AsCollection::using(CustomCollection::class),
-            'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
-            'asEncryptedCustomCollectionAttribute' => AsEncryptedCollection::using(CustomCollection::class),
-            'asEncryptedCustomCollectionAsArrayAttribute' => [AsEncryptedCollection::class, CustomCollection::class],
-            'asCustomEnumCollectionAttribute' => AsEnumCollection::of(StringStatus::class),
-            'asCustomEnumArrayObjectAttribute' => AsEnumArrayObject::of(StringStatus::class),
-            'singleElementInArrayAttribute' => [AsCollection::class],
-            'duplicatedAttribute' => 'int',
-            'asToObjectCast' => TestCast::class,
-            'castStringableObject' => new StringableCastBuilder(),
-        ];
-    }
-
-    public function jsonAttributeValue()
-    {
-        return $this->attributes['jsonAttribute'];
-    }
-
-    public function jsonAttributeWithUnicodeValue()
-    {
-        return $this->attributes['jsonAttributeWithUnicode'];
-    }
-
-    protected function serializeDate(DateTimeInterface $date)
-    {
-        return $date->format('Y-m-d H:i:s');
-    }
-}
-
-class EloquentModelEnumCastingStub extends Model
-{
-    protected $casts = ['enumAttribute' => StringStatus::class];
-}
-
 class EloquentModelDynamicHiddenStub extends Model
 {
     protected $table = 'stub';
@@ -4688,11 +4614,6 @@ class Uppercase implements CastsInboundAttributes
     {
         return is_string($value) ? strtoupper($value) : $value;
     }
-}
-
-class CustomCollection extends BaseCollection
-{
-    //
 }
 
 class EloquentModelWithPrimitiveCasts extends Model
@@ -4976,16 +4897,6 @@ class EloquentModelBootingCallbackTestStub extends Model
 class EloquentChildModelBootingCallbackTestStub extends EloquentModelBootingCallbackTestStub
 {
     public static bool $bootHasFinished = false;
-}
-
-class StringableCastBuilder implements NativeStringable
-{
-    public $cast = 'int';
-
-    public function __toString()
-    {
-        return $this->cast;
-    }
 }
 
 enum ConnectionName

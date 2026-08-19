@@ -3,12 +3,9 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Tests\App\Models\Relationships\HasOneInverseChildModel;
+use Illuminate\Tests\App\Models\Relationships\HasOneInverseParentModel;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentInverseRelationHasOneTest extends TestCase
@@ -183,64 +180,5 @@ class DatabaseEloquentInverseRelationHasOneTest extends TestCase
     protected function schema($connection = 'default')
     {
         return $this->connection($connection)->getSchemaBuilder();
-    }
-}
-
-class HasOneInverseParentModel extends Model
-{
-    use HasFactory;
-
-    protected $table = 'test_parent';
-
-    protected $fillable = ['id'];
-
-    protected static function newFactory()
-    {
-        return new HasOneInverseParentModelFactory();
-    }
-
-    public function child(): HasOne
-    {
-        return $this->hasOne(HasOneInverseChildModel::class, 'parent_id')->inverse('parent');
-    }
-}
-
-class HasOneInverseParentModelFactory extends Factory
-{
-    protected $model = HasOneInverseParentModel::class;
-
-    public function definition()
-    {
-        return [];
-    }
-}
-
-class HasOneInverseChildModel extends Model
-{
-    use HasFactory;
-
-    protected $table = 'test_child';
-    protected $fillable = ['id', 'parent_id'];
-
-    protected static function newFactory()
-    {
-        return new HasOneInverseChildModelFactory();
-    }
-
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(HasOneInverseParentModel::class, 'parent_id');
-    }
-}
-
-class HasOneInverseChildModelFactory extends Factory
-{
-    protected $model = HasOneInverseChildModel::class;
-
-    public function definition()
-    {
-        return [
-            'parent_id' => HasOneInverseParentModel::factory(),
-        ];
     }
 }

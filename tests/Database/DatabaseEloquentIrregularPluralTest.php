@@ -5,6 +5,9 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Models\Relationships\IrregularPluralHuman;
+use Illuminate\Tests\App\Models\Relationships\IrregularPluralMotto;
+use Illuminate\Tests\App\Models\Relationships\IrregularPluralToken;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentIrregularPluralTest extends TestCase
@@ -107,48 +110,5 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
         $motto = IrregularPluralMotto::query()->first();
 
         $this->assertSame('Real eyes realize real lies', $motto->name);
-    }
-}
-
-class IrregularPluralHuman extends Model
-{
-    protected $guarded = [];
-
-    public function irregularPluralTokens()
-    {
-        return $this->belongsToMany(
-            IrregularPluralToken::class,
-            'irregular_plural_human_irregular_plural_token',
-            'irregular_plural_token_id',
-            'irregular_plural_human_id'
-        );
-    }
-
-    public function mottoes()
-    {
-        return $this->morphToMany(IrregularPluralMotto::class, 'cool_motto');
-    }
-}
-
-class IrregularPluralToken extends Model
-{
-    protected $guarded = [];
-
-    public $timestamps = false;
-
-    protected $touches = [
-        'irregularPluralHumans',
-    ];
-}
-
-class IrregularPluralMotto extends Model
-{
-    protected $guarded = [];
-
-    public $timestamps = false;
-
-    public function irregularPluralHumans()
-    {
-        return $this->morphedByMany(IrregularPluralHuman::class, 'cool_motto');
     }
 }

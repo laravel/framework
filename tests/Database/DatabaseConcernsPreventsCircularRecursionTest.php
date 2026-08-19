@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Concerns\PreventsCircularRecursion;
+use Illuminate\Tests\App\Models\Relationships\TestModel;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 

@@ -2,12 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphManyTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Models\Relationships\MorphManyComment as Comment;
+use Illuminate\Tests\App\Models\Relationships\MorphManyPost as Post;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphManyTest extends DatabaseTestCase
@@ -68,45 +69,5 @@ class EloquentMorphManyTest extends DatabaseTestCase
 
         $this->assertEquals($latestComment->id, $post->latestComment->id);
         $this->assertEquals($oldestComment->id, $post->oldestComment->id);
-    }
-}
-
-class Post extends Model
-{
-    public $table = 'posts';
-    public $timestamps = true;
-    protected $guarded = [];
-    protected $withCount = ['comments'];
-
-    public function comments()
-    {
-        return $this->morphMany(Comment::class, 'commentable');
-    }
-
-    public function latestComment(): MorphOne
-    {
-        return $this->comments()->one()->latestOfMany();
-    }
-
-    public function oldestComment(): MorphOne
-    {
-        return $this->comments()->one()->oldestOfMany();
-    }
-}
-
-class Comment extends Model
-{
-    public $table = 'comments';
-    public $timestamps = true;
-    protected $guarded = [];
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-
-    public function replies()
-    {
-        return $this->morphMany(self::class, 'commentable');
     }
 }

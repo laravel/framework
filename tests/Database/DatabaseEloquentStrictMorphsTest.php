@@ -3,9 +3,10 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\ClassMorphViolationException;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Tests\App\Models\Relationships\TestModel;
+use Illuminate\Tests\App\Models\Relationships\TestPivotModel;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentStrictMorphsTest extends TestCase
@@ -71,12 +72,4 @@ class DatabaseEloquentStrictMorphsTest extends TestCase
         Relation::morphMap([], false);
         Relation::requireMorphMap(false);
     }
-}
-
-class TestModel extends Model
-{
-}
-
-class TestPivotModel extends Pivot
-{
 }

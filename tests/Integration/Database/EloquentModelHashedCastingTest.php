@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Casts\HashedCast;
 use RuntimeException;
 
 class EloquentModelHashedCastingTest extends DatabaseTestCase
@@ -300,14 +300,4 @@ class EloquentModelHashedCastingTest extends DatabaseTestCase
             'password' => '$argon2i$v=19$m=2345,t=7,p=2$MWVVZnpiZHl5RkcveHovcA$QECQzuQ2aAKvUpD25cTUJaAyPFxlOIsCRu+5nbDsU3k',
         ]);
     }
-}
-
-class HashedCast extends Model
-{
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public $casts = [
-        'password' => 'hashed',
-    ];
 }

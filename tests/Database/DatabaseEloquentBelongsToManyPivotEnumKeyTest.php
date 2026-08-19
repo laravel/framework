@@ -4,7 +4,9 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Tests\Database\Fixtures\Enums\Bar;
+use Illuminate\Tests\App\Enums\Bar;
+use Illuminate\Tests\App\Models\Relationships\PivotEnumKeyTestRole;
+use Illuminate\Tests\App\Models\Relationships\PivotEnumKeyTestUser;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyPivotEnumKeyTest extends TestCase
@@ -90,22 +92,4 @@ class DatabaseEloquentBelongsToManyPivotEnumKeyTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
-}
-
-class PivotEnumKeyTestUser extends Eloquent
-{
-    protected $table = 'users';
-    public $timestamps = false;
-
-    public function roles(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->belongsToMany(PivotEnumKeyTestRole::class, 'role_user', 'user_id', 'role_id');
-    }
-}
-
-class PivotEnumKeyTestRole extends Eloquent
-{
-    protected $table = 'roles';
-    protected $fillable = ['id', 'name'];
-    public $timestamps = false;
 }

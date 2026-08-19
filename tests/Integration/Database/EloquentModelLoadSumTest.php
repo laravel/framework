@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelLoadSumTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\LoadSumBaseModel as BaseModel;
+use Illuminate\Tests\App\Models\Relationships\LoadSumRelated1 as Related1;
+use Illuminate\Tests\App\Models\Relationships\LoadSumRelated2 as Related2;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelLoadSumTest extends DatabaseTestCase
@@ -58,46 +60,5 @@ class EloquentModelLoadSumTest extends DatabaseTestCase
         $this->assertCount(1, DB::getQueryLog());
         $this->assertEquals(21, $model->related1_sum_number);
         $this->assertEquals(12, $model->related2_sum_number);
-    }
-}
-
-class BaseModel extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function related1()
-    {
-        return $this->hasMany(Related1::class);
-    }
-
-    public function related2()
-    {
-        return $this->hasMany(Related2::class);
-    }
-}
-
-class Related1 extends Model
-{
-    public $timestamps = false;
-
-    protected $fillable = ['base_model_id', 'number'];
-
-    public function parent()
-    {
-        return $this->belongsTo(BaseModel::class);
-    }
-}
-
-class Related2 extends Model
-{
-    public $timestamps = false;
-
-    protected $fillable = ['base_model_id', 'number'];
-
-    public function parent()
-    {
-        return $this->belongsTo(BaseModel::class);
     }
 }

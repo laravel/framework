@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\Postgres;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\DatabaseEloquentPostgresIntegrationUser;
 
 class DatabaseEloquentPostgresIntegrationTest extends PostgresTestCase
 {
@@ -74,11 +74,4 @@ class DatabaseEloquentPostgresIntegrationTest extends PostgresTestCase
             $this->assertNull($user2->name);
         });
     }
-}
-
-class DatabaseEloquentPostgresIntegrationUser extends Model
-{
-    protected $table = 'database_eloquent_postgres_integration_users';
-
-    protected $guarded = [];
 }

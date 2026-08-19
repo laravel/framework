@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMultiDimensionalArrayEagerLoadingTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\NestedEagerLoadUser as User;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
@@ -195,77 +195,5 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
         $users[0]->posts->flatMap->comments->every(fn ($comment) => $this->assertEquals(3, $comment->tags_count));
         $this->assertTrue($users[0]->posts->flatMap->comments->every->relationLoaded('tags'));
         $this->assertCount(6, $users[0]->posts->flatMap->comments->flatMap->tags);
-    }
-}
-
-class User extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasMany(Post::class);
-    }
-
-    public function avatar()
-    {
-        return $this->hasOne(Avatar::class);
-    }
-}
-
-class Post extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function comments()
-    {
-        return $this->hasMany(Comment::class);
-    }
-
-    public function image()
-    {
-        return $this->hasOne(Image::class);
-    }
-}
-
-class Image extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function tags()
-    {
-        return $this->hasMany(Tag::class);
-    }
-}
-
-class Tag extends Model
-{
-    protected $guarded = [];
-
-    public $timestamps = false;
-}
-
-class Avatar extends Model
-{
-    protected $guarded = [];
-
-    public $timestamps = false;
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 }

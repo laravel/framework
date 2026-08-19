@@ -2,12 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Query\Builder as Query;
-use Illuminate\Tests\Database\DynamicRelationModel2 as Related;
+use Illuminate\Tests\App\Models\Relationships\DynamicRelationModel;
+use Illuminate\Tests\App\Models\Relationships\DynamicRelationModel2;
+use Illuminate\Tests\App\Models\Relationships\DynamicRelationModel2 as Related;
+use Illuminate\Tests\App\Models\Relationships\DynamicRelationModel3;
+use Illuminate\Tests\App\Models\Relationships\DynamicRelationModel4;
+use Illuminate\Tests\App\Models\Relationships\FakeHasManyRel;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentDynamicRelationsTest extends TestCase
@@ -83,57 +85,5 @@ class DatabaseEloquentDynamicRelationsTest extends TestCase
         $this->assertInstanceOf(HasMany::class, $model3->dynamicRel());
         $this->assertTrue($model1->isRelation('dynamicRel'));
         $this->assertTrue($model3->isRelation('dynamicRel'));
-    }
-}
-
-class DynamicRelationModel extends Model
-{
-    public function hardCodedRelation()
-    {
-        return new FakeHasManyRel();
-    }
-}
-
-class DynamicRelationModel2 extends Model
-{
-    public function getResults()
-    {
-        //
-    }
-
-    public function newQuery()
-    {
-        $query = new class extends Query
-        {
-            public function __construct()
-            {
-                //
-            }
-        };
-
-        return new Builder($query);
-    }
-}
-
-class DynamicRelationModel3 extends Model
-{
-    //
-}
-
-class DynamicRelationModel4 extends DynamicRelationModel
-{
-    //
-}
-
-class FakeHasManyRel extends HasMany
-{
-    public function __construct()
-    {
-        //
-    }
-
-    public function getResults()
-    {
-        return ['many' => 'related'];
     }
 }

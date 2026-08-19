@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Tests\App\Models\Relationships\EloquentHasManyModelStub;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -426,9 +427,4 @@ class DatabaseEloquentHasManyTest extends TestCase
 
         return $model;
     }
-}
-
-class EloquentHasManyModelStub extends Model
-{
-    public $foreign_key = 'foreign.value';
 }

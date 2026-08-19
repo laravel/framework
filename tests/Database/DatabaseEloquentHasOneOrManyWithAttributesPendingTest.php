@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Tests\App\Models\Relationships\RelatedPendingAttributesModel;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
@@ -295,13 +295,4 @@ class DatabaseEloquentHasOneOrManyWithAttributesPendingTest extends TestCase
         $this->assertSame($parentId, $relatedModel->parent_id);
         $this->assertTrue($relatedModel->is_admin);
     }
-}
-
-class RelatedPendingAttributesModel extends Model
-{
-    protected $guarded = [];
-
-    protected $casts = [
-        'is_admin' => 'boolean',
-    ];
 }

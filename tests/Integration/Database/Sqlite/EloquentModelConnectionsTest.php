@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database\Sqlite;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Models\Relationships\ChildModel;
+use Illuminate\Tests\App\Models\Relationships\ChildModelDefaultConn2;
+use Illuminate\Tests\App\Models\Relationships\ParentModel;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
 use Orchestra\Testbench\TestCase;
 
@@ -90,47 +92,5 @@ class EloquentModelConnectionsTest extends TestCase
         $this->assertSame('childAlwaysOnConn2', ChildModelDefaultConn2::first()->name);
         $this->assertSame('childAlwaysOnConn2', $parent1->childrenDefaultConn2()->first()->name);
         $this->assertSame('childAlwaysOnConn2', $parents1[0]->childrenDefaultConn2[0]->name);
-    }
-}
-
-class ParentModel extends Model
-{
-    public $table = 'parent';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function children()
-    {
-        return $this->hasMany(ChildModel::class, 'parent_id');
-    }
-
-    public function childrenDefaultConn2()
-    {
-        return $this->hasMany(ChildModelDefaultConn2::class, 'parent_id');
-    }
-}
-
-class ChildModel extends Model
-{
-    public $table = 'child';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function parent()
-    {
-        return $this->belongsTo(ParentModel::class, 'parent_id');
-    }
-}
-
-class ChildModelDefaultConn2 extends Model
-{
-    public $connection = 'conn2';
-    public $table = 'child';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function parent()
-    {
-        return $this->belongsTo(ParentModel::class, 'parent_id');
     }
 }

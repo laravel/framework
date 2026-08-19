@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Tests\App\Models\Relationships\WithoutTouchingArticle as Article;
+use Illuminate\Tests\App\Models\Relationships\WithoutTouchingUser as User;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -43,28 +45,5 @@ class DatabaseEloquentBelongsToManyWithoutTouchingTest extends TestCase
         });
 
         $this->assertFalse($related::isIgnoringTouch());
-    }
-}
-
-class User extends Model
-{
-    protected $table = 'users';
-    protected $fillable = ['id', 'email'];
-
-    public function articles(): BelongsToMany
-    {
-        return $this->belongsToMany(Article::class, 'article_user', 'user_id', 'article_id');
-    }
-}
-
-class Article extends Model
-{
-    protected $table = 'articles';
-    protected $fillable = ['id', 'title'];
-    protected $touches = ['user'];
-
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'article_user', 'article_id', 'user_id');
     }
 }

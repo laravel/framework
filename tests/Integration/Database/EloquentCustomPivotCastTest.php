@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Casts\CustomPivotCastTestProject;
+use Illuminate\Tests\App\Models\Casts\CustomPivotCastTestUser;
 
 class EloquentCustomPivotCastTest extends DatabaseTestCase
 {
@@ -148,36 +148,4 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
 
         $this->assertEquals(['permissions' => ['create', 'update']], $pivot->toArray());
     }
-}
-
-class CustomPivotCastTestUser extends Model
-{
-    public $table = 'users';
-    public $timestamps = false;
-}
-
-class CustomPivotCastTestProject extends Model
-{
-    public $table = 'projects';
-    public $timestamps = false;
-
-    public function collaborators()
-    {
-        return $this->belongsToMany(
-            CustomPivotCastTestUser::class, 'project_users', 'project_id', 'user_id'
-        )->using(CustomPivotCastTestCollaborator::class)->withPivot('permissions');
-    }
-}
-
-class CustomPivotCastTestCollaborator extends Pivot
-{
-    public $timestamps = false;
-
-    protected $attributes = [
-        'permissions' => '["create", "update"]',
-    ];
-
-    protected $casts = [
-        'permissions' => 'json',
-    ];
 }

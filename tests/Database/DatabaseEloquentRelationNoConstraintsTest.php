@@ -3,8 +3,9 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Tests\App\Models\Relationships\NoConstraintsTestToken;
+use Illuminate\Tests\App\Models\Relationships\NoConstraintsTestUser;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationNoConstraintsTest extends TestCase
@@ -80,32 +81,5 @@ class DatabaseEloquentRelationNoConstraintsTest extends TestCase
         $resolvedUser = Relation::noConstraints(fn () => $token->tokenable);
 
         $this->assertTrue($admin->is($resolvedUser));
-    }
-}
-
-class NoConstraintsTestUser extends Model
-{
-    public static $selectedToken;
-
-    public $timestamps = false;
-    protected $table = 'users';
-    protected $guarded = [];
-
-    public function selectedUserTokens()
-    {
-        return $this->hasMany(NoConstraintsTestToken::class, 'tokenable_id')
-            ->where('tokenable_id', static::$selectedToken->tokenable->getKey());
-    }
-}
-
-class NoConstraintsTestToken extends Model
-{
-    public $timestamps = false;
-    protected $table = 'tokens';
-    protected $guarded = [];
-
-    public function tokenable()
-    {
-        return $this->morphTo();
     }
 }

@@ -7,13 +7,15 @@ use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
 use Illuminate\Database\Eloquent\BroadcastableModelEventOccurred;
-use Illuminate\Database\Eloquent\BroadcastsEvents;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Broadcasting\SoftDeletableTestEloquentBroadcastUser;
+use Illuminate\Tests\App\Models\Broadcasting\TestEloquentBroadcastUser;
+use Illuminate\Tests\App\Models\Broadcasting\TestEloquentBroadcastUserOnSpecificEventsOnly;
+use Illuminate\Tests\App\Models\Broadcasting\TestEloquentBroadcastUserWithSpecificBroadcastName;
+use Illuminate\Tests\App\Models\Broadcasting\TestEloquentBroadcastUserWithSpecificBroadcastPayload;
 use Mockery;
 
 class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
@@ -40,7 +42,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
             return $event->model instanceof TestEloquentBroadcastUser
                     && count($event->broadcastOn()) === 1
                     && $event->model->name === 'Taylor'
-                    && $event->broadcastOn()[0]->name === "private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{$event->model->id}";
+                    && $event->broadcastOn()[0]->name === "private-Illuminate.Tests.App.Models.Broadcasting.TestEloquentBroadcastUser.{$event->model->id}";
         });
     }
 
@@ -48,7 +50,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
     {
         $model = new TestEloquentBroadcastUser;
 
-        $this->assertSame('Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{testEloquentBroadcastUser}', $model->broadcastChannelRoute());
+        $this->assertSame('Illuminate.Tests.App.Models.Broadcasting.TestEloquentBroadcastUser.{testEloquentBroadcastUser}', $model->broadcastChannelRoute());
     }
 
     public function testBroadcastingOnModelTrashing()
@@ -66,7 +68,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
                 && $event->event() === 'trashed'
                 && count($event->broadcastOn()) === 1
                 && $event->model->name === 'Bean'
-                && $event->broadcastOn()[0]->name === "private-Illuminate.Tests.Integration.Database.SoftDeletableTestEloquentBroadcastUser.{$event->model->id}";
+                && $event->broadcastOn()[0]->name === "private-Illuminate.Tests.App.Models.Broadcasting.SoftDeletableTestEloquentBroadcastUser.{$event->model->id}";
         });
     }
 
@@ -83,7 +85,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
                 && $event->event() === 'created'
                 && count($event->broadcastOn()) === 1
                 && $event->model->name === 'James'
-                && $event->broadcastOn()[0]->name === "private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUserOnSpecificEventsOnly.{$event->model->id}";
+                && $event->broadcastOn()[0]->name === "private-Illuminate.Tests.App.Models.Broadcasting.TestEloquentBroadcastUserOnSpecificEventsOnly.{$event->model->id}";
         });
 
         $model->name = 'Graham';
@@ -206,64 +208,5 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
         (new BroadcastEvent($event))->handle($manager);
 
         return true;
-    }
-}
-
-class TestEloquentBroadcastUser extends Model
-{
-    use BroadcastsEvents;
-
-    protected $table = 'test_eloquent_broadcasting_users';
-}
-
-class SoftDeletableTestEloquentBroadcastUser extends Model
-{
-    use BroadcastsEvents, SoftDeletes;
-
-    protected $table = 'test_eloquent_broadcasting_users';
-}
-
-class TestEloquentBroadcastUserOnSpecificEventsOnly extends Model
-{
-    use BroadcastsEvents;
-
-    protected $table = 'test_eloquent_broadcasting_users';
-
-    public function broadcastOn($event)
-    {
-        switch ($event) {
-            case 'created':
-                return [$this];
-        }
-    }
-}
-
-class TestEloquentBroadcastUserWithSpecificBroadcastName extends Model
-{
-    use BroadcastsEvents;
-
-    protected $table = 'test_eloquent_broadcasting_users';
-
-    public function broadcastAs($event)
-    {
-        switch ($event) {
-            case 'created':
-                return 'foo';
-        }
-    }
-}
-
-class TestEloquentBroadcastUserWithSpecificBroadcastPayload extends Model
-{
-    use BroadcastsEvents;
-
-    protected $table = 'test_eloquent_broadcasting_users';
-
-    public function broadcastWith($event)
-    {
-        switch ($event) {
-            case 'created':
-                return ['foo' => 'bar'];
-        }
     }
 }

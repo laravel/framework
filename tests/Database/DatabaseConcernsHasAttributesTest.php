@@ -2,10 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Concerns\HasAttributes;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Tests\App\Models\Casts\HasAttributesWithArrayCast;
+use Illuminate\Tests\App\Models\Casts\HasAttributesWithConstructorArguments;
+use Illuminate\Tests\App\Models\Casts\HasAttributesWithoutConstructor;
+use Illuminate\Tests\App\Models\Casts\HasCacheableAttributeWithAccessor;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -60,61 +61,5 @@ class DatabaseConcernsHasAttributesTest extends TestCase
         unset($instance->cacheableProperty);
 
         $this->assertFalse($instance->cachedAttributeIsset('cacheableProperty'));
-    }
-}
-
-class HasAttributesWithoutConstructor
-{
-    use HasAttributes;
-
-    public function someAttribute(): Attribute
-    {
-        return new Attribute(function () {
-        });
-    }
-}
-
-class HasAttributesWithConstructorArguments extends HasAttributesWithoutConstructor
-{
-    public function __construct($someValue)
-    {
-    }
-}
-
-class HasAttributesWithArrayCast
-{
-    use HasAttributes;
-
-    public function getArrayableAttributes(): array
-    {
-        return ['foo' => ''];
-    }
-
-    public function getCasts(): array
-    {
-        return ['foo' => 'array'];
-    }
-
-    public function usesTimestamps(): bool
-    {
-        return false;
-    }
-}
-
-/**
- * @property string $cacheableProperty
- */
-class HasCacheableAttributeWithAccessor extends Model
-{
-    public function cacheableProperty(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => 'foo'
-        )->shouldCache();
-    }
-
-    public function cachedAttributeIsset($attribute): bool
-    {
-        return isset($this->attributeCastCache[$attribute]);
     }
 }

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Tests\App\Models\Relationships\EloquentMorphResetModelStub;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -546,9 +547,4 @@ class DatabaseEloquentMorphTest extends TestCase
 
         return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
     }
-}
-
-class EloquentMorphResetModelStub extends Model
-{
-    //
 }

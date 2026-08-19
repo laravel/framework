@@ -5,6 +5,9 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManyAggregateTestTestOrder;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManyAggregateTestTestProduct;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManyAggregateTestTestTransaction;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyAggregateTest extends TestCase
@@ -157,40 +160,5 @@ class DatabaseEloquentBelongsToManyAggregateTest extends TestCase
     protected function schema()
     {
         return $this->connection()->getSchemaBuilder();
-    }
-}
-
-class BelongsToManyAggregateTestTestOrder extends Eloquent
-{
-    protected $table = 'orders';
-    protected $fillable = ['id'];
-    public $timestamps = false;
-
-    public function products()
-    {
-        return $this
-            ->belongsToMany(BelongsToManyAggregateTestTestProduct::class, 'order_product', 'order_id', 'product_id')
-            ->withPivot('quantity');
-    }
-}
-
-class BelongsToManyAggregateTestTestProduct extends Eloquent
-{
-    protected $table = 'products';
-    protected $fillable = ['id'];
-    public $timestamps = false;
-}
-
-class BelongsToManyAggregateTestTestTransaction extends Eloquent
-{
-    protected $table = 'transactions';
-    protected $fillable = ['id', 'value'];
-    public $timestamps = false;
-
-    public function allocatedTo()
-    {
-        return $this
-            ->belongsToMany(BelongsToManyAggregateTestTestTransaction::class, 'allocations', 'from_id', 'to_id')
-            ->withPivot('quantity');
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\MySqlBuilder;
-use Illuminate\Tests\Database\Fixtures\Enums\Foo;
+use Illuminate\Tests\App\Enums\Foo;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 

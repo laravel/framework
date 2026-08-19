@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Tests\App\Models\Relationships\EloquentBelongsToManyModelStub;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -77,9 +78,4 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
             'related_key'
         );
     }
-}
-
-class EloquentBelongsToManyModelStub extends Model
-{
-    public $foreign_key = 'foreign.value';
 }

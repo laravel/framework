@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToLazyEagerLoadingTest;
 
 use DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\Comment;
+use Illuminate\Tests\App\Models\Relationships\MorphToLazyEagerLoadPost as Post;
+use Illuminate\Tests\App\Models\Relationships\MorphToLazyEagerLoadUser as User;
+use Illuminate\Tests\App\Models\Relationships\MorphToLazyEagerLoadVideo as Video;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
@@ -54,37 +57,4 @@ class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
         $this->assertTrue($comments[1]->relationLoaded('commentable'));
     }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-}
-
-class Post extends Model
-{
-    public $timestamps = false;
-    protected $primaryKey = 'post_id';
-    protected $with = ['user'];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-}
-
-class User extends Model
-{
-    public $timestamps = false;
-}
-
-class Video extends Model
-{
-    public $timestamps = false;
-    protected $primaryKey = 'video_id';
 }

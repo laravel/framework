@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Tests\App\Models\Relationships\ManyToManyPendingAttributesPost;
+use Illuminate\Tests\App\Models\Relationships\ManyToManyPendingAttributesTag;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyWithAttributesPendingTest extends TestCase
@@ -197,60 +197,5 @@ class DatabaseEloquentBelongsToManyWithAttributesPendingTest extends TestCase
     protected function schema($connection = 'default')
     {
         return $this->connection($connection)->getSchemaBuilder();
-    }
-}
-
-class ManyToManyPendingAttributesPost extends Model
-{
-    protected $guarded = [];
-    protected $table = 'pending_attributes_posts';
-
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            ManyToManyPendingAttributesTag::class,
-            'pending_attributes_pivot',
-            'tag_id',
-            'post_id',
-        );
-    }
-
-    public function metaTags(): BelongsToMany
-    {
-        return $this->tags()
-            ->withAttributes('visible', true, asConditions: false)
-            ->withPivotValue('type', 'meta');
-    }
-
-    public function morphedTags(): MorphToMany
-    {
-        return $this
-            ->morphToMany(
-                ManyToManyPendingAttributesTag::class,
-                'taggable',
-                'pending_attributes_taggables',
-                relatedPivotKey: 'tag_id'
-            )
-            ->withAttributes('visible', true, asConditions: false)
-            ->withPivotValue('type', 'meta');
-    }
-}
-
-class ManyToManyPendingAttributesTag extends Model
-{
-    protected $guarded = [];
-    protected $table = 'pending_attributes_tags';
-
-    public function morphedPosts(): MorphToMany
-    {
-        return $this
-            ->morphedByMany(
-                ManyToManyPendingAttributesPost::class,
-                'taggable',
-                'pending_attributes_taggables',
-                'tag_id',
-            )
-            ->withAttributes('title', 'Title!', asConditions: false)
-            ->withPivotValue('type', 'meta');
     }
 }

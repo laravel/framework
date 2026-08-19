@@ -2,9 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentHasOneIsTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\Attachment;
+use Illuminate\Tests\App\Models\Relationships\HasOneIsPost;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentHasOneIsTest extends DatabaseTestCase
@@ -21,13 +22,13 @@ class EloquentHasOneIsTest extends DatabaseTestCase
             $table->unsignedInteger('post_id')->nullable();
         });
 
-        $post = Post::create();
+        $post = HasOneIsPost::create();
         $post->attachment()->create();
     }
 
     public function testChildIsNotNull()
     {
-        $parent = Post::first();
+        $parent = HasOneIsPost::first();
         $child = null;
 
         $this->assertFalse($parent->attachment()->is($child));
@@ -36,7 +37,7 @@ class EloquentHasOneIsTest extends DatabaseTestCase
 
     public function testChildIsModel()
     {
-        $parent = Post::first();
+        $parent = HasOneIsPost::first();
         $child = Attachment::first();
 
         $this->assertTrue($parent->attachment()->is($child));
@@ -45,7 +46,7 @@ class EloquentHasOneIsTest extends DatabaseTestCase
 
     public function testChildIsNotAnotherModel()
     {
-        $parent = Post::first();
+        $parent = HasOneIsPost::first();
         $child = new Attachment;
         $child->id = 2;
 
@@ -55,7 +56,7 @@ class EloquentHasOneIsTest extends DatabaseTestCase
 
     public function testNullChildIsNotModel()
     {
-        $parent = Post::first();
+        $parent = HasOneIsPost::first();
         $child = Attachment::first();
         $child->post_id = null;
 
@@ -65,7 +66,7 @@ class EloquentHasOneIsTest extends DatabaseTestCase
 
     public function testChildIsNotModelWithAnotherTable()
     {
-        $parent = Post::first();
+        $parent = HasOneIsPost::first();
         $child = Attachment::first();
         $child->setTable('foo');
 
@@ -75,24 +76,11 @@ class EloquentHasOneIsTest extends DatabaseTestCase
 
     public function testChildIsNotModelWithAnotherConnection()
     {
-        $parent = Post::first();
+        $parent = HasOneIsPost::first();
         $child = Attachment::first();
         $child->setConnection('foo');
 
         $this->assertFalse($parent->attachment()->is($child));
         $this->assertTrue($parent->attachment()->isNot($child));
-    }
-}
-
-class Attachment extends Model
-{
-    public $timestamps = false;
-}
-
-class Post extends Model
-{
-    public function attachment()
-    {
-        return $this->hasOne(Attachment::class);
     }
 }

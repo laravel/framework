@@ -2,11 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\TestPost;
+use Illuminate\Tests\App\Models\Relationships\TestUser;
 
 class EloquentCursorPaginateTest extends DatabaseTestCase
 {
@@ -291,20 +292,5 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(5, $query->get());
         $this->assertEquals(5, $query->count());
         $this->assertCount(5, $query->cursorPaginate()->items());
-    }
-}
-
-class TestPost extends Model
-{
-    protected $guarded = [];
-}
-
-class TestUser extends Model
-{
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasMany(TestPost::class, 'user_id');
     }
 }

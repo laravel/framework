@@ -2,9 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\PaginatePost as Post;
+use Illuminate\Tests\App\Models\Relationships\PaginateUser as User;
 
 class EloquentPaginateTest extends DatabaseTestCase
 {
@@ -96,14 +97,4 @@ class EloquentPaginateTest extends DatabaseTestCase
         $this->assertEquals(5, $query->count());
         $this->assertEquals(5, $query->paginate()->total());
     }
-}
-
-class Post extends Model
-{
-    protected $guarded = [];
-}
-
-class User extends Model
-{
-    protected $guarded = [];
 }

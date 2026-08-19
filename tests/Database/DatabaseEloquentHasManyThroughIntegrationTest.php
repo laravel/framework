@@ -5,9 +5,14 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Tests\App\Models\Relationships\HasManyThroughDefaultTestCountry;
+use Illuminate\Tests\App\Models\Relationships\HasManyThroughIntermediateTestCountry;
+use Illuminate\Tests\App\Models\Relationships\HasManyThroughSoftDeletesTestCountry;
+use Illuminate\Tests\App\Models\Relationships\HasManyThroughSoftDeletesTestUser;
+use Illuminate\Tests\App\Models\Relationships\HasManyThroughTestCountry;
+use Illuminate\Tests\App\Models\Relationships\HasManyThroughTestPost;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
@@ -169,7 +174,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
     public function testFirstOrFailThrowsAnException()
     {
-        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].'));
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\App\Models\Relationships\HasManyThroughTestPost].'));
 
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
             ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
@@ -179,7 +184,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
     public function testFindOrFailThrowsAnException()
     {
-        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1'));
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\App\Models\Relationships\HasManyThroughTestPost] 1'));
 
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
             ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
@@ -189,7 +194,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
     public function testFindOrFailWithManyThrowsAnException()
     {
-        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1, 2'));
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\App\Models\Relationships\HasManyThroughTestPost] 1, 2'));
 
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
             ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
@@ -200,7 +205,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
     public function testFindOrFailWithManyUsingCollectionThrowsAnException()
     {
-        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1, 2'));
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\App\Models\Relationships\HasManyThroughTestPost] 1, 2'));
 
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
             ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
@@ -591,152 +596,5 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     protected function schema()
     {
         return $this->connection()->getSchemaBuilder();
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class HasManyThroughTestUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasMany(HasManyThroughTestPost::class, 'user_id');
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class HasManyThroughTestPost extends Eloquent
-{
-    protected $table = 'posts';
-    protected $guarded = [];
-
-    public function owner()
-    {
-        return $this->belongsTo(HasManyThroughTestUser::class, 'user_id');
-    }
-}
-
-class HasManyThroughTestCountry extends Eloquent
-{
-    protected $table = 'countries';
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasManyThrough(HasManyThroughTestPost::class, HasManyThroughTestUser::class, 'country_id', 'user_id');
-    }
-
-    public function users()
-    {
-        return $this->hasMany(HasManyThroughTestUser::class, 'country_id');
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class HasManyThroughDefaultTestUser extends Eloquent
-{
-    protected $table = 'users_default';
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasMany(HasManyThroughDefaultTestPost::class);
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class HasManyThroughDefaultTestPost extends Eloquent
-{
-    protected $table = 'posts_default';
-    protected $guarded = [];
-
-    public function owner()
-    {
-        return $this->belongsTo(HasManyThroughDefaultTestUser::class);
-    }
-}
-
-class HasManyThroughDefaultTestCountry extends Eloquent
-{
-    protected $table = 'countries_default';
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasManyThrough(HasManyThroughDefaultTestPost::class, HasManyThroughDefaultTestUser::class);
-    }
-
-    public function users()
-    {
-        return $this->hasMany(HasManyThroughDefaultTestUser::class);
-    }
-}
-
-class HasManyThroughIntermediateTestCountry extends Eloquent
-{
-    protected $table = 'countries';
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasManyThrough(HasManyThroughTestPost::class, HasManyThroughTestUser::class, 'country_short', 'email', 'shortname', 'email');
-    }
-
-    public function users()
-    {
-        return $this->hasMany(HasManyThroughTestUser::class, 'country_id');
-    }
-}
-
-class HasManyThroughSoftDeletesTestUser extends Eloquent
-{
-    use SoftDeletes;
-
-    protected $table = 'users';
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasMany(HasManyThroughSoftDeletesTestPost::class, 'user_id');
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class HasManyThroughSoftDeletesTestPost extends Eloquent
-{
-    protected $table = 'posts';
-    protected $guarded = [];
-
-    public function owner()
-    {
-        return $this->belongsTo(HasManyThroughSoftDeletesTestUser::class, 'user_id');
-    }
-}
-
-class HasManyThroughSoftDeletesTestCountry extends Eloquent
-{
-    protected $table = 'countries';
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasManyThrough(HasManyThroughSoftDeletesTestPost::class, HasManyThroughTestUser::class, 'country_id', 'user_id');
-    }
-
-    public function users()
-    {
-        return $this->hasMany(HasManyThroughSoftDeletesTestUser::class, 'country_id');
     }
 }

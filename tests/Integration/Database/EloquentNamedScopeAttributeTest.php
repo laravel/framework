@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Tests\App\Models\Scopes\NamedScopeUser;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -24,7 +25,7 @@ class EloquentNamedScopeAttributeTest extends TestCase
     #[DataProvider('scopeDataProvider')]
     public function test_it_can_query_named_scoped_from_the_query_builder(string $methodName)
     {
-        $query = Fixtures\NamedScopeUser::query()->{$methodName}(true);
+        $query = NamedScopeUser::query()->{$methodName}(true);
 
         $this->assertSame($this->query, $query->toRawSql());
     }
@@ -32,7 +33,7 @@ class EloquentNamedScopeAttributeTest extends TestCase
     #[DataProvider('scopeDataProvider')]
     public function test_it_can_query_named_scoped_from_static_query(string $methodName)
     {
-        $query = Fixtures\NamedScopeUser::{$methodName}(true);
+        $query = NamedScopeUser::{$methodName}(true);
 
         $this->assertSame($this->query, $query->toRawSql());
     }

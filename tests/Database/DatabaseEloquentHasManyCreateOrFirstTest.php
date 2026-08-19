@@ -7,10 +7,10 @@ use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Models\Relationships\HasManyCreateOrFirstTestParentModel;
 use Mockery;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -432,28 +432,4 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
             $pdo->expects('lastInsertId')->andReturn($id);
         }
     }
-}
-
-/**
- * @property int $id
- */
-class HasManyCreateOrFirstTestParentModel extends Model
-{
-    protected $table = 'parent_table';
-    protected $guarded = [];
-
-    public function children(): HasMany
-    {
-        return $this->hasMany(HasManyCreateOrFirstTestChildModel::class, 'parent_id');
-    }
-}
-
-/**
- * @property int $id
- * @property int $parent_id
- */
-class HasManyCreateOrFirstTestChildModel extends Model
-{
-    protected $table = 'child_table';
-    protected $guarded = [];
 }

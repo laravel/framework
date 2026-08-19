@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Casts\JsonCast;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use stdClass;
 
@@ -69,26 +69,4 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
         $this->assertInstanceOf(Collection::class, $user->collection_as_json_field);
         $this->assertSame('value1', $user->collection_as_json_field->get('key1'));
     }
-}
-
-/**
- * @property $basic_string_as_json_field
- * @property $json_string_as_json_field
- * @property $array_as_json_field
- * @property $object_as_json_field
- * @property $collection_as_json_field
- */
-class JsonCast extends Model
-{
-    public $table = 'json_casts';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public $casts = [
-        'basic_string_as_json_field' => 'json',
-        'json_string_as_json_field' => 'json',
-        'array_as_json_field' => 'array',
-        'object_as_json_field' => 'object',
-        'collection_as_json_field' => 'collection',
-    ];
 }

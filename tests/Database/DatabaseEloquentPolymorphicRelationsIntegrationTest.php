@@ -5,6 +5,9 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Tests\App\Models\Relationships\EloquentManyToManyPolymorphicTestImage;
+use Illuminate\Tests\App\Models\Relationships\EloquentManyToManyPolymorphicTestPost;
+use Illuminate\Tests\App\Models\Relationships\EloquentManyToManyPolymorphicTestTag;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
@@ -146,46 +149,5 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
     protected function schema($connection = 'default')
     {
         return $this->connection($connection)->getSchemaBuilder();
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class EloquentManyToManyPolymorphicTestPost extends Eloquent
-{
-    protected $table = 'posts';
-    protected $guarded = [];
-
-    public function tags()
-    {
-        return $this->morphToMany(EloquentManyToManyPolymorphicTestTag::class, 'taggable');
-    }
-}
-
-class EloquentManyToManyPolymorphicTestImage extends Eloquent
-{
-    protected $table = 'images';
-    protected $guarded = [];
-
-    public function tags()
-    {
-        return $this->morphToMany(EloquentManyToManyPolymorphicTestTag::class, 'taggable');
-    }
-}
-
-class EloquentManyToManyPolymorphicTestTag extends Eloquent
-{
-    protected $table = 'tags';
-    protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->morphedByMany(EloquentManyToManyPolymorphicTestPost::class, 'taggable');
-    }
-
-    public function images()
-    {
-        return $this->morphedByMany(EloquentManyToManyPolymorphicTestImage::class, 'taggable');
     }
 }

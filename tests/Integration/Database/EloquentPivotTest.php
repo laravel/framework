@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\PivotTestProject;
+use Illuminate\Tests\App\Models\Relationships\PivotTestUser;
 
 class EloquentPivotTest extends DatabaseTestCase
 {
@@ -82,80 +82,4 @@ class EloquentPivotTest extends DatabaseTestCase
         $this->assertSame('active', $user->activeSubscriptions->first()->pivot->status);
         $this->assertSame('inactive', $user->inactiveSubscriptions->first()->pivot->status);
     }
-}
-
-class PivotTestUser extends Model
-{
-    public $table = 'users';
-
-    public function activeSubscriptions()
-    {
-        return $this->belongsToMany(PivotTestProject::class, 'subscriptions', 'user_id', 'project_id')
-            ->withPivotValue('status', 'active')
-            ->withPivot('status')
-            ->using(PivotTestSubscription::class);
-    }
-
-    public function inactiveSubscriptions()
-    {
-        return $this->belongsToMany(PivotTestProject::class, 'subscriptions', 'user_id', 'project_id')
-            ->withPivotValue('status', 'inactive')
-            ->withPivot('status')
-            ->using(PivotTestSubscription::class);
-    }
-}
-
-class PivotTestProject extends Model
-{
-    public $table = 'projects';
-
-    public function collaborators()
-    {
-        return $this->belongsToMany(
-            PivotTestUser::class, 'collaborators', 'project_id', 'user_id'
-        )->withPivot('permissions')
-            ->using(PivotTestCollaborator::class);
-    }
-
-    public function contributors()
-    {
-        return $this->belongsToMany(PivotTestUser::class, 'contributors', 'project_id', 'user_id')
-            ->withPivot('id', 'permissions')
-            ->using(PivotTestContributor::class);
-    }
-}
-
-class PivotTestCollaborator extends Pivot
-{
-    public $table = 'collaborators';
-
-    public $timestamps = false;
-
-    protected $casts = [
-        'permissions' => 'json',
-    ];
-}
-
-class PivotTestContributor extends Pivot
-{
-    public $table = 'contributors';
-
-    public $timestamps = false;
-
-    public $incrementing = true;
-
-    protected $casts = [
-        'permissions' => 'json',
-    ];
-}
-
-class PivotTestSubscription extends Pivot
-{
-    public $table = 'subscriptions';
-
-    public $timestamps = false;
-
-    protected $attributes = [
-        'status' => 'active',
-    ];
 }

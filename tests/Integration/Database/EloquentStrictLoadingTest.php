@@ -8,6 +8,11 @@ use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\EloquentStrictLoadingTestModel1;
+use Illuminate\Tests\App\Models\Relationships\EloquentStrictLoadingTestModel1WithCustomHandler;
+use Illuminate\Tests\App\Models\Relationships\EloquentStrictLoadingTestModel1WithLocalPreventsLazyLoading;
+use Illuminate\Tests\App\Models\Relationships\EloquentStrictLoadingTestModel2;
+use Illuminate\Tests\App\Models\Relationships\ViolatedLazyLoadingEvent;
 use RuntimeException;
 
 class EloquentStrictLoadingTest extends DatabaseTestCase
@@ -158,78 +163,5 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
     {
         $model1 = EloquentStrictLoadingTestModel1WithLocalPreventsLazyLoading::create();
         $this->assertInstanceOf(Collection::class, $model1->modelTwos);
-    }
-}
-
-class EloquentStrictLoadingTestModel1 extends Model
-{
-    public $table = 'test_model1';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function modelTwos()
-    {
-        return $this->hasMany(EloquentStrictLoadingTestModel2::class, 'model_1_id');
-    }
-}
-
-class EloquentStrictLoadingTestModel1WithCustomHandler extends Model
-{
-    public $table = 'test_model1';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function modelTwos()
-    {
-        return $this->hasMany(EloquentStrictLoadingTestModel2::class, 'model_1_id');
-    }
-
-    protected function handleLazyLoadingViolation($key)
-    {
-        throw new RuntimeException("Violated {$key}");
-    }
-}
-
-class EloquentStrictLoadingTestModel1WithLocalPreventsLazyLoading extends Model
-{
-    public $table = 'test_model1';
-    public $timestamps = false;
-    public $preventsLazyLoading = true;
-    protected $guarded = [];
-
-    public function modelTwos()
-    {
-        return $this->hasMany(EloquentStrictLoadingTestModel2::class, 'model_1_id');
-    }
-}
-
-class EloquentStrictLoadingTestModel2 extends Model
-{
-    public $table = 'test_model2';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function modelThrees()
-    {
-        return $this->hasMany(EloquentStrictLoadingTestModel3::class, 'model_2_id');
-    }
-}
-
-class EloquentStrictLoadingTestModel3 extends Model
-{
-    public $table = 'test_model3';
-    public $timestamps = false;
-    protected $guarded = [];
-}
-
-class ViolatedLazyLoadingEvent
-{
-    public $model;
-    public $key;
-
-    public function __construct($model, $key)
-    {
-        $this->model = $model;
-        $this->key = $key;
     }
 }

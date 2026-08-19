@@ -3,11 +3,12 @@
 namespace Illuminate\Tests\Integration\Database\EloquentWhereHasMorphTest;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\WhereHasMorphComment as Comment;
+use Illuminate\Tests\App\Models\Relationships\WhereHasMorphPost as Post;
+use Illuminate\Tests\App\Models\Relationships\WhereHasMorphVideo as Video;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentWhereHasMorphTest extends DatabaseTestCase
@@ -281,55 +282,5 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
 
         $this->assertCount(0, $commentsWhereFirst);
         $this->assertCount(0, $commentsWhereLast);
-    }
-}
-
-class Comment extends Model
-{
-    use SoftDeletes;
-
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-
-    public function commentableWithConstraint()
-    {
-        return $this->morphTo('commentable')->where('title', 'bar');
-    }
-
-    public function commentableWithOwnerKey()
-    {
-        return $this->morphTo('commentable', null, null, 'slug');
-    }
-}
-
-class Post extends Model
-{
-    use SoftDeletes;
-
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function scopeSomeSharedModelScope($query)
-    {
-        $query->where('title', '=', 'foo');
-    }
-}
-
-class Video extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function scopeSomeSharedModelScope($query)
-    {
-        $query->where('title', '=', 'foo');
     }
 }

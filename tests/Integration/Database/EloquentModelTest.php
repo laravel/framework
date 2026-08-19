@@ -7,6 +7,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Models\EloquentModelTestModel1 as TestModel1;
+use Illuminate\Tests\App\Models\EloquentModelTestModel2 as TestModel2;
 
 class EloquentModelTest extends DatabaseTestCase
 {
@@ -135,19 +137,4 @@ class EloquentModelTest extends DatabaseTestCase
             'analyze' => true,
         ]);
     }
-}
-
-class TestModel1 extends Model
-{
-    public $table = 'test_model1';
-    public $timestamps = false;
-    protected $guarded = [];
-    protected $casts = ['nullable_date' => 'datetime'];
-}
-
-class TestModel2 extends Model
-{
-    public $table = 'test_model2';
-    public $timestamps = false;
-    protected $guarded = [];
 }

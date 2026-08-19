@@ -3,13 +3,9 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Tests\App\Models\Relationships\MorphManyInverseCommentModel;
+use Illuminate\Tests\App\Models\Relationships\MorphManyInversePostModel;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentInverseRelationMorphManyTest extends TestCase
@@ -286,91 +282,5 @@ class DatabaseEloquentInverseRelationMorphManyTest extends TestCase
     protected function schema($connection = 'default')
     {
         return $this->connection($connection)->getSchemaBuilder();
-    }
-}
-
-class MorphManyInversePostModel extends Model
-{
-    use HasFactory;
-
-    protected $table = 'test_posts';
-    protected $fillable = ['id'];
-
-    protected static function newFactory()
-    {
-        return new MorphManyInversePostModelFactory();
-    }
-
-    public function comments(): MorphMany
-    {
-        return $this->morphMany(MorphManyInverseCommentModel::class, 'commentable')->inverse('commentable');
-    }
-
-    public function guessedComments(): MorphMany
-    {
-        return $this->morphMany(MorphManyInverseCommentModel::class, 'commentable')->inverse();
-    }
-
-    public function lastComment(): MorphOne
-    {
-        return $this->morphOne(MorphManyInverseCommentModel::class, 'commentable')->latestOfMany()->inverse('commentable');
-    }
-
-    public function guessedLastComment(): MorphOne
-    {
-        return $this->morphOne(MorphManyInverseCommentModel::class, 'commentable')->latestOfMany()->inverse();
-    }
-
-    public function firstComment(): MorphOne
-    {
-        return $this->comments()->one();
-    }
-}
-
-class MorphManyInversePostModelFactory extends Factory
-{
-    protected $model = MorphManyInversePostModel::class;
-
-    public function definition()
-    {
-        return [];
-    }
-
-    public function withComments(int $count = 3)
-    {
-        return $this->afterCreating(function (MorphManyInversePostModel $model) use ($count) {
-            MorphManyInverseCommentModel::factory()->recycle($model)->count($count)->create();
-        });
-    }
-}
-
-class MorphManyInverseCommentModel extends Model
-{
-    use HasFactory;
-
-    protected $table = 'test_comments';
-    protected $fillable = ['id', 'commentable_type', 'commentable_id'];
-
-    protected static function newFactory()
-    {
-        return new MorphManyInverseCommentModelFactory();
-    }
-
-    public function commentable(): MorphTo
-    {
-        return $this->morphTo('commentable');
-    }
-}
-
-class MorphManyInverseCommentModelFactory extends Factory
-{
-    protected $model = MorphManyInverseCommentModel::class;
-
-    public function definition()
-    {
-        return [
-            'commentable_type' => MorphManyInversePostModel::class,
-            'commentable_id' => MorphManyInversePostModel::factory(),
-        ];
     }
 }

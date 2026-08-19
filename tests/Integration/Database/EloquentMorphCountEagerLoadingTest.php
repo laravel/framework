@@ -2,10 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphCountEagerLoadingTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\Comment;
+use Illuminate\Tests\App\Models\Relationships\MorphCountEagerLoadLike as Like;
+use Illuminate\Tests\App\Models\Relationships\MorphCountEagerLoadPost as Post;
+use Illuminate\Tests\App\Models\Relationships\MorphCountEagerLoadVideo as Video;
+use Illuminate\Tests\App\Models\Relationships\MorphCountEagerLoadView as View;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphCountEagerLoadingTest extends DatabaseTestCase
@@ -72,55 +76,5 @@ class EloquentMorphCountEagerLoadingTest extends DatabaseTestCase
 
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
         $this->assertEquals(2, $comments[0]->commentable->likes_count);
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-}
-
-class Post extends Model
-{
-    public $timestamps = false;
-
-    public function likes()
-    {
-        return $this->hasMany(Like::class);
-    }
-}
-
-class Video extends Model
-{
-    public $timestamps = false;
-
-    public function views()
-    {
-        return $this->hasMany(View::class);
-    }
-}
-
-class Like extends Model
-{
-    public $timestamps = false;
-
-    public function post()
-    {
-        return $this->belongsTo(Post::class);
-    }
-}
-
-class View extends Model
-{
-    public $timestamps = false;
-
-    public function video()
-    {
-        return $this->belongsTo(Video::class);
     }
 }

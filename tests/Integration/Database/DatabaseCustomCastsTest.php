@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
-use Illuminate\Database\Eloquent\Casts\AsStringable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Stringable;
+use Illuminate\Tests\App\Casts\CustomCollection;
+use Illuminate\Tests\App\Casts\FluentWithCallback;
+use Illuminate\Tests\App\Models\Casts\TestEloquentModelWithCustomCasts;
+use Illuminate\Tests\App\Models\Casts\TestEloquentModelWithCustomCastsNullable;
 
 class DatabaseCustomCastsTest extends DatabaseTestCase
 {
@@ -215,61 +215,4 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertInstanceOf(FluentWithCallback::class, $model->collection->first());
         $this->assertSame('bar', $model->collection->first()->foo);
     }
-}
-
-class TestEloquentModelWithCustomCasts extends Model
-{
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var string[]
-     */
-    protected $guarded = [];
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'array_object' => AsArrayObject::class,
-        'array_object_json' => AsArrayObject::class,
-        'collection' => AsCollection::class,
-        'stringable' => AsStringable::class,
-        'password' => 'hashed',
-    ];
-}
-
-class TestEloquentModelWithCustomCastsNullable extends Model
-{
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var string[]
-     */
-    protected $guarded = [];
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'array_object' => AsArrayObject::class,
-        'array_object_json' => AsArrayObject::class,
-        'collection' => AsCollection::class,
-        'stringable' => AsStringable::class,
-    ];
-}
-
-class FluentWithCallback extends Fluent
-{
-    public static function make($attributes = [])
-    {
-        return new static($attributes);
-    }
-}
-
-class CustomCollection extends Collection
-{
 }

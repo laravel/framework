@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Tests\App\Models\Relationships\EloquentMorphToManyModelStub;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use SortDirection;
@@ -145,9 +146,4 @@ class DatabaseEloquentMorphToManyTest extends TestCase
             false,
         ];
     }
-}
-
-class EloquentMorphToManyModelStub extends Model
-{
-    protected $guarded = [];
 }

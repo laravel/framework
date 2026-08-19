@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelRefreshTest;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Scopes\AsPivotPost;
+use Illuminate\Tests\App\Models\Scopes\SoftDeletingGlobalScopePost as Post;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelRefreshTest extends DatabaseTestCase
@@ -83,39 +82,4 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
         $post->children->first()->refresh();
     }
-}
-
-class Post extends Model
-{
-    public $table = 'posts';
-    public $timestamps = true;
-    protected $guarded = [];
-
-    use SoftDeletes;
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope('age', function ($query) {
-            $query->where('title', '!=', 'mohamed');
-        });
-    }
-}
-
-class AsPivotPost extends Post
-{
-    public function children()
-    {
-        return $this
-            ->belongsToMany(static::class, (new AsPivotPostPivot)->getTable(), 'foreign_id', 'related_id')
-            ->using(AsPivotPostPivot::class);
-    }
-}
-
-class AsPivotPostPivot extends Model
-{
-    use AsPivot;
-
-    protected $table = 'post_posts';
 }

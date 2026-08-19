@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Database\EloquentRelationshipsTest;
 
-use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -15,10 +13,23 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Query\Builder as BaseBuilder;
-use Illuminate\Database\Query\Grammars\Grammar;
-use Illuminate\Database\Query\Processors\Processor;
-use Mockery;
+use Illuminate\Tests\App\Models\Relationships\ClassicMechanic;
+use Illuminate\Tests\App\Models\Relationships\ClassicProject;
+use Illuminate\Tests\App\Models\Relationships\CustomBelongsTo;
+use Illuminate\Tests\App\Models\Relationships\CustomBelongsToMany;
+use Illuminate\Tests\App\Models\Relationships\CustomHasMany;
+use Illuminate\Tests\App\Models\Relationships\CustomHasManyThrough;
+use Illuminate\Tests\App\Models\Relationships\CustomHasOne;
+use Illuminate\Tests\App\Models\Relationships\CustomHasOneThrough;
+use Illuminate\Tests\App\Models\Relationships\CustomMorphMany;
+use Illuminate\Tests\App\Models\Relationships\CustomMorphOne;
+use Illuminate\Tests\App\Models\Relationships\CustomMorphTo;
+use Illuminate\Tests\App\Models\Relationships\CustomMorphToMany;
+use Illuminate\Tests\App\Models\Relationships\CustomPost;
+use Illuminate\Tests\App\Models\Relationships\FakeRelationship;
+use Illuminate\Tests\App\Models\Relationships\FluentMechanic;
+use Illuminate\Tests\App\Models\Relationships\FluentProject;
+use Illuminate\Tests\App\Models\Relationships\Post;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationshipsTest extends TestCase
@@ -258,292 +269,4 @@ class DatabaseEloquentRelationshipsTest extends TestCase
         $this->assertSame('environments.pro_id', $higher->getQualifiedFirstKeyName());
         $this->assertSame('environments.pro_id', $fluent->getQualifiedFirstKeyName());
     }
-}
-
-class FakeRelationship extends Model
-{
-    //
-}
-
-class Post extends Model
-{
-    public function attachment()
-    {
-        return $this->hasOne(FakeRelationship::class);
-    }
-
-    public function author()
-    {
-        return $this->belongsTo(FakeRelationship::class);
-    }
-
-    public function comments()
-    {
-        return $this->hasMany(FakeRelationship::class);
-    }
-
-    public function likes()
-    {
-        return $this->morphMany(FakeRelationship::class, 'actionable');
-    }
-
-    public function owner()
-    {
-        return $this->morphOne(FakeRelationship::class, 'property');
-    }
-
-    public function viewers()
-    {
-        return $this->belongsToMany(FakeRelationship::class);
-    }
-
-    public function lovers()
-    {
-        return $this->hasManyThrough(FakeRelationship::class, FakeRelationship::class);
-    }
-
-    public function contract()
-    {
-        return $this->hasOneThrough(FakeRelationship::class, FakeRelationship::class);
-    }
-
-    public function tags()
-    {
-        return $this->morphToMany(FakeRelationship::class, 'taggable');
-    }
-
-    public function postable()
-    {
-        return $this->morphTo();
-    }
-}
-
-class CustomPost extends Post
-{
-    protected function newBelongsTo(Builder $query, Model $child, $foreignKey, $ownerKey, $relation)
-    {
-        return new CustomBelongsTo($query, $child, $foreignKey, $ownerKey, $relation);
-    }
-
-    protected function newHasMany(Builder $query, Model $parent, $foreignKey, $localKey)
-    {
-        return new CustomHasMany($query, $parent, $foreignKey, $localKey);
-    }
-
-    protected function newHasOne(Builder $query, Model $parent, $foreignKey, $localKey)
-    {
-        return new CustomHasOne($query, $parent, $foreignKey, $localKey);
-    }
-
-    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey)
-    {
-        return new CustomMorphOne($query, $parent, $type, $id, $localKey);
-    }
-
-    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey)
-    {
-        return new CustomMorphMany($query, $parent, $type, $id, $localKey);
-    }
-
-    protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,
-        $parentKey, $relatedKey, $relationName = null
-    ) {
-        return new CustomBelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
-    }
-
-    protected function newHasManyThrough(Builder $query, Model $farParent, Model $throughParent, $firstKey,
-        $secondKey, $localKey, $secondLocalKey
-    ) {
-        return new CustomHasManyThrough($query, $farParent, $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey);
-    }
-
-    protected function newHasOneThrough(Builder $query, Model $farParent, Model $throughParent, $firstKey,
-        $secondKey, $localKey, $secondLocalKey
-    ) {
-        return new CustomHasOneThrough($query, $farParent, $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey);
-    }
-
-    protected function newMorphToMany(Builder $query, Model $parent, $name, $table, $foreignPivotKey,
-        $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $inverse = false)
-    {
-        return new CustomMorphToMany($query, $parent, $name, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey,
-            $relationName, $inverse);
-    }
-
-    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
-    {
-        return new CustomMorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation);
-    }
-}
-
-class CustomHasOne extends HasOne
-{
-    //
-}
-
-class CustomBelongsTo extends BelongsTo
-{
-    //
-}
-
-class CustomHasMany extends HasMany
-{
-    //
-}
-
-class CustomMorphOne extends MorphOne
-{
-    //
-}
-
-class CustomMorphMany extends MorphMany
-{
-    //
-}
-
-class CustomBelongsToMany extends BelongsToMany
-{
-    //
-}
-
-class CustomHasManyThrough extends HasManyThrough
-{
-    //
-}
-
-class CustomHasOneThrough extends HasOneThrough
-{
-    //
-}
-
-class CustomMorphToMany extends MorphToMany
-{
-    //
-}
-
-class CustomMorphTo extends MorphTo
-{
-    //
-}
-
-class MockedConnectionModel extends Model
-{
-    public function getConnection()
-    {
-        $mock = Mockery::mock(Connection::class);
-        $grammar = Mockery::mock(Grammar::class);
-        $mock->shouldReceive('getQueryGrammar')->andReturn($grammar);
-        $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
-        $processor = Mockery::mock(Processor::class);
-        $mock->shouldReceive('getPostProcessor')->andReturn($processor);
-        $mock->shouldReceive('getName')->andReturn('name');
-        $mock->shouldReceive('query')->andReturnUsing(function () use ($mock, $grammar, $processor) {
-            return new BaseBuilder($mock, $grammar, $processor);
-        });
-
-        return $mock;
-    }
-}
-
-class Car extends MockedConnectionModel
-{
-    public function owner()
-    {
-        return $this->hasOne(Owner::class, 'car_id', 'c_id');
-    }
-}
-
-class Owner extends MockedConnectionModel
-{
-    //
-}
-
-class FluentMechanic extends MockedConnectionModel
-{
-    public function owner()
-    {
-        return $this->through($this->car())
-            ->has(fn (Car $car) => $car->owner());
-    }
-
-    public function car()
-    {
-        return $this->hasOne(Car::class, 'mechanic_id', 'm_id');
-    }
-}
-
-class ClassicMechanic extends MockedConnectionModel
-{
-    public function owner()
-    {
-        return $this->hasOneThrough(Owner::class, Car::class, 'mechanic_id', 'car_id', 'm_id', 'c_id');
-    }
-}
-
-class ClassicProject extends MockedConnectionModel
-{
-    public function deployments()
-    {
-        return $this->hasManyThrough(
-            Deployment::class,
-            Environment::class,
-            'pro_id',
-            'env_id',
-            'p_id',
-            'e_id',
-        );
-    }
-
-    public function environmentData()
-    {
-        return $this->hasManyThrough(
-            Metadata::class,
-            Environment::class,
-            'pro_id',
-            'env_id',
-            'p_id',
-            'e_id',
-        );
-    }
-}
-
-class FluentProject extends MockedConnectionModel
-{
-    public function deployments()
-    {
-        return $this->through($this->environments())->has(fn (Environment $env) => $env->deployments());
-    }
-
-    public function environmentData()
-    {
-        return $this->through($this->environments())->has(fn (Environment $env) => $env->metadata());
-    }
-
-    public function environments()
-    {
-        return $this->hasMany(Environment::class, 'pro_id', 'p_id');
-    }
-}
-
-class Environment extends MockedConnectionModel
-{
-    public function deployments()
-    {
-        return $this->hasMany(Deployment::class, 'env_id', 'e_id');
-    }
-
-    public function metadata()
-    {
-        return $this->hasOne(MetaData::class, 'env_id', 'e_id');
-    }
-}
-
-class MetaData extends MockedConnectionModel
-{
-    //
-}
-
-class Deployment extends MockedConnectionModel
-{
-    //
 }

@@ -4,9 +4,9 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Tests\App\Models\Relationships\WherePivotClosureProject;
+use Illuminate\Tests\App\Models\Relationships\WherePivotClosureUser;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyWherePivotClosureTest extends TestCase
@@ -137,41 +137,5 @@ class DatabaseEloquentBelongsToManyWherePivotClosureTest extends TestCase
     protected function schema()
     {
         return $this->connection()->getSchemaBuilder();
-    }
-}
-
-class WherePivotClosureProject extends Eloquent
-{
-    protected $table = 'projects';
-    protected $guarded = [];
-    public $timestamps = false;
-
-    public function subscribers(): BelongsToMany
-    {
-        return $this->belongsToMany(WherePivotClosureUser::class, 'project_user', 'project_id', 'user_id')
-            ->using(WherePivotClosureSubscription::class)
-            ->withPivot(['role', 'muted']);
-    }
-}
-
-class WherePivotClosureUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $guarded = [];
-    public $timestamps = false;
-}
-
-class WherePivotClosureSubscription extends Pivot
-{
-    protected $table = 'project_user';
-
-    public function scopeActive($query)
-    {
-        return $query->where('muted', false);
-    }
-
-    public function scopeAdmins($query)
-    {
-        return $query->where('role', 'admin');
     }
 }

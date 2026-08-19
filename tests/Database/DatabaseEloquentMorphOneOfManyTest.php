@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Tests\App\Models\Relationships\MorphOneOfManyTestProduct;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentMorphOneOfManyTest extends TestCase
@@ -215,42 +216,4 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
-}
-
-/**
- * Eloquent Models...
- */
-class MorphOneOfManyTestProduct extends Eloquent
-{
-    protected $table = 'products';
-    protected $guarded = [];
-    public $timestamps = false;
-
-    public function states()
-    {
-        return $this->morphMany(MorphOneOfManyTestState::class, 'stateful');
-    }
-
-    public function current_state()
-    {
-        return $this->morphOne(MorphOneOfManyTestState::class, 'stateful')->ofMany();
-    }
-
-    public function current_foo_state()
-    {
-        return $this->morphOne(MorphOneOfManyTestState::class, 'stateful')->ofMany(
-            ['id' => 'max'],
-            function ($q) {
-                $q->where('type', 'foo');
-            }
-        );
-    }
-}
-
-class MorphOneOfManyTestState extends Eloquent
-{
-    protected $table = 'states';
-    protected $guarded = [];
-    public $timestamps = false;
-    protected $fillable = ['state', 'type'];
 }

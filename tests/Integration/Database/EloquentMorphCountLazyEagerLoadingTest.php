@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphCountLazyEagerLoadingTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\Comment;
+use Illuminate\Tests\App\Models\Relationships\LazyMorphCountLike as Like;
+use Illuminate\Tests\App\Models\Relationships\LazyMorphCountPost as Post;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphCountLazyEagerLoadingTest extends DatabaseTestCase
@@ -44,35 +46,5 @@ class EloquentMorphCountLazyEagerLoadingTest extends DatabaseTestCase
 
         $this->assertTrue($comment->relationLoaded('commentable'));
         $this->assertEquals(2, $comment->commentable->likes_count);
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-}
-
-class Post extends Model
-{
-    public $timestamps = false;
-
-    public function likes()
-    {
-        return $this->hasMany(Like::class);
-    }
-}
-
-class Like extends Model
-{
-    public $timestamps = false;
-
-    public function post()
-    {
-        return $this->belongsTo(Post::class);
     }
 }

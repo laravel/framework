@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Tests\Database\Fixtures\Enums\Bar;
+use Illuminate\Tests\App\Enums\Bar;
+use Illuminate\Tests\App\Models\Relationships\AnotherEloquentBelongsToModelStub;
+use Illuminate\Tests\App\Models\Relationships\EloquentBelongsToModelStub;
+use Illuminate\Tests\App\Models\Relationships\EloquentBelongsToModelStubWithBackedEnumCast;
+use Illuminate\Tests\App\Models\Relationships\EloquentBelongsToModelStubWithZeroId;
+use Illuminate\Tests\App\Models\Relationships\MissingEloquentBelongsToModelStub;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -395,35 +400,4 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
         return new BelongsTo($this->builder, $parent, 'foreign_key', 'id', 'relation');
     }
-}
-
-class EloquentBelongsToModelStub extends Model
-{
-    public $foreign_key = 'foreign.value';
-}
-
-class AnotherEloquentBelongsToModelStub extends Model
-{
-    public $foreign_key = 'foreign.value.two';
-}
-
-class EloquentBelongsToModelStubWithZeroId extends Model
-{
-    public $foreign_key = 0;
-}
-
-class MissingEloquentBelongsToModelStub extends Model
-{
-    public $foreign_key;
-}
-
-class EloquentBelongsToModelStubWithBackedEnumCast extends Model
-{
-    protected $casts = [
-        'foreign_key' => Bar::class,
-    ];
-
-    public $attributes = [
-        'foreign_key' => 5,
-    ];
 }

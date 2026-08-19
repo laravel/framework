@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Models\Relationships\EloquentBuilderCreateOrFirstTestModel;
 use Mockery;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -671,10 +672,4 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
             $pdo->expects('lastInsertId')->andReturn($id);
         }
     }
-}
-
-class EloquentBuilderCreateOrFirstTestModel extends Model
-{
-    protected $table = 'table';
-    protected $guarded = [];
 }

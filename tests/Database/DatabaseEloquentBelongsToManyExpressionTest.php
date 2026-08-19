@@ -5,9 +5,10 @@ namespace Illuminate\Tests\Database;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Tests\App\Models\Relationships\DatabaseEloquentBelongsToManyExpressionTestTestPost;
+use Illuminate\Tests\App\Models\Relationships\DatabaseEloquentBelongsToManyExpressionTestTestTag;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyExpressionTest extends TestCase
@@ -148,31 +149,4 @@ class DatabaseEloquentBelongsToManyExpressionTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
-}
-
-class DatabaseEloquentBelongsToManyExpressionTestTestPost extends Eloquent
-{
-    protected $table = 'posts';
-    protected $fillable = ['id'];
-    public $timestamps = false;
-
-    public function tags(): MorphToMany
-    {
-        return  $this->morphToMany(
-            DatabaseEloquentBelongsToManyExpressionTestTestTag::class,
-            'taggable',
-            'taggables',
-            'taggable_id',
-            'tag_id',
-            'id',
-            'id',
-        );
-    }
-}
-
-class DatabaseEloquentBelongsToManyExpressionTestTestTag extends Eloquent
-{
-    protected $table = 'tags';
-    protected $fillable = ['id'];
-    public $timestamps = false;
 }

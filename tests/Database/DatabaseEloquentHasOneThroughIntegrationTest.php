@@ -5,7 +5,11 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Tests\App\Models\Relationships\HasOneThroughDefaultTestPosition;
+use Illuminate\Tests\App\Models\Relationships\HasOneThroughIntermediateTestPosition;
+use Illuminate\Tests\App\Models\Relationships\HasOneThroughSoftDeletesTestPosition;
+use Illuminate\Tests\App\Models\Relationships\HasOneThroughSoftDeletesTestUser;
+use Illuminate\Tests\App\Models\Relationships\HasOneThroughTestPosition;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
@@ -130,7 +134,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
 
     public function testFirstOrFailThrowsAnException()
     {
-        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\HasOneThroughTestContract].'));
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\App\Models\Relationships\HasOneThroughTestContract].'));
 
         HasOneThroughTestPosition::create(['id' => 1, 'name' => 'President', 'shortname' => 'ps'])
             ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
@@ -367,152 +371,5 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
     protected function schema()
     {
         return $this->connection()->getSchemaBuilder();
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class HasOneThroughTestUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $guarded = [];
-
-    public function contract()
-    {
-        return $this->hasOne(HasOneThroughTestContract::class, 'user_id');
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class HasOneThroughTestContract extends Eloquent
-{
-    protected $table = 'contracts';
-    protected $guarded = [];
-
-    public function owner()
-    {
-        return $this->belongsTo(HasOneThroughTestUser::class, 'user_id');
-    }
-}
-
-class HasOneThroughTestPosition extends Eloquent
-{
-    protected $table = 'positions';
-    protected $guarded = [];
-
-    public function contract()
-    {
-        return $this->hasOneThrough(HasOneThroughTestContract::class, HasOneThroughTestUser::class, 'position_id', 'user_id');
-    }
-
-    public function user()
-    {
-        return $this->hasOne(HasOneThroughTestUser::class, 'position_id');
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class HasOneThroughDefaultTestUser extends Eloquent
-{
-    protected $table = 'users_default';
-    protected $guarded = [];
-
-    public function contract()
-    {
-        return $this->hasOne(HasOneThroughDefaultTestContract::class);
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class HasOneThroughDefaultTestContract extends Eloquent
-{
-    protected $table = 'contracts_default';
-    protected $guarded = [];
-
-    public function owner()
-    {
-        return $this->belongsTo(HasOneThroughDefaultTestUser::class);
-    }
-}
-
-class HasOneThroughDefaultTestPosition extends Eloquent
-{
-    protected $table = 'positions_default';
-    protected $guarded = [];
-
-    public function contract()
-    {
-        return $this->hasOneThrough(HasOneThroughDefaultTestContract::class, HasOneThroughDefaultTestUser::class);
-    }
-
-    public function user()
-    {
-        return $this->hasOne(HasOneThroughDefaultTestUser::class);
-    }
-}
-
-class HasOneThroughIntermediateTestPosition extends Eloquent
-{
-    protected $table = 'positions';
-    protected $guarded = [];
-
-    public function contract()
-    {
-        return $this->hasOneThrough(HasOneThroughTestContract::class, HasOneThroughTestUser::class, 'position_short', 'email', 'shortname', 'email');
-    }
-
-    public function user()
-    {
-        return $this->hasOne(HasOneThroughTestUser::class, 'position_id');
-    }
-}
-
-class HasOneThroughSoftDeletesTestUser extends Eloquent
-{
-    use SoftDeletes;
-
-    protected $table = 'users';
-    protected $guarded = [];
-
-    public function contract()
-    {
-        return $this->hasOne(HasOneThroughSoftDeletesTestContract::class, 'user_id');
-    }
-}
-
-/**
- * Eloquent Models...
- */
-class HasOneThroughSoftDeletesTestContract extends Eloquent
-{
-    protected $table = 'contracts';
-    protected $guarded = [];
-
-    public function owner()
-    {
-        return $this->belongsTo(HasOneThroughSoftDeletesTestUser::class, 'user_id');
-    }
-}
-
-class HasOneThroughSoftDeletesTestPosition extends Eloquent
-{
-    protected $table = 'positions';
-    protected $guarded = [];
-
-    public function contract()
-    {
-        return $this->hasOneThrough(HasOneThroughSoftDeletesTestContract::class, HasOneThroughTestUser::class, 'position_id', 'user_id');
-    }
-
-    public function user()
-    {
-        return $this->hasOne(HasOneThroughSoftDeletesTestUser::class, 'position_id');
     }
 }

@@ -3,13 +3,16 @@
 namespace Illuminate\Tests\Integration\Database\EloquentHasManyThroughTest;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Models\Relationships\Article;
+use Illuminate\Tests\App\Models\Relationships\Category;
+use Illuminate\Tests\App\Models\Relationships\Product;
+use Illuminate\Tests\App\Models\Relationships\Team;
+use Illuminate\Tests\App\Models\Relationships\User;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentHasManyThroughTest extends DatabaseTestCase
@@ -394,132 +397,5 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $latestArticle = Article::create(['user_id' => $user->id, 'title' => Str::random(), 'created_at' => Carbon::now()]);
 
         $this->assertEquals($latestArticle->id, $team->latestArticle->id);
-    }
-}
-
-class User extends Model
-{
-    public $table = 'users';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function teamMates()
-    {
-        return $this->hasManyThrough(self::class, Team::class, 'owner_id', 'team_id');
-    }
-
-    public function teamMatesWithPendingRelation()
-    {
-        return $this->through($this->ownedTeams())
-            ->has(fn (Team $team) => $team->members());
-    }
-
-    public function teamMatesBySlug()
-    {
-        return $this->hasManyThrough(self::class, Team::class, 'owner_slug', 'team_id', 'slug');
-    }
-
-    public function teamMatesBySlugWithPendingRelationship()
-    {
-        return $this->through($this->hasMany(Team::class, 'owner_slug', 'slug'))
-            ->has(fn ($team) => $team->hasMany(User::class, 'team_id'));
-    }
-
-    public function teamMatesWithGlobalScope()
-    {
-        return $this->hasManyThrough(UserWithGlobalScope::class, Team::class, 'owner_id', 'team_id');
-    }
-
-    public function teamMatesWithGlobalScopeWithPendingRelation()
-    {
-        return $this->through($this->ownedTeams())
-            ->has(fn (Team $team) => $team->membersWithGlobalScope());
-    }
-
-    public function ownedTeams()
-    {
-        return $this->hasMany(Team::class, 'owner_id');
-    }
-
-    public function team()
-    {
-        return $this->belongsTo(Team::class);
-    }
-
-    public function articles()
-    {
-        return $this->hasMany(Article::class);
-    }
-}
-
-class UserWithGlobalScope extends Model
-{
-    public $table = 'users';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope(function ($query) {
-            $query->select('users.id');
-        });
-    }
-}
-
-class Team extends Model
-{
-    public $table = 'teams';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function members()
-    {
-        return $this->hasMany(User::class, 'team_id');
-    }
-
-    public function membersWithGlobalScope()
-    {
-        return $this->hasMany(UserWithGlobalScope::class, 'team_id');
-    }
-
-    public function articles()
-    {
-        return $this->hasManyThrough(Article::class, User::class);
-    }
-
-    public function latestArticle(): HasOneThrough
-    {
-        return $this->articles()->one()->latest();
-    }
-}
-
-class Category extends Model
-{
-    use SoftDeletes;
-
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function subProducts()
-    {
-        return $this->hasManyThrough(Product::class, self::class, 'parent_id');
-    }
-}
-
-class Product extends Model
-{
-    public $timestamps = false;
-    protected $guarded = [];
-}
-
-class Article extends Model
-{
-    protected $guarded = [];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 }

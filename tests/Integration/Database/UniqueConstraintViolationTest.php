@@ -2,10 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\UniqueCompositeModel;
+use Illuminate\Tests\App\Models\UniqueSingleModel;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
 
 class UniqueConstraintViolationTest extends DatabaseTestCase
@@ -112,22 +113,4 @@ class UniqueConstraintViolationTest extends DatabaseTestCase
         $this->assertSame('unique_composite_idx', $e->index);
         $this->assertSame([], $e->columns);
     }
-}
-
-class UniqueSingleModel extends Model
-{
-    protected $table = 'test_unique_constraint';
-
-    protected $fillable = ['name'];
-
-    public $timestamps = false;
-}
-
-class UniqueCompositeModel extends Model
-{
-    protected $table = 'test_unique_constraint_composite';
-
-    protected $fillable = ['first_name', 'last_name'];
-
-    public $timestamps = false;
 }

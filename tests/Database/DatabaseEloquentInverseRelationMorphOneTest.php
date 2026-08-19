@@ -3,12 +3,9 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Tests\App\Models\Relationships\MorphOneInverseImageModel;
+use Illuminate\Tests\App\Models\Relationships\MorphOneInversePostModel;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
@@ -208,69 +205,5 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
     protected function schema($connection = 'default')
     {
         return $this->connection($connection)->getSchemaBuilder();
-    }
-}
-
-class MorphOneInversePostModel extends Model
-{
-    use HasFactory;
-
-    protected $table = 'test_posts';
-    protected $fillable = ['id'];
-
-    protected static function newFactory()
-    {
-        return new MorphOneInversePostModelFactory();
-    }
-
-    public function image(): MorphOne
-    {
-        return $this->morphOne(MorphOneInverseImageModel::class, 'imageable')->inverse('imageable');
-    }
-
-    public function guessedImage(): MorphOne
-    {
-        return $this->morphOne(MorphOneInverseImageModel::class, 'imageable')->inverse();
-    }
-}
-
-class MorphOneInversePostModelFactory extends Factory
-{
-    protected $model = MorphOneInversePostModel::class;
-
-    public function definition()
-    {
-        return [];
-    }
-}
-
-class MorphOneInverseImageModel extends Model
-{
-    use HasFactory;
-
-    protected $table = 'test_images';
-    protected $fillable = ['id', 'imageable_type', 'imageable_id'];
-
-    protected static function newFactory()
-    {
-        return new MorphOneInverseImageModelFactory();
-    }
-
-    public function imageable(): MorphTo
-    {
-        return $this->morphTo('imageable');
-    }
-}
-
-class MorphOneInverseImageModelFactory extends Factory
-{
-    protected $model = MorphOneInverseImageModel::class;
-
-    public function definition()
-    {
-        return [
-            'imageable_type' => MorphOneInversePostModel::class,
-            'imageable_id' => MorphOneInversePostModel::factory(),
-        ];
     }
 }

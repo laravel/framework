@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\AfterQueryPost;
+use Illuminate\Tests\App\Models\Relationships\AfterQueryTeam;
+use Illuminate\Tests\App\Models\Relationships\AfterQueryUser;
 
 class AfterQueryTest extends DatabaseTestCase
 {
@@ -354,42 +356,4 @@ class AfterQueryTest extends DatabaseTestCase
 
         $this->assertEquals(collect(['foo', 'bar']), $teamMates);
     }
-}
-
-class AfterQueryUser extends Model
-{
-    protected $table = 'users';
-    protected $guarded = [];
-    public $timestamps = false;
-
-    public function teamMates()
-    {
-        return $this->hasManyThrough(self::class, AfterQueryTeam::class, 'owner_id', 'team_id');
-    }
-
-    public function posts()
-    {
-        return $this->belongsToMany(AfterQueryPost::class, 'users_posts', 'user_id', 'post_id')
-            ->afterQuery(fn (Collection $posts) => $posts->keyBy(fn (AfterQueryPost $post) => $post->id))
-            ->withTimestamps();
-    }
-}
-
-class AfterQueryTeam extends Model
-{
-    protected $table = 'teams';
-    protected $guarded = [];
-    public $timestamps = false;
-
-    public function members()
-    {
-        return $this->hasMany(AfterQueryUser::class, 'team_id');
-    }
-}
-
-class AfterQueryPost extends Model
-{
-    protected $table = 'posts';
-    protected $guarded = [];
-    public $timestamps = false;
 }

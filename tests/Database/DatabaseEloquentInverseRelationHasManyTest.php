@@ -3,13 +3,9 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Tests\App\Models\Relationships\HasManyInversePostModel;
+use Illuminate\Tests\App\Models\Relationships\HasManyInverseUserModel;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentInverseRelationHasManyTest extends TestCase
@@ -230,80 +226,5 @@ class DatabaseEloquentInverseRelationHasManyTest extends TestCase
     protected function schema($connection = 'default')
     {
         return $this->connection($connection)->getSchemaBuilder();
-    }
-}
-
-class HasManyInverseUserModel extends Model
-{
-    use HasFactory;
-
-    protected $table = 'test_users';
-    protected $fillable = ['id'];
-
-    protected static function newFactory()
-    {
-        return new HasManyInverseUserModelFactory();
-    }
-
-    public function posts(): HasMany
-    {
-        return $this->hasMany(HasManyInversePostModel::class, 'user_id')->inverse('user');
-    }
-
-    public function lastPost(): HasOne
-    {
-        return $this->hasOne(HasManyInversePostModel::class, 'user_id')->latestOfMany()->inverse('user');
-    }
-
-    public function firstPost(): HasOne
-    {
-        return $this->posts()->one();
-    }
-}
-
-class HasManyInverseUserModelFactory extends Factory
-{
-    protected $model = HasManyInverseUserModel::class;
-
-    public function definition()
-    {
-        return [];
-    }
-
-    public function withPosts(int $count = 3)
-    {
-        return $this->afterCreating(function (HasManyInverseUserModel $model) use ($count) {
-            HasManyInversePostModel::factory()->recycle($model)->count($count)->create();
-        });
-    }
-}
-
-class HasManyInversePostModel extends Model
-{
-    use HasFactory;
-
-    protected $table = 'test_posts';
-    protected $fillable = ['id', 'user_id'];
-
-    protected static function newFactory()
-    {
-        return new HasManyInversePostModelFactory();
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(HasManyInverseUserModel::class, 'user_id');
-    }
-}
-
-class HasManyInversePostModelFactory extends Factory
-{
-    protected $model = HasManyInversePostModel::class;
-
-    public function definition()
-    {
-        return [
-            'user_id' => HasManyInverseUserModel::factory(),
-        ];
     }
 }

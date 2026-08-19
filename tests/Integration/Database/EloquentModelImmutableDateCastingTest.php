@@ -3,9 +3,10 @@
 namespace Illuminate\Tests\Integration\Database\EloquentModelDateCastingTest;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Casts\TestModelCustomImmutable;
+use Illuminate\Tests\App\Models\Casts\TestModelImmutable;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelImmutableDateCastingTest extends DatabaseTestCase
@@ -44,28 +45,4 @@ class EloquentModelImmutableDateCastingTest extends DatabaseTestCase
         $this->assertInstanceOf(CarbonImmutable::class, $model->date_field);
         $this->assertInstanceOf(CarbonImmutable::class, $model->datetime_field);
     }
-}
-
-class TestModelImmutable extends Model
-{
-    public $table = 'test_model_immutable';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public $casts = [
-        'date_field' => 'immutable_date',
-        'datetime_field' => 'immutable_datetime',
-    ];
-}
-
-class TestModelCustomImmutable extends Model
-{
-    public $table = 'test_model_immutable';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public $casts = [
-        'date_field' => 'immutable_date:Y-m',
-        'datetime_field' => 'immutable_datetime:Y-m H:i',
-    ];
 }

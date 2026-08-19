@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Tests\App\Models\Relationships\RelatedWithAttributesModel;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
@@ -284,13 +284,4 @@ class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
         $this->assertSame($parentId, $relatedModel->parent_id);
         $this->assertTrue($relatedModel->is_admin);
     }
-}
-
-class RelatedWithAttributesModel extends Model
-{
-    protected $guarded = [];
-
-    protected $casts = [
-        'is_admin' => 'boolean',
-    ];
 }

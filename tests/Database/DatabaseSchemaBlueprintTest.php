@@ -7,7 +7,10 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
-use Illuminate\Tests\Database\Fixtures\Models\User;
+use Illuminate\Tests\App\Models\Keys\EloquentModelUsingNonIncrementedInt;
+use Illuminate\Tests\App\Models\Keys\EloquentModelUsingUlid;
+use Illuminate\Tests\App\Models\Keys\EloquentModelUsingUuid;
+use Illuminate\Tests\App\Models\Keys\UserWithInternalIdKey as User;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -429,7 +432,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $getSql = function ($grammar) {
             return $this->getBlueprint($grammar, 'posts', function ($table) {
-                $table->foreignIdFor(Fixtures\Models\EloquentModelUsingNonIncrementedInt::class);
+                $table->foreignIdFor(EloquentModelUsingNonIncrementedInt::class);
             })->toSql();
         };
 
@@ -442,7 +445,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $getSql = function ($grammar) {
             return $this->getBlueprint($grammar, 'posts', function ($table) {
-                $table->foreignIdFor(Fixtures\Models\EloquentModelUsingUuid::class);
+                $table->foreignIdFor(EloquentModelUsingUuid::class);
             })->toSql();
         };
 
@@ -455,7 +458,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $getSql = function ($grammar) {
             return $this->getBlueprint($grammar, 'posts', function ($table) {
-                $table->foreignUuidFor(Fixtures\Models\EloquentModelUsingUuid::class);
+                $table->foreignUuidFor(EloquentModelUsingUuid::class);
             })->toSql();
         };
 
@@ -468,7 +471,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $getSql = function ($grammar) {
             return $this->getBlueprint($grammar, 'posts', function ($table) {
-                $table->foreignIdFor(Fixtures\Models\EloquentModelUsingUlid::class);
+                $table->foreignIdFor(EloquentModelUsingUlid::class);
             })->toSql();
         };
 
@@ -485,7 +488,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $getSql = function ($grammar) {
             return $this->getBlueprint($grammar, 'posts', function ($table) {
-                $table->foreignUlidFor(Fixtures\Models\EloquentModelUsingUlid::class);
+                $table->foreignUlidFor(EloquentModelUsingUlid::class);
             })->toSql();
         };
 
@@ -512,7 +515,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $getSql = function ($grammar) {
             return $this->getBlueprint($grammar, 'posts', function ($table) {
-                $table->foreignUuidFor(Fixtures\Models\EloquentModelUsingUuid::class)->constrained();
+                $table->foreignUuidFor(EloquentModelUsingUuid::class)->constrained();
             })->toSql();
         };
 
@@ -526,7 +529,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $getSql = function ($grammar) {
             return $this->getBlueprint($grammar, 'posts', function ($table) {
-                $table->foreignUlidFor(Fixtures\Models\EloquentModelUsingUlid::class)->constrained();
+                $table->foreignUlidFor(EloquentModelUsingUlid::class)->constrained();
             })->toSql();
         };
 
@@ -545,8 +548,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         };
 
         $this->assertEquals([
-            'alter table `posts` add `user_internal_id` bigint unsigned not null',
-            'alter table `posts` add constraint `posts_user_internal_id_foreign` foreign key (`user_internal_id`) references `users` (`internal_id`)',
+            'alter table `posts` add `user_with_internal_id_key_internal_id` bigint unsigned not null',
+            'alter table `posts` add constraint `posts_user_with_internal_id_key_internal_id_foreign` foreign key (`user_with_internal_id_key_internal_id`) references `users` (`internal_id`)',
         ], $getSql('MySql'));
     }
 
@@ -567,7 +570,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $getSql = function ($grammar) {
             return $this->getBlueprint($grammar, 'posts', function ($table) {
-                $table->dropForeignIdFor(Fixtures\Models\EloquentModelUsingUuid::class);
+                $table->dropForeignIdFor(EloquentModelUsingUuid::class);
             })->toSql();
         };
 
@@ -594,7 +597,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $getSql = function ($grammar) {
             return $this->getBlueprint($grammar, 'posts', function ($table) {
-                $table->dropConstrainedForeignIdFor(Fixtures\Models\EloquentModelUsingUuid::class);
+                $table->dropConstrainedForeignIdFor(EloquentModelUsingUuid::class);
             })->toSql();
         };
 

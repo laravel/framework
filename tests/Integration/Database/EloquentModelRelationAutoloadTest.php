@@ -3,12 +3,15 @@
 namespace Illuminate\Tests\Integration\Database\EloquentModelRelationAutoloadTest;
 
 use DB;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\RelationAutoloadComment as Comment;
+use Illuminate\Tests\App\Models\Relationships\RelationAutoloadLike as Like;
+use Illuminate\Tests\App\Models\Relationships\RelationAutoloadPost as Post;
+use Illuminate\Tests\App\Models\Relationships\RelationAutoloadTag as Tag;
+use Illuminate\Tests\App\Models\Relationships\RelationAutoloadVideo as Video;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelRelationAutoloadTest extends DatabaseTestCase
@@ -287,122 +290,5 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         Model::automaticallyEagerLoadRelationships(false);
 
         DB::disableQueryLog();
-    }
-}
-
-class TagFactory extends Factory
-{
-    protected $model = Tag::class;
-
-    public function definition()
-    {
-        return [];
-    }
-}
-
-class Tag extends Model
-{
-    use HasFactory;
-
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            if ($model->post->shouldApplyStatus()) {
-                $model->status = 'Todo';
-            }
-        });
-    }
-
-    protected static function newFactory()
-    {
-        return TagFactory::new();
-    }
-
-    public function post()
-    {
-        return $this->belongsTo(Post::class);
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function parent()
-    {
-        return $this->belongsTo(self::class);
-    }
-
-    public function likes()
-    {
-        return $this->morphMany(Like::class, 'likeable');
-    }
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-}
-
-class Post extends Model
-{
-    public $timestamps = false;
-
-    public function shouldApplyStatus()
-    {
-        return false;
-    }
-
-    public function comments()
-    {
-        return $this->morphMany(Comment::class, 'commentable');
-    }
-
-    public function commentsWithChaperone()
-    {
-        return $this->morphMany(Comment::class, 'commentable')->chaperone();
-    }
-
-    public function likes()
-    {
-        return $this->morphMany(Like::class, 'likeable');
-    }
-
-    public function tags()
-    {
-        return $this->hasMany(Tag::class);
-    }
-}
-
-class Video extends Model
-{
-    public $timestamps = false;
-
-    public function comments()
-    {
-        return $this->morphMany(Comment::class, 'commentable');
-    }
-
-    public function likes()
-    {
-        return $this->morphMany(Like::class, 'likeable');
-    }
-}
-
-class Like extends Model
-{
-    public $timestamps = false;
-
-    protected $guarded = [];
-
-    public function likeable()
-    {
-        return $this->morphTo();
     }
 }

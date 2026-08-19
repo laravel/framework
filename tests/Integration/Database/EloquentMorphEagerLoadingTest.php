@@ -2,12 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphEagerLoadingTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\Comment;
+use Illuminate\Tests\App\Models\Relationships\MorphEagerLoadAction as Action;
+use Illuminate\Tests\App\Models\Relationships\MorphEagerLoadPost as Post;
+use Illuminate\Tests\App\Models\Relationships\MorphEagerLoadUser as User;
+use Illuminate\Tests\App\Models\Relationships\MorphEagerLoadVideo as Video;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphEagerLoadingTest extends DatabaseTestCase
@@ -111,48 +114,4 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 
         $this->assertInstanceOf(User::class, $action->target);
     }
-}
-
-class Action extends Model
-{
-    public $timestamps = false;
-
-    public function target()
-    {
-        return $this->morphTo()->withTrashed();
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-}
-
-class Post extends Model
-{
-    public $timestamps = false;
-    protected $primaryKey = 'post_id';
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-}
-
-class User extends Model
-{
-    use SoftDeletes;
-
-    public $timestamps = false;
-}
-
-class Video extends Model
-{
-    public $timestamps = false;
-    protected $primaryKey = 'video_id';
 }

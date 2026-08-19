@@ -2,12 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Tests\App\Models\Relationships\PivotWithoutTimestampRole;
+use Illuminate\Tests\App\Models\Relationships\PivotWithoutTimestampUser;
 use Illuminate\Tests\Integration\Database\EloquentPivotWithoutTimestampTest as App;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Concerns\WithFixtures;
 
-#[WithConfig('auth.providers.users.model', App\User::class)]
+#[WithConfig('auth.providers.users.model', PivotWithoutTimestampUser::class)]
 #[WithMigration]
 class EloquentPivotWithoutTimestampTest extends DatabaseTestCase
 {
@@ -22,8 +24,8 @@ class EloquentPivotWithoutTimestampTest extends DatabaseTestCase
     {
         $now = $this->freezeSecond();
 
-        $user = App\User::factory()->create();
-        $role = App\Role::factory()->create();
+        $user = PivotWithoutTimestampUser::factory()->create();
+        $role = PivotWithoutTimestampRole::factory()->create();
 
         $user->roles()->attach($role->getKey(), ['notes' => 'Laravel']);
 

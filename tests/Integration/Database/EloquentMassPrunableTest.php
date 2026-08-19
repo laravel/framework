@@ -3,13 +3,13 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Eloquent\MassPrunable;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Prunable\MassPrunableSoftDeleteTestModel;
+use Illuminate\Tests\App\Models\Prunable\MassPrunableTestModel;
+use Illuminate\Tests\App\Models\Prunable\MassPrunableTestModelMissingPrunableMethod;
 use LogicException;
 use Mockery;
 
@@ -88,29 +88,4 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         $this->assertEquals(0, MassPrunableSoftDeleteTestModel::count());
         $this->assertEquals(2000, MassPrunableSoftDeleteTestModel::withTrashed()->count());
     }
-}
-
-class MassPrunableTestModel extends Model
-{
-    use MassPrunable;
-
-    public function prunable()
-    {
-        return $this->where('id', '<=', 1500);
-    }
-}
-
-class MassPrunableSoftDeleteTestModel extends Model
-{
-    use MassPrunable, SoftDeletes;
-
-    public function prunable()
-    {
-        return $this->where('id', '<=', 3000);
-    }
-}
-
-class MassPrunableTestModelMissingPrunableMethod extends Model
-{
-    use MassPrunable;
 }

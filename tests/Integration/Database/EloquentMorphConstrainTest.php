@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphConstrainTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\Comment;
+use Illuminate\Tests\App\Models\Relationships\MorphConstrainPost as Post;
+use Illuminate\Tests\App\Models\Relationships\MorphConstrainVideo as Video;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphConstrainTest extends DatabaseTestCase
@@ -61,28 +63,4 @@ class EloquentMorphConstrainTest extends DatabaseTestCase
         $this->assertTrue($comments[2]->commentable->video_visible);
         $this->assertNull($comments[3]->commentable);
     }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-}
-
-class Post extends Model
-{
-    public $timestamps = false;
-    protected $fillable = ['post_visible'];
-    protected $casts = ['post_visible' => 'boolean'];
-}
-
-class Video extends Model
-{
-    public $timestamps = false;
-    protected $fillable = ['video_visible'];
-    protected $casts = ['video_visible' => 'boolean'];
 }

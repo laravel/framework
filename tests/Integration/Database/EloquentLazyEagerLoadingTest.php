@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Integration\Database\EloquentLazyEagerLoadingTest;
 
 use DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\Model1;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentLazyEagerLoadingTest extends DatabaseTestCase
@@ -45,47 +45,5 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
         $this->assertCount(1, DB::getQueryLog());
 
         $this->assertTrue($model->relationLoaded('threes'));
-    }
-}
-
-class Model1 extends Model
-{
-    public $table = 'one';
-    public $timestamps = false;
-    protected $guarded = [];
-    protected $with = ['twos'];
-
-    public function twos()
-    {
-        return $this->hasMany(Model2::class, 'one_id');
-    }
-
-    public function threes()
-    {
-        return $this->hasMany(Model3::class, 'one_id');
-    }
-}
-
-class Model2 extends Model
-{
-    public $table = 'two';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function one()
-    {
-        return $this->belongsTo(Model1::class, 'one_id');
-    }
-}
-
-class Model3 extends Model
-{
-    public $table = 'three';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function one()
-    {
-        return $this->belongsTo(Model1::class, 'one_id');
     }
 }

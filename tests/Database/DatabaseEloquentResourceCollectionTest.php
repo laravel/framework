@@ -5,12 +5,12 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceCollectionTestModel;
-use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithUseResourceAttribute;
-use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithUseResourceCollectionAttribute;
-use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceCollectionTestResource;
-use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceTestJsonResource;
-use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceTestJsonResourceCollection;
+use Illuminate\Tests\App\Http\Resources\EloquentResourceCollectionTestResource;
+use Illuminate\Tests\App\Http\Resources\EloquentResourceTestJsonResource;
+use Illuminate\Tests\App\Http\Resources\EloquentResourceTestJsonResourceCollection;
+use Illuminate\Tests\App\Models\EloquentResourceCollectionTestModel;
+use Illuminate\Tests\App\Models\EloquentResourceTestResourceModelWithUseResourceAttribute;
+use Illuminate\Tests\App\Models\EloquentResourceTestResourceModelWithUseResourceCollectionAttribute;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +29,7 @@ class DatabaseEloquentResourceCollectionTest extends TestCase
 
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
-        $this->expectExceptionObject(new LogicException('Failed to find resource class for model [Illuminate\Tests\Database\Fixtures\Models\EloquentResourceCollectionTestModel].'));
+        $this->expectExceptionObject(new LogicException('Failed to find resource class for model [Illuminate\Tests\App\Models\EloquentResourceCollectionTestModel].'));
 
         $collection = new Collection([
             new EloquentResourceCollectionTestModel(),
@@ -43,7 +43,7 @@ class DatabaseEloquentResourceCollectionTest extends TestCase
             new EloquentResourceCollectionTestModel(),
         ]);
 
-        class_alias(EloquentResourceCollectionTestResource::class, 'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceCollectionTestModelResource');
+        class_alias(EloquentResourceCollectionTestResource::class, 'Illuminate\Tests\App\Http\Resources\EloquentResourceCollectionTestModelResource');
 
         $resource = $collection->toResourceCollection();
 

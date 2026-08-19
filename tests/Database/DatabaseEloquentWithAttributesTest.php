@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Tests\App\Models\Relationships\WithAttributesEnum;
+use Illuminate\Tests\App\Models\Relationships\WithAttributesModel;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentWithAttributesTest extends TestCase
@@ -122,37 +122,4 @@ class DatabaseEloquentWithAttributesTest extends TestCase
     {
         return WithAttributesModel::getConnectionResolver()->connection()->getSchemaBuilder();
     }
-}
-
-class WithAttributesModel extends Model
-{
-    protected $guarded = [];
-
-    protected $casts = [
-        'is_admin' => 'boolean',
-        'type' => WithAttributesEnum::class,
-    ];
-
-    public function setFirstNameAttribute(string $value): void
-    {
-        $this->attributes['first_name'] = strtolower($value);
-    }
-
-    public function getFirstNameAttribute(?string $value): string
-    {
-        return ucfirst($value);
-    }
-
-    protected function lastName(): Attribute
-    {
-        return Attribute::make(
-            get: fn (string $value) => ucfirst($value),
-            set: fn (string $value) => strtolower($value),
-        );
-    }
-}
-
-enum WithAttributesEnum: string
-{
-    case internal = 'int';
 }

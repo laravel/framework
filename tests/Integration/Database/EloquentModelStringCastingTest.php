@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Casts\StringCasts;
 use stdClass;
 
 class EloquentModelStringCastingTest extends DatabaseTestCase
@@ -60,29 +60,4 @@ class EloquentModelStringCastingTest extends DatabaseTestCase
         $this->assertSame([], $model->getOriginal('object_attributes'));
         $this->assertSame([], $model->getAttribute('object_attributes'));
     }
-}
-
-/**
- * Eloquent Models...
- */
-class StringCasts extends Eloquent
-{
-    /**
-     * @var string
-     */
-    protected $table = 'casting_table';
-
-    /**
-     * @var string[]
-     */
-    protected $guarded = [];
-
-    /**
-     * @var array
-     */
-    protected $casts = [
-        'array_attributes' => 'array',
-        'json_attributes' => 'json',
-        'object_attributes' => 'object',
-    ];
 }

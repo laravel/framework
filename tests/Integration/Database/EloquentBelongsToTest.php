@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentBelongsToTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Models\Relationships\SelfReferencingUser;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentBelongsToTest extends DatabaseTestCase
@@ -19,28 +19,28 @@ class EloquentBelongsToTest extends DatabaseTestCase
             $table->string('parent_slug')->nullable();
         });
 
-        $user = User::create(['slug' => Str::random()]);
-        User::create(['parent_id' => $user->id, 'parent_slug' => $user->slug]);
+        $user = SelfReferencingUser::create(['slug' => Str::random()]);
+        SelfReferencingUser::create(['parent_id' => $user->id, 'parent_slug' => $user->slug]);
     }
 
     public function testHasSelf()
     {
-        $users = User::has('parent')->get();
+        $users = SelfReferencingUser::has('parent')->get();
 
         $this->assertCount(1, $users);
     }
 
     public function testHasSelfCustomOwnerKey()
     {
-        $users = User::has('parentBySlug')->get();
+        $users = SelfReferencingUser::has('parentBySlug')->get();
 
         $this->assertCount(1, $users);
     }
 
     public function testAssociateWithModel()
     {
-        $parent = User::doesntHave('parent')->first();
-        $child = User::has('parent')->first();
+        $parent = SelfReferencingUser::doesntHave('parent')->first();
+        $child = SelfReferencingUser::has('parent')->first();
 
         $parent->parent()->associate($child);
 
@@ -50,8 +50,8 @@ class EloquentBelongsToTest extends DatabaseTestCase
 
     public function testAssociateWithId()
     {
-        $parent = User::doesntHave('parent')->first();
-        $child = User::has('parent')->first();
+        $parent = SelfReferencingUser::doesntHave('parent')->first();
+        $child = SelfReferencingUser::has('parent')->first();
 
         $parent->parent()->associate($child->id);
 
@@ -61,7 +61,7 @@ class EloquentBelongsToTest extends DatabaseTestCase
 
     public function testAssociateWithIdUnsetsLoadedRelation()
     {
-        $child = User::has('parent')->with('parent')->first();
+        $child = SelfReferencingUser::has('parent')->with('parent')->first();
 
         // Overwrite the (loaded) parent relation
         $child->parent()->associate($child->id);
@@ -72,7 +72,7 @@ class EloquentBelongsToTest extends DatabaseTestCase
 
     public function testParentIsNotNull()
     {
-        $child = User::has('parent')->first();
+        $child = SelfReferencingUser::has('parent')->first();
         $parent = null;
 
         $this->assertFalse($child->parent()->is($parent));
@@ -81,8 +81,8 @@ class EloquentBelongsToTest extends DatabaseTestCase
 
     public function testParentIsModel()
     {
-        $child = User::has('parent')->first();
-        $parent = User::doesntHave('parent')->first();
+        $child = SelfReferencingUser::has('parent')->first();
+        $parent = SelfReferencingUser::doesntHave('parent')->first();
 
         $this->assertTrue($child->parent()->is($parent));
         $this->assertFalse($child->parent()->isNot($parent));
@@ -90,8 +90,8 @@ class EloquentBelongsToTest extends DatabaseTestCase
 
     public function testParentIsNotAnotherModel()
     {
-        $child = User::has('parent')->first();
-        $parent = new User;
+        $child = SelfReferencingUser::has('parent')->first();
+        $parent = new SelfReferencingUser;
         $parent->id = 3;
 
         $this->assertFalse($child->parent()->is($parent));
@@ -100,9 +100,9 @@ class EloquentBelongsToTest extends DatabaseTestCase
 
     public function testNullParentIsNotModel()
     {
-        $child = User::has('parent')->first();
+        $child = SelfReferencingUser::has('parent')->first();
         $child->parent()->dissociate();
-        $parent = User::doesntHave('parent')->first();
+        $parent = SelfReferencingUser::doesntHave('parent')->first();
 
         $this->assertFalse($child->parent()->is($parent));
         $this->assertTrue($child->parent()->isNot($parent));
@@ -110,8 +110,8 @@ class EloquentBelongsToTest extends DatabaseTestCase
 
     public function testParentIsNotModelWithAnotherTable()
     {
-        $child = User::has('parent')->first();
-        $parent = User::doesntHave('parent')->first();
+        $child = SelfReferencingUser::has('parent')->first();
+        $parent = SelfReferencingUser::doesntHave('parent')->first();
         $parent->setTable('foo');
 
         $this->assertFalse($child->parent()->is($parent));
@@ -120,27 +120,11 @@ class EloquentBelongsToTest extends DatabaseTestCase
 
     public function testParentIsNotModelWithAnotherConnection()
     {
-        $child = User::has('parent')->first();
-        $parent = User::doesntHave('parent')->first();
+        $child = SelfReferencingUser::has('parent')->first();
+        $parent = SelfReferencingUser::doesntHave('parent')->first();
         $parent->setConnection('foo');
 
         $this->assertFalse($child->parent()->is($parent));
         $this->assertTrue($child->parent()->isNot($parent));
-    }
-}
-
-class User extends Model
-{
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function parent()
-    {
-        return $this->belongsTo(self::class, 'parent_id');
-    }
-
-    public function parentBySlug()
-    {
-        return $this->belongsTo(self::class, 'parent_slug', 'slug');
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentWithCountTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Scopes\WithCountBaseModel as Model1;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentWithCountTest extends DatabaseTestCase
@@ -69,81 +69,5 @@ class EloquentWithCountTest extends DatabaseTestCase
 
         $this->assertNull($query->orders);
         $this->assertSame([], $query->getRawBindings()['order']);
-    }
-}
-
-class Model1 extends Model
-{
-    public $table = 'one';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public function twos()
-    {
-        return $this->hasMany(Model2::class, 'one_id');
-    }
-
-    public function fours()
-    {
-        return $this->hasMany(Model4::class, 'one_id');
-    }
-
-    public function allFours()
-    {
-        return $this->fours()->withoutGlobalScopes();
-    }
-}
-
-class Model2 extends Model
-{
-    public $table = 'two';
-    public $timestamps = false;
-    protected $guarded = [];
-    protected $withCount = ['threes'];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope('app', function ($builder) {
-            $builder->latest();
-        });
-    }
-
-    public function threes()
-    {
-        return $this->hasMany(Model3::class, 'two_id');
-    }
-}
-
-class Model3 extends Model
-{
-    public $table = 'three';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope('app', function ($builder) {
-            $builder->where('id', '>', 0);
-        });
-    }
-}
-
-class Model4 extends Model
-{
-    public $table = 'four';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope('app', function ($builder) {
-            $builder->where('id', '>', 1);
-        });
     }
 }

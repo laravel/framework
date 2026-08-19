@@ -30,7 +30,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Illuminate\Tests\Database\Fixtures\Enums\Bar;
+use Illuminate\Tests\App\Enums\Bar;
 use InvalidArgumentException;
 use Mockery;
 use Mockery\MockInterface;

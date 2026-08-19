@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManySyncTestTestArticle;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManySyncTestTestUser;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
@@ -131,25 +133,4 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
-}
-
-class BelongsToManySyncTestTestUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $fillable = ['id', 'email'];
-    public $timestamps = false;
-
-    public function articles()
-    {
-        return $this->belongsToMany(BelongsToManySyncTestTestArticle::class, 'article_user', 'user_id', 'article_id')->withPivot('visible');
-    }
-}
-
-class BelongsToManySyncTestTestArticle extends Eloquent
-{
-    protected $table = 'articles';
-    protected $keyType = 'string';
-    public $incrementing = false;
-    public $timestamps = false;
-    protected $fillable = ['id', 'title'];
 }

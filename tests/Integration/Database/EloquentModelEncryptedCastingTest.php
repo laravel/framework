@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Fluent;
+use Illuminate\Tests\App\Models\Casts\EncryptedCast;
 use stdClass;
 
 class EloquentModelEncryptedCastingTest extends DatabaseTestCase
@@ -370,25 +371,4 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             'secret' => 'encrypted-secret-string',
         ]);
     }
-}
-
-/**
- * @property $secret
- * @property $secret_array
- * @property $secret_json
- * @property $secret_object
- * @property $secret_collection
- */
-class EncryptedCast extends Model
-{
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public $casts = [
-        'secret' => 'encrypted',
-        'secret_array' => 'encrypted:array',
-        'secret_json' => 'encrypted:json',
-        'secret_object' => 'encrypted:object',
-        'secret_collection' => 'encrypted:collection',
-    ];
 }

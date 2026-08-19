@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManyLazyByIdTestTestArticle;
+use Illuminate\Tests\App\Models\Relationships\BelongsToManyLazyByIdTestTestUser;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyLazyByIdTest extends TestCase
@@ -109,26 +111,4 @@ class DatabaseEloquentBelongsToManyLazyByIdTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
-}
-
-class BelongsToManyLazyByIdTestTestUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $fillable = ['id', 'email'];
-    public $timestamps = false;
-
-    public function articles()
-    {
-        return $this->belongsToMany(BelongsToManyLazyByIdTestTestArticle::class, 'article_user', 'user_id', 'article_id');
-    }
-}
-
-class BelongsToManyLazyByIdTestTestArticle extends Eloquent
-{
-    protected $primaryKey = 'aid';
-    protected $table = 'articles';
-    protected $keyType = 'string';
-    public $incrementing = false;
-    public $timestamps = false;
-    protected $fillable = ['aid', 'title'];
 }

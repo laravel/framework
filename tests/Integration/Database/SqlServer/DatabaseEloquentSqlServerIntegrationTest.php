@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\SqlServer;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\DatabaseEloquentSqlServerIntegrationUser;
 
 class DatabaseEloquentSqlServerIntegrationTest extends SqlServerTestCase
 {
@@ -74,11 +74,4 @@ class DatabaseEloquentSqlServerIntegrationTest extends SqlServerTestCase
             $this->assertNull($user2->name);
         });
     }
-}
-
-class DatabaseEloquentSqlServerIntegrationUser extends Model
-{
-    protected $table = 'database_eloquent_sql_server_integration_users';
-
-    protected $guarded = [];
 }

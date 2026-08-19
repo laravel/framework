@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphPivot;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Relationships\PivotEventsTestCollaborator;
+use Illuminate\Tests\App\Models\Relationships\PivotEventsTestEquipment;
+use Illuminate\Tests\App\Models\Relationships\PivotEventsTestModelEquipment;
+use Illuminate\Tests\App\Models\Relationships\PivotEventsTestProject;
+use Illuminate\Tests\App\Models\Relationships\PivotEventsTestUser;
 
 class EloquentPivotEventsTest extends DatabaseTestCase
 {
@@ -189,172 +191,5 @@ class EloquentPivotEventsTest extends DatabaseTestCase
             ['equipmentable_type', 'equipmentable_type', 'equipmentable_type', 'equipmentable_type', 'equipmentable_type', 'equipmentable_type'],
             PivotEventsTestModelEquipment::$eventsMorphTypes
         );
-    }
-}
-
-class PivotEventsTestUser extends Model
-{
-    public $table = 'users';
-}
-
-class PivotEventsTestEquipment extends Model
-{
-    public $table = 'equipments';
-
-    public function getForeignKey()
-    {
-        return 'equipment_id';
-    }
-
-    public function projects()
-    {
-        return $this->morphedByMany(PivotEventsTestProject::class, 'equipmentable')->using(PivotEventsTestModelEquipment::class);
-    }
-}
-
-class PivotEventsTestProject extends Model
-{
-    public $table = 'projects';
-
-    public function collaborators()
-    {
-        return $this->belongsToMany(
-            PivotEventsTestUser::class, 'project_users', 'project_id', 'user_id'
-        )->using(PivotEventsTestCollaborator::class);
-    }
-
-    public function contributors()
-    {
-        return $this->belongsToMany(PivotEventsTestUser::class, 'project_users', 'project_id', 'user_id')
-            ->using(PivotEventsTestCollaborator::class)
-            ->wherePivot('role', 'contributor');
-    }
-
-    public function managers()
-    {
-        return $this->belongsToMany(PivotEventsTestUser::class, 'project_users', 'project_id', 'user_id')
-            ->using(PivotEventsTestCollaborator::class)
-            ->withPivotValue('role', 'manager');
-    }
-
-    public function equipments()
-    {
-        return $this->morphToMany(PivotEventsTestEquipment::class, 'equipmentable')->using(PivotEventsTestModelEquipment::class);
-    }
-}
-
-class PivotEventsTestModelEquipment extends MorphPivot
-{
-    public $table = 'equipmentables';
-
-    public static $eventsMorphClasses = [];
-
-    public static $eventsMorphTypes = [];
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            static::$eventsMorphClasses[] = $model->morphClass;
-            static::$eventsMorphTypes[] = $model->morphType;
-        });
-
-        static::created(function ($model) {
-            static::$eventsMorphClasses[] = $model->morphClass;
-            static::$eventsMorphTypes[] = $model->morphType;
-        });
-
-        static::updating(function ($model) {
-            static::$eventsMorphClasses[] = $model->morphClass;
-            static::$eventsMorphTypes[] = $model->morphType;
-        });
-
-        static::updated(function ($model) {
-            static::$eventsMorphClasses[] = $model->morphClass;
-            static::$eventsMorphTypes[] = $model->morphType;
-        });
-
-        static::saving(function ($model) {
-            static::$eventsMorphClasses[] = $model->morphClass;
-            static::$eventsMorphTypes[] = $model->morphType;
-        });
-
-        static::saved(function ($model) {
-            static::$eventsMorphClasses[] = $model->morphClass;
-            static::$eventsMorphTypes[] = $model->morphType;
-        });
-
-        static::deleting(function ($model) {
-            static::$eventsMorphClasses[] = $model->morphClass;
-            static::$eventsMorphTypes[] = $model->morphType;
-        });
-
-        static::deleted(function ($model) {
-            static::$eventsMorphClasses[] = $model->morphClass;
-            static::$eventsMorphTypes[] = $model->morphType;
-        });
-    }
-
-    public function equipment()
-    {
-        return $this->belongsTo(PivotEventsTestEquipment::class);
-    }
-
-    public function equipmentable()
-    {
-        return $this->morphTo();
-    }
-}
-
-class PivotEventsTestCollaborator extends Pivot
-{
-    public $table = 'project_users';
-
-    public $timestamps = false;
-
-    protected $casts = [
-        'permissions' => 'json',
-    ];
-
-    public static $eventsCalled = [];
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            static::$eventsCalled[] = 'creating';
-        });
-
-        static::created(function ($model) {
-            static::$eventsCalled[] = 'created';
-        });
-
-        static::updating(function ($model) {
-            static::$eventsCalled[] = 'updating';
-        });
-
-        static::updated(function ($model) {
-            $_SERVER['pivot_attributes'] = $model->getAttributes();
-            $_SERVER['pivot_dirty_attributes'] = $model->getDirty();
-            static::$eventsCalled[] = 'updated';
-        });
-
-        static::saving(function ($model) {
-            static::$eventsCalled[] = 'saving';
-        });
-
-        static::saved(function ($model) {
-            static::$eventsCalled[] = 'saved';
-        });
-
-        static::deleting(function ($model) {
-            static::$eventsCalled[] = 'deleting';
-        });
-
-        static::deleted(function ($model) {
-            static::$eventsCalled[] = 'deleted';
-        });
     }
 }

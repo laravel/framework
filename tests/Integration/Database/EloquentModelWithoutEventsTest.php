@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Events\AutoFilledModel;
 
 class EloquentModelWithoutEventsTest extends DatabaseTestCase
 {
@@ -27,21 +27,5 @@ class EloquentModelWithoutEventsTest extends DatabaseTestCase
         $model->save();
 
         $this->assertSame('Laravel', $model->project);
-    }
-}
-
-class AutoFilledModel extends Model
-{
-    public $table = 'auto_filled_models';
-    public $timestamps = false;
-    protected $guarded = [];
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::saving(function ($model) {
-            $model->project = 'Laravel';
-        });
     }
 }

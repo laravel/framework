@@ -4,7 +4,8 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Tests\App\Models\Relationships\OrFailRole;
+use Illuminate\Tests\App\Models\Relationships\OrFailUser;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyOrFailTest extends TestCase
@@ -200,23 +201,4 @@ class DatabaseEloquentBelongsToManyOrFailTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
-}
-
-class OrFailUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $guarded = [];
-    public $timestamps = false;
-
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(OrFailRole::class, 'role_user', 'user_id', 'role_id');
-    }
-}
-
-class OrFailRole extends Eloquent
-{
-    protected $table = 'roles';
-    protected $guarded = [];
-    public $timestamps = false;
 }
