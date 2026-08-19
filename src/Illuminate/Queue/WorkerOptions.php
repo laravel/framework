@@ -89,6 +89,13 @@ class WorkerOptions
     public $maxTime;
 
     /**
+     * The number of seconds between worker heartbeat events. Zero disables it.
+     *
+     * @var int
+     */
+    public $heartbeat;
+
+    /**
      * Create a new worker options instance.
      *
      * @param  string  $name
@@ -103,6 +110,7 @@ class WorkerOptions
      * @param  int  $maxTime
      * @param  int  $rest
      * @param  int  $stopWhenEmptyFor
+     * @param  int  $heartbeat
      */
     public function __construct(
         $name = 'default',
@@ -117,6 +125,7 @@ class WorkerOptions
         $maxTime = 0,
         $rest = 0,
         $stopWhenEmptyFor = 0,
+        $heartbeat = 0,
     ) {
         $this->name = $name;
         $this->backoff = $backoff;
@@ -130,5 +139,6 @@ class WorkerOptions
         $this->stopWhenEmptyFor = $stopWhenEmptyFor;
         $this->maxJobs = $maxJobs;
         $this->maxTime = $maxTime;
+        $this->heartbeat = $heartbeat;
     }
 }

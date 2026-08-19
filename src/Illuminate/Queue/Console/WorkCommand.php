@@ -50,6 +50,7 @@ class WorkCommand extends Command
                             {--rest=0 : The number of seconds to rest between jobs}
                             {--timeout=60 : The number of seconds a child process can run}
                             {--tries=1 : The number of times to attempt a job before logging it failed}
+                            {--heartbeat=0 : The number of seconds between worker heartbeat events}
                             {--json : Output the queue worker information as JSON}';
 
     /**
@@ -173,6 +174,7 @@ class WorkCommand extends Command
             $this->option('max-time'),
             $this->option('rest'),
             $this->option('stop-when-empty-for'),
+            $this->option('heartbeat'),
         );
     }
 

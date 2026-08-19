@@ -18,6 +18,7 @@ use Illuminate\Queue\Events\JobReleased;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\JobTimedOut;
 use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerHeartbeat;
 use Illuminate\Queue\Events\WorkerIdle;
 use Illuminate\Queue\Events\WorkerInterrupted;
 use Illuminate\Queue\Events\WorkerPausing;
@@ -225,11 +226,26 @@ class Worker
 
         $startTime = $this->currentTime();
 
+        $lastHeartbeat = $this->currentTime();
+
         $this->jobsProcessed = 0;
 
         $this->raiseWorkerStartingEvent($connectionName, $queue, $options);
 
         while (true) {
+            // If a heartbeat interval is configured, we will dispatch a heartbeat event
+            // once enough time has elapsed. This runs before the pause check so that a
+            // paused or maintenance-mode worker still reports that it is alive.
+            if ($options->heartbeat > 0 &&
+                $this->currentTime() - $lastHeartbeat >= $options->heartbeat) {
+                $this->events->dispatch(new WorkerHeartbeat(
+                    $connectionName, $queue, $options,
+                    $this->jobsProcessed, $this->lastJobProcessedAt, $this->currentMemoryUsage()
+                ));
+
+                $lastHeartbeat = $this->currentTime();
+            }
+
             // Before reserving any jobs, we will make sure this queue is not paused and
             // if it is we will just pause this worker for a given amount of time and
             // make sure we do not need to kill this worker process off completely.

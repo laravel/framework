@@ -16,6 +16,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleased;
 use Illuminate\Queue\Events\JobReleasedAfterException;
+use Illuminate\Queue\Events\WorkerHeartbeat;
 use Illuminate\Queue\Events\WorkerIdle;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
@@ -541,6 +542,54 @@ class QueueWorkerTest extends TestCase
                 && $event->queue === 'queue'
                 && $event->workerOptions === $workerOptions;
         }))->once();
+    }
+
+    public function testWorkerHeartbeatIsDispatchedOnceIntervalElapses()
+    {
+        $workerOptions = new WorkerOptions();
+        $workerOptions->heartbeat = 5;
+        $workerOptions->stopWhenEmptyFor = 10;
+
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $worker->currentTime = 0;
+
+        $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($workerOptions) {
+            return $event instanceof WorkerHeartbeat
+                && $event->connectionName === 'default'
+                && $event->queue === 'queue'
+                && $event->workerOptions === $workerOptions
+                && $event->jobsProcessed === 0
+                && $event->lastJobProcessedAt === null;
+        }))->once();
+    }
+
+    public function testWorkerHeartbeatIsNotDispatchedBeforeIntervalElapses()
+    {
+        $workerOptions = new WorkerOptions();
+        $workerOptions->heartbeat = 100;
+        $workerOptions->stopWhenEmptyFor = 5;
+
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $worker->currentTime = 0;
+
+        $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->events->shouldNotHaveReceived('dispatch', [m::type(WorkerHeartbeat::class)]);
+    }
+
+    public function testWorkerHeartbeatIsDisabledByDefault()
+    {
+        $workerOptions = new WorkerOptions();
+        $workerOptions->stopWhenEmptyFor = 10;
+
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $worker->currentTime = 0;
+
+        $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->events->shouldNotHaveReceived('dispatch', [m::type(WorkerHeartbeat::class)]);
     }
 
     public function testWorkerStoppingIsDispatched()
