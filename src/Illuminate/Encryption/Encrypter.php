@@ -51,7 +51,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @throws \RuntimeException
      */
-    public function __construct($key, $cipher = 'aes-128-cbc')
+    public function __construct(#[\SensitiveParameter] $key, $cipher = 'aes-128-cbc')
     {
         $key = (string) $key;
 
@@ -72,7 +72,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      * @param  string  $cipher
      * @return bool
      */
-    public static function supported($key, $cipher)
+    public static function supported(#[\SensitiveParameter] $key, $cipher)
     {
         if (! isset(self::$supportedCiphers[strtolower($cipher)])) {
             return false;
@@ -121,7 +121,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
             ? '' // For AEAD-algorithms, the tag / MAC is returned by openssl_encrypt...
             : $this->hash($iv, $value, $this->key);
 
-        $json = json_encode(compact('iv', 'value', 'mac', 'tag'), JSON_UNESCAPED_SLASHES);
+        $json = json_encode(['iv' => $iv, 'value' => $value, 'mac' => $mac, 'tag' => $tag], JSON_UNESCAPED_SLASHES);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new EncryptException('Could not encrypt the data.');
@@ -162,16 +162,19 @@ class Encrypter implements EncrypterContract, StringEncrypter
             $tag = empty($payload['tag']) ? null : base64_decode($payload['tag'])
         );
 
-        $foundValidMac = false;
+        [$keys, $validKey] = [$this->getAllKeys(), null];
 
         // Here we will decrypt the value. If we are able to successfully decrypt it
         // we will then unserialize it and return it out to the caller. If we are
         // unable to decrypt this value we will throw out an exception message.
-        foreach ($this->getAllKeys() as $key) {
-            if (
-                $this->shouldValidateMac() &&
-                ! ($foundValidMac = $foundValidMac || $this->validMacForKey($payload, $key))
-            ) {
+        foreach ($keys as $key) {
+            if ($this->shouldValidateMac()) {
+                $validMac = $this->validMacForKey($payload, $key);
+
+                if ($validMac && $validKey === null) {
+                    $validKey = $key;
+                }
+
                 continue;
             }
 
@@ -184,8 +187,14 @@ class Encrypter implements EncrypterContract, StringEncrypter
             }
         }
 
-        if ($this->shouldValidateMac() && ! $foundValidMac) {
+        if ($this->shouldValidateMac() && $validKey === null) {
             throw new DecryptException('The MAC is invalid.');
+        }
+
+        if ($this->shouldValidateMac()) {
+            $decrypted = \openssl_decrypt(
+                $payload['value'], strtolower($this->cipher), $validKey, 0, $iv, $tag ?? ''
+            );
         }
 
         if (($decrypted ?? false) === false) {
@@ -290,7 +299,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      * @param  string  $key
      * @return bool
      */
-    protected function validMacForKey(#[\SensitiveParameter] $payload, $key)
+    protected function validMacForKey(#[\SensitiveParameter] $payload, #[\SensitiveParameter] $key)
     {
         return hash_equals(
             $this->hash($payload['iv'], $payload['value'], $key), $payload['mac']
@@ -302,6 +311,8 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @param  string  $tag
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
     protected function ensureTagIsValid($tag)
     {
@@ -322,6 +333,30 @@ class Encrypter implements EncrypterContract, StringEncrypter
     protected function shouldValidateMac()
     {
         return ! self::$supportedCiphers[strtolower($this->cipher)]['aead'];
+    }
+
+    /**
+     * Determine if the given value appears to be encrypted by this encrypter.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function appearsEncrypted($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $decoded = base64_decode($value, true);
+
+        if ($decoded === false) {
+            return false;
+        }
+
+        $payload = json_decode($decoded, true);
+
+        return is_array($payload)
+            && isset($payload['iv'], $payload['value'], $payload['mac']);
     }
 
     /**
@@ -359,8 +394,10 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @param  array  $keys
      * @return $this
+     *
+     * @throws \RuntimeException
      */
-    public function previousKeys(array $keys)
+    public function previousKeys(#[\SensitiveParameter] array $keys)
     {
         foreach ($keys as $key) {
             if (! static::supported($key, $this->cipher)) {

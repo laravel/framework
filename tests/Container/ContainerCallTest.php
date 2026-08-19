@@ -7,6 +7,7 @@ use Error;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use stdClass;
 
 class ContainerCallTest extends TestCase
@@ -129,7 +130,7 @@ class ContainerCallTest extends TestCase
         });
 
         $this->assertInstanceOf(stdClass::class, $result[0]);
-        $this->assertEquals([], $result[1]);
+        $this->assertSame([], $result[1]);
 
         $result = $container->call(function (stdClass $foo, $bar = []) {
             return func_get_args();
@@ -201,8 +202,7 @@ class ContainerCallTest extends TestCase
 
     public function testCallWithoutRequiredParamsThrowsException()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub');
+        $this->expectExceptionObject(new BindingResolutionException('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub'));
 
         $container = new Container;
         $container->call(ContainerTestCallStub::class.'@unresolvable');
@@ -210,8 +210,7 @@ class ContainerCallTest extends TestCase
 
     public function testCallWithUnnamedParametersThrowsException()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub');
+        $this->expectExceptionObject(new BindingResolutionException('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub'));
 
         $container = new Container;
         $container->call([new ContainerTestCallStub, 'unresolvable'], ['foo', 'bar']);
@@ -219,13 +218,57 @@ class ContainerCallTest extends TestCase
 
     public function testCallWithoutRequiredParamsOnClosureThrowsException()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerCallTest');
+        $this->expectExceptionObject(new BindingResolutionException('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerCallTest'));
 
         $container = new Container;
         $container->call(function ($foo, $bar = 'default') {
             return $foo;
         });
+    }
+
+    public function testCallCleansUpBuildStackAfterException()
+    {
+        $container = new Container;
+
+        $container->when(ContainerCallFailingStub::class)
+            ->needs(ContainerCallConcreteStub::class)
+            ->give(ContainerCallContextualConcreteStub::class);
+
+        try {
+            $container->call([new ContainerCallFailingStub, 'handle']);
+
+            $this->fail('Expected the callback to throw an exception.');
+        } catch (RuntimeException) {
+            // Expected.
+        }
+
+        $dependency = $container->make(ContainerCallConcreteStub::class);
+
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $dependency);
+        $this->assertNotInstanceOf(ContainerCallContextualConcreteStub::class, $dependency);
+    }
+
+    public function testCallWithNullableClassParameterDefaultValue()
+    {
+        $container = new Container;
+
+        $result = $container->call(function (?ContainerCallConcreteStub $stub = null) {
+            return $stub;
+        });
+
+        $this->assertNull($result);
+    }
+
+    public function testCallWithNullableClassParameterDefaultValueWithBinding()
+    {
+        $container = new Container;
+        $container->bind(ContainerCallConcreteStub::class);
+
+        $result = $container->call(function (?ContainerCallConcreteStub $stub = null) {
+            return $stub;
+        });
+
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $result);
     }
 }
 
@@ -250,6 +293,19 @@ class ContainerTestCallStub
 class ContainerCallConcreteStub
 {
     //
+}
+
+class ContainerCallContextualConcreteStub extends ContainerCallConcreteStub
+{
+    //
+}
+
+class ContainerCallFailingStub
+{
+    public function handle(ContainerCallConcreteStub $stub)
+    {
+        throw new RuntimeException('Expected.');
+    }
 }
 
 function containerTestInject(ContainerCallConcreteStub $stub, $default = 'taylor')

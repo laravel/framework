@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
+use Throwable;
 
 #[WithConfig('cache.default', 'file')]
 class FileCacheLockTest extends TestCase
@@ -100,6 +101,30 @@ class FileCacheLockTest extends TestCase
         $this->assertTrue($secondLock->isOwnedByCurrentProcess());
     }
 
+    public function testCacheRememberReturnsValueWhenLockWithSameKeyExists()
+    {
+        $lock = Cache::lock('my-key', 5);
+        $this->assertTrue($lock->get());
+
+        $value = Cache::remember('my-key', 60, fn () => 'expected-value');
+
+        $this->assertSame('expected-value', $value);
+
+        $lock->release();
+    }
+
+    public function testIsLocked()
+    {
+        $lock = Cache::lock('foo', 10);
+        $this->assertFalse($lock->isLocked());
+
+        $lock->get();
+        $this->assertTrue($lock->isLocked());
+
+        $lock->release();
+        $this->assertFalse($lock->isLocked());
+    }
+
     public function testOtherOwnerDoesNotOwnLockAfterRestore()
     {
         $firstLock = Cache::lock('foo', 10);
@@ -122,5 +147,60 @@ class FileCacheLockTest extends TestCase
         // try to get lock and hit block timeout
         $this->expectException(LockTimeoutException::class);
         Cache::lock('foo', 10)->block(5);
+    }
+
+    public function testLockCanBeRefreshed()
+    {
+        $lock = Cache::lock('foo', 10);
+        $this->assertTrue($lock->get());
+
+        // Refresh the lock for another 20 seconds
+        $this->assertTrue($lock->refresh(20));
+
+        // Lock should still be held
+        $this->assertFalse(Cache::lock('foo', 10)->get());
+
+        $lock->release();
+    }
+
+    public function testLockCannotBeRefreshedByAnotherOwner()
+    {
+        $firstLock = Cache::lock('foo', 10);
+        $this->assertTrue($firstLock->get());
+
+        // Create a new lock with a different owner
+        $secondLock = Cache::store('file')->restoreLock('foo', 'other_owner');
+
+        // Second lock should not be able to refresh
+        $this->assertFalse($secondLock->refresh(20));
+
+        // Original lock should still be able to refresh
+        $this->assertTrue($firstLock->refresh(20));
+
+        $firstLock->release();
+    }
+
+    public function testLockRefreshWithDefaultSeconds()
+    {
+        $lock = Cache::lock('foo', 10);
+        $this->assertTrue($lock->get());
+
+        // Refresh without specifying seconds should use the original duration
+        $this->assertTrue($lock->refresh());
+
+        // Lock should still be held
+        $this->assertFalse(Cache::lock('foo', 10)->get());
+
+        $lock->release();
+    }
+
+    protected function tearDown(): void
+    {
+        try {
+            Cache::lock('foo')->forceRelease();
+        } catch (Throwable) {
+        }
+
+        parent::tearDown();
     }
 }

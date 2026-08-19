@@ -2,8 +2,10 @@
 
 namespace Illuminate\Validation\Rules;
 
+use ArrayIterator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\DataAwareRule;
+use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
@@ -11,8 +13,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
+use IteratorAggregate;
+use Traversable;
 
-class Password implements Rule, DataAwareRule, ValidatorAwareRule
+class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, ValidatorAwareRule
 {
     use Conditionable;
 
@@ -43,6 +47,20 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      * @var int
      */
     protected $max;
+
+    /**
+     * If the password is required.
+     *
+     * @var bool
+     */
+    protected $required = false;
+
+    /**
+     * If the password should only be validated when present.
+     *
+     * @var bool
+     */
+    protected $sometimes = false;
 
     /**
      * If the password requires at least one uppercase and one lowercase letter.
@@ -123,7 +141,9 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      * If no arguments are passed, the default password rule configuration will be returned.
      *
      * @param  static|callable|null  $callback
-     * @return static|void
+     * @return ($callback is null ? static : void)
+     *
+     * @throws \InvalidArgumentException
      */
     public static function defaults($callback = null)
     {
@@ -155,21 +175,29 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Get the default configuration of the password rule and mark the field as required.
      *
-     * @return array
+     * @return static
      */
     public static function required()
     {
-        return ['required', static::default()];
+        $password = static::default();
+
+        $password->required = true;
+
+        return $password;
     }
 
     /**
      * Get the default configuration of the password rule and mark the field as sometimes being required.
      *
-     * @return array
+     * @return static
      */
     public static function sometimes()
     {
-        return ['sometimes', static::default()];
+        $password = static::default();
+
+        $password->sometimes = true;
+
+        return $password;
     }
 
     /**
@@ -202,7 +230,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      * Set the minimum size of the password.
      *
      * @param  int  $size
-     * @return $this
+     * @return static
      */
     public static function min($size)
     {
@@ -309,14 +337,17 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     {
         $this->messages = [];
 
+        if (! $this->required && ! $this->sometimes && ! Arr::has($this->data ?? [], $attribute)) {
+            return true;
+        }
+
+        if (blank($value) && ! $this->required && $this->validator?->hasRule($attribute, ['Nullable'])) {
+            return true;
+        }
+
         $validator = Validator::make(
             $this->data,
-            [$attribute => [
-                'string',
-                'min:'.$this->min,
-                ...($this->max ? ['max:'.$this->max] : []),
-                ...$this->customRules,
-            ]],
+            [$attribute => [...$this]],
             $this->validator->customMessages,
             $this->validator->customAttributes
         )->after(function ($validator) use ($attribute, $value) {
@@ -398,5 +429,55 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             'compromisedThreshold' => $this->compromisedThreshold,
             'customRules' => $this->customRules,
         ];
+    }
+
+    /**
+     * Convert the password rule to a passwordrules HTML attribute string.
+     *
+     * @return string
+     *
+     * @see https://developer.apple.com/password-rules/
+     */
+    public function toPasswordRulesString()
+    {
+        $rules = ['minlength: '.$this->min];
+
+        if ($this->max) {
+            $rules[] = 'maxlength: '.$this->max;
+        }
+
+        if ($this->mixedCase) {
+            $rules[] = 'required: lower';
+            $rules[] = 'required: upper';
+        } elseif ($this->letters) {
+            $rules[] = 'required: lower';
+        }
+
+        if ($this->numbers) {
+            $rules[] = 'required: digit';
+        }
+
+        if ($this->symbols) {
+            $rules[] = 'required: special';
+        }
+
+        return implode('; ', $rules).';';
+    }
+
+    /**
+     * Get an iterator for the password validation rules.
+     *
+     * @return \ArrayIterator<int, mixed>
+     */
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator([
+            ...($this->required ? ['required'] : []),
+            ...($this->sometimes ? ['sometimes'] : []),
+            'string',
+            'min:'.$this->min,
+            ...($this->max ? ['max:'.$this->max] : []),
+            ...$this->customRules,
+        ]);
     }
 }

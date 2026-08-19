@@ -266,6 +266,22 @@ class PendingSingletonResourceRegistration
     }
 
     /**
+     * Add metadata to the registered singleton resource routes.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function metadata(array $metadata)
+    {
+        $this->options['metadata'] = RouteGroup::mergeMetadata(
+            $this->options['metadata'] ?? [],
+            $metadata
+        );
+
+        return $this;
+    }
+
+    /**
      * Register the singleton resource route.
      *
      * @return \Illuminate\Routing\RouteCollection

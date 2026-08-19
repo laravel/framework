@@ -1,0 +1,38 @@
+{
+    "name": "illuminate/reflection",
+    "description": "The Illuminate Reflection package.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylor@laravel.com"
+        }
+    ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
+    "require": {
+        "php": "^8.3",
+        "illuminate/collections": "^13.0",
+        "illuminate/contracts": "^13.0"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Support\\": ""
+        },
+        "files": [
+            "helpers.php"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "13.0.x-dev"
+        }
+    }
+}

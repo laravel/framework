@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Http;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MissingValue;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class JsonResourceTest extends TestCase
@@ -35,14 +35,14 @@ class JsonResourceTest extends TestCase
         $model = new class extends Model {
         };
 
-        $resource = m::mock(JsonResource::class, ['resource' => $model])
+        $resource = Mockery::mock(JsonResource::class, ['resource' => $model])
             ->makePartial()
-            ->shouldReceive('jsonSerialize')->andReturn(['foo' => 'bar'])
+            ->expects('jsonSerialize')->andReturn(['foo' => 'bar'])
             ->getMock();
 
         // Simulate a JSON error
         json_decode('{');
-        $this->assertTrue(json_last_error() !== JSON_ERROR_NONE);
+        $this->assertNotSame(json_last_error(), JSON_ERROR_NONE);
 
         $this->assertSame('{"foo":"bar"}', $resource->toJson(JSON_THROW_ON_ERROR));
     }
@@ -52,9 +52,9 @@ class JsonResourceTest extends TestCase
         $model = new class extends Model {
         };
 
-        $resource = m::mock(JsonResource::class, ['resource' => $model])
+        $resource = Mockery::mock(JsonResource::class, ['resource' => $model])
             ->makePartial()
-            ->shouldReceive('jsonSerialize')->andReturn(['foo' => 'bar', 'bar' => 'foo', 'number' => 123])
+            ->expects('jsonSerialize')->times(3)->andReturn(['foo' => 'bar', 'bar' => 'foo', 'number' => 123])
             ->getMock();
 
         $results = $resource->toPrettyJson();

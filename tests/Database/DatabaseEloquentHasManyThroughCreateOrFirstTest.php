@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Illuminate\Tests\Database;
 
+use Closure;
 use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
@@ -14,6 +15,7 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Mockery;
 use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
@@ -23,13 +25,8 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         Carbon::setTestNow('2023-01-01 00:00:00');
     }
 
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-        Mockery::close();
-    }
-
-    public function testCreateOrFirstMethodCreatesNewRecord(): void
+    #[DataProvider('createOrFirstValues')]
+    public function testCreateOrFirstMethodCreatesNewRecord(Closure|array $values): void
     {
         $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;
@@ -41,7 +38,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
             ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
         )->andReturnTrue();
 
-        $result = $parent->children()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
+        $result = $parent->children()->createOrFirst(['attr' => 'foo'], $values);
         $this->assertTrue($result->wasRecentlyCreated);
         $this->assertEquals([
             'id' => 789,
@@ -75,6 +72,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
                 'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                 [123, 'foo'],
                 true,
+                [],
             )
             ->andReturn([[
                 'id' => 789,
@@ -114,6 +112,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
                 'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                 [123, 'foo'],
                 true,
+                [],
             )
             ->andReturn([]);
 
@@ -148,6 +147,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
                 'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                 [123, 'foo'],
                 true,
+                [],
             )
             ->andReturn([[
                 'id' => 789,
@@ -187,6 +187,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
                 'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                 [123, 'foo'],
                 true,
+                [],
             )
             ->andReturn([]);
 
@@ -204,6 +205,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
                 'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ? and "val" = ?) limit 1',
                 [123, 'foo', 'bar'],
                 true,
+                [],
             )
             ->andReturn([[
                 'id' => 789,
@@ -243,6 +245,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
                 'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                 [123, 'foo'],
                 true,
+                [],
             )
             ->andReturn([]);
 
@@ -280,6 +283,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
                 'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                 [123, 'foo'],
                 true,
+                [],
             )
             ->andReturn([[
                 'id' => 789,
@@ -327,6 +331,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
                 'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ?) limit 1',
                 [123, 'foo'],
                 true,
+                [],
             )
             ->andReturn([]);
 
@@ -344,6 +349,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
                 'select "child".*, "pivot"."parent_id" as "laravel_through_key" from "child" inner join "pivot" on "pivot"."id" = "child"."pivot_id" where "pivot"."parent_id" = ? and ("attr" = ? and "val" = ?) limit 1',
                 [123, 'foo', 'bar'],
                 true,
+                [],
             )
             ->andReturn([[
                 'id' => 789,
@@ -368,6 +374,14 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
+    public static function createOrFirstValues(): array
+    {
+        return [
+            'array' => [['val' => 'bar']],
+            'closure' => [fn () => ['val' => 'bar']],
+        ];
+    }
+
     protected function mockConnectionForModel(Model $model, string $database, array $lastInsertIds = []): void
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -386,7 +400,8 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $class = get_class($model);
         $class::setConnectionResolver($resolver);
 
-        $connection->shouldReceive('getPdo')->andReturn($pdo = Mockery::mock(PDO::class));
+        $pdo = Mockery::mock(PDO::class);
+        $connection->shouldReceive('getPdo')->andReturn($pdo);
 
         foreach ($lastInsertIds as $id) {
             $pdo->expects('lastInsertId')->andReturn($id);

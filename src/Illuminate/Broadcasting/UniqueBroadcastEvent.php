@@ -29,8 +29,6 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
      */
     public function __construct($event)
     {
-        $this->uniqueId = get_class($event);
-
         if (method_exists($event, 'uniqueId')) {
             $this->uniqueId .= $event->uniqueId();
         } elseif (property_exists($event, 'uniqueId')) {

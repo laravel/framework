@@ -7,11 +7,11 @@ use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 use function Illuminate\Filesystem\join_paths;
 
-#[RequiresOperatingSystemFamily('Linux|Darwin')]
+#[RequiresOperatingSystem('Linux|Darwin')]
 #[WithConfig('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
 #[WithMigration]
 class SerializableClosureV1CacheRouteTest extends TestCase
@@ -27,8 +27,6 @@ class SerializableClosureV1CacheRouteTest extends TestCase
         ];
     }
 
-    /** {@inheritDoc} */
-    #[\Override]
     protected function setUp(): void
     {
         $_ENV['APP_ROUTES_CACHE'] = realpath(join_paths(__DIR__, 'stubs', 'serializable-closure-v1', 'routes-v7.php'));
@@ -36,13 +34,11 @@ class SerializableClosureV1CacheRouteTest extends TestCase
         parent::setUp();
     }
 
-    /** {@inheritDoc} */
-    #[\Override]
     protected function tearDown(): void
     {
-        unset($_ENV['APP_ROUTES_CACHE']);
-
         parent::tearDown();
+
+        unset($_ENV['APP_ROUTES_CACHE']);
     }
 
     public function testItCanUseCachedRouteFromSerializableClosureV1()

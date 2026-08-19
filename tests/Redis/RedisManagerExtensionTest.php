@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Redis;
 use Illuminate\Contracts\Redis\Connector;
 use Illuminate\Foundation\Application;
 use Illuminate\Redis\RedisManager;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class RedisManagerExtensionTest extends TestCase
@@ -17,8 +17,6 @@ class RedisManagerExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->redis = new RedisManager(new Application, 'my_custom_driver', [
             'default' => [
                 'host' => 'some-host',
@@ -41,11 +39,6 @@ class RedisManagerExtensionTest extends TestCase
         $this->redis->extend('my_custom_driver', function () {
             return new FakeRedisConnector;
         });
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
     }
 
     public function testUsingCustomRedisConnectorWithSingleRedisInstance()
@@ -78,9 +71,8 @@ class RedisManagerExtensionTest extends TestCase
             ],
         ]);
         $redis->extend('my_custom_driver', function () use ($config) {
-            return m::mock(Connector::class)
-                ->shouldReceive('connectToCluster')
-                ->once()
+            return Mockery::mock(Connector::class)
+                ->expects('connectToCluster')
                 ->withArgs(function ($configArg) use ($config) {
                     return $config === $configArg;
                 })
@@ -88,6 +80,26 @@ class RedisManagerExtensionTest extends TestCase
         });
 
         $redis->resolve($name);
+    }
+
+    public function testPurgeAcceptsUnitEnum()
+    {
+        $redis = new RedisManager(new Application, 'my_custom_driver', [
+            'default' => [
+                'host' => 'some-host',
+                'port' => 'some-port',
+                'database' => 5,
+                'timeout' => 0.5,
+            ],
+        ]);
+
+        $property = new \ReflectionProperty($redis, 'connections');
+        $property->setValue($redis, ['default' => 'fake-connection']);
+
+        $this->assertCount(1, $redis->connections());
+
+        $redis->purge(FakeRedisConnectionName::Default);
+        $this->assertCount(0, $redis->connections());
     }
 }
 
@@ -117,4 +129,9 @@ class FakeRedisConnector implements Connector
     {
         return 'my-redis-cluster-connection';
     }
+}
+
+enum FakeRedisConnectionName: string
+{
+    case Default = 'default';
 }

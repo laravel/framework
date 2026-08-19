@@ -9,7 +9,7 @@ use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\RouteBinding;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -23,15 +23,11 @@ class BroadcasterTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->broadcaster = new FakeBroadcaster;
     }
 
     protected function tearDown(): void
     {
-        m::close();
-
         Container::setInstance(null);
     }
 
@@ -53,19 +49,19 @@ class BroadcasterTest extends TestCase
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd', 'asd', $callback);
-        $this->assertEquals([], $parameters);
+        $this->assertSame([], $parameters);
 
         $callback = function ($user, $something) {
             //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd', 'asd', $callback);
-        $this->assertEquals([], $parameters);
+        $this->assertSame([], $parameters);
 
         // Test Explicit Binding...
         $container = new Container;
         Container::setInstance($container);
-        $binder = m::mock(BindingRegistrar::class);
-        $binder->shouldReceive('getBindingCallback')->times(2)->with('model')->andReturn(function () {
+        $binder = Mockery::mock(BindingRegistrar::class);
+        $binder->expects('getBindingCallback')->times(2)->with('model')->andReturn(function () {
             return 'bound';
         });
         $container->instance(BindingRegistrar::class, $binder);
@@ -87,10 +83,10 @@ class BroadcasterTest extends TestCase
     {
         $container = new Container;
         Container::setInstance($container);
-        $binder = m::mock(BindingRegistrar::class);
+        $binder = Mockery::mock(BindingRegistrar::class);
         $callback = RouteBinding::forModel($container, BroadcasterTestEloquentModelStub::class);
 
-        $binder->shouldReceive('getBindingCallback')->times(2)->with('model')->andReturn($callback);
+        $binder->expects('getBindingCallback')->times(2)->with('model')->andReturn($callback);
         $container->instance(BindingRegistrar::class, $binder);
         $callback = function ($user, $model) {
             //
@@ -202,9 +198,8 @@ class BroadcasterTest extends TestCase
             //
         });
 
-        $request = m::mock(Request::class);
-        $request->shouldReceive('user')
-            ->once()
+        $request = Mockery::mock(Request::class);
+        $request->expects('user')
             ->withNoArgs()
             ->andReturn(new DummyUser);
 
@@ -220,9 +215,8 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => 'myguard']);
 
-        $request = m::mock(Request::class);
-        $request->shouldReceive('user')
-            ->once()
+        $request = Mockery::mock(Request::class);
+        $request->expects('user')
             ->with('myguard')
             ->andReturn(new DummyUser);
 
@@ -241,13 +235,12 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => ['myguard2', 'myguard1']]);
 
-        $request = m::mock(Request::class);
-        $request->shouldReceive('user')
-            ->once()
+        $request = Mockery::mock(Request::class);
+        $request->expects('user')
             ->with('myguard1')
             ->andReturn(null);
-        $request->shouldReceive('user')
-            ->twice()
+        $request->expects('user')
+            ->times(2)
             ->with('myguard2')
             ->andReturn(new DummyUser)
             ->ordered('user');
@@ -269,9 +262,8 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => 'myguard']);
 
-        $request = m::mock(Request::class);
-        $request->shouldReceive('user')
-            ->once()
+        $request = Mockery::mock(Request::class);
+        $request->expects('user')
             ->with('myguard')
             ->andReturn(null);
         $request->shouldNotReceive('user')
@@ -286,13 +278,11 @@ class BroadcasterTest extends TestCase
             //
         }, ['guards' => ['myguard1', 'myguard2']]);
 
-        $request = m::mock(Request::class);
-        $request->shouldReceive('user')
-            ->once()
+        $request = Mockery::mock(Request::class);
+        $request->expects('user')
             ->with('myguard1')
             ->andReturn(null);
-        $request->shouldReceive('user')
-            ->once()
+        $request->expects('user')
             ->with('myguard2')
             ->andReturn(null);
         $request->shouldNotReceive('user')

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Closure;
 use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
@@ -12,6 +13,7 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Mockery;
 use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
@@ -21,13 +23,8 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         Carbon::setTestNow('2023-01-01 00:00:00');
     }
 
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-        Mockery::close();
-    }
-
-    public function testCreateOrFirstMethodCreatesNewRecord(): void
+    #[DataProvider('createOrFirstValues')]
+    public function testCreateOrFirstMethodCreatesNewRecord(Closure|array $values): void
     {
         $model = new HasManyCreateOrFirstTestParentModel();
         $model->id = 123;
@@ -40,7 +37,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
             ['foo', 'bar', 123, '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
         )->andReturnTrue();
 
-        $result = $model->children()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
+        $result = $model->children()->createOrFirst(['attr' => 'foo'], $values);
         $this->assertTrue($result->wasRecentlyCreated);
         $this->assertEquals([
             'id' => 456,
@@ -70,7 +67,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], false)
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], false, [])
             ->andReturn([[
                 'id' => 456,
                 'parent_id' => 123,
@@ -102,7 +99,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true)
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])
             ->andReturn([]);
 
         $model->getConnection()->expects('insert')->with(
@@ -132,7 +129,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true)
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])
             ->andReturn([[
                 'id' => 456,
                 'parent_id' => 123,
@@ -164,7 +161,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true)
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])
             ->andReturn([]);
 
         $sql = 'insert into "child_table" ("attr", "val", "parent_id", "updated_at", "created_at") values (?, ?, ?, ?, ?)';
@@ -177,7 +174,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], false)
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], false, [])
             ->andReturn([[
                 'id' => 456,
                 'parent_id' => 123,
@@ -209,7 +206,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true)
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])
             ->andReturn([]);
 
         $model->getConnection()->expects('insert')->with(
@@ -239,7 +236,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true)
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])
             ->andReturn([[
                 'id' => 456,
                 'parent_id' => 123,
@@ -276,7 +273,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true)
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])
             ->andReturn([]);
 
         $sql = 'insert into "child_table" ("attr", "val", "parent_id", "updated_at", "created_at") values (?, ?, ?, ?, ?)';
@@ -289,7 +286,7 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
 
         $model->getConnection()
             ->expects('select')
-            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], false)
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], false, [])
             ->andReturn([[
                 'id' => 456,
                 'parent_id' => 123,
@@ -316,6 +313,100 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
+    #[DataProvider('createOrFirstValues')]
+    public function testUpdateOrCreateMethodAcceptsClosureValuesAndCreates(Closure|array $values): void
+    {
+        $model = new HasManyCreateOrFirstTestParentModel();
+        $model->id = 123;
+        $this->mockConnectionForModel($model, 'SQLite', [456]);
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])
+            ->andReturn([]);
+
+        $model->getConnection()->expects('insert')->with(
+            'insert into "child_table" ("attr", "val", "parent_id", "updated_at", "created_at") values (?, ?, ?, ?, ?)',
+            ['foo', 'bar', 123, '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+        )->andReturnTrue();
+
+        $result = $model->children()->updateOrCreate(['attr' => 'foo'], $values);
+        $this->assertTrue($result->wasRecentlyCreated);
+        $this->assertSame('bar', $result->val);
+    }
+
+    public function testUpdateOrCreateMethodAcceptsClosureValuesAndUpdates(): void
+    {
+        $model = new HasManyCreateOrFirstTestParentModel();
+        $model->id = 123;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])
+            ->andReturn([[
+                'id' => 456,
+                'parent_id' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01T00:00:00.000000Z',
+                'updated_at' => '2023-01-01T00:00:00.000000Z',
+            ]]);
+
+        $model->getConnection()->expects('update')->with(
+            'update "child_table" set "val" = ?, "updated_at" = ? where "id" = ?',
+            ['baz', '2023-01-01 00:00:00', 456],
+        )->andReturn(1);
+
+        $result = $model->children()->updateOrCreate(['attr' => 'foo'], fn () => ['val' => 'baz']);
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertSame('baz', $result->val);
+    }
+
+    public function testFirstOrNewDoesNotInvokeClosureWhenRecordExists(): void
+    {
+        $model = new HasManyCreateOrFirstTestParentModel();
+        $model->id = 123;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])
+            ->andReturn([[
+                'id' => 456,
+                'parent_id' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $callCount = 0;
+        $result = $model->children()->firstOrNew(['attr' => 'foo'], function () use (&$callCount) {
+            $callCount++;
+
+            return ['val' => 'should-not-be-called'];
+        });
+
+        $this->assertSame(0, $callCount);
+        $this->assertTrue($result->exists);
+        $this->assertSame('bar', $result->val);
+    }
+
+    public static function createOrFirstValues(): array
+    {
+        return [
+            'array' => [['val' => 'bar']],
+            'closure' => [fn () => ['val' => 'bar']],
+        ];
+    }
+
     protected function mockConnectionForModel(Model $model, string $database, array $lastInsertIds = []): void
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -334,7 +425,8 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         $class = get_class($model);
         $class::setConnectionResolver($resolver);
 
-        $connection->shouldReceive('getPdo')->andReturn($pdo = Mockery::mock(PDO::class));
+        $pdo = Mockery::mock(PDO::class);
+        $connection->shouldReceive('getPdo')->andReturn($pdo);
 
         foreach ($lastInsertIds as $id) {
             $pdo->expects('lastInsertId')->andReturn($id);

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Support\Arr;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -106,12 +107,22 @@ class MorphTo extends BelongsTo
      */
     protected function buildDictionary(EloquentCollection $models)
     {
-        foreach ($models as $model) {
+        $isAssociative = Arr::isAssoc($models->all());
+
+        foreach ($models as $key => $model) {
             if ($model->{$this->morphType}) {
                 $morphTypeKey = $this->getDictionaryKey($model->{$this->morphType});
                 $foreignKeyKey = $this->getDictionaryKey($model->{$this->foreignKey});
 
-                $this->dictionary[$morphTypeKey][$foreignKeyKey][] = $model;
+                if ($morphTypeKey === null || $foreignKeyKey === null) {
+                    continue;
+                }
+
+                if ($isAssociative) {
+                    $this->dictionary[$morphTypeKey][$foreignKeyKey][$key] = $model;
+                } else {
+                    $this->dictionary[$morphTypeKey][$foreignKeyKey][] = $model;
+                }
             }
         }
     }
@@ -215,9 +226,9 @@ class MorphTo extends BelongsTo
     protected function matchToMorphParents($type, EloquentCollection $results)
     {
         foreach ($results as $result) {
-            $ownerKey = ! is_null($this->ownerKey) ? $this->getDictionaryKey($result->{$this->ownerKey}) : $result->getKey();
+            $ownerKey = $this->getDictionaryKey(! is_null($this->ownerKey) ? $result->{$this->ownerKey} : $result->getKey());
 
-            if (isset($this->dictionary[$type][$ownerKey])) {
+            if ($ownerKey !== null && isset($this->dictionary[$type][$ownerKey])) {
                 foreach ($this->dictionary[$type][$ownerKey] as $model) {
                     $model->setRelation($this->relationName, $result);
                 }
@@ -437,7 +448,7 @@ class MorphTo extends BelongsTo
             $result = parent::__call($method, $parameters);
 
             if (in_array($method, ['select', 'selectRaw', 'selectSub', 'addSelect', 'withoutGlobalScopes'])) {
-                $this->macroBuffer[] = compact('method', 'parameters');
+                $this->macroBuffer[] = ['method' => $method, 'parameters' => $parameters];
             }
 
             return $result;
@@ -447,7 +458,7 @@ class MorphTo extends BelongsTo
         // we'll assume that we want to call a query macro (e.g. withTrashed) that only
         // exists on related models. We will just store the call and replay it later.
         catch (BadMethodCallException) {
-            $this->macroBuffer[] = compact('method', 'parameters');
+            $this->macroBuffer[] = ['method' => $method, 'parameters' => $parameters];
 
             return $this;
         }

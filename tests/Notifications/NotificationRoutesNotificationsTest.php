@@ -7,7 +7,7 @@ use Illuminate\Contracts\Notifications\Dispatcher;
 use Illuminate\Notifications\RoutesNotifications;
 use Illuminate\Support\Facades\Notification;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -15,19 +15,17 @@ class NotificationRoutesNotificationsTest extends TestCase
 {
     protected function tearDown(): void
     {
-        m::close();
-
         Container::setInstance(null);
     }
 
     public function testNotificationCanBeDispatched()
     {
         $container = new Container;
-        $factory = m::mock(Dispatcher::class);
+        $factory = Mockery::mock(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new stdClass;
-        $factory->shouldReceive('send')->with($notifiable, $instance);
+        $factory->expects('send')->with($notifiable, $instance);
         Container::setInstance($container);
 
         $notifiable->notify($instance);
@@ -36,11 +34,11 @@ class NotificationRoutesNotificationsTest extends TestCase
     public function testNotificationCanBeSentNow()
     {
         $container = new Container;
-        $factory = m::mock(Dispatcher::class);
+        $factory = Mockery::mock(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new stdClass;
-        $factory->shouldReceive('sendNow')->with($notifiable, $instance, null);
+        $factory->expects('sendNow')->with($notifiable, $instance, null);
         Container::setInstance($container);
 
         $notifiable->notifyNow($instance);

@@ -84,6 +84,8 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  string  $key
      * @param  (\Closure():(string|null))|string|null  $default
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function string(string $key, $default = null): string
     {
@@ -104,6 +106,8 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  string  $key
      * @param  (\Closure():(int|null))|int|null  $default
      * @return int
+     *
+     * @throws \InvalidArgumentException
      */
     public function integer(string $key, $default = null): int
     {
@@ -124,6 +128,8 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  string  $key
      * @param  (\Closure():(float|null))|float|null  $default
      * @return float
+     *
+     * @throws \InvalidArgumentException
      */
     public function float(string $key, $default = null): float
     {
@@ -144,6 +150,8 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  string  $key
      * @param  (\Closure():(bool|null))|bool|null  $default
      * @return bool
+     *
+     * @throws \InvalidArgumentException
      */
     public function boolean(string $key, $default = null): bool
     {
@@ -164,6 +172,8 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  string  $key
      * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
      * @return array<array-key, mixed>
+     *
+     * @throws \InvalidArgumentException
      */
     public function array(string $key, $default = null): array
     {
@@ -241,7 +251,7 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Get all of the configuration items for the application.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function all()
     {
@@ -251,45 +261,45 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Determine if the given configuration option exists.
      *
-     * @param  string  $key
+     * @param  string  $offset
      * @return bool
      */
-    public function offsetExists($key): bool
+    public function offsetExists($offset): bool
     {
-        return $this->has($key);
+        return $this->has($offset);
     }
 
     /**
      * Get a configuration option.
      *
-     * @param  string  $key
+     * @param  string  $offset
      * @return mixed
      */
-    public function offsetGet($key): mixed
+    public function offsetGet($offset): mixed
     {
-        return $this->get($key);
+        return $this->get($offset);
     }
 
     /**
      * Set a configuration option.
      *
-     * @param  string  $key
+     * @param  string  $offset
      * @param  mixed  $value
      * @return void
      */
-    public function offsetSet($key, $value): void
+    public function offsetSet($offset, $value): void
     {
-        $this->set($key, $value);
+        $this->set($offset, $value);
     }
 
     /**
      * Unset a configuration option.
      *
-     * @param  string  $key
+     * @param  string  $offset
      * @return void
      */
-    public function offsetUnset($key): void
+    public function offsetUnset($offset): void
     {
-        $this->set($key, null);
+        $this->set($offset, null);
     }
 }

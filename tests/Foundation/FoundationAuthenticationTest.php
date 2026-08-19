@@ -8,7 +8,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class FoundationAuthenticationTest extends TestCase
@@ -21,7 +21,7 @@ class FoundationAuthenticationTest extends TestCase
     protected $app;
 
     /**
-     * @return array
+     * @var array
      */
     protected $credentials = [
         'email' => 'someone@laravel.com',
@@ -33,32 +33,24 @@ class FoundationAuthenticationTest extends TestCase
      */
     protected function mockGuard()
     {
-        $guard = m::mock(Guard::class);
+        $guard = Mockery::mock(Guard::class);
 
-        $auth = m::mock(AuthManager::class);
-        $auth->shouldReceive('guard')
-            ->once()
+        $auth = Mockery::mock(AuthManager::class);
+        $auth->expects('guard')
             ->andReturn($guard);
 
-        $this->app = m::mock(Application::class);
-        $this->app->shouldReceive('make')
-            ->once()
+        $this->app = Mockery::mock(Application::class);
+        $this->app->expects('make')
             ->withArgs(['auth'])
             ->andReturn($auth);
 
         return $guard;
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testAssertAuthenticated()
     {
         $this->mockGuard()
-            ->shouldReceive('check')
-            ->once()
+            ->expects('check')
             ->andReturn(true);
 
         $this->assertAuthenticated();
@@ -67,8 +59,7 @@ class FoundationAuthenticationTest extends TestCase
     public function testAssertGuest()
     {
         $this->mockGuard()
-            ->shouldReceive('check')
-            ->once()
+            ->expects('check')
             ->andReturn(false);
 
         $this->assertGuest();
@@ -76,17 +67,16 @@ class FoundationAuthenticationTest extends TestCase
 
     public function testAssertAuthenticatedAs()
     {
-        $expected = m::mock(Authenticatable::class);
-        $expected->shouldReceive('getAuthIdentifier')
+        $expected = Mockery::mock(Authenticatable::class);
+        $expected->expects('getAuthIdentifier')
             ->andReturn('1');
 
         $this->mockGuard()
-            ->shouldReceive('user')
-            ->once()
+            ->expects('user')
             ->andReturn($expected);
 
-        $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getAuthIdentifier')
+        $user = Mockery::mock(Authenticatable::class);
+        $user->expects('getAuthIdentifier')
             ->andReturn('1');
 
         $this->assertAuthenticatedAs($user);
@@ -94,21 +84,20 @@ class FoundationAuthenticationTest extends TestCase
 
     protected function setupProvider(array $credentials)
     {
-        $user = m::mock(Authenticatable::class);
+        $user = Mockery::mock(Authenticatable::class);
 
-        $provider = m::mock(UserProvider::class);
+        $provider = Mockery::mock(UserProvider::class);
 
-        $provider->shouldReceive('retrieveByCredentials')
+        $provider->expects('retrieveByCredentials')
             ->with($credentials)
             ->andReturn($user);
 
-        $provider->shouldReceive('validateCredentials')
+        $provider->expects('validateCredentials')
             ->with($user, $credentials)
             ->andReturn($this->credentials === $credentials);
 
         $this->mockGuard()
-            ->shouldReceive('getProvider')
-            ->once()
+            ->expects('getProvider')
             ->andReturn($provider);
     }
 

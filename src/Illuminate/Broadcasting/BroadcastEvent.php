@@ -6,14 +6,22 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
+use Illuminate\Queue\Attributes\MaxExceptions;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Attributes\Timeout;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Arr;
 use ReflectionClass;
 use ReflectionProperty;
 use Throwable;
 
+use function Illuminate\Support\enum_value;
+
 class BroadcastEvent implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, ReadsQueueAttributes;
 
     /**
      * The event instance.
@@ -51,6 +59,13 @@ class BroadcastEvent implements ShouldQueue
     public $maxExceptions;
 
     /**
+     * Delete the job if its models no longer exist.
+     *
+     * @var bool
+     */
+    public $deleteWhenMissingModels = true;
+
+    /**
      * Create a new job handler instance.
      *
      * @param  mixed  $event
@@ -58,11 +73,12 @@ class BroadcastEvent implements ShouldQueue
     public function __construct($event)
     {
         $this->event = $event;
-        $this->tries = property_exists($event, 'tries') ? $event->tries : null;
-        $this->timeout = property_exists($event, 'timeout') ? $event->timeout : null;
-        $this->backoff = property_exists($event, 'backoff') ? $event->backoff : null;
+        $this->tries = $this->getAttributeValue($event, Tries::class, 'tries');
+        $this->timeout = $this->getAttributeValue($event, Timeout::class, 'timeout');
+        $this->backoff = $this->getAttributeValue($event, Backoff::class, 'backoff');
         $this->afterCommit = property_exists($event, 'afterCommit') ? $event->afterCommit : null;
-        $this->maxExceptions = property_exists($event, 'maxExceptions') ? $event->maxExceptions : null;
+        $this->maxExceptions = $this->getAttributeValue($event, MaxExceptions::class, 'maxExceptions');
+        $this->deleteWhenMissingModels = $this->getAttributeValue($event, DeleteWhenMissingModels::class, 'deleteWhenMissingModels') ?? true;
     }
 
     /**
@@ -74,7 +90,7 @@ class BroadcastEvent implements ShouldQueue
     public function handle(BroadcastingFactory $manager)
     {
         $name = method_exists($this->event, 'broadcastAs')
-            ? $this->event->broadcastAs()
+            ? enum_value($this->event->broadcastAs())
             : get_class($this->event);
 
         $channels = Arr::wrap($this->event->broadcastOn());

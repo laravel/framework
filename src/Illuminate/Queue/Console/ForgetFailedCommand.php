@@ -34,7 +34,7 @@ class ForgetFailedCommand extends Command
         } else {
             $this->components->error('No failed job matches the given ID.');
 
-            return 1;
+            return self::FAILURE;
         }
     }
 }

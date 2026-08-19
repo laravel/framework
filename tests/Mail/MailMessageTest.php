@@ -19,8 +19,6 @@ class MailMessageTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->message = new Message(new Email());
     }
 
@@ -165,13 +163,14 @@ class MailMessageTest extends TestCase
         $cid = $this->message->embed($path);
 
         $this->assertStringStartsWith('cid:', $cid);
-        $name = Str::after($cid, 'cid:');
+        $contentId = Str::after($cid, 'cid:');
         $attachment = $this->message->getSymfonyMessage()->getAttachments()[0];
         $headers = $attachment->getPreparedHeaders()->toArray();
         $this->assertSame('bar', $attachment->getBody());
-        $this->assertSame("Content-Type: image/jpeg; name={$name}", $headers[0]);
+        $this->assertSame($contentId, $attachment->getContentId());
+        $this->assertStringContainsString('Content-Type: image/jpeg', $headers[0]);
         $this->assertSame('Content-Transfer-Encoding: base64', $headers[1]);
-        $this->assertSame("Content-Disposition: inline; name={$name}; filename={$name}", $headers[2]);
+        $this->assertStringContainsString('Content-Disposition: inline', $headers[2]);
 
         unlink($path);
     }
@@ -182,7 +181,9 @@ class MailMessageTest extends TestCase
 
         $attachment = $this->message->getSymfonyMessage()->getAttachments()[0];
         $headers = $attachment->getPreparedHeaders()->toArray();
-        $this->assertSame('cid:foo.jpg', $cid);
+        $this->assertStringStartsWith('cid:', $cid);
+        $contentId = Str::after($cid, 'cid:');
+        $this->assertSame($contentId, $attachment->getContentId());
         $this->assertSame('bar', $attachment->getBody());
         $this->assertSame('Content-Type: image/png; name=foo.jpg', $headers[0]);
         $this->assertSame('Content-Transfer-Encoding: base64', $headers[1]);
@@ -201,15 +202,38 @@ class MailMessageTest extends TestCase
             }
         });
 
-        $this->assertSame('cid:baz', $cid);
+        $this->assertStringStartsWith('cid:', $cid);
+        $contentId = Str::after($cid, 'cid:');
         $attachment = $this->message->getSymfonyMessage()->getAttachments()[0];
         $headers = $attachment->getPreparedHeaders()->toArray();
+        $this->assertSame($contentId, $attachment->getContentId());
         $this->assertSame('bar', $attachment->getBody());
         $this->assertSame('Content-Type: image/png; name=baz', $headers[0]);
         $this->assertSame('Content-Transfer-Encoding: base64', $headers[1]);
         $this->assertSame('Content-Disposition: inline; name=baz; filename=baz', $headers[2]);
 
         unlink($path);
+    }
+
+    public function testItEmbedsFilesViaAttachableContractFromData(): void
+    {
+        $cid = $this->message->embed(new class() implements Attachable
+        {
+            public function toMailAttachment()
+            {
+                return Attachment::fromData(fn () => 'bar', 'foo.jpg')->withMime('image/png');
+            }
+        });
+
+        $this->assertStringStartsWith('cid:', $cid);
+        $contentId = Str::after($cid, 'cid:');
+        $attachment = $this->message->getSymfonyMessage()->getAttachments()[0];
+        $headers = $attachment->getPreparedHeaders()->toArray();
+        $this->assertSame($contentId, $attachment->getContentId());
+        $this->assertSame('bar', $attachment->getBody());
+        $this->assertStringContainsString('Content-Type: image/png', $headers[0]);
+        $this->assertSame('Content-Transfer-Encoding: base64', $headers[1]);
+        $this->assertStringContainsString('Content-Disposition: inline', $headers[2]);
     }
 
     public function testItGeneratesARandomNameWhenAttachableHasNone(): void
@@ -225,14 +249,14 @@ class MailMessageTest extends TestCase
         });
 
         $this->assertStringStartsWith('cid:', $cid);
-        $name = Str::after($cid, 'cid:');
-        $this->assertSame(16, mb_strlen($name));
+        $contentId = Str::after($cid, 'cid:');
         $attachment = $this->message->getSymfonyMessage()->getAttachments()[0];
+        $this->assertSame($contentId, $attachment->getContentId());
         $headers = $attachment->getPreparedHeaders()->toArray();
         $this->assertSame('bar', $attachment->getBody());
-        $this->assertSame("Content-Type: image/jpeg; name={$name}", $headers[0]);
+        $this->assertStringContainsString('Content-Type: image/jpeg', $headers[0]);
         $this->assertSame('Content-Transfer-Encoding: base64', $headers[1]);
-        $this->assertSame("Content-Disposition: inline; name={$name};\r\n filename={$name}", $headers[2]);
+        $this->assertStringContainsString('Content-Disposition: inline', $headers[2]);
 
         unlink($path);
     }

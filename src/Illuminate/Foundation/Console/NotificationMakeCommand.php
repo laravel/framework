@@ -4,11 +4,10 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function Laravel\Prompts\confirm;
@@ -20,11 +19,14 @@ class NotificationMakeCommand extends GeneratorCommand
     use CreatesMatchingTest;
 
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'make:notification';
+    protected $signature = 'make:notification
+                    {name : The name of the notification}
+                    {--f|force : Create the class even if the notification already exists}
+                    {--m|markdown= : Create a new Markdown template for the notification}';
 
     /**
      * The console command description.
@@ -151,7 +153,7 @@ class NotificationMakeCommand extends GeneratorCommand
         $wantsMarkdownView = confirm('Would you like to create a markdown view?');
 
         if ($wantsMarkdownView) {
-            $defaultMarkdownView = (new Collection(explode('/', str_replace('\\', '/', $this->argument('name')))))
+            $defaultMarkdownView = (new Stringable($this->argument('name')))->replace('\\', '/')->explode('/')
                 ->map(fn ($path) => Str::kebab($path))
                 ->prepend('mail')
                 ->implode('.');
@@ -160,18 +162,5 @@ class NotificationMakeCommand extends GeneratorCommand
 
             $input->setOption('markdown', $markdownView);
         }
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the notification already exists'],
-            ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the notification'],
-        ];
     }
 }

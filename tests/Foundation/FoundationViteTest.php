@@ -75,6 +75,46 @@ class FoundationViteTest extends TestCase
         );
     }
 
+    public function testViteWithNestedCssImport()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'imports' => [
+                    '_layout.js',
+                ],
+            ],
+            '_layout.js' => [
+                'file' => 'assets/layout.versioned.js',
+                'css' => [
+                    'assets/layout.versioned.css',
+                ],
+                'imports' => [
+                    '_header.js',
+                ],
+            ],
+            '_header.js' => [
+                'file' => 'assets/header.versioned.js',
+                'css' => [
+                    'assets/header.versioned.css',
+                ],
+            ],
+        ], $buildDir);
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/layout.versioned.css" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/header.versioned.css" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js"></script>',
+            $result->toHtml()
+        );
+
+        $this->cleanViteManifest($buildDir);
+    }
+
     public function testViteHotModuleReplacementWithJsOnly()
     {
         $this->makeViteHotFile();
@@ -566,16 +606,14 @@ class FoundationViteTest extends TestCase
 
     public function testItThrowsWhenUnableToFindAssetManifestInBuildMode()
     {
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Vite manifest not found at: '.public_path('build/manifest.json'));
+        $this->expectExceptionObject(new ViteException('Vite manifest not found at: '.public_path('build/manifest.json')));
 
         ViteFacade::asset('resources/js/app.js');
     }
 
     public function testItThrowsDeprecatedExecptionWhenUnableToFindAssetManifestInBuildMode()
     {
-        $this->expectException(ViteManifestNotFoundException::class);
-        $this->expectExceptionMessage('Vite manifest not found at: '.public_path('build/manifest.json'));
+        $this->expectExceptionObject(new ViteManifestNotFoundException('Vite manifest not found at: '.public_path('build/manifest.json')));
 
         ViteFacade::asset('resources/js/app.js');
     }
@@ -584,8 +622,7 @@ class FoundationViteTest extends TestCase
     {
         $this->makeViteManifest();
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Unable to locate file in Vite manifest: resources/js/missing.js');
+        $this->expectExceptionObject(new ViteException('Unable to locate file in Vite manifest: resources/js/missing.js'));
 
         ViteFacade::asset('resources/js/missing.js');
     }
@@ -728,12 +765,12 @@ class FoundationViteTest extends TestCase
             .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/Login.8c52c4a3.js" />'
             .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/app.a26d8e4d.js" />'
             .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/AuthenticationCard.47ef70cc.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/_plugin-vue_export-helper.cdc0426e.js" />'
             .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/AuthenticationCardLogo.9999a373.js" />'
             .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/Checkbox.33ba23f3.js" />'
             .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/TextInput.e2f0248c.js" />'
             .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/InputLabel.d245ec4e.js" />'
             .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/PrimaryButton.931d2859.js" />'
-            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/_plugin-vue_export-helper.cdc0426e.js" />'
             .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.9842b564.css" />'
             .'<script type="module" src="https://example.com/'.$buildDir.'/assets/Login.8c52c4a3.js"></script>', $result->toHtml()
         );
@@ -754,6 +791,10 @@ class FoundationViteTest extends TestCase
                 'rel="modulepreload"',
                 'as="script"',
             ],
+            'https://example.com/'.$buildDir.'/assets/_plugin-vue_export-helper.cdc0426e.js' => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
             'https://example.com/'.$buildDir.'/assets/AuthenticationCardLogo.9999a373.js' => [
                 'rel="modulepreload"',
                 'as="script"',
@@ -771,10 +812,6 @@ class FoundationViteTest extends TestCase
                 'as="script"',
             ],
             'https://example.com/'.$buildDir.'/assets/PrimaryButton.931d2859.js' => [
-                'rel="modulepreload"',
-                'as="script"',
-            ],
-            'https://example.com/'.$buildDir.'/assets/_plugin-vue_export-helper.cdc0426e.js' => [
                 'rel="modulepreload"',
                 'as="script"',
             ],
@@ -1259,8 +1296,7 @@ class FoundationViteTest extends TestCase
     {
         $this->makeViteManifest();
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Unable to locate file from Vite manifest: '.public_path('build/assets/app.versioned.js'));
+        $this->expectExceptionObject(new ViteException('Unable to locate file from Vite manifest: '.public_path('build/assets/app.versioned.js')));
 
         ViteFacade::content('resources/js/app.js');
     }

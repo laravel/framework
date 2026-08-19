@@ -4,9 +4,11 @@ namespace Illuminate\Tests\Queue;
 
 use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsQueue;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -45,10 +47,10 @@ class QueueSqsJobTest extends TestCase
         $this->queueUrl = $this->baseUrl.'/'.$this->account.'/'.$this->queueName;
 
         // Get a mock of the SqsClient
-        $this->mockedSqsClient = m::mock(SqsClient::class)->makePartial();
+        $this->mockedSqsClient = Mockery::mock(SqsClient::class)->makePartial();
 
         // Use Mockery to mock the IoC Container
-        $this->mockedContainer = m::mock(Container::class);
+        $this->mockedContainer = Mockery::mock(Container::class);
 
         $this->mockedJob = 'foo';
         $this->mockedData = ['data'];
@@ -65,38 +67,171 @@ class QueueSqsJobTest extends TestCase
         ];
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
-        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock(stdClass::class));
-        $handler->shouldReceive('fire')->once()->with($job, ['data']);
+        $handler = Mockery::mock(stdClass::class);
+        $job->getContainer()->expects('make')->with('foo')->andReturn($handler);
+        $handler->expects('fire')->with($job, ['data']);
         $job->fire();
     }
 
     public function testDeleteRemovesTheJobFromSqs()
     {
-        $this->mockedSqsClient = m::mock(SqsClient::class)->makePartial();
-        $queue = m::mock(SqsQueue::class, [$this->mockedSqsClient, $this->queueName, $this->account])->makePartial();
+        $this->mockedSqsClient = Mockery::mock(SqsClient::class)->makePartial();
+        $queue = Mockery::mock(SqsQueue::class, [$this->mockedSqsClient, $this->queueName, $this->account])->makePartial();
         $queue->setContainer($this->mockedContainer);
         $job = $this->getJob();
-        $job->getSqs()->shouldReceive('deleteMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle]);
+        $job->getSqs()->expects('deleteMessage')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle]);
         $job->delete();
     }
 
     public function testReleaseProperlyReleasesTheJobOntoSqs()
     {
-        $this->mockedSqsClient = m::mock(SqsClient::class)->makePartial();
-        $queue = m::mock(SqsQueue::class, [$this->mockedSqsClient, $this->queueName, $this->account])->makePartial();
+        $this->mockedSqsClient = Mockery::mock(SqsClient::class)->makePartial();
+        $queue = Mockery::mock(SqsQueue::class, [$this->mockedSqsClient, $this->queueName, $this->account])->makePartial();
         $queue->setContainer($this->mockedContainer);
         $job = $this->getJob();
-        $job->getSqs()->shouldReceive('changeMessageVisibility')->once()->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle, 'VisibilityTimeout' => $this->releaseDelay]);
+        $job->getSqs()->expects('changeMessageVisibility')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle, 'VisibilityTimeout' => $this->releaseDelay]);
         $job->release($this->releaseDelay);
         $this->assertTrue($job->isReleased());
+    }
+
+    public function testGetRawBodyResolvesPointerFromCache()
+    {
+        $fullPayload = json_encode(['job' => 'foo', 'data' => ['key' => 'value']]);
+        $pointerPath = 'laravel:sqs-payloads:some-uuid';
+        $pointerBody = json_encode(['@pointer' => $pointerPath]);
+
+        $store = Mockery::mock(CacheRepository::class);
+        $store->expects('get')->with($pointerPath)->andReturn($fullPayload);
+
+        $cache = Mockery::mock(CacheFactory::class);
+        $cache->expects('store')->with('database')->andReturn($store);
+
+        $container = Mockery::mock(Container::class);
+        $container->expects('make')->with('cache')->andReturn($cache);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $job = new SqsJob($container, $this->mockedSqsClient, $jobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'store' => 'database',
+            'delete_after_processing' => true,
+        ]);
+
+        $this->assertEquals($fullPayload, $job->getRawBody());
+    }
+
+    public function testGetRawBodyReturnsNormalBodyWithoutPointer()
+    {
+        $job = $this->getJob();
+        $this->assertEquals($this->mockedPayload, $job->getRawBody());
+    }
+
+    public function testGetRawBodyReturnsPointerBodyWhenExtendedStoreIsDisabled()
+    {
+        $pointerBody = json_encode(['@pointer' => 'laravel:sqs-payloads:some-uuid']);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $job = new SqsJob($this->mockedContainer, $this->mockedSqsClient, $jobData, 'connection-name', $this->queueUrl);
+
+        $this->assertEquals($pointerBody, $job->getRawBody());
+    }
+
+    public function testGetRawBodyCachesResult()
+    {
+        $fullPayload = json_encode(['job' => 'foo', 'data' => ['key' => 'value']]);
+        $pointerPath = 'laravel:sqs-payloads:some-uuid';
+        $pointerBody = json_encode(['@pointer' => $pointerPath]);
+
+        $store = Mockery::mock(CacheRepository::class);
+        $store->expects('get')->with($pointerPath)->andReturn($fullPayload);
+
+        $cache = Mockery::mock(CacheFactory::class);
+        $cache->expects('store')->with('database')->andReturn($store);
+
+        $container = Mockery::mock(Container::class);
+        $container->expects('make')->with('cache')->andReturn($cache);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $job = new SqsJob($container, $this->mockedSqsClient, $jobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'store' => 'database',
+            'delete_after_processing' => true,
+        ]);
+
+        // Call twice; cache should only be hit once.
+        $job->getRawBody();
+        $this->assertEquals($fullPayload, $job->getRawBody());
+    }
+
+    public function testDeleteCleansUpCacheKeyWhenCleanupEnabled()
+    {
+        $pointerPath = 'laravel:sqs-payloads:some-uuid';
+        $pointerBody = json_encode(['@pointer' => $pointerPath]);
+
+        $store = Mockery::mock(CacheRepository::class);
+        $store->expects('forget')->with($pointerPath);
+
+        $cache = Mockery::mock(CacheFactory::class);
+        $cache->expects('store')->with('database')->andReturn($store);
+
+        $container = Mockery::mock(Container::class);
+        $container->expects('make')->with('cache')->andReturn($cache);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $sqsClient = Mockery::mock(SqsClient::class)->makePartial();
+        $sqsClient->expects('deleteMessage');
+
+        $job = new SqsJob($container, $sqsClient, $jobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'store' => 'database',
+            'delete_after_processing' => true,
+        ]);
+
+        $job->delete();
+    }
+
+    public function testDeleteDoesNotCleanUpWhenCleanupDisabled()
+    {
+        $pointerPath = 'laravel:sqs-payloads:some-uuid';
+        $pointerBody = json_encode(['@pointer' => $pointerPath]);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $sqsClient = Mockery::mock(SqsClient::class)->makePartial();
+        $sqsClient->expects('deleteMessage');
+
+        $job = new SqsJob($this->mockedContainer, $sqsClient, $jobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'store' => 'database',
+            'delete_after_processing' => false,
+        ]);
+
+        $job->delete();
+    }
+
+    public function testDeleteDoesNotCleanUpWhenNoPointer()
+    {
+        $sqsClient = Mockery::mock(SqsClient::class)->makePartial();
+        $sqsClient->expects('deleteMessage');
+
+        $job = new SqsJob($this->mockedContainer, $sqsClient, $this->mockedJobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'store' => 'database',
+            'delete_after_processing' => true,
+        ]);
+
+        $job->delete();
     }
 
     protected function getJob()

@@ -4,12 +4,16 @@ namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
+use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ValidationPasswordRuleTest extends TestCase
@@ -57,6 +61,7 @@ class ValidationPasswordRuleTest extends TestCase
         $rule = (new Password(8))->when($is_privileged_user, function ($rule) {
             $rule->symbols();
         });
+        $this->assertInstanceOf(Password::class, $rule);
 
         $this->fails($rule, ['aaaaaaaa', '11111111'], [
             'validation.password.symbols',
@@ -66,6 +71,7 @@ class ValidationPasswordRuleTest extends TestCase
         $rule = (new Password(8))->when($is_privileged_user, function ($rule) {
             $rule->symbols();
         });
+        $this->assertInstanceOf(Password::class, $rule);
 
         $this->passes($rule, ['aaaaaaaa', '11111111']);
     }
@@ -116,6 +122,18 @@ class ValidationPasswordRuleTest extends TestCase
 
     public function testUncompromised()
     {
+        // These are treated as compromised, with a breach count high enough to still
+        // be considered compromised past the raised threshold used further below.
+        $this->fakePwnedPasswordsApi([
+            '123456' => 25000000,
+            'password' => 10000000,
+            'welcome' => 500000,
+            'abc123' => 300000,
+            '123456789' => 20000000,
+            '12345678' => 15000000,
+            'nuno' => 5000000,
+        ]);
+
         $this->fails(Password::min(2)->uncompromised(), [
             '123456',
             'password',
@@ -141,6 +159,30 @@ class ValidationPasswordRuleTest extends TestCase
             '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
             'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
         ]);
+    }
+
+    /**
+     * Fake the "Have I Been Pwned" range API with deterministic responses, so the
+     * uncompromised password rule never depends on a real, flaky network call.
+     *
+     * @param  array<string, int>  $breachCountsByPassword
+     * @return void
+     */
+    protected function fakePwnedPasswordsApi(array $breachCountsByPassword): void
+    {
+        Http::fake(function ($request) use ($breachCountsByPassword) {
+            $prefix = Str::after($request->url(), '/range/');
+
+            foreach ($breachCountsByPassword as $password => $count) {
+                $hash = strtoupper(sha1($password));
+
+                if (str_starts_with($hash, $prefix)) {
+                    return Http::response(substr($hash, 5).':'.$count);
+                }
+            }
+
+            return Http::response('');
+        });
     }
 
     public function testMessagesOrder()
@@ -237,20 +279,19 @@ class ValidationPasswordRuleTest extends TestCase
 
         $this->passes(Password::default(), ['abcd', '454qb^', '接2133手田']);
         $this->assertSame($password, Password::default());
-        $this->assertSame(['required', $password], Password::required());
-        $this->assertSame(['sometimes', $password], Password::sometimes());
+        $this->assertInstanceOf(Password::class, Password::required());
+        $this->assertInstanceOf(Password::class, Password::sometimes());
 
         Password::defaults($password2);
         $this->passes(Password::default(), ['Nn', 'Mn', 'âA']);
         $this->assertSame($password2, Password::default());
-        $this->assertSame(['required', $password2], Password::required());
-        $this->assertSame(['sometimes', $password2], Password::sometimes());
+        $this->assertInstanceOf(Password::class, Password::required());
+        $this->assertInstanceOf(Password::class, Password::sometimes());
     }
 
     public function testItCannotSetDefaultUsingGivenString()
     {
-        $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('given callback should be callable');
+        $this->expectExceptionObject(new InvalidArgumentException('given callback should be callable'));
 
         Password::defaults('required|password');
     }
@@ -348,7 +389,7 @@ class ValidationPasswordRuleTest extends TestCase
             ->letters()
             ->symbols();
 
-        $this->assertSame($password->appliedRules(), [
+        $this->assertSame([
             'min' => 2,
             'max' => 4,
             'mixedCase' => true,
@@ -358,11 +399,11 @@ class ValidationPasswordRuleTest extends TestCase
             'uncompromised' => false,
             'compromisedThreshold' => 0,
             'customRules' => [],
-        ]);
+        ], $password->appliedRules());
 
         $password = Password::min(2);
 
-        $this->assertSame($password->appliedRules(), [
+        $this->assertSame([
             'min' => 2,
             'max' => null,
             'mixedCase' => false,
@@ -372,7 +413,150 @@ class ValidationPasswordRuleTest extends TestCase
             'uncompromised' => false,
             'compromisedThreshold' => 0,
             'customRules' => [],
+        ], $password->appliedRules());
+    }
+
+    public function testRequired()
+    {
+        $this->fails(Password::required(), [null], [
+            'validation.required',
         ]);
+
+        $this->passes(Password::required(), ['12345678', 'password123']);
+
+        $this->fails([Password::required()], ['short'], [
+            'validation.min.string',
+        ]);
+
+        $this->passes(Password::required()->mixedCase()->numbers(), ['Password1']);
+
+        // Ensure it still correct when using array
+        $this->passes([Password::required()], ['12345678', 'password123']);
+
+        $this->fails([Password::required()], ['short'], [
+            'validation.min.string',
+        ]);
+
+        $this->passes(['string', Password::required()], ['12345678', 'password123']);
+
+        $this->passes([Password::required()->mixedCase()->numbers()], ['Password1']);
+
+        // Test with custom defaults
+        Password::defaults(Password::min(6)->letters());
+
+        $this->fails(Password::required(), [null], [
+            'validation.required',
+        ]);
+
+        $this->passes(Password::required(), ['Password123', 'password123']);
+        $this->passes([Password::required()], ['Password123', 'password123']);
+    }
+
+    public function testSometimes()
+    {
+        $this->fails(Password::sometimes(), ['short'], [
+            'validation.min.string',
+        ]);
+
+        $this->passes(Password::sometimes(), ['12345678', 'password123']);
+
+        $this->fails([Password::sometimes()], ['12345'], [
+            'validation.min.string',
+        ]);
+
+        $this->passes(Password::sometimes()->mixedCase()->numbers(), ['Password1']);
+
+        // Ensure it still correct when using array
+        $this->passes([Password::sometimes()], ['12345678', 'password123']);
+
+        $this->fails([Password::sometimes()], ['12345'], [
+            'validation.min.string',
+        ]);
+
+        $this->passes(['string', Password::sometimes()], ['12345678', 'password123']);
+
+        $this->passes([Password::sometimes()->mixedCase()->numbers()], ['Password1']);
+
+        // Test with custom defaults
+        Password::defaults(Password::min(6)->letters());
+
+        $this->passes(Password::sometimes(), ['Password123', 'password123']);
+        $this->passes([Password::sometimes()], ['Password123', 'password123']);
+    }
+
+    public function testRequiredWithMissingValue()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [],
+            ['password' => [Password::required()]]
+        );
+
+        $this->assertFalse($v->passes());
+        $this->assertArrayHasKey('password', $v->messages()->toArray());
+        $this->assertStringContainsString('required', $v->messages()->first('password'));
+
+        $v = \Illuminate\Support\Facades\Validator::make(
+            [],
+            [
+                'password' => [Password::required()],
+            ]
+        );
+
+        $this->assertFalse($v->passes());
+    }
+
+    public function testNullableWithEmptyString()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            ['password' => ''],
+            ['password' => ['nullable', Password::min(8)->letters()->numbers()]]
+        );
+
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            resolve('translator'),
+            ['password' => null],
+            ['password' => ['nullable', Password::min(8)->letters()->numbers()]]
+        );
+
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            resolve('translator'),
+            ['password' => ''],
+            ['password' => ['nullable', Password::sometimes()->min(8)->letters()->numbers()]]
+        );
+
+        $this->assertTrue($v->passes());
+    }
+
+    public function testItCanReturnsAsUnpackedArray()
+    {
+        $this->assertSame(['required', 'string', 'min:8'], [...Password::required()]);
+        $this->assertSame(['sometimes', 'string', 'min:8'], [...Password::sometimes()]);
+    }
+
+    public function testToPasswordRulesString()
+    {
+        $this->assertSame('minlength: 8;', Password::min(8)->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; maxlength: 64;', Password::min(8)->max(64)->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; required: lower; required: upper;', Password::min(8)->mixedCase()->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; required: lower;', Password::min(8)->letters()->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; required: digit;', Password::min(8)->numbers()->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; required: special;', Password::min(8)->symbols()->toPasswordRulesString());
+
+        $this->assertSame(
+            'minlength: 12; maxlength: 64; required: lower; required: upper; required: digit; required: special;',
+            Password::min(12)->max(64)->mixedCase()->numbers()->symbols()->toPasswordRulesString()
+        );
     }
 
     protected function passes($rule, $values)
@@ -412,6 +596,8 @@ class ValidationPasswordRuleTest extends TestCase
                 new ArrayLoader, 'en'
             );
         });
+
+        $container->singleton(HttpFactory::class);
 
         Facade::setFacadeApplication($container);
 

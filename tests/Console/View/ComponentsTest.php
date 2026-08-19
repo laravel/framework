@@ -5,18 +5,13 @@ namespace Illuminate\Tests\Console\View;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components;
 use Illuminate\Database\Migrations\MigrationResult;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class ComponentsTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testAlert()
     {
         $output = new BufferedOutput();
@@ -73,19 +68,17 @@ class ComponentsTest extends TestCase
 
     public function testConfirm()
     {
-        $output = m::mock(OutputStyle::class);
+        $output = Mockery::mock(OutputStyle::class);
 
-        $output->shouldReceive('confirm')
+        $output->expects('confirm')
             ->with('Question?', false)
-            ->once()
             ->andReturnTrue();
 
         $result = (new Components\Confirm($output))->render('Question?');
         $this->assertTrue($result);
 
-        $output->shouldReceive('confirm')
+        $output->expects('confirm')
             ->with('Question?', true)
-            ->once()
             ->andReturnTrue();
 
         $result = (new Components\Confirm($output))->render('Question?', true);
@@ -94,11 +87,10 @@ class ComponentsTest extends TestCase
 
     public function testChoice()
     {
-        $output = m::mock(OutputStyle::class);
+        $output = Mockery::mock(OutputStyle::class);
 
-        $output->shouldReceive('askQuestion')
-            ->with(m::type(ChoiceQuestion::class))
-            ->once()
+        $output->expects('askQuestion')
+            ->with(Mockery::type(ChoiceQuestion::class))
             ->andReturn('a');
 
         $result = (new Components\Choice($output))->render('Question?', ['a', 'b']);
@@ -133,6 +125,15 @@ class ComponentsTest extends TestCase
         $result = $output->fetch();
         $this->assertStringContainsString('First', $result);
         $this->assertStringContainsString('Second', $result);
+    }
+
+    public function testTwoColumnDetailPreservesTrailingPunctuationInValue()
+    {
+        $output = new BufferedOutput();
+
+        (new Components\TwoColumnDetail($output))->render('Key', 'value!');
+        $result = $output->fetch();
+        $this->assertStringContainsString('value!', $result);
     }
 
     public function testWarn()

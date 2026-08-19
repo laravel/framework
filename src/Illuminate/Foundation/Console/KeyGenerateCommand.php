@@ -4,13 +4,14 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Encryption\Encrypter;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'key:generate')]
 class KeyGenerateCommand extends Command
 {
-    use ConfirmableTrait;
+    use ConfirmableTrait, Prohibitable;
 
     /**
      * The name and signature of the console command.
@@ -35,6 +36,10 @@ class KeyGenerateCommand extends Command
      */
     public function handle()
     {
+        if ($this->isProhibited()) {
+            return;
+        }
+
         $key = $this->generateRandomKey();
 
         if ($this->option('show')) {
@@ -101,7 +106,11 @@ class KeyGenerateCommand extends Command
         );
 
         if ($replaced === $input || $replaced === null) {
-            $this->error('Unable to set application key. No APP_KEY variable was found in the .env file.');
+            if (isset($_ENV['APP_KEY'])) {
+                $this->components->error('Unable to set application key. APP_KEY is already present in the environment.');
+            } else {
+                $this->components->error('Unable to set application key. No APP_KEY variable was found in the .env file.');
+            }
 
             return false;
         }

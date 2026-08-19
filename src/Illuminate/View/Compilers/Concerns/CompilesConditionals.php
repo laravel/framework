@@ -138,6 +138,17 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the has-stack statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileHasStack($expression)
+    {
+        return "<?php if (! \$__env->isStackEmpty{$expression}): ?>";
+    }
+
+    /**
      * Compile the section-missing statements into valid PHP.
      *
      * @param  string  $expression

@@ -3,11 +3,14 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Pagination\Cursor;
@@ -50,6 +53,49 @@ use Orchestra\Testbench\TestCase;
 
 class ResourceTest extends TestCase
 {
+    public function testResourceMayBeConvetedToArray()
+    {
+        $resource = new class((new User)->forceFill(['id' => 1, 'name' => 'Taylor Otwell'])) extends JsonResource
+        {
+            public function toArray(Request $request)
+            {
+                return [
+                    'id' => $this->id,
+                    'name' => $this->name,
+                    'posts' => (new AnonymousResourceCollection([
+                        new Post([
+                            'id' => 5,
+                            'title' => 'Test Title',
+                            'abstract' => 'Test abstract',
+                        ]),
+                        new Post([
+                            'id' => 10,
+                            'title' => 'Another Test Title',
+                            'abstract' => 'Another Test abstract',
+                        ]),
+                    ], PostResource::class)),
+                ];
+            }
+        };
+
+        $request = Request::create('GET', '/users');
+
+        tap($resource->toArray($request), function ($userAsArray) use ($request) {
+            $this->assertSame(1, $userAsArray['id']);
+            $this->assertSame('Taylor Otwell', $userAsArray['name']);
+
+            $this->assertInstanceOf(AnonymousResourceCollection::class, $userAsArray['posts']);
+            $this->assertSame(PostResource::class, $userAsArray['posts']->collects);
+
+            tap($userAsArray['posts']->toArray($request), function ($postsAsArray) {
+                $this->assertIsArray($postsAsArray);
+                $this->assertCount(2, $postsAsArray);
+                $this->assertSame(['id' => 5, 'title' => 'Test Title', 'custom' => true], $postsAsArray[0]);
+                $this->assertSame(['id' => 10, 'title' => 'Another Test Title', 'custom' => true], $postsAsArray[1]);
+            });
+        });
+    }
+
     public function testResourcesMayBeConvertedToJson()
     {
         Route::get('/', function () {
@@ -861,7 +907,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '{"data":{"id":5,"title":"Test Title","reading_time":3.0}}',
             $response->baseResponse->content()
         );
@@ -879,7 +925,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '{"data":[{"id":5,"title":"Test Title","reading_time":3.0}]}',
             $response->baseResponse->content()
         );
@@ -900,7 +946,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '{"data":[{"id":5,"title":"Test Title","reading_time":3.0}],"links":{"first":"\/?page=1","last":"\/?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"\/?page=1","label":"1","page":1,"active":true},{"url":null,"label":"Next &raquo;","page":null,"active":false}],"path":"\/","per_page":15,"to":1,"total":10}}',
             $response->baseResponse->content()
         );
@@ -920,7 +966,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '{"data":{"id":5,"title":"Test Title","reading_time":3.0}}',
             $response->baseResponse->content()
         );
@@ -1402,8 +1448,7 @@ class ResourceTest extends TestCase
             new Post(['id' => 2, 'title' => 'Test title 2']),
         ]);
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('must collect');
+        $this->expectExceptionObject(new LogicException('must collect'));
 
         new PostModelCollectionResource($posts);
     }
@@ -1448,7 +1493,7 @@ class ResourceTest extends TestCase
 
     public function testKeysArePreservedInAnAnonymousCollectionIfTheResourceIsFlaggedToPreserveKeys()
     {
-        $data = Collection::make([
+        $data = (new Collection([
             [
                 'id' => 1,
                 'authorId' => 5,
@@ -1464,10 +1509,30 @@ class ResourceTest extends TestCase
                 'authorId' => 42,
                 'bookId' => 12,
             ],
-        ])->keyBy->id;
+        ]))->keyBy->id;
 
         Route::get('/', function () use ($data) {
             return ResourceWithPreservedKeys::collection($data);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson(['data' => $data->toArray()]);
+    }
+
+    public function testKeysArePreservedInAnAnonymousCollectionUsingPreserveKeysMethod()
+    {
+        $data = (new Collection([
+            ['id' => 1, 'title' => 'Test'],
+            ['id' => 2, 'title' => 'Test 2'],
+        ]))->keyBy->id;
+
+        Route::get('/', function () use ($data) {
+            return JsonResource::collection($data)->preserveKeys();
         });
 
         $response = $this->withoutExceptionHandling()->get(
@@ -1506,8 +1571,7 @@ class ResourceTest extends TestCase
         $post = new ValidatePostSize;
         $post->handle($request, fn () => null);
 
-        $this->expectException(PostTooLargeException::class);
-        $this->expectExceptionMessage('The POST data is too large.');
+        $this->expectExceptionObject(new PostTooLargeException('The POST data is too large.'));
 
         $request = new Request(server: ['CONTENT_LENGTH' => '2147483640']);
         $post = new ValidatePostSize;
@@ -1886,6 +1950,102 @@ class ResourceTest extends TestCase
                 'title' => 'Test',
             ],
         ], $content);
+    }
+
+    public function testResourceCanOverridesWrapping()
+    {
+        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = 'results';
+            public static bool $forceWrapping = true;
+        };
+
+        JsonResource::flushState();
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'results' => [
+                'id' => 5,
+                'title' => 'Test',
+                'data' => 'some data',
+            ],
+        ], $content);
+    }
+
+    public function testResourceCollectionCanOverridesWrapping()
+    {
+        $resource = new class([new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = null;
+        },
+        ]) extends ResourceCollection {
+            public static $wrap = 'results';
+        };
+
+        JsonResource::flushState();
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'results' => [
+                [
+                    'id' => 5,
+                    'title' => 'Test',
+                    'data' => 'some data',
+                ],
+            ],
+        ], $content);
+    }
+
+    public function testPaginatedResourceCollectionCanOverridesWrapping()
+    {
+        $resource = new class(new LengthAwarePaginator([new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = null;
+        },
+        ], 10, 2)) extends ResourceCollection {
+            public static $wrap = 'results';
+        };
+
+        JsonResource::flushState();
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertArrayHasKey('results', $content);
+        $this->assertArrayHasKey('links', $content);
+        $this->assertArrayHasKey('meta', $content);
+
+        $this->assertCount(1, $content['results']);
+        $this->assertEquals([
+            [
+                'id' => 5,
+                'title' => 'Test',
+                'data' => 'some data',
+            ],
+        ], $content['results']);
+    }
+
+    public function testEmptyPaginatedResourceCollectionCanOverridesWrapping()
+    {
+        $resource = new class(new LengthAwarePaginator([], 10, 2)) extends ResourceCollection
+        {
+            public static $wrap = 'results';
+        };
+
+        JsonResource::flushState();
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertArrayHasKey('results', $content);
+        $this->assertArrayHasKey('links', $content);
+        $this->assertArrayHasKey('meta', $content);
+
+        $this->assertCount(0, $content['results']);
     }
 
     public function testResourceForceWrapOverridesDataKeyCheck()

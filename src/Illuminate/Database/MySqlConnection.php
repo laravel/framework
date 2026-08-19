@@ -79,7 +79,24 @@ class MySqlConnection extends Connection
      */
     protected function isUniqueConstraintError(Exception $exception)
     {
-        return boolval(preg_match('#Integrity constraint violation: 1062#i', $exception->getMessage()));
+        return (bool) preg_match('#Integrity constraint violation: 1062#i', $exception->getMessage());
+    }
+
+    /**
+     * Extract the index that caused a unique constraint violation.
+     *
+     * @param  Exception  $exception
+     * @return array{index: string|null, columns: list<string>}
+     */
+    protected function parseUniqueConstraintViolation(Exception $exception): array
+    {
+        preg_match(
+            '#Duplicate entry \'.*?\' for key \'(?:.*?\.)?(.+?)\'#i',
+            $exception->getMessage(),
+            $matches
+        );
+
+        return ['columns' => [], 'index' => $matches[1] ?? null];
     }
 
     /**

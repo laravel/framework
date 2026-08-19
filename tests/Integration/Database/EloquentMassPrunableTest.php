@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
-use Mockery as m;
+use Mockery;
 
 class EloquentMassPrunableTest extends DatabaseTestCase
 {
@@ -19,7 +20,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         parent::setUp();
 
         $this->app->singleton(Dispatcher::class, function () {
-            return m::mock(Dispatcher::class);
+            return Mockery::mock(Dispatcher::class);
         });
 
         $this->app->alias(Dispatcher::class, 'events');
@@ -44,10 +45,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
 
     public function testPrunableMethodMustBeImplemented()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
-            'Please implement',
-        );
+        $this->expectExceptionObject(new LogicException('Please implement'));
 
         MassPrunableTestModelMissingPrunableMethod::create()->pruneAll();
     }
@@ -55,9 +53,9 @@ class EloquentMassPrunableTest extends DatabaseTestCase
     public function testPrunesRecords()
     {
         app('events')
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->times(2)
-            ->with(m::type(ModelsPruned::class));
+            ->with(Mockery::type(ModelsPruned::class));
 
         collect(range(1, 5000))->map(function ($id) {
             return ['name' => 'foo'];
@@ -74,12 +72,12 @@ class EloquentMassPrunableTest extends DatabaseTestCase
     public function testPrunesSoftDeletedRecords()
     {
         app('events')
-            ->shouldReceive('dispatch')
+            ->expects('dispatch')
             ->times(3)
-            ->with(m::type(ModelsPruned::class));
+            ->with(Mockery::type(ModelsPruned::class));
 
         collect(range(1, 5000))->map(function ($id) {
-            return ['deleted_at' => now()];
+            return ['deleted_at' => Carbon::now()];
         })->chunk(200)->each(function ($chunk) {
             MassPrunableSoftDeleteTestModel::insert($chunk->all());
         });

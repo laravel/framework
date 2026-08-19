@@ -194,12 +194,12 @@ abstract class Job
         // the proper value. Otherwise, the current transaction will never commit.
         if ($e instanceof TimeoutExceededException &&
             $commandName &&
-            in_array(Batchable::class, class_uses_recursive($commandName))) {
+            isset(class_uses_recursive($commandName)[Batchable::class])) {
             $batchRepository = $this->resolve(BatchRepository::class);
 
             try {
                 $batchRepository->rollBack();
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 // ...
             }
         }
@@ -248,7 +248,7 @@ abstract class Job
     {
         $payload = $this->payload();
 
-        [$class, $method] = JobName::parse($payload['job']);
+        [$class] = JobName::parse($payload['job']);
 
         if (method_exists($this->instance = $this->resolve($class), 'failed')) {
             $this->instance->failed($payload['data'], $e, $payload['uuid'] ?? '', $this);

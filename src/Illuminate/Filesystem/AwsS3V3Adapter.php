@@ -28,6 +28,8 @@ class AwsS3V3Adapter extends FilesystemAdapter
      */
     public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config, S3Client $client)
     {
+        $config['directory_separator'] = '/';
+
         parent::__construct($driver, $adapter, $config);
 
         $this->client = $client;
@@ -61,6 +63,16 @@ class AwsS3V3Adapter extends FilesystemAdapter
      * @return bool
      */
     public function providesTemporaryUrls()
+    {
+        return true;
+    }
+
+    /**
+     * Determine if temporary upload URLs can be generated.
+     *
+     * @return bool
+     */
+    public function providesTemporaryUploadUrls()
     {
         return true;
     }

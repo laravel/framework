@@ -8,7 +8,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseTruncationTest extends TestCase
@@ -23,8 +23,6 @@ class DatabaseTruncationTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->app['config'] = new Repository([
             'database' => [
                 'migrations' => [
@@ -36,8 +34,6 @@ class DatabaseTruncationTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $this->app = null;
         static::$allTables = [];
         $this->tablesToTruncate = null;
@@ -180,20 +176,21 @@ class DatabaseTruncationTest extends TestCase
     ): Connection {
         $actual = [];
 
-        $schema = m::mock($builder ?? Builder::class);
-        $schema->shouldReceive('getTables')->with($schemas)->once()->andReturn(
+        $schema = Mockery::mock($builder ?? Builder::class);
+        $schema->expects('getTables')->with($schemas)->andReturn(
             empty($schemas)
                 ? $allTables
                 : array_filter($allTables, fn ($table) => in_array($table['schema'], $schemas))
         );
-        $schema->shouldReceive('getCurrentSchemaListing')->once()->andReturn($schemas);
+        $schema->expects('getCurrentSchemaListing')->andReturn($schemas);
 
-        $connection = m::mock(Connection::class);
+        $connection = Mockery::mock(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
-        $connection->shouldReceive('getEventDispatcher')->once()->andReturn($dispatcher = m::mock(Dispatcher::class));
-        $connection->shouldReceive('unsetEventDispatcher')->once();
-        $connection->shouldReceive('setEventDispatcher')->once()->with($dispatcher);
-        $connection->shouldReceive('getSchemaBuilder')->once()->andReturn($schema);
+        $dispatcher = Mockery::mock(Dispatcher::class);
+        $connection->expects('getEventDispatcher')->andReturn($dispatcher);
+        $connection->expects('unsetEventDispatcher');
+        $connection->expects('setEventDispatcher')->with($dispatcher);
+        $connection->expects('getSchemaBuilder')->andReturn($schema);
         $connection->shouldReceive('withoutTablePrefix')->andReturnUsing(function ($callback) use ($connection) {
             $callback($connection);
         });
@@ -201,9 +198,9 @@ class DatabaseTruncationTest extends TestCase
             ->andReturnUsing(function (string $tableName) use (&$actual) {
                 $actual[] = $tableName;
 
-                $table = m::mock();
-                $table->shouldReceive('exists')->andReturnTrue();
-                $table->shouldReceive('truncate');
+                $table = Mockery::mock();
+                $table->expects('exists')->andReturnTrue();
+                $table->expects('truncate');
 
                 return $table;
             });

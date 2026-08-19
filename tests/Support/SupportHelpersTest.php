@@ -4,8 +4,10 @@ namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use Carbon\CarbonInterval;
 use Countable;
 use Error;
+use Exception;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
@@ -17,8 +19,9 @@ use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
 use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use IteratorAggregate;
 use LogicException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
@@ -30,19 +33,13 @@ class SupportHelpersTest extends TestCase
     protected function setUp(): void
     {
         mkdir(__DIR__.'/tmp');
-
-        parent::setUp();
     }
 
     protected function tearDown(): void
     {
-        m::close();
-
         if (is_dir(__DIR__.'/tmp')) {
             (new Filesystem)->deleteDirectory(__DIR__.'/tmp');
         }
-
-        parent::tearDown();
     }
 
     public function testE()
@@ -50,15 +47,15 @@ class SupportHelpersTest extends TestCase
         $str = 'A \'quote\' is <b>bold</b>';
         $this->assertSame('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
 
-        $html = m::mock(Htmlable::class);
-        $html->shouldReceive('toHtml')->andReturn($str);
+        $html = Mockery::mock(Htmlable::class);
+        $html->expects('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
     }
 
     public function testEWithInvalidCodePoints()
     {
         $str = mb_convert_encoding('føø bar', 'ISO-8859-1', 'UTF-8');
-        $this->assertEquals('f�� bar', e($str));
+        $this->assertSame('f�� bar', e($str));
     }
 
     public function testEWithEnums()
@@ -128,26 +125,26 @@ class SupportHelpersTest extends TestCase
 
     public function testWhen()
     {
-        $this->assertEquals('Hello', when(true, 'Hello'));
+        $this->assertSame('Hello', when(true, 'Hello'));
         $this->assertNull(when(false, 'Hello'));
-        $this->assertEquals('There', when(1 === 1, 'There')); // strict types
-        $this->assertEquals('There', when(1 == '1', 'There')); // loose types
+        $this->assertSame('There', when(1 === 1, 'There')); // strict types
+        $this->assertSame('There', when(1 == '1', 'There')); // loose types
         $this->assertNull(when(1 == 2, 'There'));
         $this->assertNull(when('1', fn () => null));
         $this->assertNull(when(0, fn () => null));
-        $this->assertEquals('True', when([1, 2, 3, 4], 'True')); // Array
+        $this->assertSame('True', when([1, 2, 3, 4], 'True')); // Array
         $this->assertNull(when([], 'True')); // Empty Array = Falsy
-        $this->assertEquals('True', when(new StdClass, fn () => 'True')); // Object
-        $this->assertEquals('World', when(false, 'Hello', 'World'));
-        $this->assertEquals('World', when(1 === 0, 'Hello', 'World')); // strict types
-        $this->assertEquals('World', when(1 == '0', 'Hello', 'World')); // loose types
+        $this->assertSame('True', when(new stdClass, fn () => 'True')); // Object
+        $this->assertSame('World', when(false, 'Hello', 'World'));
+        $this->assertSame('World', when(1 === 0, 'Hello', 'World')); // strict types
+        $this->assertSame('World', when(1 == '0', 'Hello', 'World')); // loose types
         $this->assertNull(when('', fn () => 'There', fn () => null));
         $this->assertNull(when(0, fn () => 'There', fn () => null));
-        $this->assertEquals('False', when([], 'True', 'False'));  // Empty Array = Falsy
+        $this->assertSame('False', when([], 'True', 'False'));  // Empty Array = Falsy
         $this->assertTrue(when(true, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
         $this->assertTrue(when(false, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
-        $this->assertEquals('Hello', when(fn () => true, 'Hello')); // lazy evaluation condition
-        $this->assertEquals('World', when(fn () => false, 'Hello', 'World')); // lazy evaluation condition
+        $this->assertSame('Hello', when(fn () => true, 'Hello')); // lazy evaluation condition
+        $this->assertSame('World', when(fn () => false, 'Hello', 'World')); // lazy evaluation condition
     }
 
     public function testFilled()
@@ -216,6 +213,42 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($object, object_get($object, false));
         $this->assertEquals($object, object_get($object, ''));
         $this->assertEquals($object, object_get($object, '  '));
+    }
+
+    public function testDataHas()
+    {
+        $object = (object) ['users' => ['name' => ['Taylor', 'Otwell']]];
+        $array = [(object) ['users' => [(object) ['name' => 'Taylor']]]];
+        $dottedArray = ['users' => ['first.name' => 'Taylor', 'middle.name' => null]];
+        $arrayAccess = new SupportTestArrayAccess(['price' => 56, 'user' => new SupportTestArrayAccess(['name' => 'John']), 'email' => null]);
+        $sameKeyMultiLevel = (object) ['name' => 'Taylor', 'company' => ['name' => 'Laravel']];
+        $plainArray = [1, 2, 3];
+
+        $this->assertTrue(data_has($object, 'users.name.0'));
+        $this->assertTrue(data_has($array, '0.users.0.name'));
+        $this->assertFalse(data_has($array, '0.users.3'));
+        $this->assertFalse(data_has($array, '0.users.3'));
+        $this->assertFalse(data_has($array, '0.users.3'));
+        $this->assertTrue(data_has($dottedArray, ['users', 'first.name']));
+        $this->assertTrue(data_has($dottedArray, ['users', 'middle.name']));
+        $this->assertFalse(data_has($dottedArray, ['users', 'last.name']));
+        $this->assertTrue(data_has($arrayAccess, 'price'));
+        $this->assertTrue(data_has($arrayAccess, 'user.name'));
+        $this->assertFalse(data_has($arrayAccess, 'foo'));
+        $this->assertFalse(data_has($arrayAccess, 'user.foo'));
+        $this->assertFalse(data_has($arrayAccess, 'foo'));
+        $this->assertFalse(data_has($arrayAccess, 'user.foo'));
+        $this->assertTrue(data_has($arrayAccess, 'email'));
+        $this->assertTrue(data_has($sameKeyMultiLevel, 'name'));
+        $this->assertTrue(data_has($sameKeyMultiLevel, 'company.name'));
+        $this->assertFalse(data_has($sameKeyMultiLevel, 'foo.name'));
+        $this->assertTrue(data_has($plainArray, 0));
+        $this->assertTrue(data_has($plainArray, '0'));
+        $this->assertFalse(data_has($plainArray, 4));
+        $this->assertFalse(data_has($plainArray, '4'));
+        $this->assertFalse(data_has($plainArray, ''));
+        $this->assertFalse(data_has($plainArray, []));
+        $this->assertFalse(data_has($plainArray, null));
     }
 
     public function testDataGet()
@@ -305,8 +338,8 @@ class SupportHelpersTest extends TestCase
 
         $this->assertEquals(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], data_get($array, 'posts.*.comments.*.author'));
         $this->assertEquals([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
-        $this->assertEquals([], data_get($array, 'posts.*.users.*.name', 'irrelevant'));
-        $this->assertEquals([], data_get($array, 'posts.*.users.*.name'));
+        $this->assertSame([], data_get($array, 'posts.*.users.*.name', 'irrelevant'));
+        $this->assertSame([], data_get($array, 'posts.*.users.*.name'));
     }
 
     public function testDataGetFirstLastDirectives()
@@ -329,13 +362,13 @@ class SupportHelpersTest extends TestCase
             'empty' => [],
         ];
 
-        $this->assertEquals('LHR', data_get($array, 'flights.0.segments.{first}.from'));
-        $this->assertEquals('PKX', data_get($array, 'flights.0.segments.{last}.to'));
+        $this->assertSame('LHR', data_get($array, 'flights.0.segments.{first}.from'));
+        $this->assertSame('PKX', data_get($array, 'flights.0.segments.{last}.to'));
 
-        $this->assertEquals('LHR', data_get($array, 'flights.{first}.segments.{first}.from'));
-        $this->assertEquals('PEK', data_get($array, 'flights.{last}.segments.{last}.to'));
-        $this->assertEquals('PKX', data_get($array, 'flights.{first}.segments.{last}.to'));
-        $this->assertEquals('LGW', data_get($array, 'flights.{last}.segments.{first}.from'));
+        $this->assertSame('LHR', data_get($array, 'flights.{first}.segments.{first}.from'));
+        $this->assertSame('PEK', data_get($array, 'flights.{last}.segments.{last}.to'));
+        $this->assertSame('PKX', data_get($array, 'flights.{first}.segments.{last}.to'));
+        $this->assertSame('LGW', data_get($array, 'flights.{last}.segments.{first}.from'));
 
         $this->assertEquals(['LHR', 'IST'], data_get($array, 'flights.{first}.segments.*.from'));
         $this->assertEquals(['SAW', 'PEK'], data_get($array, 'flights.{last}.segments.*.to'));
@@ -343,8 +376,8 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(['LHR', 'LGW'], data_get($array, 'flights.*.segments.{first}.from'));
         $this->assertEquals(['PKX', 'PEK'], data_get($array, 'flights.*.segments.{last}.to'));
 
-        $this->assertEquals('Not found', data_get($array, 'empty.{first}', 'Not found'));
-        $this->assertEquals('Not found', data_get($array, 'empty.{last}', 'Not found'));
+        $this->assertSame('Not found', data_get($array, 'empty.{first}', 'Not found'));
+        $this->assertSame('Not found', data_get($array, 'empty.{last}', 'Not found'));
     }
 
     public function testDataGetFirstLastDirectivesOnArrayAccessIterable()
@@ -367,13 +400,13 @@ class SupportHelpersTest extends TestCase
             'empty' => new SupportTestArrayAccessIterable([]),
         ];
 
-        $this->assertEquals('LHR', data_get($arrayAccessIterable, 'flights.0.segments.{first}.from'));
-        $this->assertEquals('PKX', data_get($arrayAccessIterable, 'flights.0.segments.{last}.to'));
+        $this->assertSame('LHR', data_get($arrayAccessIterable, 'flights.0.segments.{first}.from'));
+        $this->assertSame('PKX', data_get($arrayAccessIterable, 'flights.0.segments.{last}.to'));
 
-        $this->assertEquals('LHR', data_get($arrayAccessIterable, 'flights.{first}.segments.{first}.from'));
-        $this->assertEquals('PEK', data_get($arrayAccessIterable, 'flights.{last}.segments.{last}.to'));
-        $this->assertEquals('PKX', data_get($arrayAccessIterable, 'flights.{first}.segments.{last}.to'));
-        $this->assertEquals('LGW', data_get($arrayAccessIterable, 'flights.{last}.segments.{first}.from'));
+        $this->assertSame('LHR', data_get($arrayAccessIterable, 'flights.{first}.segments.{first}.from'));
+        $this->assertSame('PEK', data_get($arrayAccessIterable, 'flights.{last}.segments.{last}.to'));
+        $this->assertSame('PKX', data_get($arrayAccessIterable, 'flights.{first}.segments.{last}.to'));
+        $this->assertSame('LGW', data_get($arrayAccessIterable, 'flights.{last}.segments.{first}.from'));
 
         $this->assertEquals(['LHR', 'IST'], data_get($arrayAccessIterable, 'flights.{first}.segments.*.from'));
         $this->assertEquals(['SAW', 'PEK'], data_get($arrayAccessIterable, 'flights.{last}.segments.*.to'));
@@ -381,8 +414,8 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(['LHR', 'LGW'], data_get($arrayAccessIterable, 'flights.*.segments.{first}.from'));
         $this->assertEquals(['PKX', 'PEK'], data_get($arrayAccessIterable, 'flights.*.segments.{last}.to'));
 
-        $this->assertEquals('Not found', data_get($arrayAccessIterable, 'empty.{first}', 'Not found'));
-        $this->assertEquals('Not found', data_get($arrayAccessIterable, 'empty.{last}', 'Not found'));
+        $this->assertSame('Not found', data_get($arrayAccessIterable, 'empty.{first}', 'Not found'));
+        $this->assertSame('Not found', data_get($arrayAccessIterable, 'empty.{last}', 'Not found'));
     }
 
     public function testDataGetFirstLastDirectivesOnKeyedArrays()
@@ -400,11 +433,11 @@ class SupportHelpersTest extends TestCase
             ],
         ];
 
-        $this->assertEquals('second', data_get($array, 'numericKeys.0'));
-        $this->assertEquals('first', data_get($array, 'numericKeys.{first}'));
-        $this->assertEquals('last', data_get($array, 'numericKeys.{last}'));
-        $this->assertEquals('first', data_get($array, 'stringKeys.{first}'));
-        $this->assertEquals('last', data_get($array, 'stringKeys.{last}'));
+        $this->assertSame('second', data_get($array, 'numericKeys.0'));
+        $this->assertSame('first', data_get($array, 'numericKeys.{first}'));
+        $this->assertSame('last', data_get($array, 'numericKeys.{last}'));
+        $this->assertSame('first', data_get($array, 'stringKeys.{first}'));
+        $this->assertSame('last', data_get($array, 'stringKeys.{last}'));
     }
 
     public function testDataGetEscapedSegmentKeys()
@@ -417,12 +450,12 @@ class SupportHelpersTest extends TestCase
             ],
         ];
 
-        $this->assertEquals('caret', data_get($array, 'symbols.\{first}.description'));
-        $this->assertEquals('dollar', data_get($array, 'symbols.{first}.description'));
-        $this->assertEquals('asterisk', data_get($array, 'symbols.\*.description'));
+        $this->assertSame('caret', data_get($array, 'symbols.\{first}.description'));
+        $this->assertSame('dollar', data_get($array, 'symbols.{first}.description'));
+        $this->assertSame('asterisk', data_get($array, 'symbols.\*.description'));
         $this->assertEquals(['dollar', 'asterisk', 'caret'], data_get($array, 'symbols.*.description'));
-        $this->assertEquals('dollar', data_get($array, 'symbols.\{last}.description'));
-        $this->assertEquals('caret', data_get($array, 'symbols.{last}.description'));
+        $this->assertSame('dollar', data_get($array, 'symbols.\{last}.description'));
+        $this->assertSame('caret', data_get($array, 'symbols.{last}.description'));
     }
 
     public function testDataGetStar()
@@ -783,11 +816,11 @@ class SupportHelpersTest extends TestCase
 
         $strAccessor = str();
         $this->assertTrue((new ReflectionClass($strAccessor))->isAnonymous());
-        $this->assertSame($strAccessor->limit('string-value', 3), 'str...');
+        $this->assertSame('str...', $strAccessor->limit('string-value', 3));
 
         $strAccessor = str();
         $this->assertTrue((new ReflectionClass($strAccessor))->isAnonymous());
-        $this->assertSame((string) $strAccessor, '');
+        $this->assertSame('', (string) $strAccessor);
     }
 
     public function testTap()
@@ -797,8 +830,8 @@ class SupportHelpersTest extends TestCase
             $object->id = 2;
         })->id);
 
-        $mock = m::mock();
-        $mock->shouldReceive('foo')->once()->andReturn('bar');
+        $mock = Mockery::mock();
+        $mock->expects('foo')->andReturn('bar');
         $this->assertEquals($mock, tap($mock)->foo());
     }
 
@@ -818,42 +851,37 @@ class SupportHelpersTest extends TestCase
 
     public function testThrowExceptionWithMessage()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new RuntimeException('test'));
 
         throw_if(true, 'test');
     }
 
     public function testThrowExceptionAsStringWithMessage()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new LogicException('test'));
 
         throw_if(true, LogicException::class, 'test');
     }
 
     public function testThrowClosureException()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new Exception('test'));
 
-        throw_if(true, fn () => new \Exception('test'));
+        throw_if(true, fn () => new Exception('test'));
     }
 
     public function testThrowClosureWithParamsException()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new Exception('test'));
 
-        throw_if(true, fn (string $message) => new \Exception($message), 'test');
+        throw_if(true, fn (string $message) => new Exception($message), 'test');
     }
 
     public function testThrowClosureStringWithParamsException()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new Exception('test'));
 
-        throw_if(true, fn () => \Exception::class, 'test');
+        throw_if(true, fn () => Exception::class, 'test');
     }
 
     public function testThrowUnless()
@@ -872,16 +900,14 @@ class SupportHelpersTest extends TestCase
 
     public function testThrowUnlessExceptionWithMessage()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new RuntimeException('test'));
 
         throw_unless(false, 'test');
     }
 
     public function testThrowUnlessExceptionAsStringWithMessage()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('test');
+        $this->expectExceptionObject(new LogicException('test'));
 
         throw_unless(false, LogicException::class, 'test');
     }
@@ -893,8 +919,7 @@ class SupportHelpersTest extends TestCase
 
     public function testThrowWithString()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Test Message');
+        $this->expectExceptionObject(new RuntimeException('Test Message'));
 
         throw_if(true, RuntimeException::class, 'Test Message');
     }
@@ -1008,6 +1033,29 @@ class SupportHelpersTest extends TestCase
 
             throw new RuntimeException;
         }, 100);
+
+        // Make sure we made two attempts
+        $this->assertEquals(2, $attempts);
+
+        // Make sure we waited 100ms for the first attempt
+        Sleep::assertSleptTimes(1);
+
+        Sleep::assertSequence([
+            Sleep::usleep(100_000),
+        ]);
+    }
+
+    public function testRetryWithCarbonIntervalSleep()
+    {
+        Sleep::fake();
+
+        $attempts = retry(2, function ($attempts) {
+            if ($attempts > 1) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        }, CarbonInterval::milliseconds(100));
 
         // Make sure we made two attempts
         $this->assertEquals(2, $attempts);
@@ -1466,6 +1514,23 @@ class SupportHelpersTest extends TestCase
         );
     }
 
+    public function testWriteVariableQuotesValuesWithSpecialCharacters()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, 'APP_NAME=Laravel'.PHP_EOL);
+
+        Env::writeVariable('APP_BRACKET', 'pass[word', $path);
+        Env::writeVariable('APP_CARET', 'foo^bar', $path);
+        Env::writeVariable('APP_BACKTICK', 'foo`bar', $path);
+
+        $contents = $filesystem->get($path);
+
+        $this->assertStringContainsString('APP_BRACKET="pass[word"', $contents);
+        $this->assertStringContainsString('APP_CARET="foo^bar"', $contents);
+        $this->assertStringContainsString('APP_BACKTICK="foo`bar"', $contents);
+    }
+
     public function testWillThrowAnExceptionIfFileIsMissingWhenTryingToWriteVariables(): void
     {
         $this->expectExceptionObject(new RuntimeException('The file [missing-file] does not exist.'));
@@ -1499,7 +1564,7 @@ class SupportHelpersTest extends TestCase
     public function testLiteral(): void
     {
         $this->assertEquals(1, literal(1));
-        $this->assertEquals('taylor', literal('taylor'));
+        $this->assertSame('taylor', literal('taylor'));
         $this->assertEquals((object) ['name' => 'Taylor', 'role' => 'Developer'], literal(name: 'Taylor', role: 'Developer'));
     }
 
@@ -1535,6 +1600,551 @@ class SupportHelpersTest extends TestCase
             $expectedOutput,
             preg_replace_array($pattern, $replacements, $subject)
         );
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testLazy(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
+            $instance->__construct('foo', 'bar');
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testLazyCanAcceptShortClosure(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => $instance->__construct('foo', 'bar'));
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testLazyThrowsExceptionWhenConstructorIsNotCalled(): void
+    {
+        $instance = lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
+            //
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Typed property Illuminate\Tests\Support\SupportLazyClass::$first must not be accessed before initialization');
+
+        $instance->first;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testLazyCanAcceptHashForProperties(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => [
+            'second' => 'bar',
+            'first' => 'foo',
+        ]);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testLazyCanAcceptListForProperties(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => ['foo', 'bar']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testLazyCanAcceptSingleValueForConstructor(): void
+    {
+        SupportLazyClassWithArrayParameter::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClassWithArrayParameter::class, fn (SupportLazyClassWithArrayParameter $instance) => [['foo']]);
+
+        $this->assertFalse(SupportLazyClassWithArrayParameter::$constructorCalled);
+        $this->assertSame(['foo'], $instance->first);
+        $this->assertTrue(SupportLazyClassWithArrayParameter::$constructorCalled);
+
+        SupportLazyClassWithArrayParameter::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testLazySupportsPositionAndNamedArguments(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => ['foo', 'second' => 'bar']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testLazyThrowsWhenPositionalArgumentsComeAfterNamedArguments(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => ['second' => 'bar', 'foo']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Cannot use positional argument after named argument during unpacking');
+
+        $instance->first;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testLazyCanReturnInitializedObject(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
+            $instance->__construct('foo');
+
+            return $instance;
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertNull($instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testLazyMustInitilizeObject(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
+            return new SupportLazyClass('foo');
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Typed property Illuminate\Tests\Support\SupportLazyClass::$first must not be accessed before initialization');
+
+        $instance->first;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testLazyCanEagerlySetProperties(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, fn () => ['foo', 'bar'], eager: ['eager' => 'baz']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyLazy(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(function (SupportLazyClass $instance) {
+            $instance->__construct('foo', 'bar');
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyLazyCanAcceptShortClosure(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(fn (SupportLazyClass $instance) => $instance->__construct('foo', 'bar'));
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyLazyThrowsExceptionWhenConstructorIsNotCalled(): void
+    {
+        $instance = lazy(function (SupportLazyClass $instance) {
+            //
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Typed property Illuminate\Tests\Support\SupportLazyClass::$first must not be accessed before initialization');
+
+        $instance->first;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyLazyThrowsWhenNotClassSpecifiedInClosure(): void
+    {
+        $this->expectExceptionObject(new RuntimeException('The first parameter of the given Closure is missing a type hint.'));
+
+        lazy(function ($instance) {
+            //
+        });
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyLazyCanAcceptHashForProperties(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(fn (SupportLazyClass $instance) => [
+            'second' => 'bar',
+            'first' => 'foo',
+        ]);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyLazyCanAcceptListForProperties(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(fn (SupportLazyClass $instance) => ['foo', 'bar']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClousureOnlyLazyCanAcceptSingleValueForConstructor(): void
+    {
+        SupportLazyClassWithArrayParameter::$constructorCalled = false;
+
+        $instance = lazy(fn (SupportLazyClassWithArrayParameter $instance) => [['foo']]);
+
+        $this->assertFalse(SupportLazyClassWithArrayParameter::$constructorCalled);
+        $this->assertSame(['foo'], $instance->first);
+        $this->assertTrue(SupportLazyClassWithArrayParameter::$constructorCalled);
+
+        SupportLazyClassWithArrayParameter::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyLazySupportsPositionAndNamedArguments(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(fn (SupportLazyClass $instance) => ['foo', 'second' => 'bar']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyLazyThrowsWhenPositionalArgumentsComeAfterNamedArguments(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(fn (SupportLazyClass $instance) => ['second' => 'bar', 'foo']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Cannot use positional argument after named argument during unpacking');
+
+        $instance->first;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyLazyCanReturnInitializedObject(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(function (SupportLazyClass $instance) {
+            $instance->__construct('foo');
+
+            return $instance;
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertNull($instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyLazyMustInitilizeObject(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(function (SupportLazyClass $instance) {
+            return new SupportLazyClass('foo');
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Typed property Illuminate\Tests\Support\SupportLazyClass::$first must not be accessed before initialization');
+
+        $instance->first;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testProxy(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(SupportLazyClass::class, fn (SupportLazyClass $proxy) => $factory());
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testProxyCanEagerlySetProperties(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(SupportLazyClass::class, fn () => $factory(), eager: ['eager' => 'baz']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertFalse(isset($instance->eager));
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testProxyCanEagerlySetPropertiesAndThenAlsoSetThemOnActualObject(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(SupportLazyClass::class, function ($proxy, $eager) use ($factory) {
+            $instance = $factory();
+
+            foreach ($eager as $prop => $value) {
+                $instance->{$prop} = $value;
+            }
+
+            return $instance;
+        }, eager: ['eager' => 'baz']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testProxyCanAcceptShortClosure(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(SupportLazyClass::class, fn (SupportLazyClass $proxy) => $factory());
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testProxyThrowsExceptionWhenObjectIsNotReturned(): void
+    {
+        $instance = proxy(SupportLazyClass::class, function (SupportLazyClass $proxy) {
+            //
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Lazy proxy factory must return an instance of a class compatible with Illuminate\Tests\Support\SupportLazyClass, null returned');
+
+        $instance->first;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testProxyMustNotInitilizeProxy(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = proxy(SupportLazyClass::class, function (SupportLazyClass $proxy) {
+            $proxy->__construct('foo');
+
+            return $proxy;
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Lazy proxy factory must return a non-lazy object');
+
+        $instance->first;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyProxy(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(function (SupportLazyClass $proxy) use ($factory) {
+            return $factory();
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyProxyCanAcceptShortClosure(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(fn (SupportLazyClass $proxy) => $factory());
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyProxyThrowsExceptionWhenObjectIsNotReturned(): void
+    {
+        $instance = proxy(function (SupportLazyClass $proxy) {
+            //
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Lazy proxy factory must return an instance of a class compatible with Illuminate\Tests\Support\SupportLazyClass, null returned');
+
+        $instance->first;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyProxyThrowsWhenNotClassSpecifiedInClosure(): void
+    {
+        $this->expectExceptionObject(new RuntimeException('The first parameter of the given Closure is missing a type hint.'));
+
+        proxy(function ($proxy) {
+            //
+        });
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testClosureOnlyProxyMustNotInitilizeProxy(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = proxy(function (SupportLazyClass $proxy) {
+            $proxy->__construct('foo');
+
+            return $proxy;
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Lazy proxy factory must return a non-lazy object');
+
+        $instance->first;
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testProxyCanUseClosureReturnTypeForClassDetection(): void
+    {
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(fn (): SupportLazyClass => $factory());
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
     }
 }
 
@@ -1629,5 +2239,30 @@ class SupportTestCountable implements Countable
     public function count(): int
     {
         return 0;
+    }
+}
+
+class SupportLazyClass
+{
+    public static bool $constructorCalled = false;
+
+    public string $eager;
+
+    public function __construct(
+        public string $first,
+        public ?string $second = null,
+    ) {
+        self::$constructorCalled = true;
+    }
+}
+
+class SupportLazyClassWithArrayParameter
+{
+    public static bool $constructorCalled = false;
+
+    public function __construct(
+        public array $first,
+    ) {
+        self::$constructorCalled = true;
     }
 }

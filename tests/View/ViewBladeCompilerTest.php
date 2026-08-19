@@ -5,28 +5,22 @@ namespace Illuminate\Tests\View;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ViewBladeCompilerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testIsExpiredReturnsTrueIfCompiledFileDoesntExist()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(false);
+        $files->expects('exists')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(false);
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
     public function testCannotConstructWithBadCachePath()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Please provide a valid cache path.');
+        $this->expectExceptionObject(new InvalidArgumentException('Please provide a valid cache path.'));
 
         new BladeCompiler($this->getFiles(), null);
     }
@@ -34,18 +28,18 @@ class ViewBladeCompilerTest extends TestCase
     public function testIsExpiredReturnsTrueWhenModificationTimesWarrant()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(true);
-        $files->shouldReceive('lastModified')->once()->with('foo')->andReturn(100);
-        $files->shouldReceive('lastModified')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(0);
+        $files->expects('exists')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(true);
+        $files->expects('lastModified')->with('foo')->andReturn(100);
+        $files->expects('lastModified')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(0);
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
     public function testIsExpiredReturnsFalseWhenUseCacheIsTrueAndNoFileModification()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(true);
-        $files->shouldReceive('lastModified')->once()->with('foo')->andReturn(0);
-        $files->shouldReceive('lastModified')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(100);
+        $files->expects('exists')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(true);
+        $files->expects('lastModified')->with('foo')->andReturn(0);
+        $files->expects('lastModified')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(100);
         $this->assertFalse($compiler->isExpired('foo'));
     }
 
@@ -58,7 +52,7 @@ class ViewBladeCompilerTest extends TestCase
     public function testIsExpiredReturnsFalseWhenIgnoreCacheTimestampsIsTrue()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__, shouldCheckTimestamps: false);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(true);
+        $files->expects('exists')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(true);
         $this->assertFalse($compiler->isExpired('foo'));
     }
 
@@ -71,20 +65,20 @@ class ViewBladeCompilerTest extends TestCase
     public function testCompileCompilesFileAndReturnsContents()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(false);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->expects('get')->with('foo')->andReturn('Hello World');
+        $files->expects('exists')->with(__DIR__)->andReturn(true);
+        $files->expects('exists')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(false);
+        $files->expects('replace')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
     }
 
     public function testCompileCompilesFileAndReturnsContentsCreatingDirectory()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(false);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->expects('get')->with('foo')->andReturn('Hello World');
+        $files->expects('exists')->with(__DIR__)->andReturn(true);
+        $files->expects('exists')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(false);
+        $files->expects('replace')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
     }
 
@@ -92,11 +86,11 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiledPath = __DIR__.'/'.hash('xxh128', 'v2foo').'.php';
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('exists')->once()->with($compiledPath)->andReturn(true);
-        $files->shouldReceive('hash')->once()->with($compiledPath, 'xxh128')->andReturn(hash('xxh128', 'outdated content'));
-        $files->shouldReceive('put')->once()->with($compiledPath, 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->expects('get')->with('foo')->andReturn('Hello World');
+        $files->expects('exists')->with(__DIR__)->andReturn(true);
+        $files->expects('exists')->with($compiledPath)->andReturn(true);
+        $files->expects('hash')->with($compiledPath, 'xxh128')->andReturn(hash('xxh128', 'outdated content'));
+        $files->expects('replace')->with($compiledPath, 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
     }
 
@@ -104,21 +98,62 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiledPath = __DIR__.'/'.hash('xxh128', 'v2foo').'.php';
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(false);
-        $files->shouldReceive('makeDirectory')->once()->with(__DIR__, 0777, true, true);
-        $files->shouldReceive('exists')->once()->with($compiledPath)->andReturn(true);
-        $files->shouldReceive('hash')->once()->with($compiledPath, 'xxh128')->andReturn(hash('xxh128', 'Hello World<?php /**PATH foo ENDPATH**/ ?>'));
+        $files->expects('get')->with('foo')->andReturn('Hello World');
+        $files->expects('exists')->with(__DIR__)->andReturn(false);
+        $files->expects('makeDirectory')->with(__DIR__, 0777, true, true);
+        $files->expects('exists')->with($compiledPath)->andReturn(true);
+        $files->expects('hash')->with($compiledPath, 'xxh128')->andReturn(hash('xxh128', 'Hello World<?php /**PATH foo ENDPATH**/ ?>'));
+        $files->expects('lastModified')->with('foo')->andReturn(100);
+        $files->expects('lastModified')->with($compiledPath)->andReturn(200);
         $compiler->compile('foo');
+    }
+
+    public function testCompileRefreshesCacheTimestampIfUnchangedButExpired()
+    {
+        $files = new Filesystem;
+        $directory = sys_get_temp_dir().'/laravel-blade-compiler-test-'.uniqid();
+        $source = $directory.'/source.blade.php';
+        $cache = $directory.'/cache';
+
+        try {
+            $files->ensureDirectoryExists($cache);
+            $files->put($source, 'Hello World');
+
+            $compiler = new BladeCompiler($files, $cache);
+            $compiler->compile($source);
+
+            $compiled = $compiler->getCompiledPath($source);
+
+            $compiledModified = time();
+            $sourceModified = $compiledModified + 10;
+
+            touch($source, $sourceModified);
+            touch($compiled, $compiledModified);
+
+            clearstatcache(true, $source);
+            clearstatcache(true, $compiled);
+
+            $this->assertTrue($compiler->isExpired($source));
+
+            $compiler->compile($source);
+
+            clearstatcache(true, $source);
+            clearstatcache(true, $compiled);
+
+            $this->assertGreaterThan($files->lastModified($source), $files->lastModified($compiled));
+            $this->assertFalse($compiler->isExpired($source));
+        } finally {
+            $files->deleteDirectory($directory);
+        }
     }
 
     public function testCompileCompilesAndGetThePath()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(false);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->expects('get')->with('foo')->andReturn('Hello World');
+        $files->expects('exists')->with(__DIR__)->andReturn(true);
+        $files->expects('exists')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(false);
+        $files->expects('replace')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
         $this->assertSame('foo', $compiler->getPath());
     }
@@ -133,10 +168,10 @@ class ViewBladeCompilerTest extends TestCase
     public function testCompileWithPathSetBefore()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(false);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->expects('get')->with('foo')->andReturn('Hello World');
+        $files->expects('exists')->with(__DIR__)->andReturn(true);
+        $files->expects('exists')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(false);
+        $files->expects('replace')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         // set path before compilation
         $compiler->setPath('foo');
         // trigger compilation with $path
@@ -164,10 +199,10 @@ class ViewBladeCompilerTest extends TestCase
     public function testIncludePathToTemplate($content, $compiled)
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('get')->once()->with('foo')->andReturn($content);
-        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(false);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', $compiled);
+        $files->expects('get')->with('foo')->andReturn($content);
+        $files->expects('exists')->with(__DIR__)->andReturn(true);
+        $files->expects('exists')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php')->andReturn(false);
+        $files->expects('replace')->with(__DIR__.'/'.hash('xxh128', 'v2foo').'.php', $compiled);
 
         $compiler->compile('foo');
     }
@@ -220,10 +255,10 @@ class ViewBladeCompilerTest extends TestCase
     public function testDontIncludeEmptyPath()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('get')->once()->with('')->andReturn('Hello World');
-        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2').'.php')->andReturn(false);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2').'.php', 'Hello World');
+        $files->expects('get')->with('')->andReturn('Hello World');
+        $files->expects('exists')->with(__DIR__)->andReturn(true);
+        $files->expects('exists')->with(__DIR__.'/'.hash('xxh128', 'v2').'.php')->andReturn(false);
+        $files->expects('replace')->with(__DIR__.'/'.hash('xxh128', 'v2').'.php', 'Hello World');
         $compiler->setPath('');
         $compiler->compile();
     }
@@ -231,10 +266,10 @@ class ViewBladeCompilerTest extends TestCase
     public function testDontIncludeNullPath()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('get')->once()->with(null)->andReturn('Hello World');
-        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.hash('xxh128', 'v2').'.php')->andReturn(false);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.hash('xxh128', 'v2').'.php', 'Hello World');
+        $files->expects('get')->with(null)->andReturn('Hello World');
+        $files->expects('exists')->with(__DIR__)->andReturn(true);
+        $files->expects('exists')->with(__DIR__.'/'.hash('xxh128', 'v2').'.php')->andReturn(false);
+        $files->expects('replace')->with(__DIR__.'/'.hash('xxh128', 'v2').'.php', 'Hello World');
         $compiler->setPath(null);
         $compiler->compile();
     }
@@ -302,6 +337,6 @@ class ViewBladeCompilerTest extends TestCase
 
     protected function getFiles()
     {
-        return m::mock(Filesystem::class);
+        return Mockery::mock(Filesystem::class);
     }
 }

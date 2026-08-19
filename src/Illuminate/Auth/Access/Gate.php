@@ -117,20 +117,14 @@ class Gate implements GateContract
     /**
      * Determine if a given ability has been defined.
      *
-     * @param  string|array  $ability
+     * @param  \UnitEnum|array|string  $ability
      * @return bool
      */
     public function has($ability)
     {
         $abilities = is_array($ability) ? $ability : func_get_args();
 
-        foreach ($abilities as $ability) {
-            if (! isset($this->abilities[$ability])) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($abilities, fn ($ability) => isset($this->abilities[enum_value($ability)]));
     }
 
     /**
@@ -864,7 +858,7 @@ class Gate implements GateContract
      */
     public function forUser($user)
     {
-        return new static(
+        $gate = new static(
             $this->container,
             fn () => $user,
             $this->abilities,
@@ -873,6 +867,10 @@ class Gate implements GateContract
             $this->afterCallbacks,
             $this->guessPolicyNamesUsingCallback,
         );
+
+        $gate->defaultDenialResponse = $this->defaultDenialResponse;
+
+        return $gate;
     }
 
     /**

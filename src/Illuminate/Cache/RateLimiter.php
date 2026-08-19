@@ -7,12 +7,13 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Traits\Macroable;
 
 use function Illuminate\Support\enum_value;
 
 class RateLimiter
 {
-    use InteractsWithTime;
+    use InteractsWithTime, Macroable;
 
     /**
      * The cache store implementation.
@@ -39,9 +40,9 @@ class RateLimiter
     }
 
     /**
-     * Register a named limiter configuration.
+     * Register a named rate limiter configuration.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $name
+     * @param  \UnitEnum|string  $name
      * @param  \Closure  $callback
      * @return $this
      */
@@ -57,7 +58,7 @@ class RateLimiter
     /**
      * Get the given named rate limiter.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $name
+     * @param  \UnitEnum|string  $name
      * @return \Closure|null
      */
     public function limiter($name)
@@ -171,9 +172,9 @@ class RateLimiter
 
         $hits = (int) $this->cache->increment($key, $amount);
 
-        if (! $added && $hits == 1) {
+        if (! $added && $hits == $amount) {
             $this->withoutSerializationOrCompression(
-                fn () => $this->cache->put($key, 1, $decaySeconds)
+                fn () => $this->cache->put($key, $amount, $decaySeconds)
             );
         }
 
@@ -232,7 +233,7 @@ class RateLimiter
 
         $attempts = $this->attempts($key);
 
-        return $maxAttempts - $attempts;
+        return max(0, $maxAttempts - $attempts);
     }
 
     /**
@@ -289,8 +290,10 @@ class RateLimiter
     /**
      * Execute the given callback without serialization or compression when applicable.
      *
-     * @param  callable  $callback
-     * @return mixed
+     * @template TReturn
+     *
+     * @param  (callable(): TReturn)  $callback
+     * @return TReturn
      */
     protected function withoutSerializationOrCompression(callable $callback)
     {
@@ -312,7 +315,7 @@ class RateLimiter
     /**
      * Resolve the rate limiter name.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $name
+     * @param  \UnitEnum|string  $name
      * @return string
      */
     private function resolveLimiterName($name): string

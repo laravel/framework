@@ -27,6 +27,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
 
         Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('title');
             $table->nullableMorphs('commentable');
             $table->softDeletes();
         });
@@ -45,7 +46,10 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         $models[] = null; // deleted
 
         foreach ($models as $model) {
-            (new Comment)->commentable()->associate($model)->save();
+            $comment = new Comment();
+            $comment->commentable()->associate($model);
+            $comment->title = 'foo';
+            $comment->save();
         }
     }
 
@@ -261,6 +265,22 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         $comments = Comment::whereDoesntHaveMorph('commentable', '*')->orderBy('id')->get();
 
         $this->assertEquals([3, 7, 8], $comments->pluck('id')->all());
+    }
+
+    public function testWhereDoesntHaveMorphWithNullableMorphAndAdditionalWhereIsLogicallyGrouped()
+    {
+        $commentsWhereFirst = Comment::whereNot('title', 'foo')
+            ->whereDoesntHaveMorph('commentable', '*')
+            ->orderBy('id')
+            ->get();
+
+        $commentsWhereLast = Comment::whereDoesntHaveMorph('commentable', '*')
+            ->whereNot('title', 'foo')
+            ->orderBy('id')
+            ->get();
+
+        $this->assertCount(0, $commentsWhereFirst);
+        $this->assertCount(0, $commentsWhereLast);
     }
 }
 

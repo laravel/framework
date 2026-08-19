@@ -3,12 +3,14 @@
 namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Config\Repository;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Support\ServiceProvider;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -16,29 +18,28 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FoundationApplicationTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
     {
         $app = new Application;
-        $app['config'] = $config = m::mock(stdClass::class);
-        $config->shouldReceive('set')->once()->with('app.locale', 'foo');
-        $app['translator'] = $trans = m::mock(stdClass::class);
-        $trans->shouldReceive('setLocale')->once()->with('foo');
-        $app['events'] = $events = m::mock(stdClass::class);
-        $events->shouldReceive('dispatch')->once()->with(m::type(LocaleUpdated::class));
+
+        $app['config'] = $config = Mockery::mock(Repository::class);
+        $config->expects('get')->with('app.locale')->andReturn('bar');
+        $config->expects('set')->with('app.locale', 'foo');
+        $app['translator'] = $trans = Mockery::mock(Translator::class);
+        $trans->expects('setLocale')->with('foo');
+        $app['events'] = $events = Mockery::mock(Dispatcher::class);
+        $events->expects('dispatch')->with(Mockery::on(function (LocaleUpdated $event) {
+            return $event->locale === 'foo' && $event->previousLocale === 'bar';
+        }));
 
         $app->setLocale('foo');
     }
 
     public function testServiceProvidersAreCorrectlyRegistered()
     {
-        $provider = m::mock(ApplicationBasicServiceProviderStub::class);
+        $provider = Mockery::mock(ApplicationBasicServiceProviderStub::class);
         $class = get_class($provider);
-        $provider->shouldReceive('register')->once();
+        $provider->expects('register');
         $app = new Application;
         $app->register($provider);
 
@@ -89,9 +90,9 @@ class FoundationApplicationTest extends TestCase
 
     public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotFilled()
     {
-        $provider = m::mock(ServiceProvider::class);
+        $provider = Mockery::mock(ServiceProvider::class);
         $class = get_class($provider);
-        $provider->shouldReceive('register')->once();
+        $provider->expects('register');
         $app = new Application;
         $app->register($provider);
 
@@ -100,9 +101,9 @@ class FoundationApplicationTest extends TestCase
 
     public function testServiceProvidersCouldBeLoaded()
     {
-        $provider = m::mock(ServiceProvider::class);
+        $provider = Mockery::mock(ServiceProvider::class);
         $class = get_class($provider);
-        $provider->shouldReceive('register')->once();
+        $provider->expects('register');
         $app = new Application;
         $app->register($provider);
 
@@ -583,8 +584,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testAbortThrowsNotFoundHttpException()
     {
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('Page was not found');
+        $this->expectExceptionObject(new NotFoundHttpException('Page was not found'));
 
         $app = new Application();
         $app->abort(404, 'Page was not found');
@@ -592,8 +592,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testAbortThrowsHttpException()
     {
-        $this->expectException(HttpException::class);
-        $this->expectExceptionMessage('Request is bad');
+        $this->expectExceptionObject(new HttpException(400, 'Request is bad'));
 
         $app = new Application();
         $app->abort(400, 'Request is bad');
@@ -608,6 +607,58 @@ class FoundationApplicationTest extends TestCase
         } catch (HttpException $exception) {
             $this->assertSame(['X-FOO' => 'BAR'], $exception->getHeaders());
         }
+    }
+
+    public function test_routes_are_cached()
+    {
+        $app = new Application();
+        $app->instance('routes.cached', true);
+        $this->assertTrue($app->routesAreCached());
+    }
+
+    public function test_routes_are_not_cached_by_instance_falls_back_to_file()
+    {
+        $app = new Application();
+        $files = new FileExistsFake;
+        $app->instance('files', $files);
+
+        $this->assertFalse($app->routesAreCached());
+        $this->assertStringContainsString('routes-v7.php', $files->pathRequested);
+    }
+
+    public function test_events_are_cached_uses_container_instance()
+    {
+        $app = new Application();
+        $app->instance('events.cached', true);
+        $files = new FileExistsFake;
+        $app->instance('files', $files);
+
+        $this->assertTrue($app->eventsAreCached());
+        $this->assertFalse(isset($files->pathRequested));
+    }
+
+    public function test_events_are_cached_checks_filesystem_if_not_set()
+    {
+        $app = new Application();
+        $files = new FileExistsFake;
+        $app->instance('files', $files);
+
+        $this->assertFalse($app->eventsAreCached());
+        $this->assertStringContainsString('events.php', $files->pathRequested);
+        $this->assertTrue($app->bound('events.cached'));
+        $this->assertFalse($app->make('events.cached'));
+    }
+
+    public function testCoreContainerAliasesAreRegisteredByDefault(): void
+    {
+        $app = new Application();
+
+        $this->assertTrue($app->isAlias(\Illuminate\Contracts\Translation\Translator::class));
+        $this->assertSame('translator', $app->getAlias(\Illuminate\Contracts\Translation\Translator::class));
+        $this->assertTrue($app->isAlias(\Illuminate\Contracts\Auth\PasswordBrokerFactory::class));
+        $this->assertSame('auth.password', $app->getAlias(\Illuminate\Contracts\Auth\PasswordBrokerFactory::class));
+        $this->assertTrue($app->isAlias(\Illuminate\Contracts\Auth\PasswordBroker::class));
+        $this->assertSame('auth.password.broker', $app->getAlias(\Illuminate\Contracts\Auth\PasswordBroker::class));
     }
 }
 
@@ -741,5 +792,17 @@ class ConcreteTerminator
     public function terminate()
     {
         return self::$counter++;
+    }
+}
+
+class FileExistsFake
+{
+    public string $pathRequested;
+
+    public function exists(string $path): bool
+    {
+        $this->pathRequested = $path;
+
+        return false;
     }
 }

@@ -111,6 +111,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $rehashOnLogin;
 
     /**
+     * The key used to hash recaller cookie values.
+     *
+     * @var string|null
+     */
+    protected $hashKey;
+
+    /**
      * Indicates if the logout method has been called.
      *
      * @var bool
@@ -134,6 +141,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Support\Timebox|null  $timebox
      * @param  bool  $rehashOnLogin
      * @param  int  $timeboxDuration
+     * @param  string|null  $hashKey
      */
     public function __construct(
         $name,
@@ -143,6 +151,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         ?Timebox $timebox = null,
         bool $rehashOnLogin = true,
         int $timeboxDuration = 200000,
+        ?string $hashKey = null,
     ) {
         $this->name = $name;
         $this->session = $session;
@@ -151,6 +160,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $this->timebox = $timebox ?: new Timebox;
         $this->rehashOnLogin = $rehashOnLogin;
         $this->timeboxDuration = $timeboxDuration;
+        $this->hashKey = $hashKey;
     }
 
     /**
@@ -258,7 +268,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  array  $credentials
      * @return bool
      */
-    public function once(array $credentials = [])
+    public function once(#[\SensitiveParameter] array $credentials = [])
     {
         $this->fireAttemptEvent($credentials);
 
@@ -298,7 +308,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  array  $credentials
      * @return bool
      */
-    public function validate(array $credentials = [])
+    public function validate(#[\SensitiveParameter] array $credentials = [])
     {
         return $this->timebox->call(function ($timebox) use ($credentials) {
             $this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
@@ -406,7 +416,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  bool  $remember
      * @return bool
      */
-    public function attempt(array $credentials = [], $remember = false)
+    public function attempt(#[\SensitiveParameter] array $credentials = [], $remember = false)
     {
         return $this->timebox->call(function ($timebox) use ($credentials, $remember) {
             $this->fireAttemptEvent($credentials, $remember);
@@ -443,7 +453,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  bool  $remember
      * @return bool
      */
-    public function attemptWhen(array $credentials = [], $callbacks = null, $remember = false)
+    public function attemptWhen(#[\SensitiveParameter] array $credentials = [], $callbacks = null, $remember = false)
     {
         return $this->timebox->call(function ($timebox) use ($credentials, $callbacks, $remember) {
             $this->fireAttemptEvent($credentials, $remember);
@@ -476,7 +486,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  array  $credentials
      * @return bool
      */
-    protected function hasValidCredentials($user, $credentials)
+    protected function hasValidCredentials($user, #[\SensitiveParameter] $credentials)
     {
         $validated = ! is_null($user) && $this->provider->validateCredentials($user, $credentials);
 
@@ -600,7 +610,9 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function queueRecallerCookie(AuthenticatableContract $user)
     {
         $this->getCookieJar()->queue($this->createRecaller(
-            $user->getAuthIdentifier().'|'.$user->getRememberToken().'|'.$user->getAuthPassword()
+            $user->getAuthIdentifier().'|'.
+            $user->getRememberToken().'|'.
+            $this->hashPasswordForCookie($user->getAuthPassword())
         ));
     }
 
@@ -613,6 +625,21 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function createRecaller($value)
     {
         return $this->getCookieJar()->make($this->getRecallerName(), $value, $this->getRememberDuration());
+    }
+
+    /**
+     * Create a HMAC of the password hash for storage in cookies.
+     *
+     * @param  string  $passwordHash
+     * @return string
+     */
+    public function hashPasswordForCookie($passwordHash)
+    {
+        return hash_hmac(
+            'sha256',
+            $passwordHash,
+            $this->hashKey ?? 'base-key-for-password-hash-mac'
+        );
     }
 
     /**
@@ -710,7 +737,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function logoutOtherDevices($password)
+    public function logoutOtherDevices(#[\SensitiveParameter] $password)
     {
         if (! $this->user()) {
             return;
@@ -736,7 +763,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @throws \InvalidArgumentException
      */
-    protected function rehashUserPasswordForDeviceLogout($password)
+    protected function rehashUserPasswordForDeviceLogout(#[\SensitiveParameter] $password)
     {
         $user = $this->user();
 
@@ -767,7 +794,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  bool  $remember
      * @return void
      */
-    protected function fireAttemptEvent(array $credentials, $remember = false)
+    protected function fireAttemptEvent(#[\SensitiveParameter] array $credentials, $remember = false)
     {
         $this->events?->dispatch(new Attempting($this->name, $credentials, $remember));
     }
@@ -824,7 +851,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  array  $credentials
      * @return void
      */
-    protected function fireFailedEvent($user, array $credentials)
+    protected function fireFailedEvent($user, #[\SensitiveParameter] array $credentials)
     {
         $this->events?->dispatch(new Failed($this->name, $user, $credentials));
     }

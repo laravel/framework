@@ -13,6 +13,7 @@ use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\View\Component;
 use InvalidArgumentException;
+use ParseError;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -195,7 +196,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             );
 
             if (! $this->files->exists($compiledPath)) {
-                $this->files->put($compiledPath, $contents);
+                $this->files->replace($compiledPath, $contents);
 
                 return;
             }
@@ -203,7 +204,15 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $compiledHash = $this->files->hash($compiledPath, 'xxh128');
 
             if ($compiledHash !== hash('xxh128', $contents)) {
-                $this->files->put($compiledPath, $contents);
+                $this->files->replace($compiledPath, $contents);
+
+                return;
+            }
+
+            $lastModified = $this->files->lastModified($this->getPath());
+
+            if ($lastModified >= $this->files->lastModified($compiledPath)) {
+                touch($compiledPath, $lastModified + 1);
             }
         }
     }
@@ -306,7 +315,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         // If there are any footer lines that need to get added to a template we will
         // add them here at the end of the template. This gets used mainly for the
         // template inheritance via the extends keyword that should be appended.
-        if (count($this->footer) > 0) {
+        if ($this->footer !== []) {
             $result = $this->addFooters($result);
         }
 
@@ -620,7 +629,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function hasEvenNumberOfParentheses(string $expression)
     {
-        $tokens = token_get_all('<?php '.$expression);
+        try {
+            $tokens = token_get_all('<?php '.$expression);
+        } catch (ParseError) {
+            return false;
+        }
 
         if (Arr::last($tokens) !== ')') {
             return false;
@@ -630,9 +643,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $closing = 0;
 
         foreach ($tokens as $token) {
-            if ($token == ')') {
+            if ($token === ')') {
                 $closing++;
-            } elseif ($token == '(') {
+            } elseif ($token === '(') {
                 $opening++;
             }
         }
@@ -777,7 +790,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         if (is_null($alias)) {
             $alias = str_contains($class, '\\View\\Components\\')
-                ? (new Collection(explode('\\', Str::after($class, '\\View\\Components\\'))))
+                ? (new Stringable($class))->after('\\View\\Components\\')->explode('\\')
                     ->map(fn ($segment) => Str::kebab($segment))
                     ->implode(':')
                 : Str::kebab(class_basename($class));
@@ -969,7 +982,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register a handler for custom directives.
      *
      * @param  string  $name
-     * @param  callable  $handler
+     * @param  ($bind is true ? \Closure : callable)  $handler
      * @param  bool  $bind
      * @return void
      *

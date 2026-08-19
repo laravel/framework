@@ -27,7 +27,7 @@ class SQLiteConnection extends Connection
      */
     protected function executeBeginTransactionStatement()
     {
-        if (version_compare(PHP_VERSION, '8.4.0') >= 0) {
+        if (version_compare(PHP_VERSION, '8.4.0', '>=')) {
             $mode = $this->getConfig('transaction_mode') ?? 'DEFERRED';
 
             $this->getPdo()->exec("BEGIN {$mode} TRANSACTION");
@@ -59,7 +59,29 @@ class SQLiteConnection extends Connection
      */
     protected function isUniqueConstraintError(Exception $exception)
     {
-        return boolval(preg_match('#(column(s)? .* (is|are) not unique|UNIQUE constraint failed: .*)#i', $exception->getMessage()));
+        return (bool) preg_match('#(column(s)? .* (is|are) not unique|UNIQUE constraint failed: .*)#i', $exception->getMessage());
+    }
+
+    /**
+     * Extract the columns that caused a unique constraint violation.
+     *
+     * @param  Exception  $exception
+     * @return array{index: null, columns: list<string>}
+     */
+    protected function parseUniqueConstraintViolation(Exception $exception): array
+    {
+        preg_match('#UNIQUE constraint failed: (.+)#i', $exception->getMessage(), $matches);
+
+        $columns = [];
+
+        if (isset($matches[1])) {
+            $columns = array_map(
+                static fn ($col) => last(explode('.', trim($col))),
+                explode(',', $matches[1])
+            );
+        }
+
+        return ['columns' => $columns, 'index' => null];
     }
 
     /**

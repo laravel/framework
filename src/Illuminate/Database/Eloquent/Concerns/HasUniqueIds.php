@@ -5,14 +5,14 @@ namespace Illuminate\Database\Eloquent\Concerns;
 trait HasUniqueIds
 {
     /**
-     * Indicates if the model uses unique ids.
+     * Indicates if the model uses unique IDs.
      *
      * @var bool
      */
     public $usesUniqueIds = false;
 
     /**
-     * Determine if the model uses unique ids.
+     * Determine if the model uses unique IDs.
      *
      * @return bool
      */
@@ -38,7 +38,7 @@ trait HasUniqueIds
     /**
      * Generate a new key for the model.
      *
-     * @return string
+     * @return string|null
      */
     public function newUniqueId()
     {

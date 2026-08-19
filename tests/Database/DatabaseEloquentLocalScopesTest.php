@@ -10,8 +10,6 @@ class DatabaseEloquentLocalScopesTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         tap(new DB)->addConnection([
             'driver' => 'sqlite',
             'database' => ':memory:',
@@ -20,8 +18,6 @@ class DatabaseEloquentLocalScopesTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Model::unsetConnectionResolver();
     }
 

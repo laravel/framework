@@ -2,11 +2,12 @@
 
 namespace Illuminate\Routing;
 
-use BackedEnum;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+
+use function Illuminate\Support\enum_value;
 
 class RouteUrlGenerator
 {
@@ -233,7 +234,7 @@ class RouteUrlGenerator
         $offset = 0;
         $emptyParameters = array_filter($namedParameters, static fn ($val) => $val === '');
 
-        if (count($requiredRouteParametersWithoutDefaultsOrNamedParameters) !== 0 &&
+        if ($requiredRouteParametersWithoutDefaultsOrNamedParameters !== [] &&
             count($parameters) !== count($emptyParameters)) {
             // Find the index of the first required parameter...
             $offset = array_search($requiredRouteParametersWithoutDefaultsOrNamedParameters[0], array_keys($namedParameters));
@@ -250,7 +251,7 @@ class RouteUrlGenerator
             if ($offset < 0) {
                 $offset = 0;
             }
-        } elseif (count($requiredRouteParametersWithoutDefaultsOrNamedParameters) === 0 && count($parameters) !== 0) {
+        } elseif ($requiredRouteParametersWithoutDefaultsOrNamedParameters === [] && count($parameters) !== 0) {
             // Handle the case where all passed parameters are for parameters that have default values...
             $remainingCount = count($parameters);
 
@@ -299,9 +300,7 @@ class RouteUrlGenerator
         })->all();
 
         array_walk_recursive($parameters, function (&$item) {
-            if ($item instanceof BackedEnum) {
-                $item = $item->value;
-            }
+            $item = enum_value($item);
         });
 
         return $this->url->formatParameters($parameters);
@@ -401,7 +400,7 @@ class RouteUrlGenerator
         // First we will get all of the string parameters that are remaining after we
         // have replaced the route wildcards. We'll then build a query string from
         // these string parameters then use it as a starting point for the rest.
-        if (count($parameters) === 0) {
+        if ($parameters === []) {
             return '';
         }
 

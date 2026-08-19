@@ -6,6 +6,7 @@ use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use InvalidArgumentException;
 
 class FilesystemServiceProvider extends ServiceProvider
 {
@@ -76,6 +77,8 @@ class FilesystemServiceProvider extends ServiceProvider
      * Register protected file serving.
      *
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     protected function serveFiles()
     {
@@ -83,15 +86,25 @@ class FilesystemServiceProvider extends ServiceProvider
             return;
         }
 
+        $served = [];
+
         foreach ($this->app['config']['filesystems.disks'] ?? [] as $disk => $config) {
             if (! $this->shouldServeFiles($config)) {
                 continue;
             }
 
-            $this->app->booted(function ($app) use ($disk, $config) {
+            $this->app->booted(function ($app) use ($disk, $config, &$served) {
                 $uri = isset($config['url'])
                     ? rtrim(parse_url($config['url'])['path'], '/')
                     : '/storage';
+
+                if (isset($served[$uri])) {
+                    throw new InvalidArgumentException(
+                        "The [{$disk}] disk conflicts with the [{$served[$uri]}] disk at [{$uri}]. Each served disk must have a unique URL."
+                    );
+                }
+
+                $served[$uri] = $disk;
 
                 $isProduction = $app->isProduction();
 
@@ -102,6 +115,14 @@ class FilesystemServiceProvider extends ServiceProvider
                         $isProduction
                     ))($request, $path);
                 })->where('path', '.*')->name('storage.'.$disk);
+
+                Route::put($uri.'/{path}', function (Request $request, string $path) use ($disk, $config, $isProduction) {
+                    return (new ReceiveFile(
+                        $disk,
+                        $config,
+                        $isProduction
+                    ))($request, $path);
+                })->where('path', '.*')->name('storage.'.$disk.'.upload');
             });
         }
     }

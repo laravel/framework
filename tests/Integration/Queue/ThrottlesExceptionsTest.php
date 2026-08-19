@@ -5,13 +5,14 @@ namespace Illuminate\Tests\Integration\Queue;
 use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\ThrottlesExceptions;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 
@@ -55,13 +56,12 @@ class ThrottlesExceptionsTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('release')->with(0)->once();
-        $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('release')->with(0);
+        $job->expects('isReleased')->times(2)->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -75,15 +75,16 @@ class ThrottlesExceptionsTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('release')->withArgs(function ($delay) {
-            return $delay >= 600;
-        })->once();
-        $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('release')->withArgs(function ($delay) {
+            // The delay is the remainder of the decay window, less wall clock
+            // seconds elapsed since the first exception opened the circuit.
+            return $delay >= 590 && $delay <= 610;
+        });
+        $job->expects('isReleased')->times(2)->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -97,14 +98,12 @@ class ThrottlesExceptionsTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('delete')->once();
-        $job->shouldReceive('isDeleted')->andReturn(true);
-        $job->shouldReceive('isReleased')->twice()->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('delete');
+        $job->expects('isReleased')->times(2)->andReturn(false);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -118,14 +117,12 @@ class ThrottlesExceptionsTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(true);
-        $job->shouldReceive('fail')->once();
-        $job->shouldReceive('isDeleted')->andReturn(true);
-        $job->shouldReceive('isReleased')->once()->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        $job->expects('hasFailed')->andReturn(true);
+        $job->expects('fail');
+        $job->expects('isReleased')->andReturn(false);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -139,13 +136,12 @@ class ThrottlesExceptionsTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
-        $job->shouldReceive('delete')->once();
-        $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
+        $job->expects('isDeletedOrReleased')->andReturn(false);
+        $job->expects('delete');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -185,7 +181,7 @@ class ThrottlesExceptionsTest extends TestCase
             $this->assertTrue($job->released);
             $this->assertTrue($job->handled);
 
-            Carbon::setTestNow(now()->addSeconds(1));
+            Carbon::setTestNow(Carbon::now()->addSecond());
         }
 
         $result = $middleware->handle($job = $jobFactory(), $next);
@@ -239,7 +235,7 @@ class ThrottlesExceptionsTest extends TestCase
             $this->assertTrue($job->released);
             $this->assertTrue($job->handled);
 
-            Carbon::setTestNow(now()->addMilliseconds(100));
+            Carbon::setTestNow(Carbon::now()->addMilliseconds(100));
         }
 
         $result = $middleware->handle($job = $jobFactory(), $next);
@@ -293,7 +289,7 @@ class ThrottlesExceptionsTest extends TestCase
             $this->assertTrue($job->released);
             $this->assertTrue($job->handled);
 
-            Carbon::setTestNow(now()->addSeconds(1));
+            Carbon::setTestNow(Carbon::now()->addSecond());
         }
 
         $result = $middleware->handle($job = $jobFactory(), $next);
@@ -316,12 +312,44 @@ class ThrottlesExceptionsTest extends TestCase
         $this->assertTrue($job->handled);
     }
 
+    public function testItCanBackoffUsingException()
+    {
+        $job = new class
+        {
+            public $releasedAfter;
+
+            public function release($delay)
+            {
+                $this->releasedAfter = $delay;
+
+                return $this;
+            }
+        };
+        $expectedException = new RuntimeException('Whoops!');
+        $receivedException = null;
+        $next = function () use ($expectedException) {
+            throw $expectedException;
+        };
+
+        $middleware = (new ThrottlesExceptions())->backoff(function ($throwable) use (&$receivedException) {
+            $receivedException = $throwable;
+
+            return 5;
+        });
+
+        $result = $middleware->handle($job, $next);
+
+        $this->assertSame($job, $result);
+        $this->assertSame($expectedException, $receivedException);
+        $this->assertSame(300, $job->releasedAfter);
+    }
+
     public function testReportingExceptions()
     {
         $this->spy(ExceptionHandler::class)
-            ->shouldReceive('report')
-            ->twice()
-            ->with(m::type(RuntimeException::class));
+            ->expects('report')
+            ->times(2)
+            ->with(Mockery::type(RuntimeException::class));
 
         $job = new class
         {
@@ -344,6 +372,81 @@ class ThrottlesExceptionsTest extends TestCase
 
         $middleware->report(fn () => false);
         $middleware->handle($job, $next);
+    }
+
+    public function testUsesJobClassNameForCacheKey()
+    {
+        $rateLimiter = $this->mock(RateLimiter::class);
+
+        $job = new class
+        {
+            public $released = false;
+
+            public function release()
+            {
+                $this->released = true;
+
+                return $this;
+            }
+        };
+
+        $expectedKey = 'laravel_throttles_exceptions:'.hash('xxh128', get_class($job));
+
+        $rateLimiter->expects('tooManyAttempts')
+            ->with($expectedKey, 10)
+            ->andReturn(false);
+
+        $rateLimiter->expects('hit')
+            ->with($expectedKey, 600);
+
+        $next = function ($job) {
+            throw new RuntimeException('Whoops!');
+        };
+
+        $middleware = new ThrottlesExceptions();
+        $middleware->handle($job, $next);
+
+        $this->assertTrue($job->released);
+    }
+
+    public function testUsesDisplayNameForCacheKeyWhenAvailable()
+    {
+        $rateLimiter = $this->mock(RateLimiter::class);
+
+        $job = new class
+        {
+            public $released = false;
+
+            public function release()
+            {
+                $this->released = true;
+
+                return $this;
+            }
+
+            public function displayName(): string
+            {
+                return 'App\\Actions\\ThrottlesExceptionsTestAction';
+            }
+        };
+
+        $expectedKey = 'laravel_throttles_exceptions:'.hash('xxh128', 'App\\Actions\\ThrottlesExceptionsTestAction');
+
+        $rateLimiter->expects('tooManyAttempts')
+            ->with($expectedKey, 10)
+            ->andReturn(false);
+
+        $rateLimiter->expects('hit')
+            ->with($expectedKey, 600);
+
+        $next = function ($job) {
+            throw new RuntimeException('Whoops!');
+        };
+
+        $middleware = new ThrottlesExceptions();
+        $middleware->handle($job, $next);
+
+        $this->assertTrue($job->released);
     }
 }
 

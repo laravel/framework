@@ -39,6 +39,17 @@ class StringTypeTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_sets_format()
+    {
+        $type = (new StringType)->default('foo')->format('date');
+
+        $this->assertEquals([
+            'type' => 'string',
+            'default' => 'foo',
+            'format' => 'date',
+        ], $type->toArray());
+    }
+
     public function test_it_sets_enum()
     {
         $type = (new StringType)->enum(['draft', 'published']);

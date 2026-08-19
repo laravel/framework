@@ -25,11 +25,6 @@ class FileSessionHandlerTest extends TestCase
         $this->sessionHandler = new FileSessionHandler($this->files, '/path/to/sessions', 30);
     }
 
-    protected function tearDown(): void
-    {
-        Mockery::close();
-    }
-
     public function test_open()
     {
         $this->assertTrue($this->sessionHandler->open('/path/to/sessions', 'session_name'));
@@ -46,15 +41,15 @@ class FileSessionHandlerTest extends TestCase
         $path = '/path/to/sessions/'.$sessionId;
         Carbon::setTestNow(Carbon::parse('2025-02-02 01:30:00'));
         // Set up expectations
-        $this->files->shouldReceive('isFile')->with($path)->andReturn(true);
+        $this->files->expects('isFile')->with($path)->andReturn(true);
 
         $minutesAgo30 = Carbon::parse('2025-02-02 01:00:00')->getTimestamp();
-        $this->files->shouldReceive('lastModified')->with($path)->andReturn($minutesAgo30);
-        $this->files->shouldReceive('sharedGet')->with($path)->once()->andReturn('session_data');
+        $this->files->expects('lastModified')->with($path)->andReturn($minutesAgo30);
+        $this->files->expects('sharedGet')->with($path)->andReturn('session_data');
 
         $result = $this->sessionHandler->read($sessionId);
 
-        $this->assertEquals('session_data', $result);
+        $this->assertSame('session_data', $result);
     }
 
     public function test_read_returns_data_when_file_exists_but_expired()
@@ -63,15 +58,15 @@ class FileSessionHandlerTest extends TestCase
         $path = '/path/to/sessions/'.$sessionId;
         Carbon::setTestNow(Carbon::parse('2025-02-02 01:30:01'));
         // Set up expectations
-        $this->files->shouldReceive('isFile')->with($path)->andReturn(true);
+        $this->files->expects('isFile')->with($path)->andReturn(true);
 
         $minutesAgo30 = Carbon::parse('2025-02-02 01:00:00')->getTimestamp();
-        $this->files->shouldReceive('lastModified')->with($path)->andReturn($minutesAgo30);
+        $this->files->expects('lastModified')->with($path)->andReturn($minutesAgo30);
         $this->files->shouldReceive('sharedGet')->never();
 
         $result = $this->sessionHandler->read($sessionId);
 
-        $this->assertEquals('', $result);
+        $this->assertSame('', $result);
     }
 
     public function test_read_returns_empty_string_when_file_does_not_exist()
@@ -80,11 +75,11 @@ class FileSessionHandlerTest extends TestCase
         $path = '/path/to/sessions/'.$sessionId;
 
         // Set up expectations
-        $this->files->shouldReceive('isFile')->with($path)->andReturn(false);
+        $this->files->expects('isFile')->with($path)->andReturn(false);
 
         $result = $this->sessionHandler->read($sessionId);
 
-        $this->assertEquals('', $result);
+        $this->assertSame('', $result);
     }
 
     public function test_write_stores_data()
@@ -93,7 +88,7 @@ class FileSessionHandlerTest extends TestCase
         $data = 'session_data';
 
         // Set up expectations
-        $this->files->shouldReceive('put')->with('/path/to/sessions/'.$sessionId, $data, true)->once()->andReturn(null);
+        $this->files->expects('put')->with('/path/to/sessions/'.$sessionId, $data, true)->andReturn(null);
 
         $result = $this->sessionHandler->write($sessionId, $data);
 
@@ -105,7 +100,7 @@ class FileSessionHandlerTest extends TestCase
         $sessionId = 'session_id';
 
         // Set up expectations
-        $this->files->shouldReceive('delete')->with('/path/to/sessions/'.$sessionId)->once()->andReturn(null);
+        $this->files->expects('delete')->with('/path/to/sessions/'.$sessionId)->andReturn(null);
 
         $result = $this->sessionHandler->destroy($sessionId);
 
@@ -116,8 +111,8 @@ class FileSessionHandlerTest extends TestCase
     {
         $session = new FileSessionHandler($this->files, join_paths(__DIR__, 'tmp'), 30);
         // Set up expectations for Filesystem
-        $this->files->shouldReceive('delete')->with(join_paths(__DIR__, 'tmp', 'a2'))->once()->andReturn(false);
-        $this->files->shouldReceive('delete')->with(join_paths(__DIR__, 'tmp', 'a3'))->once()->andReturn(true);
+        $this->files->expects('delete')->with(join_paths(__DIR__, 'tmp', 'a2'))->andReturn(false);
+        $this->files->expects('delete')->with(join_paths(__DIR__, 'tmp', 'a3'))->andReturn(true);
 
         mkdir(__DIR__.'/tmp');
         touch(__DIR__.'/tmp/a1', time() - 3); // last modified: 3 sec ago

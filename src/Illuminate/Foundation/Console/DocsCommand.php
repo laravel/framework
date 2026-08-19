@@ -82,7 +82,7 @@ class DocsCommand extends Command
      *
      * @return void
      */
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -97,6 +97,8 @@ class DocsCommand extends Command
      * @param  \Illuminate\Http\Client\Factory  $http
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @return int
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function handle(Http $http, Cache $cache)
     {
@@ -115,7 +117,7 @@ class DocsCommand extends Command
 
         $this->refreshDocs();
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 
     /**
@@ -368,6 +370,8 @@ class DocsCommand extends Command
      *
      * @param  string  $url
      * @return void
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     protected function openViaBuiltInStrategy($url)
     {

@@ -41,7 +41,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     /**
      * The provider class names.
      *
-     * @var string[]
+     * @var array<int, class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected $providers = [
         FormRequestServiceProvider::class,
@@ -142,6 +142,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
      * Register the "validate" macro on the request.
      *
      * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function registerRequestValidation()
     {
@@ -215,7 +217,11 @@ class FoundationServiceProvider extends AggregateServiceProvider
         });
 
         $this->app['events']->listen(function (JobAttempted $event) {
-            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => $event->connectionName !== 'sync' && ($event->successful() || $callback->always));
+            if (in_array($event->connectionName, ['sync', 'deferred'])) {
+                return;
+            }
+
+            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => ($event->successful() || $callback->always));
         });
     }
 

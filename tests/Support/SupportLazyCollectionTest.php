@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Sleep;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SupportLazyCollectionTest extends TestCase
@@ -39,13 +39,13 @@ class SupportLazyCollectionTest extends TestCase
     {
         $array = [1, 2, 3];
 
-        $data = LazyCollection::make(Collection::make($array));
+        $data = LazyCollection::make(new Collection($array));
 
         $this->assertSame($array, $data->all());
 
         $array = ['a' => 1, 'b' => 2, 'c' => 3];
 
-        $data = LazyCollection::make(Collection::make($array));
+        $data = LazyCollection::make(new Collection($array));
 
         $this->assertSame($array, $data->all());
     }
@@ -184,7 +184,7 @@ class SupportLazyCollectionTest extends TestCase
     {
         $timeout = Carbon::now();
 
-        $mock = m::mock(LazyCollection::class.'[now]');
+        $mock = Mockery::mock(LazyCollection::class.'[now]');
 
         $timedOutWith = [];
 
@@ -194,7 +194,7 @@ class SupportLazyCollectionTest extends TestCase
                 tap($collection)
                     ->mockery_init($mock->mockery_getContainer())
                     ->shouldAllowMockingProtectedMethods()
-                    ->shouldReceive('now')
+                    ->expects('now')
                     ->times(3)
                     ->andReturn(
                         (clone $timeout)->sub(2, 'minute')->getTimestamp(),
@@ -209,8 +209,6 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertSame([1, 2], $results);
         $this->assertSame([2, 1], $timedOutWith);
-
-        m::close();
     }
 
     public function testTapEach()
@@ -255,7 +253,7 @@ class SupportLazyCollectionTest extends TestCase
     public function testThrottleAccountsForTimePassed()
     {
         Sleep::fake();
-        Carbon::setTestNow(now());
+        Carbon::setTestNow(Carbon::now());
 
         $data = LazyCollection::times(3)
             ->throttle(3)
@@ -280,7 +278,6 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertSame([1, 2, 3], $data);
 
         Sleep::fake(false);
-        Carbon::setTestNow();
     }
 
     public function testUniqueDoubleEnumeration()
@@ -392,6 +389,21 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertFalse($multipleCollection->containsOneItem());
     }
 
+    public function testContainsManyItems()
+    {
+        $emptyCollection = new LazyCollection([]);
+        $this->assertFalse($emptyCollection->containsManyItems());
+
+        $singleCollection = new LazyCollection([1]);
+        $this->assertFalse($singleCollection->containsManyItems());
+
+        $multipleCollection = new LazyCollection([1, 2]);
+        $this->assertTrue($multipleCollection->containsManyItems());
+
+        $manyCollection = new LazyCollection([1, 2, 3]);
+        $this->assertTrue($manyCollection->containsManyItems());
+    }
+
     public function testDoesntContain()
     {
         $collection = new LazyCollection([1, 2, 3, 4, 5]);
@@ -496,7 +508,37 @@ class SupportLazyCollectionTest extends TestCase
             ],
             $output->all(),
         );
+    }
 
-        Carbon::setTestNow();
+    public function testRandomPreservesKeys()
+    {
+        $collection = new LazyCollection([
+            'first' => 1,
+            'second' => 2,
+            'third' => 3,
+        ]);
+
+        $keysWithoutPreserve = array_keys($collection->random(2)->all());
+
+        $this->assertEquals([0, 1], $keysWithoutPreserve);
+
+        $keysWithPreserve = array_keys($collection->random(2, true)->all());
+
+        foreach ($keysWithPreserve as $key) {
+            $this->assertContains($key, ['first', 'second', 'third']);
+        }
+    }
+
+    public function testHasDoesNotCountDuplicateKeys()
+    {
+        $collection = LazyCollection::make(function () {
+            yield 'a' => 1;
+            yield 'a' => 2;
+            yield 'c' => 3;
+        });
+
+        $this->assertFalse($collection->has('a', 'b'));
+        $this->assertFalse($collection->has(['a', 'b']));
+        $this->assertTrue($collection->has('a'));
     }
 }

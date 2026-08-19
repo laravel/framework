@@ -12,6 +12,8 @@ use Illuminate\Console\Scheduling\ScheduleClearCacheCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleInterruptCommand;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
+use Illuminate\Console\Scheduling\SchedulePauseCommand;
+use Illuminate\Console\Scheduling\ScheduleResumeCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Console\Scheduling\ScheduleTestCommand;
 use Illuminate\Console\Scheduling\ScheduleWorkCommand;
@@ -43,6 +45,8 @@ use Illuminate\Foundation\Console\ConfigMakeCommand;
 use Illuminate\Foundation\Console\ConfigPublishCommand;
 use Illuminate\Foundation\Console\ConfigShowCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
+use Illuminate\Foundation\Console\DevCommand;
+use Illuminate\Foundation\Console\DevListCommand;
 use Illuminate\Foundation\Console\DocsCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\EnumMakeCommand;
@@ -70,6 +74,7 @@ use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\PackageDiscoverCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
+use Illuminate\Foundation\Console\ReloadCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\ResourceMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
@@ -88,6 +93,7 @@ use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Foundation\Console\ViewCacheCommand;
 use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Foundation\Console\ViewMakeCommand;
+use Illuminate\Foundation\DevCommands;
 use Illuminate\Notifications\Console\NotificationTableCommand;
 use Illuminate\Queue\Console\BatchesTableCommand;
 use Illuminate\Queue\Console\ClearCommand as QueueClearCommand;
@@ -97,9 +103,11 @@ use Illuminate\Queue\Console\ForgetFailedCommand as ForgetFailedQueueCommand;
 use Illuminate\Queue\Console\ListenCommand as QueueListenCommand;
 use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
 use Illuminate\Queue\Console\MonitorCommand as QueueMonitorCommand;
+use Illuminate\Queue\Console\PauseCommand as QueuePauseCommand;
 use Illuminate\Queue\Console\PruneBatchesCommand as QueuePruneBatchesCommand;
 use Illuminate\Queue\Console\PruneFailedJobsCommand as QueuePruneFailedJobsCommand;
 use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
+use Illuminate\Queue\Console\ResumeCommand as QueueResumeCommand;
 use Illuminate\Queue\Console\RetryBatchCommand as QueueRetryBatchCommand;
 use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
 use Illuminate\Queue\Console\TableCommand;
@@ -150,12 +158,15 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueForget' => ForgetFailedQueueCommand::class,
         'QueueListen' => QueueListenCommand::class,
         'QueueMonitor' => QueueMonitorCommand::class,
+        'QueuePause' => QueuePauseCommand::class,
         'QueuePruneBatches' => QueuePruneBatchesCommand::class,
         'QueuePruneFailedJobs' => QueuePruneFailedJobsCommand::class,
         'QueueRestart' => QueueRestartCommand::class,
+        'QueueResume' => QueueResumeCommand::class,
         'QueueRetry' => QueueRetryCommand::class,
         'QueueRetryBatch' => QueueRetryBatchCommand::class,
         'QueueWork' => QueueWorkCommand::class,
+        'Reload' => ReloadCommand::class,
         'RouteCache' => RouteCacheCommand::class,
         'RouteClear' => RouteClearCommand::class,
         'RouteList' => RouteListCommand::class,
@@ -168,6 +179,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ScheduleTest' => ScheduleTestCommand::class,
         'ScheduleWork' => ScheduleWorkCommand::class,
         'ScheduleInterrupt' => ScheduleInterruptCommand::class,
+        'SchedulePause' => SchedulePauseCommand::class,
+        'ScheduleResume' => ScheduleResumeCommand::class,
         'ShowModel' => ShowModelCommand::class,
         'StorageLink' => StorageLinkCommand::class,
         'StorageUnlink' => StorageUnlinkCommand::class,
@@ -194,6 +207,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ConfigPublish' => ConfigPublishCommand::class,
         'ConsoleMake' => ConsoleMakeCommand::class,
         'ControllerMake' => ControllerMakeCommand::class,
+        'Dev' => DevCommand::class,
+        'DevList' => DevListCommand::class,
         'Docs' => DocsCommand::class,
         'EnumMake' => EnumMakeCommand::class,
         'EventGenerate' => EventGenerateCommand::class,
@@ -250,9 +265,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     }
 
     /**
+     * Bootstrap the application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        DevCommands::registerDefaults();
+    }
+
+    /**
      * Register the given commands.
      *
-     * @param  array  $commands
      * @return void
      */
     protected function registerCommands(array $commands)
@@ -409,7 +433,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerConfigPublishCommand()
     {
-        $this->app->singleton(ConfigPublishCommand::class, function ($app) {
+        $this->app->singleton(ConfigPublishCommand::class, function () {
             return new ConfigPublishCommand;
         });
     }

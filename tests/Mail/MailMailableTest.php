@@ -11,17 +11,12 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Transport\ArrayTransport;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 
 class MailMailableTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testMailableSetsRecipientsCorrectly(): void
     {
         $this->stubMailer();
@@ -582,7 +577,7 @@ class MailMailableTest extends TestCase
 
     public function testMailablePriorityGetsSent(): void
     {
-        $view = m::mock(Factory::class);
+        $view = Mockery::mock(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -603,7 +598,7 @@ class MailMailableTest extends TestCase
     {
         $this->stubMailer();
 
-        $view = m::mock(Factory::class);
+        $view = Mockery::mock(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -660,7 +655,7 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasMetadata('total', 1670));
 
         $this->stubMailer();
-        $view = m::mock(Factory::class);
+        $view = Mockery::mock(Factory::class);
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
         $sentMessage = $mailer->send($mailable);
@@ -677,7 +672,7 @@ class MailMailableTest extends TestCase
     {
         $this->stubMailer();
 
-        $view = m::mock(Factory::class);
+        $view = Mockery::mock(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -1024,6 +1019,36 @@ class MailMailableTest extends TestCase
         $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg', 'bar.jpg', ['mime' => 'text/html']));
     }
 
+    public function testAssertHasNoAttachments(): void
+    {
+        $this->stubMailer();
+
+        $mailable = new class() extends Mailable
+        {
+            public function build()
+            {
+                //
+            }
+        };
+
+        $mailable->assertHasNoAttachments();
+
+        $mailableWithAttachment = new class() extends Mailable
+        {
+            public function build()
+            {
+                $this->attach('/path/to/foo.jpg');
+            }
+        };
+
+        try {
+            $mailableWithAttachment->assertHasNoAttachments();
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringContainsString('Expected no attachments', $e->getMessage());
+        }
+    }
+
     public function testAssertHasAttachment(): void
     {
         $this->stubMailer();
@@ -1144,7 +1169,7 @@ class MailMailableTest extends TestCase
 
     public function testMailableHeadersGetSent(): void
     {
-        $view = m::mock(Factory::class);
+        $view = Mockery::mock(Factory::class);
 
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
@@ -1158,12 +1183,12 @@ class MailMailableTest extends TestCase
         $this->assertSame('custom-message-id@example.com', $sentMessage->getMessageId());
 
         $this->assertTrue($sentMessage->getOriginalMessage()->getHeaders()->has('references'));
-        $this->assertEquals('References', $sentMessage->getOriginalMessage()->getHeaders()->get('references')->getName());
-        $this->assertEquals('<previous-message@example.com>', $sentMessage->getOriginalMessage()->getHeaders()->get('references')->getValue());
+        $this->assertSame('References', $sentMessage->getOriginalMessage()->getHeaders()->get('references')->getName());
+        $this->assertSame('<previous-message@example.com>', $sentMessage->getOriginalMessage()->getHeaders()->get('references')->getValue());
 
         $this->assertTrue($sentMessage->getOriginalMessage()->getHeaders()->has('x-custom-header'));
-        $this->assertEquals('X-Custom-Header', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getName());
-        $this->assertEquals('Custom Value', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getValue());
+        $this->assertSame('X-Custom-Header', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getName());
+        $this->assertSame('Custom Value', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getValue());
     }
 
     public function testMailableAttributesInBuild(): void

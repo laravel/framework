@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
-use Mockery as m;
+use Mockery;
 
 class BladeComponentsTest extends AbstractBladeTestCase
 {
@@ -26,14 +26,14 @@ class BladeComponentsTest extends AbstractBladeTestCase
 
     public function testEndComponentsAreCompiled()
     {
-        $this->compiler->newComponentHash('foo');
+        $this->compiler::newComponentHash('foo');
 
         $this->assertSame('<?php echo $__env->renderComponent(); ?>', $this->compiler->compileString('@endcomponent'));
     }
 
     public function testEndComponentClassesAreCompiled()
     {
-        $this->compiler->newComponentHash('foo');
+        $this->compiler::newComponentHash('foo');
 
         $this->assertSame(str_replace("\r\n", "\n", '<?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -62,9 +62,9 @@ class BladeComponentsTest extends AbstractBladeTestCase
     {
         $attributes = new ComponentAttributeBag(['foo' => 'baz', 'other' => 'ok']);
 
-        $component = m::mock(Component::class);
+        $component = Mockery::mock(Component::class);
         $component->shouldReceive('withName', 'test');
-        $component->shouldReceive('shouldRender')->andReturn(false);
+        $component->expects('shouldRender')->andReturn(false);
 
         Component::resolveComponentsUsing(fn () => $component);
 

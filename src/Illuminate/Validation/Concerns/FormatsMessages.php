@@ -85,7 +85,7 @@ trait FormatsMessages
         $inlineEntry = $this->getFromLocalArray($attribute, Str::snake($rule));
 
         return is_array($inlineEntry) && in_array($rule, $this->sizeRules)
-            ? $inlineEntry[$this->getAttributeType($attribute)]
+            ? ($inlineEntry[$this->getAttributeType($attribute)] ?? null)
             : $inlineEntry;
     }
 
@@ -103,10 +103,12 @@ trait FormatsMessages
 
         $keys = ["{$attribute}.{$lowerRule}", $lowerRule, $attribute];
 
-        $shortRule = "{$attribute}.".Str::snake(class_basename($lowerRule));
+        if ($this->getAttributeType($attribute) !== 'file') {
+            $shortRule = "{$attribute}.".Str::snake(class_basename($lowerRule));
 
-        if (! in_array($shortRule, $keys)) {
-            $keys[] = $shortRule;
+            if (! in_array($shortRule, $keys)) {
+                $keys[] = $shortRule;
+            }
         }
 
         // First we will check for a custom message for an attribute specific rule
@@ -120,8 +122,8 @@ trait FormatsMessages
                     if (preg_match('#^'.$pattern.'\z#u', $key) === 1) {
                         $message = $source[$sourceKey];
 
-                        if (is_array($message) && isset($message[$lowerRule])) {
-                            return $message[$lowerRule];
+                        if (is_array($message)) {
+                            return $message[$lowerRule] ?? null;
                         }
 
                         return $message;
@@ -420,6 +422,11 @@ trait FormatsMessages
      */
     protected function replaceIndexOrPositionPlaceholder($message, $attribute, $placeholder, ?Closure $modifier = null)
     {
+        if (! str_contains(strtolower($message), ':'.$placeholder) &&
+            ! str_contains(strtolower($message), '-'.$placeholder)) {
+            return $message;
+        }
+
         $segments = explode('.', $attribute);
 
         $modifier ??= fn ($value) => $value;
@@ -476,6 +483,10 @@ trait FormatsMessages
      */
     protected function replaceInputPlaceholder($message, $attribute)
     {
+        if (! str_contains($message, ':input')) {
+            return $message;
+        }
+
         $actualValue = $this->getValue($attribute);
 
         if (is_scalar($actualValue) || is_null($actualValue)) {

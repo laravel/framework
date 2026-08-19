@@ -127,8 +127,7 @@ class EloquentModelCustomCastingTest extends TestCase
             'string_field' => 'string_value',
         ]);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given value is not an Address instance.');
+        $this->expectExceptionObject(new InvalidArgumentException('The given value is not an Address instance.'));
         $model->address = 'single_string';
 
         // Ensure model values remain unchanged
@@ -146,8 +145,7 @@ class EloquentModelCustomCastingTest extends TestCase
             'string_field' => 'string_value',
         ]);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given value is not an Address instance.');
+        $this->expectExceptionObject(new InvalidArgumentException('The given value is not an Address instance.'));
         $model->address = null;
 
         // Ensure model values remain unchanged
@@ -184,10 +182,10 @@ class EloquentModelCustomCastingTest extends TestCase
         $model->save();
 
         $this->assertInstanceOf(Euro::class, $model->amount);
-        $this->assertEquals('2', $model->amount->value);
+        $this->assertSame('2', $model->amount->value);
 
         $model->increment('amount', new Euro('1'));
-        $this->assertEquals('3.00', $model->amount->value);
+        $this->assertSame('3.00', $model->amount->value);
     }
 
     public function testModelWithCustomCastsCompareFunction()
@@ -442,14 +440,14 @@ class EuroCaster implements CastsAttributes
 
     public function increment($model, $key, $value, $attributes)
     {
-        $model->$key = new Euro((string) BigNumber::of($model->$key->value)->plus($value->value)->toScale(2));
+        $model->$key = new Euro((string) BigNumber::of((string) $model->$key->value)->plus($value->value)->toScale(2));
 
         return $model->$key;
     }
 
     public function decrement($model, $key, $value, $attributes)
     {
-        $model->$key = new Euro((string) BigNumber::of($model->$key->value)->subtract($value->value)->toScale(2));
+        $model->$key = new Euro((string) BigNumber::of((string) $model->$key->value)->subtract($value->value)->toScale(2));
 
         return $model->$key;
     }

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Queue;
 
-use Carbon\Carbon;
 use Closure;
 use DateTimeInterface;
+use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -12,17 +12,26 @@ use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
+use Illuminate\Queue\Attributes\FailOnTimeout;
+use Illuminate\Queue\Attributes\MaxExceptions;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Attributes\Timeout;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Throwable;
 
 abstract class Queue
 {
-    use InteractsWithTime;
+    use InteractsWithTime, ReadsQueueAttributes, ResolvesQueueRoutes;
 
     /**
      * The IoC container instance.
@@ -128,7 +137,9 @@ abstract class Queue
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new InvalidPayloadException(
-                'Unable to JSON encode payload. Error ('.json_last_error().'): '.json_last_error_msg(), $value
+                sprintf('Unable to JSON encode payload for job [%s] on queue [%s]. Error (%d): %s',
+                    $value['displayName'] ?? 'unknown', $queue, json_last_error(), json_last_error_msg()
+                ), $value
             );
         }
 
@@ -156,6 +167,8 @@ abstract class Queue
      * @param  object  $job
      * @param  string  $queue
      * @return array
+     *
+     * @throws \RuntimeException
      */
     protected function createObjectPayload($job, $queue)
     {
@@ -164,14 +177,16 @@ abstract class Queue
             'displayName' => $this->getDisplayName($job),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $this->getJobTries($job),
-            'maxExceptions' => $job->maxExceptions ?? null,
-            'failOnTimeout' => $job->failOnTimeout ?? false,
+            'maxExceptions' => $this->getAttributeValue($job, MaxExceptions::class, 'maxExceptions'),
+            'failOnTimeout' => $this->getAttributeValue($job, FailOnTimeout::class, 'failOnTimeout') ?? false,
             'backoff' => $this->getJobBackoff($job),
-            'timeout' => $job->timeout ?? null,
+            'timeout' => $this->getAttributeValue($job, Timeout::class, 'timeout'),
             'retryUntil' => $this->getJobExpiration($job),
+            'deleteWhenMissingModels' => $this->getAttributeValue($job, DeleteWhenMissingModels::class, 'deleteWhenMissingModels') ?? false,
             'data' => [
                 'commandName' => $job,
                 'command' => $job,
+                'batchId' => $job->batchId ?? null,
             ],
             'createdAt' => Carbon::now()->getTimestamp(),
         ]);
@@ -217,12 +232,10 @@ abstract class Queue
      */
     public function getJobTries($job)
     {
-        if (! method_exists($job, 'tries') && ! isset($job->tries)) {
-            return;
-        }
+        $tries = $this->getAttributeValue($job, Tries::class, 'tries');
 
-        if (is_null($tries = $job->tries ?? $job->tries())) {
-            return;
+        if (method_exists($job, 'tries')) {
+            $tries = $job->tries();
         }
 
         return $tries;
@@ -236,11 +249,13 @@ abstract class Queue
      */
     public function getJobBackoff($job)
     {
-        if (! method_exists($job, 'backoff') && ! isset($job->backoff)) {
-            return;
+        $backoff = $this->getAttributeValue($job, Backoff::class, 'backoff');
+
+        if (method_exists($job, 'backoff')) {
+            $backoff = $job->backoff();
         }
 
-        if (is_null($backoff = $job->backoff ?? $job->backoff())) {
+        if (is_null($backoff)) {
             return;
         }
 
@@ -326,7 +341,6 @@ abstract class Queue
      * Create the given payload using any registered payload hooks.
      *
      * @param  string  $queue
-     * @param  array  $payload
      * @return array
      */
     protected function withCreatePayloadHooks($queue, array $payload)
@@ -354,13 +368,7 @@ abstract class Queue
     {
         if ($this->shouldDispatchAfterCommit($job) &&
             $this->container->bound('db.transactions')) {
-            if ($job instanceof ShouldBeUnique) {
-                $this->container->make('db.transactions')->addCallbackForRollback(
-                    function () use ($job) {
-                        (new UniqueLock($this->container->make(Cache::class)))->release($job);
-                    }
-                );
-            }
+            $this->registerRollbackCallbacksForJobsThatDispatchAfterCommit($job);
 
             return $this->container->make('db.transactions')->addCallback(
                 function () use ($queue, $job, $payload, $delay, $callback) {
@@ -397,6 +405,49 @@ abstract class Queue
         }
 
         return $this->dispatchAfterCommit ?? false;
+    }
+
+    /**
+     * Partition the given jobs by whether they should be deferred until the active database transaction commits.
+     *
+     * @param  array  $jobs
+     * @return array{0: array, 1: array}
+     */
+    protected function partitionJobsByAfterCommit(array $jobs)
+    {
+        if (! isset($this->container) || ! $this->container->bound('db.transactions')) {
+            return [[], $jobs];
+        }
+
+        return (new Collection($jobs))
+            ->partition(fn ($job) => $this->shouldDispatchAfterCommit($job))
+            ->map(fn ($jobs) => $jobs->values()->all())
+            ->all();
+    }
+
+    /**
+     * Register callbacks to release locks if the current database transaction is rolled back.
+     *
+     * @param  \Closure|string|object  $job
+     * @return void
+     */
+    protected function registerRollbackCallbacksForJobsThatDispatchAfterCommit($job)
+    {
+        if ($job instanceof ShouldBeUnique) {
+            $this->container->make('db.transactions')->addCallbackForRollback(
+                function () use ($job) {
+                    (new UniqueLock($this->container->make(Cache::class)))->release($job);
+                }
+            );
+        }
+
+        if (! empty($job->debounceOwner ?? '')) {
+            $this->container->make('db.transactions')->addCallbackForRollback(
+                function () use ($job) {
+                    (new DebounceLock($this->container->make(Cache::class)))->release($job, $job->debounceOwner ?? '');
+                }
+            );
+        }
     }
 
     /**
@@ -437,6 +488,17 @@ abstract class Queue
     }
 
     /**
+     * Get the routed queue name for the given queue.
+     *
+     * @param  string  $queue
+     * @return string
+     */
+    protected function resolveQueue($queue)
+    {
+        return $this->queueRoutes()->forwardedQueue($queue, $this->connectionName);
+    }
+
+    /**
      * Get the connection name for the queue.
      *
      * @return string
@@ -472,7 +534,6 @@ abstract class Queue
     /**
      * Set the queue configuration array.
      *
-     * @param  array  $config
      * @return $this
      */
     public function setConfig(array $config)
@@ -495,7 +556,6 @@ abstract class Queue
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @return void
      */
     public function setContainer(Container $container)

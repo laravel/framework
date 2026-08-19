@@ -39,7 +39,7 @@ class ValidationException extends Exception
     /**
      * The path the client should be redirected to.
      *
-     * @var string
+     * @var string|null
      */
     public $redirectTo;
 
@@ -95,7 +95,7 @@ class ValidationException extends Exception
         if ($count = count($messages)) {
             $pluralized = $count === 1 ? 'error' : 'errors';
 
-            $message .= ' '.$validator->getTranslator()->choice("(and :count more $pluralized)", $count, compact('count'));
+            $message .= ' '.$validator->getTranslator()->choice("(and :count more $pluralized)", $count, ['count' => $count]);
         }
 
         return $message;

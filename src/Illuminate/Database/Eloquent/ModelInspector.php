@@ -17,16 +17,9 @@ use function Illuminate\Support\enum_value;
 class ModelInspector
 {
     /**
-     * The Laravel application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
-    /**
      * The methods that can be called in a model to indicate a relation.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $relationMethods = [
         'hasMany',
@@ -45,11 +38,10 @@ class ModelInspector
     /**
      * Create a new model inspector instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app  The Laravel application instance.
      */
-    public function __construct(Application $app)
+    public function __construct(protected Application $app)
     {
-        $this->app = $app;
     }
 
     /**
@@ -57,7 +49,7 @@ class ModelInspector
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>|string  $model
      * @param  string|null  $connection
-     * @return array{"class": class-string<\Illuminate\Database\Eloquent\Model>, database: string, table: string, policy: class-string|null, attributes: \Illuminate\Support\Collection, relations: \Illuminate\Support\Collection, events: \Illuminate\Support\Collection, observers: \Illuminate\Support\Collection, collection: class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>, builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>}
+     * @return \Illuminate\Database\Eloquent\ModelInfo
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
@@ -72,18 +64,19 @@ class ModelInspector
             $model->setConnection($connection);
         }
 
-        return [
-            'class' => get_class($model),
-            'database' => $model->getConnection()->getName(),
-            'table' => $model->getConnection()->getTablePrefix().$model->getTable(),
-            'policy' => $this->getPolicy($model),
-            'attributes' => $this->getAttributes($model),
-            'relations' => $this->getRelations($model),
-            'events' => $this->getEvents($model),
-            'observers' => $this->getObservers($model),
-            'collection' => $this->getCollectedBy($model),
-            'builder' => $this->getBuilder($model),
-        ];
+        return new ModelInfo(
+            class: $model::class,
+            database: $model->getConnection()->getName(),
+            table: $model->getConnection()->getTablePrefix().$model->getTable(),
+            policy: $this->getPolicy($model),
+            attributes: $this->getAttributes($model),
+            relations: $this->getRelations($model),
+            events: $this->getEvents($model),
+            observers: $this->getObservers($model),
+            collection: $this->getCollectedBy($model),
+            builder: $this->getBuilder($model),
+            resource: $this->getResource($model),
+        );
     }
 
     /**
@@ -294,6 +287,17 @@ class ModelInspector
     protected function getBuilder($model)
     {
         return $model->newQuery()::class;
+    }
+
+    /**
+     * Get the class used for JSON response transforming.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Http\Resources\Json\JsonResource|null
+     */
+    protected function getResource($model)
+    {
+        return rescue(static fn () => $model->toResource()::class, null, false);
     }
 
     /**

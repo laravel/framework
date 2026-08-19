@@ -617,7 +617,6 @@ if (! function_exists('now')) {
      * Create a new Carbon instance for the current time.
      *
      * @param  \DateTimeZone|\UnitEnum|string|null  $tz
-     * @return \Illuminate\Support\Carbon
      */
     function now($tz = null): CarbonInterface
     {
@@ -1019,6 +1018,7 @@ if (! function_exists('__')) {
      * @param  string|null  $key
      * @param  array  $replace
      * @param  string|null  $locale
+     * @return ($key is null ? null : array|string)
      */
     function __($key = null, $replace = [], $locale = null): string|array|null
     {

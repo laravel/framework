@@ -33,4 +33,48 @@ class Carbon extends BaseCarbon
 
         return static::createFromInterface($id->getDateTime());
     }
+
+    /**
+     * Get the current date / time plus a given amount of time.
+     */
+    public function plus(
+        int $years = 0,
+        int $months = 0,
+        int $weeks = 0,
+        int $days = 0,
+        int $hours = 0,
+        int $minutes = 0,
+        int $seconds = 0,
+        int $microseconds = 0,
+        ?bool $overflow = null
+    ): static {
+        return $this->add('years', $years, $overflow)
+            ->add('months', $months, $overflow)
+            ->add("
+                $weeks weeks $days days
+                $hours hours $minutes minutes $seconds seconds $microseconds microseconds
+            ");
+    }
+
+    /**
+     * Get the current date / time minus a given amount of time.
+     */
+    public function minus(
+        int $years = 0,
+        int $months = 0,
+        int $weeks = 0,
+        int $days = 0,
+        int $hours = 0,
+        int $minutes = 0,
+        int $seconds = 0,
+        int $microseconds = 0,
+        ?bool $overflow = null
+    ): static {
+        return $this->sub('years', $years, $overflow)
+            ->sub('months', $months, $overflow)
+            ->sub("
+                $weeks weeks $days days
+                $hours hours $minutes minutes $seconds seconds $microseconds microseconds
+            ");
+    }
 }

@@ -10,7 +10,7 @@ use function Illuminate\Support\enum_value;
 class DoesntContain implements Stringable
 {
     /**
-     * The values that should be contained in the attribute.
+     * The values that should not be contained in the attribute.
      *
      * @var array
      */
@@ -19,7 +19,7 @@ class DoesntContain implements Stringable
     /**
      * Create a new doesntContain rule instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|array|string  $values
      */
     public function __construct($values)
     {
@@ -40,7 +40,7 @@ class DoesntContain implements Stringable
         $values = array_map(function ($value) {
             $value = enum_value($value);
 
-            return '"'.str_replace('"', '""', $value).'"';
+            return '"'.str_replace('"', '""', (string) $value).'"';
         }, $this->values);
 
         return 'doesnt_contain:'.implode(',', $values);

@@ -13,7 +13,7 @@ class EloquentTransactionWithAfterCommitUsingDatabaseTransactionsTest extends Te
     /**
      * The current database driver.
      *
-     * @return string
+     * @var string
      */
     protected $driver;
 

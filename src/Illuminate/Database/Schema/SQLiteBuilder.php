@@ -55,7 +55,7 @@ class SQLiteBuilder extends Builder
 
         return $this->connection->getPostProcessor()->processTables(
             $this->connection->selectFromWriteConnection(
-                $this->grammar->compileTables($schema, $withSize)
+                $this->grammar->compileTables($schema)
             )
         );
     }
@@ -164,7 +164,7 @@ class SQLiteBuilder extends Builder
     /**
      * Get the names of current schemas for the connection.
      *
-     * @return string[]|null
+     * @return string[]
      */
     public function getCurrentSchemaListing()
     {

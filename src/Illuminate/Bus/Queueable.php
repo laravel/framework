@@ -43,6 +43,20 @@ trait Queueable
     public $deduplicator;
 
     /**
+     * The lock owner token for debounce supersession checks.
+     *
+     * @var string
+     */
+    public $debounceOwner = '';
+
+    /**
+     * The owner of the unique job lock.
+     *
+     * @var string
+     */
+    public $uniqueLockOwner = '';
+
+    /**
      * The number of seconds before the job should be made available.
      *
      * @var \DateTimeInterface|\DateInterval|array|int|null
@@ -322,7 +336,7 @@ trait Queueable
      */
     public function dispatchNextJobInChain()
     {
-        if (! empty($this->chained)) {
+        if (is_array($this->chained) && ! empty($this->chained)) {
             dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
                 $next->chained = $this->chained;
 

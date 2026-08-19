@@ -21,7 +21,7 @@ class EloquentNamedScopeAttributeTest extends TestCase
         );
     }
 
-    #[DataProvider('namedScopeDataProvider')]
+    #[DataProvider('scopeDataProvider')]
     public function test_it_can_query_named_scoped_from_the_query_builder(string $methodName)
     {
         $query = Fixtures\NamedScopeUser::query()->{$methodName}(true);
@@ -29,7 +29,7 @@ class EloquentNamedScopeAttributeTest extends TestCase
         $this->assertSame($this->query, $query->toRawSql());
     }
 
-    #[DataProvider('namedScopeDataProvider')]
+    #[DataProvider('scopeDataProvider')]
     public function test_it_can_query_named_scoped_from_static_query(string $methodName)
     {
         $query = Fixtures\NamedScopeUser::{$methodName}(true);
@@ -37,7 +37,7 @@ class EloquentNamedScopeAttributeTest extends TestCase
         $this->assertSame($this->query, $query->toRawSql());
     }
 
-    public static function namedScopeDataProvider(): array
+    public static function scopeDataProvider(): array
     {
         return [
             'scope with return' => ['verified'],

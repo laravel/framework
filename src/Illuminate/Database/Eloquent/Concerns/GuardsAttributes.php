@@ -2,6 +2,12 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\Initialize;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+
 trait GuardsAttributes
 {
     /**
@@ -31,6 +37,27 @@ trait GuardsAttributes
      * @var array<class-string,list<string>>
      */
     protected static $guardableColumns = [];
+
+    /**
+     * Initialize the GuardsAttributes trait.
+     *
+     * @return void
+     */
+    #[Initialize]
+    public function initializeGuardsAttributes()
+    {
+        $this->mergeFillable(static::resolveClassAttribute(Fillable::class, 'columns') ?? []);
+
+        $default = $this instanceof Pivot ? [] : ['*'];
+
+        if ($this->guarded === $default) {
+            if (static::resolveClassAttribute(Unguarded::class) !== null) {
+                $this->guarded = [];
+            } else {
+                $this->guarded = static::resolveClassAttribute(Guarded::class, 'columns') ?? $default;
+            }
+        }
+    }
 
     /**
      * Get the fillable attributes for the model.
@@ -63,6 +90,10 @@ trait GuardsAttributes
      */
     public function mergeFillable(array $fillable)
     {
+        if ($fillable === []) {
+            return $this;
+        }
+
         $this->fillable = array_values(array_unique(array_merge($this->fillable, $fillable)));
 
         return $this;

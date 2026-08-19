@@ -379,7 +379,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         $columns = Schema::getColumns('foo');
 
         $this->assertCount(1, $columns);
-        $this->assertTrue($columns[0]['name'] === 'bar');
+        $this->assertSame($columns[0]['name'], 'bar');
     }
 
     public function testGetIndexes()
@@ -793,7 +793,7 @@ class SchemaBuilderTest extends DatabaseTestCase
     {
         Schema::macro('foo', fn () => 'foo');
 
-        $this->assertEquals('foo', Schema::foo());
+        $this->assertSame('foo', Schema::foo());
 
         Schema::macro('hasForeignKeyForColumn', function (string $column, string $table, string $foreignTable) {
             return collect(Schema::getForeignKeys($table))

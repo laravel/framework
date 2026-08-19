@@ -6,28 +6,38 @@ use Closure;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ResponseException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Promise\EachPromise;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\UriTemplate\UriTemplate;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
+use Illuminate\Http\Client\Promises\FluentPromise;
+use Illuminate\Http\Client\Promises\LazyPromise;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use JsonSerializable;
-use OutOfBoundsException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 use Symfony\Component\VarDumper\VarDumper;
+use Throwable;
 
+/**
+ * @template TAsync of bool = false
+ */
 class PendingRequest
 {
     use Conditionable, Macroable;
@@ -133,7 +143,7 @@ class PendingRequest
     /**
      * The number of milliseconds to wait between retries.
      *
-     * @var Closure|int
+     * @var (Closure(int, mixed): int)|int
      */
     protected $retryDelay = 100;
 
@@ -147,7 +157,7 @@ class PendingRequest
     /**
      * The callback that will determine if the request should be retried.
      *
-     * @var callable|null
+     * @var (callable(\Throwable, static, string|null): bool)|null
      */
     protected $retryWhenCallback = null;
 
@@ -157,6 +167,13 @@ class PendingRequest
      * @var \Illuminate\Support\Collection
      */
     protected $beforeSendingCallbacks;
+
+    /**
+     * The callbacks that should execute after the Laravel Response is built.
+     *
+     * @var \Illuminate\Support\Collection<int, (callable(\Illuminate\Http\Client\Response, \Illuminate\Http\Client\Request): \Illuminate\Http\Client\Response|null)>
+     */
+    protected $afterResponseCallbacks;
 
     /**
      * The stub callables that will handle requests.
@@ -189,9 +206,16 @@ class PendingRequest
     /**
      * Whether the requests should be asynchronous.
      *
-     * @var bool
+     * @var TAsync
      */
     protected $async = false;
+
+    /**
+     * The attributes to track with the request.
+     *
+     * @var array<array-key, mixed>
+     */
+    protected $attributes = [];
 
     /**
      * The pending request promise.
@@ -254,6 +278,8 @@ class PendingRequest
 
             $pendingRequest->dispatchRequestSendingEvent();
         }]);
+
+        $this->afterResponseCallbacks = new Collection();
     }
 
     /**
@@ -279,6 +305,10 @@ class PendingRequest
     public function withBody($content, $contentType = 'application/json')
     {
         $this->bodyFormat('body');
+
+        $content = $this->normalizeRequestOptionValue($content);
+
+        $this->ensureValidRequestBody($content);
 
         $this->pendingBody = $content;
 
@@ -328,12 +358,17 @@ class PendingRequest
 
         $this->asMultipart();
 
-        $this->pendingFiles[] = array_filter([
+        $file = [
             'name' => $name,
             'contents' => $contents,
             'headers' => $headers,
-            'filename' => $filename,
-        ]);
+        ];
+
+        if ($filename !== null) {
+            $file['filename'] = $filename;
+        }
+
+        $this->pendingFiles[] = $file;
 
         return $this;
     }
@@ -356,9 +391,9 @@ class PendingRequest
      */
     public function bodyFormat(string $format)
     {
-        return tap($this, function () use ($format) {
-            $this->bodyFormat = $format;
-        });
+        $this->bodyFormat = $format;
+
+        return $this;
     }
 
     /**
@@ -369,11 +404,11 @@ class PendingRequest
      */
     public function withQueryParameters(array $parameters)
     {
-        return tap($this, function () use ($parameters) {
-            $this->options = array_merge_recursive($this->options, [
-                'query' => $parameters,
-            ]);
-        });
+        $this->options = array_merge_recursive($this->options, [
+            'query' => $parameters,
+        ]);
+
+        return $this;
     }
 
     /**
@@ -418,11 +453,11 @@ class PendingRequest
      */
     public function withHeaders(array $headers)
     {
-        return tap($this, function () use ($headers) {
-            $this->options = array_merge_recursive($this->options, [
-                'headers' => $headers,
-            ]);
-        });
+        $this->options = array_merge_recursive($this->options, [
+            'headers' => $headers,
+        ]);
+
+        return $this;
     }
 
     /**
@@ -457,11 +492,11 @@ class PendingRequest
      * @param  string  $password
      * @return $this
      */
-    public function withBasicAuth(string $username, string $password)
+    public function withBasicAuth(string $username, #[\SensitiveParameter] string $password)
     {
-        return tap($this, function () use ($username, $password) {
-            $this->options['auth'] = [$username, $password];
-        });
+        $this->options['auth'] = [$username, $password];
+
+        return $this;
     }
 
     /**
@@ -471,11 +506,11 @@ class PendingRequest
      * @param  string  $password
      * @return $this
      */
-    public function withDigestAuth($username, $password)
+    public function withDigestAuth($username, #[\SensitiveParameter] $password)
     {
-        return tap($this, function () use ($username, $password) {
-            $this->options['auth'] = [$username, $password, 'digest'];
-        });
+        $this->options['auth'] = [$username, $password, 'digest'];
+
+        return $this;
     }
 
     /**
@@ -485,11 +520,11 @@ class PendingRequest
      * @param  string  $password
      * @return $this
      */
-    public function withNtlmAuth($username, $password)
+    public function withNtlmAuth($username, #[\SensitiveParameter] $password)
     {
-        return tap($this, function () use ($username, $password) {
-            $this->options['auth'] = [$username, $password, 'ntlm'];
-        });
+        $this->options['auth'] = [$username, $password, 'ntlm'];
+
+        return $this;
     }
 
     /**
@@ -499,11 +534,11 @@ class PendingRequest
      * @param  string  $type
      * @return $this
      */
-    public function withToken($token, $type = 'Bearer')
+    public function withToken(#[\SensitiveParameter] $token, $type = 'Bearer')
     {
-        return tap($this, function () use ($token, $type) {
-            $this->options['headers']['Authorization'] = trim($type.' '.$token);
-        });
+        $this->options['headers']['Authorization'] = trim($type.' '.$token);
+
+        return $this;
     }
 
     /**
@@ -514,9 +549,9 @@ class PendingRequest
      */
     public function withUserAgent($userAgent)
     {
-        return tap($this, function () use ($userAgent) {
-            $this->options['headers']['User-Agent'] = trim($userAgent);
-        });
+        $this->options['headers']['User-Agent'] = trim($userAgent);
+
+        return $this;
     }
 
     /**
@@ -527,9 +562,9 @@ class PendingRequest
      */
     public function withUrlParameters(array $parameters = [])
     {
-        return tap($this, function () use ($parameters) {
-            $this->urlParameters = array_merge($this->urlParameters, $parameters);
-        });
+        $this->urlParameters = array_merge($this->urlParameters, $parameters);
+
+        return $this;
     }
 
     /**
@@ -541,11 +576,11 @@ class PendingRequest
      */
     public function withCookies(array $cookies, string $domain)
     {
-        return tap($this, function () use ($cookies, $domain) {
-            $this->options = array_merge_recursive($this->options, [
-                'cookies' => CookieJar::fromArray($cookies, $domain),
-            ]);
-        });
+        $this->options = array_merge_recursive($this->options, [
+            'cookies' => CookieJar::fromArray($cookies, $domain),
+        ]);
+
+        return $this;
     }
 
     /**
@@ -556,9 +591,9 @@ class PendingRequest
      */
     public function maxRedirects(int $max)
     {
-        return tap($this, function () use ($max) {
-            $this->options['allow_redirects']['max'] = $max;
-        });
+        $this->options['allow_redirects']['max'] = $max;
+
+        return $this;
     }
 
     /**
@@ -568,9 +603,9 @@ class PendingRequest
      */
     public function withoutRedirecting()
     {
-        return tap($this, function () {
-            $this->options['allow_redirects'] = false;
-        });
+        $this->options['allow_redirects'] = false;
+
+        return $this;
     }
 
     /**
@@ -580,9 +615,9 @@ class PendingRequest
      */
     public function withoutVerifying()
     {
-        return tap($this, function () {
-            $this->options['verify'] = false;
-        });
+        $this->options['verify'] = false;
+
+        return $this;
     }
 
     /**
@@ -593,9 +628,9 @@ class PendingRequest
      */
     public function sink($to)
     {
-        return tap($this, function () use ($to) {
-            $this->options['sink'] = $to;
-        });
+        $this->options['sink'] = $to;
+
+        return $this;
     }
 
     /**
@@ -606,9 +641,9 @@ class PendingRequest
      */
     public function timeout(int|float $seconds)
     {
-        return tap($this, function () use ($seconds) {
-            $this->options['timeout'] = $seconds;
-        });
+        $this->options['timeout'] = $seconds;
+
+        return $this;
     }
 
     /**
@@ -619,17 +654,17 @@ class PendingRequest
      */
     public function connectTimeout(int|float $seconds)
     {
-        return tap($this, function () use ($seconds) {
-            $this->options['connect_timeout'] = $seconds;
-        });
+        $this->options['connect_timeout'] = $seconds;
+
+        return $this;
     }
 
     /**
      * Specify the number of times the request should be attempted.
      *
      * @param  array|int  $times
-     * @param  Closure|int  $sleepMilliseconds
-     * @param  callable|null  $when
+     * @param  (Closure(int, mixed): int)|int  $sleepMilliseconds
+     * @param  (callable(\Throwable, static, string|null): bool)|null  $when
      * @param  bool  $throw
      * @return $this
      */
@@ -637,8 +672,8 @@ class PendingRequest
     {
         $this->tries = $times;
         $this->retryDelay = $sleepMilliseconds;
-        $this->retryThrow = $throw;
         $this->retryWhenCallback = $when;
+        $this->retryThrow = $throw;
 
         return $this;
     }
@@ -651,12 +686,12 @@ class PendingRequest
      */
     public function withOptions(array $options)
     {
-        return tap($this, function () use ($options) {
-            $this->options = array_replace_recursive(
-                array_merge_recursive($this->options, Arr::only($options, $this->mergeableOptions)),
-                $options
-            );
-        });
+        $this->options = array_replace_recursive(
+            array_merge_recursive($this->options, Arr::only($options, $this->mergeableOptions)),
+            $options
+        );
+
+        return $this;
     }
 
     /**
@@ -699,6 +734,19 @@ class PendingRequest
     }
 
     /**
+     * Set arbitrary attributes to store with the request.
+     *
+     * @param  array<array-key, mixed>  $attributes
+     * @return $this
+     */
+    public function withAttributes($attributes)
+    {
+        $this->attributes = array_merge_recursive($this->attributes, $attributes);
+
+        return $this;
+    }
+
+    /**
      * Add a new "before sending" callback to the request.
      *
      * @param  callable  $callback
@@ -706,9 +754,22 @@ class PendingRequest
      */
     public function beforeSending($callback)
     {
-        return tap($this, function () use ($callback) {
-            $this->beforeSendingCallbacks[] = $callback;
-        });
+        $this->beforeSendingCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Add a new callback to execute after the response is built.
+     *
+     * @param  callable(\Illuminate\Http\Client\Response, \Illuminate\Http\Client\Request): (\Illuminate\Http\Client\Response|null)  $callback
+     * @return $this
+     */
+    public function afterResponse(callable $callback)
+    {
+        $this->afterResponseCallbacks[] = $callback;
+
+        return $this;
     }
 
     /**
@@ -747,7 +808,11 @@ class PendingRequest
      */
     public function throwUnless($condition)
     {
-        return $this->throwIf(! $condition);
+        return $this->throwIf(
+            is_callable($condition)
+                ? fn ($response) => ! $condition($response)
+                : ! $condition
+        );
     }
 
     /**
@@ -789,7 +854,9 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|string|null  $query
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     *
+     * @phpstan-return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -805,7 +872,9 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|string|null  $query
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     *
+     * @phpstan-return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -817,11 +886,31 @@ class PendingRequest
     }
 
     /**
+     * Issue a QUERY request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     *
+     * @phpstan-return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
+     *
+     * @throws \Illuminate\Http\Client\ConnectionException
+     */
+    public function query(string $url, $data = [])
+    {
+        return $this->send('QUERY', $url, [
+            $this->bodyFormat => $data,
+        ]);
+    }
+
+    /**
      * Issue a POST request to the given URL.
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     *
+     * @phpstan-return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -837,7 +926,9 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     *
+     * @phpstan-return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -853,7 +944,9 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     *
+     * @phpstan-return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -869,7 +962,9 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     *
+     * @phpstan-return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -883,18 +978,52 @@ class PendingRequest
     /**
      * Send a pool of asynchronous requests concurrently.
      *
-     * @param  callable  $callback
-     * @return array<array-key, \Illuminate\Http\Client\Response>
+     * @param  (callable(\Illuminate\Http\Client\Pool): mixed)  $callback
+     * @param  non-negative-int|null  $concurrency
+     * @return array<array-key, \Illuminate\Http\Client\Response|\Throwable>
      */
-    public function pool(callable $callback)
+    public function pool(callable $callback, ?int $concurrency = 0)
     {
         $results = [];
 
         $requests = tap(new Pool($this->factory), $callback)->getRequests();
 
-        foreach ($requests as $key => $item) {
-            $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
+        if ($concurrency === null) {
+            (new Collection($requests))->each(static function ($item) {
+                if ($item instanceof static) {
+                    $item = $item->getPromise();
+                }
+
+                if ($item instanceof LazyPromise) {
+                    $item->buildPromise();
+                }
+            });
+
+            foreach ($requests as $key => $item) {
+                $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
+            }
+
+            return $results;
         }
+
+        $concurrency = $concurrency === 0 ? count($requests) : $concurrency;
+
+        $promiseGenerator = static function () use ($requests) {
+            foreach ($requests as $key => $item) {
+                $promise = $item instanceof static ? $item->getPromise() : $item;
+                yield $key => $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
+            }
+        };
+
+        (new EachPromise($promiseGenerator(), [
+            'fulfilled' => function ($result, $key) use (&$results) {
+                $results[$key] = $result;
+            },
+            'rejected' => function ($reason, $key) use (&$results) {
+                $results[$key] = $reason;
+            },
+            'concurrency' => $concurrency,
+        ]))->promise()->wait();
 
         return $results;
     }
@@ -916,7 +1045,9 @@ class PendingRequest
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\Illuminate\Http\Client\Promises\LazyPromise
+     *
+     * @phpstan-return (TAsync is false ? \Illuminate\Http\Client\Response : \Illuminate\Http\Client\Promises\LazyPromise)
      *
      * @throws \Exception
      * @throws \Illuminate\Http\Client\ConnectionException
@@ -934,63 +1065,62 @@ class PendingRequest
         [$this->pendingBody, $this->pendingFiles] = [null, []];
 
         if ($this->async) {
-            return $this->makePromise($method, $url, $options);
+            return $this->promise = new LazyPromise(
+                fn () => $this->makePromise($method, $url, $options)
+            );
         }
 
         $shouldRetry = null;
 
         return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
             try {
-                return tap($this->newResponse($this->sendRequest($method, $url, $options)), function ($response) use ($attempt, &$shouldRetry) {
+                return tap($this->newResponse($this->sendRequest($method, $url, $options)), function (&$response) use ($attempt, &$shouldRetry) {
                     $this->populateResponse($response);
 
                     $this->dispatchResponseReceivedEvent($response);
+                    $response = $this->runAfterResponseCallbacks($response);
 
-                    if (! $response->successful()) {
-                        try {
-                            $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
-                        } catch (Exception $exception) {
-                            $shouldRetry = false;
+                    if ($response->successful()) {
+                        return;
+                    }
 
-                            throw $exception;
-                        }
+                    try {
+                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
+                    } catch (Exception $exception) {
+                        $shouldRetry = false;
 
-                        if ($this->throwCallback &&
-                            ($this->throwIfCallback === null ||
-                             call_user_func($this->throwIfCallback, $response))) {
-                            $response->throw($this->throwCallback);
-                        }
+                        throw $exception;
+                    }
 
-                        $potentialTries = is_array($this->tries)
-                            ? count($this->tries) + 1
-                            : $this->tries;
+                    if ($this->throwCallback &&
+                        ($this->throwIfCallback === null ||
+                         call_user_func($this->throwIfCallback, $response))) {
+                        $response->throw($this->throwCallback);
+                    }
 
-                        if ($attempt < $potentialTries && $shouldRetry) {
-                            $response->throw();
-                        }
+                    $potentialTries = is_array($this->tries)
+                        ? count($this->tries) + 1
+                        : $this->tries;
 
-                        if ($potentialTries > 1 && $this->retryThrow) {
-                            $response->throw();
-                        }
+                    if ($attempt < $potentialTries && $shouldRetry) {
+                        $response->throw();
+                    }
+
+                    if ($potentialTries > 1 && $this->retryThrow) {
+                        $response->throw();
                     }
                 });
             } catch (TransferException $e) {
-                if ($e instanceof ConnectException) {
-                    $this->marshalConnectionException($e);
-                }
-
-                if ($e instanceof RequestException && ! $e->hasResponse()) {
-                    $this->marshalRequestExceptionWithoutResponse($e);
-                }
-
-                if ($e instanceof RequestException && $e->hasResponse()) {
-                    $this->marshalRequestExceptionWithResponse($e);
+                if (($response = $this->responseFromException($e)) !== null) {
+                    $this->marshalTransportExceptionWithResponse($e, $response);
+                } elseif (method_exists($e, 'getRequest')) {
+                    $this->marshalTransportException($e);
                 }
 
                 throw $e;
             }
         }, $this->retryDelay ?? 100, function ($exception) use (&$shouldRetry) {
-            $result = $shouldRetry ?? ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this, $this->request?->toPsrRequest()->getMethod()) : true);
+            $result = $shouldRetry !== null ? $shouldRetry : ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this, $this->request?->toPsrRequest()->getMethod()) : true);
 
             $shouldRetry = null;
 
@@ -1006,6 +1136,10 @@ class PendingRequest
      */
     protected function expandUrlParameters(string $url)
     {
+        if (! str_contains($url, '{')) {
+            return $url;
+        }
+
         return UriTemplate::expand($url, $this->urlParameters);
     }
 
@@ -1053,20 +1187,13 @@ class PendingRequest
     protected function parseMultipartBodyFormat(array $data)
     {
         return (new Collection($data))
-            ->flatMap(function ($value, $key) {
-                if (is_array($value)) {
-                    // If the array has 'name' and 'contents' keys, it's already formatted for multipart...
-                    if (isset($value['name']) && isset($value['contents'])) {
-                        return [$value];
-                    }
-
-                    // Otherwise, treat it as multiple values for the same field name...
-                    return (new Collection($value))->map(function ($item) use ($key) {
-                        return ['name' => $key.'[]', 'contents' => $item];
-                    });
+            ->map(function ($value, $key) {
+                // If the array has 'name' and 'contents' keys, it's already formatted for multipart...
+                if (is_array($value) && isset($value['name'], $value['contents'])) {
+                    return $value;
                 }
 
-                return [['name' => $key, 'contents' => $value]];
+                return ['name' => $key, 'contents' => $value];
             })
             ->values()
             ->all();
@@ -1085,27 +1212,36 @@ class PendingRequest
     {
         return $this->promise = $this->sendRequest($method, $url, $options)
             ->then(function (MessageInterface $message) {
-                return tap($this->newResponse($message), function ($response) {
-                    $this->populateResponse($response);
-                    $this->dispatchResponseReceivedEvent($response);
-                });
+                $response = $this->newResponse($message);
+
+                $this->populateResponse($response);
+                $this->dispatchResponseReceivedEvent($response);
+
+                return $this->runAfterResponseCallbacks($response);
             })
-            ->otherwise(function (OutOfBoundsException|TransferException|StrayRequestException $e) {
+            ->otherwise(function (Throwable $e) {
                 if ($e instanceof StrayRequestException) {
                     throw $e;
                 }
 
-                if ($e instanceof ConnectException || ($e instanceof RequestException && ! $e->hasResponse())) {
+                if (($response = $this->responseFromException($e)) !== null) {
+                    return $this->populateResponse($this->newResponse($response));
+                }
+
+                if ($e instanceof TransferException && method_exists($e, 'getRequest')) {
                     $exception = new ConnectionException($e->getMessage(), 0, $e);
 
-                    $this->dispatchConnectionFailedEvent(new Request($e->getRequest()), $exception);
+                    $this->dispatchConnectionFailedEvent(
+                        (new Request($e->getRequest()))->setRequestAttributes($this->attributes),
+                        $exception
+                    );
 
                     return $exception;
                 }
 
-                return $e instanceof RequestException && $e->hasResponse() ? $this->populateResponse($this->newResponse($e->getResponse())) : $e;
+                return $e;
             })
-            ->then(function (Response|ConnectionException|TransferException $response) use ($method, $url, $options, $attempt) {
+            ->then(function (Response|Throwable $response) use ($method, $url, $options, $attempt) {
                 return $this->handlePromiseResponse($response, $method, $url, $options, $attempt);
             });
     }
@@ -1113,39 +1249,39 @@ class PendingRequest
     /**
      * Handle the response of an asynchronous request.
      *
-     * @param  \Illuminate\Http\Client\Response  $response
+     * @param  \Illuminate\Http\Client\Response|\Throwable  $response
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
      * @param  int  $attempt
      * @return mixed
      */
-    protected function handlePromiseResponse(Response|ConnectionException|TransferException $response, $method, $url, $options, $attempt)
+    protected function handlePromiseResponse(Response|Throwable $response, $method, $url, $options, $attempt)
     {
         if ($response instanceof Response && $response->successful()) {
             return $response;
         }
 
-        if ($response instanceof RequestException) {
-            $response = $this->populateResponse($this->newResponse($response->getResponse()));
+        if ($response instanceof RequestException
+            && ($psrResponse = $this->responseFromException($response)) !== null) {
+            $response = $this->populateResponse($this->newResponse($psrResponse));
         }
 
         try {
             $shouldRetry = $this->retryWhenCallback ? call_user_func(
                 $this->retryWhenCallback,
                 $response instanceof Response ? $response->toException() : $response,
-                $this
+                $this,
+                $method,
             ) : true;
         } catch (Exception $exception) {
             return $exception;
         }
 
-        if ($attempt < $this->tries && $shouldRetry) {
-            $options['delay'] = value(
-                $this->retryDelay,
-                $attempt,
-                $response instanceof Response ? $response->toException() : $response
-            );
+        $exception = $response instanceof Response ? $response->toException() : $response;
+
+        if ($attempt < $this->getMaximumAttempts() && $shouldRetry) {
+            $options['delay'] = $this->retryDelayInMilliseconds($attempt, $exception);
 
             return $this->makePromise($method, $url, $options, $attempt + 1);
         }
@@ -1160,11 +1296,37 @@ class PendingRequest
             }
         }
 
-        if ($this->tries > 1 && $this->retryThrow) {
+        if ($this->getMaximumAttempts() > 1 && $this->retryThrow) {
             return $response instanceof Response ? $response->toException() : $response;
         }
 
         return $response;
+    }
+
+    /**
+     * Get the maximum number of attempts for the request.
+     *
+     * @return int
+     */
+    protected function getMaximumAttempts()
+    {
+        return is_array($this->tries)
+            ? count($this->tries) + 1
+            : ($this->tries ?? 1);
+    }
+
+    /**
+     * Get the delay in milliseconds before the next retry attempt.
+     *
+     * @param  int  $attempt
+     * @param  mixed  $exception
+     * @return int|float
+     */
+    protected function retryDelayInMilliseconds($attempt, $exception)
+    {
+        return is_array($this->tries)
+            ? $this->tries[$attempt - 1] ?? 0
+            : value($this->retryDelay ?? 100, $attempt, $exception);
     }
 
     /**
@@ -1196,7 +1358,13 @@ class PendingRequest
             'on_stats' => $onStats,
         ], $options));
 
-        return $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
+        $result = $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
+
+        if ($result instanceof PromiseInterface && ! $result instanceof FluentPromise) {
+            $result = new FluentPromise($result);
+        }
+
+        return $result;
     }
 
     /**
@@ -1231,6 +1399,10 @@ class PendingRequest
             $laravelData = $laravelData->jsonSerialize();
         }
 
+        if (is_array($laravelData) && $this->bodyFormat === 'multipart') {
+            return $this->normalizeMultipartOption($laravelData);
+        }
+
         return is_array($laravelData) ? $laravelData : [];
     }
 
@@ -1243,14 +1415,220 @@ class PendingRequest
     protected function normalizeRequestOptions(array $options)
     {
         foreach ($options as $key => $value) {
-            $options[$key] = match (true) {
-                is_array($value) => $this->normalizeRequestOptions($value),
-                $value instanceof Stringable => $value->toString(),
-                default => $value,
-            };
+            if ($key === 'headers' && is_array($value)) {
+                $options[$key] = $this->normalizeHeaderValues($value);
+
+                continue;
+            }
+
+            if (($key === 'query' || $key === 'form_params') && is_array($value)) {
+                $options[$key] = $this->normalizeNonFiniteFloatValues(
+                    $this->normalizeRequestOptionValue($value)
+                );
+
+                continue;
+            }
+
+            if ($key === 'multipart' && is_array($value)) {
+                $options[$key] = $this->normalizeMultipartOption($value);
+
+                continue;
+            }
+
+            if ($key === 'body') {
+                $options[$key] = $this->normalizeRequestOptionValue($value);
+
+                $this->ensureValidRequestBody($options[$key]);
+
+                continue;
+            }
+
+            $options[$key] = $this->normalizeRequestOptionValue($value);
         }
 
         return $options;
+    }
+
+    /**
+     * Normalize the given header values.
+     *
+     * @param  array  $headers
+     * @return array
+     */
+    protected function normalizeHeaderValues(array $headers): array
+    {
+        foreach ($headers as $name => $value) {
+            $headers[$name] = $this->normalizeHeaderValue($value);
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Normalize the given header value.
+     *
+     * @param  mixed  $value
+     * @return string|array
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function normalizeHeaderValue($value): string|array
+    {
+        if (is_array($value)) {
+            if ($value === []) {
+                return '';
+            }
+
+            foreach ($value as $key => $item) {
+                $value[$key] = match (true) {
+                    $item === null => '',
+                    is_scalar($item) => $this->normalizeScalarString($item),
+                    $item instanceof Stringable => $item->toString(),
+                    default => throw new InvalidArgumentException('HTTP header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
+                };
+            }
+
+            return $value;
+        }
+
+        return match (true) {
+            $value === null => '',
+            is_scalar($value) => $this->normalizeScalarString($value),
+            $value instanceof Stringable => $value->toString(),
+            default => throw new InvalidArgumentException('HTTP header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
+        };
+    }
+
+    /**
+     * Normalize non-finite floats within a nested array.
+     *
+     * @param  array  $values
+     * @return array
+     */
+    protected function normalizeNonFiniteFloatValues(array $values): array
+    {
+        foreach ($values as $key => $value) {
+            if (is_array($value)) {
+                $values[$key] = $this->normalizeNonFiniteFloatValues($value);
+            } elseif (is_float($value) && ! is_finite($value)) {
+                $values[$key] = $this->normalizeScalarString($value);
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * Normalize the given multipart option.
+     *
+     * @param  array  $multipart
+     * @return array
+     */
+    protected function normalizeMultipartOption(array $multipart): array
+    {
+        foreach ($multipart as $index => $part) {
+            if (! is_array($part)) {
+                $multipart[$index] = $this->normalizeRequestOptionValue($part);
+
+                continue;
+            }
+
+            foreach ($part as $key => $value) {
+                if ($key === 'headers' && is_array($value)) {
+                    continue;
+                }
+
+                $part[$key] = $this->normalizeRequestOptionValue($value);
+
+                if ($key === 'contents') {
+                    if (is_array($part[$key])) {
+                        $part[$key] = $this->normalizeNonFiniteFloatValues($part[$key]);
+                    } elseif (is_float($part[$key]) && ! is_finite($part[$key])) {
+                        $part[$key] = $this->normalizeScalarString($part[$key]);
+                    }
+                }
+            }
+
+            $multipart[$index] = $part;
+        }
+
+        return $this->normalizeMultipartHeaders($multipart);
+    }
+
+    /**
+     * Normalize the given multipart headers.
+     *
+     * @param  array  $multipart
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function normalizeMultipartHeaders(array $multipart): array
+    {
+        foreach ($multipart as $index => $part) {
+            if (is_array($part) && isset($part['headers']) && is_array($part['headers'])) {
+                foreach ($part['headers'] as $name => $value) {
+                    $multipart[$index]['headers'][$name] = match (true) {
+                        $value === [] => '',
+                        $value === null => '',
+                        is_scalar($value) => $this->normalizeScalarString($value),
+                        $value instanceof Stringable => $value->toString(),
+                        default => throw new InvalidArgumentException('Multipart header values must be scalar, null, or Laravel Stringable.'),
+                    };
+                }
+            }
+        }
+
+        return $multipart;
+    }
+
+    /**
+     * Normalize the given request option value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function normalizeRequestOptionValue($value)
+    {
+        return match (true) {
+            is_array($value) => array_map(fn ($item) => $this->normalizeRequestOptionValue($item), $value),
+            $value instanceof Stringable => $value->toString(),
+            default => $value,
+        };
+    }
+
+    /**
+     * Normalize a scalar to a string without triggering PHP 8.5 non-finite float warnings.
+     *
+     * @param  scalar  $value
+     * @return string
+     */
+    protected function normalizeScalarString($value): string
+    {
+        if (is_float($value) && ! is_finite($value)) {
+            return match (true) {
+                is_nan($value) => 'NAN',
+                $value > 0 => 'INF',
+                default => '-INF',
+            };
+        }
+
+        return (string) $value;
+    }
+
+    /**
+     * Ensure the given request body can be passed to Guzzle.
+     *
+     * @param  mixed  $body
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function ensureValidRequestBody($body): void
+    {
+        if (! is_string($body) && ! is_null($body) && ! is_resource($body) && ! $body instanceof StreamInterface) {
+            throw new InvalidArgumentException('HTTP request body must be a string, resource, Psr\Http\Message\StreamInterface, or null.');
+        }
     }
 
     /**
@@ -1368,7 +1746,9 @@ class PendingRequest
 
                 return $promise->then(function ($response) use ($request, $options) {
                     $this->factory?->recordRequestResponsePair(
-                        (new Request($request))->withData($options['laravel_data']),
+                        (new Request($request))
+                            ->withData($options['laravel_data'] ?? [])
+                            ->setRequestAttributes($this->attributes),
                         $this->newResponse($response)
                     );
 
@@ -1382,6 +1762,8 @@ class PendingRequest
      * Build the stub handler.
      *
      * @return \Closure
+     *
+     * @throws \Illuminate\Http\Client\StrayRequestException
      */
     public function buildStubHandler()
     {
@@ -1389,7 +1771,12 @@ class PendingRequest
             return function ($request, $options) use ($handler) {
                 $response = ($this->stubCallbacks ?? new Collection)
                     ->map
-                    ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
+                    ->__invoke(
+                        (new Request($request))
+                            ->withData($options['laravel_data'] ?? [])
+                            ->setRequestAttributes($this->attributes),
+                        $options
+                    )
                     ->filter()
                     ->first();
 
@@ -1439,16 +1826,21 @@ class PendingRequest
     /**
      * Execute the "before sending" callbacks.
      *
-     * @param  \GuzzleHttp\Psr7\RequestInterface  $request
+     * @param  \Psr\Http\Message\RequestInterface  $request
      * @param  array  $options
-     * @return \GuzzleHttp\Psr7\RequestInterface
+     * @return \Psr\Http\Message\RequestInterface
      */
     public function runBeforeSendingCallbacks($request, array $options)
     {
         return tap($request, function (&$request) use ($options) {
             $this->beforeSendingCallbacks->each(function ($callback) use (&$request, $options) {
                 $callbackResult = call_user_func(
-                    $callback, (new Request($request))->withData($options['laravel_data']), $options, $this
+                    $callback,
+                    (new Request($request))
+                        ->withData($options['laravel_data'] ?? [])
+                        ->setRequestAttributes($this->attributes),
+                    $options,
+                    $this
                 );
 
                 if ($callbackResult instanceof RequestInterface) {
@@ -1491,6 +1883,25 @@ class PendingRequest
                 ? $laravelResponse->dontTruncateExceptions()
                 : $laravelResponse->truncateExceptionsAt($this->truncateExceptionsAt);
         });
+    }
+
+    /**
+     * Execute the "after response" callbacks.
+     *
+     * @param  \Illuminate\Http\Client\Response  $response
+     * @return \Illuminate\Http\Client\Response
+     */
+    protected function runAfterResponseCallbacks(Response $response)
+    {
+        foreach ($this->afterResponseCallbacks as $callback) {
+            $returnedResponse = $callback($response, $this->request);
+
+            if ($returnedResponse instanceof Response) {
+                $response = $returnedResponse;
+            }
+        }
+
+        return $response;
     }
 
     /**
@@ -1544,20 +1955,18 @@ class PendingRequest
             return true;
         }
 
-        foreach ($this->allowedStrayRequestUrls as $pattern) {
-            if (Str::is($pattern, $url)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->allowedStrayRequestUrls, fn ($pattern) => Str::is($pattern, $url));
     }
 
     /**
      * Toggle asynchronicity in requests.
      *
-     * @param  bool  $async
-     * @return $this
+     * @template T of bool = true
+     *
+     * @param  T  $async
+     * @return self<T>
+     *
+     * @phpstan-self-out self<T>
      */
     public function async(bool $async = true)
     {
@@ -1643,16 +2052,39 @@ class PendingRequest
     }
 
     /**
-     * Handle the given connection exception.
+     * Get the PSR-7 response carried by the given exception, if any.
      *
-     * @param  \GuzzleHttp\Exception\ConnectException  $e
-     * @return void
+     * @param  \Throwable  $e
+     * @return \Psr\Http\Message\ResponseInterface|null
      */
-    protected function marshalConnectionException(ConnectException $e)
+    protected function responseFromException(Throwable $e)
+    {
+        // Guzzle 8 uses ResponseException
+        if ($e instanceof ResponseException) {
+            return $e->getResponse();
+        }
+
+        // Guzzle 7 uses RequestException with hasResponse() true
+        if ($e instanceof RequestException && is_callable([$e, 'hasResponse']) && $e->hasResponse()) {
+            return $e->getResponse();
+        }
+
+        return null;
+    }
+
+    /**
+     * Handle the given transport exception.
+     *
+     * @param  \GuzzleHttp\Exception\TransferException  $e
+     * @return void
+     *
+     * @throws \Illuminate\Http\Client\ConnectionException
+     */
+    protected function marshalTransportException(TransferException $e)
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
 
-        $request = new Request($e->getRequest());
+        $request = (new Request($e->getRequest()))->setRequestAttributes($this->attributes);
 
         $this->factory?->recordRequestResponsePair(
             $request, null
@@ -1664,38 +2096,21 @@ class PendingRequest
     }
 
     /**
-     * Handle the given request exception.
+     * Handle the given transport exception that carried a response.
      *
-     * @param  \GuzzleHttp\Exception\RequestException  $e
+     * @param  \GuzzleHttp\Exception\TransferException  $e
+     * @param  \Psr\Http\Message\ResponseInterface  $response
      * @return void
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
-    protected function marshalRequestExceptionWithoutResponse(RequestException $e)
+    protected function marshalTransportExceptionWithResponse(TransferException $e, ResponseInterface $response)
     {
-        $exception = new ConnectionException($e->getMessage(), 0, $e);
-
-        $request = new Request($e->getRequest());
+        $response = $this->populateResponse($this->newResponse($response));
 
         $this->factory?->recordRequestResponsePair(
-            $request, null
-        );
-
-        $this->dispatchConnectionFailedEvent($request, $exception);
-
-        throw $exception;
-    }
-
-    /**
-     * Handle the given request exception.
-     *
-     * @param  \GuzzleHttp\Exception\RequestException  $e
-     * @return void
-     */
-    protected function marshalRequestExceptionWithResponse(RequestException $e)
-    {
-        $response = $this->populateResponse($this->newResponse($e->getResponse()));
-
-        $this->factory?->recordRequestResponsePair(
-            new Request($e->getRequest()),
+            (new Request($e->getRequest()))->setRequestAttributes($this->attributes),
             $response
         );
 

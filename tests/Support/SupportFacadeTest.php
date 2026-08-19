@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
 use Illuminate\Support\Facades\Facade;
-use Mockery as m;
+use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -17,16 +17,11 @@ class SupportFacadeTest extends TestCase
         FacadeStub::setFacadeApplication(null);
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testFacadeCallsUnderlyingApplication()
     {
         $app = new ApplicationStub;
-        $app->setAttributes(['foo' => $mock = m::mock(stdClass::class)]);
-        $mock->shouldReceive('bar')->once()->andReturn('baz');
+        $app->setAttributes(['foo' => $mock = Mockery::mock(stdClass::class)]);
+        $mock->expects('bar')->andReturn('baz');
         FacadeStub::setFacadeApplication($app);
         $this->assertSame('baz', FacadeStub::bar());
     }
@@ -37,7 +32,7 @@ class SupportFacadeTest extends TestCase
         $app->setAttributes(['foo' => new stdClass]);
         FacadeStub::setFacadeApplication($app);
 
-        $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
+        $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::expects('foo')->with('bar')->andReturn('baz')->getMock());
         $this->assertSame('baz', $app['foo']->foo('bar'));
     }
 
@@ -59,15 +54,15 @@ class SupportFacadeTest extends TestCase
         $app->setAttributes(['foo' => new stdClass]);
         FacadeStub::setFacadeApplication($app);
 
-        $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
-        $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::shouldReceive('foo2')->once()->with('bar2')->andReturn('baz2')->getMock());
+        $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::expects('foo')->with('bar')->andReturn('baz')->getMock());
+        $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::expects('foo2')->with('bar2')->andReturn('baz2')->getMock());
         $this->assertSame('baz', $app['foo']->foo('bar'));
         $this->assertSame('baz2', $app['foo']->foo2('bar2'));
     }
 
     public function testCanBeMockedWithoutUnderlyingInstance()
     {
-        FacadeStub::shouldReceive('foo')->once()->andReturn('bar');
+        FacadeStub::expects('foo')->andReturn('bar');
         $this->assertSame('bar', FacadeStub::foo());
     }
 
@@ -79,6 +74,40 @@ class SupportFacadeTest extends TestCase
 
         $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::expects('foo')->with('bar')->andReturn('baz')->getMock());
         $this->assertSame('baz', $app['foo']->foo('bar'));
+    }
+
+    public function testFacadeResolvesAgainAfterClearingSpecific()
+    {
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => $mock = Mockery::mock(stdClass::class)]);
+        $mock->expects('bar')->times(3)->andReturn('baz');
+
+        // Resolve for the first time
+        FacadeStub::setFacadeApplication($app);
+        $this->assertSame('baz', FacadeStub::bar());
+
+        // Clear resolved instance and resolve the second time
+        FacadeStub::clearResolvedInstance();
+        $this->assertSame('baz', FacadeStub::bar());
+
+        // Clear resolved instance through parent and resolve the third time
+        Facade::clearResolvedInstance('foo');
+        $this->assertSame('baz', FacadeStub::bar());
+    }
+
+    public function testFacadeResolvesAgainAfterClearingAll()
+    {
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => $mock = Mockery::mock(stdClass::class)]);
+        $mock->expects('bar')->times(2)->andReturn('baz');
+
+        // Resolve for the first time
+        FacadeStub::setFacadeApplication($app);
+        $this->assertSame('baz', FacadeStub::bar());
+
+        // Clear all resolved instances and resolve a second time
+        Facade::clearResolvedInstances();
+        $this->assertSame('baz', FacadeStub::bar());
     }
 }
 

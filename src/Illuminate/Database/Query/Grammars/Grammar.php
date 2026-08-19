@@ -139,7 +139,7 @@ class Grammar extends BaseGrammar
             $column = 'distinct '.$column;
         }
 
-        return 'select '.$aggregate['function'].'('.$column.') as aggregate';
+        return 'select '.$aggregate['function'].'('.$column.') as '.$this->wrap('aggregate');
     }
 
     /**
@@ -199,7 +199,9 @@ class Grammar extends BaseGrammar
                 return $this->compileJoinLateral($join, $tableAndNestedJoins);
             }
 
-            return trim("{$join->type} join {$tableAndNestedJoins} {$this->compileWheres($join)}");
+            $joinWord = ($join->type === 'straight_join' && $this->supportsStraightJoins()) ? '' : ' join';
+
+            return trim("{$join->type}{$joinWord} {$tableAndNestedJoins} {$this->compileWheres($join)}");
         })->implode(' ');
     }
 
@@ -215,6 +217,18 @@ class Grammar extends BaseGrammar
     public function compileJoinLateral(JoinLateralClause $join, string $expression): string
     {
         throw new RuntimeException('This database engine does not support lateral joins.');
+    }
+
+    /**
+     * Determine if the grammar supports straight joins.
+     *
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    protected function supportsStraightJoins()
+    {
+        throw new RuntimeException('This database engine does not support straight joins.');
     }
 
     /**
@@ -315,6 +329,8 @@ class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function whereLike(Builder $query, $where)
     {
@@ -325,6 +341,18 @@ class Grammar extends BaseGrammar
         $where['operator'] = $where['not'] ? 'not like' : 'like';
 
         return $this->whereBasic($query, $where);
+    }
+
+    /**
+     * Compile a "where null safe equals" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNullSafeEquals(Builder $query, $where)
+    {
+        return $this->wrap($where['column']).' is not distinct from '.$this->parameter($where['value']);
     }
 
     /**
@@ -557,7 +585,9 @@ class Grammar extends BaseGrammar
      */
     protected function whereColumn(Builder $query, $where)
     {
-        return $this->wrap($where['first']).' '.$where['operator'].' '.$this->wrap($where['second']);
+        $operator = str_replace('?', '??', $where['operator']);
+
+        return $this->wrap($where['first']).' '.$operator.' '.$this->wrap($where['second']);
     }
 
     /**
@@ -799,6 +829,8 @@ class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function whereFullText(Builder $query, $where)
     {
@@ -992,8 +1024,31 @@ class Grammar extends BaseGrammar
                 return $order['sql']->getValue($query->getGrammar());
             }
 
+            if (isset($order['type']) && $order['type'] === 'InOrderOf') {
+                return $this->compileInOrderOf($order);
+            }
+
             return $order['sql'] ?? $this->wrap($order['column']).' '.$order['direction'];
         }, $orders);
+    }
+
+    /**
+     * Compile an "in order of" clause.
+     *
+     * @param  array  $order
+     * @return string
+     */
+    protected function compileInOrderOf($order)
+    {
+        $column = $this->wrap($order['column']);
+
+        $cases = [];
+
+        foreach (array_values($order['values']) as $index => $value) {
+            $cases[] = 'when '.$column.' = '.$this->parameter($value).' then '.$index;
+        }
+
+        return 'case '.implode(' ', $cases).' else '.count($order['values']).' end';
     }
 
     /**
@@ -1218,6 +1273,22 @@ class Grammar extends BaseGrammar
     public function compileInsertOrIgnore(Builder $query, array $values)
     {
         throw new RuntimeException('This database engine does not support inserting while ignoring errors.');
+    }
+
+    /**
+     * Compile an insert or ignore statement with a returning clause into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @param  array  $returning
+     * @param  array|null  $uniqueBy
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $returning, ?array $uniqueBy)
+    {
+        throw new RuntimeException('This database engine does not support insert or ignore with returning.');
     }
 
     /**
@@ -1552,6 +1623,7 @@ class Grammar extends BaseGrammar
         $bindings = array_map(fn ($value) => $this->escape($value, is_resource($value) || gettype($value) === 'resource (closed)'), $bindings);
 
         $query = '';
+        $bindingIndex = 0;
 
         $isStringLiteral = false;
 
@@ -1569,7 +1641,7 @@ class Grammar extends BaseGrammar
                 $query .= $char;
                 $isStringLiteral = ! $isStringLiteral;
             } elseif ($char === '?' && ! $isStringLiteral) { // Substitutable binding...
-                $query .= array_shift($bindings) ?? '?';
+                $query .= $bindings[$bindingIndex++] ?? '?';
             } else { // Normal character...
                 $query .= $char;
             }

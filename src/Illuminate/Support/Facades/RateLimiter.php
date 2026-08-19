@@ -3,8 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static \Illuminate\Cache\RateLimiter for(\BackedEnum|\UnitEnum|string $name, \Closure $callback)
- * @method static \Closure|null limiter(\BackedEnum|\UnitEnum|string $name)
+ * @method static \Illuminate\Cache\RateLimiter for(\UnitEnum|string $name, \Closure $callback)
+ * @method static \Closure|null limiter(\UnitEnum|string $name)
  * @method static mixed attempt(string $key, int $maxAttempts, \Closure $callback, \DateTimeInterface|\DateInterval|int $decaySeconds = 60)
  * @method static bool tooManyAttempts(string $key, int $maxAttempts)
  * @method static int hit(string $key, \DateTimeInterface|\DateInterval|int $decaySeconds = 60)
@@ -17,6 +17,10 @@ namespace Illuminate\Support\Facades;
  * @method static void clear(string $key)
  * @method static int availableIn(string $key)
  * @method static string cleanRateLimiterKey(string $key)
+ * @method static void macro(string $name, object|callable $macro)
+ * @method static void mixin(object $mixin, bool $replace = true)
+ * @method static bool hasMacro(string $name)
+ * @method static void flushMacros()
  *
  * @see \Illuminate\Cache\RateLimiter
  */

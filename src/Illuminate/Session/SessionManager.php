@@ -4,6 +4,8 @@ namespace Illuminate\Session;
 
 use Illuminate\Support\Manager;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @mixin \Illuminate\Session\Store
  */
@@ -137,9 +139,13 @@ class SessionManager extends Manager
     {
         $handler = $this->createCacheHandler('redis');
 
-        $handler->getCache()->getStore()->setConnection(
-            $this->config->get('session.connection')
-        );
+        $store = $handler->getCache()->getStore();
+
+        $store->setConnection($this->config->get('session.connection'));
+
+        if ($prefix = $this->config->get('session.prefix')) {
+            $store->setPrefix($prefix);
+        }
 
         return $this->buildSession($handler);
     }
@@ -279,11 +285,11 @@ class SessionManager extends Manager
     /**
      * Set the default session driver name.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @return void
      */
     public function setDefaultDriver($name)
     {
-        $this->config->set('session.driver', $name);
+        $this->config->set('session.driver', enum_value($name));
     }
 }

@@ -2,12 +2,6 @@
 
 namespace Illuminate\Contracts\Queue;
 
-/**
- * @method int pendingSize(string|null $queue = null)
- * @method int delayedSize(string|null $queue = null)
- * @method int reservedSize(string|null $queue = null)
- * @method int|null creationTimeOfOldestPendingJob(string|null $queue = null)
- */
 interface Queue
 {
     /**
@@ -17,6 +11,38 @@ interface Queue
      * @return int
      */
     public function size($queue = null);
+
+    /**
+     * Get the number of pending jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function pendingSize($queue = null);
+
+    /**
+     * Get the number of delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function delayedSize($queue = null);
+
+    /**
+     * Get the number of reserved jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function reservedSize($queue = null);
+
+    /**
+     * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int|null
+     */
+    public function creationTimeOfOldestPendingJob($queue = null);
 
     /**
      * Push a new job onto the queue.

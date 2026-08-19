@@ -3,9 +3,13 @@
 namespace Illuminate\Tests\Routing;
 
 use ArrayIterator;
+use Illuminate\Container\Container;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Routing\CompiledRouteCollection;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\Router;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -13,15 +17,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RouteCollectionTest extends TestCase
 {
-    /**
-     * @var \Illuminate\Routing\RouteCollection
-     */
-    protected $routeCollection;
+    protected RouteCollection $routeCollection;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->routeCollection = new RouteCollection;
     }
 
@@ -284,10 +283,26 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection->compile();
     }
 
+    public function testCompiledRouteCollectionPreservesRouteMetadata()
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users', [
+                'uses' => 'UsersController@index',
+                'as' => 'users',
+                'metadata' => ['head' => ['title' => 'Users']],
+            ])
+        );
+
+        $route = $this->routeCollection
+            ->toCompiledRouteCollection(new Router(new Dispatcher, new Container), new Container)
+            ->getByName('users');
+
+        $this->assertSame(['title' => 'Users'], $route->getMetadata('head'));
+    }
+
     public function testRouteCollectionDontMatchNonMatchingDoubleSlashes()
     {
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('The route foo could not be found.');
+        $this->expectExceptionObject(new NotFoundHttpException('The route foo could not be found.'));
 
         $this->routeCollection->add(new Route('GET', 'foo', [
             'uses' => 'FooController@index',
@@ -304,8 +319,7 @@ class RouteCollectionTest extends TestCase
 
     public function testRouteCollectionRequestMethodNotAllowed()
     {
-        $this->expectException(MethodNotAllowedHttpException::class);
-        $this->expectExceptionMessage('The POST method is not supported for route users. Supported methods: GET, HEAD.');
+        $this->expectExceptionObject(new MethodNotAllowedHttpException(['GET', 'HEAD'], 'The POST method is not supported for route users. Supported methods: GET, HEAD.'));
 
         $this->routeCollection->add(
             new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])
@@ -357,6 +371,224 @@ class RouteCollectionTest extends TestCase
         $request = Request::create('users/1/show', 'GET');
 
         $this->assertCount(2, $this->routeCollection->getRoutes());
-        $this->assertEquals('first', $this->routeCollection->match($request)->getName());
+        $this->assertSame('first', $this->routeCollection->match($request)->getName());
+    }
+
+    public function testPrependsRoutesWithDomain()
+    {
+        $this->routeCollection->add(
+            $noDomainGet1 = new Route('GET', 'no-domain-get1', ['uses' => 'NoDomainController@index'])
+        );
+
+        $this->routeCollection->add(
+            $fooDomainGet1 = (new Route('GET', 'foo-domain-get1', ['uses' => 'FooDomainController@index']))->domain('foo.test')
+        );
+
+        $this->routeCollection->add(
+            $barDomainGet1 = (new Route('GET', 'bar-domain-get1', ['uses' => 'BarDomainController@index']))->domain('bar.test')
+        );
+
+        $this->routeCollection->add(
+            $noDomainGet2 = new Route('GET', 'no-domain-get2', ['uses' => 'NoDomainController@show'])
+        );
+
+        $this->routeCollection->add(
+            $fooDomainGet2 = (new Route('GET', 'foo-domain-get2', ['uses' => 'FooDomainController@show']))->domain('foo.test')
+        );
+
+        $this->routeCollection->add(
+            $barDomainGet2 = (new Route('GET', 'bar-domain-get2', ['uses' => 'BarDomainController@show']))->domain('bar.test')
+        );
+
+        $this->assertSame([
+            $fooDomainGet1,
+            $barDomainGet1,
+            $fooDomainGet2,
+            $barDomainGet2,
+            $noDomainGet1,
+            $noDomainGet2,
+        ], $this->routeCollection->getRoutes());
+
+        $this->assertSame([
+            'GET' => [
+                'foo.testfoo-domain-get1' => $fooDomainGet1,
+                'bar.testbar-domain-get1' => $barDomainGet1,
+
+                'foo.testfoo-domain-get2' => $fooDomainGet2,
+                'bar.testbar-domain-get2' => $barDomainGet2,
+
+                'no-domain-get1' => $noDomainGet1,
+                'no-domain-get2' => $noDomainGet2,
+            ],
+
+            'HEAD' => [
+                'foo.testfoo-domain-get1' => $fooDomainGet1,
+                'bar.testbar-domain-get1' => $barDomainGet1,
+
+                'foo.testfoo-domain-get2' => $fooDomainGet2,
+                'bar.testbar-domain-get2' => $barDomainGet2,
+
+                'no-domain-get1' => $noDomainGet1,
+                'no-domain-get2' => $noDomainGet2,
+            ],
+        ], $this->routeCollection->getRoutesByMethod());
+    }
+
+    public function testDomainRoutesAreMatchedBeforeNonDomainRoutes()
+    {
+        $this->routeCollection->add(
+            (new Route('GET', 'users', ['uses' => 'NoDomainController@index']))->name('no-domain')
+        );
+
+        $this->routeCollection->add(
+            (new Route('GET', 'users', ['uses' => 'DomainController@index']))->domain('api.test')->name('with-domain')
+        );
+
+        $request = Request::create('http://api.test/users', 'GET');
+
+        $this->assertSame('with-domain', $this->routeCollection->match($request)->getName());
+    }
+
+    public function testCompiledRouteCollectionGetReturnsAllRoutesWhenMethodIsNull(): void
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users.index'])
+        );
+        $this->routeCollection->add(
+            new Route('POST', 'users', ['uses' => 'UsersController@store', 'as' => 'users.store'])
+        );
+
+        $compiled = $this->toCompiledRouteCollection();
+
+        $this->assertCount(2, $compiled->get());
+        $this->assertCount(2, $compiled->getRoutes());
+    }
+
+    public function testCompiledRouteCollectionCanRetrieveByMethod(): void
+    {
+        $this->routeCollection->add(new Route('GET', 'foo/index', [
+            'uses' => 'FooController@index',
+            'as' => 'route_name',
+        ]));
+
+        $compiled = $this->toCompiledRouteCollection();
+
+        $this->assertCount(1, $compiled->get('GET'));
+        $this->assertCount(0, $compiled->get('PUT'));
+        $this->assertSame('route_name', $compiled->get('GET')['foo/index']->getName());
+
+        $this->routeCollection->add(new Route('GET', 'bar/show', [
+            'uses' => 'BarController@show',
+            'as' => 'bar_show',
+        ]));
+
+        $compiled = $this->toCompiledRouteCollection();
+
+        $this->assertCount(2, $compiled->get('GET'));
+    }
+
+    public function testCompiledRouteCollectionCanRetrieveByAction(): void
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'foo/index', ['controller' => 'FooController@index', 'as' => 'foo_index'])
+        );
+
+        $compiled = $this->toCompiledRouteCollection();
+
+        $route = $compiled->getByAction('FooController@index');
+
+        $this->assertNotNull($route);
+        $this->assertSame('foo_index', $route->getName());
+
+        $this->assertNull($compiled->getByAction('Missing@action'));
+    }
+
+    public function testCompiledRouteCollectionActionLookupPrefersFirstRegisteredRoute(): void
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'first', ['controller' => 'FooController@index', 'as' => 'first_route'])
+        );
+        $this->routeCollection->add(
+            new Route('GET', 'second', ['controller' => 'FooController@index', 'as' => 'second_route'])
+        );
+
+        $route = $this->toCompiledRouteCollection()->getByAction('FooController@index');
+
+        $this->assertSame('first_route', $route->getName());
+    }
+
+    public function testCompiledRouteCollectionCanGetRoutesByMethod(): void
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'foo/index', ['uses' => 'FooController@index', 'as' => 'foo_index'])
+        );
+        $this->routeCollection->add(
+            new Route('GET', 'foo/show', ['uses' => 'FooController@show', 'as' => 'foo_show'])
+        );
+        $this->routeCollection->add(
+            new Route('POST', 'bar', ['uses' => 'BarController@create', 'as' => 'bar_create'])
+        );
+
+        $routesByMethod = $this->toCompiledRouteCollection()->getRoutesByMethod();
+
+        $this->assertSame(['foo/index', 'foo/show'], array_keys($routesByMethod['GET']));
+        $this->assertSame(['foo/index', 'foo/show'], array_keys($routesByMethod['HEAD']));
+        $this->assertSame(['bar'], array_keys($routesByMethod['POST']));
+        $this->assertSame('foo_index', $routesByMethod['GET']['foo/index']->getName());
+        $this->assertSame('bar_create', $routesByMethod['POST']['bar']->getName());
+    }
+
+    public function testCompiledRouteCollectionDynamicallyAddedRouteOverridesCachedRouteForSameUri(): void
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users.cached'])
+        );
+
+        $compiled = $this->toCompiledRouteCollection();
+
+        $compiled->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@dynamicIndex', 'as' => 'users.dynamic'])
+        );
+
+        $routes = $compiled->get('GET');
+
+        $this->assertCount(1, $routes);
+        $this->assertSame('users.dynamic', $routes['users']->getName());
+    }
+
+    public function testCompiledRouteCollectionRequestMethodNotAllowed(): void
+    {
+        $this->expectExceptionObject(new MethodNotAllowedHttpException(
+            ['GET', 'HEAD'],
+            'The POST method is not supported for route users. Supported methods: GET, HEAD.'
+        ));
+
+        $this->routeCollection->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])
+        );
+
+        $request = Request::create('users', 'POST');
+
+        $this->toCompiledRouteCollection()->match($request);
+    }
+
+    public function testCompiledRouteCollectionThrowsNotFoundForUnmatchedPath(): void
+    {
+        $this->expectExceptionObject(new NotFoundHttpException(
+            'The route this-path-does-not-exist could not be found.'
+        ));
+
+        $this->routeCollection->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])
+        );
+
+        $request = Request::create('this-path-does-not-exist', 'GET');
+
+        $this->toCompiledRouteCollection()->match($request);
+    }
+
+    protected function toCompiledRouteCollection(): CompiledRouteCollection
+    {
+        return $this->routeCollection->toCompiledRouteCollection(new Router(new Dispatcher, new Container), new Container);
     }
 }

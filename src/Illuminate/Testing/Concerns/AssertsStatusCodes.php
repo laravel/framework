@@ -222,6 +222,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a 424 "Failed Dependency" status code.
+     *
+     * @return $this
+     */
+    public function assertFailedDependency()
+    {
+        return $this->assertStatus(424);
+    }
+
+    /**
      * Assert that the response has a 429 "Too Many Requests" status code.
      *
      * @return $this

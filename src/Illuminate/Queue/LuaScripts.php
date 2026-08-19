@@ -40,6 +40,23 @@ LUA;
     }
 
     /**
+     * Get the Lua script for pushing delayed jobs onto the queue.
+     *
+     * KEYS[1] - The delayed queue to push the job onto, for example: queues:foo:delayed
+     * ARGV[1] - The UNIX timestamp at which the job should become available
+     * ARGV[2] - The job payload
+     *
+     * @return string
+     */
+    public static function later()
+    {
+        return <<<'LUA'
+-- Push the job onto the delayed queue...
+redis.call('zadd', KEYS[1], ARGV[1], ARGV[2])
+LUA;
+    }
+
+    /**
      * Get the Lua script for popping the next job off of the queue.
      *
      * KEYS[1] - The queue to pop jobs from, for example: queues:foo

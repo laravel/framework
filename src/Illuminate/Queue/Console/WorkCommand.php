@@ -9,6 +9,8 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
+use Illuminate\Queue\Events\WorkerQueuePaused;
+use Illuminate\Queue\Events\WorkerQueueResumed;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
@@ -37,16 +39,17 @@ class WorkCommand extends Command
                             {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
                             {--stop-when-empty : Stop when the queue is empty}
+                            {--stop-when-empty-for=0 : Stop when no jobs have been processed for the given number of seconds}
                             {--delay=0 : The number of seconds to delay failed jobs (Deprecated)}
                             {--backoff=0 : The number of seconds to wait before retrying a job that encountered an uncaught exception}
                             {--max-jobs=0 : The number of jobs to process before stopping}
                             {--max-time=0 : The maximum number of seconds the worker should run}
                             {--force : Force the worker to run even in maintenance mode}
                             {--memory=128 : The memory limit in megabytes}
-                            {--sleep=3 : Number of seconds to sleep when no job is available}
-                            {--rest=0 : Number of seconds to rest between jobs}
+                            {--sleep=3 : The number of seconds to sleep when no job is available}
+                            {--rest=0 : The number of seconds to rest between jobs}
                             {--timeout=60 : The number of seconds a child process can run}
-                            {--tries=1 : Number of times to attempt a job before logging it failed}
+                            {--tries=1 : The number of times to attempt a job before logging it failed}
                             {--json : Output the queue worker information as JSON}';
 
     /**
@@ -169,6 +172,7 @@ class WorkCommand extends Command
             $this->option('max-jobs'),
             $this->option('max-time'),
             $this->option('rest'),
+            $this->option('stop-when-empty-for'),
         );
     }
 
@@ -201,6 +205,14 @@ class WorkCommand extends Command
             $this->logFailedJob($event);
         });
 
+        $this->laravel['events']->listen(WorkerQueuePaused::class, function ($event) {
+            $this->writeQueueStatus($event->queue, 'paused');
+        });
+
+        $this->laravel['events']->listen(WorkerQueueResumed::class, function ($event) {
+            $this->writeQueueStatus($event->queue, 'resumed');
+        });
+
         static::$hasRegisteredListeners = true;
     }
 
@@ -209,14 +221,52 @@ class WorkCommand extends Command
      *
      * @param  Job  $job
      * @param  string  $status
-     * @param  Throwable|null  $exception
+     * @param  \Throwable|null  $exception
      * @return void
      */
     protected function writeOutput(Job $job, $status, ?Throwable $exception = null)
     {
+        if ($this->output->isQuiet() || $this->output->isSilent()) {
+            return;
+        }
+
         $this->outputUsingJson()
             ? $this->writeOutputAsJson($job, $status, $exception)
             : $this->writeOutputForCli($job, $status);
+    }
+
+    /**
+     * Write the status output for a paused or resumed queue.
+     *
+     * @param  string  $queue
+     * @param  string  $status
+     * @return void
+     */
+    protected function writeQueueStatus($queue, $status)
+    {
+        if ($this->output->isQuiet() || $this->output->isSilent()) {
+            return;
+        }
+
+        if ($this->outputUsingJson()) {
+            $this->output->writeln(json_encode([
+                'level' => 'warning',
+                'queue' => $queue,
+                'status' => $status,
+                'timestamp' => $this->now()->format('Y-m-d\TH:i:s.uP'),
+            ]));
+
+            return;
+        }
+
+        $this->output->writeln(sprintf(
+            '  <fg=gray>%s</> Queue <fg=blue>%s</> %s',
+            $this->now()->format('Y-m-d H:i:s'),
+            $queue,
+            $status === 'paused'
+                ? '<fg=yellow;options=bold>PAUSED</>'
+                : '<fg=green;options=bold>RESUMED</>',
+        ));
     }
 
     /**
@@ -239,7 +289,7 @@ class WorkCommand extends Command
                 : ''
         )));
 
-        if ($status == 'starting') {
+        if ($status === 'starting') {
             $this->latestStartedAt = microtime(true);
 
             $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
@@ -252,13 +302,14 @@ class WorkCommand extends Command
         }
 
         $runTime = $this->runTimeForHumans($this->latestStartedAt);
+        $memory = $isVerbose ? round(memory_get_usage(true) / 1024 / 1024, 1).'MB' : '';
 
         $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
-            $isVerbose ? mb_strlen($job->getJobId()) + mb_strlen($job->getConnectionName()) + mb_strlen($job->getQueue()) + 2 : 0
+            $isVerbose ? mb_strlen($job->getJobId()) + mb_strlen($job->getConnectionName()) + mb_strlen($job->getQueue()) + mb_strlen($memory) + 3 : 0
         ) - mb_strlen($runTime) - 31, 0);
 
         $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
-        $this->output->write(" <fg=gray>$runTime</>");
+        $this->output->write(" <fg=gray>{$runTime}".($memory ? " {$memory}" : '').'</>');
 
         $this->output->writeln(match ($status) {
             'success' => ' <fg=green;options=bold>DONE</>',
@@ -272,7 +323,7 @@ class WorkCommand extends Command
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  string  $status
-     * @param  Throwable|null  $exception
+     * @param  \Throwable|null  $exception
      * @return void
      */
     protected function writeOutputAsJson(Job $job, $status, ?Throwable $exception = null)

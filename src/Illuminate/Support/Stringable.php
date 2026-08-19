@@ -247,14 +247,25 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Replace consecutive instances of a given character with a single character.
+     * Get the plural form of an English word with the count prepended.
      *
-     * @param  string  $character
+     * @param  int|array|\Countable  $count
      * @return static
      */
-    public function deduplicate(string $character = ' ')
+    public function counted($count)
     {
-        return new static(Str::deduplicate($this->value, $character));
+        return new static(Str::counted($this->value, $count));
+    }
+
+    /**
+     * Replace consecutive instances of a given character with a single character.
+     *
+     * @param  array<string>|string  $characters
+     * @return static
+     */
+    public function deduplicate(array|string $characters = ' ')
+    {
+        return new static(Str::deduplicate($this->value, $characters));
     }
 
     /**
@@ -892,6 +903,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Convert the given string to only its initials.
+     *
+     * @param  bool  $capitalize
+     * @return static
+     */
+    public function initials($capitalize = false)
+    {
+        return new static(Str::initials($this->value, $capitalize));
+    }
+
+    /**
      * Convert the given string to APA-style title case.
      *
      * @return static
@@ -972,21 +994,23 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Convert a value to studly caps case.
      *
+     * @param  bool  $normalize
      * @return static
      */
-    public function studly()
+    public function studly(bool $normalize = false)
     {
-        return new static(Str::studly($this->value));
+        return new static(Str::studly($this->value, $normalize));
     }
 
     /**
      * Convert the string to Pascal case.
      *
+     * @param  bool  $normalize
      * @return static
      */
-    public function pascal()
+    public function pascal(bool $normalize = false)
     {
-        return new static(Str::pascal($this->value));
+        return new static(Str::pascal($this->value, $normalize));
     }
 
     /**
@@ -1105,6 +1129,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function ucfirst()
     {
         return new static(Str::ucfirst($this->value));
+    }
+
+    /**
+     * Capitalize the first character of each word in a string.
+     *
+     * @param  string  $separators
+     * @return static
+     */
+    public function ucwords($separators = " \t\r\n\f\v")
+    {
+        return new static(Str::ucwords($this->value, $separators));
     }
 
     /**
@@ -1482,7 +1517,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function toFloat()
     {
-        return floatval($this->value);
+        return (float) $this->value;
     }
 
     /**

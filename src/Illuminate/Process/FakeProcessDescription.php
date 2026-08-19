@@ -99,7 +99,7 @@ class FakeProcessDescription
             ->values()
             ->all();
 
-        if (strlen($output) > 0) {
+        if ($output !== '') {
             $this->output[] = [
                 'type' => 'out',
                 'buffer' => rtrim($output, "\n")."\n",
@@ -122,7 +122,7 @@ class FakeProcessDescription
             ->values()
             ->all();
 
-        if (strlen($output) > 0) {
+        if ($output !== '') {
             $this->output[] = [
                 'type' => 'err',
                 'buffer' => rtrim($output, "\n")."\n",

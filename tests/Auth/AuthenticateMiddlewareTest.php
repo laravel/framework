@@ -8,10 +8,11 @@ use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\AuthenticateWithBasicAuth;
 use Illuminate\Auth\RequestGuard;
+use Illuminate\Config\Repository;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -32,39 +33,36 @@ class AuthenticateMiddlewareTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         Container::setInstance(null);
     }
 
     public function testItCanGenerateDefinitionViaStaticMethod()
     {
-        $signature = (string) Authenticate::using('foo');
+        $signature = Authenticate::using('foo');
         $this->assertSame('Illuminate\Auth\Middleware\Authenticate:foo', $signature);
 
-        $signature = (string) Authenticate::using('foo', 'bar');
+        $signature = Authenticate::using('foo', 'bar');
         $this->assertSame('Illuminate\Auth\Middleware\Authenticate:foo,bar', $signature);
 
-        $signature = (string) Authenticate::using('foo', 'bar', 'baz');
+        $signature = Authenticate::using('foo', 'bar', 'baz');
         $this->assertSame('Illuminate\Auth\Middleware\Authenticate:foo,bar,baz', $signature);
     }
 
     public function testItCanGenerateDefinitionViaStaticMethodForBasic()
     {
-        $signature = (string) AuthenticateWithBasicAuth::using('guard');
+        $signature = AuthenticateWithBasicAuth::using('guard');
         $this->assertSame('Illuminate\Auth\Middleware\AuthenticateWithBasicAuth:guard', $signature);
 
-        $signature = (string) AuthenticateWithBasicAuth::using('guard', 'field');
+        $signature = AuthenticateWithBasicAuth::using('guard', 'field');
         $this->assertSame('Illuminate\Auth\Middleware\AuthenticateWithBasicAuth:guard,field', $signature);
 
-        $signature = (string) AuthenticateWithBasicAuth::using(field: 'field');
+        $signature = AuthenticateWithBasicAuth::using(field: 'field');
         $this->assertSame('Illuminate\Auth\Middleware\AuthenticateWithBasicAuth:,field', $signature);
     }
 
     public function testDefaultUnauthenticatedThrows()
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Unauthenticated.');
+        $this->expectExceptionObject(new AuthenticationException('Unauthenticated.'));
 
         $this->registerAuthDriver('default', false);
 
@@ -108,8 +106,7 @@ class AuthenticateMiddlewareTest extends TestCase
 
     public function testMultipleDriversUnauthenticatedThrows()
     {
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Unauthenticated.');
+        $this->expectExceptionObject(new AuthenticationException('Unauthenticated.'));
 
         $this->registerAuthDriver('default', false);
 
@@ -148,6 +145,58 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->assertSame($secondary, $this->auth->guard());
     }
 
+    public function testCustomDriverClosureBoundObjectIsAuthManager()
+    {
+        $this->auth->extend(__CLASS__, fn () => $this);
+        $this->assertSame($this->auth, $this->auth->guard(__CLASS__));
+    }
+
+    public function testCustomDriverStatic()
+    {
+        $driver = new stdClass;
+
+        $this->auth->extend(__CLASS__, fn () => $driver);
+        $this->assertSame($driver, $this->auth->guard(__CLASS__));
+    }
+
+    public function testCustomInvokableDriver()
+    {
+        $driver = new stdClass;
+        $creator = new CustomAuthDriver($driver);
+
+        $this->auth->extend(__CLASS__, $creator(...));
+        $this->assertSame($driver, $this->auth->guard(__CLASS__));
+    }
+
+    public function testAuthManagerCanResolveBackedEnumGuard()
+    {
+        $driver = $this->registerAuthDriver('default', true);
+
+        $guard1 = $this->auth->guard(GuardName::Default);
+        $guard2 = $this->auth->guard('default');
+
+        $this->assertSame($guard1, $guard2);
+        $this->assertSame($driver, $guard1);
+    }
+
+    public function testShouldUseAcceptsBackedEnum()
+    {
+        $this->registerAuthDriver('default', true);
+        $secondary = $this->registerAuthDriver('secondary', true);
+
+        $this->auth->shouldUse(GuardName::Secondary);
+
+        $this->assertSame('secondary', $this->auth->getDefaultDriver());
+        $this->assertSame($secondary, $this->auth->guard());
+    }
+
+    public function testSetDefaultDriverAcceptsBackedEnum()
+    {
+        $this->auth->setDefaultDriver(GuardName::Secondary);
+
+        $this->assertSame('secondary', $this->auth->getDefaultDriver());
+    }
+
     /**
      * Create a new config repository instance.
      *
@@ -161,6 +210,7 @@ class AuthenticateMiddlewareTest extends TestCase
                 'guards' => [
                     'default' => ['driver' => 'default'],
                     'secondary' => ['driver' => 'secondary'],
+                    __CLASS__ => ['driver' => __CLASS__],
                 ],
             ],
         ]);
@@ -194,7 +244,7 @@ class AuthenticateMiddlewareTest extends TestCase
     {
         return new RequestGuard(function () use ($authenticated) {
             return $authenticated ? new stdClass : null;
-        }, m::mock(Request::class), m::mock(EloquentUserProvider::class));
+        }, new Request, Mockery::mock(EloquentUserProvider::class));
     }
 
     /**
@@ -207,7 +257,7 @@ class AuthenticateMiddlewareTest extends TestCase
      */
     protected function authenticate(...$guards)
     {
-        $request = m::mock(Request::class);
+        $request = Mockery::mock(Request::class);
 
         $request->shouldReceive('expectsJson')->andReturn(false);
 
@@ -220,5 +270,23 @@ class AuthenticateMiddlewareTest extends TestCase
         (new Authenticate($this->auth))->handle($request, $next, ...$guards);
 
         $this->assertSame($request, $nextParam);
+    }
+}
+
+enum GuardName: string
+{
+    case Default = 'default';
+    case Secondary = 'secondary';
+}
+
+class CustomAuthDriver
+{
+    public function __construct(private object $driver)
+    {
+    }
+
+    public function __invoke()
+    {
+        return $this->driver;
     }
 }

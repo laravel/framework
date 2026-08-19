@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 /**
- * Alias of VerifyCsrfToken for consistency.
+ * @deprecated Use PreventRequestForgery instead.
  */
-class ValidateCsrfToken extends VerifyCsrfToken
+class ValidateCsrfToken extends PreventRequestForgery
 {
     //
 }

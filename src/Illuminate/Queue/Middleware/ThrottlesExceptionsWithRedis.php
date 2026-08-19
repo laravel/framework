@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Middleware;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Redis\Connection;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Support\InteractsWithTime;
@@ -13,11 +14,18 @@ class ThrottlesExceptionsWithRedis extends ThrottlesExceptions
     use InteractsWithTime;
 
     /**
-     * The Redis factory implementation.
+     * The Redis connection instance.
      *
-     * @var \Illuminate\Contracts\Redis\Factory
+     * @var \Illuminate\Contracts\Redis\Connection
      */
     protected $redis;
+
+    /**
+     * The Redis connection that should be used.
+     *
+     * @var string|null
+     */
+    protected $connectionName = null;
 
     /**
      * The rate limiter instance.
@@ -32,10 +40,14 @@ class ThrottlesExceptionsWithRedis extends ThrottlesExceptions
      * @param  mixed  $job
      * @param  callable  $next
      * @return mixed
+     *
+     * @throws \Throwable
      */
     public function handle($job, $next)
     {
-        $this->redis = Container::getInstance()->make(Redis::class);
+        $this->redis = Container::getInstance()
+            ->make(Redis::class)
+            ->connection($this->connectionName);
 
         $this->limiter = new DurationLimiter(
             $this->redis, $this->getKey($job), $this->maxAttempts, $this->decaySeconds
@@ -68,7 +80,20 @@ class ThrottlesExceptionsWithRedis extends ThrottlesExceptions
 
             $this->limiter->acquire();
 
-            return $job->release($this->retryAfterMinutes * 60);
+            return $job->release($this->getTimeUntilNextRetryAfterException($throwable));
         }
+    }
+
+    /**
+     * Specify the Redis connection that should be used.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function connection(string $name)
+    {
+        $this->connectionName = $name;
+
+        return $this;
     }
 }

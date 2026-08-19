@@ -62,6 +62,17 @@ class EncrypterTest extends TestCase
         $this->assertSame('foo', $new->decryptString($encrypted));
     }
 
+    public function testItDecryptsUsingTheFirstMacValidatedKey()
+    {
+        $previous = new Encrypter(str_repeat('b', 16));
+        $encrypted = $previous->encryptString('foo');
+
+        $new = new Encrypter(str_repeat('a', 16));
+        $new->previousKeys([str_repeat('b', 16), str_repeat('c', 16)]);
+
+        $this->assertSame('foo', $new->decryptString($encrypted));
+    }
+
     public function testEncryptionUsingBase64EncodedKey()
     {
         $e = new Encrypter(random_bytes(16));
@@ -122,8 +133,7 @@ class EncrypterTest extends TestCase
         $encrypted = $e->encrypt('foo');
         $data = json_decode(base64_decode($encrypted));
 
-        $this->expectException(DecryptException::class);
-        $this->expectExceptionMessage('Could not decrypt the data.');
+        $this->expectExceptionObject(new DecryptException('Could not decrypt the data.'));
 
         $data->tag = substr($data->tag, 0, 4);
         $encrypted = base64_encode(json_encode($data));
@@ -136,8 +146,7 @@ class EncrypterTest extends TestCase
         $encrypted = $e->encrypt('foo');
         $data = json_decode(base64_decode($encrypted));
 
-        $this->expectException(DecryptException::class);
-        $this->expectExceptionMessage('Could not decrypt the data.');
+        $this->expectExceptionObject(new DecryptException('Could not decrypt the data.'));
 
         $data->tag[0] = $data->tag[0] === 'A' ? 'B' : 'A';
         $encrypted = base64_encode(json_encode($data));
@@ -156,40 +165,35 @@ class EncrypterTest extends TestCase
 
     public function testDoNoAllowLongerKey()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
+        $this->expectExceptionObject(new RuntimeException('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.'));
 
         new Encrypter(str_repeat('z', 32));
     }
 
     public function testWithBadKeyLength()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
+        $this->expectExceptionObject(new RuntimeException('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.'));
 
         new Encrypter(str_repeat('a', 5));
     }
 
     public function testWithBadKeyLengthAlternativeCipher()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
+        $this->expectExceptionObject(new RuntimeException('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.'));
 
         new Encrypter(str_repeat('a', 16), 'AES-256-GCM');
     }
 
     public function testWithUnsupportedCipher()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
+        $this->expectExceptionObject(new RuntimeException('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.'));
 
         new Encrypter(str_repeat('c', 16), 'AES-256-CFB8');
     }
 
     public function testExceptionThrownWhenPayloadIsInvalid()
     {
-        $this->expectException(DecryptException::class);
-        $this->expectExceptionMessage('The payload is invalid.');
+        $this->expectExceptionObject(new DecryptException('The payload is invalid.'));
 
         $e = new Encrypter(str_repeat('a', 16));
         $payload = $e->encrypt('foo');
@@ -199,8 +203,7 @@ class EncrypterTest extends TestCase
 
     public function testDecryptionExceptionIsThrownWhenUnexpectedTagIsAdded()
     {
-        $this->expectException(DecryptException::class);
-        $this->expectExceptionMessage('Unable to use tag because the cipher algorithm does not support AEAD.');
+        $this->expectExceptionObject(new DecryptException('Unable to use tag because the cipher algorithm does not support AEAD.'));
 
         $e = new Encrypter(str_repeat('a', 16));
         $payload = $e->encrypt('foo');
@@ -211,8 +214,7 @@ class EncrypterTest extends TestCase
 
     public function testExceptionThrownWithDifferentKey()
     {
-        $this->expectException(DecryptException::class);
-        $this->expectExceptionMessage('The MAC is invalid.');
+        $this->expectExceptionObject(new DecryptException('The MAC is invalid.'));
 
         $a = new Encrypter(str_repeat('a', 16));
         $b = new Encrypter(str_repeat('b', 16));
@@ -221,8 +223,7 @@ class EncrypterTest extends TestCase
 
     public function testExceptionThrownWhenIvIsTooLong()
     {
-        $this->expectException(DecryptException::class);
-        $this->expectExceptionMessage('The payload is invalid.');
+        $this->expectExceptionObject(new DecryptException('The payload is invalid.'));
 
         $e = new Encrypter(str_repeat('a', 16));
         $payload = $e->encrypt('foo');
@@ -263,10 +264,39 @@ class EncrypterTest extends TestCase
     #[DataProvider('provideTamperedData')]
     public function testTamperedPayloadWillGetRejected($payload)
     {
-        $this->expectException(DecryptException::class);
-        $this->expectExceptionMessage('The payload is invalid.');
+        $this->expectExceptionObject(new DecryptException('The payload is invalid.'));
 
         $enc = new Encrypter(str_repeat('x', 16));
         $enc->decrypt(base64_encode(json_encode($payload)));
+    }
+
+    public function testEncryptedReturnsTrueForEncryptedValue()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $encrypted = $e->encrypt('foo');
+
+        $this->assertTrue(Encrypter::appearsEncrypted($encrypted));
+    }
+
+    public function testEncryptedReturnsTrueForEncryptedArray()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $encrypted = $e->encrypt(['foo' => 'bar']);
+
+        $this->assertTrue(Encrypter::appearsEncrypted($encrypted));
+    }
+
+    public function testEncryptedReturnsFalseForPlainText()
+    {
+        $this->assertFalse(Encrypter::appearsEncrypted('foo'));
+        $this->assertFalse(Encrypter::appearsEncrypted('APP_NAME=Laravel'));
+        $this->assertFalse(Encrypter::appearsEncrypted("APP_NAME=Laravel\nAPP_ENV=local"));
+    }
+
+    public function testEncryptedReturnsFalseForNonString()
+    {
+        $this->assertFalse(Encrypter::appearsEncrypted(123));
+        $this->assertFalse(Encrypter::appearsEncrypted(['foo' => 'bar']));
+        $this->assertFalse(Encrypter::appearsEncrypted(null));
     }
 }

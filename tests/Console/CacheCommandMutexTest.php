@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository;
-use Mockery as m;
+use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -35,8 +35,8 @@ class CacheCommandMutexTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->cacheFactory = m::mock(Factory::class);
-        $this->cacheRepository = m::mock(Repository::class);
+        $this->cacheFactory = Mockery::mock(Factory::class);
+        $this->cacheRepository = Mockery::mock(Repository::class);
         $this->mutex = new CacheCommandMutex($this->cacheFactory);
         $this->command = new class extends Command
         {
@@ -44,18 +44,11 @@ class CacheCommandMutexTest extends TestCase
         };
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-        parent::tearDown();
-    }
-
     public function testCanCreateMutex()
     {
         $this->mockUsingCacheStore();
-        $this->cacheRepository->shouldReceive('add')
-            ->andReturn(true)
-            ->once();
+        $this->cacheRepository->expects('add')
+            ->andReturn(true);
         $actual = $this->mutex->create($this->command);
 
         $this->assertTrue($actual);
@@ -64,9 +57,8 @@ class CacheCommandMutexTest extends TestCase
     public function testCannotCreateMutexIfAlreadyExist()
     {
         $this->mockUsingCacheStore();
-        $this->cacheRepository->shouldReceive('add')
-            ->andReturn(false)
-            ->once();
+        $this->cacheRepository->expects('add')
+            ->andReturn(false);
         $actual = $this->mutex->create($this->command);
 
         $this->assertFalse($actual);
@@ -75,12 +67,8 @@ class CacheCommandMutexTest extends TestCase
     public function testCanCreateMutexWithCustomConnection()
     {
         $this->mockUsingCacheStore();
-        $this->cacheRepository->shouldReceive('getStore')
-            ->with('test')
-            ->andReturn($this->cacheRepository);
-        $this->cacheRepository->shouldReceive('add')
-            ->andReturn(false)
-            ->once();
+        $this->cacheRepository->expects('add')
+            ->andReturn(false);
         $this->mutex->useStore('test');
 
         $this->mutex->create($this->command);
@@ -99,12 +87,8 @@ class CacheCommandMutexTest extends TestCase
     public function testCanCreateMutexWithCustomLockProviderConnection()
     {
         $this->mockUsingCacheStore();
-        $this->cacheRepository->shouldReceive('getStore')
-            ->with('test')
-            ->andReturn($this->cacheRepository);
-        $this->cacheRepository->shouldReceive('add')
-            ->andReturn(false)
-            ->once();
+        $this->cacheRepository->expects('add')
+            ->andReturn(false);
         $this->mutex->useStore('test');
 
         $this->mutex->create($this->command);
@@ -121,7 +105,7 @@ class CacheCommandMutexTest extends TestCase
 
     public function testCanCreateMutexWithCustomConnectionWithLockProvider()
     {
-        $lock = m::mock(LockProvider::class);
+        $lock = Mockery::mock(LockProvider::class);
         $this->cacheFactory->expects('store')->once()->with('test')->andReturn($this->cacheRepository);
         $this->cacheRepository->expects('getStore')->twice()->andReturn($lock);
 
@@ -140,9 +124,9 @@ class CacheCommandMutexTest extends TestCase
         $this->cacheRepository->expects('getStore')->andReturn(null);
     }
 
-    private function mockUsingLockProvider(): m\MockInterface
+    private function mockUsingLockProvider(): MockInterface
     {
-        $lock = m::mock(LockProvider::class);
+        $lock = Mockery::mock(LockProvider::class);
         $this->cacheFactory->expects('store')->once()->andReturn($this->cacheRepository);
         $this->cacheRepository->expects('getStore')->twice()->andReturn($lock);
 
@@ -153,7 +137,7 @@ class CacheCommandMutexTest extends TestCase
     {
         $lock->expects('lock')
             ->once()
-            ->with(m::type('string'), m::type('int'))
+            ->with(Mockery::type('string'), Mockery::type('int'))
             ->andReturns($lock);
 
         $lock->expects('get')
@@ -165,14 +149,9 @@ class CacheCommandMutexTest extends TestCase
     {
         $this->mockUsingCacheStore();
 
-        $this->cacheRepository->shouldReceive('getStore')
-            ->with('test')
-            ->andReturn($this->cacheRepository);
-
-        $this->cacheRepository->shouldReceive('add')
-            ->once()
+        $this->cacheRepository->expects('add')
             ->withArgs(function ($key) {
-                $this->assertEquals('framework'.DIRECTORY_SEPARATOR.'command-command-name', $key);
+                $this->assertSame('framework'.DIRECTORY_SEPARATOR.'command-command-name', $key);
 
                 return true;
             })
@@ -195,14 +174,9 @@ class CacheCommandMutexTest extends TestCase
 
         $this->mockUsingCacheStore();
 
-        $this->cacheRepository->shouldReceive('getStore')
-            ->with('test')
-            ->andReturn($this->cacheRepository);
-
-        $this->cacheRepository->shouldReceive('add')
-            ->once()
+        $this->cacheRepository->expects('add')
             ->withArgs(function ($key) {
-                $this->assertEquals('framework'.DIRECTORY_SEPARATOR.'command-command-name-isolated', $key);
+                $this->assertSame('framework'.DIRECTORY_SEPARATOR.'command-command-name-isolated', $key);
 
                 return true;
             })

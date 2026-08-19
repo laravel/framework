@@ -3,9 +3,10 @@
 namespace Illuminate\Container\Attributes;
 
 use Attribute;
-use BackedEnum;
 use InvalidArgumentException;
 use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
 class Bind
@@ -28,7 +29,7 @@ class Bind
      * Create a new attribute instance.
      *
      * @param  class-string  $concrete
-     * @param  non-empty-array<int, \BackedEnum|\UnitEnum|non-empty-string>|non-empty-string|\UnitEnum  $environments
+     * @param  non-empty-array<int, \UnitEnum|non-empty-string>|non-empty-string|\UnitEnum  $environments
      *
      * @throws \InvalidArgumentException
      */
@@ -44,10 +45,9 @@ class Bind
 
         $this->concrete = $concrete;
 
-        $this->environments = array_map(fn ($environment) => match (true) {
-            $environment instanceof BackedEnum => $environment->value,
-            $environment instanceof UnitEnum => $environment->name,
-            default => $environment,
-        }, $environments);
+        $this->environments = array_map(
+            fn ($environment) => enum_value($environment),
+            $environments,
+        );
     }
 }

@@ -4,13 +4,13 @@ namespace Illuminate\Support;
 
 use ArrayIterator;
 use Illuminate\Contracts\Support\ValidatedData;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\InteractsWithData;
-use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 
 class ValidatedInput implements ValidatedData
 {
-    use InteractsWithData;
+    use Dumpable, InteractsWithData;
 
     /**
      * The underlying input.
@@ -98,29 +98,28 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
-     * Dump the validated inputs items and end the script.
+     * Retrieve a file from the validated inputs.
      *
-     * @param  mixed  ...$keys
-     * @return never
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Http\UploadedFile|null
      */
-    public function dd(...$keys)
+    public function file($key, $default = null)
     {
-        $this->dump(...$keys);
+        $value = $this->input($key, $default);
 
-        exit(1);
+        return $value instanceof \Illuminate\Http\UploadedFile ? $value : $default;
     }
 
     /**
      * Dump the items.
      *
-     * @param  mixed  $keys
+     * @param  mixed  ...$keys
      * @return $this
      */
-    public function dump($keys = [])
+    public function dump(...$keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        VarDumper::dump(count($keys) > 0 ? $this->only($keys) : $this->all());
+        dump($keys !== [] ? $this->only($keys) : $this->all());
 
         return $this;
     }
@@ -161,6 +160,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Determine if an input item is set.
      *
+     * @param  string  $name
      * @return bool
      */
     public function __isset($name)

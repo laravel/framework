@@ -21,7 +21,7 @@ trait PromptsForMissingInput
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return void
      */
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function interact(InputInterface $input, OutputInterface $output): void
     {
         parent::interact($input, $output);
 
@@ -40,8 +40,7 @@ trait PromptsForMissingInput
     protected function promptForMissingArguments(InputInterface $input, OutputInterface $output)
     {
         $prompted = (new Collection($this->getDefinition()->getArguments()))
-            ->reject(fn (InputArgument $argument) => $argument->getName() === 'command')
-            ->filter(fn (InputArgument $argument) => $argument->isRequired() && match (true) {
+            ->filter(fn (InputArgument $argument) => $argument->getName() !== 'command' && $argument->isRequired() && match (true) {
                 $argument->isArray() => empty($input->getArgument($argument->getName())),
                 default => is_null($input->getArgument($argument->getName())),
             })
@@ -75,7 +74,7 @@ trait PromptsForMissingInput
     /**
      * Prompt for missing input arguments using the returned questions.
      *
-     * @return array
+     * @return array<string, string|array{string, string}|\Closure(): (array<int|string>|string|int|bool)>
      */
     protected function promptForMissingArgumentsUsing()
     {
@@ -103,7 +102,6 @@ trait PromptsForMissingInput
     protected function didReceiveOptions(InputInterface $input)
     {
         return (new Collection($this->getDefinition()->getOptions()))
-            ->reject(fn ($option) => $input->getOption($option->getName()) === $option->getDefault())
-            ->isNotEmpty();
+            ->contains(fn ($option) => $input->getOption($option->getName()) !== $option->getDefault());
     }
 }

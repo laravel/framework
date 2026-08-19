@@ -64,7 +64,7 @@ class QueuedClosureListenerTest extends TestCase
         Bus::assertDispatched(CallQueuedListener::class, function ($job) {
             $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
 
-            return is_callable($job->deduplicator) && call_user_func($job->deduplicator, '', null) == 'deduplicator-1';
+            return is_callable($job->deduplicator) && call_user_func($job->deduplicator, '', null) === 'deduplicator-1';
         });
     }
 }

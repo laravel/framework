@@ -44,9 +44,7 @@ class AfterQueryTest extends DatabaseTestCase
             ->afterQuery(function (Collection $users) use ($afterQueryIds) {
                 $afterQueryIds->push(...$users->pluck('id')->all());
 
-                foreach ($users as $user) {
-                    $this->assertInstanceOf(AfterQueryUser::class, $user);
-                }
+                $this->assertContainsOnlyInstancesOf(AfterQueryUser::class, $users);
             })
             ->get();
 
@@ -87,9 +85,7 @@ class AfterQueryTest extends DatabaseTestCase
             ->afterQuery(function (Collection $users) use ($afterQueryIds) {
                 $afterQueryIds->push(...$users->pluck('id')->all());
 
-                foreach ($users as $user) {
-                    $this->assertInstanceOf(AfterQueryUser::class, $user);
-                }
+                $this->assertContainsOnlyInstancesOf(AfterQueryUser::class, $users);
             })
             ->cursor();
 
@@ -177,14 +173,26 @@ class AfterQueryTest extends DatabaseTestCase
             ->afterQuery(function (Collection $posts) use ($afterQueryIds) {
                 $afterQueryIds->push(...$posts->pluck('id')->all());
 
-                foreach ($posts as $post) {
-                    $this->assertInstanceOf(AfterQueryPost::class, $post);
-                }
+                $this->assertContainsOnlyInstancesOf(AfterQueryPost::class, $posts);
             })
             ->get();
 
         $this->assertCount(2, $posts);
         $this->assertEqualsCanonicalizing($afterQueryIds->toArray(), $posts->pluck('id')->toArray());
+    }
+
+    public function testAfterQueryKeyByOnEagerBelongsToManyRelationship()
+    {
+        $user = AfterQueryUser::create();
+        $firstPost = AfterQueryPost::create();
+        $secondPost = AfterQueryPost::create();
+
+        $user->posts()->attach($firstPost);
+        $user->posts()->attach($secondPost);
+
+        $posts = AfterQueryUser::with('posts')->first()->posts;
+
+        $this->assertEqualsCanonicalizing($posts->pluck('id')->toArray(), $posts->keys()->toArray());
     }
 
     public function testAfterQueryHookOnHasManyThroughRelationship()
@@ -201,9 +209,7 @@ class AfterQueryTest extends DatabaseTestCase
             ->afterQuery(function (Collection $teamMates) use ($afterQueryIds) {
                 $afterQueryIds->push(...$teamMates->pluck('id')->all());
 
-                foreach ($teamMates as $teamMate) {
-                    $this->assertInstanceOf(AfterQueryUser::class, $teamMate);
-                }
+                $this->assertContainsOnlyInstancesOf(AfterQueryUser::class, $teamMates);
             })
             ->get();
 
@@ -363,7 +369,9 @@ class AfterQueryUser extends Model
 
     public function posts()
     {
-        return $this->belongsToMany(AfterQueryPost::class, 'users_posts', 'user_id', 'post_id')->withTimestamps();
+        return $this->belongsToMany(AfterQueryPost::class, 'users_posts', 'user_id', 'post_id')
+            ->afterQuery(fn (Collection $posts) => $posts->keyBy(fn (AfterQueryPost $post) => $post->id))
+            ->withTimestamps();
     }
 }
 

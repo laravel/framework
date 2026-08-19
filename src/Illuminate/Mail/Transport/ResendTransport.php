@@ -48,6 +48,9 @@ class ResendTransport extends AbstractTransport
 
     /**
      * {@inheritDoc}
+     *
+     * @throws \Symfony\Component\Mailer\Exception\TransportException
+     * @throws \Throwable
      */
     protected function doSend(SentMessage $message): void
     {
@@ -76,7 +79,7 @@ class ResendTransport extends AbstractTransport
                 $disposition = $attachmentHeaders->getHeaderBody('Content-Disposition');
                 $filename = $attachmentHeaders->getHeaderParameter('Content-Disposition', 'filename');
 
-                if ($contentType == 'text/calendar') {
+                if ($contentType === 'text/calendar') {
                     $content = $attachment->getBody();
                 } else {
                     $content = str_replace("\r\n", '', $attachment->bodyToString());
@@ -110,7 +113,9 @@ class ResendTransport extends AbstractTransport
                 'attachments' => $attachments,
             ]);
 
-            throw_if(isset($result['statusCode']) && $result['statusCode'] != Response::HTTP_OK, Exception::class, $result['message']);
+            if (isset($result['statusCode']) && $result['statusCode'] != Response::HTTP_OK) {
+                throw new Exception($result['message']);
+            }
         } catch (Exception $exception) {
             throw new TransportException(
                 sprintf('Request to Resend API failed. Reason: %s.', $exception->getMessage()),

@@ -120,7 +120,7 @@ class Env
     /**
      * Write an array of key-value pairs to the environment file.
      *
-     * @param  array  $variables
+     * @param  array<string, mixed>  $variables
      * @param  string  $pathToFile
      * @param  bool  $overwrite
      * @return void
@@ -178,16 +178,16 @@ class Env
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @param  array  $envLines
+     * @param  array<int, string>  $envLines
      * @param  bool  $overwrite
-     * @return array
+     * @return array<int, string>
      */
     protected static function addVariableToEnvContents(string $key, mixed $value, array $envLines, bool $overwrite): array
     {
         $prefix = explode('_', $key)[0].'_';
         $lastPrefixIndex = -1;
 
-        $shouldQuote = preg_match('/^[a-zA-z0-9]+$/', $value) === 0;
+        $shouldQuote = preg_match('/^[a-zA-Z0-9]+$/', $value) === 0;
 
         $lineToAddVariations = [
             $key.'='.(is_string($value) ? self::prepareQuotedValue($value) : $value),
@@ -293,7 +293,7 @@ class Env
      * Escape a string using addslashes, excluding the specified characters from being escaped.
      *
      * @param  string  $value
-     * @param  array  $except
+     * @param  array<string>  $except
      * @return string
      */
     protected static function addSlashesExceptFor(string $value, array $except = [])

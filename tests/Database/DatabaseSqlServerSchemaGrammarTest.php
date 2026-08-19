@@ -9,16 +9,11 @@ use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSqlServerSchemaGrammarTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testBasicCreateTable()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -55,7 +50,6 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
     public function testCreateTemporaryTable()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getTablePrefix')->andReturn('');
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->create();
         $blueprint->temporary();
@@ -1010,18 +1004,17 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         ?SqlServerBuilder $builder = null,
         string $prefix = ''
     ) {
-        $connection = m::mock(Connection::class)
-            ->shouldReceive('getTablePrefix')->andReturn($prefix)
-            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
-            ->getMock();
+        $connection = Mockery::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
 
         $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return $connection
-            ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
-            ->shouldReceive('getSchemaBuilder')->andReturn($builder)
-            ->getMock();
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn($builder);
+
+        return $connection;
     }
 
     public function getGrammar(?Connection $connection = null)

@@ -2,11 +2,12 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
-use BackedEnum;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection as BaseCollection;
+
+use function Illuminate\Support\enum_value;
 
 trait InteractsWithPivotTable
 {
@@ -35,7 +36,7 @@ trait InteractsWithPivotTable
             array_keys($records)
         ));
 
-        if (count($detach) > 0) {
+        if ($detach !== []) {
             $this->detach($detach, false);
 
             $changes['detached'] = $this->castKeys($detach);
@@ -46,7 +47,7 @@ trait InteractsWithPivotTable
         // this change list and get ready to return these results to the callers.
         $attach = array_diff_key($records, array_flip($detach));
 
-        if (count($attach) > 0) {
+        if ($attach !== []) {
             $this->attach($attach, [], false);
 
             $changes['attached'] = array_keys($attach);
@@ -61,6 +62,20 @@ trait InteractsWithPivotTable
         }
 
         return $changes;
+    }
+
+    /**
+     * Toggles a model (or models) from the parent within a transaction.
+     *
+     * @param  mixed  $ids
+     * @param  bool  $touch
+     * @return array
+     *
+     * @throws \Throwable
+     */
+    public function toggleOrFail($ids, $touch = true)
+    {
+        return $this->parent->getConnection()->transaction(fn () => $this->toggle($ids, $touch));
     }
 
     /**
@@ -105,7 +120,7 @@ trait InteractsWithPivotTable
         if ($detaching) {
             $detach = array_diff($current, array_keys($records));
 
-            if (count($detach) > 0) {
+            if ($detach !== []) {
                 $this->detach($detach, false);
 
                 $changes['detached'] = $this->castKeys($detach);
@@ -132,6 +147,33 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Sync the intermediate tables with a list of IDs or collection of models within a transaction.
+     *
+     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
+     * @param  bool  $detaching
+     * @return array{attached: array, detached: array, updated: array}
+     *
+     * @throws \Throwable
+     */
+    public function syncOrFail($ids, $detaching = true)
+    {
+        return $this->parent->getConnection()->transaction(fn () => $this->sync($ids, $detaching));
+    }
+
+    /**
+     * Sync the intermediate tables with a list of IDs without detaching within a transaction.
+     *
+     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
+     * @return array{attached: array, detached: array, updated: array}
+     *
+     * @throws \Throwable
+     */
+    public function syncWithoutDetachingOrFail($ids)
+    {
+        return $this->syncOrFail($ids, false);
+    }
+
+    /**
      * Sync the intermediate tables with a list of IDs or collection of models with the given pivot values.
      *
      * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array|int|string  $ids
@@ -147,6 +189,21 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Sync the intermediate tables with a list of IDs with the given pivot values within a transaction.
+     *
+     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array|int|string  $ids
+     * @param  array  $values
+     * @param  bool  $detaching
+     * @return array{attached: array, detached: array, updated: array}
+     *
+     * @throws \Throwable
+     */
+    public function syncWithPivotValuesOrFail($ids, array $values, bool $detaching = true)
+    {
+        return $this->parent->getConnection()->transaction(fn () => $this->syncWithPivotValues($ids, $values, $detaching));
+    }
+
+    /**
      * Format the sync / toggle record list so that it is keyed by ID.
      *
      * @param  array  $records
@@ -159,9 +216,7 @@ trait InteractsWithPivotTable
                 [$id, $attributes] = [$attributes, []];
             }
 
-            if ($id instanceof BackedEnum) {
-                $id = $id->value;
-            }
+            $id = enum_value($id);
 
             return [$id => $attributes];
         })->all();
@@ -231,6 +286,21 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Update an existing pivot record on the table within a transaction.
+     *
+     * @param  mixed  $id
+     * @param  array  $attributes
+     * @param  bool  $touch
+     * @return int
+     *
+     * @throws \Throwable
+     */
+    public function updateExistingPivotOrFail($id, array $attributes, $touch = true)
+    {
+        return $this->parent->getConnection()->transaction(fn () => $this->updateExistingPivot($id, $attributes, $touch));
+    }
+
+    /**
      * Update an existing pivot record on the table via a custom class.
      *
      * @param  mixed  $id
@@ -279,6 +349,21 @@ trait InteractsWithPivotTable
         if ($touch) {
             $this->touchIfTouching();
         }
+    }
+
+    /**
+     * Attach a model to the parent within a transaction.
+     *
+     * @param  mixed  $ids
+     * @param  array  $attributes
+     * @param  bool  $touch
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function attachOrFail($ids, array $attributes = [], $touch = true)
+    {
+        $this->parent->getConnection()->transaction(fn () => $this->attach($ids, $attributes, $touch));
     }
 
     /**
@@ -465,6 +550,20 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Detach models from the relationship within a transaction.
+     *
+     * @param  mixed  $ids
+     * @param  bool  $touch
+     * @return int
+     *
+     * @throws \Throwable
+     */
+    public function detachOrFail($ids = null, $touch = true)
+    {
+        return $this->parent->getConnection()->transaction(fn () => $this->detach($ids, $touch));
+    }
+
+    /**
      * Detach models from the relationship using a custom class.
      *
      * @param  mixed  $ids
@@ -472,15 +571,8 @@ trait InteractsWithPivotTable
      */
     protected function detachUsingCustomClass($ids)
     {
-        $results = 0;
-
-        $records = $this->getCurrentlyAttachedPivotsForIds($ids);
-
-        foreach ($records as $record) {
-            $results += $record->delete();
-        }
-
-        return $results;
+        return $this->getCurrentlyAttachedPivotsForIds($ids)
+            ->reduce(fn ($carry, $record) => $carry + $record->delete(), 0);
     }
 
     /**

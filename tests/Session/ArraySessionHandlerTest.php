@@ -9,13 +9,6 @@ use SessionHandlerInterface;
 
 class ArraySessionHandlerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        Carbon::setTestNow(null);
-    }
-
     public function test_it_implements_the_session_handler_interface()
     {
         $this->assertInstanceOf(SessionHandlerInterface::class, new ArraySessionHandler(10));
@@ -48,9 +41,10 @@ class ArraySessionHandlerTest extends TestCase
     {
         $handler = new ArraySessionHandler(10);
 
+        Carbon::setTestNow($now = Carbon::now());
         $handler->write('foo', 'bar');
 
-        Carbon::setTestNow(Carbon::now()->addMinutes(10));
+        Carbon::setTestNow($now->addMinutes(10));
         $this->assertSame('bar', $handler->read('foo'));
     }
 
@@ -58,9 +52,10 @@ class ArraySessionHandlerTest extends TestCase
     {
         $handler = new ArraySessionHandler(10);
 
+        Carbon::setTestNow($now = Carbon::now());
         $handler->write('foo', 'bar');
 
-        Carbon::setTestNow(Carbon::now()->addMinutes(10)->addSecond());
+        Carbon::setTestNow($now->addMinutes(10)->addSecond());
         $this->assertSame('', $handler->read('foo'));
     }
 
@@ -100,15 +95,16 @@ class ArraySessionHandlerTest extends TestCase
 
         $this->assertSame(0, $handler->gc(300));
 
+        Carbon::setTestNow($now = Carbon::now());
         $handler->write('foo', 'bar');
         $this->assertSame(0, $handler->gc(300));
         $this->assertSame('bar', $handler->read('foo'));
 
-        Carbon::setTestNow(Carbon::now()->addSecond());
+        Carbon::setTestNow($now->addSecond());
 
         $handler->write('baz', 'qux');
 
-        Carbon::setTestNow(Carbon::now()->addMinutes(5));
+        Carbon::setTestNow($now->addMinutes(5));
 
         $this->assertSame(1, $handler->gc(300));
         $this->assertSame('', $handler->read('foo'));

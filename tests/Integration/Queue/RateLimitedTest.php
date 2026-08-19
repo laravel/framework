@@ -15,7 +15,7 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class RateLimitedTest extends TestCase
@@ -58,12 +58,12 @@ class RateLimitedTest extends TestCase
 
     public function testRateLimitedJobsAreNotExecutedOnLimitReached2()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->andReturn(0, 1, null);
-        $cache->shouldReceive('add')->andReturn(true, true);
-        $cache->shouldReceive('increment')->andReturn(1);
-        $cache->shouldReceive('has')->andReturn(true);
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('get')->times(3)->andReturn(0, 1, null);
+        $cache->expects('add')->times(2)->andReturn(true, true);
+        $cache->expects('increment')->andReturn(1);
+        $cache->expects('has')->andReturn(true);
+        $cache->expects('getStore')->times(3)->andReturn(new ArrayStore);
 
         $rateLimiter = new RateLimiter($cache);
         $this->app->instance(RateLimiter::class, $rateLimiter);
@@ -79,14 +79,14 @@ class RateLimitedTest extends TestCase
         RateLimitedTestJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('release')->once()->withArgs(function ($delay) {
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('release')->withArgs(function ($delay) {
             return $delay >= 0;
         });
-        $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->expects('isReleased')->times(2)->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new RateLimitedTestJob),
@@ -166,17 +166,38 @@ class RateLimitedTest extends TestCase
         $this->assertInstanceOf(RateLimiter::class, $fetch('limiter'));
     }
 
+    public function testReleaseAfterIsSurvivedThroughSerialization()
+    {
+        $rateLimited = (new RateLimited('limiterName'))->releaseAfter(120);
+
+        $restoredRateLimited = unserialize(serialize($rateLimited));
+
+        $this->assertSame(120, $restoredRateLimited->releaseAfter);
+    }
+
+    public function testCustomReleaseAfterIsRespectedWhenMiddlewareIsStoredAsJobProperty()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+
+        $rateLimiter->for('test', function ($job) {
+            return Limit::perHour(1);
+        });
+
+        $this->assertJobRanSuccessfully(RateLimitedSerializedPropertyTestJob::class);
+        $this->assertJobWasReleasedAfter(RateLimitedSerializedPropertyTestJob::class, 60);
+    }
+
     protected function assertJobRanSuccessfully($class)
     {
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
-        $job->shouldReceive('delete')->once();
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
+        $job->expects('isDeletedOrReleased')->andReturn(false);
+        $job->expects('delete');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -190,12 +211,12 @@ class RateLimitedTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('release')->once();
-        $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('release');
+        $job->expects('isReleased')->times(2)->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -209,12 +230,12 @@ class RateLimitedTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('release')->once()->withArgs([$releaseAfter]);
-        $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('release')->withArgs([$releaseAfter]);
+        $job->expects('isReleased')->times(2)->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -228,12 +249,12 @@ class RateLimitedTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
-        $job->shouldReceive('delete')->once();
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('isReleased')->times(2)->andReturn(false);
+        $job->expects('isDeletedOrReleased')->andReturn(false);
+        $job->expects('delete');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -266,7 +287,7 @@ class RateLimitedTest extends TestCase
             $this->assertSame($job, $result);
             $this->assertFalse($job->released);
 
-            Carbon::setTestNow(now()->addSeconds(1));
+            Carbon::setTestNow(Carbon::now()->addSecond());
         }
 
         $result = $middleware->handle($job = $jobFactory(), $next);
@@ -310,7 +331,7 @@ class RateLimitedTest extends TestCase
             $this->assertSame($job, $result);
             $this->assertFalse($job->released);
 
-            Carbon::setTestNow(now()->addMilliseconds(100));
+            Carbon::setTestNow(Carbon::now()->addMilliseconds(100));
         }
 
         $result = $middleware->handle($job = $jobFactory(), $next);
@@ -377,6 +398,28 @@ class RateLimitedReleaseAfterTestJob extends RateLimitedTestJob
     public function middleware()
     {
         return [(new RateLimited('test'))->releaseAfter(60)];
+    }
+}
+
+class RateLimitedSerializedPropertyTestJob
+{
+    use InteractsWithQueue, Queueable;
+
+    public static $handled = false;
+
+    public function __construct()
+    {
+        $this->through([(new RateLimited('test'))->releaseAfter(60)]);
+    }
+
+    public function handle()
+    {
+        static::$handled = true;
+    }
+
+    public function middleware()
+    {
+        return [];
     }
 }
 

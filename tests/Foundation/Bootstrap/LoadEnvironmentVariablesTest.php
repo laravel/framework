@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Foundation\Bootstrap;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class LoadEnvironmentVariablesTest extends TestCase
@@ -13,21 +13,20 @@ class LoadEnvironmentVariablesTest extends TestCase
     {
         unset($_ENV['FOO'], $_SERVER['FOO']);
         putenv('FOO');
-        m::close();
     }
 
     protected function getAppMock($file)
     {
-        $app = m::mock(Application::class);
+        $app = Mockery::mock(Application::class);
 
-        $app->shouldReceive('configurationIsCached')
-            ->once()->with()->andReturn(false);
-        $app->shouldReceive('runningInConsole')
-            ->once()->with()->andReturn(false);
-        $app->shouldReceive('environmentPath')
-            ->once()->with()->andReturn(__DIR__.'/../fixtures');
-        $app->shouldReceive('environmentFile')
-            ->once()->with()->andReturn($file);
+        $app->expects('configurationIsCached')
+            ->with()->andReturn(false);
+        $app->expects('runningInConsole')
+            ->with()->andReturn(false);
+        $app->expects('environmentPath')
+            ->with()->andReturn(__DIR__.'/../fixtures');
+        $app->expects('environmentFile')
+            ->with()->andReturn($file);
 
         return $app;
     }

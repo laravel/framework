@@ -22,8 +22,6 @@ class ValidationRuleCanTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->user = new stdClass;
 
         Container::setInstance($this->container = new Container);
@@ -57,7 +55,7 @@ class ValidationRuleCanTest extends TestCase
     public function testValidationFails()
     {
         $this->gate()->define('update-company', function ($user, $value) {
-            $this->assertEquals('1', $value);
+            $this->assertSame('1', $value);
 
             return false;
         });
@@ -76,7 +74,7 @@ class ValidationRuleCanTest extends TestCase
         $this->gate()->define('update-company', function ($user, $class, $model, $value) {
             $this->assertEquals(\App\Models\Company::class, $class);
             $this->assertInstanceOf(stdClass::class, $model);
-            $this->assertEquals('1', $value);
+            $this->assertSame('1', $value);
 
             return true;
         });

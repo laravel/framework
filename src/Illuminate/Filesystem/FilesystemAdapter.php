@@ -10,6 +10,7 @@ use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Image;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
@@ -37,7 +38,6 @@ use PHPUnit\Framework\Assert as PHPUnit;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Throwable;
 
 /**
  * @mixin \League\Flysystem\FilesystemOperator
@@ -90,6 +90,13 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @var \Closure|null
      */
     protected $temporaryUrlCallback;
+
+    /**
+     * The temporary upload URL builder callback.
+     *
+     * @var \Closure|null
+     */
+    protected $temporaryUploadUrlCallback;
 
     /**
      * Create a new filesystem adapter instance.
@@ -202,6 +209,18 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Assert that the disk contains no files.
+     *
+     * @return $this
+     */
+    public function assertEmpty()
+    {
+        PHPUnit::assertEmpty($this->allFiles(), 'Disk is not empty.');
+
+        return $this;
+    }
+
+    /**
      * Determine if a file or directory exists.
      *
      * @param  string  $path
@@ -289,7 +308,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->read($path);
         } catch (UnableToReadFile $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
         }
@@ -317,6 +338,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  array  $headers
      * @param  string|null  $disposition
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     *
+     * @throws UnableToRetrieveMetadata
      */
     public function response($path, $name = null, array $headers = [], $disposition = 'inline')
     {
@@ -354,6 +377,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string|null  $name
      * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     *
+     * @throws UnableToRetrieveMetadata
      */
     public function serve(Request $request, $path, $name = null, array $headers = [])
     {
@@ -369,10 +394,20 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string|null  $name
      * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     *
+     * @throws UnableToRetrieveMetadata
      */
     public function download($path, $name = null, array $headers = [])
     {
         return $this->response($path, $name, $headers, 'attachment');
+    }
+
+    /**
+     * Create an image instance from a file in storage.
+     */
+    public function image(string $path): Image
+    {
+        return new Image(fn () => $this->get($path));
     }
 
     /**
@@ -419,7 +454,9 @@ class FilesystemAdapter implements CloudFilesystemContract
                 ? $this->driver->writeStream($path, $contents, $options)
                 : $this->driver->write($path, $contents, $options);
         } catch (UnableToWriteFile|UnableToSetVisibility $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -506,7 +543,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->setVisibility($path, $this->parseVisibility($visibility));
         } catch (UnableToSetVisibility $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -566,7 +605,9 @@ class FilesystemAdapter implements CloudFilesystemContract
             try {
                 $this->driver->delete($path);
             } catch (UnableToDeleteFile $e) {
-                throw_if($this->throwsExceptions(), $e);
+                if ($this->throwsExceptions()) {
+                    throw $e;
+                }
 
                 $this->report($e);
 
@@ -589,7 +630,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->copy($from, $to);
         } catch (UnableToCopyFile $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -611,7 +654,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->move($from, $to);
         } catch (UnableToMoveFile $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -644,7 +689,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->checksum($path, $options);
         } catch (UnableToProvideChecksum $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -657,13 +704,17 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @return string|false
+     *
+     * @throws UnableToRetrieveMetadata
      */
     public function mimeType($path)
     {
         try {
             return $this->driver->mimeType($path);
         } catch (UnableToRetrieveMetadata $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
         }
@@ -690,7 +741,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->readStream($path);
         } catch (UnableToReadFile $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
         }
@@ -704,7 +757,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->writeStream($path, $resource, $options);
         } catch (UnableToWriteFile|UnableToSetVisibility $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -794,6 +849,16 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Determine if temporary upload URLs can be generated.
+     *
+     * @return bool
+     */
+    public function providesTemporaryUploadUrls()
+    {
+        return method_exists($this->adapter, 'temporaryUploadUrl') || isset($this->temporaryUploadUrlCallback);
+    }
+
+    /**
      * Get a temporary URL for the file at the given path.
      *
      * @param  string  $path
@@ -834,6 +899,12 @@ class FilesystemAdapter implements CloudFilesystemContract
             return $this->adapter->temporaryUploadUrl($path, $expiration, $options);
         }
 
+        if ($this->temporaryUploadUrlCallback) {
+            return $this->temporaryUploadUrlCallback->bindTo($this, static::class)(
+                $path, $expiration, $options
+            );
+        }
+
         throw new RuntimeException('This driver does not support creating temporary upload URLs.');
     }
 
@@ -871,7 +942,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string|null  $directory
      * @param  bool  $recursive
-     * @return array
+     * @return array<string>
      */
     public function files($directory = null, $recursive = false)
     {
@@ -890,7 +961,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Get all of the files from the given directory (recursive).
      *
      * @param  string|null  $directory
-     * @return array
+     * @return array<string>
      */
     public function allFiles($directory = null)
     {
@@ -902,7 +973,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string|null  $directory
      * @param  bool  $recursive
-     * @return array
+     * @return array<string>
      */
     public function directories($directory = null, $recursive = false)
     {
@@ -920,7 +991,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Get all the directories within a given directory (recursive).
      *
      * @param  string|null  $directory
-     * @return array
+     * @return array<string>
      */
     public function allDirectories($directory = null)
     {
@@ -938,7 +1009,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->createDirectory($path);
         } catch (UnableToCreateDirectory|UnableToSetVisibility $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -959,7 +1032,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->deleteDirectory($directory);
         } catch (UnableToDeleteDirectory $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -1043,6 +1118,17 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Define a custom temporary upload URL builder callback.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function buildTemporaryUploadUrlsUsing(Closure $callback)
+    {
+        $this->temporaryUploadUrlCallback = $callback;
+    }
+
+    /**
      * Determine if Flysystem exceptions should be thrown.
      *
      * @return bool
@@ -1053,10 +1139,12 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
-     * @param  Throwable  $exception
+     * Report the exception.
+     *
+     * @param  \Throwable  $exception
      * @return void
      *
-     * @throws Throwable
+     * @throws \Throwable
      */
     protected function report($exception)
     {

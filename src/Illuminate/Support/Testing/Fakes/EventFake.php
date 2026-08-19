@@ -142,7 +142,7 @@ class EventFake implements Dispatcher, Fake
         }
 
         PHPUnit::assertTrue(
-            $this->dispatched($event, $callback)->count() > 0,
+            $this->dispatched($event, $callback)->isNotEmpty(),
             "The expected [{$event}] event was not dispatched."
         );
     }
@@ -151,7 +151,6 @@ class EventFake implements Dispatcher, Fake
      * Assert if an event was dispatched exactly once.
      *
      * @param  string  $event
-     * @param  int  $times
      * @return void
      */
     public function assertDispatchedOnce($event)
@@ -348,12 +347,11 @@ class EventFake implements Dispatcher, Fake
         }
 
         return (new Collection($this->eventsToFake))
-            ->filter(function ($event) use ($eventName, $payload) {
+            ->contains(function ($event) use ($eventName, $payload) {
                 return $event instanceof Closure
                     ? $event($eventName, $payload)
                     : $event === $eventName;
-            })
-            ->isNotEmpty();
+            });
     }
 
     /**
@@ -388,12 +386,11 @@ class EventFake implements Dispatcher, Fake
         }
 
         return (new Collection($this->eventsToDispatch))
-            ->filter(function ($event) use ($eventName, $payload) {
+            ->contains(function ($event) use ($eventName, $payload) {
                 return $event instanceof Closure
                     ? $event($eventName, $payload)
                     : $event === $eventName;
-            })
-            ->isNotEmpty();
+            });
     }
 
     /**

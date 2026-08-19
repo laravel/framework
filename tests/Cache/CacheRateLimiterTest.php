@@ -5,23 +5,19 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Cache\Repository as Cache;
-use Mockery as m;
+use Illuminate\Support\Carbon;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class CacheRateLimiterTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testTooManyAttemptsReturnTrueIfAlreadyLockedOut()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(1);
-        $cache->shouldReceive('has')->once()->with('key:timer')->andReturn(true);
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('get')->with('key', 0)->andReturn(1);
+        $cache->expects('has')->with('key:timer')->andReturn(true);
         $cache->shouldReceive('add')->never();
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache->expects('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 
         $this->assertTrue($rateLimiter->tooManyAttempts('key', 1));
@@ -29,11 +25,11 @@ class CacheRateLimiterTest extends TestCase
 
     public function testHitProperlyIncrementsAttemptCount()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
-        $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturn(true);
-        $cache->shouldReceive('increment')->once()->with('key', 1)->andReturn(1);
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('add')->with('key:timer', Mockery::type('int'), 1)->andReturn(true);
+        $cache->expects('add')->with('key', 0, 1)->andReturn(true);
+        $cache->expects('increment')->with('key', 1)->andReturn(1);
+        $cache->expects('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 
         $rateLimiter->hit('key', 1);
@@ -41,11 +37,11 @@ class CacheRateLimiterTest extends TestCase
 
     public function testIncrementProperlyIncrementsAttemptCount()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
-        $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturn(true);
-        $cache->shouldReceive('increment')->once()->with('key', 5)->andReturn(5);
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('add')->with('key:timer', Mockery::type('int'), 1)->andReturn(true);
+        $cache->expects('add')->with('key', 0, 1)->andReturn(true);
+        $cache->expects('increment')->with('key', 5)->andReturn(5);
+        $cache->expects('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 
         $rateLimiter->increment('key', 1, 5);
@@ -53,11 +49,11 @@ class CacheRateLimiterTest extends TestCase
 
     public function testDecrementProperlyDecrementsAttemptCount()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
-        $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturn(true);
-        $cache->shouldReceive('increment')->once()->with('key', -5)->andReturn(-5);
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('add')->with('key:timer', Mockery::type('int'), 1)->andReturn(true);
+        $cache->expects('add')->with('key', 0, 1)->andReturn(true);
+        $cache->expects('increment')->with('key', -5)->andReturn(-5);
+        $cache->expects('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 
         $rateLimiter->decrement('key', 1, 5);
@@ -65,22 +61,47 @@ class CacheRateLimiterTest extends TestCase
 
     public function testHitHasNoMemoryLeak()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
-        $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturn(false);
-        $cache->shouldReceive('increment')->once()->with('key', 1)->andReturn(1);
-        $cache->shouldReceive('put')->once()->with('key', 1, 1);
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('add')->with('key:timer', Mockery::type('int'), 1)->andReturn(true);
+        $cache->expects('add')->with('key', 0, 1)->andReturn(false);
+        $cache->expects('increment')->with('key', 1)->andReturn(1);
+        $cache->expects('put')->with('key', 1, 1);
+        $cache->expects('getStore')->times(2)->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 
         $rateLimiter->hit('key', 1);
     }
 
+    public function testIncrementWithCustomAmountHasNoMemoryLeak()
+    {
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('add')->with('key:timer', Mockery::type('int'), 60)->andReturn(true);
+        $cache->expects('add')->with('key', 0, 60)->andReturn(false);
+        $cache->expects('increment')->with('key', 2)->andReturn(2);
+        $cache->expects('put')->with('key', 2, 60);
+        $cache->expects('getStore')->times(2)->andReturn(new ArrayStore);
+        $rateLimiter = new RateLimiter($cache);
+
+        $rateLimiter->increment('key', 60, 2);
+    }
+
+    public function testRemainingIsNotNegative(): void
+    {
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('get')->times(2)->with('key', 0)->andReturn(5);
+        $cache->expects('getStore')->times(2)->andReturn(new ArrayStore);
+
+        $rateLimiter = new RateLimiter($cache);
+
+        $this->assertSame(0, $rateLimiter->remaining('key', 3));
+        $this->assertSame(0, $rateLimiter->retriesLeft('key', 3));
+    }
+
     public function testRetriesLeftReturnsCorrectCount()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(3);
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('get')->with('key', 0)->andReturn(3);
+        $cache->expects('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 
         $this->assertEquals(2, $rateLimiter->retriesLeft('key', 5));
@@ -88,9 +109,9 @@ class CacheRateLimiterTest extends TestCase
 
     public function testClearClearsTheCacheKeys()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('forget')->once()->with('key');
-        $cache->shouldReceive('forget')->once()->with('key:timer');
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('forget')->with('key');
+        $cache->expects('forget')->with('key:timer');
         $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 
@@ -99,9 +120,8 @@ class CacheRateLimiterTest extends TestCase
 
     public function testAvailableInReturnsPositiveValues()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->andReturn(now()->subSeconds(60)->getTimestamp(), null);
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('get')->times(2)->andReturn(Carbon::now()->subMinute()->getTimestamp(), null);
         $rateLimiter = new RateLimiter($cache);
 
         $this->assertTrue($rateLimiter->availableIn('key:timer') >= 0);
@@ -110,12 +130,12 @@ class CacheRateLimiterTest extends TestCase
 
     public function testAttemptsCallbackReturnsTrue()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(0);
-        $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1);
-        $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturns(1);
-        $cache->shouldReceive('increment')->once()->with('key', 1)->andReturn(1);
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('get')->with('key', 0)->andReturn(0);
+        $cache->expects('add')->with('key:timer', Mockery::type('int'), 1);
+        $cache->expects('add')->with('key', 0, 1)->andReturns(1);
+        $cache->expects('increment')->with('key', 1)->andReturn(1);
+        $cache->expects('getStore')->times(2)->andReturn(new ArrayStore);
 
         $executed = false;
 
@@ -129,12 +149,12 @@ class CacheRateLimiterTest extends TestCase
 
     public function testAttemptsCallbackReturnsCallbackReturn()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->times(6)->with('key', 0)->andReturn(0);
-        $cache->shouldReceive('add')->times(6)->with('key:timer', m::type('int'), 1);
-        $cache->shouldReceive('add')->times(6)->with('key', 0, 1)->andReturns(1);
-        $cache->shouldReceive('increment')->times(6)->with('key', 1)->andReturn(1);
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('get')->times(6)->with('key', 0)->andReturn(0);
+        $cache->expects('add')->times(6)->with('key:timer', Mockery::type('int'), 1);
+        $cache->expects('add')->times(6)->with('key', 0, 1)->andReturns(1);
+        $cache->expects('increment')->times(6)->with('key', 1)->andReturn(1);
+        $cache->expects('getStore')->times(12)->andReturn(new ArrayStore);
 
         $rateLimiter = new RateLimiter($cache);
 
@@ -142,7 +162,7 @@ class CacheRateLimiterTest extends TestCase
             return 'foo';
         }, 1));
 
-        $this->assertSame(false, $rateLimiter->attempt('key', 1, function () {
+        $this->assertFalse($rateLimiter->attempt('key', 1, function () {
             return false;
         }, 1));
 
@@ -165,10 +185,10 @@ class CacheRateLimiterTest extends TestCase
 
     public function testAttemptsCallbackReturnsFalse()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(2);
-        $cache->shouldReceive('has')->once()->with('key:timer')->andReturn(true);
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('get')->with('key', 0)->andReturn(2);
+        $cache->expects('has')->with('key:timer')->andReturn(true);
+        $cache->expects('getStore')->andReturn(new ArrayStore);
 
         $executed = false;
 
@@ -182,11 +202,11 @@ class CacheRateLimiterTest extends TestCase
 
     public function testKeysAreSanitizedFromUnicodeCharacters()
     {
-        $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->once()->with('john', 0)->andReturn(1);
-        $cache->shouldReceive('has')->once()->with('john:timer')->andReturn(true);
+        $cache = Mockery::mock(Cache::class);
+        $cache->expects('get')->with('john', 0)->andReturn(1);
+        $cache->expects('has')->with('john:timer')->andReturn(true);
         $cache->shouldReceive('add')->never();
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache->expects('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 
         $this->assertTrue($rateLimiter->tooManyAttempts('jôhn', 1));
@@ -194,16 +214,16 @@ class CacheRateLimiterTest extends TestCase
 
     public function testKeyIsSanitizedOnlyOnce()
     {
-        $cache = m::mock(Cache::class);
+        $cache = Mockery::mock(Cache::class);
         $rateLimiter = new RateLimiter($cache);
 
         $key = "john'doe";
         $cleanedKey = $rateLimiter->cleanRateLimiterKey($key);
 
-        $cache->shouldReceive('get')->once()->with($cleanedKey, 0)->andReturn(1);
-        $cache->shouldReceive('has')->once()->with("$cleanedKey:timer")->andReturn(true);
+        $cache->expects('get')->with($cleanedKey, 0)->andReturn(1);
+        $cache->expects('has')->with("$cleanedKey:timer")->andReturn(true);
         $cache->shouldReceive('add')->never();
-        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $cache->expects('getStore')->andReturn(new ArrayStore);
 
         $this->assertTrue($rateLimiter->tooManyAttempts($key, 1));
     }

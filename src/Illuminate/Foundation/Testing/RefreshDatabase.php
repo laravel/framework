@@ -85,10 +85,28 @@ trait RefreshDatabase
 
             $this->app[Kernel::class]->setArtisan(null);
 
+            $this->updateLocalCacheOfInMemoryDatabases();
+
             RefreshDatabaseState::$migrated = true;
         }
 
         $this->beginDatabaseTransaction();
+    }
+
+    /**
+     * Update locally cached in-memory PDO connections after migration.
+     *
+     * @return void
+     */
+    protected function updateLocalCacheOfInMemoryDatabases()
+    {
+        $database = $this->app->make('db');
+
+        foreach ($this->connectionsToTransact() as $name) {
+            if ($this->usingInMemoryDatabase($name)) {
+                RefreshDatabaseState::$inMemoryConnections[$name] = $database->connection($name)->getPdo();
+            }
+        }
     }
 
     /**

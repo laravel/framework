@@ -8,7 +8,7 @@ use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SessionHandlerInterface;
@@ -16,15 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSessionIsLoadedFromHandler()
     {
         $session = $this->getSession();
-        $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize(['foo' => 'bar', 'bagged' => ['name' => 'taylor'], '123' => 'bax']));
+        $session->getHandler()->expects('read')->with($this->getSessionId())->andReturn(serialize(['foo' => 'bar', 'bagged' => ['name' => 'taylor'], '123' => 'bax']));
         $session->start();
 
         $this->assertSame('bar', $session->get('foo'));
@@ -49,7 +44,7 @@ class SessionStoreTest extends TestCase
 
         $session = $this->getSession();
         $oldId = $session->getId();
-        $session->getHandler()->shouldReceive('destroy')->once()->with($oldId);
+        $session->getHandler()->expects('destroy')->with($oldId);
         $this->assertTrue($session->migrate(true));
         $this->assertNotEquals($oldId, $session->getId());
     }
@@ -90,7 +85,7 @@ class SessionStoreTest extends TestCase
         $session->flash('name', 'Taylor');
         $this->assertTrue($session->has('name'));
 
-        $session->getHandler()->shouldReceive('destroy')->once()->with($oldId);
+        $session->getHandler()->expects('destroy')->with($oldId);
         $this->assertTrue($session->invalidate());
 
         $this->assertFalse($session->has('name'));
@@ -101,12 +96,12 @@ class SessionStoreTest extends TestCase
     public function testBrandNewSessionIsProperlySaved()
     {
         $session = $this->getSession();
-        $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([]));
+        $session->getHandler()->expects('read')->andReturn(serialize([]));
         $session->start();
         $session->put('foo', 'bar');
         $session->flash('baz', 'boom');
         $session->now('qux', 'norf');
-        $session->getHandler()->shouldReceive('write')->once()->with(
+        $session->getHandler()->expects('write')->with(
             $this->getSessionId(),
             serialize([
                 '_token' => $session->token(),
@@ -126,7 +121,7 @@ class SessionStoreTest extends TestCase
     public function testSessionIsProperlyUpdated()
     {
         $session = $this->getSession();
-        $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([
+        $session->getHandler()->expects('read')->andReturn(serialize([
             '_token' => Str::random(40),
             'foo' => 'bar',
             'baz' => 'boom',
@@ -137,7 +132,7 @@ class SessionStoreTest extends TestCase
         ]));
         $session->start();
 
-        $session->getHandler()->shouldReceive('write')->once()->with(
+        $session->getHandler()->expects('write')->with(
             $this->getSessionId(),
             serialize([
                 '_token' => $session->token(),
@@ -157,7 +152,7 @@ class SessionStoreTest extends TestCase
     public function testSessionIsReSavedWhenNothingHasChanged()
     {
         $session = $this->getSession();
-        $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([
+        $session->getHandler()->expects('read')->andReturn(serialize([
             '_token' => Str::random(40),
             'foo' => 'bar',
             'baz' => 'boom',
@@ -168,7 +163,7 @@ class SessionStoreTest extends TestCase
         ]));
         $session->start();
 
-        $session->getHandler()->shouldReceive('write')->once()->with(
+        $session->getHandler()->expects('write')->with(
             $this->getSessionId(),
             serialize([
                 '_token' => $session->token(),
@@ -191,7 +186,7 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $oldId = $session->getId();
         $token = Str::random(40);
-        $session->getHandler()->shouldReceive('read')->once()->with($oldId)->andReturn(serialize([
+        $session->getHandler()->expects('read')->with($oldId)->andReturn(serialize([
             '_token' => $token,
             'foo' => 'bar',
             'baz' => 'boom',
@@ -208,7 +203,7 @@ class SessionStoreTest extends TestCase
 
         $this->assertNotEquals($newId, $oldId);
 
-        $session->getHandler()->shouldReceive('write')->once()->with(
+        $session->getHandler()->expects('write')->with(
             $newId,
             serialize([
                 '_token' => $token,
@@ -294,13 +289,13 @@ class SessionStoreTest extends TestCase
         $session->flash('foo', 'bar');
         $session->put('fu', 'baz');
         $session->put('_flash.old', ['qu']);
-        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
-        $this->assertFalse(array_search('fu', $session->get('_flash.new')));
+        $this->assertContains('foo', $session->get('_flash.new'));
+        $this->assertNotContains('fu', $session->get('_flash.new'));
         $session->keep(['fu', 'qu']);
-        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
-        $this->assertNotFalse(array_search('fu', $session->get('_flash.new')));
-        $this->assertNotFalse(array_search('qu', $session->get('_flash.new')));
-        $this->assertFalse(array_search('qu', $session->get('_flash.old')));
+        $this->assertContains('foo', $session->get('_flash.new'));
+        $this->assertContains('fu', $session->get('_flash.new'));
+        $this->assertContains('qu', $session->get('_flash.new'));
+        $this->assertNotContains('qu', $session->get('_flash.old'));
     }
 
     public function testReflash()
@@ -309,8 +304,8 @@ class SessionStoreTest extends TestCase
         $session->flash('foo', 'bar');
         $session->put('_flash.old', ['foo']);
         $session->reflash();
-        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
-        $this->assertFalse(array_search('foo', $session->get('_flash.old')));
+        $this->assertContains('foo', $session->get('_flash.new'));
+        $this->assertNotContains('foo', $session->get('_flash.old'));
     }
 
     public function testReflashWithNow()
@@ -318,8 +313,8 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $session->now('foo', 'bar');
         $session->reflash();
-        $this->assertNotFalse(array_search('foo', $session->get('_flash.new')));
-        $this->assertFalse(array_search('foo', $session->get('_flash.old')));
+        $this->assertContains('foo', $session->get('_flash.new'));
+        $this->assertNotContains('foo', $session->get('_flash.old'));
     }
 
     public function testOnly()
@@ -425,9 +420,9 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->handlerNeedsRequest());
         $session->getHandler()->shouldReceive('setRequest')->never();
 
-        $session = new Store('test', m::mock(new CookieSessionHandler(new CookieJar, 60, false)));
+        $session = new Store('test', Mockery::mock(new CookieSessionHandler(new CookieJar, 60, false)));
         $this->assertTrue($session->handlerNeedsRequest());
-        $session->getHandler()->shouldReceive('setRequest')->once();
+        $session->getHandler()->expects('setRequest');
         $request = new Request;
         $session->setRequestOnHandler($request);
     }
@@ -571,10 +566,174 @@ class SessionStoreTest extends TestCase
         $this->assertTrue($session->missing(['hulk.two']));
     }
 
+    public function testBackedEnumKeyPut()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+
+        $this->assertSame('Taylor', $session->get('user'));
+        $this->assertSame('Taylor', $session->get(SessionTestKey::User));
+    }
+
+    public function testBackedEnumKeyGet()
+    {
+        $session = $this->getSession();
+        $session->put('user', 'Taylor');
+
+        $this->assertSame('Taylor', $session->get(SessionTestKey::User));
+        $this->assertSame('default', $session->get(SessionTestKey::Settings, 'default'));
+    }
+
+    public function testBackedEnumKeyHas()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+        $session->put(SessionTestKey::Settings, 'dark-mode');
+
+        $this->assertTrue($session->has(SessionTestKey::User));
+        $this->assertTrue($session->has(SessionTestKey::User, SessionTestKey::Settings));
+        $this->assertTrue($session->has([SessionTestKey::User, SessionTestKey::Settings]));
+        $this->assertFalse($session->has(SessionTestKey::Preference));
+    }
+
+    public function testBackedEnumKeyHasAny()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+        $session->put(SessionTestKey::Settings, 'dark-mode');
+
+        $this->assertTrue($session->hasAny(SessionTestKey::User));
+        $this->assertTrue($session->hasAny('user'));
+        $this->assertTrue($session->hasAny(SessionTestKey::User, SessionTestKey::Preference, 'foo'));
+        $this->assertTrue($session->hasAny([SessionTestKey::User, SessionTestKey::Preference, 'foo']));
+
+        $this->assertFalse($session->hasAny(SessionTestKey::Preference));
+        $this->assertFalse($session->hasAny('preference'));
+        $this->assertFalse($session->hasAny(SessionTestKey::Preference, 'foo'));
+        $this->assertFalse($session->hasAny([SessionTestKey::Preference, 'foo']));
+    }
+
+    public function testBackedEnumKeyExists()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+        $session->put(SessionTestKey::Settings, null);
+
+        $this->assertTrue($session->exists(SessionTestKey::User));
+        $this->assertTrue($session->exists(SessionTestKey::Settings));
+        $this->assertFalse($session->exists(SessionTestKey::Preference));
+
+        $this->assertTrue($session->exists('user'));
+        $this->assertFalse($session->exists('preference'));
+    }
+
+    public function testBackedEnumKeyMissing()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+        $session->put(SessionTestKey::Settings, null);
+
+        $this->assertFalse($session->missing(SessionTestKey::User));
+        $this->assertFalse($session->missing(SessionTestKey::Settings));
+        $this->assertTrue($session->missing(SessionTestKey::Preference));
+
+        $this->assertFalse($session->missing('user'));
+        $this->assertTrue($session->missing('preference'));
+    }
+
+    public function testBackedEnumKeyForget()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+        $this->assertTrue($session->has('user'));
+
+        $session->forget(SessionTestKey::User);
+        $this->assertFalse($session->has('user'));
+
+        $session->put(SessionTestKey::User, 'Taylor');
+        $session->put(SessionTestKey::Settings, 'dark-mode');
+        $session->forget([SessionTestKey::User, SessionTestKey::Settings]);
+        $this->assertFalse($session->has('user'));
+        $this->assertFalse($session->has('settings'));
+    }
+
+    public function testBackedEnumKeyPull()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+
+        $this->assertSame('Taylor', $session->pull(SessionTestKey::User));
+        $this->assertNull($session->pull(SessionTestKey::User));
+        $this->assertSame('default', $session->pull(SessionTestKey::User, 'default'));
+    }
+
+    public function testBackedEnumKeyRemember()
+    {
+        $session = $this->getSession();
+
+        $result = $session->remember(SessionTestKey::User, fn () => 'Taylor');
+
+        $this->assertSame('Taylor', $result);
+        $this->assertSame('Taylor', $session->get('user'));
+        $this->assertSame('Taylor', $session->remember(SessionTestKey::User, fn () => 'Otwell'));
+    }
+
+    public function testBackedEnumKeyPush()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, ['Taylor']);
+        $session->push(SessionTestKey::User, 'Otwell');
+
+        $this->assertSame(['Taylor', 'Otwell'], $session->get('user'));
+    }
+
+    public function testBackedEnumKeyIncrement()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 5);
+
+        $this->assertSame(6, $session->increment(SessionTestKey::User));
+        $this->assertSame(6, $session->get('user'));
+
+        $this->assertSame(10, $session->increment(SessionTestKey::User, 4));
+        $this->assertSame(10, $session->get('user'));
+    }
+
+    public function testBackedEnumKeyDecrement()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 5);
+
+        $this->assertSame(4, $session->decrement(SessionTestKey::User));
+        $this->assertSame(4, $session->get('user'));
+    }
+
+    public function testBackedEnumKeyRemove()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+
+        $this->assertSame('Taylor', $session->remove(SessionTestKey::User));
+        $this->assertFalse($session->has('user'));
+    }
+
+    public function testBackedEnumKeyFlash()
+    {
+        $session = $this->getSession();
+        $session->flash(SessionTestKey::User, 'Taylor');
+        $this->assertTrue($session->has(SessionTestKey::User));
+    }
+
+    public function testBackedEnumKeyNow()
+    {
+        $session = $this->getSession();
+        $session->now(SessionTestKey::User, 'Taylor');
+        $this->assertTrue($session->has(SessionTestKey::User));
+    }
+
     public function testRememberMethodCallsPutAndReturnsDefault()
     {
         $session = $this->getSession();
-        $session->getHandler()->shouldReceive('get')->andReturn(null);
         $result = $session->remember('foo', function () {
             return 'bar';
         });
@@ -596,7 +755,7 @@ class SessionStoreTest extends TestCase
     public function testValidationErrorsCanBeSerializedAsJson()
     {
         $session = $this->getSession('json');
-        $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([]));
+        $session->getHandler()->expects('read')->andReturn(serialize([]));
         $session->start();
         $session->put('errors', $errorBag = new ViewErrorBag);
         $messageBag = new MessageBag([
@@ -608,7 +767,7 @@ class SessionStoreTest extends TestCase
         $messageBag->setFormat('<p>:message</p>');
         $errorBag->put('default', $messageBag);
 
-        $session->getHandler()->shouldReceive('write')->once()->with(
+        $session->getHandler()->expects('write')->with(
             $this->getSessionId(),
             json_encode([
                 '_token' => $session->token(),
@@ -637,7 +796,7 @@ class SessionStoreTest extends TestCase
     public function testValidationErrorsCanBeReadAsJson()
     {
         $session = $this->getSession('json');
-        $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(json_encode([
+        $session->getHandler()->expects('read')->with($this->getSessionId())->andReturn(json_encode([
             'errors' => [
                 'default' => [
                     'format' => '<p>:message</p>',
@@ -656,7 +815,7 @@ class SessionStoreTest extends TestCase
 
         $this->assertInstanceOf(ViewErrorBag::class, $errors);
         $this->assertInstanceOf(MessageBag::class, $errors->getBags()['default']);
-        $this->assertEquals('<p>:message</p>', $errors->getBags()['default']->getFormat());
+        $this->assertSame('<p>:message</p>', $errors->getBags()['default']->getFormat());
         $this->assertEquals(['first_name' => [
             'Your first name is required',
             'Your first name must be at least 1 character',
@@ -683,7 +842,7 @@ class SessionStoreTest extends TestCase
     {
         return [
             $this->getSessionName(),
-            m::mock(SessionHandlerInterface::class),
+            Mockery::mock(SessionHandlerInterface::class),
             $this->getSessionId(),
             $serialization,
         ];
@@ -698,4 +857,11 @@ class SessionStoreTest extends TestCase
     {
         return 'name';
     }
+}
+
+enum SessionTestKey: string
+{
+    case User = 'user';
+    case Settings = 'settings';
+    case Preference = 'preference';
 }

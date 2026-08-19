@@ -15,7 +15,7 @@ use Illuminate\Routing\CallableDispatcher;
 use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Router;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -29,8 +29,6 @@ class AuthorizeMiddlewareTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->user = new stdClass;
 
         Container::setInstance($this->container = new Container);
@@ -50,27 +48,24 @@ class AuthorizeMiddlewareTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         Container::setInstance(null);
     }
 
     public function testItCanGenerateDefinitionViaStaticMethod()
     {
-        $signature = (string) Authorize::using('ability');
+        $signature = Authorize::using('ability');
         $this->assertSame('Illuminate\Auth\Middleware\Authorize:ability', $signature);
 
-        $signature = (string) Authorize::using('ability', 'model');
+        $signature = Authorize::using('ability', 'model');
         $this->assertSame('Illuminate\Auth\Middleware\Authorize:ability,model', $signature);
 
-        $signature = (string) Authorize::using('ability', 'model', \App\Models\Comment::class);
+        $signature = Authorize::using('ability', 'model', \App\Models\Comment::class);
         $this->assertSame('Illuminate\Auth\Middleware\Authorize:ability,model,App\Models\Comment', $signature);
     }
 
     public function testSimpleAbilityUnauthorized()
     {
-        $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('This action is unauthorized.');
+        $this->expectExceptionObject(new AuthorizationException('This action is unauthorized.'));
 
         $this->gate()->define('view-dashboard', function ($user, $additional = null) {
             $this->assertNull($additional);
@@ -231,8 +226,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testModelTypeUnauthorized()
     {
-        $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('This action is unauthorized.');
+        $this->expectExceptionObject(new AuthorizationException('This action is unauthorized.'));
 
         $this->gate()->define('create', function ($user, $model) {
             $this->assertSame('App\User', $model);
@@ -272,8 +266,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testModelUnauthorized()
     {
-        $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('This action is unauthorized.');
+        $this->expectExceptionObject(new AuthorizationException('This action is unauthorized.'));
 
         $post = new stdClass;
 
@@ -325,7 +318,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testModelInstanceAsParameter()
     {
-        $instance = m::mock(Model::class);
+        $instance = Mockery::mock(Model::class);
 
         $this->gate()->define('success', function ($user, $model) use ($instance) {
             $this->assertSame($model, $instance);
@@ -333,7 +326,7 @@ class AuthorizeMiddlewareTest extends TestCase
             return true;
         });
 
-        $request = m::mock(Request::class);
+        $request = Mockery::mock(Request::class);
 
         $next = function () {
             //

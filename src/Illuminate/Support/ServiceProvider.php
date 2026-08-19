@@ -73,6 +73,13 @@ abstract class ServiceProvider
     public static array $optimizeClearCommands = [];
 
     /**
+     * Commands that should be run during the "reload" command.
+     *
+     * @var array<string, string>
+     */
+    public static array $reloadCommands = [];
+
+    /**
      * Create a new service provider instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -483,16 +490,7 @@ abstract class ServiceProvider
      */
     protected function optimizes(?string $optimize = null, ?string $clear = null, ?string $key = null)
     {
-        $key ??= (string) Str::of(get_class($this))
-            ->classBasename()
-            ->before('ServiceProvider')
-            ->kebab()
-            ->lower()
-            ->trim();
-
-        if (empty($key)) {
-            $key = class_basename(get_class($this));
-        }
+        $key = $this->getProviderKey($key);
 
         if ($optimize) {
             static::$optimizeCommands[$key] = $optimize;
@@ -501,6 +499,43 @@ abstract class ServiceProvider
         if ($clear) {
             static::$optimizeClearCommands[$key] = $clear;
         }
+    }
+
+    /**
+     * Register commands that should run on "reload".
+     *
+     * @param  string|null  $reload
+     * @param  string|null  $key
+     * @return void
+     */
+    protected function reloads(string $reload, ?string $key = null)
+    {
+        $key = $this->getProviderKey($key);
+
+        static::$reloadCommands[$key] = $reload;
+    }
+
+    /**
+     * Get a short descriptive key for the current service provider.
+     *
+     * @param  string|null  $key
+     * @return string
+     */
+    protected function getProviderKey(?string $key = null): string
+    {
+        $key ??= (new Stringable(get_class($this)))
+            ->classBasename()
+            ->before('ServiceProvider')
+            ->kebab()
+            ->lower()
+            ->trim()
+            ->value();
+
+        if (empty($key)) {
+            $key = class_basename(get_class($this));
+        }
+
+        return $key;
     }
 
     /**
@@ -609,7 +644,7 @@ return [
             ->values()
             ->when(
                 $strict,
-                static fn (Collection $providerCollection) => $providerCollection->reject(fn (string $p) => in_array($p, $providersToRemove, true)),
+                static fn (Collection $providerCollection) => $providerCollection->diff($providersToRemove),
                 static fn (Collection $providerCollection) => $providerCollection->reject(fn (string $p) => Str::contains($p, $providersToRemove))
             )
             ->map(fn ($p) => '    '.$p.'::class,')

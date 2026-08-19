@@ -63,7 +63,9 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      * If no arguments are passed, the default email rule configuration will be returned.
      *
      * @param  static|callable|null  $callback
-     * @return static|void
+     * @return ($callback is null ? static : void)
+     *
+     * @throws \InvalidArgumentException
      */
     public static function defaults($callback = null)
     {

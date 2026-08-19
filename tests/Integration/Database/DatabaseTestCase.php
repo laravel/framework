@@ -12,7 +12,7 @@ abstract class DatabaseTestCase extends TestCase
     /**
      * The current database driver.
      *
-     * @return string
+     * @var string
      */
     protected $driver;
 

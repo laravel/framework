@@ -43,14 +43,16 @@ trait HasCollection
      */
     public function resolveCollectionFromAttribute()
     {
-        $reflectionClass = new ReflectionClass(static::class);
+        $reflection = new ReflectionClass(static::class);
 
-        $attributes = $reflectionClass->getAttributes(CollectedBy::class);
+        do {
+            $attributes = $reflection->getAttributes(CollectedBy::class);
 
-        if (! isset($attributes[0]) || ! isset($attributes[0]->getArguments()[0])) {
-            return;
-        }
+            if (isset($attributes[0], $attributes[0]->getArguments()[0])) {
+                return $attributes[0]->getArguments()[0];
+            }
+        } while ($reflection = $reflection->getParentClass());
 
-        return $attributes[0]->getArguments()[0];
+        return null;
     }
 }

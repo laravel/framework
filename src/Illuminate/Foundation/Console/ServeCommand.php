@@ -10,7 +10,6 @@ use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
@@ -23,11 +22,15 @@ class ServeCommand extends Command
     use InteractsWithTime;
 
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'serve';
+    protected $signature = 'serve
+                    {--host= : The host address to serve the application on}
+                    {--port= : The port to serve the application on}
+                    {--tries=10 : The max number of ports to attempt to serve from}
+                    {--no-reload : Do not reload the development server on .env file changes}';
 
     /**
      * The console command description.
@@ -82,6 +85,7 @@ class ServeCommand extends Command
         'HERD_PHP_82_INI_SCAN_DIR',
         'HERD_PHP_83_INI_SCAN_DIR',
         'HERD_PHP_84_INI_SCAN_DIR',
+        'HERD_PHP_85_INI_SCAN_DIR',
         'IGNITION_LOCAL_SITES_PATH',
         'LARAVEL_SAIL',
         'PATH',
@@ -92,9 +96,18 @@ class ServeCommand extends Command
         'XDEBUG_SESSION',
     ];
 
+    #[\Override]
+    protected function configureDefaults(): void
+    {
+        // The host and port default to whatever is configured via the environment, so
+        // they can't be expressed as static defaults in the signature above.
+        $this->getDefinition()->getOption('host')->setDefault(Env::get('SERVER_HOST', '127.0.0.1'));
+        $this->getDefinition()->getOption('port')->setDefault(Env::get('SERVER_PORT'));
+    }
+
     /** {@inheritdoc} */
     #[\Override]
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->phpServerWorkers = transform((int) env('PHP_CLI_SERVER_WORKERS', 1), function (int $workers) {
             if ($workers < 2) {
@@ -104,6 +117,8 @@ class ServeCommand extends Command
             if ($workers > 1 &&
                 ! $this->option('no-reload') &&
                 ! (int) env('LARAVEL_SAIL', 0)) {
+                $this->components->warn('Unable to respect the `PHP_CLI_SERVER_WORKERS` environment variable without the `--no-reload` flag. Only creating a single server.');
+
                 return false;
             }
 
@@ -130,7 +145,7 @@ class ServeCommand extends Command
 
         $environmentLastModified = $hasEnvironment
             ? filemtime($environmentFile)
-            : now()->addDays(30)->getTimestamp();
+            : Carbon::now()->addDays(30)->getTimestamp();
 
         $process = $this->startProcess($hasEnvironment);
 
@@ -182,7 +197,7 @@ class ServeCommand extends Command
                 return [$key => $value];
             }
 
-            return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
+            return $this->shouldPassThroughEnvironmentVariable($key) ? [$key => $value] : [$key => false];
         })->merge(['PHP_CLI_SERVER_WORKERS' => $this->phpServerWorkers])->all());
 
         $this->trap(fn () => [SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], function ($signal) use ($process) {
@@ -254,7 +269,7 @@ class ServeCommand extends Command
      */
     protected function getHostAndPort()
     {
-        if (preg_match('/(\[.*\]):?([0-9]+)?/', $this->input->getOption('host'), $matches) !== false) {
+        if (preg_match('/(\[.*\]):?([0-9]+)?/', $this->input->getOption('host'), $matches) === 1) {
             return [
                 $matches[1] ?? $this->input->getOption('host'),
                 $matches[2] ?? null,
@@ -278,6 +293,21 @@ class ServeCommand extends Command
     {
         return is_null($this->input->getOption('port')) &&
             ($this->input->getOption('tries') > $this->portOffset);
+    }
+
+    /**
+     * Determine if the environment variable should be passed to the PHP server process.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function shouldPassThroughEnvironmentVariable($key)
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            return in_array(strtoupper($key), array_map(strtoupper(...), static::$passthroughVariables), true);
+        }
+
+        return in_array($key, static::$passthroughVariables, true);
     }
 
     /**
@@ -405,6 +435,8 @@ class ServeCommand extends Command
      *
      * @param  string  $line
      * @return int
+     *
+     * @throws \InvalidArgumentException
      */
     public static function getRequestPortFromLine($line)
     {
@@ -415,20 +447,5 @@ class ServeCommand extends Command
         }
 
         return (int) $matches[2];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on', Env::get('SERVER_HOST', '127.0.0.1')],
-            ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', Env::get('SERVER_PORT')],
-            ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
-            ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
-        ];
     }
 }

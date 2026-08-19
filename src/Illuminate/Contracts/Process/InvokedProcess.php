@@ -12,6 +12,13 @@ interface InvokedProcess
     public function id();
 
     /**
+     * Get the command line for the process.
+     *
+     * @return string
+     */
+    public function command();
+
+    /**
      * Send a signal to the process.
      *
      * @param  int  $signal

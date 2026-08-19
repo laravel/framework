@@ -37,4 +37,11 @@ class MultipleInstanceManagerTest extends TestCase
 
         $instance = $manager->instance('missing');
     }
+
+    public function test_custom_driver_closure_bound_object_is_multiple_instance_manager()
+    {
+        $manager = new MultipleInstanceManager($this->app);
+        $manager->extend('custom', fn () => $this);
+        $this->assertSame($manager, $manager->instance('custom'));
+    }
 }

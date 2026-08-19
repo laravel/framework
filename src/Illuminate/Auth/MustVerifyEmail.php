@@ -17,7 +17,7 @@ trait MustVerifyEmail
     }
 
     /**
-     * Mark the given user's email as verified.
+     * Mark the user's email as verified.
      *
      * @return bool
      */
@@ -25,6 +25,18 @@ trait MustVerifyEmail
     {
         return $this->forceFill([
             'email_verified_at' => $this->freshTimestamp(),
+        ])->save();
+    }
+
+    /**
+     * Mark the user's email as unverified.
+     *
+     * @return bool
+     */
+    public function markEmailAsUnverified()
+    {
+        return $this->forceFill([
+            'email_verified_at' => null,
         ])->save();
     }
 

@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Events\VendorTagPublished;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use League\Flysystem\Filesystem as Flysystem;
@@ -94,7 +95,7 @@ class VendorPublishCommand extends Command
      */
     public function handle()
     {
-        $this->publishedAt = now();
+        $this->publishedAt = Carbon::now();
 
         $this->determineWhatShouldBePublished();
 
@@ -140,11 +141,11 @@ class VendorPublishCommand extends Command
             )
             : search(
                 label: "Which provider or tag's files would you like to publish?",
-                placeholder: 'Search...',
                 options: fn ($search) => array_values(array_filter(
                     $choices,
                     fn ($choice) => str_contains(strtolower($choice), strtolower($search))
                 )),
+                placeholder: 'Search...',
                 scroll: 15,
             );
 
@@ -190,7 +191,7 @@ class VendorPublishCommand extends Command
      * Publishes the assets for a tag.
      *
      * @param  string  $tag
-     * @return mixed
+     * @return void
      */
     protected function publishTag($tag)
     {
@@ -357,7 +358,7 @@ class VendorPublishCommand extends Command
             $path = realpath($path);
 
             if ($from === $path && preg_match('/\d{4}_(\d{2})_(\d{2})_(\d{6})_/', $to)) {
-                $this->publishedAt->addSecond();
+                $this->publishedAt = $this->publishedAt->addSecond();
 
                 return preg_replace(
                     '/\d{4}_(\d{2})_(\d{2})_(\d{6})_/',

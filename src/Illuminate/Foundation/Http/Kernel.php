@@ -12,7 +12,7 @@ use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Routing\Pipeline;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\InteractsWithTime;
 use InvalidArgumentException;
 use Throwable;
@@ -165,7 +165,7 @@ class Kernel implements KernelContract
     {
         $this->app->instance('request', $request);
 
-        Facade::clearResolvedInstance('request');
+        Request::clearResolvedInstance();
 
         $this->bootstrap();
 
@@ -577,7 +577,7 @@ class Kernel implements KernelContract
     /**
      * Get the application's global middleware.
      *
-     * @return array
+     * @return array<int, class-string|string>
      */
     public function getGlobalMiddleware()
     {
@@ -602,7 +602,7 @@ class Kernel implements KernelContract
     /**
      * Get the application's route middleware groups.
      *
-     * @return array
+     * @return array<string, array<int, class-string|string>>
      */
     public function getMiddlewareGroups()
     {

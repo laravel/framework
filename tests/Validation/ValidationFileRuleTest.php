@@ -12,6 +12,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ValidationFileRuleTest extends TestCase
@@ -357,6 +358,48 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testEncoding()
+    {
+        // ASCII file containing UTF-8.
+        $this->fails(
+            File::default()->encoding('ascii'),
+            UploadedFile::fake()->createWithContent('foo.txt', '✌️'),
+            ['validation.encoding'],
+        );
+
+        // UTF-8 file containing invalid UTF-8 byte sequence.
+        $this->fails(
+            File::default()->encoding('utf-8'),
+            UploadedFile::fake()->createWithContent('foo.txt', "\xf0\x28\x8c\x28"),
+            ['validation.encoding'],
+        );
+
+        $this->passes(
+            File::default()->encoding('utf-8'),
+            UploadedFile::fake()->createWithContent('foo.txt', '✌️'),
+        );
+
+        $this->passes(
+            File::default()->encoding('utf-8'),
+            [
+                UploadedFile::fake()->createWithContent('foo-1.txt', '✌️'),
+                UploadedFile::fake()->createWithContent('foo-2.txt', '👍'),
+            ]
+        );
+    }
+
+    public function testEncodingWithInvalidParameter()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Validation rule encoding parameter [FOOBAR] is not a valid encoding.'));
+
+        // Invalid encoding.
+        $this->fails(
+            File::default()->encoding('FOOBAR'),
+            UploadedFile::fake()->createWithContent('foo.txt', ''),
+            ['validation.encoding'],
+        );
+    }
+
     public function testMacro()
     {
         File::macro('toDocument', function () {
@@ -435,7 +478,7 @@ class ValidationFileRuleTest extends TestCase
             UploadedFile::fake()->create('foo.png', 1000000000)
         );
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         File::image()->size('10xyz');
     }
 

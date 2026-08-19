@@ -9,17 +9,12 @@ use Illuminate\Http\Request;
 use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class HttpRedirectResponseTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testHeaderOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');
@@ -36,8 +31,9 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $response->setSession($session = m::mock(Store::class));
-        $session->shouldReceive('flash')->twice();
+        $session = Mockery::mock(Store::class);
+        $response->setSession($session);
+        $session->expects('flash')->times(2);
         $response->with(['name', 'age']);
     }
 
@@ -70,8 +66,9 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $response->setSession($session = m::mock(Store::class));
-        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor', 'age' => 26]);
+        $session = Mockery::mock(Store::class);
+        $session->expects('flashInput')->with(['name' => 'Taylor', 'age' => 26]);
+        $response->setSession($session);
         $response->withInput();
     }
 
@@ -83,16 +80,17 @@ class HttpRedirectResponseTest extends TestCase
             new Cookie('name', 'milwad'),
         ]);
 
-        $this->assertEquals('name', $response->headers->getCookies()[0]->getName());
-        $this->assertEquals('milwad', $response->headers->getCookies()[0]->getValue());
+        $this->assertSame('name', $response->headers->getCookies()[0]->getName());
+        $this->assertSame('milwad', $response->headers->getCookies()[0]->getValue());
     }
 
     public function testOnlyInputOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $response->setSession($session = m::mock(Store::class));
-        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
+        $session = Mockery::mock(Store::class);
+        $session->expects('flashInput')->with(['name' => 'Taylor']);
+        $response->setSession($session);
         $response->onlyInput('name');
     }
 
@@ -100,8 +98,9 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $response->setSession($session = m::mock(Store::class));
-        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
+        $session = Mockery::mock(Store::class);
+        $session->expects('flashInput')->with(['name' => 'Taylor']);
+        $response->setSession($session);
         $response->exceptInput('age');
     }
 
@@ -109,12 +108,76 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $response->setSession($session = m::mock(Store::class));
-        $session->shouldReceive('get')->with('errors', m::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
-        $session->shouldReceive('flash')->once()->with('errors', m::type(ViewErrorBag::class));
-        $provider = m::mock(MessageProvider::class);
-        $provider->shouldReceive('getMessageBag')->once()->andReturn(new MessageBag);
+        $session = Mockery::mock(Store::class);
+        $session->expects('get')->with('errors', Mockery::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
+        $session->expects('flash')->with('errors', Mockery::type(ViewErrorBag::class));
+        $response->setSession($session);
+        $provider = Mockery::mock(MessageProvider::class);
+        $provider->expects('getMessageBag')->andReturn(new MessageBag);
         $response->withErrors($provider);
+    }
+
+    public function testCanEnforceSameOriginWhenSameOrigin()
+    {
+        $response = new RedirectResponse('https://example.com/foo/bar');
+        $response->setRequest(Request::create('https://example.com/baz/buzz'));
+        $response->enforceSameOrigin('fallback');
+
+        $this->assertSame('https://example.com/foo/bar', $response->getTargetUrl());
+    }
+
+    public function testCanEnforceSameOriginWhenSameOriginAndCustomPort()
+    {
+        $response = new RedirectResponse('https://example.com:1/foo/bar');
+        $response->setRequest(Request::create('https://example.com:1/baz/buzz'));
+        $response->enforceSameOrigin('fallback');
+
+        $this->assertSame('https://example.com:1/foo/bar', $response->getTargetUrl());
+    }
+
+    public function testCanEnforceSameOriginWhenNotSameScheme()
+    {
+        $response = new RedirectResponse('https://example.com/foo/bar');
+        $response->setRequest(Request::create('http://example.com/baz/buzz'));
+        $response->enforceSameOrigin('fallback');
+
+        $this->assertSame('fallback', $response->getTargetUrl());
+    }
+
+    public function testCanEnforceSameOriginWhenNotSameHostname()
+    {
+        $response = new RedirectResponse('https://example.com/foo/bar');
+        $response->setRequest(Request::create('https://example2.com/baz/buzz'));
+        $response->enforceSameOrigin('fallback');
+
+        $this->assertSame('fallback', $response->getTargetUrl());
+    }
+
+    public function testCanEnforceSameOriginWhenNotSamePort()
+    {
+        $response = new RedirectResponse('https://example.com:1/foo/bar');
+        $response->setRequest(Request::create('https://example.com:2/baz/buzz'));
+        $response->enforceSameOrigin('fallback');
+
+        $this->assertSame('fallback', $response->getTargetUrl());
+    }
+
+    public function testCanEnforceSameOriginWhenNotSameSchemeAndSchemeValidationIsDisabled()
+    {
+        $response = new RedirectResponse('https://example.com/foo/bar');
+        $response->setRequest(Request::create('http://example.com/baz/buzz'));
+        $response->enforceSameOrigin('fallback', validateScheme: false);
+
+        $this->assertSame('https://example.com/foo/bar', $response->getTargetUrl());
+    }
+
+    public function testCanEnforceSameOriginWhenNotSamePortAndPortValidationIsDisabled()
+    {
+        $response = new RedirectResponse('https://example.com:1/foo/bar');
+        $response->setRequest(Request::create('https://example.com:2/baz/buzz'));
+        $response->enforceSameOrigin('fallback', validatePort: false);
+
+        $this->assertSame('https://example.com:1/foo/bar', $response->getTargetUrl());
     }
 
     public function testSettersGettersOnRequest()
@@ -124,7 +187,7 @@ class HttpRedirectResponseTest extends TestCase
         $this->assertNull($response->getSession());
 
         $request = Request::create('/', 'GET');
-        $session = m::mock(Store::class);
+        $session = Mockery::mock(Store::class);
         $response->setRequest($request);
         $response->setSession($session);
         $this->assertSame($request, $response->getRequest());
@@ -135,9 +198,10 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $response->setSession($session = m::mock(Store::class));
-        $session->shouldReceive('get')->with('errors', m::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
-        $session->shouldReceive('flash')->once()->with('errors', m::type(ViewErrorBag::class));
+        $session = Mockery::mock(Store::class);
+        $session->expects('get')->with('errors', Mockery::type(ViewErrorBag::class))->andReturn(new ViewErrorBag);
+        $session->expects('flash')->with('errors', Mockery::type(ViewErrorBag::class));
+        $response->setSession($session);
         $provider = ['foo' => 'bar'];
         $response->withErrors($provider);
     }
@@ -146,15 +210,15 @@ class HttpRedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
-        $response->setSession($session = m::mock(Store::class));
-        $session->shouldReceive('flash')->once()->with('foo', 'bar');
+        $session = Mockery::mock(Store::class);
+        $session->expects('flash')->with('foo', 'bar');
+        $response->setSession($session);
         $response->withFoo('bar');
     }
 
     public function testMagicCallException()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Call to undefined method Illuminate\Http\RedirectResponse::doesNotExist()');
+        $this->expectExceptionObject(new BadMethodCallException('Call to undefined method Illuminate\Http\RedirectResponse::doesNotExist()'));
 
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');

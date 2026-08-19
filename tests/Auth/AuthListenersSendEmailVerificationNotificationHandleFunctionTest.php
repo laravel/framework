@@ -6,7 +6,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class AuthListenersSendEmailVerificationNotificationHandleFunctionTest extends TestCase
@@ -16,7 +16,7 @@ class AuthListenersSendEmailVerificationNotificationHandleFunctionTest extends T
      */
     public function testWillExecuted()
     {
-        $user = $this->getMockBuilder(MustVerifyEmail::class)->getMock();
+        $user = $this->createMock(MustVerifyEmail::class);
         $user->method('hasVerifiedEmail')->willReturn(false);
         $user->expects($this->once())->method('sendEmailVerificationNotification');
 
@@ -30,7 +30,7 @@ class AuthListenersSendEmailVerificationNotificationHandleFunctionTest extends T
      */
     public function testUserIsNotInstanceOfMustVerifyEmail()
     {
-        $user = m::mock(User::class);
+        $user = Mockery::mock(User::class);
         $user->shouldNotReceive('sendEmailVerificationNotification');
 
         $listener = new SendEmailVerificationNotification;
@@ -43,7 +43,7 @@ class AuthListenersSendEmailVerificationNotificationHandleFunctionTest extends T
      */
     public function testHasVerifiedEmailAsTrue()
     {
-        $user = $this->getMockBuilder(MustVerifyEmail::class)->getMock();
+        $user = $this->createMock(MustVerifyEmail::class);
         $user->method('hasVerifiedEmail')->willReturn(true);
         $user->expects($this->never())->method('sendEmailVerificationNotification');
 

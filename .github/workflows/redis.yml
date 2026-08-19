@@ -1,0 +1,119 @@
+name: Redis and Redis Cluster
+
+on:
+  push:
+    branches:
+      - master
+      - "*.x"
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  redis:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    services:
+      redis:
+        image: redis:7.0
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
+    strategy:
+      fail-fast: true
+      matrix:
+        client: ["phpredis", "predis"]
+
+    name: Redis (${{ matrix.client}}) Driver
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
+        with:
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+
+      - name: Execute Cache tests
+        run: vendor/bin/phpunit tests/Integration/Cache
+        env:
+          CACHE_STORE: redis
+          REDIS_CACHE_CONNECTION: cache
+          REDIS_CACHE_LOCK_CONNECTION: cache
+          REDIS_CLIENT: ${{ matrix.client }}
+
+      - name: Execute Queue tests
+        run: vendor/bin/phpunit tests/Integration/Queue
+        env:
+          REDIS_CLIENT: ${{ matrix.client }}
+          QUEUE_CONNECTION: redis
+
+  redis-cluster:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: true
+      matrix:
+        client: ["phpredis", "predis"]
+
+    name: Redis Cluster (${{ matrix.client}}) Driver
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
+        with:
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+
+      - name: Create Redis Cluster
+        run: |
+          sudo apt update
+          sudo apt-get install -y --fix-missing redis-server
+          sudo service redis-server stop
+          redis-server --daemonize yes --port 7000 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7000.conf
+          redis-server --daemonize yes --port 7001 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7001.conf
+          redis-server --daemonize yes --port 7002 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7002.conf
+          for port in 7000 7001 7002; do
+            until redis-cli -h 127.0.0.1 -p "${port}" ping; do sleep 1; done
+          done
+          redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes
+
+      - name: Check Redis Cluster is ready
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
+        with:
+          timeout_seconds: 5
+          max_attempts: 5
+          retry_wait_seconds: 5
+          retry_on: error
+          command: |
+            redis-cli -c -h 127.0.0.1 -p 7000 cluster info | grep "cluster_state:ok"
+            redis-cli -c -h 127.0.0.1 -p 7001 cluster info | grep "cluster_state:ok"
+            redis-cli -c -h 127.0.0.1 -p 7002 cluster info | grep "cluster_state:ok"
+
+      - name: Execute Cache tests
+        run: vendor/bin/phpunit tests/Integration/Cache
+        env:
+          CACHE_STORE: redis
+          REDIS_CACHE_CONNECTION: default
+          REDIS_CACHE_LOCK_CONNECTION: default
+          REDIS_CLIENT: ${{ matrix.client }}
+          REDIS_CLUSTER_HOSTS_AND_PORTS: 127.0.0.1:7000,127.0.0.1:7001,127.0.0.1:7002
+
+      - name: Execute Queue Tests
+        run: vendor/bin/phpunit tests/Integration/Queue
+        env:
+          REDIS_CLIENT: ${{ matrix.client }}
+          REDIS_CLUSTER_HOSTS_AND_PORTS: 127.0.0.1:7000,127.0.0.1:7001,127.0.0.1:7002
+          REDIS_QUEUE: "default"
+          QUEUE_CONNECTION: redis

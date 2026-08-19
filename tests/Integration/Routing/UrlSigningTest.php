@@ -9,6 +9,7 @@ use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 
@@ -60,7 +61,7 @@ class UrlSigningTest extends TestCase
         })->name('foo');
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
-        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', Carbon::now()->addMinutes(5), ['id' => 1]));
         $this->assertSame('valid', $this->get($url)->original);
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
@@ -69,14 +70,13 @@ class UrlSigningTest extends TestCase
 
     public function testTemporarySignedUrlsWithExpiresParameter()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('reserved');
+        $this->expectExceptionObject(new InvalidArgumentException('reserved'));
 
         Route::get('/foo/{id}', function (Request $request, $id) {
             return $request->hasValidSignature() ? 'valid' : 'invalid';
         })->name('foo');
 
-        URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1, 'expires' => 253402300799]);
+        URL::temporarySignedRoute('foo', Carbon::now()->addMinutes(5), ['id' => 1, 'expires' => 253402300799]);
     }
 
     public function testSignedUrlWithUrlWithoutSignatureParameter()
@@ -138,11 +138,49 @@ class UrlSigningTest extends TestCase
         $this->assertSame('invalid', $this->get($url.'&appended')->original);
     }
 
+    public function testSignedUrlPrefersVaporRawQueryStringOverQueryString()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]));
+        $originalQueryString = Str::after($url, '?');
+
+        $this->withServerVariables(['VAPOR_RAW_QUERY_STRING' => $originalQueryString]);
+
+        $this->assertSame('valid', $this->get($url.'&tampered=1')->original);
+    }
+
+    public function testSignedUrlIsInvalidWhenVaporRawQueryStringDoesNotMatch()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1, 'extra' => 'value']));
+
+        $this->withServerVariables(['VAPOR_RAW_QUERY_STRING' => str_replace('extra=value', 'extra=tampered', Str::after($url, '?'))]);
+
+        $this->assertSame('invalid', $this->get($url)->original);
+    }
+
+    public function testSignedUrlFallsBackToQueryStringWhenVaporRawQueryStringIsAbsent()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]));
+
+        $this->assertSame('valid', $this->get($url)->original);
+    }
+
     public function testSignedUrlParametersParsedCorrectly()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
             return $request->hasValidSignature()
-                && intval($id) === 1
+                && (int) $id === 1
                 && $request->has('paramEmpty')
                 && $request->has('paramEmptyString')
                 && $request->query('paramWithValue') === 'value'
@@ -217,7 +255,7 @@ class UrlSigningTest extends TestCase
         })->name('foo')->middleware(ValidateSignature::class);
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
-        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', Carbon::now()->addMinutes(5), ['id' => 1]));
         $this->assertSame('valid', $this->get($url)->original);
     }
 
@@ -228,7 +266,7 @@ class UrlSigningTest extends TestCase
         })->name('foo')->middleware(ValidateSignature::class);
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
-        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', Carbon::now()->addMinutes(5), ['id' => 1]));
         Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
 
         $response = $this->get($url);

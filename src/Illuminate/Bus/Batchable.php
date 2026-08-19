@@ -12,7 +12,7 @@ trait Batchable
     /**
      * The batch ID (if applicable).
      *
-     * @var string
+     * @var string|null
      */
     public $batchId;
 
@@ -48,7 +48,7 @@ trait Batchable
     {
         $batch = $this->batch();
 
-        return $batch && ! $batch->cancelled();
+        return $batch && ! $batch->finished() && ! $batch->cancelled();
     }
 
     /**

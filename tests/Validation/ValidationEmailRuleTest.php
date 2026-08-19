@@ -166,6 +166,35 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    public function testStrict()
+    {
+        $emailThatFailsInStrict = 'username@sub..example.com';
+        $emailThatPassesNonStrictButFailsInStrict = '"has space"@example.com';
+        $emailThatPassesInStrict = 'plainaddress@example.com';
+
+        $this->fails(
+            (new Email())->strict(),
+            $emailThatPassesNonStrictButFailsInStrict,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        $this->fails(
+            Rule::email()->strict(),
+            $emailThatFailsInStrict,
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        $this->passes(
+            (new Email())->strict(),
+            $emailThatPassesInStrict
+        );
+
+        $this->passes(
+            Rule::email()->strict(),
+            $emailThatPassesInStrict
+        );
+    }
+
     #[RequiresPhpExtension('intl')]
     public function testValidateMxRecord()
     {

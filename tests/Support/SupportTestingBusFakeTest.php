@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
@@ -10,7 +11,7 @@ use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Testing\Fakes\BatchRepositoryFake;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\PendingBatchFake;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -22,21 +23,14 @@ class SupportTestingBusFakeTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-        $this->fake = new BusFake(m::mock(QueueingDispatcher::class));
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
+        $this->fake = new BusFake(Mockery::mock(QueueingDispatcher::class));
     }
 
     public function testItUsesCustomBusRepository()
     {
         $busRepository = new BatchRepositoryFake;
 
-        $fake = new BusFake(m::mock(QueueingDispatcher::class), [], $busRepository);
+        $fake = new BusFake(Mockery::mock(QueueingDispatcher::class), [], $busRepository);
 
         $this->assertNull($fake->findBatch('non-existent-batch'));
 
@@ -484,6 +478,36 @@ class SupportTestingBusFakeTest extends TestCase
         }
     }
 
+    public function testAssertNothingDispatchedWithSyncDispatch()
+    {
+        $this->fake->assertNothingDispatched();
+
+        $this->fake->dispatchSync(new BusJobStub);
+
+        try {
+            $this->fake->assertNothingDispatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The following jobs were dispatched unexpectedly:', $e->getMessage());
+            $this->assertStringContainsString(BusJobStub::class, $e->getMessage());
+        }
+    }
+
+    public function testAssertNothingDispatchedWithAfterResponseDispatch()
+    {
+        $this->fake->assertNothingDispatched();
+
+        $this->fake->dispatchAfterResponse(new BusJobStub);
+
+        try {
+            $this->fake->assertNothingDispatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The following jobs were dispatched unexpectedly:', $e->getMessage());
+            $this->assertStringContainsString(BusJobStub::class, $e->getMessage());
+        }
+    }
+
     public function testAssertChained()
     {
         Container::setInstance($container = new Container);
@@ -583,11 +607,11 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testAssertDispatchedWithIgnoreClass()
     {
-        $dispatcher = m::mock(QueueingDispatcher::class);
+        $dispatcher = Mockery::mock(QueueingDispatcher::class);
 
         $job = new BusJobStub;
-        $dispatcher->shouldReceive('dispatch')->once()->with($job);
-        $dispatcher->shouldReceive('dispatchNow')->once()->with($job, null);
+        $dispatcher->expects('dispatch')->with($job);
+        $dispatcher->expects('dispatchNow')->with($job, null);
 
         $otherJob = new OtherBusJobStub;
         $dispatcher->shouldReceive('dispatch')->never()->with($otherJob);
@@ -607,15 +631,15 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testDispatchedFakingOnlyGivenJobs()
     {
-        $dispatcher = m::mock(QueueingDispatcher::class);
+        $dispatcher = Mockery::mock(QueueingDispatcher::class);
 
         $job = new BusJobStub;
         $dispatcher->shouldReceive('dispatch')->never()->with($job);
         $dispatcher->shouldReceive('dispatchNow')->never()->with($job, null);
 
         $otherJob = new OtherBusJobStub;
-        $dispatcher->shouldReceive('dispatch')->once()->with($otherJob);
-        $dispatcher->shouldReceive('dispatchNow')->once()->with($otherJob, null);
+        $dispatcher->expects('dispatch')->with($otherJob);
+        $dispatcher->expects('dispatchNow')->with($otherJob, null);
 
         $thirdJob = new ThirdJob;
         $dispatcher->shouldReceive('dispatch')->never()->with($thirdJob);
@@ -639,15 +663,15 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testAssertDispatchedWithIgnoreCallback()
     {
-        $dispatcher = m::mock(QueueingDispatcher::class);
+        $dispatcher = Mockery::mock(QueueingDispatcher::class);
 
         $job = new BusJobStub;
-        $dispatcher->shouldReceive('dispatch')->once()->with($job);
-        $dispatcher->shouldReceive('dispatchNow')->once()->with($job, null);
+        $dispatcher->expects('dispatch')->with($job);
+        $dispatcher->expects('dispatchNow')->with($job, null);
 
         $otherJob = new OtherBusJobStub;
-        $dispatcher->shouldReceive('dispatch')->once()->with($otherJob);
-        $dispatcher->shouldReceive('dispatchNow')->once()->with($otherJob, null);
+        $dispatcher->expects('dispatch')->with($otherJob);
+        $dispatcher->expects('dispatchNow')->with($otherJob, null);
 
         $anotherJob = new OtherBusJobStub(1);
         $dispatcher->shouldReceive('dispatch')->never()->with($anotherJob);
@@ -755,6 +779,28 @@ class SupportTestingBusFakeTest extends TestCase
         $this->assertTrue($batch->cancelled());
     }
 
+    public function testCancelledBatchesHaveImmutableCancelledAtTimestamp()
+    {
+        $batch = $this->fake->batch([])->dispatch();
+
+        $batch->cancel();
+
+        $this->assertInstanceOf(CarbonImmutable::class, $batch->cancelledAt);
+    }
+
+    public function testFinishedBatchesHaveImmutableFinishedAtTimestamp()
+    {
+        $batchRepository = new BatchRepositoryFake;
+
+        $fake = new BusFake(Mockery::mock(QueueingDispatcher::class), [], $batchRepository);
+
+        $batch = $fake->batch([])->dispatch();
+
+        $batchRepository->markAsFinished($batch->id);
+
+        $this->assertInstanceOf(CarbonImmutable::class, $batch->finishedAt);
+    }
+
     public function testDispatchFakeBatch()
     {
         $this->fake->assertNothingBatched();
@@ -853,6 +899,144 @@ class SupportTestingBusFakeTest extends TestCase
         $serializingBusFake->assertBatched(function (PendingBatchFake $batchedCollection) {
             return $batchedCollection->jobs->count() === 1 && $batchedCollection->jobs->first()->value === 'hello';
         });
+    }
+
+    public function testDispatchAfterResponseWithHandler()
+    {
+        $job = new BusJobStub;
+        $handler = function () {
+            return 'handled';
+        };
+
+        $this->fake->dispatchAfterResponse($job, $handler);
+
+        $this->fake->assertDispatchedAfterResponse(BusJobStub::class);
+    }
+
+    public function testCanAssertJobsOnPendingBatchFake()
+    {
+        $this->fake->batch([
+            new BusFakeJobWithSerialization('foo'),
+            new BusFakeJobWithSerialization('bar'),
+            new BusFakeJobWithSerialization('baz'),
+        ])->dispatch();
+
+        $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+            return $batchedCollection->hasJobs([
+                new BusFakeJobWithSerialization('foo'),
+                new BusFakeJobWithSerialization('bar'),
+                new BusFakeJobWithSerialization('baz'),
+            ]);
+        });
+
+        $this->fake->assertBatched([
+            new BusFakeJobWithSerialization('foo'),
+            new BusFakeJobWithSerialization('bar'),
+            new BusFakeJobWithSerialization('baz'),
+        ]);
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    new BusFakeJobWithSerialization('baz'),
+                    new BusFakeJobWithSerialization('foo'),
+                    new BusFakeJobWithSerialization('bar'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    new BusFakeJobWithSerialization('foo'),
+                    new BusFakeJobWithSerialization('baaar'),
+                    new BusFakeJobWithSerialization('baz'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    new BusFakeJobWithSerialization('foo'),
+                    new BusFakeJobWithSerialization('baz'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    new BusFakeJobWithSerialization('foo'),
+                    new BusFakeJobWithSerialization('bar'),
+                    new BusFakeJobWithSerialization('baz'),
+                    new BusFakeJobWithSerialization('qux'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
+    }
+
+    public function testCanAssertJobsOnPendingBatchFakeWithClosures()
+    {
+        $this->fake->batch([
+            new BusFakeJobWithSerialization('foo'),
+            new BusFakeJobWithSerialization('bar'),
+            new BusFakeJobWithSerialization('baz'),
+        ])->dispatch();
+
+        $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+            return $batchedCollection->hasJobs([
+                fn (BusFakeJobWithSerialization $job) => $job->value === 'foo',
+                fn (BusFakeJobWithSerialization $job) => $job->value === 'bar',
+                fn (BusFakeJobWithSerialization $job) => $job->value === 'baz',
+            ]);
+        });
+
+        $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+            return $batchedCollection->hasJobs([
+                fn (BusFakeJobWithSerialization $job) => $job->value === 'foo',
+                BusFakeJobWithSerialization::class,
+                new BusFakeJobWithSerialization('baz'),
+            ]);
+        });
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'foo',
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'wrong',
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'baz',
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'foo',
+                    fn (BusJobStub $job) => true,
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'baz',
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
     }
 }
 

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Events\MigrationEnded;
 use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Database\Events\MigrationSkipped;
 use Illuminate\Database\Events\MigrationsStarted;
 use Illuminate\Database\Events\MigrationStarted;
 use Illuminate\Database\Events\NoPendingMigrations;
@@ -32,6 +33,7 @@ class MigratorEventsTest extends TestCase
         Event::assertDispatched(MigrationsEnded::class, 2);
         Event::assertDispatched(MigrationStarted::class, 2);
         Event::assertDispatched(MigrationEnded::class, 2);
+        Event::assertDispatched(MigrationSkipped::class, 1);
     }
 
     public function testMigrationEventsContainTheOptionsAndPretendFalse()
@@ -110,16 +112,24 @@ class MigratorEventsTest extends TestCase
         });
 
         Event::assertDispatched(MigrationStarted::class, function ($event) {
-            return $event->method === 'up' && $event->migration instanceof Migration;
+            return $event->method === 'up'
+                && $event->migration instanceof Migration
+                && $event->name === '2014_10_12_000000_create_members_table';
         });
         Event::assertDispatched(MigrationStarted::class, function ($event) {
-            return $event->method === 'down' && $event->migration instanceof Migration;
+            return $event->method === 'down'
+                && $event->migration instanceof Migration
+                && $event->name === '2014_10_12_000000_create_members_table';
         });
         Event::assertDispatched(MigrationEnded::class, function ($event) {
-            return $event->method === 'up' && $event->migration instanceof Migration;
+            return $event->method === 'up'
+                && $event->migration instanceof Migration
+                && $event->name === '2014_10_12_000000_create_members_table';
         });
         Event::assertDispatched(MigrationEnded::class, function ($event) {
-            return $event->method === 'down' && $event->migration instanceof Migration;
+            return $event->method === 'down'
+                && $event->migration instanceof Migration
+                && $event->name === '2014_10_12_000000_create_members_table';
         });
     }
 
@@ -135,6 +145,20 @@ class MigratorEventsTest extends TestCase
         });
         Event::assertDispatched(NoPendingMigrations::class, function ($event) {
             return $event->method === 'down';
+        });
+    }
+
+    public function testMigrationSkippedEventIsFired()
+    {
+        Event::fake();
+
+        $this->artisan('migrate', [
+            '--path' => realpath(__DIR__.'/stubs/2014_10_13_000000_skipped_migration.php'),
+            '--realpath' => true,
+        ]);
+
+        Event::assertDispatched(MigrationSkipped::class, function ($event) {
+            return $event->migrationName === '2014_10_13_000000_skipped_migration';
         });
     }
 }

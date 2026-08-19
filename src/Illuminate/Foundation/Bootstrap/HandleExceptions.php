@@ -92,25 +92,29 @@ class HandleExceptions
             return;
         }
 
-        try {
-            $logger = static::$app->make(LogManager::class);
-        } catch (Exception) {
+        if (! static::$app->bound('config')) {
             return;
         }
 
-        $this->ensureDeprecationLoggerIsConfigured();
+        try {
+            $logger = static::$app->make(LogManager::class);
 
-        $options = static::$app['config']->get('logging.deprecations') ?? [];
+            $this->ensureDeprecationLoggerIsConfigured();
 
-        with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
-            if ($options['trace'] ?? false) {
-                $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
-            } else {
-                $log->warning(sprintf('%s in %s on line %s',
-                    $message, $file, $line
-                ));
-            }
-        });
+            $options = static::$app['config']->get('logging.deprecations') ?? [];
+
+            with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
+                if ($options['trace'] ?? false) {
+                    $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
+                } else {
+                    $log->warning(sprintf('%s in %s on line %s',
+                        $message, $file, $line
+                    ));
+                }
+            });
+        } catch (Throwable) {
+            return;
+        }
     }
 
     /**
@@ -121,6 +125,7 @@ class HandleExceptions
     protected function shouldIgnoreDeprecationErrors()
     {
         return ! class_exists(LogManager::class)
+            || is_null(static::$app)
             || ! static::$app->hasBeenBootstrapped()
             || (static::$app->runningUnitTests() && ! Env::get('LOG_DEPRECATIONS_WHILE_TESTING'));
     }

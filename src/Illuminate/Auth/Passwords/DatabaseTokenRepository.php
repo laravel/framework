@@ -20,6 +20,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
         protected ConnectionInterface $connection,
         protected HasherContract $hasher,
         protected string $table,
+        #[\SensitiveParameter]
         protected string $hashKey,
         protected int $expires = 3600,
         protected int $throttle = 60,

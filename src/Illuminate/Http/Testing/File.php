@@ -112,7 +112,7 @@ class File extends UploadedFile
     }
 
     /**
-     * Set the "MIME type" for the file.
+     * Set the MIME type for the file.
      *
      * @param  string  $mimeType
      * @return $this

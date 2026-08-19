@@ -2,34 +2,29 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class DatabaseSoftDeletingTraitTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testDeleteSetsSoftDeletedColumn()
     {
-        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
-        $model->makePartial();
-        $model->shouldReceive('newModelQuery')->andReturn($query = m::mock(stdClass::class));
-        $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
-        $query->shouldReceive('update')->once()->with([
+        $model = Mockery::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
+        $query = Mockery::mock(Builder::class);
+        $model->expects('newModelQuery')->andReturn($query);
+        $query->expects('where')->with('id', '=', 1)->andReturn($query);
+        $query->expects('update')->with([
             'deleted_at' => 'date-time',
             'updated_at' => 'date-time',
         ]);
-        $model->shouldReceive('syncOriginalAttributes')->once()->with([
+        $model->expects('syncOriginalAttributes')->with([
             'deleted_at',
             'updated_at',
         ]);
-        $model->shouldReceive('usesTimestamps')->once()->andReturn(true);
+        $model->expects('usesTimestamps')->andReturn(true);
         $model->delete();
 
         $this->assertInstanceOf(Carbon::class, $model->deleted_at);
@@ -37,11 +32,9 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
     public function testRestore()
     {
-        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
-        $model->makePartial();
-        $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(true);
-        $model->shouldReceive('save')->once();
-        $model->shouldReceive('fireModelEvent')->with('restored', false)->andReturn(true);
+        $model = Mockery::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
+        $model->expects('fireModelEvent')->with('restoring')->andReturn(true);
+        $model->expects('save');
 
         $model->restore();
 
@@ -50,9 +43,8 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
     public function testRestoreCancel()
     {
-        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
-        $model->makePartial();
-        $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(false);
+        $model = Mockery::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
+        $model->expects('fireModelEvent')->with('restoring')->andReturn(false);
         $model->shouldReceive('save')->never();
 
         $this->assertFalse($model->restore());

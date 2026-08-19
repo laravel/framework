@@ -58,8 +58,8 @@ abstract class Compiler
      * @param  string  $cachePath
      * @param  string  $basePath
      * @param  bool  $shouldCache
-     * @param  bool  $shouldCheckTimestamps
      * @param  string  $compiledExtension
+     * @param  bool  $shouldCheckTimestamps
      *
      * @throws \InvalidArgumentException
      */

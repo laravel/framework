@@ -98,8 +98,7 @@ class InteractsWithContainerTest extends TestCase
     public function testForgetMock()
     {
         $this->mock(InstanceStub::class)
-            ->shouldReceive('execute')
-            ->once()
+            ->expects('execute')
             ->andReturn('bar');
 
         $this->assertSame('bar', $this->app->make(InstanceStub::class)->execute());

@@ -46,4 +46,12 @@ class BladeIncludesTest extends AbstractBladeTestCase
         $this->assertSame('<?php echo $__env->first(["issue", "#45424)"], ["foo" => "bar(-(("], array_diff_key(get_defined_vars(), [\'__data\' => 1, \'__path\' => 1]))->render(); ?>', $this->compiler->compileString('@includeFirst(["issue", "#45424)"], ["foo" => "bar(-(("])'));
         $this->assertSame('<?php echo $__env->first(["issue", "#45424)"], [(string) "foo()" => "bar(-(("], array_diff_key(get_defined_vars(), [\'__data\' => 1, \'__path\' => 1]))->render(); ?>', $this->compiler->compileString('@includeFirst(["issue", "#45424)"], [(string) "foo()" => "bar(-(("])'));
     }
+
+    public function testIncludeScopedsAreCompiled()
+    {
+        $this->assertSame('<?php echo $__env->make(\'foo\')->render(); ?>', $this->compiler->compileString('@includeIsolated(\'foo\')'));
+        $this->assertSame('<?php echo $__env->make(\'foo\', [\'((\'])->render(); ?>', $this->compiler->compileString('@includeIsolated(\'foo\', [\'((\'])'));
+        $this->assertSame('<?php echo $__env->make(\'foo\', [\'((a)\' => \'((a)\'])->render(); ?>', $this->compiler->compileString('@includeIsolated(\'foo\', [\'((a)\' => \'((a)\'])'));
+        $this->assertSame('<?php echo $__env->make(name(foo))->render(); ?>', $this->compiler->compileString('@includeIsolated(name(foo))'));
+    }
 }

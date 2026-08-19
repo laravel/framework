@@ -3,9 +3,8 @@
 namespace Illuminate\Tests\Console\Scheduling;
 
 use Illuminate\Console\Scheduling\Event;
-use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
 use PHPUnit\Framework\TestCase;
 
 class FrequencyTest extends TestCase
@@ -15,10 +14,7 @@ class FrequencyTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->event = new Event(
-            m::mock(EventMutex::class),
-            'php foo'
-        );
+        $this->event = new Event(new FakeEventMutex, 'php foo');
     }
 
     public function testEveryMinute()
@@ -123,8 +119,6 @@ class FrequencyTest extends TestCase
         Carbon::setTestNow('2020-10-10 10:10:10');
 
         $this->assertSame('0 0 31 * *', $this->event->lastDayOfMonth()->getExpression());
-
-        Carbon::setTestNow(null);
     }
 
     public function testTwiceMonthly()
@@ -200,6 +194,11 @@ class FrequencyTest extends TestCase
     public function testQuarterly()
     {
         $this->assertSame('0 0 1 1-12/3 *', $this->event->quarterly()->getExpression());
+    }
+
+    public function testQuarterlyOn()
+    {
+        $this->assertSame('0 15 4 1-12/3 *', $this->event->quarterlyOn(4, '15:00')->getExpression());
     }
 
     public function testYearly()

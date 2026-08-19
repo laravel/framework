@@ -161,6 +161,14 @@ class BroadcastingInstallCommand extends Command
                 'commands: __DIR__.\'/../routes/console.php\','.PHP_EOL.'        channels: __DIR__.\'/../routes/channels.php\',',
                 $appBootstrapPath,
             );
+        } elseif (str_contains($content, '->withRouting(')) {
+            (new Filesystem)->replaceInFile(
+                '->withRouting(',
+                '->withRouting('.PHP_EOL.'        channels: __DIR__.\'/../routes/channels.php\',',
+                $appBootstrapPath,
+            );
+        } else {
+            $this->components->error('Unable to register broadcast routes. Please register them manually in ['.$appBootstrapPath.'].');
         }
     }
 
@@ -399,12 +407,12 @@ class BroadcastingInstallCommand extends Command
 
         if (file_exists(base_path('pnpm-lock.yaml'))) {
             $commands = [
-                'pnpm add --save-dev laravel-echo pusher-js',
+                'pnpm add --save-dev laravel-echo pusher-js --ignore-scripts',
                 'pnpm run build',
             ];
         } elseif (file_exists(base_path('yarn.lock'))) {
             $commands = [
-                'yarn add --dev laravel-echo pusher-js',
+                'yarn add --dev laravel-echo pusher-js --ignore-scripts',
                 'yarn run build',
             ];
         } elseif (file_exists(base_path('bun.lock')) || file_exists(base_path('bun.lockb'))) {
@@ -414,7 +422,7 @@ class BroadcastingInstallCommand extends Command
             ];
         } else {
             $commands = [
-                'npm install --save-dev laravel-echo pusher-js',
+                'npm install --save-dev laravel-echo pusher-js --ignore-scripts',
                 'npm run build',
             ];
         }

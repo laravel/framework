@@ -34,6 +34,36 @@ if (! function_exists('data_fill')) {
     }
 }
 
+if (! function_exists('data_has')) {
+    /**
+     * Determine if a key / property exists on an array or object using "dot" notation.
+     *
+     * @param  mixed  $target
+     * @param  string|array|int|null  $key
+     * @return bool
+     */
+    function data_has($target, $key): bool
+    {
+        if (is_null($key) || $key === []) {
+            return false;
+        }
+
+        $key = is_array($key) ? $key : explode('.', $key);
+
+        foreach ($key as $segment) {
+            if (Arr::accessible($target) && Arr::exists($target, $segment)) {
+                $target = $target[$segment];
+            } elseif (is_object($target) && property_exists($target, $segment)) {
+                $target = $target->{$segment};
+            } else {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
 if (! function_exists('data_get')) {
     /**
      * Get an item from an array or object using "dot" notation.
@@ -241,10 +271,14 @@ if (! function_exists('when')) {
     /**
      * Return a value if the given condition is true.
      *
+     * @template TValue
+     * @template TArgs
+     * @template TDefault
+     *
      * @param  mixed  $condition
-     * @param  \Closure|mixed  $value
-     * @param  \Closure|mixed  $default
-     * @return mixed
+     * @param  TValue|\Closure(TArgs): TValue  $value
+     * @param  TDefault|\Closure(): TDefault  $default
+     * @return ($condition is true|positive-int|non-falsy-string|non-empty-array ? TValue : ($condition is callable ? TValue|TDefault : TDefault))
      */
     function when($condition, $value, $default = null)
     {

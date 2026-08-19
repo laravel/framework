@@ -34,6 +34,9 @@ trait PacksPhpRedisValues
      *
      * @param  array<int|string,string>  $values
      * @return array<int|string,string>
+     *
+     * @throws \RuntimeException
+     * @throws \UnexpectedValueException
      */
     public function pack(array $values): array
     {
@@ -85,8 +88,10 @@ trait PacksPhpRedisValues
     /**
      * Execute the given callback without serialization or compression when applicable.
      *
-     * @param  callable  $callback
-     * @return mixed
+     * @template TReturn
+     *
+     * @param  (callable(): TReturn)  $callback
+     * @return TReturn
      */
     public function withoutSerializationOrCompression(callable $callback)
     {

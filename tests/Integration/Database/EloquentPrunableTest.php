@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Schema;
@@ -36,10 +37,7 @@ class EloquentPrunableTest extends DatabaseTestCase
 
     public function testPrunableMethodMustBeImplemented()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
-            'Please implement',
-        );
+        $this->expectExceptionObject(new LogicException('Please implement'));
 
         PrunableTestModelMissingPrunableMethod::create()->pruneAll();
     }
@@ -67,7 +65,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         Event::fake();
 
         collect(range(1, 5000))->map(function ($id) {
-            return ['deleted_at' => now()];
+            return ['deleted_at' => Carbon::now()];
         })->chunk(200)->each(function ($chunk) {
             PrunableSoftDeleteTestModel::insert($chunk->all());
         });

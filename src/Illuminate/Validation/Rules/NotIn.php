@@ -26,7 +26,7 @@ class NotIn implements Stringable
     /**
      * Create a new "not in" rule instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|array|string  $values
      */
     public function __construct($values)
     {
@@ -47,7 +47,7 @@ class NotIn implements Stringable
         $values = array_map(function ($value) {
             $value = enum_value($value);
 
-            return '"'.str_replace('"', '""', $value).'"';
+            return '"'.str_replace('"', '""', (string) $value).'"';
         }, $this->values);
 
         return $this->rule.':'.implode(',', $values);

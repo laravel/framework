@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Events\CacheFlushed;
 use Illuminate\Cache\Events\CacheFlushing;
+use Illuminate\Cache\Events\CacheLocksFlushed;
+use Illuminate\Cache\Events\CacheLocksFlushing;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Config\Repository as ConfigRepository;
@@ -16,7 +18,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SupportFacadesEventTest extends TestCase
@@ -25,9 +27,7 @@ class SupportFacadesEventTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->events = m::mock(Dispatcher::class);
+        $this->events = Mockery::mock(Dispatcher::class);
 
         $container = new Container;
         $container->instance('events', $this->events);
@@ -40,10 +40,8 @@ class SupportFacadesEventTest extends TestCase
 
     protected function tearDown(): void
     {
-        Event::clearResolvedInstances();
-        Event::setFacadeApplication(null);
-
-        m::close();
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
     }
 
     public function testFakeFor()
@@ -54,7 +52,7 @@ class SupportFacadesEventTest extends TestCase
             Event::assertDispatched(EventStub::class);
         });
 
-        $this->events->shouldReceive('dispatch')->once();
+        $this->events->expects('dispatch');
 
         (new FakeForStub)->dispatch();
     }
@@ -78,7 +76,7 @@ class SupportFacadesEventTest extends TestCase
     {
         $arrayRepository = Cache::store('array');
 
-        $this->events->shouldReceive('dispatch')->times(2);
+        $this->events->expects('dispatch')->times(2);
         $arrayRepository->get('foo');
 
         Event::fake();
@@ -98,6 +96,17 @@ class SupportFacadesEventTest extends TestCase
 
         Event::assertDispatched(CacheFlushing::class);
         Event::assertDispatched(CacheFlushed::class);
+    }
+
+    public function testCacheFlushLocksDispatchesEvent()
+    {
+        $arrayRepository = Cache::store('array');
+        Event::fake();
+
+        $arrayRepository->flushLocks();
+
+        Event::assertDispatched(CacheLocksFlushing::class);
+        Event::assertDispatched(CacheLocksFlushed::class);
     }
 
     protected function getCacheConfig()

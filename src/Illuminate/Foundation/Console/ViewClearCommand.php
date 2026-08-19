@@ -11,11 +11,11 @@ use Symfony\Component\Console\Attribute\AsCommand;
 class ViewClearCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'view:clear';
+    protected $signature = 'view:clear';
 
     /**
      * The console command description.
@@ -63,7 +63,11 @@ class ViewClearCommand extends Command
             ->forgetCompiledOrNotExpired();
 
         foreach ($this->files->glob("{$path}/*") as $view) {
-            $this->files->delete($view);
+            if ($this->files->isDirectory($view)) {
+                $this->files->deleteDirectory($view);
+            } else {
+                $this->files->delete($view);
+            }
         }
 
         $this->components->info('Compiled views cleared successfully.');

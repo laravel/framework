@@ -2,27 +2,22 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Carbon\Carbon;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Notification;
-use Mockery as m;
+use Illuminate\Support\Carbon;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class NotificationDatabaseChannelTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationDatabaseChannelTestNotification;
         $notification->id = 1;
-        $notifiable = m::mock();
+        $notifiable = Mockery::mock();
 
-        $notifiable->shouldReceive('routeNotificationFor->create')->with([
+        $notifiable->expects('routeNotificationFor->create')->with([
             'id' => 1,
             'type' => get_class($notification),
             'data' => ['invoice_id' => 1],
@@ -37,9 +32,9 @@ class NotificationDatabaseChannelTest extends TestCase
     {
         $notification = new NotificationDatabaseChannelTestNotification;
         $notification->id = 1;
-        $notifiable = m::mock();
+        $notifiable = Mockery::mock();
 
-        $notifiable->shouldReceive('routeNotificationFor->create')->with([
+        $notifiable->expects('routeNotificationFor->create')->with([
             'id' => 1,
             'type' => get_class($notification),
             'data' => ['invoice_id' => 1],
@@ -55,9 +50,9 @@ class NotificationDatabaseChannelTest extends TestCase
     {
         $notification = new NotificationDatabaseChannelCustomizeTypeTestNotification;
         $notification->id = 1;
-        $notifiable = m::mock();
+        $notifiable = Mockery::mock();
 
-        $notifiable->shouldReceive('routeNotificationFor->create')->with([
+        $notifiable->expects('routeNotificationFor->create')->with([
             'id' => 1,
             'type' => 'MONTHLY',
             'data' => ['invoice_id' => 1],

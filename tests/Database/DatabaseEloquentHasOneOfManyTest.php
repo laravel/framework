@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -151,8 +152,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
     public function testItFailsWhenUsingInvalidAggregate()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid aggregate [count] used within ofMany relation. Available aggregates: MIN, MAX');
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid aggregate [count] used within ofMany relation. Available aggregates: MIN, MAX'));
         $user = HasOneOfManyTestUser::make();
         $user->latest_login_with_invalid_aggregate();
     }
@@ -626,7 +626,7 @@ class HasOneOfManyTestUser extends Eloquent
             'published_at' => 'max',
             'id' => 'max',
         ], function ($q) {
-            $q->where('published_at', '<', now());
+            $q->where('published_at', '<', Carbon::now());
         });
     }
 
@@ -646,7 +646,7 @@ class HasOneOfManyTestUser extends Eloquent
             'published_at' => 'max',
             'id' => 'max',
         ], function ($q) {
-            $q->where('published_at', '<', now());
+            $q->where('published_at', '<', Carbon::now());
         });
     }
 

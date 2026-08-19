@@ -11,13 +11,12 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
+use function Illuminate\Filesystem\join_paths;
 use function Orchestra\Testbench\artisan;
 use function Orchestra\Testbench\phpunit_version_compare;
 
 class BladeTest extends TestCase
 {
-    /** {@inheritdoc} */
-    #[\Override]
     protected function tearDown(): void
     {
         artisan($this, 'view:clear');
@@ -223,6 +222,35 @@ class BladeTest extends TestCase
         $found = collect($compiledFiles)
             ->contains(fn (SplFileInfo $file) => str_contains($file->getContents(), 'echo "<?php echo e($scriptMessage); ?>" > output.log'));
         $this->assertTrue($found);
+    }
+
+    public function test_include_scoped_does_not_inherit_parent_scope()
+    {
+        // Regular @include passes parent scope variables
+        $regularInclude = View::make('uses-include-regular', [
+            'parentVar' => 'parent-value',
+            'explicitVar' => 'explicit-value',
+        ])->render();
+
+        $this->assertSame('Parent: parent-value, Explicit: explicit-value', trim($regularInclude));
+
+        // @includeIsolated does NOT pass parent scope variables
+        $scopedInclude = View::make('uses-include-scoped', [
+            'parentVar' => 'parent-value',
+            'explicitVar' => 'explicit-value',
+        ])->render();
+
+        $this->assertSame('Parent: undefined, Explicit: explicit-value', trim($scopedInclude));
+    }
+
+    public function test_view_cache_command_deduplicates_paths_before_compiling()
+    {
+        View::addNamespace('templates', join_paths(__DIR__, 'templates'));
+        View::addNamespace('components', join_paths(__DIR__, 'templates', 'components'));
+
+        Blade::partialMock()->expects('compile')->with(realpath(__DIR__.'/templates/components/panel.blade.php'));
+
+        $this->artisan('view:cache');
     }
 
     /** {@inheritdoc} */

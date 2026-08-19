@@ -14,6 +14,8 @@ trait Prunable
      *
      * @param  int  $chunkSize
      * @return int
+     *
+     * @throws \Throwable
      */
     public function pruneAll(int $chunkSize = 1000)
     {
@@ -49,6 +51,8 @@ trait Prunable
      * Get the prunable model query.
      *
      * @return \Illuminate\Database\Eloquent\Builder<static>
+     *
+     * @throws \LogicException
      */
     public function prunable()
     {

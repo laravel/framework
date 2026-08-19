@@ -11,8 +11,6 @@ class ParallelTestingTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         Container::setInstance(new Container);
 
         $_SERVER['LARAVEL_PARALLEL_TESTING'] = 1;
@@ -91,6 +89,7 @@ class ParallelTestingTest extends TestCase
             ['setUpProcess'],
             ['setUpTestCase'],
             ['setUpTestDatabase'],
+            ['setUpTestDatabaseBeforeMigrating'],
             ['tearDownTestCase'],
             ['tearDownProcess'],
         ];
@@ -98,8 +97,6 @@ class ParallelTestingTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Container::setInstance(null);
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);

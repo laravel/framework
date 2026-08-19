@@ -7,6 +7,7 @@ use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Foundation\Providers\FoundationServiceProvider;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
@@ -17,6 +18,15 @@ class RendererTest extends TestCase
     protected function defineRoutes($router)
     {
         $router->get('failed', fn () => throw new RuntimeException('Bad route!'));
+        $router->get('failed-with-previous', function () {
+            throw new RuntimeException(
+                'First exception', previous: new RuntimeException(
+                    'Second exception', previous: new RuntimeException(
+                        'Third exception'
+                    )
+                )
+            );
+        });
     }
 
     #[WithConfig('app.debug', true)]
@@ -93,7 +103,7 @@ class RendererTest extends TestCase
         $listener->shouldReceive('registerListeners')->never();
 
         $this->app->instance(Listener::class, $listener);
-        $this->app->instance(Dispatcher::class, Mockery::mock(Dispatcher::class));
+        Event::swap(Mockery::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
@@ -118,7 +128,7 @@ class RendererTest extends TestCase
         $listener->shouldReceive('registerListeners')->never();
 
         $this->app->instance(Listener::class, $listener);
-        $this->app->instance(Dispatcher::class, Mockery::mock(Dispatcher::class));
+        Event::swap(Mockery::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
@@ -131,12 +141,38 @@ class RendererTest extends TestCase
         $this->assertFalse($this->app->bound(ExceptionRenderer::class));
 
         $listener = Mockery::mock(Listener::class);
-        $listener->shouldReceive('registerListeners')->once();
+        $listener->expects('registerListeners');
 
         $this->app->instance(Listener::class, $listener);
-        $this->app->instance(Dispatcher::class, Mockery::mock(Dispatcher::class));
+        Event::swap(Mockery::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
+    }
+
+    #[WithConfig('app.debug', true)]
+    public function testItRendersPreviousExceptions()
+    {
+        $this->assertTrue($this->app->bound(Renderer::class));
+
+        $this->get('/failed-with-previous')
+            ->assertInternalServerError()
+            ->assertSeeInOrder([
+                'RuntimeException',
+                'First exception',
+                'Previous exceptions',
+                'Second exception',
+                'Third exception',
+            ]);
+    }
+
+    #[WithConfig('app.debug', true)]
+    public function testItExcludesDecorativeAsciiArtInNonBrowserContexts()
+    {
+        $this->get('/failed')
+            ->assertInternalServerError()
+            ->assertSee('RuntimeException')
+            ->assertSee('Bad route!')
+            ->assertDontSee('viewBox="0 0 1268 308"', false);
     }
 }

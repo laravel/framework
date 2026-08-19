@@ -9,18 +9,22 @@ use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Redis\Connections\PredisConnection;
 
+use function Illuminate\Support\enum_value;
+
 class RedisTaggedCache extends TaggedCache
 {
     /**
      * Store an item in the cache if the key does not exist.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
     public function add($key, $value, $ttl = null)
     {
+        $key = enum_value($key);
+
         $seconds = null;
 
         if ($ttl !== null) {
@@ -40,13 +44,15 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Store an item in the cache.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
     public function put($key, $value, $ttl = null)
     {
+        $key = enum_value($key);
+
         if (is_null($ttl)) {
             return $this->forever($key, $value);
         }
@@ -66,12 +72,14 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @return int|bool
      */
     public function increment($key, $value = 1)
     {
+        $key = enum_value($key);
+
         $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
 
         return parent::increment($key, $value);
@@ -80,12 +88,14 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @return int|bool
      */
     public function decrement($key, $value = 1)
     {
+        $key = enum_value($key);
+
         $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
 
         return parent::decrement($key, $value);
@@ -94,12 +104,14 @@ class RedisTaggedCache extends TaggedCache
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)
     {
+        $key = enum_value($key);
+
         $this->tags->addEntry($this->itemKey($key));
 
         return parent::forever($key, $value);
@@ -129,14 +141,9 @@ class RedisTaggedCache extends TaggedCache
         $cachePrefix = $redisPrefix.$this->store->getPrefix();
 
         $cacheTags = [];
-        $keysToBeDeleted = [];
 
         foreach ($this->tags->getNames() as $name) {
             $cacheTags[] = $cachePrefix.$this->tags->tagId($name);
-        }
-
-        foreach ($this->tags->entries() as $entry) {
-            $keysToBeDeleted[] = $this->store->getPrefix().$entry;
         }
 
         $script = <<<'LUA'
@@ -152,12 +159,20 @@ class RedisTaggedCache extends TaggedCache
             end
         LUA;
 
-        $connection->eval(
-            $script,
-            count($keysToBeDeleted),
-            ...$keysToBeDeleted,
-            ...[$cachePrefix, ...$cacheTags]
-        );
+        $prefix = $this->store->getPrefix();
+
+        $entries = $this->tags->entries()
+            ->map(fn (string $key) => $prefix.$key)
+            ->chunk(1000);
+
+        foreach ($entries as $keysToBeDeleted) {
+            $connection->eval(
+                $script,
+                count($keysToBeDeleted),
+                ...$keysToBeDeleted,
+                ...[str_replace('-', '%-', $cachePrefix), ...$cacheTags]
+            );
+        }
 
         $this->event(new CacheFlushed($this->getName()));
 
@@ -188,12 +203,24 @@ class RedisTaggedCache extends TaggedCache
      */
     protected function flushValues()
     {
+        $prefix = $this->store->getPrefix();
+
         $entries = $this->tags->entries()
-            ->map(fn (string $key) => $this->store->getPrefix().$key)
+            ->map(fn (string $key) => $prefix.$key)
             ->chunk(1000);
 
+        $connection = $this->store->connection();
+
         foreach ($entries as $cacheKeys) {
-            $this->store->connection()->del(...$cacheKeys);
+            if ($connection instanceof PredisClusterConnection) {
+                $connection->pipeline(function ($connection) use ($cacheKeys) {
+                    foreach ($cacheKeys as $cacheKey) {
+                        $connection->del($cacheKey);
+                    }
+                });
+            } else {
+                $connection->del(...$cacheKeys);
+            }
         }
     }
 

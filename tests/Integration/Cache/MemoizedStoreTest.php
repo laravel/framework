@@ -18,28 +18,30 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Redis;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Throwable;
 
+#[WithConfig('cache.default', 'redis')]
+#[WithConfig('cache.prefix', 'laravel-cache-')]
 class MemoizedStoreTest extends TestCase
 {
     use InteractsWithRedis;
 
     protected function setUp(): void
     {
+        $this->afterApplicationCreated(function () {
+            $this->setUpRedis();
+
+            Redis::connection(Config::get('cache.stores.redis.connection'))->flushDb();
+            Redis::connection(Config::get('cache.stores.redis.lock_connection'))->flushDb();
+        });
+
+        $this->beforeApplicationDestroyed(function () {
+            $this->tearDownRedis();
+        });
+
         parent::setUp();
-
-        $this->setUpRedis();
-
-        Config::set('cache.default', 'redis');
-        Redis::flushAll();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->tearDownRedis();
     }
 
     public function test_it_can_memoize_when_retrieving_single_value()
@@ -120,20 +122,35 @@ class MemoizedStoreTest extends TestCase
         $this->assertSame($cacheValue, $memoValue);
     }
 
+    public function test_it_uses_correct_keys_for_getMultiple_with_empty_prefix()
+    {
+        Cache::setPrefix(null);
+
+        $data = [
+            '1' => 'one',
+            0 => 'zero',
+        ];
+        Cache::putMany($data);
+
+        $this->assertSame($data, Cache::memo()->many(array_keys($data)));
+        // ensure correct on the second memoized retrieval
+        $this->assertSame($data, Cache::memo()->many(array_keys($data)));
+    }
+
     public function test_null_values_are_memoized_when_retrieving_multiple_values()
     {
         $live = Cache::getMultiple(['name.0', 'name.1']);
         $memoized = Cache::memo()->getMultiple(['name.0', 'name.1']);
-        $this->assertSame($live, ['name.0' => null, 'name.1' => null]);
-        $this->assertSame($memoized, ['name.0' => null, 'name.1' => null]);
+        $this->assertSame(['name.0' => null, 'name.1' => null], $live);
+        $this->assertSame(['name.0' => null, 'name.1' => null], $memoized);
 
         Cache::put('name.0', 'MacDonald', 60);
         Cache::put('name.1', 'Otwell', 60);
 
         $live = Cache::getMultiple(['name.0', 'name.1']);
         $memoized = Cache::memo()->getMultiple(['name.0', 'name.1']);
-        $this->assertSame($live, ['name.0' => 'MacDonald', 'name.1' => 'Otwell']);
-        $this->assertSame($memoized, ['name.0' => null, 'name.1' => null]);
+        $this->assertSame(['name.0' => 'MacDonald', 'name.1' => 'Otwell'], $live);
+        $this->assertSame(['name.0' => null, 'name.1' => null], $memoized);
     }
 
     public function test_it_can_retrieve_already_memoized_and_not_yet_memoized_values_when_retrieving_multiple_values()
@@ -277,7 +294,7 @@ class MemoizedStoreTest extends TestCase
 
     public function test_memoized_driver_uses_underlying_drivers_prefix()
     {
-        $this->assertSame('laravel_cache_', Cache::memo()->getPrefix());
+        $this->assertSame('laravel-cache-', Cache::memo()->getPrefix());
 
         Cache::driver('redis')->setPrefix('foo');
 
@@ -461,6 +478,11 @@ class MemoizedStoreTest extends TestCase
                 return Cache::forget(...func_get_args());
             }
 
+            public function touch($key, $seconds)
+            {
+                return Cache::touch(...func_get_args());
+            }
+
             public function flush()
             {
                 return Cache::flush(...func_get_args());
@@ -494,5 +516,14 @@ class MemoizedStoreTest extends TestCase
         $value = Cache::get('key');
 
         $this->assertSame('value-2', $value);
+    }
+
+    public function test_it_supports_restore_lock()
+    {
+        $owner = Cache::lock('foo', 10)->owner();
+
+        $restoredLock = Cache::memo()->restoreLock('foo', $owner);
+
+        $this->assertSame($owner, $restoredLock->owner());
     }
 }

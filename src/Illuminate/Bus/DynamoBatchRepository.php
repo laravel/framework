@@ -119,7 +119,7 @@ class DynamoBatchRepository implements BatchRepository
      */
     public function find(string $batchId)
     {
-        if ($batchId === '') {
+        if (trim($batchId) === '') {
             return null;
         }
 
@@ -377,8 +377,10 @@ class DynamoBatchRepository implements BatchRepository
     /**
      * Execute the given Closure within a storage specific transaction.
      *
-     * @param  \Closure  $callback
-     * @return mixed
+     * @template TReturn
+     *
+     * @param  (\Closure(): TReturn)  $callback
+     * @return TReturn
      */
     public function transaction(Closure $callback)
     {

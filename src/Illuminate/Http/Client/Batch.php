@@ -7,6 +7,7 @@ use Closure;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Utils;
+use Illuminate\Http\Client\Promises\LazyPromise;
 use Illuminate\Support\Defer\DeferredCallback;
 
 use function Illuminate\Support\defer;
@@ -68,28 +69,28 @@ class Batch
     /**
      * The callback to run after a request from the batch succeeds.
      *
-     * @var (\Closure($this, int|string, \Illuminate\Http\Response): void)|null
+     * @var (\Closure($this, int|string, \Illuminate\Http\Client\Response): void)|null
      */
     protected $progressCallback = null;
 
     /**
      * The callback to run after a request from the batch fails.
      *
-     * @var (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)|null
+     * @var (\Closure($this, int|string, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)|null
      */
     protected $catchCallback = null;
 
     /**
      * The callback to run if all the requests from the batch succeeded.
      *
-     * @var (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)|null
+     * @var (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)|null
      */
     protected $thenCallback = null;
 
     /**
      * The callback to run after all the requests from the batch finish.
      *
-     * @var (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)|null
+     * @var (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)|null
      */
     protected $finallyCallback = null;
 
@@ -103,7 +104,7 @@ class Batch
     /**
      * The date when the batch was created.
      *
-     * @var \Carbon\CarbonImmutable
+     * @var \Carbon\CarbonImmutable|null
      */
     public $createdAt = null;
 
@@ -115,9 +116,14 @@ class Batch
     public $finishedAt = null;
 
     /**
-     * Create a new request batch instance.
+     * The maximum number of concurrent requests.
      *
-     * @return void
+     * @var int|null
+     */
+    protected $concurrencyLimit = null;
+
+    /**
+     * Create a new request batch instance.
      */
     public function __construct(?Factory $factory = null)
     {
@@ -146,6 +152,24 @@ class Batch
     }
 
     /**
+     * Add a request to the batch with a numeric index.
+     *
+     * @return \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\Promise
+     *
+     * @throws \Illuminate\Http\Client\BatchInProgressException
+     */
+    public function newRequest()
+    {
+        if ($this->inProgress) {
+            throw new BatchInProgressException();
+        }
+
+        $this->incrementPendingRequests();
+
+        return $this->requests[] = $this->asyncRequest();
+    }
+
+    /**
      * Register a callback to run before the first request from the batch runs.
      *
      * @param  (\Closure($this): void)  $callback
@@ -161,7 +185,7 @@ class Batch
     /**
      * Register a callback to run after a request from the batch succeeds.
      *
-     * @param  (\Closure($this, int|string, \Illuminate\Http\Response): void)  $callback
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Client\Response): void)  $callback
      * @return Batch
      */
     public function progress(Closure $callback): self
@@ -174,7 +198,7 @@ class Batch
     /**
      * Register a callback to run after a request from the batch fails.
      *
-     * @param  (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)  $callback
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)  $callback
      * @return Batch
      */
     public function catch(Closure $callback): self
@@ -187,7 +211,7 @@ class Batch
     /**
      * Register a callback to run after all the requests from the batch succeed.
      *
-     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
+     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)  $callback
      * @return Batch
      */
     public function then(Closure $callback): self
@@ -200,12 +224,25 @@ class Batch
     /**
      * Register a callback to run after all the requests from the batch finish.
      *
-     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
+     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)  $callback
      * @return Batch
      */
     public function finally(Closure $callback): self
     {
         $this->finallyCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Set the maximum number of concurrent requests.
+     *
+     * @param  int  $limit
+     * @return Batch
+     */
+    public function concurrency(int $limit): self
+    {
+        $this->concurrencyLimit = $limit;
 
         return $this;
     }
@@ -223,7 +260,7 @@ class Batch
     /**
      * Send all of the requests in the batch.
      *
-     * @return array<int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException>
+     * @return array<int|string, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\RequestException>
      */
     public function send(): array
     {
@@ -234,19 +271,9 @@ class Batch
         }
 
         $results = [];
-        $promises = [];
 
-        foreach ($this->requests as $key => $item) {
-            $promise = match (true) {
-                $item instanceof PendingRequest => $item->getPromise(),
-                default => $item,
-            };
-
-            $promises[$key] = $promise;
-        }
-
-        if (! empty($promises)) {
-            (new EachPromise($promises, [
+        if (! empty($this->requests)) {
+            $eachPromiseOptions = [
                 'fulfilled' => function ($result, $key) use (&$results) {
                     $results[$key] = $result;
 
@@ -287,8 +314,31 @@ class Batch
 
                     return $reason;
                 },
-            ]))->promise()->wait();
+            ];
+
+            if ($this->concurrencyLimit !== null) {
+                $eachPromiseOptions['concurrency'] = $this->concurrencyLimit;
+            }
+
+            $promiseGenerator = function () {
+                foreach ($this->requests as $key => $item) {
+                    $promise = $item instanceof PendingRequest ? $item->getPromise() : $item;
+                    yield $key => $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
+                }
+            };
+
+            (new EachPromise($promiseGenerator(), $eachPromiseOptions))
+                ->promise()
+                ->wait();
         }
+
+        // Before returning the results, we must ensure that the results are sorted
+        // in the same order as the requests were defined, respecting any custom
+        // key names that were assigned to this request using the "as" method.
+        uksort($results, function ($key1, $key2) {
+            return array_search($key1, array_keys($this->requests), true) <=>
+                   array_search($key2, array_keys($this->requests), true);
+        });
 
         if (! $this->hasFailures() && $this->thenCallback !== null) {
             call_user_func($this->thenCallback, $this, $results);
@@ -391,15 +441,11 @@ class Batch
      * @param  string  $method
      * @param  array  $parameters
      * @return \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\Promise
+     *
+     * @throws \Illuminate\Http\Client\BatchInProgressException
      */
     public function __call(string $method, array $parameters)
     {
-        if ($this->inProgress) {
-            throw new BatchInProgressException();
-        }
-
-        $this->incrementPendingRequests();
-
-        return $this->requests[] = $this->asyncRequest()->$method(...$parameters);
+        return $this->newRequest()->{$method}(...$parameters);
     }
 }

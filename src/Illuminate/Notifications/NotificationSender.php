@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\Delay;
+use Illuminate\Queue\Attributes\Queue as QueueAttribute;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Localizable;
@@ -18,7 +22,7 @@ use Throwable;
 
 class NotificationSender
 {
-    use Localizable;
+    use Localizable, ReadsQueueAttributes;
 
     /**
      * The notification manager instance.
@@ -82,8 +86,6 @@ class NotificationSender
      */
     public function send($notifiables, $notification)
     {
-        $notifiables = $this->formatNotifiables($notifiables);
-
         if ($notification instanceof ShouldQueue) {
             return $this->queueNotification($notifiables, $notification);
         }
@@ -106,11 +108,11 @@ class NotificationSender
         $original = clone $notification;
 
         foreach ($notifiables as $notifiable) {
-            if (empty($viaChannels = $channels ?: $notification->via($notifiable))) {
+            if (empty($viaChannels = $channels ?: $original->via($notifiable))) {
                 continue;
             }
 
-            $this->withLocale($this->preferredLocale($notifiable, $notification), function () use ($viaChannels, $notifiable, $original) {
+            $this->withLocale($this->preferredLocale($notifiable, $original), function () use ($viaChannels, $notifiable, $original) {
                 $notificationId = (string) Str::uuid();
 
                 foreach ((array) $viaChannels as $channel) {
@@ -177,6 +179,10 @@ class NotificationSender
             throw $exception;
         }
 
+        if (method_exists($notification, 'afterSending')) {
+            $notification->afterSending($notifiable, $channel, $response);
+        }
+
         $this->events->dispatch(
             new NotificationSent($notifiable, $notification, $channel, $response)
         );
@@ -229,25 +235,27 @@ class NotificationSender
                     $notification->locale = $this->locale;
                 }
 
-                $connection = $notification->connection;
+                $connection = $this->getAttributeValue($notification, Connection::class, 'connection')
+                    ?? $this->manager->resolveConnectionFromQueueRoute($notification)
+                    ?? null;
 
                 if (method_exists($notification, 'viaConnections')) {
-                    $connection = $notification->viaConnections()[$channel] ?? null;
+                    $connection = $notification->viaConnections()[$channel] ?? $connection;
                 }
 
-                $queue = $notification->queue;
+                $queue = $this->getAttributeValue($notification, QueueAttribute::class, 'queue')
+                    ?? $this->manager->resolveQueueFromQueueRoute($notification)
+                    ?? null;
 
                 if (method_exists($notification, 'viaQueues')) {
-                    $queue = $notification->viaQueues()[$channel] ?? null;
+                    $queue = $notification->viaQueues()[$channel] ?? $queue;
                 }
 
-                $delay = $notification->delay;
+                $delay = method_exists($notification, 'withDelay')
+                    ? ($notification->withDelay($notifiable, $channel) ?? null)
+                    : $this->getAttributeValue($notification, Delay::class, 'delay');
 
-                if (method_exists($notification, 'withDelay')) {
-                    $delay = $notification->withDelay($notifiable, $channel) ?? null;
-                }
-
-                $messageGroup = $notification->messageGroup ?? null;
+                $messageGroup = $notification->messageGroup ?? (method_exists($notification, 'messageGroup') ? $notification->messageGroup() : null);
 
                 if (method_exists($notification, 'withMessageGroups')) {
                     $messageGroup = $notification->withMessageGroups($notifiable, $channel) ?? null;

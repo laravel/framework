@@ -61,7 +61,7 @@ class CursorPaginatorTest extends TestCase
         $p = new CursorPaginator($array = [['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
             $options = ['path' => 'http://website.com/test', 'parameters' => ['id']]);
 
-        $this->assertSame($p->path(), 'http://website.com/test');
+        $this->assertSame('http://website.com/test', $p->path());
     }
 
     public function testCanTransformPaginatorItems()
@@ -95,6 +95,24 @@ class CursorPaginatorTest extends TestCase
 
         $this->assertFalse($paginator->onFirstPage());
         $this->assertTrue($paginator->onLastPage());
+    }
+
+    public function testItemsAreConsistentlyReindexedForNextAndPreviousPages(): void
+    {
+        $next = new CursorPaginator([['id' => 1], ['id' => 2], ['id' => 3]], 2, null, [
+            'parameters' => ['id'],
+        ]);
+
+        $this->assertSame([0, 1], array_keys($next->items()));
+
+        $cursor = new Cursor(['id' => 5], false);
+
+        $previous = new CursorPaginator([['id' => 4], ['id' => 3], ['id' => 2]], 2, $cursor, [
+            'parameters' => ['id'],
+        ]);
+
+        $this->assertSame([0, 1], array_keys($previous->items()));
+        $this->assertSame([['id' => 3], ['id' => 4]], $previous->items());
     }
 
     public function testReturnEmptyCursorWhenItemsAreEmpty()

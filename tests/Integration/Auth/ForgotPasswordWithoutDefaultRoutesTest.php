@@ -12,6 +12,7 @@ use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 #[WithMigration]
 class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
@@ -41,8 +42,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
 
     public function testItCannotSendForgotPasswordEmail()
     {
-        $this->expectException('Symfony\Component\Routing\Exception\RouteNotFoundException');
-        $this->expectExceptionMessage('Route [password.reset] not defined.');
+        $this->expectExceptionObject(new RouteNotFoundException('Route [password.reset] not defined.'));
 
         Notification::fake();
 
@@ -98,7 +98,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
 
         ResetPassword::toMailUsing(function ($notifiable, $token) {
             return (new MailMessage)
-                ->subject(__('Reset Password Notification'))
+                ->subject(__('Reset your password'))
                 ->line(__('You are receiving this email because we received a password reset request for your account.'))
                 ->action(__('Reset Password'), route('custom.password.reset', $token))
                 ->line(__('If you did not request a password reset, no further action is required.'));

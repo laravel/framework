@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Attributes\Scope as NamedScope;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
 
 class EloquentModelScopeTest extends DatabaseTestCase
@@ -28,6 +28,13 @@ class EloquentModelScopeTest extends DatabaseTestCase
 
         $this->assertTrue($model->hasNamedScope('existsAsWell'));
     }
+
+    public function testModelDoesNotHaveScopeWhenPrivateVisibility()
+    {
+        $model = new TestScopeModel1;
+
+        $this->assertFalse($model->hasNamedScope('existsAsPrivate'));
+    }
 }
 
 class TestScopeModel1 extends Model
@@ -37,8 +44,14 @@ class TestScopeModel1 extends Model
         return $builder;
     }
 
-    #[NamedScope]
+    #[Scope]
     protected function existsAsWell(Builder $builder)
+    {
+        return $builder;
+    }
+
+    #[Scope]
+    private function existsAsPrivate(Builder $builder)
     {
         return $builder;
     }

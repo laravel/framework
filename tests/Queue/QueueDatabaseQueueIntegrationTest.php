@@ -10,6 +10,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
+use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
@@ -119,7 +120,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
                 'payload' => 'mock_payload',
                 'attempts' => 0,
                 'reserved_at' => null,
-                'available_at' => Carbon::now()->subSeconds(1)->getTimestamp(),
+                'available_at' => Carbon::now()->subSecond()->getTimestamp(),
                 'created_at' => Carbon::now()->getTimestamp(),
             ]);
 
@@ -139,7 +140,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
             'payload' => 'mock_payload',
             'attempts' => 0,
             'reserved_at' => null,
-            'available_at' => Carbon::now()->subSeconds(1)->getTimestamp(),
+            'available_at' => Carbon::now()->subSecond()->getTimestamp(),
             'created_at' => Carbon::now()->getTimestamp(),
         ];
 
@@ -174,7 +175,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
                 'payload' => 'mock_payload 2',
                 'attempts' => 0,
                 'reserved_at' => null,
-                'available_at' => Carbon::now()->subSeconds(1)->getTimestamp(),
+                'available_at' => Carbon::now()->subSecond()->getTimestamp(),
                 'created_at' => Carbon::now()->getTimestamp(),
             ]]);
 
@@ -195,7 +196,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
                 'payload' => 'mock_payload',
                 'attempts' => 0,
                 'reserved_at' => null,
-                'available_at' => Carbon::now()->addSeconds(60)->getTimestamp(),
+                'available_at' => Carbon::now()->addMinute()->getTimestamp(),
                 'created_at' => Carbon::now()->getTimestamp(),
             ]);
 
@@ -246,6 +247,21 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $popped_job = $this->queue->pop($mock_queue_name);
 
         $this->assertNull($popped_job);
+    }
+
+    public function testCustomPayloadIsExposedOnInspectedJob()
+    {
+        Queue::createPayloadUsing(function ($connection, $queue, $payload) {
+            return ['context' => ['tenant' => 'acme']];
+        });
+
+        $this->queue->push('MyJob', []);
+
+        $job = $this->queue->pendingJobs()->first();
+
+        $this->assertSame(['tenant' => 'acme'], $job->payload['context']);
+
+        Queue::createPayloadUsing(null);
     }
 
     public function testJobPayloadIsAvailableOnEvents()

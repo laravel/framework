@@ -9,9 +9,9 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -182,9 +182,17 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function previousPath($fallback = false)
     {
-        $previousPath = str_replace($this->to('/'), '', rtrim(preg_replace('/\?.*/', '', $this->previous($fallback)), '/'));
+        $previousPath = parse_url($this->previous($fallback), PHP_URL_PATH);
 
-        return $previousPath === '' ? '/' : $previousPath;
+        if (! is_string($previousPath) || $previousPath === '') {
+            return '/';
+        }
+
+        $basePath = parse_url($this->to('/'), PHP_URL_PATH) ?: '';
+
+        $previousPath = $basePath !== '/' ? preg_replace('#^'.preg_quote($basePath, '#').'#', '', $previousPath) : $previousPath;
+
+        return rtrim($previousPath, '/') ?: '/';
     }
 
     /**
@@ -383,6 +391,8 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  mixed  $parameters
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     protected function ensureSignedRouteParametersAreNotReserved($parameters)
     {
@@ -449,9 +459,17 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function hasCorrectSignature(Request $request, $absolute = true, Closure|array $ignoreQuery = [])
     {
-        $url = $absolute ? $request->url() : '/'.$request->path();
+        $signature = $request->query('signature');
 
-        $queryString = (new Collection(explode('&', (string) $request->server->get('QUERY_STRING'))))
+        if (! is_string($signature)) {
+            return false;
+        }
+
+        $url = $absolute
+            ? rtrim($request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo(), '/')
+            : '/'.$request->path();
+
+        $queryString = (new Stringable((string) ($request->server->get('VAPOR_RAW_QUERY_STRING') ?? $request->server->get('QUERY_STRING'))))->explode('&')
             ->reject(function ($parameter) use ($ignoreQuery) {
                 $parameter = Str::before($parameter, '=');
 
@@ -473,16 +491,10 @@ class UrlGenerator implements UrlGeneratorContract
 
         $keys = is_array($keys) ? $keys : [$keys];
 
-        foreach ($keys as $key) {
-            if (hash_equals(
-                hash_hmac('sha256', $original, $key),
-                (string) $request->query('signature', '')
-            )) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($keys, fn ($key) => hash_equals(
+            hash_hmac('sha256', $original, $key),
+            $signature
+        ));
     }
 
     /**
@@ -494,6 +506,10 @@ class UrlGenerator implements UrlGeneratorContract
     public function signatureHasNotExpired(Request $request)
     {
         $expires = $request->query('expires');
+
+        if ($expires !== null && ! is_string($expires)) {
+            return false;
+        }
 
         return ! ($expires && Carbon::now()->getTimestamp() > $expires);
     }
@@ -837,7 +853,7 @@ class UrlGenerator implements UrlGeneratorContract
         $this->cachedRoot = null;
         $this->cachedScheme = null;
 
-        tap(optional($this->routeGenerator)->defaultParameters ?: [], function ($defaults) {
+        tap($this->routeGenerator?->defaultParameters ?: [], function ($defaults) {
             $this->routeGenerator = null;
 
             if (! empty($defaults)) {

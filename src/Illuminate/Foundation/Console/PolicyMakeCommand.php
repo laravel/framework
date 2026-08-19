@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 use LogicException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function Laravel\Prompts\suggest;
@@ -16,11 +15,15 @@ use function Laravel\Prompts\suggest;
 class PolicyMakeCommand extends GeneratorCommand
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'make:policy';
+    protected $signature = 'make:policy
+                    {name : The name of the policy}
+                    {--f|force : Create the class even if the policy already exists}
+                    {--m|model= : The model that the policy applies to}
+                    {--g|guard= : The guard that the policy relies on}';
 
     /**
      * The console command description.
@@ -190,20 +193,6 @@ class PolicyMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the policy already exists'],
-            ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to'],
-            ['guard', 'g', InputOption::VALUE_OPTIONAL, 'The guard that the policy relies on'],
-        ];
-    }
-
-    /**
      * Interact further with the user if they were prompted for missing arguments.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
@@ -218,7 +207,7 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $model = suggest(
             'What model should this policy apply to? (Optional)',
-            $this->possibleModels(),
+            $this->findAvailableModels(),
         );
 
         if ($model) {

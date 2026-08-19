@@ -6,7 +6,10 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use RuntimeException;
 
 class Attachment
@@ -21,7 +24,7 @@ class Attachment
     public $as;
 
     /**
-     * The attached file's mime type.
+     * The attached file's MIME type.
      *
      * @var string|null
      */
@@ -63,6 +66,10 @@ class Attachment
      */
     public static function fromUrl($url)
     {
+        if (! Str::isUrl($url, ['http', 'https'])) {
+            throw new InvalidArgumentException('Attachment URLs must use the http or https scheme.');
+        }
+
         return static::fromPath($url);
     }
 
@@ -98,7 +105,7 @@ class Attachment
     }
 
     /**
-     * Create a mail attachment from a file in the default storage disk.
+     * Create a mail attachment from a file on the default storage disk.
      *
      * @param  string  $path
      * @return static
@@ -109,7 +116,7 @@ class Attachment
     }
 
     /**
-     * Create a mail attachment from a file in the specified storage disk.
+     * Create a mail attachment from a file on the specified storage disk.
      *
      * @param  string|null  $disk
      * @param  string  $path
@@ -131,6 +138,17 @@ class Attachment
     }
 
     /**
+     * Create a mail attachment from a file on the cloud storage disk.
+     *
+     * @param  string  $path
+     * @return static
+     */
+    public static function fromCloudStorage($path)
+    {
+        return self::fromStorageDisk(Storage::getDefaultCloudDriver(), $path);
+    }
+
+    /**
      * Set the attached file's filename.
      *
      * @param  string|null  $name
@@ -144,7 +162,7 @@ class Attachment
     }
 
     /**
-     * Set the attached file's mime type.
+     * Set the attached file's MIME type.
      *
      * @param  string  $mime
      * @return $this
@@ -174,6 +192,8 @@ class Attachment
      * @param  \Illuminate\Mail\Mailable|\Illuminate\Mail\Message|\Illuminate\Notifications\Messages\MailMessage  $mail
      * @param  array  $options
      * @return mixed
+     *
+     * @throws \RuntimeException
      */
     public function attachTo($mail, $options = [])
     {

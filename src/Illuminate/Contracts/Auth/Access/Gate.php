@@ -7,7 +7,7 @@ interface Gate
     /**
      * Determine if a given ability has been defined.
      *
-     * @param  string  $ability
+     * @param  \UnitEnum|string  $ability
      * @return bool
      */
     public function has($ability);
