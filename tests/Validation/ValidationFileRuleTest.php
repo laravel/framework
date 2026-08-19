@@ -496,5 +496,4 @@ class ValidationFileRuleTest extends TestCase
 
         (new ValidationServiceProvider($container))->register();
     }
-
 }

@@ -93,5 +93,4 @@ class AssertRedirectToSignedRouteTest extends TestCase
         $this->get('test-route')
             ->assertRedirectToSignedRoute('signed-route');
     }
-
 }

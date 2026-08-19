@@ -158,7 +158,6 @@ class ValidationImageFileRuleTest extends TestCase
 
         (new ValidationServiceProvider($container))->register();
     }
-
 }
 
 class UploadedFileWithCustomImageSizeMethod extends UploadedFile

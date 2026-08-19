@@ -925,5 +925,4 @@ class ValidationEmailRuleTest extends TestCase
 
         (new ValidationServiceProvider($container))->register();
     }
-
 }

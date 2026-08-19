@@ -390,5 +390,4 @@ class ValidationAnyOfRuleTest extends TestCase
 
         $this->setUpRuleSets();
     }
-
 }

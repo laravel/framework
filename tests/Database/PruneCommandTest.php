@@ -263,5 +263,4 @@ class PruneCommandTest extends TestCase
 
         return $output;
     }
-
 }

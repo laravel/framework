@@ -82,5 +82,4 @@ class AssertRedirectToRouteTest extends TestCase
         $this->get('test-route')
             ->assertRedirectToRoute('route-with-empty-uri', ['foo' => 'bar']);
     }
-
 }

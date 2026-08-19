@@ -603,5 +603,4 @@ class ValidationPasswordRuleTest extends TestCase
 
         (new ValidationServiceProvider($container))->register();
     }
-
 }

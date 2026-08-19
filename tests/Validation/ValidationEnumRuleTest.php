@@ -338,5 +338,4 @@ class ValidationEnumRuleTest extends TestCase
 
         (new ValidationServiceProvider($container))->register();
     }
-
 }

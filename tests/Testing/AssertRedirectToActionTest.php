@@ -46,7 +46,6 @@ class AssertRedirectToActionTest extends TestCase
         $this->get('redirect-to-show')
             ->assertRedirectToAction([TestActionController::class, 'show'], ['id' => 123]);
     }
-
 }
 
 class TestActionController extends Controller
