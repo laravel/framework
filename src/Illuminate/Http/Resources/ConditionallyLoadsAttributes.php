@@ -272,11 +272,11 @@ trait ConditionallyLoadsAttributes
      */
     protected function whenLoaded($relationship, $value = null, $default = new MissingValue)
     {
-        if (! $this->resource->isRelation($relationship)) {
-            throw RelationNotFoundException::make($this->resource, $relationship);
-        }
-
         if (! $this->resource->relationLoaded($relationship)) {
+            if (! $this->resource->isRelation($relationship)) {
+                throw RelationNotFoundException::make($this->resource, $relationship);
+            }
+
             return value($default);
         }
 
