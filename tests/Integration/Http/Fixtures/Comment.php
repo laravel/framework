@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Http\Fixtures;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Author extends Model
+class Comment extends Model
 {
     /**
      * The attributes that aren't mass assignable.
@@ -12,9 +12,4 @@ class Author extends Model
      * @var string[]
      */
     protected $guarded = [];
-
-    public function posts()
-    {
-        return $this->hasMany(Post::class);
-    }
 }
