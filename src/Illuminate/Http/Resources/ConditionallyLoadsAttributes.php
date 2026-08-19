@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Resources;
 
+use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Http\Resources\Attributes\PreserveKeys;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Stringable;
@@ -271,6 +272,10 @@ trait ConditionallyLoadsAttributes
      */
     protected function whenLoaded($relationship, $value = null, $default = new MissingValue)
     {
+        if (! $this->resource->isRelation($relationship)) {
+            throw RelationNotFoundException::make($this->resource, $relationship);
+        }
+
         if (! $this->resource->relationLoaded($relationship)) {
             return value($default);
         }
