@@ -881,4 +881,25 @@ class PostgresGrammar extends Grammar
     {
         self::cascadeOnTruncate($value);
     }
+
+    /**
+     * Determine if the grammar supports vector distance queries.
+     *
+     * @return bool
+     */
+    public function supportsVectorDistance()
+    {
+        return true;
+    }
+
+    /**
+     * Compile a vector distance expression for the given column.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    public function compileVectorDistanceExpression($column)
+    {
+        return "({$this->wrap($column)} <=> ?)";
+    }
 }

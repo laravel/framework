@@ -15,7 +15,6 @@ use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\Paginator;
@@ -519,7 +518,7 @@ class Builder implements BuilderContract
         $as = $this->getGrammar()->wrap($as ?? $column.'_distance');
 
         return $this->addSelect(
-            new Expression("({$this->getGrammar()->wrap($column)} <=> ?) as {$as}")
+            new Expression("{$this->getGrammar()->compileVectorDistanceExpression($column)} as {$as}")
         );
     }
 
@@ -1254,7 +1253,7 @@ class Builder implements BuilderContract
         }
 
         return $this->whereRaw(
-            "({$this->getGrammar()->wrap($column)} <=> ?) <= ?",
+            "{$this->getGrammar()->compileVectorDistanceExpression($column)} <= ?",
             [
                 json_encode(
                     $vector instanceof Arrayable
@@ -3061,7 +3060,7 @@ class Builder implements BuilderContract
         );
 
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
-            'column' => new Expression("({$this->getGrammar()->wrap($column)} <=> ?)"),
+            'column' => new Expression($this->getGrammar()->compileVectorDistanceExpression($column)),
             'direction' => 'asc',
         ];
 
@@ -4775,8 +4774,8 @@ class Builder implements BuilderContract
      */
     protected function ensureConnectionSupportsVectors()
     {
-        if (! $this->connection instanceof PostgresConnection) {
-            throw new RuntimeException('Vector distance queries are only supported by Postgres.');
+        if (! $this->getGrammar()->supportsVectorDistance()) {
+            throw new RuntimeException('Vector distance queries are only supported by Postgres and MariaDB.');
         }
     }
 

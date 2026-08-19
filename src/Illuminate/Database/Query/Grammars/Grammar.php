@@ -1063,6 +1063,29 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Determine if the grammar supports vector distance queries.
+     *
+     * @return bool
+     */
+    public function supportsVectorDistance()
+    {
+        return false;
+    }
+
+    /**
+     * Compile a vector distance expression for the given column.
+     *
+     * @param  string  $column
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileVectorDistanceExpression($column)
+    {
+        throw new RuntimeException('This database engine does not support vector distance queries.');
+    }
+
+    /**
      * Compile the "limit" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

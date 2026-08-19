@@ -66,4 +66,25 @@ class MariaDbGrammar extends MySqlGrammar
 
         return 'json_value('.$field.$path.')';
     }
+
+    /**
+     * Determine if the grammar supports vector distance queries.
+     *
+     * @return bool
+     */
+    public function supportsVectorDistance()
+    {
+        return true;
+    }
+
+    /**
+     * Compile a vector distance expression for the given column.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    public function compileVectorDistanceExpression($column)
+    {
+        return "vec_distance_cosine({$this->wrap($column)}, ?)";
+    }
 }
