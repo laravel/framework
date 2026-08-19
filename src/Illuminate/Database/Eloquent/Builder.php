@@ -327,6 +327,28 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add an "or where" clause on the primary key to the query.
+     *
+     * @param  mixed  $id
+     * @return $this
+     */
+    public function orWhereKey($id)
+    {
+        return $this->where(fn (self $query) => $query->whereKey($id), null, null, 'or');
+    }
+
+    /**
+     * Add an "or where not" clause on the primary key to the query.
+     *
+     * @param  mixed  $id
+     * @return $this
+     */
+    public function orWhereKeyNot($id)
+    {
+        return $this->where(fn (self $query) => $query->whereKeyNot($id), null, null, 'or');
+    }
+
+    /**
      * Exclude the given models from the query results.
      *
      * @param  iterable|mixed  $models

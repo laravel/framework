@@ -2452,6 +2452,83 @@ class DatabaseEloquentBuilderTest extends TestCase
         });
     }
 
+    public function testOrWhereKeyMethodWithInt()
+    {
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->whereKey(1)->orWhereKey(2);
+
+        $this->assertSame('select * from "table" where "table"."id" = ? or ("table"."id" = ?)', $query->toSql());
+        $this->assertEquals([1, 2], $query->getBindings());
+    }
+
+    public function testOrWhereKeyMethodWithArray()
+    {
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->whereKey(1)->orWhereKey([2, 3]);
+
+        $this->assertSame('select * from "table" where "table"."id" = ? or ("table"."id" in (2, 3))', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
+    }
+
+    public function testOrWhereKeyMethodWithCollection()
+    {
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->whereKey(1)->orWhereKey(new Collection([2, 3]));
+
+        $this->assertSame('select * from "table" where "table"."id" = ? or ("table"."id" in (2, 3))', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
+    }
+
+    public function testOrWhereKeyNotMethodWithInt()
+    {
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->whereKey(1)->orWhereKeyNot(2);
+
+        $this->assertSame('select * from "table" where "table"."id" = ? or ("table"."id" != ?)', $query->toSql());
+        $this->assertEquals([1, 2], $query->getBindings());
+    }
+
+    public function testOrWhereKeyNotMethodWithArray()
+    {
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->whereKey(1)->orWhereKeyNot([2, 3]);
+
+        $this->assertSame('select * from "table" where "table"."id" = ? or ("table"."id" not in (2, 3))', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
+    }
+
+    public function testOrWhereKeyNotMethodWithCollection()
+    {
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->whereKey(1)->orWhereKeyNot(new Collection([2, 3]));
+
+        $this->assertSame('select * from "table" where "table"."id" = ? or ("table"."id" not in (2, 3))', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
+    }
+
+    public function testOrWhereKeyMethodsHonorWhereKeyOverrides()
+    {
+        $model = new EloquentBuilderTestWhereKeyOverrideStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->whereKey(1)->orWhereKey(2)->orWhereKeyNot(3);
+
+        $this->assertSame('select * from "table" where ("tenant_id" = ? and "local_id" = ?) or (("tenant_id" = ? and "local_id" = ?)) or (not ("tenant_id" = ? and "local_id" = ?))', $query->toSql());
+        $this->assertEquals([1, 1, 2, 2, 3, 3], $query->getBindings());
+    }
+
     public function testExceptMethodWithModel()
     {
         $model = new EloquentBuilderTestStubStringPrimaryKey;
@@ -3241,6 +3318,29 @@ class EloquentBuilderTestStubStringPrimaryKey extends Model
     protected $table = 'foo_table';
 
     protected $keyType = 'string';
+}
+
+class EloquentBuilderTestWhereKeyOverrideStub extends Model
+{
+    protected $table = 'table';
+
+    public function newEloquentBuilder($query)
+    {
+        return new EloquentBuilderTestWhereKeyOverrideBuilder($query);
+    }
+}
+
+class EloquentBuilderTestWhereKeyOverrideBuilder extends Builder
+{
+    public function whereKey($id)
+    {
+        return $this->where(fn ($query) => $query->where('tenant_id', '=', $id)->where('local_id', '=', $id));
+    }
+
+    public function whereKeyNot($id)
+    {
+        return $this->whereNot(fn ($query) => $query->where('tenant_id', '=', $id)->where('local_id', '=', $id));
+    }
 }
 
 class EloquentBuilderTestWhereBelongsToStub extends Model
