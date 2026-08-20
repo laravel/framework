@@ -742,6 +742,17 @@ class SupportStrTest extends TestCase
         $this->assertSame(Str::isUuid($uuid, $version), $passes);
     }
 
+    public function testIsUlid(): void
+    {
+        $this->assertTrue(Str::isUlid((string) Str::ulid()));
+        $this->assertTrue(Str::isUlid('01ARZ3NDEKTSV4RRFFQ69G5FAV'));
+
+        $this->assertFalse(Str::isUlid('not-a-ulid'));
+        $this->assertFalse(Str::isUlid('01ARZ3NDEKTSV4RRFFQ69G5FA'));
+        $this->assertFalse(Str::isUlid(null));
+        $this->assertFalse(Str::isUlid(['not', 'a', 'ulid']));
+    }
+
     public function testIsJson()
     {
         $this->assertTrue(Str::isJson('1'));
@@ -1974,6 +1985,23 @@ class SupportStrTest extends TestCase
         }
     }
 
+    public function testResetFactoryState(): void
+    {
+        Str::createRandomStringsUsing(fn ($length) => 'random:'.$length);
+        Str::createUuidsUsing(fn () => Str::of('fixed-uuid'));
+        Str::createUlidsUsing(fn () => Str::of('fixed-ulid'));
+
+        $this->assertSame('random:7', Str::random(7));
+        $this->assertSame('fixed-uuid', (string) Str::uuid());
+        $this->assertSame('fixed-ulid', (string) Str::ulid());
+
+        Str::resetFactoryState();
+
+        $this->assertNotSame('random:7', Str::random(7));
+        $this->assertNotSame('fixed-uuid', (string) Str::uuid());
+        $this->assertNotSame('fixed-ulid', (string) Str::ulid());
+    }
+
     public function testPasswordCreation()
     {
         $this->assertSame(32, strlen(Str::password()));
@@ -2143,5 +2171,20 @@ class SupportStrTest extends TestCase
         };
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
+    }
+
+    public function testPluralStudly(): void
+    {
+        $this->assertSame('VerifiedHumans', Str::pluralStudly('VerifiedHuman'));
+        $this->assertSame('UserFeedback', Str::pluralStudly('UserFeedback'));
+        $this->assertSame('VerifiedHuman', Str::pluralStudly('VerifiedHuman', 1));
+        $this->assertSame('VerifiedHumans', Str::pluralStudly('VerifiedHuman', 2));
+    }
+
+    public function testSingular(): void
+    {
+        $this->assertSame('child', Str::singular('children'));
+        $this->assertSame('mouse', Str::singular('mice'));
+        $this->assertSame('Laracon', Str::singular('Laracons'));
     }
 }
