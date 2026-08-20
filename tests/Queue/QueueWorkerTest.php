@@ -555,7 +555,7 @@ class QueueWorkerTest extends TestCase
 
         $worker->daemon('default', 'queue', $workerOptions);
 
-        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($workerOptions) {
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::on(function ($event) use ($workerOptions) {
             return $event instanceof WorkerHeartbeat
                 && $event->connectionName === 'default'
                 && $event->queue === 'queue'
@@ -576,7 +576,7 @@ class QueueWorkerTest extends TestCase
 
         $worker->daemon('default', 'queue', $workerOptions);
 
-        $this->events->shouldNotHaveReceived('dispatch', [m::type(WorkerHeartbeat::class)]);
+        $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(WorkerHeartbeat::class)]);
     }
 
     public function testWorkerHeartbeatIsDisabled()
@@ -589,7 +589,7 @@ class QueueWorkerTest extends TestCase
 
         $worker->daemon('default', 'queue', $workerOptions);
 
-        $this->events->shouldNotHaveReceived('dispatch', [m::type(WorkerHeartbeat::class)]);
+        $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(WorkerHeartbeat::class)]);
     }
 
     public function testWorkerStoppingIsDispatched()
