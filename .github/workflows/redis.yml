@@ -76,7 +76,7 @@ jobs:
         with:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
 
-      - name: Create Redis Cluster
+      - name: Install Redis Server
         run: |
           sudo apt update
           sudo apt-get install -y --fix-missing redis-server
@@ -84,10 +84,19 @@ jobs:
           redis-server --daemonize yes --port 7000 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7000.conf
           redis-server --daemonize yes --port 7001 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7001.conf
           redis-server --daemonize yes --port 7002 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7002.conf
-          for port in 7000 7001 7002; do
-            until redis-cli -h 127.0.0.1 -p "${port}" ping; do sleep 1; done
-          done
-          redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes
+
+      - name: Create Redis Cluster
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
+        with:
+          timeout_seconds: 5
+          max_attempts: 5
+          retry_wait_seconds: 5
+          retry_on: error
+          command: |
+            redis-cli -h 127.0.0.1 -p 7000 ping
+            redis-cli -h 127.0.0.1 -p 7001 ping
+            redis-cli -h 127.0.0.1 -p 7002 ping
+            redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes
 
       - name: Check Redis Cluster is ready
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
