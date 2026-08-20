@@ -4,6 +4,7 @@ namespace Illuminate\Broadcasting;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastAfterCommit;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Queue\Attributes\Backoff;
@@ -76,7 +77,13 @@ class BroadcastEvent implements ShouldQueue
         $this->tries = $this->getAttributeValue($event, Tries::class, 'tries');
         $this->timeout = $this->getAttributeValue($event, Timeout::class, 'timeout');
         $this->backoff = $this->getAttributeValue($event, Backoff::class, 'backoff');
-        $this->afterCommit = property_exists($event, 'afterCommit') ? $event->afterCommit : null;
+
+        if ($event instanceof ShouldBroadcastAfterCommit) {
+            $this->afterCommit = true;
+        } else {
+            $this->afterCommit = property_exists($event, 'afterCommit') ? $event->afterCommit : null;
+        }
+
         $this->maxExceptions = $this->getAttributeValue($event, MaxExceptions::class, 'maxExceptions');
         $this->deleteWhenMissingModels = $this->getAttributeValue($event, DeleteWhenMissingModels::class, 'deleteWhenMissingModels') ?? true;
     }
