@@ -981,6 +981,75 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '2022-04-20', 1 => '2022-04-20'], $builder->getBindings());
     }
 
+    public function testWhereBinaryClauseMariaDb()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('users')->whereBinary('name', 'john');
+        $this->assertSame('select * from `users` where `name` = binary ?', $builder->toSql());
+        $this->assertEquals([0 => 'john'], $builder->getBindings());
+
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('users')->whereNotBinary('name', 'john');
+        $this->assertSame('select * from `users` where `name` != binary ?', $builder->toSql());
+        $this->assertEquals([0 => 'john'], $builder->getBindings());
+    }
+
+    public function testWhereBinaryClauseMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereBinary('name', 'john');
+        $this->assertSame('select * from `users` where `name` = binary ?', $builder->toSql());
+        $this->assertEquals([0 => 'john'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNotBinary('name', 'john');
+        $this->assertSame('select * from `users` where `name` != binary ?', $builder->toSql());
+        $this->assertEquals([0 => 'john'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereBinary('name', 'john');
+        $this->assertSame('select * from `users` where `id` = ? or `name` = binary ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'john'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotBinary('name', 'john');
+        $this->assertSame('select * from `users` where `id` = ? or `name` != binary ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'john'], $builder->getBindings());
+    }
+
+    public function testWhereBinaryClausePostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereBinary('name', 'john');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This database engine does not support binary comparison operations.');
+
+        $builder->toSql();
+    }
+
+    public function testWhereBinaryClauseSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereBinary('name', 'john');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This database engine does not support binary comparison operations.');
+
+        $builder->toSql();
+    }
+
+    public function testWhereBinaryClauseSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereBinary('name', 'john');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This database engine does not support binary comparison operations.');
+
+        $builder->toSql();
+    }
+
     public function testWhereLikePostgres()
     {
         $builder = $this->getPostgresBuilder();
