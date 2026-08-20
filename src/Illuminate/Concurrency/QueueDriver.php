@@ -49,7 +49,7 @@ class QueueDriver implements Driver
             return [];
         }
 
-        $connection = $this->connection();
+        $connection = $this->resolveConnection();
         $store = $this->resolveStore();
         $inline = $this->queueConnectionDriver($connection) === 'sync';
 
@@ -119,7 +119,7 @@ class QueueDriver implements Driver
 
                 $job->onConnection($connection);
 
-                if (! is_null($queue = $this->queue())) {
+                if (! is_null($queue = $this->resolveQueue())) {
                     $job->onQueue($queue);
                 }
 
@@ -173,7 +173,7 @@ class QueueDriver implements Driver
      */
     public function defer(Closure|array $tasks): DeferredCallback
     {
-        $connection = $this->connection();
+        $connection = $this->resolveConnection();
 
         $this->ensureQueueConnectionIsSupported($connection);
 
@@ -181,7 +181,7 @@ class QueueDriver implements Driver
             foreach (Arr::wrap($tasks) as $task) {
                 $job = CallQueuedClosure::create($task)->onConnection($connection);
 
-                if (! is_null($queue = $this->queue())) {
+                if (! is_null($queue = $this->resolveQueue())) {
                     $job->onQueue($queue);
                 }
 
@@ -257,7 +257,7 @@ class QueueDriver implements Driver
 
         if (Carbon::now()->getTimestamp() > $startedAt->getTimestamp() + $timeout) {
             throw new TaskTimedOutException(
-                count($keys) - $missing, count($keys), $timeout, $connection, $this->queue(), $store,
+                count($keys) - $missing, count($keys), $timeout, $connection, $this->resolveQueue(), $store,
             );
         }
 
@@ -307,7 +307,7 @@ class QueueDriver implements Driver
                 $repository->deleteMultiple(array_values($keys));
 
                 throw new TaskTimedOutException(
-                    $received, count($keys), $timeout, $connection, $this->queue(), $store,
+                    $received, count($keys), $timeout, $connection, $this->resolveQueue(), $store,
                 );
             }
 
@@ -356,7 +356,7 @@ class QueueDriver implements Driver
     /**
      * Get the queue connection name that tasks should be dispatched to.
      */
-    protected function connection(): ?string
+    protected function resolveConnection(): ?string
     {
         return $this->options['connection'] ?? $this->config->get('queue.default');
     }
@@ -364,7 +364,7 @@ class QueueDriver implements Driver
     /**
      * Get the queue name that tasks should be dispatched to.
      */
-    protected function queue(): ?string
+    protected function resolveQueue(): ?string
     {
         return $this->options['queue'] ?? null;
     }

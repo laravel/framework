@@ -135,6 +135,23 @@ class TaskResultTest extends TestCase
         $this->fail('The expected exception was not thrown.');
     }
 
+    public function testUnwrapToleratesEnvelopesWithoutParameters()
+    {
+        $envelope = TaskResult::failure(new RuntimeException('Original message'));
+
+        unset($envelope['parameters']);
+
+        try {
+            TaskResult::unwrap($envelope);
+        } catch (RuntimeException $e) {
+            $this->assertSame('Original message', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('The expected exception was not thrown.');
+    }
+
     public function testFailureEnvelopeIgnoresInheritedConstructors()
     {
         $envelope = TaskResult::failure(new TaskResultTestExceptionWithoutConstructor('Inherited'));
