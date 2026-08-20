@@ -41,9 +41,6 @@ class ComponentTest extends TestCase
 
     protected function tearDown(): void
     {
-        Facade::clearResolvedInstances();
-        Facade::setFacadeApplication(null);
-        Container::setInstance(null);
         Component::flushCache();
         Component::forgetFactory();
     }

@@ -32,8 +32,6 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(Mockery::mock(ShouldQueue::class));
-
-        Container::setInstance(null);
     }
 
     public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
@@ -51,8 +49,6 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherTestCustomQueueCommand);
-
-        Container::setInstance(null);
     }
 
     public function testCommandsThatShouldQueueIsQueuedUsingCustomQueueAndDelay()
@@ -70,8 +66,6 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherTestSpecificQueueAndDelayCommand);
-
-        Container::setInstance(null);
     }
 
     public function testCommandsAreDispatchedWithQueueRoute()
@@ -90,8 +84,6 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherQueueable);
-
-        Container::setInstance(null);
     }
 
     public function testCommandsAreForwardedToConnectionByQueueName()
@@ -115,8 +107,6 @@ class BusDispatcherTest extends TestCase
         $dispatcher->dispatch((new BusDispatcherQueueable)->onQueue('reports'));
 
         $this->assertSame('cloud', $usedConnection);
-
-        Container::setInstance(null);
     }
 
     public function testExplicitConnectionWinsOverForwardedQueue()
@@ -140,8 +130,6 @@ class BusDispatcherTest extends TestCase
         $dispatcher->dispatch((new BusDispatcherQueueable)->onConnection('redis')->onQueue('reports'));
 
         $this->assertSame('redis', $usedConnection);
-
-        Container::setInstance(null);
     }
 
     public function testDispatchNowShouldNeverQueue()
@@ -199,8 +187,6 @@ class BusDispatcherTest extends TestCase
         $job = (new ShouldNotBeDispatched)->onConnection('null');
 
         $dispatcher->dispatch($job);
-
-        Container::setInstance(null);
     }
 
     public function testDispatchBulk()
@@ -223,8 +209,6 @@ class BusDispatcherTest extends TestCase
             new BusDispatcherQueueable,
             new BusDispatcherTestSpecificQueueCommand,
         ]);
-
-        Container::setInstance(null);
     }
 }
 

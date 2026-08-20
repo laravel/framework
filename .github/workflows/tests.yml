@@ -14,6 +14,8 @@ permissions:
 
 jobs:
   linux_tests:
+    if: github.event_name != 'schedule' || github.repository == 'laravel/framework'
+
     runs-on: ubuntu-24.04
     timeout-minutes: 10
 
@@ -87,6 +89,8 @@ jobs:
             !vendor/**/.gitignore
 
   windows_tests:
+    if: github.event_name != 'schedule' || github.repository == 'laravel/framework'
+
     runs-on: windows-2022
     timeout-minutes: 10
 

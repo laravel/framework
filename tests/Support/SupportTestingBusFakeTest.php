@@ -583,8 +583,6 @@ class SupportTestingBusFakeTest extends TestCase
             fn (ChainedJobStub $job) => $job->id === 123,
             fn (ChainedJobStub $job) => $job->id === 456,
         ]);
-
-        Container::setInstance(null);
     }
 
     public function testAssertNothingChained()

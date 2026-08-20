@@ -8,11 +8,13 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Queue\Events\UniqueJobSkipped;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Tests\App\Jobs\OwnerlessUniqueUntilProcessingRetryJob;
 use Illuminate\Tests\App\Jobs\UniqueIdTestJob;
 use Illuminate\Tests\App\Jobs\UniqueIdTestJobWithDisplayName;
+use Illuminate\Tests\App\Jobs\UniqueTestAfterCommitJob;
 use Illuminate\Tests\App\Jobs\UniqueTestFailJob;
 use Illuminate\Tests\App\Jobs\UniqueTestJob;
 use Illuminate\Tests\App\Jobs\UniqueTestJobWithDisplayName;
@@ -273,6 +275,27 @@ class UniqueJobTest extends QueueTestCase
         UniqueTestJob::dispatch();
 
         Queue::assertPushedTimes(UniqueTestJob::class, 1);
+    }
+
+    public function testRolledBackPushDoesNotReleaseAnotherDispatchesUniqueLock()
+    {
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
+
+        dispatch($job = new UniqueTestAfterCommitJob);
+
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+
+        try {
+            DB::transaction(function () {
+                Queue::push(new UniqueTestAfterCommitJob);
+
+                throw new Exception('Rollback.');
+            });
+        } catch (Exception) {
+            //
+        }
+
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
     protected function getLockKey($job)

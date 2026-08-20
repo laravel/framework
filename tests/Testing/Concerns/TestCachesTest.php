@@ -35,9 +35,7 @@ class TestCachesTest extends TestCase
 
     protected function tearDown(): void
     {
-        Container::setInstance(null);
         ParallelTestingFacade::clearResolvedInstance();
-        Facade::setFacadeApplication(null);
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
 
@@ -118,7 +116,8 @@ class TestCachesTest extends TestCase
 
         $_SERVER['LARAVEL_PARALLEL_TESTING_WITHOUT_CACHE'] = 1;
 
-        Container::getInstance()->make(ParallelTesting::class)->callSetUpTestCaseCallbacks(new class {
+        Container::getInstance()->make(ParallelTesting::class)->callSetUpTestCaseCallbacks(new class
+        {
         });
 
         $this->assertSame('myapp_cache_', Container::getInstance()['config']->get('cache.prefix'));

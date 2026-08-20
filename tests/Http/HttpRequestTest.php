@@ -2058,7 +2058,7 @@ class HttpRequestTest extends TestCase
 
         Request::create('', 'GET')->json();
 
-        $this->assertSame(json_last_error(), JSON_ERROR_NONE);
+        $this->assertSame(JSON_ERROR_NONE, json_last_error());
     }
 
     public function testItClampsValues()

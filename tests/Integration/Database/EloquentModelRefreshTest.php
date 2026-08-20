@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\EloquentModelRefreshTest;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\App\Models\Scopes\AsPivotPost;
 use Illuminate\Tests\App\Models\Scopes\SoftDeletingGlobalScopePost as Post;
@@ -63,6 +64,21 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
         $this->assertEmpty($post->getDirty());
         $this->assertEmpty($post->getPrevious());
+    }
+
+    public function testItRefreshesModelForUpdate()
+    {
+        $post = Post::create(['title' => 'pat']);
+
+        Post::whereKey($post)->update(['title' => 'patrick']);
+
+        DB::transaction(function () use ($post) {
+            $this->assertSame($post, $post->refreshForUpdate());
+        });
+
+        $this->assertSame('patrick', $post->title);
+        $this->assertEmpty($post->getDirty());
+        $this->assertSame('patrick', $post->getOriginal('title'));
     }
 
     public function testAsPivot()

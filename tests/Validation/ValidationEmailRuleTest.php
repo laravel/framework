@@ -925,13 +925,4 @@ class ValidationEmailRuleTest extends TestCase
 
         (new ValidationServiceProvider($container))->register();
     }
-
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-
-        Facade::clearResolvedInstances();
-
-        Facade::setFacadeApplication(null);
-    }
 }

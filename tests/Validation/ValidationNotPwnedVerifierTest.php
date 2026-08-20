@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Client\ConnectionException;
@@ -9,26 +10,28 @@ use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\Response;
 use Illuminate\Validation\NotPwnedVerifier;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ValidationNotPwnedVerifierTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-    }
-
-    public function testEmptyValues()
+    #[DataProvider('dataProviderEmptyValues')]
+    public function testEmptyValues($password): void
     {
         $httpFactory = Mockery::mock(HttpFactory::class);
         $verifier = new NotPwnedVerifier($httpFactory);
 
-        foreach (['', false, 0] as $password) {
-            $this->assertFalse($verifier->verify([
-                'value' => $password,
-                'threshold' => 0,
-            ]));
-        }
+        $this->assertFalse($verifier->verify([
+            'value' => $password,
+            'threshold' => 0,
+        ]));
+    }
+
+    public static function dataProviderEmptyValues(): Generator
+    {
+        yield 'empty string' => [''];
+        yield 'false' => [false];
+        yield 'zero' => [0];
     }
 
     public function testApiResponseGoesWrong()

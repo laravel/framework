@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
+use Generator;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
@@ -739,6 +740,17 @@ class SupportStrTest extends TestCase
     public function testIsUuidWithVersion($uuid, $version, $passes)
     {
         $this->assertSame(Str::isUuid($uuid, $version), $passes);
+    }
+
+    public function testIsUlid(): void
+    {
+        $this->assertTrue(Str::isUlid((string) Str::ulid()));
+        $this->assertTrue(Str::isUlid('01ARZ3NDEKTSV4RRFFQ69G5FAV'));
+
+        $this->assertFalse(Str::isUlid('not-a-ulid'));
+        $this->assertFalse(Str::isUlid('01ARZ3NDEKTSV4RRFFQ69G5FA'));
+        $this->assertFalse(Str::isUlid(null));
+        $this->assertFalse(Str::isUlid(['not', 'a', 'ulid']));
     }
 
     public function testIsJson()
@@ -1973,9 +1985,26 @@ class SupportStrTest extends TestCase
         }
     }
 
+    public function testResetFactoryState(): void
+    {
+        Str::createRandomStringsUsing(fn ($length) => 'random:'.$length);
+        Str::createUuidsUsing(fn () => Str::of('fixed-uuid'));
+        Str::createUlidsUsing(fn () => Str::of('fixed-ulid'));
+
+        $this->assertSame('random:7', Str::random(7));
+        $this->assertSame('fixed-uuid', (string) Str::uuid());
+        $this->assertSame('fixed-ulid', (string) Str::ulid());
+
+        Str::resetFactoryState();
+
+        $this->assertNotSame('random:7', Str::random(7));
+        $this->assertNotSame('fixed-uuid', (string) Str::uuid());
+        $this->assertNotSame('fixed-ulid', (string) Str::ulid());
+    }
+
     public function testPasswordCreation()
     {
-        $this->assertSame(strlen(Str::password()), 32);
+        $this->assertSame(32, strlen(Str::password()));
 
         $this->assertStringNotContainsString(' ', Str::password());
         $this->assertStringContainsString(' ', Str::password(spaces: true));
@@ -1997,76 +2026,68 @@ class SupportStrTest extends TestCase
         $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
     }
 
-    public function testChopStart()
+    public static function dataProviderChopStart(): Generator
     {
-        foreach ([
-            '' => ['', ''],
-            'Laravel' => ['', 'Laravel'],
-            'Ship it' => [['', 'Ship '], 'it'],
-            'http://laravel.com' => ['http://', 'laravel.com'],
-            'http://-http://' => ['http://', '-http://'],
-            'http://laravel.com' => ['htp:/', 'http://laravel.com'],
-            'http://laravel.com' => ['http://www.', 'http://laravel.com'],
-            'http://laravel.com' => ['-http://', 'http://laravel.com'],
-            'http://laravel.com' => [['https://', 'http://'], 'laravel.com'],
-            'http://www.laravel.com' => [['http://', 'www.'], 'www.laravel.com'],
-            'http://http-is-fun.test' => ['http://', 'http-is-fun.test'],
-            // Multibyte emoji tests
-            '🌊✋' => ['🌊', '✋'],
-            '🌊✋' => ['✋', '🌊✋'],
-            '🚀🌟💫' => ['🚀', '🌟💫'],
-            '🚀🌟💫' => ['🚀🌟', '💫'],
-            // Multibyte character tests (Japanese, Chinese, Arabic, etc.)
-            'こんにちは世界' => ['こんにちは', '世界'],
-            '你好世界' => ['你好', '世界'],
-            'مرحبا بك' => ['مرحبا ', 'بك'],
-            // Mixed multibyte and ASCII
-            '🎉Laravel' => ['🎉', 'Laravel'],
-            'Hello🌍World' => ['Hello🌍', 'World'],
-            // Multiple needle array with multibyte
-            '🌊✋🎉' => [['🚀', '🌊'], '✋🎉'],
-            'こんにちは世界' => [['Hello', 'こんにちは'], '世界'],
-        ] as $subject => $value) {
-            [$needle, $expected] = $value;
-
-            $this->assertSame($expected, Str::chopStart($subject, $needle));
-        }
+        yield 'empty subject and needle' => ['', '', ''];
+        yield 'empty needle leaves subject' => ['Laravel', '', 'Laravel'];
+        yield 'first matching needle from array is removed' => ['Ship it', ['', 'Ship '], 'it'];
+        yield 'standard http prefix removed' => ['http://laravel.com', 'http://', 'laravel.com'];
+        yield 'prefix only removed once at start' => ['http://-http://', 'http://', '-http://'];
+        yield 'non-matching partial prefix is ignored' => ['http://laravel.com', 'htp:/', 'http://laravel.com'];
+        yield 'different non-matching prefix is ignored' => ['http://laravel.com', 'http://www.', 'http://laravel.com'];
+        yield 'prefix not at start is ignored' => ['http://laravel.com', '-http://', 'http://laravel.com'];
+        yield 'matching prefix selected from array' => ['http://laravel.com', ['https://', 'http://'], 'laravel.com'];
+        yield 'first matching prefix in ordered array used' => ['http://www.laravel.com', ['http://', 'www.'], 'www.laravel.com'];
+        yield 'http removed from complex host' => ['http://http-is-fun.test', 'http://', 'http-is-fun.test'];
+        yield 'emoji prefix removed' => ['🌊✋', '🌊', '✋'];
+        yield 'emoji needle without prefix match is ignored' => ['🌊✋', '✋', '🌊✋'];
+        yield 'first emoji removed from emoji sequence' => ['🚀🌟💫', '🚀', '🌟💫'];
+        yield 'multibyte emoji sequence prefix removed' => ['🚀🌟💫', '🚀🌟', '💫'];
+        yield 'japanese prefix removed' => ['こんにちは世界', 'こんにちは', '世界'];
+        yield 'chinese prefix removed' => ['你好世界', '你好', '世界'];
+        yield 'arabic prefix removed' => ['مرحبا بك', 'مرحبا ', 'بك'];
+        yield 'mixed emoji and ascii prefix removed' => ['🎉Laravel', '🎉', 'Laravel'];
+        yield 'mixed ascii and emoji prefix removed' => ['Hello🌍World', 'Hello🌍', 'World'];
+        yield 'multibyte prefix selected from array' => ['🌊✋🎉', ['🚀', '🌊'], '✋🎉'];
+        yield 'multibyte prefix selected from mixed array' => ['こんにちは世界', ['Hello', 'こんにちは'], '世界'];
     }
 
-    public function testChopEnd()
+    #[DataProvider('dataProviderChopStart')]
+    public function testChopStart($subject, $needle, $expected): void
     {
-        foreach ([
-            '' => ['', ''],
-            'Laravel' => ['', 'Laravel'],
-            'Ship it' => [['', ' it'], 'Ship'],
-            'path/to/file.php' => ['.php', 'path/to/file'],
-            '.php-.php' => ['.php', '.php-'],
-            'path/to/file.php' => ['.ph', 'path/to/file.php'],
-            'path/to/file.php' => ['foo.php', 'path/to/file.php'],
-            'path/to/file.php' => ['.php-', 'path/to/file.php'],
-            'path/to/file.php' => [['.html', '.php'], 'path/to/file'],
-            'path/to/file.php' => [['.php', 'file'], 'path/to/file'],
-            'path/to/php.php' => ['.php', 'path/to/php'],
-            // Multibyte emoji tests
-            '✋🌊' => ['🌊', '✋'],
-            '✋🌊' => ['✋', '✋🌊'],
-            '🌟💫🚀' => ['🚀', '🌟💫'],
-            '🌟💫🚀' => ['💫🚀', '🌟'],
-            // Multibyte character tests (Japanese, Chinese, Arabic, etc.)
-            '世界こんにちは' => ['こんにちは', '世界'],
-            '世界你好' => ['你好', '世界'],
-            'بك مرحبا' => [' مرحبا', 'بك'],
-            // Mixed multibyte and ASCII
-            'Laravel🎉' => ['🎉', 'Laravel'],
-            'Hello🌍World' => ['World', 'Hello🌍'],
-            // Multiple needle array with multibyte
-            '🎉✋🌊' => [['🚀', '🌊'], '🎉✋'],
-            '世界こんにちは' => [['Hello', 'こんにちは'], '世界'],
-        ] as $subject => $value) {
-            [$needle, $expected] = $value;
+        $this->assertSame($expected, Str::chopStart($subject, $needle));
+    }
 
-            $this->assertSame($expected, Str::chopEnd($subject, $needle));
-        }
+    public static function dataProviderChopEnd(): Generator
+    {
+        yield 'empty string with empty needle' => ['', '', ''];
+        yield 'empty needle leaves subject unchanged' => ['Laravel', '', 'Laravel'];
+        yield 'matching needle selected from array' => ['Ship it', ['', ' it'], 'Ship'];
+        yield 'file extension removed' => ['path/to/file.php', '.php', 'path/to/file'];
+        yield 'suffix removed from repeated extension segment' => ['.php-.php', '.php', '.php-'];
+        yield 'partial non-matching suffix is ignored' => ['path/to/file.php', '.ph', 'path/to/file.php'];
+        yield 'different non-matching suffix is ignored' => ['path/to/file.php', 'foo.php', 'path/to/file.php'];
+        yield 'near-matching suffix is ignored' => ['path/to/file.php', '.php-', 'path/to/file.php'];
+        yield 'matching suffix selected from array' => ['path/to/file.php', ['.html', '.php'], 'path/to/file'];
+        yield 'first matching suffix in ordered array used' => ['path/to/file.php', ['.php', 'file'], 'path/to/file'];
+        yield 'suffix removed from complex path' => ['path/to/php.php', '.php', 'path/to/php'];
+        yield 'emoji suffix removed' => ['✋🌊', '🌊', '✋'];
+        yield 'emoji needle without suffix match is ignored' => ['✋🌊', '✋', '✋🌊'];
+        yield 'last emoji removed from emoji sequence' => ['🌟💫🚀', '🚀', '🌟💫'];
+        yield 'multibyte emoji sequence suffix removed' => ['🌟💫🚀', '💫🚀', '🌟'];
+        yield 'japanese suffix removed' => ['世界こんにちは', 'こんにちは', '世界'];
+        yield 'chinese suffix removed' => ['世界你好', '你好', '世界'];
+        yield 'arabic suffix removed' => ['بك مرحبا', ' مرحبا', 'بك'];
+        yield 'mixed ascii and emoji suffix removed' => ['Laravel🎉', '🎉', 'Laravel'];
+        yield 'mixed emoji and ascii suffix removed' => ['Hello🌍World', 'World', 'Hello🌍'];
+        yield 'multibyte suffix selected from array' => ['🎉✋🌊', ['🚀', '🌊'], '🎉✋'];
+        yield 'multibyte suffix selected from mixed array' => ['世界こんにちは', ['Hello', 'こんにちは'], '世界'];
+    }
+
+    #[DataProvider('dataProviderChopEnd')]
+    public function testChopEnd($subject, $needle, $expected): void
+    {
+        $this->assertSame($expected, Str::chopEnd($subject, $needle));
     }
 
     public function testReplaceMatches()
@@ -2150,5 +2171,20 @@ class SupportStrTest extends TestCase
         };
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
+    }
+
+    public function testPluralStudly(): void
+    {
+        $this->assertSame('VerifiedHumans', Str::pluralStudly('VerifiedHuman'));
+        $this->assertSame('UserFeedback', Str::pluralStudly('UserFeedback'));
+        $this->assertSame('VerifiedHuman', Str::pluralStudly('VerifiedHuman', 1));
+        $this->assertSame('VerifiedHumans', Str::pluralStudly('VerifiedHuman', 2));
+    }
+
+    public function testSingular(): void
+    {
+        $this->assertSame('child', Str::singular('children'));
+        $this->assertSame('mouse', Str::singular('mice'));
+        $this->assertSame('Laracon', Str::singular('Laracons'));
     }
 }

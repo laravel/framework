@@ -36,11 +36,6 @@ use PHPUnit\Framework\TestCase;
 
 class NotificationChannelManagerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-    }
-
     public function testNotificationCanBeDispatchedToDriver()
     {
         $container = new Container;

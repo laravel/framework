@@ -268,9 +268,4 @@ class PruneCommandTest extends TestCase
 
         return $output;
     }
-
-    protected function tearDown(): void
-    {
-        Application::setInstance(null);
-    }
 }

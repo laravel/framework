@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\FailoverQueue;
@@ -12,11 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class FailoverQueueTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-    }
-
     public function test_push_fails_over_on_exception()
     {
         $queue = Mockery::mock(QueueManager::class);

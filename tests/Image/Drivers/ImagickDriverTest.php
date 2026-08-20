@@ -184,7 +184,7 @@ class ImagickDriverTest extends TestCase
         try {
             $this->assertSame([137, 73], (new Image($heic))->dimensions());
         } finally {
-            Container::setInstance(null);
+            //
         }
     }
 

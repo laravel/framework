@@ -12,7 +12,8 @@ class JsonResourceTest extends TestCase
 {
     public function testJsonResourceNullAttributes()
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
 
         $model->setAttribute('relation_sum_column', null);
@@ -32,7 +33,8 @@ class JsonResourceTest extends TestCase
 
     public function testJsonResourceToJsonSucceedsWithPriorErrors(): void
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
 
         $resource = Mockery::mock(JsonResource::class, ['resource' => $model])
@@ -42,14 +44,15 @@ class JsonResourceTest extends TestCase
 
         // Simulate a JSON error
         json_decode('{');
-        $this->assertNotSame(json_last_error(), JSON_ERROR_NONE);
+        $this->assertNotSame(JSON_ERROR_NONE, json_last_error());
 
         $this->assertSame('{"foo":"bar"}', $resource->toJson(JSON_THROW_ON_ERROR));
     }
 
     public function testJsonResourceToPrettyPrint(): void
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
 
         $resource = Mockery::mock(JsonResource::class, ['resource' => $model])
