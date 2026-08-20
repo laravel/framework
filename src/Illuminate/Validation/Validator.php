@@ -90,6 +90,13 @@ class Validator implements ValidatorContract
     protected $rules;
 
     /**
+     * The parsed validation rules, keyed by their string representation.
+     *
+     * @var array<string, array{0: string, 1: array}>
+     */
+    private $parsedRules = [];
+
+    /**
      * The current rule that is validating.
      *
      * @var string
@@ -687,7 +694,7 @@ class Validator implements ValidatorContract
     {
         $this->currentRule = $rule;
 
-        [$rule, $parameters] = ValidationRuleParser::parse($rule);
+        [$rule, $parameters] = $this->parseRule($rule);
 
         if ($rule === '') {
             return;
@@ -1168,12 +1175,30 @@ class Validator implements ValidatorContract
         $rules = (array) $rules;
 
         foreach ($this->rules[$attribute] as $rule) {
-            [$rule, $parameters] = ValidationRuleParser::parse($rule);
+            [$rule, $parameters] = $this->parseRule($rule);
 
             if (in_array($rule, $rules)) {
                 return [$rule, $parameters];
             }
         }
+    }
+
+    /**
+     * Parse a rule, reusing the result of an identical rule parsed before.
+     *
+     * The same rule string is parsed once per attribute it applies to, and a wildcard
+     * rule set applies the same handful of strings to every row of the data.
+     *
+     * @param  object|string  $rule
+     * @return array{0: object|string, 1: array}
+     */
+    protected function parseRule($rule)
+    {
+        if (! is_string($rule)) {
+            return ValidationRuleParser::parse($rule);
+        }
+
+        return $this->parsedRules[$rule] ??= ValidationRuleParser::parse($rule);
     }
 
     /**
