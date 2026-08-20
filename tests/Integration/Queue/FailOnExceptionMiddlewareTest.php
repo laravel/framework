@@ -3,13 +3,10 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Dispatcher;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\CallQueuedHandler;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\FailOnException;
+use Illuminate\Tests\App\Jobs\FailOnExceptionJob;
 use InvalidArgumentException;
 use LogicException;
 use Orchestra\Testbench\TestCase;
@@ -22,7 +19,7 @@ class FailOnExceptionMiddlewareTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        FailOnExceptionMiddlewareTestJob::$_middleware = [];
+        FailOnExceptionJob::$_middleware = [];
     }
 
     /**
@@ -50,8 +47,8 @@ class FailOnExceptionMiddlewareTest extends TestCase
         FailOnException $middleware,
         bool $expectedToFail
     ): void {
-        FailOnExceptionMiddlewareTestJob::$_middleware = [$middleware];
-        $job = new FailOnExceptionMiddlewareTestJob($thrown);
+        FailOnExceptionJob::$_middleware = [$middleware];
+        $job = new FailOnExceptionJob($thrown);
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $fakeJob = new FakeJob();
@@ -73,11 +70,11 @@ class FailOnExceptionMiddlewareTest extends TestCase
     #[TestWith(['tots', false])]
     public function test_can_test_against_job_properties($value, bool $expectedToFail): void
     {
-        FailOnExceptionMiddlewareTestJob::$_middleware = [
+        FailOnExceptionJob::$_middleware = [
             new FailOnException(fn ($thrown, $job) => $job->value === 'abc'),
         ];
 
-        $job = new FailOnExceptionMiddlewareTestJob(InvalidArgumentException::class, $value);
+        $job = new FailOnExceptionJob(InvalidArgumentException::class, $value);
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $fakeJob = new FakeJob();
@@ -93,28 +90,5 @@ class FailOnExceptionMiddlewareTest extends TestCase
         }
 
         $expectedToFail ? $job->assertFailed() : $job->assertNotFailed();
-    }
-}
-
-class FailOnExceptionMiddlewareTestJob implements ShouldQueue
-{
-    use Dispatchable, InteractsWithQueue, Queueable;
-
-    public static array $_middleware = [];
-
-    public int $tries = 2;
-
-    public function __construct(private $throws, public $value = null)
-    {
-    }
-
-    public function handle()
-    {
-        throw new $this->throws;
-    }
-
-    public function middleware(): array
-    {
-        return self::$_middleware;
     }
 }

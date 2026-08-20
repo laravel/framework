@@ -7,12 +7,15 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
+use Illuminate\Tests\App\Jobs\FailingSyncQueueJob;
+use Illuminate\Tests\App\Jobs\SyncQueueAfterCommitInterfaceJob;
+use Illuminate\Tests\App\Jobs\SyncQueueAfterCommitInterfaceUniqueJob;
+use Illuminate\Tests\App\Jobs\SyncQueueJob;
 use LogicException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -197,40 +200,6 @@ class FailingSyncQueueTestHandler
     }
 }
 
-class FailingSyncQueueJob implements ShouldQueue
-{
-    use InteractsWithQueue;
-
-    public function handle()
-    {
-        throw new LogicException();
-    }
-
-    public function failed()
-    {
-        $payload = $this->job->payload();
-
-        $_SERVER['__sync.failed'] = $payload['data']['extra'];
-    }
-}
-
-class SyncQueueJob implements ShouldQueue
-{
-    use InteractsWithQueue;
-
-    public function handle()
-    {
-        throw new LogicException($this->getValueFromJob('extra'));
-    }
-
-    public function getValueFromJob($key)
-    {
-        $payload = $this->job->payload();
-
-        return $payload['data'][$key] ?? null;
-    }
-}
-
 class SyncQueueAfterCommitJob
 {
     use InteractsWithQueue;
@@ -242,29 +211,11 @@ class SyncQueueAfterCommitJob
     }
 }
 
-class SyncQueueAfterCommitInterfaceJob implements ShouldQueueAfterCommit
-{
-    use InteractsWithQueue;
-
-    public function handle()
-    {
-    }
-}
-
 class SyncQueueAfterCommitUniqueJob implements ShouldBeUnique
 {
     use InteractsWithQueue;
 
     public $afterCommit = true;
-
-    public function handle()
-    {
-    }
-}
-
-class SyncQueueAfterCommitInterfaceUniqueJob implements ShouldBeUnique, ShouldQueueAfterCommit
-{
-    use InteractsWithQueue;
 
     public function handle()
     {

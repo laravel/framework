@@ -2,13 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Jobs\DeleteMissingModelJob;
+use Illuminate\Tests\App\Models\DeletableModel;
 use Orchestra\Testbench\Attributes\WithMigration;
 
 #[WithMigration]
@@ -44,49 +41,15 @@ class DeleteModelWhenMissingTest extends QueueTestCase
 
     public function test_deleteModelWhenMissing_and_display_name(): void
     {
-        $model = MyTestModel::query()->create(['name' => 'test']);
+        $model = DeletableModel::query()->create(['name' => 'test']);
 
         DeleteMissingModelJob::dispatch($model);
 
-        MyTestModel::query()->where('name', 'test')->delete();
+        DeletableModel::query()->where('name', 'test')->delete();
 
         $this->runQueueWorkerCommand(['--once' => '1']);
 
         $this->assertFalse(DeleteMissingModelJob::$handled);
         $this->assertNull(\DB::table('failed_jobs')->first());
     }
-}
-
-class DeleteMissingModelJob implements ShouldQueue
-{
-    use InteractsWithQueue;
-    use Dispatchable;
-    use SerializesModels;
-
-    public static bool $handled = false;
-
-    public $deleteWhenMissingModels = true;
-
-    public function __construct(public MyTestModel $model)
-    {
-    }
-
-    public function displayName(): string
-    {
-        return 'sorry-ma-forgot-to-take-out-the-trash';
-    }
-
-    public function handle()
-    {
-        self::$handled = true;
-    }
-}
-
-class MyTestModel extends Model
-{
-    protected $table = 'delete_model_test_models';
-
-    public $timestamps = false;
-
-    protected $guarded = [];
 }

@@ -3,22 +3,25 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Exception;
-use Illuminate\Bus\Queueable;
 use Illuminate\Bus\UniqueLock;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Foundation\Auth\User;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\Events\UniqueJobSkipped;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Tests\App\Jobs\OwnerlessUniqueUntilProcessingRetryJob;
+use Illuminate\Tests\App\Jobs\UniqueIdTestJob;
+use Illuminate\Tests\App\Jobs\UniqueIdTestJobWithDisplayName;
+use Illuminate\Tests\App\Jobs\UniqueTestFailJob;
+use Illuminate\Tests\App\Jobs\UniqueTestJob;
+use Illuminate\Tests\App\Jobs\UniqueTestJobWithDisplayName;
+use Illuminate\Tests\App\Jobs\UniqueTestReleasedJob;
+use Illuminate\Tests\App\Jobs\UniqueTestRetryJob;
+use Illuminate\Tests\App\Jobs\UniqueTestSerializesModelsJob;
+use Illuminate\Tests\App\Jobs\UniqueUntilProcessingRetryJob;
+use Illuminate\Tests\App\Jobs\UniqueUntilStartTestJob;
+use Illuminate\Tests\App\Jobs\UniqueViaJob;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 
@@ -331,135 +334,5 @@ class UniqueJobTest extends QueueTestCase
             'laravel_unique_job:'.hash('xxh128', 'App\\Actions\\UniqueTestAction').':unique-id-2',
             UniqueLock::getKey(new UniqueIdTestJobWithDisplayName)
         );
-    }
-}
-
-class UniqueTestJob implements ShouldQueue, ShouldBeUnique
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public static $handled = false;
-
-    public function handle()
-    {
-        static::$handled = true;
-    }
-}
-
-class UniqueTestFailJob implements ShouldQueue, ShouldBeUnique
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public $tries = 1;
-
-    public static $handled = false;
-
-    public function handle()
-    {
-        static::$handled = true;
-
-        throw new Exception;
-    }
-}
-
-class UniqueTestReleasedJob extends UniqueTestFailJob
-{
-    public $tries = 1;
-
-    public function handle()
-    {
-        static::$handled = true;
-
-        $this->release();
-    }
-}
-
-class UniqueTestRetryJob extends UniqueTestFailJob
-{
-    public $tries = 2;
-}
-
-class UniqueUntilStartTestJob extends UniqueTestJob implements ShouldBeUniqueUntilProcessing
-{
-    public $tries = 2;
-}
-
-class UniqueUntilProcessingRetryJob implements ShouldQueue, ShouldBeUniqueUntilProcessing
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public $tries = 2;
-
-    public static $handled = false;
-
-    public function handle()
-    {
-        static::$handled = true;
-
-        if ($this->attempts() === 1) {
-            throw new Exception('First attempt failure.');
-        }
-    }
-}
-
-class OwnerlessUniqueUntilProcessingRetryJob implements ShouldQueue, ShouldBeUniqueUntilProcessing
-{
-    use InteractsWithQueue, Dispatchable;
-
-    public $tries = 2;
-
-    public function handle()
-    {
-        if ($this->attempts() === 1) {
-            throw new Exception('First attempt failure.');
-        }
-    }
-}
-
-class UniqueTestSerializesModelsJob extends UniqueTestJob
-{
-    use SerializesModels;
-
-    public $deleteWhenMissingModels = true;
-
-    public function __construct(public User $user)
-    {
-    }
-}
-
-class UniqueViaJob extends UniqueTestJob
-{
-    public function uniqueVia(): Cache
-    {
-        return Container::getInstance()->make(Cache::class);
-    }
-}
-
-class UniqueIdTestJob extends UniqueTestJob
-{
-    public function uniqueId(): string
-    {
-        return 'unique-id-1';
-    }
-}
-
-class UniqueTestJobWithDisplayName extends UniqueTestJob
-{
-    public function displayName(): string
-    {
-        return 'App\\Actions\\UniqueTestAction';
-    }
-}
-
-class UniqueIdTestJobWithDisplayName extends UniqueTestJob
-{
-    public function uniqueId(): string
-    {
-        return 'unique-id-2';
-    }
-
-    public function displayName(): string
-    {
-        return 'App\\Actions\\UniqueTestAction';
     }
 }

@@ -7,12 +7,20 @@ use Illuminate\Database\Eloquent\Attributes\Boot;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Tests\App\Models\Serialization\CustomCollectionUser;
+use Illuminate\Tests\App\Models\Serialization\EagerLoadingOrder;
+use Illuminate\Tests\App\Models\Serialization\Line;
+use Illuminate\Tests\App\Models\Serialization\Order;
+use Illuminate\Tests\App\Models\Serialization\Product;
+use Illuminate\Tests\App\Models\Serialization\Role;
+use Illuminate\Tests\App\Models\Serialization\RoleUser;
+use Illuminate\Tests\App\Models\Serialization\TraitInitializedModel;
+use Illuminate\Tests\App\Models\Serialization\User;
 use LogicException;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
@@ -176,7 +184,7 @@ class ModelSerializationTest extends TestCase
 
     public function testItReloadsRelationshipsOnlyOnce()
     {
-        $order = tap(ModelSerializationTestCustomOrder::create(), function (ModelSerializationTestCustomOrder $order) {
+        $order = tap(EagerLoadingOrder::create(), function (EagerLoadingOrder $order) {
             $order->wasRecentlyCreated = false;
         });
 
@@ -280,7 +288,7 @@ class ModelSerializationTest extends TestCase
 
     public function testItCanRunModelBootsAndTraitInitializations()
     {
-        $model = new ModelBootTestWithTraitInitialization();
+        $model = new TraitInitializedModel();
 
         $this->assertTrue($model->fooBar);
         $this->assertTrue($model->initializedViaAttributeInClass);
@@ -376,11 +384,11 @@ class ModelSerializationTest extends TestCase
 
     public function testItCanUnserializeCustomCollection()
     {
-        ModelSerializationTestCustomUser::create(['email' => 'mohamed@laravel.com']);
-        ModelSerializationTestCustomUser::create(['email' => 'taylor@laravel.com']);
+        CustomCollectionUser::create(['email' => 'mohamed@laravel.com']);
+        CustomCollectionUser::create(['email' => 'taylor@laravel.com']);
 
         $serialized = serialize(new CollectionSerializationTestClass(
-            ModelSerializationTestCustomUser::all()
+            CustomCollectionUser::all()
         ));
 
         $unserialized = unserialize($serialized);
@@ -445,7 +453,7 @@ class ModelSerializationTest extends TestCase
         $serialized = serialize(new ModelSerializationWithoutRelations($user));
 
         $this->assertSame(
-            'O:69:"Illuminate\Tests\Integration\Queue\ModelSerializationWithoutRelations":1:{s:4:"user";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:39:"Illuminate\Tests\Integration\Queue\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}', $serialized
+            'O:69:"Illuminate\Tests\Integration\Queue\ModelSerializationWithoutRelations":1:{s:4:"user";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:46:"Illuminate\Tests\App\Models\Serialization\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}', $serialized
         );
     }
 
@@ -459,7 +467,7 @@ class ModelSerializationTest extends TestCase
         $serialized = serialize(new ModelSerializationAttributeTargetsClassTestClass($user, new DataValueObject('hello')));
 
         $this->assertSame(
-            'O:83:"Illuminate\Tests\Integration\Queue\ModelSerializationAttributeTargetsClassTestClass":2:{s:4:"user";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:39:"Illuminate\Tests\Integration\Queue\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}s:5:"value";O:50:"Illuminate\Tests\Integration\Queue\DataValueObject":1:{s:5:"value";s:5:"hello";}}',
+            'O:83:"Illuminate\Tests\Integration\Queue\ModelSerializationAttributeTargetsClassTestClass":2:{s:4:"user";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:46:"Illuminate\Tests\App\Models\Serialization\User";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}s:5:"value";O:50:"Illuminate\Tests\Integration\Queue\DataValueObject":1:{s:5:"value";s:5:"hello";}}',
             $serialized
         );
 
@@ -587,28 +595,6 @@ trait TraitBootsAndInitializersTest
     }
 }
 
-class ModelBootTestWithTraitInitialization extends Model
-{
-    use TraitBootsAndInitializersTest;
-
-    public static bool $bootedViaAttributeInClass = false;
-
-    public bool $initializedViaAttributeInClass = false;
-
-    #[Boot]
-    public static function nonConventionalBootFunctionInClass()
-    {
-        static::addGlobalScope('booted_attr_in_class', function () {
-        });
-    }
-
-    #[Initialize]
-    public function nonConventionalInitFunctionInClass()
-    {
-        $this->initializedViaAttributeInClass = ! $this->initializedViaAttributeInClass;
-    }
-}
-
 class ModelSerializationTestUser extends Model
 {
     public $table = 'users';
@@ -633,118 +619,6 @@ class ModelSerializationTypedCustomCollectionTestClass
     }
 }
 
-class ModelSerializationTestCustomUser extends Model
-{
-    public $table = 'users';
-    public $guarded = [];
-    public $timestamps = false;
-
-    public function newCollection(array $models = [])
-    {
-        return new ModelSerializationTestCustomUserCollection($models);
-    }
-}
-
-class ModelSerializationTestCustomOrder extends Model
-{
-    public $table = 'orders';
-    public $guarded = [];
-    public $timestamps = false;
-    public $with = ['line', 'lines', 'products'];
-
-    public function line()
-    {
-        return $this->hasOne(Line::class, 'order_id');
-    }
-
-    public function lines()
-    {
-        return $this->hasMany(Line::class, 'order_id');
-    }
-
-    public function products()
-    {
-        return $this->belongsToMany(Product::class, 'lines', 'order_id');
-    }
-}
-
-class Order extends Model
-{
-    public $guarded = [];
-    public $timestamps = false;
-
-    public function line()
-    {
-        return $this->hasOne(Line::class);
-    }
-
-    public function lines()
-    {
-        return $this->hasMany(Line::class);
-    }
-
-    public function products()
-    {
-        return $this->belongsToMany(Product::class, 'lines');
-    }
-}
-
-class Line extends Model
-{
-    public $guarded = [];
-    public $timestamps = false;
-
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
-    }
-}
-
-class Product extends Model
-{
-    public $guarded = [];
-    public $timestamps = false;
-}
-
-class User extends Model
-{
-    public $guarded = [];
-    public $timestamps = false;
-
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class)
-            ->using(RoleUser::class);
-    }
-}
-
-class Role extends Model
-{
-    public $guarded = [];
-    public $timestamps = false;
-
-    public function users()
-    {
-        return $this->belongsToMany(User::class)
-            ->using(RoleUser::class);
-    }
-}
-
-class RoleUser extends Pivot
-{
-    public $guarded = [];
-    public $timestamps = false;
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
-}
 
 class ModelSerializationTestClass
 {

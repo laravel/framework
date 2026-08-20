@@ -2,11 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\PreparesForDispatch;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Tests\App\Jobs\PreparesForDispatchFalseJob;
+use Illuminate\Tests\App\Jobs\PreparesForDispatchVoidJob;
 use Orchestra\Testbench\TestCase;
 
 class PreparesForDispatchTest extends TestCase
@@ -30,35 +28,5 @@ class PreparesForDispatchTest extends TestCase
 
         $this->assertTrue(PreparesForDispatchVoidJob::$ran);
         Queue::assertPushed(PreparesForDispatchVoidJob::class);
-    }
-}
-
-class PreparesForDispatchFalseJob implements PreparesForDispatch, ShouldQueue
-{
-    use Dispatchable, Queueable;
-
-    public function prepareForDispatch(): bool
-    {
-        return false;
-    }
-
-    public function handle(): void
-    {
-    }
-}
-
-class PreparesForDispatchVoidJob implements PreparesForDispatch, ShouldQueue
-{
-    use Dispatchable, Queueable;
-
-    public static bool $ran = false;
-
-    public function prepareForDispatch(): void
-    {
-        static::$ran = true;
-    }
-
-    public function handle(): void
-    {
     }
 }

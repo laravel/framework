@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
+use Illuminate\Tests\App\Models\JsonApi\ApiPost;
+use Illuminate\Tests\App\Models\JsonApi\ApiTeam;
+use Illuminate\Tests\App\Models\JsonApi\ApiUser;
+use Illuminate\Tests\App\Models\JsonApi\Profile;
 
 class JsonApiCollectionTest extends TestCase
 {
     public function testItCanGenerateJsonApiResponse()
     {
-        $users = User::factory()->times(5)->create();
+        $users = ApiUser::factory()->times(5)->create();
 
         $this->getJson('/users')
             ->assertHeader('Content-type', 'application/vnd.api+json')
@@ -30,7 +30,7 @@ class JsonApiCollectionTest extends TestCase
 
     public function testItCanGenerateJsonApiResponseWithSparseFieldsets()
     {
-        $users = User::factory()->times(5)->create();
+        $users = ApiUser::factory()->times(5)->create();
 
         $this->getJson('/users/?'.http_build_query(['fields' => ['users' => 'name']]))
             ->assertHeader('Content-type', 'application/vnd.api+json')
@@ -48,7 +48,7 @@ class JsonApiCollectionTest extends TestCase
 
     public function testItCanGenerateJsonApiResponseWithEmptyRelationshipsUsingSparseIncluded()
     {
-        $users = User::factory()->times(5)->create();
+        $users = ApiUser::factory()->times(5)->create();
 
         $this->getJson('/users/?'.http_build_query(['include' => 'posts']))
             ->assertHeader('Content-type', 'application/vnd.api+json')
@@ -74,8 +74,8 @@ class JsonApiCollectionTest extends TestCase
     {
         $now = $this->freezeSecond();
 
-        $users = User::factory()->times(4)->create();
-        $user = User::factory()->create();
+        $users = ApiUser::factory()->times(4)->create();
+        $user = ApiUser::factory()->create();
 
         $profile = Profile::factory()->create([
             'user_id' => $user->getKey(),
@@ -83,14 +83,14 @@ class JsonApiCollectionTest extends TestCase
             'timezone' => 'America/Chicago',
         ]);
 
-        $team = Team::factory()->create([
-            'name' => 'Laravel Team',
+        $team = ApiTeam::factory()->create([
+            'name' => 'Laravel ApiTeam',
         ]);
 
         $user->teams()->attach($team, ['role' => 'Admin']);
         $user->teams()->attach($team, ['role' => 'Member']);
 
-        $posts = Post::factory()->times(2)->create([
+        $posts = ApiPost::factory()->times(2)->create([
             'user_id' => $user->getKey(),
         ]);
 
@@ -174,7 +174,7 @@ class JsonApiCollectionTest extends TestCase
                         'attributes' => [
                             'id' => $team->getKey(),
                             'user_id' => $team->user_id,
-                            'name' => 'Laravel Team',
+                            'name' => 'Laravel ApiTeam',
                             'personal_team' => true,
                             'membership' => [
                                 'user_id' => $user->getKey(),
@@ -191,7 +191,7 @@ class JsonApiCollectionTest extends TestCase
                         'attributes' => [
                             'id' => $team->getKey(),
                             'user_id' => $team->user_id,
-                            'name' => 'Laravel Team',
+                            'name' => 'Laravel ApiTeam',
                             'personal_team' => true,
                             'membership' => [
                                 'user_id' => $user->getKey(),

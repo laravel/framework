@@ -3,18 +3,18 @@
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Comment;
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\PostResource;
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
+use Illuminate\Tests\App\Http\Resources\JsonApi\ApiPostResource;
+use Illuminate\Tests\App\Models\JsonApi\ApiComment;
+use Illuminate\Tests\App\Models\JsonApi\ApiPost;
+use Illuminate\Tests\App\Models\JsonApi\ApiTeam;
+use Illuminate\Tests\App\Models\JsonApi\ApiUser;
+use Illuminate\Tests\App\Models\JsonApi\Profile;
 
 class JsonApiResourceTest extends TestCase
 {
     public function testItCanGenerateJsonApiResponse()
     {
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
         $this->getJson("/users/{$user->getKey()}")
             ->assertHeader('Content-type', 'application/vnd.api+json')
@@ -33,7 +33,7 @@ class JsonApiResourceTest extends TestCase
 
     public function testItCanGenerateJsonApiResponseWithSparseFieldsets()
     {
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
         $this->getJson("/users/{$user->getKey()}?".http_build_query(['fields' => ['users' => 'name']]))
             ->assertHeader('Content-type', 'application/vnd.api+json')
@@ -51,7 +51,7 @@ class JsonApiResourceTest extends TestCase
 
     public function testItCanGenerateJsonApiResponseWithEmptySparseFieldsets()
     {
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
         $this->getJson("/users/{$user->getKey()}?".http_build_query(['fields' => ['users' => '']]))
             ->assertHeader('Content-type', 'application/vnd.api+json')
@@ -66,7 +66,7 @@ class JsonApiResourceTest extends TestCase
 
     public function testItCanGenerateJsonApiResponseWithEmptyRelationshipsUsingSparseIncluded()
     {
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
         $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'posts']))
             ->assertHeader('Content-type', 'application/vnd.api+json')
@@ -92,7 +92,7 @@ class JsonApiResourceTest extends TestCase
     {
         $now = $this->freezeSecond();
 
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
         $profile = Profile::factory()->create([
             'user_id' => $user->getKey(),
@@ -100,14 +100,14 @@ class JsonApiResourceTest extends TestCase
             'timezone' => 'America/Chicago',
         ]);
 
-        $team = Team::factory()->create([
-            'name' => 'Laravel Team',
+        $team = ApiTeam::factory()->create([
+            'name' => 'Laravel ApiTeam',
         ]);
 
         $user->teams()->attach($team, ['role' => 'Admin']);
         $user->teams()->attach($team, ['role' => 'Member']);
 
-        $posts = Post::factory()->times(2)->create([
+        $posts = ApiPost::factory()->times(2)->create([
             'user_id' => $user->getKey(),
         ]);
 
@@ -173,7 +173,7 @@ class JsonApiResourceTest extends TestCase
                         'attributes' => [
                             'id' => $team->getKey(),
                             'user_id' => $team->user_id,
-                            'name' => 'Laravel Team',
+                            'name' => 'Laravel ApiTeam',
                             'personal_team' => true,
                             'membership' => [
                                 'created_at' => $now->toISOString(),
@@ -190,7 +190,7 @@ class JsonApiResourceTest extends TestCase
                         'attributes' => [
                             'id' => $team->getKey(),
                             'user_id' => $team->user_id,
-                            'name' => 'Laravel Team',
+                            'name' => 'Laravel ApiTeam',
                             'personal_team' => true,
                             'membership' => [
                                 'created_at' => $now->toISOString(),
@@ -209,9 +209,9 @@ class JsonApiResourceTest extends TestCase
     {
         $now = $this->freezeSecond();
 
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
-        [$post1, $post2] = Post::factory()->times(2)->create([
+        [$post1, $post2] = ApiPost::factory()->times(2)->create([
             'user_id' => $user->getKey(),
         ]);
 
@@ -290,7 +290,7 @@ class JsonApiResourceTest extends TestCase
     {
         $now = $this->freezeSecond();
 
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
         $profile = Profile::factory()->create([
             'user_id' => $user->getKey(),
@@ -298,11 +298,11 @@ class JsonApiResourceTest extends TestCase
             'timezone' => 'America/Chicago',
         ]);
 
-        [$post1, $post2] = Post::factory()->times(2)->create([
+        [$post1, $post2] = ApiPost::factory()->times(2)->create([
             'user_id' => $user->getKey(),
         ]);
 
-        $comment = Comment::factory()->create([
+        $comment = ApiComment::factory()->create([
             'post_id' => $post1->getKey(),
             'user_id' => $user->getKey(),
         ]);
@@ -344,7 +344,7 @@ class JsonApiResourceTest extends TestCase
     {
         $now = $this->freezeSecond();
 
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
         $profile = Profile::factory()->create([
             'user_id' => $user->getKey(),
@@ -352,11 +352,11 @@ class JsonApiResourceTest extends TestCase
             'timezone' => 'America/Chicago',
         ]);
 
-        [$post1, $post2] = Post::factory()->times(2)->create([
+        [$post1, $post2] = ApiPost::factory()->times(2)->create([
             'user_id' => $user->getKey(),
         ]);
 
-        $comment = Comment::factory()->create([
+        $comment = ApiComment::factory()->create([
             'post_id' => $post1->getKey(),
             'user_id' => $user->getKey(),
         ]);
@@ -424,23 +424,23 @@ class JsonApiResourceTest extends TestCase
 
     public function testItCanResolveNestedRelationshipThroughClosureReturningResourceCollection()
     {
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
-        $publicPost = Post::factory()->create([
+        $publicPost = ApiPost::factory()->create([
             'user_id' => $user->getKey(),
         ]);
 
-        $privatePost = Post::factory()->create([
+        $privatePost = ApiPost::factory()->create([
             'user_id' => $user->getKey(),
         ]);
 
-        $publicComment = Comment::factory()->create([
+        $publicComment = ApiComment::factory()->create([
             'content' => 'public',
             'post_id' => $publicPost->getKey(),
             'user_id' => $user->getKey(),
         ]);
 
-        $privateComment = Comment::factory()->create([
+        $privateComment = ApiComment::factory()->create([
             'content' => 'private',
             'post_id' => $privatePost->getKey(),
             'user_id' => $user->getKey(),
@@ -457,34 +457,34 @@ class JsonApiResourceTest extends TestCase
 
     public function testItResolvesEachRelationshipClosureOnceWhenIncludingNestedRelationships()
     {
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
-        $posts = Post::factory()->count(2)->create([
+        $posts = ApiPost::factory()->count(2)->create([
             'user_id' => $user->getKey(),
         ]);
 
         foreach ($posts as $post) {
-            Comment::factory()->create([
+            ApiComment::factory()->create([
                 'content' => 'public',
                 'post_id' => $post->getKey(),
                 'user_id' => $user->getKey(),
             ]);
         }
 
-        PostResource::$commentsResolutionCount = 0;
+        ApiPostResource::$commentsResolutionCount = 0;
 
         $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'posts.comments']))
             ->assertJsonPath('data.relationships.posts.data.0.id', (string) $posts[0]->getKey());
 
         // The "comments" closure should be resolved once per included post, not multiple times...
-        $this->assertSame(2, PostResource::$commentsResolutionCount);
+        $this->assertSame(2, ApiPostResource::$commentsResolutionCount);
     }
 
     public function testItCanResolveRelationshipWithRecursiveNestedRelationship()
     {
         $now = $this->freezeSecond();
 
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
         $profile = Profile::factory()->create([
             'user_id' => $user->getKey(),
@@ -546,7 +546,7 @@ class JsonApiResourceTest extends TestCase
 
         $now = $this->freezeSecond();
 
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
         $profile = Profile::factory()->create([
             'user_id' => $user->getKey(),
@@ -601,9 +601,9 @@ class JsonApiResourceTest extends TestCase
     {
         $now = $this->freezeSecond();
 
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
-        [$post1, $post2] = Post::factory()->times(2)->create([
+        [$post1, $post2] = ApiPost::factory()->times(2)->create([
             'user_id' => $user->getKey(),
         ]);
 
@@ -681,18 +681,18 @@ class JsonApiResourceTest extends TestCase
 
     public function testItHandlesBidirectionalRelationshipsWithChaperoneWithoutInfiniteLoop()
     {
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
-        $post = Post::factory()->create([
+        $post = ApiPost::factory()->create([
             'user_id' => $user->getKey(),
         ]);
 
         // The /with-chaperone-posts route loads chaperonePosts which uses chaperone()
-        // to automatically set the inverse 'author' relationship on each Post,
-        // creating circular object references (User -> Post -> User same instance).
+        // to automatically set the inverse 'author' relationship on each ApiPost,
+        // creating circular object references (ApiUser -> ApiPost -> ApiUser same instance).
         // Without the fix, this would hang forever due to infinite loop.
-        // The same User model appears twice in included: once as "posts" (the Post)
-        // and once as "authors" (Post's author via chaperone) - this is correct
+        // The same ApiUser model appears twice in included: once as "posts" (the ApiPost)
+        // and once as "authors" (ApiPost's author via chaperone) - this is correct
         // because different resource types should not be deduplicated.
         $this->getJson("/users/{$user->getKey()}/with-chaperone-posts?".http_build_query(['include' => 'chaperonePosts']))
             ->assertHeader('Content-type', 'application/vnd.api+json')
@@ -707,7 +707,7 @@ class JsonApiResourceTest extends TestCase
 
     public function testIncludedResourcesCanBeArrayBackedCustomResources()
     {
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
         $this->getJson("/users/{$user->getKey()}/with-array-relationship")
             ->assertHeader('Content-type', 'application/vnd.api+json')
@@ -737,27 +737,27 @@ class JsonApiResourceTest extends TestCase
 
     public function testSameModelWithTheSameResourceTypeIsDeduplicated()
     {
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
-        $post1 = Post::factory()->create([
+        $post1 = ApiPost::factory()->create([
             'user_id' => $user->getKey(),
         ]);
 
-        $post2 = Post::factory()->create([
+        $post2 = ApiPost::factory()->create([
             'user_id' => $user->getKey(),
         ]);
 
-        Comment::factory()->create([
+        ApiComment::factory()->create([
             'post_id' => $post1->getKey(),
             'user_id' => $user->getKey(),
         ]);
 
-        Comment::factory()->create([
+        ApiComment::factory()->create([
             'post_id' => $post2->getKey(),
             'user_id' => $user->getKey(),
         ]);
 
-        // Both comments have the same commenter (User). Per the JSON:API spec, the same
+        // Both comments have the same commenter (ApiUser). Per the JSON:API spec, the same
         // type+id pair should only appear once in included, even when referenced by
         // multiple relationships. We expect 3 items: 2 comments + 1 user (deduped).
         $response = $this->getJson('/posts?'.http_build_query(['include' => 'comments.commenter']))
@@ -773,9 +773,9 @@ class JsonApiResourceTest extends TestCase
 
     public function testDifferentModelInstancesWithSameTypeAndIdAreDeduplicated()
     {
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
-        // This route manually creates two different User model instances with the same ID and
+        // This route manually creates two different ApiUser model instances with the same ID and
         // adds them both to the loadedRelationshipsMap. Per the JSON:API spec, they should
         // be deduplicated since they have the same type+id, even though they're different object instances.
         $response = $this->getJson("/users/{$user->getKey()}/with-duplicate-instances")
@@ -790,13 +790,13 @@ class JsonApiResourceTest extends TestCase
 
     public function testSameModelOnDifferentResourcesIsNotDeduplicated()
     {
-        $user = User::factory()->create();
+        $user = ApiUser::factory()->create();
 
-        $post = Post::factory()->create([
+        $post = ApiPost::factory()->create([
             'user_id' => $user->getKey(),
         ]);
 
-        // Post's author uses AuthorResource ("authors"), root uses UserResource ("users").
+        // ApiPost's author uses ApiAuthorResource ("authors"), root uses UserResource ("users").
         // We don't want to deduplicate them, as even though the underlying model is the
         // same, they are different resource types, so they have different identity.
         $this->getJson("/users/{$user->getKey()}/with-chaperone-posts?".http_build_query(['include' => 'chaperonePosts.author']))

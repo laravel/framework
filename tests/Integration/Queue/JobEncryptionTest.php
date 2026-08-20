@@ -2,16 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Contracts\Queue\ShouldBeEncrypted;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Jobs\EncryptedJob;
+use Illuminate\Tests\App\Jobs\NonEncryptedJob;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\WithMigration;
 
@@ -31,15 +29,15 @@ class JobEncryptionTest extends DatabaseTestCase
 
     protected function tearDown(): void
     {
-        JobEncryptionTestEncryptedJob::$ran = false;
-        JobEncryptionTestNonEncryptedJob::$ran = false;
+        EncryptedJob::$ran = false;
+        NonEncryptedJob::$ran = false;
 
         parent::tearDown();
     }
 
     public function testEncryptedJobPayloadIsStoredEncrypted()
     {
-        Bus::dispatch(new JobEncryptionTestEncryptedJob);
+        Bus::dispatch(new EncryptedJob);
 
         $this->assertNotEmpty(
             decrypt(json_decode(DB::table('jobs')->first()->payload)->data->command)
@@ -48,11 +46,11 @@ class JobEncryptionTest extends DatabaseTestCase
 
     public function testNonEncryptedJobPayloadIsStoredRaw()
     {
-        Bus::dispatch(new JobEncryptionTestNonEncryptedJob);
+        Bus::dispatch(new NonEncryptedJob);
 
         $this->expectExceptionObject(new DecryptException('The payload is invalid'));
 
-        $this->assertInstanceOf(JobEncryptionTestNonEncryptedJob::class,
+        $this->assertInstanceOf(NonEncryptedJob::class,
             unserialize(json_decode(DB::table('jobs')->first()->payload)->data->command)
         );
 
@@ -61,43 +59,19 @@ class JobEncryptionTest extends DatabaseTestCase
 
     public function testQueueCanProcessEncryptedJob()
     {
-        Bus::dispatch(new JobEncryptionTestEncryptedJob);
+        Bus::dispatch(new EncryptedJob);
 
         Queue::pop()->fire();
 
-        $this->assertTrue(JobEncryptionTestEncryptedJob::$ran);
+        $this->assertTrue(EncryptedJob::$ran);
     }
 
     public function testQueueCanProcessUnEncryptedJob()
     {
-        Bus::dispatch(new JobEncryptionTestNonEncryptedJob);
+        Bus::dispatch(new NonEncryptedJob);
 
         Queue::pop()->fire();
 
-        $this->assertTrue(JobEncryptionTestNonEncryptedJob::$ran);
-    }
-}
-
-class JobEncryptionTestEncryptedJob implements ShouldQueue, ShouldBeEncrypted
-{
-    use Dispatchable, Queueable;
-
-    public static $ran = false;
-
-    public function handle()
-    {
-        static::$ran = true;
-    }
-}
-
-class JobEncryptionTestNonEncryptedJob implements ShouldQueue
-{
-    use Dispatchable, Queueable;
-
-    public static $ran = false;
-
-    public function handle()
-    {
-        static::$ran = true;
+        $this->assertTrue(NonEncryptedJob::$ran);
     }
 }

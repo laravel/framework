@@ -4,6 +4,10 @@ namespace Illuminate\Tests\Integration\Database\Queue;
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Tests\App\Jobs\TimeOutJobWithNestedTransactions;
+use Illuminate\Tests\App\Jobs\TimeOutJobWithTransaction;
+use Illuminate\Tests\App\Jobs\TimeOutNonBatchableJobWithNestedTransactions;
+use Illuminate\Tests\App\Jobs\TimeOutNonBatchableJobWithTransaction;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -55,10 +59,10 @@ class QueueTransactionTest extends DatabaseTestCase
     public static function timeoutJobs(): array
     {
         return [
-            [new Fixtures\TimeOutJobWithTransaction()],
-            [new Fixtures\TimeOutJobWithNestedTransactions()],
-            [new Fixtures\TimeOutNonBatchableJobWithTransaction()],
-            [new Fixtures\TimeOutNonBatchableJobWithNestedTransactions()],
+            [new TimeOutJobWithTransaction()],
+            [new TimeOutJobWithNestedTransactions()],
+            [new TimeOutNonBatchableJobWithTransaction()],
+            [new TimeOutNonBatchableJobWithNestedTransactions()],
         ];
     }
 }

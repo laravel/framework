@@ -4,18 +4,19 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Exception;
 use Illuminate\Bus\DebounceLock;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Cache\Repository as Cache;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Queue\Events\JobDebounced;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache as CacheFacade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Tests\App\Jobs\ChainReceiverJob;
+use Illuminate\Tests\App\Jobs\ChildOfDebouncedTestJob;
+use Illuminate\Tests\App\Jobs\DebouncedAndUniqueTestJob;
+use Illuminate\Tests\App\Jobs\DebouncedTestFailJob;
+use Illuminate\Tests\App\Jobs\DebouncedTestJob;
+use Illuminate\Tests\App\Jobs\DebouncedWithCustomCacheJob;
+use Illuminate\Tests\App\Jobs\DebouncedWithMaxWaitJob;
 use LogicException;
 use Orchestra\Testbench\Attributes\WithMigration;
 
@@ -330,159 +331,5 @@ class DebouncedJobTest extends QueueTestCase
 
         // Only the second (latest) dispatch should have executed.
         $this->assertEquals(1, ChildOfDebouncedTestJob::$handleCount);
-    }
-}
-
-#[DebounceFor(30)]
-class DebouncedTestJob implements ShouldQueue
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public static $handled = false;
-
-    public static $handleCount = 0;
-
-    public function __construct(public string $entityId)
-    {
-    }
-
-    public function debounceId(): string
-    {
-        return $this->entityId;
-    }
-
-    public function handle()
-    {
-        static::$handled = true;
-        static::$handleCount++;
-    }
-}
-
-#[DebounceFor(30)]
-class DebouncedTestFailJob implements ShouldQueue
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public $tries = 1;
-
-    public static $handled = false;
-
-    public function __construct(public string $entityId)
-    {
-    }
-
-    public function debounceId(): string
-    {
-        return $this->entityId;
-    }
-
-    public function handle()
-    {
-        static::$handled = true;
-
-        throw new Exception;
-    }
-}
-
-#[DebounceFor(30)]
-class DebouncedAndUniqueTestJob implements ShouldQueue, ShouldBeUnique
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public function __construct(public string $entityId)
-    {
-    }
-
-    public function debounceId(): string
-    {
-        return $this->entityId;
-    }
-
-    public function handle()
-    {
-    }
-}
-
-class ChainReceiverJob implements ShouldQueue
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public static $handled = false;
-
-    public function handle()
-    {
-        static::$handled = true;
-    }
-}
-
-#[DebounceFor(30)]
-class DebouncedWithCustomCacheJob implements ShouldQueue
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public static $handled = false;
-
-    public function __construct(public string $entityId)
-    {
-    }
-
-    public function debounceId(): string
-    {
-        return $this->entityId;
-    }
-
-    public function debounceVia(): \Illuminate\Contracts\Cache\Repository
-    {
-        return \Illuminate\Container\Container::getInstance()
-            ->make(\Illuminate\Contracts\Cache\Factory::class)
-            ->store('array');
-    }
-
-    public function handle()
-    {
-        static::$handled = true;
-    }
-}
-
-#[DebounceFor(30, maxWait: 60)]
-class DebouncedWithMaxWaitJob implements ShouldQueue
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public static $handleCount = 0;
-
-    public function __construct(public string $entityId)
-    {
-    }
-
-    public function debounceId(): string
-    {
-        return $this->entityId;
-    }
-
-    public function handle()
-    {
-        static::$handleCount++;
-    }
-}
-
-class ChildOfDebouncedTestJob extends DebouncedTestJob implements ShouldQueue
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public static $handleCount = 0;
-
-    public function __construct(public string $entityId)
-    {
-    }
-
-    public function debounceId(): string
-    {
-        return $this->entityId;
-    }
-
-    public function handle()
-    {
-        static::$handleCount++;
     }
 }

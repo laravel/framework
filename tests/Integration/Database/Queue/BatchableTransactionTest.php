@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\Queue;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Tests\App\Jobs\TimeOutJobWithTransaction;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -32,7 +33,7 @@ class BatchableTransactionTest extends DatabaseTestCase
 
     public function testItCanHandleTimeoutJob()
     {
-        Bus::batch([new Fixtures\TimeOutJobWithTransaction()])
+        Bus::batch([new TimeOutJobWithTransaction()])
             ->allowFailures()
             ->dispatch();
 

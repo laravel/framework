@@ -2,17 +2,18 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Tests\App\Jobs\DispatchableJob;
+use Illuminate\Tests\App\Jobs\JobWithClassQueueAttributeOverridingTrait;
+use Illuminate\Tests\App\Jobs\JobWithEnumQueueAttribute;
+use Illuminate\Tests\App\Jobs\JobWithTraitQueueAttribute;
+use Illuminate\Tests\App\Jobs\MyTestDispatchableJob;
+use Illuminate\Tests\App\Jobs\UniqueJob;
 use Orchestra\Testbench\Attributes\WithMigration;
 
 #[WithMigration]
@@ -22,8 +23,8 @@ class JobDispatchingTest extends QueueTestCase
     protected function setUp(): void
     {
         $this->beforeApplicationDestroyed(function () {
-            Job::$ran = false;
-            Job::$value = null;
+            DispatchableJob::$ran = false;
+            DispatchableJob::$value = null;
         });
 
         parent::setUp();
@@ -31,76 +32,76 @@ class JobDispatchingTest extends QueueTestCase
 
     public function testJobCanUseCustomMethodsAfterDispatch()
     {
-        Job::dispatch('test')->replaceValue('new-test');
+        DispatchableJob::dispatch('test')->replaceValue('new-test');
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertTrue(Job::$ran);
-        $this->assertSame('new-test', Job::$value);
+        $this->assertTrue(DispatchableJob::$ran);
+        $this->assertSame('new-test', DispatchableJob::$value);
     }
 
     public function testDispatchesConditionallyWithBoolean()
     {
-        Job::dispatchIf(false, 'test')->replaceValue('new-test');
+        DispatchableJob::dispatchIf(false, 'test')->replaceValue('new-test');
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertFalse(Job::$ran);
-        $this->assertNull(Job::$value);
+        $this->assertFalse(DispatchableJob::$ran);
+        $this->assertNull(DispatchableJob::$value);
 
-        Job::dispatchIf(true, 'test')->replaceValue('new-test');
+        DispatchableJob::dispatchIf(true, 'test')->replaceValue('new-test');
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertTrue(Job::$ran);
-        $this->assertSame('new-test', Job::$value);
+        $this->assertTrue(DispatchableJob::$ran);
+        $this->assertSame('new-test', DispatchableJob::$value);
     }
 
     public function testDispatchesConditionallyWithClosure()
     {
-        Job::dispatchIf(fn ($job) => $job instanceof Job ? 0 : 1, 'test')->replaceValue('new-test');
+        DispatchableJob::dispatchIf(fn ($job) => $job instanceof DispatchableJob ? 0 : 1, 'test')->replaceValue('new-test');
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertFalse(Job::$ran);
+        $this->assertFalse(DispatchableJob::$ran);
 
-        Job::dispatchIf(fn ($job) => $job instanceof Job ? 1 : 0, 'test')->replaceValue('new-test');
+        DispatchableJob::dispatchIf(fn ($job) => $job instanceof DispatchableJob ? 1 : 0, 'test')->replaceValue('new-test');
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertTrue(Job::$ran);
+        $this->assertTrue(DispatchableJob::$ran);
     }
 
     public function testDoesNotDispatchConditionallyWithBoolean()
     {
-        Job::dispatchUnless(true, 'test')->replaceValue('new-test');
+        DispatchableJob::dispatchUnless(true, 'test')->replaceValue('new-test');
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertFalse(Job::$ran);
-        $this->assertNull(Job::$value);
+        $this->assertFalse(DispatchableJob::$ran);
+        $this->assertNull(DispatchableJob::$value);
 
-        Job::dispatchUnless(false, 'test')->replaceValue('new-test');
+        DispatchableJob::dispatchUnless(false, 'test')->replaceValue('new-test');
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertTrue(Job::$ran);
-        $this->assertSame('new-test', Job::$value);
+        $this->assertTrue(DispatchableJob::$ran);
+        $this->assertSame('new-test', DispatchableJob::$value);
     }
 
     public function testDoesNotDispatchConditionallyWithClosure()
     {
-        Job::dispatchUnless(fn ($job) => $job instanceof Job ? 1 : 0, 'test')->replaceValue('new-test');
+        DispatchableJob::dispatchUnless(fn ($job) => $job instanceof DispatchableJob ? 1 : 0, 'test')->replaceValue('new-test');
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertFalse(Job::$ran);
+        $this->assertFalse(DispatchableJob::$ran);
 
-        Job::dispatchUnless(fn ($job) => $job instanceof Job ? 0 : 1, 'test')->replaceValue('new-test');
+        DispatchableJob::dispatchUnless(fn ($job) => $job instanceof DispatchableJob ? 0 : 1, 'test')->replaceValue('new-test');
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertTrue(Job::$ran);
+        $this->assertTrue(DispatchableJob::$ran);
     }
 
     public function testUniqueJobLockIsReleasedForJobDispatchedAfterResponse()
@@ -187,33 +188,33 @@ class JobDispatchingTest extends QueueTestCase
 
     public function testCanDisableDispatchingAfterResponse()
     {
-        Job::dispatchAfterResponse('test');
+        DispatchableJob::dispatchAfterResponse('test');
 
-        $this->assertFalse(Job::$ran);
+        $this->assertFalse(DispatchableJob::$ran);
 
         $this->app->terminate();
 
-        $this->assertTrue(Job::$ran);
+        $this->assertTrue(DispatchableJob::$ran);
 
         Bus::withoutDispatchingAfterResponses();
 
-        Job::$ran = false;
-        Job::dispatchAfterResponse('test');
+        DispatchableJob::$ran = false;
+        DispatchableJob::dispatchAfterResponse('test');
 
-        $this->assertTrue(Job::$ran);
+        $this->assertTrue(DispatchableJob::$ran);
 
         $this->app->terminate();
 
         Bus::withDispatchingAfterResponses();
 
-        Job::$ran = false;
-        Job::dispatchAfterResponse('test');
+        DispatchableJob::$ran = false;
+        DispatchableJob::dispatchAfterResponse('test');
 
-        $this->assertFalse(Job::$ran);
+        $this->assertFalse(DispatchableJob::$ran);
 
         $this->app->terminate();
 
-        $this->assertTrue(Job::$ran);
+        $this->assertTrue(DispatchableJob::$ran);
     }
 
     public function testQueueAttributeWithEnumNormalizesToStringInJobQueuedEvent()
@@ -273,69 +274,12 @@ class JobDispatchingTest extends QueueTestCase
     }
 }
 
-class Job implements ShouldQueue
-{
-    use Dispatchable, Queueable;
-
-    public static $ran = false;
-    public static $usedQueue = null;
-    public static $usedConnection = null;
-    public static $value = null;
-
-    public function __construct($value)
-    {
-        static::$value = $value;
-    }
-
-    public function handle()
-    {
-        static::$ran = true;
-    }
-
-    public function replaceValue($value)
-    {
-        static::$value = $value;
-    }
-}
-
-class UniqueJob extends Job implements ShouldBeUnique
-{
-    use InteractsWithQueue;
-
-    public function uniqueId()
-    {
-        return self::$value;
-    }
-}
-
-class MyTestDispatchableJob implements ShouldQueue
-{
-    use Dispatchable;
-}
-
 enum JobDispatchingTestQueueEnum: string
 {
     case DEFAULT = 'default';
 }
 
-#[QueueAttribute(JobDispatchingTestQueueEnum::DEFAULT)]
-class JobWithEnumQueueAttribute implements ShouldQueue
-{
-    use Dispatchable;
-}
-
 #[QueueAttribute('notifications')]
 trait JobDispatchingTestQueueTrait
 {
-}
-
-class JobWithTraitQueueAttribute implements ShouldQueue
-{
-    use Dispatchable, JobDispatchingTestQueueTrait;
-}
-
-#[QueueAttribute('high')]
-class JobWithClassQueueAttributeOverridingTrait implements ShouldQueue
-{
-    use Dispatchable, JobDispatchingTestQueueTrait;
 }

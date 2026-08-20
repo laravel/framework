@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Contracts\Bus\QueueingDispatcher;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Tests\App\Jobs\CustomPayloadJob;
 use Orchestra\Testbench\Concerns\CreatesApplication;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -31,7 +31,7 @@ class CustomPayloadTest extends TestCase
     {
         $dispatcher = $this->app->make(QueueingDispatcher::class);
 
-        $dispatcher->dispatchToQueue(new MyJob);
+        $dispatcher->dispatchToQueue(new CustomPayloadJob);
     }
 }
 
@@ -50,15 +50,5 @@ class QueueServiceProvider extends ServiceProvider
 
             return ['password' => $password];
         });
-    }
-}
-
-class MyJob implements ShouldQueue
-{
-    public $connection = 'sync';
-
-    public function handle()
-    {
-        //
     }
 }

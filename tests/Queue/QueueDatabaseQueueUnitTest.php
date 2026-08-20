@@ -4,20 +4,17 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Bus\Batchable;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Delay;
-use Illuminate\Queue\Attributes\FailOnTimeout;
-use Illuminate\Queue\Attributes\MaxExceptions;
-use Illuminate\Queue\Attributes\Timeout;
-use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Jobs\AfterCommitJob;
+use Illuminate\Tests\App\Jobs\ChildJobWithPropertiesOverridingParentAttributes;
+use Illuminate\Tests\App\Jobs\JobWithAttributesAndDefaultProperties;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -531,47 +528,3 @@ class JobWithDelayAttribute
 {
 }
 
-class AfterCommitJob implements ShouldQueue
-{
-    public $afterCommit = true;
-}
-
-#[Backoff(9)]
-#[FailOnTimeout]
-#[MaxExceptions(3)]
-#[Timeout(40)]
-#[Tries(2)]
-abstract class ParentJobWithAttributes implements ShouldQueue
-{
-}
-
-class ChildJobWithPropertiesOverridingParentAttributes extends ParentJobWithAttributes
-{
-    public $backoff = 13;
-
-    public $failOnTimeout = false;
-
-    public $maxExceptions = 11;
-
-    public $timeout = 1700;
-
-    public $tries = 7;
-}
-
-#[Backoff(9)]
-#[FailOnTimeout]
-#[MaxExceptions(3)]
-#[Timeout(40)]
-#[Tries(2)]
-class JobWithAttributesAndDefaultProperties implements ShouldQueue
-{
-    public $backoff = 13;
-
-    public $failOnTimeout = false;
-
-    public $maxExceptions = 11;
-
-    public $timeout = 1700;
-
-    public $tries = 7;
-}

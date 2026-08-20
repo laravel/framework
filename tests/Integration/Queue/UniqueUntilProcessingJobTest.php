@@ -2,12 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Tests\App\Jobs\UniqueTestJobThatDoesNotRelease;
+use Illuminate\Tests\App\Jobs\UniqueUntilProcessingJobThatReleases;
+use Illuminate\Tests\App\Jobs\UniqueUntilProcessingJobThatReleasesOnce;
 use Orchestra\Testbench\Attributes\WithMigration;
 
 #[WithMigration]
@@ -64,66 +62,5 @@ class UniqueUntilProcessingJobTest extends QueueTestCase
 
         $this->assertTrue(UniqueUntilProcessingJobThatReleasesOnce::$handled);
         $this->assertNull(DB::table('cache_locks')->first());
-    }
-}
-
-class UniqueTestJobThatDoesNotRelease implements ShouldQueue, ShouldBeUniqueUntilProcessing
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public static $handled = false;
-    public static $released = false;
-
-    public function __construct()
-    {
-        static::$handled = false;
-        static::$released = false;
-    }
-
-    public function handle()
-    {
-        static::$handled = true;
-    }
-}
-
-class UniqueUntilProcessingJobThatReleases extends UniqueTestJobThatDoesNotRelease
-{
-    public function middleware()
-    {
-        return [
-            function ($job) {
-                static::$released = true;
-
-                return $job->release(30);
-            },
-        ];
-    }
-
-    public function uniqueId()
-    {
-        return 100;
-    }
-}
-
-class UniqueUntilProcessingJobThatReleasesOnce extends UniqueTestJobThatDoesNotRelease
-{
-    public $tries = 2;
-
-    public function middleware()
-    {
-        return [
-            function ($job, $next) {
-                if ($job->attempts() === 1) {
-                    return $job->release();
-                }
-
-                return $next($job);
-            },
-        ];
-    }
-
-    public function uniqueId()
-    {
-        return 200;
     }
 }

@@ -2,9 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Tests\App\Jobs\DelayedJob;
 use Orchestra\Testbench\TestCase;
 
 class QueueDelayTest extends TestCase
@@ -13,7 +12,7 @@ class QueueDelayTest extends TestCase
     {
         Queue::fake();
 
-        $job = new TestJob;
+        $job = new DelayedJob;
 
         dispatch($job);
 
@@ -24,7 +23,7 @@ class QueueDelayTest extends TestCase
     {
         Queue::fake();
 
-        $job = new TestJob;
+        $job = new DelayedJob;
 
         dispatch($job->withoutDelay());
 
@@ -35,20 +34,10 @@ class QueueDelayTest extends TestCase
     {
         Queue::fake();
 
-        $job = new TestJob;
+        $job = new DelayedJob;
 
         dispatch($job)->withoutDelay();
 
         $this->assertEquals(0, $job->delay);
-    }
-}
-
-class TestJob implements ShouldQueue
-{
-    use Queueable;
-
-    public function __construct()
-    {
-        $this->delay(60);
     }
 }

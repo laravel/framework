@@ -18,36 +18,36 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Tests\Integration\Http\Fixtures\Author;
-use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
-use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
-use Illuminate\Tests\Integration\Http\Fixtures\ObjectResource;
-use Illuminate\Tests\Integration\Http\Fixtures\Post;
-use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
-use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResourceWithPaginationInformation;
-use Illuminate\Tests\Integration\Http\Fixtures\PostModelCollectionResource;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithAnonymousResourceCollectionWithPaginationInformation;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithJsonOptions;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithJsonOptionsAndTypeHints;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalAppendedAttributes;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalAttributes;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalHasAttributes;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipAggregates;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipCounts;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipExists;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipUsingNamedParameters;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithUnlessOptionalData;
-use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
-use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
-use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
-use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
+use Illuminate\Tests\App\Http\Resources\AuthorResourceWithOptionalRelationship;
+use Illuminate\Tests\App\Http\Resources\EmptyPostCollectionResource;
+use Illuminate\Tests\App\Http\Resources\ObjectResource;
+use Illuminate\Tests\App\Http\Resources\PostCollectionResource;
+use Illuminate\Tests\App\Http\Resources\PostCollectionResourceWithPaginationInformation;
+use Illuminate\Tests\App\Http\Resources\PostModelCollectionResource;
+use Illuminate\Tests\App\Http\Resources\PostResource;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithAnonymousResourceCollectionWithPaginationInformation;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithExtraData;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithJsonOptions;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithJsonOptionsAndTypeHints;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithOptionalAppendedAttributes;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithOptionalAttributes;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithOptionalData;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithOptionalHasAttributes;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithOptionalMerging;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithOptionalPivotRelationship;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithOptionalRelationship;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithOptionalRelationshipAggregates;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithOptionalRelationshipCounts;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithOptionalRelationshipExists;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithOptionalRelationshipUsingNamedParameters;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithoutWrap;
+use Illuminate\Tests\App\Http\Resources\PostResourceWithUnlessOptionalData;
+use Illuminate\Tests\App\Http\Resources\ReallyEmptyPostResource;
+use Illuminate\Tests\App\Http\Resources\ResourceWithPreservedKeys;
+use Illuminate\Tests\App\Http\Resources\SerializablePostResource;
+use Illuminate\Tests\App\Http\Resources\Subscription;
+use Illuminate\Tests\App\Models\AccessorPost;
+use Illuminate\Tests\App\Models\Author;
 use LogicException;
 use Orchestra\Testbench\TestCase;
 
@@ -63,12 +63,12 @@ class ResourceTest extends TestCase
                     'id' => $this->id,
                     'name' => $this->name,
                     'posts' => (new AnonymousResourceCollection([
-                        new Post([
+                        new AccessorPost([
                             'id' => 5,
                             'title' => 'Test Title',
                             'abstract' => 'Test abstract',
                         ]),
-                        new Post([
+                        new AccessorPost([
                             'id' => 10,
                             'title' => 'Another Test Title',
                             'abstract' => 'Another Test abstract',
@@ -99,7 +99,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayBeConvertedToJson()
     {
         Route::get('/', function () {
-            return new PostResource(new Post([
+            return new PostResource(new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
                 'abstract' => 'Test abstract',
@@ -122,7 +122,7 @@ class ResourceTest extends TestCase
 
     public function testResourcesMayBeConvertedToJsonWithToJsonMethod()
     {
-        $resource = new PostResource(new Post([
+        $resource = new PostResource(new AccessorPost([
             'id' => 5,
             'title' => 'Test Title',
             'abstract' => 'Test abstract',
@@ -175,7 +175,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveNoWrap()
     {
         Route::get('/', function () {
-            return new PostResourceWithoutWrap(new Post([
+            return new PostResourceWithoutWrap(new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ]));
@@ -194,7 +194,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveOptionalValues()
     {
         Route::get('/', function () {
-            return new PostResourceWithOptionalData(new Post([
+            return new PostResourceWithOptionalData(new AccessorPost([
                 'id' => 5,
             ]));
         });
@@ -219,7 +219,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveOptionalValuesUsingUnless()
     {
         Route::get('/', function () {
-            return new PostResourceWithUnlessOptionalData(new Post([
+            return new PostResourceWithUnlessOptionalData(new AccessorPost([
                 'id' => 5,
             ]));
         });
@@ -244,7 +244,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveOptionalSelectedAttributes()
     {
         Route::get('/', function () {
-            return new PostResourceWithOptionalAttributes(new Post([
+            return new PostResourceWithOptionalAttributes(new AccessorPost([
                 'id' => 5,
             ]));
         });
@@ -266,7 +266,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveOptionalHasAttributes()
     {
         Route::get('/', function () {
-            $post = new Post([
+            $post = new AccessorPost([
                 'id' => 5,
                 'is_published' => true,
             ]);
@@ -296,7 +296,7 @@ class ResourceTest extends TestCase
     public function testResourcesWithOptionalHasAttributesReturnDefaultValuesAndNotMissingValues()
     {
         Route::get('/', function () {
-            return new PostResourceWithOptionalHasAttributes(new Post([
+            return new PostResourceWithOptionalHasAttributes(new AccessorPost([
                 'id' => 5,
             ]));
         });
@@ -320,7 +320,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveOptionalAppendedAttributes()
     {
         Route::get('/', function () {
-            $post = new Post([
+            $post = new AccessorPost([
                 'id' => 5,
             ]);
 
@@ -350,7 +350,7 @@ class ResourceTest extends TestCase
     public function testResourcesWithOptionalAppendedAttributesReturnDefaultValuesAndNotMissingValues()
     {
         Route::get('/', function () {
-            return new PostResourceWithOptionalAppendedAttributes(new Post([
+            return new PostResourceWithOptionalAppendedAttributes(new AccessorPost([
                 'id' => 5,
             ]));
         });
@@ -373,7 +373,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveOptionalMerges()
     {
         Route::get('/', function () {
-            return new PostResourceWithOptionalMerging(new Post([
+            return new PostResourceWithOptionalMerging(new AccessorPost([
                 'id' => 5,
             ]));
         });
@@ -395,7 +395,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveOptionalRelationships()
     {
         Route::get('/', function () {
-            return new PostResourceWithOptionalRelationship(new Post([
+            return new PostResourceWithOptionalRelationship(new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ]));
@@ -417,7 +417,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveOptionalRelationshipCounts()
     {
         Route::get('/', function () {
-            $post = new Post([
+            $post = new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ]);
@@ -442,7 +442,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayLoadOptionalRelationshipCounts()
     {
         Route::get('/', function () {
-            $post = new Post([
+            $post = new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
                 'authors_count' => 2,
@@ -472,7 +472,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveOptionalRelationshipExists()
     {
         Route::get('/', function () {
-            return new PostResourceWithOptionalRelationshipExists(new Post([
+            return new PostResourceWithOptionalRelationshipExists(new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ]));
@@ -495,7 +495,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayLoadOptionalRelationshipExists()
     {
         Route::get('/', function () {
-            $post = new Post([
+            $post = new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
                 'authors_exists' => true,
@@ -525,7 +525,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayLoadOptionalRelationships()
     {
         Route::get('/', function () {
-            $post = new Post([
+            $post = new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ]);
@@ -553,7 +553,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayLoadOptionalRelationshipAggregates()
     {
         Route::get('/', function () {
-            $post = new Post([
+            $post = new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
                 'comments_avg_rating' => 3.8,
@@ -584,7 +584,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveOptionalRelationshipAggregates()
     {
         Route::get('/', function () {
-            $post = new Post([
+            $post = new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ]);
@@ -610,7 +610,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayShowsNullForLoadedRelationshipWithValueNull()
     {
         Route::get('/', function () {
-            $post = new Post([
+            $post = new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ]);
@@ -661,7 +661,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveOptionalPivotRelationships()
     {
         Route::get('/', function () {
-            $post = new Post(['id' => 5]);
+            $post = new AccessorPost(['id' => 5]);
             $post->setRelation('pivot', new Subscription);
 
             return new PostResourceWithOptionalPivotRelationship($post);
@@ -688,7 +688,7 @@ class ResourceTest extends TestCase
         Model::shouldBeStrict(true);
 
         Route::get('/', function () {
-            $post = new Post(['id' => 5]);
+            $post = new AccessorPost(['id' => 5]);
             (function () {
                 $this->exists = true;
                 $this->wasRecentlyCreated = false;
@@ -713,7 +713,7 @@ class ResourceTest extends TestCase
     public function testWhenLoadedUsingNamedDefaultParameterOnMissingRelation()
     {
         Route::get('/', function () {
-            $post = new Post(['id' => 1]);
+            $post = new AccessorPost(['id' => 1]);
 
             return new PostResourceWithOptionalRelationshipUsingNamedParameters($post);
         });
@@ -736,7 +736,7 @@ class ResourceTest extends TestCase
     public function testWhenLoadedUsingNamedDefaultParameterOnLoadedRelation()
     {
         Route::get('/', function () {
-            $post = new Post(['id' => 1]);
+            $post = new AccessorPost(['id' => 1]);
             $post->setRelation('author', new Author(['name' => 'jrrmartin']));
 
             return new PostResourceWithOptionalRelationshipUsingNamedParameters($post);
@@ -761,7 +761,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayHaveOptionalPivotRelationshipsWithCustomAccessor()
     {
         Route::get('/', function () {
-            $post = new Post(['id' => 5]);
+            $post = new AccessorPost(['id' => 5]);
             $post->setRelation('accessor', new Subscription);
 
             return new PostResourceWithOptionalPivotRelationship($post);
@@ -785,7 +785,7 @@ class ResourceTest extends TestCase
 
     public function testResourceIsUrlRoutable()
     {
-        $post = new PostResource(new Post([
+        $post = new PostResource(new AccessorPost([
             'id' => 5,
             'title' => 'Test Title',
         ]));
@@ -795,7 +795,7 @@ class ResourceTest extends TestCase
 
     public function testNamedRoutesAreUrlRoutable()
     {
-        $post = new PostResource(new Post([
+        $post = new PostResource(new AccessorPost([
             'id' => 5,
             'title' => 'Test Title',
         ]));
@@ -812,7 +812,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayBeSerializable()
     {
         Route::get('/', function () {
-            return new SerializablePostResource(new Post([
+            return new SerializablePostResource(new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ]));
@@ -834,7 +834,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayCustomizeResponses()
     {
         Route::get('/', function () {
-            return new PostResource(new Post([
+            return new PostResource(new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ]));
@@ -851,7 +851,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayCustomizeExtraData()
     {
         Route::get('/', function () {
-            return new PostResourceWithExtraData(new Post([
+            return new PostResourceWithExtraData(new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ]));
@@ -873,7 +873,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayCustomizeExtraDataWhenBuildingResponse()
     {
         Route::get('/', function () {
-            return (new PostResourceWithExtraData(new Post([
+            return (new PostResourceWithExtraData(new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ])))->additional(['baz' => 'qux']);
@@ -896,7 +896,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayCustomizeJsonOptions()
     {
         Route::get('/', function () {
-            return new PostResourceWithJsonOptions(new Post([
+            return new PostResourceWithJsonOptions(new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
                 'reading_time' => 3.0,
@@ -917,7 +917,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return PostResourceWithJsonOptions::collection(collect([
-                new Post(['id' => 5, 'title' => 'Test Title', 'reading_time' => 3.0]),
+                new AccessorPost(['id' => 5, 'title' => 'Test Title', 'reading_time' => 3.0]),
             ]));
         });
 
@@ -935,7 +935,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $paginator = new LengthAwarePaginator(
-                collect([new Post(['id' => 5, 'title' => 'Test Title', 'reading_time' => 3.0])]),
+                collect([new AccessorPost(['id' => 5, 'title' => 'Test Title', 'reading_time' => 3.0])]),
                 10, 15, 1
             );
 
@@ -955,7 +955,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayCustomizeJsonOptionsWithTypeHintedConstructor()
     {
         Route::get('/', function () {
-            return new PostResourceWithJsonOptionsAndTypeHints(new Post([
+            return new PostResourceWithJsonOptionsAndTypeHints(new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
                 'reading_time' => 3.0,
@@ -975,7 +975,7 @@ class ResourceTest extends TestCase
     public function testCustomHeadersMayBeSetOnResponses()
     {
         Route::get('/', function () {
-            return (new PostResource(new Post([
+            return (new PostResource(new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ])))->response()->setStatusCode(202)->header('X-Custom', 'True');
@@ -992,7 +992,7 @@ class ResourceTest extends TestCase
     public function testResourcesMayReceiveProperStatusCodeForFreshModels()
     {
         Route::get('/', function () {
-            $post = new Post([
+            $post = new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ]);
@@ -1012,7 +1012,7 @@ class ResourceTest extends TestCase
     public function testCollectionsAreNotDoubledWrapped()
     {
         Route::get('/', function () {
-            return new PostCollectionResource(collect([new Post([
+            return new PostCollectionResource(collect([new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ])]));
@@ -1038,7 +1038,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $paginator = new LengthAwarePaginator(
-                collect([new Post(['id' => 5, 'title' => 'Test Title'])]),
+                collect([new AccessorPost(['id' => 5, 'title' => 'Test Title'])]),
                 10, 15, 1
             );
 
@@ -1079,7 +1079,7 @@ class ResourceTest extends TestCase
     public function testPaginatorResourceCanPreserveQueryParameters()
     {
         Route::get('/', function () {
-            $collection = collect([new Post(['id' => 2, 'title' => 'Laravel Nova'])]);
+            $collection = collect([new AccessorPost(['id' => 2, 'title' => 'Laravel Nova'])]);
             $paginator = new LengthAwarePaginator(
                 $collection, 3, 1, 2
             );
@@ -1121,7 +1121,7 @@ class ResourceTest extends TestCase
     public function testPaginatorResourceCanReceiveQueryParameters()
     {
         Route::get('/', function () {
-            $collection = collect([new Post(['id' => 2, 'title' => 'Laravel Nova'])]);
+            $collection = collect([new AccessorPost(['id' => 2, 'title' => 'Laravel Nova'])]);
             $paginator = new LengthAwarePaginator(
                 $collection, 3, 1, 2
             );
@@ -1164,7 +1164,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $paginator = new CursorPaginator(
-                collect([new Post(['id' => 5, 'title' => 'Test Title']), new Post(['id' => 6, 'title' => 'Hello'])]),
+                collect([new AccessorPost(['id' => 5, 'title' => 'Test Title']), new AccessorPost(['id' => 6, 'title' => 'Hello'])]),
                 1, null, ['parameters' => ['id']]
             );
 
@@ -1202,7 +1202,7 @@ class ResourceTest extends TestCase
     public function testCursorPaginatorResourceCanPreserveQueryParameters()
     {
         Route::get('/', function () {
-            $collection = collect([new Post(['id' => 5, 'title' => 'Test Title']), new Post(['id' => 6, 'title' => 'Hello'])]);
+            $collection = collect([new AccessorPost(['id' => 5, 'title' => 'Test Title']), new AccessorPost(['id' => 6, 'title' => 'Hello'])]);
             $paginator = new CursorPaginator(
                 $collection, 1, null, ['parameters' => ['id']]
             );
@@ -1239,7 +1239,7 @@ class ResourceTest extends TestCase
     public function testCursorPaginatorResourceCanReceiveQueryParameters()
     {
         Route::get('/', function () {
-            $collection = collect([new Post(['id' => 5, 'title' => 'Test Title']), new Post(['id' => 6, 'title' => 'Hello'])]);
+            $collection = collect([new AccessorPost(['id' => 5, 'title' => 'Test Title']), new AccessorPost(['id' => 6, 'title' => 'Hello'])]);
             $paginator = new CursorPaginator(
                 $collection, 1, null, ['parameters' => ['id']]
             );
@@ -1277,7 +1277,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return new EmptyPostCollectionResource(new LengthAwarePaginator(
-                collect([new Post(['id' => 5, 'title' => 'Test Title'])]),
+                collect([new AccessorPost(['id' => 5, 'title' => 'Test Title'])]),
                 10, 15, 1
             ));
         });
@@ -1317,7 +1317,7 @@ class ResourceTest extends TestCase
     public function testToJsonMayBeLeftOffOfSingleResource()
     {
         Route::get('/', function () {
-            return new ReallyEmptyPostResource(new Post([
+            return new ReallyEmptyPostResource(new AccessorPost([
                 'id' => 5,
                 'title' => 'Test Title',
             ]));
@@ -1339,7 +1339,7 @@ class ResourceTest extends TestCase
 
     public function testOriginalOnResponseIsModelWhenSingleResource()
     {
-        $createdPost = new Post(['id' => 5, 'title' => 'Test Title']);
+        $createdPost = new AccessorPost(['id' => 5, 'title' => 'Test Title']);
         Route::get('/', function () use ($createdPost) {
             return new ReallyEmptyPostResource($createdPost);
         });
@@ -1352,8 +1352,8 @@ class ResourceTest extends TestCase
     public function testOriginalOnResponseIsCollectionOfModelWhenCollectionResource()
     {
         $createdPosts = collect([
-            new Post(['id' => 5, 'title' => 'Test Title']),
-            new Post(['id' => 6, 'title' => 'Test Title 2']),
+            new AccessorPost(['id' => 5, 'title' => 'Test Title']),
+            new AccessorPost(['id' => 6, 'title' => 'Test Title 2']),
         ]);
         Route::get('/', function () use ($createdPosts) {
             return new EmptyPostCollectionResource(new LengthAwarePaginator($createdPosts, 10, 15, 1));
@@ -1369,7 +1369,7 @@ class ResourceTest extends TestCase
     public function testCollectionResourceWithPaginationInformation()
     {
         $posts = collect([
-            new Post(['id' => 5, 'title' => 'Test Title']),
+            new AccessorPost(['id' => 5, 'title' => 'Test Title']),
         ]);
 
         Route::get('/', function () use ($posts) {
@@ -1400,7 +1400,7 @@ class ResourceTest extends TestCase
     public function testResourceWithPaginationInformation()
     {
         $posts = collect([
-            new Post(['id' => 5, 'title' => 'Test Title']),
+            new AccessorPost(['id' => 5, 'title' => 'Test Title']),
         ]);
 
         Route::get('/', function () use ($posts) {
@@ -1431,8 +1431,8 @@ class ResourceTest extends TestCase
     public function testCollectionResourcesAreCountable()
     {
         $posts = collect([
-            new Post(['id' => 1, 'title' => 'Test title']),
-            new Post(['id' => 2, 'title' => 'Test title 2']),
+            new AccessorPost(['id' => 1, 'title' => 'Test title']),
+            new AccessorPost(['id' => 2, 'title' => 'Test title 2']),
         ]);
 
         $collection = new PostCollectionResource($posts);
@@ -1444,8 +1444,8 @@ class ResourceTest extends TestCase
     public function testCollectionResourcesMustCollectResources()
     {
         $posts = collect([
-            new Post(['id' => 1, 'title' => 'Test title']),
-            new Post(['id' => 2, 'title' => 'Test title 2']),
+            new AccessorPost(['id' => 1, 'title' => 'Test title']),
+            new AccessorPost(['id' => 2, 'title' => 'Test title 2']),
         ]);
 
         $this->expectExceptionObject(new LogicException('must collect'));
@@ -1689,7 +1689,7 @@ class ResourceTest extends TestCase
 
             public function work()
             {
-                $postResource = new PostResource(new Post([
+                $postResource = new PostResource(new AccessorPost([
                     'id' => 1,
                     'title' => 'Test Title 1',
                 ]));
@@ -1722,8 +1722,8 @@ class ResourceTest extends TestCase
             public function work()
             {
                 $posts = collect([
-                    new Post(['id' => 1, 'title' => 'Test title 1']),
-                    new Post(['id' => 2, 'title' => 'Test title 2']),
+                    new AccessorPost(['id' => 1, 'title' => 'Test title 1']),
+                    new AccessorPost(['id' => 2, 'title' => 'Test title 2']),
                 ]);
 
                 return $this->filter([
@@ -1900,7 +1900,7 @@ class ResourceTest extends TestCase
         try {
             Route::get('/', function () {
                 $paginator = new LengthAwarePaginator(
-                    collect([new Post(['id' => 5, 'title' => 'Test Title', 'reading_time' => 3.0])]),
+                    collect([new AccessorPost(['id' => 5, 'title' => 'Test Title', 'reading_time' => 3.0])]),
                     10, 15, 1
                 );
 

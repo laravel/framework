@@ -2,11 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Cache\Repository;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\UniqueConstraintViolationException;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\Carbon;
@@ -14,9 +11,12 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Tests\App\Jobs\FirstJob;
+use Illuminate\Tests\App\Jobs\JobWillFail;
+use Illuminate\Tests\App\Jobs\SecondJob;
+use Illuminate\Tests\App\Jobs\ThirdJob;
 use Mockery;
 use Orchestra\Testbench\Attributes\WithMigration;
-use RuntimeException;
 
 #[WithMigration]
 #[WithMigration('queue')]
@@ -254,53 +254,5 @@ class WorkCommandTest extends QueueTestCase
         $this->withoutMockingConsoleOutput()->artisan('queue:work', ['--once' => true]);
         Exceptions::assertNotReported(UniqueConstraintViolationException::class);
         $this->assertSame(2, substr_count(Artisan::output(), JobWillFail::class));
-    }
-}
-
-class FirstJob implements ShouldQueue
-{
-    use Dispatchable, Queueable;
-
-    public static $ran = false;
-
-    public function handle()
-    {
-        static::$ran = true;
-    }
-}
-
-class SecondJob implements ShouldQueue
-{
-    use Dispatchable, Queueable;
-
-    public static $ran = false;
-
-    public function handle()
-    {
-        static::$ran = true;
-    }
-}
-
-class ThirdJob implements ShouldQueue
-{
-    use Dispatchable, Queueable;
-
-    public static $ran = false;
-
-    public function handle()
-    {
-        sleep(1);
-
-        static::$ran = true;
-    }
-}
-
-class JobWillFail implements ShouldQueue
-{
-    use Dispatchable, Queueable;
-
-    public function handle()
-    {
-        throw new RuntimeException;
     }
 }

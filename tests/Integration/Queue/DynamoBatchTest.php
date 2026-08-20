@@ -2,16 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\Batchable;
 use Illuminate\Bus\DynamoBatchRepository;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Jobs\BatchJob;
+use Illuminate\Tests\App\Jobs\FailingJob;
 use Orchestra\Testbench\Attributes\RequiresEnv;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
@@ -141,34 +138,6 @@ class DynamoBatchTest extends TestCase
         $this->assertCount(0, $repo->get(100, $batches[0]->id));
         $this->assertCount(9, $repo->get(100, $batches[9]->id));
         $this->assertCount(10, $repo->get(100, Str::orderedUuid()));
-    }
-}
-
-class BatchJob implements ShouldQueue
-{
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable;
-
-    public static $results = [];
-
-    public string $id;
-
-    public function __construct(string $id)
-    {
-        $this->id = $id;
-    }
-
-    public function handle()
-    {
-        BatchRunRecorder::record($this->id);
-    }
-}
-
-class FailingJob extends BatchJob
-{
-    public function handle()
-    {
-        BatchRunRecorder::recordFailure($this->id);
-        $this->fail();
     }
 }
 
