@@ -59,17 +59,7 @@ class ProcessDriver implements Driver
                 $output = substr($output, 0, $pos);
             }
 
-            $result = json_decode($output, true);
-
-            if (! $result['successful']) {
-                throw new $result['exception'](
-                    ...(! empty(array_filter($result['parameters'], fn ($parameter) => ! is_null($parameter)))
-                        ? $result['parameters']
-                        : [$result['message']])
-                );
-            }
-
-            return [$key => unserialize($result['result'])];
+            return [$key => TaskResult::unwrap(json_decode($output, true))];
         })->all();
     }
 
