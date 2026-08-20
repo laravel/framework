@@ -172,6 +172,36 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get the number of pending jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalPendingSize()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the number of delayed jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalDelayedSize()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the number of reserved jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalReservedSize()
+    {
+        return 0;
+    }
+
+    /**
      * Get the pending jobs for the given queue.
      *
      * @param  \UnitEnum|string|null  $queue

@@ -136,6 +136,44 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get the number of pending jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalPendingSize()
+    {
+        return $this->database->table($this->table)
+            ->whereNull('reserved_at')
+            ->where('available_at', '<=', $this->currentTime())
+            ->count();
+    }
+
+    /**
+     * Get the number of delayed jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalDelayedSize()
+    {
+        return $this->database->table($this->table)
+            ->whereNull('reserved_at')
+            ->where('available_at', '>', $this->currentTime())
+            ->count();
+    }
+
+    /**
+     * Get the number of reserved jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalReservedSize()
+    {
+        return $this->database->table($this->table)
+            ->whereNotNull('reserved_at')
+            ->count();
+    }
+
+    /**
      * Get the pending jobs for the given queue.
      *
      * @param  \UnitEnum|string|null  $queue

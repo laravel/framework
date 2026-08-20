@@ -634,6 +634,14 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertTrue($pending->contains(fn ($job) => $job->name === JobToFakeStub::class));
     }
 
+    public function testTotalPendingSize()
+    {
+        $this->fake->push($this->job, '', 'foo');
+        $this->fake->push(new JobToFakeStub, '', 'bar');
+
+        $this->assertSame(2, $this->fake->totalPendingSize());
+    }
+
     public function testDelayedJobs()
     {
         $this->fake->later(10, $this->job, '', 'foo');
@@ -661,6 +669,14 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertCount(2, $delayed->pluck('uuid')->unique());
         $this->assertTrue($delayed->contains(fn ($job) => $job->name === JobStub::class));
         $this->assertTrue($delayed->contains(fn ($job) => $job->name === JobToFakeStub::class));
+    }
+
+    public function testTotalDelayedSize()
+    {
+        $this->fake->later(10, $this->job, '', 'foo');
+        $this->fake->later(10, new JobToFakeStub, '', 'bar');
+
+        $this->assertSame(2, $this->fake->totalDelayedSize());
     }
 
     public function testDelayedSize()
@@ -721,6 +737,14 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertInstanceOf(InspectedJob::class, $reserved->first());
         $this->assertTrue($reserved->contains(fn ($job) => $job->name === JobStub::class));
         $this->assertTrue($reserved->contains(fn ($job) => $job->name === JobToFakeStub::class));
+    }
+
+    public function testTotalReservedSize()
+    {
+        $this->fake->reserve($this->job, 'foo');
+        $this->fake->reserve(new JobToFakeStub, 'bar');
+
+        $this->assertSame(2, $this->fake->totalReservedSize());
     }
 
     public function testReservedSize()

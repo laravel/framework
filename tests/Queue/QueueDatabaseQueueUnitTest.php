@@ -491,6 +491,50 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $this->assertSame('emails', $jobs->last()->queue);
     }
 
+    public function testTotalPendingSize()
+    {
+        $database = Mockery::mock(Connection::class);
+        $queue = new DatabaseQueue($database, 'table', 'default');
+        $queue->setContainer(Mockery::spy(Container::class));
+
+        $query = Mockery::mock(QueryBuilder::class);
+        $database->expects('table')->with('table')->andReturn($query);
+        $query->expects('whereNull')->with('reserved_at')->andReturnSelf();
+        $query->expects('where')->with('available_at', '<=', Mockery::any())->andReturnSelf();
+        $query->expects('count')->andReturn(2);
+
+        $this->assertSame(2, $queue->totalPendingSize());
+    }
+
+    public function testTotalDelayedSize()
+    {
+        $database = Mockery::mock(Connection::class);
+        $queue = new DatabaseQueue($database, 'table', 'default');
+        $queue->setContainer(Mockery::spy(Container::class));
+
+        $query = Mockery::mock(QueryBuilder::class);
+        $database->expects('table')->with('table')->andReturn($query);
+        $query->expects('whereNull')->with('reserved_at')->andReturnSelf();
+        $query->expects('where')->with('available_at', '>', Mockery::any())->andReturnSelf();
+        $query->expects('count')->andReturn(3);
+
+        $this->assertSame(3, $queue->totalDelayedSize());
+    }
+
+    public function testTotalReservedSize()
+    {
+        $database = Mockery::mock(Connection::class);
+        $queue = new DatabaseQueue($database, 'table', 'default');
+        $queue->setContainer(Mockery::spy(Container::class));
+
+        $query = Mockery::mock(QueryBuilder::class);
+        $database->expects('table')->with('table')->andReturn($query);
+        $query->expects('whereNotNull')->with('reserved_at')->andReturnSelf();
+        $query->expects('count')->andReturn(4);
+
+        $this->assertSame(4, $queue->totalReservedSize());
+    }
+
     public function testGetLockForPoppingIsCached()
     {
         $database = Mockery::mock(Connection::class);
