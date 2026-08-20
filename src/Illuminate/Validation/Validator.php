@@ -1186,9 +1186,6 @@ class Validator implements ValidatorContract
     /**
      * Parse a rule, reusing the result of an identical rule parsed before.
      *
-     * The same rule string is parsed once per attribute it applies to, and a wildcard
-     * rule set applies the same handful of strings to every row of the data.
-     *
      * @param  object|string  $rule
      * @return array{0: object|string, 1: array}
      */
