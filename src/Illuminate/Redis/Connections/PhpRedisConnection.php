@@ -184,7 +184,9 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $dictionary = $dictionary[0];
         }
 
-        return array_values($this->command('hmget', [$key, $dictionary]));
+        $result = $this->command('hmget', [$key, $dictionary]);
+
+        return $result !== false ? array_values($result) : [];
     }
 
     /**
