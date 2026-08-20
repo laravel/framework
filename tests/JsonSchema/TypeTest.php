@@ -62,6 +62,19 @@ class TypeTest extends TestCase
         JSON, $type->toString());
     }
 
+    public function test_numeric_property_names_are_encoded_as_json_object_properties(): void
+    {
+        $schema = JsonSchema::object([
+            '0' => JsonSchema::string()->required(),
+        ]);
+
+        $encoded = json_decode($schema->toString(), false, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertIsObject($encoded->properties);
+        $this->assertSame('string', $encoded->properties->{'0'}->type);
+        $this->assertValidOnJsonSchema($schema, (object) ['0' => 'value']);
+    }
+
     public function test_does_have_a_stringable_representation(): void
     {
         $type = JsonSchema::object([

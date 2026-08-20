@@ -387,11 +387,13 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
      */
     public function decode(): string
     {
-        if (empty($this->query()->toArray())) {
+        $query = $this->query();
+
+        if (empty($query->toArray())) {
             return $this->value();
         }
 
-        return Str::replace($this->query()->value(), $this->query()->decode(), $this->value());
+        return Str::replaceFirst('?'.$query->value(), '?'.$query->decode(), $this->value());
     }
 
     /**

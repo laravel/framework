@@ -197,6 +197,13 @@ class SupportUriTest extends TestCase
         $this->assertSame('https://laravel.com/docs/11.x/routing?q=laravel docs#route-model-binding', $uri->decode());
     }
 
+    public function test_decoding_the_query_does_not_modify_the_path_or_fragment()
+    {
+        $uri = Uri::of('https://example.com/x=a%20b?x=a%20b#x=a%20b');
+
+        $this->assertSame('https://example.com/x=a%20b?x=a b#x=a%20b', $uri->decode());
+    }
+
     public function test_with_query_if_missing()
     {
         // Test adding new parameters while preserving existing ones

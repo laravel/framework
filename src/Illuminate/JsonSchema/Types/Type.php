@@ -119,7 +119,39 @@ abstract class Type extends JsonSchema
      */
     public function toString(): string
     {
-        return json_encode($this->toArray(), JSON_PRETTY_PRINT) ?: '';
+        return json_encode(static::normalizeSchemaForJson($this->toArray()), JSON_PRETTY_PRINT) ?: '';
+    }
+
+    /**
+     * Normalize schema objects that PHP cannot represent with an array.
+     *
+     * @param  array<string, mixed>  $schema
+     * @return array<string, mixed>
+     */
+    protected static function normalizeSchemaForJson(array $schema): array
+    {
+        if (isset($schema['properties'])) {
+            $properties = new \stdClass;
+
+            foreach ($schema['properties'] as $name => $property) {
+                $properties->{(string) $name} = static::normalizeSchemaForJson($property);
+            }
+
+            $schema['properties'] = $properties;
+        }
+
+        if (isset($schema['items']) && is_array($schema['items'])) {
+            $schema['items'] = static::normalizeSchemaForJson($schema['items']);
+        }
+
+        if (isset($schema['anyOf']) && is_array($schema['anyOf'])) {
+            $schema['anyOf'] = array_map(
+                static fn (array $schema): array => static::normalizeSchemaForJson($schema),
+                $schema['anyOf'],
+            );
+        }
+
+        return $schema;
     }
 
     /**
