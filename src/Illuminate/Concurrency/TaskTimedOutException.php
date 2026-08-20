@@ -16,13 +16,13 @@ class TaskTimedOutException extends RuntimeException
     ) {
         parent::__construct(sprintf(
             'Concurrency tasks dispatched to the [%s] queue connection%s timed out after %d %s with [%d/%d] results received. Ensure queue workers are running and share the [%s] cache store with this process.',
-            $connection ?? 'default',
+            $connection,
             is_null($queue) ? '' : sprintf(' on the [%s] queue', $queue),
             $seconds,
             $seconds === 1 ? 'second' : 'seconds',
             $received,
             $total,
-            $store ?? 'default',
+            $store,
         ));
     }
 }
