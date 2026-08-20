@@ -15,7 +15,6 @@ class TaskResultTest extends TestCase
     {
         $envelope = TaskResult::success($value);
 
-        $this->assertSame(1, $envelope['version']);
         $this->assertTrue($envelope['successful']);
         $this->assertEquals($value, TaskResult::unwrap($envelope));
     }
@@ -38,7 +37,6 @@ class TaskResultTest extends TestCase
     {
         $envelope = TaskResult::failure(new RuntimeException('Something broke'));
 
-        $this->assertSame(1, $envelope['version']);
         $this->assertFalse($envelope['successful']);
         $this->assertSame(RuntimeException::class, $envelope['exception']);
         $this->assertSame('Something broke', $envelope['message']);

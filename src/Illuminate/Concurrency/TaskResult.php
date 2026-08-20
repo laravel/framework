@@ -14,7 +14,6 @@ class TaskResult
     public static function success(mixed $value): array
     {
         return [
-            'version' => 1,
             'successful' => true,
             'result' => serialize($value),
         ];
@@ -36,7 +35,6 @@ class TaskResult
         }
 
         return [
-            'version' => 1,
             'successful' => false,
             'exception' => get_class($e),
             'message' => $e->getMessage(),
