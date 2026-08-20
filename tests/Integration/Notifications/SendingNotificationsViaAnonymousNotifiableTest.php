@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Integration\Notifications;
 
 use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
+use Illuminate\Tests\App\Notifications\TestMailNotificationForAnonymousNotifiable;
 use Orchestra\Testbench\TestCase;
 
 class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
@@ -62,14 +62,6 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
                     $locale === 'it';
             }
         );
-    }
-}
-
-class TestMailNotificationForAnonymousNotifiable extends Notification
-{
-    public function via($notifiable)
-    {
-        return [TestCustomChannel::class, AnotherTestCustomChannel::class];
     }
 }
 

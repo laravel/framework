@@ -14,6 +14,15 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\NotificationSender;
 use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Tests\App\Notifications\DummyMultiChannelNotificationWithConditionalMiddleware;
+use Illuminate\Tests\App\Notifications\DummyNotificationWithDatabaseVia;
+use Illuminate\Tests\App\Notifications\DummyNotificationWithEmptyStringVia;
+use Illuminate\Tests\App\Notifications\DummyNotificationWithMiddleware;
+use Illuminate\Tests\App\Notifications\DummyNotificationWithViaConnections;
+use Illuminate\Tests\App\Notifications\DummyNotificationWithViaMutation;
+use Illuminate\Tests\App\Notifications\DummyNotificationWithViaQueues;
+use Illuminate\Tests\App\Notifications\DummyQueuedNotificationWithArrayVia;
+use Illuminate\Tests\App\Notifications\DummyQueuedNotificationWithStringVia;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
@@ -352,162 +361,6 @@ class NotificationSenderTest extends TestCase
     }
 }
 
-class DummyQueuedNotificationWithStringVia extends Notification implements ShouldQueue
-{
-    use Queueable;
-
-    /**
-     * Get the notification channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array|string
-     */
-    public function via($notifiable)
-    {
-        return 'mail';
-    }
-}
-
-class DummyQueuedNotificationWithArrayVia extends Notification implements ShouldQueue
-{
-    use Queueable;
-
-    public function __construct()
-    {
-        $this->connection = 'redis';
-        $this->queue = 'dummy';
-    }
-
-    /**
-     * Get the notification channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array|string
-     */
-    public function via($notifiable)
-    {
-        return ['mail', 'database'];
-    }
-}
-
-class DummyNotificationWithEmptyStringVia extends Notification
-{
-    use Queueable;
-
-    /**
-     * Get the notification channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array|string
-     */
-    public function via($notifiable)
-    {
-        return '';
-    }
-}
-
-class DummyNotificationWithDatabaseVia extends Notification
-{
-    use Queueable;
-
-    /**
-     * Get the notification channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array|string
-     */
-    public function via($notifiable)
-    {
-        return 'database';
-    }
-}
-
-class DummyNotificationWithViaConnections extends Notification implements ShouldQueue
-{
-    use Queueable;
-
-    public function __construct()
-    {
-        $this->connection = 'redis';
-        $this->queue = 'dummy';
-    }
-
-    public function via($notifiable)
-    {
-        return ['mail', 'database'];
-    }
-
-    public function viaConnections()
-    {
-        return [
-            'database' => 'sync',
-        ];
-    }
-}
-
-class DummyNotificationWithViaQueues extends Notification implements ShouldQueue
-{
-    use Queueable;
-
-    public function __construct()
-    {
-        $this->connection = 'redis';
-        $this->queue = 'dummy';
-    }
-
-    public function via($notifiable)
-    {
-        return ['mail', 'database'];
-    }
-
-    public function viaQueues()
-    {
-        return [
-            'mail' => 'admin_notifications',
-        ];
-    }
-}
-
-class DummyNotificationWithMiddleware extends Notification implements ShouldQueue
-{
-    use Queueable;
-
-    public function via($notifiable)
-    {
-        return 'mail';
-    }
-
-    public function middleware()
-    {
-        return [
-            new TestNotificationMiddleware,
-        ];
-    }
-}
-
-class DummyMultiChannelNotificationWithConditionalMiddleware extends Notification implements ShouldQueue
-{
-    use Queueable;
-
-    public function via($notifiable)
-    {
-        return [
-            'mail',
-            'database',
-            'broadcast',
-        ];
-    }
-
-    public function middleware($notifiable, $channel)
-    {
-        return match ($channel) {
-            'mail' => [new TestMailNotificationMiddleware],
-            'database' => [new TestDatabaseNotificationMiddleware],
-            default => []
-        };
-    }
-}
-
 class TestNotificationMiddleware
 {
     public function handle($command, $next)
@@ -529,17 +382,5 @@ class TestDatabaseNotificationMiddleware
     public function handle($command, $next)
     {
         return $next($command);
-    }
-}
-
-class DummyNotificationWithViaMutation extends Notification
-{
-    public $channelData = null;
-
-    public function via($notifiable)
-    {
-        $this->channelData = $notifiable->routeConfig ?? 'default';
-
-        return 'mail';
     }
 }

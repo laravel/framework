@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Illuminate\Mail\Mailable;
+use Illuminate\Tests\App\Mail\MailableWithCallbackBuild;
 use PHPUnit\Framework\TestCase;
 
 class MailMailableDataTest extends TestCase
 {
     public function testMailableDataIsNotLost(): void
     {
-        $mailable = new MailableStub;
+        $mailable = new MailableWithCallbackBuild;
 
         $testData = [
             'first_name' => 'James',
@@ -21,24 +21,11 @@ class MailMailableDataTest extends TestCase
         });
         $this->assertSame($testData, $mailable->buildViewData());
 
-        $mailable = new MailableStub;
+        $mailable = new MailableWithCallbackBuild;
         $mailable->build(function ($m) use ($testData) {
             $m->view('view', $testData)
                 ->text('text-view');
         });
         $this->assertSame($testData, $mailable->buildViewData());
-    }
-}
-
-class MailableStub extends Mailable
-{
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build($builder)
-    {
-        $builder($this);
     }
 }

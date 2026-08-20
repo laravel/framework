@@ -10,6 +10,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\Assert;
+use Illuminate\Tests\App\Mail\TestMail;
+use Illuminate\Tests\App\Mail\TimestampTestMail;
 use Orchestra\Testbench\TestCase;
 
 class SendingMailWithLocaleTest extends TestCase
@@ -169,19 +171,6 @@ class SendingMailWithLocaleTest extends TestCase
     }
 }
 
-class TestMail extends Mailable
-{
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build()
-    {
-        return $this->view('view');
-    }
-}
-
 class TestEmailLocaleUser extends Model implements HasLocalePreference
 {
     protected $fillable = [
@@ -192,18 +181,5 @@ class TestEmailLocaleUser extends Model implements HasLocalePreference
     public function preferredLocale()
     {
         return $this->email_locale;
-    }
-}
-
-class TimestampTestMail extends Mailable
-{
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build()
-    {
-        return $this->view('timestamp');
     }
 }

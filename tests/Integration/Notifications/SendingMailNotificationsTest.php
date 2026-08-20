@@ -3,18 +3,22 @@
 namespace Illuminate\Tests\Integration\Notifications;
 
 use Illuminate\Contracts\Mail\Factory as MailFactory;
-use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Mail\Markdown;
 use Illuminate\Mail\Message;
-use Illuminate\Notifications\Channels\MailChannel;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Notifications\TestMailNotification;
+use Illuminate\Tests\App\Notifications\TestMailNotificationWithCustomTheme;
+use Illuminate\Tests\App\Notifications\TestMailNotificationWithHtmlAndPlain;
+use Illuminate\Tests\App\Notifications\TestMailNotificationWithHtmlOnly;
+use Illuminate\Tests\App\Notifications\TestMailNotificationWithMailable;
+use Illuminate\Tests\App\Notifications\TestMailNotificationWithPlainOnly;
+use Illuminate\Tests\App\Notifications\TestMailNotificationWithSubject;
 use Mockery;
 use Orchestra\Testbench\TestCase;
 
@@ -398,120 +402,5 @@ class NotifiableUserWithMultipleAddresses extends NotifiableUser
             'foo_'.$this->email,
             'bar_'.$this->email,
         ];
-    }
-}
-
-class TestMailNotification extends Notification
-{
-    public function via($notifiable)
-    {
-        return [MailChannel::class];
-    }
-
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->priority(1)
-            ->cc('cc@deepblue.com', 'cc')
-            ->bcc('bcc@deepblue.com', 'bcc')
-            ->from('jack@deepblue.com', 'Jacques Mayol')
-            ->replyTo('jack@deepblue.com', 'Jacques Mayol')
-            ->line('The introduction to the notification.')
-            ->mailer('foo');
-    }
-}
-
-class TestMailNotificationWithSubject extends Notification
-{
-    public function via($notifiable)
-    {
-        return [MailChannel::class];
-    }
-
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->subject('mail custom subject')
-            ->line('The introduction to the notification.');
-    }
-}
-
-class TestMailNotificationWithMailable extends Notification
-{
-    public function via($notifiable)
-    {
-        return [MailChannel::class];
-    }
-
-    public function toMail($notifiable)
-    {
-        $mailable = Mockery::mock(Mailable::class);
-
-        $mailable->expects('send');
-
-        return $mailable;
-    }
-}
-
-class TestMailNotificationWithHtmlAndPlain extends Notification
-{
-    public function via($notifiable)
-    {
-        return [MailChannel::class];
-    }
-
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->view(['html', 'plain']);
-    }
-}
-
-class TestMailNotificationWithHtmlOnly extends Notification
-{
-    public function via($notifiable)
-    {
-        return [MailChannel::class];
-    }
-
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->view('html');
-    }
-}
-
-class TestMailNotificationWithPlainOnly extends Notification
-{
-    public function via($notifiable)
-    {
-        return [MailChannel::class];
-    }
-
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->view([null, 'plain']);
-    }
-}
-
-class TestMailNotificationWithCustomTheme extends Notification
-{
-    public function via($notifiable)
-    {
-        return [MailChannel::class];
-    }
-
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->priority(1)
-            ->cc('cc@deepblue.com', 'cc')
-            ->bcc('bcc@deepblue.com', 'bcc')
-            ->from('jack@deepblue.com', 'Jacques Mayol')
-            ->replyTo('jack@deepblue.com', 'Jacques Mayol')
-            ->line('The introduction to the notification.')
-            ->theme('my-custom-theme')
-            ->mailer('foo');
     }
 }

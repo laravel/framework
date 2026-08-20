@@ -2,12 +2,11 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
-use Illuminate\Mail\Mailable;
 use Illuminate\Mail\MailManager;
 use Illuminate\Support\Testing\Fakes\MailFake;
+use Illuminate\Tests\App\Mail\MailableStub;
+use Illuminate\Tests\App\Mail\QueueableMailableStub;
 use Mockery;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +24,7 @@ class SupportTestingMailFakeTest extends TestCase
     private $fake;
 
     /**
-     * @var \Illuminate\Tests\Support\MailableStub
+     * @var \Illuminate\Tests\App\Mail\MailableStub
      */
     private $mailable;
 
@@ -45,7 +44,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertSent(MailableStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was not sent.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\App\Mail\MailableStub] mailable was not sent.', $e->getMessage());
         }
 
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
@@ -59,7 +58,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertSent(MailableStub::class, 'taylor@laravel.com');
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was not sent to address [taylor@laravel.com].', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\App\Mail\MailableStub] mailable was not sent to address [taylor@laravel.com].', $e->getMessage());
         }
 
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
@@ -129,7 +128,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertNotSent(MailableStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\MailableStub] mailable was sent.', $e->getMessage());
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\App\Mail\MailableStub] mailable was sent.', $e->getMessage());
         }
     }
 
@@ -180,7 +179,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertSent(MailableStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was sent 2 times instead of 1 time.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\App\Mail\MailableStub] mailable was sent 2 times instead of 1 time.', $e->getMessage());
         }
 
         $this->fake->assertSent(MailableStub::class, 2);
@@ -207,7 +206,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertQueued(MailableStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was not queued.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\App\Mail\MailableStub] mailable was not queued.', $e->getMessage());
         }
 
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
@@ -221,7 +220,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertQueued(MailableStub::class, 'taylor@laravel.com');
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was not queued to address [taylor@laravel.com].', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\App\Mail\MailableStub] mailable was not queued to address [taylor@laravel.com].', $e->getMessage());
         }
 
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
@@ -252,7 +251,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertQueued(MailableStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was queued 2 times instead of 1 time.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\App\Mail\MailableStub] mailable was queued 2 times instead of 1 time.', $e->getMessage());
         }
 
         $this->fake->assertQueued(MailableStub::class, 2);
@@ -267,7 +266,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertQueuedTimes(MailableStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was queued 2 times instead of 1 time.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\App\Mail\MailableStub] mailable was queued 2 times instead of 1 time.', $e->getMessage());
         }
 
         $this->fake->assertQueuedTimes(MailableStub::class, 2);
@@ -320,7 +319,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertSent(QueueableMailableStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\QueueableMailableStub] mailable was not sent.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\App\Mail\QueueableMailableStub] mailable was not sent.', $e->getMessage());
         }
     }
 
@@ -334,7 +333,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertNothingSent();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("The following mailables were sent unexpectedly:\n\n- Illuminate\Tests\Support\MailableStub", $e->getMessage());
+            $this->assertStringContainsString("The following mailables were sent unexpectedly:\n\n- Illuminate\Tests\App\Mail\MailableStub", $e->getMessage());
         }
     }
 
@@ -348,7 +347,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertNothingQueued();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("The following mailables were queued unexpectedly:\n\n- Illuminate\Tests\Support\MailableStub", $e->getMessage());
+            $this->assertStringContainsString("The following mailables were queued unexpectedly:\n\n- Illuminate\Tests\App\Mail\MailableStub", $e->getMessage());
         }
     }
 
@@ -498,44 +497,6 @@ class SupportTestingMailFakeTest extends TestCase
 enum MailTestQueueEnum: string
 {
     case Emails = 'emails';
-}
-
-class MailableStub extends Mailable
-{
-    public $framework = 'Laravel';
-
-    protected $version = '6.0';
-
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build()
-    {
-        $this->with('first_name', 'Taylor')
-            ->withLastName('Otwell');
-    }
-}
-
-class QueueableMailableStub extends Mailable implements ShouldQueue
-{
-    use Queueable;
-
-    public $framework = 'Laravel';
-
-    protected $version = '6.0';
-
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build()
-    {
-        $this->with('first_name', 'Taylor')
-            ->withLastName('Otwell');
-    }
 }
 
 class LocalizedRecipientStub implements HasLocalePreference

@@ -3,9 +3,10 @@
 namespace Illuminate\Tests\Notifications;
 
 use Illuminate\Notifications\Channels\DatabaseChannel;
-use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Notifications\DatabaseNotification;
+use Illuminate\Tests\App\Notifications\DatabaseNotificationWithCustomType;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +14,7 @@ class NotificationDatabaseChannelTest extends TestCase
 {
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
-        $notification = new NotificationDatabaseChannelTestNotification;
+        $notification = new DatabaseNotification;
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -30,7 +31,7 @@ class NotificationDatabaseChannelTest extends TestCase
 
     public function testCorrectPayloadIsSentToDatabase()
     {
-        $notification = new NotificationDatabaseChannelTestNotification;
+        $notification = new DatabaseNotification;
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -48,7 +49,7 @@ class NotificationDatabaseChannelTest extends TestCase
 
     public function testCustomizeTypeIsSentToDatabase()
     {
-        $notification = new NotificationDatabaseChannelCustomizeTypeTestNotification;
+        $notification = new DatabaseNotificationWithCustomType;
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -62,32 +63,6 @@ class NotificationDatabaseChannelTest extends TestCase
 
         $channel = new ExtendedDatabaseChannel;
         $channel->send($notifiable, $notification);
-    }
-}
-
-class NotificationDatabaseChannelTestNotification extends Notification
-{
-    public function toDatabase($notifiable)
-    {
-        return new DatabaseMessage(['invoice_id' => 1]);
-    }
-}
-
-class NotificationDatabaseChannelCustomizeTypeTestNotification extends Notification
-{
-    public function toDatabase($notifiable)
-    {
-        return new DatabaseMessage(['invoice_id' => 1]);
-    }
-
-    public function databaseType()
-    {
-        return 'MONTHLY';
-    }
-
-    public function initialDatabaseReadAtValue()
-    {
-        return Carbon::now();
     }
 }
 

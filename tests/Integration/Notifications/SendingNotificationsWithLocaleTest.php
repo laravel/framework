@@ -6,16 +6,14 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Events\LocaleUpdated;
-use Illuminate\Mail\Mailable;
-use Illuminate\Notifications\Channels\MailChannel;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\Assert;
+use Illuminate\Tests\App\Notifications\GreetingMailNotification;
+use Illuminate\Tests\App\Notifications\GreetingMailNotificationWithMailable;
 use Orchestra\Testbench\TestCase;
 
 class SendingNotificationsWithLocaleTest extends TestCase
@@ -242,42 +240,5 @@ class NotifiableEmailLocalePreferredUser extends Model implements HasLocalePrefe
     public function preferredLocale()
     {
         return $this->email_locale;
-    }
-}
-
-class GreetingMailNotification extends Notification
-{
-    public function via($notifiable)
-    {
-        return [MailChannel::class];
-    }
-
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->greeting(__('hi'))
-            ->line(Carbon::tomorrow()->diffForHumans());
-    }
-}
-
-class GreetingMailNotificationWithMailable extends Notification
-{
-    public function via($notifiable)
-    {
-        return [MailChannel::class];
-    }
-
-    public function toMail($notifiable)
-    {
-        return (new GreetingMailable)
-            ->to($notifiable->email);
-    }
-}
-
-class GreetingMailable extends Mailable
-{
-    public function build()
-    {
-        return $this->view('greeting');
     }
 }

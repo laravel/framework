@@ -2,10 +2,9 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
-use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Tests\App\Mail\MailableWithAlternativeSyntax;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -64,28 +63,5 @@ class MailableAlternativeSyntaxTest extends TestCase
         $envelope->from('dries@example.com', 'Dries Vints');
         $this->assertSame('dries@example.com', $envelope->from->address);
         $this->assertSame('Dries Vints', $envelope->from->name);
-    }
-}
-
-class MailableWithAlternativeSyntax extends Mailable
-{
-    public function envelope()
-    {
-        return new Envelope(
-            to: [new Address('taylor@laravel.com', 'Taylor Otwell')],
-            cc: [new Address('adam@laravel.com', 'Adam Wathan')],
-            bcc: [new Address('tyler@laravel.com', 'Tyler Blair')],
-            subject: 'Test Subject',
-            tags: ['tag-1', 'tag-2'],
-            metadata: ['test-meta' => 'test-meta-value'],
-        );
-    }
-
-    public function content()
-    {
-        return new Content(
-            view: 'test-view',
-            with: ['test-data-key' => 'test-data-value'],
-        );
     }
 }

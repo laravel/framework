@@ -3,14 +3,14 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
+use Illuminate\Tests\App\Notifications\NotificationStub;
+use Illuminate\Tests\App\Notifications\NotificationWithFalsyShouldSendStub;
+use Illuminate\Tests\App\Notifications\NotificationWithSerialization;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -22,7 +22,7 @@ class SupportTestingNotificationFakeTest extends TestCase
     private $fake;
 
     /**
-     * @var \Illuminate\Tests\Support\NotificationStub
+     * @var \Illuminate\Tests\App\Notifications\NotificationStub
      */
     private $notification;
 
@@ -44,7 +44,7 @@ class SupportTestingNotificationFakeTest extends TestCase
             $this->fake->assertSentTo($this->user, NotificationStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\NotificationStub] notification was not sent.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\App\Notifications\NotificationStub] notification was not sent.', $e->getMessage());
         }
 
         $this->fake->send($this->user, new NotificationStub);
@@ -87,7 +87,7 @@ class SupportTestingNotificationFakeTest extends TestCase
             $this->fake->assertNotSentTo($this->user, NotificationStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.', $e->getMessage());
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\App\Notifications\NotificationStub] notification was sent.', $e->getMessage());
         }
     }
 
@@ -101,7 +101,7 @@ class SupportTestingNotificationFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.', $e->getMessage());
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\App\Notifications\NotificationStub] notification was sent.', $e->getMessage());
         }
     }
 
@@ -233,27 +233,6 @@ class SupportTestingNotificationFakeTest extends TestCase
     }
 }
 
-class NotificationStub extends Notification
-{
-    public function via($notifiable)
-    {
-        return ['mail'];
-    }
-}
-
-class NotificationWithFalsyShouldSendStub extends Notification
-{
-    public function via($notifiable)
-    {
-        return ['mail'];
-    }
-
-    public function shouldSend($notifiable, $channel)
-    {
-        return false;
-    }
-}
-
 class UserStub extends User
 {
     //
@@ -264,24 +243,5 @@ class LocalizedUserStub extends User implements HasLocalePreference
     public function preferredLocale()
     {
         return 'au';
-    }
-}
-
-class NotificationWithSerialization extends NotificationStub implements ShouldQueue
-{
-    use Queueable;
-
-    public function __construct(public $value)
-    {
-    }
-
-    public function __serialize(): array
-    {
-        return ['value' => $this->value.'-serialized'];
-    }
-
-    public function __unserialize(array $data): void
-    {
-        $this->value = $data['value'].'-unserialized';
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Notifications\NotificationStub;
 use Orchestra\Testbench\Attributes\DefineDatabase;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
@@ -61,13 +62,5 @@ class UuidUserStub extends \Illuminate\Foundation\Auth\User
     public function casts()
     {
         return array_merge(parent::casts(), ['id' => AsStringable::class]);
-    }
-}
-
-class NotificationStub extends \Illuminate\Notifications\Notification
-{
-    public function via($notifiable)
-    {
-        return ['mail'];
     }
 }

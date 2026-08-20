@@ -2,12 +2,18 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
-use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Stringable;
+use Illuminate\Tests\App\Mail\BasicMailable;
+use Illuminate\Tests\App\Mail\BasicMailableWithTextView;
+use Illuminate\Tests\App\Mail\BasicMailableWithTheme;
+use Illuminate\Tests\App\Mail\EmbedDataMailable;
+use Illuminate\Tests\App\Mail\EmbedImageMailable;
+use Illuminate\Tests\App\Mail\EmbedMailable;
+use Illuminate\Tests\App\Mail\EmbedMultilineMailable;
+use Illuminate\Tests\App\Mail\MessageAsPublicPropertyMailable;
+use Illuminate\Tests\App\Mail\MessageAsWithNamedParameterMailable;
 use Orchestra\Testbench\TestCase;
 
 class SendingMarkdownMailTest extends TestCase
@@ -185,170 +191,5 @@ class SendingMarkdownMailTest extends TestCase
         $attachmentContentId = $headerMatches[1] ?? null;
 
         return [$htmlImageCid, $attachmentContentId];
-    }
-}
-
-class BasicMailable extends Mailable
-{
-    public function envelope()
-    {
-        return new Envelope(
-            subject: 'My basic title',
-        );
-    }
-
-    public function content()
-    {
-        return new Content(
-            markdown: 'basic',
-        );
-    }
-}
-
-class BasicMailableWithTheme extends Mailable
-{
-    public $theme = 'taylor';
-
-    public function envelope()
-    {
-        return new Envelope(
-            subject: 'My basic title',
-        );
-    }
-
-    public function content()
-    {
-        return new Content(
-            markdown: 'basic',
-        );
-    }
-}
-
-class BasicMailableWithTextView extends Mailable
-{
-    public $textView = 'text';
-
-    public function envelope()
-    {
-        return new Envelope(
-            subject: 'My basic title',
-        );
-    }
-
-    public function content()
-    {
-        return new Content(
-            markdown: 'basic',
-        );
-    }
-}
-
-class EmbedMailable extends Mailable
-{
-    public function envelope()
-    {
-        return new Envelope(
-            subject: 'My basic title',
-        );
-    }
-
-    public function content()
-    {
-        return new Content(
-            markdown: 'embed',
-        );
-    }
-}
-
-class EmbedMultilineMailable extends Mailable
-{
-    public function envelope()
-    {
-        return new Envelope(
-            subject: 'My basic title',
-        );
-    }
-
-    public function content()
-    {
-        return new Content(
-            markdown: 'embed-multiline',
-        );
-    }
-}
-
-class EmbedDataMailable extends Mailable
-{
-    public function envelope()
-    {
-        return new Envelope(
-            subject: 'My basic title',
-        );
-    }
-
-    public function content()
-    {
-        return new Content(
-            markdown: 'embed-data',
-        );
-    }
-}
-
-class EmbedImageMailable extends Mailable
-{
-    public function envelope()
-    {
-        return new Envelope(
-            subject: 'My basic title',
-        );
-    }
-
-    public function content()
-    {
-        return new Content(
-            markdown: 'embed-image',
-            with: [
-                'image' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'empty_image.jpg',
-            ]
-        );
-    }
-}
-
-class MessageAsPublicPropertyMailable extends Mailable
-{
-    public $message = 'My message';
-
-    public function envelope()
-    {
-        return new Envelope(
-            subject: 'My basic title',
-        );
-    }
-
-    public function content()
-    {
-        return new Content(
-            markdown: 'message',
-        );
-    }
-}
-
-class MessageAsWithNamedParameterMailable extends Mailable
-{
-    public function envelope()
-    {
-        return new Envelope(
-            subject: 'My basic title',
-        );
-    }
-
-    public function content()
-    {
-        return new Content(
-            markdown: 'message',
-            with: [
-                'message' => 'My message',
-            ]
-        );
     }
 }

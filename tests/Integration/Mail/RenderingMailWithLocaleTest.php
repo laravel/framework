@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
-use Illuminate\Mail\Mailable;
+use Illuminate\Tests\App\Mail\RenderedTestMail;
 use Orchestra\Testbench\TestCase;
 
 class RenderingMailWithLocaleTest extends TestCase
@@ -44,13 +44,5 @@ class RenderingMailWithLocaleTest extends TestCase
         $mail = new RenderedTestMail;
 
         $this->assertStringContainsString('nombre', $mail->render());
-    }
-}
-
-class RenderedTestMail extends Mailable
-{
-    public function build()
-    {
-        return $this->view('view');
     }
 }

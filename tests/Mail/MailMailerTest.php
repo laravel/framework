@@ -10,6 +10,7 @@ use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Message;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Support\HtmlString;
+use Illuminate\Tests\App\Mail\MailableWithExplicitFrom;
 use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -196,7 +197,7 @@ class MailMailerTest extends TestCase
         $view->expects('render')->andReturn('rendered.view');
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
-        $sentMessage = $mailer->to('taylor@laravel.com', 'Taylor Otwell')->send(new TestMail());
+        $sentMessage = $mailer->to('taylor@laravel.com', 'Taylor Otwell')->send(new MailableWithExplicitFrom());
 
         $recipients = $sentMessage->getEnvelope()->getRecipients();
         $this->assertCount(1, $recipients);
@@ -345,14 +346,5 @@ class MailMailerTest extends TestCase
         $this->assertSame(
             'bar', $mailer->foo()
         );
-    }
-}
-
-class TestMail extends \Illuminate\Mail\Mailable
-{
-    public function build()
-    {
-        return $this->view('view')
-            ->from('hello@laravel.com');
     }
 }

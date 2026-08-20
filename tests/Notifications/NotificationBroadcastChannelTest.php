@@ -6,8 +6,11 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Channels\BroadcastChannel;
 use Illuminate\Notifications\Events\BroadcastNotificationCreated;
-use Illuminate\Notifications\Messages\BroadcastMessage;
-use Illuminate\Notifications\Notification;
+use Illuminate\Tests\App\Notifications\BroadcastNotification;
+use Illuminate\Tests\App\Notifications\NotificationBroadcastOnSyncConnection;
+use Illuminate\Tests\App\Notifications\NotificationWithAdditionalBroadcastData;
+use Illuminate\Tests\App\Notifications\NotificationWithCustomBroadcastChannel;
+use Illuminate\Tests\App\Notifications\NotificationWithCustomBroadcastType;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +18,7 @@ class NotificationBroadcastChannelTest extends TestCase
 {
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
-        $notification = new NotificationBroadcastChannelTestNotification;
+        $notification = new BroadcastNotification;
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -27,7 +30,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedOnCustomChannels()
     {
-        $notification = new CustomChannelsTestNotification;
+        $notification = new NotificationWithCustomBroadcastChannel;
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -42,7 +45,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedWithCustomEventName()
     {
-        $notification = new CustomEventNameTestNotification;
+        $notification = new NotificationWithCustomBroadcastType;
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -57,7 +60,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedWithCustomDataType()
     {
-        $notification = new CustomEventNameTestNotification;
+        $notification = new NotificationWithCustomBroadcastType;
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -72,7 +75,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedNow()
     {
-        $notification = new TestNotificationBroadCastedNow;
+        $notification = new NotificationBroadcastOnSyncConnection;
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -86,7 +89,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedWithCustomAdditionalPayload()
     {
-        $notification = new CustomBroadcastWithTestNotification;
+        $notification = new NotificationWithAdditionalBroadcastData;
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -97,65 +100,5 @@ class NotificationBroadcastChannelTest extends TestCase
         $data = $event->broadcastWith();
 
         $this->assertArrayHasKey('additional', $data);
-    }
-}
-
-class NotificationBroadcastChannelTestNotification extends Notification
-{
-    public function toArray($notifiable)
-    {
-        return ['invoice_id' => 1];
-    }
-}
-
-class CustomChannelsTestNotification extends Notification
-{
-    public function toArray($notifiable)
-    {
-        return ['invoice_id' => 1];
-    }
-
-    public function broadcastOn()
-    {
-        return [new PrivateChannel('custom-channel')];
-    }
-}
-
-class CustomEventNameTestNotification extends Notification
-{
-    public function toArray($notifiable)
-    {
-        return ['invoice_id' => 1];
-    }
-
-    public function broadcastType()
-    {
-        return 'custom.type';
-    }
-}
-
-class TestNotificationBroadCastedNow extends Notification
-{
-    public function toArray($notifiable)
-    {
-        return ['invoice_id' => 1];
-    }
-
-    public function toBroadcast()
-    {
-        return (new BroadcastMessage([]))->onConnection('sync');
-    }
-}
-
-class CustomBroadcastWithTestNotification extends Notification
-{
-    public function toArray($notifiable)
-    {
-        return ['invoice_id' => 1];
-    }
-
-    public function broadcastWith()
-    {
-        return ['id' => 1, 'type' => 'custom', 'additional' => 'custom'];
     }
 }

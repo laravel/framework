@@ -8,9 +8,10 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Transport\ArrayTransport;
+use Illuminate\Tests\App\Mail\MailableHeadersStub;
+use Illuminate\Tests\App\Mail\WelcomeMailableStub;
 use Mockery;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
@@ -1245,36 +1246,6 @@ class MailMailableTest extends TestCase
                 //
             }
         });
-    }
-}
-
-class MailableHeadersStub extends Mailable
-{
-    public function headers()
-    {
-        return new Headers('custom-message-id@example.com', [
-            'previous-message@example.com',
-        ], [
-            'X-Custom-Header' => 'Custom Value',
-        ]);
-    }
-}
-
-class WelcomeMailableStub extends Mailable
-{
-    public $framework = 'Laravel';
-
-    protected $version = '5.3';
-
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build()
-    {
-        $this->with('first_name', 'Taylor')
-            ->withLastName('Otwell');
     }
 }
 

@@ -6,11 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Notifications\Events\NotificationSent;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Notifications\SentMessageMailNotification;
 use Orchestra\Testbench\TestCase;
 
 class SentMessageMailTest extends TestCase
@@ -62,22 +61,4 @@ class SentMessageUser extends Model
     use Notifiable;
 
     public $timestamps = false;
-}
-
-class SentMessageMailNotification extends Notification
-{
-    public function via(): array
-    {
-        return ['mail'];
-    }
-
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('Example notification with attachment.')
-            ->attach(__DIR__.'/Fixtures/blank_document.pdf', [
-                'as' => 'blank_document.pdf',
-                'mime' => 'application/pdf',
-            ]);
-    }
 }

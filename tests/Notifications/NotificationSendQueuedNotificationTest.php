@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\SendQueuedNotifications;
-use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Support\Collection;
+use Illuminate\Tests\App\Notifications\EmptyNotification;
+use Illuminate\Tests\App\Notifications\FailOnTimeoutNotification;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -18,12 +18,12 @@ class NotificationSendQueuedNotificationTest extends TestCase
 {
     public function testNotificationsCanBeSent()
     {
-        $notification = new TestNotification;
+        $notification = new EmptyNotification;
         $job = new SendQueuedNotifications('notifiables', $notification);
         $manager = Mockery::mock(ChannelManager::class);
         $manager->expects('sendNow')->withArgs(function ($notifiables, $notification, $channels) {
             return $notifiables instanceof Collection && $notifiables->toArray() === ['notifiables']
-                && $notification instanceof TestNotification
+                && $notification instanceof EmptyNotification
                 && $channels === null;
         });
         $job->handle($manager);
@@ -34,7 +34,7 @@ class NotificationSendQueuedNotificationTest extends TestCase
         $identifier = new ModelIdentifier(NotifiableUser::class, [null], [], null);
         $serializedIdentifier = serialize($identifier);
 
-        $job = new SendQueuedNotifications(new NotifiableUser, new TestNotification);
+        $job = new SendQueuedNotifications(new NotifiableUser, new EmptyNotification);
         $serialized = serialize($job);
 
         $this->assertStringContainsString($serializedIdentifier, $serialized);
@@ -45,7 +45,7 @@ class NotificationSendQueuedNotificationTest extends TestCase
         $notifiable = new AnonymousNotifiable;
         $serializedNotifiable = serialize($notifiable);
 
-        $job = new SendQueuedNotifications($notifiable, new TestNotification);
+        $job = new SendQueuedNotifications($notifiable, new EmptyNotification);
         $serialized = serialize($job);
 
         $this->assertStringContainsString($serializedNotifiable, $serialized);
@@ -78,13 +78,4 @@ class NotifiableUser extends Model
 
     public $table = 'users';
     public $timestamps = false;
-}
-
-class TestNotification extends Notification
-{
-}
-
-#[FailOnTimeout]
-class FailOnTimeoutNotification extends Notification
-{
 }

@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
-use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\SendQueuedMailable;
-use Illuminate\Queue\Attributes\Connection;
-use Illuminate\Queue\Attributes\Delay;
-use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Illuminate\Tests\App\Mail\MailableQueueableStub;
+use Illuminate\Tests\App\Mail\MailableQueueableStubWithDeduplication;
+use Illuminate\Tests\App\Mail\MailableQueueableStubWithDelayAttribute;
+use Illuminate\Tests\App\Mail\MailableQueueableStubWithDelayQueueAndConnectionAttributes;
+use Illuminate\Tests\App\Mail\MailableQueueableStubWithMessageGroup;
+use Illuminate\Tests\App\Mail\MailableQueueableStubWithQueueAndConnectionAttributes;
 use Laravel\SerializableClosure\SerializableClosure;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -290,95 +290,9 @@ class MailableQueuedTest extends TestCase
     }
 }
 
-class MailableQueueableStub extends Mailable implements ShouldQueue
-{
-    use Queueable;
-
-    public function build(): self
-    {
-        $this
-            ->subject('lorem ipsum')
-            ->html('foo bar baz')
-            ->to('foo@example.tld');
-
-        return $this;
-    }
-}
-
 enum MailableQueue: string
 {
     case Emails = 'emails';
-}
-
-class MailableQueueableStubWithMessageGroup extends Mailable implements ShouldQueue
-{
-    use Queueable;
-
-    public function build(): self
-    {
-        $this
-            ->subject('lorem ipsum')
-            ->html('foo bar baz')
-            ->to('foo@example.tld');
-
-        return $this;
-    }
-
-    public function messageGroup(): string
-    {
-        return 'group-1';
-    }
-}
-
-#[Delay(30)]
-class MailableQueueableStubWithDelayAttribute extends Mailable implements ShouldQueue
-{
-    use Queueable;
-
-    public function build(): self
-    {
-        $this
-            ->subject('lorem ipsum')
-            ->html('foo bar baz')
-            ->to('foo@example.tld');
-
-        return $this;
-    }
-}
-
-class MailableQueueableStubWithDeduplication extends Mailable implements ShouldQueue
-{
-    use Queueable;
-
-    public function build(): self
-    {
-        $this
-            ->subject('lorem ipsum')
-            ->html('foo bar baz')
-            ->to('foo@example.tld');
-
-        return $this;
-    }
-
-    public function deduplicationId($payload, $queue)
-    {
-        return hash('sha256', $payload);
-    }
-}
-
-#[Connection('redis')]
-#[QueueAttribute('mail-queue')]
-class MailableQueueableStubWithQueueAndConnectionAttributes extends MailableQueueableStub
-{
-    //
-}
-
-#[Connection('sqs')]
-#[Delay(30)]
-#[QueueAttribute('delayed-mail-queue')]
-class MailableQueueableStubWithDelayQueueAndConnectionAttributes extends MailableQueueableStub
-{
-    //
 }
 
 class MailableQueueFake extends QueueFake
