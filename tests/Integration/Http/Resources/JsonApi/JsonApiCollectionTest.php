@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Comment;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
@@ -9,6 +11,59 @@ use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
 
 class JsonApiCollectionTest extends TestCase
 {
+    public function testItLoadsIncludedRelationshipsForCollectionInBatches()
+    {
+        $posts = Post::factory()->times(5)->create();
+
+        $posts->each(fn ($post) => Comment::factory()->create([
+            'post_id' => $post->getKey(),
+        ]));
+
+        DB::enableQueryLog();
+
+        $this->getJson('/posts?'.http_build_query(['include' => 'comments']))
+            ->assertOk()
+            ->assertJsonCount(5, 'data')
+            ->assertJsonCount(5, 'included');
+
+        $this->assertCount(3, DB::getQueryLog());
+    }
+
+    public function testItLoadsNestedIncludedRelationshipsForCollectionInBatches()
+    {
+        $users = User::factory()->times(5)->create();
+
+        $users->each(fn ($user) => Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]));
+
+        DB::enableQueryLog();
+
+        $this->getJson('/users?'.http_build_query(['include' => 'posts.author']))
+            ->assertOk()
+            ->assertJsonCount(5, 'data');
+
+        $this->assertCount(4, DB::getQueryLog());
+    }
+
+    public function testItDoesNotReloadRelationshipsThatWereAlreadyEagerLoaded()
+    {
+        $posts = Post::factory()->times(5)->create();
+
+        $posts->each(fn ($post) => Comment::factory()->create([
+            'post_id' => $post->getKey(),
+        ]));
+
+        DB::enableQueryLog();
+
+        $this->getJson('/posts-with-comments?'.http_build_query(['include' => 'comments']))
+            ->assertOk()
+            ->assertJsonCount(5, 'data')
+            ->assertJsonCount(5, 'included');
+
+        $this->assertCount(3, DB::getQueryLog());
+    }
+
     public function testItCanGenerateJsonApiResponse()
     {
         $users = User::factory()->times(5)->create();

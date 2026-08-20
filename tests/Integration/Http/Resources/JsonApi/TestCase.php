@@ -45,6 +45,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             return Post::paginate(5)->toResourceCollection();
         });
 
+        $router->get('posts-with-comments', function () {
+            return Post::with('comments')->paginate(5)->toResourceCollection();
+        });
+
         $router->get('posts/{postId}', function ($postId) {
             return Post::find($postId)->toResource();
         });

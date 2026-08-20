@@ -2,11 +2,14 @@
 
 namespace Illuminate\Http\Resources\JsonApi;
 
+use Closure;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection as BaseAnonymousResourceCollection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class AnonymousResourceCollection extends BaseAnonymousResourceCollection
 {
@@ -44,9 +47,65 @@ class AnonymousResourceCollection extends BaseAnonymousResourceCollection
     #[\Override]
     public function toAttributes(Request $request)
     {
+        $this->loadMissingResourceRelationships($request = $this->resolveJsonApiRequestFrom($request));
+
         return $this->collection
             ->map(fn ($resource) => $resource->resolveResourceData($request))
             ->all();
+    }
+
+    /**
+     * Load the requested resource relationships for the collection.
+     */
+    protected function loadMissingResourceRelationships(JsonApiRequest $request): void
+    {
+        if (empty($requestedRelationships = $request->sparseIncluded())) {
+            return;
+        }
+
+        $loadGroups = [];
+
+        foreach ($this->collection as $resource) {
+            if (! $resource instanceof JsonApiResource || ! $resource->resource instanceof Model) {
+                continue;
+            }
+
+            $relationships = [];
+
+            foreach (new Collection($resource->toRelationships($request)) as $key => $value) {
+                $relationship = is_int($key) ? $value : $key;
+
+                if (! is_string($relationship) || ! in_array($relationship, $requestedRelationships, true)) {
+                    continue;
+                }
+
+                $nestedRelationships = $request->sparseIncluded($relationship);
+                $paths = $value instanceof Closure || empty($nestedRelationships)
+                    ? [$relationship]
+                    : array_map(fn ($nestedRelationship) => $relationship.'.'.$nestedRelationship, $nestedRelationships);
+
+                foreach ($paths as $path) {
+                    $relationships[$path] = true;
+                }
+            }
+
+            if (empty($relationships)) {
+                continue;
+            }
+
+            $relationships = array_keys($relationships);
+            sort($relationships);
+
+            $groupKey = $resource->resource::class."\0".implode("\0", $relationships);
+            $loadGroups[$groupKey]['models'][] = $resource->resource;
+            $loadGroups[$groupKey]['relationships'] = $relationships;
+        }
+
+        foreach ($loadGroups as $loadGroup) {
+            $loadGroup['models'][0]
+                ->newCollection($loadGroup['models'])
+                ->loadMissing($loadGroup['relationships']);
+        }
     }
 
     /**
