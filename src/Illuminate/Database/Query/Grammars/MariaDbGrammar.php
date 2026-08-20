@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinLateralClause;
+use InvalidArgumentException;
 use RuntimeException;
 
 class MariaDbGrammar extends MySqlGrammar
@@ -47,11 +48,20 @@ class MariaDbGrammar extends MySqlGrammar
      * Compile a vector distance expression for the given column.
      *
      * @param  string  $column
+     * @param  string  $metric
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
-    public function compileVectorDistanceExpression($column)
+    public function compileVectorDistanceExpression($column, $metric = 'cosine')
     {
-        return "vec_distance_cosine({$this->wrap($column)}, ?)";
+        $function = match ($metric) {
+            'cosine' => 'vec_distance_cosine',
+            'euclidean' => 'vec_distance_euclidean',
+            default => throw new InvalidArgumentException("Unsupported vector distance metric [{$metric}]."),
+        };
+
+        return "{$function}({$this->wrap($column)}, ?)";
     }
 
     /**
