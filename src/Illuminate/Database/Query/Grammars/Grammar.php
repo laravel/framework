@@ -867,11 +867,12 @@ class Grammar extends BaseGrammar
      * Compile a vector distance expression for the given column.
      *
      * @param  string  $column
+     * @param  string  $metric
      * @return string
      *
      * @throws \RuntimeException
      */
-    public function compileVectorDistanceExpression($column)
+    public function compileVectorDistanceExpression($column, $metric = 'cosine')
     {
         throw new RuntimeException('This database engine does not support vector distance queries.');
     }
