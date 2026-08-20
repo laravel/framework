@@ -1283,7 +1283,6 @@ class Builder implements BuilderContract
     {
         return $this->whereVectorDistanceLessThan($column, $vector, $maxDistance, 'or', $metric);
     }
-    }
 
     /**
      * Add a raw "where" clause to the query.
