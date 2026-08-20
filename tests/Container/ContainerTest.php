@@ -15,6 +15,7 @@ use LogicException;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
+use ReflectionProperty;
 use stdClass;
 use TypeError;
 
@@ -168,6 +169,42 @@ class ContainerTest extends TestCase
         });
         $this->assertSame('foo', $container->make('class'));
         $this->assertNotSame('bar', $container->make('class'));
+    }
+
+    public function testScopedDoesNotRegisterDuplicateScopedInstances()
+    {
+        $container = new Container;
+        $container->scoped('class', function () {
+            return new stdClass;
+        });
+        $container->scoped('class', function () {
+            return new stdClass;
+        });
+
+        $this->assertSame(['class'], (new ReflectionProperty($container, 'scopedInstances'))->getValue($container));
+    }
+
+    public function testScopedIfDoesNotRegisterDuplicateScopedInstancesWhenRebound()
+    {
+        $container = new Container;
+        $container->scopedIf('class', function () {
+            return new stdClass;
+        });
+
+        unset($container['class']);
+
+        $container->scopedIf('class', function () {
+            return new stdClass;
+        });
+
+        $this->assertSame(['class'], (new ReflectionProperty($container, 'scopedInstances'))->getValue($container));
+
+        $container->forgetScopedInstances();
+
+        $firstInstantiation = $container->make('class');
+        $container->forgetScopedInstances();
+
+        $this->assertNotSame($firstInstantiation, $container->make('class'));
     }
 
     public function testScopedClosureResets()
