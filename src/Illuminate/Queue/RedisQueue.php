@@ -160,7 +160,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @return int
      */
-    public function allPendingSize()
+    public function totalPendingSize()
     {
         return $this->allQueueNames()->sum(fn ($name) => $this->pendingSize($name));
     }
@@ -170,7 +170,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @return int
      */
-    public function allDelayedSize()
+    public function totalDelayedSize()
     {
         return $this->allQueueNames()->sum(fn ($name) => $this->delayedSize($name));
     }
@@ -180,7 +180,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @return int
      */
-    public function allReservedSize()
+    public function totalReservedSize()
     {
         return $this->allQueueNames()->sum(fn ($name) => $this->reservedSize($name));
     }

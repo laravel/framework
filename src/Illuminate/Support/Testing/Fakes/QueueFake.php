@@ -508,7 +508,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      *
      * @return int
      */
-    public function allPendingSize()
+    public function totalPendingSize()
     {
         return $this->allPendingJobs()->count();
     }
@@ -518,7 +518,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      *
      * @return int
      */
-    public function allDelayedSize()
+    public function totalDelayedSize()
     {
         return $this->allDelayedJobs()->count();
     }
@@ -528,7 +528,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      *
      * @return int
      */
-    public function allReservedSize()
+    public function totalReservedSize()
     {
         return $this->allReservedJobs()->count();
     }

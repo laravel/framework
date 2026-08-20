@@ -729,29 +729,29 @@ class RedisQueueTest extends TestCase
     }
 
     #[DataProvider('redisDriverProvider')]
-    public function testAllPendingSize($driver)
+    public function testTotalPendingSize($driver)
     {
         $this->setQueue($driver, config('queue.connections.redis.queue', 'default'));
 
         $this->queue->push(new RedisQueueIntegrationTestJob(1));
         $this->queue->pushOn('emails', new RedisQueueIntegrationTestJob(2));
 
-        $this->assertSame(2, $this->queue->allPendingSize());
+        $this->assertSame(2, $this->queue->totalPendingSize());
     }
 
     #[DataProvider('redisDriverProvider')]
-    public function testAllDelayedSize($driver)
+    public function testTotalDelayedSize($driver)
     {
         $this->setQueue($driver, config('queue.connections.redis.queue', 'default'));
 
         $this->queue->later(60, new RedisQueueIntegrationTestJob(1));
         $this->queue->laterOn('emails', 60, new RedisQueueIntegrationTestJob(2));
 
-        $this->assertSame(2, $this->queue->allDelayedSize());
+        $this->assertSame(2, $this->queue->totalDelayedSize());
     }
 
     #[DataProvider('redisDriverProvider')]
-    public function testAllReservedSize($driver)
+    public function testTotalReservedSize($driver)
     {
         $this->setQueue($driver, config('queue.connections.redis.queue', 'default'));
 
@@ -760,7 +760,7 @@ class RedisQueueTest extends TestCase
         $this->queue->pop();
         $this->queue->pop('emails');
 
-        $this->assertSame(2, $this->queue->allReservedSize());
+        $this->assertSame(2, $this->queue->totalReservedSize());
     }
 }
 

@@ -140,7 +140,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @return int
      */
-    public function allPendingSize()
+    public function totalPendingSize()
     {
         return $this->database->table($this->table)
             ->whereNull('reserved_at')
@@ -153,7 +153,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @return int
      */
-    public function allDelayedSize()
+    public function totalDelayedSize()
     {
         return $this->database->table($this->table)
             ->whereNull('reserved_at')
@@ -166,7 +166,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @return int
      */
-    public function allReservedSize()
+    public function totalReservedSize()
     {
         return $this->database->table($this->table)
             ->whereNotNull('reserved_at')

@@ -176,7 +176,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @return int
      */
-    public function allPendingSize()
+    public function totalPendingSize()
     {
         return 0;
     }
@@ -186,7 +186,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @return int
      */
-    public function allDelayedSize()
+    public function totalDelayedSize()
     {
         return 0;
     }
@@ -196,7 +196,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @return int
      */
-    public function allReservedSize()
+    public function totalReservedSize()
     {
         return 0;
     }

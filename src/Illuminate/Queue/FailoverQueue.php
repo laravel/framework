@@ -78,9 +78,9 @@ class FailoverQueue extends Queue implements QueueContract
      *
      * @return int
      */
-    public function allPendingSize()
+    public function totalPendingSize()
     {
-        return $this->manager->connection($this->connections[0])->allPendingSize();
+        return $this->manager->connection($this->connections[0])->totalPendingSize();
     }
 
     /**
@@ -88,9 +88,9 @@ class FailoverQueue extends Queue implements QueueContract
      *
      * @return int
      */
-    public function allDelayedSize()
+    public function totalDelayedSize()
     {
-        return $this->manager->connection($this->connections[0])->allDelayedSize();
+        return $this->manager->connection($this->connections[0])->totalDelayedSize();
     }
 
     /**
@@ -98,9 +98,9 @@ class FailoverQueue extends Queue implements QueueContract
      *
      * @return int
      */
-    public function allReservedSize()
+    public function totalReservedSize()
     {
-        return $this->manager->connection($this->connections[0])->allReservedSize();
+        return $this->manager->connection($this->connections[0])->totalReservedSize();
     }
 
     /**

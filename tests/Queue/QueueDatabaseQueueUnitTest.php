@@ -491,7 +491,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $this->assertSame('emails', $jobs->last()->queue);
     }
 
-    public function testAllPendingSize()
+    public function testTotalPendingSize()
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
@@ -503,10 +503,10 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query->expects('where')->with('available_at', '<=', Mockery::any())->andReturnSelf();
         $query->expects('count')->andReturn(2);
 
-        $this->assertSame(2, $queue->allPendingSize());
+        $this->assertSame(2, $queue->totalPendingSize());
     }
 
-    public function testAllDelayedSize()
+    public function testTotalDelayedSize()
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
@@ -518,10 +518,10 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query->expects('where')->with('available_at', '>', Mockery::any())->andReturnSelf();
         $query->expects('count')->andReturn(3);
 
-        $this->assertSame(3, $queue->allDelayedSize());
+        $this->assertSame(3, $queue->totalDelayedSize());
     }
 
-    public function testAllReservedSize()
+    public function testTotalReservedSize()
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
@@ -532,7 +532,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query->expects('whereNotNull')->with('reserved_at')->andReturnSelf();
         $query->expects('count')->andReturn(4);
 
-        $this->assertSame(4, $queue->allReservedSize());
+        $this->assertSame(4, $queue->totalReservedSize());
     }
 
     public function testGetLockForPoppingIsCached()

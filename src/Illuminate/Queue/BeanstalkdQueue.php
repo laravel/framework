@@ -120,7 +120,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      *
      * @return int
      */
-    public function allPendingSize()
+    public function totalPendingSize()
     {
         return 0;
     }
@@ -130,7 +130,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      *
      * @return int
      */
-    public function allDelayedSize()
+    public function totalDelayedSize()
     {
         return 0;
     }
@@ -140,7 +140,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      *
      * @return int
      */
-    public function allReservedSize()
+    public function totalReservedSize()
     {
         return 0;
     }
