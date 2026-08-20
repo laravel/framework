@@ -236,8 +236,7 @@ class Worker
             // If a heartbeat interval is configured, we will dispatch a heartbeat event
             // once enough time has elapsed. This runs before the pause check so that a
             // paused or maintenance-mode worker still reports that it is alive.
-            if ($options->heartbeat > 0 &&
-                $this->currentTime() - $lastHeartbeat >= $options->heartbeat) {
+            if ($options->heartbeat > 0 && $this->currentTime() - $lastHeartbeat >= $options->heartbeat) {
                 $this->events->dispatch(new WorkerHeartbeat(
                     $connectionName, $queue, $options,
                     $this->jobsProcessed, $this->lastJobProcessedAt, $this->currentMemoryUsage()

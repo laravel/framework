@@ -544,7 +544,7 @@ class QueueWorkerTest extends TestCase
         }))->once();
     }
 
-    public function testWorkerHeartbeatIsDispatchedOnceIntervalElapses()
+    public function testWorkerHeartbeatIsDispatched()
     {
         $workerOptions = new WorkerOptions();
         $workerOptions->heartbeat = 5;
@@ -565,7 +565,7 @@ class QueueWorkerTest extends TestCase
         }))->once();
     }
 
-    public function testWorkerHeartbeatIsNotDispatchedBeforeIntervalElapses()
+    public function testWorkerHeartbeatIsNotDispatched()
     {
         $workerOptions = new WorkerOptions();
         $workerOptions->heartbeat = 100;
@@ -579,7 +579,7 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldNotHaveReceived('dispatch', [m::type(WorkerHeartbeat::class)]);
     }
 
-    public function testWorkerHeartbeatIsDisabledByDefault()
+    public function testWorkerHeartbeatIsDisabled()
     {
         $workerOptions = new WorkerOptions();
         $workerOptions->stopWhenEmptyFor = 10;

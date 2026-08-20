@@ -89,7 +89,7 @@ class WorkerOptions
     public $maxTime;
 
     /**
-     * The number of seconds between worker heartbeat events. Zero disables it.
+     * The number of seconds between worker heartbeat events.
      *
      * @var int
      */
