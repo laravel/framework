@@ -1975,7 +1975,7 @@ class SupportStrTest extends TestCase
 
     public function testPasswordCreation()
     {
-        $this->assertSame(strlen(Str::password()), 32);
+        $this->assertSame(32, strlen(Str::password()));
 
         $this->assertStringNotContainsString(' ', Str::password());
         $this->assertStringContainsString(' ', Str::password(spaces: true));

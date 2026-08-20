@@ -379,7 +379,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         $columns = Schema::getColumns('foo');
 
         $this->assertCount(1, $columns);
-        $this->assertSame($columns[0]['name'], 'bar');
+        $this->assertSame('bar', $columns[0]['name']);
     }
 
     public function testGetIndexes()
