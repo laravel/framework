@@ -682,7 +682,6 @@ class QueueConcurrencyTest extends TestCase
     public function testFailureEnvelopesDropUnserializableExceptionParameters()
     {
         $job = new InvokeQueuedClosure(
-            'run',
             'illuminate:concurrency:test:0',
             'illuminate:concurrency:test:cancelled',
             'file',
@@ -784,7 +783,6 @@ class QueueConcurrencyTest extends TestCase
     protected function makeJob(callable $task, bool $rethrowFailures = false, ?int $deadline = null): InvokeQueuedClosure
     {
         return new InvokeQueuedClosure(
-            'run',
             'task:0',
             'task:cancelled',
             null,

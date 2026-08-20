@@ -104,7 +104,6 @@ class QueueDriver implements Driver
                 $keys[$index] = $this->resultKey($runId, $index);
 
                 $job = new InvokeQueuedClosure(
-                    $runId,
                     $keys[$index],
                     $cancellationKey,
                     $store,

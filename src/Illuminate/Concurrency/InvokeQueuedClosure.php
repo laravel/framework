@@ -40,7 +40,6 @@ class InvokeQueuedClosure implements ShouldQueue
     public $timeout;
 
     public function __construct(
-        public string $runId,
         public string $resultKey,
         public string $cancellationKey,
         public ?string $store,
