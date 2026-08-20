@@ -91,6 +91,7 @@ class TestDatabasesTest extends TestCase
 
     protected function tearDown(): void
     {
+        Container::setInstance(null);
         DB::clearResolvedInstance();
         DB::setFacadeApplication(null);
 

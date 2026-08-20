@@ -15,6 +15,11 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationNotPwnedVerifierTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+    }
+
     #[DataProvider('dataProviderEmptyValues')]
     public function testEmptyValues($password): void
     {

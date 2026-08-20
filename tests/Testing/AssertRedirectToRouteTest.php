@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Testing;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase;
 
 class AssertRedirectToRouteTest extends TestCase
@@ -81,5 +82,12 @@ class AssertRedirectToRouteTest extends TestCase
 
         $this->get('test-route')
             ->assertRedirectToRoute('route-with-empty-uri', ['foo' => 'bar']);
+    }
+
+    protected function tearDown(): void
+    {
+        Facade::setFacadeApplication(null);
+
+        parent::tearDown();
     }
 }

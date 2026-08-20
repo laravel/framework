@@ -13,6 +13,11 @@ use stdClass;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+    }
+
     public function testNotificationCanBeDispatched()
     {
         $container = new Container;

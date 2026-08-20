@@ -36,7 +36,9 @@ class TestViewsTest extends TestCase
 
     protected function tearDown(): void
     {
+        Container::setInstance(null);
         ParallelTestingFacade::clearResolvedInstance();
+        Facade::setFacadeApplication(null);
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
     }

@@ -31,6 +31,11 @@ class AuthenticateMiddlewareTest extends TestCase
         });
     }
 
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+    }
+
     public function testItCanGenerateDefinitionViaStaticMethod()
     {
         $signature = Authenticate::using('foo');

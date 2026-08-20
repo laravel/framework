@@ -33,6 +33,11 @@ class DevCommandTest extends TestCase
         $app['config'] = new Repository(['app' => ['name' => 'Laravel']]);
     }
 
+    protected function tearDown(): void
+    {
+        Application::setInstance(null);
+    }
+
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testMultiplexCommandDefaultsToTabs()
     {

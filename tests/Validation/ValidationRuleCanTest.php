@@ -43,6 +43,15 @@ class ValidationRuleCanTest extends TestCase
         (new ValidationServiceProvider($this->container))->register();
     }
 
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+
+        Facade::clearResolvedInstances();
+
+        Facade::setFacadeApplication(null);
+    }
+
     public function testValidationFails()
     {
         $this->gate()->define('update-company', function ($user, $value) {
