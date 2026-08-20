@@ -60,11 +60,41 @@ class QueueDriver implements Driver
         $ttl = max((int) ($this->options['ttl'] ?? 0), $timeout + 60);
 
         $startedAt = Carbon::now();
-        $deadline = $startedAt->getTimestamp() + $timeout;
-
         $runId = (string) Str::ulid();
         $cancellationKey = $this->cancellationKey($runId);
         $repository = $this->cache->store($store);
+
+        [$keys, $inlineEnvelopes] = $this->dispatchTasks(
+            $repository, $tasks, $runId, $cancellationKey, $connection, $store, $inline, $timeout, $ttl, $startedAt,
+        );
+
+        $envelopes = $inline
+            ? $this->ensureInlineEnvelopes($repository, $keys, $inlineEnvelopes)
+            : $this->wait(
+                $repository, $keys, $cancellationKey, $startedAt, $timeout, $ttl, $connection, $store,
+            );
+
+        return $this->resolveResults($repository, $tasks, $keys, $cancellationKey, $envelopes);
+    }
+
+    /**
+     * Dispatch one queued job per task, collecting inline results as they run.
+     *
+     * @throws \Throwable
+     */
+    protected function dispatchTasks(
+        CacheRepository $repository,
+        array $tasks,
+        string $runId,
+        string $cancellationKey,
+        ?string $connection,
+        ?string $store,
+        bool $inline,
+        int $timeout,
+        int $ttl,
+        Carbon $startedAt,
+    ): array {
+        $deadline = $startedAt->getTimestamp() + $timeout;
 
         $keys = [];
         $inlineEnvelopes = [];
@@ -109,12 +139,21 @@ class QueueDriver implements Driver
             throw $e;
         }
 
-        $envelopes = $inline
-            ? $this->ensureInlineEnvelopes($repository, $keys, $inlineEnvelopes)
-            : $this->wait(
-                $repository, $keys, $cancellationKey, $startedAt, $timeout, $ttl, $connection, $store,
-            );
+        return [$keys, $inlineEnvelopes];
+    }
 
+    /**
+     * Unwrap the collected envelopes in their original task order, then clean up.
+     *
+     * @throws \Throwable
+     */
+    protected function resolveResults(
+        CacheRepository $repository,
+        array $tasks,
+        array $keys,
+        string $cancellationKey,
+        array $envelopes,
+    ): array {
         try {
             $results = [];
 
