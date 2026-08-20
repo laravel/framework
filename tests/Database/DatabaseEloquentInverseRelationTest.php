@@ -284,8 +284,7 @@ class DatabaseEloquentInverseRelationTest extends TestCase
             [],
             new HasInverseRelationRelatedStub(),
             'foo',
-            new class()
-            {
+            new class() {
             },
             new HasInverseRelationRelatedStub(),
         ]);

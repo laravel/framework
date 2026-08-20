@@ -2,16 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use Illuminate\Contracts\Translation\HasLocalePreference;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Events\LocaleUpdated;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\Assert;
+use Illuminate\Tests\App\Models\Locale\NotifiableEmailLocalePreferredUser;
+use Illuminate\Tests\App\Models\Notifications\NotifiableUser;
 use Illuminate\Tests\App\Notifications\GreetingMailNotification;
 use Illuminate\Tests\App\Notifications\GreetingMailNotificationWithMailable;
 use Orchestra\Testbench\TestCase;
@@ -50,7 +49,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
     public function testMailIsSentWithDefaultLocale()
     {
-        $user = NotifiableLocalizedUser::forceCreate([
+        $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
             'name' => 'Taylor Otwell',
         ]);
@@ -64,7 +63,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
     public function testMailIsSentWithFacadeSelectedLocale()
     {
-        $user = NotifiableLocalizedUser::forceCreate([
+        $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
             'name' => 'Taylor Otwell',
         ]);
@@ -79,11 +78,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
     public function testMailIsSentWithNotificationSelectedLocale()
     {
         $users = [
-            NotifiableLocalizedUser::forceCreate([
+            NotifiableUser::forceCreate([
                 'email' => 'taylor@laravel.com',
                 'name' => 'Taylor Otwell',
             ]),
-            NotifiableLocalizedUser::forceCreate([
+            NotifiableUser::forceCreate([
                 'email' => 'mohamed@laravel.com',
                 'name' => 'Mohamed Said',
             ]),
@@ -102,7 +101,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
     public function testMailableIsSentWithSelectedLocale()
     {
-        $user = NotifiableLocalizedUser::forceCreate([
+        $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
             'name' => 'Taylor Otwell',
         ]);
@@ -122,7 +121,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
             Carbon::setLocale($event->locale);
         });
 
-        $user = NotifiableLocalizedUser::forceCreate([
+        $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
             'name' => 'Taylor Otwell',
         ]);
@@ -167,7 +166,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
                 'email' => 'test.2@mail.com',
                 'email_locale' => 'es',
             ]),
-            NotifiableLocalizedUser::forceCreate([
+            NotifiableUser::forceCreate([
                 'email' => 'test.3@mail.com',
             ]),
         ];
@@ -217,28 +216,5 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $this->assertStringContainsString('bonjour',
             app('mailer')->getSymfonyTransport()->messages()[0]->toString()
         );
-    }
-}
-
-class NotifiableLocalizedUser extends Model
-{
-    use Notifiable;
-
-    public $table = 'users';
-    public $timestamps = false;
-}
-
-class NotifiableEmailLocalePreferredUser extends Model implements HasLocalePreference
-{
-    use Notifiable;
-
-    protected $fillable = [
-        'email',
-        'email_locale',
-    ];
-
-    public function preferredLocale()
-    {
-        return $this->email_locale;
     }
 }

@@ -4,14 +4,15 @@ namespace Illuminate\Tests\Integration\Notifications;
 
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Mail\Markdown;
 use Illuminate\Mail\Message;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Models\Notifications\NotifiableUser;
+use Illuminate\Tests\App\Models\Notifications\NotifiableUserWithMultipleAddresses;
+use Illuminate\Tests\App\Models\Notifications\NotifiableUserWithNamedAddress;
 use Illuminate\Tests\App\Notifications\TestMailNotification;
 use Illuminate\Tests\App\Notifications\TestMailNotificationWithCustomTheme;
 use Illuminate\Tests\App\Notifications\TestMailNotificationWithHtmlAndPlain;
@@ -372,35 +373,5 @@ class SendingMailNotificationsTest extends TestCase
         );
 
         $user->notify($notification);
-    }
-}
-
-class NotifiableUser extends Model
-{
-    use Notifiable;
-
-    public $table = 'users';
-    public $timestamps = false;
-}
-
-class NotifiableUserWithNamedAddress extends NotifiableUser
-{
-    public function routeNotificationForMail($notification)
-    {
-        return [
-            $this->email => $this->name,
-            'foo_'.$this->email,
-        ];
-    }
-}
-
-class NotifiableUserWithMultipleAddresses extends NotifiableUser
-{
-    public function routeNotificationForMail($notification)
-    {
-        return [
-            'foo_'.$this->email,
-            'bar_'.$this->email,
-        ];
     }
 }

@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
-use Illuminate\Contracts\Translation\HasLocalePreference;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Carbon;
@@ -12,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\Assert;
 use Illuminate\Tests\App\Mail\TestMail;
 use Illuminate\Tests\App\Mail\TimestampTestMail;
+use Illuminate\Tests\App\Models\Locale\TestEmailLocaleUser;
 use Orchestra\Testbench\TestCase;
 
 class SendingMailWithLocaleTest extends TestCase
@@ -168,18 +167,5 @@ class SendingMailWithLocaleTest extends TestCase
         $this->assertStringContainsString('name',
             app('mailer')->getSymfonyTransport()->messages()[1]->toString()
         );
-    }
-}
-
-class TestEmailLocaleUser extends Model implements HasLocalePreference
-{
-    protected $fillable = [
-        'email',
-        'email_locale',
-    ];
-
-    public function preferredLocale()
-    {
-        return $this->email_locale;
     }
 }

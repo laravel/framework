@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Notifications\Events\NotificationSent;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\App\Models\Notifications\SentMessageUser;
 use Illuminate\Tests\App\Notifications\SentMessageMailNotification;
 use Orchestra\Testbench\TestCase;
 
@@ -54,11 +53,4 @@ class SentMessageMailTest extends TestCase
 
         $this->assertTrue($notificationWasSent);
     }
-}
-
-class SentMessageUser extends Model
-{
-    use Notifiable;
-
-    public $timestamps = false;
 }

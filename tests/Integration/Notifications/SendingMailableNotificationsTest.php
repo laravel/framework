@@ -2,12 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Stringable;
+use Illuminate\Tests\App\Models\Notifications\NotifiableUser;
 use Illuminate\Tests\App\Notifications\MarkdownNotification;
 use Orchestra\Testbench\TestCase;
 
@@ -42,7 +41,7 @@ class SendingMailableNotificationsTest extends TestCase
 
     public function testMarkdownNotification()
     {
-        $user = MailableNotificationUser::forceCreate([
+        $user = NotifiableUser::forceCreate([
             'email' => 'nuno@laravel.com',
         ]);
 
@@ -71,7 +70,7 @@ class SendingMailableNotificationsTest extends TestCase
 
     public function testCanSetTheme()
     {
-        $user = MailableNotificationUser::forceCreate([
+        $user = NotifiableUser::forceCreate([
             'email' => 'nuno@laravel.com',
         ]);
 
@@ -87,12 +86,4 @@ class SendingMailableNotificationsTest extends TestCase
         $contents = $mailTransport->messages()[1]->getOriginalMessage()->toString();
         $this->assertStringNotContainsString('<body style=3D"color: test;">', $contents);
     }
-}
-
-class MailableNotificationUser extends Model
-{
-    use Notifiable;
-
-    public $table = 'users';
-    public $timestamps = false;
 }
