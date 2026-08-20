@@ -177,6 +177,8 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
 
         $fakeQueue->connection('event-connection')->assertPushedOn('event-queue', CallQueuedListener::class);
+
+        Container::setInstance(null);
     }
 
     public function testConnectionIsSetUsingForwardedQueue()
@@ -200,6 +202,8 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
 
         $fakeQueue->connection('cloud')->assertPushedOn('reports', CallQueuedListener::class);
+
+        Container::setInstance(null);
     }
 
     public function testDelayIsSetByWithDelayDynamically()

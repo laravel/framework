@@ -6,6 +6,7 @@ use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase;
 
 class AssertRedirectToActionTest extends TestCase
@@ -45,6 +46,13 @@ class AssertRedirectToActionTest extends TestCase
     {
         $this->get('redirect-to-show')
             ->assertRedirectToAction([TestActionController::class, 'show'], ['id' => 123]);
+    }
+
+    protected function tearDown(): void
+    {
+        Facade::setFacadeApplication(null);
+
+        parent::tearDown();
     }
 }
 

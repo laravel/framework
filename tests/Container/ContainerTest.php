@@ -28,6 +28,11 @@ class ContainerTest extends TestCase
         }
     }
 
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+    }
+
     public function testContainerSingleton()
     {
         $container = Container::setInstance(new Container);

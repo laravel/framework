@@ -288,5 +288,6 @@ class HtmlDumperTest extends TestCase
     protected function tearDown(): void
     {
         HtmlDumper::resolveDumpSourceUsing(null);
+        Container::setInstance(null);
     }
 }

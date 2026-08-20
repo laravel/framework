@@ -46,6 +46,11 @@ class QueueWorkerTest extends TestCase
         $container->instance(ExceptionHandler::class, $this->exceptionHandler);
     }
 
+    protected function tearDown(): void
+    {
+        Container::setInstance();
+    }
+
     public function testJobCanBeFired()
     {
         $worker = $this->getWorker('default', ['queue' => [$job = new WorkerFakeJob]]);

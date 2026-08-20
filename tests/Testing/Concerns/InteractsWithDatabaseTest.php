@@ -6,6 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Facade;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -13,6 +14,8 @@ class InteractsWithDatabaseTest extends TestCase
 {
     protected function setUp(): void
     {
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
     }
 
     public function testCastToJsonSqlite()

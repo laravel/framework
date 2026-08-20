@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Foundation\Configuration;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Foundation\MaintenanceMode;
@@ -27,6 +28,7 @@ class MiddlewareTest extends TestCase
 {
     protected function tearDown(): void
     {
+        Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();
         EncryptCookies::flushState();
         PreventRequestForgery::flushState();

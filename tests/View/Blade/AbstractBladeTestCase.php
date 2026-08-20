@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Component;
@@ -22,6 +23,7 @@ abstract class AbstractBladeTestCase extends TestCase
 
     protected function tearDown(): void
     {
+        Container::setInstance(null);
         Component::flushCache();
         Component::forgetComponentsResolver();
         Component::forgetFactory();

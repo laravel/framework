@@ -12,6 +12,11 @@ use PHPUnit\Framework\TestCase;
 
 class FoundationAuthorizesRequestsTraitTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+    }
+
     public function testBasicGateCheck()
     {
         unset($_SERVER['_test.authorizes.trait']);

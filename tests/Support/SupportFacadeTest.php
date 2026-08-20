@@ -13,6 +13,7 @@ class SupportFacadeTest extends TestCase
 {
     protected function setUp(): void
     {
+        Facade::clearResolvedInstances();
         FacadeStub::setFacadeApplication(null);
     }
 

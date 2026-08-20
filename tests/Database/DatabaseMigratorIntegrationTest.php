@@ -77,6 +77,12 @@ class DatabaseMigratorIntegrationTest extends TestCase
         }
     }
 
+    protected function tearDown(): void
+    {
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
+    }
+
     public function testBasicMigrationOfSingleFolder()
     {
         $ran = $this->migrator->run([__DIR__.'/migrations/one']);
