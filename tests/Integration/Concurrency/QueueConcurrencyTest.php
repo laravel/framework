@@ -256,6 +256,30 @@ class QueueConcurrencyTest extends TestCase
         }
     }
 
+    public function testInlineRunsThatExceedTheTimeoutFailAsTimeouts()
+    {
+        try {
+            Concurrency::driver('queue')->run([
+                'slow' => function () {
+                    Carbon::setTestNow(Carbon::now()->addSeconds(5));
+
+                    return 'finished';
+                },
+                'skipped' => fn () => 'never',
+            ], timeout: 1);
+
+            $this->fail('The expected timeout exception was not thrown.');
+        } catch (TaskTimedOutException $e) {
+            $this->assertSame(1, $e->received);
+            $this->assertSame(2, $e->total);
+            $this->assertSame(1, $e->seconds);
+            $this->assertSame('sync', $e->connection);
+            $this->assertSame('array', $e->store);
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
     public function testDeferDispatchesCallQueuedClosureJobs()
     {
         Bus::fake();

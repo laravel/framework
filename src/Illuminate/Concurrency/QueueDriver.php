@@ -69,7 +69,9 @@ class QueueDriver implements Driver
         );
 
         $envelopes = $inline
-            ? $this->ensureInlineEnvelopes($repository, $keys, $inlineEnvelopes)
+            ? $this->ensureInlineEnvelopes(
+                $repository, $keys, $inlineEnvelopes, $startedAt, $timeout, $connection, $store,
+            )
             : $this->wait(
                 $repository, $keys, $cancellationKey, $startedAt, $timeout, $ttl, $connection, $store,
             );
@@ -233,24 +235,38 @@ class QueueDriver implements Driver
     /**
      * Ensure every inline task reported a result envelope during dispatch.
      *
+     * @throws \Illuminate\Concurrency\TaskTimedOutException
      * @throws \RuntimeException
      */
-    protected function ensureInlineEnvelopes(CacheRepository $repository, array $keys, array $envelopes): array
-    {
-        if (in_array(null, $envelopes, true)) {
-            $missing = count(array_keys($envelopes, null, true));
+    protected function ensureInlineEnvelopes(
+        CacheRepository $repository,
+        array $keys,
+        array $envelopes,
+        Carbon $startedAt,
+        int $timeout,
+        ?string $connection,
+        ?string $store,
+    ): array {
+        if (! in_array(null, $envelopes, true)) {
+            return $envelopes;
+        }
 
-            $repository->deleteMultiple(array_values($keys));
+        $missing = count(array_keys($envelopes, null, true));
 
-            throw new RuntimeException(
-                sprintf(
-                    '[%d] of [%d] concurrency tasks did not report a result. Ensure the queue connection and cache store are configured correctly.',
-                    $missing, count($keys),
-                )
+        $repository->deleteMultiple(array_values($keys));
+
+        if (Carbon::now()->getTimestamp() > $startedAt->getTimestamp() + $timeout) {
+            throw new TaskTimedOutException(
+                count($keys) - $missing, count($keys), $timeout, $connection, $this->queue(), $store,
             );
         }
 
-        return $envelopes;
+        throw new RuntimeException(
+            sprintf(
+                '[%d] of [%d] concurrency tasks did not report a result. Ensure the queue connection and cache store are configured correctly.',
+                $missing, count($keys),
+            )
+        );
     }
 
     /**
