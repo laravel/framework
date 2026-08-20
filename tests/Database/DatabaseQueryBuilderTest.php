@@ -7927,6 +7927,81 @@ SQL;
         $this->assertEquals(['[1,2,3]'], $builder->getBindings());
     }
 
+        public function testWhereVectorDistanceLessThanWithEuclideanMetricOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('documents')->whereVectorDistanceLessThan('embedding', [1, 2, 3], 0.5, metric: 'euclidean');
+
+        $this->assertSame('select * from "documents" where ("embedding" <-> ?) <= ?', $builder->toSql());
+        $this->assertEquals(['[1,2,3]', 0.5], $builder->getBindings());
+    }
+
+    public function testWhereVectorDistanceLessThanWithInnerProductMetricOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('documents')->whereVectorDistanceLessThan('embedding', [1, 2, 3], 0.5, metric: 'inner_product');
+
+        $this->assertSame('select * from "documents" where ("embedding" <#> ?) <= ?', $builder->toSql());
+        $this->assertEquals(['[1,2,3]', 0.5], $builder->getBindings());
+    }
+
+    public function testWhereVectorDistanceLessThanWithEuclideanMetricOnMariaDb()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('documents')->whereVectorDistanceLessThan('embedding', [1, 2, 3], 0.5, metric: 'euclidean');
+
+        $this->assertSame('select * from `documents` where vec_distance_euclidean(`embedding`, ?) <= ?', $builder->toSql());
+        $this->assertEquals(['[1,2,3]', 0.5], $builder->getBindings());
+    }
+
+    public function testWhereVectorDistanceLessThanWithUnsupportedMetricOnMariaDbThrows()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported vector distance metric [inner_product].');
+
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('documents')->whereVectorDistanceLessThan('embedding', [1, 2, 3], 0.5, metric: 'inner_product');
+    }
+
+    public function testOrderByVectorDistanceWithEuclideanMetricOnMariaDb()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('documents')->orderByVectorDistance('embedding', [1, 2, 3], 'euclidean');
+
+        $this->assertSame('select * from `documents` order by vec_distance_euclidean(`embedding`, ?) asc', $builder->toSql());
+        $this->assertEquals(['[1,2,3]'], $builder->getBindings());
+    }
+
+    public function testSelectVectorDistanceWithInnerProductMetricOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->from('documents')->selectVectorDistance('embedding', [1, 2, 3], metric: 'inner_product');
+
+        $this->assertSame('select ("embedding" <#> ?) as "embedding_distance" from "documents"', $builder->toSql());
+        $this->assertEquals(['[1,2,3]'], $builder->getBindings());
+    }
+
+    public function testWhereVectorSimilarToWithMetricOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('documents')->whereVectorSimilarTo('embedding', [1, 2, 3], minSimilarity: 0.4, metric: 'euclidean')->limit(10);
+
+        $this->assertSame(
+            'select * from "documents" where ("embedding" <-> ?) <= ? order by ("embedding" <-> ?) asc limit 10',
+            $builder->toSql()
+        );
+        $this->assertEquals(['[1,2,3]', 0.6, '[1,2,3]'], $builder->getBindings());
+    }
+
+    public function testCompileVectorDistanceExpressionThrowsOnUnsupportedMetricOnPostgres()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported vector distance metric [taxicab].');
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('documents')->whereVectorDistanceLessThan('embedding', [1, 2, 3], 0.5, metric: 'taxicab');
+    }
+
     public function testToRawSql()
     {
         $connection = $this->getConnection();
