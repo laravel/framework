@@ -7927,7 +7927,7 @@ SQL;
         $this->assertEquals(['[1,2,3]'], $builder->getBindings());
     }
 
-        public function testWhereVectorDistanceLessThanWithEuclideanMetricOnPostgres()
+    public function testWhereVectorDistanceLessThanWithEuclideanMetricOnPostgres()
     {
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('documents')->whereVectorDistanceLessThan('embedding', [1, 2, 3], 0.5, metric: 'euclidean');
