@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Console\Fixtures;
+namespace Illuminate\Tests\App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
@@ -8,9 +8,9 @@ use Laravel\Prompts\Prompt;
 use Laravel\Prompts\TextPrompt;
 use Symfony\Component\Console\Input\InputInterface;
 
-class FakeCommandWithArrayInputPrompting extends Command implements PromptsForMissingInput
+class FakeCommandWithInputPrompting extends Command implements PromptsForMissingInput
 {
-    protected $signature = 'fake-command-for-testing-array {names* : An array argument}';
+    protected $signature = 'fake-command-for-testing {name : An argument}';
 
     public $prompted = false;
 

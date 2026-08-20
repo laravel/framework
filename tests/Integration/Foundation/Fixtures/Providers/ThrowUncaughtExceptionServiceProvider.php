@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Foundation\Fixtures\Providers;
 
 use Illuminate\Console\Application;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Tests\Integration\Foundation\Fixtures\Console\ThrowExceptionCommand;
+use Illuminate\Tests\App\Console\Commands\ThrowExceptionCommand;
 use Illuminate\Tests\Integration\Foundation\Fixtures\Logs\ThrowExceptionLogHandler;
 
 class ThrowUncaughtExceptionServiceProvider extends ServiceProvider

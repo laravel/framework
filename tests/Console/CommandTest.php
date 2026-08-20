@@ -3,16 +3,17 @@
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Application;
-use Illuminate\Console\Attributes\Aliases;
-use Illuminate\Console\Attributes\Help;
-use Illuminate\Console\Attributes\Hidden;
-use Illuminate\Console\Attributes\Signature;
-use Illuminate\Console\Attributes\Usage;
 use Illuminate\Console\Command;
 use Illuminate\Console\CommandInput;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Console\Commands\AliasesAttributeCommand;
+use Illuminate\Tests\App\Console\Commands\AliasesAttributeOverridesSignatureCommand;
+use Illuminate\Tests\App\Console\Commands\HelpCommand;
+use Illuminate\Tests\App\Console\Commands\HiddenCommand;
+use Illuminate\Tests\App\Console\Commands\SignatureWithAliasesCommand;
+use Illuminate\Tests\App\Console\Commands\UsageCommand;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -328,58 +329,4 @@ enum CommandInputType: string
 {
     case Foo = 'foo';
     case Bar = 'bar';
-}
-
-#[Signature('foo:bar', aliases: ['bar:baz', 'baz:qux'])]
-class SignatureWithAliasesCommand extends Command
-{
-    public function handle()
-    {
-    }
-}
-
-#[Signature('foo:bar')]
-#[Hidden]
-class HiddenCommand extends Command
-{
-    public function handle()
-    {
-    }
-}
-
-#[Signature('foo:bar')]
-#[Help('Extended help text.')]
-class HelpCommand extends Command
-{
-    public function handle()
-    {
-    }
-}
-
-#[Signature('foo:bar {user}')]
-#[Usage('foo:bar 1')]
-#[Usage('foo:bar 1 --force')]
-class UsageCommand extends Command
-{
-    public function handle()
-    {
-    }
-}
-
-#[Signature('foo:bar')]
-#[Aliases(['bar:baz', 'baz:qux'])]
-class AliasesAttributeCommand extends Command
-{
-    public function handle()
-    {
-    }
-}
-
-#[Signature('foo:bar', aliases: ['ignored:alias'])]
-#[Aliases(['override:alias'])]
-class AliasesAttributeOverridesSignatureCommand extends Command
-{
-    public function handle()
-    {
-    }
 }

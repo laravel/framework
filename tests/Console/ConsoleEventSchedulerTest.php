@@ -10,6 +10,7 @@ use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
+use Illuminate\Tests\App\Console\Commands\ConsoleCommandStub;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -166,21 +167,5 @@ class FooClassStub
     public function __construct(Schedule $schedule)
     {
         $this->schedule = $schedule;
-    }
-}
-
-class ConsoleCommandStub extends Command
-{
-    protected $signature = 'foo:bar';
-
-    protected $description = 'This is a description about the command';
-
-    protected $foo;
-
-    public function __construct(FooClassStub $foo)
-    {
-        parent::__construct();
-
-        $this->foo = $foo;
     }
 }

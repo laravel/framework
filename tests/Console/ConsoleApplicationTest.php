@@ -11,14 +11,17 @@ use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Foundation\Console\Kernel;
-use Illuminate\Tests\Console\Fixtures\FakeCommandWithArrayInputPrompting;
-use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
+use Illuminate\Tests\App\Console\Commands\CommandWithAliasViaAttribute;
+use Illuminate\Tests\App\Console\Commands\CommandWithAliasViaProperty;
+use Illuminate\Tests\App\Console\Commands\CommandWithNoAliasViaAttribute;
+use Illuminate\Tests\App\Console\Commands\CommandWithNoAliasViaProperty;
+use Illuminate\Tests\App\Console\Commands\FakeCommandWithArrayInputPrompting;
+use Illuminate\Tests\App\Console\Commands\FakeCommandWithInputPrompting;
 use Mockery;
 use Orchestra\Testbench\Concerns\InteractsWithMockery;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Throwable;
@@ -306,28 +309,6 @@ class ConsoleApplicationTest extends TestCase
             $app, $events, 'test-version',
         ])->getMock();
     }
-}
-
-#[AsCommand('command-name')]
-class CommandWithNoAliasViaAttribute extends Command
-{
-    //
-}
-#[AsCommand('command-name', aliases: ['command-alias'])]
-class CommandWithAliasViaAttribute extends Command
-{
-    //
-}
-
-class CommandWithNoAliasViaProperty extends Command
-{
-    public $name = 'command-name';
-}
-
-class CommandWithAliasViaProperty extends Command
-{
-    public $name = 'command-name';
-    public $aliases = ['command-alias'];
 }
 
 class TestKernel extends Kernel

@@ -619,7 +619,6 @@ class ModelSerializationTypedCustomCollectionTestClass
     }
 }
 
-
 class ModelSerializationTestClass
 {
     use SerializesModels;

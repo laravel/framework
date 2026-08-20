@@ -10,6 +10,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithConsoleEvents;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use Illuminate\Tests\App\Console\Commands\CommandWithArgumentsAndOptions;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -51,7 +52,7 @@ class CommandEventsTest extends TestCase
     #[DataProvider('foregroundCommandEventsProvider')]
     public function testCommandEventsReceiveParsedInput($callback): void
     {
-        $this->app[ConsoleKernel::class]->registerCommand(new CommandEventsTestCommand);
+        $this->app[ConsoleKernel::class]->registerCommand(new CommandWithArgumentsAndOptions);
         $this->app[Dispatcher::class]->listen(function (CommandStarting $event) {
             array_map(fn ($e) => $this->files->append($this->logfile, $e.PHP_EOL), [
                 'CommandStarting',
@@ -81,7 +82,7 @@ class CommandEventsTest extends TestCase
     public static function foregroundCommandEventsProvider()
     {
         yield 'Foreground with array' => [function ($testCase) {
-            $testCase->artisan(CommandEventsTestCommand::class, [
+            $testCase->artisan(CommandWithArgumentsAndOptions::class, [
                 'firstname' => 'taylor',
                 'lastname' => 'otwell',
                 '--occupation' => 'coding',
@@ -123,9 +124,9 @@ class CommandEventsTest extends TestCase
 
         tap($laravel[ConsoleKernel::class], function ($kernel) {
             $kernel->rerouteSymfonyCommandEvents();
-            $kernel->registerCommand(new CommandEventsTestCommand);
+            $kernel->registerCommand(new CommandWithArgumentsAndOptions);
 
-            $kernel->call(CommandEventsTestCommand::class, [
+            $kernel->call(CommandWithArgumentsAndOptions::class, [
                 'firstname' => 'taylor',
                 'lastname' => 'otwell',
                 '--occupation' => 'coding',
@@ -145,15 +146,5 @@ class CommandEventsTest extends TestCase
         $log = trim($this->files->get($this->logfile));
 
         $this->assertEquals(implode(PHP_EOL, $messages), $log);
-    }
-}
-
-class CommandEventsTestCommand extends \Illuminate\Console\Command
-{
-    protected $signature = 'command-events-test-command {firstname} {lastname} {--occupation=cook}';
-
-    public function handle()
-    {
-        // ...
     }
 }

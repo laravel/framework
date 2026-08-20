@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Integration\Console\Scheduling;
 
 use Illuminate\Console\Application;
-use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleTestCommand;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\App\Console\Commands\BarCommandStub;
 use Orchestra\Testbench\TestCase;
 
 class ScheduleTestCommandTest extends TestCase
@@ -77,13 +77,6 @@ class ScheduleTestCommandTest extends TestCase
             )
             ->expectsOutputToContain('Running [callback]');
     }
-}
-
-class BarCommandStub extends Command
-{
-    protected $signature = 'bar:command';
-
-    protected $description = 'This is the description of the command.';
 }
 
 class BarJobStub

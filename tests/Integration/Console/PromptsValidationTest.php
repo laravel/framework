@@ -2,11 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
-use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Tests\App\Console\Commands\DummyPromptsValidationCommand;
+use Illuminate\Tests\App\Console\Commands\DummyPromptsWithLaravelRulesCommand;
+use Illuminate\Tests\App\Console\Commands\DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttributesCommand;
+use Illuminate\Tests\App\Console\Commands\DummyPromptsWithLaravelRulesMessagesAndAttributesCommand;
 use Orchestra\Testbench\TestCase;
-
-use function Laravel\Prompts\text;
 
 class PromptsValidationTest extends TestCase
 {
@@ -48,59 +49,5 @@ class PromptsValidationTest extends TestCase
             ->artisan(DummyPromptsWithLaravelRulesMessagesAndAttributesCommand::class)
             ->expectsQuestion('What is your name?', '')
             ->expectsOutputToContain('Your full name is mandatory.');
-    }
-}
-
-class DummyPromptsValidationCommand extends Command
-{
-    protected $signature = 'prompts-validation-test';
-
-    public function handle()
-    {
-        text('What is your name?', validate: fn ($value) => $value == '' ? 'Required!' : null);
-    }
-}
-
-class DummyPromptsWithLaravelRulesCommand extends Command
-{
-    protected $signature = 'prompts-laravel-rules-test';
-
-    public function handle()
-    {
-        text('What is your name?', validate: 'required');
-    }
-}
-
-class DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttributesCommand extends Command
-{
-    protected $signature = 'prompts-laravel-rules-inline-test';
-
-    public function handle()
-    {
-        text('What is your name?', validate: literal(
-            rules: ['name' => 'required'],
-            messages: ['name.required' => 'Your :attribute is mandatory.'],
-            attributes: ['name' => 'full name'],
-        ));
-    }
-}
-
-class DummyPromptsWithLaravelRulesMessagesAndAttributesCommand extends Command
-{
-    protected $signature = 'prompts-laravel-rules-messages-attributes-test';
-
-    public function handle()
-    {
-        text('What is your name?', validate: ['name' => 'required']);
-    }
-
-    protected function validationMessages()
-    {
-        return ['name.required' => 'Your :attribute is mandatory.'];
-    }
-
-    protected function validationAttributes()
-    {
-        return ['name' => 'full name'];
     }
 }

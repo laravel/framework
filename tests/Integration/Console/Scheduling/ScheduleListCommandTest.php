@@ -3,12 +3,12 @@
 namespace Illuminate\Tests\Integration\Console\Scheduling;
 
 use Illuminate\Console\Application;
-use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ProcessUtils;
+use Illuminate\Tests\App\Console\Commands\FooCommand;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -585,13 +585,6 @@ class ScheduleListCommandTest extends TestCase
 
         parent::tearDown();
     }
-}
-
-class FooCommand extends Command
-{
-    protected $signature = 'foo:command';
-
-    protected $description = 'This is the description of the command.';
 }
 
 class FooJob

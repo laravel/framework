@@ -8,7 +8,7 @@ use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule as ScheduleClass;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schedule;
-use Illuminate\Tests\Console\Fixtures\JobToTestWithSchedule;
+use Illuminate\Tests\App\Jobs\JobToTestWithSchedule;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 

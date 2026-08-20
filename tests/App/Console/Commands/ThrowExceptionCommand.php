@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Foundation\Fixtures\Console;
+namespace Illuminate\Tests\App\Console\Commands;
 
 use Exception;
 use Illuminate\Console\Command;

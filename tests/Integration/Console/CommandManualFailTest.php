@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Console;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Console\ManuallyFailedException;
+use Illuminate\Tests\App\Console\Commands\FailingCommandStub;
 use Orchestra\Testbench\TestCase;
 
 class CommandManualFailTest extends TestCase
@@ -49,23 +50,5 @@ class CommandManualFailTest extends TestCase
         } catch (\Throwable $e) {
             $this->assertSame($original, $e);
         }
-    }
-}
-
-class FailingCommandStub extends Command
-{
-    protected $signature = 'app:fail';
-
-    public function handle()
-    {
-        $this->trigger_failure();
-
-        // This should never be reached.
-        return static::SUCCESS;
-    }
-
-    protected function trigger_failure()
-    {
-        $this->fail('Whoops!');
     }
 }

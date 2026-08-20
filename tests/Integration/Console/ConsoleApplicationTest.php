@@ -3,13 +3,14 @@
 namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Console\Application as Artisan;
-use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Console\QueuedCommand;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Tests\App\Console\Commands\FooCommandStub;
+use Illuminate\Tests\App\Console\Commands\ScheduleCommandStub;
+use Illuminate\Tests\App\Console\Commands\ZondaCommandStub;
 use Orchestra\Testbench\TestCase;
-use Symfony\Component\Console\Attribute\AsCommand;
 
 class ConsoleApplicationTest extends TestCase
 {
@@ -107,40 +108,5 @@ class ConsoleApplicationTest extends TestCase
         Queue::assertPushed(QueuedCommand::class, function ($job) {
             return $job->displayName() === 'foo:bar';
         });
-    }
-}
-
-class FooCommandStub extends Command
-{
-    protected $signature = 'foo:bar {id}';
-
-    protected $aliases = ['app:foobar'];
-
-    public function handle()
-    {
-        //
-    }
-}
-
-#[AsCommand(name: 'zonda', aliases: ['app:zonda'])]
-class ZondaCommandStub extends Command
-{
-    protected $signature = 'zonda {id}';
-
-    protected $aliases = ['app:zonda'];
-
-    public function handle()
-    {
-        //
-    }
-}
-
-class ScheduleCommandStub extends Command
-{
-    protected $signature = 'foo:schedule';
-
-    public function handle(Schedule $schedule)
-    {
-        //
     }
 }

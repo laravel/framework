@@ -527,4 +527,3 @@ class MyBatchableJob
 class JobWithDelayAttribute
 {
 }
-

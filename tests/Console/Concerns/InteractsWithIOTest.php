@@ -3,9 +3,8 @@
 namespace Illuminate\Tests\Console\Concerns;
 
 use Generator;
-use Illuminate\Console\Command;
-use Illuminate\Console\Concerns\InteractsWithIO;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Tests\App\Console\Commands\CommandInteractsWithIO;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -73,9 +72,4 @@ class InteractsWithIOTest extends TestCase
 
         $this->assertTrue($called);
     }
-}
-
-class CommandInteractsWithIO extends Command
-{
-    use InteractsWithIO;
 }
