@@ -7,6 +7,7 @@ use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class PostgresGrammar extends Grammar
 {
@@ -229,11 +230,21 @@ class PostgresGrammar extends Grammar
      * Compile a vector distance expression for the given column.
      *
      * @param  string  $column
+     * @param  string  $metric
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
-    public function compileVectorDistanceExpression($column)
+    public function compileVectorDistanceExpression($column, $metric = 'cosine')
     {
-        return "({$this->wrap($column)} <=> ?)";
+        $operator = match ($metric) {
+            'cosine' => '<=>',
+            'euclidean' => '<->',
+            'inner_product' => '<#>',
+            default => throw new InvalidArgumentException("Unsupported vector distance metric [{$metric}]."),
+        };
+
+        return "({$this->wrap($column)} {$operator} ?)";
     }
 
     /**
