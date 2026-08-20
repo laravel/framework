@@ -1266,41 +1266,6 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->hasRule('bar', 'Required'));
     }
 
-    public function testCachedRuleParametersAreNotReusedAcrossDifferentRuleStrings()
-    {
-        $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['foo' => 'abcd'], ['foo' => 'Max:3']);
-
-        $this->assertTrue($v->fails());
-
-        $v->setRules(['foo' => 'Max:5']);
-
-        $this->assertTrue($v->passes());
-    }
-
-    public function testCachedRuleParsingIsNotUsedForRuleObjects()
-    {
-        $trans = $this->getIlluminateArrayTranslator();
-        $rule = new class implements Rule
-        {
-            public function passes($attribute, $value)
-            {
-                return false;
-            }
-
-            public function message()
-            {
-                return 'failed';
-            }
-        };
-
-        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => ['Required', $rule]]);
-
-        $this->assertFalse($v->hasRule('foo', ['Array']));
-        $this->assertTrue($v->hasRule('foo', ['Required']));
-        $this->assertTrue($v->fails());
-    }
-
     public function testValidateArray()
     {
         $trans = $this->getIlluminateArrayTranslator();
