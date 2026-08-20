@@ -9,6 +9,7 @@ use Illuminate\Contracts\Image\Driver;
 use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image;
 use Illuminate\Image\ImageException;
@@ -257,10 +258,14 @@ class ImageManagerTest extends TestCase
     {
         $contents = $this->fakeImageContents();
 
-        $http = Mockery::mock(HttpFactory::class);
-        $response = Mockery::mock();
-        $response->expects('body')->andReturn($contents);
-        $http->expects('get')->with('https://example.com/photo.jpg')->andReturn($response);
+        $http = new HttpFactory;
+        $http->fake([
+            'https://example.com/photo.jpg' => HttpFactory::response(
+                $contents,
+                200,
+                ['Content-Type' => 'image/jpeg'],
+            ),
+        ]);
 
         $app = $this->makeApp([]);
         $app->expects('make')
@@ -272,6 +277,28 @@ class ImageManagerTest extends TestCase
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertSame($contents, $image->toBytes());
+    }
+
+    public function test_from_url_throws_for_unsuccessful_response()
+    {
+        $http = new HttpFactory;
+        $http->fake([
+            'https://example.com/missing.jpg' => HttpFactory::response('not found', 404),
+        ]);
+
+        $app = $this->makeApp([]);
+        $app->expects('make')
+            ->with(HttpFactory::class)
+            ->andReturn($http);
+
+        $manager = new ImageManager($app);
+        $image = $manager->fromUrl('https://example.com/missing.jpg');
+
+        $this->assertInstanceOf(Image::class, $image);
+
+        $this->expectException(RequestException::class);
+
+        $image->toBytes();
     }
 
     public function test_from_url_is_lazy()
@@ -370,7 +397,8 @@ class ImageManagerTest extends TestCase
                 return $this;
             }
         };
-        $transformation = new class implements Transformation {
+        $transformation = new class implements Transformation
+        {
             //
         };
         $callback = fn () => null;
@@ -411,7 +439,8 @@ class ImageManagerTest extends TestCase
                 return $this;
             }
         };
-        $transformation = new class implements Transformation {
+        $transformation = new class implements Transformation
+        {
             //
         };
         $callback = fn () => null;
