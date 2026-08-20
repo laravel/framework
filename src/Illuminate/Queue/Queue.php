@@ -435,9 +435,6 @@ abstract class Queue
     protected function registerRollbackCallbacksForJobsThatDispatchAfterCommit($job)
     {
         if ($job instanceof ShouldBeUnique) {
-            // Jobs pushed directly onto the queue never acquire the unique lock, so an
-            // empty owner means this job is not holding one. Releasing it here would
-            // force release a lock that another dispatch of the job is holding.
             $owner = isset(class_uses_recursive($job)[Queueable::class])
                 ? ($job->uniqueLockOwner ?? '')
                 : null;
