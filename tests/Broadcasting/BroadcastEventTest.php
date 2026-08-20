@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastAfterCommit;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -152,6 +153,25 @@ class BroadcastEventTest extends TestCase
         $this->assertFalse($job->deleteWhenMissingModels);
     }
 
+    public function testAfterCommitIsResolvedFromTheEventProperty()
+    {
+        $event = new class
+        {
+            public $afterCommit = true;
+        };
+
+        $job = new BroadcastEvent($event);
+
+        $this->assertTrue($job->afterCommit);
+    }
+
+    public function testAfterCommitIsResolvedFromTheShouldBroadcastAfterCommitContract()
+    {
+        $job = new BroadcastEvent(new TestBroadcastEventAfterCommit);
+
+        $this->assertTrue($job->afterCommit);
+    }
+
     public function testMiddlewareProxiesFailedHandlerFromUnderlyingEvent()
     {
         $event = new class
@@ -187,6 +207,11 @@ class TestBroadcastEvent
     {
         return ['test-channel'];
     }
+}
+
+class TestBroadcastEventAfterCommit extends TestBroadcastEvent implements ShouldBroadcastAfterCommit
+{
+    //
 }
 
 class TestBroadcastEventWithStringName extends TestBroadcastEvent
