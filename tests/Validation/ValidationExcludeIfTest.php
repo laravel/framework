@@ -3,11 +3,13 @@
 namespace Illuminate\Tests\Validation;
 
 use Exception;
+use Generator;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -36,20 +38,33 @@ class ValidationExcludeIfTest extends TestCase
         $this->assertSame('', (string) $rule);
     }
 
-    public function testItValidatesCallableAndBooleanAreAcceptableArguments()
+    public function testItAcceptsCallableAndBooleanArguments(): void
     {
         new ExcludeIf(false);
         new ExcludeIf(true);
         new ExcludeIf(fn () => true);
 
-        foreach ([1, 1.1, 'phpinfo', new stdClass, null] as $condition) {
-            try {
-                new ExcludeIf($condition);
-                $this->fail('The ExcludeIf constructor must not accept '.gettype($condition));
-            } catch (InvalidArgumentException $exception) {
-                $this->assertSame('The provided condition must be a callable or boolean.', $exception->getMessage());
-            }
+        $this->addToAssertionCount(1);
+    }
+
+    #[DataProvider('dataProviderItRejectsNonCallableNonBooleanArguments')]
+    public function testItRejectsNonCallableNonBooleanArguments($condition): void
+    {
+        try {
+            new ExcludeIf($condition);
+            $this->fail('The ExcludeIf constructor must not accept '.gettype($condition));
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame('The provided condition must be a callable or boolean.', $exception->getMessage());
         }
+    }
+
+    public static function dataProviderItRejectsNonCallableNonBooleanArguments(): Generator
+    {
+        yield 'int' => [1];
+        yield 'float' => [1.1];
+        yield 'string' => ['phpinfo'];
+        yield 'object' => [new stdClass];
+        yield 'null' => [null];
     }
 
     public function testItThrowsExceptionIfRuleIsNotSerializable()
