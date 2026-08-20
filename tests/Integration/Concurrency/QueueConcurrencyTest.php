@@ -128,6 +128,27 @@ class QueueConcurrencyTest extends TestCase
         $this->fail('The expected exception was not thrown.');
     }
 
+    public function testCacheIsCleanedUpWhenATaskFails()
+    {
+        $thrown = false;
+
+        $ulid = Str::freezeUlids(function () use (&$thrown) {
+            try {
+                Concurrency::driver('queue')->run([
+                    'ok' => fn () => 'this task succeeds',
+                    'boom' => fn () => throw new RuntimeException('Task failure'),
+                ]);
+            } catch (RuntimeException) {
+                $thrown = true;
+            }
+        });
+
+        $this->assertTrue($thrown);
+        $this->assertNull(Cache::get("illuminate:concurrency:{$ulid}:0"));
+        $this->assertNull(Cache::get("illuminate:concurrency:{$ulid}:1"));
+        $this->assertNull(Cache::get("illuminate:concurrency:{$ulid}:cancelled"));
+    }
+
     public function testResultKeysAreRemovedFromCacheAfterRun()
     {
         $ulid = Str::freezeUlids(function () {
@@ -515,13 +536,19 @@ class QueueConcurrencyTest extends TestCase
         Bus::fake();
         Sleep::fake();
 
-        try {
-            Concurrency::driver('queue')->run([fn () => 1]);
+        Str::freezeUlids(function ($ulid) {
+            Cache::put("illuminate:concurrency:{$ulid}:0", TaskResult::success('collected'), 60);
 
-            $this->fail('The expected exception was not thrown.');
-        } catch (RuntimeException $e) {
-            $this->assertStringContainsString('did not report a result', $e->getMessage());
-        }
+            try {
+                Concurrency::driver('queue')->run([fn () => 1, fn () => 2]);
+
+                $this->fail('The expected exception was not thrown.');
+            } catch (RuntimeException $e) {
+                $this->assertStringContainsString('did not report a result', $e->getMessage());
+            }
+
+            $this->assertNull(Cache::get("illuminate:concurrency:{$ulid}:0"));
+        });
 
         Sleep::assertNeverSlept();
     }
