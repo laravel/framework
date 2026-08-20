@@ -229,7 +229,7 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
     }
 
     /**
-     * Copy a file on the primary filesystem.
+     * Copy a file on the primary filesystem, reading it from the fallback filesystem when necessary.
      */
     public function copy(string $source, string $destination, Config $config): void
     {
