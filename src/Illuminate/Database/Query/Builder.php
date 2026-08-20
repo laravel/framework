@@ -493,11 +493,12 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
      * @param  string|null  $as
+     * @param  string  $metric
      * @return $this
      *
      * @throws \JsonException
      */
-    public function selectVectorDistance($column, $vector, $as = null)
+    public function selectVectorDistance($column, $vector, $as = null, $metric = 'cosine')
     {
         $this->ensureConnectionSupportsVectors();
 
@@ -518,7 +519,7 @@ class Builder implements BuilderContract
         $as = $this->getGrammar()->wrap($as ?? $column.'_distance');
 
         return $this->addSelect(
-            new Expression("{$this->getGrammar()->compileVectorDistanceExpression($column)} as {$as}")
+            new Expression("{$this->getGrammar()->compileVectorDistanceExpression($column, $metric)} as {$as}")
         );
     }
 
@@ -1216,18 +1217,19 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
      * @param  float  $minSimilarity  A value between 0.0 and 1.0, where 1.0 is identical.
      * @param  bool  $order
+     * @param  string  $metric
      * @return $this
      */
-    public function whereVectorSimilarTo($column, $vector, $minSimilarity = 0.6, $order = true)
+    public function whereVectorSimilarTo($column, $vector, $minSimilarity = 0.6, $order = true, $metric = 'cosine')
     {
         if (is_string($vector)) {
             $vector = (new Stringable($vector))->toEmbeddings(cache: true);
         }
 
-        $this->whereVectorDistanceLessThan($column, $vector, 1 - $minSimilarity);
+        $this->whereVectorDistanceLessThan($column, $vector, 1 - $minSimilarity, metric: $metric);
 
         if ($order) {
-            $this->orderByVectorDistance($column, $vector);
+            $this->orderByVectorDistance($column, $vector, $metric);
         }
 
         return $this;
@@ -1240,11 +1242,12 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
      * @param  float  $maxDistance
      * @param  string  $boolean
+     * @param  string  $metric
      * @return $this
      *
      * @throws \JsonException
      */
-    public function whereVectorDistanceLessThan($column, $vector, $maxDistance, $boolean = 'and')
+    public function whereVectorDistanceLessThan($column, $vector, $maxDistance, $boolean = 'and', $metric = 'cosine')
     {
         $this->ensureConnectionSupportsVectors();
 
@@ -1253,7 +1256,7 @@ class Builder implements BuilderContract
         }
 
         return $this->whereRaw(
-            "{$this->getGrammar()->compileVectorDistanceExpression($column)} <= ?",
+            "{$this->getGrammar()->compileVectorDistanceExpression($column, $metric)} <= ?",
             [
                 json_encode(
                     $vector instanceof Arrayable
@@ -1273,11 +1276,13 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
      * @param  float  $maxDistance
+     * @param  string  $metric
      * @return $this
      */
-    public function orWhereVectorDistanceLessThan($column, $vector, $maxDistance)
+    public function orWhereVectorDistanceLessThan($column, $vector, $maxDistance, $metric = 'cosine')
     {
-        return $this->whereVectorDistanceLessThan($column, $vector, $maxDistance, 'or');
+        return $this->whereVectorDistanceLessThan($column, $vector, $maxDistance, 'or', $metric);
+    }
     }
 
     /**
@@ -3094,11 +3099,12 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>  $vector
+     * @param  string  $metric
      * @return $this
      *
      * @throws \JsonException
      */
-    public function orderByVectorDistance($column, $vector)
+    public function orderByVectorDistance($column, $vector, $metric = 'cosine')
     {
         $this->ensureConnectionSupportsVectors();
 
@@ -3117,7 +3123,7 @@ class Builder implements BuilderContract
         );
 
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
-            'column' => new Expression($this->getGrammar()->compileVectorDistanceExpression($column)),
+            'column' => new Expression($this->getGrammar()->compileVectorDistanceExpression($column, $metric)),
             'direction' => 'asc',
         ];
 
