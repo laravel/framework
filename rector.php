@@ -7,7 +7,6 @@ use Rector\CodeQuality\Rector\FuncCall\SortCallLikeNamedArgsRector;
 use Rector\CodeQuality\Rector\Identical\StrlenZeroToIdenticalEmptyStringRector;
 use Rector\CodingStyle\Rector\ArrowFunction\ArrowFunctionDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\Closure\ClosureDelegatingCallToFirstClassCallableRector;
-use Rector\CodingStyle\Rector\FuncCall\CountArrayToEmptyArrayComparisonRector;
 use Rector\CodingStyle\Rector\FuncCall\FunctionFirstClassCallableRector;
 use Rector\Config\RectorConfig;
 use Rector\Php55\Rector\Class_\ClassConstantToSelfClassRector;
@@ -27,9 +26,7 @@ use Rector\Php80\Rector\Ternary\GetDebugTypeRector;
 use Rector\Php81\Rector\Array_\ArrayToFirstClassCallableRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\Php83\Rector\ClassConst\AddTypeToConstRector;
-use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\Php83\Rector\FuncCall\DynamicClassConstFetchRector;
-use Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector;
 use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AddInstanceofAssertForNullableInstanceRector;
@@ -70,7 +67,6 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         ...$skipPHPUnitSetList,
-        AddOverrideAttributeToOverriddenMethodsRector::class,
         AddTypeToConstRector::class,
         ArrayToFirstClassCallableRector::class,
         ArrowFunctionDelegatingCallToFirstClassCallableRector::class,
@@ -82,7 +78,6 @@ return RectorConfig::configure()
         ClassPropertyAssignToConstructorPromotionRector::class,
         ClosureDelegatingCallToFirstClassCallableRector::class,
         ClosureToArrowFunctionRector::class,
-        DeprecatedAnnotationToDeprecatedAttributeRector::class,
         DynamicClassConstFetchRector::class,
         FunctionFirstClassCallableRector::class,
         GetDebugTypeRector::class,
@@ -98,7 +93,6 @@ return RectorConfig::configure()
     ])
     ->withRules([
         CompactToVariablesRector::class,
-        CountArrayToEmptyArrayComparisonRector::class,
         SortCallLikeNamedArgsRector::class,
         StrlenZeroToIdenticalEmptyStringRector::class,
     ])
@@ -115,7 +109,6 @@ return RectorConfig::configure()
     )
     ->withSets([
         PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
-        PHPUnitSetList::PHPUNIT_110,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
         PHPUnitSetList::PHPUNIT_MOCK_TO_STUB,
     ])
