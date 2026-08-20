@@ -2109,8 +2109,35 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this;
         }
 
+        return $this->refreshUsingQuery($this->newQueryWithoutScopes());
+    }
+
+    /**
+     * Reload the current model instance with fresh attributes from the database while locking it for updating.
+     *
+     * @return $this
+     */
+    public function refreshForUpdate()
+    {
+        if (! $this->exists) {
+            return $this;
+        }
+
+        return $this->refreshUsingQuery(
+            $this->newQueryWithoutScopes()->lockForUpdate()
+        );
+    }
+
+    /**
+     * Reload the current model instance using the given query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
+     * @return $this
+     */
+    protected function refreshUsingQuery(Builder $query)
+    {
         $this->setRawAttributes(
-            $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+            $this->setKeysForSelectQuery($query)
                 ->useWritePdo()
                 ->firstOrFail()
                 ->attributes
