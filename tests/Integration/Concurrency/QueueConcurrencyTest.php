@@ -227,6 +227,33 @@ class QueueConcurrencyTest extends TestCase
             $this->assertSame(2, $e->seconds);
             $this->assertSame('database', $e->connection);
             $this->assertSame('file', $e->store);
+            $this->assertSame(
+                'Concurrency tasks dispatched to the [database] queue connection timed out after 2 seconds with [0/2] results received. Ensure queue workers are running and writing results to the [file] cache store.',
+                $e->getMessage(),
+            );
+        } finally {
+            Cache::store('file')->flush();
+        }
+    }
+
+    public function testTimeoutMessageIncludesTheQueueWhenOneIsSpecified()
+    {
+        config()->set('queue.default', 'database');
+        config()->set('cache.default', 'file');
+
+        Queue::fake();
+        Sleep::fake(syncWithCarbon: true);
+
+        try {
+            Concurrency::driver('queue')->onQueue('reports')->run([fn () => 1], timeout: 1);
+
+            $this->fail('The expected timeout exception was not thrown.');
+        } catch (TaskTimedOutException $e) {
+            $this->assertSame('reports', $e->queue);
+            $this->assertSame(
+                'Concurrency tasks dispatched to the [database] queue connection on the [reports] queue timed out after 1 seconds with [0/1] results received. Ensure queue workers are running and writing results to the [file] cache store.',
+                $e->getMessage(),
+            );
         } finally {
             Cache::store('file')->flush();
         }
