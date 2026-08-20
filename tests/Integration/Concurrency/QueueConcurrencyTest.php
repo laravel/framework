@@ -554,8 +554,7 @@ class QueueConcurrencyTest extends TestCase
 
     public function testDispatchFailureWritesCancellationFlagAndCleansUp()
     {
-        $context = new class
-        {
+        $context = new class {
         };
 
         $thrown = null;
