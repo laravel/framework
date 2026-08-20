@@ -156,7 +156,6 @@ class FakeInvokedProcess implements InvokedProcessContract
 
         if ($this->remainingRunIterations === 0) {
             while (! $this->stopped && $this->invokeOutputHandlerWithNextLineOfOutput()) {
-
             }
 
             return false;
