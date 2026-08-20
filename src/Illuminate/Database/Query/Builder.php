@@ -1311,6 +1311,63 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where binary" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $value
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereBinary($column, $value, $boolean = 'and', $not = false)
+    {
+        $type = 'Binary';
+
+        $this->wheres[] = compact('type', 'column', 'value', 'boolean', 'not');
+
+        $this->addBinding($value);
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where binary" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $value
+     * @return $this
+     */
+    public function orWhereBinary($column, $value)
+    {
+        return $this->whereBinary($column, $value, 'or');
+    }
+
+    /**
+     * Add a "where not binary" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotBinary($column, $value, $boolean = 'and')
+    {
+        return $this->whereBinary($column, $value, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not binary" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $value
+     * @return $this
+     */
+    public function orWhereNotBinary($column, $value)
+    {
+        return $this->whereNotBinary($column, $value, 'or');
+    }
+
+    /**
      * Add a "where like" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column

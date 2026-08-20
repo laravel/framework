@@ -312,6 +312,20 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where binary" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function whereBinary(Builder $query, $where)
+    {
+        throw new RuntimeException('This database engine does not support binary comparison operations.');
+    }
+
+    /**
      * Compile a bitwise operator where clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
