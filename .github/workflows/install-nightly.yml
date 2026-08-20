@@ -9,6 +9,8 @@ permissions:
 
 jobs:
   install:
+    if: github.repository == 'laravel/framework'
+
     strategy:
       fail-fast: false
       matrix:

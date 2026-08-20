@@ -9,6 +9,8 @@ permissions:
 
 jobs:
   mysql_innovation:
+    if: github.repository == 'laravel/framework'
+
     runs-on: ubuntu-24.04
     timeout-minutes: 10
 
@@ -41,6 +43,8 @@ jobs:
           DB_CONNECTION: mysql
 
   mariadb:
+    if: github.repository == 'laravel/framework'
+
     runs-on: ubuntu-24.04
     continue-on-error: true
     timeout-minutes: 10
