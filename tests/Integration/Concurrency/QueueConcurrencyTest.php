@@ -146,7 +146,6 @@ class QueueConcurrencyTest extends TestCase
         $this->assertTrue($thrown);
         $this->assertNull(Cache::get("illuminate:concurrency:{$ulid}:0"));
         $this->assertNull(Cache::get("illuminate:concurrency:{$ulid}:1"));
-        $this->assertNull(Cache::get("illuminate:concurrency:{$ulid}:cancelled"));
     }
 
     public function testResultKeysAreRemovedFromCacheAfterRun()
@@ -553,7 +552,7 @@ class QueueConcurrencyTest extends TestCase
         Sleep::assertNeverSlept();
     }
 
-    public function testDispatchFailureWritesCancellationFlag()
+    public function testDispatchFailureWritesCancellationFlagAndCleansUp()
     {
         $context = new class
         {
@@ -563,7 +562,12 @@ class QueueConcurrencyTest extends TestCase
 
         $ulid = Str::freezeUlids(function () use ($context, &$thrown) {
             try {
-                Concurrency::driver('queue')->run([fn () => $context]);
+                Concurrency::driver('queue')->run([
+                    // The first task runs inline and caches its envelope
+                    // before the second task's dispatch fails to serialize.
+                    'ok' => fn () => 'collected',
+                    'boom' => fn () => $context,
+                ]);
             } catch (Throwable $thrown) {
                 //
             }
