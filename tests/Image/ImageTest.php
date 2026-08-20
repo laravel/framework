@@ -334,7 +334,7 @@ class ImageTest extends TestCase
             $this->assertSame(123, $image->width());
             $this->assertSame(45, $image->height());
         } finally {
-            Container::setInstance(null);
+            //
         }
     }
 
@@ -377,7 +377,7 @@ class ImageTest extends TestCase
 
             $image->dimensions();
         } finally {
-            Container::setInstance(null);
+            //
         }
     }
 

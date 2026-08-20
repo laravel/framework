@@ -16,11 +16,6 @@ class JsonFormatterTest extends TestCase
         Container::setInstance(new Container);
     }
 
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-    }
-
     protected function createRecord(): LogRecord
     {
         return new LogRecord(

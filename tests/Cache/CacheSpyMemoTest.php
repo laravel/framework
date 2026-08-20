@@ -34,12 +34,6 @@ class CacheSpyMemoTest extends TestCase
         Facade::setFacadeApplication($container);
     }
 
-    protected function tearDown(): void
-    {
-        Facade::clearResolvedInstances();
-        Facade::setFacadeApplication(null);
-    }
-
     public function test_cache_spy_works_with_memoized_cache()
     {
         $cache = Cache::spy();

@@ -77,11 +77,6 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler = new Handler($this->container);
     }
 
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-    }
-
     public function testHandlerReportsExceptionAsContext()
     {
         $logger = Mockery::mock(LoggerInterface::class);

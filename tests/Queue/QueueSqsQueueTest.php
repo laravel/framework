@@ -355,8 +355,6 @@ class QueueSqsQueueTest extends TestCase
         ])->andReturn($this->mockedSendMessageResponseModel);
 
         $queue->pushRaw('payload', 'jobs');
-
-        Container::setInstance(null);
     }
 
     public function testGetQueueEnsuresTheQueueIsOnlySuffixedOnce()

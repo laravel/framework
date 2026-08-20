@@ -30,8 +30,6 @@ class FoundationFormRequestTest extends TestCase
     {
         FormRequest::failOnUnknownFields(false);
 
-        Container::setInstance(null);
-
         $this->mocks = [];
     }
 

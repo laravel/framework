@@ -28,8 +28,6 @@ class BusBatchableTest extends TestCase
         $container->instance(BatchRepository::class, $repository);
 
         $this->assertSame('test-batch', $class->batch());
-
-        Container::setInstance(null);
     }
 
     public function test_with_fake_batch_sets_and_returns_fake()

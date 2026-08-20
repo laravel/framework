@@ -26,11 +26,6 @@ class BroadcasterTest extends TestCase
         $this->broadcaster = new FakeBroadcaster;
     }
 
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-    }
-
     public function testExtractingParametersWhileCheckingForUserAccess()
     {
         $callback = function ($user, BroadcasterTestEloquentModelStub $model, $nonModel) {
