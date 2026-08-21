@@ -270,7 +270,7 @@ class DebouncedJobTest extends QueueTestCase
 
     public function testMaxDebounceWaitForcesImmediateExecution()
     {
-        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+        $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
 
         DebouncedWithMaxWaitJob::$handleCount = 0;
 
@@ -289,6 +289,31 @@ class DebouncedJobTest extends QueueTestCase
 
         // The job should be queued with delay=0 since max wait was exceeded.
         $this->assertEquals(0, $job->delay);
+    }
+
+    public function testMaxDebounceWaitStartsOverAfterTheDebouncedJobRuns()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        DebouncedWithMaxWaitJob::$handleCount = 0;
+
+        // First dispatch at t=0, which runs once the debounce window closes.
+        dispatch(new DebouncedWithMaxWaitJob('entity-1'));
+
+        $this->travelTo(Carbon::now()->addSeconds(31));
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertEquals(1, DebouncedWithMaxWaitJob::$handleCount);
+
+        // Second dispatch at t=92, long after the first job stopped waiting.
+        $this->travelTo(Carbon::now()->addSeconds(61));
+
+        $job = new DebouncedWithMaxWaitJob('entity-1');
+        $pending = dispatch($job);
+        unset($pending);
+
+        // The job should be debounced again rather than forced to run immediately.
+        $this->assertEquals(30, $job->delay);
     }
 
     public function testDebounceWithoutMaxWaitAllowsIndefiniteDelay()
