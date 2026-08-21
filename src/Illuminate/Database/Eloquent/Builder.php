@@ -1904,7 +1904,7 @@ class Builder implements BuilderContract
      */
     protected function combineConstraints(array $constraints)
     {
-        return function ($builder) use ($constraints) {
+        return static function ($builder) use ($constraints) {
             foreach ($constraints as $constraint) {
                 $builder = $constraint($builder) ?? $builder;
             }
