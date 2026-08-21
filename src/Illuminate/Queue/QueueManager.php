@@ -240,7 +240,7 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $this->app['cache']
             ->store()
-            ->forever("illuminate:queue:paused:{$connection}:{$queue}", true);
+            ->forever($this->getPausedQueueKey($connection, $queue), true);
 
         $this->app['events']->dispatch(
             new Events\QueuePaused($connection, $queue)
@@ -259,7 +259,7 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $this->app['cache']
             ->store()
-            ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $ttl);
+            ->put($this->getPausedQueueKey($connection, $queue), true, $ttl);
 
         $this->app['events']->dispatch(
             new Events\QueuePaused($connection, $queue, $ttl)
@@ -293,7 +293,7 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $this->app['cache']
             ->store()
-            ->forget("illuminate:queue:paused:{$connection}:{$queue}");
+            ->forget($this->getPausedQueueKey($connection, $queue));
 
         $this->app['events']->dispatch(
             new Events\QueueResumed($connection, $queue)
@@ -330,7 +330,7 @@ class QueueManager implements FactoryContract, MonitorContract
         $cache = $this->app['cache']->store();
 
         return (bool) ($cache->get('illuminate:queues:paused')
-            ?: $cache->get("illuminate:queue:paused:{$connection}:{$queue}"));
+            ?: $cache->get($this->getPausedQueueKey($connection, $queue)));
     }
 
     /**
@@ -349,11 +349,11 @@ class QueueManager implements FactoryContract, MonitorContract
         }
 
         $states = $cache->many(
-            array_map(fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues)
+            array_map(fn ($queue) => $this->getPausedQueueKey($connection, $queue), $queues)
         );
 
         return array_values(array_filter(
-            $queues, fn ($queue) => $states["illuminate:queue:paused:{$connection}:{$queue}"] ?? false
+            $queues, fn ($queue) => $states[$this->getPausedQueueKey($connection, $queue)] ?? false
         ));
     }
 
@@ -392,6 +392,18 @@ class QueueManager implements FactoryContract, MonitorContract
     public function addConnector($driver, Closure $resolver)
     {
         $this->connectors[$driver] = $resolver;
+    }
+
+    /**
+     * Get the paused queue key for the given connection and queue.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @return string
+     */
+    public function getPausedQueueKey($connection, $queue)
+    {
+        return "illuminate:queue:paused:{$connection}:{$queue}";
     }
 
     /**
