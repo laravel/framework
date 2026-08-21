@@ -5406,8 +5406,11 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => 'not-an-email'], ['x' => 'email:dns']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['x' => '.invalid@gmail.com'], ['x' => 'email:dns']);
+        $v = new Validator($trans, ['x' => '.invalid@this-domain-does-not-exist.com'], ['x' => 'email:dns']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '.invalid@this-domain-does-not-exist.com'], ['x' => 'email:rfc,dns']);
+        $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['x' => 'taylor@this-domain-does-not-exist.invalid'], ['x' => 'email:dns']);
         $this->assertFalse($v->passes());
