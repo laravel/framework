@@ -118,6 +118,17 @@ class DebounceLock
     }
 
     /**
+     * Remove the maximum wait timestamp for the given job.
+     *
+     * @param  mixed  $job
+     * @return void
+     */
+    public function releaseMaxWait($job)
+    {
+        $this->resolveCache($job)->forget(static::getKey($job).':first_dispatched_at');
+    }
+
+    /**
      * Get the debounce delay for the given job.
      *
      * @param  mixed  $job
