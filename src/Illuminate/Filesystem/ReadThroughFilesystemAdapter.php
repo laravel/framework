@@ -7,6 +7,7 @@ use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
 
@@ -216,7 +217,7 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
      */
     public function move(string $source, string $destination, Config $config): void
     {
-        $this->primary->move($source, $destination, $config->toArray());
+        $this->moveOnPrimary($source, $destination, $config);
 
         try {
             if ($this->fallback->fileExists($source)) {
@@ -228,11 +229,55 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
     }
 
     /**
-     * Copy a file on the primary filesystem.
+     * Copy a file on the primary filesystem, reading it from the fallback filesystem when necessary.
      */
     public function copy(string $source, string $destination, Config $config): void
     {
-        $this->primary->copy($source, $destination, $config->toArray());
+        if ($this->primary->fileExists($source)) {
+            $this->primary->copy($source, $destination, $config->toArray());
+
+            return;
+        }
+
+        try {
+            $this->copyFromFallback($source, $destination, $config);
+        } catch (FilesystemException $exception) {
+            throw UnableToCopyFile::fromLocationTo($source, $destination, $exception);
+        }
+    }
+
+    /**
+     * Move a file to its destination on the primary filesystem.
+     */
+    protected function moveOnPrimary(string $source, string $destination, Config $config): void
+    {
+        if ($this->primary->fileExists($source)) {
+            $this->primary->move($source, $destination, $config->toArray());
+
+            return;
+        }
+
+        try {
+            $this->copyFromFallback($source, $destination, $config);
+        } catch (FilesystemException $exception) {
+            throw UnableToMoveFile::fromLocationTo($source, $destination, $exception);
+        }
+    }
+
+    /**
+     * Copy a file from the fallback filesystem to the primary filesystem.
+     */
+    protected function copyFromFallback(string $source, string $destination, Config $config): void
+    {
+        $stream = $this->fallback->readStream($source);
+
+        try {
+            $this->primary->writeStream($destination, $stream, $config->toArray());
+        } finally {
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+        }
     }
 
     /**
