@@ -6,6 +6,7 @@ use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
 use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
+use Illuminate\Cache\Console\PruneExpiredCommand;
 use Illuminate\Cache\Console\PruneStaleTagsCommand;
 use Illuminate\Concurrency\Console\InvokeSerializedClosureCommand;
 use Illuminate\Console\Scheduling\ScheduleClearCacheCommand;
@@ -151,6 +152,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'Optimize' => OptimizeCommand::class,
         'OptimizeClear' => OptimizeClearCommand::class,
         'PackageDiscover' => PackageDiscoverCommand::class,
+        'PruneExpiredCommand' => PruneExpiredCommand::class,
         'PruneStaleTagsCommand' => PruneStaleTagsCommand::class,
         'QueueClear' => QueueClearCommand::class,
         'QueueFailed' => ListFailedQueueCommand::class,

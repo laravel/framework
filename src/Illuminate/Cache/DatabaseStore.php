@@ -453,6 +453,18 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
     }
 
     /**
+     * Remove all expired items from the cache.
+     *
+     * @return int
+     */
+    public function pruneExpired()
+    {
+        return $this->table()
+            ->where('expiration', '<=', $this->getTime())
+            ->delete();
+    }
+
+    /**
      * Remove all locks from the store.
      *
      * @return bool
