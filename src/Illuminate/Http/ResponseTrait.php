@@ -2,7 +2,10 @@
 
 namespace Illuminate\Http;
 
+use DateInterval;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Carbon;
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
 
@@ -111,6 +114,104 @@ trait ResponseTrait
         }
 
         return $this;
+    }
+
+    /**
+     * Mark the resource as deprecated using the "Deprecation" header.
+     *
+     * @param  \DateTimeInterface|\DateInterval|int|string|null  $at  A date, an interval from now, a UNIX timestamp, or null for the current time
+     * @param  string|null  $link
+     * @param  string|null  $type
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function deprecated($at = null, $link = null, $type = null)
+    {
+        $at = $this->parseHeaderDate($at);
+
+        $sunset = $this->headers->get('Sunset');
+
+        if (! is_null($sunset) && ($sunsetAt = strtotime($sunset)) !== false && $sunsetAt < $at) {
+            throw new InvalidArgumentException('The [Sunset] date must not be earlier than the [Deprecation] date.');
+        }
+
+        $this->headers->set('Deprecation', '@'.$at);
+
+        return is_null($link) ? $this : $this->withLink($link, 'deprecation', $type);
+    }
+
+    /**
+     * Indicate when the resource will become unresponsive using the "Sunset" header.
+     *
+     * @param  \DateTimeInterface|\DateInterval|int|string  $at  A date, an interval from now, or a UNIX timestamp
+     * @param  string|null  $link
+     * @param  string|null  $type
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function sunset($at, $link = null, $type = null)
+    {
+        $at = $this->parseHeaderDate($at);
+
+        $deprecation = $this->headers->get('Deprecation');
+
+        if (! is_null($deprecation) && $at < (int) ltrim($deprecation, '@')) {
+            throw new InvalidArgumentException('The [Sunset] date must not be earlier than the [Deprecation] date.');
+        }
+
+        $this->headers->set('Sunset', gmdate('D, d M Y H:i:s', $at).' GMT');
+
+        return is_null($link) ? $this : $this->withLink($link, 'sunset', $type);
+    }
+
+    /**
+     * Add a "Link" header to the response.
+     *
+     * @param  string  $url
+     * @param  string  $rel
+     * @param  string|null  $type
+     * @return $this
+     */
+    public function withLink($url, $rel, $type = null)
+    {
+        $link = '<'.$url.'>; rel="'.$rel.'"';
+
+        if (! is_null($type)) {
+            $link .= '; type="'.$type.'"';
+        }
+
+        $this->headers->set('Link', $link, false);
+
+        return $this;
+    }
+
+    /**
+     * Resolve the given value into a UNIX timestamp.
+     *
+     * @param  \DateTimeInterface|\DateInterval|int|string|null  $at
+     * @return int
+     */
+    protected function parseHeaderDate($at)
+    {
+        if (is_null($at)) {
+            return Carbon::now()->getTimestamp();
+        }
+
+        if (is_numeric($at)) {
+            return (int) $at;
+        }
+
+        if (is_string($at)) {
+            $at = Carbon::parse($at);
+        }
+
+        if ($at instanceof DateInterval) {
+            $at = Carbon::now()->add($at);
+        }
+
+        return $at->getTimestamp();
     }
 
     /**

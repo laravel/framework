@@ -3,16 +3,20 @@
 namespace Illuminate\Tests\Http;
 
 use BadMethodCallException;
+use DateInterval;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Session\Store;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use InvalidArgumentException;
 use JsonSerializable;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -22,6 +26,13 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class HttpResponseTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+
+        parent::tearDown();
+    }
+
     public function testJsonResponsesAreConvertedAndHeadersAreSet()
     {
         $response = new Response(new ArrayableStub);
@@ -270,6 +281,153 @@ class HttpResponseTest extends TestCase
         $response->withoutHeader(['baz', 'zal']);
         $this->assertNull($response->headers->get('baz'));
         $this->assertNull($response->headers->get('zal'));
+    }
+
+    public function testDeprecatedSetsAStructuredFieldDate()
+    {
+        $response = new Response;
+
+        $result = $response->deprecated(Carbon::createFromTimestamp(1688169599, 'UTC'));
+
+        $this->assertSame($response, $result);
+        $this->assertSame('@1688169599', $response->headers->get('Deprecation'));
+    }
+
+    public function testDeprecatedDefaultsToTheCurrentTime()
+    {
+        Carbon::setTestNow('2026-08-21 10:00:00');
+
+        $response = (new Response)->deprecated();
+
+        $this->assertSame('@'.Carbon::now()->getTimestamp(), $response->headers->get('Deprecation'));
+    }
+
+    public function testDeprecatedAcceptsStringsIntervalsAndTimestamps()
+    {
+        Carbon::setTestNow('2026-08-21 10:00:00');
+
+        $this->assertSame(
+            '@'.strtotime('2026-10-01 00:00:00'),
+            (new Response)->deprecated('2026-10-01 00:00:00')->headers->get('Deprecation')
+        );
+
+        $this->assertSame(
+            '@'.strtotime('2026-08-22 10:00:00'),
+            (new Response)->deprecated(new DateInterval('P1D'))->headers->get('Deprecation')
+        );
+
+        $this->assertSame(
+            '@1688169599',
+            (new Response)->deprecated(1688169599)->headers->get('Deprecation')
+        );
+    }
+
+    public function testNumericStringsAreResolvedIdenticallyToIntegers()
+    {
+        $this->assertSame(
+            '@1688169599',
+            (new Response)->deprecated('1688169599')->headers->get('Deprecation')
+        );
+
+        $this->assertSame(
+            (new Response)->deprecated(1688169599)->headers->get('Deprecation'),
+            (new Response)->deprecated('1688169599')->headers->get('Deprecation')
+        );
+
+        $this->assertSame(
+            (new Response)->sunset(1790812800)->headers->get('Sunset'),
+            (new Response)->sunset('1790812800')->headers->get('Sunset')
+        );
+    }
+
+    public function testDeprecatedAddsADeprecationLink()
+    {
+        $response = (new Response)->deprecated(null, 'https://example.com/deprecations');
+
+        $this->assertSame(
+            '<https://example.com/deprecations>; rel="deprecation"',
+            $response->headers->get('Link')
+        );
+
+        $response = (new Response)->deprecated(null, 'https://example.com/deprecations', 'text/html');
+
+        $this->assertSame(
+            '<https://example.com/deprecations>; rel="deprecation"; type="text/html"',
+            $response->headers->get('Link')
+        );
+    }
+
+    public function testSunsetIsFormattedAsAnHttpDate()
+    {
+        $response = new Response;
+
+        $result = $response->sunset(Carbon::create(2026, 10, 1, 12, 0, 0, 'America/New_York'));
+
+        $this->assertSame($response, $result);
+        $this->assertSame('Thu, 01 Oct 2026 16:00:00 GMT', $response->headers->get('Sunset'));
+    }
+
+    public function testSunsetAddsASunsetLink()
+    {
+        $response = (new Response)->sunset('2026-10-01 00:00:00', 'https://example.com/sunset', 'text/html');
+
+        $this->assertSame(
+            '<https://example.com/sunset>; rel="sunset"; type="text/html"',
+            $response->headers->get('Link')
+        );
+    }
+
+    public function testLinkHeadersAreAppendedInsteadOfReplaced()
+    {
+        $response = (new Response)
+            ->header('Link', '<https://example.com/page/2>; rel="next"')
+            ->deprecated('2026-10-01 00:00:00', 'https://example.com/deprecations')
+            ->sunset('2026-12-01 00:00:00', 'https://example.com/sunset');
+
+        $this->assertSame([
+            '<https://example.com/page/2>; rel="next"',
+            '<https://example.com/deprecations>; rel="deprecation"',
+            '<https://example.com/sunset>; rel="sunset"',
+        ], $response->headers->all('Link'));
+    }
+
+    public function testSunsetMayNotBeEarlierThanTheDeprecationDate()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageIsOrContains('The [Sunset] date must not be earlier than the [Deprecation] date.');
+
+        (new Response)->deprecated('2026-10-01 00:00:00')->sunset('2026-09-01 00:00:00');
+    }
+
+    public function testDeprecationMayNotBeLaterThanTheSunsetDate()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageIsOrContains('The [Sunset] date must not be earlier than the [Deprecation] date.');
+
+        (new Response)->sunset('2026-09-01 00:00:00')->deprecated('2026-10-01 00:00:00');
+    }
+
+    public function testSunsetMayEqualTheDeprecationDate()
+    {
+        $response = (new Response)->deprecated('2026-10-01 00:00:00')->sunset('2026-10-01 00:00:00');
+
+        $this->assertSame('@'.strtotime('2026-10-01 00:00:00'), $response->headers->get('Deprecation'));
+        $this->assertSame('Thu, 01 Oct 2026 00:00:00 GMT', $response->headers->get('Sunset'));
+    }
+
+    public function testDeprecationHeadersMayBeSetOnJsonResponses()
+    {
+        $response = (new JsonResponse(['foo' => 'bar']))
+            ->deprecated('2026-10-01 00:00:00', 'https://example.com/deprecations', 'text/html')
+            ->sunset('2026-12-01 00:00:00');
+
+        $this->assertSame('@'.strtotime('2026-10-01 00:00:00'), $response->headers->get('Deprecation'));
+        $this->assertSame('Tue, 01 Dec 2026 00:00:00 GMT', $response->headers->get('Sunset'));
+        $this->assertSame(
+            '<https://example.com/deprecations>; rel="deprecation"; type="text/html"',
+            $response->headers->get('Link')
+        );
+        $this->assertSame('{"foo":"bar"}', $response->getContent());
     }
 
     public function testMagicCall()
