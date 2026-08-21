@@ -84,6 +84,20 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         $this->assertEmpty($provider->all());
     }
 
+    public function testCanLogFailedJobWithCorruptedPayload()
+    {
+        $provider = $this->getFailedJobProvider();
+
+        $id = $provider->log('connection-1', 'queue-1', 'corrupted-payload', new RuntimeException());
+
+        $this->assertTrue(Str::isUuid($id));
+
+        $failedJob = $provider->find($id);
+
+        $this->assertSame($id, $failedJob->id);
+        $this->assertSame('corrupted-payload', $failedJob->payload);
+    }
+
     public function testPruningFailedJobs()
     {
         $provider = $this->getFailedJobProvider();

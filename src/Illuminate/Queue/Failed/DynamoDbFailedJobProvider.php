@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 
 class DynamoDbFailedJobProvider implements FailedJobProviderInterface
 {
@@ -57,7 +58,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      */
     public function log($connection, $queue, $payload, $exception)
     {
-        $id = json_decode($payload, true)['uuid'];
+        $id = json_decode($payload, true)['uuid'] ?? (string) Str::uuid();
 
         $failedAt = Date::now();
 
