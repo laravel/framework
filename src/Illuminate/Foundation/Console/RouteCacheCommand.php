@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -59,15 +60,28 @@ class RouteCacheCommand extends Command
             return $this->components->error("Your application doesn't have any routes.");
         }
 
-        foreach ($routes as $route) {
-            $route->prepareForSerialization();
-        }
+        $routes = $this->prepareRoutes($routes);
 
         $this->files->put(
             $this->laravel->getCachedRoutesPath(), $this->buildRouteCacheFile($routes)
         );
 
         $this->components->info('Routes cached successfully.');
+    }
+
+    protected function prepareRoutes(RouteCollection $routes)
+    {
+        $collection = new RouteCollection;
+
+        foreach ($routes as $route) {
+            $collection->add(transform(clone $route, static function (Route $route) {
+                $route->prepareForSerialization();
+
+                return $route;
+            }));
+        }
+
+        return $collection;
     }
 
     /**
