@@ -6,6 +6,7 @@ use Aws\Credentials\CredentialProvider;
 use Aws\Sqs\SqsClient;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Arr;
+use Illuminate\Support\AwsTransportSharing;
 use InvalidArgumentException;
 
 class SqsConnector implements ConnectorInterface
@@ -32,7 +33,7 @@ class SqsConnector implements ConnectorInterface
 
         return new SqsQueue(
             new SqsClient(
-                Arr::except($config, ['token', 'overflow'])
+                AwsTransportSharing::apply(Arr::except($config, ['token', 'overflow']))
             ),
             $config['queue'],
             $config['prefix'] ?? '',

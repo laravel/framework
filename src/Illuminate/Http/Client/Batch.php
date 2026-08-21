@@ -6,7 +6,6 @@ use Carbon\CarbonImmutable;
 use Closure;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\EachPromise;
-use GuzzleHttp\Utils;
 use Illuminate\Http\Client\Promises\LazyPromise;
 use Illuminate\Support\Defer\DeferredCallback;
 
@@ -128,7 +127,7 @@ class Batch
     public function __construct(?Factory $factory = null)
     {
         $this->factory = $factory ?: new Factory;
-        $this->handler = Utils::chooseHandler();
+        $this->handler = $this->factory->newHandler();
         $this->createdAt = new CarbonImmutable;
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Cache\Factory as FactoryContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\AwsTransportSharing;
 use Illuminate\Support\RebindsCallbacksToSelf;
 use InvalidArgumentException;
 use Mockery;
@@ -252,6 +253,7 @@ class CacheManager implements FactoryContract
             'region' => $config['region'],
             'version' => 'latest',
             'endpoint' => $config['endpoint'] ?? null,
+            'transport_sharing' => $config['transport_sharing'] ?? null,
         ];
 
         if (! empty($config['key']) && ! empty($config['secret'])) {
@@ -264,7 +266,7 @@ class CacheManager implements FactoryContract
             }
         }
 
-        return new DynamoDbClient($dynamoConfig);
+        return new DynamoDbClient(AwsTransportSharing::apply($dynamoConfig));
     }
 
     /**

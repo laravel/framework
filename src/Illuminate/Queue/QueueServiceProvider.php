@@ -21,6 +21,7 @@ use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Support\Arr;
+use Illuminate\Support\AwsTransportSharing;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -372,6 +373,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
             'region' => $config['region'],
             'version' => 'latest',
             'endpoint' => $config['endpoint'] ?? null,
+            'transport_sharing' => $config['transport_sharing'] ?? null,
         ];
 
         if (! empty($config['key']) && ! empty($config['secret'])) {
@@ -383,7 +385,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         }
 
         return new DynamoDbFailedJobProvider(
-            new DynamoDbClient($dynamoConfig),
+            new DynamoDbClient(AwsTransportSharing::apply($dynamoConfig)),
             $this->app['config']['app.name'],
             $config['table']
         );

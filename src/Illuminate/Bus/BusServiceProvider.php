@@ -9,6 +9,7 @@ use Illuminate\Contracts\Bus\QueueingDispatcher as QueueingDispatcherContract;
 use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\Arr;
+use Illuminate\Support\AwsTransportSharing;
 use Illuminate\Support\ServiceProvider;
 
 class BusServiceProvider extends ServiceProvider implements DeferrableProvider
@@ -67,6 +68,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
                 'region' => $config['region'],
                 'version' => 'latest',
                 'endpoint' => $config['endpoint'] ?? null,
+                'transport_sharing' => $config['transport_sharing'] ?? null,
             ];
 
             if (! empty($config['key']) && ! empty($config['secret'])) {
@@ -79,7 +81,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
 
             return new DynamoBatchRepository(
                 $app->make(BatchFactory::class),
-                new DynamoDbClient($dynamoConfig),
+                new DynamoDbClient(AwsTransportSharing::apply($dynamoConfig)),
                 $app->config->get('app.name'),
                 $app->config->get('queue.batching.table', 'job_batches'),
                 ttl: $app->config->get('queue.batching.ttl', null),
