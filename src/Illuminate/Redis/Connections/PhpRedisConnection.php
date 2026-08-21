@@ -130,9 +130,15 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function mget(array $keys)
     {
+        $result = $this->command('mget', [$keys]);
+
+        if ($result === false) {
+            return array_fill(0, count($keys), null);
+        }
+
         return array_map(function ($value) {
             return $value !== false ? $value : null;
-        }, $this->command('mget', [$keys]));
+        }, $result);
     }
 
     /**
@@ -179,7 +185,13 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $dictionary = $dictionary[0];
         }
 
-        return array_values($this->command('hmget', [$key, $dictionary]));
+        $result = $this->command('hmget', [$key, $dictionary]);
+
+        if ($result === false) {
+            return array_fill(0, count((array) $dictionary), null);
+        }
+
+        return array_values($result);
     }
 
     /**
