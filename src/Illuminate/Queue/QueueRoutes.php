@@ -37,7 +37,13 @@ class QueueRoutes
         $route = $this->getRoute($queueable);
 
         if (! is_null($route)) {
-            return is_string($route) ? null : $route[0];
+            if (! is_string($route) && ! is_null($route[0])) {
+                return $route[0];
+            }
+
+            return $this->forwardedConnection(
+                is_string($route) ? $route : $route[1]
+            );
         }
 
         if (empty($this->forwards)) {

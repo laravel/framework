@@ -122,6 +122,74 @@ class QueueRoutesTest extends TestCase
         $this->assertNull($defaults->getConnection(new SomeJob));
     }
 
+    public function testStringRouteResolvesForwardedConnection()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->set([SomeJob::class => 'payments']);
+        $defaults->forward('payments', 'settlements', 'cloud');
+
+        $job = new SomeJob;
+        $connection = $defaults->getConnection($job);
+
+        $this->assertSame('cloud', $connection);
+        $this->assertSame('settlements', $defaults->forwardedQueue(
+            $defaults->getQueue($job),
+            $connection,
+        ));
+    }
+
+    public function testRouteWithoutConnectionResolvesForwardedConnection()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->set(SomeJob::class, 'payments');
+        $defaults->forward('payments', 'settlements', 'cloud');
+
+        $job = new SomeJob;
+        $connection = $defaults->getConnection($job);
+
+        $this->assertSame('cloud', $connection);
+        $this->assertSame('settlements', $defaults->forwardedQueue(
+            $defaults->getQueue($job),
+            $connection,
+        ));
+    }
+
+    public function testRouteWithExplicitConnectionRetainsItsConnection()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->set(SomeJob::class, 'payments', 'redis');
+        $defaults->forward('payments', 'settlements', 'cloud');
+
+        $job = new SomeJob;
+        $connection = $defaults->getConnection($job);
+
+        $this->assertSame('redis', $connection);
+        $this->assertSame('payments', $defaults->forwardedQueue(
+            $defaults->getQueue($job),
+            $connection,
+        ));
+    }
+
+    public function testUnrelatedRouteIsNotForwarded()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->set([SomeJob::class => 'other']);
+        $defaults->forward('payments', 'settlements', 'cloud');
+
+        $job = new SomeJob;
+        $connection = $defaults->getConnection($job);
+
+        $this->assertNull($connection);
+        $this->assertSame('other', $defaults->forwardedQueue(
+            $defaults->getQueue($job),
+            $connection,
+        ));
+    }
+
     public function testForwardMatchesQueueAttribute()
     {
         $defaults = new QueueRoutes();
