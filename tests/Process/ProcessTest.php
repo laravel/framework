@@ -1182,6 +1182,111 @@ class ProcessTest extends TestCase
         $this->assertEmpty($waitUntilCallbacks);
     }
 
+    public function testFakeInvokedProcessCanBeStopped()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('STARTED')
+                ->exitCode(143)
+                ->runsFor(iterations: 10);
+        });
+
+        $process = $factory->start('sleep 100');
+
+        $this->assertTrue($process->running());
+        $this->assertSame(143, $process->stop());
+        $this->assertFalse($process->running());
+    }
+
+    public function testFakeInvokedProcessStopsInvokingOutputHandlerOnceStopped()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('FIRST')
+                ->output('SECOND')
+                ->output('THIRD')
+                ->runsFor(iterations: 10);
+        });
+
+        $output = [];
+
+        $process = $factory->start('sleep 100', function ($type, $buffer) use (&$output) {
+            $output[] = $buffer;
+        });
+
+        while ($process->running()) {
+            $process->stop();
+        }
+
+        $this->assertSame(["FIRST\n"], $output);
+    }
+
+    public function testFakeInvokedProcessStopsInvokingOutputHandlerWhenStoppedFromWithinIt()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('FIRST')
+                ->output('SECOND')
+                ->output('THIRD')
+                ->runsFor(iterations: 10);
+        });
+
+        $output = [];
+
+        $process = $factory->start('sleep 100');
+
+        $process->waitUntil(function ($type, $buffer) use (&$output, &$process) {
+            $output[] = $buffer;
+
+            $process->stop();
+
+            return false;
+        });
+
+        $this->assertSame(["FIRST\n"], $output);
+    }
+
+    public function testFakeInvokedProcessPoolCanBeStopped()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()->runsFor(iterations: 10);
+        });
+
+        $pool = $factory->pool(function ($pool) {
+            return [
+                $pool->command('sleep 100'),
+                $pool->command('sleep 100'),
+            ];
+        })->start();
+
+        $this->assertCount(2, $pool->running());
+
+        $pool->stop();
+
+        $this->assertCount(0, $pool->running());
+    }
+
+    public function testFakeInvokedProcessNeverTimesOut()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()->runsFor(iterations: 10);
+        });
+
+        $process = $factory->timeout(1)->start('sleep 100');
+
+        $this->assertNull($process->ensureNotTimedOut());
+    }
+
     public function testBasicFakeAssertions()
     {
         $factory = new Factory;
