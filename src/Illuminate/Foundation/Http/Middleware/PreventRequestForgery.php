@@ -133,7 +133,7 @@ class PreventRequestForgery
     }
 
     /**
-     * Determine if the request has a valid origin based on the Sec-Fetch-Site header.
+     * Determine if the request has a valid origin.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return bool
@@ -144,7 +144,7 @@ class PreventRequestForgery
     {
         $secFetchSite = $request->header('Sec-Fetch-Site');
 
-        if ($secFetchSite === 'same-origin') {
+        if ($secFetchSite === 'same-origin' || $secFetchSite === 'none') {
             return true;
         }
 
@@ -152,11 +152,43 @@ class PreventRequestForgery
             return true;
         }
 
+        // Sec-Fetch-Site absent, try Origin header as fallback.
+        if ($secFetchSite === null && $this->originMatchesHost($request)) {
+            return true;
+        }
+
         if (static::$originOnly) {
+            if ($secFetchSite === null && ! $request->secure()) {
+                throw new OriginMismatchException(
+                    'Origin verification requires a secure connection. '
+                    .'Browsers do not send Sec-Fetch-Site headers over plain HTTP.'
+                );
+            }
+
             throw new OriginMismatchException('Origin mismatch.');
         }
 
         return false;
+    }
+
+    /**
+     * Determine if the request's Origin header matches the application host.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function originMatchesHost($request)
+    {
+        $origin = $request->header('Origin');
+
+        if ($origin === null || $origin === 'null') {
+            return false;
+        }
+
+        return strcasecmp(
+            rtrim($origin, '/'),
+            $request->getSchemeAndHttpHost()
+        ) === 0;
     }
 
     /**
