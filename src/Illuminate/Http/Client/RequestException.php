@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use GuzzleHttp\Psr7\Message;
+use GuzzleHttp\Psr7\Utils;
 
 class RequestException extends HttpClientException
 {
@@ -114,6 +115,10 @@ class RequestException extends HttpClientException
 
         if (is_int($truncateExceptionsAt)) {
             $summary = Message::bodySummary($psrResponse, $truncateExceptionsAt);
+
+            if (! is_null($summary)) {
+                $summary = Message::toString($psrResponse->withBody(Utils::streamFor(''))).$summary;
+            }
         } elseif (($body = $psrResponse->getBody())->isSeekable() && $body->isReadable()) {
             $summary = Message::toString($psrResponse);
         }
