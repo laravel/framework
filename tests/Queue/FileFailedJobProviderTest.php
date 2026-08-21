@@ -96,6 +96,19 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertNull($failedJob);
     }
 
+    public function testCanLogFailedJobWithCorruptedPayload()
+    {
+        $id = $this->provider->log('connection', 'queue', 'corrupted-payload', new Exception('Something went wrong.'));
+
+        $this->assertTrue(Str::isUuid($id));
+
+        $failedJobs = $this->provider->all();
+
+        $this->assertCount(1, $failedJobs);
+        $this->assertSame($id, $failedJobs[0]->id);
+        $this->assertSame('corrupted-payload', $failedJobs[0]->payload);
+    }
+
     public function testCanForgetFailedJobs()
     {
         [$uuid] = $this->logFailedJob();
