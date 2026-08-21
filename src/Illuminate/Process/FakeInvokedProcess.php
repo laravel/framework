@@ -123,21 +123,6 @@ class FakeInvokedProcess implements InvokedProcessContract
     }
 
     /**
-     * Stop the process if it is still running.
-     *
-     * @param  float  $timeout
-     * @param  int|null  $signal
-     * @return int|null
-     */
-    public function stop(float $timeout = 10, ?int $signal = null)
-    {
-        $this->stopped = true;
-        $this->remainingRunIterations = 0;
-
-        return $this->process->exitCode;
-    }
-
-    /**
      * Determine if the process is still running.
      *
      * @return bool
@@ -351,6 +336,21 @@ class FakeInvokedProcess implements InvokedProcessContract
         $this->remainingRunIterations = 0;
 
         return $this->process->toProcessResult($this->command);
+    }
+
+    /**
+     * Stop the process if it is still running.
+     *
+     * @param  float  $timeout
+     * @param  int|null  $signal
+     * @return int|null
+     */
+    public function stop(float $timeout = 10, ?int $signal = null)
+    {
+        $this->stopped = true;
+        $this->remainingRunIterations = 0;
+
+        return $this->process->exitCode;
     }
 
     /**
