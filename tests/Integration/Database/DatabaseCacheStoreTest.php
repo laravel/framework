@@ -328,6 +328,30 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $store->flushLocks();
     }
 
+    public function testPruneExpiredRemovesOnlyExpiredEntries()
+    {
+        $store = $this->getStore();
+
+        $this->insertToCacheTable('foo', 'bar', 0);
+        $this->insertToCacheTable('baz', 'qux', 0);
+        $this->insertToCacheTable('fresh', 'value', 60);
+
+        $this->assertSame(2, $store->pruneExpired());
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo')]);
+        $this->assertDatabaseMissing($this->getCacheTableName(), ['key' => $this->withCachePrefix('baz')]);
+        $this->assertDatabaseHas($this->getCacheTableName(), ['key' => $this->withCachePrefix('fresh')]);
+    }
+
+    public function testPruneExpiredRemovesNothingWhenNoEntriesAreExpired()
+    {
+        $store = $this->getStore();
+
+        $this->insertToCacheTable('foo', 'bar', 60);
+
+        $this->assertSame(0, $store->pruneExpired());
+        $this->assertDatabaseHas($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo')]);
+    }
+
     /**
      * @return \Illuminate\Cache\DatabaseStore
      */

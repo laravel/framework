@@ -84,6 +84,18 @@ return [
             ],
         ],
     ],
+    \Illuminate\Cache\Console\PruneExpiredCommand::class => [
+        'name' => 'cache:prune-expired',
+        'arguments' => [
+            [
+                'name' => 'store',
+                'mode' => 'optional',
+                'isArray' => false,
+                'default' => null,
+                'description' => 'The name of the store you would like to prune expired items from',
+            ],
+        ],
+    ],
     \Illuminate\Cache\Console\PruneStaleTagsCommand::class => [
         'name' => 'cache:prune-stale-tags',
         'arguments' => [
