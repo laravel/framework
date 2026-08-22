@@ -6,6 +6,7 @@ use Closure;
 use Dotenv\Repository\Adapter\PutenvAdapter;
 use Dotenv\Repository\RepositoryBuilder;
 use Illuminate\Filesystem\Filesystem;
+use InvalidArgumentException;
 use PhpOption\Option;
 use RuntimeException;
 
@@ -115,6 +116,140 @@ class Env
     public static function getOrFail($key)
     {
         return self::getOption($key)->getOrThrow(new RuntimeException("Environment variable [$key] has no value."));
+    }
+
+    /**
+     * Get the specified string environment value.
+     *
+     * @param  string  $key
+     * @param  (Closure():(string|null))|string|null  $default
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function string(string $key, $default = null): string
+    {
+        $value = static::get($key, $default);
+
+        if (! is_string($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Environment value for key [%s] must be a string, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified integer environment value.
+     *
+     * @param  string  $key
+     * @param  (Closure():(int|null))|int|null  $default
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function integer(string $key, $default = null): int
+    {
+        $value = static::get($key, $default);
+
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_INT) !== false) {
+            return (int) $value;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf('Environment value for key [%s] must be an integer, %s given.', $key, gettype($value))
+        );
+    }
+
+    /**
+     * Get the specified float environment value.
+     *
+     * @param  string  $key
+     * @param  (Closure():(float|null))|float|null  $default
+     * @return float
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function float(string $key, $default = null): float
+    {
+        $value = static::get($key, $default);
+
+        if (is_float($value)) {
+            return $value;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_FLOAT) !== false) {
+            return (float) $value;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf('Environment value for key [%s] must be a float, %s given.', $key, gettype($value))
+        );
+    }
+
+    /**
+     * Get the specified boolean environment value.
+     *
+     * @param  string  $key
+     * @param  (Closure():(bool|null))|bool|null  $default
+     * @return bool
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function boolean(string $key, $default = null): bool
+    {
+        $value = static::get($key, $default);
+
+        if (! is_bool($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Environment value for key [%s] must be a boolean, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified array environment value.
+     *
+     * @param  string  $key
+     * @param  (Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
+     * @return array<array-key, mixed>
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function array(string $key, $default = null): array
+    {
+        $value = static::get($key, $default);
+
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            return trim($value) === '' ? [] : array_map('trim', explode(',', $value));
+        }
+
+        throw new InvalidArgumentException(
+            sprintf('Environment value for key [%s] must be an array, %s given.', $key, gettype($value))
+        );
+    }
+
+    /**
+     * Get the specified array environment value as a collection.
+     *
+     * @param  string  $key
+     * @param  (Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
+     * @return Collection<array-key, mixed>
+     */
+    public function collection(string $key, $default = null): Collection
+    {
+        return new Collection($this->array($key, $default));
     }
 
     /**
