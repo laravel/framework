@@ -1004,6 +1004,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is not a valid e-mail address.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateNotEmail($attribute, $value, $parameters)
+    {
+        return ! $this->validateEmail($attribute, $value, $parameters);
+    }
+
+    /**
      * Validate the encoding of an attribute.
      *
      * @param  string  $attribute
