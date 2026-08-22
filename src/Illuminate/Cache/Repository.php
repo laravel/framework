@@ -635,11 +635,12 @@ class Repository implements ArrayAccess, CacheContract
      * @param  \UnitEnum|string  $key
      * @param  array{ 0: \DateTimeInterface|\DateInterval|int, 1: \DateTimeInterface|\DateInterval|int }  $ttl
      * @param  (callable(): TCacheValue)  $callback
-     * @param  array{ seconds?: int, owner?: string }|null  $lock
+     * @param  array{ seconds?: int, owner?: string }|null  $lock  Lock options used to coordinate stale refreshes.
      * @param  bool  $alwaysDefer
+     * @param  bool  $preventStampede
      * @return TCacheValue
      */
-    public function flexible($key, $ttl, $callback, $lock = null, $alwaysDefer = false)
+    public function flexible($key, $ttl, $callback, $lock = null, $alwaysDefer = false, $preventStampede = false)
     {
         $key = enum_value($key);
 
@@ -649,6 +650,29 @@ class Repository implements ArrayAccess, CacheContract
         ] = $this->many([$key, self::FLEXIBLE_CREATED_KEY_PREFIX.$key]);
 
         if (in_array(null, [$value, $created], true)) {
+            if ($lock !== null && $preventStampede) {
+                // Re-check after acquiring the lock in case another request filled the cache while we waited.
+                return $this->store->lock(
+                    "illuminate:cache:flexible:lock:{$this->itemKey($key)}",
+                    $lock['seconds'] ?? 0,
+                    $lock['owner'] ?? null,
+                )->block($lock['seconds'] ?? 0, function () use ($key, $ttl, $callback) {
+                    [
+                        $key => $value,
+                        self::FLEXIBLE_CREATED_KEY_PREFIX.$key => $created,
+                    ] = $this->many([$key, self::FLEXIBLE_CREATED_KEY_PREFIX.$key]);
+
+                    if (! in_array(null, [$value, $created], true)) {
+                        return $value;
+                    }
+
+                    return tap(value($callback), fn ($value) => $this->putMany([
+                        $key => $value,
+                        self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
+                    ], $ttl[1]));
+                });
+            }
+
             return tap(value($callback), fn ($value) => $this->putMany([
                 $key => $value,
                 self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
@@ -679,6 +703,30 @@ class Repository implements ArrayAccess, CacheContract
         defer($refresh, "illuminate:cache:flexible:{$this->itemKey($key)}", $alwaysDefer);
 
         return $value;
+    }
+
+    /**
+     * Configure flexible cache retrieval to prevent cold-cache and stale-cache stampedes.
+     *
+     * Cold-cache callers wait for the lock and re-check the cache before computing.
+     * Stale-cache callers coordinate their deferred refreshes through the same lock.
+     *
+     * @param  int  $seconds
+     * @param  string|null  $owner
+     * @return \Illuminate\Cache\PendingFlexible
+     *
+     * @throws \BadMethodCallException
+     */
+    public function withoutStampede($seconds = 10, $owner = null)
+    {
+        if (! $this->store instanceof LockProvider) {
+            throw new BadMethodCallException('This cache store does not support locks.');
+        }
+
+        return new PendingFlexible($this, [
+            'seconds' => $seconds,
+            'owner' => $owner,
+        ]);
     }
 
     /**

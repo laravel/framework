@@ -43,6 +43,7 @@ use Mockery;
  * @method static mixed sear(\UnitEnum|string $key, \Closure $callback)
  * @method static mixed rememberForever(\UnitEnum|string $key, \Closure $callback)
  * @method static mixed flexible(\UnitEnum|string $key, array $ttl, callable $callback, array|null $lock = null, bool $alwaysDefer = false)
+ * @method static \Illuminate\Cache\PendingFlexible withoutStampede(int $seconds = 10, string|null $owner = null)
  * @method static bool touch(\UnitEnum|string $key, \DateTimeInterface|\DateInterval|int $ttl)
  * @method static mixed withoutOverlapping(\UnitEnum|string $key, callable $callback, int $lockFor = 0, int $waitFor = 10, string|null $owner = null)
  * @method static \Illuminate\Cache\Limiters\ConcurrencyLimiterBuilder funnel(\UnitEnum|string $name)

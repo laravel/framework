@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -328,6 +330,147 @@ class RepositoryTest extends TestCase
         $cache->clear();
         $this->assertSame(['foo' => null, 'bar' => null, 'baz' => null], $cache->many([TestCacheKey::FOO, TestCacheKey::BAR, TestCacheKey::BAZ]));
         $this->assertSame(['foo' => 'default', 'qux' => 'default'], $cache->getMultiple([TestCacheKey::FOO, TestCacheKey::QUX], 'default'));
+    }
+
+    public function testItCanConfigureFlexibleToPreventAColdCacheStampedeThroughTheFacade(): void
+    {
+        config(['cache.default' => 'array']);
+
+        $value = Cache::withoutStampede()->flexible('foo', [10, 20], fn () => 'bar');
+
+        $this->assertSame('bar', $value);
+    }
+
+    public function testItDoesNotRecomputeAColdCacheValueFilledWhileWaitingForTheLock(): void
+    {
+        $store = new class extends ArrayStore
+        {
+            public $beforeLock = null;
+
+            public function lock($name, $seconds = 0, $owner = null)
+            {
+                if ($this->beforeLock !== null) {
+                    $beforeLock = $this->beforeLock;
+                    $this->beforeLock = null;
+
+                    $beforeLock();
+                }
+
+                return parent::lock($name, $seconds, $owner);
+            }
+        };
+
+        $cache = new Repository($store);
+        $calls = 0;
+
+        // Simulate a concurrent request winning the lock and filling the value
+        // after this request observes the miss, but before it acquires the lock.
+        $store->beforeLock = function () use ($store) {
+            $store->put('foo', 'winner', 20);
+            $store->put(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo', Carbon::now()->getTimestamp(), 20);
+        };
+
+        $value = $cache->withoutStampede()->flexible('foo', [10, 20], function () use (&$calls) {
+            $calls++;
+
+            return 'loser';
+        });
+
+        $this->assertSame('winner', $value);
+        $this->assertSame(0, $calls);
+    }
+
+    public function testConfiguringAFlexibleLockDoesNotProtectColdCacheValuesWithoutStampedeProtection(): void
+    {
+        $store = new class extends ArrayStore
+        {
+            public $beforeLock = null;
+
+            public function lock($name, $seconds = 0, $owner = null)
+            {
+                if ($this->beforeLock !== null) {
+                    $beforeLock = $this->beforeLock;
+                    $this->beforeLock = null;
+
+                    $beforeLock();
+                }
+
+                return parent::lock($name, $seconds, $owner);
+            }
+        };
+
+        $cache = new Repository($store);
+        $calls = 0;
+
+        $store->beforeLock = function () use ($store) {
+            $store->put('foo', 'winner', 20);
+            $store->put(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo', Carbon::now()->getTimestamp(), 20);
+        };
+
+        $value = $cache->flexible('foo', [10, 20], function () use (&$calls) {
+            $calls++;
+
+            return 'loser';
+        }, lock: ['seconds' => 10]);
+
+        $this->assertSame('loser', $value);
+        $this->assertSame(1, $calls);
+        $this->assertSame('loser', $cache->get('foo'));
+    }
+
+    public function testItDoesNotRecomputeAStaleCacheValueRefreshedWhileWaitingForTheLock(): void
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00');
+
+        $store = new class extends ArrayStore
+        {
+            public $beforeLock = null;
+
+            public function lock($name, $seconds = 0, $owner = null)
+            {
+                if ($this->beforeLock !== null) {
+                    $beforeLock = $this->beforeLock;
+                    $this->beforeLock = null;
+
+                    $beforeLock();
+                }
+
+                return parent::lock($name, $seconds, $owner);
+            }
+        };
+
+        $cache = new Repository($store);
+        $cache->put('foo', 'stale', 20);
+        $cache->put(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo', Carbon::now()->subSeconds(10)->getTimestamp(), 20);
+        $calls = 0;
+
+        // Simulate another request refreshing the stale value before this
+        // request's deferred refresh acquires the lock.
+        $store->beforeLock = function () use ($store) {
+            $store->put('foo', 'winner', 20);
+            $store->put(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo', Carbon::now()->getTimestamp(), 20);
+        };
+
+        $value = $cache->withoutStampede()->flexible('foo', [5, 20], function () use (&$calls) {
+            $calls++;
+
+            return 'loser';
+        });
+
+        $this->assertSame('stale', $value);
+        $this->assertCount(1, defer());
+
+        defer()->invoke();
+
+        $this->assertSame('winner', $cache->get('foo'));
+        $this->assertSame(0, $calls);
+    }
+
+    public function testItThrowsWhenStampedeProtectionIsUsedWithAStoreThatDoesNotSupportLocks(): void
+    {
+        $this->expectException(\BadMethodCallException::class);
+
+        (new Repository($this->createStub(Store::class)))->withoutStampede();
     }
 
     public function testFlexibleDeferLabelIsScopedToTagGroup(): void
