@@ -4611,6 +4611,113 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($result->isEmpty());
     }
 
+    public function testInsertReturningMethod()
+    {
+        $this->expectExceptionObject(new RuntimeException('does not support'));
+        $builder = $this->getBuilder();
+        $builder->from('users')->insertReturning(['email' => 'foo']);
+    }
+
+    public function testInsertReturningMethodWithEmptyValues()
+    {
+        $builder = $this->getPostgresBuilder();
+        $result = $builder->from('users')->insertReturning([]);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertTrue($result->isEmpty());
+    }
+
+    public function testMySqlInsertReturningMethod()
+    {
+        $this->expectExceptionObject(new RuntimeException('does not support'));
+        $builder = $this->getMySqlBuilder();
+        $builder->from('users')->insertReturning(['email' => 'foo']);
+    }
+
+    public function testPostgresInsertReturningMethod()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->expects('recordsHaveBeenModified');
+        $builder->getConnection()->expects('selectFromWriteConnection')->with(
+            'insert into "users" ("email") values (?) returning "id"',
+            ['foo']
+        )->andReturn([['id' => 1]]);
+        $result = $builder->from('users')->insertReturning(['email' => 'foo'], ['id']);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals([['id' => 1]], $result->all());
+    }
+
+    public function testPostgresInsertReturningMethodWithMultipleRecords()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->expects('recordsHaveBeenModified');
+        $builder->getConnection()->expects('selectFromWriteConnection')->with(
+            'insert into "users" ("email") values (?), (?) returning "id", "email"',
+            ['foo', 'bar']
+        )->andReturn([['id' => 1, 'email' => 'foo'], ['id' => 2, 'email' => 'bar']]);
+        $result = $builder->from('users')->insertReturning(
+            [['email' => 'foo'], ['email' => 'bar']],
+            ['id', 'email']
+        );
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals([['id' => 1, 'email' => 'foo'], ['id' => 2, 'email' => 'bar']], $result->all());
+    }
+
+    public function testSqliteInsertReturningMethod()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->expects('recordsHaveBeenModified');
+        $builder->getConnection()->expects('selectFromWriteConnection')->with(
+            'insert into "users" ("email") values (?) returning "id"',
+            ['foo']
+        )->andReturn([['id' => 1]]);
+        $result = $builder->from('users')->insertReturning(['email' => 'foo'], ['id']);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals([['id' => 1]], $result->all());
+    }
+
+    public function testSqliteInsertReturningMethodWithMultipleRecords()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->expects('recordsHaveBeenModified');
+        $builder->getConnection()->expects('selectFromWriteConnection')->with(
+            'insert into "users" ("email") values (?), (?) returning "id", "email"',
+            ['foo', 'bar']
+        )->andReturn([['id' => 1, 'email' => 'foo'], ['id' => 2, 'email' => 'bar']]);
+        $result = $builder->from('users')->insertReturning(
+            [['email' => 'foo'], ['email' => 'bar']],
+            ['id', 'email']
+        );
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals([['id' => 1, 'email' => 'foo'], ['id' => 2, 'email' => 'bar']], $result->all());
+    }
+
+    public function testSqlServerInsertReturningMethod()
+    {
+        $this->expectExceptionObject(new RuntimeException('does not support'));
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('users')->insertReturning(['email' => 'foo']);
+    }
+
+    public function testInsertReturningWithEmptyReturning()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('The returning columns must not be empty.'));
+        $builder = $this->getPostgresBuilder();
+        $builder->from('users')->insertReturning(['email' => 'foo'], []);
+    }
+
+    public function testInsertReturningDoesNotMarkRecordsModifiedWhenNoRowsWereInserted()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->expects('selectFromWriteConnection')->with(
+            'insert into "users" ("email") values (?) returning *',
+            ['foo']
+        )->andReturn([]);
+        $builder->getConnection()->expects('recordsHaveBeenModified')->with(false);
+        $result = $builder->from('users')->insertReturning(['email' => 'foo']);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertTrue($result->isEmpty());
+    }
+
     public function testInsertOrIgnoreUsingMethod()
     {
         $this->expectExceptionObject(new RuntimeException('does not support'));

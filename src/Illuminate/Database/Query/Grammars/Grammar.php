@@ -1329,6 +1329,21 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile an insert statement with a returning clause into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @param  array  $returning
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileInsertReturning(Builder $query, array $values, array $returning)
+    {
+        throw new RuntimeException('This database engine does not support insert with returning.');
+    }
+
+    /**
      * Compile an insert and get ID statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
