@@ -4297,6 +4297,45 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Insert new records into the database and return the specified columns.
+     *
+     * @param  non-empty-array<non-empty-string>  $returning
+     * @return \Illuminate\Support\Collection
+     */
+    public function insertReturning(array $values, array $returning = ['*'])
+    {
+        if (empty($values)) {
+            return new Collection;
+        }
+
+        if ($returning === []) {
+            throw new InvalidArgumentException('The returning columns must not be empty.');
+        }
+
+        if (! is_array(array_first($values))) {
+            $values = [$values];
+        } else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+
+                $values[$key] = $value;
+            }
+        }
+
+        $this->applyBeforeQueryCallbacks();
+
+        $sql = $this->grammar->compileInsertReturning($this, $values, $returning);
+
+        $result = new Collection(
+            $this->connection->selectFromWriteConnection($sql, $this->cleanBindings(Arr::flatten($values, 1)))
+        );
+
+        $this->connection->recordsHaveBeenModified($result->isNotEmpty());
+
+        return $result;
+    }
+
+    /**
      * Insert a new record and get the value of the primary key.
      *
      * @param  string|null  $sequence

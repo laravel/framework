@@ -414,6 +414,19 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile an insert statement with a returning clause into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @param  array  $returning
+     * @return string
+     */
+    public function compileInsertReturning(Builder $query, array $values, array $returning)
+    {
+        return $this->compileInsert($query, $values).' returning '.$this->columnize($returning);
+    }
+
+    /**
      * Compile an insert ignore statement using a subquery into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
