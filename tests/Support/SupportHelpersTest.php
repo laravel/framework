@@ -11,12 +11,14 @@ use Exception;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Stringable;
 use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
 use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
+use InvalidArgumentException;
 use IteratorAggregate;
 use LogicException;
 use Mockery;
@@ -1230,6 +1232,72 @@ class SupportHelpersTest extends TestCase
         $_SERVER['foo'] = 'bar';
         $this->assertSame('bar', env('foo'));
         $this->assertSame('bar', Env::get('foo'));
+    }
+
+    public function testEnvWithoutAKeyReturnsAnEnvironmentAccessor()
+    {
+        $this->assertInstanceOf(Env::class, env());
+    }
+
+    public function testEnvTypedValues()
+    {
+        $_SERVER['env_string'] = 'Laravel';
+        $_SERVER['env_integer'] = '42';
+        $_SERVER['env_float'] = '12.5';
+        $_SERVER['env_true'] = 'true';
+        $_SERVER['env_false'] = '(false)';
+        $_SERVER['env_array'] = 'one, two,three';
+        $_SERVER['env_empty_array'] = '';
+
+        $this->assertSame('Laravel', env()->string('env_string'));
+        $this->assertSame('default', env()->string('missing_string', fn () => 'default'));
+        $this->assertSame(42, env()->integer('env_integer'));
+        $this->assertSame(10, env()->integer('missing_integer', fn () => 10));
+        $this->assertSame(12.5, env()->float('env_float'));
+        $this->assertSame(1.5, env()->float('missing_float', fn () => 1.5));
+        $this->assertTrue(env()->boolean('env_true'));
+        $this->assertFalse(env()->boolean('env_false'));
+        $this->assertTrue(env()->boolean('missing_boolean', fn () => true));
+        $this->assertSame(['one', 'two', 'three'], env()->array('env_array'));
+        $this->assertSame([], env()->array('env_empty_array'));
+        $this->assertSame(['default'], env()->array('missing_array', fn () => ['default']));
+
+        $collection = env()->collection('env_array');
+
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertSame(['one', 'two', 'three'], $collection->all());
+        $this->assertSame(['default'], env()->collection('missing_collection', fn () => ['default'])->all());
+    }
+
+    #[DataProvider('invalidTypedEnvValues')]
+    public function testEnvTypedValuesRejectInvalidValues($method, $value, $expectedType)
+    {
+        $_SERVER['invalid_typed_env'] = $value;
+
+        try {
+            env()->{$method}('invalid_typed_env');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame(
+                sprintf('Environment value for key [invalid_typed_env] must be %s, %s given.', $expectedType, gettype(env('invalid_typed_env'))),
+                $e->getMessage()
+            );
+
+            return;
+        }
+
+        $this->fail('Expected an InvalidArgumentException to be thrown.');
+    }
+
+    public static function invalidTypedEnvValues()
+    {
+        return [
+            'string' => ['string', 'true', 'a string'],
+            'integer' => ['integer', 'not-an-integer', 'an integer'],
+            'float' => ['float', 'not-a-float', 'a float'],
+            'boolean' => ['boolean', 'not-a-boolean', 'a boolean'],
+            'array' => ['array', 'true', 'an array'],
+            'collection' => ['collection', 'true', 'an array'],
+        ];
     }
 
     public function testEnvTrue()

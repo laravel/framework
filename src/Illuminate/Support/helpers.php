@@ -143,12 +143,16 @@ if (! function_exists('env')) {
     /**
      * Gets the value of an environment variable.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed  $default
-     * @return mixed
+     * @return ($key is null ? \Illuminate\Support\Env : mixed)
      */
-    function env($key, $default = null)
+    function env($key = null, $default = null)
     {
+        if (is_null($key)) {
+            return new Env;
+        }
+
         return Env::get($key, $default);
     }
 }

@@ -2,6 +2,15 @@
 
 use function PHPStan\Testing\assertType;
 
+assertType('Illuminate\Support\Env', env());
+assertType('mixed', env('foo'));
+assertType('string', env()->string('foo'));
+assertType('int', env()->integer('foo'));
+assertType('float', env()->float('foo'));
+assertType('bool', env()->boolean('foo'));
+assertType('array<mixed>', env()->array('foo'));
+assertType('Illuminate\Support\Collection<(int|string), mixed>', env()->collection('foo'));
+
 /** @var bool|float|int|string|null $value */
 if (filled($value)) {
     assertType('bool|float|int|non-empty-string', $value);
