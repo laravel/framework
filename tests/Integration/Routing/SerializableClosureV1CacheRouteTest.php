@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Route;
+namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Attributes\WithConfig;
