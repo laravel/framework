@@ -227,6 +227,81 @@ class ImageManagerTest extends TestCase
         fclose($stream);
     }
 
+    public function test_from_stream_contents_are_only_read_once()
+    {
+        $contents = $this->fakeImageContents();
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, $contents);
+        rewind($stream);
+
+        $app = $this->makeApp([]);
+        $manager = new ImageManager($app);
+        $image = $manager->fromStream($stream);
+
+        $this->assertSame($contents, $image->toBytes());
+        $this->assertSame($contents, $image->toBytes());
+        $this->assertSame([100, 100], $image->dimensions());
+
+        fclose($stream);
+    }
+
+    public function test_from_stream_contents_are_shared_between_clones()
+    {
+        $contents = $this->fakeImageContents();
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, $contents);
+        rewind($stream);
+
+        $app = $this->makeApp([]);
+        $manager = new ImageManager($app);
+        $image = $manager->fromStream($stream);
+
+        $first = $image->usingGd();
+        $second = $image->usingImagick();
+
+        $this->assertSame($contents, $first->toBytes());
+        $this->assertSame($contents, $second->toBytes());
+
+        fclose($stream);
+    }
+
+    public function test_lazy_contents_are_not_shared_between_different_images()
+    {
+        $app = $this->makeApp([]);
+        $manager = new ImageManager($app);
+
+        $first = $manager->fromBase64(base64_encode('first'));
+        $second = $manager->fromBase64(base64_encode('second'));
+
+        $this->assertSame('first', $first->toBytes());
+        $this->assertSame('second', $second->toBytes());
+        $this->assertSame('first', $first->toBytes());
+    }
+
+    public function test_from_url_is_only_fetched_once()
+    {
+        $contents = $this->fakeImageContents();
+
+        $http = new HttpFactory;
+        $http->fake([
+            'https://example.com/photo.jpg' => HttpFactory::response($contents, 200, ['Content-Type' => 'image/jpeg']),
+        ]);
+
+        $app = $this->makeApp([]);
+        $app->shouldReceive('make')
+            ->with(HttpFactory::class)
+            ->andReturn($http);
+
+        $manager = new ImageManager($app);
+        $image = $manager->fromUrl('https://example.com/photo.jpg');
+
+        $this->assertSame($contents, $image->toBytes());
+        $this->assertSame($contents, $image->toBytes());
+        $this->assertSame([100, 100], $image->dimensions());
+
+        $http->assertSentCount(1);
+    }
+
     public function test_from_stream_throws_for_invalid_data()
     {
         $stream = fopen('php://memory', 'r+');
