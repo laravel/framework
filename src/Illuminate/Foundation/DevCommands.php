@@ -446,6 +446,6 @@ class DevCommands
      */
     protected static function getPackageManager(): NodePackageManager
     {
-        return self::$packageManager ??= new NodePackageManager();
+        return self::$packageManager ??= app(NodePackageManager::class);
     }
 }

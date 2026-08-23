@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\DevCommand;
 use Illuminate\Foundation\DevCommandMode;
 use Illuminate\Foundation\DevCommands;
+use Illuminate\Support\NodePackageManager;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -24,6 +25,8 @@ class DevCommandTest extends TestCase
             'autoRestart' => true,
             'bufferSize' => null,
             'streamBufferSize' => null,
+            'commands' => [],
+            'packageManager' => null,
         ] as $prop => $value) {
             $ref->getProperty($prop)->setValue(null, $value);
         }
@@ -187,6 +190,25 @@ class DevCommandTest extends TestCase
             '--timestamp-format="HH:mm:ss" -p "{time} [{name}]"',
             $this->command()->buildConcurrentlyCommandForTesting($this->devCommands())
         );
+    }
+
+    public function testNodeCommandsUseThePackageManagerResolvedFromTheContainer()
+    {
+        app()->instance(NodePackageManager::class, new class extends NodePackageManager
+        {
+            public function getRunCommand(string $command): string
+            {
+                return "custom-manager run {$command}";
+            }
+
+            public function getExecCommand(string $command): string
+            {
+                return "custom-manager exec {$command}";
+            }
+        });
+
+        $this->assertSame('custom-manager run dev', DevCommands::node('dev', 'vite')->toArray()['command']);
+        $this->assertSame('custom-manager exec vite', DevCommands::nodeExec('vite', 'bundler')->toArray()['command']);
     }
 
     protected function command(array $options = [])
