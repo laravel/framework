@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Repository;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -397,6 +398,129 @@ class RepositoryTest extends TestCase
         $this->assertSame('posts-refreshed', $posts->get('profile'));
 
         $usersLock->release();
+    }
+
+    public function testItDoesNotRecomputeAColdCacheValueWhenAnotherRequestFillsItFirst(): void
+    {
+        $store = new class extends ArrayStore
+        {
+            public $afterMany = null;
+            public $lockOptions = null;
+
+            public function many(array $keys)
+            {
+                $values = parent::many($keys);
+
+                if ($this->afterMany !== null && in_array('foo', $keys, true)) {
+                    $afterMany = $this->afterMany;
+                    $this->afterMany = null;
+
+                    $afterMany();
+                }
+
+                return $values;
+            }
+
+            public function lock($name, $seconds = 0, $owner = null)
+            {
+                $this->lockOptions = [$seconds, $owner];
+
+                return parent::lock($name, $seconds, $owner);
+            }
+        };
+
+        $cache = new Repository($store);
+        $calls = 0;
+        $secondValue = null;
+
+        $expensiveComputation = function () use (&$calls) {
+            return 'value-'.(++$calls);
+        };
+
+        // Simulate a second request observing the same cold-cache miss.
+        $store->afterMany = function () use ($cache, $expensiveComputation, &$secondValue) {
+            $secondValue = $cache->flexible('foo', [10, 20], $expensiveComputation);
+        };
+
+        $value = $cache->flexible('foo', [10, 20], $expensiveComputation);
+
+        $this->assertSame('value-1', $value);
+        $this->assertSame('value-1', $secondValue);
+        $this->assertSame(1, $calls);
+        $this->assertSame([10, null], $store->lockOptions);
+    }
+
+    public function testItUsesConfiguredLockOptionsForColdCacheValues(): void
+    {
+        $store = new class extends ArrayStore
+        {
+            public $lockOptions = null;
+
+            public function lock($name, $seconds = 0, $owner = null)
+            {
+                $this->lockOptions = [$seconds, $owner];
+
+                return parent::lock($name, $seconds, $owner);
+            }
+        };
+
+        $cache = new Repository($store);
+
+        $value = $cache->flexible('foo', [10, 20], fn () => 'bar', lock: [
+            'seconds' => 30,
+            'owner' => 'custom-owner',
+        ]);
+
+        $this->assertSame('bar', $value);
+        $this->assertSame([30, 'custom-owner'], $store->lockOptions);
+    }
+
+    public function testItDoesNotRecomputeAStaleCacheValueRefreshedWhileWaitingForTheLock(): void
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00');
+
+        $store = new class extends ArrayStore
+        {
+            public $beforeLock = null;
+
+            public function lock($name, $seconds = 0, $owner = null)
+            {
+                if ($this->beforeLock !== null) {
+                    $beforeLock = $this->beforeLock;
+                    $this->beforeLock = null;
+
+                    $beforeLock();
+                }
+
+                return parent::lock($name, $seconds, $owner);
+            }
+        };
+
+        $cache = new Repository($store);
+        $cache->put('foo', 'stale', 20);
+        $cache->put(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo', Carbon::now()->subSeconds(10)->getTimestamp(), 20);
+        $calls = 0;
+
+        // Simulate another request refreshing the stale value before this
+        // request's deferred refresh acquires the lock.
+        $store->beforeLock = function () use ($store) {
+            $store->put('foo', 'winner', 20);
+            $store->put(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo', Carbon::now()->getTimestamp(), 20);
+        };
+
+        $value = $cache->flexible('foo', [5, 20], function () use (&$calls) {
+            $calls++;
+
+            return 'loser';
+        });
+
+        $this->assertSame('stale', $value);
+        $this->assertCount(1, defer());
+
+        defer()->invoke();
+
+        $this->assertSame('winner', $cache->get('foo'));
+        $this->assertSame(0, $calls);
     }
 }
 

@@ -635,7 +635,7 @@ class Repository implements ArrayAccess, CacheContract
      * @param  \UnitEnum|string  $key
      * @param  array{ 0: \DateTimeInterface|\DateInterval|int, 1: \DateTimeInterface|\DateInterval|int }  $ttl
      * @param  (callable(): TCacheValue)  $callback
-     * @param  array{ seconds?: int, owner?: string }|null  $lock
+     * @param  array{ seconds?: int, owner?: string }|null  $lock  Lock options used to coordinate cold fills and stale refreshes.
      * @param  bool  $alwaysDefer
      * @return TCacheValue
      */
@@ -643,16 +643,38 @@ class Repository implements ArrayAccess, CacheContract
     {
         $key = enum_value($key);
 
+        // Default lock if none provided. The default lock time is 10 seconds, same as Cache::withoutOverlapping.
+        $lock = array_merge([
+            'seconds' => 10,
+            'owner' => null,
+        ], $lock ?? []);
+
         [
             $key => $value,
             self::FLEXIBLE_CREATED_KEY_PREFIX.$key => $created,
         ] = $this->many([$key, self::FLEXIBLE_CREATED_KEY_PREFIX.$key]);
 
         if (in_array(null, [$value, $created], true)) {
-            return tap(value($callback), fn ($value) => $this->putMany([
-                $key => $value,
-                self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
-            ], $ttl[1]));
+            // Re-check after acquiring the lock in case another request filled the cache while we waited.
+            return $this->store->lock(
+                "illuminate:cache:flexible:lock:{$this->itemKey($key)}",
+                $lock['seconds'],
+                $lock['owner'],
+            )->block($lock['seconds'], function () use ($key, $ttl, $callback) {
+                [
+                    $key => $value,
+                    self::FLEXIBLE_CREATED_KEY_PREFIX.$key => $created,
+                ] = $this->many([$key, self::FLEXIBLE_CREATED_KEY_PREFIX.$key]);
+
+                if (! in_array(null, [$value, $created], true)) {
+                    return $value;
+                }
+
+                return tap(value($callback), fn ($value) => $this->putMany([
+                    $key => $value,
+                    self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
+                ], $ttl[1]));
+            });
         }
 
         if (($created + $this->getSeconds($ttl[0])) > Carbon::now()->getTimestamp()) {
@@ -662,8 +684,8 @@ class Repository implements ArrayAccess, CacheContract
         $refresh = function () use ($key, $ttl, $callback, $lock, $created) {
             $this->store->lock(
                 "illuminate:cache:flexible:lock:{$this->itemKey($key)}",
-                $lock['seconds'] ?? 0,
-                $lock['owner'] ?? null,
+                $lock['seconds'],
+                $lock['owner'],
             )->get(function () use ($key, $callback, $created, $ttl) {
                 if ($created !== $this->get(self::FLEXIBLE_CREATED_KEY_PREFIX.$key)) {
                     return;
