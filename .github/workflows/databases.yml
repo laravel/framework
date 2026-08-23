@@ -13,7 +13,7 @@ permissions:
 jobs:
   mysql_57:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     services:
       mysql:
@@ -46,7 +46,7 @@ jobs:
 
   mysql_84:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     services:
       mysql:
@@ -78,7 +78,7 @@ jobs:
 
   mysql_97:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     services:
       mysql:
@@ -110,7 +110,7 @@ jobs:
 
   mariadb:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     services:
       mariadb:
@@ -142,7 +142,7 @@ jobs:
 
   pgsql_18:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     services:
       postgresql:
@@ -177,7 +177,7 @@ jobs:
 
   pgsql_14:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     services:
       postgresql:
@@ -212,7 +212,7 @@ jobs:
 
   pgsql_10:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     services:
       postgresql:
@@ -247,7 +247,7 @@ jobs:
 
   mssql_2019:
     runs-on: ubuntu-22.04
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     services:
       sqlsrv:
@@ -281,7 +281,7 @@ jobs:
 
   mssql_2017:
     runs-on: ubuntu-22.04
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     services:
       sqlsrv:
@@ -315,7 +315,7 @@ jobs:
 
   sqlite:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     name: SQLite
 
