@@ -203,6 +203,18 @@ class JsonApiResource extends JsonResource
     }
 
     /**
+     * Create a new anonymous JSON:API resource collection.
+     *
+     * @param  mixed  $resource
+     * @return \Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection
+     */
+    #[\Override]
+    public static function collection($resource)
+    {
+        return parent::collection($resource);
+    }
+
+    /**
      * Create a new resource collection instance.
      *
      * @param  mixed  $resource
