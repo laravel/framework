@@ -41,6 +41,14 @@ class ThrottlesExceptionsTest extends TestCase
         $this->assertJobWasReleasedWithDelay(CircuitBreakerTestJob::class);
     }
 
+    public function testCircuitIsNotResetWhenClearWhenCallbackReturnsFalse()
+    {
+        $this->assertJobWasReleasedImmediately(CircuitBreakerTestJob::class);
+        $this->assertJobWasReleasedByItself(CircuitBreakerReleasedJob::class);
+        $this->assertJobWasReleasedImmediately(CircuitBreakerTestJob::class);
+        $this->assertJobWasReleasedWithDelay(CircuitBreakerTestJob::class);
+    }
+
     public function testCircuitCanSkipJob()
     {
         $this->assertJobWasDeleted(CircuitBreakerSkipJob::class);
@@ -91,6 +99,26 @@ class ThrottlesExceptionsTest extends TestCase
         ]);
 
         $this->assertFalse($class::$handled);
+    }
+
+    protected function assertJobWasReleasedByItself($class)
+    {
+        $class::$handled = false;
+
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = Mockery::mock(Job::class);
+
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('release')->with(5);
+        $job->expects('isReleased')->times(3)->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
+
+        $instance->call($job, [
+            'command' => serialize($command = new $class),
+        ]);
+
+        $this->assertTrue($class::$handled);
     }
 
     protected function assertJobWasDeleted($class)
@@ -466,6 +494,25 @@ class CircuitBreakerTestJob
     public function middleware()
     {
         return [(new ThrottlesExceptions(2, 10 * 60))->by('test')];
+    }
+}
+
+class CircuitBreakerReleasedJob
+{
+    use InteractsWithQueue, Queueable;
+
+    public static $handled = false;
+
+    public function handle()
+    {
+        static::$handled = true;
+
+        $this->release(5);
+    }
+
+    public function middleware()
+    {
+        return [(new ThrottlesExceptions(2, 10 * 60))->by('test')->clearWhen(fn ($job) => ! $job->job->isReleased())];
     }
 }
 

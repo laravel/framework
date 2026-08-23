@@ -59,6 +59,34 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
     }
 
+    public function testCircuitIsNotResetWhenClearWhenCallbackReturnsFalse()
+    {
+        $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key = Str::random());
+        $this->assertJobWasReleasedByItself(CircuitBreakerWithRedisReleasedJob::class, $key);
+        $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);
+        $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
+    }
+
+    protected function assertJobWasReleasedByItself($class, $key)
+    {
+        $class::$handled = false;
+
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = Mockery::mock(Job::class);
+
+        $job->expects('hasFailed')->andReturn(false);
+        $job->expects('release')->with(5);
+        $job->expects('isReleased')->times(3)->andReturn(true);
+        $job->expects('isDeletedOrReleased')->andReturn(true);
+
+        $instance->call($job, [
+            'command' => serialize($command = new $class($key)),
+        ]);
+
+        $this->assertTrue($class::$handled);
+    }
+
     protected function assertJobWasReleasedImmediately($class, $key)
     {
         $class::$handled = false;
@@ -206,6 +234,29 @@ class CircuitBreakerWithRedisTestJob
     public function middleware()
     {
         return [(new ThrottlesExceptionsWithRedis(2, 10 * 60))->by($this->key)];
+    }
+}
+
+class CircuitBreakerWithRedisReleasedJob
+{
+    use InteractsWithQueue, Queueable;
+
+    public static $handled = false;
+
+    public function __construct(protected $key)
+    {
+    }
+
+    public function handle()
+    {
+        static::$handled = true;
+
+        $this->release(5);
+    }
+
+    public function middleware()
+    {
+        return [(new ThrottlesExceptionsWithRedis(2, 10 * 60))->by($this->key)->clearWhen(fn ($job) => ! $job->job->isReleased())];
     }
 }
 

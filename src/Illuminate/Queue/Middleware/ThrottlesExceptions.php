@@ -59,6 +59,13 @@ class ThrottlesExceptions
     protected $whenCallback;
 
     /**
+     * The callback that determines if the limiter should be cleared after the job is processed.
+     *
+     * @var callable|null
+     */
+    protected $clearWhenCallback;
+
+    /**
      * The callbacks that determine if the job should be deleted.
      *
      * @var callable[]
@@ -118,7 +125,9 @@ class ThrottlesExceptions
         try {
             $next($job);
 
-            $this->limiter->clear($jobKey);
+            if ($this->shouldClear($job)) {
+                $this->limiter->clear($jobKey);
+            }
         } catch (Throwable $throwable) {
             if ($this->whenCallback && ! call_user_func($this->whenCallback, $throwable, $this->limiter)) {
                 throw $throwable;
@@ -153,6 +162,30 @@ class ThrottlesExceptions
         $this->whenCallback = $callback;
 
         return $this;
+    }
+
+    /**
+     * Specify a callback that should determine if the limiter should be cleared after the job is processed.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function clearWhen(callable $callback)
+    {
+        $this->clearWhenCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the limiter should be cleared after the job was processed.
+     *
+     * @param  mixed  $job
+     * @return bool
+     */
+    protected function shouldClear($job)
+    {
+        return $this->clearWhenCallback === null || call_user_func($this->clearWhenCallback, $job);
     }
 
     /**
