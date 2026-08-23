@@ -56,6 +56,8 @@ class CloudBootstrapper
             return;
         }
 
+        $defaultDisk = $_SERVER['FILESYSTEM_DISK'] ?? null;
+
         $disks = json_decode($_SERVER['LARAVEL_CLOUD_DISK_CONFIG'], true);
 
         foreach ($disks as $disk) {
@@ -80,7 +82,8 @@ class CloudBootstrapper
                 ]);
             }
 
-            if ($disk['is_default'] ?? false) {
+            if (($disk['is_default'] ?? false) &&
+                ($defaultDisk === null || $defaultDisk === $disk['disk'])) {
                 $app['config']->set('filesystems.default', $disk['disk']);
             }
         }

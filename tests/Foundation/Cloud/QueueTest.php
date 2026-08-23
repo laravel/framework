@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Tests\Foundation;
+namespace Illuminate\Tests\Foundation\Cloud;
 
 use Aws\CommandInterface;
 use Aws\Exception\AwsException;

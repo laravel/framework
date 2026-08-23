@@ -78,7 +78,7 @@ class JsonApiRequest extends Request
                         return null;
                     }
 
-                    $item = implode('.', Arr::take(explode('.', $item), JsonApiResource::$maxRelationshipDepth - 1));
+                    $item = implode('.', Arr::take(explode('.', $item), max(0, JsonApiResource::$maxRelationshipDepth - 1)));
 
                     return ! empty($item) ? $item : null;
                 })->filter()->all();

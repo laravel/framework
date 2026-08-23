@@ -1457,6 +1457,14 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame('users.index', $this->getRoute()->getName());
     }
 
+    public function testCanSetRouteNameWithNonCallableControllerActionArray()
+    {
+        $this->router->name('users.missing')->get('users', [RouteRegistrarControllerStub::class, 'missing']);
+
+        $this->assertSame('users.missing', $this->getRoute()->getName());
+        $this->assertSame(RouteRegistrarControllerStub::class.'@missing', ltrim($this->getRoute()->getAction('uses'), '\\'));
+    }
+
     public function testCanSetRouteNameUsingStringBackedEnum()
     {
         $this->router->name(RouteNameEnum::UserIndex)->get('users', fn () => 'all-users');

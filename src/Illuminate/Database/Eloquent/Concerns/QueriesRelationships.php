@@ -186,7 +186,7 @@ trait QueriesRelationships
     public function withWhereHas($relation, ?Closure $callback = null, $operator = '>=', $count = 1)
     {
         return $this->whereHas(Str::before($relation, ':'), $callback, $operator, $count)
-            ->with($callback ? [$relation => fn ($query) => $callback($query)] : $relation);
+            ->with($callback ? [$relation => static fn ($query) => $callback($query)] : $relation);
     }
 
     /**
@@ -461,7 +461,7 @@ trait QueriesRelationships
     {
         return $this->whereRelation($relation, $column, $operator, $value)
             ->with([
-                $relation => fn ($query) => $column instanceof Closure
+                $relation => static fn ($query) => $column instanceof Closure
                     ? $column($query)
                     : $query->where($column, $operator, $value),
             ]);
