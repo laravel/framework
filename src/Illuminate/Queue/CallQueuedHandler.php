@@ -80,8 +80,6 @@ class CallQueuedHandler
             return $this->deleteDebouncedJob($job, $command);
         }
 
-        $this->ensureDebounceMaxWaitIsReleased($command);
-
         $this->runningCommand = $command;
 
         try {
@@ -152,6 +150,10 @@ class CallQueuedHandler
                     $this->ensureUniqueJobLockIsReleased($command);
 
                     $lockReleased = true;
+                }
+
+                if (! empty($command->debounceOwner ?? '')) {
+                    (new DebounceLock($this->container->make(Cache::class)))->releaseMaxWait($command);
                 }
 
                 return $this->dispatcher->dispatchNow(
@@ -296,19 +298,6 @@ class CallQueuedHandler
         }
 
         $job->delete();
-    }
-
-    /**
-     * Ensure the maximum wait timestamp for a debounced job is released.
-     *
-     * @param  mixed  $command
-     * @return void
-     */
-    protected function ensureDebounceMaxWaitIsReleased($command)
-    {
-        if (! empty($command->debounceOwner ?? '')) {
-            (new DebounceLock($this->container->make(Cache::class)))->releaseMaxWait($command);
-        }
     }
 
     /**
