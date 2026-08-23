@@ -181,6 +181,36 @@ trait ResolvesJsonApiElements
     }
 
     /**
+     * Resolve the relationships requested for the resource.
+     */
+    protected function resolveRequestedRelationships(JsonApiRequest $request): Collection
+    {
+        $sparseIncluded = match (true) {
+            $this->includesPreviouslyLoadedRelationships => array_keys($this->resource->getRelations()),
+            default => $request->sparseIncluded(),
+        };
+
+        return (new Collection($this->toRelationships($request)))
+            ->transform(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
+            ->mapWithKeys(fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
+            ->only($sparseIncluded);
+    }
+
+    /**
+     * Resolve the relationships that should be eager loaded for the resource.
+     *
+     * @return array<int, string>
+     */
+    public function resolveRelationshipsToEagerLoad(JsonApiRequest $request): array
+    {
+        if (! $this->resource instanceof Model) {
+            return [];
+        }
+
+        return $this->resolveRequestedRelationships($request)->keys()->all();
+    }
+
+    /**
      * Compile resource relationships.
      */
     protected function compileResourceRelationships(JsonApiRequest $request): void
@@ -189,15 +219,7 @@ trait ResolvesJsonApiElements
             return;
         }
 
-        $sparseIncluded = match (true) {
-            $this->includesPreviouslyLoadedRelationships => array_keys($this->resource->getRelations()),
-            default => $request->sparseIncluded(),
-        };
-
-        $resourceRelationships = (new Collection($this->toRelationships($request)))
-            ->transform(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
-            ->mapWithKeys(fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
-            ->only($sparseIncluded);
+        $resourceRelationships = $this->resolveRequestedRelationships($request);
 
         $resourceRelationshipKeys = $resourceRelationships->keys();
 

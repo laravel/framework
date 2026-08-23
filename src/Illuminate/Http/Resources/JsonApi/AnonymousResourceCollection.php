@@ -3,6 +3,8 @@
 namespace Illuminate\Http\Resources\JsonApi;
 
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection as BaseAnonymousResourceCollection;
@@ -44,9 +46,54 @@ class AnonymousResourceCollection extends BaseAnonymousResourceCollection
     #[\Override]
     public function toAttributes(Request $request)
     {
+        $this->eagerLoadRequestedRelationships($this->resolveJsonApiRequestFrom($request));
+
         return $this->collection
             ->map(fn ($resource) => $resource->resolveResourceData($request))
             ->all();
+    }
+
+    /**
+     * Eager load the requested relationships across every resource in the collection.
+     */
+    protected function eagerLoadRequestedRelationships(JsonApiRequest $request): void
+    {
+        if (empty($request->sparseIncluded())) {
+            return;
+        }
+
+        $models = new Collection(
+            $this->collection
+                ->pluck('resource')
+                ->filter(fn ($model) => $model instanceof Model)
+                ->all()
+        );
+
+        if ($models->isEmpty()) {
+            return;
+        }
+
+        $relationships = $this->collection
+            ->flatMap(fn ($resource) => $resource->resolveRelationshipsToEagerLoad($request))
+            ->unique()
+            ->flatMap(fn ($relationship) => $this->expandRequestedRelationship($request, $relationship))
+            ->all();
+
+        $models->loadMissing($relationships);
+    }
+
+    /**
+     * Expand a relationship into the nested relationships requested for it.
+     *
+     * @return array<int, string>
+     */
+    protected function expandRequestedRelationship(JsonApiRequest $request, string $relationship): array
+    {
+        $nested = $request->sparseIncluded($relationship);
+
+        return empty($nested)
+            ? [$relationship]
+            : array_map(fn ($path) => $relationship.'.'.$path, $nested);
     }
 
     /**

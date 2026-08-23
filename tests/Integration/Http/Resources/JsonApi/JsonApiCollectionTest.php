@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Comment;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
@@ -204,5 +206,43 @@ class JsonApiCollectionTest extends TestCase
                     ],
                 ]
             );
+    }
+
+    public function testItEagerLoadsIncludedRelationshipsForTheWholeCollectionAtOnce()
+    {
+        $this->createPostsWithComments(5);
+
+        DB::enableQueryLog();
+
+        $this->getJson('/posts?'.http_build_query(['include' => 'comments']))
+            ->assertJsonCount(5, 'data')
+            ->assertJsonCount(5, 'included');
+
+        $this->assertCount(3, DB::getQueryLog());
+    }
+
+    public function testItEagerLoadsNestedIncludedRelationshipsForTheWholeCollectionAtOnce()
+    {
+        $this->createPostsWithComments(5);
+
+        DB::enableQueryLog();
+
+        $this->getJson('/posts?'.http_build_query(['include' => 'comments.commenter']))
+            ->assertJsonCount(5, 'data');
+
+        $this->assertCount(4, DB::getQueryLog());
+    }
+
+    protected function createPostsWithComments(int $count)
+    {
+        $user = User::factory()->create();
+
+        Post::factory()->times($count)->create(['user_id' => $user->getKey()])->each(
+            fn ($post) => Comment::factory()->create([
+                'content' => 'public',
+                'post_id' => $post->getKey(),
+                'user_id' => $user->getKey(),
+            ])
+        );
     }
 }
