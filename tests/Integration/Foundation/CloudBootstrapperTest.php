@@ -71,7 +71,7 @@ class CloudBootstrapperTest extends TestCase
         $_SERVER['FILESYSTEM_DISK'] = 'read-through';
         $this->app['config']->set('filesystems.default', 'read-through');
 
-        Cloud::configureDisks($this->app);
+        CloudBootstrapper::configureDisks($this->app);
 
         $this->assertSame('read-through', $this->app['config']->get('filesystems.default'));
         $this->assertSame('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
