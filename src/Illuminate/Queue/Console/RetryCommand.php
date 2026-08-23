@@ -4,7 +4,9 @@ namespace Illuminate\Queue\Console;
 
 use DateTimeInterface;
 use Illuminate\Console\Command;
+use Illuminate\Console\View\TaskResult;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Queue\PreparesForRetry;
 use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -52,9 +54,13 @@ class RetryCommand extends Command
             } else {
                 $this->laravel['events']->dispatch(new JobRetryRequested($job));
 
-                $this->components->task($id, fn () => $this->retryJob($job));
+                $this->components->task($id, function () use ($job, &$retried) {
+                    return ($retried = $this->retryJob($job)) ? TaskResult::Success->value : TaskResult::Skipped->value;
+                });
 
-                $this->laravel['queue.failer']->forget($id);
+                if ($retried) {
+                    $this->laravel['queue.failer']->forget($id);
+                }
             }
         }
 
@@ -136,17 +142,54 @@ class RetryCommand extends Command
      * Retry the queue job.
      *
      * @param  \stdClass  $job
-     * @return void
+     * @return bool
      */
     protected function retryJob($job)
     {
         $queue = $this->laravel['queue']->connection($job->connection);
 
+        if (is_null($payload = $this->prepareForRetry($this->resetAttempts($job->payload)))) {
+            return false;
+        }
+
         $this->laravel['queue']->connection($job->connection)->pushRaw(
-            $this->refreshRetryUntil($this->resetAttempts($job->payload)),
+            $this->refreshRetryUntil($payload),
             $job->queue,
             $this->getQueueableOptions($queue, $job)
         );
+
+        return true;
+    }
+
+    /**
+     * Give the job a chance to prepare itself before it is retried.
+     *
+     * @param  string  $payload
+     * @return string|null
+     */
+    protected function prepareForRetry($payload)
+    {
+        $decoded = json_decode($payload, true);
+
+        if (! isset($decoded['data']['command'])) {
+            return $payload;
+        }
+
+        $instance = $this->getInstanceFromPayload($decoded);
+
+        if (! $instance instanceof PreparesForRetry) {
+            return $payload;
+        }
+
+        if ($instance->prepareForRetry() === false) {
+            return null;
+        }
+
+        $decoded['data']['command'] = str_starts_with($decoded['data']['command'], 'O:')
+            ? serialize($instance)
+            : $this->laravel->make(Encrypter::class)->encrypt(serialize($instance));
+
+        return json_encode($decoded);
     }
 
     /**
