@@ -114,7 +114,14 @@ trait QueriesRelationships
                 : $q->has(array_shift($relations), $operator, $count, 'and', $callback);
         };
 
-        return $this->has(array_shift($relations), $doesntHave ? '<' : '>=', 1, $boolean, $closure);
+        // The closure references itself so that it can recurse, which forms a reference
+        // cycle that would keep this builder alive until the cycle collector runs. It is
+        // only invoked within this "has" call, so we release it once the call returns...
+        try {
+            return $this->has(array_shift($relations), $doesntHave ? '<' : '>=', 1, $boolean, $closure);
+        } finally {
+            $closure = null;
+        }
     }
 
     /**

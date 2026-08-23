@@ -24,6 +24,7 @@ use Mockery;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use WeakReference;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
@@ -1737,6 +1738,35 @@ class DatabaseEloquentBuilderTest extends TestCase
         $result = $model->has('foo.bar')->toSql();
 
         $this->assertEquals($builder->toSql(), $result);
+    }
+
+    public function testHasNestedDoesNotLeaveBuilderReferenceCycle()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $builders = [
+            fn () => $model->has('foo.bar'),
+            fn () => $model->whereHas('foo.bar', fn ($q) => $q->where('baz', 'bam')),
+            fn () => $model->where('bar', 'baz')->orWhereHas('foo.bar'),
+            fn () => $model->doesntHave('foo.bar'),
+        ];
+
+        gc_disable();
+
+        try {
+            foreach ($builders as $makeBuilder) {
+                $builder = $makeBuilder();
+
+                $reference = WeakReference::create($builder);
+
+                unset($builder);
+
+                $this->assertNull($reference->get());
+            }
+        } finally {
+            gc_enable();
+        }
     }
 
     public function testHasNestedWithMorphTo()
