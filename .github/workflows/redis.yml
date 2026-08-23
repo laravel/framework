@@ -89,7 +89,7 @@ jobs:
       - name: Create Redis Cluster
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
         with:
-          timeout_seconds: 5
+          timeout_seconds: 30
           max_attempts: 5
           retry_wait_seconds: 5
           retry_on: error
