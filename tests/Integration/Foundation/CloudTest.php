@@ -53,6 +53,32 @@ class CloudTest extends TestCase
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
     }
 
+    public function test_it_does_not_override_a_different_filesystem_disk()
+    {
+        $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode(
+            [
+                [
+                    'disk' => 'test-disk',
+                    'access_key_id' => 'test-access-key-id',
+                    'access_key_secret' => 'test-access-key-secret',
+                    'bucket' => 'test-bucket',
+                    'url' => 'test-url',
+                    'endpoint' => 'test-endpoint',
+                    'is_default' => true,
+                ],
+            ]
+        );
+        $_SERVER['FILESYSTEM_DISK'] = 'read-through';
+        $this->app['config']->set('filesystems.default', 'read-through');
+
+        Cloud::configureDisks($this->app);
+
+        $this->assertSame('read-through', $this->app['config']->get('filesystems.default'));
+        $this->assertSame('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
+
+        unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG'], $_SERVER['FILESYSTEM_DISK']);
+    }
+
     public function test_it_can_configure_scoped_disks()
     {
         $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode(
