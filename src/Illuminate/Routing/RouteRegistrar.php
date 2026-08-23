@@ -285,7 +285,7 @@ class RouteRegistrar
 
         if (is_array($action) &&
             array_is_list($action) &&
-            Reflector::isCallable($action)) {
+            Reflector::isCallable($action, true)) {
             if (strncmp($action[0], '\\', 1)) {
                 $action[0] = '\\'.$action[0];
             }
