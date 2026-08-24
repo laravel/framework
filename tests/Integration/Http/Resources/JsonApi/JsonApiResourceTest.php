@@ -466,6 +466,47 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonMissing(['jsonapi']);
     }
 
+    public function testItIgnoresNestedIncludesThatAreNotResourceRelationships()
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        Comment::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        Comment::factory()->create([
+            'user_id' => $otherUser->getKey(),
+        ]);
+
+        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'comments.truncate']))
+            ->assertOk()
+            ->assertJsonCount(1, 'included');
+
+        $this->assertSame(2, Comment::count());
+    }
+
+    public function testItIgnoresDeeplyNestedIncludesThatAreNotResourceRelationships()
+    {
+        $user = User::factory()->create();
+        $post = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        Comment::factory()->create([
+            'post_id' => $post->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        Comment::factory()->create();
+
+        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'posts.comments.truncate']))
+            ->assertOk()
+            ->assertJsonCount(2, 'included');
+
+        $this->assertSame(2, Comment::count());
+    }
+
     public function testItCanResolveRelationshipWithRecursiveNestedRelationshipLimitedToDepthConfiguration()
     {
         JsonApiResource::maxRelationshipDepth(2);
