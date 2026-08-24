@@ -209,7 +209,7 @@
             "Illuminate\\Tests\\": "tests/"
         },
         "files": [
-            "tests/Database/stubs/MigrationCreatorFakeMigration.php"
+            "tests/Database/Fixtures/MigrationCreatorFakeMigration.php"
         ]
     },
     "config": {

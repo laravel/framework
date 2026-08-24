@@ -48,7 +48,7 @@ class MigratorTest extends TestCase
 
         $this->output->expects('writeln');
 
-        $this->subject->run([__DIR__.'/fixtures']);
+        $this->subject->run([__DIR__.'/Fixtures']);
 
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
@@ -61,7 +61,7 @@ class MigratorTest extends TestCase
         $this->app->forgetInstance('migrator');
         $this->subject = $this->app->make('migrator');
 
-        $this->subject->run([__DIR__.'/fixtures']);
+        $this->subject->run([__DIR__.'/Fixtures']);
 
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
@@ -76,13 +76,13 @@ class MigratorTest extends TestCase
 
         Migrator::withoutMigrations(['2015_10_04_000000_modify_people_table.php', '2016_10_04_000000_modify_people_table']);
 
-        $this->subject->run([__DIR__.'/fixtures']);
+        $this->subject->run([__DIR__.'/Fixtures']);
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
         $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
         $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
 
         Migrator::withoutMigrations([]);
-        $this->subject->run([__DIR__.'/fixtures']);
+        $this->subject->run([__DIR__.'/Fixtures']);
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
     }
@@ -102,7 +102,7 @@ class MigratorTest extends TestCase
 
         $this->output->expects('writeln');
 
-        $this->subject->rollback([__DIR__.'/fixtures']);
+        $this->subject->rollback([__DIR__.'/Fixtures']);
 
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('people'));
     }
@@ -125,7 +125,7 @@ class MigratorTest extends TestCase
 
         $this->output->expects('writeln')->times(3);
 
-        $this->subject->run([__DIR__.'/fixtures'], ['pretend' => true]);
+        $this->subject->run([__DIR__.'/Fixtures'], ['pretend' => true]);
 
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('people'));
     }

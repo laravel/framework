@@ -1247,7 +1247,7 @@ class RoutingRouteTest extends TestCase
     public function testRouteGroupingFromFile()
     {
         $router = $this->getRouter();
-        $router->group(['prefix' => 'api'], __DIR__.'/fixtures/routes.php');
+        $router->group(['prefix' => 'api'], __DIR__.'/Fixtures/routes.php');
 
         $route = last($router->getRoutes()->get());
         $request = Request::create('api/users', 'GET');

@@ -21,7 +21,7 @@ class MigrateFreshCommandWithJournalModeWalTest extends DatabaseTestCase
         $files = new Filesystem;
 
         $files->copy(
-            join_paths(__DIR__, 'stubs', 'database-journal-mode-wal.sqlite'),
+            join_paths(__DIR__, 'Fixtures', 'database-journal-mode-wal.sqlite'),
             join_paths(default_skeleton_path(), 'database', 'database.sqlite')
         );
 

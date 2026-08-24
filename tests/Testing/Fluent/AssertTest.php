@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Testing\Fluent;
 
 use Illuminate\Support\Collection;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Illuminate\Tests\Testing\Stubs\ArrayableStubObject;
+use Illuminate\Tests\Testing\Fixtures\ArrayableStubObject;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

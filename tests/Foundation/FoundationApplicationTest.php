@@ -385,8 +385,8 @@ class FoundationApplicationTest extends TestCase
 
     public function testGetNamespace()
     {
-        $app1 = new Application(realpath(__DIR__.'/fixtures/laravel1'));
-        $app2 = new Application(realpath(__DIR__.'/fixtures/laravel2'));
+        $app1 = new Application(realpath(__DIR__.'/Fixtures/laravel1'));
+        $app2 = new Application(realpath(__DIR__.'/Fixtures/laravel2'));
 
         $this->assertSame('Laravel\\One\\', $app1->getNamespace());
         $this->assertSame('Laravel\\Two\\', $app2->getNamespace());
@@ -522,7 +522,7 @@ class FoundationApplicationTest extends TestCase
     public function testUseConfigPath(): void
     {
         $app = new Application;
-        $app->useConfigPath(__DIR__.'/fixtures/config');
+        $app->useConfigPath(__DIR__.'/Fixtures/config');
         $app->bootstrapWith([\Illuminate\Foundation\Bootstrap\LoadConfiguration::class]);
 
         $this->assertSame('bar', $app->make('config')->get('app.foo'));
@@ -531,7 +531,7 @@ class FoundationApplicationTest extends TestCase
     public function testMergingConfig(): void
     {
         $app = new Application;
-        $app->useConfigPath(__DIR__.'/fixtures/config');
+        $app->useConfigPath(__DIR__.'/Fixtures/config');
         $app->bootstrapWith([\Illuminate\Foundation\Bootstrap\LoadConfiguration::class]);
 
         $config = $app->make('config');

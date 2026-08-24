@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Database\stubs;
+namespace Illuminate\Tests\Database\Fixtures;
 
 class TestValueObject
 {

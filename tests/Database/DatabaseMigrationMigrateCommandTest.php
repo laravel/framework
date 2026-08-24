@@ -57,13 +57,13 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $schemaState = Mockery::mock(SchemaState::class);
         $connection->expects('getSchemaState')->andReturn($schemaState);
         $schemaState->expects('handleOutputUsing')->andReturnSelf();
-        $schemaState->expects('load')->with(__DIR__.'/stubs/schema.sql');
+        $schemaState->expects('load')->with(__DIR__.'/Fixtures/schema.sql');
         $dispatcher->expects('dispatch')->with(Mockery::type(SchemaLoaded::class));
         $migrator->expects('setOutput')->andReturn($migrator);
         $migrator->expects('run')->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
         $migrator->expects('repositoryExists')->andReturn(true);
 
-        $this->runCommand($command, ['--schema-path' => __DIR__.'/stubs/schema.sql']);
+        $this->runCommand($command, ['--schema-path' => __DIR__.'/Fixtures/schema.sql']);
     }
 
     public function testMigrationRepositoryCreatedWhenNecessary()

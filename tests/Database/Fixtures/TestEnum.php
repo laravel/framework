@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Database\stubs;
+namespace Illuminate\Tests\Database\Fixtures;
 
 enum TestEnum: string
 {

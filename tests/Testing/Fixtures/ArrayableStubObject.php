@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Testing\Stubs;
+namespace Illuminate\Tests\Testing\Fixtures;
 
 use Illuminate\Contracts\Support\Arrayable;
 
