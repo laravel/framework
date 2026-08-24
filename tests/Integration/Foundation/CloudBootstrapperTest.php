@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Integration\Foundation;
 
-use Illuminate\Foundation\Cloud;
+use Illuminate\Foundation\CloudBootstrapper;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
-class CloudTest extends TestCase
+class CloudBootstrapperTest extends TestCase
 {
     #[WithConfig('database.connections.pgsql', ['host' => 'test-pooler.pg.laravel.cloud', 'username' => 'test-username', 'password' => 'test-password'])]
     public function test_it_can_resolve_core_container_aliases()
     {
-        Cloud::configureUnpooledPostgresConnection($this->app);
+        CloudBootstrapper::configureUnpooledPostgresConnection($this->app);
 
         $this->assertEquals([
             'host' => 'test.pg.laravel.cloud',
@@ -45,7 +45,7 @@ class CloudTest extends TestCase
             ]
         );
 
-        Cloud::configureDisks($this->app);
+        CloudBootstrapper::configureDisks($this->app);
 
         $this->assertEquals('test-disk-2', $this->app['config']->get('filesystems.default'));
         $this->assertEquals('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
@@ -62,7 +62,7 @@ class CloudTest extends TestCase
 
         $_SERVER['LOG_LEVEL'] = 'notice';
 
-        Cloud::configureCloudLogging($this->app);
+        CloudBootstrapper::configureCloudLogging($this->app);
 
         $this->assertEquals('notice', $this->app['config']->get('logging.channels.laravel-cloud-socket.level'));
 
@@ -89,7 +89,7 @@ class CloudTest extends TestCase
         ]);
 
         try {
-            Cloud::configureDisks($this->app);
+            CloudBootstrapper::configureDisks($this->app);
 
             $config = $this->app['config']->get('filesystems.disks.aws-bucket');
 
@@ -108,7 +108,7 @@ class CloudTest extends TestCase
 
     public function test_it_configures_a_cloud_logging_socket_timeout()
     {
-        Cloud::configureCloudLogging($this->app);
+        CloudBootstrapper::configureCloudLogging($this->app);
 
         $this->assertSame(2.0, $this->app['config']->get('logging.channels.laravel-cloud-socket.with.timeout'));
     }
