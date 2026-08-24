@@ -8,6 +8,7 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 include_once 'Fixtures/Enums.php';
@@ -87,5 +88,16 @@ class ValidationRuleDoesntContainTest extends TestCase
         // Test with nullable field
         $v = new Validator($trans, ['roles' => null], ['roles' => ['nullable', Rule::doesntContain('admin')]]);
         $this->assertTrue($v->passes());
+    }
+
+    #[TestWith([['0e123'], true])]
+    #[TestWith([['0'], false])]
+    public function testDoesntContainRuleDoesNotUseLooseComparisons(array $value, bool $expectation)
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['x' => $value], ['x' => ['doesnt_contain:0']]);
+
+        $this->assertSame($expectation, $v->passes());
     }
 }
