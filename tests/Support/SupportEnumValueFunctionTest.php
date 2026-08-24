@@ -2,12 +2,15 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Tests\Support\Fixtures\TestBackedEnum;
+use Illuminate\Tests\Support\Fixtures\TestEnum;
+use Illuminate\Tests\Support\Fixtures\TestStringBackedEnum;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 use function Illuminate\Support\enum_value;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class SupportEnumValueFunctionTest extends TestCase
 {

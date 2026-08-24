@@ -30,7 +30,7 @@ class FoundationDocsCommandTest extends TestCase
         parent::setUp();
 
         Http::preventStrayRequests()->fake([
-            'https://laravel.com/docs/8.x/index.json' => Http::response(file_get_contents(__DIR__.'/fixtures/docs.json')),
+            'https://laravel.com/docs/8.x/index.json' => Http::response(file_get_contents(__DIR__.'/Fixtures/docs.json')),
         ]);
 
         $this->app[Kernel::class]->registerCommand($this->command());
@@ -130,7 +130,7 @@ class FoundationDocsCommandTest extends TestCase
 
     public function testItCanUseCustomAskStrategy()
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/always-dusk-ask-strategy.php');
+        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/Fixtures/always-dusk-ask-strategy.php');
 
         $this->artisan('docs')
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
@@ -141,7 +141,7 @@ class FoundationDocsCommandTest extends TestCase
 
     public function testItFallsbackToAutocompleteWhenAskStrategyContainsBadSyntax(): void
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/bad-syntax-strategy.php');
+        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/Fixtures/bad-syntax-strategy.php');
 
         $this->artisan('docs')
             ->expectsQuestion('Which page would you like to open?', 'laravel dusk')
@@ -153,7 +153,7 @@ class FoundationDocsCommandTest extends TestCase
 
     public function testItFallsbackToAutocompleteWithBadAskStrategyReturnValue(): void
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/bad-return-strategy.php');
+        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/Fixtures/bad-return-strategy.php');
 
         $this->artisan('docs')
             ->expectsQuestion('Which page would you like to open?', 'laravel dusk')
@@ -165,14 +165,14 @@ class FoundationDocsCommandTest extends TestCase
 
     public function testItCatchesAndHandlesProcessInterruptExceptionsInAskStrategies()
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/process-interrupt-strategy.php');
+        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/Fixtures/process-interrupt-strategy.php');
 
         $this->artisan('docs')->assertExitCode(130);
     }
 
     public function testItBubblesUpAskStrategyExceptions()
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/exception-throwing-strategy.php');
+        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/Fixtures/exception-throwing-strategy.php');
 
         $this->expectExceptionObject(new RuntimeException('strategy failed'));
 
@@ -181,7 +181,7 @@ class FoundationDocsCommandTest extends TestCase
 
     public function testItBubblesUpNonProcessInterruptExceptionsInAskStrategies()
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/process-failure-strategy.php');
+        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/Fixtures/process-failure-strategy.php');
 
         $this->expectException(ProcessFailedException::class);
 
@@ -232,7 +232,7 @@ Working directory: expected-working-directory');
     public function testItCanSpecifyCustomOpenCommandsViaEnvVariables()
     {
         $GLOBALS['open-strategy-output-path'] = __DIR__.'/output.txt';
-        putenv('ARTISAN_DOCS_OPEN_STRATEGY='.__DIR__.'/fixtures/open-strategy.php');
+        putenv('ARTISAN_DOCS_OPEN_STRATEGY='.__DIR__.'/Fixtures/open-strategy.php');
         $this->app[Kernel::class]->registerCommand($this->command()->setUrlOpener(null));
 
         @unlink($GLOBALS['open-strategy-output-path']);
@@ -253,7 +253,7 @@ Working directory: expected-working-directory');
 
     public function testItHandlesBadSyntaxInOpeners()
     {
-        putenv('ARTISAN_DOCS_OPEN_STRATEGY='.__DIR__.'/fixtures/bad-syntax-strategy.php');
+        putenv('ARTISAN_DOCS_OPEN_STRATEGY='.__DIR__.'/Fixtures/bad-syntax-strategy.php');
         $this->app[Kernel::class]->registerCommand($this->command()->setUrlOpener(null));
 
         $this->artisan('docs installation')
@@ -263,7 +263,7 @@ Working directory: expected-working-directory');
 
     public function testItHandlesBadReturnTypesInOpeners()
     {
-        putenv('ARTISAN_DOCS_OPEN_STRATEGY='.__DIR__.'/fixtures/bad-return-strategy.php');
+        putenv('ARTISAN_DOCS_OPEN_STRATEGY='.__DIR__.'/Fixtures/bad-return-strategy.php');
         $this->app[Kernel::class]->registerCommand($this->command()->setUrlOpener(null));
 
         $this->artisan('docs installation')

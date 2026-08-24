@@ -624,7 +624,7 @@ class ViewFactoryTest extends TestCase
     public function testComponentHandling()
     {
         $factory = $this->getFactory();
-        $factory->getFinder()->expects('find')->andReturn(__DIR__.'/fixtures/component.php');
+        $factory->getFinder()->expects('find')->andReturn(__DIR__.'/Fixtures/component.php');
         $factory->getEngineResolver()->expects('resolve')->andReturn(new PhpEngine(new Filesystem));
         $factory->getDispatcher()->expects('hasListeners')->times(2)->andReturn(false);
         $factory->startComponent('component', ['name' => 'Taylor']);
@@ -640,7 +640,7 @@ class ViewFactoryTest extends TestCase
     public function testComponentHandlingUsingViewObject()
     {
         $factory = $this->getFactory();
-        $factory->getFinder()->expects('find')->andReturn(__DIR__.'/fixtures/component.php');
+        $factory->getFinder()->expects('find')->andReturn(__DIR__.'/Fixtures/component.php');
         $factory->getEngineResolver()->expects('resolve')->andReturn(new PhpEngine(new Filesystem));
         $factory->getDispatcher()->expects('hasListeners')->times(2)->andReturn(false);
         $factory->startComponent($factory->make('component'), ['name' => 'Taylor']);
@@ -656,7 +656,7 @@ class ViewFactoryTest extends TestCase
     public function testComponentHandlingUsingClosure()
     {
         $factory = $this->getFactory();
-        $factory->getFinder()->expects('find')->andReturn(__DIR__.'/fixtures/component.php');
+        $factory->getFinder()->expects('find')->andReturn(__DIR__.'/Fixtures/component.php');
         $factory->getEngineResolver()->expects('resolve')->andReturn(new PhpEngine(new Filesystem));
         $factory->getDispatcher()->expects('hasListeners')->times(2)->andReturn(false);
         $factory->startComponent(function ($data) use ($factory) {
@@ -874,8 +874,8 @@ class ViewFactoryTest extends TestCase
         $engine->getCompiler()->expects('isExpired')->times(2)->andReturn(false);
         $factory = $this->getFactory();
         $factory->getEngineResolver()->expects('resolve')->times(2)->andReturn($engine);
-        $factory->getFinder()->expects('find')->with('layout')->andReturn(__DIR__.'/fixtures/section-exception-layout.php');
-        $factory->getFinder()->expects('find')->with('view')->andReturn(__DIR__.'/fixtures/section-exception.php');
+        $factory->getFinder()->expects('find')->with('layout')->andReturn(__DIR__.'/Fixtures/section-exception-layout.php');
+        $factory->getFinder()->expects('find')->with('view')->andReturn(__DIR__.'/Fixtures/section-exception.php');
         $factory->getDispatcher()->expects('hasListeners')->times(4); // 2 "creating" + 2 "composing"...
 
         $factory->make('view')->render();

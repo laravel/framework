@@ -12,6 +12,9 @@ use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
+use Illuminate\Tests\Http\Fixtures\TestEnum;
+use Illuminate\Tests\Http\Fixtures\TestEnumBacked;
+use Illuminate\Tests\Http\Fixtures\TestIntegerEnumBacked;
 use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -23,7 +26,7 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class HttpRequestTest extends TestCase
 {

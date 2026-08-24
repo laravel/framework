@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Routing\ImplicitRouteBinding;
 use Illuminate\Routing\Route;
+use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
+use Illuminate\Tests\Routing\Fixtures\CategoryEnum;
 use PHPUnit\Framework\TestCase;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class ImplicitRouteBindingTest extends TestCase
 {
