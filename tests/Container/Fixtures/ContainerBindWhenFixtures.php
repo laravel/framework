@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Container;
+namespace Illuminate\Tests\Container\Fixtures;
 
 use Illuminate\Container\Attributes\Bind;
 use Illuminate\Container\Attributes\BindWhen;
