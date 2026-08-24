@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Validation;
 use Illuminate\Tests\Validation\Fixtures\IntegerStatus;
 use Illuminate\Tests\Validation\Fixtures\PureEnum;
 use Illuminate\Tests\Validation\Fixtures\StringStatus;
-use Illuminate\Tests\Validation\fixtures\Values;
+use Illuminate\Tests\Validation\Fixtures\Values;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;

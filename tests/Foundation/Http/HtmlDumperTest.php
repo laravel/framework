@@ -139,7 +139,7 @@ class HtmlDumperTest extends TestCase
 
     public function testGetOriginalViewCompiledFile()
     {
-        $compiled = __DIR__.'/../fixtures/fake-compiled-view.php';
+        $compiled = __DIR__.'/../Fixtures/fake-compiled-view.php';
         $original = '/my-work-directory/resources/views/welcome.blade.php';
 
         $dumper = new HtmlDumper(
@@ -155,7 +155,7 @@ class HtmlDumperTest extends TestCase
 
     public function testWhenGetOriginalViewCompiledFileFails()
     {
-        $compiled = __DIR__.'/../fixtures/fake-compiled-view-without-source-map.php';
+        $compiled = __DIR__.'/../Fixtures/fake-compiled-view-without-source-map.php';
         $original = $compiled;
 
         $dumper = new HtmlDumper(
