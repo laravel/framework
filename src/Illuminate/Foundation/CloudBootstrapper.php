@@ -13,12 +13,12 @@ use Illuminate\Queue\Connectors\SqsConnector;
 use Monolog\Handler\SocketHandler;
 use PDO;
 
-class Cloud
+class CloudBootstrapper
 {
     /**
      * Handle a bootstrapper that is bootstrapping.
      */
-    public static function bootstrapperBootstrapping(Application $app, string $bootstrapper): void
+    public static function bootstrapping(Application $app, string $bootstrapper): void
     {
         (match ($bootstrapper) {
             BootProviders::class => function () use ($app) {
@@ -31,7 +31,7 @@ class Cloud
     /**
      * Handle a bootstrapper that has bootstrapped.
      */
-    public static function bootstrapperBootstrapped(Application $app, string $bootstrapper): void
+    public static function bootstrapped(Application $app, string $bootstrapper): void
     {
         (match ($bootstrapper) {
             LoadConfiguration::class => function () use ($app) {
@@ -167,7 +167,7 @@ class Cloud
             return;
         }
 
-        $app->singleton(Events::class, fn () => new Events(Cloud::socket()));
+        $app->singleton(Events::class, fn () => new Events(CloudBootstrapper::socket()));
         $app->bind(QueueConnector::class, fn ($app) => new QueueConnector(new SqsConnector, $app));
 
         $app['queue']->addConnector('cloud', $app->factory(QueueConnector::class));
@@ -198,7 +198,7 @@ class Cloud
                 'includeStacktraces' => true,
             ],
             'with' => [
-                'connectionString' => Cloud::socket(),
+                'connectionString' => CloudBootstrapper::socket(),
                 'persistent' => true,
                 'timeout' => 2.0,
             ],

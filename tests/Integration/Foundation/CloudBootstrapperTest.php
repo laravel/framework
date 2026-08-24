@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Integration\Foundation;
 
-use Illuminate\Foundation\Cloud;
+use Illuminate\Foundation\CloudBootstrapper;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
-class CloudTest extends TestCase
+class CloudBootstrapperTest extends TestCase
 {
     #[WithConfig('database.connections.pgsql', ['host' => 'test-pooler.pg.laravel.cloud', 'username' => 'test-username', 'password' => 'test-password'])]
     public function test_it_can_resolve_core_container_aliases()
     {
-        Cloud::configureUnpooledPostgresConnection($this->app);
+        CloudBootstrapper::configureUnpooledPostgresConnection($this->app);
 
         $this->assertEquals([
             'host' => 'test.pg.laravel.cloud',
@@ -45,7 +45,7 @@ class CloudTest extends TestCase
             ]
         );
 
-        Cloud::configureDisks($this->app);
+        CloudBootstrapper::configureDisks($this->app);
 
         $this->assertSame('test-disk-2', $this->app['config']->get('filesystems.default'));
         $this->assertSame('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
@@ -71,7 +71,7 @@ class CloudTest extends TestCase
         $_SERVER['FILESYSTEM_DISK'] = 'read-through';
         $this->app['config']->set('filesystems.default', 'read-through');
 
-        Cloud::configureDisks($this->app);
+        CloudBootstrapper::configureDisks($this->app);
 
         $this->assertSame('read-through', $this->app['config']->get('filesystems.default'));
         $this->assertSame('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
@@ -100,7 +100,7 @@ class CloudTest extends TestCase
             ]
         );
 
-        Cloud::configureDisks($this->app);
+        CloudBootstrapper::configureDisks($this->app);
 
         $this->assertSame('scoped', $this->app['config']->get('filesystems.disks.test-disk-scoped.driver'));
         $this->assertSame('test-disk', $this->app['config']->get('filesystems.disks.test-disk-scoped.disk'));
@@ -116,7 +116,7 @@ class CloudTest extends TestCase
 
         $_SERVER['LOG_LEVEL'] = 'notice';
 
-        Cloud::configureCloudLogging($this->app);
+        CloudBootstrapper::configureCloudLogging($this->app);
 
         $this->assertSame('notice', $this->app['config']->get('logging.channels.laravel-cloud-socket.level'));
 
@@ -129,14 +129,14 @@ class CloudTest extends TestCase
 
     public function test_it_configures_a_cloud_logging_socket_timeout()
     {
-        Cloud::configureCloudLogging($this->app);
+        CloudBootstrapper::configureCloudLogging($this->app);
 
         $this->assertSame(2.0, $this->app['config']->get('logging.channels.laravel-cloud-socket.with.timeout'));
     }
 
     public function test_it_aliases_cloud_logging_channel()
     {
-        Cloud::configureCloudLogging($this->app);
+        CloudBootstrapper::configureCloudLogging($this->app);
 
         $this->assertSame(
             $this->app['config']->get('logging.channels.laravel-cloud-socket'),
@@ -151,7 +151,7 @@ class CloudTest extends TestCase
             'path' => 'test.log',
         ]);
 
-        Cloud::configureCloudLogging($this->app);
+        CloudBootstrapper::configureCloudLogging($this->app);
 
         $this->assertSame([
             'driver' => 'single',
