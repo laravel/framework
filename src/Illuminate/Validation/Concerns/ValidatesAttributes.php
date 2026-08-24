@@ -571,7 +571,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return array_all($parameters, fn ($parameter) => in_array($parameter, $value));
+        return array_all($parameters, fn ($parameter) => in_array($parameter, $value, true));
     }
 
     /**
