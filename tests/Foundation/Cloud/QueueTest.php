@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation\Cloud;
 
 use Aws\CommandInterface;
+use Aws\Credentials\Credentials;
 use Aws\Exception\AwsException;
 use Aws\HandlerList;
 use Aws\MockHandler;
@@ -152,6 +153,11 @@ class QueueTest extends TestCase
             'always' => false,
             'delete_after_processing' => true,
         ];
+        $expected['connection']['credentials_cache'] = [
+            'enabled' => true,
+            'store' => null,
+            'fallback_store' => 'file',
+        ];
 
         $this->assertSame(
             $expected,
@@ -218,6 +224,62 @@ class QueueTest extends TestCase
 
         $this->assertFalse($this->app->bound(Events::class));
         $this->assertSame($originalFailer, $this->app['queue.failer']);
+    }
+
+    public function testCredentialCachingIsInertWhenTheDriverIsNotCloud()
+    {
+        $this->app['config']->set('queue.connections.cloud.driver', 'sqs');
+
+        CloudBootstrapper::bootManagedQueues($this->app);
+
+        // The cloud connector - and with it the managed queue credential cache
+        // defaults - is never registered when the driver is not "cloud".
+        $this->assertFalse($this->app->bound(QueueConnector::class));
+    }
+
+    public function testItDefaultsCredentialCachingForAppLevelSqsConnections()
+    {
+        $this->app['config']->set('queue.connections.sqs', ['driver' => 'sqs', 'region' => 'us-east-1', 'queue' => 'default']);
+        $this->app['config']->set('queue.connections.redis', ['driver' => 'redis', 'queue' => 'default']);
+        $this->app['config']->set('queue.connections.other-sqs', ['driver' => 'sqs', 'credentials_cache' => ['enabled' => false]]);
+
+        CloudBootstrapper::configureQueueCredentialCaching($this->app);
+
+        // App-level SQS connections dispatch through the same pod identity, so
+        // they share the cached credentials by default too.
+        $this->assertSame(
+            ['enabled' => true, 'store' => null, 'fallback_store' => 'file'],
+            $this->app['config']->get('queue.connections.sqs.credentials_cache'),
+        );
+
+        // Non-SQS connections and explicit configuration are left untouched.
+        $this->assertArrayNotHasKey('credentials_cache', $this->app['config']->get('queue.connections.redis'));
+        $this->assertSame(['enabled' => false], $this->app['config']->get('queue.connections.other-sqs.credentials_cache'));
+    }
+
+    public function testManagedQueueCredentialsAreServedFromTheSharedCacheWithoutFetching()
+    {
+        $_SERVER['AWS_CONTAINER_CREDENTIALS_FULL_URI'] = 'http://169.254.170.23/v1/credentials';
+
+        try {
+            CloudBootstrapper::configureManagedQueues($this->app);
+            config(['queue.connections.cloud.connection.credentials_cache.store' => 'array']);
+            CloudBootstrapper::bootManagedQueues($this->app);
+
+            Cache::store('array')->forever(
+                SqsConnector::credentialsCacheKey(config('queue.connections.cloud.connection')),
+                new Credentials('cached-key', 'cached-secret', 'cached-token', time() + 3600),
+            );
+
+            // A cache hit resolves the fleet-shared credentials without the
+            // provider ever contacting the Pod Identity Agent.
+            $credentials = $this->app['queue']->connection('cloud')->getSqs()->getCredentials()->wait();
+
+            $this->assertSame('cached-key', $credentials->getAccessKeyId());
+            $this->assertSame('cached-secret', $credentials->getSecretKey());
+        } finally {
+            unset($_SERVER['AWS_CONTAINER_CREDENTIALS_FULL_URI']);
+        }
     }
 
     public function testItDoesNotEmitEventsWhilePoppingWhenNoJobsAreProcessingAndNoJobsAreAvailableToPop()

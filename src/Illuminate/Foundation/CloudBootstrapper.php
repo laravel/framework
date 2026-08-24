@@ -39,6 +39,7 @@ class CloudBootstrapper
                 static::configureUnpooledPostgresConnection($app);
                 static::ensureMigrationsUseUnpooledConnection($app);
                 static::configureManagedQueues($app);
+                static::configureQueueCredentialCaching($app);
             },
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
@@ -155,7 +156,34 @@ class CloudBootstrapper
             'delete_after_processing' => env('CLOUD_QUEUE_OVERFLOW_DELETE_AFTER_PROCESSING', true),
         ];
 
+        $config['connection']['credentials_cache'] ??= [
+            'enabled' => env('CLOUD_QUEUE_CREDENTIALS_CACHE_ENABLED', true),
+            'store' => env('CLOUD_QUEUE_CREDENTIALS_CACHE_STORE'),
+            'fallback_store' => env('CLOUD_QUEUE_CREDENTIALS_CACHE_FALLBACK_STORE', 'file'),
+        ];
+
         $app['config']->set('queue.connections.cloud', $config);
+    }
+
+    /**
+     * Share cached AWS credentials across processes for all SQS queue connections.
+     *
+     * Every PHP-FPM process resolving its own pod identity credentials can
+     * exceed the Pod Identity Agent's rate limit when many processes spawn at
+     * once, so caching defaults to enabled for every SQS connection whose
+     * credentials are resolved dynamically.
+     */
+    public static function configureQueueCredentialCaching(Application $app): void
+    {
+        foreach ($app['config']->get('queue.connections', []) as $name => $connection) {
+            if (($connection['driver'] ?? null) === 'sqs' && ! isset($connection['credentials_cache'])) {
+                $app['config']->set("queue.connections.{$name}.credentials_cache", [
+                    'enabled' => env('CLOUD_QUEUE_CREDENTIALS_CACHE_ENABLED', true),
+                    'store' => env('CLOUD_QUEUE_CREDENTIALS_CACHE_STORE'),
+                    'fallback_store' => env('CLOUD_QUEUE_CREDENTIALS_CACHE_FALLBACK_STORE', 'file'),
+                ]);
+            }
+        }
     }
 
     /**
