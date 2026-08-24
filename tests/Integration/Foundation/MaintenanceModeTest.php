@@ -257,6 +257,15 @@ class MaintenanceModeTest extends TestCase
         $this->assertFalse(MaintenanceModeBypassCookie::isValid($cookie->getValue(), 'test-key'));
     }
 
+    public function testBypassCookieWithMalformedMacIsInvalid()
+    {
+        foreach ([['mac' => []], ['mac' => ['nested']], ['expires_at' => 9999999999]] as $payload) {
+            $cookie = base64_encode(json_encode(array_merge(['expires_at' => 9999999999], $payload)));
+
+            $this->assertFalse(MaintenanceModeBypassCookie::isValid($cookie, 'test-key'));
+        }
+    }
+
     public function testDispatchEventWhenMaintenanceModeIsEnabled()
     {
         Event::fake();
