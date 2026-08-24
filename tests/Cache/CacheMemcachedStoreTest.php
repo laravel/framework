@@ -64,7 +64,7 @@ class CacheMemcachedStoreTest extends TestCase
         $key = 'key';
         $ttl = 60;
 
-        $now = Carbon::now();
+        Carbon::setTestNow($now = Carbon::now());
 
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['touch'])->getMock();
 
