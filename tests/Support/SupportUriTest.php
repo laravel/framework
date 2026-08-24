@@ -183,6 +183,32 @@ class SupportUriTest extends TestCase
         $this->assertSame('foo[bar]=zab', $uri->replaceQuery(['foo.bar' => 'zab'])->query()->decode());
     }
 
+    public function test_query_strings_with_asterisks_are_treated_as_literal_keys()
+    {
+        $uri = Uri::of('https://laravel.com/?role=user&tenant=10');
+
+        $this->assertEquals(['role' => 'user', 'tenant' => '10', '*' => 'admin'], $uri->withQuery(['*' => 'admin'])->query()->all());
+
+        $uri = Uri::of('https://laravel.com/');
+
+        $this->assertEquals(['*' => 'admin'], $uri->withQuery(['*' => 'admin'])->query()->all());
+
+        $uri = Uri::of('https://laravel.com/?filter[name]=taylor&filter[role]=user');
+
+        $this->assertEquals(['filter' => ['name' => 'taylor', 'role' => 'user', '*' => 'masked']], $uri->withQuery(['filter.*' => 'masked'])->query()->all());
+
+        $uri = Uri::of('https://laravel.com/?role=user');
+
+        $this->assertEquals(['*' => 'admin'], $uri->withQuery(['*' => 'admin'], merge: false)->query()->all());
+    }
+
+    public function test_with_query_if_missing_treats_asterisks_as_literal_keys()
+    {
+        $uri = Uri::of('https://laravel.com/?role=user&tenant=10');
+
+        $this->assertEquals(['role' => 'user', 'tenant' => '10', '*' => 'admin'], $uri->withQueryIfMissing(['*' => 'admin'])->query()->all());
+    }
+
     public function test_decoding_the_entire_uri()
     {
         $uri = Uri::of('https://laravel.com/docs/11.x/installation')->withQuery(['tags' => ['first', 'second']]);
