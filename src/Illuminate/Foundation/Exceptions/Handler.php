@@ -852,7 +852,10 @@ class Handler implements ExceptionHandlerContract
             return response()->noContent(401);
         }
 
-        return redirect()->guest($redirectTo);
+        return redirect()->guest(
+            $redirectTo,
+            in_array($request->method(), ['PUT', 'PATCH', 'DELETE']) ? 303 : 302
+        );
     }
 
     /**
