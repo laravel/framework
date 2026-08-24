@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentPivotWithoutTimestampTest;
+namespace Illuminate\Tests\Integration\Database\Fixtures\EloquentPivotWithoutTimestamp;
 
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;

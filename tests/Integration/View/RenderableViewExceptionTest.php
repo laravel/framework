@@ -23,7 +23,7 @@ class RenderableViewExceptionTest extends TestCase
 
     protected function defineEnvironment($app)
     {
-        $app['config']->set('view.paths', [__DIR__.'/templates']);
+        $app['config']->set('view.paths', [__DIR__.'/Fixtures/templates']);
     }
 }
 
