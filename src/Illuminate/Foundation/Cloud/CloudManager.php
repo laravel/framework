@@ -3,10 +3,13 @@
 namespace Illuminate\Foundation\Cloud;
 
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
 class CloudManager
 {
+    use Macroable;
+
     /**
      * Create a new Laravel Cloud manager instance.
      */
