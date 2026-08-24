@@ -11,11 +11,15 @@ use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
+use Illuminate\Tests\Routing\Fixtures\CategoryEnum;
+use Illuminate\Tests\Routing\Fixtures\RouteDomainEnum;
+use Illuminate\Tests\Routing\Fixtures\RouteNameEnum;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class RoutingUrlGeneratorTest extends TestCase
 {

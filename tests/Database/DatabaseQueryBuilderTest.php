@@ -31,6 +31,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
+use Illuminate\Tests\Database\Fixtures\Enums\IntegerStatus;
+use Illuminate\Tests\Database\Fixtures\Enums\NonBackedStatus;
+use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 use InvalidArgumentException;
 use Mockery;
 use Mockery\MockInterface;
@@ -38,7 +41,7 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums/Enums.php';
 
 class DatabaseQueryBuilderTest extends TestCase
 {

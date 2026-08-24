@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Routing;
+namespace Illuminate\Tests\Integration\Routing\Fixtures;
 
 enum RouteNameEnum: string
 {

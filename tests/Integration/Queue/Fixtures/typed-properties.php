@@ -1,9 +1,10 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Queue;
+namespace Illuminate\Tests\Integration\Queue\Fixtures;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Tests\Integration\Queue\ModelSerializationTestUser;
 
 class TypedPropertyTestClass
 {

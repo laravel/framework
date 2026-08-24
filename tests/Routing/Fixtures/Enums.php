@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Routing;
+namespace Illuminate\Tests\Routing\Fixtures;
 
 enum CategoryEnum
 {

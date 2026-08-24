@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Testing\Fluent;
+namespace Illuminate\Tests\Testing\Fixtures;
 
 enum BackedEnum: string
 {

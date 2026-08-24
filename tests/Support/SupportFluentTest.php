@@ -8,10 +8,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use InvalidArgumentException;
 use IteratorAggregate;
+use Illuminate\Tests\Support\Fixtures\TestBackedEnum;
+use Illuminate\Tests\Support\Fixtures\TestEnum;
+use Illuminate\Tests\Support\Fixtures\TestStringBackedEnum;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class SupportFluentTest extends TestCase
 {

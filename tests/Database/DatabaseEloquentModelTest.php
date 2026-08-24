@@ -55,6 +55,7 @@ use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
 use Illuminate\Tests\Database\Fixtures\TestCast;
+use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 use Illuminate\Tests\Database\Fixtures\TestValueObject;
 use InvalidArgumentException;
 use LogicException;
@@ -65,7 +66,7 @@ use ReflectionClass;
 use stdClass;
 use Stringable as NativeStringable;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums/Enums.php';
 
 class DatabaseEloquentModelTest extends TestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Http;
+namespace Illuminate\Tests\Http\Fixtures;
 
 enum TestEnumBacked: string
 {

@@ -205,7 +205,7 @@ class MigratorTest extends TestCase
 
         $this->output->expects('writeln');
 
-        $this->subject->run([__DIR__.'/pretending/2014_10_12_000000_create_people_is_dynamic_table.php'], ['pretend' => false]);
+        $this->subject->run([__DIR__.'/Fixtures/pretending/2014_10_12_000000_create_people_is_dynamic_table.php'], ['pretend' => false]);
 
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
 
@@ -223,7 +223,7 @@ class MigratorTest extends TestCase
 
         $this->output->expects('writeln');
 
-        $this->subject->run([__DIR__.'/pretending/2023_10_17_000000_dynamic_content_is_shown.php'], ['pretend' => true]);
+        $this->subject->run([__DIR__.'/Fixtures/pretending/2023_10_17_000000_dynamic_content_is_shown.php'], ['pretend' => true]);
 
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('blogs'));
 
@@ -238,7 +238,7 @@ class MigratorTest extends TestCase
 
         $this->output->expects('writeln');
 
-        $this->subject->run([__DIR__.'/pretending/2014_10_12_000000_create_people_non_dynamic_table.php'], ['pretend' => false]);
+        $this->subject->run([__DIR__.'/Fixtures/pretending/2014_10_12_000000_create_people_non_dynamic_table.php'], ['pretend' => false]);
 
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
 
@@ -254,7 +254,7 @@ class MigratorTest extends TestCase
 
         $this->output->expects('writeln');
 
-        $this->subject->run([__DIR__.'/pretending/2023_10_17_000000_dynamic_content_not_shown.php'], ['pretend' => true]);
+        $this->subject->run([__DIR__.'/Fixtures/pretending/2023_10_17_000000_dynamic_content_not_shown.php'], ['pretend' => true]);
 
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('blogs'));
 

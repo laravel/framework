@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Validation;
+namespace Illuminate\Tests\Validation\Fixtures;
 
 enum StringStatus: string
 {

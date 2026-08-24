@@ -10,9 +10,10 @@ use Illuminate\Container\Container;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\Auth\Fixtures\AbilitiesEnum;
 use stdClass;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class AuthAccessGateTest extends TestCase
 {

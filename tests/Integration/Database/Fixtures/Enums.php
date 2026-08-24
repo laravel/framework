@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Integration\Database\Fixtures;
 
 use Illuminate\Contracts\Support\Arrayable;
 

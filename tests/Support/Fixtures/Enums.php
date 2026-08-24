@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Support;
+namespace Illuminate\Tests\Support\Fixtures;
 
 enum TestEnum
 {

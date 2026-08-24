@@ -6,9 +6,11 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
+use Illuminate\Tests\Validation\Fixtures\ArrayKeys;
+use Illuminate\Tests\Validation\Fixtures\ArrayKeysBacked;
 use PHPUnit\Framework\TestCase;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class ValidationRuleContainsTest extends TestCase
 {

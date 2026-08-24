@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Auth;
+namespace Illuminate\Tests\Auth\Fixtures;
 
 enum AbilitiesEnum: string
 {

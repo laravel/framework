@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Database\Fixtures\Enums;
 
 use Illuminate\Contracts\Support\Arrayable;
 

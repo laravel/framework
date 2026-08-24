@@ -17,9 +17,10 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Router;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\Auth\Fixtures\AbilitiesEnum;
 use stdClass;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class AuthorizeMiddlewareTest extends TestCase
 {

@@ -13,9 +13,12 @@ use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Illuminate\Tests\Validation\Fixtures\IntegerStatus;
+use Illuminate\Tests\Validation\Fixtures\PureEnum;
+use Illuminate\Tests\Validation\Fixtures\StringStatus;
 use PHPUnit\Framework\TestCase;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class ValidationEnumRuleTest extends TestCase
 {

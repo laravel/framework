@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Http\Middleware;
+namespace Illuminate\Tests\Integration\Http\Fixtures;
 
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 

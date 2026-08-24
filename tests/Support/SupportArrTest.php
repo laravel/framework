@@ -12,11 +12,19 @@ use Illuminate\Support\MultipleItemsFoundException;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\Support\Fixtures\TestArrayableObject;
+use Illuminate\Tests\Support\Fixtures\TestBackedEnum;
+use Illuminate\Tests\Support\Fixtures\TestEnum;
+use Illuminate\Tests\Support\Fixtures\TestJsonableObject;
+use Illuminate\Tests\Support\Fixtures\TestJsonSerializeObject;
+use Illuminate\Tests\Support\Fixtures\TestJsonSerializeWithScalarValueObject;
+use Illuminate\Tests\Support\Fixtures\TestStringBackedEnum;
+use Illuminate\Tests\Support\Fixtures\TestTraversableAndJsonSerializableObject;
 use stdClass;
 use WeakMap;
 
-include_once 'Common.php';
-include_once 'Enums.php';
+include_once 'Fixtures/Common.php';
+include_once 'Fixtures/Enums.php';
 
 class SupportArrTest extends TestCase
 {
