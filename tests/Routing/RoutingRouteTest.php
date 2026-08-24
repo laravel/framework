@@ -38,12 +38,12 @@ use Illuminate\Routing\RouteGroup;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Str;
+use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
 use UnexpectedValueException;
 
 include_once __DIR__.'/Fixtures/Enums.php';

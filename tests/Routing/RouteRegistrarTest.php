@@ -9,12 +9,12 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\RouteRegistrar;
-use InvalidArgumentException;
-use Mockery;
 use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
 use Illuminate\Tests\Routing\Fixtures\IntegerEnum;
 use Illuminate\Tests\Routing\Fixtures\RouteDomainEnum;
 use Illuminate\Tests\Routing\Fixtures\RouteNameEnum;
+use InvalidArgumentException;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Stringable;
 

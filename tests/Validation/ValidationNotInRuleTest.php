@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Tests\Validation\Fixtures\IntegerStatus;
+use Illuminate\Tests\Validation\Fixtures\PureEnum;
+use Illuminate\Tests\Validation\Fixtures\StringStatus;
 use Illuminate\Tests\Validation\fixtures\Values;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Validator;
-use Illuminate\Tests\Validation\Fixtures\IntegerStatus;
-use Illuminate\Tests\Validation\Fixtures\PureEnum;
-use Illuminate\Tests\Validation\Fixtures\StringStatus;
 use PHPUnit\Framework\TestCase;
 
 include_once 'Fixtures/Enums.php';
