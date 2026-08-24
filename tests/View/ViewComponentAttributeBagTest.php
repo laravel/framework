@@ -137,6 +137,13 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('style="color: blue;"', (string) $bag->merge([]));
     }
 
+    public function testDoubleQuotesAreEscapedAsHtmlEntities()
+    {
+        $bag = new ComponentAttributeBag(['title' => '6" pipe']);
+
+        $this->assertSame('title="6&quot; pipe"', (string) $bag);
+    }
+
     public function testAttributeRetrievalUsingDotNotation()
     {
         $bag = new ComponentAttributeBag([
