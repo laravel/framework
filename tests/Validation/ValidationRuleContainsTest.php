@@ -8,6 +8,7 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 include_once 'Fixtures/Enums.php';
@@ -87,5 +88,25 @@ class ValidationRuleContainsTest extends TestCase
         // Test with nullable field
         $v = new Validator($trans, ['roles' => null], ['roles' => ['nullable', Rule::contains('admin')]]);
         $this->assertTrue($v->passes());
+    }
+
+    #[TestWith([' 1', '1', false])]
+    #[TestWith(['1 ', '1', false])]
+    #[TestWith(["\t1", '1', false])]
+    #[TestWith(["1\n", '1', false])]
+    #[TestWith(['01', '1', false])]
+    #[TestWith(['+1', '1', false])]
+    #[TestWith(['1.0', '1', false])]
+    #[TestWith(['1e0', '1', false])]
+    #[TestWith(['0e123', '0', false])]
+    #[TestWith(['1', '1', true])]
+    #[TestWith(['0', '0', true])]
+    public function testContainsRuleIsNotLooselyBypassed(mixed $value, string $parameter, bool $expectation)
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['x' => [$value]], ['x' => ["contains:{$parameter}"]]);
+
+        $this->assertSame($expectation, $v->passes());
     }
 }
