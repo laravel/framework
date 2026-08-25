@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\Fixtures\Post;
+use Illuminate\Tests\Database\Fixtures\Models\Integration\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\PostStringyKey;
 
 class EloquentDeleteTest extends DatabaseTestCase
