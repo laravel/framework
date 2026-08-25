@@ -153,7 +153,7 @@ class QueueTest extends TestCase
             'always' => false,
             'delete_after_processing' => true,
         ];
-        $expected['connection']['credentials_cache'] = [
+        $expected['connection']['credential_cache'] = [
             'enabled' => true,
             'store' => null,
             'fallback_store' => 'file',
@@ -241,7 +241,7 @@ class QueueTest extends TestCase
     {
         $this->app['config']->set('queue.connections.sqs', ['driver' => 'sqs', 'region' => 'us-east-1', 'queue' => 'default']);
         $this->app['config']->set('queue.connections.redis', ['driver' => 'redis', 'queue' => 'default']);
-        $this->app['config']->set('queue.connections.other-sqs', ['driver' => 'sqs', 'credentials_cache' => ['enabled' => false]]);
+        $this->app['config']->set('queue.connections.other-sqs', ['driver' => 'sqs', 'credential_cache' => ['enabled' => false]]);
 
         CloudBootstrapper::configureQueueCredentialCaching($this->app);
 
@@ -249,12 +249,12 @@ class QueueTest extends TestCase
         // they share the cached credentials by default too.
         $this->assertSame(
             ['enabled' => true, 'store' => null, 'fallback_store' => 'file'],
-            $this->app['config']->get('queue.connections.sqs.credentials_cache'),
+            $this->app['config']->get('queue.connections.sqs.credential_cache'),
         );
 
         // Non-SQS connections and explicit configuration are left untouched.
-        $this->assertArrayNotHasKey('credentials_cache', $this->app['config']->get('queue.connections.redis'));
-        $this->assertSame(['enabled' => false], $this->app['config']->get('queue.connections.other-sqs.credentials_cache'));
+        $this->assertArrayNotHasKey('credential_cache', $this->app['config']->get('queue.connections.redis'));
+        $this->assertSame(['enabled' => false], $this->app['config']->get('queue.connections.other-sqs.credential_cache'));
     }
 
     public function testManagedQueueCredentialsAreServedFromTheSharedCacheWithoutFetching()
@@ -263,7 +263,7 @@ class QueueTest extends TestCase
 
         try {
             CloudBootstrapper::configureManagedQueues($this->app);
-            config(['queue.connections.cloud.connection.credentials_cache.store' => 'array']);
+            config(['queue.connections.cloud.connection.credential_cache.store' => 'array']);
             CloudBootstrapper::bootManagedQueues($this->app);
 
             Cache::store('array')->forever(

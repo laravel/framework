@@ -17,7 +17,7 @@ class QueueSqsConnectorTest extends TestCase
     public function testCredentialsAreWrappedWithASharedCacheProviderWhenCachingIsEnabled()
     {
         $config = $this->credentials([
-            'credentials_cache' => ['enabled' => true],
+            'credential_cache' => ['enabled' => true],
         ]);
 
         $this->assertInstanceOf(Closure::class, $config['credentials']);
@@ -33,7 +33,7 @@ class QueueSqsConnectorTest extends TestCase
     public function testCredentialsAreNotWrappedWhenCachingIsDisabled()
     {
         $config = $this->credentials([
-            'credentials_cache' => ['enabled' => false],
+            'credential_cache' => ['enabled' => false],
         ]);
 
         $this->assertArrayNotHasKey('credentials', $config);
@@ -43,7 +43,7 @@ class QueueSqsConnectorTest extends TestCase
     {
         $config = $this->credentials([
             'credentials' => false,
-            'credentials_cache' => ['enabled' => true],
+            'credential_cache' => ['enabled' => true],
         ]);
 
         $this->assertFalse($config['credentials']);
@@ -54,7 +54,7 @@ class QueueSqsConnectorTest extends TestCase
         $config = $this->credentials([
             'key' => 'static-key',
             'secret' => 'static-secret',
-            'credentials_cache' => ['enabled' => true],
+            'credential_cache' => ['enabled' => true],
         ]);
 
         $this->assertSame(['key' => 'static-key', 'secret' => 'static-secret'], $config['credentials']);

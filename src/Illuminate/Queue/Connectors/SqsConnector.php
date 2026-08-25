@@ -26,7 +26,7 @@ class SqsConnector implements ConnectorInterface
 
         return new SqsQueue(
             new SqsClient(
-                Arr::except($config, ['token', 'overflow', 'credentials_cache'])
+                Arr::except($config, ['token', 'overflow', 'credential_cache'])
             ),
             $config['queue'],
             $config['prefix'] ?? '',
@@ -123,8 +123,8 @@ class SqsConnector implements ConnectorInterface
     protected function cachedCredentialProvider(callable $provider, array $config)
     {
         [$store, $fallbackStore] = [
-            $config['credentials_cache']['store'] ?? null,
-            $config['credentials_cache']['fallback_store'] ?? null,
+            $config['credential_cache']['store'] ?? null,
+            $config['credential_cache']['fallback_store'] ?? null,
         ];
 
         $cache = new AwsCredentialCache(
@@ -165,6 +165,6 @@ class SqsConnector implements ConnectorInterface
      */
     protected function credentialCachingEnabled(array $config)
     {
-        return (bool) ($config['credentials_cache']['enabled'] ?? false);
+        return (bool) ($config['credential_cache']['enabled'] ?? false);
     }
 }
