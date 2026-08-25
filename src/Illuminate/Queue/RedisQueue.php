@@ -284,8 +284,10 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
             return $connection->keys('queues:*');
         }
 
-        // Unlike keys(), phpredis does not apply the connection prefix to a SCAN match pattern...
-        $match = $connection->_prefix('queues:*');
+        $match = defined('Redis::SCAN_PREFIX') &&
+            $connection->client()->getOption(\Redis::OPT_SCAN) === \Redis::SCAN_PREFIX
+                ? 'queues:*'
+                : $connection->_prefix('queues:*');
 
         $keys = [];
         $cursor = version_compare(phpversion('redis'), '6.1.0', '>=') ? null : '0';

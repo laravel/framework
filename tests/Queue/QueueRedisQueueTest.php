@@ -13,6 +13,7 @@ use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 class QueueRedisQueueTest extends TestCase
@@ -456,6 +457,25 @@ class QueueRedisQueueTest extends TestCase
         $queue = new TestableRedisQueue($redis, 'default');
 
         $this->assertSame(['default', 'emails'], $queue->testAllQueueNames()->all());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testScanningQueueNamesDoesNotDoublePrefixTheMatchPattern()
+    {
+        $redis = Mockery::mock(Factory::class);
+        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $client = Mockery::mock();
+
+        $redis->expects('connection')->andReturn($connection);
+        $connection->expects('client')->andReturn($client);
+        $client->expects('getOption')->with(\Redis::OPT_SCAN)->andReturn(\Redis::SCAN_PREFIX);
+        $connection->expects('scan')
+            ->with(null, ['match' => 'queues:*', 'count' => 1000])
+            ->andReturn([null, ['test_queues:{default}']]);
+
+        $queue = new TestableRedisQueue($redis, 'default');
+
+        $this->assertSame(['default'], $queue->testAllQueueNames()->all());
     }
 
     public function testSizeResolvesTheQueueNameFromAnEnum()
