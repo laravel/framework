@@ -51,7 +51,7 @@ class MariaDbGrammar extends MySqlGrammar
      */
     public function compileVectorDistanceExpression($column)
     {
-        return "vec_distance_cosine({$this->wrap($column)}, ?)";
+        return "vec_distance_cosine({$this->wrap($column)}, vec_fromtext(?))";
     }
 
     /**

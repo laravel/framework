@@ -7879,7 +7879,7 @@ SQL;
         $builder->select('*')->from('documents')->whereVectorSimilarTo('embedding', [1, 2, 3], minSimilarity: 0.4)->limit(10);
 
         $this->assertSame(
-            'select * from `documents` where vec_distance_cosine(`embedding`, ?) <= ? order by vec_distance_cosine(`embedding`, ?) asc limit 10',
+            'select * from `documents` where vec_distance_cosine(`embedding`, vec_fromtext(?)) <= ? order by vec_distance_cosine(`embedding`, vec_fromtext(?)) asc limit 10',
             $builder->toSql()
         );
         $this->assertEquals(['[1,2,3]', 0.6, '[1,2,3]'], $builder->getBindings());
@@ -7908,7 +7908,7 @@ SQL;
         $builder = $this->getMariaDbBuilder();
         $builder->select('*')->from('documents')->whereVectorDistanceLessThan('embedding', [1, 2, 3], 0.5);
 
-        $this->assertSame('select * from `documents` where vec_distance_cosine(`embedding`, ?) <= ?', $builder->toSql());
+        $this->assertSame('select * from `documents` where vec_distance_cosine(`embedding`, vec_fromtext(?)) <= ?', $builder->toSql());
         $this->assertEquals(['[1,2,3]', 0.5], $builder->getBindings());
     }
 
@@ -7917,7 +7917,7 @@ SQL;
         $builder = $this->getMariaDbBuilder();
         $builder->select('*')->from('documents')->orderByVectorDistance('embedding', [1, 2, 3]);
 
-        $this->assertSame('select * from `documents` order by vec_distance_cosine(`embedding`, ?) asc', $builder->toSql());
+        $this->assertSame('select * from `documents` order by vec_distance_cosine(`embedding`, vec_fromtext(?)) asc', $builder->toSql());
         $this->assertEquals(['[1,2,3]'], $builder->getBindings());
     }
 
@@ -7926,7 +7926,7 @@ SQL;
         $builder = $this->getMariaDbBuilder();
         $builder->from('documents')->selectVectorDistance('embedding', [1, 2, 3]);
 
-        $this->assertSame('select vec_distance_cosine(`embedding`, ?) as `embedding_distance` from `documents`', $builder->toSql());
+        $this->assertSame('select vec_distance_cosine(`embedding`, vec_fromtext(?)) as `embedding_distance` from `documents`', $builder->toSql());
         $this->assertEquals(['[1,2,3]'], $builder->getBindings());
     }
 
