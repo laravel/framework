@@ -27,6 +27,8 @@ class RedisTaggedCache extends TaggedCache
 
         $seconds = null;
 
+        $result = parent::add($key, $value, $ttl);
+
         if ($ttl !== null) {
             $seconds = $this->getSeconds($ttl);
 
@@ -38,7 +40,7 @@ class RedisTaggedCache extends TaggedCache
             }
         }
 
-        return parent::add($key, $value, $ttl);
+        return $result;
     }
 
     /**
@@ -59,6 +61,8 @@ class RedisTaggedCache extends TaggedCache
 
         $seconds = $this->getSeconds($ttl);
 
+        $result = parent::put($key, $value, $ttl);
+
         if ($seconds > 0) {
             $this->tags->addEntry(
                 $this->itemKey($key),
@@ -66,7 +70,7 @@ class RedisTaggedCache extends TaggedCache
             );
         }
 
-        return parent::put($key, $value, $ttl);
+        return $result;
     }
 
     /**
@@ -80,9 +84,11 @@ class RedisTaggedCache extends TaggedCache
     {
         $key = enum_value($key);
 
+        $result = parent::increment($key, $value);
+
         $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
 
-        return parent::increment($key, $value);
+        return $result;
     }
 
     /**
@@ -96,9 +102,11 @@ class RedisTaggedCache extends TaggedCache
     {
         $key = enum_value($key);
 
+        $result = parent::decrement($key, $value);
+
         $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
 
-        return parent::decrement($key, $value);
+        return $result;
     }
 
     /**
@@ -112,9 +120,11 @@ class RedisTaggedCache extends TaggedCache
     {
         $key = enum_value($key);
 
+        $result = parent::forever($key, $value);
+
         $this->tags->addEntry($this->itemKey($key));
 
-        return parent::forever($key, $value);
+        return $result;
     }
 
     /**

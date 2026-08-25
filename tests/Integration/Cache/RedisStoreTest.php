@@ -131,6 +131,34 @@ class RedisStoreTest extends TestCase
         $this->assertCount(0, $keyCount);
     }
 
+    public function testTagEntriesWrittenDuringAFlushCanStillBeFlushed()
+    {
+        Cache::store('redis')->clear();
+
+        $flushed = false;
+
+        Cache::store('redis')->connection()->setEventDispatcher($this->app['events']);
+
+        Cache::store('redis')->connection()->listen(function ($event) use (&$flushed) {
+            if ($flushed || $event->command !== 'zadd') {
+                return;
+            }
+
+            $flushed = true;
+
+            Cache::store('redis')->tags(['people'])->flush();
+        });
+
+        Cache::store('redis')->tags(['people'])->forever('name', 'Sally');
+
+        $this->assertTrue($flushed);
+
+        Cache::store('redis')->tags(['people'])->flush();
+
+        $keyCount = Cache::store('redis')->connection()->keys('*');
+        $this->assertCount(0, $keyCount);
+    }
+
     public function testTagEntriesCanBeIncremented()
     {
         Cache::store('redis')->clear();
