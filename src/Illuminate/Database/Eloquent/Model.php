@@ -296,6 +296,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static array $classAttributes = [];
 
     /**
+     * Cache of table names derived from the model class name.
+     *
+     * @var array<class-string<self>, string>
+     */
+    protected static array $resolvedTableNames = [];
+
+    /**
      * The name of the "created at" column.
      *
      * @var string|null
@@ -2300,7 +2307,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getTable()
     {
-        return $this->table ?? Str::snake(Str::pluralStudly(class_basename($this)));
+        if (! is_null($this->table)) {
+            return $this->table;
+        }
+
+        return static::$resolvedTableNames[static::class] ??= Str::snake(Str::pluralStudly(class_basename($this)));
     }
 
     /**

@@ -52,6 +52,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
 use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
@@ -2224,6 +2225,39 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('eloquent_model_namespaced_stubs', $namespacedModel->getTable());
     }
 
+    public function testDerivedTableNameIsResolvedOncePerClass()
+    {
+        $this->assertSame('eloquent_model_animals', (new EloquentModelAnimal)->getTable());
+
+        try {
+            Pluralizer::useLanguage('french');
+
+            $this->assertSame('eloquent_model_animals', (new EloquentModelAnimal)->getTable());
+        } finally {
+            Pluralizer::useLanguage('english');
+        }
+    }
+
+    public function testGetTableDoesNotMutateInstanceState()
+    {
+        $pristine = new EloquentModelWithoutTableStub;
+
+        $model = new EloquentModelWithoutTableStub;
+        $model->getTable();
+
+        $this->assertEquals($pristine, $model);
+    }
+
+    public function testSetTableTakesPrecedenceOverTheResolvedTableName()
+    {
+        $model = new EloquentModelAnimal;
+        $model->getTable();
+
+        $model->setTable('custom_animals');
+
+        $this->assertSame('custom_animals', $model->getTable());
+    }
+
     public function testTheMutatorCacheIsPopulated()
     {
         $class = new EloquentModelStub;
@@ -4372,6 +4406,11 @@ class EloquentModelWithoutRelationStub extends Model
 }
 
 class EloquentModelWithoutTableStub extends Model
+{
+    //
+}
+
+class EloquentModelAnimal extends Model
 {
     //
 }
