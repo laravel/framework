@@ -33,4 +33,11 @@ class CloudManagerTest extends TestCase
     {
         $this->assertInstanceOf(CloudManager::class, Cloud::getFacadeRoot());
     }
+
+    public function testCloudManagerIsMacroable()
+    {
+        CloudManager::macro('foo', fn () => 'bar');
+
+        $this->assertSame('bar', Cloud::foo());
+    }
 }
