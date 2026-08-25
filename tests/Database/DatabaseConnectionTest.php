@@ -443,7 +443,7 @@ class DatabaseConnectionTest extends TestCase
     public function testQueryExceptionMasksBindingsWhenEnabledOnTheConnection()
     {
         $connection = new Connection($this->getFailingPdo(), '', '', [
-            'mask_bindings_on_exception_message' => true,
+            'mask_bindings_in_exception_messages' => true,
         ]);
 
         try {

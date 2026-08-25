@@ -861,7 +861,7 @@ class Connection implements ConnectionInterface
                 $e,
                 $this->getConnectionDetails(),
                 $this->latestReadWriteTypeUsed(),
-                (bool) $this->getConfig('mask_bindings_on_exception_message'),
+                (bool) $this->getConfig('mask_bindings_in_exception_messages'),
             );
 
             if ($isUniqueConstraintError) {
