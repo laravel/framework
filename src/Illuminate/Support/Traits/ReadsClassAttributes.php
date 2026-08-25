@@ -2,8 +2,12 @@
 
 namespace Illuminate\Support\Traits;
 
+use Closure;
 use Exception;
+use Illuminate\Container\Container;
 use ReflectionClass;
+
+use function Illuminate\Support\enum_value;
 
 trait ReadsClassAttributes
 {
@@ -47,7 +51,15 @@ trait ReadsClassAttributes
     {
         $properties = get_object_vars($instance);
 
-        return $properties === [] ? true : reset($properties);
+        if ($properties === []) {
+            return true;
+        }
+
+        $value = reset($properties);
+
+        return $value instanceof Closure
+            ? enum_value($value(Container::getInstance()))
+            : $value;
     }
 
     /**
