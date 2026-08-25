@@ -427,6 +427,50 @@ class DatabaseConnectionTest extends TestCase
         $connection->statement('foo');
     }
 
+    public function testQueryExceptionEmbedsBindingsByDefault()
+    {
+        $connection = new Connection($this->getFailingPdo(), '', '', []);
+
+        try {
+            $connection->statement('SELECT * FROM users WHERE email = ?', ['foo@example.com']);
+
+            $this->fail('A QueryException was not thrown.');
+        } catch (QueryException $e) {
+            $this->assertStringContainsString('SQL: SELECT * FROM users WHERE email = foo@example.com', $e->getMessage());
+        }
+    }
+
+    public function testQueryExceptionMasksBindingsWhenEnabledOnTheConnection()
+    {
+        $connection = new Connection($this->getFailingPdo(), '', '', [
+            'mask_bindings_in_exception_messages' => true,
+        ]);
+
+        try {
+            $connection->statement('SELECT * FROM users WHERE email = ?', ['foo@example.com']);
+
+            $this->fail('A QueryException was not thrown.');
+        } catch (QueryException $e) {
+            $this->assertStringContainsString('SQL: SELECT * FROM users WHERE email = ?', $e->getMessage());
+            $this->assertStringNotContainsString('foo@example.com', $e->getMessage());
+            $this->assertSame(['foo@example.com'], $e->getBindings());
+        }
+    }
+
+    protected function getFailingPdo()
+    {
+        $statement = Mockery::mock(PDOStatement::class);
+        $statement->shouldReceive('bindValue')->once();
+        $statement->shouldReceive('execute')->once()->andThrow(
+            new PDOException('SQLSTATE[42S02]: Base table or view not found')
+        );
+
+        $pdo = Mockery::mock(PDO::class);
+        $pdo->shouldReceive('prepare')->once()->andReturn($statement);
+
+        return $pdo;
+    }
+
     public function testOnLostConnectionPDOIsSwappedOutsideTransaction()
     {
         $pdo = Mockery::mock(PDO::class);
