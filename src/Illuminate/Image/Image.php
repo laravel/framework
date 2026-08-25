@@ -44,6 +44,11 @@ class Image implements Responsable, Stringable
     protected ?string $driver = null;
 
     /**
+     * The image contents, or a lazy loader that resolves them.
+     */
+    protected Closure|string $contents;
+
+    /**
      * Whether the image has been processed.
      */
     protected bool $processed = false;
@@ -52,11 +57,6 @@ class Image implements Responsable, Stringable
      * The cached hash name.
      */
     protected ?string $hashName = null;
-
-    /**
-     * The image contents, or a lazy loader that resolves them.
-     */
-    protected Closure|string $contents;
 
     /**
      * Create a new image instance.
