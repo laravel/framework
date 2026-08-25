@@ -12,6 +12,7 @@ use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Notifications\Events\NotificationSkipped;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\SendQueuedNotifications;
@@ -87,6 +88,7 @@ class NotificationChannelManagerTest extends TestCase
         $driver = Mockery::mock();
         $manager->expects('driver')->andReturn($driver);
         $driver->expects('send');
+        $events->expects('dispatch')->with(Mockery::type(NotificationSkipped::class));
         $events->expects('dispatch')->with(Mockery::type(NotificationSent::class));
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotificationWithTwoChannels);
@@ -104,7 +106,8 @@ class NotificationChannelManagerTest extends TestCase
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
         $events->expects('listen');
         $manager->shouldNotReceive('driver');
-        $events->shouldNotReceive('dispatch');
+        $events->expects('dispatch')->with(Mockery::type(NotificationSkipped::class));
+        $events->shouldNotReceive('dispatch')->with(Mockery::type(NotificationSent::class));
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestCancelledNotification);
     }
