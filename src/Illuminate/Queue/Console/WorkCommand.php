@@ -11,6 +11,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\WorkerQueuePaused;
 use Illuminate\Queue\Events\WorkerQueueResumed;
+use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
@@ -213,6 +214,10 @@ class WorkCommand extends Command
             $this->writeQueueStatus($event->queue, 'resumed');
         });
 
+        $this->laravel['events']->listen(WorkerStopping::class, function ($event) {
+            $this->writeStopReason($event);
+        });
+
         static::$hasRegisteredListeners = true;
     }
 
@@ -266,6 +271,39 @@ class WorkCommand extends Command
             $status === 'paused'
                 ? '<fg=yellow;options=bold>PAUSED</>'
                 : '<fg=green;options=bold>RESUMED</>',
+        ));
+    }
+
+    /**
+     * Write the status output for a queue worker that is stopping.
+     *
+     * @param  \Illuminate\Queue\Events\WorkerStopping  $event
+     * @return void
+     */
+    protected function writeStopReason(WorkerStopping $event)
+    {
+        if ($this->output->isQuiet() || $this->output->isSilent() || is_null($event->reason)) {
+            return;
+        }
+
+        if ($this->outputUsingJson()) {
+            $this->output->writeln(json_encode([
+                'level' => $event->status === 0 ? 'info' : 'warning',
+                'status' => 'stopped',
+                'reason' => $event->reason->value,
+                'exit_code' => $event->status,
+                'jobs_processed' => $event->jobsProcessed,
+                'memory' => is_null($event->memoryUsage) ? null : round($event->memoryUsage, 1),
+                'timestamp' => $this->now()->format('Y-m-d\TH:i:s.uP'),
+            ]));
+
+            return;
+        }
+
+        $this->output->writeln(sprintf(
+            '  <fg=gray>%s</> Worker <fg=yellow;options=bold>STOPPED</> <fg=gray>%s</>',
+            $this->now()->format('Y-m-d H:i:s'),
+            $event->reason->description(),
         ));
     }
 
