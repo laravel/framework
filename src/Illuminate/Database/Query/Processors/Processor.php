@@ -49,7 +49,7 @@ class Processor
 
             return [
                 'name' => $result->name,
-                'path' => $result?->path, // SQLite Only...
+                'path' => $result->path ?? null, // SQLite Only...
                 'default' => (bool) $result->default,
             ];
         }, $results);
@@ -68,12 +68,12 @@ class Processor
 
             return [
                 'name' => $result->name,
-                'schema' => $result?->schema,
+                'schema' => $result->schema ?? null,
                 'schema_qualified_name' => isset($result->schema) ? $result->schema.'.'.$result->name : $result->name,
                 'size' => isset($result->size) ? (int) $result->size : null,
-                'comment' => $result?->comment, // MySQL and PostgreSQL
-                'collation' => $result?->collation, // MySQL only
-                'engine' => $result?->engine, // MySQL only
+                'comment' => $result->comment ?? null, // MySQL and PostgreSQL
+                'collation' => $result->collation ?? null, // MySQL only
+                'engine' => $result->engine ?? null, // MySQL only
             ];
         }, $results);
     }
@@ -91,7 +91,7 @@ class Processor
 
             return [
                 'name' => $result->name,
-                'schema' => $result?->schema,
+                'schema' => $result->schema ?? null,
                 'schema_qualified_name' => isset($result->schema) ? $result->schema.'.'.$result->name : $result->name,
                 'definition' => $result->definition,
             ];
