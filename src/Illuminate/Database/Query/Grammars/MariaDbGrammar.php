@@ -46,9 +46,6 @@ class MariaDbGrammar extends MySqlGrammar
     /**
      * Compile a vector distance expression for the given column.
      *
-     * The bound vector is JSON text, so it must pass through vec_fromtext()
-     * before MariaDB will accept it as a VECTOR argument.
-     *
      * @param  string  $column
      * @return string
      */
