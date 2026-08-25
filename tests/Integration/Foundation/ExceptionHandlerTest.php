@@ -336,4 +336,33 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
         $this->assertCount(1, $recordedLogs);
         $this->assertStringContainsString('a really (truncated...)', $recordedLogs[0]['message']);
     }
+
+    public function testItRedirectsUnauthenticatedWritesWithSeeOtherStatus()
+    {
+        Route::get('login', fn () => 'login form')->name('login');
+        Route::put('protected-route', fn () => 'ok')->middleware('auth');
+        Route::delete('protected-route', fn () => 'ok')->middleware('auth');
+
+        // Browsers follow a 302 by replaying the request method on the
+        // redirect target (only POST is downgraded to GET), so a 302 would
+        // arrive as PUT /login and fail with a 405 instead of showing the
+        // login page. A 303 tells the browser to follow with GET.
+        $this->put('protected-route')
+            ->assertStatus(303)
+            ->assertRedirect('login');
+
+        $this->delete('protected-route')
+            ->assertStatus(303)
+            ->assertRedirect('login');
+    }
+
+    public function testItRedirectsUnauthenticatedReadsWithFoundStatus()
+    {
+        Route::get('login', fn () => 'login form')->name('login');
+        Route::get('protected-route', fn () => 'ok')->middleware('auth');
+
+        $this->get('protected-route')
+            ->assertStatus(302)
+            ->assertRedirect('login');
+    }
 }
