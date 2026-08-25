@@ -33,6 +33,16 @@ class DatabaseEloquentAsVectorCastTest extends TestCase
         $this->assertSame([0.5, -1.25, 3.0], $model->embedding);
     }
 
+    public function testGetDecodesBinaryVectorBeginningWithOpeningBracketByte()
+    {
+        $this->useGrammar(MariaDbGrammar::class);
+
+        $model = new AsVectorTestModel;
+        $model->setRawAttributes(['embedding' => pack('g*', 1.0000108480453491)]);
+
+        $this->assertSame([1.0000108480453491], $model->embedding);
+    }
+
     public function testGetDecodesTextVector()
     {
         $this->useGrammar(PostgresGrammar::class);

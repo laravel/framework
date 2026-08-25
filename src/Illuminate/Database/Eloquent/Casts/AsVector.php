@@ -29,20 +29,22 @@ class AsVector implements Castable
                     return null;
                 }
 
-                // A vector assigned to the model but not yet persisted on MariaDB
-                // is held as a "vec_fromtext('[...]')" expression, so pull the
-                // JSON back out of it...
-                if ($value instanceof ExpressionContract) {
-                    $value = Str::between($value->getValue($model->getConnection()->getQueryGrammar()), "('", "')");
-                }
+                $grammar = $model->getConnection()->getQueryGrammar();
 
-                // Postgres (pgvector) and MariaDB's vec_totext() return JSON text...
-                if (str_starts_with($value, '[')) {
+                // Decode a MariaDB expression assigned to the model before it is persisted...
+                if ($value instanceof ExpressionContract) {
+                    $value = Str::between($value->getValue($grammar), "('", "')");
+
                     return array_map(floatval(...), json_decode($value, true, flags: JSON_THROW_ON_ERROR));
                 }
 
-                // ...while MariaDB vector columns return little-endian float32 bytes.
-                return array_values(unpack('g*', $value));
+                // MariaDB vector columns return little-endian float32 bytes...
+                if ($grammar instanceof MariaDbGrammar) {
+                    return array_values(unpack('g*', $value));
+                }
+
+                // PostgreSQL (pgvector) returns JSON text...
+                return array_map(floatval(...), json_decode($value, true, flags: JSON_THROW_ON_ERROR));
             }
 
             public function set($model, $key, $value, $attributes)
@@ -63,10 +65,7 @@ class AsVector implements Castable
 
                 $vector = json_encode(array_values(array_map(floatval(...), $value)), JSON_THROW_ON_ERROR);
 
-                // MariaDB will not accept text (or raw bytes) bound directly to a
-                // vector column, so the JSON has to be converted server-side. The
-                // JSON encoding of a float array only ever contains digits, ".",
-                // "-", "e", "," and brackets, so it is safe to inline.
+                // MariaDB requires vectors to be converted from JSON text server-side...
                 return [
                     $key => $model->getConnection()->getQueryGrammar() instanceof MariaDbGrammar
                         ? new Expression("vec_fromtext('{$vector}')")
