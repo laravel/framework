@@ -11,7 +11,7 @@ class HttpUploadedFileTest extends TestCase
     public function testUploadedFileCanRetrieveContentsFromTextFile()
     {
         $file = new UploadedFile(
-            __DIR__.'/fixtures/test.txt',
+            __DIR__.'/Fixtures/test.txt',
             'test.txt',
             null,
             null,

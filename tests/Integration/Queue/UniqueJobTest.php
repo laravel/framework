@@ -17,6 +17,7 @@ use Illuminate\Queue\Events\UniqueJobSkipped;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -272,6 +273,27 @@ class UniqueJobTest extends QueueTestCase
         Queue::assertPushedTimes(UniqueTestJob::class, 1);
     }
 
+    public function testRolledBackPushDoesNotReleaseAnotherDispatchesUniqueLock()
+    {
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
+
+        dispatch($job = new UniqueTestAfterCommitJob);
+
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+
+        try {
+            DB::transaction(function () {
+                Queue::push(new UniqueTestAfterCommitJob);
+
+                throw new Exception('Rollback.');
+            });
+        } catch (Exception) {
+            //
+        }
+
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+    }
+
     protected function getLockKey($job)
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job)).':';
@@ -461,5 +483,20 @@ class UniqueIdTestJobWithDisplayName extends UniqueTestJob
     public function displayName(): string
     {
         return 'App\\Actions\\UniqueTestAction';
+    }
+}
+
+class UniqueTestAfterCommitJob implements ShouldQueue, ShouldBeUnique
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public function __construct()
+    {
+        $this->afterCommit = true;
+    }
+
+    public function handle()
+    {
+        //
     }
 }

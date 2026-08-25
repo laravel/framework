@@ -202,6 +202,38 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
+    public function testPostgresKeepaliveOptionsAreSet()
+    {
+        $dsn = 'pgsql:host=foo;dbname=\'bar\';port=111;keepalives=1;keepalives_idle=600;keepalives_interval=30;keepalives_count=5';
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'keepalives' => 1, 'keepalives_idle' => 600, 'keepalives_interval' => 30, 'keepalives_count' => 5];
+        $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = Mockery::mock(PDO::class);
+        $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
+        $statement = Mockery::mock(PDOStatement::class);
+        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
+        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
+    public function testPostgresKeepaliveOptionsAreOmittedWhenNotConfigured()
+    {
+        $dsn = 'pgsql:host=foo;dbname=\'bar\';port=111;keepalives_idle=600';
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'keepalives_idle' => 600];
+        $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = Mockery::mock(PDO::class);
+        $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
+        $statement = Mockery::mock(PDOStatement::class);
+        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
+        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
     public function testPostgresApplicationUseAlternativeDatabaseName()
     {
         $dsn = 'pgsql:dbname=\'baz\'';

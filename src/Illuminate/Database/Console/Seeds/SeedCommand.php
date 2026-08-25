@@ -68,9 +68,35 @@ class SeedCommand extends Command
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
-        Model::unguarded(function () {
-            $this->getSeeder()->__invoke();
+        $seeder = $this->getSeeder();
+
+        $requestedClass = $this->input->getArgument('class') ?? $this->input->getOption('class');
+
+        $shouldReportProgress = ! in_array($requestedClass, [
+            'Database\\Seeders\\DatabaseSeeder', 'DatabaseSeeder',
+        ]);
+
+        if ($shouldReportProgress) {
+            $this->components->twoColumnDetail(
+                get_class($seeder), '<fg=yellow;options=bold>RUNNING</>'
+            );
+        }
+
+        $startTime = microtime(true);
+
+        Model::unguarded(function () use ($seeder) {
+            $seeder->__invoke();
         });
+
+        if ($shouldReportProgress) {
+            $runTime = number_format((microtime(true) - $startTime) * 1000);
+
+            $this->components->twoColumnDetail(
+                get_class($seeder), "<fg=gray>$runTime ms</> <fg=green;options=bold>DONE</>"
+            );
+
+            $this->newLine();
+        }
 
         if ($previousConnection) {
             $this->resolver->setDefaultConnection($previousConnection);

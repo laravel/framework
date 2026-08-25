@@ -16,7 +16,7 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -53,7 +53,7 @@ class MaintenanceModeTest extends TestCase
 
     public function testCacheMaintenanceModeAllowsRequestWhenDeactivatedWhileReadingPayload()
     {
-        $cache = m::mock(Factory::class, Repository::class);
+        $cache = Mockery::mock(Factory::class, Repository::class);
         $cache->shouldReceive('store')->with('maintenance')->andReturnSelf();
         $cache->shouldReceive('has')->with('framework:down')->andReturn(true, false);
         $cache->shouldReceive('get')->once()->with('framework:down')->andReturnNull();
@@ -255,6 +255,15 @@ class MaintenanceModeTest extends TestCase
 
         Carbon::setTestNow(Carbon::now()->addMonths(6));
         $this->assertFalse(MaintenanceModeBypassCookie::isValid($cookie->getValue(), 'test-key'));
+    }
+
+    public function testBypassCookieWithMalformedMacIsInvalid()
+    {
+        foreach ([['mac' => []], ['mac' => ['nested']], ['expires_at' => 9999999999]] as $payload) {
+            $cookie = base64_encode(json_encode(array_merge(['expires_at' => 9999999999], $payload)));
+
+            $this->assertFalse(MaintenanceModeBypassCookie::isValid($cookie, 'test-key'));
+        }
     }
 
     public function testDispatchEventWhenMaintenanceModeIsEnabled()

@@ -24,7 +24,7 @@ class LoadEnvironmentVariablesTest extends TestCase
         $app->expects('runningInConsole')
             ->with()->andReturn(false);
         $app->expects('environmentPath')
-            ->with()->andReturn(__DIR__.'/../fixtures');
+            ->with()->andReturn(__DIR__.'/../Fixtures');
         $app->expects('environmentFile')
             ->with()->andReturn($file);
 

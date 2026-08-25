@@ -7,6 +7,8 @@ use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\UnableToCopyFile;
+use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
 
 class ReadThroughFilesystemAdapter implements FilesystemAdapter
@@ -18,6 +20,7 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
         protected FilesystemOperator $primary,
         protected FilesystemOperator $fallback,
         protected bool $throwOnPromotionFailure = false,
+        protected bool $copy = true,
     ) {
     }
 
@@ -64,6 +67,10 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
 
         $contents = $this->fallback->read($path);
 
+        if (! $this->copy) {
+            return $contents;
+        }
+
         if ($this->primary->fileExists($path)) {
             return $this->primary->read($path);
         }
@@ -84,6 +91,10 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
     {
         if ($this->primary->fileExists($path)) {
             return $this->primary->readStream($path);
+        }
+
+        if (! $this->copy) {
+            return $this->fallback->readStream($path);
         }
 
         $source = $this->fallback->readStream($path);
@@ -122,18 +133,26 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
     }
 
     /**
-     * Delete a file from the primary filesystem.
+     * Delete a file from both filesystems.
      */
     public function delete(string $path): void
     {
+        if ($this->fallback->fileExists($path)) {
+            $this->fallback->delete($path);
+        }
+
         $this->primary->delete($path);
     }
 
     /**
-     * Delete a directory from the primary filesystem.
+     * Delete a directory from both filesystems.
      */
     public function deleteDirectory(string $path): void
     {
+        if ($this->fallback->directoryExists($path)) {
+            $this->fallback->deleteDirectory($path);
+        }
+
         $this->primary->deleteDirectory($path);
     }
 
@@ -194,19 +213,71 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
     }
 
     /**
-     * Move a file on the primary filesystem.
+     * Move a file on the primary filesystem and remove its fallback source.
      */
     public function move(string $source, string $destination, Config $config): void
     {
-        $this->primary->move($source, $destination, $config->toArray());
+        $this->moveOnPrimary($source, $destination, $config);
+
+        try {
+            if ($this->fallback->fileExists($source)) {
+                $this->fallback->delete($source);
+            }
+        } catch (FilesystemException $exception) {
+            throw UnableToMoveFile::fromLocationTo($source, $destination, $exception);
+        }
     }
 
     /**
-     * Copy a file on the primary filesystem.
+     * Copy a file on the primary filesystem, reading it from the fallback filesystem when necessary.
      */
     public function copy(string $source, string $destination, Config $config): void
     {
-        $this->primary->copy($source, $destination, $config->toArray());
+        if ($this->primary->fileExists($source)) {
+            $this->primary->copy($source, $destination, $config->toArray());
+
+            return;
+        }
+
+        try {
+            $this->copyFromFallback($source, $destination, $config);
+        } catch (FilesystemException $exception) {
+            throw UnableToCopyFile::fromLocationTo($source, $destination, $exception);
+        }
+    }
+
+    /**
+     * Move a file to its destination on the primary filesystem.
+     */
+    protected function moveOnPrimary(string $source, string $destination, Config $config): void
+    {
+        if ($this->primary->fileExists($source)) {
+            $this->primary->move($source, $destination, $config->toArray());
+
+            return;
+        }
+
+        try {
+            $this->copyFromFallback($source, $destination, $config);
+        } catch (FilesystemException $exception) {
+            throw UnableToMoveFile::fromLocationTo($source, $destination, $exception);
+        }
+    }
+
+    /**
+     * Copy a file from the fallback filesystem to the primary filesystem.
+     */
+    protected function copyFromFallback(string $source, string $destination, Config $config): void
+    {
+        $stream = $this->fallback->readStream($source);
+
+        try {
+            $this->primary->writeStream($destination, $stream, $config->toArray());
+        } finally {
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+        }
     }
 
     /**

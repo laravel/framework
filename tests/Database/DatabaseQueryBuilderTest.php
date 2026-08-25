@@ -31,6 +31,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
+use Illuminate\Tests\Database\Fixtures\Enums\IntegerStatus;
+use Illuminate\Tests\Database\Fixtures\Enums\NonBackedStatus;
+use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 use InvalidArgumentException;
 use Mockery;
 use Mockery\MockInterface;
@@ -38,7 +41,7 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums/Enums.php';
 
 class DatabaseQueryBuilderTest extends TestCase
 {
@@ -979,6 +982,75 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('posts')->whereBeforeToday(['published_at', 'held_at']);
         $this->assertSame('select * from [posts] where cast([published_at] as date) < ? and cast([held_at] as date) < ?', $builder->toSql());
         $this->assertEquals([0 => '2022-04-20', 1 => '2022-04-20'], $builder->getBindings());
+    }
+
+    public function testWhereBinaryClauseMariaDb()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('users')->whereBinary('name', 'john');
+        $this->assertSame('select * from `users` where `name` = binary ?', $builder->toSql());
+        $this->assertEquals([0 => 'john'], $builder->getBindings());
+
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('users')->whereNotBinary('name', 'john');
+        $this->assertSame('select * from `users` where `name` != binary ?', $builder->toSql());
+        $this->assertEquals([0 => 'john'], $builder->getBindings());
+    }
+
+    public function testWhereBinaryClauseMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereBinary('name', 'john');
+        $this->assertSame('select * from `users` where `name` = binary ?', $builder->toSql());
+        $this->assertEquals([0 => 'john'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNotBinary('name', 'john');
+        $this->assertSame('select * from `users` where `name` != binary ?', $builder->toSql());
+        $this->assertEquals([0 => 'john'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereBinary('name', 'john');
+        $this->assertSame('select * from `users` where `id` = ? or `name` = binary ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'john'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotBinary('name', 'john');
+        $this->assertSame('select * from `users` where `id` = ? or `name` != binary ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'john'], $builder->getBindings());
+    }
+
+    public function testWhereBinaryClausePostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereBinary('name', 'john');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This database engine does not support binary comparison operations.');
+
+        $builder->toSql();
+    }
+
+    public function testWhereBinaryClauseSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereBinary('name', 'john');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This database engine does not support binary comparison operations.');
+
+        $builder->toSql();
+    }
+
+    public function testWhereBinaryClauseSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereBinary('name', 'john');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This database engine does not support binary comparison operations.');
+
+        $builder->toSql();
     }
 
     public function testWhereLikePostgres()
@@ -7787,6 +7859,75 @@ SQL;
 
         $this->assertSame('select * from "users" order by "email" asc', $clone->toSql());
         $this->assertSame([], $clone->getBindings());
+    }
+
+    public function testWhereVectorSimilarToOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('documents')->whereVectorSimilarTo('embedding', [1, 2, 3], minSimilarity: 0.4)->limit(10);
+
+        $this->assertSame(
+            'select * from "documents" where ("embedding" <=> ?) <= ? order by ("embedding" <=> ?) asc limit 10',
+            $builder->toSql()
+        );
+        $this->assertEquals(['[1,2,3]', 0.6, '[1,2,3]'], $builder->getBindings());
+    }
+
+    public function testWhereVectorSimilarToOnMariaDb()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('documents')->whereVectorSimilarTo('embedding', [1, 2, 3], minSimilarity: 0.4)->limit(10);
+
+        $this->assertSame(
+            'select * from `documents` where vec_distance_cosine(`embedding`, ?) <= ? order by vec_distance_cosine(`embedding`, ?) asc limit 10',
+            $builder->toSql()
+        );
+        $this->assertEquals(['[1,2,3]', 0.6, '[1,2,3]'], $builder->getBindings());
+    }
+
+    public function testWhereVectorSimilarToThrowsOnUnsupportedGrammar()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Vector distance queries are only supported by Postgres and MariaDB.');
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('documents')->whereVectorSimilarTo('embedding', [1, 2, 3]);
+    }
+
+    public function testWhereVectorDistanceLessThanOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('documents')->whereVectorDistanceLessThan('embedding', [1, 2, 3], 0.5);
+
+        $this->assertSame('select * from "documents" where ("embedding" <=> ?) <= ?', $builder->toSql());
+        $this->assertEquals(['[1,2,3]', 0.5], $builder->getBindings());
+    }
+
+    public function testWhereVectorDistanceLessThanOnMariaDb()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('documents')->whereVectorDistanceLessThan('embedding', [1, 2, 3], 0.5);
+
+        $this->assertSame('select * from `documents` where vec_distance_cosine(`embedding`, ?) <= ?', $builder->toSql());
+        $this->assertEquals(['[1,2,3]', 0.5], $builder->getBindings());
+    }
+
+    public function testOrderByVectorDistanceOnMariaDb()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('documents')->orderByVectorDistance('embedding', [1, 2, 3]);
+
+        $this->assertSame('select * from `documents` order by vec_distance_cosine(`embedding`, ?) asc', $builder->toSql());
+        $this->assertEquals(['[1,2,3]'], $builder->getBindings());
+    }
+
+    public function testSelectVectorDistanceOnMariaDb()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->from('documents')->selectVectorDistance('embedding', [1, 2, 3]);
+
+        $this->assertSame('select vec_distance_cosine(`embedding`, ?) as `embedding_distance` from `documents`', $builder->toSql());
+        $this->assertEquals(['[1,2,3]'], $builder->getBindings());
     }
 
     public function testToRawSql()

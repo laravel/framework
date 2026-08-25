@@ -11,10 +11,25 @@ use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Container\SelfBuilding;
+use Illuminate\Tests\Container\Fixtures\BindBeforeBindWhenInterface;
+use Illuminate\Tests\Container\Fixtures\BindBeforeConcrete;
+use Illuminate\Tests\Container\Fixtures\BindFallbackConcrete;
+use Illuminate\Tests\Container\Fixtures\BindWhenAndBindInterface;
+use Illuminate\Tests\Container\Fixtures\BindWhenCondition;
+use Illuminate\Tests\Container\Fixtures\BindWhenConditionalConcrete;
+use Illuminate\Tests\Container\Fixtures\BindWhenConditionalInterface;
+use Illuminate\Tests\Container\Fixtures\BindWhenFallbackInterface;
+use Illuminate\Tests\Container\Fixtures\BindWhenInterface;
+use Illuminate\Tests\Container\Fixtures\BindWhenNoMatchInterface;
+use Illuminate\Tests\Container\Fixtures\BindWhenSingletonConcrete;
+use Illuminate\Tests\Container\Fixtures\BindWhenSingletonInterface;
+use Illuminate\Tests\Container\Fixtures\BindWhenTrueConcrete;
+use Illuminate\Tests\Container\Fixtures\BindWhenWinsConcrete;
 use LogicException;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
+use ReflectionProperty;
 use stdClass;
 use TypeError;
 
@@ -168,6 +183,42 @@ class ContainerTest extends TestCase
         });
         $this->assertSame('foo', $container->make('class'));
         $this->assertNotSame('bar', $container->make('class'));
+    }
+
+    public function testScopedDoesNotRegisterDuplicateScopedInstances()
+    {
+        $container = new Container;
+        $container->scoped('class', function () {
+            return new stdClass;
+        });
+        $container->scoped('class', function () {
+            return new stdClass;
+        });
+
+        $this->assertSame(['class'], (new ReflectionProperty($container, 'scopedInstances'))->getValue($container));
+    }
+
+    public function testScopedIfDoesNotRegisterDuplicateScopedInstancesWhenRebound()
+    {
+        $container = new Container;
+        $container->scopedIf('class', function () {
+            return new stdClass;
+        });
+
+        unset($container['class']);
+
+        $container->scopedIf('class', function () {
+            return new stdClass;
+        });
+
+        $this->assertSame(['class'], (new ReflectionProperty($container, 'scopedInstances'))->getValue($container));
+
+        $container->forgetScopedInstances();
+
+        $firstInstantiation = $container->make('class');
+        $container->forgetScopedInstances();
+
+        $this->assertNotSame($firstInstantiation, $container->make('class'));
     }
 
     public function testScopedClosureResets()

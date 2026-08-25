@@ -520,7 +520,7 @@ trait ValidatesAttributes
             $size = BigNumber::of($this->getSize($attribute, $value));
 
             return $size->isGreaterThanOrEqualTo($this->trim($parameters[0])) && $size->isLessThanOrEqualTo($this->trim($parameters[1]));
-        } catch (MathException) {
+        } catch (MathException|BrickMathException) {
             return false;
         }
     }
@@ -588,7 +588,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return array_all($parameters, fn ($parameter) => ! in_array($parameter, $value));
+        return array_all($parameters, fn ($parameter) => ! in_array($parameter, $value, true));
     }
 
     /**
@@ -1323,7 +1323,7 @@ trait ValidatesAttributes
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             try {
                 return BigNumber::of($this->getSize($attribute, $value))->isGreaterThan($this->trim($parameters[0]));
-            } catch (MathException) {
+            } catch (MathException|BrickMathException) {
                 return false;
             }
         }
@@ -1335,7 +1335,7 @@ trait ValidatesAttributes
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
             try {
                 return BigNumber::of($this->trim($value))->isGreaterThan($this->trim($comparedToValue));
-            } catch (MathException) {
+            } catch (MathException|BrickMathException) {
                 return false;
             }
         }
@@ -1370,7 +1370,7 @@ trait ValidatesAttributes
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             try {
                 return BigNumber::of($this->getSize($attribute, $value))->isLessThan($this->trim($parameters[0]));
-            } catch (MathException) {
+            } catch (MathException|BrickMathException) {
                 return false;
             }
         }
@@ -1380,7 +1380,11 @@ trait ValidatesAttributes
         }
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
-            return BigNumber::of($this->trim($value))->isLessThan($this->trim($comparedToValue));
+            try {
+                return BigNumber::of($this->trim($value))->isLessThan($this->trim($comparedToValue));
+            } catch (MathException|BrickMathException) {
+                return false;
+            }
         }
 
         if (! $this->isSameType($value, $comparedToValue)) {
@@ -1413,7 +1417,7 @@ trait ValidatesAttributes
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             try {
                 return BigNumber::of($this->getSize($attribute, $value))->isGreaterThanOrEqualTo($this->trim($parameters[0]));
-            } catch (MathException) {
+            } catch (MathException|BrickMathException) {
                 return false;
             }
         }
@@ -1425,7 +1429,7 @@ trait ValidatesAttributes
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
             try {
                 return BigNumber::of($this->trim($value))->isGreaterThanOrEqualTo($this->trim($comparedToValue));
-            } catch (MathException) {
+            } catch (MathException|BrickMathException) {
                 return false;
             }
         }
@@ -1460,7 +1464,7 @@ trait ValidatesAttributes
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             try {
                 return BigNumber::of($this->getSize($attribute, $value))->isLessThanOrEqualTo($this->trim($parameters[0]));
-            } catch (MathException) {
+            } catch (MathException|BrickMathException) {
                 return false;
             }
         }
@@ -1470,7 +1474,11 @@ trait ValidatesAttributes
         }
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
-            return BigNumber::of($this->trim($value))->isLessThanOrEqualTo($this->trim($comparedToValue));
+            try {
+                return BigNumber::of($this->trim($value))->isLessThanOrEqualTo($this->trim($comparedToValue));
+            } catch (MathException|BrickMathException) {
+                return false;
+            }
         }
 
         if (! $this->isSameType($value, $comparedToValue)) {
@@ -1559,7 +1567,7 @@ trait ValidatesAttributes
             return array_diff($value, $parameters) === [];
         }
 
-        return ! is_array($value) && in_array((string) $value, $parameters);
+        return ! is_array($value) && in_array((string) $value, $parameters, true);
     }
 
     /**
@@ -1582,7 +1590,7 @@ trait ValidatesAttributes
             return Str::is($parameters[0], $key);
         });
 
-        return in_array($value, $otherValues);
+        return in_array($value, $otherValues, true);
     }
 
     /**
@@ -1709,7 +1717,7 @@ trait ValidatesAttributes
 
         try {
             return BigNumber::of($this->getSize($attribute, $value))->isLessThanOrEqualTo($this->trim($parameters[0]));
-        } catch (MathException) {
+        } catch (MathException|BrickMathException) {
             return false;
         }
     }
@@ -1819,7 +1827,7 @@ trait ValidatesAttributes
 
         try {
             return BigNumber::of($this->getSize($attribute, $value))->isGreaterThanOrEqualTo($this->trim($parameters[0]));
-        } catch (MathException) {
+        } catch (MathException|BrickMathException) {
             return false;
         }
     }
@@ -2638,7 +2646,7 @@ trait ValidatesAttributes
 
         try {
             return BigNumber::of($this->getSize($attribute, $value))->isEqualTo($this->trim($parameters[0]));
-        } catch (MathException) {
+        } catch (MathException|BrickMathException) {
             return false;
         }
     }

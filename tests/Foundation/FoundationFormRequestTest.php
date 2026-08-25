@@ -384,6 +384,62 @@ class FoundationFormRequestTest extends TestCase
         $this->assertTrue($exception->validator->errors()->has('items.0.name'));
     }
 
+    public function testFailOnUnknownFieldsRejectsLiteralDottedKeysOnlyMatchingNestedRules()
+    {
+        $request = $this->createRequest(
+            ['profile.name' => 'not-an-integer'],
+            FoundationTestFormRequestFailOnUnknownFieldsLiteralDotStub::class,
+            'POST'
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('profile.name'));
+    }
+
+    public function testFailOnUnknownFieldsRejectsLiteralDottedKeysOnlyMatchingWildcardRules()
+    {
+        $request = $this->createRequest(
+            ['items.0.id' => 'not-an-integer'],
+            FoundationTestFormRequestFailOnUnknownFieldsSometimesWildcardStub::class,
+            'POST'
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('items.0.id'));
+    }
+
+    public function testFailOnUnknownFieldsAllowsLiteralDottedKeysMatchingEscapedDotRules()
+    {
+        $request = $this->createRequest(
+            ['profile.name' => 'Taylor'],
+            FoundationTestFormRequestFailOnUnknownFieldsEscapedDotStub::class,
+            'POST'
+        );
+
+        $request->validateResolved();
+
+        $this->assertEquals(['profile.name' => 'Taylor'], $request->validated());
+    }
+
+    public function testFailOnUnknownFieldsAllowsNestedKeysContainingLiteralDotsMatchingWildcardRules()
+    {
+        $request = $this->createRequest(
+            ['items' => ['a.b' => 5]],
+            FoundationTestFormRequestFailOnUnknownFieldsSometimesSingleSegmentWildcardStub::class,
+            'POST'
+        );
+
+        $request->validateResolved();
+
+        $this->assertEquals(['items' => ['a.b' => 5]], $request->validated());
+    }
+
     public function testFailOnUnknownFieldsRejectsMultipleUnknownKeys()
     {
         $request = $this->createRequest(
@@ -921,6 +977,62 @@ class FoundationTestFormRequestFailOnUnknownFieldsSingleSegmentWildcardStub exte
     public function rules()
     {
         return ['items.*' => 'array'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsLiteralDotStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['profile.name' => 'sometimes|integer'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsEscapedDotStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['profile\.name' => 'sometimes|string'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsSometimesWildcardStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['items.*.id' => 'sometimes|integer'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsSometimesSingleSegmentWildcardStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['items.*' => 'sometimes|integer'];
     }
 
     public function authorize()

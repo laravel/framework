@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Component;
-use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Finder\Finder;
@@ -246,13 +245,10 @@ class BladeTest extends TestCase
 
     public function test_view_cache_command_deduplicates_paths_before_compiling()
     {
-        View::addNamespace('templates', join_paths(__DIR__, 'templates'));
-        View::addNamespace('components', join_paths(__DIR__, 'templates', 'components'));
+        View::addNamespace('templates', join_paths(__DIR__, 'Fixtures', 'templates'));
+        View::addNamespace('components', join_paths(__DIR__, 'Fixtures', 'templates', 'components'));
 
-        $compiler = Mockery::mock(app('blade.compiler'))->makePartial();
-        $compiler->expects('compile')->with(realpath(__DIR__.'/templates/components/panel.blade.php'));
-
-        $this->instance('blade.compiler', $compiler);
+        Blade::partialMock()->expects('compile')->with(realpath(__DIR__.'/Fixtures/templates/components/panel.blade.php'));
 
         $this->artisan('view:cache');
     }
@@ -261,7 +257,7 @@ class BladeTest extends TestCase
     #[\Override]
     protected function defineEnvironment($app)
     {
-        $app['config']->set('view.paths', [__DIR__.'/templates']);
+        $app['config']->set('view.paths', [__DIR__.'/Fixtures/templates']);
     }
 }
 

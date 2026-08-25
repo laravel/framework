@@ -6,6 +6,7 @@ namespace Illuminate\Tests;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Lottery;
 use Illuminate\Support\Once;
 use Illuminate\Support\Sleep;
@@ -21,6 +22,7 @@ final class AfterEachTestSubscriber implements FinishedSubscriber
             \Mockery::close();
         }
 
+        Date::useDefault();
         Carbon::setTestNow();
         CarbonImmutable::setTestNow();
         date_default_timezone_set('UTC');

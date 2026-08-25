@@ -42,7 +42,7 @@ class AboutCommandTest extends TestCase
         });
     }
 
-    #[WithEnv('VIEW_COMPILED_PATH', __DIR__.'/../../View/templates')]
+    #[WithEnv('VIEW_COMPILED_PATH', __DIR__.'/../../View/Fixtures/templates')]
     public function testItRespectsCustomPathForCompiledViews(): void
     {
         $process = remote('about --json', ['APP_ENV' => 'local'])->mustRun();

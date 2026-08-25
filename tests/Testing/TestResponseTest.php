@@ -3177,6 +3177,44 @@ EOT
         $response->assertStatus(200);
     }
 
+    public function testValidationErrorsAreIncludedInAssertionFailureWhenSessionIsJsonSerialized(): void
+    {
+        $session = new Store('test-session', new NullSessionHandler(), null, 'json');
+
+        $response = TestResponse::fromBaseResponse(
+            tap(new RedirectResponse('/'))
+                ->setSession($session)
+                ->withErrors([
+                    'first_name' => 'The first name field is required.',
+                    'last_name' => 'The last name field is required.',
+                ])
+        );
+
+        $session->save(); // Required to serialize error bag to JSON
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches('/Expected response status code \[200\] but received 302.*The first name field is required.*The last name field is required/s');
+
+        $response->assertStatus(200);
+    }
+
+    public function testValidationErrorsAreIncludedInAssertionFailureWhenJsonSerializedSessionIsNotSaved(): void
+    {
+        $response = TestResponse::fromBaseResponse(
+            tap(new RedirectResponse('/'))
+                ->setSession(new Store('test-session', new NullSessionHandler(), null, 'json'))
+                ->withErrors([
+                    'first_name' => 'The first name field is required.',
+                    'last_name' => 'The last name field is required.',
+                ])
+        );
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches('/Expected response status code \[200\] but received 302.*The first name field is required.*The last name field is required/s');
+
+        $response->assertStatus(200);
+    }
+
     public function testJsonErrorsAreIncludedInAssertionFailure(): void
     {
         $response = TestResponse::fromBaseResponse(new JsonResponse([

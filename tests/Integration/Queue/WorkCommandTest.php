@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -12,6 +11,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
@@ -198,11 +198,8 @@ class WorkCommandTest extends QueueTestCase
         $cache->expects('get')->with('illuminate:queues:paused')->andReturn(null);
         $cache->expects('many')->andReturn([]);
 
-        $cacheManager = Mockery::mock(CacheManager::class);
-        $cacheManager->expects('driver')->times(2)->andReturn($cache);
-        $cacheManager->expects('store')->andReturn($cache);
-
-        $this->app->instance('cache', $cacheManager);
+        Cache::expects('driver')->times(2)->andReturn($cache);
+        Cache::expects('store')->andReturn($cache);
 
         Queue::push(new FirstJob);
 
@@ -228,11 +225,8 @@ class WorkCommandTest extends QueueTestCase
         $cache->expects('get')->times(2)->with('illuminate:queue:restart')->andReturn(null);
         $cache->shouldNotReceive('many');
 
-        $cacheManager = Mockery::mock(CacheManager::class);
-        $cacheManager->expects('driver')->times(2)->andReturn($cache);
-        $cacheManager->shouldNotReceive('store');
-
-        $this->app->instance('cache', $cacheManager);
+        Cache::expects('driver')->times(2)->andReturn($cache);
+        Cache::shouldNotReceive('store');
 
         Queue::push(new FirstJob);
 

@@ -38,6 +38,7 @@ use Illuminate\Routing\RouteGroup;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Str;
+use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -45,7 +46,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use UnexpectedValueException;
 
-include_once __DIR__.'/Enums.php';
+include_once __DIR__.'/Fixtures/Enums.php';
 
 class RoutingRouteTest extends TestCase
 {
@@ -1247,7 +1248,7 @@ class RoutingRouteTest extends TestCase
     public function testRouteGroupingFromFile()
     {
         $router = $this->getRouter();
-        $router->group(['prefix' => 'api'], __DIR__.'/fixtures/routes.php');
+        $router->group(['prefix' => 'api'], __DIR__.'/Fixtures/routes.php');
 
         $route = last($router->getRoutes()->get());
         $request = Request::create('api/users', 'GET');
@@ -1996,12 +1997,12 @@ class RoutingRouteTest extends TestCase
 
     public function testImplicitBindingsWithOptionalParameterUsingEnumIsAlwaysCastedToEnum()
     {
-        include_once 'Enums.php';
+        include_once 'Fixtures/Enums.php';
 
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (?\Illuminate\Tests\Routing\CategoryBackedEnum $bar = null) {
+            'uses' => function (?\Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum $bar = null) {
                 $this->assertInstanceOf(CategoryBackedEnum::class, $bar);
             },
         ]);

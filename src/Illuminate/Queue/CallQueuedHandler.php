@@ -152,6 +152,10 @@ class CallQueuedHandler
                     $lockReleased = true;
                 }
 
+                if (! empty($command->debounceOwner ?? '')) {
+                    (new DebounceLock($this->container->make(Cache::class)))->releaseMaxWait($command);
+                }
+
                 return $this->dispatcher->dispatchNow(
                     $command, $this->resolveHandler($job, $command)
                 );

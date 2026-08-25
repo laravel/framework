@@ -177,12 +177,12 @@ class Factory
     /**
      * Assert that a process was recorded matching a given truth test.
      *
-     * @param  \Closure|string  $callback
+     * @param  \Closure|array<array-key, string>|string  $callback
      * @return $this
      */
-    public function assertRan(Closure|string $callback)
+    public function assertRan(Closure|array|string $callback)
     {
-        $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
+        $callback = $callback instanceof Closure ? $callback : fn ($process) => $process->command === $callback;
 
         PHPUnit::assertTrue(
             (new Collection($this->recorded))->contains(function ($pair) use ($callback) {
@@ -197,13 +197,13 @@ class Factory
     /**
      * Assert that a process was recorded a given number of times matching a given truth test.
      *
-     * @param  \Closure|string  $callback
+     * @param  \Closure|array<array-key, string>|string  $callback
      * @param  int  $times
      * @return $this
      */
-    public function assertRanTimes(Closure|string $callback, int $times = 1)
+    public function assertRanTimes(Closure|array|string $callback, int $times = 1)
     {
-        $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
+        $callback = $callback instanceof Closure ? $callback : fn ($process) => $process->command === $callback;
 
         $count = (new Collection($this->recorded))
             ->filter(fn ($pair) => $callback($pair[0], $pair[1]))
@@ -218,14 +218,51 @@ class Factory
     }
 
     /**
-     * Assert that a process was not recorded matching a given truth test.
+     * Assert that the given processes were run in the given order.
      *
-     * @param  \Closure|string  $callback
+     * @param  list<\Closure|array<array-key, string>|string>  $callbacks
      * @return $this
      */
-    public function assertNotRan(Closure|string $callback)
+    public function assertRanInOrder(array $callbacks)
     {
-        $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
+        $this->assertRanCount(count($callbacks));
+
+        foreach ($callbacks as $index => $callback) {
+            $callback = $callback instanceof Closure
+                ? $callback
+                : fn ($process) => $process->command === $callback;
+
+            PHPUnit::assertTrue(
+                $callback($this->recorded[$index][0], $this->recorded[$index][1]),
+                'An expected process (#'.($index + 1).') was not invoked.'
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert how many processes have been recorded.
+     *
+     * @param  int  $count
+     * @return $this
+     */
+    protected function assertRanCount(int $count)
+    {
+        PHPUnit::assertCount($count, $this->recorded);
+
+        return $this;
+    }
+
+    /**
+     * Assert that a process was not recorded matching a given truth test.
+     *
+     * @param  \Closure|array<array-key, string>|string  $callback
+     * @return $this
+     */
+    public function assertNotRan(Closure|array|string $callback)
+    {
+        $callback = $callback instanceof Closure ? $callback : fn ($process) => $process->command === $callback;
 
         PHPUnit::assertTrue(
             (new Collection($this->recorded))->doesntContain(function ($pair) use ($callback) {
@@ -240,10 +277,10 @@ class Factory
     /**
      * Assert that a process was not recorded matching a given truth test.
      *
-     * @param  \Closure|string  $callback
+     * @param  \Closure|array<array-key, string>|string  $callback
      * @return $this
      */
-    public function assertDidntRun(Closure|string $callback)
+    public function assertDidntRun(Closure|array|string $callback)
     {
         return $this->assertNotRan($callback);
     }

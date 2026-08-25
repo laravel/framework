@@ -54,8 +54,9 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
-use Illuminate\Tests\Database\stubs\TestCast;
-use Illuminate\Tests\Database\stubs\TestValueObject;
+use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
+use Illuminate\Tests\Database\Fixtures\TestCast;
+use Illuminate\Tests\Database\Fixtures\TestValueObject;
 use InvalidArgumentException;
 use LogicException;
 use Mockery;
@@ -65,7 +66,7 @@ use ReflectionClass;
 use stdClass;
 use Stringable as NativeStringable;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums/Enums.php';
 
 class DatabaseEloquentModelTest extends TestCase
 {
@@ -717,6 +718,31 @@ class DatabaseEloquentModelTest extends TestCase
     public function testFindMethodUseWritePdo()
     {
         EloquentModelFindWithWritePdoStub::onWriteConnection()->find(1);
+    }
+
+    public function testRefreshForUpdateUsesLockForUpdate()
+    {
+        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes,load]');
+        $model->exists = true;
+        $model->setRawAttributes(['id' => 1, 'name' => 'Taylor'], true);
+
+        $freshModel = new EloquentModelStub;
+        $freshModel->setRawAttributes(['id' => 1, 'name' => 'Abigail']);
+
+        $query = Mockery::mock(Builder::class);
+        $model->expects('newQueryWithoutScopes')->once()->andReturn($query);
+        $query->expects('lockForUpdate')->once()->andReturnSelf();
+        $query->expects('where')->once()->with('id', '=', 1)->andReturnSelf();
+        $query->expects('useWritePdo')->once()->andReturnSelf();
+        $query->expects('firstOrFail')->once()->andReturn($freshModel);
+        $model->expects('load')->once()->with([])->andReturnSelf();
+
+        $result = $model->refreshForUpdate();
+
+        $this->assertSame($model, $result);
+        $this->assertSame('Abigail', $model->name);
+        $this->assertEmpty($model->getDirty());
+        $this->assertSame('Abigail', $model->getOriginal('name'));
     }
 
     public function testDestroyMethodCallsQueryBuilderCorrectly()
@@ -2189,7 +2215,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelsAssumeTheirName()
     {
-        require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
+        require_once __DIR__.'/Fixtures/EloquentModelNamespacedStub.php';
 
         $model = new EloquentModelWithoutTableStub;
         $this->assertSame('eloquent_model_without_table_stubs', $model->getTable());
@@ -3878,7 +3904,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         // Simulate a JSON error
         json_decode('{');
-        $this->assertNotSame(json_last_error(), JSON_ERROR_NONE);
+        $this->assertNotSame(JSON_ERROR_NONE, json_last_error());
 
         $this->assertSame('{"name":"Mateus"}', $user->toJson(JSON_THROW_ON_ERROR));
     }

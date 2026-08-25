@@ -90,7 +90,9 @@ class ImageManager extends Manager
     public function fromUrl(string $url): Image
     {
         return new Image(
-            fn () => $this->container->make(HttpFactory::class)->get($url)->body(),
+            fn () => $this->container->make(HttpFactory::class)->get($url)
+                ->throw()
+                ->body(),
         );
     }
 

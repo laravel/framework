@@ -9,12 +9,16 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\RouteRegistrar;
+use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
+use Illuminate\Tests\Routing\Fixtures\IntegerEnum;
+use Illuminate\Tests\Routing\Fixtures\RouteDomainEnum;
+use Illuminate\Tests\Routing\Fixtures\RouteNameEnum;
 use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Stringable;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class RouteRegistrarTest extends TestCase
 {
@@ -1455,6 +1459,14 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertSame('users.index', $this->getRoute()->getName());
+    }
+
+    public function testCanSetRouteNameWithNonCallableControllerActionArray()
+    {
+        $this->router->name('users.missing')->get('users', [RouteRegistrarControllerStub::class, 'missing']);
+
+        $this->assertSame('users.missing', $this->getRoute()->getName());
+        $this->assertSame(RouteRegistrarControllerStub::class.'@missing', ltrim($this->getRoute()->getAction('uses'), '\\'));
     }
 
     public function testCanSetRouteNameUsingStringBackedEnum()

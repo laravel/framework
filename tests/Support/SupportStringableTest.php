@@ -13,6 +13,7 @@ use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Extension\ExtensionInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\VarDumper;
 
 class SupportStringableTest extends TestCase
 {
@@ -271,6 +272,13 @@ class SupportStringableTest extends TestCase
 
         $this->assertSame(DIRECTORY_SEPARATOR, (string) $this->stringable('/framework/')->dirname());
         $this->assertSame(DIRECTORY_SEPARATOR, (string) $this->stringable('/')->dirname());
+    }
+
+    public function testBasename(): void
+    {
+        $this->assertSame('Support', (string) $this->stringable('/framework/tests/Support')->basename());
+        $this->assertSame('Str.php', (string) $this->stringable('/framework/src/Str.php')->basename());
+        $this->assertSame('Str', (string) $this->stringable('/framework/src/Str.php')->basename('.php'));
     }
 
     public function testUcsplitOnStringable()
@@ -613,6 +621,55 @@ class SupportStringableTest extends TestCase
     {
         $this->assertSame('Jefferson Costella', (string) $this->stringable('jefferson costella')->title());
         $this->assertSame('Jefferson Costella', (string) $this->stringable('jefFErson coSTella')->title());
+    }
+
+    public function testHeadline(): void
+    {
+        $this->assertSame('Jefferson Costella', (string) $this->stringable('jefferson costella')->headline());
+        $this->assertSame('Laravel Php Framework', (string) $this->stringable('laravel_php_framework')->headline());
+        $this->assertSame('Foo Bar Baz', (string) $this->stringable('foo-barBaz')->headline());
+    }
+
+    public function testApa(): void
+    {
+        $this->assertSame('Back to the Future', (string) $this->stringable('back to the future')->apa());
+        $this->assertSame('Self-Report', (string) $this->stringable('self-report')->apa());
+    }
+
+    public function testLcfirst(): void
+    {
+        $this->assertSame('laravel', (string) $this->stringable('Laravel')->lcfirst());
+        $this->assertSame('laravel framework', (string) $this->stringable('Laravel framework')->lcfirst());
+    }
+
+    public function testUcfirst(): void
+    {
+        $this->assertSame('Laravel', (string) $this->stringable('laravel')->ucfirst());
+        $this->assertSame('Laravel framework', (string) $this->stringable('laravel framework')->ucfirst());
+    }
+
+    public function testConvertCase(): void
+    {
+        $this->assertSame('HELLO', (string) $this->stringable('hello')->convertCase(MB_CASE_UPPER));
+        $this->assertSame('hello', (string) $this->stringable('HELLO')->convertCase(MB_CASE_LOWER));
+    }
+
+    public function testWordWrap(): void
+    {
+        $this->assertSame('Hello<br />World', (string) $this->stringable('Hello World')->wordWrap(3, '<br />'));
+        $this->assertSame('Hel<br />lo<br />Wor<br />ld', (string) $this->stringable('Hello World')->wordWrap(3, '<br />', true));
+    }
+
+    public function testPlural(): void
+    {
+        $this->assertSame('Laracons', (string) $this->stringable('Laracon')->plural(3));
+        $this->assertSame('Laracon', (string) $this->stringable('Laracon')->plural(1));
+    }
+
+    public function testSingular(): void
+    {
+        $this->assertSame('child', (string) $this->stringable('children')->singular());
+        $this->assertSame('mouse', (string) $this->stringable('mice')->singular());
     }
 
     public function testWithoutWordsDoesntProduceError()
@@ -1016,6 +1073,20 @@ class SupportStringableTest extends TestCase
     public function testKebab()
     {
         $this->assertSame('laravel-php-framework', (string) $this->stringable('LaravelPhpFramework')->kebab());
+    }
+
+    public function testChopStart(): void
+    {
+        $this->assertSame('laravel.com', (string) $this->stringable('http://laravel.com')->chopStart('http://'));
+        $this->assertSame('http://laravel.com', (string) $this->stringable('http://laravel.com')->chopStart('https://'));
+        $this->assertSame('laravel.com', (string) $this->stringable('http://laravel.com')->chopStart(['https://', 'http://']));
+    }
+
+    public function testChopEnd(): void
+    {
+        $this->assertSame('path/to/file', (string) $this->stringable('path/to/file.php')->chopEnd('.php'));
+        $this->assertSame('path/to/file.php', (string) $this->stringable('path/to/file.php')->chopEnd('.html'));
+        $this->assertSame('path/to/file', (string) $this->stringable('path/to/file.php')->chopEnd(['.html', '.php']));
     }
 
     public function testLower()
@@ -1610,5 +1681,20 @@ class SupportStringableTest extends TestCase
 
         $this->assertNotSame('foo', $encrypted->value());
         $this->assertSame('foo', $encrypted->decrypt()->value());
+    }
+
+    public function testDump(): void
+    {
+        $log = new Collection;
+
+        VarDumper::setHandler(function ($value) use ($log) {
+            $log->add($value);
+        });
+
+        $this->stringable('foo')->dump('one', 'two');
+
+        $this->assertSame(['foo', 'one', 'two'], $log->all());
+
+        VarDumper::setHandler(null);
     }
 }

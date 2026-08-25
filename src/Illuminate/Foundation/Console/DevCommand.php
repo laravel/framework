@@ -21,13 +21,6 @@ class DevCommand extends Command
     use Prohibitable;
 
     /**
-     * The version of `@laravel/multiplex` to use.
-     *
-     * @var string
-     */
-    protected const MULTIPLEX_VERSION = '0.4';
-
-    /**
      * The name and signature of the console command.
      *
      * @var string
@@ -134,7 +127,7 @@ class DevCommand extends Command
 
         $title = 'artisan dev · '.(config('app.name') === 'Laravel' ? basename(base_path()) : config('app.name'));
 
-        $command = '@laravel/multiplex@'.self::MULTIPLEX_VERSION.' --title '.escapeshellarg($title);
+        $command = '@laravel/multiplex --title '.escapeshellarg($title);
 
         if (! $flags->isEmpty()) {
             $command .= ' '.$flags->implode(' ');

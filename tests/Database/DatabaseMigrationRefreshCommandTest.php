@@ -102,15 +102,19 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
     }
 }
 
-class InputMatcher extends Mockery\Matcher\MatcherAbstract
+class InputMatcher implements \Mockery\Matcher\MatcherInterface
 {
+    public function __construct(protected $expected)
+    {
+    }
+
     /**
      * @param  \Symfony\Component\Console\Input\ArrayInput  $actual
      * @return bool
      */
     public function match(&$actual)
     {
-        return (string) $actual == $this->_expected;
+        return (string) $actual === $this->expected;
     }
 
     public function __toString()

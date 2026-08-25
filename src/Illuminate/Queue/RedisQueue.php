@@ -156,6 +156,36 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get the number of pending jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalPendingSize()
+    {
+        return $this->allQueueNames()->sum(fn ($name) => $this->pendingSize($name));
+    }
+
+    /**
+     * Get the number of delayed jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalDelayedSize()
+    {
+        return $this->allQueueNames()->sum(fn ($name) => $this->delayedSize($name));
+    }
+
+    /**
+     * Get the number of reserved jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalReservedSize()
+    {
+        return $this->allQueueNames()->sum(fn ($name) => $this->reservedSize($name));
+    }
+
+    /**
      * Get the pending jobs for the given queue.
      *
      * @param  \UnitEnum|string|null  $queue
@@ -542,7 +572,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function getQueue($queue)
     {
-        return 'queues:'.(enum_value($queue) ?: $this->default);
+        return 'queues:'.$this->resolveQueue(enum_value($queue) ?: $this->default);
     }
 
     /**
@@ -553,11 +583,11 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function getQueueRedisKey($queue = null)
     {
-        $queue = enum_value($queue) ?: $this->default;
+        $queue = $this->resolveQueue(enum_value($queue) ?: $this->default);
 
         return $this->isClusterConnection() && ! Connection::hasHashTag($queue)
-            ? $this->getQueue('{'.$queue.'}')
-            : $this->getQueue($queue);
+            ? 'queues:{'.$queue.'}'
+            : 'queues:'.$queue;
     }
 
     /**

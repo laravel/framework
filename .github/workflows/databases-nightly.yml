@@ -8,13 +8,15 @@ permissions:
   contents: read
 
 jobs:
-  mysql_9:
+  mysql_innovation:
+    if: github.repository == 'laravel/framework'
+
     runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     services:
       mysql:
-        image: mysql:9
+        image: mysql:innovation
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: laravel
@@ -22,7 +24,7 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
-    name: MySQL 9
+    name: MySQL Innovation
 
     steps:
       - name: Checkout code
@@ -41,6 +43,8 @@ jobs:
           DB_CONNECTION: mysql
 
   mariadb:
+    if: github.repository == 'laravel/framework'
+
     runs-on: ubuntu-24.04
     continue-on-error: true
     timeout-minutes: 10

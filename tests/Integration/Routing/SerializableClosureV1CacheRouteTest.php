@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Route;
+namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Attributes\WithConfig;
@@ -29,7 +29,7 @@ class SerializableClosureV1CacheRouteTest extends TestCase
 
     protected function setUp(): void
     {
-        $_ENV['APP_ROUTES_CACHE'] = realpath(join_paths(__DIR__, 'stubs', 'serializable-closure-v1', 'routes-v7.php'));
+        $_ENV['APP_ROUTES_CACHE'] = realpath(join_paths(__DIR__, 'Fixtures', 'serializable-closure-v1', 'routes-v7.php'));
 
         parent::setUp();
     }

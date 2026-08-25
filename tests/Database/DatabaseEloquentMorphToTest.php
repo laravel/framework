@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Tests\Database\stubs\TestEnum;
+use Illuminate\Tests\Database\Fixtures\TestEnum;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -115,20 +115,20 @@ class DatabaseEloquentMorphToTest extends TestCase
         $this->assertSame('taylor', $result->username);
     }
 
-    public function testMorphToWithZeroMorphType()
+    public function testMorphToWithZeroMorphType(): void
     {
         $parent = $this->getMockBuilder(EloquentMorphToModelStub::class)->onlyMethods(['getAttributeFromArray', 'morphEagerTo', 'morphInstanceTo'])->getMock();
-        $parent->method('getAttributeFromArray')->with('relation_type')->willReturn(0);
+        $parent->expects($this->once())->method('getAttributeFromArray')->with('relation_type')->willReturn(0);
         $parent->expects($this->once())->method('morphInstanceTo');
         $parent->expects($this->never())->method('morphEagerTo');
 
         $parent->relation();
     }
 
-    public function testMorphToWithEmptyStringMorphType()
+    public function testMorphToWithEmptyStringMorphType(): void
     {
         $parent = $this->getMockBuilder(EloquentMorphToModelStub::class)->onlyMethods(['getAttributeFromArray', 'morphEagerTo', 'morphInstanceTo'])->getMock();
-        $parent->method('getAttributeFromArray')->with('relation_type')->willReturn('');
+        $parent->expects($this->once())->method('getAttributeFromArray')->with('relation_type')->willReturn('');
         $parent->expects($this->once())->method('morphEagerTo');
         $parent->expects($this->never())->method('morphInstanceTo');
 
