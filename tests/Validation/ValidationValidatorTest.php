@@ -10154,6 +10154,51 @@ class ValidationValidatorTest extends TestCase
         ], $validator->messages()->keys());
     }
 
+    #[DataProvider('untrimmableWhitespaceLiteralParameterRules')]
+    public function testItFailsSizeRulesForNumericStringsWithUntrimmableWhitespaceWithoutThrowing($value, $rule)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['foo' => $value], ['foo' => ['numeric', $rule]]);
+
+        $this->assertFalse($validator->passes());
+    }
+
+    public static function untrimmableWhitespaceLiteralParameterRules()
+    {
+        $data = [];
+
+        foreach (["\x0C5", "5\x0C"] as $value) {
+            foreach (['min:3', 'max:3', 'size:3', 'between:1,5', 'gt:0', 'lt:10', 'gte:0', 'lte:10'] as $rule) {
+                $data[] = [$value, $rule];
+            }
+        }
+
+        return $data;
+    }
+
+    #[DataProvider('untrimmableWhitespaceFieldComparisonRules')]
+    public function testItFailsFieldComparisonRulesForUntrimmableWhitespaceWithoutThrowing($data, $rule)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, $data, ['foo' => ['numeric', $rule]]);
+
+        $this->assertFalse($validator->passes());
+    }
+
+    public static function untrimmableWhitespaceFieldComparisonRules()
+    {
+        $data = [];
+
+        foreach (['gt:bar', 'lt:bar', 'gte:bar', 'lte:bar'] as $rule) {
+            foreach (["\x0C5", "5\x0C"] as $value) {
+                $data[] = [['foo' => $value, 'bar' => 5], $rule];
+                $data[] = [['foo' => 5, 'bar' => $value], $rule];
+            }
+        }
+
+        return $data;
+    }
+
     #[DataProvider('outsideRangeExponents')]
     public function testItLimitsLengthOfScientificNotationExponent($value)
     {
