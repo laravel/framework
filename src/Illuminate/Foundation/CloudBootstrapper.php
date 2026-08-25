@@ -157,7 +157,7 @@ class CloudBootstrapper
         ];
 
         $config['connection']['credential_cache'] ??= [
-            'enabled' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_ENABLED', true),
+            'enabled' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_ENABLED', false),
             'store' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_STORE'),
             'fallback_store' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_FALLBACK_STORE', 'file'),
         ];
@@ -175,7 +175,7 @@ class CloudBootstrapper
         foreach ($app['config']->get('queue.connections', []) as $name => $connection) {
             if (($connection['driver'] ?? null) === 'sqs' && ! isset($connection['credential_cache'])) {
                 $app['config']->set("queue.connections.{$name}.credential_cache", [
-                    'enabled' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_ENABLED', true),
+                    'enabled' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_ENABLED', false),
                     'store' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_STORE'),
                     'fallback_store' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_FALLBACK_STORE', 'file'),
                 ]);

@@ -154,7 +154,7 @@ class QueueTest extends TestCase
             'delete_after_processing' => true,
         ];
         $expected['connection']['credential_cache'] = [
-            'enabled' => true,
+            'enabled' => false,
             'store' => null,
             'fallback_store' => 'file',
         ];
@@ -245,10 +245,10 @@ class QueueTest extends TestCase
 
         CloudBootstrapper::configureQueueCredentialCaching($this->app);
 
-        // App-level SQS connections dispatch through the same pod identity, so
-        // they share the cached credentials by default too.
+        // App-level SQS connections receive the credential cache configuration,
+        // but caching remains disabled until it is explicitly enabled.
         $this->assertSame(
-            ['enabled' => true, 'store' => null, 'fallback_store' => 'file'],
+            ['enabled' => false, 'store' => null, 'fallback_store' => 'file'],
             $this->app['config']->get('queue.connections.sqs.credential_cache'),
         );
 
@@ -263,7 +263,10 @@ class QueueTest extends TestCase
 
         try {
             CloudBootstrapper::configureManagedQueues($this->app);
-            config(['queue.connections.cloud.connection.credential_cache.store' => 'array']);
+            config([
+                'queue.connections.cloud.connection.credential_cache.enabled' => true,
+                'queue.connections.cloud.connection.credential_cache.store' => 'array',
+            ]);
             CloudBootstrapper::bootManagedQueues($this->app);
 
             Cache::store('array')->forever(
