@@ -102,7 +102,8 @@ class WorkCommandTest extends QueueTestCase
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--memory' => 1024,
-        ])->assertExitCode(0);
+        ])->expectsOutputToContain('Queue empty')
+            ->assertExitCode(0);
 
         $this->assertSame(0, Queue::size());
         $this->assertTrue(FirstJob::$ran);
@@ -118,12 +119,27 @@ class WorkCommandTest extends QueueTestCase
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--memory' => 1,
-        ])->assertExitCode(12);
+        ])->expectsOutputToContain('Memory limit exceeded')
+            ->assertExitCode(12);
 
         // Memory limit isn't checked until after the first job is attempted.
         $this->assertSame(1, Queue::size());
         $this->assertTrue(FirstJob::$ran);
         $this->assertFalse(SecondJob::$ran);
+    }
+
+    public function testStopReasonIsWrittenAsJson()
+    {
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
+
+        $this->artisan('queue:work', [
+            '--daemon' => true,
+            '--stop-when-empty' => true,
+            '--memory' => 1,
+            '--json' => true,
+        ])->expectsOutputToContain('"status":"stopped","reason":"memory","exit_code":12')
+            ->assertExitCode(12);
     }
 
     public function testMaxJobsExceeded()
@@ -137,7 +153,7 @@ class WorkCommandTest extends QueueTestCase
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--max-jobs' => 1,
-        ]);
+        ])->expectsOutputToContain('Maximum jobs exceeded');
 
         // Memory limit isn't checked until after the first job is attempted.
         $this->assertSame(1, Queue::size());
