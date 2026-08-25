@@ -127,14 +127,12 @@ class SqsConnector implements ConnectorInterface
             $config['credentials_cache']['fallback_store'] ?? null,
         ];
 
-        return CredentialProvider::cache(
-            $provider,
-            new AwsCredentialCache(
-                fn () => Container::getInstance()->make('cache')->store($store),
-                $fallbackStore ? fn () => Container::getInstance()->make('cache')->store($fallbackStore) : null,
-            ),
-            static::credentialsCacheKey($config),
+        $cache = new AwsCredentialCache(
+            fn () => Container::getInstance()->make('cache')->store($store),
+            $fallbackStore ? fn () => Container::getInstance()->make('cache')->store($fallbackStore) : null,
         );
+
+        return fn () => $cache->resolve(static::credentialsCacheKey($config), $provider);
     }
 
     /**

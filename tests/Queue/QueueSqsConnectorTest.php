@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Aws\Credentials\CredentialProvider;
 use Aws\Credentials\Credentials;
 use Closure;
 use GuzzleHttp\Promise\Create;
@@ -66,23 +65,80 @@ class QueueSqsConnectorTest extends TestCase
         $repository = new Repository(new ArrayStore);
         $repository->forever('credentials', new Credentials('cached-key', 'cached-secret', 'cached-token', time() + 3600));
 
-        $provider = CredentialProvider::cache(
-            fn () => $this->fail('The underlying provider should not be invoked on a cache hit.'),
-            new AwsCredentialCache(fn () => $repository),
+        $provider = fn () => (new AwsCredentialCache(fn () => $repository))->resolve(
             'credentials',
+            fn () => $this->fail('The underlying provider should not be invoked on a cache hit.'),
         );
 
         $this->assertSame('cached-key', $provider()->wait()->getAccessKeyId());
+    }
+
+    public function testCredentialResolutionRefreshesCredentialsBeforeTheyExpire()
+    {
+        $repository = new Repository(new ArrayStore);
+        $repository->forever('credentials', new Credentials('expiring-key', 'expiring-secret', expires: time() + 30));
+        $calls = 0;
+
+        $credentials = (new AwsCredentialCache(fn () => $repository))->resolve(
+            'credentials',
+            function () use (&$calls) {
+                $calls++;
+
+                return Create::promiseFor(new Credentials('fresh-key', 'fresh-secret', expires: time() + 3600));
+            },
+        )->wait();
+
+        $this->assertSame(1, $calls);
+        $this->assertSame('fresh-key', $credentials->getAccessKeyId());
+        $this->assertSame('fresh-key', $repository->get('credentials')->getAccessKeyId());
+    }
+
+    public function testCredentialResolutionReusesCredentialsRefreshedByAnotherProcess()
+    {
+        $repository = new Repository(new ArrayStore);
+        $cache = new AwsCredentialCache(fn () => $repository);
+        $calls = 0;
+        $provider = function () use (&$calls) {
+            $calls++;
+
+            return Create::promiseFor(new Credentials('shared-key', 'shared-secret', expires: time() + 3600));
+        };
+
+        $first = $cache->resolve('credentials', $provider)->wait();
+        $second = $cache->resolve('credentials', $provider)->wait();
+
+        $this->assertSame(1, $calls);
+        $this->assertSame('shared-key', $first->getAccessKeyId());
+        $this->assertSame('shared-key', $second->getAccessKeyId());
+    }
+
+    public function testCredentialResolutionCachesCredentialsWithoutAnExpiration()
+    {
+        $repository = new Repository(new ArrayStore);
+        $cache = new AwsCredentialCache(fn () => $repository);
+        $calls = 0;
+        $provider = function () use (&$calls) {
+            $calls++;
+
+            return Create::promiseFor(new Credentials('constant-key', 'constant-secret'));
+        };
+
+        $cache->resolve('credentials', $provider)->wait();
+        $credentials = $cache->resolve('credentials', $provider)->wait();
+
+        $this->assertSame(1, $calls);
+        $this->assertSame('constant-key', $credentials->getAccessKeyId());
     }
 
     public function testCredentialResolutionFallsBackToADirectFetchWhenTheCacheStoreIsUnavailable()
     {
         // A broken cache backend (e.g. Redis down) must behave exactly like a
         // cache miss rather than breaking credential resolution.
-        $provider = CredentialProvider::cache(
-            fn () => Create::promiseFor(new Credentials('direct-key', 'direct-secret')),
-            new AwsCredentialCache(fn () => throw new RuntimeException('Cache store is down.')),
+        $provider = fn () => (new AwsCredentialCache(
+            fn () => throw new RuntimeException('Cache store is down.'),
+        ))->resolve(
             'credentials',
+            fn () => Create::promiseFor(new Credentials('direct-key', 'direct-secret')),
         );
 
         $this->assertSame('direct-key', $provider()->wait()->getAccessKeyId());
@@ -95,13 +151,12 @@ class QueueSqsConnectorTest extends TestCase
 
         // With the primary store down, the fallback keeps credential fetches
         // deduplicated rather than degrading straight to one fetch per process.
-        $provider = CredentialProvider::cache(
-            fn () => $this->fail('The underlying provider should not be invoked on a fallback cache hit.'),
-            new AwsCredentialCache(
-                fn () => throw new RuntimeException('Cache store is down.'),
-                fn () => $fallback,
-            ),
+        $provider = fn () => (new AwsCredentialCache(
+            fn () => throw new RuntimeException('Cache store is down.'),
+            fn () => $fallback,
+        ))->resolve(
             'credentials',
+            fn () => $this->fail('The underlying provider should not be invoked on a fallback cache hit.'),
         );
 
         $this->assertSame('fallback-key', $provider()->wait()->getAccessKeyId());
@@ -116,53 +171,44 @@ class QueueSqsConnectorTest extends TestCase
 
         // The fallback is written through on every set so it is already warm
         // when the primary store becomes unavailable.
-        $cache->set('credentials', 'value', 60);
-        $this->assertSame('value', $primary->get('credentials'));
-        $this->assertSame('value', $fallback->get('credentials'));
+        $cache->resolve(
+            'credentials',
+            fn () => Create::promiseFor(new Credentials('shared-key', 'shared-secret', expires: time() + 3600)),
+        )->wait();
 
-        $cache->remove('credentials');
-        $this->assertNull($primary->get('credentials'));
-        $this->assertNull($fallback->get('credentials'));
+        $this->assertSame('shared-key', $primary->get('credentials')->getAccessKeyId());
+        $this->assertSame('shared-key', $fallback->get('credentials')->getAccessKeyId());
     }
 
     public function testThePrimaryStoreIsPreferredOverTheFallbackStore()
     {
         $primary = new Repository(new ArrayStore);
-        $primary->forever('credentials', 'primary-value');
+        $primary->forever('credentials', new Credentials('primary-key', 'primary-secret', expires: time() + 3600));
 
         $fallback = new Repository(new ArrayStore);
-        $fallback->forever('credentials', 'fallback-value');
+        $fallback->forever('credentials', new Credentials('fallback-key', 'fallback-secret', expires: time() + 3600));
 
         $cache = new AwsCredentialCache(fn () => $primary, fn () => $fallback);
 
-        $this->assertSame('primary-value', $cache->get('credentials'));
+        $credentials = $cache->resolve(
+            'credentials',
+            fn () => $this->fail('The underlying provider should not be invoked on a cache hit.'),
+        )->wait();
+
+        $this->assertSame('primary-key', $credentials->getAccessKeyId());
     }
 
     public function testCredentialResolutionFallsBackToADirectFetchWhenEveryCacheStoreIsUnavailable()
     {
-        $provider = CredentialProvider::cache(
-            fn () => Create::promiseFor(new Credentials('direct-key', 'direct-secret')),
-            new AwsCredentialCache(
-                fn () => throw new RuntimeException('Cache store is down.'),
-                fn () => throw new RuntimeException('Fallback store is down too.'),
-            ),
+        $provider = fn () => (new AwsCredentialCache(
+            fn () => throw new RuntimeException('Cache store is down.'),
+            fn () => throw new RuntimeException('Fallback store is down too.'),
+        ))->resolve(
             'credentials',
+            fn () => Create::promiseFor(new Credentials('direct-key', 'direct-secret')),
         );
 
         $this->assertSame('direct-key', $provider()->wait()->getAccessKeyId());
-    }
-
-    public function testCredentialCacheStoresAndRemovesThroughTheRepository()
-    {
-        $repository = new Repository(new ArrayStore);
-
-        $cache = new AwsCredentialCache(fn () => $repository);
-
-        $cache->set('credentials', 'value', 60);
-        $this->assertSame('value', $cache->get('credentials'));
-
-        $cache->remove('credentials');
-        $this->assertNull($cache->get('credentials'));
     }
 
     public function testCredentialsCacheKeyIsScopedToThePodIdentityAndConnection()
@@ -192,7 +238,7 @@ class QueueSqsConnectorTest extends TestCase
         {
             public function credentials(array $config)
             {
-                return $this->configureCredentials($this->getDefaultConfiguration($config));
+                return $this->withCredentials($this->getDefaultConfiguration($config));
             }
         };
 
