@@ -25,22 +25,16 @@ class RedisTaggedCache extends TaggedCache
     {
         $key = enum_value($key);
 
-        $seconds = null;
+        $seconds = $ttl !== null ? $this->getSeconds($ttl) : null;
 
-        $result = parent::add($key, $value, $ttl);
-
-        if ($ttl !== null) {
-            $seconds = $this->getSeconds($ttl);
-
+        return tap(parent::add($key, $value, $ttl), function () use ($key, $seconds) {
             if ($seconds > 0) {
                 $this->tags->addEntry(
                     $this->itemKey($key),
                     $seconds
                 );
             }
-        }
-
-        return $result;
+        });
     }
 
     /**
@@ -61,16 +55,14 @@ class RedisTaggedCache extends TaggedCache
 
         $seconds = $this->getSeconds($ttl);
 
-        $result = parent::put($key, $value, $ttl);
-
-        if ($seconds > 0) {
-            $this->tags->addEntry(
-                $this->itemKey($key),
-                $seconds
-            );
-        }
-
-        return $result;
+        return tap(parent::put($key, $value, $ttl), function () use ($key, $seconds) {
+            if ($seconds > 0) {
+                $this->tags->addEntry(
+                    $this->itemKey($key),
+                    $seconds
+                );
+            }
+        });
     }
 
     /**
@@ -84,11 +76,9 @@ class RedisTaggedCache extends TaggedCache
     {
         $key = enum_value($key);
 
-        $result = parent::increment($key, $value);
-
-        $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
-
-        return $result;
+        return tap(parent::increment($key, $value), function () use ($key) {
+            $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
+        });
     }
 
     /**
@@ -102,11 +92,9 @@ class RedisTaggedCache extends TaggedCache
     {
         $key = enum_value($key);
 
-        $result = parent::decrement($key, $value);
-
-        $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
-
-        return $result;
+        return tap(parent::decrement($key, $value), function () use ($key) {
+            $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
+        });
     }
 
     /**
@@ -120,11 +108,9 @@ class RedisTaggedCache extends TaggedCache
     {
         $key = enum_value($key);
 
-        $result = parent::forever($key, $value);
-
-        $this->tags->addEntry($this->itemKey($key));
-
-        return $result;
+        return tap(parent::forever($key, $value), function () use ($key) {
+            $this->tags->addEntry($this->itemKey($key));
+        });
     }
 
     /**
