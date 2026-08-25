@@ -39,6 +39,7 @@ class CloudBootstrapper
                 static::configureUnpooledPostgresConnection($app);
                 static::ensureMigrationsUseUnpooledConnection($app);
                 static::configureManagedQueues($app);
+                static::configureQueueCredentialCaching($app);
             },
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
@@ -155,7 +156,31 @@ class CloudBootstrapper
             'delete_after_processing' => env('CLOUD_QUEUE_OVERFLOW_DELETE_AFTER_PROCESSING', true),
         ];
 
+        $config['connection']['credential_cache'] ??= [
+            'enabled' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_ENABLED', true),
+            'store' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_STORE'),
+            'fallback_store' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_FALLBACK_STORE', 'file'),
+        ];
+
         $app['config']->set('queue.connections.cloud', $config);
+    }
+
+    /**
+     * Share cached AWS credentials across processes for all SQS queue connections.
+     *
+     * Avoids Pod Identity Agent rate limiting.
+     */
+    public static function configureQueueCredentialCaching(Application $app): void
+    {
+        foreach ($app['config']->get('queue.connections', []) as $name => $connection) {
+            if (($connection['driver'] ?? null) === 'sqs' && ! isset($connection['credential_cache'])) {
+                $app['config']->set("queue.connections.{$name}.credential_cache", [
+                    'enabled' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_ENABLED', true),
+                    'store' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_STORE'),
+                    'fallback_store' => env('CLOUD_QUEUE_CREDENTIAL_CACHE_FALLBACK_STORE', 'file'),
+                ]);
+            }
+        }
     }
 
     /**
