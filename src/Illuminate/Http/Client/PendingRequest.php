@@ -64,6 +64,13 @@ class PendingRequest
     protected $handler;
 
     /**
+     * The persistent transport (connection sharing) mode for the request.
+     *
+     * @var \Illuminate\Http\Client\PersistentTransport
+     */
+    protected PersistentTransport $persistentTransport = PersistentTransport::None;
+
+    /**
      * The base URL for the request.
      *
      * @var string
@@ -1697,7 +1704,22 @@ class PendingRequest
      */
     public function buildHandlerStack()
     {
-        return $this->pushHandlers(HandlerStack::create($this->handler));
+        return $this->pushHandlers(HandlerStack::create($this->buildDefaultHandler()));
+    }
+
+    /**
+     * Resolve the base Guzzle handler, applying persistent transport sharing when enabled.
+     *
+     * @return callable|null
+     */
+    protected function buildDefaultHandler()
+    {
+        // Transport sharing can only be applied when Guzzle builds the handler.
+        if (! is_null($this->handler)) {
+            return $this->handler;
+        }
+
+        return $this->persistentTransport->handler();
     }
 
     /**
@@ -2139,6 +2161,19 @@ class PendingRequest
     public function setHandler($handler)
     {
         $this->handler = $handler;
+
+        return $this;
+    }
+
+    /**
+     * Set the persistent transport (connection sharing) mode for the request.
+     *
+     * @param  \Illuminate\Http\Client\PersistentTransport  $mode
+     * @return $this
+     */
+    public function persistentTransport(PersistentTransport $mode)
+    {
+        $this->persistentTransport = $mode;
 
         return $this;
     }
