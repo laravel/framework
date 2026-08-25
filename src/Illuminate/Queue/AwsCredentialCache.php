@@ -11,19 +11,12 @@ class AwsCredentialCache implements CacheInterface
     /**
      * The resolver for the backing cache repository.
      *
-     * The repository is resolved lazily on first use so that building a
-     * connection never touches the cache while the application is still
-     * bootstrapping.
-     *
      * @var \Closure(): \Illuminate\Contracts\Cache\Repository
      */
     protected $repository;
 
     /**
      * The resolver for the fallback cache repository, if any.
-     *
-     * The fallback is written through on every set so that it is already warm
-     * when the primary store becomes unavailable.
      *
      * @var \Closure(): \Illuminate\Contracts\Cache\Repository|null
      */

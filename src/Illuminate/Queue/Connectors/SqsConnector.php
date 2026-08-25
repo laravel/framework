@@ -20,7 +20,7 @@ class SqsConnector implements ConnectorInterface
      */
     public function connect(array $config)
     {
-        $config = $this->configureCredentials(
+        $config = $this->withCredentials(
             $this->getDefaultConfiguration($config)
         );
 
@@ -37,12 +37,29 @@ class SqsConnector implements ConnectorInterface
     }
 
     /**
+     * Get the default configuration for SQS.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function getDefaultConfiguration(array $config)
+    {
+        return array_merge([
+            'version' => 'latest',
+            'http' => [
+                'timeout' => 60,
+                'connect_timeout' => 60,
+            ],
+        ], $config);
+    }
+
+    /**
      * Configure the credentials for the given connection config.
      *
      * @param  array  $config
      * @return array
      */
-    protected function configureCredentials(array $config)
+    protected function withCredentials(array $config)
     {
         if ($credentials = $this->resolveCredentialProvider($config)) {
             $config['credentials'] = $credentials;
@@ -97,17 +114,6 @@ class SqsConnector implements ConnectorInterface
     }
 
     /**
-     * Determine if resolved credentials should be shared across processes via the cache.
-     *
-     * @param  array  $config
-     * @return bool
-     */
-    protected function credentialCachingEnabled(array $config)
-    {
-        return (bool) ($config['credentials_cache']['enabled'] ?? false);
-    }
-
-    /**
      * Wrap the given credential provider so the credentials it resolves are shared across processes via the cache.
      *
      * @param  callable  $provider
@@ -116,8 +122,10 @@ class SqsConnector implements ConnectorInterface
      */
     protected function cachedCredentialProvider(callable $provider, array $config)
     {
-        $store = $config['credentials_cache']['store'] ?? null;
-        $fallbackStore = $config['credentials_cache']['fallback_store'] ?? null;
+        [$store, $fallbackStore] = [
+            $config['credentials_cache']['store'] ?? null,
+            $config['credentials_cache']['fallback_store'] ?? null,
+        ];
 
         return CredentialProvider::cache(
             $provider,
@@ -131,9 +139,6 @@ class SqsConnector implements ConnectorInterface
 
     /**
      * Get the cache key for the connection's shared credentials.
-     *
-     * The key is scoped so that only processes resolving the same identity
-     * (e.g. the same EKS pod identity association) share credentials.
      *
      * @param  array  $config
      * @return string
@@ -155,19 +160,13 @@ class SqsConnector implements ConnectorInterface
     }
 
     /**
-     * Get the default configuration for SQS.
+     * Determine if resolved credentials should be shared across processes via the cache.
      *
      * @param  array  $config
-     * @return array
+     * @return bool
      */
-    protected function getDefaultConfiguration(array $config)
+    protected function credentialCachingEnabled(array $config)
     {
-        return array_merge([
-            'version' => 'latest',
-            'http' => [
-                'timeout' => 60,
-                'connect_timeout' => 60,
-            ],
-        ], $config);
+        return (bool) ($config['credentials_cache']['enabled'] ?? false);
     }
 }

@@ -168,10 +168,7 @@ class CloudBootstrapper
     /**
      * Share cached AWS credentials across processes for all SQS queue connections.
      *
-     * Every PHP-FPM process resolving its own pod identity credentials can
-     * exceed the Pod Identity Agent's rate limit when many processes spawn at
-     * once, so caching defaults to enabled for every SQS connection whose
-     * credentials are resolved dynamically.
+     * Avoids Pod Identity Agent rate limiting.
      */
     public static function configureQueueCredentialCaching(Application $app): void
     {
