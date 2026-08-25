@@ -1,6 +1,6 @@
 <?php
 
-namespace Auth;
+namespace Illuminate\Tests\Auth;
 
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use PHPUnit\Framework\TestCase;

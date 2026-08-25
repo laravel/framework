@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Tests\Integration\Routing\Fixtures\RouteNameEnum;
 use Orchestra\Testbench\TestCase;
 
 class SimpleRouteTest extends TestCase

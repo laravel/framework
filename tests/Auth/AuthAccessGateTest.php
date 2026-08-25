@@ -7,12 +7,13 @@ use Illuminate\Auth\Access\Gate;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
+use Illuminate\Tests\Auth\Fixtures\AbilitiesEnum;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class AuthAccessGateTest extends TestCase
 {

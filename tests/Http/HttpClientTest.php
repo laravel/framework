@@ -1254,7 +1254,7 @@ class HttpClientTest extends TestCase
             '*' => $this->factory->sequence()
                 ->push('Ok', 201)
                 ->push(['fact' => 'Cats are great!'])
-                ->pushFile(__DIR__.'/fixtures/test.txt')
+                ->pushFile(__DIR__.'/Fixtures/test.txt')
                 ->pushStatus(403),
         ]);
 
@@ -1980,7 +1980,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fakeSequence()->push('abc123');
 
-        $destination = __DIR__.'/fixtures/sunk.txt';
+        $destination = __DIR__.'/Fixtures/sunk.txt';
 
         if (file_exists($destination)) {
             unlink($destination);

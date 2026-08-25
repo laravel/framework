@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Queue;
+namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;

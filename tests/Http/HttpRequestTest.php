@@ -12,6 +12,9 @@ use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
+use Illuminate\Tests\Http\Fixtures\TestEnum;
+use Illuminate\Tests\Http\Fixtures\TestEnumBacked;
+use Illuminate\Tests\Http\Fixtures\TestIntegerEnumBacked;
 use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -23,7 +26,7 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class HttpRequestTest extends TestCase
 {
@@ -1216,6 +1219,39 @@ class HttpRequestTest extends TestCase
         $this->assertSame('Dayle', $request->input('buddy'));
     }
 
+    public function testMergeMethodTreatsAsterisksAsLiteralKeys()
+    {
+        $request = Request::create('/', 'GET', []);
+        $request->merge(['*' => 226]);
+        $this->assertSame(226, $request->all()['*']);
+
+        $request = Request::create('/', 'GET', ['organisation_id' => 10, 'name' => 'Taylor']);
+        $request->merge(['*' => 226]);
+        $this->assertSame(10, $request->input('organisation_id'));
+        $this->assertSame('Taylor', $request->input('name'));
+        $this->assertSame(226, $request->all()['*']);
+
+        $request = Request::create('/', 'GET', ['profile' => ['name' => 'Taylor', 'email' => 'taylor@laravel.com']]);
+        $request->merge(['profile.*' => 'masked']);
+        $this->assertSame('Taylor', $request->input('profile.name'));
+        $this->assertSame('taylor@laravel.com', $request->input('profile.email'));
+        $this->assertSame('masked', $request->all()['profile']['*']);
+
+        $request = Request::create('/', 'GET', ['profile' => ['name' => 'Taylor', 'email' => 'taylor@laravel.com']]);
+        $request->merge(['profile.name' => 'Otwell']);
+        $this->assertSame('Otwell', $request->input('profile.name'));
+        $this->assertSame('taylor@laravel.com', $request->input('profile.email'));
+    }
+
+    public function testMergeMethodTreatsAsterisksAsLiteralKeysOnJsonRequests()
+    {
+        $request = Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode(['organisation_id' => 10, 'name' => 'Taylor']));
+        $request->merge(['*' => 226]);
+        $this->assertSame(10, $request->input('organisation_id'));
+        $this->assertSame('Taylor', $request->input('name'));
+        $this->assertSame(226, $request->all()['*']);
+    }
+
     public function testMergeIfMissingMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);
@@ -1239,6 +1275,15 @@ class HttpRequestTest extends TestCase
         $merge = ['user.first_name' => 'John'];
         $request->mergeIfMissing($merge);
         $this->assertSame('Taylor', $request->input('user.first_name'));
+    }
+
+    public function testMergeIfMissingMethodTreatsAsterisksAsLiteralKeys()
+    {
+        $request = Request::create('/', 'GET', ['organisation_id' => 10, 'name' => 'Taylor']);
+        $request->mergeIfMissing(['*' => 226]);
+        $this->assertSame(10, $request->input('organisation_id'));
+        $this->assertSame('Taylor', $request->input('name'));
+        $this->assertSame(226, $request->all()['*']);
     }
 
     public function testReplaceMethod()

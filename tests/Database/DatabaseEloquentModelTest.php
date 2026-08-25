@@ -54,8 +54,9 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
-use Illuminate\Tests\Database\stubs\TestCast;
-use Illuminate\Tests\Database\stubs\TestValueObject;
+use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
+use Illuminate\Tests\Database\Fixtures\TestCast;
+use Illuminate\Tests\Database\Fixtures\TestValueObject;
 use InvalidArgumentException;
 use LogicException;
 use Mockery;
@@ -65,7 +66,7 @@ use ReflectionClass;
 use stdClass;
 use Stringable as NativeStringable;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums/Enums.php';
 
 class DatabaseEloquentModelTest extends TestCase
 {
@@ -2214,7 +2215,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelsAssumeTheirName()
     {
-        require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
+        require_once __DIR__.'/Fixtures/EloquentModelNamespacedStub.php';
 
         $model = new EloquentModelWithoutTableStub;
         $this->assertSame('eloquent_model_without_table_stubs', $model->getTable());

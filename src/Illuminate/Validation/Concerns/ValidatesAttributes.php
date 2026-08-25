@@ -571,7 +571,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return array_all($parameters, fn ($parameter) => in_array($parameter, $value));
+        return array_all($parameters, fn ($parameter) => in_array($parameter, $value, true));
     }
 
     /**
@@ -588,7 +588,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return array_all($parameters, fn ($parameter) => ! in_array($parameter, $value));
+        return array_all($parameters, fn ($parameter) => ! in_array($parameter, $value, true));
     }
 
     /**
@@ -1582,7 +1582,7 @@ trait ValidatesAttributes
             return Str::is($parameters[0], $key);
         });
 
-        return in_array($value, $otherValues);
+        return in_array($value, $otherValues, true);
     }
 
     /**

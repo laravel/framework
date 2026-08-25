@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Rules;
+namespace Illuminate\Tests\Validation;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Translation\ArrayLoader;

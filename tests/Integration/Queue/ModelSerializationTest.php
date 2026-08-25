@@ -13,6 +13,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Tests\Integration\Queue\Fixtures\TypedPropertyCollectionTestClass;
+use Illuminate\Tests\Integration\Queue\Fixtures\TypedPropertyTestClass;
 use LogicException;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
@@ -390,7 +392,7 @@ class ModelSerializationTest extends TestCase
 
     public function testItSerializesTypedProperties()
     {
-        require_once __DIR__.'/typed-properties.php';
+        require_once __DIR__.'/Fixtures/typed-properties.php';
 
         $defaultConnection = config('database.default');
 
