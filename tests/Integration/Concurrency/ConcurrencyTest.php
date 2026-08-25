@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 #[RequiresOperatingSystem('Linux|Darwin')]
-#[WithEnv('APP_KEY', 'somerandomstring')]
+#[WithEnv('APP_KEY', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
 class ConcurrencyTest extends TestCase
 {
     protected function setUp(): void
