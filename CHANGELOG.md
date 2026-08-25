@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.67.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.68.0...12.x)
+
+## [v12.68.0](https://github.com/laravel/framework/compare/v12.67.0...v12.68.0) - 2026-08-25
+
+* Fix resource loading by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/61323
 
 ## [v12.67.0](https://github.com/laravel/framework/compare/v12.66.0...v12.67.0) - 2026-08-18
 
