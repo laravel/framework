@@ -44,6 +44,11 @@ class Image implements Responsable, Stringable
     protected ?string $driver = null;
 
     /**
+     * The image contents, or a lazy loader that resolves them.
+     */
+    protected Closure|string $contents;
+
+    /**
      * Whether the image has been processed.
      */
     protected bool $processed = false;
@@ -57,10 +62,26 @@ class Image implements Responsable, Stringable
      * Create a new image instance.
      */
     public function __construct(
-        protected Closure|string $contents,
+        Closure|string $contents,
         protected ?UploadedFile $file = null,
     ) {
+        $this->contents = $contents instanceof Closure
+            ? $this->resolveOnce($contents)
+            : $contents;
+
         $this->pipeline = new ImagePipeline;
+    }
+
+    /**
+     * Wrap a lazy contents loader so it is invoked at most once, even across clones.
+     */
+    protected function resolveOnce(Closure $loader): Closure
+    {
+        return function () use ($loader) {
+            static $contents;
+
+            return $contents ??= $loader();
+        };
     }
 
     /**
