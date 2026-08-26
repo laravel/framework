@@ -255,6 +255,33 @@ class WorkCommandTest extends QueueTestCase
         Exceptions::assertNotReported(UniqueConstraintViolationException::class);
         $this->assertSame(2, substr_count(Artisan::output(), JobWillFail::class));
     }
+
+    public function testStopReasonIsWritten()
+    {
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
+
+        $this->artisan('queue:work', [
+            '--daemon' => true,
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+        ])->expectsOutputToContain('Queue empty')
+            ->assertExitCode(0);
+    }
+
+    public function testStopReasonIsWrittenAsJson()
+    {
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
+
+        $this->artisan('queue:work', [
+            '--daemon' => true,
+            '--stop-when-empty' => true,
+            '--memory' => 1,
+            '--json' => true,
+        ])->expectsOutputToContain('"status":"stopped","reason":"memory","exit_code":12')
+            ->assertExitCode(12);
+    }
 }
 
 class FirstJob implements ShouldQueue
