@@ -366,6 +366,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function load($namespace, $group, $locale)
     {
+        $this->ensureLocaleIsValid($locale);
+
         if ($this->isLoaded($namespace, $group, $locale)) {
             return;
         }
@@ -575,11 +577,24 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function setLocale($locale)
     {
-        if (Str::contains($locale, ['/', '\\'])) {
-            throw new InvalidArgumentException('Invalid characters present in locale.');
-        }
+        $this->ensureLocaleIsValid($locale);
 
         $this->locale = $locale;
+    }
+
+    /**
+     * Ensure the given locale may be safely used to resolve translation files.
+     *
+     * @param  string|null  $locale
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function ensureLocaleIsValid($locale)
+    {
+        if (Str::contains((string) $locale, ['/', '\\'])) {
+            throw new InvalidArgumentException('Invalid characters present in locale.');
+        }
     }
 
     /**

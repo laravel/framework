@@ -3,15 +3,19 @@
 namespace Illuminate\Tests\Translation;
 
 use Illuminate\Contracts\Translation\Loader;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Translation\Fixtures\Enums\Bar;
 use Illuminate\Tests\Translation\Fixtures\Enums\Baz;
 use Illuminate\Tests\Translation\Fixtures\Enums\Foo;
+use Illuminate\Translation\FileLoader;
 use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
 use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 class TranslationTranslatorTest extends TestCase
@@ -409,6 +413,93 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->expects('load')->with('en', 'foo', '*')->andReturn([]);
         $t->getLoader()->expects('load')->with('lz', 'foo', '*')->andReturn([]);
         $this->assertSame('foo', $t->get('foo'));
+    }
+
+    #[TestWith(['../../config'])]
+    #[TestWith(['..\..\config'])]
+    #[TestWith(['en/../../config'])]
+    #[TestWith(['/etc/passwd'])]
+    public function testGetMethodRejectsExplicitLocaleContainingPathSeparators($locale)
+    {
+        $t = new Translator($this->getLoader(), 'en');
+
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid characters present in locale.'));
+
+        $t->get('messages.title', [], $locale);
+    }
+
+    #[TestWith(['../../config'])]
+    #[TestWith(['..\..\config'])]
+    public function testChoiceMethodRejectsExplicitLocaleContainingPathSeparators($locale)
+    {
+        $t = new Translator($this->getLoader(), 'en');
+
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid characters present in locale.'));
+
+        $t->choice('messages.title', 1, [], $locale);
+    }
+
+    #[TestWith(['has'])]
+    #[TestWith(['hasForLocale'])]
+    public function testHasMethodsRejectExplicitLocaleContainingPathSeparators($method)
+    {
+        $t = new Translator($this->getLoader(), 'en');
+
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid characters present in locale.'));
+
+        $t->{$method}('messages.title', '../../config');
+    }
+
+    public function testLoadMethodRejectsLocaleContainingPathSeparators()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid characters present in locale.'));
+
+        $t->load('*', 'messages', '../../config');
+    }
+
+    public function testSetLocaleRejectsLocaleContainingPathSeparators()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid characters present in locale.'));
+
+        $t->setLocale('../../config');
+    }
+
+    #[TestWith(['en'])]
+    #[TestWith(['en_US'])]
+    #[TestWith(['pt-BR'])]
+    public function testValidExplicitLocalesAreStillLoaded($locale)
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->expects('load')->with($locale, '*', '*')->andReturn([]);
+        $t->getLoader()->expects('load')->with($locale, 'messages', '*')->andReturn(['title' => 'Hello']);
+
+        $this->assertSame('Hello', $t->get('messages.title', [], $locale));
+    }
+
+    public function testExplicitLocaleCannotLoadFilesOutsideOfTheTranslationPaths()
+    {
+        $base = sys_get_temp_dir().'/laravel-translation-'.Str::random(8);
+
+        mkdir($base.'/lang/en', 0777, true);
+        mkdir($base.'/config', 0777, true);
+        file_put_contents($base.'/lang/en/messages.php', '<?php return ["title" => "Hello"];');
+        file_put_contents($base.'/config/app.php', '<?php return ["title" => "secret"];');
+
+        try {
+            $t = new Translator(new FileLoader(new Filesystem, $base.'/lang'), 'en');
+
+            $this->assertSame('Hello', $t->get('messages.title'));
+
+            $this->expectExceptionObject(new InvalidArgumentException('Invalid characters present in locale.'));
+
+            $t->get('app.title', [], '../config');
+        } finally {
+            (new Filesystem)->deleteDirectory($base);
+        }
     }
 
     protected function getLoader()
