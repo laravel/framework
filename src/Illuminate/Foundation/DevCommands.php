@@ -462,7 +462,7 @@ class DevCommands
     }
 
     /**
-     * Exclude any development commands registered by packages within the "vendor" directory.
+     * Exclude any commands from the vendor directory.
      *
      * @return void
      */
@@ -472,7 +472,7 @@ class DevCommands
     }
 
     /**
-     * Exclude the framework's default development commands.
+     * Exclude the framework's default commands.
      *
      * @return void
      */
