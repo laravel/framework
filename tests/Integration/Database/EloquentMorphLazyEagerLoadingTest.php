@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentMorphLazyEagerLoadingTes
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphLazyEagerLoadingTest extends DatabaseTestCase
@@ -43,16 +44,6 @@ class EloquentMorphLazyEagerLoadingTest extends DatabaseTestCase
 
         $this->assertTrue($comment->relationLoaded('commentable'));
         $this->assertTrue($comment->commentable->relationLoaded('user'));
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
     }
 }
 

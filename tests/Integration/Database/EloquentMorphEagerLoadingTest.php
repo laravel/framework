@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphEagerLoadingTest extends DatabaseTestCase
@@ -120,16 +121,6 @@ class Action extends Model
     public function target()
     {
         return $this->morphTo()->withTrashed();
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
     }
 }
 

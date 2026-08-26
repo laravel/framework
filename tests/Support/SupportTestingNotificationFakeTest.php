@@ -11,6 +11,7 @@ use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
+use Illuminate\Tests\Notifications\Fixtures\NotificationStub;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -22,7 +23,7 @@ class SupportTestingNotificationFakeTest extends TestCase
     private $fake;
 
     /**
-     * @var \Illuminate\Tests\Support\NotificationStub
+     * @var \Illuminate\Tests\Notifications\Fixtures\NotificationStub
      */
     private $notification;
 
@@ -44,7 +45,7 @@ class SupportTestingNotificationFakeTest extends TestCase
             $this->fake->assertSentTo($this->user, NotificationStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\NotificationStub] notification was not sent.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Notifications\Fixtures\NotificationStub] notification was not sent.', $e->getMessage());
         }
 
         $this->fake->send($this->user, new NotificationStub);
@@ -87,7 +88,7 @@ class SupportTestingNotificationFakeTest extends TestCase
             $this->fake->assertNotSentTo($this->user, NotificationStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.', $e->getMessage());
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Notifications\Fixtures\NotificationStub] notification was sent.', $e->getMessage());
         }
     }
 
@@ -101,7 +102,7 @@ class SupportTestingNotificationFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.', $e->getMessage());
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Notifications\Fixtures\NotificationStub] notification was sent.', $e->getMessage());
         }
     }
 
@@ -230,14 +231,6 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->fake->assertSentTo($this->user, NotificationWithSerialization::class, function ($notification) {
             return $notification->value === 'hello-serialized-unserialized';
         });
-    }
-}
-
-class NotificationStub extends Notification
-{
-    public function via($notifiable)
-    {
-        return ['mail'];
     }
 }
 

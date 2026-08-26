@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentMorphToIsTest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphToIsTest extends DatabaseTestCase
@@ -82,16 +83,6 @@ class EloquentMorphToIsTest extends DatabaseTestCase
 
         $this->assertFalse($child->commentable()->is($parent));
         $this->assertTrue($child->commentable()->isNot($parent));
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
     }
 }
 

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphCountEagerLoadingTest extends DatabaseTestCase
@@ -72,16 +73,6 @@ class EloquentMorphCountEagerLoadingTest extends DatabaseTestCase
 
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
         $this->assertEquals(2, $comments[0]->commentable->likes_count);
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
     }
 }
 

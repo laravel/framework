@@ -96,12 +96,14 @@ class CompiledRouteCollectionTest extends TestCase
 
     public function testCompiledAndNonCompiledUrlResolutionHasSamePrecedenceForActions()
     {
-        @unlink(__DIR__.'/Fixtures/cache/routes-v7.php');
-        $this->app->useBootstrapPath(__DIR__.'/Fixtures');
-        $app = (static function () {
+        $fixtures = dirname(__DIR__, 2).'/Routing/Fixtures';
+
+        @unlink($fixtures.'/cache/routes-v7.php');
+        $this->app->useBootstrapPath($fixtures);
+        $app = (static function () use ($fixtures) {
             $refresh = true;
 
-            return require __DIR__.'/Fixtures/app.php';
+            return require $fixtures.'/app.php';
         })();
         $app['router']->get('/foo/{bar}', ['FooController', 'show']);
         $app['router']->get('/foo/{bar}/{baz}', ['FooController', 'show']);
@@ -110,11 +112,11 @@ class CompiledRouteCollectionTest extends TestCase
         $this->assertSame('foo/{bar}', $app['router']->getRoutes()->getByAction('FooController@show')->uri);
 
         $this->artisan('route:cache')->assertExitCode(0);
-        require __DIR__.'/Fixtures/cache/routes-v7.php';
+        require $fixtures.'/cache/routes-v7.php';
 
         $this->assertSame('foo/{bar}', $app['router']->getRoutes()->getByAction('FooController@show')->uri);
 
-        unlink(__DIR__.'/Fixtures/cache/routes-v7.php');
+        unlink($fixtures.'/cache/routes-v7.php');
     }
 
     public function testCompiledAndNonCompiledUrlResolutionHasSamePrecedenceForNames()

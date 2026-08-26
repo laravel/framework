@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentMorphToSelectTest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphToSelectTest extends DatabaseTestCase
@@ -68,16 +69,6 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
         $post = $comment->commentable()->select('id')->first();
 
         $this->assertEquals(['id' => 1], $post->getAttributes());
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
     }
 }
 

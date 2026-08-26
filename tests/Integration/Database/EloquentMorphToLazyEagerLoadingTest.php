@@ -6,6 +6,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
@@ -53,16 +54,6 @@ class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
         $this->assertTrue($comments[1]->relationLoaded('commentable'));
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
     }
 }
 
