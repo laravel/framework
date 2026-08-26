@@ -16,11 +16,13 @@ use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\PathTraversalDetected;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
 use Mockery;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -173,6 +175,57 @@ class FilesystemAdapterTest extends TestCase
             'root' => $this->tempDir.DIRECTORY_SEPARATOR,
         ]);
         $this->assertEquals($this->tempDir.DIRECTORY_SEPARATOR.'file.txt', $filesystemAdapter->path('file.txt'));
+    }
+
+    #[TestWith(['../../../.env'])]
+    #[TestWith(['..\..\..\.env'])]
+    #[TestWith(['/../../../.env'])]
+    #[TestWith(['..'])]
+    #[TestWith(['foo/../../../.env'])]
+    public function testPathRejectsTraversalOutsideOfTheRoot($path)
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, [
+            'root' => $this->tempDir.DIRECTORY_SEPARATOR,
+        ]);
+
+        $this->expectException(PathTraversalDetected::class);
+
+        $filesystemAdapter->path($path);
+    }
+
+    public function testPathRejectsTraversalOutsideOfThePrefix()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, [
+            'root' => $this->tempDir.DIRECTORY_SEPARATOR,
+            'prefix' => 'scoped',
+        ]);
+
+        $this->assertSame(
+            $this->tempDir.DIRECTORY_SEPARATOR.'scoped'.DIRECTORY_SEPARATOR.'file.txt',
+            $filesystemAdapter->path('file.txt')
+        );
+
+        $this->expectException(PathTraversalDetected::class);
+
+        $filesystemAdapter->path('../file.txt');
+    }
+
+    public function testPathResolvesRelativeSegmentsTheSameWayTheDriverDoes()
+    {
+        $this->filesystem->write('foo/bar.txt', 'Hello World');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, [
+            'root' => $this->tempDir.DIRECTORY_SEPARATOR,
+        ]);
+
+        $expected = $this->tempDir.DIRECTORY_SEPARATOR.'foo/bar.txt';
+
+        $this->assertSame($expected, $filesystemAdapter->path('foo/bar.txt'));
+        $this->assertSame($expected, $filesystemAdapter->path('/foo/bar.txt'));
+        $this->assertSame($expected, $filesystemAdapter->path('foo/./bar.txt'));
+        $this->assertSame($expected, $filesystemAdapter->path('foo/baz/../bar.txt'));
+
+        $this->assertSame('Hello World', $filesystemAdapter->get('foo/baz/../bar.txt'));
+        $this->assertSame('Hello World', file_get_contents($filesystemAdapter->path('foo/baz/../bar.txt')));
     }
 
     public function testGet()
