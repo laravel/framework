@@ -261,18 +261,26 @@ class PhpRedisConnector implements Connector
      */
     protected function createSentinel($host, $port, array $config)
     {
+        return new RedisSentinel(...$this->sentinelParameters($host, $port, $config));
+    }
+
+    /**
+     * Get the constructor parameters for a Redis Sentinel client.
+     *
+     * @param  string  $host
+     * @param  int  $port
+     * @param  array  $config
+     * @return array
+     */
+    protected function sentinelParameters($host, $port, array $config)
+    {
         $timeout = (float) Arr::get($config, 'timeout', 0.0);
 
         if (version_compare(phpversion('redis'), '6.0.0', '>=')) {
-            return new RedisSentinel([
-                'host' => $host,
-                'port' => $port,
-                'connectTimeout' => $timeout,
-                'readTimeout' => $timeout,
-            ]);
+            return [['host' => $host, 'port' => $port, 'connectTimeout' => $timeout, 'readTimeout' => $timeout]];
         }
 
-        return new RedisSentinel($host, $port, $timeout, null, 0, $timeout);
+        return [$host, $port, $timeout, null, 0, $timeout];
     }
 
     /**
