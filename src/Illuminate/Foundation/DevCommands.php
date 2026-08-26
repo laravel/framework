@@ -71,14 +71,14 @@ class DevCommands
     protected static $autoRestart = true;
 
     /**
-     * Whether commands registered by packages within the "vendor" directory should be excluded.
+     * Whether to exclude vendor commands.
      *
      * @var bool
      */
     protected static $withoutVendorCommands = false;
 
     /**
-     * Whether the framework's default commands should be excluded.
+     * Whether to exclude the framework's default commands.
      *
      * @var bool
      */
