@@ -109,19 +109,6 @@ class WorkCommandTest extends QueueTestCase
         $this->assertTrue(SecondJob::$ran);
     }
 
-    public function testStopReasonIsWritten()
-    {
-        Queue::push(new FirstJob);
-        Queue::push(new SecondJob);
-
-        $this->artisan('queue:work', [
-            '--daemon' => true,
-            '--stop-when-empty' => true,
-            '--memory' => 1024,
-        ])->expectsOutputToContain('Queue empty')
-            ->assertExitCode(0);
-    }
-
     public function testMemoryExceeded()
     {
         Queue::push(new FirstJob);
@@ -137,20 +124,6 @@ class WorkCommandTest extends QueueTestCase
         $this->assertSame(1, Queue::size());
         $this->assertTrue(FirstJob::$ran);
         $this->assertFalse(SecondJob::$ran);
-    }
-
-    public function testStopReasonIsWrittenAsJson()
-    {
-        Queue::push(new FirstJob);
-        Queue::push(new SecondJob);
-
-        $this->artisan('queue:work', [
-            '--daemon' => true,
-            '--stop-when-empty' => true,
-            '--memory' => 1,
-            '--json' => true,
-        ])->expectsOutputToContain('"status":"stopped","reason":"memory","exit_code":12')
-            ->assertExitCode(12);
     }
 
     public function testMaxJobsExceeded()
@@ -281,6 +254,33 @@ class WorkCommandTest extends QueueTestCase
         $this->withoutMockingConsoleOutput()->artisan('queue:work', ['--once' => true]);
         Exceptions::assertNotReported(UniqueConstraintViolationException::class);
         $this->assertSame(2, substr_count(Artisan::output(), JobWillFail::class));
+    }
+
+    public function testStopReasonIsWritten()
+    {
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
+
+        $this->artisan('queue:work', [
+            '--daemon' => true,
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+        ])->expectsOutputToContain('Queue empty')
+            ->assertExitCode(0);
+    }
+
+    public function testStopReasonIsWrittenAsJson()
+    {
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
+
+        $this->artisan('queue:work', [
+            '--daemon' => true,
+            '--stop-when-empty' => true,
+            '--memory' => 1,
+            '--json' => true,
+        ])->expectsOutputToContain('"status":"stopped","reason":"memory","exit_code":12')
+            ->assertExitCode(12);
     }
 }
 
