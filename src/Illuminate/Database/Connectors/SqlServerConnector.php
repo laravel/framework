@@ -189,7 +189,22 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             $arguments['Authentication'] = $config['authentication'];
         }
 
-        return $this->buildConnectString('sqlsrv', $arguments);
+        return $this->buildConnectString('sqlsrv', array_map($this->escapeSqlSrvDsnValue(...), $arguments));
+    }
+
+    /**
+     * Escape a value for a SqlSrv connection string.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function escapeSqlSrvDsnValue($value)
+    {
+        if (! is_string($value) || (! str_contains($value, ';') && ! str_contains($value, '}') && ! preg_match('/^\s|\s$/', $value))) {
+            return $value;
+        }
+
+        return '{'.str_replace('}', '}}', $value).'}';
     }
 
     /**
