@@ -14,12 +14,7 @@ enum WorkerStopReason: string
     case ReceivedRestartSignal = 'restart_signal';
     case TimedOut = 'timed_out';
 
-    /**
-     * Get a human readable description of the stop reason.
-     *
-     * @return string
-     */
-    public function description()
+    public function description(): string
     {
         return match ($this) {
             self::Interrupted => 'Interrupted',
