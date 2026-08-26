@@ -150,4 +150,15 @@ class PostgresProcessor extends Processor
             ];
         }, $results);
     }
+
+    /**
+     * Process the results of an explain query.
+     *
+     * @param  array  $results
+     * @return int<0, max>
+     */
+    public function processApproximateCount($results)
+    {
+        return (int) json_decode($results[0]->{'QUERY PLAN'}, true)[0]['Plan']['Plan Rows'];
+    }
 }

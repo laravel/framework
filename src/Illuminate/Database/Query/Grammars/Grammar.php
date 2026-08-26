@@ -1376,6 +1376,19 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a query to get an approximate count of rows.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileApproximateCount(Builder $query)
+    {
+        throw new RuntimeException('This database engine does not support rows count estimation through query explanation.');
+    }
+
+    /**
      * Compile an update statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

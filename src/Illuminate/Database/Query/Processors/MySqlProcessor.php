@@ -99,4 +99,15 @@ class MySqlProcessor extends Processor
             ];
         }, $results);
     }
+
+    /**
+     * Process the results of an explain query.
+     *
+     * @param  array  $results
+     * @return int<0, max>
+     */
+    public function processApproximateCount($results)
+    {
+        return (int) $results[0]->rows;
+    }
 }

@@ -530,6 +530,17 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a query to get an approximate count of rows.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileApproximateCount(Builder $query)
+    {
+        return 'EXPLAIN (FORMAT JSON) '.$query->toSql();
+    }
+
+    /**
      * Compile an update from statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

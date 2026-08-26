@@ -141,4 +141,15 @@ class Processor
     {
         return $results;
     }
+
+    /**
+     * Process the results of an explain query.
+     *
+     * @param  int  $results
+     * @return int<0, max>
+     */
+    public function processApproximateCount($results)
+    {
+        return $results;
+    }
 }

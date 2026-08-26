@@ -4058,6 +4058,24 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Retrieve estimated "count" result of the query.
+     *
+     * @return int<0, max>
+     */
+    public function approximateCount()
+    {
+        try {
+            $sql = $this->grammar->compileApproximateCount($this);
+        } catch (RuntimeException) {
+            return $this->count();
+        }
+
+        $explanation = $this->getConnection()->select($sql, $this->getBindings());
+
+        return $this->getProcessor()->processApproximateCount($explanation);
+    }
+
+    /**
      * Retrieve the minimum value of a given column.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column

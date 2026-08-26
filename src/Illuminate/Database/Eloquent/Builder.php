@@ -108,6 +108,7 @@ class Builder implements BuilderContract
         'average',
         'avg',
         'count',
+        'approximatecount',
         'dd',
         'ddrawsql',
         'doesntexist',
