@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Database\Fixtures\Models\Comment;
+use Illuminate\Tests\Database\Fixtures\Models\MorphEagerLoading\User;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphLazyEagerLoadingTest extends DatabaseTestCase
@@ -56,9 +57,4 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
-}
-
-class User extends Model
-{
-    public $timestamps = false;
 }

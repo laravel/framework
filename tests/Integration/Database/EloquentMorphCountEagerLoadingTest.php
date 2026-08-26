@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Database\Fixtures\Models\Comment;
+use Illuminate\Tests\Database\Fixtures\Models\PostLikes\Like;
+use Illuminate\Tests\Database\Fixtures\Models\PostLikes\Post;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphCountEagerLoadingTest extends DatabaseTestCase
@@ -76,16 +78,6 @@ class EloquentMorphCountEagerLoadingTest extends DatabaseTestCase
     }
 }
 
-class Post extends Model
-{
-    public $timestamps = false;
-
-    public function likes()
-    {
-        return $this->hasMany(Like::class);
-    }
-}
-
 class Video extends Model
 {
     public $timestamps = false;
@@ -93,16 +85,6 @@ class Video extends Model
     public function views()
     {
         return $this->hasMany(View::class);
-    }
-}
-
-class Like extends Model
-{
-    public $timestamps = false;
-
-    public function post()
-    {
-        return $this->belongsTo(Post::class);
     }
 }
 

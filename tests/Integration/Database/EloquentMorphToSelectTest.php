@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToSelectTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Database\Fixtures\Models\Comment;
+use Illuminate\Tests\Database\Fixtures\Models\MorphToTarget\Post;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphToSelectTest extends DatabaseTestCase
@@ -70,9 +70,4 @@ class EloquentMorphToSelectTest extends DatabaseTestCase
 
         $this->assertEquals(['id' => 1], $post->getAttributes());
     }
-}
-
-class Post extends Model
-{
-    //
 }

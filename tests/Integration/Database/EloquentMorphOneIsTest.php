@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentMorphOneIsTest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Attachment;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphOneIsTest extends DatabaseTestCase
@@ -84,11 +85,6 @@ class EloquentMorphOneIsTest extends DatabaseTestCase
         $this->assertFalse($parent->attachment()->is($child));
         $this->assertTrue($parent->attachment()->isNot($child));
     }
-}
-
-class Attachment extends Model
-{
-    public $timestamps = false;
 }
 
 class Post extends Model

@@ -9,6 +9,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Database\Fixtures\Models\Comment;
+use Illuminate\Tests\Database\Fixtures\Models\MorphEagerLoading\Video;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphEagerLoadingTest extends DatabaseTestCase
@@ -140,10 +141,4 @@ class User extends Model
     use SoftDeletes;
 
     public $timestamps = false;
-}
-
-class Video extends Model
-{
-    public $timestamps = false;
-    protected $primaryKey = 'video_id';
 }
