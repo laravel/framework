@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Support\Facades\Facade;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'route:cache')]
@@ -92,7 +93,25 @@ class RouteCacheCommand extends Command
     {
         return tap(require $this->laravel->bootstrapPath('app.php'), function ($app) {
             $app->make(ConsoleKernelContract::class)->bootstrap();
+
+            $this->restoreFacadeApplication();
         });
+    }
+
+    /**
+     * Re-point the facades at the running application.
+     *
+     * Bootstrapping the fresh application registers it as the facade
+     * application. Left in place, every facade resolved for the rest of the
+     * process would target that throwaway instance instead of this one.
+     *
+     * @return void
+     */
+    protected function restoreFacadeApplication()
+    {
+        Facade::clearResolvedInstances();
+
+        Facade::setFacadeApplication($this->laravel);
     }
 
     /**
