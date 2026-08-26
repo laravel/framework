@@ -12,6 +12,8 @@ use InvalidArgumentException;
 use LogicException;
 use Redis;
 use RedisCluster;
+use RedisException;
+use RedisSentinel;
 
 class PhpRedisConnector implements Connector
 {
@@ -33,6 +35,30 @@ class PhpRedisConnector implements Connector
         $connector = function () use ($config, $options, $formattedOptions) {
             return $this->createClient(array_merge(
                 $config, $options, $formattedOptions
+            ));
+        };
+
+        return new PhpRedisConnection($connector(), $connector, $config);
+    }
+
+    /**
+     * Create a new PhpRedis connection to the master of a Redis Sentinel service.
+     *
+     * @param  array  $config
+     * @param  array  $options
+     * @return \Illuminate\Redis\Connections\PhpRedisConnection
+     */
+    public function connectToSentinel(array $config, array $options)
+    {
+        $formattedOptions = Arr::pull($config, 'options', []);
+
+        if (isset($config['prefix'])) {
+            $formattedOptions['prefix'] = $config['prefix'];
+        }
+
+        $connector = function () use ($config, $options, $formattedOptions) {
+            return $this->createClient(array_merge(
+                $this->resolveSentinelMaster($config), $options, $formattedOptions
             ));
         };
 
@@ -185,6 +211,68 @@ class PhpRedisConnector implements Connector
         }
 
         $client->{$persistent ? 'pconnect' : 'connect'}(...$parameters);
+    }
+
+    /**
+     * Resolve the current master of the configured Redis Sentinel service.
+     *
+     * @param  array  $config
+     * @return array
+     *
+     * @throws \RedisException
+     */
+    protected function resolveSentinelMaster(array $config)
+    {
+        $service = $config['service'] ?? 'mymaster';
+
+        $failures = [];
+
+        foreach ($config['hosts'] ?? [] as $sentinel) {
+            $host = $sentinel['host'];
+            $port = (int) ($sentinel['port'] ?? 26379);
+
+            try {
+                $master = $this->createSentinel($host, $port, $config)->getMasterAddrByName($service);
+            } catch (RedisException $e) {
+                $failures[] = "{$host}:{$port} ({$e->getMessage()})";
+
+                continue;
+            }
+
+            if (is_array($master) && isset($master[0], $master[1])) {
+                return array_merge($config, ['host' => $master[0], 'port' => (int) $master[1]]);
+            }
+
+            $failures[] = "{$host}:{$port} (no master known for service [{$service}])";
+        }
+
+        throw new RedisException(
+            "Unable to resolve the Redis master for service [{$service}] from Sentinel: ".implode('; ', $failures)
+        );
+    }
+
+    /**
+     * Create the Redis Sentinel client instance.
+     *
+     * @param  string  $host
+     * @param  int  $port
+     * @param  array  $config
+     * @return \RedisSentinel
+     */
+    protected function createSentinel($host, $port, array $config)
+    {
+        $timeout = (float) Arr::get($config, 'timeout', 0.0);
+
+        if (version_compare(phpversion('redis'), '6.0.0', '>=')) {
+            return new RedisSentinel([
+                'host' => $host,
+                'port' => $port,
+                'connectTimeout' => $timeout,
+                'readTimeout' => $timeout,
+            ]);
+        }
+
+        return new RedisSentinel($host, $port, $timeout, null, 0, $timeout);
     }
 
     /**

@@ -426,6 +426,142 @@ class PhpRedisConnectorTest extends TestCase
         $this->assertSame('bar', $connection->command('get', ['foo']));
         $this->assertSame($healthyClient, $connection->client());
     }
+
+    public function testConnectToSentinelResolvesTheMaster()
+    {
+        $connector = new SentinelStubPhpRedisConnector([
+            'sentinel-1:26379' => fn () => ['10.0.0.9', '6380'],
+        ]);
+
+        $connection = $connector->connectToSentinel([
+            'hosts' => [['host' => 'sentinel-1', 'port' => 26379]],
+            'service' => 'mymaster',
+            'database' => 2,
+        ], []);
+
+        $this->assertInstanceOf(PhpRedisConnection::class, $connection);
+        $this->assertSame(['sentinel-1:26379'], $connector->queried);
+        $this->assertSame('10.0.0.9', $connector->lastClientConfig['host']);
+        $this->assertSame(6380, $connector->lastClientConfig['port']);
+        $this->assertSame(2, $connector->lastClientConfig['database']);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectToSentinelSkipsSentinelsThatCannotNameTheMaster()
+    {
+        $connector = new SentinelStubPhpRedisConnector([
+            'sentinel-1:26379' => fn () => throw new RedisException('Connection refused'),
+            'sentinel-2:26379' => fn () => false,
+            'sentinel-3:26379' => fn () => ['10.0.0.9', '6380'],
+        ]);
+
+        $connector->connectToSentinel([
+            'hosts' => [['host' => 'sentinel-1'], ['host' => 'sentinel-2', 'port' => 26379], ['host' => 'sentinel-3', 'port' => '26379']],
+        ], []);
+
+        $this->assertSame(['sentinel-1:26379', 'sentinel-2:26379', 'sentinel-3:26379'], $connector->queried);
+        $this->assertSame(['10.0.0.9:6380'], $connector->clients);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectToSentinelThrowsWhenNoSentinelKnowsTheMaster()
+    {
+        $connector = new SentinelStubPhpRedisConnector([
+            'sentinel-1:26379' => fn () => throw new RedisException('Connection refused'),
+            'sentinel-2:26379' => fn () => false,
+        ]);
+
+        try {
+            $connector->connectToSentinel(['hosts' => [['host' => 'sentinel-1'], ['host' => 'sentinel-2']]], []);
+            $this->fail('Expected RedisException was not thrown.');
+        } catch (RedisException $e) {
+            $this->assertStringContainsString('service [mymaster]', $e->getMessage());
+            $this->assertStringContainsString('sentinel-1:26379 (Connection refused)', $e->getMessage());
+            $this->assertStringContainsString('sentinel-2:26379 (no master known for service [mymaster])', $e->getMessage());
+        }
+
+        $this->assertSame([], $connector->clients);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testSentinelConnectionResolvesTheMasterAgainWhenRebuildingItsClient()
+    {
+        $masters = [['10.0.0.9', '6380'], ['10.0.0.2', '6380']];
+
+        $connector = new SentinelStubPhpRedisConnector([
+            'sentinel-1:26379' => function () use (&$masters) {
+                return array_shift($masters);
+            },
+        ], ['10.0.0.9']);
+
+        $connection = $connector->connectToSentinel(['hosts' => [['host' => 'sentinel-1']]], []);
+
+        $this->assertSame('bar', $connection->command('get', ['foo']));
+        $this->assertSame(['sentinel-1:26379', 'sentinel-1:26379'], $connector->queried);
+        $this->assertSame(['10.0.0.9:6380', '10.0.0.2:6380'], $connector->clients);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testCreateSentinelReturnsARedisSentinelInstance()
+    {
+        $connector = new TestablePhpRedisConnector;
+
+        $this->assertInstanceOf(\RedisSentinel::class, $connector->testCreateSentinel('127.0.0.1', 26379, ['timeout' => 0.5]));
+    }
+}
+
+class SentinelStubPhpRedisConnector extends PhpRedisConnector
+{
+    public array $queried = [];
+
+    public array $clients = [];
+
+    public array $lastClientConfig = [];
+
+    public function __construct(protected array $sentinels = [], protected array $deadHosts = [])
+    {
+    }
+
+    protected function createClient(array $config)
+    {
+        $this->clients[] = $config['host'].':'.$config['port'];
+        $this->lastClientConfig = $config;
+
+        return new class($config['host'], $this->deadHosts)
+        {
+            public function __construct(protected string $host, protected array $deadHosts)
+            {
+            }
+
+            public function get($key)
+            {
+                if (in_array($this->host, $this->deadHosts, true)) {
+                    throw new RedisException('Connection lost');
+                }
+
+                return 'bar';
+            }
+        };
+    }
+
+    protected function createSentinel($host, $port, array $config)
+    {
+        $this->queried[] = "{$host}:{$port}";
+
+        $answer = $this->sentinels["{$host}:{$port}"] ?? fn () => throw new RedisException('Connection refused');
+
+        return new class($answer)
+        {
+            public function __construct(protected $answer)
+            {
+            }
+
+            public function getMasterAddrByName($service)
+            {
+                return ($this->answer)($service);
+            }
+        };
+    }
 }
 
 class ClusterStubPhpRedisConnector extends PhpRedisConnector
@@ -471,5 +607,10 @@ class TestablePhpRedisConnector extends PhpRedisConnector
     public function testFormatHost(array $options): string
     {
         return $this->formatHost($options);
+    }
+
+    public function testCreateSentinel(string $host, int $port, array $config)
+    {
+        return $this->createSentinel($host, $port, $config);
     }
 }

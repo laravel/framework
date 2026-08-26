@@ -34,11 +34,58 @@ class RedisManagerExtensionTest extends TestCase
                     ],
                 ],
             ],
+            'sentinels' => [
+                'my-sentinel' => [
+                    'hosts' => [['host' => 'sentinel-1', 'port' => 26379]],
+                    'service' => 'mymaster',
+                    'database' => 5,
+                    'timeout' => 0.5,
+                ],
+            ],
         ]);
 
         $this->redis->extend('my_custom_driver', function () {
             return new FakeRedisConnector;
         });
+    }
+
+    public function testUsingCustomRedisConnectorWithRedisSentinelInstance()
+    {
+        $this->assertSame(
+            'my-redis-sentinel-connection', $this->redis->resolve('my-sentinel')
+        );
+    }
+
+    public function testParseConnectionConfigurationForSentinel()
+    {
+        $connector = new FakeRedisConnector;
+
+        $redis = new RedisManager(new Application, 'my_custom_driver', [
+            'options' => [
+                'prefix' => 'laravel_database_',
+            ],
+            'sentinels' => [
+                'my-sentinel' => [
+                    'hosts' => [['host' => 'sentinel-1', 'port' => 26379]],
+                    'service' => 'mymaster',
+                    'database' => 5,
+                ],
+            ],
+        ]);
+
+        $redis->extend('my_custom_driver', function () use ($connector) {
+            return $connector;
+        });
+
+        $redis->resolve('my-sentinel');
+
+        $this->assertSame([
+            'hosts' => [['host' => 'sentinel-1', 'port' => 26379]],
+            'service' => 'mymaster',
+            'database' => 5,
+        ], $connector->sentinelConfig);
+
+        $this->assertSame(['prefix' => 'laravel_database_'], $connector->sentinelOptions);
     }
 
     public function testUsingCustomRedisConnectorWithSingleRedisInstance()
@@ -105,6 +152,10 @@ class RedisManagerExtensionTest extends TestCase
 
 class FakeRedisConnector implements Connector
 {
+    public $sentinelConfig;
+
+    public $sentinelOptions;
+
     /**
      * Create a new clustered Predis connection.
      *
@@ -128,6 +179,21 @@ class FakeRedisConnector implements Connector
     public function connectToCluster(array $config, array $clusterOptions, array $options)
     {
         return 'my-redis-cluster-connection';
+    }
+
+    /**
+     * Create a new Sentinel connection.
+     *
+     * @param  array  $config
+     * @param  array  $options
+     * @return string
+     */
+    public function connectToSentinel(array $config, array $options)
+    {
+        $this->sentinelConfig = $config;
+        $this->sentinelOptions = $options;
+
+        return 'my-redis-sentinel-connection';
     }
 }
 
