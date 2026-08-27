@@ -361,6 +361,30 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
+    public function testSqlServerConnectBuildsDsnWithAdditionalOptions()
+    {
+        $config = [
+            'host' => '127.0.0.1',
+            'port' => 1433,
+            'database' => 'example_database',
+            'appname' => 'Laravel;Worker}',
+            'column_encryption' => 'Enabled',
+            'encrypt' => 'true',
+            'login_timeout' => '30',
+            'transaction_isolation' => 'READ_COMMITTED',
+            'trust_server_certificate' => 'true',
+            'multi_subnet_failover' => '1',
+        ];
+        $dsn = 'sqlsrv:Server=127.0.0.1,1433;Database=example_database;APP={Laravel;Worker}}};Encrypt=true;TrustServerCertificate=true;TransactionIsolation=READ_COMMITTED;MultiSubnetFailover=1;ColumnEncryption=Enabled;LoginTimeout=30';
+        $connector = $this->getMockBuilder(SqlServerConnector::class)->onlyMethods(['createConnection', 'getOptions', 'getAvailableDrivers'])->getMock();
+        $connection = Mockery::mock(PDO::class);
+        $connector->method('getAvailableDrivers')->willReturn(['sqlsrv']);
+        $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
+
+        $this->assertSame($connection, $connector->connect($config));
+    }
+
     #[RequiresPhpExtension('odbc')]
     public function testSqlServerConnectCallsCreateConnectionWithPreferredODBC()
     {
