@@ -84,9 +84,15 @@ class SeedCommand extends Command
 
         $startTime = microtime(true);
 
-        Model::unguarded(function () use ($seeder) {
-            $seeder->__invoke();
-        });
+        try {
+            Model::unguarded(function () use ($seeder) {
+                $seeder->__invoke();
+            });
+        } finally {
+            if ($previousConnection) {
+                $this->resolver->setDefaultConnection($previousConnection);
+            }
+        }
 
         if ($shouldReportProgress) {
             $runTime = number_format((microtime(true) - $startTime) * 1000);
@@ -96,10 +102,6 @@ class SeedCommand extends Command
             );
 
             $this->newLine();
-        }
-
-        if ($previousConnection) {
-            $this->resolver->setDefaultConnection($previousConnection);
         }
 
         return self::SUCCESS;
