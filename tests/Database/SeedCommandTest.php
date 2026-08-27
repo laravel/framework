@@ -16,6 +16,7 @@ use Illuminate\Events\NullDispatcher;
 use Illuminate\Testing\Assert;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
@@ -56,6 +57,53 @@ class SeedCommandTest extends TestCase
         $command->handle();
 
         $container->shouldHaveReceived('call')->with([$command, 'handle']);
+    }
+
+    public function testFailedSeederRestoresPreviousDefaultConnection()
+    {
+        $input = new ArrayInput(['--force' => true, '--database' => 'sqlite']);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $seeder = Mockery::mock(Seeder::class);
+        $seeder->expects('setContainer')->andReturnSelf();
+        $seeder->expects('setCommand')->andReturnSelf();
+        $seeder->expects('__invoke')->andThrow(new RuntimeException('Seeding failed.'));
+
+        $connections = [];
+
+        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $resolver->expects('getDefaultConnection')->andReturn('mysql');
+        $resolver->shouldReceive('setDefaultConnection')->andReturnUsing(function ($name) use (&$connections) {
+            $connections[] = $name;
+        });
+
+        $container = Mockery::mock(Container::class);
+        $container->expects('call');
+        $container->expects('environment')->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->expects('make')->with('DatabaseSeeder')->andReturn($seeder);
+        $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(
+            $outputStyle
+        );
+        $container->expects('make')->with(Factory::class, Mockery::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        // call run to set up IO, then fire manually.
+        $command->run($input, $output);
+
+        try {
+            $command->handle();
+            $this->fail('Seeding should have failed.');
+        } catch (RuntimeException) {
+            //
+        }
+
+        Assert::assertSame(['sqlite', 'mysql'], $connections);
     }
 
     public function testWithoutModelEvents()
