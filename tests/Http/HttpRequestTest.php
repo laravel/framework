@@ -2122,8 +2122,8 @@ class HttpRequestTest extends TestCase
         $this->assertSame(100, $request->clamp('per_page', 1, 250, 99));
         $this->assertSame(22.4, $request->clamp('per_page', 1.11, 22.4, 2));
         $this->assertSame(9.24, $request->clamp('float', 1, 10));
-        $this->assertSame(10, $request->clamp('empty', 10, 100));
-        $this->assertSame(10, $request->clamp('null', 10, 100));
-        $this->assertSame(10, $request->clamp('string', 10, 100));
+        $this->assertSame(15, $request->clamp('empty', 10, 100, 15));
+        $this->assertSame(15, $request->clamp('string', 10, 100, 15));
+        $this->assertSame(15, $request->clamp('null', 10, 100, 15));
     }
 }
