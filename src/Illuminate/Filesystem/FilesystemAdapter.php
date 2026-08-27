@@ -34,6 +34,7 @@ use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToSetVisibility;
 use League\Flysystem\UnableToWriteFile;
 use League\Flysystem\Visibility;
+use League\Flysystem\WhitespacePathNormalizer;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
@@ -294,7 +295,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function path($path)
     {
-        return $this->prefixer->prefixPath($path);
+        return $this->prefixer->prefixPath((new WhitespacePathNormalizer)->normalizePath($path));
     }
 
     /**
