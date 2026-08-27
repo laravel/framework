@@ -32,6 +32,8 @@ class FoundationDevCommandsTest extends TestCase
             'autoRestart' => true,
             'bufferSize' => null,
             'streamBufferSize' => null,
+            'withoutVendorCommands' => false,
+            'withoutDefaultCommands' => false,
         ] as $prop => $value) {
             $ref->getProperty($prop)->setValue(null, $value);
         }
@@ -397,5 +399,76 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertArrayHasKey('source', $commands[0]);
         $this->assertIsArray($commands[0]['source']);
         $this->assertSame(__CLASS__, $commands[0]['source']['class']);
+    }
+
+    public function testVendorCommandsAreIncludedByDefault()
+    {
+        $ref = new ReflectionClass(DevCommands::class);
+        $ref->getProperty('commands')->setValue(null, [
+            'vendor' => new DevCommand('echo vendor', [], 'vendor', DevCommand::PRIORITY_VENDOR),
+        ]);
+
+        DevCommands::register('echo local', 'local');
+
+        $names = array_column(DevCommands::commands(), 'name');
+
+        $this->assertContains('vendor', $names);
+        $this->assertContains('local', $names);
+    }
+
+    public function testWithoutVendorCommandsExcludesOnlyVendorCommands()
+    {
+        $ref = new ReflectionClass(DevCommands::class);
+        $ref->getProperty('commands')->setValue(null, [
+            'server' => new DevCommand('php artisan serve', [], 'server', DevCommand::PRIORITY_DEFAULT),
+            'vendor' => new DevCommand('echo vendor', [], 'vendor', DevCommand::PRIORITY_VENDOR),
+        ]);
+
+        DevCommands::register('echo local', 'local');
+
+        DevCommands::withoutVendorCommands();
+
+        $names = array_column(DevCommands::commands(), 'name');
+
+        $this->assertNotContains('vendor', $names);
+        $this->assertContains('server', $names);
+        $this->assertContains('local', $names);
+    }
+
+    public function testWithoutDefaultCommandsExcludesOnlyFrameworkDefaultCommands()
+    {
+        $ref = new ReflectionClass(DevCommands::class);
+        $ref->getProperty('commands')->setValue(null, [
+            'server' => new DevCommand('php artisan serve', [], 'server', DevCommand::PRIORITY_DEFAULT),
+            'vendor' => new DevCommand('echo vendor', [], 'vendor', DevCommand::PRIORITY_VENDOR),
+        ]);
+
+        DevCommands::register('echo local', 'local');
+
+        DevCommands::withoutDefaultCommands();
+
+        $names = array_column(DevCommands::commands(), 'name');
+
+        $this->assertNotContains('server', $names);
+        $this->assertContains('vendor', $names);
+        $this->assertContains('local', $names);
+    }
+
+    public function testWithoutVendorAndDefaultCommandsKeepsOnlyLocalCommands()
+    {
+        $ref = new ReflectionClass(DevCommands::class);
+        $ref->getProperty('commands')->setValue(null, [
+            'server' => new DevCommand('php artisan serve', [], 'server', DevCommand::PRIORITY_DEFAULT),
+            'vendor' => new DevCommand('echo vendor', [], 'vendor', DevCommand::PRIORITY_VENDOR),
+        ]);
+
+        DevCommands::register('echo local', 'local');
+
+        DevCommands::withoutVendorCommands();
+        DevCommands::withoutDefaultCommands();
+
+        $names = array_column(DevCommands::commands(), 'name');
+
+        $this->assertSame(['local'], $names);
     }
 }

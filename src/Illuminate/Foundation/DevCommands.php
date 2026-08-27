@@ -71,6 +71,20 @@ class DevCommands
     protected static $autoRestart = true;
 
     /**
+     * Whether to exclude vendor commands.
+     *
+     * @var bool
+     */
+    protected static $withoutVendorCommands = false;
+
+    /**
+     * Whether to exclude the framework's default commands.
+     *
+     * @var bool
+     */
+    protected static $withoutDefaultCommands = false;
+
+    /**
      * How many lines of output to buffer for each command when running in tabbed mode.
      *
      * @var int|null
@@ -181,6 +195,14 @@ class DevCommands
         $commands = [];
 
         foreach (self::$commands as $command) {
+            if (self::$withoutVendorCommands && $command->priority() === DevCommand::PRIORITY_VENDOR) {
+                continue;
+            }
+
+            if (self::$withoutDefaultCommands && $command->priority() === DevCommand::PRIORITY_DEFAULT) {
+                continue;
+            }
+
             $cmd = $command->toArray();
 
             if ((! empty(self::$only) && ! in_array($cmd['name'], self::$only)) || in_array($cmd['name'], self::$except)) {
@@ -437,6 +459,26 @@ class DevCommands
     public static function except(...$names): void
     {
         self::$except = $names;
+    }
+
+    /**
+     * Exclude any commands from the vendor directory.
+     *
+     * @return void
+     */
+    public static function withoutVendorCommands(): void
+    {
+        self::$withoutVendorCommands = true;
+    }
+
+    /**
+     * Exclude the framework's default commands.
+     *
+     * @return void
+     */
+    public static function withoutDefaultCommands(): void
+    {
+        self::$withoutDefaultCommands = true;
     }
 
     /**
