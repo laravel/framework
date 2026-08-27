@@ -180,6 +180,7 @@ return [
             'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
             'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
             'command_retries' => env('REDIS_COMMAND_RETRIES', 0),
+            'command_retry_delay' => env('REDIS_COMMAND_RETRY_DELAY', 0),
         ],
 
         'cache' => [
@@ -194,6 +195,7 @@ return [
             'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
             'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
             'command_retries' => env('REDIS_COMMAND_RETRIES', 0),
+            'command_retry_delay' => env('REDIS_COMMAND_RETRY_DELAY', 0),
         ],
 
     ],

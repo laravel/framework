@@ -5,6 +5,7 @@ namespace Illuminate\Redis\Connections;
 use Closure;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use RedisClusterException;
 use RedisException;
@@ -633,6 +634,10 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             } catch (RedisClusterException|RedisException $e) {
                 if (! Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'READONLY', 'Connection lost', 'Error processing response from Redis node'])) {
                     throw $e;
+                }
+
+                if ($retries > 0 && ($delay = (int) ($this->config['command_retry_delay'] ?? 0)) > 0) {
+                    Sleep::usleep($delay * 1000);
                 }
 
                 $this->client = $this->connector ? call_user_func($this->connector) : $this->client;

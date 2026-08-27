@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Redis;
 
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connectors\PhpRedisConnector;
+use Illuminate\Support\Sleep;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -410,6 +411,47 @@ class PhpRedisConnectorTest extends TestCase
         }
 
         $this->assertSame(3, $reconnects);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionWaitsBeforeRetryingWhenADelayIsConfigured()
+    {
+        Sleep::fake();
+
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('get')->with('foo')->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('get')->with('foo')->willReturn('bar');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient, ['command_retry_delay' => 250]);
+
+        $this->assertSame('bar', $connection->command('get', ['foo']));
+
+        Sleep::assertSequence([Sleep::usleep(250_000)]);
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionDoesNotWaitAfterItsFinalAttempt()
+    {
+        Sleep::fake();
+
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('incr')->with('foo')->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->never())->method('incr');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient, ['command_retry_delay' => 250]);
+
+        try {
+            $connection->command('incr', ['foo']);
+            $this->fail('Expected RedisException was not thrown.');
+        } catch (RedisException $e) {
+            $this->assertSame('Connection lost', $e->getMessage());
+        }
+
+        Sleep::assertNeverSlept();
     }
 
     #[RequiresPhpExtension('redis')]
