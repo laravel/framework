@@ -191,6 +191,10 @@ class Grammar extends BaseGrammar
         return (new Collection($joins))->map(function ($join) use ($query) {
             $table = $this->wrapTable($join->table);
 
+            if ($join->indexHint) {
+                $table .= ' '.$this->compileIndexHint($query, $join->indexHint);
+            }
+
             $nestedJoins = is_null($join->joins) ? '' : ' '.$this->compileJoins($query, $join->joins);
 
             $tableAndNestedJoins = is_null($join->joins) ? $table : '('.$table.$nestedJoins.')';
