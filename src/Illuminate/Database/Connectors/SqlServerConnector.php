@@ -193,21 +193,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     }
 
     /**
-     * Escape a value for a SqlSrv connection string.
-     *
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function escapeSqlSrvDsnValue($value)
-    {
-        if (! is_string($value) || (! str_contains($value, ';') && ! str_contains($value, '}') && ! preg_match('/^\s|\s$/', $value))) {
-            return $value;
-        }
-
-        return '{'.str_replace('}', '}}', $value).'}';
-    }
-
-    /**
      * Build a connection string from the given arguments.
      *
      * @param  string  $driver
@@ -235,6 +220,21 @@ class SqlServerConnector extends Connector implements ConnectorInterface
         }
 
         return $config['host'].$separator.$config['port'];
+    }
+
+    /**
+     * Escape a value for the connection string.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function escapeSqlSrvDsnValue($value)
+    {
+        if (! is_string($value) || (! str_contains($value, ';') && ! str_contains($value, '}') && ! preg_match('/^\s|\s$/', $value))) {
+            return $value;
+        }
+
+        return '{'.str_replace('}', '}}', $value).'}';
     }
 
     /**
