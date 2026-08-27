@@ -388,7 +388,7 @@ class Worker
      *
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  int  $lastRestart
-     * @param  int  $startTime
+     * @param  int|float  $startTime
      * @param  mixed  $job
      * @return array|null
      */
