@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Tests\Events\Fixtures\ExampleEvent;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 

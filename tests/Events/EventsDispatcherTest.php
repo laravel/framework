@@ -6,6 +6,7 @@ use Error;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Tests\Events\Fixtures\ExampleEvent;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -785,11 +786,6 @@ class TestListenerInvokey
 
         return false;
     }
-}
-
-class ExampleEvent
-{
-    //
 }
 
 interface SomeEventInterface
