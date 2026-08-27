@@ -79,13 +79,6 @@ class FilesystemAdapter implements CloudFilesystemContract
     protected $prefixer;
 
     /**
-     * The Flysystem PathNormalizer instance.
-     *
-     * @var \League\Flysystem\PathNormalizer
-     */
-    protected $pathNormalizer;
-
-    /**
      * The file server callback.
      *
      * @var \Closure|null
@@ -121,8 +114,6 @@ class FilesystemAdapter implements CloudFilesystemContract
         $separator = $config['directory_separator'] ?? DIRECTORY_SEPARATOR;
 
         $this->prefixer = new PathPrefixer($config['root'] ?? '', $separator);
-        $this->pathNormalizer = new WhitespacePathNormalizer;
-
         if (isset($config['prefix'])) {
             $this->prefixer = new PathPrefixer($this->prefixer->prefixPath($config['prefix']), $separator);
         }
@@ -303,7 +294,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function path($path)
     {
-        return $this->prefixer->prefixPath($this->pathNormalizer->normalizePath($path));
+        return $this->prefixer->prefixPath((new WhitespacePathNormalizer)->normalizePath($path));
     }
 
     /**
