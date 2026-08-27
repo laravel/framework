@@ -316,7 +316,7 @@ trait InteractsWithData
         $value = $this->data($key, $default);
 
         if (! is_numeric($value)) {
-            $value = (int) $value;
+            $value = $default;
         }
 
         return Number::clamp($value, $min, $max);
