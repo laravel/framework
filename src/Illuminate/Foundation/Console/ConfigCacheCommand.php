@@ -3,9 +3,11 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Facade;
 use LogicException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
@@ -96,6 +98,11 @@ class ConfigCacheCommand extends Command
         $app->useStoragePath($this->laravel->storagePath());
 
         $app->make(ConsoleKernelContract::class)->bootstrap();
+
+        Facade::clearResolvedInstances();
+
+        Facade::setFacadeApplication($this->laravel);
+        Container::setInstance($this->laravel);
 
         return $app['config']->all();
     }
