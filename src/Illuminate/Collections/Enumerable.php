@@ -1062,6 +1062,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function chunkWhile(callable $callback);
 
     /**
+     * Chunk the collection into chunks by comparing adjacent values using the given key or callback.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string  $key
+     * @return static<int, static<TKey, TValue>>
+     */
+    public function chunkBy($key);
+
+    /**
      * Split a collection into a certain number of groups, and fill the first groups completely.
      *
      * @param  int  $numberOfGroups

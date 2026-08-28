@@ -929,6 +929,21 @@ trait EnumeratesValues
     }
 
     /**
+     * Chunk the collection into chunks by comparing adjacent values using the given key or callback.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string  $key
+     * @return static<int, static<TKey, TValue>>
+     */
+    public function chunkBy($key)
+    {
+        $callback = $this->valueRetriever($key);
+
+        return $this->chunkWhile(
+            fn ($value, $key, $chunk) => $callback($value, $key) == $callback($chunk->last(), $chunk->keys()->last())
+        );
+    }
+
+    /**
      * Pass the collection to the given callback and then return it.
      *
      * @param  callable($this): mixed  $callback

@@ -76,6 +76,23 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testChunkByIsLazy()
+    {
+        $collection = LazyCollection::make(['A', 'A', 'B', 'B', 'C', 'C', 'C']);
+
+        $this->assertDoesNotEnumerateCollection($collection, function ($collection) {
+            $collection->chunkBy(fn ($value) => $value);
+        });
+
+        $this->assertEnumeratesCollection($collection, 3, function ($collection) {
+            $collection->chunkBy(fn ($value) => $value)->first();
+        });
+
+        $this->assertEnumeratesCollectionOnce($collection, function ($collection) {
+            $collection->chunkBy(fn ($value) => $value)->all();
+        });
+    }
+
     public function testCollapseIsLazy()
     {
         $collection = LazyCollection::make([
