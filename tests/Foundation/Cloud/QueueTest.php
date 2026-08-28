@@ -131,6 +131,7 @@ class QueueTest extends TestCase
     public function testItBindsQueueConnectorAndNewsUpSqsConnector()
     {
         $this->app->bind(SqsConnector::class, fn () => throw new RuntimeException('Should not be resolved'));
+        CloudBootstrapper::registerEvents($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->app[QueueConnector::class];
@@ -138,6 +139,7 @@ class QueueTest extends TestCase
 
     public function testItBindsCloudQueue()
     {
+        CloudBootstrapper::registerEvents($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->assertInstanceOf(Queue::class, $this->app['queue']->connection('cloud'));
@@ -145,6 +147,7 @@ class QueueTest extends TestCase
 
     public function testItBindsCloudEventsAsSingleton()
     {
+        CloudBootstrapper::registerEvents($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->assertFalse($this->app->resolved(Events::class));
@@ -153,6 +156,7 @@ class QueueTest extends TestCase
 
     public function testItBindsTheQueueFailer()
     {
+        CloudBootstrapper::registerEvents($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->assertInstanceOf(FailedJobProvider::class, $this->app['queue.failer']);
@@ -162,6 +166,7 @@ class QueueTest extends TestCase
     {
         $this->app['config']->set('queue.connections.cloud', null);
 
+        CloudBootstrapper::registerEvents($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->expectException(InvalidArgumentException::class);
@@ -176,7 +181,6 @@ class QueueTest extends TestCase
 
         CloudBootstrapper::bootManagedQueues($this->app);
 
-        $this->assertFalse($this->app->bound(Events::class));
         $this->assertSame($originalFailer, $this->app['queue.failer']);
     }
 
