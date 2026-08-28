@@ -14,6 +14,11 @@ class Events
      */
     protected $socket = null;
 
+    /**
+     * The cloud socket factory.
+     *
+     * @var callable|null
+     */
     public static $socketFactory = null;
 
     /**

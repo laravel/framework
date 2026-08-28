@@ -185,7 +185,7 @@ class CloudBootstrapper
     }
 
     /**
-     * Boot the events system for Laravel Cloud.
+     * Register the events system for Laravel Cloud.
      */
     public static function registerEvents(Application $app): void
     {
