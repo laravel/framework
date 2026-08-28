@@ -1838,6 +1838,45 @@ class QueueTest extends TestCase
         $this->assertSame(['default', 'emails'], $queue->managedQueues());
     }
 
+    public function testTotalPendingSizeSumsAcrossManagedQueues()
+    {
+        config(['queue.connections.cloud.queues' => ['default', 'emails']]);
+        $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+
+        $client->expects('getQueueAttributes')->twice()->andReturn(new Result([
+            'Attributes' => ['ApproximateNumberOfMessages' => 2],
+        ]));
+
+        $this->assertSame(4, $queue->totalPendingSize());
+    }
+
+    public function testTotalDelayedSizeSumsAcrossManagedQueues()
+    {
+        config(['queue.connections.cloud.queues' => ['default', 'emails']]);
+        $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+
+        $client->expects('getQueueAttributes')->twice()->andReturn(new Result([
+            'Attributes' => ['ApproximateNumberOfMessagesDelayed' => 1],
+        ]));
+
+        $this->assertSame(2, $queue->totalDelayedSize());
+    }
+
+    public function testTotalReservedSizeSumsAcrossManagedQueues()
+    {
+        config(['queue.connections.cloud.queues' => ['default', 'emails']]);
+        $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+
+        $client->expects('getQueueAttributes')->twice()->andReturn(new Result([
+            'Attributes' => ['ApproximateNumberOfMessagesNotVisible' => 3],
+        ]));
+
+        $this->assertSame(6, $queue->totalReservedSize());
+    }
+
     /**
      * @return array{Queue, MockInterface<SqsClient>}
      */

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -92,6 +93,36 @@ class Queue implements QueueContract, ClearableQueue
     public function reservedSize($queue = null)
     {
         return $this->queue->reservedSize(...func_get_args());
+    }
+
+    /**
+     * Get the number of pending jobs across every managed queue.
+     *
+     * @return int
+     */
+    public function totalPendingSize()
+    {
+        return (new Collection($this->managedQueues()))->sum(fn ($queue) => $this->pendingSize($queue));
+    }
+
+    /**
+     * Get the number of delayed jobs across every managed queue.
+     *
+     * @return int
+     */
+    public function totalDelayedSize()
+    {
+        return (new Collection($this->managedQueues()))->sum(fn ($queue) => $this->delayedSize($queue));
+    }
+
+    /**
+     * Get the number of reserved jobs across every managed queue.
+     *
+     * @return int
+     */
+    public function totalReservedSize()
+    {
+        return (new Collection($this->managedQueues()))->sum(fn ($queue) => $this->reservedSize($queue));
     }
 
     /**
