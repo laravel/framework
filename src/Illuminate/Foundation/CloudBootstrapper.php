@@ -43,6 +43,7 @@ class CloudBootstrapper
             },
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
+                static::registerEvents($app);
             },
             default => fn () => true,
         })();
@@ -192,7 +193,6 @@ class CloudBootstrapper
             return;
         }
 
-        $app->singleton(Events::class, fn () => new Events(CloudBootstrapper::socket()));
         $app->bind(QueueConnector::class, fn ($app) => new QueueConnector(new SqsConnector, $app));
 
         $app['queue']->addConnector('cloud', $app->factory(QueueConnector::class));
@@ -234,6 +234,14 @@ class CloudBootstrapper
         if (! $app['config']->has('logging.channels.cloud')) {
             $app['config']->set('logging.channels.cloud', $channel);
         }
+    }
+
+    /**
+     * Register the events system for Laravel Cloud.
+     */
+    public static function registerEvents(Application $app): void
+    {
+        $app->singleton(Events::class, fn () => new Events(CloudBootstrapper::socket()));
     }
 
     /**
