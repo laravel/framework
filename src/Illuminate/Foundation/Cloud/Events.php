@@ -29,9 +29,13 @@ class Events
      *
      * @param  array<string, mixed>  $payload
      */
-    public function emit(array $payload): void
+    public function emit(array $payload): bool
     {
-        $this->emitMany([$payload]);
+        if ($payload === []) {
+            return true;
+        }
+
+        return $this->emitMany([$payload]);
     }
 
     /**
@@ -39,18 +43,20 @@ class Events
      *
      * @param  list<array<string, mixed>>  $payloads
      */
-    public function emitMany(array $payloads): void
+    public function emitMany(array $payloads): bool
     {
         if ($payloads === []) {
-            return;
+            return true;
         }
 
         try {
             $this->ensureConnected();
 
             $this->write($this->format($payloads));
+
+            return true;
         } catch (Throwable) {
-            //
+            return false;
         }
     }
 
