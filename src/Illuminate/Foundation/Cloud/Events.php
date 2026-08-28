@@ -14,6 +14,8 @@ class Events
      */
     protected $socket = null;
 
+    public static $socketFactory = null;
+
     /**
      * Create a new instance.
      */
@@ -127,7 +129,9 @@ class Events
      */
     protected function connect(): void
     {
-        $socket = stream_socket_client(
+        $factory = static::$socketFactory ?? stream_socket_client(...);
+
+        $socket = $factory(
             address: $this->address,
             error_code: $errorCode,
             error_message: $errorMessage,
