@@ -349,7 +349,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     }
 
     /**
-     * Determine if the message bag has any messages.
+     * Determine if the message bag has no messages.
      *
      * @return bool
      */

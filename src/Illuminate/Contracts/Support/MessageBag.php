@@ -95,7 +95,7 @@ interface MessageBag extends Arrayable, Countable
     public function setFormat($format = ':message');
 
     /**
-     * Determine if the message bag has any messages.
+     * Determine if the message bag has no messages.
      *
      * @return bool
      */
