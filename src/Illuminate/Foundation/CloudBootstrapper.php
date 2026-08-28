@@ -185,14 +185,6 @@ class CloudBootstrapper
     }
 
     /**
-     * Register the events system for Laravel Cloud.
-     */
-    public static function registerEvents(Application $app): void
-    {
-        $app->singleton(Events::class, fn () => new Events(CloudBootstrapper::socket()));
-    }
-
-    /**
      * Boot managed queues if applicable.
      */
     public static function bootManagedQueues(Application $app): void
@@ -242,6 +234,14 @@ class CloudBootstrapper
         if (! $app['config']->has('logging.channels.cloud')) {
             $app['config']->set('logging.channels.cloud', $channel);
         }
+    }
+
+    /**
+     * Register the events system for Laravel Cloud.
+     */
+    public static function registerEvents(Application $app): void
+    {
+        $app->singleton(Events::class, fn () => new Events(CloudBootstrapper::socket()));
     }
 
     /**
