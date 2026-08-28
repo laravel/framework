@@ -2,11 +2,14 @@
 
 namespace Illuminate\Tests\Foundation\Console;
 
+use Illuminate\Console\Command;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\Kernel;
 use Illuminate\Foundation\Events\Terminating;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\StringInput;
 
 class KernelTest extends TestCase
@@ -31,5 +34,103 @@ class KernelTest extends TestCase
             'terminating event',
             'terminating callback',
         ], $called);
+    }
+
+    public function testCommandNamedReturnsNullWhenTheCommandDoesNotExist()
+    {
+        $kernel = $this->makeKernel();
+
+        $command = $kernel->commandNamed('not-a-real-command');
+
+        $this->assertNull($command);
+    }
+
+    public function testCommandNamedRetrievesTheCommand()
+    {
+        $kernel = $this->makeKernel();
+        $kernel->registerCommand(new KernelTestCommand);
+
+        $command = $kernel->commandNamed('kernel-test-command');
+
+        $this->assertInstanceOf(KernelTestCommand::class, $command);
+    }
+
+    public function testCommandNamedDoesNotResolveOtherLazilyRegisteredCommands()
+    {
+        KernelTestLazyCommand::$constructionAttempts = 0;
+        $kernel = $this->makeKernel();
+        $artisan = $this->getArtisan($kernel);
+        $artisan->resolveCommands([KernelTestLazyCommand::class]);
+        $artisan->setContainerCommandLoader();
+
+        $kernel->registerCommand(new KernelTestCommand);
+
+        $command = $kernel->commandNamed('kernel-test-command');
+
+        $this->assertInstanceOf(KernelTestCommand::class, $command);
+        $this->assertSame(0, KernelTestLazyCommand::$constructionAttempts);
+
+        $command = $kernel->commandNamed('kernel-test-lazy-command');
+        $this->assertSame(1, KernelTestLazyCommand::$constructionAttempts);
+        $this->assertInstanceOf(KernelTestLazyCommand::class, $command);
+    }
+
+    public function testCommandNamedReturnsTheSameInstanceOnSubsequentCalls()
+    {
+        KernelTestLazyCommand::$constructionAttempts = 0;
+        $kernel = $this->makeKernel();
+        $artisan = $this->getArtisan($kernel);
+        $artisan->resolveCommands([KernelTestLazyCommand::class]);
+        $artisan->setContainerCommandLoader();
+
+        $first = $kernel->commandNamed('kernel-test-lazy-command');
+        $second = $kernel->commandNamed('kernel-test-lazy-command');
+
+        $this->assertSame($first, $second);
+        $this->assertSame(1, KernelTestLazyCommand::$constructionAttempts);
+    }
+
+    protected function makeKernel(): Kernel
+    {
+        $app = new Application;
+        $events = new Dispatcher($app);
+        $app->instance('events', $events);
+
+        return new Kernel($app, $events);
+    }
+
+    protected function getArtisan(Kernel $kernel)
+    {
+        $method = (new ReflectionClass($kernel))->getMethod('getArtisan');
+
+        return $method->invoke($kernel);
+    }
+}
+
+class KernelTestCommand extends Command
+{
+    protected $signature = 'kernel-test-command';
+
+    public function handle()
+    {
+        //
+    }
+}
+
+#[AsCommand(name: 'kernel-test-lazy-command')]
+class KernelTestLazyCommand extends Command
+{
+    public static int $constructionAttempts = 0;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        static::$constructionAttempts++;
+    }
+
+    public function handle()
+    {
+        //
     }
 }
