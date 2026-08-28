@@ -15,6 +15,13 @@ class Events
     protected $socket = null;
 
     /**
+     * The cloud socket factory.
+     *
+     * @var callable|null
+     */
+    public static $socketFactory = null;
+
+    /**
      * Create a new instance.
      */
     public function __construct(protected string $address)
@@ -27,9 +34,13 @@ class Events
      *
      * @param  array<string, mixed>  $payload
      */
-    public function emit(array $payload): void
+    public function emit(array $payload): bool
     {
-        $this->emitMany([$payload]);
+        if ($payload === []) {
+            return true;
+        }
+
+        return $this->emitMany([$payload]);
     }
 
     /**
@@ -37,18 +48,20 @@ class Events
      *
      * @param  list<array<string, mixed>>  $payloads
      */
-    public function emitMany(array $payloads): void
+    public function emitMany(array $payloads): bool
     {
         if ($payloads === []) {
-            return;
+            return true;
         }
 
         try {
             $this->ensureConnected();
 
             $this->write($this->format($payloads));
+
+            return true;
         } catch (Throwable) {
-            //
+            return false;
         }
     }
 
@@ -127,7 +140,12 @@ class Events
      */
     protected function connect(): void
     {
-        $socket = stream_socket_client(
+        $factory = static::$socketFactory ?? stream_socket_client(...);
+
+        $errorCode = null;
+        $errorMessage = null;
+
+        $socket = $factory(
             address: $this->address,
             error_code: $errorCode,
             error_message: $errorMessage,
