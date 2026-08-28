@@ -1231,13 +1231,17 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Skip the first {$count} items.
+     * Skip the first or last {$count} items.
      *
      * @param  int  $count
      * @return static
      */
     public function skip($count)
     {
+        if ($count < 0) {
+            return $this->passthru(__FUNCTION__, func_get_args());
+        }
+
         return new static(function () use ($count) {
             $iterator = $this->getIterator();
 
