@@ -607,6 +607,11 @@ class Handler implements ExceptionHandlerContract
         return $this;
     }
 
+    public function contextForException(Throwable $e)
+    {
+        return $this->buildExceptionContext($e);
+    }
+
     /**
      * Create the context array for logging the given exception.
      *
