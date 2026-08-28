@@ -6,7 +6,7 @@ use Closure;
 use ErrorException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
-use Illuminate\Foundation\Http\Middleware\Concerns\ExcludesPaths;
+use Illuminate\Http\Middleware\Concerns\ExcludesPaths;
 use Illuminate\Support\Arr;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use TypeError;
