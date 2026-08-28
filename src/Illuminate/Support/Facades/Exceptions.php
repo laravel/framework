@@ -24,6 +24,7 @@ use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
  * @method static bool shouldReport(\Throwable $e)
  * @method static \Illuminate\Foundation\Exceptions\Handler throttleUsing(callable $throttleUsing)
  * @method static \Illuminate\Foundation\Exceptions\Handler stopIgnoring(array|string $exceptions)
+ * @method static array contextForException(\Throwable $e)
  * @method static array buildContextForException(\Throwable $e)
  * @method static \Illuminate\Foundation\Exceptions\Handler buildContextUsing(\Closure $contextCallback)
  * @method static \Symfony\Component\HttpFoundation\Response render(\Illuminate\Http\Request $request, \Throwable $e)
