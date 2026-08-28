@@ -113,6 +113,7 @@ class QueueTest extends TestCase
         $_SERVER['argv'] = ['artisan', 'queue:work'];
 
         try {
+            CloudBootstrapper::registerEvents($this->app);
             CloudBootstrapper::bootManagedQueues($this->app);
             $this->assertTrue(Worker::$restartable);
 
@@ -129,6 +130,7 @@ class QueueTest extends TestCase
         $_SERVER['argv'] = ['artisan', 'queue:work'];
 
         try {
+            CloudBootstrapper::registerEvents($this->app);
             CloudBootstrapper::bootManagedQueues($this->app);
             $this->assertTrue(Worker::$pausable);
 
@@ -178,6 +180,7 @@ class QueueTest extends TestCase
     public function testItBindsQueueConnectorAndNewsUpSqsConnector()
     {
         $this->app->bind(SqsConnector::class, fn () => throw new RuntimeException('Should not be resolved'));
+        CloudBootstrapper::registerEvents($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->app[QueueConnector::class];
@@ -185,6 +188,7 @@ class QueueTest extends TestCase
 
     public function testItBindsCloudQueue()
     {
+        CloudBootstrapper::registerEvents($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->assertInstanceOf(Queue::class, $this->app['queue']->connection('cloud'));
@@ -192,6 +196,7 @@ class QueueTest extends TestCase
 
     public function testItBindsCloudEventsAsSingleton()
     {
+        CloudBootstrapper::registerEvents($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->assertFalse($this->app->resolved(Events::class));
@@ -200,6 +205,7 @@ class QueueTest extends TestCase
 
     public function testItBindsTheQueueFailer()
     {
+        CloudBootstrapper::registerEvents($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->assertInstanceOf(FailedJobProvider::class, $this->app['queue.failer']);
@@ -209,6 +215,7 @@ class QueueTest extends TestCase
     {
         $this->app['config']->set('queue.connections.cloud', null);
 
+        CloudBootstrapper::registerEvents($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->expectExceptionObject(new InvalidArgumentException('The [cloud] queue connection has not been configured.'));
@@ -222,7 +229,6 @@ class QueueTest extends TestCase
 
         CloudBootstrapper::bootManagedQueues($this->app);
 
-        $this->assertFalse($this->app->bound(Events::class));
         $this->assertSame($originalFailer, $this->app['queue.failer']);
     }
 
@@ -230,6 +236,7 @@ class QueueTest extends TestCase
     {
         $this->app['config']->set('queue.connections.cloud.driver', 'sqs');
 
+        CloudBootstrapper::registerEvents($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
         // The cloud connector - and with it the managed queue credential cache
@@ -262,6 +269,7 @@ class QueueTest extends TestCase
         $_SERVER['AWS_CONTAINER_CREDENTIALS_FULL_URI'] = 'http://169.254.170.23/v1/credentials';
 
         try {
+            CloudBootstrapper::registerEvents($this->app);
             CloudBootstrapper::configureManagedQueues($this->app);
             config([
                 'queue.connections.cloud.connection.credential_cache.enabled' => true,
