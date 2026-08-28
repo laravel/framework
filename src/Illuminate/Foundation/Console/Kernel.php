@@ -465,7 +465,7 @@ class Kernel implements KernelContract
      * @param  string  $name
      * @return \Symfony\Component\Console\Command\Command|null
      */
-    public function commandNamed($name)
+    public function findCommand($name)
     {
         $artisan = $this->getArtisan();
 
