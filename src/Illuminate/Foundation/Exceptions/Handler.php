@@ -613,6 +613,17 @@ class Handler implements ExceptionHandlerContract
      * @param  \Throwable  $e
      * @return array
      */
+    public function contextForException(Throwable $e)
+    {
+        return $this->buildExceptionContext($e);
+    }
+
+    /**
+     * Create the context array for logging the given exception.
+     *
+     * @param  \Throwable  $e
+     * @return array
+     */
     protected function buildExceptionContext(Throwable $e)
     {
         return array_merge(
