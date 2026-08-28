@@ -16,6 +16,7 @@ use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
 use Illuminate\Container\Attributes\Give;
 use Illuminate\Container\Attributes\Log;
+use Illuminate\Container\Attributes\Redis;
 use Illuminate\Container\Attributes\RouteParameter;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Attributes\Tag;
@@ -32,6 +33,8 @@ use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Http\Request;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Log\LogManager;
+use Illuminate\Redis\Connections\Connection as RedisConnection;
+use Illuminate\Redis\RedisManager;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -209,6 +212,21 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $container->make(DatabaseTest::class);
+    }
+
+    public function testRedisAttribute()
+    {
+        $container = new Container;
+        $container->singleton('redis', function () {
+            $manager = Mockery::mock(RedisManager::class);
+            $manager->expects('connection')->with('foo')->andReturn(Mockery::mock(RedisConnection::class));
+            $manager->expects('connection')->with('bar')->andReturn(Mockery::mock(RedisConnection::class));
+            $manager->expects('connection')->with(null)->andReturn(Mockery::mock(RedisConnection::class));
+
+            return $manager;
+        });
+
+        $container->make(RedisTest::class);
     }
 
     public function testAuthAttribute()
@@ -610,6 +628,16 @@ final readonly class DatabaseTest
 {
     public function __construct(#[Database('foo')] Connection $foo, #[Database('bar')] Connection $bar)
     {
+    }
+}
+
+final readonly class RedisTest
+{
+    public function __construct(
+        #[Redis('foo')] RedisConnection $foo,
+        #[Redis('bar')] RedisConnection $bar,
+        #[Redis] RedisConnection $default,
+    ) {
     }
 }
 
