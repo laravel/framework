@@ -137,6 +137,9 @@ class Events
     {
         $factory = static::$socketFactory ?? stream_socket_client(...);
 
+        $errorCode = null;
+        $errorMessage = null;
+
         $socket = $factory(
             address: $this->address,
             error_code: $errorCode,
