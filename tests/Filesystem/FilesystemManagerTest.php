@@ -461,6 +461,7 @@ class FilesystemManagerTest extends TestCase
         $filesystem->disk('read-through')->get('fallback.txt');
     }
 
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testReadThroughDisksSetVisibilityOnTheDiskContainingTheFile()
     {
         $filesystem = $this->readThroughFilesystemManager();
