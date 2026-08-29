@@ -535,6 +535,18 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile an explain query into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    #[\Override]
+    public function compileExplain(Builder $query)
+    {
+        return 'EXPLAIN FORMAT=TRADITIONAL '.$query->toSql();
+    }
+
+    /**
      * Compile a delete statement without joins into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

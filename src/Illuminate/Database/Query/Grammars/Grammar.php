@@ -51,6 +51,17 @@ class Grammar extends BaseGrammar
     ];
 
     /**
+     * Compile an explain query into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileExplain(Builder $query)
+    {
+        return 'EXPLAIN '.$query->toSql();
+    }
+
+    /**
      * Compile a select query into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

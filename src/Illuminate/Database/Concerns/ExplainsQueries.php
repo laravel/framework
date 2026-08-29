@@ -13,11 +13,11 @@ trait ExplainsQueries
      */
     public function explain()
     {
-        $sql = $this->toSql();
+        $sql = $this->getGrammar()->compileExplain($this);
 
         $bindings = $this->getBindings();
 
-        $explanation = $this->getConnection()->select('EXPLAIN '.$sql, $bindings);
+        $explanation = $this->getConnection()->select($sql, $bindings);
 
         return new Collection($explanation);
     }
