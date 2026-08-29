@@ -491,6 +491,19 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $this->assertSame('emails', $jobs->last()->queue);
     }
 
+    public function testTotalSize()
+    {
+        $database = Mockery::mock(Connection::class);
+        $queue = new DatabaseQueue($database, 'table', 'default');
+        $queue->setContainer(Mockery::spy(Container::class));
+
+        $query = Mockery::mock(QueryBuilder::class);
+        $database->expects('table')->with('table')->andReturn($query);
+        $query->expects('count')->andReturn(9);
+
+        $this->assertSame(9, $queue->totalSize());
+    }
+
     public function testTotalPendingSize()
     {
         $database = Mockery::mock(Connection::class);
