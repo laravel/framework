@@ -938,9 +938,8 @@ trait EnumeratesValues
     {
         $callback = $this->valueRetriever($key);
 
-        return $this->chunkWhile(
-            fn ($value, $key, $chunk) => $callback($value, $key) == $callback($chunk->last(), $chunk->keys()->last())
-        );
+        return $this->map(fn ($value, $key) => [$value, $callback($value, $key)])->chunkWhile(
+            fn ($value, $key, $chunk) => $value[1] == $chunk->last()[1])->map(fn ($chunk) => $chunk->map(fn ($value) => $value[0]));
     }
 
     /**

@@ -2457,6 +2457,27 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testChunkByInvokesCallbackOncePerItem($collection)
+    {
+        $invocations = [];
+
+        $data = (new $collection(['a' => 1, 'b' => 1, 'c' => 2, 'd' => 2]))
+            ->chunkBy(function ($value, $key) use (&$invocations) {
+                $invocations[] = [$key, $value];
+
+                return $value;
+            });
+
+        $this->assertCount(2, $data);
+        $this->assertSame([
+            ['a', 1],
+            ['b', 1],
+            ['c', 2],
+            ['d', 2],
+        ], $invocations);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testChunkByWithStringKey($collection)
     {
         $data = (new $collection([
