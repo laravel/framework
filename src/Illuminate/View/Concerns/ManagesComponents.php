@@ -5,6 +5,7 @@ namespace Illuminate\View\Concerns;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\View\ComponentSlot;
 
 trait ManagesComponents
@@ -43,6 +44,13 @@ trait ManagesComponents
      * @var array
      */
     protected $slotStack = [];
+
+    /**
+     * The attributes of the slots being rendered.
+     *
+     * @var array
+     */
+    protected $slotAttributesStack = [];
 
     /**
      * Start a component rendering process.
@@ -155,6 +163,12 @@ trait ManagesComponents
             }
         }
 
+        for ($i = count($this->slotAttributesStack) - 1; $i >= 0; $i--) {
+            if (array_key_exists($key, $this->slotAttributesStack[$i])) {
+                return $this->slotAttributesStack[$i][$key];
+            }
+        }
+
         return value($default);
     }
 
@@ -174,6 +188,8 @@ trait ManagesComponents
             $this->slots[$this->currentComponent()][$name] = '';
 
             $this->slotStack[$this->currentComponent()][] = [$name, $attributes];
+
+            $this->slotAttributesStack[] = Arr::mapWithKeys($attributes, fn ($value, $key) => [Str::camel($key) => $value]);
         }
     }
 
@@ -191,6 +207,8 @@ trait ManagesComponents
         );
 
         [$currentName, $currentAttributes] = $currentSlot;
+
+        array_pop($this->slotAttributesStack);
 
         $this->slots[$this->currentComponent()][$currentName] = new ComponentSlot(
             trim(ob_get_clean()), $currentAttributes
@@ -219,5 +237,6 @@ trait ManagesComponents
         $this->currentComponentData = [];
         $this->slots = [];
         $this->slotStack = [];
+        $this->slotAttributesStack = [];
     }
 }
