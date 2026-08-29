@@ -1134,7 +1134,7 @@ class Container implements ArrayAccess, ContainerContract
         // hand back the results of the functions, which allows functions to be
         // used as resolvers for more fine-tuned resolution of these objects.
         if ($concrete instanceof Closure) {
-            $this->buildStack[] = spl_object_hash($concrete);
+            $this->buildStack[] = spl_object_id($concrete);
 
             try {
                 return $concrete($this, $this->getLastParameterOverride());
