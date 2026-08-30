@@ -33,6 +33,13 @@ class MaintenanceModeTest extends TestCase
         parent::setUp();
     }
 
+    protected function tearDown(): void
+    {
+        PreventRequestsDuringMaintenance::flushState();
+
+        parent::tearDown();
+    }
+
     public function testBasicMaintenanceModeResponse()
     {
         file_put_contents(storage_path('framework/down'), json_encode([
@@ -221,6 +228,38 @@ class MaintenanceModeTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertSame('Hello World', $response->original);
+    }
+
+    public function testMaintenanceModeCanBeBypassedUsingSkipCallback()
+    {
+        PreventRequestsDuringMaintenance::skipWhen(fn ($request) => $request->is('allowed'));
+
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'retry' => 60,
+        ]));
+
+        Route::get('/allowed', fn () => 'Allowed')->middleware(PreventRequestsDuringMaintenance::class);
+        Route::get('/blocked', fn () => 'Blocked')->middleware(PreventRequestsDuringMaintenance::class);
+
+        $this->get('/allowed')
+            ->assertOk()
+            ->assertSeeText('Allowed');
+
+        $this->get('/blocked')->assertServiceUnavailable();
+    }
+
+    public function testMaintenanceModeSkipCallbacksCanBeFlushed()
+    {
+        PreventRequestsDuringMaintenance::skipWhen(fn () => true);
+        PreventRequestsDuringMaintenance::flushState();
+
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'retry' => 60,
+        ]));
+
+        Route::get('/blocked', fn () => 'Blocked')->middleware(PreventRequestsDuringMaintenance::class);
+
+        $this->get('/blocked')->assertServiceUnavailable();
     }
 
     public function testMaintenanceModeCantBeBypassedWithInvalidCookie()

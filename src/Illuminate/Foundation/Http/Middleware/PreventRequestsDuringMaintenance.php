@@ -37,6 +37,13 @@ class PreventRequestsDuringMaintenance
     protected static $neverPrevent = [];
 
     /**
+     * All of the registered skip callbacks.
+     *
+     * @var array
+     */
+    protected static $skipCallbacks = [];
+
+    /**
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -58,6 +65,12 @@ class PreventRequestsDuringMaintenance
      */
     public function handle($request, Closure $next)
     {
+        foreach (static::$skipCallbacks as $callback) {
+            if ($callback($request)) {
+                return $next($request);
+            }
+        }
+
         if ($this->inExceptArray($request)) {
             return $next($request);
         }
@@ -181,6 +194,17 @@ class PreventRequestsDuringMaintenance
     }
 
     /**
+     * Register a callback that instructs the middleware to be skipped.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function skipWhen(Closure $callback)
+    {
+        static::$skipCallbacks[] = $callback;
+    }
+
+    /**
      * Flush the state of the middleware.
      *
      * @return void
@@ -188,5 +212,7 @@ class PreventRequestsDuringMaintenance
     public static function flushState()
     {
         static::$neverPrevent = [];
+
+        static::$skipCallbacks = [];
     }
 }
