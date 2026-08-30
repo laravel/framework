@@ -162,6 +162,17 @@ class BladeTest extends TestCase
 <div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
     }
 
+    public function test_aware_data_is_available_within_named_slots()
+    {
+        $content = Blade::render('<x-named-slot>
+    <x-slot:search is-grouped>
+        <x-aware-slot />
+    </x-slot:search>
+</x-named-slot>');
+
+        $this->assertSame('grouped', trim($content));
+    }
+
     public function test_name_attribute_can_be_used_if_using_short_slot_names()
     {
         $content = Blade::render('<x-input-with-slot>
