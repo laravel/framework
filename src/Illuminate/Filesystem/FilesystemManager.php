@@ -111,6 +111,7 @@ class FilesystemManager implements FactoryContract
     public function build($config)
     {
         return $this->resolve('ondemand', is_array($config) ? $config : [
+        return $this->disks['ondemand'] ?? $this->resolve('ondemand', is_array($config) ? $config : [
             'driver' => 'local',
             'root' => $config,
         ]);

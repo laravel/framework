@@ -60,6 +60,20 @@ class StorageFacadeTest extends TestCase
         $this->assertNull(Storage::persistentFake(StorageDisk::Test)->get('nonExistentFile'));
         $this->assertNull(Storage::fake(StorageDisk::Public)->get('nonExistentFile'));
     }
+
+    public function testCanFakeOnDemandDisk()
+    {
+        $fake = Storage::fake('ondemand');
+
+        Storage::build([
+            'driver' => 'ftp',
+            'host' => 'example.com',
+            'username' => 'foo',
+            'password' => 'bar',
+        ])->put('file.txt', 'contents');
+
+        $fake->assertExists('file.txt');
+    }
 }
 
 enum StorageDisk: string
