@@ -461,6 +461,26 @@ class FilesystemManagerTest extends TestCase
         $filesystem->disk('read-through')->get('fallback.txt');
     }
 
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testReadThroughDisksSetVisibilityOnTheDiskContainingTheFile()
+    {
+        $filesystem = $this->readThroughFilesystemManager();
+        $primary = $filesystem->disk('primary');
+        $fallback = $filesystem->disk('fallback');
+        $readThrough = $filesystem->disk('read-through');
+
+        $fallback->put('fallback.txt', 'fallback contents');
+        $primary->put('primary.txt', 'primary contents');
+
+        $this->assertTrue($readThrough->setVisibility('fallback.txt', 'private'));
+        $this->assertSame('private', $fallback->getVisibility('fallback.txt'));
+        $this->assertSame('private', $readThrough->getVisibility('fallback.txt'));
+        $this->assertTrue($primary->missing('fallback.txt'));
+
+        $this->assertTrue($readThrough->setVisibility('primary.txt', 'private'));
+        $this->assertSame('private', $primary->getVisibility('primary.txt'));
+    }
+
     public function testReadThroughDisksDelegateUrlsToTheDiskContainingTheFile()
     {
         $filesystem = $this->readThroughFilesystemManager([], [
