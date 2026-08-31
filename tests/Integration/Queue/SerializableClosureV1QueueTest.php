@@ -9,6 +9,7 @@ use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 
 #[WithMigration]
+#[WithEnv('APP_KEY', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
 class SerializableClosureV1QueueTest extends TestCase
 {
     use RefreshDatabase;
