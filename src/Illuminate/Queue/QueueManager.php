@@ -469,6 +469,17 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Register a callback to be executed when creating job payloads.
+     *
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function createPayloadUsing($callback)
+    {
+        Queue::createPayloadUsing($callback);
+    }
+
+    /**
      * Dynamically pass calls to the default connection.
      *
      * @param  string  $method
