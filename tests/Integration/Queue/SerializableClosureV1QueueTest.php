@@ -22,7 +22,6 @@ class SerializableClosureV1QueueTest extends TestCase
 
         tap($app->make('config'), function ($config) {
             $config->set([
-                'app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF',
                 'queue.default' => 'database',
             ]);
         });
