@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
