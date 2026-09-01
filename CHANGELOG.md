@@ -1,6 +1,11 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.68.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.69.0...12.x)
+
+## [v12.69.0](https://github.com/laravel/framework/compare/v12.68.0...v12.69.0) - 2026-09-01
+
+* [12.x] Disable html by default on Laravel exception page tooltip by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61381
+* [12.x] Ensure password hash matches stored cookie before authenticating the user by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61386
 
 ## [v12.68.0](https://github.com/laravel/framework/compare/v12.67.0...v12.68.0) - 2026-08-25
 
