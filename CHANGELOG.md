@@ -1,6 +1,14 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.30.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.30.1...13.x)
+
+## [v13.30.1](https://github.com/laravel/framework/compare/v13.30.0...v13.30.1) - 2026-09-01
+
+* [13.x] Add connection and queue to WorkerStopping by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61387
+* [13.x] Add `insertOrIgnoreReturning()` to the Eloquent builder passthru by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61393
+* [13.x] Add `dropVectorIndex()` to the schema blueprint by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61391
+* [13.x] Fix `limit()` being ignored on `update()` for SQL Server by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61394
+* [13.x] Prevent orphaned Redis tagged cache entries by [@drewmt](https://github.com/drewmt) in https://github.com/laravel/framework/pull/61385
 
 ## [v13.30.0](https://github.com/laravel/framework/compare/v13.29.0...v13.30.0) - 2026-09-01
 
