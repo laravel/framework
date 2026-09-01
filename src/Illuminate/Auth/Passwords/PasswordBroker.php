@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Timebox;
 use UnexpectedValueException;
 
@@ -139,6 +140,12 @@ class PasswordBroker implements PasswordBrokerContract
             $callback($user, $password);
 
             $this->tokens->delete($user);
+
+            $user->setRememberToken($token = Str::random(60));
+
+            if (method_exists($this->users, 'updateRememberToken')) {
+                $this->users->updateRememberToken($user, $token);
+            }
 
             $timebox->returnEarly();
 
