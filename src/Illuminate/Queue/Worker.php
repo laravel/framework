@@ -237,7 +237,7 @@ class Worker
                 [$status, $reason] = $this->pauseWorker($options, $lastRestart, $startTime);
 
                 if (! is_null($status)) {
-                    return $this->stop($status, $options, $reason);
+                    return $this->stop($status, $options, $reason, $connectionName, $queue);
                 }
 
                 continue;
@@ -287,7 +287,7 @@ class Worker
             [$status, $reason] = $this->stopIfNecessary($options, $lastRestart, $startTime, $job);
 
             if (! is_null($status)) {
-                return $this->stop($status, $options, $reason);
+                return $this->stop($status, $options, $reason, $connectionName, $queue);
             }
         }
     }
@@ -1002,12 +1002,15 @@ class Worker
      * @param  int  $status
      * @param  WorkerOptions|null  $options
      * @param  WorkerStopReason|null  $reason
+     * @param  string|null  $connectionName
+     * @param  string|null  $queue
      * @return int
      */
-    public function stop($status = 0, $options = null, $reason = null)
+    public function stop($status = 0, $options = null, $reason = null, $connectionName = null, $queue = null)
     {
         $this->events->dispatch(new WorkerStopping(
-            $status, $options, $reason, $this->jobsProcessed, $this->lastJobProcessedAt, $this->currentMemoryUsage()
+            $status, $options, $reason, $this->jobsProcessed, $this->lastJobProcessedAt, $this->currentMemoryUsage(),
+            $connectionName, $queue
         ));
 
         return $status;

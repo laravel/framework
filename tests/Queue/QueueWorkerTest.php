@@ -570,7 +570,9 @@ class QueueWorkerTest extends TestCase
                 && $event->reason === WorkerStopReason::QueueEmpty
                 && $event->jobsProcessed === 2
                 && $event->lastJobProcessedAt !== null
-                && $event->memoryUsage > 0;
+                && $event->memoryUsage > 0
+                && $event->connectionName === 'default'
+                && $event->queue === 'queue';
         }));
     }
 
@@ -733,9 +735,9 @@ class InsomniacWorker extends Worker
         parent::notifyJobOfSignal($signal);
     }
 
-    public function stop($status = 0, $options = null, $reason = null)
+    public function stop($status = 0, $options = null, $reason = null, $connectionName = null, $queue = null)
     {
-        return parent::stop($status, $options, $reason);
+        return parent::stop($status, $options, $reason, $connectionName, $queue);
     }
 
     public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
