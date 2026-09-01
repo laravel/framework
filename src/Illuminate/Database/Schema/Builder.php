@@ -351,6 +351,36 @@ class Builder
     }
 
     /**
+     * Execute a table builder callback if the given table has a given foreign key.
+     *
+     * @param  string  $table
+     * @param  string|array  $foreignKey
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function whenTableHasForeignKey(string $table, string|array $foreignKey, Closure $callback)
+    {
+        if ($this->hasForeignKey($table, $foreignKey)) {
+            $this->table($table, fn (Blueprint $table) => $callback($table));
+        }
+    }
+
+    /**
+     * Execute a table builder callback if the given table doesn't have a given foreign key.
+     *
+     * @param  string  $table
+     * @param  string|array  $foreignKey
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function whenTableDoesntHaveForeignKey(string $table, string|array $foreignKey, Closure $callback)
+    {
+        if (! $this->hasForeignKey($table, $foreignKey)) {
+            $this->table($table, fn (Blueprint $table) => $callback($table));
+        }
+    }
+
+    /**
      * Get the data type for the given column name.
      *
      * @param  string  $table
