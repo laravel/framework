@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.69.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.69.1...12.x)
+
+## [v12.69.1](https://github.com/laravel/framework/compare/v12.69.0...v12.69.1) - 2026-09-01
+
+* [12.x] Fix TypeError in userFromRecaller() when the recaller matches no user by [@lazerg](https://github.com/lazerg) in https://github.com/laravel/framework/pull/61397
 
 ## [v12.69.0](https://github.com/laravel/framework/compare/v12.68.0...v12.69.0) - 2026-09-01
 
