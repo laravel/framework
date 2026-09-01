@@ -14,7 +14,6 @@
         "source": "https://github.com/laravel/framework"
     },
     "require": {
-<<<<<<< HEAD
         "php": "^8.4",
         "illuminate/collections": "^14.0",
         "illuminate/console": "^14.0",
@@ -24,18 +23,6 @@
         "illuminate/filesystem": "^14.0",
         "illuminate/pipeline": "^14.0",
         "illuminate/support": "^14.0",
-=======
-        "php": "^8.3",
-        "illuminate/collections": "^13.0",
-        "illuminate/console": "^13.0",
-        "illuminate/container": "^13.0",
-        "illuminate/contracts": "^13.0",
-        "illuminate/database": "^13.0",
-        "illuminate/filesystem": "^13.0",
-        "illuminate/pipeline": "^13.0",
-        "illuminate/reflection": "^13.0",
-        "illuminate/support": "^13.0",
->>>>>>> upstream/13.x
         "laravel/serializable-closure": "^2.0.10",
         "ramsey/uuid": "^4.7",
         "symfony/process": "^8.0.5"

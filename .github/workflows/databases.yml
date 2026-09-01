@@ -70,6 +70,7 @@ jobs:
       - name: Setup PHP project
         uses: ./.github/actions/setup-php-project
         with:
+          php-version: 8.4
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
 
       - name: Execute tests

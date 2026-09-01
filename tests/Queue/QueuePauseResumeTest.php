@@ -189,17 +189,17 @@ class QueuePauseResumeTest extends TestCase
     {
         $this->manager->pauseAll();
 
-        $this->assertTrue($this->manager->isPaused('redis', 'default'));
-        $this->assertTrue($this->manager->isPaused('database', 'emails'));
+        $this->assertTrue($this->manager->isPaused('default'));
+        $this->assertTrue($this->manager->isPaused('emails', 'database'));
         $this->assertSame(
             ['default', 'emails'],
-            $this->manager->getPausedQueues('redis', ['default', 'emails'])
+            $this->manager->getPausedQueues(['default', 'emails'])
         );
 
         $this->manager->resumeAll();
 
-        $this->assertFalse($this->manager->isPaused('redis', 'default'));
-        $this->assertSame([], $this->manager->getPausedQueues('redis', ['default', 'emails']));
+        $this->assertFalse($this->manager->isPaused('default'));
+        $this->assertSame([], $this->manager->getPausedQueues(['default', 'emails']));
     }
 
     public function testPauseChecksDoNotBatchTheGlobalKeyWithQueueKeys()
@@ -218,13 +218,13 @@ class QueuePauseResumeTest extends TestCase
 
         $manager = $this->createManager(new Repository($store));
 
-        $this->assertFalse($manager->isPaused('redis', 'default'));
-        $this->assertSame([], $manager->getPausedQueues('redis', ['default']));
+        $this->assertFalse($manager->isPaused('default', 'redis'));
+        $this->assertSame([], $manager->getPausedQueues(['default'], 'redis'));
 
         $manager->pauseAll();
 
-        $this->assertTrue($manager->isPaused('redis', 'default'));
-        $this->assertSame(['default'], $manager->getPausedQueues('redis', ['default']));
+        $this->assertTrue($manager->isPaused('default', 'redis'));
+        $this->assertSame(['default'], $manager->getPausedQueues(['default'], 'redis'));
     }
 
     public function testPauseAllDispatchesQueuesPausedEvent()

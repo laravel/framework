@@ -16,7 +16,6 @@
     "require": {
         "php": "^8.4",
         "ext-tokenizer": "*",
-<<<<<<< HEAD
         "illuminate/collections": "^14.0",
         "illuminate/container": "^14.0",
         "illuminate/contracts": "^14.0",
@@ -24,17 +23,6 @@
         "illuminate/filesystem": "^14.0",
         "illuminate/macroable": "^14.0",
         "illuminate/support": "^14.0"
-=======
-        "illuminate/collections": "^13.0",
-        "illuminate/conditionable": "^13.0",
-        "illuminate/container": "^13.0",
-        "illuminate/contracts": "^13.0",
-        "illuminate/events": "^13.0",
-        "illuminate/filesystem": "^13.0",
-        "illuminate/macroable": "^13.0",
-        "illuminate/reflection": "^13.0",
-        "illuminate/support": "^13.0"
->>>>>>> upstream/13.x
     },
     "minimum-stability": "dev",
     "autoload": {
