@@ -2822,6 +2822,33 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a basic "having not" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
+     * @param  \DateTimeInterface|string|int|float|null  $operator
+     * @param  \Illuminate\Contracts\Database\Query\Expression|\DateTimeInterface|string|int|float|null  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function havingNot($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->having($column, $operator, $value, $boolean.' not');
+    }
+
+    /**
+     * Add an "or having not" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|\Closure|string  $column
+     * @param  \DateTimeInterface|string|int|float|null  $operator
+     * @param  \Illuminate\Contracts\Database\Query\Expression|\DateTimeInterface|string|int|float|null  $value
+     * @return $this
+     */
+    public function orHavingNot($column, $operator = null, $value = null)
+    {
+        return $this->havingNot($column, $operator, $value, 'or');
+    }
+
+    /**
      * Add a nested "having" statement to the query.
      *
      * @param  string  $boolean
