@@ -72,6 +72,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static \Illuminate\Support\Collection pushedRaw(null|\Closure $callback = null)
  * @method static \Illuminate\Support\Collection listenersPushed(string $listenerClass, \Closure|null $callback = null)
  * @method static bool hasPushed(string $job)
+ * @method static int totalSize()
  * @method static int totalPendingSize()
  * @method static int totalDelayedSize()
  * @method static int totalReservedSize()
