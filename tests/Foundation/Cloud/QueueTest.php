@@ -1838,6 +1838,23 @@ class QueueTest extends TestCase
         $this->assertSame(['default', 'emails'], $queue->managedQueues());
     }
 
+    public function testTotalSizeSumsAcrossManagedQueues()
+    {
+        config(['queue.connections.cloud.queues' => ['default', 'emails']]);
+        $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+
+        $client->expects('getQueueAttributes')->twice()->andReturn(new Result([
+            'Attributes' => [
+                'ApproximateNumberOfMessages' => 2,
+                'ApproximateNumberOfMessagesDelayed' => 1,
+                'ApproximateNumberOfMessagesNotVisible' => 3,
+            ],
+        ]));
+
+        $this->assertSame(12, $queue->totalSize());
+    }
+
     public function testTotalPendingSizeSumsAcrossManagedQueues()
     {
         config(['queue.connections.cloud.queues' => ['default', 'emails']]);

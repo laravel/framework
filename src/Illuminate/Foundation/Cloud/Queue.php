@@ -96,6 +96,16 @@ class Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get the number of jobs across every managed queue.
+     *
+     * @return int
+     */
+    public function totalSize()
+    {
+        return (new Collection($this->managedQueues()))->sum(fn ($queue) => $this->size($queue));
+    }
+
+    /**
      * Get the number of pending jobs across every managed queue.
      *
      * @return int

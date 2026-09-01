@@ -116,6 +116,16 @@ class BeanstalkdQueue extends Queue implements QueueContract
     }
 
     /**
+     * Get the number of jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalSize()
+    {
+        return 0;
+    }
+
+    /**
      * Get the number of pending jobs across every queue.
      *
      * @return int

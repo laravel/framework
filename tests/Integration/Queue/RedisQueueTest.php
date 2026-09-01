@@ -729,6 +729,18 @@ class RedisQueueTest extends TestCase
     }
 
     #[DataProvider('redisDriverProvider')]
+    public function testTotalSize($driver)
+    {
+        $this->setQueue($driver, config('queue.connections.redis.queue', 'default'));
+
+        $this->queue->push(new RedisQueueIntegrationTestJob(1));
+        $this->queue->pushOn('emails', new RedisQueueIntegrationTestJob(2));
+        $this->queue->later(60, new RedisQueueIntegrationTestJob(3));
+
+        $this->assertSame(3, $this->queue->totalSize());
+    }
+
+    #[DataProvider('redisDriverProvider')]
     public function testTotalPendingSize($driver)
     {
         $this->setQueue($driver, config('queue.connections.redis.queue', 'default'));

@@ -74,6 +74,16 @@ class FailoverQueue extends Queue implements QueueContract
     }
 
     /**
+     * Get the number of jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalSize()
+    {
+        return $this->manager->connection($this->connections[0])->totalSize();
+    }
+
+    /**
      * Get the number of pending jobs across every queue.
      *
      * @return int
