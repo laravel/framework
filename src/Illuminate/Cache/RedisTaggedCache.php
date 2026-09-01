@@ -29,16 +29,18 @@ class RedisTaggedCache extends TaggedCache
 
         if ($ttl !== null) {
             $seconds = $this->getSeconds($ttl);
-
-            if ($seconds > 0) {
-                $this->tags->addEntry(
-                    $this->itemKey($key),
-                    $seconds
-                );
-            }
         }
 
-        return parent::add($key, $value, $ttl);
+        $result = parent::add($key, $value, $ttl);
+
+        if ($result && $seconds > 0 && method_exists($this->store, 'add')) {
+            $this->tags->addEntry(
+                $this->itemKey($key),
+                $seconds
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -59,14 +61,16 @@ class RedisTaggedCache extends TaggedCache
 
         $seconds = $this->getSeconds($ttl);
 
-        if ($seconds > 0) {
+        $result = parent::put($key, $value, $ttl);
+
+        if ($result && $seconds > 0) {
             $this->tags->addEntry(
                 $this->itemKey($key),
                 $seconds
             );
         }
 
-        return parent::put($key, $value, $ttl);
+        return $result;
     }
 
     /**
@@ -80,9 +84,13 @@ class RedisTaggedCache extends TaggedCache
     {
         $key = enum_value($key);
 
-        $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
+        $result = parent::increment($key, $value);
 
-        return parent::increment($key, $value);
+        if ($result !== false) {
+            $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
+        }
+
+        return $result;
     }
 
     /**
@@ -96,9 +104,13 @@ class RedisTaggedCache extends TaggedCache
     {
         $key = enum_value($key);
 
-        $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
+        $result = parent::decrement($key, $value);
 
-        return parent::decrement($key, $value);
+        if ($result !== false) {
+            $this->tags->addEntry($this->itemKey($key), updateWhen: 'NX');
+        }
+
+        return $result;
     }
 
     /**
@@ -112,9 +124,13 @@ class RedisTaggedCache extends TaggedCache
     {
         $key = enum_value($key);
 
-        $this->tags->addEntry($this->itemKey($key));
+        $result = parent::forever($key, $value);
 
-        return parent::forever($key, $value);
+        if ($result) {
+            $this->tags->addEntry($this->itemKey($key));
+        }
+
+        return $result;
     }
 
     /**
