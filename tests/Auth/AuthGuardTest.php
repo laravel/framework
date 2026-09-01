@@ -616,10 +616,23 @@ class AuthGuardTest extends TestCase
         $user = Mockery::mock(Authenticatable::class);
         $guard->getProvider()->expects('retrieveByToken')->with('id', 'recaller')->andReturn($user);
         $user->expects('getAuthIdentifier')->andReturn('bar');
+        $user->expects('getAuthPassword')->andReturn('baz');
         $guard->getSession()->expects('put')->with($guard->getName(), 'bar');
         $session->expects('regenerate');
         $this->assertSame($user, $guard->user());
         $this->assertTrue($guard->viaRemember());
+    }
+
+    public function testUserReturnsNullWhenRememberCookieTokenDoesNotMatchAnyUser()
+    {
+        $guard = $this->getGuard();
+        [$session, $provider, $request, $cookie] = $this->getMocks();
+        $request = Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller|baz']);
+        $guard = new SessionGuard('default', $provider, $session, $request);
+        $guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
+        $guard->getProvider()->shouldReceive('retrieveByToken')->once()->with('id', 'recaller')->andReturn(null);
+        $this->assertNull($guard->user());
+        $this->assertFalse($guard->viaRemember());
     }
 
     public function testLoginOnceSetsUser()
