@@ -276,6 +276,16 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `geo` drop index `geo_coordinates_spatialindex`', $statements[0]);
     }
 
+    public function testDropVectorIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->dropVectorIndex(['embeddings']);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `posts` drop index `posts_embeddings_vectorindex`', $statements[0]);
+    }
+
     public function testDropForeign()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
