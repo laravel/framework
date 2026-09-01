@@ -4801,6 +4801,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->expects('update')->with('update `users` set `email` = ?, `name` = ? where `id` = ? order by `foo` desc limit 5', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->where('id', '=', 1)->orderBy('foo', 'desc')->limit(5)->update(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->expects('update')->with('update [users] set [email] = ?, [name] = ? where [id] = ?', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->expects('update')->with('update top (5) [users] set [email] = ?, [name] = ? where [id] = ?', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '=', 1)->limit(5)->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->getConnection()->expects('update')->with('update [users] set [email] = ?, [name] = ? where [id] = ?', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '=', 1)->limit(5)->offset(5)->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
     }
 
     public function testUpsertMethod()
