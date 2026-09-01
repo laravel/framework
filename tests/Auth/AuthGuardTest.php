@@ -620,6 +620,7 @@ class AuthGuardTest extends TestCase
         $guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
         $guard->getProvider()->shouldReceive('retrieveByToken')->once()->with('id', 'recaller')->andReturn(null);
         $this->assertNull($guard->user());
+        $this->assertFalse($guard->viaRemember());
     }
 
     public function testLoginOnceSetsUser()
