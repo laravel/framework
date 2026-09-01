@@ -13,6 +13,8 @@ class WorkerStopping
      * @param  int|null  $jobsProcessed  The number of jobs processed by the worker.
      * @param  int|float|null  $lastJobProcessedAt  The timestamp of the last job processed by the worker.
      * @param  int|float|null  $memoryUsage  The memory usage of the worker in MB.
+     * @param  string|null  $connectionName  The connection name.
+     * @param  string|null  $queue  The queue name.
      */
     public function __construct(
         public $status = 0,
@@ -21,6 +23,8 @@ class WorkerStopping
         public $jobsProcessed = null,
         public $lastJobProcessedAt = null,
         public $memoryUsage = null,
+        public $connectionName = null,
+        public $queue = null,
     ) {
     }
 }
