@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Auth;
 
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Auth\Passwords\TokenRepositoryInterface;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -92,7 +93,9 @@ class AuthPasswordBrokerTest extends TestCase
         unset($_SERVER['__password.reset.test']);
         $mocks = $this->getMocks();
         $broker = m::mock(PasswordBroker::class, array_values($mocks))->makePartial()->shouldAllowMockingProtectedMethods();
-        $broker->shouldReceive('validateReset')->once()->andReturn($user = m::mock(CanResetPassword::class));
+        $broker->shouldReceive('validateReset')->once()->andReturn($user = m::mock(Authenticatable::class, CanResetPassword::class));
+        $user->shouldReceive('setRememberToken')->once()->with(m::type('String'));
+        $mocks['users']->shouldReceive('updateRememberToken')->once()->with($user, m::type('String'));
         $mocks['tokens']->shouldReceive('delete')->once()->with($user);
         $callback = function ($user, $password) {
             $_SERVER['__password.reset.test'] = compact('user', 'password');
