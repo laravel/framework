@@ -2,9 +2,13 @@
 
 namespace Illuminate\Tests\Image;
 
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Image\Driver;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image;
 use Illuminate\Image\ImageException;
+use Illuminate\Image\ImageManager;
 use Illuminate\Image\ImageOutputOptions;
 use Illuminate\Image\ImagePipeline;
 use Illuminate\Image\Transformations\Blur;
@@ -19,6 +23,7 @@ use Illuminate\Image\Transformations\Resize;
 use Illuminate\Image\Transformations\Rotate;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 class ImageTest extends TestCase
@@ -146,6 +151,13 @@ class ImageTest extends TestCase
         $this->assertNotSame($image, $image->toAvif());
     }
 
+    public function test_to_heic_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toHeic());
+    }
+
     public function test_to_bmp_returns_new_instance()
     {
         $image = $this->makeImage();
@@ -249,12 +261,9 @@ class ImageTest extends TestCase
         $this->assertSame('jpg', $image->extension());
     }
 
-    public function test_extension_returns_avif_for_avif()
+    #[RequiresPhpExtension('imagick')]
+    public function test_extension_returns_avif_for_avif(): void
     {
-        if (! extension_loaded('imagick')) {
-            $this->markTestSkipped('The Imagick extension is not available.');
-        }
-
         $imagick = new \Imagick;
         $imagick->newImage(10, 10, 'red');
         $imagick->setImageFormat('avif');
@@ -280,10 +289,96 @@ class ImageTest extends TestCase
     {
         $image = new Image('not-an-image');
 
-        $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('Unable to determine the dimensions of the image.');
+        $this->expectExceptionObject(new ImageException('Unable to determine the dimensions of the image.'));
 
         $image->dimensions();
+    }
+
+    public function test_dimensions_defers_to_the_driver_for_heic_images()
+    {
+        $container = new Container;
+        $container->instance('config', new Repository(['images' => ['default' => 'fake']]));
+
+        $manager = new ImageManager($container);
+        $manager->extend('fake', fn () => new class implements Driver
+        {
+            public function process(string $contents, ImagePipeline $pipeline): string
+            {
+                // Bytes that finfo reports as image/heic but getimagesizefromstring() cannot read.
+                return "\x00\x00\x00\x18ftypheic\x00\x00\x00\x00mif1heic";
+            }
+
+            public function dimensions(string $contents): array
+            {
+                return [123, 45];
+            }
+
+            public function dominantColor(string $contents): string
+            {
+                return '#000000';
+            }
+
+            public function transformUsing(string $transformation, callable $callback): static
+            {
+                return $this;
+            }
+        });
+        $container->instance('image', $manager);
+
+        Container::setInstance($container);
+
+        try {
+            $image = (new Image($this->fakeImageContents()))->using('fake')->cover(1, 1);
+
+            $this->assertSame([123, 45], $image->dimensions());
+            $this->assertSame(123, $image->width());
+            $this->assertSame(45, $image->height());
+        } finally {
+            Container::setInstance(null);
+        }
+    }
+
+    public function test_dimensions_falls_back_to_native_reader_when_the_driver_cannot_decode_heic()
+    {
+        $container = new Container;
+        $container->instance('config', new Repository(['images' => ['default' => 'fake']]));
+
+        $manager = new ImageManager($container);
+        $manager->extend('fake', fn () => new class implements Driver
+        {
+            public function process(string $contents, ImagePipeline $pipeline): string
+            {
+                return "\x00\x00\x00\x18ftypheic\x00\x00\x00\x00mif1heic";
+            }
+
+            public function dimensions(string $contents): array
+            {
+                throw new ImageException('The driver cannot decode this image.');
+            }
+
+            public function dominantColor(string $contents): string
+            {
+                return '#000000';
+            }
+
+            public function transformUsing(string $transformation, callable $callback): static
+            {
+                return $this;
+            }
+        });
+        $container->instance('image', $manager);
+
+        Container::setInstance($container);
+
+        try {
+            $image = (new Image($this->fakeImageContents()))->using('fake')->cover(1, 1);
+
+            $this->expectExceptionObject(new ImageException('Unable to determine the dimensions of the image.'));
+
+            $image->dimensions();
+        } finally {
+            Container::setInstance(null);
+        }
     }
 
     public function test_hash_name_returns_name_with_extension()
@@ -345,8 +440,7 @@ class ImageTest extends TestCase
     {
         $image = $this->makeImage();
 
-        $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('The [tiff] format is not supported.');
+        $this->expectExceptionObject(new ImageException('The [tiff] format is not supported.'));
 
         $image->optimize('tiff');
     }
@@ -399,6 +493,13 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $this->assertSame('avif', $this->getOptions($image->toAvif())->format);
+    }
+
+    public function test_to_heic_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('heic', $this->getOptions($image->toHeic())->format);
     }
 
     public function test_to_bmp_sets_format()
@@ -519,8 +620,7 @@ class ImageTest extends TestCase
     {
         $image = new Image($this->fakeImageContents());
 
-        $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('Failed to process image:');
+        $this->expectExceptionObject(new ImageException('Failed to process image:'));
 
         // Trigger a driver error by using a non-existent driver
         $image->using('nonexistent')->cover(100, 100)->toBytes();
@@ -695,8 +795,7 @@ class ImageTest extends TestCase
     {
         $image = $this->makeImage();
 
-        $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('The [jpge] format is not supported.');
+        $this->expectExceptionObject(new ImageException('The [jpge] format is not supported.'));
 
         $image->optimize('jpge');
     }
@@ -712,8 +811,7 @@ class ImageTest extends TestCase
     {
         $image = new Image($this->fakeImageContents());
 
-        $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('Images cannot be serialized. Store the image first and serialize the path instead.');
+        $this->expectExceptionObject(new ImageException('Images cannot be serialized. Store the image first and serialize the path instead.'));
 
         serialize($image);
     }
@@ -788,6 +886,18 @@ class ImageTest extends TestCase
         $this->assertSame('#ffffff', $options->containBackground);
     }
 
+    public function test_contain_sets_dominant_background()
+    {
+        $image = $this->makeImage();
+        $result = $image->contain(1200, 800, 'dominant');
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(1200, $options->containWidth);
+        $this->assertSame(800, $options->containHeight);
+        $this->assertSame('dominant', $options->containBackground);
+    }
+
     public function test_crop_sets_dimensions_and_position()
     {
         $image = $this->makeImage();
@@ -836,8 +946,7 @@ class ImageTest extends TestCase
 
     public function test_resize_requires_at_least_one_dimension()
     {
-        $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('At least one resize dimension must be specified.');
+        $this->expectExceptionObject(new ImageException('At least one resize dimension must be specified.'));
 
         $this->makeImage()->resize();
     }
@@ -851,6 +960,17 @@ class ImageTest extends TestCase
 
         $this->assertSame(90.0, $options->rotateAngle);
         $this->assertSame('#ffffff', $options->rotateBackground);
+    }
+
+    public function test_rotate_sets_dominant_background()
+    {
+        $image = $this->makeImage();
+        $result = $image->rotate(45, 'dominant');
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(45.0, $options->rotateAngle);
+        $this->assertSame('dominant', $options->rotateBackground);
     }
 
     public function test_scale_sets_width_only()
@@ -877,8 +997,7 @@ class ImageTest extends TestCase
 
     public function test_scale_requires_at_least_one_dimension()
     {
-        $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('At least one scale dimension must be specified.');
+        $this->expectExceptionObject(new ImageException('At least one scale dimension must be specified.'));
 
         $this->makeImage()->scale();
     }
@@ -914,6 +1033,20 @@ class ImageTest extends TestCase
         $result = $this->makeImage()->optimize('avif');
 
         $this->assertSame('avif', $this->getOptions($result)->format);
+    }
+
+    public function test_optimize_allows_heic()
+    {
+        $result = $this->makeImage()->optimize('heic');
+
+        $this->assertSame('heic', $this->getOptions($result)->format);
+    }
+
+    public function test_optimize_normalizes_heif_to_heic()
+    {
+        $result = $this->makeImage()->optimize('heif');
+
+        $this->assertSame('heic', $this->getOptions($result)->format);
     }
 
     public function test_optimize_allows_jpeg_spelling()
@@ -1013,6 +1146,34 @@ class ImageTest extends TestCase
         $exception = new ImageException('test');
 
         $this->assertInstanceOf(\RuntimeException::class, $exception);
+    }
+
+    public function test_implements_responsable()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->assertInstanceOf(\Illuminate\Contracts\Support\Responsable::class, $image);
+    }
+
+    public function test_to_response_returns_response_with_image_bytes()
+    {
+        $contents = $this->fakeImageContents();
+        $image = new Image($contents);
+
+        $response = $image->toResponse(new \Illuminate\Http\Request);
+
+        $this->assertInstanceOf(\Illuminate\Http\Response::class, $response);
+        $this->assertSame($contents, $response->getContent());
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function test_to_response_sets_content_type_header()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $response = $image->toResponse(new \Illuminate\Http\Request);
+
+        $this->assertSame('image/jpeg', $response->headers->get('Content-Type'));
     }
 
     protected function makeImage(): Image

@@ -14,6 +14,7 @@
         "source": "https://github.com/laravel/framework"
     },
     "require": {
+<<<<<<< HEAD
         "php": "^8.4",
         "illuminate/bus": "^14.0",
         "illuminate/collections": "^14.0",
@@ -21,6 +22,16 @@
         "illuminate/contracts": "^14.0",
         "illuminate/queue": "^14.0",
         "illuminate/support": "^14.0",
+=======
+        "php": "^8.3",
+        "illuminate/bus": "^13.0",
+        "illuminate/collections": "^13.0",
+        "illuminate/container": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/queue": "^13.0",
+        "illuminate/reflection": "^13.0",
+        "illuminate/support": "^13.0",
+>>>>>>> upstream/13.x
         "psr/log": "^1.0 || ^2.0 || ^3.0"
     },
     "suggest": {

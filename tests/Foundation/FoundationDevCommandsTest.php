@@ -2,10 +2,16 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\DevCommand;
 use Illuminate\Foundation\DevCommandColor;
+use Illuminate\Foundation\DevCommandMode;
 use Illuminate\Foundation\DevCommands;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\File;
+use Mockery;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -14,18 +20,36 @@ class FoundationDevCommandsTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         $ref = new ReflectionClass(DevCommands::class);
 
-        foreach (['commands', 'except', 'only'] as $prop) {
-            $ref->getProperty($prop)->setValue(null, []);
+        foreach ([
+            'commands' => [],
+            'except' => [],
+            'only' => [],
+            'colorCount' => 0,
+            'mode' => DevCommandMode::TABS,
+            'withTimestamps' => false,
+            'autoRestart' => true,
+            'bufferSize' => null,
+            'streamBufferSize' => null,
+            'withoutVendorCommands' => false,
+            'withoutDefaultCommands' => false,
+        ] as $prop => $value) {
+            $ref->getProperty($prop)->setValue(null, $value);
         }
-
-        $ref->getProperty('colorCount')->setValue(null, 0);
 
         $app = new Application(__DIR__);
         $app['env'] = 'testing';
+
+        File::swap(new Filesystem);
+    }
+
+    protected function tearDown(): void
+    {
+        Facade::clearResolvedInstances();
+        Container::setInstance(null);
+
+        parent::tearDown();
     }
 
     public function testRegisterAddsCommand()
@@ -296,6 +320,13 @@ class FoundationDevCommandsTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRegisterDefaultsRegistersExpectedCommands()
     {
+        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnTrue();
+
+        $provider = Mockery::mock('alias:Laravel\Pail\PailServiceProvider');
+        $provider->shouldReceive('register');
+
+        Application::getInstance()->register($provider);
+
         DevCommands::registerDefaults();
 
         $commands = DevCommands::commands();
@@ -304,14 +335,17 @@ class FoundationDevCommandsTest extends TestCase
 
         $names = array_column($commands, 'name');
         $this->assertContains('server', $names);
+        $this->assertSame('php artisan serve', collect($commands)->firstWhere('name', 'server')['command']);
         $this->assertContains('queue', $names);
         $this->assertContains('logs', $names);
         $this->assertContains('vite', $names);
     }
 
-    #[RequiresOperatingSystem('Windows')]
-    public function testRegisterDefaultsExcludesPailOnWindows()
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testRegisterDefaultsExcludesPailWhenNotInstalled()
     {
+        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnTrue();
+
         DevCommands::registerDefaults();
 
         $commands = DevCommands::commands();
@@ -325,6 +359,37 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertNotContains('logs', $names);
     }
 
+    #[RequiresOperatingSystem('Windows')]
+    public function testRegisterDefaultsExcludesPailOnWindows()
+    {
+        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnTrue();
+
+        DevCommands::registerDefaults();
+
+        $commands = DevCommands::commands();
+
+        $this->assertCount(3, $commands);
+
+        $names = array_column($commands, 'name');
+        $this->assertContains('server', $names);
+        $this->assertContains('queue', $names);
+        $this->assertContains('vite', $names);
+        $this->assertNotContains('logs', $names);
+    }
+
+    public function testRegisterDefaultsExcludesViteWithoutPackageJson()
+    {
+        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnFalse();
+
+        DevCommands::registerDefaults();
+
+        $names = array_column(DevCommands::commands(), 'name');
+
+        $this->assertContains('server', $names);
+        $this->assertContains('queue', $names);
+        $this->assertNotContains('vite', $names);
+    }
+
     public function testRegisteredCommandIncludesSource()
     {
         DevCommands::register('echo hello', 'greeter');
@@ -334,5 +399,76 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertArrayHasKey('source', $commands[0]);
         $this->assertIsArray($commands[0]['source']);
         $this->assertSame(__CLASS__, $commands[0]['source']['class']);
+    }
+
+    public function testVendorCommandsAreIncludedByDefault()
+    {
+        $ref = new ReflectionClass(DevCommands::class);
+        $ref->getProperty('commands')->setValue(null, [
+            'vendor' => new DevCommand('echo vendor', [], 'vendor', DevCommand::PRIORITY_VENDOR),
+        ]);
+
+        DevCommands::register('echo local', 'local');
+
+        $names = array_column(DevCommands::commands(), 'name');
+
+        $this->assertContains('vendor', $names);
+        $this->assertContains('local', $names);
+    }
+
+    public function testWithoutVendorCommandsExcludesOnlyVendorCommands()
+    {
+        $ref = new ReflectionClass(DevCommands::class);
+        $ref->getProperty('commands')->setValue(null, [
+            'server' => new DevCommand('php artisan serve', [], 'server', DevCommand::PRIORITY_DEFAULT),
+            'vendor' => new DevCommand('echo vendor', [], 'vendor', DevCommand::PRIORITY_VENDOR),
+        ]);
+
+        DevCommands::register('echo local', 'local');
+
+        DevCommands::withoutVendorCommands();
+
+        $names = array_column(DevCommands::commands(), 'name');
+
+        $this->assertNotContains('vendor', $names);
+        $this->assertContains('server', $names);
+        $this->assertContains('local', $names);
+    }
+
+    public function testWithoutDefaultCommandsExcludesOnlyFrameworkDefaultCommands()
+    {
+        $ref = new ReflectionClass(DevCommands::class);
+        $ref->getProperty('commands')->setValue(null, [
+            'server' => new DevCommand('php artisan serve', [], 'server', DevCommand::PRIORITY_DEFAULT),
+            'vendor' => new DevCommand('echo vendor', [], 'vendor', DevCommand::PRIORITY_VENDOR),
+        ]);
+
+        DevCommands::register('echo local', 'local');
+
+        DevCommands::withoutDefaultCommands();
+
+        $names = array_column(DevCommands::commands(), 'name');
+
+        $this->assertNotContains('server', $names);
+        $this->assertContains('vendor', $names);
+        $this->assertContains('local', $names);
+    }
+
+    public function testWithoutVendorAndDefaultCommandsKeepsOnlyLocalCommands()
+    {
+        $ref = new ReflectionClass(DevCommands::class);
+        $ref->getProperty('commands')->setValue(null, [
+            'server' => new DevCommand('php artisan serve', [], 'server', DevCommand::PRIORITY_DEFAULT),
+            'vendor' => new DevCommand('echo vendor', [], 'vendor', DevCommand::PRIORITY_VENDOR),
+        ]);
+
+        DevCommands::register('echo local', 'local');
+
+        DevCommands::withoutVendorCommands();
+        DevCommands::withoutDefaultCommands();
+
+        $names = array_column(DevCommands::commands(), 'name');
+
+        $this->assertSame(['local'], $names);
     }
 }

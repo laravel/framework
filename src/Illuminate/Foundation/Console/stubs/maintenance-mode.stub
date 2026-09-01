@@ -52,7 +52,7 @@ if (isset($data['except'])) {
 }
 
 // Allow framework to handle maintenance mode bypass route...
-if (isset($data['secret']) && $_SERVER['REQUEST_URI'] === '/'.$data['secret']) {
+if (isset($data['secret']) && hash_equals('/'.$data['secret'], $_SERVER['REQUEST_URI'] ?? '')) {
     return;
 }
 

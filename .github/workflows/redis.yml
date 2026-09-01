@@ -13,6 +13,7 @@ permissions:
 jobs:
   redis:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
 
     services:
       redis:
@@ -30,7 +31,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -56,6 +57,7 @@ jobs:
 
   redis-cluster:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
 
     strategy:
       fail-fast: true
@@ -66,7 +68,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -76,15 +78,28 @@ jobs:
           php-version: 8.4
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
 
-      - name: Create Redis Cluster
+      - name: Install Redis Server
         run: |
           sudo apt update
           sudo apt-get install -y --fix-missing redis-server
           sudo service redis-server stop
-          redis-server --daemonize yes --port 7000 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7000.conf
-          redis-server --daemonize yes --port 7001 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7001.conf
-          redis-server --daemonize yes --port 7002 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7002.conf
-          redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes
+          mkdir -p /tmp/redis-7000 /tmp/redis-7001 /tmp/redis-7002
+          redis-server --daemonize yes --port 7000 --dir /tmp/redis-7000 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7000.conf
+          redis-server --daemonize yes --port 7001 --dir /tmp/redis-7001 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7001.conf
+          redis-server --daemonize yes --port 7002 --dir /tmp/redis-7002 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7002.conf
+
+      - name: Create Redis Cluster
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
+        with:
+          timeout_seconds: 30
+          max_attempts: 5
+          retry_wait_seconds: 5
+          retry_on: error
+          command: |
+            redis-cli -h 127.0.0.1 -p 7000 ping
+            redis-cli -h 127.0.0.1 -p 7001 ping
+            redis-cli -h 127.0.0.1 -p 7002 ping
+            redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes
 
       - name: Check Redis Cluster is ready
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4

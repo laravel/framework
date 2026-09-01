@@ -7,7 +7,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
@@ -62,10 +62,10 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testDatabaseIsRefreshedOnInteraction()
     {
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = Mockery::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
-        $kernel->shouldReceive('call')
-            ->once()
+        $kernel->expects('call')
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => false,
@@ -78,7 +78,8 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testDatabaseIsNotRefreshedWithoutInteraction()
     {
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = Mockery::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->shouldReceive('call')
             ->never();
@@ -91,10 +92,10 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testNonDefaultConnectionTriggersRefresh()
     {
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
+        $kernel = Mockery::spy(ConsoleKernel::class);
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
-        $kernel->shouldReceive('call')
-            ->once()
+        $kernel->expects('call')
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => false,

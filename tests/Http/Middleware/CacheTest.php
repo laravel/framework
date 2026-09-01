@@ -62,7 +62,7 @@ class CacheTest extends TestCase
     public function testSetHeaderToFileResponseEvenWithNoContent()
     {
         $response = (new Cache)->handle(new Request, function () {
-            $filePath = __DIR__.'/../fixtures/test.txt';
+            $filePath = __DIR__.'/../Fixtures/test.txt';
 
             return new BinaryFileResponse($filePath);
         }, 'max_age=120;s_maxage=60');
@@ -74,7 +74,7 @@ class CacheTest extends TestCase
     {
         $response = (new Cache)->handle(new Request, function () {
             return new StreamedResponse(function () {
-                $filePath = __DIR__.'/../fixtures/test.txt';
+                $filePath = __DIR__.'/../Fixtures/test.txt';
                 readfile($filePath);
             });
         }, 'max_age=120;s_maxage=60');
@@ -188,7 +188,7 @@ class CacheTest extends TestCase
     public function testItDoesNotSetEtagHeadersForBinaryContent()
     {
         $response = (new Cache)->handle(new Request, function () {
-            return new BinaryFileResponse(__DIR__.'/../fixtures/test.txt');
+            return new BinaryFileResponse(__DIR__.'/../Fixtures/test.txt');
         }, 'etag');
 
         $this->assertNull($response->getEtag());

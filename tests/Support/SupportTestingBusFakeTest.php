@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
@@ -10,7 +11,7 @@ use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Testing\Fakes\BatchRepositoryFake;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\PendingBatchFake;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -22,15 +23,14 @@ class SupportTestingBusFakeTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-        $this->fake = new BusFake(m::mock(QueueingDispatcher::class));
+        $this->fake = new BusFake(Mockery::mock(QueueingDispatcher::class));
     }
 
     public function testItUsesCustomBusRepository()
     {
         $busRepository = new BatchRepositoryFake;
 
-        $fake = new BusFake(m::mock(QueueingDispatcher::class), [], $busRepository);
+        $fake = new BusFake(Mockery::mock(QueueingDispatcher::class), [], $busRepository);
 
         $this->assertNull($fake->findBatch('non-existent-batch'));
 
@@ -607,11 +607,11 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testAssertDispatchedWithIgnoreClass()
     {
-        $dispatcher = m::mock(QueueingDispatcher::class);
+        $dispatcher = Mockery::mock(QueueingDispatcher::class);
 
         $job = new BusJobStub;
-        $dispatcher->shouldReceive('dispatch')->once()->with($job);
-        $dispatcher->shouldReceive('dispatchNow')->once()->with($job, null);
+        $dispatcher->expects('dispatch')->with($job);
+        $dispatcher->expects('dispatchNow')->with($job, null);
 
         $otherJob = new OtherBusJobStub;
         $dispatcher->shouldReceive('dispatch')->never()->with($otherJob);
@@ -631,15 +631,15 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testDispatchedFakingOnlyGivenJobs()
     {
-        $dispatcher = m::mock(QueueingDispatcher::class);
+        $dispatcher = Mockery::mock(QueueingDispatcher::class);
 
         $job = new BusJobStub;
         $dispatcher->shouldReceive('dispatch')->never()->with($job);
         $dispatcher->shouldReceive('dispatchNow')->never()->with($job, null);
 
         $otherJob = new OtherBusJobStub;
-        $dispatcher->shouldReceive('dispatch')->once()->with($otherJob);
-        $dispatcher->shouldReceive('dispatchNow')->once()->with($otherJob, null);
+        $dispatcher->expects('dispatch')->with($otherJob);
+        $dispatcher->expects('dispatchNow')->with($otherJob, null);
 
         $thirdJob = new ThirdJob;
         $dispatcher->shouldReceive('dispatch')->never()->with($thirdJob);
@@ -663,15 +663,15 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testAssertDispatchedWithIgnoreCallback()
     {
-        $dispatcher = m::mock(QueueingDispatcher::class);
+        $dispatcher = Mockery::mock(QueueingDispatcher::class);
 
         $job = new BusJobStub;
-        $dispatcher->shouldReceive('dispatch')->once()->with($job);
-        $dispatcher->shouldReceive('dispatchNow')->once()->with($job, null);
+        $dispatcher->expects('dispatch')->with($job);
+        $dispatcher->expects('dispatchNow')->with($job, null);
 
         $otherJob = new OtherBusJobStub;
-        $dispatcher->shouldReceive('dispatch')->once()->with($otherJob);
-        $dispatcher->shouldReceive('dispatchNow')->once()->with($otherJob, null);
+        $dispatcher->expects('dispatch')->with($otherJob);
+        $dispatcher->expects('dispatchNow')->with($otherJob, null);
 
         $anotherJob = new OtherBusJobStub(1);
         $dispatcher->shouldReceive('dispatch')->never()->with($anotherJob);
@@ -777,6 +777,28 @@ class SupportTestingBusFakeTest extends TestCase
         $batch->cancel();
 
         $this->assertTrue($batch->cancelled());
+    }
+
+    public function testCancelledBatchesHaveImmutableCancelledAtTimestamp()
+    {
+        $batch = $this->fake->batch([])->dispatch();
+
+        $batch->cancel();
+
+        $this->assertInstanceOf(CarbonImmutable::class, $batch->cancelledAt);
+    }
+
+    public function testFinishedBatchesHaveImmutableFinishedAtTimestamp()
+    {
+        $batchRepository = new BatchRepositoryFake;
+
+        $fake = new BusFake(Mockery::mock(QueueingDispatcher::class), [], $batchRepository);
+
+        $batch = $fake->batch([])->dispatch();
+
+        $batchRepository->markAsFinished($batch->id);
+
+        $this->assertInstanceOf(CarbonImmutable::class, $batch->finishedAt);
     }
 
     public function testDispatchFakeBatch()

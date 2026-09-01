@@ -83,7 +83,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
     public function handle()
     {
         if (! $this->confirmToProceed()) {
-            return 1;
+            return self::FAILURE;
         }
 
         try {
@@ -92,13 +92,13 @@ class MigrateCommand extends BaseCommand implements Isolatable
             if ($this->option('graceful')) {
                 $this->components->warn($e->getMessage());
 
-                return 0;
+                return self::SUCCESS;
             }
 
             throw $e;
         }
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**
@@ -145,7 +145,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
             $this->components->task('Creating migration table', function () {
                 return $this->callSilent('migrate:install', array_filter([
                     '--database' => $this->option('database'),
-                ])) == 0;
+                ])) === 0;
             });
 
             $this->newLine();

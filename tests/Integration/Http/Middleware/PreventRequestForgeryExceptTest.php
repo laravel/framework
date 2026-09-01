@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Http\Middleware;
 
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Http\Request;
+use Illuminate\Tests\Integration\Http\Fixtures\PreventRequestForgeryExceptStub;
 use Orchestra\Testbench\TestCase;
 
 class PreventRequestForgeryExceptTest extends TestCase

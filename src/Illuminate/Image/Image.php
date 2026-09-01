@@ -8,6 +8,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Contracts\Image\Transformation;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Transformations\Blur;
 use Illuminate\Image\Transformations\Contain;
@@ -27,7 +29,7 @@ use Illuminate\Support\Traits\Macroable;
 use Stringable;
 use Throwable;
 
-class Image implements Stringable
+class Image implements Responsable, Stringable
 {
     use Conditionable, Macroable;
 
@@ -40,6 +42,11 @@ class Image implements Stringable
      * The driver override.
      */
     protected ?string $driver = null;
+
+    /**
+     * The image contents, or a lazy loader that resolves them.
+     */
+    protected Closure|string $contents;
 
     /**
      * Whether the image has been processed.
@@ -55,10 +62,26 @@ class Image implements Stringable
      * Create a new image instance.
      */
     public function __construct(
-        protected Closure|string $contents,
+        Closure|string $contents,
         protected ?UploadedFile $file = null,
     ) {
+        $this->contents = $contents instanceof Closure
+            ? $this->resolveOnce($contents)
+            : $contents;
+
         $this->pipeline = new ImagePipeline;
+    }
+
+    /**
+     * Wrap a lazy contents loader so it is invoked at most once, even across clones.
+     */
+    protected function resolveOnce(Closure $loader): Closure
+    {
+        return function () use ($loader) {
+            static $contents;
+
+            return $contents ??= $loader();
+        };
     }
 
     /**
@@ -283,6 +306,14 @@ class Image implements Stringable
     }
 
     /**
+     * Convert the image to HEIC format.
+     */
+    public function toHeic(): static
+    {
+        return $this->toFormat('heic');
+    }
+
+    /**
      * Convert the image to BMP format.
      */
     public function toBmp(): static
@@ -295,11 +326,13 @@ class Image implements Stringable
      *
      * @throws ImageException
      */
-    protected function toFormat(string $format): static
+    public function toFormat(string $format): static
     {
-        if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'bmp'])) {
+        if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'heic', 'heif', 'bmp'])) {
             throw new ImageException("The [{$format}] format is not supported.");
         }
+
+        $format = $format === 'heif' ? 'heic' : $format;
 
         return $this->withOutput(fn (ImageOutputOptions $output) => $output->format = $format);
     }
@@ -423,7 +456,8 @@ class Image implements Stringable
             'image/png' => 'png',
             'image/gif' => 'gif',
             'image/webp' => 'webp',
-            'image/avif' => 'avif',
+            'image/avif', 'image/x-avif' => 'avif',
+            'image/heic', 'image/x-heic', 'image/heif' => 'heic',
             'image/bmp' => 'bmp',
             'image/svg+xml' => 'svg',
             'image/tiff' => 'tiff',
@@ -449,7 +483,18 @@ class Image implements Stringable
     public function dimensions(): array
     {
         return once(function () {
-            $size = @getimagesizefromstring($this->toBytes());
+            $contents = $this->toBytes();
+
+            // getimagesize() misreports HEIC's coded / padded frame size, so read HEIC via the driver...
+            if (in_array($this->mimeType(), ['image/heic', 'image/heif', 'image/x-heic'], true)) {
+                try {
+                    return $this->resolveDriver()->dimensions($contents);
+                } catch (Throwable) {
+                    // The driver can't decode this image; fall back to the native reader below...
+                }
+            }
+
+            $size = @getimagesizefromstring($contents);
 
             if ($size === false) {
                 throw new ImageException('Unable to determine the dimensions of the image.');
@@ -473,6 +518,22 @@ class Image implements Stringable
     public function height(): int
     {
         return $this->dimensions()[1];
+    }
+
+    /**
+     * Get the dominant (average) color of the image as a hex string.
+     */
+    public function dominantColor(): string
+    {
+        return once(function () {
+            $contents = value($this->contents);
+
+            if ($this->pipeline->hasChanges() && ! $this->processed) {
+                $contents = $this->resolveDriver()->process($contents, clone $this->pipeline);
+            }
+
+            return $this->resolveDriver()->dominantColor($contents);
+        });
     }
 
     /**
@@ -554,6 +615,18 @@ class Image implements Stringable
         $callback($clone);
 
         return $clone;
+    }
+
+    /**
+     * Create an HTTP response that represents the image.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     */
+    public function toResponse($request): Response
+    {
+        return new Response($this->toBytes(), 200, [
+            'Content-Type' => $this->mimeType(),
+        ]);
     }
 
     /**

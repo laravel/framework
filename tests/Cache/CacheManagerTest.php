@@ -12,7 +12,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Events\Dispatcher as Event;
 use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -109,8 +109,8 @@ class CacheManagerTest extends TestCase
     {
         $disk = new ArrayFilesystem;
 
-        $filesystem = m::mock();
-        $filesystem->shouldReceive('disk')->with('s3')->once()->andReturn($disk);
+        $filesystem = Mockery::mock();
+        $filesystem->expects('disk')->with('s3')->andReturn($disk);
 
         $app = $this->getApp([
             'cache' => [
@@ -268,17 +268,16 @@ class CacheManagerTest extends TestCase
 
     public function testForgetDriver()
     {
-        $cacheManager = m::mock(CacheManager::class)
+        $cacheManager = Mockery::mock(CacheManager::class)
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
 
-        $cacheManager->shouldReceive('resolve')
+        $cacheManager->expects('resolve')
             ->withArgs(['array'])
             ->times(4)
             ->andReturn(new ArrayStore);
 
-        $cacheManager->shouldReceive('getDefaultDriver')
-            ->once()
+        $cacheManager->expects('getDefaultDriver')
             ->andReturn('array');
 
         foreach (['array', ['array'], null] as $option) {
@@ -311,8 +310,7 @@ class CacheManagerTest extends TestCase
 
     public function testThrowExceptionWhenUnknownDriverIsUsed()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Driver [unknown_taxi_driver] is not supported.');
+        $this->expectExceptionObject(new InvalidArgumentException('Driver [unknown_taxi_driver] is not supported.'));
 
         $userConfig = [
             'cache' => [
@@ -333,8 +331,7 @@ class CacheManagerTest extends TestCase
 
     public function testThrowExceptionWhenUnknownStoreIsUsed()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cache store [alien_store] is not defined.');
+        $this->expectExceptionObject(new InvalidArgumentException('Cache store [alien_store] is not defined.'));
 
         $userConfig = [
             'cache' => [

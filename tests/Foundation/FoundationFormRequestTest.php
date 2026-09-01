@@ -19,7 +19,7 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator as TranslatorConcrete;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\ValidationException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class FoundationFormRequestTest extends TestCase
@@ -33,8 +33,6 @@ class FoundationFormRequestTest extends TestCase
         Container::setInstance(null);
 
         $this->mocks = [];
-
-        parent::tearDown();
     }
 
     public function testValidatedMethodReturnsTheValidatedData()
@@ -97,8 +95,6 @@ class FoundationFormRequestTest extends TestCase
 
         $request = $this->createRequest(['no' => 'name']);
 
-        $this->mocks['redirect']->shouldReceive('withInput->withErrors');
-
         $request->validateResolved();
     }
 
@@ -115,16 +111,14 @@ class FoundationFormRequestTest extends TestCase
 
     public function testValidateMethodThrowsWhenAuthorizationFails()
     {
-        $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('This action is unauthorized.');
+        $this->expectExceptionObject(new AuthorizationException('This action is unauthorized.'));
 
         $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validateResolved();
     }
 
     public function testValidateThrowsExceptionFromAuthorizationResponse()
     {
-        $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('foo');
+        $this->expectExceptionObject(new AuthorizationException('foo'));
 
         $this->createRequest([], FoundationTestFormRequestForbiddenWithResponseStub::class)->validateResolved();
     }
@@ -390,6 +384,62 @@ class FoundationFormRequestTest extends TestCase
         $this->assertTrue($exception->validator->errors()->has('items.0.name'));
     }
 
+    public function testFailOnUnknownFieldsRejectsLiteralDottedKeysOnlyMatchingNestedRules()
+    {
+        $request = $this->createRequest(
+            ['profile.name' => 'not-an-integer'],
+            FoundationTestFormRequestFailOnUnknownFieldsLiteralDotStub::class,
+            'POST'
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('profile.name'));
+    }
+
+    public function testFailOnUnknownFieldsRejectsLiteralDottedKeysOnlyMatchingWildcardRules()
+    {
+        $request = $this->createRequest(
+            ['items.0.id' => 'not-an-integer'],
+            FoundationTestFormRequestFailOnUnknownFieldsSometimesWildcardStub::class,
+            'POST'
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('items.0.id'));
+    }
+
+    public function testFailOnUnknownFieldsAllowsLiteralDottedKeysMatchingEscapedDotRules()
+    {
+        $request = $this->createRequest(
+            ['profile.name' => 'Taylor'],
+            FoundationTestFormRequestFailOnUnknownFieldsEscapedDotStub::class,
+            'POST'
+        );
+
+        $request->validateResolved();
+
+        $this->assertEquals(['profile.name' => 'Taylor'], $request->validated());
+    }
+
+    public function testFailOnUnknownFieldsAllowsNestedKeysContainingLiteralDotsMatchingWildcardRules()
+    {
+        $request = $this->createRequest(
+            ['items' => ['a.b' => 5]],
+            FoundationTestFormRequestFailOnUnknownFieldsSometimesSingleSegmentWildcardStub::class,
+            'POST'
+        );
+
+        $request->validateResolved();
+
+        $this->assertEquals(['items' => ['a.b' => 5]], $request->validated());
+    }
+
     public function testFailOnUnknownFieldsRejectsMultipleUnknownKeys()
     {
         $request = $this->createRequest(
@@ -630,9 +680,9 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createValidationFactory($container)
     {
-        $translator = m::mock(Translator::class)->shouldReceive('get')
-            ->zeroOrMoreTimes()->andReturn('error')->shouldReceive('choice')
-            ->zeroOrMoreTimes()->andReturn('error')->getMock();
+        $translator = Mockery::mock(Translator::class);
+        $translator->shouldReceive('get')->zeroOrMoreTimes()->andReturn('error');
+        $translator->shouldReceive('choice')->zeroOrMoreTimes()->andReturn('error');
 
         return new ValidationFactory($translator, $container);
     }
@@ -645,7 +695,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createMockRedirector($request)
     {
-        $redirector = $this->mocks['redirector'] = m::mock(Redirector::class);
+        $redirector = $this->mocks['redirector'] = Mockery::mock(Redirector::class);
 
         $redirector->shouldReceive('getUrlGenerator')->zeroOrMoreTimes()
             ->andReturn($generator = $this->createMockUrlGenerator());
@@ -666,7 +716,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createMockUrlGenerator()
     {
-        return $this->mocks['generator'] = m::mock(UrlGenerator::class);
+        return $this->mocks['generator'] = Mockery::mock(UrlGenerator::class);
     }
 
     /**
@@ -676,7 +726,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createMockRedirectResponse()
     {
-        return $this->mocks['redirect'] = m::mock(RedirectResponse::class);
+        return $this->mocks['redirect'] = Mockery::mock(RedirectResponse::class);
     }
 }
 
@@ -927,6 +977,62 @@ class FoundationTestFormRequestFailOnUnknownFieldsSingleSegmentWildcardStub exte
     public function rules()
     {
         return ['items.*' => 'array'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsLiteralDotStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['profile.name' => 'sometimes|integer'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsEscapedDotStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['profile\.name' => 'sometimes|string'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsSometimesWildcardStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['items.*.id' => 'sometimes|integer'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsSometimesSingleSegmentWildcardStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['items.*' => 'sometimes|integer'];
     }
 
     public function authorize()

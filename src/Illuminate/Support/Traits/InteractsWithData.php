@@ -313,7 +313,13 @@ trait InteractsWithData
      */
     public function clamp($key, $min, $max, $default = 0)
     {
-        return Number::clamp($this->data($key, $default), $min, $max);
+        $value = $this->data($key, $default);
+
+        if (! is_numeric($value)) {
+            $value = $default;
+        }
+
+        return Number::clamp($value, $min, $max);
     }
 
     /**

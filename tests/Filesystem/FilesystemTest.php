@@ -6,7 +6,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Testing\Assert;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
@@ -39,8 +39,6 @@ class FilesystemTest extends TestCase
     {
         $files = new Filesystem;
         $files->deleteDirectory(self::$tempDir, $preserve = true);
-
-        parent::tearDown();
     }
 
     public function testGetRetrievesFiles()
@@ -79,8 +77,7 @@ class FilesystemTest extends TestCase
 
     public function testLinesThrowsExceptionNonexisitingFile()
     {
-        $this->expectException(FileNotFoundException::class);
-        $this->expectExceptionMessage('File does not exist at path '.__DIR__.'/unknown-file.txt.');
+        $this->expectExceptionObject(new FileNotFoundException('File does not exist at path '.__DIR__.'/unknown-file.txt.'));
 
         (new Filesystem)->lines(__DIR__.'/unknown-file.txt');
     }
@@ -325,15 +322,14 @@ class FilesystemTest extends TestCase
         file_put_contents(self::$tempDir.'/tmp6/foo.txt', '');
         mkdir(self::$tempDir.'/tmp7', 0777, true);
 
-        $files = m::mock(Filesystem::class)->makePartial();
-        $files->shouldReceive('deleteDirectory')->once()->andReturn(false);
+        $files = Mockery::mock(Filesystem::class)->makePartial();
+        $files->expects('deleteDirectory')->andReturn(false);
         $this->assertFalse($files->moveDirectory(self::$tempDir.'/tmp6', self::$tempDir.'/tmp7', true));
     }
 
     public function testGetThrowsExceptionNonexisitingFile()
     {
-        $this->expectException(FileNotFoundException::class);
-        $this->expectExceptionMessage('File does not exist at path '.self::$tempDir.'/unknown-file.txt.');
+        $this->expectExceptionObject(new FileNotFoundException('File does not exist at path '.self::$tempDir.'/unknown-file.txt.'));
 
         (new Filesystem)->get(self::$tempDir.'/unknown-file.txt');
     }
@@ -347,8 +343,7 @@ class FilesystemTest extends TestCase
 
     public function testGetRequireThrowsExceptionNonExistingFile()
     {
-        $this->expectException(FileNotFoundException::class);
-        $this->expectExceptionMessage('File does not exist at path '.self::$tempDir.'/unknown-file.txt.');
+        $this->expectExceptionObject(new FileNotFoundException('File does not exist at path '.self::$tempDir.'/unknown-file.txt.'));
 
         (new Filesystem)->getRequire(self::$tempDir.'/unknown-file.txt');
     }
@@ -590,8 +585,7 @@ class FilesystemTest extends TestCase
 
     public function testRequireOnceThrowsExceptionNonexisitingFile()
     {
-        $this->expectException(FileNotFoundException::class);
-        $this->expectExceptionMessage('File does not exist at path '.__DIR__.'/unknown-file.txt.');
+        $this->expectExceptionObject(new FileNotFoundException('File does not exist at path '.__DIR__.'/unknown-file.txt.'));
 
         (new Filesystem)->requireOnce(__DIR__.'/unknown-file.txt');
     }

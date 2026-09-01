@@ -4,12 +4,16 @@ namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
+use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ValidationPasswordRuleTest extends TestCase
@@ -57,6 +61,7 @@ class ValidationPasswordRuleTest extends TestCase
         $rule = (new Password(8))->when($is_privileged_user, function ($rule) {
             $rule->symbols();
         });
+        $this->assertInstanceOf(Password::class, $rule);
 
         $this->fails($rule, ['aaaaaaaa', '11111111'], [
             'validation.password.symbols',
@@ -66,6 +71,7 @@ class ValidationPasswordRuleTest extends TestCase
         $rule = (new Password(8))->when($is_privileged_user, function ($rule) {
             $rule->symbols();
         });
+        $this->assertInstanceOf(Password::class, $rule);
 
         $this->passes($rule, ['aaaaaaaa', '11111111']);
     }
@@ -116,6 +122,18 @@ class ValidationPasswordRuleTest extends TestCase
 
     public function testUncompromised()
     {
+        // These are treated as compromised, with a breach count high enough to still
+        // be considered compromised past the raised threshold used further below.
+        $this->fakePwnedPasswordsApi([
+            '123456' => 25000000,
+            'password' => 10000000,
+            'welcome' => 500000,
+            'abc123' => 300000,
+            '123456789' => 20000000,
+            '12345678' => 15000000,
+            'nuno' => 5000000,
+        ]);
+
         $this->fails(Password::min(2)->uncompromised(), [
             '123456',
             'password',
@@ -141,6 +159,30 @@ class ValidationPasswordRuleTest extends TestCase
             '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
             'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
         ]);
+    }
+
+    /**
+     * Fake the "Have I Been Pwned" range API with deterministic responses, so the
+     * uncompromised password rule never depends on a real, flaky network call.
+     *
+     * @param  array<string, int>  $breachCountsByPassword
+     * @return void
+     */
+    protected function fakePwnedPasswordsApi(array $breachCountsByPassword): void
+    {
+        Http::fake(function ($request) use ($breachCountsByPassword) {
+            $prefix = Str::after($request->url(), '/range/');
+
+            foreach ($breachCountsByPassword as $password => $count) {
+                $hash = strtoupper(sha1($password));
+
+                if (str_starts_with($hash, $prefix)) {
+                    return Http::response(substr($hash, 5).':'.$count);
+                }
+            }
+
+            return Http::response('');
+        });
     }
 
     public function testMessagesOrder()
@@ -249,8 +291,7 @@ class ValidationPasswordRuleTest extends TestCase
 
     public function testItCannotSetDefaultUsingGivenString()
     {
-        $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('given callback should be callable');
+        $this->expectExceptionObject(new InvalidArgumentException('given callback should be callable'));
 
         Password::defaults('required|password');
     }
@@ -458,7 +499,7 @@ class ValidationPasswordRuleTest extends TestCase
         $v = \Illuminate\Support\Facades\Validator::make(
             [],
             [
-                'password' => [\Illuminate\Validation\Rules\Password::required()],
+                'password' => [Password::required()],
             ]
         );
 
@@ -556,6 +597,8 @@ class ValidationPasswordRuleTest extends TestCase
             );
         });
 
+        $container->singleton(HttpFactory::class);
+
         Facade::setFacadeApplication($container);
 
         (new ValidationServiceProvider($container))->register();
@@ -570,7 +613,5 @@ class ValidationPasswordRuleTest extends TestCase
         Facade::setFacadeApplication(null);
 
         Password::$defaultCallback = null;
-
-        parent::tearDown();
     }
 }

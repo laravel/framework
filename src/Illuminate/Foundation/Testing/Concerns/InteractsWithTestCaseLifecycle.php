@@ -178,6 +178,18 @@ trait InteractsWithTestCaseLifecycle
             $this->originalDeprecationHandler = null;
         }
 
+        $this->flushState();
+
+        if ($this->callbackException) {
+            throw $this->callbackException;
+        }
+    }
+
+    /**
+     * Reset static state between test executions.
+     */
+    protected function flushState(): void
+    {
         AboutCommand::flushState();
         Artisan::forgetBootstrappers();
         Component::flushCache();
@@ -208,10 +220,6 @@ trait InteractsWithTestCaseLifecycle
         PreventRequestForgery::flushState();
         Validator::flushState();
         WorkCommand::flushState();
-
-        if ($this->callbackException) {
-            throw $this->callbackException;
-        }
     }
 
     /**

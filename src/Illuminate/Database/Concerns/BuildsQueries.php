@@ -50,7 +50,7 @@ trait BuildsQueries
 
             $limit = is_null($remaining) ? $count : min($count, $remaining);
 
-            if ($limit == 0) {
+            if ($limit === 0) {
                 break;
             }
 
@@ -58,7 +58,7 @@ trait BuildsQueries
 
             $countResults = $results->count();
 
-            if ($countResults == 0) {
+            if ($countResults === 0) {
                 break;
             }
 
@@ -179,7 +179,7 @@ trait BuildsQueries
 
             $limit = is_null($remaining) ? $count : min($count, $remaining);
 
-            if ($limit == 0) {
+            if ($limit === 0) {
                 break;
             }
 
@@ -193,7 +193,7 @@ trait BuildsQueries
 
             $countResults = $results->count();
 
-            if ($countResults == 0) {
+            if ($countResults === 0) {
                 break;
             }
 

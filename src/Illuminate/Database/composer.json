@@ -22,12 +22,22 @@
     "require": {
         "php": "^8.4",
         "ext-pdo": "*",
+<<<<<<< HEAD
         "brick/math": "^0.14.2 || ^0.15 || ^0.16 || ^0.17 || ^0.18",
         "illuminate/collections": "^14.0",
         "illuminate/container": "^14.0",
         "illuminate/contracts": "^14.0",
         "illuminate/macroable": "^14.0",
         "illuminate/support": "^14.0",
+=======
+        "brick/math": "^0.14.2 || ^0.15 || ^0.16 || ^0.17 || ^0.18 || ^0.19",
+        "illuminate/collections": "^13.0",
+        "illuminate/conditionable": "^13.0",
+        "illuminate/container": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/macroable": "^13.0",
+        "illuminate/support": "^13.0",
+>>>>>>> upstream/13.x
         "laravel/serializable-closure": "^2.0.10",
         "symfony/polyfill-php85": "^1.36",
         "symfony/polyfill-php86": "^1.36"

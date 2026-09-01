@@ -8,7 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Tests\Database\Fixtures\Models\User;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBlueprintTest extends TestCase
@@ -16,15 +16,13 @@ class DatabaseSchemaBlueprintTest extends TestCase
     protected function tearDown(): void
     {
         Builder::$defaultMorphKeyType = 'int';
-
-        parent::tearDown();
     }
 
     public function testToSqlRunsCommandsFromBlueprint()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('statement')->once()->with('foo');
-        $conn->shouldReceive('statement')->once()->with('bar');
+        $conn->expects('statement')->with('foo');
+        $conn->expects('statement')->with('bar');
         $blueprint = $this->getMockBuilder(Blueprint::class)->onlyMethods(['toSql'])->setConstructorArgs([$conn, 'users'])->getMock();
         $blueprint->expects($this->once())->method('toSql')->willReturn(['foo', 'bar']);
 
@@ -483,6 +481,19 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $getSql('MySql'));
     }
 
+    public function testGenerateUlidRelationshipColumnWithUlidModel()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->foreignUlidFor(Fixtures\Models\EloquentModelUsingUlid::class);
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'alter table `posts` add `model_using_ulid_id` char(26) not null',
+        ], $getSql('MySql'));
+    }
+
     public function testGenerateRelationshipConstrainedColumn()
     {
         $getSql = function ($grammar) {
@@ -508,6 +519,20 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals([
             'alter table `posts` add `model_using_uuid_id` char(36) not null',
             'alter table `posts` add constraint `posts_model_using_uuid_id_foreign` foreign key (`model_using_uuid_id`) references `model` (`id`)',
+        ], $getSql('MySql'));
+    }
+
+    public function testGenerateUlidRelationshipConstrainedColumn()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->foreignUlidFor(Fixtures\Models\EloquentModelUsingUlid::class)->constrained();
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'alter table `posts` add `model_using_ulid_id` char(26) not null',
+            'alter table `posts` add constraint `posts_model_using_ulid_id_foreign` foreign key (`model_using_ulid_id`) references `model` (`id`)',
         ], $getSql('MySql'));
     }
 
@@ -685,17 +710,16 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     protected function getConnection(?string $grammar = null, string $prefix = '')
     {
-        $connection = m::mock(Connection::class)
-            ->shouldReceive('getTablePrefix')->andReturn($prefix)
-            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true)
-            ->getMock();
+        $connection = Mockery::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true);
 
         $grammar ??= 'MySql';
         $grammarClass = 'Illuminate\Database\Schema\Grammars\\'.$grammar.'Grammar';
         $builderClass = 'Illuminate\Database\Schema\\'.$grammar.'Builder';
 
         $connection->shouldReceive('getSchemaGrammar')->andReturn(new $grammarClass($connection));
-        $connection->shouldReceive('getSchemaBuilder')->andReturn(m::mock($builderClass));
+        $connection->shouldReceive('getSchemaBuilder')->andReturn(Mockery::mock($builderClass));
 
         if ($grammar === 'SQLite') {
             $connection->shouldReceive('getServerVersion')->andReturn('3.35');

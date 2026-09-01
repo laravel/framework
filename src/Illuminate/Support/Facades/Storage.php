@@ -15,6 +15,7 @@ use function Illuminate\Support\enum_value;
  * @method static \Illuminate\Contracts\Filesystem\Filesystem createFtpDriver(array $config)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem createSftpDriver(array $config)
  * @method static \Illuminate\Contracts\Filesystem\Cloud createS3Driver(array $config)
+ * @method static \Illuminate\Contracts\Filesystem\Filesystem createReadThroughDriver(array $config, string $name = 'read-through')
  * @method static \Illuminate\Contracts\Filesystem\Filesystem createScopedDriver(array $config)
  * @method static \Illuminate\Filesystem\FilesystemManager set(string $name, mixed $disk)
  * @method static string getDefaultDriver()

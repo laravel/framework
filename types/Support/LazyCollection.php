@@ -723,6 +723,9 @@ assertType('Illuminate\Support\LazyCollection<int, Illuminate\Support\LazyCollec
     return true;
 }));
 
+assertType('Illuminate\Support\LazyCollection<int, Illuminate\Support\LazyCollection<int, User>>', $collection->chunkBy(fn ($user) => $user->getKey()));
+assertType('Illuminate\Support\LazyCollection<int, Illuminate\Support\LazyCollection<int, User>>', $collection->chunkBy('name'));
+
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sort(function ($userA, $userB) {
     assertType('User', $userA);
     assertType('User', $userB);

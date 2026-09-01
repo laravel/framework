@@ -16,10 +16,18 @@
     "require": {
         "php": "^8.4",
         "ext-mbstring": "*",
+<<<<<<< HEAD
         "illuminate/collections": "^14.0",
         "illuminate/contracts": "^14.0",
         "illuminate/macroable": "^14.0",
         "illuminate/support": "^14.0"
+=======
+        "illuminate/collections": "^13.0",
+        "illuminate/conditionable": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/macroable": "^13.0",
+        "illuminate/support": "^13.0"
+>>>>>>> upstream/13.x
     },
     "suggest": {
         "brianium/paratest": "Required to run tests in parallel (^7.0 || ^8.0).",

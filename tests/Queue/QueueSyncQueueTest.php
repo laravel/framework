@@ -14,7 +14,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
 use LogicException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class QueueSyncQueueTest extends TestCase
@@ -22,8 +22,6 @@ class QueueSyncQueueTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
-
-        parent::tearDown();
     }
 
     public function testPushShouldFireJobInstantly()
@@ -46,8 +44,8 @@ class QueueSyncQueueTest extends TestCase
         $sync = new SyncQueue;
         $container = new Container;
         Container::setInstance($container);
-        $events = m::mock(Dispatcher::class);
-        $events->shouldReceive('dispatch')->times(4);
+        $events = Mockery::mock(Dispatcher::class);
+        $events->expects('dispatch')->times(4);
         $container->instance('events', $events);
         $container->instance(Dispatcher::class, $events);
         $sync->setContainer($container);
@@ -108,8 +106,8 @@ class QueueSyncQueueTest extends TestCase
         $sync = new SyncQueue;
         $container = new Container;
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
-        $transactionManager = m::mock(DatabaseTransactionsManager::class);
-        $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
+        $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
+        $transactionManager->expects('addCallback')->andReturn(null);
         $transactionManager->shouldNotReceive('addCallbackForRollback');
         $container->instance('db.transactions', $transactionManager);
 
@@ -122,8 +120,8 @@ class QueueSyncQueueTest extends TestCase
         $sync = new SyncQueue;
         $container = new Container;
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
-        $transactionManager = m::mock(DatabaseTransactionsManager::class);
-        $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
+        $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
+        $transactionManager->expects('addCallback')->andReturn(null);
         $transactionManager->shouldNotReceive('addCallbackForRollback');
         $container->instance('db.transactions', $transactionManager);
 
@@ -136,9 +134,9 @@ class QueueSyncQueueTest extends TestCase
         $sync = new SyncQueue;
         $container = new Container;
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
-        $transactionManager = m::mock(DatabaseTransactionsManager::class);
-        $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
-        $transactionManager->shouldReceive('addCallbackForRollback')->once()->andReturn(null);
+        $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
+        $transactionManager->expects('addCallback')->andReturn(null);
+        $transactionManager->expects('addCallbackForRollback')->andReturn(null);
         $container->instance('db.transactions', $transactionManager);
 
         $sync->setContainer($container);
@@ -150,9 +148,9 @@ class QueueSyncQueueTest extends TestCase
         $sync = new SyncQueue;
         $container = new Container;
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
-        $transactionManager = m::mock(DatabaseTransactionsManager::class);
-        $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
-        $transactionManager->shouldReceive('addCallbackForRollback')->once()->andReturn(null);
+        $transactionManager = Mockery::mock(DatabaseTransactionsManager::class);
+        $transactionManager->expects('addCallback')->andReturn(null);
+        $transactionManager->expects('addCallbackForRollback')->andReturn(null);
         $container->instance('db.transactions', $transactionManager);
 
         $sync->setContainer($container);

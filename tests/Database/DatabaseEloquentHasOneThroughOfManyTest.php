@@ -67,8 +67,6 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
         $this->schema()->drop('logins');
         $this->schema()->drop('states');
         $this->schema()->drop('prices');
-
-        parent::tearDown();
     }
 
     public function testItGuessesRelationName(): void
@@ -157,8 +155,7 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
 
     public function testItFailsWhenUsingInvalidAggregate(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid aggregate [count] used within ofMany relation. Available aggregates: MIN, MAX');
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid aggregate [count] used within ofMany relation. Available aggregates: MIN, MAX'));
         $user = HasOneThroughOfManyTestUser::make();
         $user->latest_login_with_invalid_aggregate();
     }

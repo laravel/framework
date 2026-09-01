@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Sleep;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class SupportLazyCollectionTest extends TestCase
@@ -39,13 +39,13 @@ class SupportLazyCollectionTest extends TestCase
     {
         $array = [1, 2, 3];
 
-        $data = LazyCollection::make(Collection::make($array));
+        $data = LazyCollection::make(new Collection($array));
 
         $this->assertSame($array, $data->all());
 
         $array = ['a' => 1, 'b' => 2, 'c' => 3];
 
-        $data = LazyCollection::make(Collection::make($array));
+        $data = LazyCollection::make(new Collection($array));
 
         $this->assertSame($array, $data->all());
     }
@@ -184,7 +184,7 @@ class SupportLazyCollectionTest extends TestCase
     {
         $timeout = Carbon::now();
 
-        $mock = m::mock(LazyCollection::class.'[now]');
+        $mock = Mockery::mock(LazyCollection::class.'[now]');
 
         $timedOutWith = [];
 
@@ -194,7 +194,7 @@ class SupportLazyCollectionTest extends TestCase
                 tap($collection)
                     ->mockery_init($mock->mockery_getContainer())
                     ->shouldAllowMockingProtectedMethods()
-                    ->shouldReceive('now')
+                    ->expects('now')
                     ->times(3)
                     ->andReturn(
                         (clone $timeout)->sub(2, 'minute')->getTimestamp(),

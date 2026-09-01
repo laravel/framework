@@ -76,8 +76,6 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
         }
 
         Relation::morphMap([], false);
-
-        parent::tearDown();
     }
 
     public function testBasicModelHydration()

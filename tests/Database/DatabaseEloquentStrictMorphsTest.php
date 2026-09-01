@@ -12,8 +12,6 @@ class DatabaseEloquentStrictMorphsTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         Relation::requireMorphMap();
     }
 
@@ -72,8 +70,6 @@ class DatabaseEloquentStrictMorphsTest extends TestCase
     {
         Relation::morphMap([], false);
         Relation::requireMorphMap(false);
-
-        parent::tearDown();
     }
 }
 

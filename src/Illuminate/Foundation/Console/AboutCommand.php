@@ -99,7 +99,7 @@ class AboutCommand extends Command
 
         $this->newLine();
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**
@@ -332,7 +332,7 @@ class AboutCommand extends Command
      */
     protected function sections()
     {
-        return (new Collection(explode(',', $this->option('only') ?? '')))
+        return (new Stringable($this->option('only') ?? ''))->explode(',')
             ->filter()
             ->map(fn ($only) => $this->toSearchKeyword($only))
             ->all();

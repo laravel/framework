@@ -79,6 +79,19 @@ class CacheArrayStoreTest extends TestCase
         $this->assertSame($value, $store->get($key));
     }
 
+    public function testTouchDoesNotRestoreExpiredItem(): void
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $store = new ArrayStore;
+        $store->put('key', 'value', 30);
+
+        Carbon::setTestNow($now->addSeconds(30));
+
+        $this->assertFalse($store->touch('key', 60));
+        $this->assertNull($store->get('key'));
+    }
+
     public function testStoreItemForeverProperlyStoresInArray()
     {
         $mock = $this->getMockBuilder(ArrayStore::class)->onlyMethods(['put'])->getMock();

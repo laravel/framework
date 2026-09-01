@@ -15,8 +15,6 @@ class FoundationApplicationBuilderTest extends TestCase
     protected function tearDown(): void
     {
         unset($_ENV['APP_BASE_PATH'], $_ENV['LARAVEL_STORAGE_PATH'], $_SERVER['LARAVEL_STORAGE_PATH']);
-
-        parent::tearDown();
     }
 
     public function testBaseDirectoryWithArg()

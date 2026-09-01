@@ -119,8 +119,7 @@ class DebouncedJobTest extends QueueTestCase
 
     public function testDebouncedAndUniqueThrowsLogicException()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('debounced job cannot also implement ShouldBeUnique');
+        $this->expectExceptionObject(new LogicException('debounced job cannot also implement ShouldBeUnique'));
 
         DebouncedAndUniqueTestJob::dispatch('entity-1');
     }
@@ -203,7 +202,7 @@ class DebouncedJobTest extends QueueTestCase
         $lock->release($jobA, $ownerA);
 
         // B should still be the current owner.
-        $this->assertTrue($lock->getCurrentOwner($jobB) === $ownerB);
+        $this->assertSame($lock->getCurrentOwner($jobB), $ownerB);
     }
 
     public function testReleaseClearsMaxWaitTimestamp()
@@ -271,7 +270,7 @@ class DebouncedJobTest extends QueueTestCase
 
     public function testMaxDebounceWaitForcesImmediateExecution()
     {
-        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+        $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
 
         DebouncedWithMaxWaitJob::$handleCount = 0;
 
@@ -289,6 +288,49 @@ class DebouncedJobTest extends QueueTestCase
         unset($pending);
 
         // The job should be queued with delay=0 since max wait was exceeded.
+        $this->assertEquals(0, $job->delay);
+    }
+
+    public function testMaxDebounceWaitStartsOverAfterTheDebouncedJobRuns()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        DebouncedWithMaxWaitJob::$handleCount = 0;
+
+        // First dispatch at t=0, which runs once the debounce window closes.
+        dispatch(new DebouncedWithMaxWaitJob('entity-1'));
+
+        $this->travelTo(Carbon::now()->addSeconds(31));
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertEquals(1, DebouncedWithMaxWaitJob::$handleCount);
+
+        // Second dispatch at t=92, long after the first job stopped waiting.
+        $this->travelTo(Carbon::now()->addSeconds(61));
+
+        $job = new DebouncedWithMaxWaitJob('entity-1');
+        $pending = dispatch($job);
+        unset($pending);
+
+        // The job should be debounced again rather than forced to run immediately.
+        $this->assertEquals(30, $job->delay);
+    }
+
+    public function testMaxDebounceWaitIsNotReleasedWhenMiddlewareReleasesTheJob()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
+
+        dispatch(new DebouncedWithReleasingMiddlewareJob('entity-1'));
+
+        $this->travelTo(Carbon::now()->addSeconds(31));
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->travelTo(Carbon::now()->addSeconds(30));
+
+        $job = new DebouncedWithReleasingMiddlewareJob('entity-1');
+        $pending = dispatch($job);
+        unset($pending);
+
         $this->assertEquals(0, $job->delay);
     }
 
@@ -464,6 +506,38 @@ class DebouncedWithMaxWaitJob implements ShouldQueue
     public function handle()
     {
         static::$handleCount++;
+    }
+}
+
+#[DebounceFor(30, maxWait: 60)]
+class DebouncedWithReleasingMiddlewareJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public function __construct(public string $entityId)
+    {
+    }
+
+    public function debounceId(): string
+    {
+        return $this->entityId;
+    }
+
+    public function middleware(): array
+    {
+        return [new ReleaseDebouncedJobMiddleware];
+    }
+
+    public function handle()
+    {
+    }
+}
+
+class ReleaseDebouncedJobMiddleware
+{
+    public function handle($job, $next)
+    {
+        $job->release();
     }
 }
 

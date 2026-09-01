@@ -377,8 +377,6 @@ class ValidationAnyOfRuleTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $container = Container::getInstance();
         $container->bind('translator', function () {
             return new Translator(
@@ -398,7 +396,5 @@ class ValidationAnyOfRuleTest extends TestCase
         Container::setInstance(null);
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 }

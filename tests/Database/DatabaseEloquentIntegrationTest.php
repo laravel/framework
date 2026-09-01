@@ -24,7 +24,6 @@ use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
@@ -207,8 +206,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Str::createUuidsNormally();
         DB::flushQueryLog();
-
-        parent::tearDown();
     }
 
     /**
@@ -1023,6 +1020,64 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals([1 => 'taylorotwell@gmail.com', 2 => 'abigailotwell@gmail.com'], $keyed);
     }
 
+    public function testModelKeys()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame([1, 2], EloquentTestUser::oldest('id')->modelKeys());
+    }
+
+    public function testModelKeysWithCastPrimaryKey()
+    {
+        EloquentTestUserWithStringCastId::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame(['1', '2'], EloquentTestUserWithStringCastId::oldest('id')->modelKeys());
+    }
+
+    public function testModelKeysWithCustomPrimaryKey()
+    {
+        EloquentTestUniqueUserWithCustomKey::insert([
+            ['screen_name' => 'first', 'email' => 'taylorotwell@gmail.com'],
+            ['screen_name' => 'second', 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame(['first', 'second'], EloquentTestUniqueUserWithCustomKey::orderBy('screen_name')->modelKeys());
+    }
+
+    public function testModelKeysWithQueryConstraints()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
+
+        $this->assertSame([2, 3], EloquentTestUser::where('id', '>', 1)->oldest('id')->modelKeys());
+        $this->assertSame([1], EloquentTestUser::oldest('id')->take(1)->modelKeys());
+    }
+
+    public function testModelKeysWithRelationshipAndJoin()
+    {
+        $user1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user2 = EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $user1->posts()->create(['id' => 1, 'name' => 'First post']);
+        $user1->posts()->create(['id' => 2, 'name' => 'Second post']);
+        $user2->posts()->create(['id' => 3, 'name' => 'Third post']);
+
+        $this->assertEquals([1, 2], $user1->posts()->oldest('id')->modelKeys());
+
+        $join = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id')->where('users.id', 1);
+
+        $this->assertEquals([1, 1], $join->modelKeys());
+    }
+
     public function testFindOrFail()
     {
         EloquentTestUser::insert([
@@ -1042,8 +1097,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFindOrFailWithSingleIdThrowsModelNotFoundException()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1'));
         $this->expectExceptionObject(
             (new ModelNotFoundException())->setModel(EloquentTestUser::class, [1]),
         );
@@ -1053,8 +1107,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFindOrFailWithMultipleIdsThrowsModelNotFoundException()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3'));
         $this->expectExceptionObject(
             (new ModelNotFoundException())->setModel(EloquentTestUser::class, [2, 3]),
         );
@@ -1065,8 +1118,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFindOrFailWithMultipleIdsUsingCollectionThrowsModelNotFoundException()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3'));
         $this->expectExceptionObject(
             (new ModelNotFoundException())->setModel(EloquentTestUser::class, [2, 3]),
         );
@@ -2143,7 +2195,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
     }
 
-    public function testTimestampsUsingOldSqlServerDateFormatFallbackToDefaultParsing()
+    public function testTimestampsUsingOldSqlServerDateFormatFallbackToDefaultParsing(): void
     {
         $model = new EloquentTestUser;
         $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
@@ -2156,8 +2208,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('2017-11-14 08:23:19.000', $model->fromDateTime($date), 'the format should trims it');
         // No longer throwing exception since Laravel 7,
         // but Date::hasFormat() can be used instead to check date formatting:
-        $this->assertTrue(Date::hasFormat('2017-11-14 08:23:19.000', $model->getDateFormat()));
-        $this->assertFalse(Date::hasFormat('2017-11-14 08:23:19.734', $model->getDateFormat()));
+        $this->assertTrue(Carbon::hasFormat('2017-11-14 08:23:19.000', $model->getDateFormat()));
+        $this->assertFalse(Carbon::hasFormat('2017-11-14 08:23:19.734', $model->getDateFormat()));
     }
 
     public function testSpecialFormats()
@@ -2853,6 +2905,13 @@ class EloquentTestUniqueUser extends Eloquent
     protected $table = 'unique_users';
     protected $casts = ['birthday' => 'datetime'];
     protected $guarded = [];
+}
+
+class EloquentTestUniqueUserWithCustomKey extends EloquentTestUniqueUser
+{
+    protected $primaryKey = 'screen_name';
+    public $incrementing = false;
+    protected $keyType = 'string';
 }
 
 class EloquentTestPost extends Eloquent

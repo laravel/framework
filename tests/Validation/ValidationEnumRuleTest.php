@@ -7,6 +7,9 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Tests\Validation\Fixtures\IntegerStatus;
+use Illuminate\Tests\Validation\Fixtures\PureEnum;
+use Illuminate\Tests\Validation\Fixtures\StringStatus;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\Enum;
@@ -15,7 +18,7 @@ use Illuminate\Validation\Validator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class ValidationEnumRuleTest extends TestCase
 {
@@ -346,7 +349,5 @@ class ValidationEnumRuleTest extends TestCase
         Facade::clearResolvedInstances();
 
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 }

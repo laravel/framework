@@ -1,6 +1,6 @@
 <?php
 
-namespace Database;
+namespace Illuminate\Tests\Database;
 
 use Generator;
 use Illuminate\Database\MariaDbConnection;

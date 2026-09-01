@@ -5,9 +5,12 @@ namespace Illuminate\Tests\Foundation\Testing\Concerns;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
+use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
+use ReflectionMethod;
+use SensitiveParameter;
 
 class MakesHttpRequestsTest extends TestCase
 {
@@ -83,6 +86,15 @@ class MakesHttpRequestsTest extends TestCase
 
         $this->withBasicAuth($username, $password);
         $this->assertSame('Basic '.$callback($username, $password), $this->defaultHeaders['Authorization']);
+    }
+
+    public function testAuthenticationCredentialsAreSensitiveParameters()
+    {
+        $token = (new ReflectionMethod(MakesHttpRequests::class, 'withToken'))->getParameters()[0];
+        $password = (new ReflectionMethod(MakesHttpRequests::class, 'withBasicAuth'))->getParameters()[1];
+
+        $this->assertCount(1, $token->getAttributes(SensitiveParameter::class));
+        $this->assertCount(1, $password->getAttributes(SensitiveParameter::class));
     }
 
     public function testWithoutTokenRemovesAuthorizationHeader()

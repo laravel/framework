@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseConcernsHasAttributesTest extends TestCase
@@ -27,11 +27,11 @@ class DatabaseConcernsHasAttributesTest extends TestCase
 
     public function testRelationsToArray()
     {
-        $mock = m::mock(HasAttributesWithoutConstructor::class)
+        $mock = Mockery::mock(HasAttributesWithoutConstructor::class)
             ->makePartial()
             ->shouldAllowMockingProtectedMethods()
-            ->shouldReceive('getArrayableRelations')->andReturn([
-                'arrayable_relation' => Collection::make(['foo' => 'bar']),
+            ->expects('getArrayableRelations')->andReturn([
+                'arrayable_relation' => new Collection(['foo' => 'bar']),
                 'invalid_relation' => 'invalid',
                 'null_relation' => null,
             ])
@@ -48,7 +48,7 @@ class DatabaseConcernsHasAttributesTest extends TestCase
         $instance = new HasAttributesWithArrayCast();
         $this->assertEquals(['foo' => null], $instance->attributesToArray());
 
-        $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
+        $this->assertSame(JSON_ERROR_NONE, json_last_error());
     }
 
     public function testUnsettingCachedAttribute()

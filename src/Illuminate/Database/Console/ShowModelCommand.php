@@ -19,13 +19,6 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
     use FindsAvailableModels;
 
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'model:show {model}';
-
-    /**
      * The console command description.
      *
      * @var string
@@ -56,12 +49,12 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
         } catch (BindingResolutionException $e) {
             $this->components->error($e->getMessage());
 
-            return 1;
+            return self::FAILURE;
         }
 
         $this->display($info);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**
@@ -152,7 +145,7 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
 
         $this->components->twoColumnDetail('<fg=green;options=bold>Events</>');
 
-        if ($modelData->events->count()) {
+        if ($modelData->events->isNotEmpty()) {
             foreach ($modelData->events as $event) {
                 $this->components->twoColumnDetail(
                     sprintf('%s', $event['event']),
@@ -165,7 +158,7 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
 
         $this->components->twoColumnDetail('<fg=green;options=bold>Observers</>');
 
-        if ($modelData->observers->count()) {
+        if ($modelData->observers->isNotEmpty()) {
             foreach ($modelData->observers as $observer) {
                 $this->components->twoColumnDetail(
                     sprintf('%s', $observer['event']),

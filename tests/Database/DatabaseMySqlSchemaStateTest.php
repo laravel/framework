@@ -156,8 +156,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
 
         $schemaState->method('makeProcess')->willReturn($mockProcess);
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Dump execution exceeded maximum depth of 30.');
+        $this->expectExceptionObject(new Exception('Dump execution exceeded maximum depth of 30.'));
 
         // test executeDumpProcess
         $method = new ReflectionMethod(get_class($schemaState), 'executeDumpProcess');

@@ -91,7 +91,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
             $dsn .= ";application_name='".str_replace("'", "\'", $application_name)."'";
         }
 
-        return $this->addSslOptions($dsn, $config);
+        return $this->addKeepaliveOptions($this->addSslOptions($dsn, $config), $config);
     }
 
     /**
@@ -104,6 +104,24 @@ class PostgresConnector extends Connector implements ConnectorInterface
     protected function addSslOptions($dsn, array $config)
     {
         foreach (['sslmode', 'sslcert', 'sslkey', 'sslrootcert'] as $option) {
+            if (isset($config[$option])) {
+                $dsn .= ";{$option}={$config[$option]}";
+            }
+        }
+
+        return $dsn;
+    }
+
+    /**
+     * Add the keepalive options to the DSN.
+     *
+     * @param  string  $dsn
+     * @param  array  $config
+     * @return string
+     */
+    protected function addKeepaliveOptions($dsn, array $config)
+    {
+        foreach (['keepalives', 'keepalives_idle', 'keepalives_interval', 'keepalives_count'] as $option) {
             if (isset($config[$option])) {
                 $dsn .= ";{$option}={$config[$option]}";
             }

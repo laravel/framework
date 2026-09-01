@@ -14,10 +14,18 @@
         "source": "https://github.com/laravel/framework"
     },
     "require": {
+<<<<<<< HEAD
         "php": "^8.4",
         "illuminate/contracts": "^14.0",
         "illuminate/support": "^14.0",
         "monolog/monolog": "^3.0",
+=======
+        "php": "^8.3",
+        "illuminate/conditionable": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/support": "^13.0",
+        "monolog/monolog": "^3.10",
+>>>>>>> upstream/13.x
         "psr/log": "^1.0 || ^2.0 || ^3.0"
     },
     "provide": {
