@@ -127,7 +127,7 @@ class QueuePauseResumeTest extends TestCase
         $this->manager->pause('default', 'redis');
 
         $this->assertInstanceOf(QueuePaused::class, $dispatchedEvent);
-        $this->assertSame('redis', $dispatchedEvent->connection);
+        $this->assertSame('redis', $dispatchedEvent->connectionName);
         $this->assertSame('default', $dispatchedEvent->queue);
         $this->assertNull($dispatchedEvent->ttl);
     }
@@ -145,7 +145,7 @@ class QueuePauseResumeTest extends TestCase
         $this->manager->pauseFor('emails', 60, 'redis');
 
         $this->assertInstanceOf(QueuePaused::class, $dispatchedEvent);
-        $this->assertSame('redis', $dispatchedEvent->connection);
+        $this->assertSame('redis', $dispatchedEvent->connectionName);
         $this->assertSame('emails', $dispatchedEvent->queue);
         $this->assertSame(60, $dispatchedEvent->ttl);
     }
@@ -163,7 +163,7 @@ class QueuePauseResumeTest extends TestCase
         $this->manager->resume('notifications', 'database');
 
         $this->assertInstanceOf(QueueResumed::class, $dispatchedEvent);
-        $this->assertSame('database', $dispatchedEvent->connection);
+        $this->assertSame('database', $dispatchedEvent->connectionName);
         $this->assertSame('notifications', $dispatchedEvent->queue);
     }
 
