@@ -2761,6 +2761,26 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?', $builder->toSql());
     }
 
+    public function testHavingNots()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->havingNot('email', 'foo')->havingNot('email', '<>', 'bar');
+        $this->assertSame('select * from "users" having not "email" = ? and not "email" <> ?', $builder->toSql());
+        $this->assertEquals(['foo', 'bar'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->having('email', '>', 1)->orHavingNot('email', '<', 5);
+        $this->assertSame('select * from "users" having "email" > ? or not "email" < ?', $builder->toSql());
+        $this->assertEquals([1, 5], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->havingNot(function ($query) {
+            $query->having('email', '>', 1)->orHaving('email', '<', 5);
+        });
+        $this->assertSame('select * from "users" having not ("email" > ? or "email" < ?)', $builder->toSql());
+        $this->assertEquals([1, 5], $builder->getBindings());
+    }
+
     public function testNestedHavings()
     {
         $builder = $this->getBuilder();
