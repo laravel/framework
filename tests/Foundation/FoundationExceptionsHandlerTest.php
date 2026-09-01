@@ -102,9 +102,9 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testHandlerMergesInlineContextIntoLogContext()
     {
-        $logger = m::mock(LoggerInterface::class);
+        $logger = Mockery::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('error')->withArgs(['Exception message', m::subset(['from' => 'user@example.com', 'subject' => 'Hello'])])->once();
+        $logger->shouldReceive('error')->withArgs(['Exception message', Mockery::subset(['from' => 'user@example.com', 'subject' => 'Hello'])])->once();
 
         $this->handler->report(new RuntimeException('Exception message'), [
             'from' => 'user@example.com',
@@ -114,9 +114,9 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testHandlerInlineContextOverridesExceptionContext()
     {
-        $logger = m::mock(LoggerInterface::class);
+        $logger = Mockery::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('error')->withArgs(['Exception message', m::subset(['foo' => 'overridden'])])->once();
+        $logger->shouldReceive('error')->withArgs(['Exception message', Mockery::subset(['foo' => 'overridden'])])->once();
 
         $this->handler->report(new ContextProvidingException('Exception message'), [
             'foo' => 'overridden',

@@ -42,9 +42,6 @@ class PauseCommand extends Command
             return self::FAILURE;
         }
 
-<<<<<<< HEAD
-        $manager->pause($queue, $connection);
-=======
         if ($this->option('all')) {
             $manager->pauseAll();
 
@@ -61,8 +58,7 @@ class PauseCommand extends Command
 
         [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 
-        $manager->pause($connection, $queue);
->>>>>>> upstream/13.x
+        $manager->pause($queue, $connection);
 
         $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused.");
 

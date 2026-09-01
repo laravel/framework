@@ -17,21 +17,13 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void forward(array|\UnitEnum|string $queue, \UnitEnum|string|null $to = null, \UnitEnum|string|null $connection = null)
  * @method static bool connected(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Contracts\Queue\Queue connection(\UnitEnum|string|null $name = null)
-<<<<<<< HEAD
  * @method static void pause(string $queue, string|null $connection = null)
  * @method static void pauseFor(string $queue, \DateTimeInterface|\DateInterval|int $ttl, string|null $connection = null)
+ * @method static void pauseAll()
  * @method static void resume(string $queue, string|null $connection = null)
+ * @method static void resumeAll()
  * @method static bool isPaused(string $queue, string|null $connection = null)
  * @method static array getPausedQueues(array $queues, string|null $connection = null)
-=======
- * @method static void pause(string $connection, string $queue)
- * @method static void pauseFor(string $connection, string $queue, \DateTimeInterface|\DateInterval|int $ttl)
- * @method static void pauseAll()
- * @method static void resume(string $connection, string $queue)
- * @method static void resumeAll()
- * @method static bool isPaused(string $connection, string $queue)
- * @method static array getPausedQueues(string $connection, array $queues)
->>>>>>> upstream/13.x
  * @method static void withoutInterruptionPolling()
  * @method static void extend(string $driver, \Closure $resolver)
  * @method static void addConnector(string $driver, \Closure $resolver)
