@@ -604,7 +604,6 @@ class AuthGuardTest extends TestCase
         $user = m::mock(Authenticatable::class);
         $guard->getProvider()->shouldReceive('retrieveByToken')->once()->with('id', 'recaller')->andReturn($user);
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
-        $user->shouldReceive('getAuthPassword')->once()->andReturn('baz');
         $guard->getSession()->shouldReceive('put')->with($guard->getName(), 'bar')->once();
         $session->shouldReceive('regenerate')->once();
         $this->assertSame($user, $guard->user());
