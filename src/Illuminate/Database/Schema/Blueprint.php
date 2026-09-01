@@ -494,6 +494,17 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given vector index should be dropped.
+     *
+     * @param  string|array  $index
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropVectorIndex($index)
+    {
+        return $this->dropIndexCommand('dropVectorIndex', 'vectorIndex', $index);
+    }
+
+    /**
      * Indicate that the given foreign key should be dropped.
      *
      * @param  string|array  $index
