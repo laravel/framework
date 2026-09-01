@@ -630,6 +630,174 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(3, $value);
     }
 
+    public function test_for_each_builds_a_model_per_item_using_the_configured_factory()
+    {
+        [$taylor, $abigail] = FactoryTestUserFactory::new()->forEachSequence(
+            ['name' => 'Taylor Otwell'],
+            ['name' => 'Abigail Otwell'],
+        )->create();
+
+        $posts = FactoryTestPostFactory::new()
+            ->state(['title' => 'Announcement'])
+            ->forEach(
+                [$taylor, $abigail],
+                fn ($factory, $user) => $factory->for($user, 'user'),
+            )
+            ->create();
+
+        $this->assertInstanceOf(Collection::class, $posts);
+        $this->assertCount(2, $posts);
+        $this->assertSame($taylor->id, $posts[0]->user_id);
+        $this->assertSame($abigail->id, $posts[1]->user_id);
+        $this->assertSame(['Announcement', 'Announcement'], $posts->pluck('title')->all());
+        $this->assertCount(2, FactoryTestPost::all());
+    }
+
+    public function test_for_each_passes_the_index_of_the_item_to_the_callback()
+    {
+        $posts = FactoryTestPostFactory::new()
+            ->forEach(
+                ['First', 'Second', 'Third'],
+                fn ($factory, $title, $index) => $factory->state(['title' => $index.'. '.$title]),
+            )
+            ->create();
+
+        $this->assertSame(['0. First', '1. Second', '2. Third'], $posts->pluck('title')->all());
+    }
+
+    public function test_for_each_may_vary_a_morph_to_relationship_per_item()
+    {
+        $posts = FactoryTestPostFactory::new()->count(2)->create();
+
+        $comments = FactoryTestCommentFactory::new()
+            ->forEach(
+                $posts,
+                fn ($factory, $post) => $factory->for($post, 'commentable'),
+            )
+            ->create();
+
+        $this->assertCount(2, $comments);
+        $this->assertSame($posts[0]->id, $comments[0]->commentable_id);
+        $this->assertSame($posts[1]->id, $comments[1]->commentable_id);
+        $this->assertSame(FactoryTestPost::class, $comments[0]->commentable_type);
+    }
+
+    public function test_for_each_keeps_its_items_when_the_factory_is_configured_further()
+    {
+        $posts = FactoryTestPostFactory::new()
+            ->forEach(
+                ['First', 'Second'],
+                fn ($factory, $title) => $factory->state(['title' => $title]),
+            )
+            ->for(FactoryTestUserFactory::new()->state(['name' => 'Taylor Otwell']), 'user')
+            ->create();
+
+        $this->assertCount(2, $posts);
+        $this->assertSame(['First', 'Second'], $posts->pluck('title')->all());
+        $this->assertSame('Taylor Otwell', $posts[0]->user->name);
+        $this->assertSame($posts[0]->user_id, $posts[1]->user_id);
+    }
+
+    public function test_for_each_cycles_through_its_items_when_a_larger_count_is_set()
+    {
+        $posts = FactoryTestPostFactory::new()
+            ->forEach(
+                ['First', 'Second'],
+                fn ($factory, $title) => $factory->state(['title' => $title]),
+            )
+            ->count(3)
+            ->create();
+
+        $this->assertCount(3, $posts);
+        $this->assertSame(['First', 'Second', 'First'], $posts->pluck('title')->all());
+    }
+
+    public function test_for_each_builds_a_single_model_when_the_count_is_cleared()
+    {
+        $post = FactoryTestPostFactory::new()
+            ->forEach(
+                ['First', 'Second'],
+                fn ($factory, $title) => $factory->state(['title' => $title]),
+            )
+            ->createOne();
+
+        $this->assertInstanceOf(FactoryTestPost::class, $post);
+        $this->assertSame('First', $post->title);
+    }
+
+    public function test_for_each_can_make_models_without_persisting_them()
+    {
+        $posts = FactoryTestPostFactory::new()
+            ->forEach(
+                ['First', 'Second'],
+                fn ($factory, $title) => $factory->state(['title' => $title]),
+            )
+            ->make();
+
+        $this->assertCount(2, $posts);
+        $this->assertSame(['First', 'Second'], $posts->pluck('title')->all());
+        $this->assertCount(0, FactoryTestPost::all());
+    }
+
+    public function test_for_each_can_create_many_models()
+    {
+        $posts = FactoryTestPostFactory::new()
+            ->forEach(
+                ['First', 'Second'],
+                fn ($factory, $title) => $factory->state(['title' => $title]),
+            )
+            ->createMany();
+
+        $this->assertCount(2, $posts);
+        $this->assertInstanceOf(FactoryTestPost::class, $posts[0]);
+        $this->assertSame(['First', 'Second'], $posts->pluck('title')->all());
+
+        $posts = FactoryTestPostFactory::new()
+            ->forEach(
+                ['First', 'Second'],
+                fn ($factory, $title) => $factory->state(['title' => $title]),
+            )
+            ->createMany(3);
+
+        $this->assertCount(3, $posts);
+        $this->assertSame(['First', 'Second', 'First'], $posts->pluck('title')->all());
+    }
+
+    public function test_for_each_can_make_many_models()
+    {
+        $posts = FactoryTestPostFactory::new()
+            ->forEach(
+                ['First', 'Second'],
+                fn ($factory, $title) => $factory->state(['title' => $title]),
+            )
+            ->makeMany();
+
+        $this->assertCount(2, $posts);
+        $this->assertInstanceOf(FactoryTestPost::class, $posts[0]);
+        $this->assertSame(['First', 'Second'], $posts->pluck('title')->all());
+        $this->assertCount(0, FactoryTestPost::all());
+    }
+
+    public function test_for_each_gives_precedence_to_the_attributes_it_is_built_with()
+    {
+        $factory = FactoryTestPostFactory::new()->forEach(
+            ['First', 'Second'],
+            fn ($factory, $title) => $factory->state(['title' => $title]),
+        );
+
+        $posts = $factory->create(['title' => 'Announcement']);
+
+        $this->assertSame(['Announcement', 'Announcement'], $posts->pluck('title')->all());
+
+        $posts = $factory->createMany([
+            ['title' => 'Announcement'],
+            ['title' => 'Retraction'],
+        ]);
+
+        $this->assertCount(2, $posts);
+        $this->assertSame(['Announcement', 'Retraction'], $posts->pluck('title')->all());
+    }
+
     public function test_sequence_with_has_many_relationship()
     {
         $users = FactoryTestUserFactory::times(2)

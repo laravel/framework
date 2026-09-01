@@ -104,6 +104,13 @@ abstract class Factory
     protected $excludeRelationships = [];
 
     /**
+     * The sequence of items and the callback that configures the factory for each of them.
+     *
+     * @var array{sequence: \Illuminate\Database\Eloquent\Factories\Sequence, callback: \Closure(static, mixed, non-negative-int): static}|null
+     */
+    protected $forEach;
+
+    /**
      * The name of the database connection that will be used to create the models.
      *
      * @var \UnitEnum|string|null
@@ -172,6 +179,7 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $recycle
      * @param  bool|null  $expandRelationships
      * @param  array  $excludeRelationships
+     * @param  array{sequence: \Illuminate\Database\Eloquent\Factories\Sequence, callback: \Closure(static, mixed, non-negative-int): static}|null  $forEach
      */
     public function __construct(
         $count = null,
@@ -184,6 +192,7 @@ abstract class Factory
         ?Collection $recycle = null,
         ?bool $expandRelationships = null,
         array $excludeRelationships = [],
+        ?array $forEach = null,
     ) {
         $this->count = $count;
         $this->states = $states ?? new Collection;
@@ -196,6 +205,7 @@ abstract class Factory
         $this->faker = $this->withFaker();
         $this->expandRelationships = $expandRelationships ?? self::$expandRelationshipsByDefault;
         $this->excludeRelationships = $excludeRelationships;
+        $this->forEach = $forEach;
     }
 
     /**
@@ -295,7 +305,7 @@ abstract class Factory
 
         return new EloquentCollection(
             (new Collection($records))->map(function ($record) {
-                return $this->state($record)->create();
+                return $this->create($record);
             })
         );
     }
@@ -320,6 +330,10 @@ abstract class Factory
      */
     public function create($attributes = [], ?Model $parent = null)
     {
+        if ($this->forEach) {
+            return $this->buildForEach(fn ($factory) => $factory->create($attributes, $parent));
+        }
+
         if (! empty($attributes)) {
             return $this->state($attributes)->create([], $parent);
         }
@@ -423,6 +437,10 @@ abstract class Factory
      */
     public function make($attributes = [], ?Model $parent = null)
     {
+        if ($this->forEach) {
+            return $this->buildForEach(fn ($factory) => $factory->make($attributes, $parent));
+        }
+
         $autoEagerLoadingEnabled = Model::isAutomaticallyEagerLoadingRelationships();
 
         if ($autoEagerLoadingEnabled) {
@@ -474,7 +492,7 @@ abstract class Factory
 
         return new EloquentCollection(
             (new Collection($records))->map(function ($record) {
-                return $this->state($record)->make();
+                return $this->make($record);
             })
         );
     }
@@ -676,6 +694,50 @@ abstract class Factory
     public function forEachSequence(...$sequence)
     {
         return $this->state(new Sequence(...$sequence))->count(count($sequence));
+    }
+
+    /**
+     * Build a model for each of the given items using the factory returned by the callback.
+     *
+     * @param  iterable<mixed>  $items
+     * @param  \Closure(static, mixed, non-negative-int): static  $callback
+     * @return static
+     */
+    public function forEach(iterable $items, Closure $callback)
+    {
+        $items = (new Collection($items))->values()->all();
+
+        return $this->newInstance(['forEach' => [
+            'sequence' => new Sequence(...$items),
+            'callback' => $callback,
+        ]])->count(count($items));
+    }
+
+    /**
+     * Build a model for each of the "for each" items using the given callback.
+     *
+     * @param  \Closure(static): TModel  $build
+     * @return \Illuminate\Database\Eloquent\Collection<int, TModel>|TModel
+     */
+    protected function buildForEach(Closure $build)
+    {
+        ['sequence' => $sequence, 'callback' => $callback] = $this->forEach;
+
+        $factory = $this->newInstance(['forEach' => null, 'count' => null]);
+
+        $buildNext = fn ($index) => $build($callback($factory, $sequence(), $index));
+
+        if ($this->count === null) {
+            return $buildNext(0);
+        }
+
+        if ($this->count < 1) {
+            return $this->newModel()->newCollection();
+        }
+
+        return $this->newModel()->newCollection(
+            array_map($buildNext, range(0, $this->count - 1))
+        );
     }
 
     /**
@@ -933,6 +995,7 @@ abstract class Factory
             'recycle' => $this->recycle,
             'expandRelationships' => $this->expandRelationships,
             'excludeRelationships' => $this->excludeRelationships,
+            'forEach' => $this->forEach,
         ], $arguments)));
     }
 
