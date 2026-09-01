@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
+use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Mockery;
@@ -62,6 +64,52 @@ class DatabaseSchemaBuilderTest extends TestCase
 
         $this->assertTrue($builder->hasColumns('users', ['id', 'firstname']));
         $this->assertFalse($builder->hasColumns('users', ['id', 'address']));
+    }
+
+    public function testWhenTableHasForeignKey()
+    {
+        $connection = Mockery::mock(Connection::class);
+        $connection->expects('getSchemaGrammar')->andReturn(Mockery::mock(Grammar::class));
+        $builder = Mockery::mock(Builder::class.'[hasForeignKey,table]', [$connection]);
+        $builder->expects('hasForeignKey')->with('posts', 'posts_user_id_foreign')->andReturnTrue();
+        $builder->expects('hasForeignKey')->with('posts', ['missing_id'])->andReturnFalse();
+        $builder->expects('table')->with('posts', Mockery::type(Closure::class))
+            ->andReturnUsing(fn ($table, $callback) => $callback(Mockery::mock(Blueprint::class)));
+
+        $ran = [];
+
+        $builder->whenTableHasForeignKey('posts', 'posts_user_id_foreign', function (Blueprint $table) use (&$ran) {
+            $ran[] = 'existing';
+        });
+
+        $builder->whenTableHasForeignKey('posts', ['missing_id'], function (Blueprint $table) use (&$ran) {
+            $ran[] = 'missing';
+        });
+
+        $this->assertSame(['existing'], $ran);
+    }
+
+    public function testWhenTableDoesntHaveForeignKey()
+    {
+        $connection = Mockery::mock(Connection::class);
+        $connection->expects('getSchemaGrammar')->andReturn(Mockery::mock(Grammar::class));
+        $builder = Mockery::mock(Builder::class.'[hasForeignKey,table]', [$connection]);
+        $builder->expects('hasForeignKey')->with('posts', ['missing_id'])->andReturnFalse();
+        $builder->expects('hasForeignKey')->with('posts', 'posts_user_id_foreign')->andReturnTrue();
+        $builder->expects('table')->with('posts', Mockery::type(Closure::class))
+            ->andReturnUsing(fn ($table, $callback) => $callback(Mockery::mock(Blueprint::class)));
+
+        $ran = [];
+
+        $builder->whenTableDoesntHaveForeignKey('posts', ['missing_id'], function (Blueprint $table) use (&$ran) {
+            $ran[] = 'missing';
+        });
+
+        $builder->whenTableDoesntHaveForeignKey('posts', 'posts_user_id_foreign', function (Blueprint $table) use (&$ran) {
+            $ran[] = 'existing';
+        });
+
+        $this->assertSame(['missing'], $ran);
     }
 
     public function testGetColumnTypeAddsPrefix()
