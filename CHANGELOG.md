@@ -1,6 +1,29 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.29.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.30.0...13.x)
+
+## [v13.30.0](https://github.com/laravel/framework/compare/v13.29.0...v13.30.0) - 2026-09-01
+
+* [12.x] Backport #60908: Avoid quadratic wildcard rule expansion by [@matteo-palazzo](https://github.com/matteo-palazzo) in https://github.com/laravel/framework/pull/61232
+* Fix resource loading by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/61323
+* [13.x] Output the worker stop reason in queue:work by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61339
+* Fix incorrect $startTime type in Worker::stopIfNecessary docblock by [@il-m-tomita](https://github.com/il-m-tomita) in https://github.com/laravel/framework/pull/61347
+* [13.x] Ability to opt out of vendor/default commands in DevCommands by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61344
+* [13.x] Confine `Storage::path()` to the configured disk root by [@KIKOmanasijev](https://github.com/KIKOmanasijev) in https://github.com/laravel/framework/pull/61343
+* [13.x] Support Microsoft SQL Server DSN connection strings by [@HenkPoley](https://github.com/HenkPoley) in https://github.com/laravel/framework/pull/61341
+* [13.x] Restore the facade application after route:cache boots a fresh application by [@reiarseni](https://github.com/reiarseni) in https://github.com/laravel/framework/pull/61346
+* [13.x] Gracefully handle missing param value or strings with request clamps by [@kylemilloy](https://github.com/kylemilloy) in https://github.com/laravel/framework/pull/61355
+* [13.x] Restore default database connection when seeding fails by [@sayful1411](https://github.com/sayful1411) in https://github.com/laravel/framework/pull/61354
+* [13.x] Cloud enhancements by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/61360
+* [13.x] Allow retrieving command by name without resolving all commands by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/61361
+* [13.x] Expose methods by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/61362
+* [13.x] Add basic test for query explain by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/61363
+* [13.x] Add totalXSize methods to Cloud Queue by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61352
+* [13.x] Add `chunkBy` to collections by [@JosephSilber](https://github.com/JosephSilber) in https://github.com/laravel/framework/pull/61357
+* [13.x] spl_object_id over hash by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61372
+* [13.x] Add createPayloadUsing directly to the queue manager by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61367
+* [13.x] Set visibility on files that only exist on a read-through disk's fallback by [@sulimanbenhalim](https://github.com/sulimanbenhalim) in https://github.com/laravel/framework/pull/61375
+* [12.x] Disable html by default on Laravel exception page tooltip by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61381
 
 ## [v13.29.0](https://github.com/laravel/framework/compare/v13.27.0...v13.29.0) - 2026-08-25
 
