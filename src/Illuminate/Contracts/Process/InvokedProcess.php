@@ -27,15 +27,6 @@ interface InvokedProcess
     public function signal(int $signal);
 
     /**
-     * Stop the process if it is still running.
-     *
-     * @param  float  $timeout
-     * @param  int|null  $signal
-     * @return int|null
-     */
-    public function stop(float $timeout = 10, ?int $signal = null);
-
-    /**
      * Determine if the process is still running.
      *
      * @return bool
@@ -71,15 +62,6 @@ interface InvokedProcess
     public function latestErrorOutput();
 
     /**
-     * Ensure that the process has not timed out.
-     *
-     * @return void
-     *
-     * @throws \Illuminate\Process\Exceptions\ProcessTimedOutException
-     */
-    public function ensureNotTimedOut();
-
-    /**
      * Wait for the process to finish.
      *
      * @param  callable|null  $output
@@ -94,4 +76,13 @@ interface InvokedProcess
      * @return \Illuminate\Process\ProcessResult
      */
     public function waitUntil(?callable $output = null);
+
+    /**
+     * Stop the process if it is still running.
+     *
+     * @param  float  $timeout
+     * @param  int|null  $signal
+     * @return int|null
+     */
+    public function stop(float $timeout = 10, ?int $signal = null);
 }
