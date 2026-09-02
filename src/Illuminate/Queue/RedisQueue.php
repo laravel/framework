@@ -354,11 +354,6 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         };
 
         if ($connection instanceof PhpRedisClusterConnection) {
-            // A cluster MULTI must target a single node, but transaction()/multi() is node-less
-            // while the pushes inside route to the queue's own {hash tag} slot, so the
-            // transaction silently fails and drops every job. Since every job in the bulk
-            // targets the same queue - and therefore the same slot - the payloads are pushed
-            // in single slot Lua scripts instead, which the cluster routes correctly...
             $this->bulkOnClusterConnection($jobs, $data, $queue);
         } elseif ($connection instanceof PredisClusterConnection) {
             $connection->pipeline($bulk);
@@ -372,9 +367,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * Every job in the bulk targets the same queue - and therefore the same key
      * slot - so the payloads are collected and pushed with a single slot Lua
-     * script, keeping the events of pushing each job. Delayed jobs use a separate
-     * key and after-commit jobs must wait for their transaction to commit, so
-     * both are pushed through the usual per-job path.
+     * script. Delayed jobs and "after commit" jobs are pushed like normal.
      *
      * @param  array  $jobs
      * @param  mixed  $data
