@@ -940,6 +940,72 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(2, $chunks);
     }
 
+    public function testLazyWithLimits()
+    {
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
+
+        DB::enableQueryLog();
+
+        $users = EloquentTestUser::query()->orderBy('id', 'asc')->limit(2)->lazy(2);
+
+        $this->assertSame(['First', 'Second'], $users->pluck('name')->all());
+        $this->assertCount(1, DB::getQueryLog());
+    }
+
+    public function testLazyWithLimitsAndOffsets()
+    {
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+            ['name' => 'Fourth', 'email' => 'fourth@example.com'],
+            ['name' => 'Fifth', 'email' => 'fifth@example.com'],
+            ['name' => 'Sixth', 'email' => 'sixth@example.com'],
+            ['name' => 'Seventh', 'email' => 'seventh@example.com'],
+        ]);
+
+        $users = EloquentTestUser::query()->orderBy('id', 'asc')->offset(2)->limit(3)->lazy(2);
+
+        $this->assertSame(['Third', 'Fourth', 'Fifth'], $users->pluck('name')->all());
+    }
+
+    public function testLazyByIdWithLimits()
+    {
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
+
+        DB::enableQueryLog();
+
+        $users = EloquentTestUser::query()->limit(2)->lazyById(2);
+
+        $this->assertSame(['First', 'Second'], $users->pluck('name')->all());
+        $this->assertCount(1, DB::getQueryLog());
+    }
+
+    public function testLazyByIdWithLimitsAndOffsets()
+    {
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+            ['name' => 'Fourth', 'email' => 'fourth@example.com'],
+            ['name' => 'Fifth', 'email' => 'fifth@example.com'],
+            ['name' => 'Sixth', 'email' => 'sixth@example.com'],
+            ['name' => 'Seventh', 'email' => 'seventh@example.com'],
+        ]);
+
+        $users = EloquentTestUser::query()->offset(2)->limit(3)->lazyById(2);
+
+        $this->assertSame(['Third', 'Fourth', 'Fifth'], $users->pluck('name')->all());
+    }
+
     public function testChunkByIdWithNonIncrementingKey()
     {
         EloquentTestNonIncrementingSecond::insert([
