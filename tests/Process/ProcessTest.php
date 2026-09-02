@@ -1387,6 +1387,68 @@ class ProcessTest extends TestCase
         $factory->assertRanInOrder([['php', 'artisan', 'migrate']]);
     }
 
+    public function testFakeAssertionsSupportWildcardCommands()
+    {
+        $factory = new Factory;
+        $factory->fake();
+
+        $factory->run('git commit -m "Add tests"');
+
+        $factory->assertRan('git commit *');
+        $factory->assertRanTimes('git *', 1);
+        $factory->assertNotRan('git push *');
+        $factory->assertDidntRun('composer *');
+    }
+
+    public function testFakeAssertionsSupportWildcardsForArrayCommands()
+    {
+        $factory = new Factory;
+        $factory->fake();
+
+        $factory->run(['php', 'artisan', 'migrate', '--force']);
+
+        $factory->assertRan('php artisan migrate*');
+        $factory->assertRanTimes('php artisan *', 1);
+        $factory->assertNotRan('php artisan migrate:rollback*');
+    }
+
+    public function testAssertingProcessesRanInOrderSupportsWildcards()
+    {
+        $factory = new Factory;
+        $factory->fake();
+
+        $factory->run('git fetch origin main');
+        $factory->run('composer install --no-dev');
+
+        $factory->assertRanInOrder([
+            'git fetch *',
+            'composer install *',
+        ]);
+    }
+
+    public function testFakeAssertionsWithWildcardsFailWhenNoProcessMatches()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $factory = new Factory;
+        $factory->fake();
+
+        $factory->run('git commit -m "Add tests"');
+
+        $factory->assertRan('composer *');
+    }
+
+    public function testFakeAssertionsStillMatchCommandsContainingWildcardCharacters()
+    {
+        $factory = new Factory;
+        $factory->fake();
+
+        $factory->run('rm *.log');
+
+        $factory->assertRan('rm *.log');
+        $factory->assertRanTimes('rm *.log', 1);
+    }
+
     public function testAssertingThatNothingRan()
     {
         $factory = new Factory;
