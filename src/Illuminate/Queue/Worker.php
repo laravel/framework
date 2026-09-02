@@ -972,11 +972,11 @@ class Worker
         $job = $handler->getRunningCommand();
 
         if ($job instanceof Interruptible) {
+            $job->interrupted($signal);
+
             $this->events->dispatch(new JobInterrupted(
                 $this->currentJob->getConnectionName(), $this->currentJob, $signal
             ));
-
-            $job->interrupted($signal);
         }
     }
 
