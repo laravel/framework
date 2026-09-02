@@ -202,6 +202,38 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->fake->assertSentOnDemandTimes(NotificationStub::class, 3);
     }
 
+    public function testAssertSentToOnce()
+    {
+        $this->fake->send($this->user, new NotificationStub);
+
+        $this->fake->assertSentToOnce($this->user, NotificationStub::class);
+
+        $this->fake->send($this->user, new NotificationStub);
+
+        try {
+            $this->fake->assertSentToOnce($this->user, NotificationStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('Expected ['.NotificationStub::class.'] to be sent 1 times, but was sent 2 times.', $e->getMessage());
+        }
+    }
+
+    public function testAssertSentOnDemandOnce()
+    {
+        $this->fake->send(new AnonymousNotifiable, new NotificationStub);
+
+        $this->fake->assertSentOnDemandOnce(NotificationStub::class);
+
+        $this->fake->send(new AnonymousNotifiable, new NotificationStub);
+
+        try {
+            $this->fake->assertSentOnDemandOnce(NotificationStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('Expected ['.NotificationStub::class.'] to be sent 1 times, but was sent 2 times.', $e->getMessage());
+        }
+    }
+
     public function testAssertSentToWhenNotifiableHasPreferredLocale()
     {
         $user = new LocalizedUserStub;
