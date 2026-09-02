@@ -27,6 +27,14 @@ class EloquentMorphManyTest extends DatabaseTestCase
             $table->string('commentable_type');
             $table->timestamps();
         });
+
+        Schema::create('string_comments', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('commentable_id');
+            $table->string('commentable_type');
+            $table->timestamps();
+        });
     }
 
     public function testUpdateModelWithDefaultWithCount()
@@ -69,6 +77,26 @@ class EloquentMorphManyTest extends DatabaseTestCase
         $this->assertEquals($latestComment->id, $post->latestComment->id);
         $this->assertEquals($oldestComment->id, $post->oldestComment->id);
     }
+
+    public function testPolymorphicWithExplicitStringForeignKey()
+    {
+        $post = Post::create(['title' => 'Post 1']);
+
+        $comment = $post->stringComments()->create(['name' => 'String FK Comment']);
+
+        $this->assertSame((string) $post->id, (string) $comment->commentable_id);
+
+        $comments = $post->stringComments()->get();
+        $this->assertCount(1, $comments);
+        $this->assertSame($comment->id, $comments->first()->id);
+
+        $loadedPost = Post::with('stringComments')->find($post->id);
+        $this->assertCount(1, $loadedPost->stringComments);
+        $this->assertSame($comment->id, $loadedPost->stringComments->first()->id);
+
+        $query = $post->stringComments()->getQuery();
+        $this->assertContains((string) $post->id, $query->getBindings());
+    }
 }
 
 class Post extends Model
@@ -81,6 +109,11 @@ class Post extends Model
     public function comments()
     {
         return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function stringComments()
+    {
+        return $this->morphMany(StringComment::class, 'commentable');
     }
 
     public function latestComment(): MorphOne
@@ -108,5 +141,21 @@ class Comment extends Model
     public function replies()
     {
         return $this->morphMany(self::class, 'commentable');
+    }
+}
+
+class StringComment extends Model
+{
+    public $table = 'string_comments';
+    public $timestamps = true;
+    protected $guarded = [];
+
+    protected $casts = [
+        'commentable_id' => 'string',
+    ];
+
+    public function commentable()
+    {
+        return $this->morphTo();
     }
 }

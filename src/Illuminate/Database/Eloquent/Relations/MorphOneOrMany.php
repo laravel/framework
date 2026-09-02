@@ -30,6 +30,13 @@ abstract class MorphOneOrMany extends HasOneOrMany
     protected $morphClass;
 
     /**
+     * The explicit polymorphic key type (e.g. 'string').
+     *
+     * @var string|null
+     */
+    protected $morphKeyType;
+
+    /**
      * Create a new morph one or many relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
@@ -62,11 +69,79 @@ abstract class MorphOneOrMany extends HasOneOrMany
     }
 
     /** @inheritDoc */
+    #[\Override]
+    public function getParentKey()
+    {
+        $key = parent::getParentKey();
+
+        return $this->morphForeignKeyIsString() && ! is_null($key)
+            ? (string) $key
+            : $key;
+    }
+
+    /** @inheritDoc */
+    #[\Override]
     public function addEagerConstraints(array $models)
     {
+        if ($this->morphForeignKeyIsString()) {
+            $this->whereInEager(
+                'whereIn',
+                $this->foreignKey,
+                array_map('strval', $this->getKeys($models, $this->localKey)),
+                $this->getRelationQuery()
+            );
+
+            $this->getRelationQuery()->where($this->morphType, $this->morphClass);
+
+            return;
+        }
+
         parent::addEagerConstraints($models);
 
         $this->getRelationQuery()->where($this->morphType, $this->morphClass);
+    }
+
+    /** @inheritDoc */
+    #[\Override]
+    protected function whereInMethod(Model $model, $key)
+    {
+        if ($this->morphForeignKeyIsString()) {
+            return 'whereIn';
+        }
+
+        return parent::whereInMethod($model, $key);
+    }
+
+    /**
+     * Specify the polymorphic key type for the relationship.
+     *
+     * @param  string  $type
+     * @return $this
+     */
+    public function morphKeyType(string $type)
+    {
+        $this->morphKeyType = $type;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the polymorphic foreign key column should be treated as a string.
+     *
+     * @return bool
+     */
+    protected function morphForeignKeyIsString()
+    {
+        if ($this->morphKeyType === 'string') {
+            return true;
+        }
+
+        try {
+            return method_exists($this->related, 'hasCast')
+                && $this->related->hasCast($this->getForeignKeyName(), ['string']);
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     /**

@@ -546,9 +546,69 @@ class DatabaseEloquentMorphTest extends TestCase
 
         return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
     }
+
+    public function testMorphManySetsProperConstraintsWithStringMorphKeyFromCasts()
+    {
+        $relation = $this->getStringKeyManyRelation();
+        $this->assertSame('1', $relation->getParentKey());
+    }
+
+    public function testMorphManySetsProperConstraintsWithExplicitStringMorphKeyType()
+    {
+        $relation = $this->getManyRelation();
+        $this->assertSame(1, $relation->getParentKey());
+
+        $relation->morphKeyType('string');
+        $this->assertSame('1', $relation->getParentKey());
+    }
+
+    public function testMorphManyEagerConstraintsAreProperlyAddedWithStringMorphKey()
+    {
+        $relation = $this->getStringKeyManyRelation();
+        $relation->getQuery()->expects('whereIn')->with('table.morph_id', ['1', '2']);
+        $relation->getQuery()->expects('where')->with('table.morph_type', get_class($relation->getParent()));
+
+        $model1 = new EloquentMorphResetModelStub;
+        $model1->id = 1;
+        $model2 = new EloquentMorphResetModelStub;
+        $model2->id = 2;
+        $relation->addEagerConstraints([$model1, $model2]);
+    }
+
+    public function testMorphManyOnePreservesMorphKeyType()
+    {
+        $relation = $this->getManyRelation();
+        $relation->morphKeyType('string');
+
+        $one = $relation->one();
+        $this->assertInstanceOf(MorphOne::class, $one);
+        $this->assertSame('1', $one->getParentKey());
+    }
+
+    protected function getStringKeyManyRelation()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->expects('whereNotNull')->with('table.morph_id');
+        $builder->expects('where')->with('table.morph_id', '=', '1');
+        $related = new EloquentMorphStringKeyModelStub;
+        $builder->shouldReceive('getModel')->andReturn($related);
+        $parent = Mockery::mock(Model::class);
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
+        $builder->expects('where')->with('table.morph_type', get_class($parent));
+
+        return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
+    }
 }
 
 class EloquentMorphResetModelStub extends Model
 {
     //
+}
+
+class EloquentMorphStringKeyModelStub extends Model
+{
+    protected $casts = [
+        'morph_id' => 'string',
+    ];
 }

@@ -28,6 +28,10 @@ class MorphMany extends MorphOneOrMany
                 $this->localKey
             ),
             function ($morphOne) {
+                if ($this->morphKeyType) {
+                    $morphOne->morphKeyType($this->morphKeyType);
+                }
+
                 if ($inverse = $this->getInverseRelationship()) {
                     $morphOne->inverse($inverse);
                 }
