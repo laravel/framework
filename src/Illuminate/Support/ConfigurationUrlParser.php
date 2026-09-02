@@ -2,10 +2,13 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Support\Traits\ParsesSqlServerConfigurationUrls;
 use InvalidArgumentException;
 
 class ConfigurationUrlParser
 {
+    use ParsesSqlServerConfigurationUrls;
+
     /**
      * The drivers aliases map.
      *
@@ -37,6 +40,10 @@ class ConfigurationUrlParser
 
         if (! $url) {
             return $config;
+        }
+
+        if ($this->isSqlServerDsn($url)) {
+            return $this->parseSqlServerDsnConfiguration($config, $url);
         }
 
         $rawComponents = $this->parseUrl($url);

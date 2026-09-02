@@ -18,6 +18,7 @@
         "illuminate/broadcasting": "^14.0",
         "illuminate/bus": "^14.0",
         "illuminate/collections": "^14.0",
+        "illuminate/conditionable": "^14.0",
         "illuminate/container": "^14.0",
         "illuminate/contracts": "^14.0",
         "illuminate/filesystem": "^14.0",

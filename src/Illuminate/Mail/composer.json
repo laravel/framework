@@ -16,6 +16,7 @@
     "require": {
         "php": "^8.4",
         "illuminate/collections": "^14.0",
+        "illuminate/conditionable": "^14.0",
         "illuminate/container": "^14.0",
         "illuminate/contracts": "^14.0",
         "illuminate/macroable": "^14.0",

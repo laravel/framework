@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Queue\Events\QueueBusy;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:monitor')]
@@ -88,7 +89,7 @@ class MonitorCommand extends Command
      */
     protected function parseQueues($queues)
     {
-        return (new Collection(explode(',', $queues)))->map(function ($queue) {
+        return (new Stringable($queues))->explode(',')->map(function ($queue) {
             [$connection, $queue] = array_pad(explode(':', $queue, 2), 2, null);
 
             if (! isset($queue)) {

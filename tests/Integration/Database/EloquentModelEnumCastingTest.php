@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Integration\Database\Fixtures\ArrayableStatus;
+use Illuminate\Tests\Integration\Database\Fixtures\IntegerStatus;
+use Illuminate\Tests\Integration\Database\Fixtures\StringStatus;
 use ValueError;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class EloquentModelEnumCastingTest extends DatabaseTestCase
 {

@@ -832,6 +832,9 @@ assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int
     return true;
 }));
 
+assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>', $collection->chunkBy(fn ($user) => $user->getKey()));
+assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>', $collection->chunkBy('name'));
+
 assertType('Illuminate\Support\Collection<int, User>', $collection->sort(function ($userA, $userB) {
     assertType('User', $userA);
     assertType('User', $userB);

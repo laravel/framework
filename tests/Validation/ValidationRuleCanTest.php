@@ -22,8 +22,6 @@ class ValidationRuleCanTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->user = new stdClass;
 
         Container::setInstance($this->container = new Container);
@@ -52,8 +50,6 @@ class ValidationRuleCanTest extends TestCase
         Facade::clearResolvedInstances();
 
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 
     public function testValidationFails()

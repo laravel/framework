@@ -9,13 +9,17 @@ use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
+use Illuminate\Tests\Routing\Fixtures\CategoryEnum;
+use Illuminate\Tests\Routing\Fixtures\RouteDomainEnum;
+use Illuminate\Tests\Routing\Fixtures\RouteNameEnum;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class RoutingUrlGeneratorTest extends TestCase
 {
@@ -617,8 +621,7 @@ class RoutingUrlGeneratorTest extends TestCase
     #[DataProvider('provideParametersAndExpectedMeaningfulExceptionMessages')]
     public function testUrlGenerationThrowsExceptionForMissingParametersWithMeaningfulMessage($parameters, $expectedMeaningfulExceptionMessage)
     {
-        $this->expectException(UrlGenerationException::class);
-        $this->expectExceptionMessage($expectedMeaningfulExceptionMessage);
+        $this->expectExceptionObject(new UrlGenerationException($expectedMeaningfulExceptionMessage));
 
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -763,8 +766,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
     public function testRouteNotDefinedException()
     {
-        $this->expectException(RouteNotFoundException::class);
-        $this->expectExceptionMessage('Route [not_exists_route] not defined.');
+        $this->expectExceptionObject(new RouteNotFoundException('Route [not_exists_route] not defined.'));
 
         $url = new UrlGenerator(
             new RouteCollection,
@@ -802,6 +804,36 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url->hasValidSignature($request, ignoreQuery: ['tampered']));
 
         $this->assertTrue($url->hasValidSignature($request, ignoreQuery: fn ($parameter) => $parameter === 'tampered'));
+    }
+
+    public function testSignedUrlDoesNotTrustForwardedPrefixToChangeThePathBeingVerified()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(fn () => 'secret');
+
+        $routes->add(new Route(['GET'], 'document/{document}', ['as' => 'document.show', function () {
+            //
+        }]));
+
+        $signedUrl = $url->signedRoute('document.show', ['document' => 1]);
+
+        $request = Request::create(
+            'http://www.foo.com/admin/42?'.parse_url($signedUrl, PHP_URL_QUERY),
+            'GET', [], [], [], [
+                'REMOTE_ADDR' => '127.0.0.1',
+                'HTTP_X_FORWARDED_PREFIX' => '/document/1?',
+            ]
+        );
+        $request::setTrustedProxies(['127.0.0.1'], Request::HEADER_X_FORWARDED_PREFIX);
+
+        try {
+            $this->assertFalse($url->hasValidSignature($request));
+        } finally {
+            $request::setTrustedProxies([], Request::HEADER_X_FORWARDED_PREFIX);
+        }
     }
 
     public function testSignedUrlImplicitModelBinding()
@@ -867,8 +899,7 @@ class RoutingUrlGeneratorTest extends TestCase
         }]);
         $routes->add($route);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('reserved');
+        $this->expectExceptionObject(new InvalidArgumentException('reserved'));
 
         Request::create($url->signedRoute('foo', ['signature' => 'bar']));
     }
@@ -888,8 +919,7 @@ class RoutingUrlGeneratorTest extends TestCase
         }]);
         $routes->add($route);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('reserved');
+        $this->expectExceptionObject(new InvalidArgumentException('reserved'));
 
         Request::create($url->signedRoute('foo', ['expires' => 253402300799]));
     }
@@ -920,6 +950,35 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame(
             'http://www.foo.com/foo?filter%5B0%5D=people&filter%5B1%5D=fruits',
             $url->route('foo', ['filter' => [CategoryBackedEnum::People, CategoryBackedEnum::Fruits]]),
+        );
+    }
+
+    public function testRouteGenerationWithUnitEnums(): void
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $namedRoute = new Route(['GET'], '/foo/{bar}', ['as' => 'foo.bar']);
+        $routes->add($namedRoute);
+
+        $this->assertSame('http://www.foo.com/foo/Fruits', $url->route('foo.bar', CategoryEnum::Fruits));
+    }
+
+    public function testRouteGenerationWithNestedUnitEnums(): void
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $namedRoute = new Route(['GET'], '/foo', ['as' => 'foo']);
+        $routes->add($namedRoute);
+
+        $this->assertSame(
+            'http://www.foo.com/foo?filter%5B0%5D=People&filter%5B1%5D=Fruits',
+            $url->route('foo', ['filter' => [CategoryEnum::People, CategoryEnum::Fruits]]),
         );
     }
 

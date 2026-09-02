@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Redis\Factory as Redis;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Redis\Connections\Connection;
@@ -12,6 +13,8 @@ use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+
+use function Illuminate\Support\enum_value;
 
 class RedisQueue extends Queue implements QueueContract, ClearableQueue
 {
@@ -107,7 +110,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the size of the queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function size($queue = null)
@@ -122,7 +125,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the number of pending jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function pendingSize($queue = null)
@@ -133,7 +136,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the number of delayed jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function delayedSize($queue = null)
@@ -144,7 +147,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the number of reserved jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function reservedSize($queue = null)
@@ -153,14 +156,44 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get the number of pending jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalPendingSize()
+    {
+        return $this->allQueueNames()->sum(fn ($name) => $this->pendingSize($name));
+    }
+
+    /**
+     * Get the number of delayed jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalDelayedSize()
+    {
+        return $this->allQueueNames()->sum(fn ($name) => $this->delayedSize($name));
+    }
+
+    /**
+     * Get the number of reserved jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalReservedSize()
+    {
+        return $this->allQueueNames()->sum(fn ($name) => $this->reservedSize($name));
+    }
+
+    /**
      * Get the pending jobs for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
      */
     public function pendingJobs($queue = null): Collection
     {
-        $name = $queue ?: $this->default;
+        $name = enum_value($queue) ?: $this->default;
 
         return (new Collection($this->getConnection()->lrange($this->getQueueRedisKey($queue), 0, -1)))
             ->map(fn ($payload) => InspectedJob::fromPayload($payload, queue: $name));
@@ -169,12 +202,12 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the delayed jobs for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
      */
     public function delayedJobs($queue = null): Collection
     {
-        $name = $queue ?: $this->default;
+        $name = enum_value($queue) ?: $this->default;
 
         return (new Collection($this->getConnection()->zrange($this->getQueueRedisKey($queue).':delayed', 0, -1)))
             ->map(fn ($payload) => InspectedJob::fromPayload($payload, queue: $name));
@@ -183,12 +216,12 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the reserved jobs for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
      */
     public function reservedJobs($queue = null): Collection
     {
-        $name = $queue ?: $this->default;
+        $name = enum_value($queue) ?: $this->default;
 
         return (new Collection($this->getConnection()->zrange($this->getQueueRedisKey($queue).':reserved', 0, -1)))
             ->map(fn ($payload) => InspectedJob::fromPayload($payload, queue: $name));
@@ -241,7 +274,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int|null
      */
     public function creationTimeOfOldestPendingJob($queue = null)
@@ -262,7 +295,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  array  $jobs
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return void
      */
     public function bulk($jobs, $data = '', $queue = null)
@@ -271,8 +304,10 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
 
         $bulk = function () use ($jobs, $data, $queue) {
             foreach ((array) $jobs as $job) {
-                if (isset($job->delay)) {
-                    $this->later($job->delay, $job, $data, $queue);
+                $delay = is_object($job) ? $this->getAttributeValue($job, Delay::class, 'delay') : null;
+
+                if (isset($delay)) {
+                    $this->later($delay, $job, $data, $queue);
                 } else {
                     $this->push($job, $data, $queue);
                 }
@@ -293,7 +328,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  object|string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
@@ -313,7 +348,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * Push a raw payload onto the queue.
      *
      * @param  string  $payload
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @param  array  $options
      * @return mixed
      */
@@ -335,7 +370,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  object|string  $job
      * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
@@ -388,7 +423,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @param  int  $index
      * @return \Illuminate\Contracts\Queue\Job|null
      */
@@ -396,11 +431,11 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $this->migrate($prefixed = $this->getQueueRedisKey($queue));
 
-        $block = ! $this->secondaryQueueHadJob && $index == 0;
+        $block = ! $this->secondaryQueueHadJob && $index === 0;
 
         [$job, $reserved] = $this->retrieveNextJob($prefixed, $block);
 
-        if ($index == 0) {
+        if ($index === 0) {
             $this->secondaryQueueHadJob = false;
         }
 
@@ -411,7 +446,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
 
             return new RedisJob(
                 $this->container, $this, $job,
-                $reserved, $this->connectionName, $queue ?: $this->default
+                $reserved, $this->connectionName, enum_value($queue) ?: $this->default
             );
         }
     }
@@ -506,7 +541,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Delete all of the jobs from the queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return int
      */
     public function clear($queue = null)
@@ -532,27 +567,27 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Get the queue or return the default.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return string
      */
     public function getQueue($queue)
     {
-        return 'queues:'.($queue ?: $this->default);
+        return 'queues:'.$this->resolveQueue(enum_value($queue) ?: $this->default);
     }
 
     /**
      * Get the cluster-safe Redis key for the given queue.
      *
-     * @param  string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return string
      */
     protected function getQueueRedisKey($queue = null)
     {
-        $queue = $queue ?: $this->default;
+        $queue = $this->resolveQueue(enum_value($queue) ?: $this->default);
 
         return $this->isClusterConnection() && ! Connection::hasHashTag($queue)
-            ? $this->getQueue('{'.$queue.'}')
-            : $this->getQueue($queue);
+            ? 'queues:{'.$queue.'}'
+            : 'queues:'.$queue;
     }
 
     /**

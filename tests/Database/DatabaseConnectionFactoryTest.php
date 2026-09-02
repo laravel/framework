@@ -5,8 +5,9 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Database\SqlServerConnection;
 use InvalidArgumentException;
-use Mockery as m;
+use Mockery;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -81,6 +82,23 @@ class DatabaseConnectionFactoryTest extends TestCase
             'strict' => true,
             'engine' => null,
         ], $this->db->getConnection('url-config')->getConfig());
+    }
+
+    public function testSqlServerDsnFromEnvironmentOverridesPhpUnitConfiguredDriver()
+    {
+        $this->db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'url' => 'sqlsrv:Server=127.0.0.1,1433;Database=example_database;TrustServerCertificate=true;Encrypt=true;MultiSubnetFailover=1',
+        ], 'sqlite-with-sql-server-connection-string');
+
+        $connection = $this->db->getConnection('sqlite-with-sql-server-connection-string');
+
+        $this->assertInstanceOf(SqlServerConnection::class, $connection);
+        $this->assertSame('sqlsrv', $connection->getConfig('driver'));
+        $this->assertSame('example_database', $connection->getConfig('database'));
+        $this->assertSame('127.0.0.1', $connection->getConfig('host'));
+        $this->assertSame(1433, $connection->getConfig('port'));
     }
 
     public function testSingleConnectionNotCreatedUntilNeeded()
@@ -341,28 +359,29 @@ class DatabaseConnectionFactoryTest extends TestCase
 
     public function testIfDriverIsntSetExceptionIsThrown()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A driver must be specified.');
+        $this->expectExceptionObject(new InvalidArgumentException('A driver must be specified.'));
 
-        $factory = new ConnectionFactory($container = m::mock(Container::class));
+        $container = Mockery::mock(Container::class);
+        $factory = new ConnectionFactory($container);
         $factory->createConnector(['foo']);
     }
 
     public function testExceptionIsThrownOnUnsupportedDriver()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unsupported driver [foo]');
+        $this->expectExceptionObject(new InvalidArgumentException('Unsupported driver [foo]'));
 
-        $factory = new ConnectionFactory($container = m::mock(Container::class));
-        $container->shouldReceive('bound')->once()->andReturn(false);
+        $container = Mockery::mock(Container::class);
+        $container->expects('bound')->andReturn(false);
+        $factory = new ConnectionFactory($container);
         $factory->createConnector(['driver' => 'foo']);
     }
 
     public function testCustomConnectorsCanBeResolvedViaContainer()
     {
-        $factory = new ConnectionFactory($container = m::mock(Container::class));
-        $container->shouldReceive('bound')->once()->with('db.connector.foo')->andReturn(true);
-        $container->shouldReceive('make')->once()->with('db.connector.foo')->andReturn('connector');
+        $container = Mockery::mock(Container::class);
+        $container->expects('bound')->with('db.connector.foo')->andReturn(true);
+        $container->expects('make')->with('db.connector.foo')->andReturn('connector');
+        $factory = new ConnectionFactory($container);
 
         $this->assertSame('connector', $factory->createConnector(['driver' => 'foo']));
     }
@@ -404,7 +423,7 @@ class DatabaseConnectionFactoryTest extends TestCase
     protected function callConnectionFactoryMethod($method, ...$arguments)
     {
         return (new ReflectionMethod(ConnectionFactory::class, $method))->invoke(
-            new ConnectionFactory(m::mock(Container::class)),
+            new ConnectionFactory(Mockery::mock(Container::class)),
             ...$arguments
         );
     }

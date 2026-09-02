@@ -606,16 +606,14 @@ class FoundationViteTest extends TestCase
 
     public function testItThrowsWhenUnableToFindAssetManifestInBuildMode()
     {
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Vite manifest not found at: '.public_path('build/manifest.json'));
+        $this->expectExceptionObject(new ViteException('Vite manifest not found at: '.public_path('build/manifest.json')));
 
         ViteFacade::asset('resources/js/app.js');
     }
 
     public function testItThrowsDeprecatedExecptionWhenUnableToFindAssetManifestInBuildMode()
     {
-        $this->expectException(ViteManifestNotFoundException::class);
-        $this->expectExceptionMessage('Vite manifest not found at: '.public_path('build/manifest.json'));
+        $this->expectExceptionObject(new ViteManifestNotFoundException('Vite manifest not found at: '.public_path('build/manifest.json')));
 
         ViteFacade::asset('resources/js/app.js');
     }
@@ -624,8 +622,7 @@ class FoundationViteTest extends TestCase
     {
         $this->makeViteManifest();
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Unable to locate file in Vite manifest: resources/js/missing.js');
+        $this->expectExceptionObject(new ViteException('Unable to locate file in Vite manifest: resources/js/missing.js'));
 
         ViteFacade::asset('resources/js/missing.js');
     }
@@ -757,7 +754,7 @@ class FoundationViteTest extends TestCase
 
     public function testItGeneratesPreloadDirectivesForJsAndCssImports()
     {
-        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/jetstream-manifest.json'));
+        $manifest = json_decode(file_get_contents(__DIR__.'/Fixtures/jetstream-manifest.json'));
         $buildDir = Str::random();
         $this->makeViteManifest($manifest, $buildDir);
 
@@ -1299,8 +1296,7 @@ class FoundationViteTest extends TestCase
     {
         $this->makeViteManifest();
 
-        $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Unable to locate file from Vite manifest: '.public_path('build/assets/app.versioned.js'));
+        $this->expectExceptionObject(new ViteException('Unable to locate file from Vite manifest: '.public_path('build/assets/app.versioned.js')));
 
         ViteFacade::content('resources/js/app.js');
     }
@@ -1357,7 +1353,7 @@ class FoundationViteTest extends TestCase
 
     public function testItCanPrefetchEntrypoint()
     {
-        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $manifest = json_decode(file_get_contents(__DIR__.'/Fixtures/prefetching-manifest.json'));
         $buildDir = Str::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
@@ -1433,7 +1429,7 @@ class FoundationViteTest extends TestCase
 
     public function testItHandlesSpecifyingPageWithAppJs()
     {
-        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $manifest = json_decode(file_get_contents(__DIR__.'/Fixtures/prefetching-manifest.json'));
         $buildDir = Str::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
@@ -1463,7 +1459,7 @@ class FoundationViteTest extends TestCase
 
     public function testItCanSpecifyWaterfallChunks()
     {
-        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $manifest = json_decode(file_get_contents(__DIR__.'/Fixtures/prefetching-manifest.json'));
         $buildDir = Str::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
@@ -1499,7 +1495,7 @@ class FoundationViteTest extends TestCase
 
     public function testItCanPrefetchAggressively()
     {
-        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $manifest = json_decode(file_get_contents(__DIR__.'/Fixtures/prefetching-manifest.json'));
         $buildDir = Str::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
@@ -1553,7 +1549,7 @@ class FoundationViteTest extends TestCase
 
     public function testAddsAttributesToPrefetchTags()
     {
-        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $manifest = json_decode(file_get_contents(__DIR__.'/Fixtures/prefetching-manifest.json'));
         $buildDir = Str::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
@@ -1589,7 +1585,7 @@ class FoundationViteTest extends TestCase
 
     public function testItNormalisesAttributes()
     {
-        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $manifest = json_decode(file_get_contents(__DIR__.'/Fixtures/prefetching-manifest.json'));
         $buildDir = Str::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
@@ -1632,7 +1628,7 @@ class FoundationViteTest extends TestCase
 
     public function testItPrefetchesCss()
     {
-        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $manifest = json_decode(file_get_contents(__DIR__.'/Fixtures/prefetching-manifest.json'));
         $buildDir = Str::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
@@ -1711,7 +1707,7 @@ class FoundationViteTest extends TestCase
 
     public function testSupportCspNonceInPrefetchScript()
     {
-        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $manifest = json_decode(file_get_contents(__DIR__.'/Fixtures/prefetching-manifest.json'));
         $buildDir = Str::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);
@@ -1735,7 +1731,7 @@ class FoundationViteTest extends TestCase
 
     public function testItCanConfigureThePrefetchTriggerEvent()
     {
-        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $manifest = json_decode(file_get_contents(__DIR__.'/Fixtures/prefetching-manifest.json'));
         $buildDir = Str::random();
         $this->makeViteManifest($manifest, $buildDir);
         app()->usePublicPath(__DIR__);

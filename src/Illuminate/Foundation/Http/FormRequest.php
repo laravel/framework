@@ -15,7 +15,6 @@ use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use ReflectionClass;
 
@@ -233,13 +232,39 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
         $input = $this->isJson() ? $this->json()->all() : $this->request->all();
 
-        foreach (array_keys(Arr::dot($input)) as $inputKey) {
+        foreach ($this->dotInputKeys($input) as $inputKey) {
             if (! $this->isKnownField($inputKey, $allowedKeys)) {
+                $inputKey = str_replace('\.', '.', $inputKey);
+
                 $validator->errors()->add($inputKey, trans('validation.prohibited', [
                     'attribute' => str_replace('_', ' ', $inputKey),
                 ]));
             }
         }
+    }
+
+    /**
+     * Flatten the given input's keys into dot notation, escaping literal dots within keys.
+     *
+     * @param  array  $input
+     * @param  string  $prefix
+     * @return array
+     */
+    protected function dotInputKeys(array $input, string $prefix = ''): array
+    {
+        $keys = [];
+
+        foreach ($input as $key => $value) {
+            $key = $prefix.str_replace('.', '\.', (string) $key);
+
+            if (is_array($value) && $value !== []) {
+                $keys = array_merge($keys, $this->dotInputKeys($value, $key.'.'));
+            } else {
+                $keys[] = $key;
+            }
+        }
+
+        return $keys;
     }
 
     /**
@@ -262,7 +287,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
             }
 
             if (str_contains($ruleKey, '*')) {
-                $pattern = '/^'.str_replace('\*', '[^.]+', preg_quote($ruleKey, '/')).'$/';
+                $pattern = '/^'.str_replace('\*', '(?:[^.\\\\]|\\\\.)+', preg_quote($ruleKey, '/')).'$/';
 
                 if (preg_match($pattern, $inputKey)) {
                     return true;

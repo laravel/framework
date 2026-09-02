@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use InvalidArgumentException;
+use UnitEnum;
 
 use function Illuminate\Support\enum_value;
 
@@ -139,6 +140,19 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Forward the given queue to another queue and/or connection.
+     *
+     * @param  array<string, \UnitEnum|string>|\UnitEnum|string  $queue
+     * @param  \UnitEnum|string|null  $to
+     * @param  \UnitEnum|string|null  $connection
+     * @return void
+     */
+    public function forward(array|string|UnitEnum $queue, $to = null, $connection = null)
+    {
+        $this->queueRoutes()->forward($queue, $to, $connection);
+    }
+
+    /**
      * Determine if the driver is connected.
      *
      * @param  \UnitEnum|string|null  $name
@@ -257,7 +271,23 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Resume a paused queue by its name and connection.
+     * Pause job processing for all queues on all connections.
+     *
+     * @return void
+     */
+    public function pauseAll()
+    {
+        $this->app['cache']
+            ->store()
+            ->forever('illuminate:queues:paused', true);
+
+        $this->app['events']->dispatch(
+            new Events\QueuesPaused
+        );
+    }
+
+    /**
+     * Resume a paused queue by its connection and name.
      *
      * @param  string  $queue
      * @param  string|null  $connection
@@ -277,6 +307,24 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Resume job processing for all queues on all connections.
+     *
+     * Queues paused individually are not affected.
+     *
+     * @return void
+     */
+    public function resumeAll()
+    {
+        $this->app['cache']
+            ->store()
+            ->forget('illuminate:queues:paused');
+
+        $this->app['events']->dispatch(
+            new Events\QueuesResumed
+        );
+    }
+
+    /**
      * Determine if a queue is paused.
      *
      * @param  string  $queue
@@ -287,9 +335,10 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $connection ??= $this->getDefaultDriver();
 
-        return (bool) $this->app['cache']
-            ->store()
-            ->get("illuminate:queue:paused:{$connection}:{$queue}", false);
+        $cache = $this->app['cache']->store();
+
+        return (bool) ($cache->get('illuminate:queues:paused')
+            ?: $cache->get("illuminate:queue:paused:{$connection}:{$queue}"));
     }
 
     /**
@@ -303,9 +352,15 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $connection ??= $this->getDefaultDriver();
 
-        $keys = array_map(fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues);
+        $cache = $this->app['cache']->store();
 
-        $states = $this->app['cache']->store()->many($keys);
+        if ($cache->get('illuminate:queues:paused')) {
+            return array_values($queues);
+        }
+
+        $states = $cache->many(
+            array_map(fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues)
+        );
 
         return array_values(array_filter(
             $queues, fn ($queue) => $states["illuminate:queue:paused:{$connection}:{$queue}"] ?? false
@@ -421,6 +476,17 @@ class QueueManager implements FactoryContract, MonitorContract
         }
 
         return $this;
+    }
+
+    /**
+     * Register a callback to be executed when creating job payloads.
+     *
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function createPayloadUsing($callback)
+    {
+        Queue::createPayloadUsing($callback);
     }
 
     /**

@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace Illuminate\Tests;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Lottery;
+use Illuminate\Support\Once;
+use Illuminate\Support\Sleep;
+use Illuminate\Support\Str;
 use PHPUnit\Event\Test\Finished;
 use PHPUnit\Event\Test\FinishedSubscriber;
 
@@ -16,7 +22,14 @@ final class AfterEachTestSubscriber implements FinishedSubscriber
             \Mockery::close();
         }
 
+        Date::useDefault();
         Carbon::setTestNow();
+        CarbonImmutable::setTestNow();
         date_default_timezone_set('UTC');
+
+        Str::resetFactoryState();
+        Sleep::fake(false);
+        Once::flush();
+        Lottery::determineResultNormally();
     }
 }

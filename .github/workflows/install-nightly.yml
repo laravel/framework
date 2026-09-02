@@ -9,12 +9,15 @@ permissions:
 
 jobs:
   install:
+    if: github.repository == 'laravel/framework'
+
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, windows-2022]
 
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
 
     steps:
       - name: Setup PHP

@@ -597,16 +597,27 @@ class Handler implements ExceptionHandlerContract
         $exceptions = Arr::wrap($exceptions);
 
         $this->dontReport = (new Collection($this->dontReport))
-            ->reject(fn ($ignored) => in_array($ignored, $exceptions))
+            ->diff($exceptions)
             ->values()
             ->all();
 
         $this->internalDontReport = (new Collection($this->internalDontReport))
-            ->reject(fn ($ignored) => in_array($ignored, $exceptions))
+            ->diff($exceptions)
             ->values()
             ->all();
 
         return $this;
+    }
+
+    /**
+     * Create the context array for logging the given exception.
+     *
+     * @param  \Throwable  $e
+     * @return array
+     */
+    public function contextForException(Throwable $e)
+    {
+        return $this->buildExceptionContext($e);
     }
 
     /**

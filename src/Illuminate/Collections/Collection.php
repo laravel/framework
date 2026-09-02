@@ -126,7 +126,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function mode($key = null)
     {
-        if ($this->count() === 0) {
+        if ($this->isEmpty()) {
             return;
         }
 
@@ -588,6 +588,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                 $resolvedKey = (string) $resolvedKey;
             }
 
+            if (is_null($resolvedKey)) {
+                $resolvedKey = (string) $resolvedKey;
+            }
+
             $results[$resolvedKey] = $item;
         }
 
@@ -995,7 +999,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Select specific values from the items within the collection.
      *
-     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string|null  $keys
+     * @param  \Illuminate\Support\Enumerable<int, string>|list<string>|string|null  $keys
      * @return static
      */
     public function select($keys)

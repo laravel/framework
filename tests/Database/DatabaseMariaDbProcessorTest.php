@@ -1,6 +1,6 @@
 <?php
 
-namespace Database;
+namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Query\Processors\MariaDbProcessor;
 use PHPUnit\Framework\TestCase;

@@ -3,9 +3,12 @@
 namespace Illuminate\Process;
 
 use ArrayAccess;
+use ArrayIterator;
 use Illuminate\Support\Collection;
+use IteratorAggregate;
+use Traversable;
 
-class ProcessPoolResults implements ArrayAccess
+class ProcessPoolResults implements ArrayAccess, IteratorAggregate
 {
     /**
      * The results of the processes.
@@ -97,5 +100,15 @@ class ProcessPoolResults implements ArrayAccess
     public function offsetUnset($offset): void
     {
         unset($this->results[$offset]);
+    }
+
+    /**
+     * Get an iterator for the results.
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->results);
     }
 }

@@ -10,7 +10,7 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Str;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMigratorIntegrationTest extends TestCase
@@ -58,7 +58,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
             new Filesystem
         );
 
-        $output = m::mock(OutputStyle::class);
+        $output = Mockery::mock(OutputStyle::class);
         $output->shouldReceive('write');
         $output->shouldReceive('writeln');
         $output->shouldReceive('newLinesWritten');
@@ -81,13 +81,11 @@ class DatabaseMigratorIntegrationTest extends TestCase
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
-
-        parent::tearDown();
     }
 
     public function testBasicMigrationOfSingleFolder()
     {
-        $ran = $this->migrator->run([__DIR__.'/migrations/one']);
+        $ran = $this->migrator->run([__DIR__.'/Fixtures/migrations/one']);
 
         $this->assertTrue($this->db::schema()->hasTable('users'));
         $this->assertTrue($this->db::schema()->hasTable('password_resets'));
@@ -99,7 +97,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
     public function testMigrationsDefaultConnectionCanBeChanged()
     {
         $ran = $this->migrator->usingConnection('sqlite2', function () {
-            return $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqllite3']);
+            return $this->migrator->run([__DIR__.'/Fixtures/migrations/one'], ['database' => 'sqllite3']);
         });
 
         $this->assertFalse($this->db::schema()->hasTable('users'));
@@ -115,7 +113,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
     public function testMigrationsCanEachDefineConnection()
     {
-        $ran = $this->migrator->run([__DIR__.'/migrations/connection_configured']);
+        $ran = $this->migrator->run([__DIR__.'/Fixtures/migrations/connection_configured']);
 
         $this->assertFalse($this->db::schema()->hasTable('failed_jobs'));
         $this->assertFalse($this->db::schema()->hasTable('jobs'));
@@ -131,7 +129,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
     public function testMigratorCannotChangeDefinedMigrationConnection()
     {
         $ran = $this->migrator->usingConnection('sqlite2', function () {
-            return $this->migrator->run([__DIR__.'/migrations/connection_configured']);
+            return $this->migrator->run([__DIR__.'/Fixtures/migrations/connection_configured']);
         });
 
         $this->assertFalse($this->db::schema()->hasTable('failed_jobs'));
@@ -147,10 +145,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
     public function testMigrationsCanBeRolledBack()
     {
-        $this->migrator->run([__DIR__.'/migrations/one']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one']);
         $this->assertTrue($this->db::schema()->hasTable('users'));
         $this->assertTrue($this->db::schema()->hasTable('password_resets'));
-        $rolledBack = $this->migrator->rollback([__DIR__.'/migrations/one']);
+        $rolledBack = $this->migrator->rollback([__DIR__.'/Fixtures/migrations/one']);
         $this->assertFalse($this->db::schema()->hasTable('users'));
         $this->assertFalse($this->db::schema()->hasTable('password_resets'));
 
@@ -160,10 +158,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
     public function testMigrationsCanBeResetUsingAnString()
     {
-        $this->migrator->run([__DIR__.'/migrations/one']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one']);
         $this->assertTrue($this->db::schema()->hasTable('users'));
         $this->assertTrue($this->db::schema()->hasTable('password_resets'));
-        $rolledBack = $this->migrator->reset(__DIR__.'/migrations/one');
+        $rolledBack = $this->migrator->reset(__DIR__.'/Fixtures/migrations/one');
         $this->assertFalse($this->db::schema()->hasTable('users'));
         $this->assertFalse($this->db::schema()->hasTable('password_resets'));
 
@@ -173,10 +171,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
     public function testMigrationsCanBeResetUsingAnArray()
     {
-        $this->migrator->run([__DIR__.'/migrations/one']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one']);
         $this->assertTrue($this->db::schema()->hasTable('users'));
         $this->assertTrue($this->db::schema()->hasTable('password_resets'));
-        $rolledBack = $this->migrator->reset([__DIR__.'/migrations/one']);
+        $rolledBack = $this->migrator->reset([__DIR__.'/Fixtures/migrations/one']);
         $this->assertFalse($this->db::schema()->hasTable('users'));
         $this->assertFalse($this->db::schema()->hasTable('password_resets'));
 
@@ -186,26 +184,26 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
     public function testNoErrorIsThrownWhenNoOutstandingMigrationsExist()
     {
-        $this->migrator->run([__DIR__.'/migrations/one']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one']);
         $this->assertTrue($this->db::schema()->hasTable('users'));
         $this->assertTrue($this->db::schema()->hasTable('password_resets'));
-        $this->migrator->run([__DIR__.'/migrations/one']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one']);
     }
 
     public function testNoErrorIsThrownWhenNothingToRollback()
     {
-        $this->migrator->run([__DIR__.'/migrations/one']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one']);
         $this->assertTrue($this->db::schema()->hasTable('users'));
         $this->assertTrue($this->db::schema()->hasTable('password_resets'));
-        $this->migrator->rollback([__DIR__.'/migrations/one']);
+        $this->migrator->rollback([__DIR__.'/Fixtures/migrations/one']);
         $this->assertFalse($this->db::schema()->hasTable('users'));
         $this->assertFalse($this->db::schema()->hasTable('password_resets'));
-        $this->migrator->rollback([__DIR__.'/migrations/one']);
+        $this->migrator->rollback([__DIR__.'/Fixtures/migrations/one']);
     }
 
     public function testMigrationsCanRunAcrossMultiplePaths()
     {
-        $this->migrator->run([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one', __DIR__.'/Fixtures/migrations/two']);
         $this->assertTrue($this->db::schema()->hasTable('users'));
         $this->assertTrue($this->db::schema()->hasTable('password_resets'));
         $this->assertTrue($this->db::schema()->hasTable('flights'));
@@ -213,11 +211,11 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
     public function testMigrationsCanBeRolledBackAcrossMultiplePaths()
     {
-        $this->migrator->run([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one', __DIR__.'/Fixtures/migrations/two']);
         $this->assertTrue($this->db::schema()->hasTable('users'));
         $this->assertTrue($this->db::schema()->hasTable('password_resets'));
         $this->assertTrue($this->db::schema()->hasTable('flights'));
-        $this->migrator->rollback([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
+        $this->migrator->rollback([__DIR__.'/Fixtures/migrations/one', __DIR__.'/Fixtures/migrations/two']);
         $this->assertFalse($this->db::schema()->hasTable('users'));
         $this->assertFalse($this->db::schema()->hasTable('password_resets'));
         $this->assertFalse($this->db::schema()->hasTable('flights'));
@@ -225,11 +223,11 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
     public function testMigrationsCanBeResetAcrossMultiplePaths()
     {
-        $this->migrator->run([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one', __DIR__.'/Fixtures/migrations/two']);
         $this->assertTrue($this->db::schema()->hasTable('users'));
         $this->assertTrue($this->db::schema()->hasTable('password_resets'));
         $this->assertTrue($this->db::schema()->hasTable('flights'));
-        $this->migrator->reset([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
+        $this->migrator->reset([__DIR__.'/Fixtures/migrations/one', __DIR__.'/Fixtures/migrations/two']);
         $this->assertFalse($this->db::schema()->hasTable('users'));
         $this->assertFalse($this->db::schema()->hasTable('password_resets'));
         $this->assertFalse($this->db::schema()->hasTable('flights'));
@@ -237,21 +235,21 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
     public function testMigrationsCanBeProperlySortedAcrossMultiplePaths()
     {
-        $paths = [__DIR__.'/migrations/multi_path/vendor', __DIR__.'/migrations/multi_path/app'];
+        $paths = [__DIR__.'/Fixtures/migrations/multi_path/vendor', __DIR__.'/Fixtures/migrations/multi_path/app'];
 
         $migrationsFilesFullPaths = array_values($this->migrator->getMigrationFiles($paths));
 
         $expected = [
-            __DIR__.'/migrations/multi_path/app/2016_01_01_000000_create_users_table.php', // This file was not created on the "vendor" directory on purpose
-            __DIR__.'/migrations/multi_path/vendor/2016_01_01_200000_create_flights_table.php', // This file was not created on the "app" directory on purpose
-            __DIR__.'/migrations/multi_path/app/2019_08_08_000001_rename_table_one.php',
-            __DIR__.'/migrations/multi_path/app/2019_08_08_000002_rename_table_two.php',
-            __DIR__.'/migrations/multi_path/app/2019_08_08_000003_rename_table_three.php',
-            __DIR__.'/migrations/multi_path/app/2019_08_08_000004_rename_table_four.php',
-            __DIR__.'/migrations/multi_path/app/2019_08_08_000005_create_table_one.php',
-            __DIR__.'/migrations/multi_path/app/2019_08_08_000006_create_table_two.php',
-            __DIR__.'/migrations/multi_path/vendor/2019_08_08_000007_create_table_three.php', // This file was not created on the "app" directory on purpose
-            __DIR__.'/migrations/multi_path/app/2019_08_08_000008_create_table_four.php',
+            __DIR__.'/Fixtures/migrations/multi_path/app/2016_01_01_000000_create_users_table.php', // This file was not created on the "vendor" directory on purpose
+            __DIR__.'/Fixtures/migrations/multi_path/vendor/2016_01_01_200000_create_flights_table.php', // This file was not created on the "app" directory on purpose
+            __DIR__.'/Fixtures/migrations/multi_path/app/2019_08_08_000001_rename_table_one.php',
+            __DIR__.'/Fixtures/migrations/multi_path/app/2019_08_08_000002_rename_table_two.php',
+            __DIR__.'/Fixtures/migrations/multi_path/app/2019_08_08_000003_rename_table_three.php',
+            __DIR__.'/Fixtures/migrations/multi_path/app/2019_08_08_000004_rename_table_four.php',
+            __DIR__.'/Fixtures/migrations/multi_path/app/2019_08_08_000005_create_table_one.php',
+            __DIR__.'/Fixtures/migrations/multi_path/app/2019_08_08_000006_create_table_two.php',
+            __DIR__.'/Fixtures/migrations/multi_path/vendor/2019_08_08_000007_create_table_three.php', // This file was not created on the "app" directory on purpose
+            __DIR__.'/Fixtures/migrations/multi_path/app/2019_08_08_000008_create_table_four.php',
         ];
 
         $this->assertEquals($expected, $migrationsFilesFullPaths);
@@ -260,41 +258,41 @@ class DatabaseMigratorIntegrationTest extends TestCase
     public function testConnectionPriorToMigrationIsNotChangedAfterMigration()
     {
         $this->migrator->setConnection('default');
-        $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one'], ['database' => 'sqlite2']);
         $this->assertSame('default', $this->migrator->getConnection());
     }
 
     public function testConnectionPriorToMigrationIsNotChangedAfterRollback()
     {
         $this->migrator->setConnection('default');
-        $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
-        $this->migrator->rollback([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->rollback([__DIR__.'/Fixtures/migrations/one'], ['database' => 'sqlite2']);
         $this->assertSame('default', $this->migrator->getConnection());
     }
 
     public function testConnectionPriorToMigrationIsNotChangedWhenNoOutstandingMigrationsExist()
     {
         $this->migrator->setConnection('default');
-        $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one'], ['database' => 'sqlite2']);
         $this->migrator->setConnection('default');
-        $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one'], ['database' => 'sqlite2']);
         $this->assertSame('default', $this->migrator->getConnection());
     }
 
     public function testConnectionPriorToMigrationIsNotChangedWhenNothingToRollback()
     {
         $this->migrator->setConnection('default');
-        $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
-        $this->migrator->rollback([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
-        $this->migrator->rollback([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->rollback([__DIR__.'/Fixtures/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->rollback([__DIR__.'/Fixtures/migrations/one'], ['database' => 'sqlite2']);
         $this->assertSame('default', $this->migrator->getConnection());
     }
 
     public function testConnectionPriorToMigrationIsNotChangedAfterMigrateReset()
     {
         $this->migrator->setConnection('default');
-        $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
-        $this->migrator->reset([__DIR__.'/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->run([__DIR__.'/Fixtures/migrations/one'], ['database' => 'sqlite2']);
+        $this->migrator->reset([__DIR__.'/Fixtures/migrations/one'], ['database' => 'sqlite2']);
         $this->assertSame('default', $this->migrator->getConnection());
     }
 }

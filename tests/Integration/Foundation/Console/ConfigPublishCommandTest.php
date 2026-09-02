@@ -18,7 +18,6 @@ class ConfigPublishCommandTest extends TestCase
         'config-stubs/*.php',
     ];
 
-    #[\Override]
     protected function setUp(): void
     {
         $files = new Filesystem();

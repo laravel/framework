@@ -103,8 +103,6 @@ class DatabaseEloquentBelongsToManyAggregateTest extends TestCase
     {
         $this->schema()->drop('orders');
         $this->schema()->drop('products');
-
-        parent::tearDown();
     }
 
     /**

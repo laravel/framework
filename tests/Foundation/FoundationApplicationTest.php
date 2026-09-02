@@ -3,12 +3,14 @@
 namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Config\Repository;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Support\ServiceProvider;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -20,13 +22,13 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application;
 
-        $app['config'] = $config = m::mock(stdClass::class);
-        $config->shouldReceive('get')->once()->with('app.locale')->andReturn('bar');
-        $config->shouldReceive('set')->once()->with('app.locale', 'foo');
-        $app['translator'] = $trans = m::mock(stdClass::class);
-        $trans->shouldReceive('setLocale')->once()->with('foo');
-        $app['events'] = $events = m::mock(stdClass::class);
-        $events->shouldReceive('dispatch')->once()->with(m::on(function (LocaleUpdated $event) {
+        $app['config'] = $config = Mockery::mock(Repository::class);
+        $config->expects('get')->with('app.locale')->andReturn('bar');
+        $config->expects('set')->with('app.locale', 'foo');
+        $app['translator'] = $trans = Mockery::mock(Translator::class);
+        $trans->expects('setLocale')->with('foo');
+        $app['events'] = $events = Mockery::mock(Dispatcher::class);
+        $events->expects('dispatch')->with(Mockery::on(function (LocaleUpdated $event) {
             return $event->locale === 'foo' && $event->previousLocale === 'bar';
         }));
 
@@ -35,9 +37,9 @@ class FoundationApplicationTest extends TestCase
 
     public function testServiceProvidersAreCorrectlyRegistered()
     {
-        $provider = m::mock(ApplicationBasicServiceProviderStub::class);
+        $provider = Mockery::mock(ApplicationBasicServiceProviderStub::class);
         $class = get_class($provider);
-        $provider->shouldReceive('register')->once();
+        $provider->expects('register');
         $app = new Application;
         $app->register($provider);
 
@@ -88,9 +90,9 @@ class FoundationApplicationTest extends TestCase
 
     public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotFilled()
     {
-        $provider = m::mock(ServiceProvider::class);
+        $provider = Mockery::mock(ServiceProvider::class);
         $class = get_class($provider);
-        $provider->shouldReceive('register')->once();
+        $provider->expects('register');
         $app = new Application;
         $app->register($provider);
 
@@ -99,9 +101,9 @@ class FoundationApplicationTest extends TestCase
 
     public function testServiceProvidersCouldBeLoaded()
     {
-        $provider = m::mock(ServiceProvider::class);
+        $provider = Mockery::mock(ServiceProvider::class);
         $class = get_class($provider);
-        $provider->shouldReceive('register')->once();
+        $provider->expects('register');
         $app = new Application;
         $app->register($provider);
 
@@ -383,8 +385,8 @@ class FoundationApplicationTest extends TestCase
 
     public function testGetNamespace()
     {
-        $app1 = new Application(realpath(__DIR__.'/fixtures/laravel1'));
-        $app2 = new Application(realpath(__DIR__.'/fixtures/laravel2'));
+        $app1 = new Application(realpath(__DIR__.'/Fixtures/laravel1'));
+        $app2 = new Application(realpath(__DIR__.'/Fixtures/laravel2'));
 
         $this->assertSame('Laravel\\One\\', $app1->getNamespace());
         $this->assertSame('Laravel\\Two\\', $app2->getNamespace());
@@ -520,7 +522,7 @@ class FoundationApplicationTest extends TestCase
     public function testUseConfigPath(): void
     {
         $app = new Application;
-        $app->useConfigPath(__DIR__.'/fixtures/config');
+        $app->useConfigPath(__DIR__.'/Fixtures/config');
         $app->bootstrapWith([\Illuminate\Foundation\Bootstrap\LoadConfiguration::class]);
 
         $this->assertSame('bar', $app->make('config')->get('app.foo'));
@@ -529,7 +531,7 @@ class FoundationApplicationTest extends TestCase
     public function testMergingConfig(): void
     {
         $app = new Application;
-        $app->useConfigPath(__DIR__.'/fixtures/config');
+        $app->useConfigPath(__DIR__.'/Fixtures/config');
         $app->bootstrapWith([\Illuminate\Foundation\Bootstrap\LoadConfiguration::class]);
 
         $config = $app->make('config');
@@ -582,8 +584,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testAbortThrowsNotFoundHttpException()
     {
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('Page was not found');
+        $this->expectExceptionObject(new NotFoundHttpException('Page was not found'));
 
         $app = new Application();
         $app->abort(404, 'Page was not found');
@@ -591,8 +592,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testAbortThrowsHttpException()
     {
-        $this->expectException(HttpException::class);
-        $this->expectExceptionMessage('Request is bad');
+        $this->expectExceptionObject(new HttpException(400, 'Request is bad'));
 
         $app = new Application();
         $app->abort(400, 'Request is bad');

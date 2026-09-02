@@ -20,6 +20,7 @@
         "illuminate/container": "^14.0",
         "illuminate/contracts": "^14.0",
         "illuminate/queue": "^14.0",
+        "illuminate/reflection": "^14.0",
         "illuminate/support": "^14.0",
         "psr/log": "^1.0 || ^2.0 || ^3.0"
     },

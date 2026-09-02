@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests\Tests\Foundation;
+namespace Illuminate\Tests\Foundation\Cloud;
 
 use Aws\CommandInterface;
+use Aws\Credentials\Credentials;
 use Aws\Exception\AwsException;
 use Aws\HandlerList;
 use Aws\MockHandler;
@@ -10,7 +11,6 @@ use Aws\Result;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\LostConnectionDetector;
-use Illuminate\Foundation\Cloud;
 use Illuminate\Foundation\Cloud\AgentAwareLostConnectionDetector;
 use Illuminate\Foundation\Cloud\AgentUnreachableException;
 use Illuminate\Foundation\Cloud\CloudJob;
@@ -19,6 +19,7 @@ use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\ManagedQueueNotFoundException;
 use Illuminate\Foundation\Cloud\Queue;
 use Illuminate\Foundation\Cloud\QueueConnector;
+use Illuminate\Foundation\CloudBootstrapper;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
@@ -36,12 +37,14 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use InvalidArgumentException;
 use Mockery\MockInterface;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\TestWith;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use Throwable;
@@ -110,7 +113,8 @@ class QueueTest extends TestCase
         $_SERVER['argv'] = ['artisan', 'queue:work'];
 
         try {
-            Cloud::bootManagedQueues($this->app);
+            CloudBootstrapper::registerEvents($this->app);
+            CloudBootstrapper::bootManagedQueues($this->app);
             $this->assertTrue(Worker::$restartable);
 
             $this->app['queue']->connection('cloud');
@@ -126,7 +130,8 @@ class QueueTest extends TestCase
         $_SERVER['argv'] = ['artisan', 'queue:work'];
 
         try {
-            Cloud::bootManagedQueues($this->app);
+            CloudBootstrapper::registerEvents($this->app);
+            CloudBootstrapper::bootManagedQueues($this->app);
             $this->assertTrue(Worker::$pausable);
 
             $this->app['queue']->connection('cloud');
@@ -140,7 +145,7 @@ class QueueTest extends TestCase
     {
         $this->app['config']->set('queue.connections.cloud', null);
 
-        Cloud::configureManagedQueues($this->app);
+        CloudBootstrapper::configureManagedQueues($this->app);
 
         $expected = json_decode($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG'], true);
         $expected['connection']['after_commit'] = false;
@@ -149,6 +154,11 @@ class QueueTest extends TestCase
             'store' => null,
             'always' => false,
             'delete_after_processing' => true,
+        ];
+        $expected['connection']['credential_cache'] = [
+            'enabled' => false,
+            'store' => null,
+            'fallback_store' => 'file',
         ];
 
         $this->assertSame(
@@ -162,7 +172,7 @@ class QueueTest extends TestCase
         unset($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG']);
         $this->app['config']->set('queue.connections.cloud', null);
 
-        Cloud::configureManagedQueues($this->app);
+        CloudBootstrapper::configureManagedQueues($this->app);
 
         $this->assertNull($this->app['config']->get('queue.connections.cloud'));
     }
@@ -170,21 +180,24 @@ class QueueTest extends TestCase
     public function testItBindsQueueConnectorAndNewsUpSqsConnector()
     {
         $this->app->bind(SqsConnector::class, fn () => throw new RuntimeException('Should not be resolved'));
-        Cloud::bootManagedQueues($this->app);
+        CloudBootstrapper::registerEvents($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->app[QueueConnector::class];
     }
 
     public function testItBindsCloudQueue()
     {
-        Cloud::bootManagedQueues($this->app);
+        CloudBootstrapper::registerEvents($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->assertInstanceOf(Queue::class, $this->app['queue']->connection('cloud'));
     }
 
     public function testItBindsCloudEventsAsSingleton()
     {
-        Cloud::bootManagedQueues($this->app);
+        CloudBootstrapper::registerEvents($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->assertFalse($this->app->resolved(Events::class));
         $this->assertSame($this->app[Events::class], $this->app[Events::class]);
@@ -192,7 +205,8 @@ class QueueTest extends TestCase
 
     public function testItBindsTheQueueFailer()
     {
-        Cloud::bootManagedQueues($this->app);
+        CloudBootstrapper::registerEvents($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
 
         $this->assertInstanceOf(FailedJobProvider::class, $this->app['queue.failer']);
     }
@@ -201,10 +215,10 @@ class QueueTest extends TestCase
     {
         $this->app['config']->set('queue.connections.cloud', null);
 
-        Cloud::bootManagedQueues($this->app);
+        CloudBootstrapper::registerEvents($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The [cloud] queue connection has not been configured.');
+        $this->expectExceptionObject(new InvalidArgumentException('The [cloud] queue connection has not been configured.'));
         $this->app['queue']->connection('cloud');
     }
 
@@ -213,10 +227,70 @@ class QueueTest extends TestCase
         $this->app['config']->set('queue.connections.cloud.driver', 'sqs');
         $originalFailer = $this->app['queue.failer'];
 
-        Cloud::bootManagedQueues($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
 
-        $this->assertFalse($this->app->bound(Events::class));
         $this->assertSame($originalFailer, $this->app['queue.failer']);
+    }
+
+    public function testCredentialCachingIsInertWhenTheDriverIsNotCloud()
+    {
+        $this->app['config']->set('queue.connections.cloud.driver', 'sqs');
+
+        CloudBootstrapper::registerEvents($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
+
+        // The cloud connector - and with it the managed queue credential cache
+        // defaults - is never registered when the driver is not "cloud".
+        $this->assertFalse($this->app->bound(QueueConnector::class));
+    }
+
+    public function testItDefaultsCredentialCachingForAppLevelSqsConnections()
+    {
+        $this->app['config']->set('queue.connections.sqs', ['driver' => 'sqs', 'region' => 'us-east-1', 'queue' => 'default']);
+        $this->app['config']->set('queue.connections.redis', ['driver' => 'redis', 'queue' => 'default']);
+        $this->app['config']->set('queue.connections.other-sqs', ['driver' => 'sqs', 'credential_cache' => ['enabled' => false]]);
+
+        CloudBootstrapper::configureQueueCredentialCaching($this->app);
+
+        // App-level SQS connections receive the credential cache configuration,
+        // but caching remains disabled until it is explicitly enabled.
+        $this->assertSame(
+            ['enabled' => false, 'store' => null, 'fallback_store' => 'file'],
+            $this->app['config']->get('queue.connections.sqs.credential_cache'),
+        );
+
+        // Non-SQS connections and explicit configuration are left untouched.
+        $this->assertArrayNotHasKey('credential_cache', $this->app['config']->get('queue.connections.redis'));
+        $this->assertSame(['enabled' => false], $this->app['config']->get('queue.connections.other-sqs.credential_cache'));
+    }
+
+    public function testManagedQueueCredentialsAreServedFromTheSharedCacheWithoutFetching()
+    {
+        $_SERVER['AWS_CONTAINER_CREDENTIALS_FULL_URI'] = 'http://169.254.170.23/v1/credentials';
+
+        try {
+            CloudBootstrapper::registerEvents($this->app);
+            CloudBootstrapper::configureManagedQueues($this->app);
+            config([
+                'queue.connections.cloud.connection.credential_cache.enabled' => true,
+                'queue.connections.cloud.connection.credential_cache.store' => 'array',
+            ]);
+            CloudBootstrapper::bootManagedQueues($this->app);
+
+            Cache::store('array')->forever(
+                SqsConnector::credentialsCacheKey(config('queue.connections.cloud.connection')),
+                new Credentials('cached-key', 'cached-secret', 'cached-token', time() + 3600),
+            );
+
+            // A cache hit resolves the fleet-shared credentials without the
+            // provider ever contacting the Pod Identity Agent.
+            $credentials = $this->app['queue']->connection('cloud')->getSqs()->getCredentials()->wait();
+
+            $this->assertSame('cached-key', $credentials->getAccessKeyId());
+            $this->assertSame('cached-secret', $credentials->getSecretKey());
+        } finally {
+            unset($_SERVER['AWS_CONTAINER_CREDENTIALS_FULL_URI']);
+        }
     }
 
     public function testItDoesNotEmitEventsWhilePoppingWhenNoJobsAreProcessingAndNoJobsAreAvailableToPop()
@@ -227,6 +301,35 @@ class QueueTest extends TestCase
         $queue->pop();
 
         $this->assertSame([], $eventsFake->emitted);
+    }
+
+    public function testAgentRequestsIgnoreGlobalClientConfiguration()
+    {
+        $options = null;
+        $hasGlobalHeader = null;
+
+        $this->fakeEvents();
+        Http::globalOptions([
+            'force_ip_resolve' => 'v4',
+            'connect_timeout' => 5,
+            'timeout' => 30,
+        ]);
+        Http::globalRequestMiddleware(fn ($request) => $request->withHeader('X-Global', 'Foo'));
+        Http::fake(function ($request, $requestOptions) use (&$options, &$hasGlobalHeader) {
+            if (str_ends_with($request->url(), '/next')) {
+                $options = $requestOptions;
+                $hasGlobalHeader = $request->hasHeader('X-Global');
+            }
+        });
+
+        [$queue] = $this->fakeQueue();
+
+        $queue->pop();
+
+        $this->assertIsArray($options);
+        $this->assertArrayNotHasKey('force_ip_resolve', $options);
+        $this->assertSame(10, $options['connect_timeout']);
+        $this->assertFalse($hasGlobalHeader);
     }
 
     public function testItEmitsStartedEventWhenJobIsSuccessfullyPopped()
@@ -447,7 +550,8 @@ class QueueTest extends TestCase
         $job = $queue->pop();
         $job->fail();
         Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
-        $failedJobProvider->log('cloud', 'default', ['payload' => 'here'], new RuntimeException('Whoops!'));
+        $line = __LINE__ + 1;
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here', 'displayName' => 'App\\Jobs\\ProcessPodcast']), new RuntimeException('Whoops!'));
         Str::createUuidsNormally();
         $queue->pop();
 
@@ -465,9 +569,9 @@ class QueueTest extends TestCase
                 'queue' => 'default',
                 'started_at' => '2000-01-02 03:04:05.060708',
                 'attempts' => 1,
-                'payload' => [
-                    'payload' => 'here',
-                ],
+                'payload' => json_encode(['payload' => 'here', 'displayName' => 'App\\Jobs\\ProcessPodcast']),
+                'exception_preview' => 'RuntimeException: Whoops! in '.__FILE__.':'.$line,
+                'job_name' => 'App\\Jobs\\ProcessPodcast',
             ],
             [
                 '_cloud_event' => 'queue',
@@ -477,6 +581,170 @@ class QueueTest extends TestCase
                 'duration_ms' => 0,
             ],
         ], $eventsFake->emitted);
+    }
+
+    public function testItEmitsFailedJobEventsWithExceptionPreviewWithMessage()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failerFake = $this->fakeFailer();
+        $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+        $this->app[FailedJobProvider::class] = $failedJobProvider;
+
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
+        Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
+        $line = __LINE__ + 1;
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here']), new RuntimeException('Whoops!'));
+        Str::createUuidsNormally();
+        $queue->pop();
+
+        $this->assertSame(
+            'RuntimeException: Whoops! in '.__FILE__.':'.$line,
+            $eventsFake->emitted[1]['exception_preview'],
+        );
+    }
+
+    public function testItEmitsFailedJobEventsWithExceptionPreviewWithoutMessage()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failerFake = $this->fakeFailer();
+        $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+        $this->app[FailedJobProvider::class] = $failedJobProvider;
+
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
+        Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
+        $line = __LINE__ + 1;
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here']), new RuntimeException);
+        Str::createUuidsNormally();
+        $queue->pop();
+
+        $this->assertSame(
+            'RuntimeException in '.__FILE__.':'.$line,
+            $eventsFake->emitted[1]['exception_preview'],
+        );
+    }
+
+    public function testItTruncatesLongExceptionPreviews()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failerFake = $this->fakeFailer();
+        $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+        $this->app[FailedJobProvider::class] = $failedJobProvider;
+
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here']), new RuntimeException(str_repeat('a', 2000)));
+        $queue->pop();
+
+        $this->assertSame(1001, mb_strlen($eventsFake->emitted[1]['exception_preview']));
+        $this->assertSame('RuntimeException: '.str_repeat('a', 1001 - strlen('RuntimeException: ')), $eventsFake->emitted[1]['exception_preview']);
+    }
+
+    public function testItTruncatesExceptionPreviewsByWidthNotByteCountForMultibyteMessages()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failerFake = $this->fakeFailer();
+        $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+        $this->app[FailedJobProvider::class] = $failedJobProvider;
+
+        $message = str_repeat('😎', 4).str_repeat('a', 2000);
+
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here']), new RuntimeException($message));
+        $queue->pop();
+
+        $this->assertSame(1001, mb_strlen($eventsFake->emitted[1]['exception_preview']));
+        $this->assertSame('RuntimeException: '.str_repeat('😎', 4).str_repeat('a', 1001 - 4 - strlen('RuntimeException: ')), $eventsFake->emitted[1]['exception_preview']);
+    }
+
+    public function testItSanitizesInvalidUtf8InTheExceptionField()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failerFake = $this->fakeFailer();
+        $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+        $this->app[FailedJobProvider::class] = $failedJobProvider;
+
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
+        Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here']), new RuntimeException("Bad byte: \xFF"));
+        Str::createUuidsNormally();
+        $queue->pop();
+
+        $this->assertTrue(mb_check_encoding($eventsFake->stream, 'UTF-8'));
+        $this->assertTrue(mb_check_encoding($eventsFake->emitted[1]['exception'], 'UTF-8'));
+        $this->assertStringContainsString('Bad byte: �', $eventsFake->emitted[1]['exception']);
+        $this->assertStringContainsString('Bad byte: ?', $eventsFake->emitted[1]['exception_preview']);
+    }
+
+    public function testItEmitsFailedJobEventsWithJobDisplayName()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failerFake = $this->fakeFailer();
+        $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+        $this->app[FailedJobProvider::class] = $failedJobProvider;
+
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
+        Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
+        $failedJobProvider->log('cloud', 'default', json_encode(['displayName' => 'App\\Jobs\\ProcessPodcast']), new RuntimeException('Whoops!'));
+        Str::createUuidsNormally();
+        $queue->pop();
+
+        $this->assertSame(
+            'App\\Jobs\\ProcessPodcast',
+            $eventsFake->emitted[1]['job_name'],
+        );
+    }
+
+    public function testItEmitsFailedJobEventsWithoutJobDisplayName()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failerFake = $this->fakeFailer();
+        $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+        $this->app[FailedJobProvider::class] = $failedJobProvider;
+
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
+        Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
+        $failedJobProvider->log('cloud', 'default', json_encode(['payload' => 'here']), new RuntimeException('Whoops!'));
+        Str::createUuidsNormally();
+        $queue->pop();
+
+        $this->assertSame(
+            '',
+            $eventsFake->emitted[1]['job_name'],
+        );
     }
 
     public function testItEmitsReleasedJobEvents()
@@ -536,7 +804,7 @@ class QueueTest extends TestCase
         $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
 
-        $client->shouldReceive('receiveMessage')->once()->andReturn(new Result([
+        $client->expects('receiveMessage')->andReturn(new Result([
             'Messages' => [[
                 'MessageId' => 'message-id',
                 'ReceiptHandle' => 'receipt-handle',
@@ -559,7 +827,7 @@ class QueueTest extends TestCase
         $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
 
-        $client->shouldReceive('receiveMessage')->once()->andReturn(new Result(['Messages' => null]));
+        $client->expects('receiveMessage')->andReturn(new Result(['Messages' => null]));
 
         $this->assertNull($queue->pop());
     }
@@ -868,6 +1136,7 @@ class QueueTest extends TestCase
 
     public function testPopThrowsWhenTheAgentSocketIsUnreachable()
     {
+        Sleep::fake();
         $this->fakeEvents();
         [$queue] = $this->fakeQueue();
 
@@ -877,6 +1146,53 @@ class QueueTest extends TestCase
         $this->expectException(AgentUnreachableException::class);
 
         $queue->pop();
+    }
+
+    public function testPopRetriesATimedOutLongPollImmediately()
+    {
+        Sleep::fake();
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+
+        // A worker that scaled to zero mid long-poll wakes with its request
+        // deadline lapsed, so the poll times out even though the agent is
+        // healthy. The poll is retried transparently - and without any backoff,
+        // since the agent typically answers the fresh attempt at once.
+        $agent->nextExceptions = [$this->pollTimeoutException()];
+        $agent->pushJob(['messageId' => 'message-id', 'body' => 'job-body']);
+
+        $job = $queue->pop();
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame('message-id', $job->getJobId());
+        $this->assertSame(2, $agent->nextRequests);
+        Sleep::assertNeverSlept();
+    }
+
+    public function testPopThrowsWhenEveryLongPollAttemptTimesOut()
+    {
+        Sleep::fake();
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+
+        // Timeouts across the original attempt and both retries mean the agent is
+        // live but wedged - the socket accepts, yet nothing answers - so it
+        // escalates to restart the pod. The second retry backs off to give an
+        // agent that is itself still waking a moment to recover.
+        $agent->nextExceptions = [
+            $this->pollTimeoutException(),
+            $this->pollTimeoutException(),
+            $this->pollTimeoutException(),
+        ];
+
+        try {
+            $queue->pop();
+
+            $this->fail('AgentUnreachableException was not thrown.');
+        } catch (AgentUnreachableException) {
+            $this->assertSame(3, $agent->nextRequests);
+            Sleep::assertSequence([Sleep::usleep(500_000)]);
+        }
     }
 
     public function testAgentAwareDetectorTreatsAnUnreachableAgentAsALostConnection()
@@ -912,12 +1228,12 @@ class QueueTest extends TestCase
     public function testItEmitsJobQueuedEvent()
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
-        Cloud::configureManagedQueues($this->app);
-        Cloud::bootManagedQueues($this->app);
+        CloudBootstrapper::configureManagedQueues($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(5)->andReturn(new Result());
-        $client->shouldReceive('sendMessageBatch')->once()->andReturnUsing(fn ($args) => new Result([
+        $client->expects('sendMessage')->times(5)->andReturn(new Result());
+        $client->expects('sendMessageBatch')->andReturnUsing(fn ($args) => new Result([
             'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
         ]));
 
@@ -981,8 +1297,8 @@ class QueueTest extends TestCase
 
         try {
             $this->travelTo('2000-01-02 03:04:05.060708');
-            Cloud::configureManagedQueues($this->app);
-            Cloud::bootManagedQueues($this->app);
+            CloudBootstrapper::configureManagedQueues($this->app);
+            CloudBootstrapper::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
             [$queue, $agent] = $this->fakeQueue();
 
@@ -1029,8 +1345,8 @@ class QueueTest extends TestCase
 
         try {
             $this->travelTo('2000-01-02 03:04:05.060708');
-            Cloud::configureManagedQueues($this->app);
-            Cloud::bootManagedQueues($this->app);
+            CloudBootstrapper::configureManagedQueues($this->app);
+            CloudBootstrapper::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
             [$queue, $agent] = $this->fakeQueue();
 
@@ -1060,8 +1376,8 @@ class QueueTest extends TestCase
 
         try {
             $this->travelTo('2000-01-02 03:04:05.060708');
-            Cloud::configureManagedQueues($this->app);
-            Cloud::bootManagedQueues($this->app);
+            CloudBootstrapper::configureManagedQueues($this->app);
+            CloudBootstrapper::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
             [$queue, $agent] = $this->fakeQueue();
 
@@ -1097,8 +1413,8 @@ class QueueTest extends TestCase
 
         try {
             $this->travelTo('2000-01-02 03:04:05.060708');
-            Cloud::configureManagedQueues($this->app);
-            Cloud::bootManagedQueues($this->app);
+            CloudBootstrapper::configureManagedQueues($this->app);
+            CloudBootstrapper::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
             [$queue, $agent] = $this->fakeQueue();
 
@@ -1121,8 +1437,8 @@ class QueueTest extends TestCase
 
         try {
             $this->travelTo('2000-01-02 03:04:05.060708');
-            Cloud::configureManagedQueues($this->app);
-            Cloud::bootManagedQueues($this->app);
+            CloudBootstrapper::configureManagedQueues($this->app);
+            CloudBootstrapper::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
             [$queue, $agent] = $this->fakeQueue();
 
@@ -1144,8 +1460,8 @@ class QueueTest extends TestCase
         $_SERVER['argv'] = ['artisan', 'queue:work'];
 
         try {
-            Cloud::configureManagedQueues($this->app);
-            Cloud::bootManagedQueues($this->app);
+            CloudBootstrapper::configureManagedQueues($this->app);
+            CloudBootstrapper::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
             $this->fakeQueue();
 
@@ -1165,8 +1481,8 @@ class QueueTest extends TestCase
 
         try {
             $this->travelTo('2000-01-02 03:04:05.060708');
-            Cloud::configureManagedQueues($this->app);
-            Cloud::bootManagedQueues($this->app);
+            CloudBootstrapper::configureManagedQueues($this->app);
+            CloudBootstrapper::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
             [$queue, $agent] = $this->fakeQueue();
 
@@ -1191,13 +1507,13 @@ class QueueTest extends TestCase
     public function testItRespectsDispatchAfterTransaction()
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
-        Cloud::configureManagedQueues($this->app);
-        Cloud::bootManagedQueues($this->app);
+        CloudBootstrapper::configureManagedQueues($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
         $this->app['config']->set('queue.connections.cloud.connection.after_commit', true);
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(5)->andReturn(new Result());
-        $client->shouldReceive('sendMessageBatch')->once()->andReturnUsing(fn ($args) => new Result([
+        $client->expects('sendMessage')->times(5)->andReturn(new Result());
+        $client->expects('sendMessageBatch')->andReturnUsing(fn ($args) => new Result([
             'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
         ]));
 
@@ -1437,8 +1753,8 @@ class QueueTest extends TestCase
 
     public function testItThrowsManagedQueueNotFoundExceptionWhenQueueDoesNotExist()
     {
-        Cloud::configureManagedQueues($this->app);
-        Cloud::bootManagedQueues($this->app);
+        CloudBootstrapper::configureManagedQueues($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
         $this->fakeEvents();
 
         $mock = new MockHandler();
@@ -1476,19 +1792,18 @@ class QueueTest extends TestCase
 
         $queue = $this->app['queue']->connection('cloud');
 
-        $this->expectException(ManagedQueueNotFoundException::class);
-        $this->expectExceptionMessage('Managed queue [missing-queue] does not exist.');
+        $this->expectExceptionObject(new ManagedQueueNotFoundException('Managed queue [missing-queue] does not exist.'));
 
         $queue->push(new FakeJob, queue: 'missing-queue');
     }
 
     public function testItUsesConfigValuesToNormalizeQueueName()
     {
-        Cloud::configureManagedQueues($this->app);
-        Cloud::bootManagedQueues($this->app);
+        CloudBootstrapper::configureManagedQueues($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(1)->andReturn(new Result());
+        $client->expects('sendMessage')->times(1)->andReturn(new Result());
 
         unset($_SERVER['SQS_PREFIX'], $_SERVER['SQS_SUFFIX']);
 
@@ -1499,11 +1814,11 @@ class QueueTest extends TestCase
 
     public function testItNormalizesFifoQueueNamesWithoutLeakingTheSuffix()
     {
-        Cloud::configureManagedQueues($this->app);
-        Cloud::bootManagedQueues($this->app);
+        CloudBootstrapper::configureManagedQueues($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(1)->andReturn(new Result());
+        $client->expects('sendMessage')->times(1)->andReturn(new Result());
 
         $queue->push(new FakeJob, queue: 'orders.fifo');
 
@@ -1512,13 +1827,63 @@ class QueueTest extends TestCase
         $this->assertSame('orders.fifo', $eventsFake->emitted[0]['queue']);
     }
 
+    #[TestWith([['default', 'emails']], 'standard list')]
+    #[TestWith([['default' => ['timeout' => 10], 'emails' => ['timeout' => 1]]], 'map keyed by name')]
+    public function testManagedQueuesReturnsTheConfiguredQueueNames($queues)
+    {
+        config(['queue.connections.cloud.queues' => $queues]);
+        $this->fakeEvents();
+        [$queue] = $this->mockedQueue();
+
+        $this->assertSame(['default', 'emails'], $queue->managedQueues());
+    }
+
+    public function testTotalPendingSizeSumsAcrossManagedQueues()
+    {
+        config(['queue.connections.cloud.queues' => ['default', 'emails']]);
+        $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+
+        $client->expects('getQueueAttributes')->twice()->andReturn(new Result([
+            'Attributes' => ['ApproximateNumberOfMessages' => 2],
+        ]));
+
+        $this->assertSame(4, $queue->totalPendingSize());
+    }
+
+    public function testTotalDelayedSizeSumsAcrossManagedQueues()
+    {
+        config(['queue.connections.cloud.queues' => ['default', 'emails']]);
+        $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+
+        $client->expects('getQueueAttributes')->twice()->andReturn(new Result([
+            'Attributes' => ['ApproximateNumberOfMessagesDelayed' => 1],
+        ]));
+
+        $this->assertSame(2, $queue->totalDelayedSize());
+    }
+
+    public function testTotalReservedSizeSumsAcrossManagedQueues()
+    {
+        config(['queue.connections.cloud.queues' => ['default', 'emails']]);
+        $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+
+        $client->expects('getQueueAttributes')->twice()->andReturn(new Result([
+            'Attributes' => ['ApproximateNumberOfMessagesNotVisible' => 3],
+        ]));
+
+        $this->assertSame(6, $queue->totalReservedSize());
+    }
+
     /**
      * @return array{Queue, MockInterface<SqsClient>}
      */
     private function mockedQueue()
     {
         $client = $this->mock(SqsClient::class);
-        $client->shouldReceive('getHandlerList')->andReturn(new HandlerList());
+        $client->expects('getHandlerList')->andReturn(new HandlerList());
 
         $this->app->instance(QueueConnector::class, new QueueConnector(new class($client) implements ConnectorInterface
         {
@@ -1550,13 +1915,20 @@ class QueueTest extends TestCase
         return $this->app->instance(Events::class, new class('test-socket') extends Events
         {
             public array $emitted = [];
+            public string $stream = '';
 
-            public function emitMany(array $payloads): void
+            protected function connected(): bool
             {
-                $this->emitted = [
-                    ...$this->emitted,
-                    ...$payloads,
-                ];
+                return true;
+            }
+
+            protected function write(string $payload): void
+            {
+                $this->stream .= $payload;
+
+                foreach (explode("\n", rtrim($payload, "\n")) as $write) {
+                    $this->emitted[] = json_decode($write, associative: true);
+                }
             }
         });
     }
@@ -1667,6 +2039,16 @@ class QueueTest extends TestCase
 
             public $nextResponse = null;
 
+            /**
+             * Exceptions GET /next throws, one per request, before serving jobs.
+             */
+            public array $nextExceptions = [];
+
+            /**
+             * The number of GET /next requests the agent has received.
+             */
+            public int $nextRequests = 0;
+
             public function pushJob(array $job = []): array
             {
                 $job = array_merge([
@@ -1687,6 +2069,12 @@ class QueueTest extends TestCase
 
         Http::fake(function ($request) use ($agent) {
             if (str_ends_with($request->url(), '/next')) {
+                $agent->nextRequests++;
+
+                if ($exception = array_shift($agent->nextExceptions)) {
+                    throw $exception;
+                }
+
                 if ($agent->nextResponse !== null) {
                     return $agent->nextResponse;
                 }
@@ -1710,6 +2098,18 @@ class QueueTest extends TestCase
         });
 
         return $agent;
+    }
+
+    /**
+     * Build the exception a timed-out GET /next long-poll surfaces as. The
+     * message mirrors the curl handler's format, which the client preserves
+     * when wrapping Guzzle's ConnectException.
+     */
+    private function pollTimeoutException(): ConnectionException
+    {
+        return new ConnectionException(
+            'cURL error 28: Operation timed out after 76900 milliseconds with 0 bytes received (see https://curl.se/libcurl/c/libcurl-errors.html) for http://localhost/next'
+        );
     }
 
     private function fakeFailer()

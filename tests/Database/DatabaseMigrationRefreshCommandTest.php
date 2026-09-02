@@ -9,7 +9,7 @@ use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
 use Illuminate\Database\Events\DatabaseRefreshed;
 use Illuminate\Foundation\Application;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -20,8 +20,6 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
     protected function tearDown(): void
     {
         RefreshCommand::prohibit(false);
-
-        parent::tearDown();
     }
 
     public function testRefreshCommandCallsCommandsWithProperArguments()
@@ -29,22 +27,23 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $command = new RefreshCommand;
 
         $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
-        $dispatcher = $app->instance(Dispatcher::class, $events = m::mock());
-        $console = m::mock(ConsoleApplication::class)->makePartial();
+        $events = Mockery::mock();
+        $dispatcher = $app->instance(Dispatcher::class, $events);
+        $console = Mockery::mock(ConsoleApplication::class)->makePartial();
         $console->__construct();
         $command->setLaravel($app);
         $command->setApplication($console);
 
-        $resetCommand = m::mock(ResetCommand::class);
-        $migrateCommand = m::mock(MigrateCommand::class);
+        $resetCommand = Mockery::mock(ResetCommand::class);
+        $migrateCommand = Mockery::mock(MigrateCommand::class);
 
-        $console->shouldReceive('find')->with('migrate:reset')->andReturn($resetCommand);
-        $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
-        $dispatcher->shouldReceive('dispatch')->once()->with(m::type(DatabaseRefreshed::class));
+        $console->expects('find')->with('migrate:reset')->andReturn($resetCommand);
+        $console->expects('find')->with('migrate')->andReturn($migrateCommand);
+        $dispatcher->expects('dispatch')->with(Mockery::type(DatabaseRefreshed::class));
 
         $quote = DIRECTORY_SEPARATOR === '\\' ? '"' : "'";
-        $resetCommand->shouldReceive('run')->with(new InputMatcher("--force=1 {$quote}migrate:reset{$quote}"), m::any());
-        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--force=1 migrate'), m::any());
+        $resetCommand->expects('run')->with(new InputMatcher("--force=1 {$quote}migrate:reset{$quote}"), Mockery::any());
+        $migrateCommand->expects('run')->with(new InputMatcher('--force=1 migrate'), Mockery::any());
 
         $this->runCommand($command);
     }
@@ -54,22 +53,23 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $command = new RefreshCommand;
 
         $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
-        $dispatcher = $app->instance(Dispatcher::class, $events = m::mock());
-        $console = m::mock(ConsoleApplication::class)->makePartial();
+        $events = Mockery::mock();
+        $dispatcher = $app->instance(Dispatcher::class, $events);
+        $console = Mockery::mock(ConsoleApplication::class)->makePartial();
         $console->__construct();
         $command->setLaravel($app);
         $command->setApplication($console);
 
-        $rollbackCommand = m::mock(RollbackCommand::class);
-        $migrateCommand = m::mock(MigrateCommand::class);
+        $rollbackCommand = Mockery::mock(RollbackCommand::class);
+        $migrateCommand = Mockery::mock(MigrateCommand::class);
 
-        $console->shouldReceive('find')->with('migrate:rollback')->andReturn($rollbackCommand);
-        $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
-        $dispatcher->shouldReceive('dispatch')->once()->with(m::type(DatabaseRefreshed::class));
+        $console->expects('find')->with('migrate:rollback')->andReturn($rollbackCommand);
+        $console->expects('find')->with('migrate')->andReturn($migrateCommand);
+        $dispatcher->expects('dispatch')->with(Mockery::type(DatabaseRefreshed::class));
 
         $quote = DIRECTORY_SEPARATOR === '\\' ? '"' : "'";
-        $rollbackCommand->shouldReceive('run')->with(new InputMatcher("--step=2 --force=1 {$quote}migrate:rollback{$quote}"), m::any());
-        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--force=1 migrate'), m::any());
+        $rollbackCommand->expects('run')->with(new InputMatcher("--step=2 --force=1 {$quote}migrate:rollback{$quote}"), Mockery::any());
+        $migrateCommand->expects('run')->with(new InputMatcher('--force=1 migrate'), Mockery::any());
 
         $this->runCommand($command, ['--step' => 2]);
     }
@@ -79,8 +79,9 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $command = new RefreshCommand;
 
         $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
-        $dispatcher = $app->instance(Dispatcher::class, $events = m::mock());
-        $console = m::mock(ConsoleApplication::class)->makePartial();
+        $events = Mockery::mock();
+        $dispatcher = $app->instance(Dispatcher::class, $events);
+        $console = Mockery::mock(ConsoleApplication::class)->makePartial();
         $console->__construct();
         $command->setLaravel($app);
         $command->setApplication($console);
@@ -91,7 +92,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 
         $this->assertSame(1, $code);
 
-        $console->shouldNotHaveBeenCalled();
+        $console->shouldNotHaveReceived('find');
         $dispatcher->shouldNotReceive('dispatch');
     }
 
@@ -101,15 +102,19 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
     }
 }
 
-class InputMatcher extends m\Matcher\MatcherAbstract
+class InputMatcher implements \Mockery\Matcher\MatcherInterface
 {
+    public function __construct(protected $expected)
+    {
+    }
+
     /**
      * @param  \Symfony\Component\Console\Input\ArrayInput  $actual
      * @return bool
      */
     public function match(&$actual)
     {
-        return (string) $actual == $this->_expected;
+        return (string) $actual === $this->expected;
     }
 
     public function __toString()

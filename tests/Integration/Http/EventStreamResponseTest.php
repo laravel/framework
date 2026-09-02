@@ -53,8 +53,7 @@ class EventStreamResponseTest extends TestCase
             });
         });
 
-        Log::shouldReceive('error')
-            ->once()
+        Log::expects('error')
             ->with('Something went wrong during streaming', \Mockery::type('array'));
 
         $response = $this->get('/stream');
@@ -75,8 +74,7 @@ class EventStreamResponseTest extends TestCase
             });
         });
 
-        Log::shouldReceive('error')
-            ->once()
+        Log::expects('error')
             ->with('Test exception reporting', \Mockery::type('array'));
 
         $response = $this->get('/stream');

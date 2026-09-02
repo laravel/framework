@@ -386,7 +386,7 @@ class Response implements ArrayAccess, Stringable
      */
     public function throwUnless($condition)
     {
-        return $this->throwIf(! $condition);
+        return $this->throwIf(! value($condition, $this));
     }
 
     /**

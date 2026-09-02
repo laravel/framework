@@ -117,7 +117,7 @@ class DocsCommand extends Command
 
         $this->refreshDocs();
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 
     /**

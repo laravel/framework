@@ -19,7 +19,7 @@ use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Session\Middleware\AuthenticateSession;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -39,8 +39,6 @@ class MiddlewareTest extends TestCase
         foreach ([Authenticate::class, AuthenticateSession::class, AuthenticationException::class, RedirectIfAuthenticated::class] as $class) {
             (new ReflectionClass($class))->getProperty('redirectToCallback')->setValue(null, null);
         }
-
-        parent::tearDown();
     }
 
     public function testConvertEmptyStringsToNull()
@@ -206,7 +204,7 @@ class MiddlewareTest extends TestCase
 
     public function testTrustHosts()
     {
-        $app = m::mock(Application::class);
+        $app = Mockery::mock(Application::class);
         $configuration = new Middleware();
         $middleware = new class($app) extends TrustHosts
         {
@@ -249,7 +247,7 @@ class MiddlewareTest extends TestCase
     public function testEncryptCookies()
     {
         $configuration = new Middleware();
-        $encrypter = m::mock(Encrypter::class);
+        $encrypter = Mockery::mock(Encrypter::class);
         $middleware = new EncryptCookies($encrypter);
 
         $this->assertFalse($middleware->isDisabled('aaa'));
@@ -268,11 +266,8 @@ class MiddlewareTest extends TestCase
     {
         $configuration = new Middleware();
 
-        $mode = m::mock(MaintenanceMode::class);
-        $mode->shouldReceive('active')->andReturn(true);
-        $mode->shouldReceive('date')->andReturn([]);
-        $app = m::mock(Application::class);
-        $app->shouldReceive('maintenanceMode')->andReturn($mode);
+        $mode = Mockery::mock(MaintenanceMode::class);
+        $app = Mockery::mock(Application::class);
         $middleware = new PreventRequestsDuringMaintenance($app);
 
         $reflection = new ReflectionClass($middleware);
@@ -293,8 +288,8 @@ class MiddlewareTest extends TestCase
     {
         $configuration = new Middleware();
         $middleware = new PreventRequestForgery(
-            m::mock(Application::class),
-            m::mock(Encrypter::class)
+            Mockery::mock(Application::class),
+            Mockery::mock(Encrypter::class)
         );
 
         $this->assertSame([], $middleware->getExcludedPaths());

@@ -268,6 +268,17 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Fake the DNS lookups performed by validation rules so they always succeed.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public function fakeDnsLookups($value = true)
+    {
+        Validator::fakeDnsLookups($value);
+    }
+
+    /**
      * Set the Validator instance resolver.
      *
      * @param  \Closure  $resolver

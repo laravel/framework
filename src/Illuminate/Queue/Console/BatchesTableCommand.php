@@ -11,16 +11,16 @@ use function Illuminate\Filesystem\join_paths;
 class BatchesTableCommand extends MigrationGeneratorCommand
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'make:queue-batches-table';
+    protected $signature = 'make:queue-batches-table';
 
     /**
      * The console command name aliases.
      *
-     * @var array
+     * @var string[]
      */
     protected $aliases = ['queue:batches-table'];
 

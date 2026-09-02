@@ -78,8 +78,6 @@ class EloquentModelCustomCastingTest extends TestCase
         $this->schema()->drop('casting_table');
         $this->schema()->drop('members');
         $this->schema()->drop('documents');
-
-        parent::tearDown();
     }
 
     #[RequiresPhpExtension('gmp')]
@@ -129,8 +127,7 @@ class EloquentModelCustomCastingTest extends TestCase
             'string_field' => 'string_value',
         ]);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given value is not an Address instance.');
+        $this->expectExceptionObject(new InvalidArgumentException('The given value is not an Address instance.'));
         $model->address = 'single_string';
 
         // Ensure model values remain unchanged
@@ -148,8 +145,7 @@ class EloquentModelCustomCastingTest extends TestCase
             'string_field' => 'string_value',
         ]);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given value is not an Address instance.');
+        $this->expectExceptionObject(new InvalidArgumentException('The given value is not an Address instance.'));
         $model->address = null;
 
         // Ensure model values remain unchanged

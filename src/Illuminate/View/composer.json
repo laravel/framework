@@ -17,11 +17,13 @@
         "php": "^8.4",
         "ext-tokenizer": "*",
         "illuminate/collections": "^14.0",
+        "illuminate/conditionable": "^14.0",
         "illuminate/container": "^14.0",
         "illuminate/contracts": "^14.0",
         "illuminate/events": "^14.0",
         "illuminate/filesystem": "^14.0",
         "illuminate/macroable": "^14.0",
+        "illuminate/reflection": "^14.0",
         "illuminate/support": "^14.0"
     },
     "minimum-stability": "dev",

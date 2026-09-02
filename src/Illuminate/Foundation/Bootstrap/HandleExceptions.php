@@ -100,19 +100,23 @@ class HandleExceptions
             return;
         }
 
-        $this->ensureDeprecationLoggerIsConfigured($config);
+        try {
+            $this->ensureDeprecationLoggerIsConfigured($config);
 
-        $options = $config->get('logging.deprecations') ?? [];
+            $options = $config->get('logging.deprecations') ?? [];
 
-        with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
-            if ($options['trace'] ?? false) {
-                $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
-            } else {
-                $log->warning(sprintf('%s in %s on line %s',
-                    $message, $file, $line
-                ));
-            }
-        });
+            with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
+                if ($options['trace'] ?? false) {
+                    $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
+                } else {
+                    $log->warning(sprintf('%s in %s on line %s',
+                        $message, $file, $line
+                    ));
+                }
+            });
+        } catch (Throwable) {
+            return;
+        }
     }
 
     /**

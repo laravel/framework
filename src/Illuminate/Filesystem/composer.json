@@ -16,6 +16,7 @@
     "require": {
         "php": "^8.4",
         "illuminate/collections": "^14.0",
+        "illuminate/conditionable": "^14.0",
         "illuminate/contracts": "^14.0",
         "illuminate/macroable": "^14.0",
         "illuminate/support": "^14.0",
@@ -31,7 +32,7 @@
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^3.25.1).",
         "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^3.25.1).",
         "league/flysystem-sftp-v3": "Required to use the Flysystem SFTP driver (^3.25.1).",
-        "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
+        "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0 || ^2.0).",
         "symfony/filesystem": "Required to enable support for relative symbolic links (^8.1).",
         "symfony/mime": "Required to enable support for guessing extensions (^8.1)."
     },

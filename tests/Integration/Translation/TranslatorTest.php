@@ -17,8 +17,8 @@ class TranslatorTest extends TestCase
      */
     protected function defineEnvironment($app)
     {
-        $app['translator']->addNamespace('tests', __DIR__.'/lang');
-        $app['translator']->addJsonPath(__DIR__.'/lang');
+        $app['translator']->addNamespace('tests', __DIR__.'/Fixtures/lang');
+        $app['translator']->addJsonPath(__DIR__.'/Fixtures/lang');
 
         parent::defineEnvironment($app);
     }

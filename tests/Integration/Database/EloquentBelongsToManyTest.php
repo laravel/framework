@@ -482,8 +482,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrFailMethod()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10'));
 
         $post = Post::create(['title' => Str::random()]);
 
@@ -496,8 +495,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrFailMethodWithMany()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10, 11');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10, 11'));
 
         $post = Post::create(['title' => Str::random()]);
 
@@ -510,8 +508,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     public function testFindOrFailMethodWithManyUsingCollection()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10, 11');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag] 10, 11'));
 
         $post = Post::create(['title' => Str::random()]);
 
@@ -1071,6 +1068,47 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $relationTag = $post->tags()->wherePivot('flag', '=', 'foo')->first();
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
+    }
+
+    public function testWherePivotWithClosure()
+    {
+        $tag1 = Tag::create(['name' => Str::random()])->fresh();
+        $tag2 = Tag::create(['name' => Str::random()])->fresh();
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => 'bar'],
+        ]);
+
+        $tags = $post->tagsWithCustomExtraPivot()->wherePivot(function ($query) {
+            $query->active();
+        })->get();
+
+        $this->assertCount(1, $tags);
+        $this->assertEquals($tag1->id, $tags->first()->id);
+    }
+
+    public function testOrWherePivotWithClosure()
+    {
+        $tag1 = Tag::create(['name' => Str::random()])->fresh();
+        $tag2 = Tag::create(['name' => Str::random()])->fresh();
+        $tag3 = Tag::create(['name' => Str::random()])->fresh();
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => 'bar'],
+            ['post_id' => $post->id, 'tag_id' => $tag3->id, 'flag' => 'baz'],
+        ]);
+
+        $tags = $post->tagsWithCustomExtraPivot()->wherePivot('flag', 'bar')->orWherePivot(function ($query) {
+            $query->active();
+        })->get();
+
+        $this->assertCount(2, $tags);
+        $this->assertTrue($tags->contains('id', $tag1->id));
+        $this->assertTrue($tags->contains('id', $tag2->id));
     }
 
     public function testFirstWhere()
@@ -1652,6 +1690,11 @@ class PostTagPivot extends Pivot
     public function getCreatedAtAttribute($value)
     {
         return Carbon::parse($value)->format('U');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('flag', 'foo');
     }
 }
 
