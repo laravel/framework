@@ -7900,6 +7900,30 @@ SQL;
         $this->assertEquals(['[1,2,3]', 0.6, '[1,2,3]'], $builder->getBindings());
     }
 
+    public function testOrWhereVectorSimilarToOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('documents')->where('title', 'foo')->orWhereVectorSimilarTo('embedding', [1, 2, 3], minSimilarity: 0.4)->limit(10);
+
+        $this->assertSame(
+            'select * from "documents" where "title" = ? or ("embedding" <=> ?) <= ? order by ("embedding" <=> ?) asc limit 10',
+            $builder->toSql()
+        );
+        $this->assertEquals(['foo', '[1,2,3]', 0.6, '[1,2,3]'], $builder->getBindings());
+    }
+
+    public function testOrWhereVectorSimilarToOnMariaDb()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('documents')->where('title', 'foo')->orWhereVectorSimilarTo('embedding', [1, 2, 3], minSimilarity: 0.4)->limit(10);
+
+        $this->assertSame(
+            'select * from `documents` where `title` = ? or vec_distance_cosine(`embedding`, vec_fromtext(?)) <= ? order by vec_distance_cosine(`embedding`, vec_fromtext(?)) asc limit 10',
+            $builder->toSql()
+        );
+        $this->assertEquals(['foo', '[1,2,3]', 0.6, '[1,2,3]'], $builder->getBindings());
+    }
+
     public function testWhereVectorSimilarToThrowsOnUnsupportedGrammar()
     {
         $this->expectException(RuntimeException::class);
