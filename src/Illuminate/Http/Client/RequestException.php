@@ -81,6 +81,16 @@ class RequestException extends HttpClientException
     }
 
     /**
+     * Flush the global state of the exception.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$truncateAt = 120;
+    }
+
+    /**
      * Prepare the exception message.
      *
      * @return bool

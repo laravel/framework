@@ -24,6 +24,7 @@ use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Middleware\TrustHosts;
@@ -33,6 +34,7 @@ use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Mail\Markdown;
 use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Queue;
+use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\Facades\Facade;
@@ -211,6 +213,7 @@ trait InteractsWithTestCaseLifecycle
         PreventRequestsDuringMaintenance::flushState();
         Queue::createPayloadUsing(null);
         RegisterProviders::flushState();
+        RequestException::flushState();
         Response::flushState();
         Sleep::fake(false);
         Str::resetFactoryState();
@@ -218,6 +221,7 @@ trait InteractsWithTestCaseLifecycle
         TrustProxies::flushState();
         TrustHosts::flushState();
         PreventRequestForgery::flushState();
+        ValidateSignature::flushState();
         Validator::flushState();
         WorkCommand::flushState();
     }
