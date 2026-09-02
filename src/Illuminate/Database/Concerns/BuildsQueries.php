@@ -256,13 +256,15 @@ trait BuildsQueries
             throw new InvalidArgumentException('The chunk size should be at least 1');
         }
 
-        $this->enforceOrderBy();
-
         return new LazyCollection(function () use ($chunkSize) {
+            $clone = clone $this;
+
+            $clone->enforceOrderBy();
+
             $page = 1;
 
             while (true) {
-                $results = $this->forPage($page++, $chunkSize)->get();
+                $results = $clone->forPage($page++, $chunkSize)->get();
 
                 foreach ($results as $result) {
                     yield $result;
