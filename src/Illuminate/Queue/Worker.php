@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\Interruptible;
 use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\Events\JobInterrupted;
 use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
@@ -971,6 +972,10 @@ class Worker
         $job = $handler->getRunningCommand();
 
         if ($job instanceof Interruptible) {
+            $this->events->dispatch(new JobInterrupted(
+                $this->currentJob->getConnectionName(), $this->currentJob, $signal
+            ));
+
             $job->interrupted($signal);
         }
     }
