@@ -1470,6 +1470,171 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $instance->toArray(),
         );
     }
+
+    public function testChaperoneSetsDeclaringAndRelatedOnPivot()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithChaperoneCustomPivot()->attach($tag);
+
+        $post = Post::first();
+        $tags = $post->tagsWithChaperoneCustomPivot;
+
+        $this->assertCount(1, $tags);
+        $pivot = $tags[0]->pivot;
+        $this->assertInstanceOf(ChaperonePostTagPivot::class, $pivot);
+        $this->assertTrue($pivot->relationLoaded('post'));
+        $this->assertTrue($pivot->relationLoaded('tag'));
+        $this->assertTrue($post->is($pivot->post));
+        $this->assertTrue($tag->is($pivot->tag));
+    }
+
+    public function testChaperoneWithExplicitRelationNames()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithChaperoneExplicit()->attach($tag);
+
+        $post = Post::first();
+        $tags = $post->tagsWithChaperoneExplicit;
+
+        $pivot = $tags[0]->pivot;
+        $this->assertTrue($pivot->relationLoaded('post'));
+        $this->assertTrue($pivot->relationLoaded('tag'));
+        $this->assertTrue($post->is($pivot->post));
+        $this->assertTrue($tag->is($pivot->tag));
+    }
+
+    public function testChaperoneGuessesOnlyExistingRelations()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithChaperonePartialPivot()->attach($tag);
+
+        $post = Post::first();
+        $tags = $post->tagsWithChaperonePartialPivot;
+
+        $pivot = $tags[0]->pivot;
+        $this->assertInstanceOf(ChaperonePartialPivot::class, $pivot);
+        $this->assertTrue($pivot->relationLoaded('post'));
+        $this->assertFalse($pivot->relationLoaded('tag'));
+        $this->assertTrue($post->is($pivot->post));
+    }
+
+    public function testChaperoneWithEagerLoading()
+    {
+        $post1 = Post::create(['title' => Str::random()]);
+        $post2 = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+
+        $post1->tagsWithChaperoneCustomPivot()->attach($tag);
+        $post2->tagsWithChaperoneCustomPivot()->attach($tag);
+
+        $posts = Post::with('tagsWithChaperoneCustomPivot')->get();
+
+        foreach ($posts as $post) {
+            $this->assertCount(1, $post->tagsWithChaperoneCustomPivot);
+            $pivot = $post->tagsWithChaperoneCustomPivot[0]->pivot;
+            $this->assertTrue($pivot->relationLoaded('post'));
+            $this->assertTrue($pivot->relationLoaded('tag'));
+            $this->assertTrue($post->is($pivot->post));
+            $this->assertTrue($tag->is($pivot->tag));
+        }
+    }
+
+    public function testChaperoneWithoutCustomPivotIsNoop()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->attach($tag, ['flag' => 'test']);
+
+        $post = Post::first();
+        $relation = $post->tags()->chaperone();
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsToMany::class, $relation);
+    }
+
+    public function testWithoutChaperoneClearsInverseRelations()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithChaperoneCustomPivot()->attach($tag);
+
+        $post = Post::first();
+        $tags = $post->tagsWithChaperoneCustomPivot()->withoutChaperone()->get();
+
+        $pivot = $tags[0]->pivot;
+        $this->assertFalse($pivot->relationLoaded('post'));
+        $this->assertFalse($pivot->relationLoaded('tag'));
+    }
+
+    public function testChaperoneThrowsForExplicitInvalidRelation()
+    {
+        $this->expectException(\Illuminate\Database\Eloquent\RelationNotFoundException::class);
+
+        $post = Post::create(['title' => Str::random()]);
+        $post->tagsWithChaperoneCustomPivot()->chaperone('nonexistent');
+    }
+
+    public function testChaperoneFromRelatedSide()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+
+        $tag->postsWithChaperone()->attach($post);
+
+        $tag = Tag::first();
+        $posts = $tag->postsWithChaperone;
+
+        $this->assertCount(1, $posts);
+        $pivot = $posts[0]->pivot;
+        $this->assertInstanceOf(ChaperonePostTagPivot::class, $pivot);
+        $this->assertTrue($pivot->relationLoaded('tag'));
+        $this->assertTrue($pivot->relationLoaded('post'));
+        $this->assertTrue($tag->is($pivot->tag));
+        $this->assertTrue($post->is($pivot->post));
+    }
+
+    public function testChaperoneFromRelatedSideWithEagerLoading()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+
+        $tag1->postsWithChaperone()->attach($post);
+        $tag2->postsWithChaperone()->attach($post);
+
+        $tags = Tag::with('postsWithChaperone')->get();
+
+        foreach ($tags as $tag) {
+            $this->assertCount(1, $tag->postsWithChaperone);
+            $pivot = $tag->postsWithChaperone[0]->pivot;
+            $this->assertTrue($pivot->relationLoaded('tag'));
+            $this->assertTrue($pivot->relationLoaded('post'));
+            $this->assertTrue($tag->is($pivot->tag));
+            $this->assertTrue($post->is($pivot->post));
+        }
+    }
+
+    public function testChaperoneWithoutCustomPivotStillReturnsResults()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->attach($tag, ['flag' => 'test']);
+
+        $post = Post::first();
+        $tags = $post->tags()->chaperone()->get();
+
+        $this->assertCount(1, $tags);
+        $this->assertTrue($tag->is($tags[0]));
+        $this->assertInstanceOf(Pivot::class, $tags[0]->pivot);
+    }
 }
 
 class User extends Model
@@ -1627,6 +1792,27 @@ class Post extends Model
     {
         return $this->belongsToMany(TagWithGlobalScope::class, 'posts_tags', 'post_id', 'tag_id');
     }
+
+    public function tagsWithChaperoneCustomPivot()
+    {
+        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id')
+            ->using(ChaperonePostTagPivot::class)
+            ->chaperone();
+    }
+
+    public function tagsWithChaperoneExplicit()
+    {
+        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id')
+            ->using(ChaperonePostTagPivot::class)
+            ->chaperone('post', 'tag');
+    }
+
+    public function tagsWithChaperonePartialPivot()
+    {
+        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id')
+            ->using(ChaperonePartialPivot::class)
+            ->chaperone();
+    }
 }
 
 class Tag extends Model
@@ -1638,6 +1824,13 @@ class Tag extends Model
     public function posts()
     {
         return $this->belongsToMany(Post::class, 'posts_tags', 'tag_id', 'post_id');
+    }
+
+    public function postsWithChaperone()
+    {
+        return $this->belongsToMany(Post::class, 'posts_tags', 'tag_id', 'post_id')
+            ->using(ChaperonePostTagPivot::class)
+            ->chaperone();
     }
 }
 
@@ -1711,5 +1904,30 @@ class TagWithGlobalScope extends Model
         static::addGlobalScope(function ($query) {
             $query->select('tags.id');
         });
+    }
+}
+
+class ChaperonePostTagPivot extends Pivot
+{
+    protected $table = 'posts_tags';
+
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
+    }
+
+    public function tag()
+    {
+        return $this->belongsTo(Tag::class);
+    }
+}
+
+class ChaperonePartialPivot extends Pivot
+{
+    protected $table = 'posts_tags';
+
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
     }
 }
