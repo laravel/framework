@@ -656,6 +656,28 @@ class ContextTest extends TestCase
         $this->assertSame(0, Context::get('foo'));
     }
 
+    public function test_it_increments_a_hidden_counter()
+    {
+        Context::incrementHidden('foo');
+        $this->assertSame(1, Context::getHidden('foo'));
+
+        Context::incrementHidden('foo', 2);
+        $this->assertSame(3, Context::getHidden('foo'));
+
+        $this->assertFalse(Context::has('foo'));
+    }
+
+    public function test_it_decrements_a_hidden_counter()
+    {
+        Context::incrementHidden('foo', 5);
+
+        Context::decrementHidden('foo');
+        $this->assertSame(4, Context::getHidden('foo'));
+
+        Context::decrementHidden('foo', 4);
+        $this->assertSame(0, Context::getHidden('foo'));
+    }
+
     public function test_it_remembers_a_value()
     {
         $this->assertSame(1, Context::remember('int', 1));
