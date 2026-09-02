@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\Interruptible;
 use Illuminate\Contracts\Queue\Job as QueueJobContract;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\Events\JobInterrupted;
 use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
@@ -671,6 +672,35 @@ class QueueWorkerTest extends TestCase
         $worker->notifyJobOfSignal(15);
 
         $this->assertSame(15, $interruptible->receivedSignal);
+    }
+
+    public function testJobInterruptedEventIsDispatchedForInterruptibleJobs()
+    {
+        $interruptible = new class implements Interruptible
+        {
+            public function interrupted(int $signal): void
+            {
+                //
+            }
+        };
+
+        $handler = Mockery::mock(CallQueuedHandler::class);
+        $handler->expects('getRunningCommand')->andReturn($interruptible);
+
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $job = new WorkerFakeJob;
+        $job->connectionName = 'default';
+        $job->resolvedJob = $handler;
+
+        $worker->currentJob = $job;
+        $worker->notifyJobOfSignal(15);
+
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::on(function ($event) use ($job) {
+            return $event instanceof JobInterrupted
+                && $event->connectionName === 'default'
+                && $event->job === $job
+                && $event->signal === 15;
+        }))->once();
     }
 
     /**
