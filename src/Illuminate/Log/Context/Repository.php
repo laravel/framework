@@ -457,6 +457,35 @@ class Repository
     }
 
     /**
+     * Increment a hidden context counter.
+     *
+     * @param  string  $key
+     * @param  int  $amount
+     * @return $this
+     */
+    public function incrementHidden(string $key, int $amount = 1)
+    {
+        $this->addHidden(
+            $key,
+            (int) $this->getHidden($key, 0) + $amount,
+        );
+
+        return $this;
+    }
+
+    /**
+     * Decrement a hidden context counter.
+     *
+     * @param  string  $key
+     * @param  int  $amount
+     * @return $this
+     */
+    public function decrementHidden(string $key, int $amount = 1)
+    {
+        return $this->incrementHidden($key, $amount * -1);
+    }
+
+    /**
      * Determine if the given value is in the given stack.
      *
      * @param  string  $key
