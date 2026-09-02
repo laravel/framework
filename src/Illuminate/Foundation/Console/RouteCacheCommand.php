@@ -98,7 +98,6 @@ class RouteCacheCommand extends Command
             Facade::clearResolvedInstances();
 
             Facade::setFacadeApplication($this->laravel);
-
             Container::setInstance($this->laravel);
         });
     }
