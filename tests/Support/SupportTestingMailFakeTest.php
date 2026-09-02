@@ -352,6 +352,27 @@ class SupportTestingMailFakeTest extends TestCase
         }
     }
 
+    public function testAssertOutgoing()
+    {
+        try {
+            $this->fake->assertOutgoing(MailableStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was not sent or queued.', $e->getMessage());
+        }
+
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->fake->assertOutgoing(MailableStub::class);
+    }
+
+    public function testAssertOutgoingWhenQueued()
+    {
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->fake->assertOutgoing(MailableStub::class);
+    }
+
     public function testAssertOutgoingCount()
     {
         $this->fake->assertNothingOutgoing();
