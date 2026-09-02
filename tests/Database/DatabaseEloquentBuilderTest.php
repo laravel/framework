@@ -594,6 +594,30 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['foo1', 'foo2'], $builder->lazy(2)->take(2)->all());
     }
 
+    public function testLazyDoesNotMutateTheOriginalBuilder()
+    {
+        $model = new EloquentBuilderTestStub;
+
+        $connection = $this->mockConnectionForModel($model, '');
+        $connection->shouldReceive('getName')->andReturn('default');
+        $connection->shouldReceive('select')->andReturn(
+            [(object) ['id' => 1], (object) ['id' => 2]],
+            [(object) ['id' => 3]],
+            [(object) ['id' => 1], (object) ['id' => 2]],
+            [(object) ['id' => 3]],
+        );
+
+        $builder = $model->newQuery();
+
+        $builder->lazy(2)->all();
+
+        $this->assertNull($builder->getQuery()->offset);
+        $this->assertNull($builder->getQuery()->limit);
+        $this->assertEmpty($builder->getQuery()->orders);
+
+        $this->assertEquals([1, 2, 3], $builder->lazy(2)->pluck('id')->all());
+    }
+
     public function testLazyByIdWithLastChunkComplete()
     {
         $builder = Mockery::mock(Builder::class.'[forPageAfterId,get]', [$this->getMockQueryBuilder()]);
