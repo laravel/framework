@@ -61,6 +61,24 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     }
 
     /**
+     * Assert if a mailable was sent or queued to be sent based on a truth-test callback.
+     *
+     * @param  string|\Closure  $mailable
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertOutgoing($mailable, $callback = null)
+    {
+        [$mailable, $callback] = $this->prepareMailableAndCallback($mailable, $callback);
+
+        PHPUnit::assertTrue(
+            $this->sent($mailable, $callback)->isNotEmpty() ||
+            $this->queued($mailable, $callback)->isNotEmpty(),
+            "The expected [{$mailable}] mailable was not sent or queued."
+        );
+    }
+
+    /**
      * Assert if a mailable was sent based on a truth-test callback.
      *
      * @param  string|\Closure  $mailable
