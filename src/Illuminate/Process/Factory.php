@@ -5,6 +5,7 @@ namespace Illuminate\Process;
 use Closure;
 use Illuminate\Contracts\Process\ProcessResult as ProcessResultContract;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -182,7 +183,7 @@ class Factory
      */
     public function assertRan(Closure|array|string $callback)
     {
-        $callback = $callback instanceof Closure ? $callback : fn ($process) => $process->command === $callback;
+        $callback = $callback instanceof Closure ? $callback : fn ($process) => $this->commandMatches($process, $callback);
 
         PHPUnit::assertTrue(
             (new Collection($this->recorded))->contains(function ($pair) use ($callback) {
@@ -203,7 +204,7 @@ class Factory
      */
     public function assertRanTimes(Closure|array|string $callback, int $times = 1)
     {
-        $callback = $callback instanceof Closure ? $callback : fn ($process) => $process->command === $callback;
+        $callback = $callback instanceof Closure ? $callback : fn ($process) => $this->commandMatches($process, $callback);
 
         $count = (new Collection($this->recorded))
             ->filter(fn ($pair) => $callback($pair[0], $pair[1]))
@@ -230,7 +231,7 @@ class Factory
         foreach ($callbacks as $index => $callback) {
             $callback = $callback instanceof Closure
                 ? $callback
-                : fn ($process) => $process->command === $callback;
+                : fn ($process) => $this->commandMatches($process, $callback);
 
             PHPUnit::assertTrue(
                 $callback($this->recorded[$index][0], $this->recorded[$index][1]),
@@ -262,7 +263,7 @@ class Factory
      */
     public function assertNotRan(Closure|array|string $callback)
     {
-        $callback = $callback instanceof Closure ? $callback : fn ($process) => $process->command === $callback;
+        $callback = $callback instanceof Closure ? $callback : fn ($process) => $this->commandMatches($process, $callback);
 
         PHPUnit::assertTrue(
             (new Collection($this->recorded))->doesntContain(function ($pair) use ($callback) {
@@ -298,6 +299,28 @@ class Factory
         );
 
         return $this;
+    }
+
+    /**
+     * Determine if the given process was invoked with the given command.
+     *
+     * @param  \Illuminate\Process\PendingProcess  $process
+     * @param  array<array-key, string>|string  $command
+     * @return bool
+     */
+    protected function commandMatches(PendingProcess $process, array|string $command)
+    {
+        if ($process->command === $command) {
+            return true;
+        }
+
+        if (is_array($command)) {
+            return false;
+        }
+
+        return Str::is($command, is_array($process->command)
+            ? implode(' ', $process->command)
+            : (string) $process->command);
     }
 
     /**
