@@ -1768,6 +1768,15 @@ class HttpClientTest extends TestCase
         $this->assertEquals(60, RequestException::$truncateAt);
     }
 
+    public function testFlushStateRestoresTheDefaultTruncationLength()
+    {
+        RequestException::dontTruncate();
+
+        RequestException::flushState();
+
+        $this->assertEquals(120, RequestException::$truncateAt);
+    }
+
     public function testNoTruncationOnRequestLevel()
     {
         RequestException::truncateAt(60);

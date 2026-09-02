@@ -37,6 +37,13 @@ class ExceptionHandlerTest extends TestCase
         $app->singleton('Illuminate\Contracts\Debug\ExceptionHandler', 'Illuminate\Foundation\Exceptions\Handler');
     }
 
+    protected function tearDown(): void
+    {
+        RequestException::flushState();
+
+        parent::tearDown();
+    }
+
     public function testItRendersAuthorizationExceptions()
     {
         Route::get('test-route', fn () => Response::deny('expected message', 321)->authorize());

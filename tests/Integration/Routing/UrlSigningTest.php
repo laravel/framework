@@ -20,6 +20,13 @@ class UrlSigningTest extends TestCase
         $app['config']->set(['app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF']);
     }
 
+    protected function tearDown(): void
+    {
+        ValidateSignature::flushState();
+
+        parent::tearDown();
+    }
+
     public function testSigningUrl()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
@@ -346,6 +353,25 @@ class UrlSigningTest extends TestCase
         } catch (InvalidSignatureException $exception) {
             $this->fail($exception->getMessage());
         }
+    }
+
+    public function testGloballyIgnoredParametersCanBeFlushed()
+    {
+        ValidateSignature::except(['globally_ignore']);
+
+        ValidateSignature::flushState();
+
+        Route::get('/foo/{id}', function (Request $request, $id) {
+        })->name('foo')->middleware('signed:relative');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1]).'&globally_ignore=me');
+
+        $this->expectException(InvalidSignatureException::class);
+
+        $middleware = $this->createValidateSignatureMiddleware(['ignore']);
+
+        $middleware->handle(Request::create($url), function ($request) {
+        });
     }
 
     public function testSignedMiddlewareIgnoringParameterViaArgumentsWithoutRelative()
