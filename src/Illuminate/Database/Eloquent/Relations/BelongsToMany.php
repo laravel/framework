@@ -290,9 +290,7 @@ class BelongsToMany extends Relation
             if ($key !== null && isset($dictionary[$key])) {
                 $items = $dictionary[$key];
 
-                // During eager loading, hydratePivotRelation sets the declaring
-                // side to $this->parent which is only the first parent model. Here
-                // we correct it to the actual parent for each group of results.
+                // Correct $this->parent to the actual parent for each group of results...
                 if ($this->declaringInverseRelationship) {
                     foreach ($items as $item) {
                         $item->{$this->accessor}?->setRelation(
