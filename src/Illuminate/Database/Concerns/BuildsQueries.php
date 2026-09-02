@@ -257,14 +257,14 @@ trait BuildsQueries
         }
 
         return new LazyCollection(function () use ($chunkSize) {
-            $base = clone $this;
-
-            $base->enforceOrderBy();
-
             $page = 1;
 
             while (true) {
-                $results = (clone $base)->forPage($page++, $chunkSize)->get();
+                $clone = clone $this;
+
+                $clone->enforceOrderBy();
+
+                $results = $clone->forPage($page++, $chunkSize)->get();
 
                 foreach ($results as $result) {
                     yield $result;
