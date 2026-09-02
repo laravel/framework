@@ -78,8 +78,8 @@ class HandleExceptionsTest extends TestCase
         $logger->expects('warning')->with(
             Mockery::on(fn (string $message) => (bool) preg_match(
                 <<<REGEXP
-                #ErrorException: str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated in /home/user/laravel/routes/web\.php:17
-                Stack trace:
+                #str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated.*
+                [\s\S]*\[stacktrace\]
                 \#0 .*helpers.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions.*
                 \#1 .*HandleExceptions\.php\(.*\): with.*
                 \#2 .*HandleExceptions\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleDeprecation.*
@@ -168,8 +168,8 @@ class HandleExceptionsTest extends TestCase
         $logger->expects('warning')->with(
             Mockery::on(fn (string $message) => (bool) preg_match(
                 <<<REGEXP
-                #ErrorException: str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated in /home/user/laravel/routes/web\.php:17
-                Stack trace:
+                #str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated.*
+                [\s\S]*\[stacktrace\]
                 \#0 .*helpers.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions.*
                 \#1 .*HandleExceptions\.php\(.*\): with.*
                 \#2 .*HandleExceptions\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleDeprecation.*
