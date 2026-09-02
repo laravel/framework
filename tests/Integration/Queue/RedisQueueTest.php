@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Queue;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\Jobs\InspectedJob;
@@ -774,9 +775,104 @@ class RedisQueueTest extends TestCase
 
         $this->assertSame(2, $this->queue->totalReservedSize());
     }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testBulkPushesAllJobsOntoQueue($driver)
+    {
+        $this->setQueue($driver, 'default');
+
+        $this->queue->bulk([
+            new RedisQueueIntegrationTestJob(1),
+            new RedisQueueIntegrationTestJob(2),
+            new RedisQueueIntegrationTestJob(3),
+        ], '', 'bulk-test');
+
+        $this->assertSame(3, $this->queue->size('bulk-test'));
+
+        $seen = [];
+
+        for ($i = 0; $i < 3; $i++) {
+            $seen[] = unserialize(json_decode($this->queue->pop('bulk-test')->getRawBody())->data->command)->i;
+        }
+
+        sort($seen);
+
+        $this->assertSame([1, 2, 3], $seen);
+        $this->assertNull($this->queue->pop('bulk-test'));
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testBulkPushesDelayedJobsOntoDelayedQueue($driver)
+    {
+        $this->setQueue($driver, 'default');
+
+        $this->queue->bulk([
+            new RedisQueueIntegrationTestJob(1),
+            new RedisQueueIntegrationTestDelayedJob(2),
+        ], '', 'bulk-delay');
+
+        $redisKey = $this->getQueueRedisKey('bulk-delay');
+
+        $this->assertSame(1, $this->redis[$driver]->connection()->llen($redisKey));
+        $this->assertSame(1, $this->redis[$driver]->connection()->zcard("$redisKey:delayed"));
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testBulkPushesManyJobsOntoQueue($driver)
+    {
+        $this->setQueue($driver, 'default');
+
+        $jobs = [];
+
+        for ($i = 0; $i < 1050; $i++) {
+            $jobs[] = new RedisQueueIntegrationTestJob($i);
+        }
+
+        $this->queue->bulk($jobs, '', 'bulk-many');
+
+        $redisKey = $this->getQueueRedisKey('bulk-many');
+
+        $this->assertSame(1050, $this->queue->size('bulk-many'));
+        $this->assertSame(1050, $this->redis[$driver]->connection()->llen("$redisKey:notify"));
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testAllQueueNamesReturnsQueuesAcrossMultipleQueues($driver)
+    {
+        $default = config('queue.connections.redis.queue', 'default');
+        $this->setQueue($driver, $default);
+
+        $this->queue->push(new RedisQueueIntegrationTestJob(1));
+        $this->queue->pushOn('emails', new RedisQueueIntegrationTestJob(2));
+        $this->queue->pushOn('notifications', new RedisQueueIntegrationTestJob(3));
+
+        $names = (new \ReflectionMethod($this->queue, 'allQueueNames'))
+            ->invoke($this->queue)
+            ->sort()
+            ->values()
+            ->all();
+
+        $this->assertSame([$default, 'emails', 'notifications'], $names);
+    }
 }
 
 class RedisQueueIntegrationTestJob
+{
+    public $i;
+
+    public function __construct($i)
+    {
+        $this->i = $i;
+    }
+
+    public function handle()
+    {
+        //
+    }
+}
+
+#[Delay(60)]
+class RedisQueueIntegrationTestDelayedJob
 {
     public $i;
 
