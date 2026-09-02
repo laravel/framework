@@ -326,7 +326,8 @@ class Worker
             }
 
             $this->kill(
-                static::$timedOutExitCode ?? static::EXIT_ERROR, $options, WorkerStopReason::TimedOut, $connectionName, $queue
+                static::$timedOutExitCode ?? static::EXIT_ERROR,
+                $options, WorkerStopReason::TimedOut, $connectionName, $queue
             );
         }, true);
 
