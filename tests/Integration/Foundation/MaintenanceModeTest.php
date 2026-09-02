@@ -165,6 +165,41 @@ class MaintenanceModeTest extends TestCase
         $this->assertSame('', $output);
     }
 
+    public function testPrerenderedMaintenanceFileHandlesBypassCookieWithNonStringMac()
+    {
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'secret' => 'foo',
+            'template' => 'Rendered Content',
+        ]));
+
+        file_put_contents(
+            storage_path('framework/maintenance.php'),
+            file_get_contents(__DIR__.'/../../../src/Illuminate/Foundation/Console/stubs/maintenance-mode.stub')
+        );
+
+        $server = $_SERVER;
+        $cookie = $_COOKIE;
+
+        try {
+            $_SERVER['REQUEST_URI'] = '/bar';
+            $_SERVER['HTTP_ACCEPT'] = 'application/json';
+
+            $_COOKIE['laravel_maintenance'] = base64_encode(json_encode([
+                'expires_at' => Carbon::now()->addHour()->getTimestamp(),
+                'mac' => ['not-a-string'],
+            ]));
+
+            ob_start();
+            include storage_path('framework/maintenance.php');
+            $output = ob_get_clean();
+        } finally {
+            $_SERVER = $server;
+            $_COOKIE = $cookie;
+        }
+
+        $this->assertSame('', $output);
+    }
+
     public function testMaintenanceModeCanRedirectWithBypassCookie()
     {
         file_put_contents(storage_path('framework/down'), json_encode([
