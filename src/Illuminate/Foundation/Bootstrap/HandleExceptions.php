@@ -106,7 +106,7 @@ class HandleExceptions
             with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
                 if ($options['trace'] ?? false) {
                     $log->warning($message, [
-                        'exception' => new ErrorException($message, 0, $level, $file, $line)
+                        'exception' => new ErrorException($message, 0, $level, $file, $line),
                     ]);
                 } else {
                     $log->warning(sprintf('%s in %s on line %s',
