@@ -255,7 +255,7 @@ class Worker
             );
 
             if ($supportsAsyncSignals) {
-                $this->registerTimeoutHandler($job, $options, $connectionName, $queue);
+                $this->registerTimeoutHandler($connectionName, $queue, $job, $options);
             }
 
             // If the daemon should run (not in maintenance mode, etc.), then we can run
@@ -295,13 +295,13 @@ class Worker
     /**
      * Register the worker timeout handler.
      *
-     * @param  \Illuminate\Contracts\Queue\Job|null  $job
-     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  string|null  $connectionName
      * @param  string|null  $queue
+     * @param  \Illuminate\Contracts\Queue\Job|null  $job
+     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
      */
-    protected function registerTimeoutHandler($job, WorkerOptions $options, $connectionName = null, $queue = null)
+    protected function registerTimeoutHandler($connectionName, $queue, $job, WorkerOptions $options)
     {
         // We will register a signal handler for the alarm signal so that we can kill this
         // process if it is running too long because it has frozen. This uses the async
