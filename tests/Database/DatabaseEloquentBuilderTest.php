@@ -545,6 +545,35 @@ class DatabaseEloquentBuilderTest extends TestCase
         }, 'someIdField');
     }
 
+    public function testChunkDoesNotMutateTheOriginalBuilder()
+    {
+        $model = new EloquentBuilderTestStub;
+
+        $connection = $this->mockConnectionForModel($model, '');
+        $connection->shouldReceive('getName')->andReturn('default');
+        $connection->shouldReceive('select')->andReturn(
+            [(object) ['id' => 1], (object) ['id' => 2]],
+            [(object) ['id' => 3]],
+            [(object) ['id' => 1], (object) ['id' => 2]],
+            [(object) ['id' => 3]],
+        );
+
+        $builder = $model->newQuery();
+
+        $builder->chunk(2, fn ($results) => true);
+
+        $this->assertNull($builder->getQuery()->offset);
+        $this->assertNull($builder->getQuery()->limit);
+        $this->assertEmpty($builder->getQuery()->orders);
+
+        $results = [];
+        $builder->chunk(2, function ($chunk) use (&$results) {
+            $results = array_merge($results, $chunk->pluck('id')->all());
+        });
+
+        $this->assertEquals([1, 2, 3], $results);
+    }
+
     public function testLazyWithLastChunkComplete()
     {
         $builder = Mockery::mock(Builder::class.'[forPage,get]', [$this->getMockQueryBuilder()]);

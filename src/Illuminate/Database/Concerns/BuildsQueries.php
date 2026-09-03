@@ -38,10 +38,12 @@ trait BuildsQueries
      */
     public function chunk($count, callable $callback)
     {
-        $this->enforceOrderBy();
+        $clone = clone $this;
 
-        $skip = $this->getOffset();
-        $remaining = $this->getLimit();
+        $clone->enforceOrderBy();
+
+        $skip = $clone->getOffset();
+        $remaining = $clone->getLimit();
 
         $page = 1;
 
@@ -54,7 +56,7 @@ trait BuildsQueries
                 break;
             }
 
-            $results = $this->offset($offset)->limit($limit)->get();
+            $results = $clone->offset($offset)->limit($limit)->get();
 
             $countResults = $results->count();
 
