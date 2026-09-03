@@ -76,18 +76,16 @@ class HandleExceptionsTest extends TestCase
 
         $logger->expects('channel')->with('deprecations')->andReturnSelf();
         $logger->expects('warning')->with(
-            Mockery::on(fn (string $message) => (bool) preg_match(
-                <<<REGEXP
-                #ErrorException: str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated in /home/user/laravel/routes/web\.php:17
-                Stack trace:
-                \#0 .*helpers.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions.*
-                \#1 .*HandleExceptions\.php\(.*\): with.*
-                \#2 .*HandleExceptions\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleDeprecation.*
-                \#3 .*HandleExceptionsTest\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleError.*
-                [\s\S]*#i
-                REGEXP,
-                $message
-            ))
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+            Mockery::on(function (array $context) {
+                $exception = $context['exception'] ?? null;
+
+                return $exception instanceof \ErrorException
+                    && $exception->getSeverity() === E_DEPRECATED
+                    && $exception->getFile() === '/home/user/laravel/routes/web.php'
+                    && $exception->getLine() === 17
+                    && $exception->getTrace();
+            })
         );
 
         $this->handleExceptions()->handleError(
@@ -166,18 +164,16 @@ class HandleExceptionsTest extends TestCase
 
         $logger->expects('channel')->with('deprecations')->andReturnSelf();
         $logger->expects('warning')->with(
-            Mockery::on(fn (string $message) => (bool) preg_match(
-                <<<REGEXP
-                #ErrorException: str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated in /home/user/laravel/routes/web\.php:17
-                Stack trace:
-                \#0 .*helpers.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions.*
-                \#1 .*HandleExceptions\.php\(.*\): with.*
-                \#2 .*HandleExceptions\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleDeprecation.*
-                \#3 .*HandleExceptionsTest\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleError.*
-                [\s\S]*#i
-                REGEXP,
-                $message
-            ))
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+            Mockery::on(function (array $context) {
+                $exception = $context['exception'] ?? null;
+
+                return $exception instanceof \ErrorException
+                    && $exception->getSeverity() === E_USER_DEPRECATED
+                    && $exception->getFile() === '/home/user/laravel/routes/web.php'
+                    && $exception->getLine() === 17
+                    && $exception->getTrace();
+            })
         );
 
         $this->handleExceptions()->handleError(
