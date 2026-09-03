@@ -23,38 +23,38 @@ use function Illuminate\Support\enum_value;
  *
  * @template-covariant TValue
  *
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $average
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $avg
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $contains
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $doesntContain
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $each
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $every
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $filter
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $first
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $flatMap
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $groupBy
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $hasMany
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $hasSole
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $keyBy
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $last
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $map
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $max
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $min
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $partition
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $percentage
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $reject
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $skipUntil
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $skipWhile
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $some
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $sortBy
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $sortByDesc
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $sum
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $takeUntil
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $takeWhile
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $unique
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $unless
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $until
- * @property-read HigherOrderCollectionProxy<TKey, TValue> $when
+ * @property-read HigherOrderCollectionProxy<'average', TValue, static> $average
+ * @property-read HigherOrderCollectionProxy<'avg', TValue, static> $avg
+ * @property-read HigherOrderCollectionProxy<'contains', TValue, static> $contains
+ * @property-read HigherOrderCollectionProxy<'doesntContain', TValue, static> $doesntContain
+ * @property-read HigherOrderCollectionProxy<'each', TValue, static> $each
+ * @property-read HigherOrderCollectionProxy<'every', TValue, static> $every
+ * @property-read HigherOrderCollectionProxy<'filter', TValue, static> $filter
+ * @property-read HigherOrderCollectionProxy<'first', TValue, static> $first
+ * @property-read HigherOrderCollectionProxy<'flatMap', TValue, static> $flatMap
+ * @property-read HigherOrderCollectionProxy<'groupBy', TValue, static> $groupBy
+ * @property-read HigherOrderCollectionProxy<'hasMany', TValue, static> $hasMany
+ * @property-read HigherOrderCollectionProxy<'hasSole', TValue, static> $hasSole
+ * @property-read HigherOrderCollectionProxy<'keyBy', TValue, static> $keyBy
+ * @property-read HigherOrderCollectionProxy<'last', TValue, static> $last
+ * @property-read HigherOrderCollectionProxy<'map', TValue, static> $map
+ * @property-read HigherOrderCollectionProxy<'max', TValue, static> $max
+ * @property-read HigherOrderCollectionProxy<'min', TValue, static> $min
+ * @property-read HigherOrderCollectionProxy<'partition', TValue, static> $partition
+ * @property-read HigherOrderCollectionProxy<'percentage', TValue, static> $percentage
+ * @property-read HigherOrderCollectionProxy<'reject', TValue, static> $reject
+ * @property-read HigherOrderCollectionProxy<'skipUntil', TValue, static> $skipUntil
+ * @property-read HigherOrderCollectionProxy<'skipWhile', TValue, static> $skipWhile
+ * @property-read HigherOrderCollectionProxy<'some', TValue, static> $some
+ * @property-read HigherOrderCollectionProxy<'sortBy', TValue, static> $sortBy
+ * @property-read HigherOrderCollectionProxy<'sortByDesc', TValue, static> $sortByDesc
+ * @property-read HigherOrderCollectionProxy<'sum', TValue, static> $sum
+ * @property-read HigherOrderCollectionProxy<'takeUntil', TValue, static> $takeUntil
+ * @property-read HigherOrderCollectionProxy<'takeWhile', TValue, static> $takeWhile
+ * @property-read HigherOrderCollectionProxy<'unique', TValue, static> $unique
+ * @property-read HigherOrderCollectionProxy<'unless', TValue, static> $unless
+ * @property-read HigherOrderCollectionProxy<'until', TValue, static> $until
+ * @property-read HigherOrderCollectionProxy<'when', TValue, static> $when
  */
 trait EnumeratesValues
 {

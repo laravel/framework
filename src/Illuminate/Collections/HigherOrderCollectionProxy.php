@@ -3,11 +3,10 @@
 namespace Illuminate\Support;
 
 /**
- * @template TKey of array-key
+ * @template TMethod of string
+ * @template TValue
+ * @template TCollection of \Illuminate\Support\Enumerable<array-key, TValue>
  *
- * @template-covariant TValue
- *
- * @mixin \Illuminate\Support\Enumerable<TKey, TValue>
  * @mixin TValue
  */
 class HigherOrderCollectionProxy
@@ -15,22 +14,22 @@ class HigherOrderCollectionProxy
     /**
      * The collection being operated on.
      *
-     * @var \Illuminate\Support\Enumerable<TKey, TValue>
+     * @var TCollection
      */
     protected $collection;
 
     /**
      * The method being proxied.
      *
-     * @var string
+     * @var TMethod
      */
     protected $method;
 
     /**
      * Create a new proxy instance.
      *
-     * @param  \Illuminate\Support\Enumerable<TKey, TValue>  $collection
-     * @param  string  $method
+     * @param  TCollection  $collection
+     * @param  TMethod  $method
      */
     public function __construct(Enumerable $collection, $method)
     {
