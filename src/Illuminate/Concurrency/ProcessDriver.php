@@ -38,6 +38,7 @@ class ProcessDriver implements Driver
         $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $command, $timeout) {
             foreach (Arr::wrap($tasks) as $key => $task) {
                 $process = $pool->as($key)->path(base_path())->env([
+                    /** @phpstan-ignore staticMethod.notFound */
                     '__LARAVEL_CONTEXT' => json_encode(Context::dehydrate()),
                     'LARAVEL_INVOKABLE_CLOSURE' => base64_encode(
                         serialize(new SerializableClosure($task))
@@ -85,6 +86,7 @@ class ProcessDriver implements Driver
         return defer(function () use ($tasks, $command) {
             foreach (Arr::wrap($tasks) as $task) {
                 $this->processFactory->path(base_path())->env([
+                    /** @phpstan-ignore staticMethod.notFound */
                     '__LARAVEL_CONTEXT' => json_encode(Context::dehydrate()),
                     'LARAVEL_INVOKABLE_CLOSURE' => base64_encode(
                         serialize(new SerializableClosure($task))
