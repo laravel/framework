@@ -136,6 +136,30 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testTypesDoesNotDiscardPreviouslyConfiguredConstraints()
+    {
+        $this->fails(
+            File::image()->max(1)->types(['jpg', 'jpeg']),
+            UploadedFile::fake()->image('photo.jpg', 800, 600),
+            ['validation.max.file'],
+        );
+    }
+
+    public function testTypesIsChainableOnInstances()
+    {
+        $file = File::image()->max(100);
+
+        $this->assertSame($file, $file->types(['image/jpeg']));
+    }
+
+    public function testTypesStaticallyCreatesANewRuleInstance()
+    {
+        $this->passes(
+            File::types(['image/jpeg', 'image/png']),
+            UploadedFile::fake()->create('photo.jpg'),
+        );
+    }
+
     public function testSingleExtension()
     {
         $this->fails(

@@ -2,6 +2,8 @@
 
 namespace Illuminate\Validation\Rules;
 
+use BadMethodCallException;
+use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
@@ -12,6 +14,9 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
+/**
+ * @method static static types(string|array<int, string> $mimetypes) Limit the uploaded file to the given MIME types or file extensions.
+ */
 class File implements Rule, DataAwareRule, ValidatorAwareRule
 {
     use Conditionable, Macroable;
@@ -138,11 +143,73 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      * Limit the uploaded file to the given MIME types or file extensions.
      *
      * @param  string|array<int, string>  $mimetypes
-     * @return static
+     * @return $this
      */
-    public static function types($mimetypes)
+    protected function types($mimetypes)
     {
-        return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
+        $this->allowedMimetypes = (array) $mimetypes;
+
+        return $this;
+    }
+
+    /**
+     * Handle dynamic method calls into the method on the file rule.
+     *
+     * @param  string  $method
+     * @param  array<int, mixed>  $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public function __call($method, $parameters)
+    {
+        if ($method === 'types') {
+            return $this->types(...$parameters);
+        }
+
+        if (static::hasMacro($method)) {
+            $macro = static::$macros[$method];
+
+            if ($macro instanceof Closure) {
+                $macro = $macro->bindTo($this, static::class);
+            }
+
+            return $macro(...$parameters);
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Method %s::%s does not exist.', static::class, $method
+        ));
+    }
+
+    /**
+     * Handle dynamic static method calls into the method on the file rule.
+     *
+     * @param  string  $method
+     * @param  array<int, mixed>  $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public static function __callStatic($method, $parameters)
+    {
+        if ($method === 'types') {
+            return tap(new static(), fn ($file) => $file->types(...$parameters));
+        }
+
+        if (static::hasMacro($method)) {
+            $macro = static::$macros[$method];
+
+            if ($macro instanceof Closure) {
+                $macro = $macro->bindTo(null, static::class);
+            }
+
+            return $macro(...$parameters);
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Method %s::%s does not exist.', static::class, $method
+        ));
     }
 
     /**
