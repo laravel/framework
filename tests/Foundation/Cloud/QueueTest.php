@@ -144,8 +144,8 @@ class QueueTest extends TestCase
         $_SERVER['argv'] = ['artisan', 'queue:work'];
 
         try {
-            CloudBootstrapper::registerEvents($this->app);
-            CloudBootstrapper::bootManagedQueues($this->app);
+            Cloud::registerEvents($this->app);
+            Cloud::bootManagedQueues($this->app);
 
             Worker::$memoryExceededExitCode = Worker::EXIT_SUCCESS;
             $this->assertSame(Worker::EXIT_SUCCESS, Worker::$memoryExceededExitCode);
