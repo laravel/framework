@@ -77,17 +77,24 @@ class HandleExceptionsTest extends TestCase
         $logger->expects('channel')->with('deprecations')->andReturnSelf();
         $logger->expects('warning')->with(
             Mockery::on(fn (string $message) => (bool) preg_match(
-                <<<REGEXP
-                #str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated.*
-                [\s\S]*\[stacktrace\]
-                \#0 .*helpers.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions.*
-                \#1 .*HandleExceptions\.php\(.*\): with.*
-                \#2 .*HandleExceptions\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleDeprecation.*
-                \#3 .*HandleExceptionsTest\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleError.*
-                [\s\S]*#i
-                REGEXP,
+                '#^str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated$#',
                 $message
-            ))
+            )),
+            Mockery::on(function (array $context) {
+                $exception = $context['exception'] ?? null;
+            
+                return $exception instanceof \ErrorException
+                    && preg_match(
+                        <<<'REGEXP'
+                        #\#0 .*helpers\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions.*
+                        \#1 .*HandleExceptions\.php\(.*\): with.*
+                        \#2 .*HandleExceptions\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleDeprecation.*
+                        \#3 .*HandleExceptionsTest\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleError.*
+                        [\s\S]*#i
+                        REGEXP,
+                        $exception->getTraceAsString()
+                    );
+            })
         );
 
         $this->handleExceptions()->handleError(
@@ -167,17 +174,24 @@ class HandleExceptionsTest extends TestCase
         $logger->expects('channel')->with('deprecations')->andReturnSelf();
         $logger->expects('warning')->with(
             Mockery::on(fn (string $message) => (bool) preg_match(
-                <<<REGEXP
-                #str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated.*
-                [\s\S]*\[stacktrace\]
-                \#0 .*helpers.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions.*
-                \#1 .*HandleExceptions\.php\(.*\): with.*
-                \#2 .*HandleExceptions\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleDeprecation.*
-                \#3 .*HandleExceptionsTest\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleError.*
-                [\s\S]*#i
-                REGEXP,
+                '#^str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated$#',
                 $message
-            ))
+            )),
+            Mockery::on(function (array $context) {
+                $exception = $context['exception'] ?? null;
+            
+                return $exception instanceof \ErrorException
+                    && preg_match(
+                        <<<'REGEXP'
+                        #\#0 .*helpers\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions.*
+                        \#1 .*HandleExceptions\.php\(.*\): with.*
+                        \#2 .*HandleExceptions\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleDeprecation.*
+                        \#3 .*HandleExceptionsTest\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleError.*
+                        [\s\S]*#i
+                        REGEXP,
+                        $exception->getTraceAsString()
+                    );
+            })
         );
 
         $this->handleExceptions()->handleError(
