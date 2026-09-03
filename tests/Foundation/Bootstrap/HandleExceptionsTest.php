@@ -76,7 +76,7 @@ class HandleExceptionsTest extends TestCase
 
         $logger->expects('channel')->with('deprecations')->andReturnSelf();
         $logger->expects('warning')->with(
-            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated'
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
             Mockery::on(function (array $context) {
                 $exception = $context['exception'] ?? null;
 
