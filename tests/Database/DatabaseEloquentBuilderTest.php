@@ -809,6 +809,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder->bam(), $builder->getQuery());
     }
 
+    public function testStaticGlobalMacrosAreCalledOnBuilder()
+    {
+        Builder::macro('staticMacro', static function () {
+            return 'foo';
+        });
+
+        $this->assertSame('foo', $this->getBuilder()->staticMacro());
+    }
+
     public function testMissingStaticMacrosThrowsProperException()
     {
         $this->expectExceptionObject(new BadMethodCallException('Call to undefined method Illuminate\Database\Eloquent\Builder::missingMacro()'));

@@ -22,7 +22,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
 use ReflectionMethod;
+use RuntimeException;
 use SortDirection;
+use Throwable;
 
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
@@ -2290,7 +2292,11 @@ class Builder implements BuilderContract
             $callable = static::$macros[$method];
 
             if ($callable instanceof Closure) {
-                $callable = $callable->bindTo($this, static::class);
+                try {
+                    $callable = $callable->bindTo($this, static::class) ?? throw new RuntimeException;
+                } catch (Throwable) {
+                    $callable = $callable->bindTo(null, static::class);
+                }
             }
 
             return $callable(...$parameters);
