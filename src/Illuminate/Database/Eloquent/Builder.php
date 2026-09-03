@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
+use Illuminate\Contracts\Database\Eloquent\SupportsPartialRelations;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
@@ -969,7 +970,11 @@ class Builder implements BuilderContract
 
         $relation->addEagerConstraints($models);
 
-        $constraints($relation);
+        if ($relation instanceof SupportsPartialRelations && $relation->isOneOfMany()) {
+            $this->applyOneOfManyEagerConstraints($relation, $constraints);
+        } else {
+            $constraints($relation);
+        }
 
         // Once we have the results, we just match those back up to their parent models
         // using the relationship instance. Then we just return the finished arrays
@@ -978,6 +983,34 @@ class Builder implements BuilderContract
             $relation->initRelation($models, $name),
             $relation->getEager(), $name
         );
+    }
+
+    /**
+     * Apply the eager load constraints to a one of many relationship's query and its
+     * underlying aggregate subselect query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @param  \Closure  $constraints
+     * @return void
+     */
+    protected function applyOneOfManyEagerConstraints($relation, Closure $constraints)
+    {
+        $query = $relation->getQuery()->getQuery();
+
+        $wheresCount = count($query->wheres);
+        $bindingsCount = count($query->bindings['where'] ?? []);
+
+        $constraints($relation);
+
+        if (! empty($newWheres = array_slice($query->wheres, $wheresCount))) {
+            $subQuery = $relation->getOneOfManySubQuery()->getQuery();
+
+            $subQuery->wheres = array_merge($subQuery->wheres, $newWheres);
+            $subQuery->bindings['where'] = array_merge(
+                $subQuery->bindings['where'] ?? [],
+                array_slice($query->bindings['where'] ?? [], $bindingsCount)
+            );
+        }
     }
 
     /**
