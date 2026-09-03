@@ -74,6 +74,7 @@ class QueueTest extends TestCase
 
         Worker::$restartable = true;
         Worker::$pausable = true;
+        Worker::$memoryExceededExitCode = null;
         $_SERVER['LARAVEL_CLOUD'] = '1';
         $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG'] = json_encode([
             'driver' => 'cloud',
@@ -105,6 +106,7 @@ class QueueTest extends TestCase
         unset($_SERVER['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG']);
         Worker::$restartable = true;
         Worker::$pausable = true;
+        Worker::$memoryExceededExitCode = null;
     }
 
     public function testItDisablesQueueRestartPollingForManagedQueues()
@@ -136,6 +138,24 @@ class QueueTest extends TestCase
 
             $this->app['queue']->connection('cloud');
             $this->assertFalse(Worker::$pausable);
+        } finally {
+            $_SERVER['argv'] = $argv;
+        }
+    }
+
+    public function testItRestoresTheMemoryExceededExitCodeForManagedQueues()
+    {
+        $argv = $_SERVER['argv'];
+        $_SERVER['argv'] = ['artisan', 'queue:work'];
+
+        try {
+            CloudBootstrapper::registerEvents($this->app);
+            CloudBootstrapper::bootManagedQueues($this->app);
+
+            Worker::$memoryExceededExitCode = Worker::EXIT_SUCCESS;
+
+            $this->app['queue']->connection('cloud');
+            $this->assertSame(Worker::EXIT_MEMORY_LIMIT, Worker::$memoryExceededExitCode);
         } finally {
             $_SERVER['argv'] = $argv;
         }
