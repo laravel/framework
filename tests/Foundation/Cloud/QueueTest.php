@@ -143,7 +143,7 @@ class QueueTest extends TestCase
         }
     }
 
-    public function testItRestoresTheMemoryExceededExitCodeForManagedQueues()
+    public function testItDefaultsTheMemoryExceededExitCodeForManagedQueues()
     {
         $argv = $_SERVER['argv'];
         $_SERVER['argv'] = ['artisan', 'queue:work'];
