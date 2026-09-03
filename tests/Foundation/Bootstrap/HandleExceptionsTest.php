@@ -81,7 +81,7 @@ class HandleExceptionsTest extends TestCase
                 $exception = $context['exception'] ?? null;
 
                 return $exception instanceof \ErrorException
-                    && $exception->getSeverity() === E_USER_DEPRECATED
+                    && $exception->getSeverity() === E_DEPRECATED
                     && $exception->getFile() === '/home/user/laravel/routes/web.php'
                     && $exception->getLine() === 17
                     && $exception->getTrace();
