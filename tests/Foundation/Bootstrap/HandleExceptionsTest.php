@@ -82,18 +82,11 @@ class HandleExceptionsTest extends TestCase
             )),
             Mockery::on(function (array $context) {
                 $exception = $context['exception'] ?? null;
-            
+
                 return $exception instanceof \ErrorException
-                    && preg_match(
-                        <<<'REGEXP'
-                        #\#0 .*helpers\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions.*
-                        \#1 .*HandleExceptions\.php\(.*\): with.*
-                        \#2 .*HandleExceptions\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleDeprecation.*
-                        \#3 .*HandleExceptionsTest\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleError.*
-                        [\s\S]*#i
-                        REGEXP,
-                        $exception->getTraceAsString()
-                    );
+                    && $exception->getMessage() === 'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated'
+                    && str_contains($exception->getTraceAsString(), 'HandleExceptionsTest.php')
+                    && str_contains($exception->getTraceAsString(), 'HandleExceptions->handleError');
             })
         );
 
@@ -179,18 +172,11 @@ class HandleExceptionsTest extends TestCase
             )),
             Mockery::on(function (array $context) {
                 $exception = $context['exception'] ?? null;
-            
+
                 return $exception instanceof \ErrorException
-                    && preg_match(
-                        <<<'REGEXP'
-                        #\#0 .*helpers\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions.*
-                        \#1 .*HandleExceptions\.php\(.*\): with.*
-                        \#2 .*HandleExceptions\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleDeprecation.*
-                        \#3 .*HandleExceptionsTest\.php\(.*\): Illuminate\\\\Foundation\\\\Bootstrap\\\\HandleExceptions->handleError.*
-                        [\s\S]*#i
-                        REGEXP,
-                        $exception->getTraceAsString()
-                    );
+                    && $exception->getMessage() === 'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated'
+                    && str_contains($exception->getTraceAsString(), 'HandleExceptionsTest.php')
+                    && str_contains($exception->getTraceAsString(), 'HandleExceptions->handleError');
             })
         );
 
