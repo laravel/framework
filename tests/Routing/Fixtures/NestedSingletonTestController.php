@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Routing\Fixtures;
+namespace Illuminate\Tests\Routing\Fixtures;
 
 use Illuminate\Routing\Controller;
 

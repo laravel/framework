@@ -10,6 +10,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Guarded\Post;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentEagerLoadingLimitTest extends DatabaseTestCase
@@ -147,11 +148,6 @@ class Comment extends Model
 {
     public $timestamps = false;
 
-    protected $guarded = [];
-}
-
-class Post extends Model
-{
     protected $guarded = [];
 }
 

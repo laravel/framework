@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\Fixtures;
+namespace Illuminate\Tests\Database\Fixtures\Models\Integration;
 
 use Illuminate\Database\Eloquent\Model;
 

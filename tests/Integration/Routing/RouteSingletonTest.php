@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Tests\Integration\Routing\Fixtures\CreatableSingletonTestController;
-use Illuminate\Tests\Integration\Routing\Fixtures\NestedSingletonTestController;
-use Illuminate\Tests\Integration\Routing\Fixtures\SingletonTestController;
+use Illuminate\Tests\Routing\Fixtures\CreatableSingletonTestController;
+use Illuminate\Tests\Routing\Fixtures\NestedSingletonTestController;
+use Illuminate\Tests\Routing\Fixtures\SingletonTestController;
 use Orchestra\Testbench\TestCase;
 
 class RouteSingletonTest extends TestCase

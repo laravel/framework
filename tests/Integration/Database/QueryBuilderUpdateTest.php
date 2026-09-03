@@ -5,11 +5,11 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\Fixtures\StringStatus;
+use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-require_once 'Fixtures/Enums.php';
+require_once __DIR__.'/../../Database/Fixtures/Enums/Enums.php';
 
 class QueryBuilderUpdateTest extends DatabaseTestCase
 {

@@ -29,7 +29,7 @@ class SerializableClosureV1CacheRouteTest extends TestCase
 
     protected function setUp(): void
     {
-        $_ENV['APP_ROUTES_CACHE'] = realpath(join_paths(__DIR__, 'Fixtures', 'serializable-closure-v1', 'routes-v7.php'));
+        $_ENV['APP_ROUTES_CACHE'] = realpath(join_paths(dirname(__DIR__, 2), 'Routing', 'Fixtures', 'serializable-closure-v1', 'routes-v7.php'));
 
         parent::setUp();
     }

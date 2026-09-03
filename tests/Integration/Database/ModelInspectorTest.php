@@ -13,9 +13,9 @@ use Illuminate\Database\Eloquent\ModelInfo;
 use Illuminate\Database\Eloquent\ModelInspector;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Integration\Http\Fixtures\ModelInspectorTestModelResource;
 
 class ModelInspectorTest extends DatabaseTestCase
 {
@@ -221,9 +221,5 @@ class ModelInspectorTestModelEloquentCollection extends Collection
 }
 
 class ModelInspectorTestModelBuilder extends Builder
-{
-}
-
-class ModelInspectorTestModelResource extends JsonResource
 {
 }

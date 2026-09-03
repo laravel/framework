@@ -6,7 +6,6 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Events\LocaleUpdated;
-use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
@@ -16,6 +15,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\Assert;
+use Illuminate\Tests\Mail\Fixtures\GreetingMailable;
 use Orchestra\Testbench\TestCase;
 
 class SendingNotificationsWithLocaleTest extends TestCase
@@ -271,13 +271,5 @@ class GreetingMailNotificationWithMailable extends Notification
     {
         return (new GreetingMailable)
             ->to($notifiable->email);
-    }
-}
-
-class GreetingMailable extends Mailable
-{
-    public function build()
-    {
-        return $this->view('greeting');
     }
 }

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Tests\Integration\Routing\Fixtures\AbilityBackedEnum;
+use Illuminate\Tests\Routing\Fixtures\AbilityBackedEnum;
 use Orchestra\Testbench\TestCase;
 use User;
 
