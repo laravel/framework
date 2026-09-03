@@ -76,15 +76,11 @@ class HandleExceptionsTest extends TestCase
 
         $logger->expects('channel')->with('deprecations')->andReturnSelf();
         $logger->expects('warning')->with(
-            Mockery::on(fn (string $message) => (bool) preg_match(
-                '#^str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated$#',
-                $message
-            )),
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated'
             Mockery::on(function (array $context) {
                 $exception = $context['exception'] ?? null;
 
                 return $exception instanceof \ErrorException
-                    && $exception->getMessage() === 'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated'
                     && $exception->getSeverity() === E_USER_DEPRECATED
                     && $exception->getFile() === '/home/user/laravel/routes/web.php'
                     && $exception->getLine() === 17
@@ -168,15 +164,11 @@ class HandleExceptionsTest extends TestCase
 
         $logger->expects('channel')->with('deprecations')->andReturnSelf();
         $logger->expects('warning')->with(
-            Mockery::on(fn (string $message) => (bool) preg_match(
-                '#^str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated$#',
-                $message
-            )),
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
             Mockery::on(function (array $context) {
                 $exception = $context['exception'] ?? null;
 
                 return $exception instanceof \ErrorException
-                    && $exception->getMessage() === 'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated'
                     && $exception->getSeverity() === E_USER_DEPRECATED
                     && $exception->getFile() === '/home/user/laravel/routes/web.php'
                     && $exception->getLine() === 17
