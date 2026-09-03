@@ -85,8 +85,10 @@ class HandleExceptionsTest extends TestCase
 
                 return $exception instanceof \ErrorException
                     && $exception->getMessage() === 'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated'
-                    && str_contains($exception->getTraceAsString(), 'HandleExceptionsTest.php')
-                    && str_contains($exception->getTraceAsString(), 'HandleExceptions->handleError');
+                    && $exception->getSeverity() === E_USER_DEPRECATED
+                    && $exception->getFile() === '/home/user/laravel/routes/web.php'
+                    && $exception->getLine() === 17
+                    && $exception->getTrace();
             })
         );
 
@@ -175,8 +177,10 @@ class HandleExceptionsTest extends TestCase
 
                 return $exception instanceof \ErrorException
                     && $exception->getMessage() === 'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated'
-                    && str_contains($exception->getTraceAsString(), 'HandleExceptionsTest.php')
-                    && str_contains($exception->getTraceAsString(), 'HandleExceptions->handleError');
+                    && $exception->getSeverity() === E_USER_DEPRECATED
+                    && $exception->getFile() === '/home/user/laravel/routes/web.php'
+                    && $exception->getLine() === 17
+                    && $exception->getTrace();
             })
         );
 
