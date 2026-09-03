@@ -11,6 +11,7 @@ use GuzzleHttp\Exception\ResponseException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\Create;
+use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\NoSeekStream;
@@ -4604,6 +4605,68 @@ class HttpClientTest extends TestCase
         $this->assertSame(1, $batch->failedRequests);
         $this->assertTrue($batch->hasFailures());
         $this->assertTrue($batch->finished());
+    }
+
+    public function testBatchResultsAreReturnedInRequestOrderWhenTheyCompleteOutOfOrder(): void
+    {
+        $promises = [];
+        $resolved = false;
+        $wait = function (bool $unwrap = true) use (&$promises, &$resolved) {
+            if ($resolved) {
+                return;
+            }
+
+            $resolved = true;
+
+            foreach (array_reverse($promises, true) as $key => $promise) {
+                $promise->resolve(new Response(new Psr7Response(200, [], "response-{$key}")));
+            }
+        };
+
+        for ($i = 0; $i < 4; $i++) {
+            $promises[] = new Promise($wait);
+        }
+
+        $batch = new class($promises) extends Batch
+        {
+            public function __construct(protected array $stubbedRequests)
+            {
+                parent::__construct();
+            }
+
+            protected function asyncRequest()
+            {
+                return array_shift($this->stubbedRequests);
+            }
+        };
+
+        $batch->as('first');
+        $batch->newRequest();
+        $batch->as('third');
+        $batch->newRequest();
+
+        $completionOrder = [];
+        $thenResults = [];
+        $finallyResults = [];
+
+        $results = $batch->progress(function (Batch $batch, int|string $key) use (&$completionOrder) {
+            $completionOrder[] = $key;
+        })->then(function (Batch $batch, array $results) use (&$thenResults) {
+            $thenResults = $results;
+        })->finally(function (Batch $batch, array $results) use (&$finallyResults) {
+            $finallyResults = $results;
+        })->send();
+
+        $this->assertSame([1, 'third', 0, 'first'], $completionOrder);
+        $this->assertSame(['first', 0, 'third', 1], array_keys($results));
+        $this->assertSame([
+            'first' => 'response-0',
+            0 => 'response-1',
+            'third' => 'response-2',
+            1 => 'response-3',
+        ], array_map(fn (Response $response) => $response->body(), $results));
+        $this->assertSame($results, $thenResults);
+        $this->assertSame($results, $finallyResults);
     }
 
     public function testBatchDefer(): void

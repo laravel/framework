@@ -332,13 +332,18 @@ class Batch
                 ->wait();
         }
 
-        // Before returning the results, we must ensure that the results are sorted
+        // Before returning the results, we must ensure that the results are ordered
         // in the same order as the requests were defined, respecting any custom
         // key names that were assigned to this request using the "as" method.
-        uksort($results, function ($key1, $key2) {
-            return array_search($key1, array_keys($this->requests), true) <=>
-                   array_search($key2, array_keys($this->requests), true);
-        });
+        $orderedResults = [];
+
+        foreach ($this->requests as $key => $request) {
+            if (array_key_exists($key, $results)) {
+                $orderedResults[$key] = $results[$key];
+            }
+        }
+
+        $results = $orderedResults;
 
         if (! $this->hasFailures() && $this->thenCallback !== null) {
             call_user_func($this->thenCallback, $this, $results);
