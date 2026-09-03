@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Interruptible;
@@ -343,6 +344,178 @@ class QueueWorkerTest extends TestCase
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
         $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
+    }
+
+    public function testJobThatCrashedWorkerIsFailedOnceMaxExceptionsWouldBeExceeded()
+    {
+        $e = MaxAttemptsExceededException::class;
+
+        // Simulates the second pickup of a job whose first attempt crashed the worker
+        // process (e.g. PHP memory exhaustion): the exception counter was optimistically
+        // incremented before the job ran and never rolled back...
+        $job = new WorkerFakeJob;
+        $job->uuid = 'test-uuid';
+        $job->maxExceptions = 1;
+        $job->attempts = 2;
+
+        $cache = Mockery::mock(CacheRepository::class);
+        $cache->shouldReceive('get')->with('job-exceptions:test-uuid')->andReturn(1)->once();
+        $cache->shouldReceive('increment')->with('job-exceptions:test-uuid')->andReturn(2)->once();
+        $cache->shouldReceive('forget')->with('job-exceptions:test-uuid')->once();
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        Worker::$pausable = false;
+
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 0]));
+
+        $this->assertFalse($job->fired);
+        $this->assertNull($job->releaseAfter);
+        $this->assertTrue($job->deleted);
+        $this->assertTrue($job->failed);
+        $this->assertInstanceOf($e, $job->failedWith);
+
+        Worker::$pausable = true;
+    }
+
+    public function testSuccessfulJobsDecrementExceptionCountAndForgetCacheKey()
+    {
+        Carbon::setTestNow($now = Carbon::create(2026, 1, 1, 0, 0, 0));
+
+        $job = new WorkerFakeJob;
+        $job->uuid = 'test-uuid';
+        $job->maxExceptions = 1;
+
+        $cache = Mockery::mock(CacheRepository::class);
+        $cache->shouldReceive('get')->with('job-exceptions:test-uuid')->andReturn(false);
+        $cache->shouldReceive('put')->with('job-exceptions:test-uuid', 0, Mockery::on(function ($ttl) use ($now) {
+            return $ttl == $now->copy()->addDay();
+        }));
+        $cache->shouldReceive('increment')->with('job-exceptions:test-uuid')->andReturn(1);
+        $cache->shouldReceive('decrement')->with('job-exceptions:test-uuid')->andReturn(0)->once();
+        $cache->shouldReceive('forget')->with('job-exceptions:test-uuid')->once();
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        Worker::$pausable = false;
+
+        $worker->runNextJob('default', 'queue', $this->workerOptions());
+
+        $this->assertTrue($job->fired);
+        $this->assertNull($job->releaseAfter);
+        $this->assertFalse($job->deleted);
+        $this->assertFalse($job->failed);
+
+        Carbon::setTestNow();
+        Worker::$pausable = true;
+    }
+
+    public function testExceptionStillFailsJobWhenMaxExceptionsReached()
+    {
+        $e = new RuntimeException;
+
+        $job = new WorkerFakeJob(function ($job) use ($e) {
+            $job->attempts++;
+
+            throw $e;
+        });
+        $job->uuid = 'test-uuid';
+        $job->maxExceptions = 1;
+
+        $cache = Mockery::mock(CacheRepository::class);
+        $cache->shouldReceive('get')->with('job-exceptions:test-uuid')->andReturn(false, 1)->twice();
+        $cache->shouldReceive('put')->with('job-exceptions:test-uuid', 0, Mockery::type(Carbon::class))->once();
+        $cache->shouldReceive('increment')->with('job-exceptions:test-uuid')->andReturn(1)->once();
+        $cache->shouldReceive('forget')->with('job-exceptions:test-uuid')->once();
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        Worker::$pausable = false;
+
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 0]));
+
+        $this->assertNull($job->releaseAfter);
+        $this->assertTrue($job->deleted);
+        $this->assertTrue($job->failed);
+        $this->assertEquals($e, $job->failedWith);
+
+        Worker::$pausable = true;
+    }
+
+    public function testJobWithMaxExceptionsOfZeroRunsItsFirstAttempt()
+    {
+        $job = new WorkerFakeJob;
+        $job->uuid = 'test-uuid';
+        $job->maxExceptions = 0;
+
+        $cache = Mockery::mock(CacheRepository::class);
+        $cache->shouldReceive('get')->with('job-exceptions:test-uuid')->andReturn(false);
+        $cache->shouldReceive('put')->with('job-exceptions:test-uuid', 0, Mockery::type(Carbon::class));
+        $cache->shouldReceive('increment')->with('job-exceptions:test-uuid')->andReturn(1);
+        $cache->shouldReceive('decrement')->with('job-exceptions:test-uuid')->andReturn(0)->once();
+        $cache->shouldReceive('forget')->with('job-exceptions:test-uuid')->once();
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        Worker::$pausable = false;
+
+        $worker->runNextJob('default', 'queue', $this->workerOptions());
+
+        $this->assertTrue($job->fired);
+        $this->assertNull($job->releaseAfter);
+        $this->assertFalse($job->deleted);
+        $this->assertFalse($job->failed);
+
+        Worker::$pausable = true;
+    }
+
+    public function testMaxExceptionsOfTwoStillPermitsTwoGenuineExceptions()
+    {
+        $e = new RuntimeException;
+
+        $firstThrow = new WorkerFakeJob(function ($job) use ($e) {
+            $job->attempts++;
+
+            throw $e;
+        });
+        $secondThrow = new WorkerFakeJob(function ($job) use ($e) {
+            $job->attempts++;
+
+            throw $e;
+        });
+        $firstThrow->uuid = $secondThrow->uuid = 'test-uuid';
+        $firstThrow->maxExceptions = $secondThrow->maxExceptions = 2;
+        $secondThrow->attempts = 1;
+
+        // Two pickups of the same job (same uuid): get sequence across both is
+        // false (seed) → 1 (post-throw compare) → 1 (pre-fire check) → 2 (final compare).
+        $cache = Mockery::mock(CacheRepository::class);
+        $cache->shouldReceive('get')->with('job-exceptions:test-uuid')->andReturn(false, 1, 1, 2)->times(4);
+        $cache->shouldReceive('put')->with('job-exceptions:test-uuid', 0, Mockery::type(Carbon::class))->once();
+        $cache->shouldReceive('increment')->with('job-exceptions:test-uuid')->andReturn(1, 2)->twice();
+        $cache->shouldReceive('forget')->with('job-exceptions:test-uuid')->once();
+
+        $worker = $this->getWorker('default', ['queue' => [$firstThrow, $secondThrow]]);
+        $worker->setCache($cache);
+        Worker::$pausable = false;
+
+        $options = $this->workerOptions(['maxTries' => 0]);
+
+        $worker->runNextJob('default', 'queue', $options);
+        $worker->runNextJob('default', 'queue', $options);
+
+        // The first genuine exception is tolerated: job released, not failed, counter persists at 1.
+        $this->assertFalse($firstThrow->failed);
+        $this->assertEquals(0, $firstThrow->releaseAfter);
+        $this->assertFalse($firstThrow->deleted);
+
+        // The second genuine exception fails the job.
+        $this->assertTrue($secondThrow->failed);
+        $this->assertEquals($e, $secondThrow->failedWith);
+        $this->assertTrue($secondThrow->deleted);
+        $this->assertNull($secondThrow->releaseAfter);
+
+        Worker::$pausable = true;
     }
 
     public function testJobIsFailedIfItHasAlreadyExceededMaxAttempts()
