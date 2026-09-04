@@ -32,4 +32,20 @@ class ResourceMakeCommandTest extends TestCase
             'class FooResourceCollection extends ResourceCollection',
         ], 'app/Http/Resources/FooResourceCollection.php');
     }
+
+    public function testItCanGenerateJsonApiResourceFile()
+    {
+        $this->artisan('make:resource', ['name' => 'FooResource', '--json-api' => true])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Http\Resources;',
+            'use Illuminate\Http\Resources\JsonApi\JsonApiResource;',
+            'class FooResource extends JsonApiResource',
+        ], 'app/Http/Resources/FooResource.php');
+
+        $this->assertFileNotContains([
+            'use Illuminate\Http\Request;',
+        ], 'app/Http/Resources/FooResource.php');
+    }
 }
