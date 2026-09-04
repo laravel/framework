@@ -22,22 +22,6 @@ class RunnableTest extends TestCase
         parent::tearDown();
     }
 
-    public function testItCanBeMadeThroughTheContainer()
-    {
-        Container::getInstance()->instance(RunnableDependency::class, $dependency = new RunnableDependency('resolved'));
-
-        $runnable = RunnableStub::make();
-
-        $this->assertSame($dependency, $runnable->dependency);
-    }
-
-    public function testItCanBeMadeWithParameters()
-    {
-        $runnable = ParameterizedRunnableStub::make(['value' => 'Taylor']);
-
-        $this->assertSame('Taylor', $runnable->value);
-    }
-
     public function testItCanBeRunThroughTheContainer()
     {
         Container::getInstance()->instance(RunnableDependency::class, new RunnableDependency('Hello'));
@@ -83,20 +67,6 @@ class RunnableStub
     public function handle(string $name): string
     {
         return "{$this->dependency->value} {$name}";
-    }
-}
-
-class ParameterizedRunnableStub
-{
-    use Runnable;
-
-    public function __construct(public string $value)
-    {
-    }
-
-    public function handle(): string
-    {
-        return $this->value;
     }
 }
 

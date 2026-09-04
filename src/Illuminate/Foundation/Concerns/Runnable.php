@@ -10,19 +10,11 @@ use Mockery\MockInterface;
 trait Runnable
 {
     /**
-     * Resolve the runnable from the container.
-     */
-    public static function make(array $parameters = []): static
-    {
-        return Container::getInstance()->make(static::class, $parameters);
-    }
-
-    /**
      * Resolve and run the runnable.
      */
     public static function run(mixed ...$arguments): mixed
     {
-        return static::make()->handle(...$arguments);
+        return Container::getInstance()->make(static::class)->handle(...$arguments);
     }
 
     /**
