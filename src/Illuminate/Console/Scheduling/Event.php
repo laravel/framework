@@ -494,7 +494,7 @@ class Event
      *
      * @param  string  $url
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return $this
      */
     public function pingBefore($url, $method = 'GET', $options = [])
@@ -508,7 +508,7 @@ class Event
      * @param  bool  $value
      * @param  string  $url
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return $this
      */
     public function pingBeforeIf($value, $url, $method = 'GET', $options = [])
@@ -521,7 +521,7 @@ class Event
      *
      * @param  string  $url
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return $this
      */
     public function thenPing($url, $method = 'GET', $options = [])
@@ -535,7 +535,7 @@ class Event
      * @param  bool  $value
      * @param  string  $url
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return $this
      */
     public function thenPingIf($value, $url, $method = 'GET', $options = [])
@@ -548,7 +548,7 @@ class Event
      *
      * @param  string  $url
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return $this
      */
     public function pingOnSuccess($url, $method = 'GET', $options = [])
@@ -562,7 +562,7 @@ class Event
      * @param  bool  $value
      * @param  string  $url
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return $this
      */
     public function pingOnSuccessIf($value, $url, $method = 'GET', $options = [])
@@ -575,7 +575,7 @@ class Event
      *
      * @param  string  $url
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return $this
      */
     public function pingOnFailure($url, $method = 'GET', $options = [])
@@ -589,7 +589,7 @@ class Event
      * @param  bool  $value
      * @param  string  $url
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return $this
      */
     public function pingOnFailureIf($value, $url, $method = 'GET', $options = [])
@@ -602,7 +602,7 @@ class Event
      *
      * @param  string  $url
      * @param  string  $method
-     * @param  array   $options
+     * @param  array  $options
      * @return \Closure
      */
     protected function pingCallback($url, $method = 'GET', $options = [])
