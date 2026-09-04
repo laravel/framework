@@ -633,7 +633,7 @@ class Event
                 'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
                 'timeout' => 30,
             ],
-            $options
+            is_array($options) ? $options : []
         );
 
         return match (true) {
