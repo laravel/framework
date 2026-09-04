@@ -749,7 +749,11 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeJson(Fluent $column)
     {
-        return 'nvarchar(max)';
+        return version_compare(
+            $this->connection->getServerVersion(),
+            '17.0.0',
+            '>='
+        ) ? 'json' : 'nvarchar(max)';
     }
 
     /**
