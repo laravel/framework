@@ -603,12 +603,41 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     public function testAddingJson()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
-        $blueprint->json('foo');
-        $statements = $blueprint->toSql();
+        $connection = Mockery::mock(Connection::class);
 
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "foo" nvarchar(max) not null', $statements[0]);
+        $grammar = new SqlServerGrammar($connection);
+
+        $connection->expects('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('getServerVersion')->andReturn('16.0.4236.7');
+        $connection->expects('getTablePrefix')->andReturn('');
+        $blueprint = new Blueprint($connection, 'users');
+
+        $blueprint->json('data');
+
+        $this->assertSame(
+            'alter table "users" add "data" nvarchar(max) not null',
+            $blueprint->toSql()[0]
+        );
+    }
+
+    public function testAddingJsonOnSqlServer2025()
+    {
+        $connection = Mockery::mock(Connection::class);
+
+        $grammar = new SqlServerGrammar($connection);
+
+        $connection->expects('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('getServerVersion')->andReturn('17.0.4075.5');
+        $connection->expects('getTablePrefix')->andReturn('');
+
+        $blueprint = new Blueprint($connection, 'users');
+
+        $blueprint->json('data');
+
+        $this->assertSame(
+            'alter table "users" add "data" json not null',
+            $blueprint->toSql()[0]
+        );
     }
 
     public function testAddingJsonb()
