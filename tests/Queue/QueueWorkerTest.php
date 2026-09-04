@@ -419,6 +419,83 @@ class QueueWorkerTest extends TestCase
         $this->assertEquals(10, $job->releaseAfter);
     }
 
+    public function testBackoffIsNotJitteredByDefault()
+    {
+        foreach (range(1, 25) as $ignored) {
+            $job = new WorkerFakeJob(function ($job) {
+                throw new Exception('Something went wrong.');
+            });
+
+            $job->attempts = 1;
+            $job->backoff = 100;
+
+            $worker = $this->getWorker('default', ['queue' => [$job]]);
+            $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 0]));
+
+            $this->assertSame(100, $job->releaseAfter);
+        }
+    }
+
+    public function testBackoffJitterKeepsTheDelayWithinTheConfiguredRatio()
+    {
+        $delays = [];
+
+        foreach (range(1, 50) as $ignored) {
+            $job = new WorkerFakeJob(function ($job) {
+                throw new Exception('Something went wrong.');
+            });
+
+            $job->attempts = 1;
+            $job->backoff = 100;
+            $job->backoffJitter = 0.25;
+
+            $worker = $this->getWorker('default', ['queue' => [$job]]);
+            $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 0]));
+
+            $delays[] = $job->releaseAfter;
+
+            $this->assertGreaterThanOrEqual(75, $job->releaseAfter);
+            $this->assertLessThanOrEqual(125, $job->releaseAfter);
+        }
+
+        $this->assertGreaterThan(1, count(array_unique($delays)));
+    }
+
+    public function testBackoffJitterLeavesAZeroBackoffAlone()
+    {
+        $job = new WorkerFakeJob(function ($job) {
+            throw new Exception('Something went wrong.');
+        });
+
+        $job->attempts = 1;
+        $job->backoff = 0;
+        $job->backoffJitter = 0.5;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 0]));
+
+        $this->assertSame(0, $job->releaseAfter);
+    }
+
+    public function testBackoffJitterRatioIsClampedAndNeverYieldsANegativeDelay()
+    {
+        foreach (range(1, 25) as $ignored) {
+            $job = new WorkerFakeJob(function ($job) {
+                throw new Exception('Something went wrong.');
+            });
+
+            $job->attempts = 1;
+            $job->backoff = 10;
+            $job->backoffJitter = 5.0;
+
+            $worker = $this->getWorker('default', ['queue' => [$job]]);
+            $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 0]));
+
+            $this->assertGreaterThanOrEqual(0, $job->releaseAfter);
+            $this->assertLessThanOrEqual(20, $job->releaseAfter);
+        }
+    }
+
     public function testJobRunsIfAppIsNotInMaintenanceMode()
     {
         $firstJob = new WorkerFakeJob(function ($job) {
@@ -861,6 +938,7 @@ class WorkerFakeJob implements QueueJobContract
     public $shouldFailOnTimeout = false;
     public $uuid;
     public $backoff;
+    public $backoffJitter;
     public $retryUntil;
     public $attempts = 0;
     public $failedWith;
@@ -916,6 +994,11 @@ class WorkerFakeJob implements QueueJobContract
     public function backoff()
     {
         return $this->backoff;
+    }
+
+    public function backoffJitter()
+    {
+        return $this->backoffJitter;
     }
 
     public function retryUntil()

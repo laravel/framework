@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\BackoffJitter;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
@@ -93,7 +94,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database->expects('table')->with('table')->andReturn($query);
         $query->expects('insertGetId')->andReturnUsing(function ($array) use ($uuid, $time) {
             $this->assertSame('default', $array['queue']);
-            $this->assertSame(json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => 10]), $array['payload']);
+            $this->assertSame(json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'backoffJitter' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => 10]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
             $this->assertIsInt($array['available_at']);
@@ -156,6 +157,29 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->push(new ChildJobWithPropertiesOverridingParentAttributes, ['data']);
 
         $container->shouldHaveReceived('bound')->with('events')->twice();
+    }
+
+    public function testPushResolvesBackoffJitterFromAttributeAndProperty()
+    {
+        $payloads = [];
+
+        foreach ([new JobWithBackoffJitterAttribute, new JobWithBackoffJitterProperty, new JobWithoutBackoffJitter] as $job) {
+            $database = Mockery::mock(Connection::class);
+            $queue = new DatabaseQueue($database, 'table', 'default');
+            $container = Mockery::spy(Container::class);
+            $queue->setContainer($container);
+            $query = Mockery::mock(QueryBuilder::class);
+            $database->expects('table')->with('table')->andReturn($query);
+            $query->expects('insertGetId')->andReturnUsing(function ($array) use (&$payloads) {
+                $payloads[] = json_decode($array['payload'], true);
+            });
+
+            $queue->push($job, ['data']);
+        }
+
+        $this->assertSame(BackoffJitter::DEFAULT_RATIO, $payloads[0]['backoffJitter']);
+        $this->assertSame(0.5, $payloads[1]['backoffJitter']);
+        $this->assertNull($payloads[2]['backoffJitter']);
     }
 
     public function testPushStillUsesAttributesDeclaredOnSameClassOverDefaultProperties()
@@ -232,14 +256,14 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query->expects('insert')->andReturnUsing(function ($records) use ($uuid, $time) {
             $this->assertEquals([[
                 'queue' => 'queue',
-                'payload' => json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => null]),
+                'payload' => json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'backoffJitter' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => null]),
                 'attempts' => 0,
                 'reserved_at' => null,
                 'available_at' => 'available',
                 'created_at' => 'created',
             ], [
                 'queue' => 'queue',
-                'payload' => json_encode(['uuid' => $uuid, 'displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => null]),
+                'payload' => json_encode(['uuid' => $uuid, 'displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'backoffJitter' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => null]),
                 'attempts' => 0,
                 'reserved_at' => null,
                 'available_at' => 'available',
@@ -586,6 +610,20 @@ class AfterCommitJob implements ShouldQueue
 #[Timeout(40)]
 #[Tries(2)]
 abstract class ParentJobWithAttributes implements ShouldQueue
+{
+}
+
+#[BackoffJitter]
+class JobWithBackoffJitterAttribute implements ShouldQueue
+{
+}
+
+class JobWithBackoffJitterProperty implements ShouldQueue
+{
+    public $backoffJitter = 0.5;
+}
+
+class JobWithoutBackoffJitter implements ShouldQueue
 {
 }
 

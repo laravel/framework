@@ -14,6 +14,7 @@ use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\BackoffJitter;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
@@ -181,6 +182,7 @@ abstract class Queue
             'maxExceptions' => $this->getAttributeValue($job, MaxExceptions::class, 'maxExceptions'),
             'failOnTimeout' => $this->getAttributeValue($job, FailOnTimeout::class, 'failOnTimeout') ?? false,
             'backoff' => $this->getJobBackoff($job),
+            'backoffJitter' => $this->getJobBackoffJitter($job),
             'timeout' => $this->getAttributeValue($job, Timeout::class, 'timeout'),
             'retryUntil' => $this->getJobExpiration($job),
             'deleteWhenMissingModels' => $this->getAttributeValue($job, DeleteWhenMissingModels::class, 'deleteWhenMissingModels') ?? false,
@@ -266,6 +268,27 @@ abstract class Queue
     }
 
     /**
+     * Get the backoff jitter ratio for an object-based queue handler.
+     *
+     * @param  mixed  $job
+     * @return float|null
+     */
+    public function getJobBackoffJitter($job)
+    {
+        $jitter = $this->getAttributeValue($job, BackoffJitter::class, 'backoffJitter');
+
+        if (method_exists($job, 'backoffJitter')) {
+            $jitter = $job->backoffJitter();
+        }
+
+        if (is_null($jitter) || $jitter === false) {
+            return;
+        }
+
+        return $jitter === true ? BackoffJitter::DEFAULT_RATIO : (float) $jitter;
+    }
+
+    /**
      * Get the expiration timestamp for an object-based queue handler.
      *
      * @param  mixed  $job
@@ -317,6 +340,7 @@ abstract class Queue
             'maxExceptions' => null,
             'failOnTimeout' => false,
             'backoff' => null,
+            'backoffJitter' => null,
             'timeout' => null,
             'data' => $data,
             'createdAt' => Carbon::now()->getTimestamp(),

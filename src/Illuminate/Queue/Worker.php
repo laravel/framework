@@ -799,7 +799,38 @@ class Worker
                 : $options->backoff
         );
 
-        return (int) ($backoff[$job->attempts() - 1] ?? last($backoff));
+        return $this->applyBackoffJitter(
+            $job, (int) ($backoff[$job->attempts() - 1] ?? last($backoff))
+        );
+    }
+
+    /**
+     * Apply the job's jitter, if any, to the calculated backoff.
+     *
+     * Jitter spreads the retries of jobs that failed together, so that they do
+     * not all hit a struggling dependency again at the same moment.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  int  $backoff
+     * @return int
+     */
+    protected function applyBackoffJitter($job, $backoff)
+    {
+        if ($backoff <= 0 || ! method_exists($job, 'backoffJitter')) {
+            return $backoff;
+        }
+
+        $ratio = $job->backoffJitter();
+
+        if (is_null($ratio)) {
+            return $backoff;
+        }
+
+        $delta = (int) round($backoff * max(0, min(1, (float) $ratio)));
+
+        return $delta === 0
+            ? $backoff
+            : random_int($backoff - $delta, $backoff + $delta);
     }
 
     /**

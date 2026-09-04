@@ -2,12 +2,27 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Illuminate\Queue\Attributes\BackoffJitter;
 use Illuminate\Queue\Attributes\Connection;
 use Illuminate\Queue\Attributes\Queue;
 use PHPUnit\Framework\TestCase;
 
 class QueueAttributesTest extends TestCase
 {
+    public function test_backoff_jitter_attribute_defaults_to_the_default_ratio()
+    {
+        $attribute = new BackoffJitter;
+
+        $this->assertSame(BackoffJitter::DEFAULT_RATIO, $attribute->ratio);
+    }
+
+    public function test_backoff_jitter_attribute_accepts_an_explicit_ratio()
+    {
+        $attribute = new BackoffJitter(0.5);
+
+        $this->assertSame(0.5, $attribute->ratio);
+    }
+
     public function test_queue_attribute_normalizes_backed_enum_to_string()
     {
         $attribute = new Queue(QueueAttributeBackedEnum::DEFAULT);

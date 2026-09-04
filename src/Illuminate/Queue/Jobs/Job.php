@@ -327,6 +327,16 @@ abstract class Job
     }
 
     /**
+     * Get the proportion the job's backoff may be adjusted by.
+     *
+     * @return float|null
+     */
+    public function backoffJitter()
+    {
+        return $this->payload()['backoffJitter'] ?? null;
+    }
+
+    /**
      * Get the number of seconds the job can run.
      *
      * @return int|null
