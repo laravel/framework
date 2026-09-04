@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Closure;
+use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
@@ -230,6 +231,33 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Get the correct prefix for paused queue cache keys.
+     *
+     * In Redis cluster mode, returns hash tag '{paused}' to ensure all
+     * pause-related keys hash to the same slot for Cache::many() operations.
+     *
+     * @return string
+     */
+    protected function getPausedQueueKeyPrefix()
+    {
+        $store = $this->app['cache']->store()->getStore();
+
+        return $store instanceof RedisStore && $store->connection()->isCluster() ? '{paused}' : 'paused';
+    }
+
+    /**
+     * Get the cache key for a paused queue.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @return string
+     */
+    protected function getPausedQueueCacheKey($connection, $queue)
+    {
+        return "illuminate:queue:{$this->getPausedQueueKeyPrefix()}:{$connection}:{$queue}";
+    }
+
+    /**
      * Pause a queue by its connection and name.
      *
      * @param  string  $connection
@@ -240,7 +268,7 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $this->app['cache']
             ->store()
-            ->forever("illuminate:queue:paused:{$connection}:{$queue}", true);
+            ->forever($this->getPausedQueueCacheKey($connection, $queue), true);
 
         $this->app['events']->dispatch(
             new Events\QueuePaused($connection, $queue)
@@ -259,7 +287,7 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $this->app['cache']
             ->store()
-            ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $ttl);
+            ->put($this->getPausedQueueCacheKey($connection, $queue), true, $ttl);
 
         $this->app['events']->dispatch(
             new Events\QueuePaused($connection, $queue, $ttl)
@@ -293,7 +321,7 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $this->app['cache']
             ->store()
-            ->forget("illuminate:queue:paused:{$connection}:{$queue}");
+            ->forget($this->getPausedQueueCacheKey($connection, $queue));
 
         $this->app['events']->dispatch(
             new Events\QueueResumed($connection, $queue)
@@ -330,7 +358,7 @@ class QueueManager implements FactoryContract, MonitorContract
         $cache = $this->app['cache']->store();
 
         return (bool) ($cache->get('illuminate:queues:paused')
-            ?: $cache->get("illuminate:queue:paused:{$connection}:{$queue}"));
+            ?: $cache->get($this->getPausedQueueCacheKey($connection, $queue)));
     }
 
     /**
@@ -348,12 +376,13 @@ class QueueManager implements FactoryContract, MonitorContract
             return array_values($queues);
         }
 
-        $states = $cache->many(
-            array_map(fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues)
-        );
+        $prefix = $this->getPausedQueueKeyPrefix();
+        $key = fn ($queue) => "illuminate:queue:{$prefix}:{$connection}:{$queue}";
+
+        $states = $cache->many(array_map($key, $queues));
 
         return array_values(array_filter(
-            $queues, fn ($queue) => $states["illuminate:queue:paused:{$connection}:{$queue}"] ?? false
+            $queues, fn ($queue) => $states[$key($queue)] ?? false
         ));
     }
 
