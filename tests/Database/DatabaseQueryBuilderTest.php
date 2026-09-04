@@ -6162,6 +6162,209 @@ SQL;
         $this->assertSame('select (1 + 1) as "expr", (2 + 2) as "expr2" from "one"', $builder->toSql());
     }
 
+    public function testSelectAggregate()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectAggregate('sum', ['amount']);
+        $this->assertSame('select sum("amount") as "amount_sum" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectAggregate('sum', ['amount'], 'total');
+        $this->assertSame('select sum("amount") as "total" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectAggregate('count');
+        $this->assertSame('select count(*) as "count" from "users"', $builder->toSql());
+    }
+
+    public function testSelectAggregateWrapsTheAliasAsASingleIdentifier()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectSum('amount', 'a.b');
+        $this->assertSame('select sum("amount") as "a.b" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectSum('amount', 'x as y');
+        $this->assertSame('select sum("amount") as "x as y" from "users"', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->from('users')->selectSum('amount', 'meta->total');
+        $this->assertSame('select sum(`amount`) as `meta->total` from `users`', $builder->toSql());
+    }
+
+    public function testSelectAggregateAliasIsNotPrefixed()
+    {
+        $builder = $this->getBuilder(prefix: 'wp_');
+        $builder->from('users')->selectSum('amount', 'a.b');
+        $this->assertSame('select sum("amount") as "a.b" from "wp_users"', $builder->toSql());
+    }
+
+    public function testSelectAggregateDerivesAliasFromColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectAggregate('sum', ['users.amount']);
+        $this->assertSame('select sum("users"."amount") as "users_amount_sum" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectAggregate('sum', ['amountTaxesIncluded']);
+        $this->assertSame('select sum("amountTaxesIncluded") as "amount_taxes_included_sum" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectAggregate('count', ['first_name', 'last_name']);
+        $this->assertSame('select count("first_name", "last_name") as "first_name_last_name_count" from "users"', $builder->toSql());
+    }
+
+    public function testSelectAggregateKeepsEveryColumnSegmentInTheAliasToAvoidCollisions()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')
+            ->join('invoices', 'invoices.user_id', '=', 'users.id')
+            ->selectAggregate('sum', ['users.amount'])
+            ->selectAggregate('sum', ['invoices.amount']);
+
+        $this->assertSame('select sum("users"."amount") as "users_amount_sum", sum("invoices"."amount") as "invoices_amount_sum" from "users" inner join "invoices" on "invoices"."user_id" = "users"."id"', $builder->toSql());
+    }
+
+    public function testSelectAggregateWithExpressionColumn()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectAggregate('sum', [new Raw('price * quantity')], 'total');
+        $this->assertSame('select sum(price * quantity) as "total" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectAggregate('sum', [new Raw('price * quantity')]);
+        $this->assertSame('select sum(price * quantity) as "price_quantity_sum" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectAggregate('sum', [new Raw('CASE WHEN paid THEN amount ELSE 0 END')]);
+        $this->assertSame('select sum(CASE WHEN paid THEN amount ELSE 0 END) as "case_when_paid_then_amount_else0_end_sum" from "users"', $builder->toSql());
+    }
+
+    public function testSelectAggregateWithBindings()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('invoices')->selectAggregate(
+            'sum', [new Raw('case when state = ? then amount else 0 end')], 'paid_total', bindings: ['paid']
+        );
+
+        $this->assertSame('select sum(case when state = ? then amount else 0 end) as "paid_total" from "invoices"', $builder->toSql());
+        $this->assertEquals(['paid'], $builder->getRawBindings()['select']);
+
+        $builder = $this->getBuilder();
+        $builder->from('invoices')
+            ->selectAggregate('sum', [new Raw('case when state = ? then amount else 0 end')], 'paid_total', bindings: ['paid'])
+            ->where('year', 2026);
+
+        $this->assertEquals(['paid', 2026], $builder->getBindings());
+    }
+
+    public function testSelectAggregateShortcutsAcceptDistinct()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')
+            ->selectCount('email', 'emails', true)
+            ->selectAvg('amount', 'distinct_average', true);
+
+        $this->assertSame('select count(distinct "email") as "emails", avg(distinct "amount") as "distinct_average" from "users"', $builder->toSql());
+    }
+
+    public function testSelectAggregateMentionsDistinctInTheDerivedAliasToAvoidCollisions()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectSum('amount', distinct: true)->selectSum('amount');
+
+        $this->assertSame('select sum(distinct "amount") as "amount_distinct_sum", sum("amount") as "amount_sum" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectCount('email', distinct: true);
+
+        $this->assertSame('select count(distinct "email") as "email_distinct_count" from "users"', $builder->toSql());
+
+        // A "count(*)" ignores the distinct constraint, so the alias must not claim it.
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectCount(distinct: true);
+
+        $this->assertSame('select count(*) as "count" from "users"', $builder->toSql());
+    }
+
+    public function testSelectAggregateShortcutsAcceptBindings()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('invoices')
+            ->selectCount()
+            ->selectSum(new Raw('case when state = ? then amount else 0 end'), 'paid_total', bindings: ['paid'])
+            ->where('year', 2026);
+
+        $this->assertSame('select count(*) as "count", sum(case when state = ? then amount else 0 end) as "paid_total" from "invoices" where "year" = ?', $builder->toSql());
+        $this->assertEquals(['paid', 2026], $builder->getBindings());
+    }
+
+    public function testSelectAggregateWithDistinct()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectAggregate('count', ['email'], 'emails', true);
+        $this->assertSame('select count(distinct "email") as "emails" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectAggregate('count', ['first_name', 'last_name'], 'names', true);
+        $this->assertSame('select count(distinct "first_name", "last_name") as "names" from "users"', $builder->toSql());
+    }
+
+    public function testMultipleSelectAggregates()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('invoices')
+            ->select('state')
+            ->selectAggregate('count')
+            ->selectAggregate('sum', ['amount'])
+            ->selectAggregate('sum', ['amount_taxes_included'], 'total_ttc')
+            ->groupBy('state');
+
+        $this->assertSame('select "state", count(*) as "count", sum("amount") as "amount_sum", sum("amount_taxes_included") as "total_ttc" from "invoices" group by "state"', $builder->toSql());
+    }
+
+    public function testSelectAggregateDoesNotInterfereWithTerminalAggregates()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->expects('select')
+            ->with('select count(*) as "aggregate" from "invoices"', [], true, [])
+            ->andReturn([['aggregate' => 1]]);
+        $builder->getProcessor()->expects('processSelect')->andReturnUsing(fn ($builder, $results) => $results);
+
+        $builder->from('invoices')->selectAggregate('sum', ['amount']);
+
+        $this->assertEquals(1, $builder->count());
+        $this->assertSame('select sum("amount") as "amount_sum" from "invoices"', $builder->toSql());
+    }
+
+    public function testSelectAggregateShortcuts()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectCount()->selectSum('amount')->selectAvg('amount')->selectMin('amount')->selectMax('amount');
+        $this->assertSame('select count(*) as "count", sum("amount") as "amount_sum", avg("amount") as "amount_avg", min("amount") as "amount_min", max("amount") as "amount_max" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectSum('amount', 'total');
+        $this->assertSame('select sum("amount") as "total" from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->selectCount('users.id')->selectCount(['first_name', 'last_name'], 'names');
+        $this->assertSame('select count("users"."id") as "users_id_count", count("first_name", "last_name") as "names" from "users"', $builder->toSql());
+    }
+
+    public function testSelectAggregateShortcutsInAGroupedQuery()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('invoices')
+            ->select('state')
+            ->selectCount()
+            ->selectSum('amount')
+            ->selectSum('amount_taxes_included', 'total_ttc')
+            ->groupBy('state');
+
+        $this->assertSame('select "state", count(*) as "count", sum("amount") as "amount_sum", sum("amount_taxes_included") as "total_ttc" from "invoices" group by "state"', $builder->toSql());
+    }
+
     public function testSelect()
     {
         $builder = $this->getBuilder();

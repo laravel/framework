@@ -120,6 +120,31 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile an aggregate function into a select column.
+     *
+     * @param  string  $function
+     * @param  array<\Illuminate\Contracts\Database\Query\Expression|string>  $columns
+     * @param  string  $as
+     * @param  bool|array  $distinct
+     * @return string
+     */
+    public function compileAggregateColumn($function, $columns, $as, $distinct = false)
+    {
+        $column = $this->columnize($columns);
+
+        // If the query has a "distinct" constraint and we're not asking for all columns
+        // we need to prepend "distinct" onto the column name so that the query takes
+        // it into account when it performs the aggregating operations on the data.
+        if (is_array($distinct)) {
+            $column = 'distinct '.$this->columnize($distinct);
+        } elseif ($distinct && $column !== '*') {
+            $column = 'distinct '.$column;
+        }
+
+        return $function.'('.$column.') as '.$this->wrapValue($as);
+    }
+
+    /**
      * Compile an aggregated select clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -128,18 +153,9 @@ class Grammar extends BaseGrammar
      */
     protected function compileAggregate(Builder $query, $aggregate)
     {
-        $column = $this->columnize($aggregate['columns']);
-
-        // If the query has a "distinct" constraint and we're not asking for all columns
-        // we need to prepend "distinct" onto the column name so that the query takes
-        // it into account when it performs the aggregating operations on the data.
-        if (is_array($query->distinct)) {
-            $column = 'distinct '.$this->columnize($query->distinct);
-        } elseif ($query->distinct && $column !== '*') {
-            $column = 'distinct '.$column;
-        }
-
-        return 'select '.$aggregate['function'].'('.$column.') as '.$this->wrap('aggregate');
+        return 'select '.$this->compileAggregateColumn(
+            $aggregate['function'], $aggregate['columns'], 'aggregate', $query->distinct
+        );
     }
 
     /**

@@ -523,6 +523,94 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add an aggregate function select expression to the query.
+     *
+     * @param  array<\Illuminate\Contracts\Database\Query\Expression|string>  $columns
+     * @return $this
+     */
+    public function selectAggregate(string $function, array $columns = ['*'], ?string $as = null, bool $distinct = false, array $bindings = [])
+    {
+        return $this->selectRaw($this->grammar->compileAggregateColumn(
+            $function, $columns, $as ?? $this->aggregateSelectAlias($function, $columns, $distinct), $distinct
+        ), $bindings);
+    }
+
+    /**
+     * Derive the select alias of an aggregate function from the columns it aggregates.
+     *
+     * @param  array<\Illuminate\Contracts\Database\Query\Expression|string>  $columns
+     * @return string
+     */
+    protected function aggregateSelectAlias(string $function, array $columns, bool $distinct = false)
+    {
+        $segments = (new Collection($columns))
+            ->map(fn ($column) => $column instanceof ExpressionContract
+                ? strtolower($this->grammar->getValue($column))
+                : str_replace('.', ' ', $column))
+            ->map(fn ($segment) => trim(preg_replace('/[^[:alnum:][:space:]_]/u', '', $segment)))
+            ->filter(fn ($segment) => $segment !== '');
+
+        $suffix = $distinct && $segments->isNotEmpty() ? 'distinct '.$function : $function;
+
+        return Str::snake($segments->push($suffix)->implode('_'));
+    }
+
+    /**
+     * Add a "count" aggregate function select expression to the query.
+     *
+     * @param  array<\Illuminate\Contracts\Database\Query\Expression|string>|\Illuminate\Contracts\Database\Query\Expression|string  $columns
+     * @return $this
+     */
+    public function selectCount($columns = '*', ?string $as = null, bool $distinct = false, array $bindings = [])
+    {
+        return $this->selectAggregate('count', Arr::wrap($columns), $as, $distinct, $bindings);
+    }
+
+    /**
+     * Add a "sum" aggregate function select expression to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @return $this
+     */
+    public function selectSum($column, ?string $as = null, bool $distinct = false, array $bindings = [])
+    {
+        return $this->selectAggregate('sum', [$column], $as, $distinct, $bindings);
+    }
+
+    /**
+     * Add an "avg" aggregate function select expression to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @return $this
+     */
+    public function selectAvg($column, ?string $as = null, bool $distinct = false, array $bindings = [])
+    {
+        return $this->selectAggregate('avg', [$column], $as, $distinct, $bindings);
+    }
+
+    /**
+     * Add a "min" aggregate function select expression to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @return $this
+     */
+    public function selectMin($column, ?string $as = null, array $bindings = [])
+    {
+        return $this->selectAggregate('min', [$column], $as, bindings: $bindings);
+    }
+
+    /**
+     * Add a "max" aggregate function select expression to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @return $this
+     */
+    public function selectMax($column, ?string $as = null, array $bindings = [])
+    {
+        return $this->selectAggregate('max', [$column], $as, bindings: $bindings);
+    }
+
+    /**
      * Force the query to only return distinct results.
      *
      * @return $this
