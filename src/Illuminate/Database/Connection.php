@@ -1479,7 +1479,14 @@ class Connection implements ConnectionInterface
      */
     public function getName()
     {
-        return $this->getConfig('name');
+        $name = $this->getConfig('name');
+
+        // The "direct" connection is a distinct connection instance with its own
+        // transactions, so its name has to keep the suffix in order to resolve
+        // back to it. Read and write connections still collapse to the base.
+        return $this->readWriteType === 'direct' && $name
+            ? $name.'::direct'
+            : $name;
     }
 
     /**
@@ -1489,7 +1496,7 @@ class Connection implements ConnectionInterface
      */
     public function getNameWithReadWriteType()
     {
-        $name = $this->getName().($this->readWriteType ? '::'.$this->readWriteType : '');
+        $name = $this->getConfig('name').($this->readWriteType ? '::'.$this->readWriteType : '');
 
         return empty($name) ? null : $name;
     }
