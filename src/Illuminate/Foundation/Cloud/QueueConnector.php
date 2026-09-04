@@ -102,6 +102,7 @@ class QueueConnector implements ConnectorInterface
     {
         Worker::$restartable = false;
         Worker::$pausable = false;
+        Worker::$memoryExceededExitCode = null;
 
         // Exit the worker (and restart the pod) when the agent socket is unreachable...
         $this->app->extend(
