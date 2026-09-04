@@ -1862,6 +1862,44 @@ EOT
         $response->assertJsonMissingPath('numeric_keys.3');
     }
 
+    public function testAssertJsonMissingPathWithWildcard(): void
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('bars.*.missing');
+        $response->assertJsonMissingPath('missing.*.bar');
+
+        // A wildcard matches a single segment, so this must not match "barfoo.*.bar.foo"...
+        $response->assertJsonMissingPath('barfoo.*.foo');
+    }
+
+    public function testAssertJsonMissingPathWithTrailingWildcardCanFail(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('bars.*');
+    }
+
+    public function testAssertJsonMissingPathWithWildcardCanFail(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('bars.*.bar');
+    }
+
+    public function testAssertJsonMissingPathWithWildcardCanFailWhenPresentOnSomeItems(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('barfoo.*.bar.foo');
+    }
+
     public function testAssertJsonMissingPaths(): void
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
