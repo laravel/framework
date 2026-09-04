@@ -135,11 +135,7 @@ class Rule
      */
     public static function in($values)
     {
-        if ($values instanceof Arrayable) {
-            $values = $values->toArray();
-        }
-
-        return new In(is_array($values) ? $values : func_get_args());
+        return new In(...func_get_args());
     }
 
     /**
@@ -150,11 +146,7 @@ class Rule
      */
     public static function notIn($values)
     {
-        if ($values instanceof Arrayable) {
-            $values = $values->toArray();
-        }
-
-        return new NotIn(is_array($values) ? $values : func_get_args());
+        return new NotIn(...func_get_args());
     }
 
     /**
@@ -335,11 +327,7 @@ class Rule
      */
     public static function contains($values)
     {
-        if ($values instanceof Arrayable) {
-            $values = $values->toArray();
-        }
-
-        return new Rules\Contains(is_array($values) ? $values : func_get_args());
+        return new Rules\Contains(...func_get_args());
     }
 
     /**
@@ -350,11 +338,7 @@ class Rule
      */
     public static function doesntContain($values)
     {
-        if ($values instanceof Arrayable) {
-            $values = $values->toArray();
-        }
-
-        return new Rules\DoesntContain(is_array($values) ? $values : func_get_args());
+        return new Rules\DoesntContain(...func_get_args());
     }
 
     /**
