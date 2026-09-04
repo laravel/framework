@@ -387,6 +387,8 @@ class FakeBroadcaster extends Broadcaster
 
 class BroadcasterTestEloquentModelStub extends Model
 {
+    protected $keyType = 'string';
+
     public function getRouteKeyName()
     {
         return 'id';
