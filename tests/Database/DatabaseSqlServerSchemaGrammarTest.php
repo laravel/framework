@@ -626,19 +626,17 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
         $grammar = new SqlServerGrammar($connection);
 
-        $connection->allows('getSchemaGrammar')->andReturn($grammar);
-        $connection->allows('getServerVersion')->andReturn('17.0.4075.5');
-        $connection->allows('getTablePrefix')->andReturn('');
+        $connection->expects('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('getServerVersion')->andReturn('17.0.4075.5');
+        $connection->expects('getTablePrefix')->andReturn('');
 
         $blueprint = new Blueprint($connection, 'users');
 
         $blueprint->json('data');
 
-        $statements = $blueprint->toSql();
-
         $this->assertSame(
             'alter table "users" add "data" json not null',
-            $statements[0]
+            $blueprint->toSql()[0]
         );
     }
 
