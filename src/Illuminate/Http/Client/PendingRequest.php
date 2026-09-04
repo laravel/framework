@@ -272,7 +272,7 @@ class PendingRequest
             'timeout' => 30,
         ];
 
-        $this->beforeSendingCallbacks = new Collection([function (Request $request, array $options, PendingRequest $pendingRequest) {
+        $this->beforeSendingCallbacks = new Collection([static function (Request $request, array $options, PendingRequest $pendingRequest) {
             $pendingRequest->request = $request;
             $pendingRequest->cookies = $options['cookies'];
 
