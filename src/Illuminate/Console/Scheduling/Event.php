@@ -616,7 +616,6 @@ class Event
                 $container->make(ExceptionHandler::class)->report($e);
             }
         };
-
     }
 
     /**
