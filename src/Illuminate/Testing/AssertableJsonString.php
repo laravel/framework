@@ -223,7 +223,22 @@ class AssertableJsonString implements ArrayAccess, Countable
      */
     public function assertMissingPath($path)
     {
-        PHPUnit::assertFalse(Arr::has($this->json(), $path));
+        if (! str_contains($path, '*')) {
+            PHPUnit::assertFalse(Arr::has($this->json(), $path));
+
+            return $this;
+        }
+
+        $pattern = '#^'.(new Collection(explode('.', $path)))
+            ->map(fn ($segment) => $segment === '*' ? '[^.]+' : preg_quote($segment, '#'))
+            ->implode('\.').'(\.|$)#';
+
+        PHPUnit::assertFalse(
+            (new Collection(Arr::dot((array) $this->json())))
+                ->keys()
+                ->contains(fn ($key) => preg_match($pattern, $key) === 1),
+            "Found unexpected path [{$path}] within the response JSON."
+        );
 
         return $this;
     }
