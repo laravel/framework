@@ -608,6 +608,7 @@ class Event
     protected function pingCallback($url, $method = 'GET', $options = [])
     {
         $method = in_array($method, ['GET', 'POST', 'HEAD']) ? strtoupper($method) : 'GET';
+
         return function (Container $container) use ($url, $method, $options) {
             try {
                 $this->getHttpClient($container, $options)->request($method, $url);
