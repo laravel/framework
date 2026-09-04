@@ -342,7 +342,14 @@ class Sleep
 
         while ($while()) {
             if ($seconds > 0) {
-                sleep($seconds);
+                $secondsToSleep = $seconds;
+
+                // sleep() returns the number of seconds left to sleep if it was
+                // interrupted by a signal, such as those sent by a queue worker,
+                // so we keep sleeping until the requested duration has elapsed.
+                while ($secondsToSleep > 0) {
+                    $secondsToSleep = sleep($secondsToSleep);
+                }
 
                 $remaining = $remaining->subSeconds($seconds);
             }
