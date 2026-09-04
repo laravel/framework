@@ -494,11 +494,12 @@ class Event
      *
      * @param  string  $url
      * @param  string  $method
+     * @param  array   $options
      * @return $this
      */
-    public function pingBefore($url, $method = 'GET')
+    public function pingBefore($url, $method = 'GET', $options = [])
     {
-        return $this->before($this->pingCallback($url, $method));
+        return $this->before($this->pingCallback($url, $method, $options));
     }
 
     /**
@@ -507,9 +508,10 @@ class Event
      * @param  bool  $value
      * @param  string  $url
      * @param  string  $method
+     * @param  array   $options
      * @return $this
      */
-    public function pingBeforeIf($value, $url, $method = 'GET')
+    public function pingBeforeIf($value, $url, $method = 'GET', $options = [])
     {
         return $value ? $this->pingBefore($url, $method) : $this;
     }
@@ -519,11 +521,12 @@ class Event
      *
      * @param  string  $url
      * @param  string  $method
+     * @param  array   $options
      * @return $this
      */
-    public function thenPing($url, $method = 'GET')
+    public function thenPing($url, $method = 'GET', $options = [])
     {
-        return $this->then($this->pingCallback($url, $method));
+        return $this->then($this->pingCallback($url, $method, $options));
     }
 
     /**
@@ -532,11 +535,12 @@ class Event
      * @param  bool  $value
      * @param  string  $url
      * @param  string  $method
+     * @param  array   $options
      * @return $this
      */
-    public function thenPingIf($value, $url, $method = 'GET')
+    public function thenPingIf($value, $url, $method = 'GET', $options = [])
     {
-        return $value ? $this->thenPing($url, $method) : $this;
+        return $value ? $this->thenPing($url, $method, $options) : $this;
     }
 
     /**
@@ -544,11 +548,12 @@ class Event
      *
      * @param  string  $url
      * @param  string  $method
+     * @param  array   $options
      * @return $this
      */
-    public function pingOnSuccess($url, $method = 'GET')
+    public function pingOnSuccess($url, $method = 'GET', $options = [])
     {
-        return $this->onSuccess($this->pingCallback($url, $method));
+        return $this->onSuccess($this->pingCallback($url, $method, $options));
     }
 
     /**
@@ -557,11 +562,12 @@ class Event
      * @param  bool  $value
      * @param  string  $url
      * @param  string  $method
+     * @param  array   $options
      * @return $this
      */
-    public function pingOnSuccessIf($value, $url, $method = 'GET')
+    public function pingOnSuccessIf($value, $url, $method = 'GET', $options = [])
     {
-        return $value ? $this->onSuccess($this->pingCallback($url, $method)) : $this;
+        return $value ? $this->onSuccess($this->pingCallback($url, $method, $options)) : $this;
     }
 
     /**
@@ -569,11 +575,12 @@ class Event
      *
      * @param  string  $url
      * @param  string  $method
+     * @param  array   $options
      * @return $this
      */
-    public function pingOnFailure($url, $method = 'GET')
+    public function pingOnFailure($url, $method = 'GET', $options = [])
     {
-        return $this->onFailure($this->pingCallback($url, $method));
+        return $this->onFailure($this->pingCallback($url, $method, $options));
     }
 
     /**
@@ -582,9 +589,10 @@ class Event
      * @param  bool  $value
      * @param  string  $url
      * @param  string  $method
+     * @param  array   $options
      * @return $this
      */
-    public function pingOnFailureIf($value, $url, $method = 'GET')
+    public function pingOnFailureIf($value, $url, $method = 'GET', $options = [])
     {
         return $value ? $this->onFailure($this->pingCallback($url, $method)) : $this;
     }
@@ -593,37 +601,45 @@ class Event
      * Get the callback that pings the given URL.
      *
      * @param  string  $url
+     * @param  string  $method
+     * @param  array   $options
      * @return \Closure
      */
-    protected function pingCallback($url, $method = 'GET')
+    protected function pingCallback($url, $method = 'GET', $options = [])
     {
         $method = in_array($method, ['GET', 'POST', 'HEAD']) ? strtoupper($method) : 'GET';
-
-        return function (Container $container) use ($url, $method) {
+        return function (Container $container) use ($url, $method, $options) {
             try {
-                $this->getHttpClient($container)->request($method, $url);
+                $this->getHttpClient($container, $options)->request($method, $url);
             } catch (ClientExceptionInterface|TransferException $e) {
                 $container->make(ExceptionHandler::class)->report($e);
             }
         };
+
     }
 
     /**
      * Get the Guzzle HTTP client to use to send pings.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  string  $method
      * @return \GuzzleHttp\ClientInterface
      */
-    protected function getHttpClient(Container $container)
+    protected function getHttpClient(Container $container, $options)
     {
-        return match (true) {
-            $container->bound(HttpClientInterface::class) => $container->make(HttpClientInterface::class),
-            $container->bound(HttpClient::class) => $container->make(HttpClient::class),
-            default => new HttpClient([
+        $options = array_merge(
+            [
                 'connect_timeout' => 10,
                 'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
                 'timeout' => 30,
-            ]),
+            ],
+            $options
+        );
+
+        return match (true) {
+            $container->bound(HttpClientInterface::class) => $container->make(HttpClientInterface::class),
+            $container->bound(HttpClient::class) => $container->make(HttpClient::class),
+            default => new HttpClient($options),
         };
     }
 
