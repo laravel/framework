@@ -493,11 +493,12 @@ class Event
      * Register a callback to ping a given URL before the job runs.
      *
      * @param  string  $url
+     * @param  string  $method
      * @return $this
      */
-    public function pingBefore($url)
+    public function pingBefore($url, $method = 'GET')
     {
-        return $this->before($this->pingCallback($url));
+        return $this->before($this->pingCallback($url, $method));
     }
 
     /**
@@ -505,22 +506,24 @@ class Event
      *
      * @param  bool  $value
      * @param  string  $url
+     * @param  string  $method
      * @return $this
      */
-    public function pingBeforeIf($value, $url)
+    public function pingBeforeIf($value, $url, $method = 'GET')
     {
-        return $value ? $this->pingBefore($url) : $this;
+        return $value ? $this->pingBefore($url, $method) : $this;
     }
 
     /**
      * Register a callback to ping a given URL after the job runs.
      *
      * @param  string  $url
+     * @param  string  $method
      * @return $this
      */
-    public function thenPing($url)
+    public function thenPing($url, $method = 'GET')
     {
-        return $this->then($this->pingCallback($url));
+        return $this->then($this->pingCallback($url, $method));
     }
 
     /**
@@ -528,22 +531,24 @@ class Event
      *
      * @param  bool  $value
      * @param  string  $url
+     * @param  string  $method
      * @return $this
      */
-    public function thenPingIf($value, $url)
+    public function thenPingIf($value, $url, $method = 'GET')
     {
-        return $value ? $this->thenPing($url) : $this;
+        return $value ? $this->thenPing($url, $method) : $this;
     }
 
     /**
      * Register a callback to ping a given URL if the operation succeeds.
      *
      * @param  string  $url
+     * @param  string  $method
      * @return $this
      */
-    public function pingOnSuccess($url)
+    public function pingOnSuccess($url, $method = 'GET')
     {
-        return $this->onSuccess($this->pingCallback($url));
+        return $this->onSuccess($this->pingCallback($url, $method));
     }
 
     /**
@@ -551,22 +556,24 @@ class Event
      *
      * @param  bool  $value
      * @param  string  $url
+     * @param  string  $method
      * @return $this
      */
-    public function pingOnSuccessIf($value, $url)
+    public function pingOnSuccessIf($value, $url, $method = 'GET')
     {
-        return $value ? $this->onSuccess($this->pingCallback($url)) : $this;
+        return $value ? $this->onSuccess($this->pingCallback($url, $method)) : $this;
     }
 
     /**
      * Register a callback to ping a given URL if the operation fails.
      *
      * @param  string  $url
+     * @param  string  $method
      * @return $this
      */
-    public function pingOnFailure($url)
+    public function pingOnFailure($url, $method = 'GET')
     {
-        return $this->onFailure($this->pingCallback($url));
+        return $this->onFailure($this->pingCallback($url, $method));
     }
 
     /**
@@ -574,11 +581,12 @@ class Event
      *
      * @param  bool  $value
      * @param  string  $url
+     * @param  string  $method
      * @return $this
      */
-    public function pingOnFailureIf($value, $url)
+    public function pingOnFailureIf($value, $url, $method = 'GET')
     {
-        return $value ? $this->onFailure($this->pingCallback($url)) : $this;
+        return $value ? $this->onFailure($this->pingCallback($url, $method)) : $this;
     }
 
     /**
@@ -587,11 +595,13 @@ class Event
      * @param  string  $url
      * @return \Closure
      */
-    protected function pingCallback($url)
+    protected function pingCallback($url, $method = 'GET')
     {
-        return function (Container $container) use ($url) {
+        $method = in_array($method, ['GET', 'POST', 'HEAD']) ? strtoupper($method) : 'GET';
+
+        return function (Container $container) use ($url, $method) {
             try {
-                $this->getHttpClient($container)->request('GET', $url);
+                $this->getHttpClient($container)->request($method, $url);
             } catch (ClientExceptionInterface|TransferException $e) {
                 $container->make(ExceptionHandler::class)->report($e);
             }
