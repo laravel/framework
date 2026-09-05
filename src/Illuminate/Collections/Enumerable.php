@@ -1302,9 +1302,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Collect the values into a collection.
      *
+     * @param  mixed  $key
      * @return \Illuminate\Support\Collection<TKey, TValue>
      */
-    public function collect();
+    public function collect($key = null);
 
     /**
      * Get the collection of items as a plain array.
