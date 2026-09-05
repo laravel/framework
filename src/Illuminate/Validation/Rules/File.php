@@ -12,9 +12,16 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
+/**
+ * @method static $this types(string|array<int, string> $mimetypes)
+ * @method $this types(string|array<int, string> $mimetypes)
+ */
 class File implements Rule, DataAwareRule, ValidatorAwareRule
 {
-    use Conditionable, Macroable;
+    use Conditionable, Macroable {
+        Macroable::__call as macroCall;
+        Macroable::__callStatic as macroCallStatic;
+    }
 
     /**
      * The MIME types that the given file should match. This array may also contain file extensions.
@@ -137,12 +144,19 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Limit the uploaded file to the given MIME types or file extensions.
      *
+     * Declared protected so that both the static and the instance form route
+     * through __callStatic and __call respectively. Calling it statically
+     * begins a new rule; calling it on an existing rule adds to that rule
+     * rather than silently discarding it.
+     *
      * @param  string|array<int, string>  $mimetypes
-     * @return static
+     * @return $this
      */
-    public static function types($mimetypes)
+    protected function types($mimetypes)
     {
-        return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
+        $this->allowedMimetypes = (array) $mimetypes;
+
+        return $this;
     }
 
     /**
@@ -399,5 +413,37 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         $this->data = $data;
 
         return $this;
+    }
+
+    /**
+     * Dynamically handle calls to the rule.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if ($method === 'types') {
+            return $this->types(...$parameters);
+        }
+
+        return $this->macroCall($method, $parameters);
+    }
+
+    /**
+     * Dynamically handle static calls to the rule.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public static function __callStatic($method, $parameters)
+    {
+        if ($method === 'types') {
+            return (new static)->types(...$parameters);
+        }
+
+        return static::macroCallStatic($method, $parameters);
     }
 }

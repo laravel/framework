@@ -322,6 +322,29 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testTypesPreservesPriorChainConfiguration()
+    {
+        $this->fails(
+            File::default()->max(1024)->types(['txt']),
+            UploadedFile::fake()->create('foo.txt', 1025),
+            ['validation.max.file']
+        );
+
+        $this->passes(
+            File::default()->max(1024)->types(['txt']),
+            UploadedFile::fake()->create('foo.txt', 1024),
+        );
+    }
+
+    public function testTypesPreservesImageConfiguration()
+    {
+        $this->fails(
+            File::image()->max(1024)->types(['jpg', 'jpeg']),
+            UploadedFile::fake()->image('foo.jpg')->size(1025),
+            ['validation.max.file']
+        );
+    }
+
     public function testMaxWithHumanReadableSize()
     {
         $this->fails(
