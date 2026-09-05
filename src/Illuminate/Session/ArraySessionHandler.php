@@ -54,6 +54,16 @@ class ArraySessionHandler implements SessionHandlerInterface
     }
 
     /**
+     * Create a new session ID.
+     *
+     * @return string
+     */
+    public function create_sid(): string
+    {
+        return session_create_id();
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string|false
