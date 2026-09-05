@@ -992,11 +992,12 @@ trait EnumeratesValues
     /**
      * Collect the values into a collection.
      *
+     * @param  mixed  $key
      * @return \Illuminate\Support\Collection<TKey, TValue>
      */
-    public function collect()
+    public function collect($key = null)
     {
-        return new Collection($this->all());
+        return new Collection(!is_null($key) ? $this->get($key) : $this->all());
     }
 
     /**

@@ -6030,6 +6030,7 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testCollect($collection)
     {
+        // Test default
         $data = $collection::make([
             'a' => 1,
             'b' => 2,
@@ -6042,6 +6043,53 @@ class SupportCollectionTest extends TestCase
             'a' => 1,
             'b' => 2,
             'c' => 3,
+        ], $data->all());
+
+        // Test collect of nested iterable
+        $data = $collection::make([
+            'd' => [
+                'foo' => 9,
+                'bar' => 8,
+                'baz' => [
+                    'boom' => 7,
+                ],
+            ],
+            'e' => [
+                'Taylor' => 'Otwell',
+            ],
+        ])->collect('d');
+
+        $this->assertInstanceOf(Collection::class, $data);
+
+        $this->assertSame([
+            'foo' => 9,
+            'bar' => 8,
+            'baz' => [
+                'boom' => 7,
+            ],
+        ], $data->all());
+
+        $data = $collection::make([
+            'baz' => [
+                'boom' => 7,
+            ],
+        ])->collect('baz');
+
+        $this->assertInstanceOf(Collection::class, $data);
+
+        $this->assertSame([
+            'boom' => 7,
+        ], $data->all());
+
+        // Test collect of non-iterable value
+        $data = $collection::make([
+            'boom' => 7,
+        ])->collect('boom');
+
+        $this->assertInstanceOf(Collection::class, $data);
+
+        $this->assertSame([
+            7,
         ], $data->all());
     }
 
