@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
+use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Tests\Integration\Generators\TestCase;
 use LogicException;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
@@ -121,5 +123,19 @@ class ConfigCacheCommandTest extends TestCase
         }
 
         $this->assertFileDoesNotExist($this->app->getCachedConfigPath());
+    }
+
+    public function testItRestoresTheFacadeApplicationAfterBootingAFreshApplication(): void
+    {
+        $this->artisan('config:cache')->assertSuccessful();
+
+        $this->assertSame($this->app, Facade::getFacadeApplication());
+    }
+
+    public function testItRestoresTheContainerInstanceAfterBootingAFreshApplication(): void
+    {
+        $this->artisan('config:cache')->assertSuccessful();
+
+        $this->assertSame($this->app, Container::getInstance());
     }
 }
