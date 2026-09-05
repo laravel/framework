@@ -716,7 +716,7 @@ class Connection implements ConnectionInterface
     /**
      * Execute the given callback in "dry run" mode.
      *
-     * @param  (\Closure(): array{query: string, bindings: array, time: float|null}[])  $callback
+     * @param  (\Closure(): (array{query: string, bindings: array, time: float|null}[]))  $callback
      * @return array{query: string, bindings: array, time: float|null}[]
      */
     protected function withFreshQueryLog($callback)
