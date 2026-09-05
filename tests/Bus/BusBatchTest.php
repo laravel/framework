@@ -673,17 +673,71 @@ class BusBatchTest extends TestCase
 
         $connection->expects('bulk')->with(Mockery::on(function ($args) {
             return true;
-        }), '', null);
+        }), '', 'custom-queue');
 
         $batch->add([
             [$firstJob, $secondJob],
         ]);
 
-        // Both jobs had ->onQueue('custom-queue') set before batching.
-        // The second job retains its queue, but the first job's queue
-        // is wiped to null by Batch::add() calling allOnQueue(null).
         $this->assertSame('custom-queue', $secondJob->queue);
         $this->assertSame('custom-queue', $firstJob->queue);
+    }
+
+    public function test_jobs_are_pushed_to_their_own_queue_when_batch_has_no_queue()
+    {
+        $queue = Mockery::mock(Factory::class);
+
+        $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
+
+        $pendingBatch = (new PendingBatch(new Container, collect()))
+            ->onConnection('test-connection');
+
+        $batch = $repository->store($pendingBatch);
+
+        $highJob = (new ChainHeadJob)->onQueue('high');
+        $lowJob = (new SecondTestJob)->onQueue('low');
+        $anotherHighJob = (new ThirdTestJob)->onQueue('high');
+        $defaultJob = new ThirdTestJob;
+
+        $connection = Mockery::mock(QueueContract::class);
+        $queue->expects('connection')
+            ->with('test-connection')
+            ->andReturn($connection);
+
+        $connection->expects('bulk')->with([$highJob, $anotherHighJob], '', 'high');
+        $connection->expects('bulk')->with([$lowJob], '', 'low');
+        $connection->expects('bulk')->with([$defaultJob], '', null);
+
+        $batch = $batch->add([$highJob, $lowJob, $anotherHighJob, $defaultJob]);
+
+        $this->assertEquals(4, $batch->totalJobs);
+    }
+
+    public function test_batch_queue_takes_precedence_over_job_queues()
+    {
+        $queue = Mockery::mock(Factory::class);
+
+        $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
+
+        $pendingBatch = (new PendingBatch(new Container, collect()))
+            ->onConnection('test-connection')
+            ->onQueue('test-queue');
+
+        $batch = $repository->store($pendingBatch);
+
+        $highJob = (new ChainHeadJob)->onQueue('high');
+        $defaultJob = new SecondTestJob;
+
+        $connection = Mockery::mock(QueueContract::class);
+        $queue->expects('connection')
+            ->with('test-connection')
+            ->andReturn($connection);
+
+        $connection->expects('bulk')->with([$highJob, $defaultJob], '', 'test-queue');
+
+        $batch = $batch->add([$highJob, $defaultJob]);
+
+        $this->assertEquals(2, $batch->totalJobs);
     }
 
     public function test_chained_closure_after_multiple_batches_is_properly_dispatched()
