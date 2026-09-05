@@ -48,7 +48,11 @@ class RollbackCommand extends BaseCommand
     }
 
     /**
-     * Execute the console command.
+     * Handle the execution of the rollback command.
+     *
+     * Displays the list of migrations that will be rolled back and asks
+     * for user confirmation before proceeding, unless the --force option
+     * is provided. Supports --step, --batch, and --pretend options.
      *
      * @return int
      */
@@ -60,6 +64,29 @@ class RollbackCommand extends BaseCommand
         }
 
         $this->migrator->usingConnection($this->option('database'), function () {
+            $migrations = $this->migrator->getRepository()->getLast();
+
+            if ($this->option('step')) {
+                $migrations = $this->migrator->getRepository()->getMigrations($this->option('step'));
+            }
+
+            if (empty($migrations)) {
+                $this->info('Nothing to rollback.');
+                return;
+            }
+
+            $this->line('Migrations to be rolled back:');
+            foreach ($migrations as $migration) {
+                $this->line(' - '.$migration->migration);
+            }
+
+            if (! $this->option('force')) {
+                if (! $this->confirm('Do you really want to rollback these migrations?')) {
+                    $this->info('Rollback cancelled.');
+                    return;
+                }
+            }
+
             $this->migrator->setOutput($this->output)->rollback(
                 $this->getMigrationPaths(), [
                     'pretend' => $this->option('pretend'),
