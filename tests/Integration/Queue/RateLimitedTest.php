@@ -150,6 +150,44 @@ class RateLimitedTest extends TestCase
         $this->assertJobWasReleasedAfter(RateLimitedReleaseAfterTestJob::class, 60);
     }
 
+    public function testLimitsAreNotHitWhenAnotherLimitIsReached()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+
+        $rateLimiter->for('test', function () {
+            return [
+                Limit::perHour(10)->by('global'),
+                Limit::perHour(1)->by('tenant'),
+            ];
+        });
+
+        $this->assertJobRanSuccessfully(RateLimitedTestJob::class);
+        $this->assertJobWasReleased(RateLimitedTestJob::class);
+        $this->assertJobWasReleased(RateLimitedTestJob::class);
+
+        $this->assertSame(1, $rateLimiter->attempts(md5('test'.'global')));
+        $this->assertSame(1, $rateLimiter->attempts(md5('test'.'tenant')));
+    }
+
+    public function testLimitsAreNotHitWhenAnotherLimitIsReachedAndJobIsSkipped()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+
+        $rateLimiter->for('test', function () {
+            return [
+                Limit::perHour(10)->by('global'),
+                Limit::perHour(1)->by('tenant'),
+            ];
+        });
+
+        $this->assertJobRanSuccessfully(RateLimitedDontReleaseTestJob::class);
+        $this->assertJobWasSkipped(RateLimitedDontReleaseTestJob::class);
+        $this->assertJobWasSkipped(RateLimitedDontReleaseTestJob::class);
+
+        $this->assertSame(1, $rateLimiter->attempts(md5('test'.'global')));
+        $this->assertSame(1, $rateLimiter->attempts(md5('test'.'tenant')));
+    }
+
     public function testMiddlewareSerialization()
     {
         $rateLimited = new RateLimited('limiterName');
