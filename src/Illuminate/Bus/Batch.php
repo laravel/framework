@@ -185,11 +185,17 @@ class Batch implements Arrayable, JsonSerializable
         $this->repository->transaction(function () use ($jobs, $count) {
             $this->repository->incrementTotalJobs($this->id, $count);
 
-            $this->queue->connection($this->options['connection'] ?? null)->bulk(
-                $jobs->all(),
-                $data = '',
-                $this->options['queue'] ?? null
-            );
+            $connection = $this->queue->connection($this->options['connection'] ?? null);
+
+            if (isset($this->options['queue'])) {
+                $connection->bulk($jobs->all(), $data = '', $this->options['queue']);
+
+                return;
+            }
+
+            foreach ($jobs->groupBy(fn ($job) => $job->queue ?? '') as $group) {
+                $connection->bulk($group->all(), $data = '', $group->first()->queue ?? null);
+            }
         });
 
         return $this->fresh();
