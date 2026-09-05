@@ -997,7 +997,7 @@ trait EnumeratesValues
      */
     public function collect($key = null)
     {
-        return new Collection(!is_null($key) ? $this->get($key) : $this->all());
+        return new Collection(! is_null($key) ? $this->get($key) : $this->all());
     }
 
     /**
