@@ -71,7 +71,7 @@ class ModelIdentifier
     /**
      * Specify the collection class that should be used when serializing / restoring collections.
      *
-     * @param  class-string<\Illuminate\Database\Eloquent\Collection>  $collectionClass
+     * @param  class-string<\Illuminate\Database\Eloquent\Collection>|null  $collectionClass
      * @return $this
      */
     public function useCollectionClass(?string $collectionClass)
