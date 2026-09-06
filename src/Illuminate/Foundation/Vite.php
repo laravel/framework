@@ -867,13 +867,27 @@ class Vite implements Htmlable
     }
 
     /**
+     * Get the URL of the running Vite development server.
+     *
+     * @return string|null
+     */
+    public function devServerUrl()
+    {
+        if (! $this->isRunningHot()) {
+            return null;
+        }
+
+        return rtrim(file_get_contents($this->hotFile()));
+    }
+
+    /**
      * Get the path to a given asset when running in HMR mode.
      *
      * @return string
      */
     protected function hotAsset($asset)
     {
-        return rtrim(file_get_contents($this->hotFile())).'/'.$asset;
+        return $this->devServerUrl().'/'.$asset;
     }
 
     /**
