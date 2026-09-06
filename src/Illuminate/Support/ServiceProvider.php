@@ -504,7 +504,7 @@ abstract class ServiceProvider
     /**
      * Register commands that should run on "reload".
      *
-     * @param  string|null  $reload
+     * @param  string  $reload
      * @param  string|null  $key
      * @return void
      */
