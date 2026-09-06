@@ -4021,6 +4021,24 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(CustomBuilder::class, $eloquentBuilder);
     }
 
+    public function testUseEloquentBuilderAttributeIsInherited()
+    {
+        $model = new EloquentModelInheritingBuilderStub();
+
+        $query = $this->createStub(\Illuminate\Database\Query\Builder::class);
+
+        $this->assertInstanceOf(CustomBuilder::class, $model->newEloquentBuilder($query));
+    }
+
+    public function testUseEloquentBuilderAttributeOnChildClassOverridesParentAttribute()
+    {
+        $model = new EloquentModelOverridingBuilderStub();
+
+        $query = $this->createStub(\Illuminate\Database\Query\Builder::class);
+
+        $this->assertInstanceOf(ChildCustomBuilder::class, $model->newEloquentBuilder($query));
+    }
+
     public function testDefaultBuilderIsUsedWhenUseEloquentBuilderAttributeIsNotPresent()
     {
         $model = new EloquentModelWithoutUseEloquentBuilderAttributeStub();
@@ -4050,8 +4068,21 @@ class CustomBuilder extends Builder
 {
 }
 
+class ChildCustomBuilder extends Builder
+{
+}
+
 #[\Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder(CustomBuilder::class)]
 class EloquentModelWithUseEloquentBuilderAttributeStub extends Model
+{
+}
+
+class EloquentModelInheritingBuilderStub extends EloquentModelWithUseEloquentBuilderAttributeStub
+{
+}
+
+#[\Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder(ChildCustomBuilder::class)]
+class EloquentModelOverridingBuilderStub extends EloquentModelWithUseEloquentBuilderAttributeStub
 {
 }
 
