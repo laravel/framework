@@ -111,6 +111,19 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertNull(SoftDeletesTestUser::find(1));
     }
 
+    public function testSoftDeletesAreNotRetrievedWhenTableIsAliased()
+    {
+        $this->createUsers();
+
+        $users = SoftDeletesTestUser::from('users as u')->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(2, $users->first()->id);
+        $this->assertCount(2, SoftDeletesTestUser::from('users as u')->withTrashed()->get());
+        $this->assertCount(1, SoftDeletesTestUser::from('users as u')->withTrashed()->withoutTrashed()->get());
+        $this->assertEquals(1, SoftDeletesTestUser::from('users as u')->onlyTrashed()->first()->id);
+    }
+
     public function testSoftDeletesAreNotRetrievedFromBaseQuery()
     {
         $this->createUsers();
