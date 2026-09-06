@@ -39,7 +39,22 @@ class DatabaseChannel
             'read_at' => method_exists($notification, 'initialDatabaseReadAtValue')
                 ? $notification->initialDatabaseReadAtValue($notifiable)
                 : null,
+            ...$this->getAdditionalAttributes($notifiable, $notification),
         ];
+    }
+
+    /**
+     * Get any additional attributes to persist on the database notification.
+     *
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return array
+     */
+    protected function getAdditionalAttributes($notifiable, Notification $notification)
+    {
+        return method_exists($notification, 'databaseAttributes')
+            ? $notification->databaseAttributes($notifiable)
+            : [];
     }
 
     /**

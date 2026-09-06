@@ -63,6 +63,25 @@ class NotificationDatabaseChannelTest extends TestCase
         $channel = new ExtendedDatabaseChannel;
         $channel->send($notifiable, $notification);
     }
+
+    public function testCustomAttributesAreSentToDatabase()
+    {
+        $notification = new NotificationDatabaseChannelCustomAttributesTestNotification;
+        $notification->id = 1;
+        $notifiable = Mockery::mock();
+
+        $notifiable->expects('routeNotificationFor->create')->with([
+            'id' => 1,
+            'type' => get_class($notification),
+            'data' => ['invoice_id' => 1],
+            'read_at' => null,
+            'organization_id' => 2,
+            'message' => 'foo',
+        ]);
+
+        $channel = new DatabaseChannel;
+        $channel->send($notifiable, $notification);
+    }
 }
 
 class NotificationDatabaseChannelTestNotification extends Notification
@@ -88,6 +107,22 @@ class NotificationDatabaseChannelCustomizeTypeTestNotification extends Notificat
     public function initialDatabaseReadAtValue()
     {
         return Carbon::now();
+    }
+}
+
+class NotificationDatabaseChannelCustomAttributesTestNotification extends Notification
+{
+    public function toDatabase($notifiable)
+    {
+        return new DatabaseMessage(['invoice_id' => 1]);
+    }
+
+    public function databaseAttributes($notifiable)
+    {
+        return [
+            'organization_id' => 2,
+            'message' => 'foo',
+        ];
     }
 }
 
