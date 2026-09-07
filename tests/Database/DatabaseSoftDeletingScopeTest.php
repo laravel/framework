@@ -19,8 +19,8 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope = Mockery::mock(SoftDeletingScope::class.'[extend]');
         $builder = Mockery::mock(EloquentBuilder::class);
         $model = Mockery::mock(Model::class);
-        $model->expects('getDeletedAtColumn')->andReturn('deleted_at');
-        $builder->expects('qualifyColumn')->with('deleted_at')->andReturn('table.deleted_at');
+        $model->expects('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
+        $builder->expects('qualifyColumn')->with('table.deleted_at')->andReturn('table.deleted_at');
         $builder->expects('whereNull')->with('table.deleted_at');
 
         $scope->apply($builder, $model);
@@ -124,8 +124,8 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $givenBuilder = Mockery::mock(EloquentBuilder::class);
         $givenBuilder->expects('getModel')->andReturn($model);
         $givenBuilder->expects('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
-        $model->expects('getDeletedAtColumn')->andReturn('deleted_at');
-        $givenBuilder->expects('qualifyColumn')->with('deleted_at')->andReturn('table.deleted_at');
+        $model->expects('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
+        $givenBuilder->expects('qualifyColumn')->with('table.deleted_at')->andReturn('table.deleted_at');
         $givenBuilder->expects('whereNotNull')->with('table.deleted_at');
         $result = $callback($givenBuilder);
 
@@ -146,8 +146,8 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $givenBuilder = Mockery::mock(EloquentBuilder::class);
         $givenBuilder->expects('getModel')->andReturn($model);
         $givenBuilder->expects('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
-        $model->expects('getDeletedAtColumn')->andReturn('deleted_at');
-        $givenBuilder->expects('qualifyColumn')->with('deleted_at')->andReturn('table.deleted_at');
+        $model->expects('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
+        $givenBuilder->expects('qualifyColumn')->with('table.deleted_at')->andReturn('table.deleted_at');
         $givenBuilder->expects('whereNull')->with('table.deleted_at');
         $result = $callback($givenBuilder);
 

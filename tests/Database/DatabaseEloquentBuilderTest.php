@@ -334,6 +334,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel(new EloquentBuilderTestStubStringPrimaryKey);
 
         $this->assertSame('alias.column', $builder->qualifyColumn('column'));
+        $this->assertSame('alias.column', $builder->qualifyColumn('foo_table.column'));
         $this->assertSame('other_table.column', $builder->qualifyColumn('other_table.column'));
         $this->assertEquals(['alias.column', 'alias.name'], $builder->qualifyColumns(['column', 'name']));
     }
