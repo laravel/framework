@@ -479,7 +479,15 @@ class SqlServerGrammar extends Grammar
                     : $this->wrap($key).' = '.$this->parameter($value);
             })->implode(', ');
 
-            $sql .= 'when matched then update set '.$update.' ';
+            $sql .= 'when matched';
+
+            if ($query->upsertConstraints) {
+                $sql .= ' and '.$this->compileUpsertConstraints(
+                    $query, fn ($column) => $this->wrap('laravel_source.'.$column),
+                );
+            }
+
+            $sql .= ' then update set '.$update.' ';
         }
 
         $sql .= 'when not matched then insert ('.$columns.') values ('.$columns.');';

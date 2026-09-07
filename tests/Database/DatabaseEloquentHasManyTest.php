@@ -259,6 +259,7 @@ class DatabaseEloquentHasManyTest extends TestCase
     public function testRelationUpsertFillsForeignKey()
     {
         $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn(Mockery::mock(QueryBuilder::class));
 
         $relation->getQuery()->expects('upsert')->with(
             [

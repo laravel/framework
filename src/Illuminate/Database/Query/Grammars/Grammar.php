@@ -1458,6 +1458,20 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile the ownership comparisons for an upsert update.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  callable(string): string  $value
+     * @return string
+     */
+    protected function compileUpsertConstraints(Builder $query, callable $value)
+    {
+        return (new Collection($query->upsertConstraints))
+            ->map(fn ($column) => $this->wrap($query->from.'.'.$column).' = '.$value($column))
+            ->implode(' and ');
+    }
+
+    /**
      * Prepare the bindings for an update statement.
      *
      * @param  array  $bindings

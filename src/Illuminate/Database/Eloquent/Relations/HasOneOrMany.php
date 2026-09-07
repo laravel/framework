@@ -322,7 +322,31 @@ abstract class HasOneOrMany extends Relation
             $values[$key][$this->getForeignKeyName()] = $this->getParentKey();
         }
 
-        return $this->getQuery()->upsert($values, $uniqueBy, $update);
+        $query = clone $this->getQuery();
+        $query->getQuery()->upsertConstraints = $constraints = $this->getUpsertConstraints();
+
+        if ($values !== [] && $update !== []) {
+            // Keep ownership columns stable while MySQL evaluates each assignment.
+            $update = array_filter(
+                $update ?? array_keys(array_first($values)),
+                fn ($value, $key) => ! in_array(is_int($key) ? $value : $key, $constraints, true),
+                ARRAY_FILTER_USE_BOTH,
+            );
+
+            $update = $update ?: $constraints;
+        }
+
+        return $query->upsert($values, $uniqueBy, $update);
+    }
+
+    /**
+     * Get the ownership columns which must match before an upsert may update a row.
+     *
+     * @return list<string>
+     */
+    protected function getUpsertConstraints()
+    {
+        return [$this->getForeignKeyName()];
     }
 
     /**

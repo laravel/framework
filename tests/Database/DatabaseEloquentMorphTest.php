@@ -68,6 +68,7 @@ class DatabaseEloquentMorphTest extends TestCase
     public function testMorphRelationUpsertFillsForeignKey()
     {
         $relation = $this->getManyRelation();
+        $relation->getQuery()->shouldReceive('getQuery')->andReturn(Mockery::mock(QueryBuilder::class));
 
         $relation->getQuery()->expects('upsert')->with(
             [

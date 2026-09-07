@@ -115,6 +115,15 @@ class Builder implements BuilderContract
     public $distinct = false;
 
     /**
+     * The columns which must match the inserted values before an upsert may update a row.
+     *
+     * @internal
+     *
+     * @var list<string>
+     */
+    public $upsertConstraints = [];
+
+    /**
      * The table which the query is targeting.
      *
      * @var \Illuminate\Database\Query\Expression|string

@@ -435,14 +435,21 @@ class MySqlGrammar extends Grammar
 
         $sql .= ' on duplicate key update ';
 
-        $columns = (new Collection($update))->map(function ($value, $key) use ($useUpsertAlias) {
-            if (! is_numeric($key)) {
-                return $this->wrap($key).' = '.$this->parameter($value);
+        $source = fn ($column) => $useUpsertAlias
+            ? $this->wrap('laravel_upsert_alias').'.'.$this->wrap($column)
+            : 'values('.$this->wrap($column).')';
+
+        $constraints = $this->compileUpsertConstraints($query, $source);
+
+        $columns = (new Collection($update))->map(function ($value, $key) use ($source, $constraints) {
+            $column = $this->wrap(is_numeric($key) ? $value : $key);
+            $value = is_numeric($key) ? $source($value) : $this->parameter($value);
+
+            if ($constraints !== '') {
+                $value = 'if('.$constraints.', '.$value.', '.$column.')';
             }
 
-            return $useUpsertAlias
-                ? $this->wrap($value).' = '.$this->wrap('laravel_upsert_alias').'.'.$this->wrap($value)
-                : $this->wrap($value).' = values('.$this->wrap($value).')';
+            return $column.' = '.$value;
         })->implode(', ');
 
         return $sql.$columns;

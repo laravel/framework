@@ -365,7 +365,15 @@ class SQLiteGrammar extends Grammar
                 : $this->wrap($key).' = '.$this->parameter($value);
         })->implode(', ');
 
-        return $sql.$columns;
+        $sql .= $columns;
+
+        if ($query->upsertConstraints) {
+            $sql .= ' where '.$this->compileUpsertConstraints(
+                $query, fn ($column) => $this->wrapValue('excluded').'.'.$this->wrap($column),
+            );
+        }
+
+        return $sql;
     }
 
     /**

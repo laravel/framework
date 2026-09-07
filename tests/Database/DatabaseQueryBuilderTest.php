@@ -4818,6 +4818,66 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testUpsertUpdateConstraints()
+    {
+        foreach ([$this->getSQLiteBuilder(), $this->getPostgresBuilder()] as $builder) {
+            $builder->upsertConstraints = ['owner_id', 'owner_type'];
+            $builder->getConnection()->expects('affectingStatement')->with(
+                'insert into "items" ("email", "owner_id", "owner_type") values (?, ?, ?) on conflict ("email") do update set "name" = ? where "items"."owner_id" = "excluded"."owner_id" and "items"."owner_type" = "excluded"."owner_type"',
+                ['example', 7, 'parent', 'updated']
+            )->andReturn(1);
+
+            $this->assertSame(1, $builder->from('items')->upsert(
+                [['email' => 'example', 'owner_id' => 7, 'owner_type' => 'parent']],
+                'email', ['name' => 'updated'],
+            ));
+        }
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->upsertConstraints = ['owner_id', 'owner_type'];
+        $builder->getConnection()->expects('affectingStatement')->with(
+            'merge [items] using (values (?, ?, ?)) [laravel_source] ([email], [owner_id], [owner_type]) on [laravel_source].[email] = [items].[email] when matched and [items].[owner_id] = [laravel_source].[owner_id] and [items].[owner_type] = [laravel_source].[owner_type] then update set [name] = ? when not matched then insert ([email], [owner_id], [owner_type]) values ([email], [owner_id], [owner_type]);',
+            ['example', 7, 'parent', 'updated']
+        )->andReturn(1);
+
+        $this->assertSame(1, $builder->from('items')->upsert(
+            [['email' => 'example', 'owner_id' => 7, 'owner_type' => 'parent']],
+            'email', ['name' => 'updated'],
+        ));
+    }
+
+    public function testMySqlUpsertUpdateConstraints()
+    {
+        foreach ([$this->getMySqlBuilder(), $this->getMariaDbBuilder()] as $builder) {
+            $builder->upsertConstraints = ['owner_id', 'owner_type'];
+            $builder->getConnection()->expects('getConfig')->with('use_upsert_alias')->andReturn(false);
+            $builder->getConnection()->expects('affectingStatement')->with(
+                'insert into `items` (`email`, `owner_id`, `owner_type`) values (?, ?, ?) on duplicate key update `name` = if(`items`.`owner_id` = values(`owner_id`) and `items`.`owner_type` = values(`owner_type`), ?, `name`), `email` = if(`items`.`owner_id` = values(`owner_id`) and `items`.`owner_type` = values(`owner_type`), values(`email`), `email`)',
+                ['example', 7, 'parent', 'updated']
+            )->andReturn(1);
+
+            $this->assertSame(1, $builder->from('items')->upsert(
+                [['email' => 'example', 'owner_id' => 7, 'owner_type' => 'parent']],
+                'email', ['name' => 'updated', 'email'],
+            ));
+        }
+    }
+
+    public function testMySqlUpsertUpdateConstraintsWithAlias()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->upsertConstraints = ['owner_id'];
+        $builder->getConnection()->expects('getConfig')->with('use_upsert_alias')->andReturn(true);
+        $builder->getConnection()->expects('affectingStatement')->with(
+            'insert into `items` (`email`, `owner_id`) values (?, ?) as laravel_upsert_alias on duplicate key update `email` = if(`items`.`owner_id` = `laravel_upsert_alias`.`owner_id`, `laravel_upsert_alias`.`email`, `email`)',
+            ['example', 7]
+        )->andReturn(1);
+
+        $this->assertSame(1, $builder->from('items')->upsert(
+            [['email' => 'example', 'owner_id' => 7]], 'email', ['email'],
+        ));
+    }
+
     public function testUpsertMethod()
     {
         $builder = $this->getMySqlBuilder();

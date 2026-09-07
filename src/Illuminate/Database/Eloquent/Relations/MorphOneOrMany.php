@@ -128,6 +128,12 @@ abstract class MorphOneOrMany extends HasOneOrMany
     }
 
     /** @inheritDoc */
+    protected function getUpsertConstraints()
+    {
+        return [...parent::getUpsertConstraints(), $this->getMorphType()];
+    }
+
+    /** @inheritDoc */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         return parent::getRelationExistenceQuery($query, $parentQuery, $columns)->where(
