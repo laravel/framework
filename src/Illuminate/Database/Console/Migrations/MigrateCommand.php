@@ -239,12 +239,10 @@ class MigrateCommand extends BaseCommand implements Isolatable
      */
     protected function createMissingMySqlOrPgsqlDatabase($connection)
     {
-        // The connection name may carry a routing suffix, such as "::direct", which is
-        // not part of the configuration key, so it has to be trimmed before the
-        // database name is read from and later written back to the config.
         $configKey = 'database.connections.'.Str::before($connection->getName(), '::');
 
-        if ($this->laravel['config']->get("{$configKey}.database") !== $connection->getDatabaseName()) {
+        if ($this->laravel['config']->get("{$configKey}.database") !== 
+            $connection->getDatabaseName()) {
             return false;
         }
 
