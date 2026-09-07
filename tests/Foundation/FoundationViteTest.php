@@ -115,6 +115,101 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest($buildDir);
     }
 
+    public function testViteResolvesCssChunksReachedThroughNestedImports()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'imports' => [
+                    '_layout.js',
+                ],
+            ],
+            '_layout.js' => [
+                'file' => 'assets/layout.versioned.js',
+                'css' => [
+                    'assets/layout.versioned.css',
+                ],
+                'imports' => [
+                    '_header.js',
+                ],
+            ],
+            '_header.js' => [
+                'file' => 'assets/header.versioned.js',
+                'css' => [
+                    'assets/header.versioned.css',
+                ],
+            ],
+            // The CSS reached through the nested imports above has its own
+            // manifest entries, which must be resolved back from the file name.
+            'resources/css/layout.css' => [
+                'src' => 'resources/css/layout.css',
+                'file' => 'assets/layout.versioned.css',
+            ],
+            'resources/css/header.css' => [
+                'src' => 'resources/css/header.css',
+                'file' => 'assets/header.versioned.css',
+            ],
+        ], $buildDir);
+
+        $vite = app(Vite::class);
+        $result = $vite(['resources/js/app.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/layout.versioned.css" />'
+            .'<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/header.versioned.css" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/layout.versioned.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/header.versioned.js" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/layout.versioned.css" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/header.versioned.css" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js"></script>',
+            $result->toHtml()
+        );
+
+        $this->assertSame([
+            'https://example.com/'.$buildDir.'/assets/layout.versioned.css',
+            'https://example.com/'.$buildDir.'/assets/header.versioned.css',
+            'https://example.com/'.$buildDir.'/assets/app.versioned.js',
+            'https://example.com/'.$buildDir.'/assets/layout.versioned.js',
+            'https://example.com/'.$buildDir.'/assets/header.versioned.js',
+        ], array_keys($vite->preloadedAssets()));
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testViteUsesTheFirstManifestEntryWhenTwoChunksShareAnOutputFile()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'css' => [
+                    'assets/shared.versioned.css',
+                ],
+            ],
+            'resources/css/first.css' => [
+                'src' => 'resources/css/first.css',
+                'file' => 'assets/shared.versioned.css',
+                'integrity' => 'first-integrity',
+            ],
+            'resources/css/second.css' => [
+                'src' => 'resources/css/second.css',
+                'file' => 'assets/shared.versioned.css',
+                'integrity' => 'second-integrity',
+            ],
+        ], $buildDir);
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertStringContainsString('integrity="first-integrity"', $result->toHtml());
+        $this->assertStringNotContainsString('second-integrity', $result->toHtml());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
     public function testViteHotModuleReplacementWithJsOnly()
     {
         $this->makeViteHotFile();

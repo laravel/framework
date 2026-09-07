@@ -396,6 +396,7 @@ class Vite implements Htmlable
         }
 
         $manifest = $this->manifest($buildDirectory);
+        $chunkKeysByFile = $this->chunkKeysByFile($manifest);
 
         $tags = new Collection;
         $preloads = new Collection;
@@ -419,19 +420,20 @@ class Vite implements Htmlable
                 ]);
 
                 foreach ($manifest[$import]['css'] ?? [] as $css) {
-                    $partialManifest = (new Collection($manifest))->where('file', $css);
+                    $cssKey = $chunkKeysByFile[$css] ?? null;
+                    $cssChunk = $cssKey === null ? null : $manifest[$cssKey];
 
                     $preloads->push([
-                        $partialManifest->keys()->first(),
+                        $cssKey,
                         $this->assetPath("{$buildDirectory}/{$css}"),
-                        $partialManifest->first(),
+                        $cssChunk,
                         $manifest,
                     ]);
 
                     $tags->push($this->makeTagForChunk(
-                        $partialManifest->keys()->first(),
+                        $cssKey,
                         $this->assetPath("{$buildDirectory}/{$css}"),
-                        $partialManifest->first(),
+                        $cssChunk,
                         $manifest
                     ));
                 }
@@ -445,19 +447,20 @@ class Vite implements Htmlable
             ));
 
             foreach ($chunk['css'] ?? [] as $css) {
-                $partialManifest = (new Collection($manifest))->where('file', $css);
+                $cssKey = $chunkKeysByFile[$css] ?? null;
+                $cssChunk = $cssKey === null ? null : $manifest[$cssKey];
 
                 $preloads->push([
-                    $partialManifest->keys()->first(),
+                    $cssKey,
                     $this->assetPath("{$buildDirectory}/{$css}"),
-                    $partialManifest->first(),
+                    $cssChunk,
                     $manifest,
                 ]);
 
                 $tags->push($this->makeTagForChunk(
-                    $partialManifest->keys()->first(),
+                    $cssKey,
                     $this->assetPath("{$buildDirectory}/{$css}"),
-                    $partialManifest->first(),
+                    $cssChunk,
                     $manifest
                 ));
             }
@@ -481,7 +484,7 @@ class Vite implements Htmlable
             ->flatMap(fn ($entrypoint) => (new Collection($manifest[$entrypoint]['dynamicImports'] ?? []))
                 ->map(fn ($import) => $manifest[$import])
                 ->filter(fn ($chunk) => str_ends_with($chunk['file'], '.js') || str_ends_with($chunk['file'], '.css'))
-                ->flatMap($f = function ($chunk) use (&$f, $manifest, &$discoveredImports) {
+                ->flatMap($f = function ($chunk) use (&$f, $manifest, $chunkKeysByFile, &$discoveredImports) {
                     return (new Collection([...$chunk['imports'] ?? [], ...$chunk['dynamicImports'] ?? []]))
                         ->reject(function ($import) use (&$discoveredImports) {
                             if (isset($discoveredImports[$import])) {
@@ -495,9 +498,9 @@ class Vite implements Htmlable
                                 $f($manifest[$import])
                             ), new Collection([$chunk]))
                         ->merge((new Collection($chunk['css'] ?? []))->map(
-                            fn ($css) => (new Collection($manifest))->first(fn ($chunk) => $chunk['file'] === $css) ?? [
-                                'file' => $css,
-                            ],
+                            fn ($css) => isset($chunkKeysByFile[$css])
+                                ? $manifest[$chunkKeysByFile[$css]]
+                                : ['file' => $css],
                         ));
                 })
                 ->map(function ($chunk) use ($buildDirectory, $manifest) {
@@ -964,6 +967,25 @@ class Vite implements Htmlable
         }
 
         return static::$manifests[$path];
+    }
+
+    /**
+     * Index the given manifest's chunk keys by their output file.
+     *
+     * @param  array  $manifest
+     * @return array<string, string>
+     */
+    protected function chunkKeysByFile($manifest)
+    {
+        $index = [];
+
+        foreach ($manifest as $key => $chunk) {
+            if (isset($chunk['file']) && ! isset($index[$chunk['file']])) {
+                $index[$chunk['file']] = $key;
+            }
+        }
+
+        return $index;
     }
 
     /**
