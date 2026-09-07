@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Component;
+use Illuminate\View\ViewException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Finder\Finder;
@@ -93,6 +94,45 @@ class BladeTest extends TestCase
         $this->assertSame('<div class="ml-2" wire:model="foo" wire:model.lazy="bar">
     Hello Taylor
 </div>', trim($view));
+    }
+
+    #[RunInSeparateProcess]
+    public function test_rendering_a_dynamic_class_component()
+    {
+        Blade::component('dynamic-hello', HelloComponent::class);
+
+        $view = Blade::render('<x-dynamic-component :component="$name" name="Taylor" />', [
+            'name' => 'dynamic-hello',
+        ]);
+
+        $this->assertSame('Hello Taylor', trim($view));
+    }
+
+    public function test_rendering_a_dynamic_mail_component()
+    {
+        View::addNamespace('mail', dirname(__DIR__, 3).'/src/Illuminate/Mail/resources/views/html');
+
+        $view = Blade::render('<x-dynamic-component :component="$name">Hello Taylor</x-dynamic-component>', [
+            'name' => 'mail::panel',
+        ]);
+
+        $this->assertStringContainsString('class="panel"', $view);
+        $this->assertStringContainsString('Hello Taylor', $view);
+    }
+
+    public function test_invalid_dynamic_names_are_rejected_with_a_cached_view()
+    {
+        $template = '<x-dynamic-component :component="$name" />';
+
+        for ($attempt = 0; $attempt < 2; $attempt++) {
+            try {
+                Blade::render($template, ['name' => 'panel with-space']);
+
+                $this->fail('An invalid dynamic component name was rendered.');
+            } catch (ViewException $exception) {
+                $this->assertStringContainsString('Invalid dynamic component name.', $exception->getMessage());
+            }
+        }
     }
 
     public function test_rendering_the_same_dynamic_component_with_different_attributes()

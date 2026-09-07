@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\View\Compilers\ComponentTagCompiler;
+use InvalidArgumentException;
 
 use function Illuminate\Support\enum_value;
 
@@ -60,6 +61,10 @@ class DynamicComponent extends Component
 EOF;
 
         return function ($data) use ($template) {
+            if (! ComponentTagCompiler::isValidComponentName($this->component)) {
+                throw new InvalidArgumentException('Invalid dynamic component name.');
+            }
+
             $bindings = $this->bindings($class = $this->classForComponent());
 
             return str_replace(

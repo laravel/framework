@@ -21,6 +21,13 @@ use ReflectionClass;
 class ComponentTagCompiler
 {
     /**
+     * The regular expression for component names.
+     *
+     * @var string
+     */
+    protected const COMPONENT_NAME_PATTERN = '[\w\-:.]*';
+
+    /**
      * The Blade compiler instance.
      *
      * @var \Illuminate\View\Compilers\BladeCompiler
@@ -64,6 +71,17 @@ class ComponentTagCompiler
     }
 
     /**
+     * Determine if the given value is a valid component name.
+     *
+     * @param  string  $component
+     * @return bool
+     */
+    public static function isValidComponentName(string $component)
+    {
+        return $component !== '' && preg_match('/\A'.static::COMPONENT_NAME_PATTERN.'\z/', $component) === 1;
+    }
+
+    /**
      * Compile the component and slot tags within the given string.
      *
      * @param  string  $value
@@ -103,10 +121,12 @@ class ComponentTagCompiler
      */
     protected function compileOpeningTags(string $value)
     {
+        $componentNamePattern = static::COMPONENT_NAME_PATTERN;
+
         $pattern = "/
             <
                 \s*
-                x[-\:]([\w\-\:\.]*)
+                x[-\:]({$componentNamePattern})
                 (?<attributes>
                     (?:
                         \s+
@@ -167,10 +187,12 @@ class ComponentTagCompiler
      */
     protected function compileSelfClosingTags(string $value)
     {
+        $componentNamePattern = static::COMPONENT_NAME_PATTERN;
+
         $pattern = "/
             <
                 \s*
-                x[-\:]([\w\-\:\.]*)
+                x[-\:]({$componentNamePattern})
                 \s*
                 (?<attributes>
                     (?:
@@ -504,7 +526,7 @@ class ComponentTagCompiler
      */
     protected function compileClosingTags(string $value)
     {
-        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", ' @endComponentClass##END-COMPONENT-CLASS##', $value);
+        return preg_replace("/<\/\s*x[-\:]".static::COMPONENT_NAME_PATTERN."\s*>/", ' @endComponentClass##END-COMPONENT-CLASS##', $value);
     }
 
     /**
