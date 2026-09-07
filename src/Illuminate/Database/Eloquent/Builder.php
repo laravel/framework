@@ -2207,9 +2207,13 @@ class Builder implements BuilderContract
      */
     public function qualifyColumns($columns)
     {
-        return (new BaseCollection($columns))
-            ->map(fn ($column) => $this->qualifyColumn($column))
-            ->all();
+        $qualified = [];
+
+        foreach ($columns as $key => $column) {
+            $qualified[$key] = $this->qualifyColumn($column);
+        }
+
+        return $qualified;
     }
 
     /**
