@@ -241,7 +241,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
     {
         $configKey = 'database.connections.'.Str::before($connection->getName(), '::');
 
-        if ($this->laravel['config']->get("{$configKey}.database") !== 
+        if ($this->laravel['config']->get("{$configKey}.database") !==
             $connection->getDatabaseName()) {
             return false;
         }
