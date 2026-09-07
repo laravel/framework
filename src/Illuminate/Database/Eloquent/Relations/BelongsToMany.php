@@ -105,6 +105,13 @@ class BelongsToMany extends Relation
     protected $pivotWhereNulls = [];
 
     /**
+     * Any pivot table restrictions for closure-based where clauses.
+     *
+     * @var array
+     */
+    protected $pivotWhereClosures = [];
+
+    /**
      * The default values for the pivot columns.
      *
      * @var array
@@ -396,13 +403,11 @@ class BelongsToMany extends Relation
     public function wherePivot($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column instanceof Closure) {
-            $pivotQuery = (new ($this->getPivotClass()))
-                ->setTable($this->table)
-                ->newQueryWithoutRelationships();
-
-            $column($pivotQuery);
+            $pivotQuery = $this->newPivotQueryForClosure($column);
 
             $this->query->getQuery()->addNestedWhereQuery($pivotQuery->getQuery(), $boolean);
+
+            $this->pivotWhereClosures[] = [$column, $boolean];
 
             return $this;
         }
@@ -410,6 +415,23 @@ class BelongsToMany extends Relation
         $this->pivotWheres[] = func_get_args();
 
         return $this->where($this->qualifyPivotColumn($column), $operator, $value, $boolean);
+    }
+
+    /**
+     * Build a new pivot model query with the given closure scope applied.
+     *
+     * @param  \Closure(\Illuminate\Database\Eloquent\Builder<TPivotModel>): mixed  $callback
+     * @return \Illuminate\Database\Eloquent\Builder<TPivotModel>
+     */
+    protected function newPivotQueryForClosure(Closure $callback)
+    {
+        $pivotQuery = (new ($this->getPivotClass()))
+            ->setTable($this->table)
+            ->newQueryWithoutRelationships();
+
+        $callback($pivotQuery);
+
+        return $pivotQuery;
     }
 
     /**
