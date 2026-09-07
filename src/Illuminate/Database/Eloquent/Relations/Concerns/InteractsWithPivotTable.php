@@ -682,6 +682,16 @@ trait InteractsWithPivotTable
             $query->whereNull(...$arguments);
         }
 
+        foreach ($this->pivotWhereClosures as [$column, $boolean]) {
+            $pivotQuery = (new ($this->getPivotClass()))
+                ->setTable($this->table)
+                ->newQueryWithoutRelationships();
+
+            $column($pivotQuery);
+
+            $query->addNestedWhereQuery($pivotQuery->getQuery(), $boolean);
+        }
+
         return $query->where($this->getQualifiedForeignPivotKeyName(), $this->parent->{$this->parentKey});
     }
 

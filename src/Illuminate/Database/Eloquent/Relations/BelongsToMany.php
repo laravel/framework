@@ -105,6 +105,13 @@ class BelongsToMany extends Relation
     protected $pivotWhereNulls = [];
 
     /**
+     * Any pivot table restrictions for closure-based where clauses.
+     *
+     * @var array
+     */
+    protected $pivotWhereClosures = [];
+
+    /**
      * The default values for the pivot columns.
      *
      * @var array
@@ -403,6 +410,8 @@ class BelongsToMany extends Relation
             $column($pivotQuery);
 
             $this->query->getQuery()->addNestedWhereQuery($pivotQuery->getQuery(), $boolean);
+
+            $this->pivotWhereClosures[] = [$column, $boolean];
 
             return $this;
         }

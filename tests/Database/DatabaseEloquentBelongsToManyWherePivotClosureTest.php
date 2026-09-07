@@ -129,6 +129,61 @@ class DatabaseEloquentBelongsToManyWherePivotClosureTest extends TestCase
         $this->assertEquals($user1->id, $results->first()->id);
     }
 
+    public function testWherePivotWithClosureScopesDetach(): void
+    {
+        $project = WherePivotClosureProject::create(['title' => 'Project 1']);
+        $active = WherePivotClosureUser::create(['name' => 'Active User']);
+        $muted = WherePivotClosureUser::create(['name' => 'Muted User']);
+
+        $project->subscribers()->attach($active->id, ['muted' => false]);
+        $project->subscribers()->attach($muted->id, ['muted' => true]);
+
+        $project->subscribers()->wherePivot(function ($query) {
+            $query->active();
+        })->detach();
+
+        $remaining = $project->subscribers()->get();
+
+        $this->assertCount(1, $remaining);
+        $this->assertTrue($remaining->contains('id', $muted->id));
+    }
+
+    public function testWherePivotWithClosureScopesUpdateExistingPivot(): void
+    {
+        $project = WherePivotClosureProject::create(['title' => 'Project 1']);
+        $active = WherePivotClosureUser::create(['name' => 'Active User']);
+        $muted = WherePivotClosureUser::create(['name' => 'Muted User']);
+
+        $project->subscribers()->attach($active->id, ['muted' => false, 'role' => 'member']);
+        $project->subscribers()->attach($muted->id, ['muted' => true, 'role' => 'member']);
+
+        $affected = $project->subscribers()->wherePivot(function ($query) {
+            $query->active();
+        })->updateExistingPivot($muted->id, ['role' => 'admin']);
+
+        $this->assertSame(0, $affected);
+        $this->assertSame('member', $project->subscribers()->find($muted->id)->pivot->role);
+    }
+
+    public function testWherePivotWithClosureScopesSync(): void
+    {
+        $project = WherePivotClosureProject::create(['title' => 'Project 1']);
+        $active = WherePivotClosureUser::create(['name' => 'Active User']);
+        $muted = WherePivotClosureUser::create(['name' => 'Muted User']);
+
+        $project->subscribers()->attach($active->id, ['muted' => false]);
+        $project->subscribers()->attach($muted->id, ['muted' => true]);
+
+        $project->subscribers()->wherePivot(function ($query) {
+            $query->active();
+        })->sync([]);
+
+        $remaining = $project->subscribers()->get();
+
+        $this->assertTrue($remaining->contains('id', $muted->id));
+        $this->assertFalse($remaining->contains('id', $active->id));
+    }
+
     protected function connection()
     {
         return Eloquent::getConnectionResolver()->connection();
