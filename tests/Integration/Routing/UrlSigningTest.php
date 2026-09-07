@@ -54,6 +54,31 @@ class UrlSigningTest extends TestCase
         });
     }
 
+    public function testSigningUrlWithPercentSignInRouteSlug()
+    {
+        Route::get('/foo/{post:slug}', function (Request $request, $slug) {
+            return ['slug' => $slug, 'valid' => $request->hasValidSignature() ? 'valid' : 'invalid'];
+        })->name('foo');
+
+        $model = new RoutableInterfaceStub;
+        $model->slug = '%66oo';
+
+        // The percent sign has to be escaped in the generated URL. Otherwise the router
+        // decodes "%66" back into an "f" when matching the URL and binds a different
+        // model than the one the URL was generated for...
+        $this->assertSame(
+            '/foo/%2566oo',
+            parse_url($url = URL::signedRoute('foo', ['post' => $model]), PHP_URL_PATH)
+        );
+
+        tap($this->get($url), function ($response) {
+            $this->assertSame('valid', $response->original['valid']);
+            $this->assertSame('%66oo', $response->original['slug']);
+
+            $this->assertSame('%66oo', $response->baseRequest->route('post'));
+        });
+    }
+
     public function testTemporarySignedUrls()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
