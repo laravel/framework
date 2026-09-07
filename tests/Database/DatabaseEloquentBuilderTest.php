@@ -324,6 +324,21 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['foo_table.column', 'foo_table.name'], $builder->qualifyColumns(['column', 'name']));
     }
 
+    public function testQualifyColumnWithTableAlias()
+    {
+        $query = Mockery::mock(BaseBuilder::class);
+        $query->expects('from')->with('foo_table');
+        $query->from = 'foo_table as alias';
+
+        $builder = new Builder($query);
+        $builder->setModel(new EloquentBuilderTestStubStringPrimaryKey);
+
+        $this->assertSame('alias.column', $builder->qualifyColumn('column'));
+        $this->assertSame('alias.column', $builder->qualifyColumn('foo_table.column'));
+        $this->assertSame('other_table.column', $builder->qualifyColumn('other_table.column'));
+        $this->assertEquals(['alias.column', 'alias.name'], $builder->qualifyColumns(['column', 'name']));
+    }
+
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
     {
         $builder = Mockery::mock(Builder::class.'[getModels,eagerLoadRelations]', [$this->getMockQueryBuilder()]);
