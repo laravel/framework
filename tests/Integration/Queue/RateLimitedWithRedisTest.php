@@ -111,6 +111,50 @@ class RateLimitedWithRedisTest extends TestCase
         $this->assertJobWasReleased($nonAdminJob);
     }
 
+    public function testLimitsAreNotHitWhenAnotherLimitIsReached()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+        $testJob = new RedisRateLimitedTestJob;
+
+        $rateLimiter->for($testJob->key, function () {
+            return [
+                Limit::perHour(10)->by('global'),
+                Limit::perHour(1)->by('tenant'),
+            ];
+        });
+
+        $this->assertJobRanSuccessfully($testJob);
+        $this->assertJobWasReleased($testJob);
+        $this->assertJobWasReleased($testJob);
+
+        $redis = $this->app->make('redis')->connection();
+
+        $this->assertSame(1, (int) $redis->hget(md5($testJob->key.'global'), 'count'));
+        $this->assertSame(1, (int) $redis->hget(md5($testJob->key.'tenant'), 'count'));
+    }
+
+    public function testLimitsAreNotHitWhenAnotherLimitIsReachedAndJobIsSkipped()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+        $testJob = new RedisRateLimitedDontReleaseTestJob;
+
+        $rateLimiter->for($testJob->key, function () {
+            return [
+                Limit::perHour(10)->by('global'),
+                Limit::perHour(1)->by('tenant'),
+            ];
+        });
+
+        $this->assertJobRanSuccessfully($testJob);
+        $this->assertJobWasSkipped($testJob);
+        $this->assertJobWasSkipped($testJob);
+
+        $redis = $this->app->make('redis')->connection();
+
+        $this->assertSame(1, (int) $redis->hget(md5($testJob->key.'global'), 'count'));
+        $this->assertSame(1, (int) $redis->hget(md5($testJob->key.'tenant'), 'count'));
+    }
+
     public function testMiddlewareSerialization()
     {
         $rateLimited = new RateLimitedWithRedis('limiterName', 'default');
