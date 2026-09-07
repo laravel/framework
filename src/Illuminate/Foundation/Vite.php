@@ -867,6 +867,16 @@ class Vite implements Htmlable
     }
 
     /**
+     * Get the path to a given asset when running in HMR mode.
+     *
+     * @return string
+     */
+    protected function hotAsset($asset)
+    {
+        return $this->devServerUrl().'/'.$asset;
+    }
+
+    /**
      * Get the URL of the running Vite development server.
      *
      * @return string|null
@@ -878,16 +888,6 @@ class Vite implements Htmlable
         }
 
         return rtrim(file_get_contents($this->hotFile()));
-    }
-
-    /**
-     * Get the path to a given asset when running in HMR mode.
-     *
-     * @return string
-     */
-    protected function hotAsset($asset)
-    {
-        return $this->devServerUrl().'/'.$asset;
     }
 
     /**
