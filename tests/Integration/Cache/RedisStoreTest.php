@@ -6,6 +6,7 @@ use DateTime;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use Mockery;
@@ -159,6 +160,30 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['votes'])->flush();
 
         $this->assertNull(Cache::store('redis')->tags(['votes'])->get(RedisTaggedCacheTestKey::PERSON_1));
+    }
+
+    public function testTouchedTagEntriesRemainFlushableAfterOriginalExpiration()
+    {
+        Carbon::setTestNow($now = Carbon::create(2026, 1, 1, 0, 0, 0));
+
+        try {
+            $cache = Cache::store('redis')->tags(['people', 'author']);
+            $cache->put(RedisTaggedCacheTestKey::PERSON_1, 'Sally', 60);
+
+            $this->assertTrue($cache->touch(RedisTaggedCacheTestKey::PERSON_1, 120));
+
+            Carbon::setTestNow($now->copy()->addSeconds(61));
+
+            $cache->flushStale();
+
+            $this->assertSame('Sally', $cache->get(RedisTaggedCacheTestKey::PERSON_1));
+
+            $cache->flush();
+
+            $this->assertNull($cache->get(RedisTaggedCacheTestKey::PERSON_1));
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     public function testIncrementedTagEntriesProperlyTurnStale()

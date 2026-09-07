@@ -74,6 +74,31 @@ class RedisTaggedCache extends TaggedCache
     }
 
     /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  \DateTimeInterface|\DateInterval|int  $ttl
+     * @return bool
+     */
+    public function touch($key, $ttl)
+    {
+        $key = enum_value($key);
+
+        $seconds = $this->getSeconds($ttl);
+
+        $result = parent::touch($key, $seconds);
+
+        if ($result && $seconds > 0) {
+            $this->tags->addEntry(
+                $this->itemKey($key),
+                $seconds
+            );
+        }
+
+        return $result;
+    }
+
+    /**
      * Increment the value of an item in the cache.
      *
      * @param  \UnitEnum|string  $key
