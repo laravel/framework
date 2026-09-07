@@ -347,7 +347,7 @@ class CacheRepositoryTest extends TestCase
         $repo->forget('a-key');
     }
 
-    public function testForgettingMultipleCacheKeys()
+    public function testForgettingWithArray()
     {
         $repo = $this->getRepository();
         $repo->getStore()->expects('forget')->with('foo')->andReturn(true);
