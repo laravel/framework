@@ -2387,6 +2387,27 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKey($collection);
     }
 
+    public function testStringKeyArraysUseStringBindings()
+    {
+        foreach (['SQLite', 'MySql', 'MariaDb', 'Postgres', 'SqlServer'] as $database) {
+            $model = new EloquentBuilderTestStubStringPrimaryKey;
+            $this->mockConnectionForModel($model, $database);
+
+            foreach (['whereKey', 'whereKeyNot'] as $method) {
+                foreach ([[0, 10, '020', null], new BaseCollection([0, 10, '020', null])] as $ids) {
+                    $query = $model->newQuery()->$method($ids);
+
+                    $this->assertSame(['0', '10', '020', null], $query->getBindings());
+                }
+
+                $query = $model->newQuery()->$method([new Expression("'example'"), 10]);
+
+                $this->assertSame(['10'], $query->getBindings());
+                $this->assertStringContainsString("'example'", $query->toSql());
+            }
+        }
+    }
+
     public function testWhereKeyMethodWithModel()
     {
         $model = new EloquentBuilderTestStubStringPrimaryKey;
@@ -2587,7 +2608,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $keyName = $model->getQualifiedKeyName();
 
         $builder->getQuery()->expects('whereNotIn')->with($keyName, Mockery::on(function ($argument) {
-            return $argument === [1, 2];
+            return $argument === ['1', '2'];
         }));
 
         $models = new Collection([
@@ -2611,7 +2632,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $keyName = $model->getQualifiedKeyName();
 
         $builder->getQuery()->expects('whereNotIn')->with($keyName, Mockery::on(function ($argument) {
-            return $argument === [1, 2];
+            return $argument === ['1', '2'];
         }));
 
         $models = [
