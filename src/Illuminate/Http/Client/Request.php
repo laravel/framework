@@ -305,7 +305,7 @@ class Request implements ArrayAccess
      */
     public function offsetGet($offset): mixed
     {
-        return $this->data()[$offset];
+        return $this->data()[$offset] ?? null;
     }
 
     /**

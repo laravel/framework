@@ -554,7 +554,7 @@ class Response implements ArrayAccess, Stringable
      */
     public function offsetGet($offset): mixed
     {
-        return $this->json()[$offset];
+        return $this->json()[$offset] ?? null;
     }
 
     /**
