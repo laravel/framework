@@ -105,6 +105,10 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function has($key): bool
     {
+        if (is_array($key)) {
+            return ! in_array(null, $this->many($key), true);
+        }
+
         return ! is_null($this->get($key));
     }
 
@@ -753,6 +757,10 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function forget($key)
     {
+        if (is_array($key)) {
+            return $this->deleteMultiple($key);
+        }
+
         $key = enum_value($key);
 
         $this->event(new ForgettingKey($this->getName(), $key));

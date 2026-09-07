@@ -97,6 +97,16 @@ class CacheRepositoryTest extends TestCase
         $this->assertTrue($repo->has('baz'));
     }
 
+    public function testHasMethodWithArray()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->expects('many')->with(['foo', 'bar'])->andReturn(['foo' => 'foo', 'bar' => 'bar']);
+        $repo->getStore()->expects('many')->with(['foo', 'baz'])->andReturn(['foo' => 'foo', 'baz' => null]);
+
+        $this->assertTrue($repo->has(['foo', TestCacheKey::BAR]));
+        $this->assertFalse($repo->has(['foo', 'baz']));
+    }
+
     public function testMissingMethod()
     {
         $repo = $this->getRepository();
@@ -335,6 +345,15 @@ class CacheRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $repo->getStore()->expects('forget')->with('a-key')->andReturn(true);
         $repo->forget('a-key');
+    }
+
+    public function testForgettingWithArray()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->expects('forget')->with('foo')->andReturn(true);
+        $repo->getStore()->expects('forget')->with('bar')->andReturn(false);
+
+        $this->assertFalse($repo->forget(['foo', TestCacheKey::BAR]));
     }
 
     public function testRemovingCacheKey()
@@ -845,4 +864,5 @@ class CacheRepositoryTest extends TestCase
 enum TestCacheKey: string
 {
     case FOO = 'foo';
+    case BAR = 'bar';
 }
