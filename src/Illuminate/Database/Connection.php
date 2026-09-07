@@ -1479,7 +1479,11 @@ class Connection implements ConnectionInterface
      */
     public function getName()
     {
-        return $this->getConfig('name');
+        $name = $this->getConfig('name');
+
+        return $this->readWriteType === 'direct' && $name
+            ? $name.'::direct'
+            : $name;
     }
 
     /**
@@ -1489,7 +1493,7 @@ class Connection implements ConnectionInterface
      */
     public function getNameWithReadWriteType()
     {
-        $name = $this->getName().($this->readWriteType ? '::'.$this->readWriteType : '');
+        $name = $this->getConfig('name').($this->readWriteType ? '::'.$this->readWriteType : '');
 
         return empty($name) ? null : $name;
     }
