@@ -453,6 +453,32 @@ class HttpClientTest extends TestCase
         $this->assertSame('bar', $response->object()->result->foo);
     }
 
+    public function testArrayAccessDoesNotRaiseErrorsForMissingKeys()
+    {
+        $response = new Response(new Psr7Response(502, [], '<html>Bad Gateway</html>'));
+        $request = new Request(new GuzzleRequest(
+            'POST', 'http://foo.com/api', ['Content-Type' => 'application/json'], '{"foo":"bar"}'
+        ));
+
+        $errors = [];
+
+        set_error_handler(function ($level, $message) use (&$errors) {
+            $errors[] = $message;
+
+            return true;
+        });
+
+        try {
+            $this->assertNull($response['missing']);
+            $this->assertSame('bar', $request['foo']);
+            $this->assertNull($request['missing']);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $errors);
+    }
+
     public function testResponseObjectIsTappable()
     {
         $bar = null;
