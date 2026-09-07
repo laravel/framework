@@ -305,6 +305,32 @@ class PhpRedisConnectorTest extends TestCase
         $this->assertIsCallable($property->getValue($connection));
     }
 
+    public function testConnectToClusterPropagatesCommandRetriesFromOptionsToTheConnection()
+    {
+        $connector = new ClusterStubPhpRedisConnector;
+
+        $connection = $connector->connectToCluster(
+            [['host' => '127.0.0.1', 'port' => 6379]], [], ['command_retries' => 3]
+        );
+
+        $property = new ReflectionProperty(PhpRedisConnection::class, 'config');
+
+        $this->assertSame(3, $property->getValue($connection)['command_retries']);
+    }
+
+    public function testConnectToClusterPropagatesCommandRetriesFromClusterOptionsToTheConnection()
+    {
+        $connector = new ClusterStubPhpRedisConnector;
+
+        $connection = $connector->connectToCluster(
+            [['host' => '127.0.0.1', 'port' => 6379]], ['command_retries' => 5], []
+        );
+
+        $property = new ReflectionProperty(PhpRedisConnection::class, 'config');
+
+        $this->assertSame(5, $property->getValue($connection)['command_retries']);
+    }
+
     #[RequiresPhpExtension('redis')]
     public function testConnectToClusterAllowsTheConnectionToRebuildItsClient()
     {
