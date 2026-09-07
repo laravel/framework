@@ -117,7 +117,6 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($repo->missing('bar'));
     }
 
-
     public function testRememberMethodCallsPutAndReturnsDefault()
     {
         $repo = $this->getRepository();
@@ -364,7 +363,6 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->expects('forget')->with('a-key')->andReturn(true);
         $repo->delete('a-key');
     }
-
 
     public function testSettingCache()
     {
