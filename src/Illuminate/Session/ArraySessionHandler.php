@@ -3,6 +3,7 @@
 namespace Illuminate\Session;
 
 use Illuminate\Support\InteractsWithTime;
+use RuntimeException;
 use SessionHandlerInterface;
 
 class ArraySessionHandler implements SessionHandlerInterface
@@ -51,6 +52,16 @@ class ArraySessionHandler implements SessionHandlerInterface
     public function close(): bool
     {
         return true;
+    }
+
+    /**
+     * Create a new session ID.
+     *
+     * @return string
+     */
+    public function create_sid(): string
+    {
+        return session_create_id() ?: throw new RuntimeException('Unable to create a session ID.');
     }
 
     /**
