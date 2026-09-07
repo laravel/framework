@@ -3,11 +3,13 @@
 namespace Illuminate\Tests\Validation;
 
 use Closure;
+use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Validation\DatabasePresenceVerifier;
 use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class ValidationDatabasePresenceVerifierTest extends TestCase
@@ -61,6 +63,35 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
         $builder->expects('count')->andReturn(100);
 
         $this->assertEquals(100, $verifier->getCount('table', 'column', 'value', null, null, $extra));
+    }
+
+    public function testCountNormalizesIdentityBindings()
+    {
+        foreach ([10 => '10', 0 => '0'] as $value => $expected) {
+            $this->assertCountBindings($value, $expected);
+        }
+
+        $this->assertCountBindings(true, '1');
+        $this->assertCountBindings(false, '0');
+        $this->assertCountBindings('010', '010');
+        $this->assertCountBindings(null, null);
+    }
+
+    protected function assertCountBindings($value, $expected)
+    {
+        $connection = new Connection(new PDO('sqlite::memory:'));
+        $db = Mockery::mock(ConnectionResolverInterface::class);
+        $db->shouldReceive('connection')->andReturn($connection);
+        $verifier = new DatabasePresenceVerifier($db);
+        $extra = [fn ($query) => $query->where('owner_id', 7)];
+
+        $queries = $connection->pretend(fn () => $verifier->getCount('table', 'column', $value, null, null, $extra));
+
+        $this->assertSame($expected === null ? [7] : [$expected, 7], $queries[0]['bindings']);
+
+        $queries = $connection->pretend(fn () => $verifier->getMultiCount('table', 'column', [$value, 'example'], $extra));
+
+        $this->assertSame([$expected, 'example', 7], $queries[0]['bindings']);
     }
 
     public function testGetCountWithValidExcludeId()

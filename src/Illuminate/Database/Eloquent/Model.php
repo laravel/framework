@@ -1716,9 +1716,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // correct set of attributes in case the developers wants to check these.
         $key = ($instance = new static)->getKeyName();
 
+        $query = $instance->getKeyType() === 'string'
+            ? $instance->whereKey($ids)
+            : $instance->whereIn($key, $ids);
+
         $count = 0;
 
-        foreach ($instance->whereIn($key, $ids)->get() as $model) {
+        foreach ($query->get() as $model) {
             if ($model->delete()) {
                 $count++;
             }

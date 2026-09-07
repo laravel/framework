@@ -102,9 +102,14 @@ trait SoftDeletes
         // correct set of attributes in case the developers wants to check these.
         $key = ($instance = new static)->getKeyName();
 
+        $query = $instance::withTrashed();
+        $query = $instance->getKeyType() === 'string'
+            ? $query->whereKey($ids)
+            : $query->whereIn($key, $ids);
+
         $count = 0;
 
-        foreach ($instance::withTrashed()->whereIn($key, $ids)->get() as $model) {
+        foreach ($query->get() as $model) {
             if ($model->forceDelete()) {
                 $count++;
             }
