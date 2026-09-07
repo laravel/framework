@@ -106,7 +106,7 @@ class Repository implements ArrayAccess, CacheContract
     public function has($key): bool
     {
         if (is_array($key)) {
-           return ! in_array(null, $this->many($key), true);
+            return ! in_array(null, $this->many($key), true);
         }
 
         return ! is_null($this->get($key));

@@ -97,6 +97,16 @@ class CacheRepositoryTest extends TestCase
         $this->assertTrue($repo->has('baz'));
     }
 
+    public function testHasMethodWithArray()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->expects('many')->with(['foo', 'bar'])->andReturn(['foo' => 'foo', 'bar' => 'bar']);
+        $repo->getStore()->expects('many')->with(['foo', 'baz'])->andReturn(['foo' => 'foo', 'baz' => null]);
+
+        $this->assertTrue($repo->has(['foo', TestCacheKey::BAR]));
+        $this->assertFalse($repo->has(['foo', 'baz']));
+    }
+
     public function testMissingMethod()
     {
         $repo = $this->getRepository();
@@ -107,15 +117,6 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($repo->missing('bar'));
     }
 
-    public function testHasMethodWithArray()
-    {
-        $repo = $this->getRepository();
-        $repo->getStore()->expects('many')->with(['foo', 'bar'])->andReturn(['foo' => 'foo', 'bar' => 'bar']);
-        $repo->getStore()->expects('many')->with(['foo', 'baz'])->andReturn(['foo' => 'foo', 'baz' => null]);
-
-        $this->assertTrue($repo->has(['foo', TestCacheKey::BAR]));
-        $this->assertFalse($repo->has(['foo', 'baz']));
-    }
 
     public function testRememberMethodCallsPutAndReturnsDefault()
     {
@@ -347,14 +348,6 @@ class CacheRepositoryTest extends TestCase
         $repo->forget('a-key');
     }
 
-    public function testRemovingCacheKey()
-    {
-        // Alias of Forget
-        $repo = $this->getRepository();
-        $repo->getStore()->expects('forget')->with('a-key')->andReturn(true);
-        $repo->delete('a-key');
-    }
-
     public function testForgettingMultipleCacheKeys()
     {
         $repo = $this->getRepository();
@@ -363,6 +356,15 @@ class CacheRepositoryTest extends TestCase
 
         $this->assertFalse($repo->forget(['foo', TestCacheKey::BAR]));
     }
+
+    public function testRemovingCacheKey()
+    {
+        // Alias of Forget
+        $repo = $this->getRepository();
+        $repo->getStore()->expects('forget')->with('a-key')->andReturn(true);
+        $repo->delete('a-key');
+    }
+
 
     public function testSettingCache()
     {
