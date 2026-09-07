@@ -746,6 +746,30 @@ class RoutingUrlGeneratorTest extends TestCase
         $url->route('not_exists_route');
     }
 
+    public function testRouteParametersContainingPercentSignsAreEncoded()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $routes->add(new Route(['GET'], 'foo/{bar}', ['as' => 'foo', function () {
+            //
+        }]));
+
+        // A raw percent sign would be decoded again when the router matches the URL,
+        // so the parameter has to survive a round trip through rawurldecode()...
+        $this->assertSame('http://www.foo.com/foo/%2566oo', $url->route('foo', ['bar' => '%66oo']));
+        $this->assertSame('http://www.foo.com/foo/100%25', $url->route('foo', ['bar' => '100%']));
+
+        $this->assertSame('%66oo', rawurldecode('%2566oo'));
+        $this->assertSame('100%', rawurldecode('100%25'));
+
+        // Values without a percent sign are unaffected...
+        $this->assertSame('http://www.foo.com/foo/bar', $url->route('foo', ['bar' => 'bar']));
+        $this->assertSame('http://www.foo.com/foo/1', $url->route('foo', ['bar' => 1]));
+    }
+
     public function testSignedUrl()
     {
         $url = new UrlGenerator(
