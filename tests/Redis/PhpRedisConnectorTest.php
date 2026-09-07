@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Redis;
 
+use ErrorException;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connectors\PhpRedisConnector;
 use InvalidArgumentException;
@@ -321,6 +322,37 @@ class PhpRedisConnectorTest extends TestCase
 
         $this->assertSame(3, $connector->created);
         $this->assertNotSame($original, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionAutomaticallyRetriesAfterAConnectionResetWarning()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('get')->with('foo')->willThrowException(new ErrorException('Redis::get(): SSL: Connection reset by peer'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('get')->with('foo')->willReturn('bar');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->assertSame('bar', $connection->command('get', ['foo']));
+        $this->assertSame($healthyClient, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testConnectionDoesNotRetryUnrelatedWarnings()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('get')->with('foo')->willThrowException(new ErrorException('Redis::get(): Undefined variable'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->never())->method('get');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->expectExceptionObject(new ErrorException('Redis::get(): Undefined variable'));
+
+        $connection->command('get', ['foo']);
     }
 
     #[RequiresPhpExtension('redis')]

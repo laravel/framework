@@ -3,6 +3,7 @@
 namespace Illuminate\Redis\Connections;
 
 use Closure;
+use ErrorException;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -630,8 +631,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         while (true) {
             try {
                 return parent::command($method, $parameters);
-            } catch (RedisClusterException|RedisException $e) {
-                if (! Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'READONLY', 'Connection lost', 'Error processing response from Redis node'])) {
+            } catch (RedisClusterException|RedisException|ErrorException $e) {
+                if (! Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'READONLY', 'Connection lost', 'Error processing response from Redis node', 'Connection reset by peer'])) {
                     throw $e;
                 }
 
