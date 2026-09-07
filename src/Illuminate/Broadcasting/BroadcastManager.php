@@ -682,13 +682,25 @@ class BroadcastManager implements FactoryContract
     protected function mercureClaims(array $config)
     {
         $claims = $config['claims'] ?? [];
+        $appUrl = $this->app['config']['app.url'] ?? null;
 
         // A FrankenPHP hub has no "url": it falls back to the same public
         // endpoint the browser subscribes to.
         $url = ($config['url'] ?? null) ?: (($config['public_url'] ?? null) ?: '/.well-known/mercure');
 
+        if (empty($config['url']) && empty($config['public_url']) && $appUrl) {
+            // The default endpoint is root-relative, but the hub validates
+            // an absolute audience. Do not include the application's path.
+            $origin = parse_url($appUrl);
+
+            if (isset($origin['scheme'], $origin['host'])) {
+                $url = $origin['scheme'].'://'.$origin['host']
+                    .(isset($origin['port']) ? ':'.$origin['port'] : '').$url;
+            }
+        }
+
         $claims['aud'] = ($claims['aud'] ?? null) ?: (($config['public_url'] ?? null) ?: $url);
-        $claims['iss'] = ($claims['iss'] ?? null) ?: (($this->app['config']['app.url'] ?? null) ?: $url);
+        $claims['iss'] = ($claims['iss'] ?? null) ?: ($appUrl ?: $url);
         $claims['client_id'] = ($claims['client_id'] ?? null) ?: $claims['iss'];
 
         return $claims;

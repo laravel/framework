@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Mercure\FrankenPhpHub;
@@ -75,8 +76,9 @@ class MercureFrankenPhpHubTest extends TestCase
 
         $this->assertSame('https://app.test', $claims['iss']);
         $this->assertSame('https://app.test', $claims['client_id']);
-        $this->assertSame('/.well-known/mercure', $claims['aud']);
+        $this->assertSame('https://app.test/.well-known/mercure', $claims['aud']);
         $this->assertSame('anonymous', $claims['sub']);
+        $this->assertSame('/.well-known/mercure', $hub->getPublicUrl());
     }
 
     public function testTheBuiltInHubAudienceFallsBackToThePublicUrl()
@@ -91,6 +93,59 @@ class MercureFrankenPhpHubTest extends TestCase
         $claims = $this->decodeJwtClaims($hub->getFactory()->create());
 
         $this->assertSame('https://app.test/.well-known/mercure', $claims['aud']);
+    }
+
+    #[DataProvider('builtInHubAudienceProvider')]
+    public function testTheBuiltInHubAudience(string $appUrl, array $config, string|array $audience)
+    {
+        $manager = new BroadcastManager($this->getApp(['app' => ['url' => $appUrl]]));
+
+        $hub = $manager->mercure($config + ['secret' => str_repeat('s', 32)]);
+
+        $claims = $this->decodeJwtClaims($hub->getFactory()->create());
+
+        $this->assertSame($audience, $claims['aud']);
+    }
+
+    public static function builtInHubAudienceProvider(): array
+    {
+        return [
+            'trailing slash' => [
+                'https://app.test/', [], 'https://app.test/.well-known/mercure',
+            ],
+            'application path' => [
+                'https://app.test/app/', [], 'https://app.test/.well-known/mercure',
+            ],
+            'application query and fragment' => [
+                'https://app.test/app/?source=test#section', [], 'https://app.test/.well-known/mercure',
+            ],
+            'non-default port' => [
+                'https://app.test:8443/app', [], 'https://app.test:8443/.well-known/mercure',
+            ],
+            'IPv6 host' => [
+                'https://[::1]:8443/app', [], 'https://[::1]:8443/.well-known/mercure',
+            ],
+            'plain HTTP' => [
+                'http://localhost:8080', [], 'http://localhost:8080/.well-known/mercure',
+            ],
+            'empty URL configuration' => [
+                'https://app.test', ['url' => '', 'public_url' => ''], 'https://app.test/.well-known/mercure',
+            ],
+            'explicit public URL' => [
+                'https://app.test', ['public_url' => 'https://hub.test/events'], 'https://hub.test/events',
+            ],
+            'explicit audience' => [
+                'https://app.test', ['claims' => ['aud' => 'urn:mercure:hub']], 'urn:mercure:hub',
+            ],
+            'multiple explicit audiences' => [
+                'https://app.test',
+                ['claims' => ['aud' => ['https://hub.test/.well-known/mercure', 'urn:mercure:hub']]],
+                ['https://hub.test/.well-known/mercure', 'urn:mercure:hub'],
+            ],
+            'different issuer' => [
+                'https://app.test', ['claims' => ['iss' => 'https://issuer.test']], 'https://app.test/.well-known/mercure',
+            ],
+        ];
     }
 
     public function testBroadcastingPublishesThroughTheBuiltInHub()
