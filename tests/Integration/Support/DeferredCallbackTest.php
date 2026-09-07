@@ -27,4 +27,23 @@ class DeferredCallbackTest extends TestCase
 
         $this->assertTrue($executed);
     }
+
+    public function test_callbacks_deferred_within_a_deferred_callback_are_invoked()
+    {
+        $result = [];
+
+        Route::get('/test', function () use (&$result) {
+            defer(function () use (&$result) {
+                $result[] = 'first';
+
+                defer(function () use (&$result) {
+                    $result[] = 'second';
+                });
+            });
+        });
+
+        $this->get('/test');
+
+        $this->assertSame(['first', 'second'], $result);
+    }
 }
