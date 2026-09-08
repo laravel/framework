@@ -1,6 +1,48 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.30.1...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.31.0...13.x)
+
+## [v13.31.0](https://github.com/laravel/framework/compare/v13.30.1...v13.31.0) - 2026-09-08
+
+* [12.x] Ensure password hash matches stored cookie before authenticating the user by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61386
+* [12.x] Fix TypeError in userFromRecaller() when the recaller matches no user by [@lazerg](https://github.com/lazerg) in https://github.com/laravel/framework/pull/61397
+* [13.x] Add totalSize method to Queue  by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61373
+* Merge branch '12.x' into 13.x by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61399
+* [13.x] Restore the container instance after route:cache boots a fresh application by [@lazerg](https://github.com/lazerg) in https://github.com/laravel/framework/pull/61405
+* [13.x] Include connection and queue on WorkerStopping when worker is killed by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61408
+* [13.x] Fix lazy() and lazyById() ignoring limit() and offset() by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61402
+* [13.x] `JobInterrupted` event by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61412
+* [13.x] Make the Redis queue driver cluster-safe (`bulk()` node-less `MULTI`; `allQueueNames()` uses `KEYS`) by [@Orrison](https://github.com/Orrison) in https://github.com/laravel/framework/pull/61198
+* [13.x] feat: add chaperone support for BelongsToMany pivot models by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/61152
+* Dedupe common test fixtures by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/61422
+* [13.x] feat: improve higher order proxy generic types by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/61418
+* Apply fixes from StyleCI by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/61427
+* [13.x] Add `once` assertions to the mail and notification fakes by [@talaridisTh](https://github.com/talaridisTh) in https://github.com/laravel/framework/pull/61415
+* Let Monolog handle deprecation exceptions by [@sysdev34-wq](https://github.com/sysdev34-wq) in https://github.com/laravel/framework/pull/61414
+* [13.x] Default `memoryExceededExitCode` for Cloud by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61430
+* [13.x] Fix context not being propagated to concurrent processes by [@newtonjob](https://github.com/newtonjob) in https://github.com/laravel/framework/pull/61419
+* [13.x] Remove the unused Request import from the JSON:API resource stub by [@Bosun18](https://github.com/Bosun18) in https://github.com/laravel/framework/pull/61434
+* [13.x] Memory leak fix in Http Client by [@skr4dan](https://github.com/skr4dan) in https://github.com/laravel/framework/pull/61438
+* [13.x] Fix SelfBuilding build stack cleanup after exceptions by [@emrebalasar](https://github.com/emrebalasar) in https://github.com/laravel/framework/pull/61454
+* [13.x] defer all logic to the dedicated rule by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/61445
+* Wrap the closure return type in `withFreshQueryLog()` by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/61444
+* [13.x] Fix `assertJsonMissingPath()` ignoring wildcards by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61441
+* [13.x] Resolve the `UsePolicy` attribute from parent classes by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61439
+* [13.x] Resolve the `UseEloquentBuilder` attribute from parent classes by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61440
+* [13.x] Fix parameter docblocks that contradict the native signature by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/61457
+* Bump softprops/action-gh-release from 3.0.2 to 3.0.3 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/61468
+* [13.x] Fix RateLimited job middleware hitting limits that did not block the job by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61449
+* [13.x] Add `devServerUrl()` to Vite by [@ramonmalcolm10](https://github.com/ramonmalcolm10) in https://github.com/laravel/framework/pull/61465
+* [13.x] Retry phpredis commands when a connection reset surfaces as a warning by [@Orrison](https://github.com/Orrison) in https://github.com/laravel/framework/pull/61462
+* [13.x] Fix callbacks deferred from within a deferred callback by [@newtonjob](https://github.com/newtonjob) in https://github.com/laravel/framework/pull/61431
+* [13.x] Propagate command_retries to phpredis cluster connections by [@Orrison](https://github.com/Orrison) in https://github.com/laravel/framework/pull/61460
+* [13.x] Qualify soft delete column with the query's table alias by [@arunarw](https://github.com/arunarw) in https://github.com/laravel/framework/pull/61456
+* [13.x] Keep Eloquent on the direct connection during migrations by [@danielebarbaro](https://github.com/danielebarbaro) in https://github.com/laravel/framework/pull/61435
+* Apply fixes from StyleCI by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/61470
+* [13.x] Fix Class `Illuminate\Session\ArraySessionHandler` implementing `SessionHandlerInterface` is missing the `create_sid()` method which will be required in PHP 9.0 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61469
+* Fix route url generation under certain circumstances by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/61475
+* [13.x] Fix message ID and header persistence on ResendTransport by [@saurabhsharma2u](https://github.com/saurabhsharma2u) in https://github.com/laravel/framework/pull/61476
+* [13.x] Fix wherePivot() closure scope being ignored in pivot table operations by [@iz-ahmad](https://github.com/iz-ahmad) in https://github.com/laravel/framework/pull/61488
 
 ## [v13.30.1](https://github.com/laravel/framework/compare/v13.30.0...v13.30.1) - 2026-09-01
 
