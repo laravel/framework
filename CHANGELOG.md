@@ -1,6 +1,12 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.69.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.69.2...12.x)
+
+## [v12.69.2](https://github.com/laravel/framework/compare/v12.69.1...v12.69.2) - 2026-09-08
+
+* [12.x] Default memoryExceededExitCode for Cloud by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61432
+* Wrap the closure return type in `withFreshQueryLog()` by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/61458
+* Wrap the autocompleter callback return type in `askWithCompletion()` by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/61487
 
 ## [v12.69.1](https://github.com/laravel/framework/compare/v12.69.0...v12.69.1) - 2026-09-01
 
