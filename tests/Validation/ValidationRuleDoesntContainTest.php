@@ -100,4 +100,15 @@ class ValidationRuleDoesntContainTest extends TestCase
 
         $this->assertSame($expectation, $v->passes());
     }
+
+    public function testDoesntContainRuleMatchesNonStringScalarValues()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['flags' => [true]], ['flags' => 'doesnt_contain:1']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['flags' => [1]], ['flags' => 'doesnt_contain:1']);
+        $this->assertTrue($v->fails());
+    }
 }
