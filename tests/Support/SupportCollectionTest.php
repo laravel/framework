@@ -2496,6 +2496,18 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testChunkByPassesTheKeyToTheCallback($collection)
+    {
+        $data = (new $collection(['a1' => 1, 'a2' => 2, 'b1' => 3, 'b2' => 4, 'a3' => 5]))
+            ->chunkBy(fn ($value, $key) => $key[0]);
+
+        $this->assertCount(3, $data);
+        $this->assertEquals(['a1' => 1, 'a2' => 2], $data->first()->toArray());
+        $this->assertEquals(['b1' => 3, 'b2' => 4], $data->get(1)->toArray());
+        $this->assertEquals(['a3' => 5], $data->last()->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testChunkByWithDotNotation($collection)
     {
         $data = (new $collection([
