@@ -885,6 +885,24 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(1, FactoryTestUser::count());
     }
 
+    public function test_for_method_with_model_instance_recycles_to_nested_factories()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $user = FactoryTestUserFactory::new()->create();
+        $post = FactoryTestPostFactory::new()
+            ->for($user, 'user')
+            ->hasComments(2)
+            ->create();
+
+        $this->assertSame(1, FactoryTestUser::count());
+        $this->assertEquals($user->id, $post->user_id);
+        $this->assertEquals($user->id, $post->comments[0]->user_id);
+        $this->assertEquals($user->id, $post->comments[1]->user_id);
+    }
+
     public function test_has_method_does_not_reassign_the_parent()
     {
         Factory::guessFactoryNamesUsing(function ($model) {

@@ -758,7 +758,9 @@ abstract class Factory
      */
     public function for($factory, $relationship = null)
     {
-        return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(
+        $instance = $factory instanceof Model ? $this->recycle($factory) : $this;
+
+        return $instance->newInstance(['for' => $instance->for->concat([new BelongsToRelationship(
             $factory,
             $relationship ?? Str::camel(class_basename(
                 $factory instanceof Factory ? $factory->modelName() : $factory
