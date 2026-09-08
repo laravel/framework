@@ -571,9 +571,11 @@ trait ValidatesAttributes
             return false;
         }
 
-        $value = array_map(fn ($item) => is_scalar($item) ? (string) $item : $item, $value);
+        $stringify = fn ($item) => is_scalar($item) ? (string) $item : $item;
 
-        return array_all($parameters, fn ($parameter) => in_array($parameter, $value, true));
+        $value = array_map($stringify, $value);
+
+        return array_all($parameters, fn ($parameter) => in_array($stringify($parameter), $value, true));
     }
 
     /**
@@ -590,9 +592,11 @@ trait ValidatesAttributes
             return false;
         }
 
-        $value = array_map(fn ($item) => is_scalar($item) ? (string) $item : $item, $value);
+        $stringify = fn ($item) => is_scalar($item) ? (string) $item : $item;
 
-        return array_all($parameters, fn ($parameter) => ! in_array($parameter, $value, true));
+        $value = array_map($stringify, $value);
+
+        return array_all($parameters, fn ($parameter) => ! in_array($stringify($parameter), $value, true));
     }
 
     /**
