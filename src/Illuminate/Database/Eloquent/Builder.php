@@ -285,12 +285,10 @@ class Builder implements BuilderContract
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
                 $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
-                if ($this->model->getKeyType() === 'string') {
-                    $id = array_map(
-                        fn ($value) => is_scalar($value) ? (string) $value : $value,
-                        $id instanceof Arrayable ? $id->toArray() : $id,
-                    );
-                }
+                $id = array_map(
+                    fn ($value) => is_scalar($value) ? (string) $value : $value,
+                    $id instanceof Arrayable ? $id->toArray() : $id,
+                );
 
                 $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
             }
@@ -321,12 +319,10 @@ class Builder implements BuilderContract
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
                 $this->query->whereIntegerNotInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
-                if ($this->model->getKeyType() === 'string') {
-                    $id = array_map(
-                        fn ($value) => is_scalar($value) ? (string) $value : $value,
-                        $id instanceof Arrayable ? $id->toArray() : $id,
-                    );
-                }
+                $id = array_map(
+                    fn ($value) => is_scalar($value) ? (string) $value : $value,
+                    $id instanceof Arrayable ? $id->toArray() : $id,
+                );
 
                 $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
             }
