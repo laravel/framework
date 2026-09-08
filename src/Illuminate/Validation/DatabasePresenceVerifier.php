@@ -70,14 +70,18 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
     }
 
     /**
-     * Normalize integer and boolean values for string parameter binding.
+     * Normalize scalar values for string parameter binding.
      *
      * @param  mixed  $value
      * @return mixed
      */
     protected function normalizeValue($value)
     {
-        return is_int($value) || is_bool($value) ? (string) (int) $value : $value;
+        if (is_bool($value)) {
+            return (string) (int) $value;
+        }
+
+        return is_scalar($value) ? (string) $value : $value;
     }
 
     /**

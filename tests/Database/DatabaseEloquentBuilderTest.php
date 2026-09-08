@@ -2394,10 +2394,10 @@ class DatabaseEloquentBuilderTest extends TestCase
             $this->mockConnectionForModel($model, $database);
 
             foreach (['whereKey', 'whereKeyNot'] as $method) {
-                foreach ([[0, 10, '020', null], new BaseCollection([0, 10, '020', null])] as $ids) {
+                foreach ([[0, 10, 1.5, false, '020', null], new BaseCollection([0, 10, 1.5, false, '020', null])] as $ids) {
                     $query = $model->newQuery()->$method($ids);
 
-                    $this->assertSame(['0', '10', '020', null], $query->getBindings());
+                    $this->assertSame(['0', '10', '1.5', '0', '020', null], $query->getBindings());
                 }
 
                 $query = $model->newQuery()->$method([new Expression("'example'"), 10]);

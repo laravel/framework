@@ -285,10 +285,7 @@ class Builder implements BuilderContract
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
                 $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
-                $id = array_map(
-                    fn ($value) => is_scalar($value) ? (string) $value : $value,
-                    $id instanceof Arrayable ? $id->toArray() : $id,
-                );
+                $id = $this->castKeysToStrings($id);
 
                 $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
             }
@@ -319,10 +316,7 @@ class Builder implements BuilderContract
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
                 $this->query->whereIntegerNotInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
-                $id = array_map(
-                    fn ($value) => is_scalar($value) ? (string) $value : $value,
-                    $id instanceof Arrayable ? $id->toArray() : $id,
-                );
+                $id = $this->castKeysToStrings($id);
 
                 $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
             }
@@ -372,6 +366,23 @@ class Builder implements BuilderContract
                 ? $models->getKey()
                 : Collection::wrap($models)->modelKeys()
         );
+    }
+
+    /**
+     * Cast the given keys to strings for string key bindings.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $keys
+     * @return array
+     */
+    protected function castKeysToStrings($keys)
+    {
+        return array_map(function ($value) {
+            if (is_bool($value)) {
+                return (string) (int) $value;
+            }
+
+            return is_scalar($value) ? (string) $value : $value;
+        }, $keys instanceof Arrayable ? $keys->toArray() : $keys);
     }
 
     /**

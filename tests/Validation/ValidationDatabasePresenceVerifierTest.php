@@ -71,6 +71,7 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
             $this->assertCountBindings($value, $expected);
         }
 
+        $this->assertCountBindings(1.5, '1.5');
         $this->assertCountBindings(true, '1');
         $this->assertCountBindings(false, '0');
         $this->assertCountBindings('010', '010');
