@@ -100,4 +100,18 @@ class ValidationRuleDoesntContainTest extends TestCase
 
         $this->assertSame($expectation, $v->passes());
     }
+
+    #[TestWith([[1], false])]
+    #[TestWith([[1.0], false])]
+    #[TestWith([[true], false])]
+    #[TestWith([['1'], false])]
+    #[TestWith([[2], true])]
+    public function testDoesntContainRuleMatchesValuesThatAreNotStrings(array $value, bool $expectation)
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['x' => $value], ['x' => ['doesnt_contain:1']]);
+
+        $this->assertSame($expectation, $v->passes());
+    }
 }

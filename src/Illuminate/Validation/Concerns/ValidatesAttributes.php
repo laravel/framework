@@ -588,6 +588,8 @@ trait ValidatesAttributes
             return false;
         }
 
+        $value = array_map(strval(...), array_filter($value, is_scalar(...)));
+
         return array_all($parameters, fn ($parameter) => ! in_array($parameter, $value, true));
     }
 
