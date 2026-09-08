@@ -571,7 +571,9 @@ trait ValidatesAttributes
             return false;
         }
 
-        return array_all($parameters, fn ($parameter) => in_array($parameter, $value));
+        $value = array_map(fn ($item) => is_scalar($item) ? (string) $item : $item, $value);
+
+        return array_all($parameters, fn ($parameter) => in_array($parameter, $value, true));
     }
 
     /**
@@ -587,6 +589,8 @@ trait ValidatesAttributes
         if (! is_array($value)) {
             return false;
         }
+
+        $value = array_map(fn ($item) => is_scalar($item) ? (string) $item : $item, $value);
 
         return array_all($parameters, fn ($parameter) => ! in_array($parameter, $value, true));
     }
