@@ -1572,8 +1572,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                     $position = ($position + 1) % $limit;
                 }
 
-                for ($i = 0, $end = min($limit, count($ringBuffer)); $i < $end; $i++) {
-                    $pointer = ($position + $i) % $limit;
+                $oldest = count($ringBuffer) === $limit ? $position : 0;
+
+                for ($i = 0, $end = count($ringBuffer); $i < $end; $i++) {
+                    $pointer = ($oldest + $i) % $limit;
                     yield $ringBuffer[$pointer][0] => $ringBuffer[$pointer][1];
                 }
             });

@@ -2860,6 +2860,24 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testTakeLastWhenTheLimitExceedsTheCollectionSize($collection)
+    {
+        $data = new $collection(['taylor', 'dayle', 'shawn']);
+
+        $this->assertEquals([0 => 'taylor', 1 => 'dayle', 2 => 'shawn'], $data->take(-3)->all());
+        $this->assertEquals([0 => 'taylor', 1 => 'dayle', 2 => 'shawn'], $data->take(-4)->all());
+        $this->assertEquals([0 => 'taylor', 1 => 'dayle', 2 => 'shawn'], $data->take(-100)->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testTakeLastPreservesKeysWhenTheLimitExceedsTheCollectionSize($collection)
+    {
+        $data = new $collection(['a' => 'taylor', 'b' => 'dayle']);
+
+        $this->assertEquals(['a' => 'taylor', 'b' => 'dayle'], $data->take(-5)->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testTakeUntilUsingValue($collection)
     {
         $data = new $collection([1, 2, 3, 4]);
