@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\Console\Concerns\ParsesQueue;
@@ -254,5 +255,116 @@ class QueuePauseResumeTest extends TestCase
         $this->assertSame(['redis', 'emails'], $parser->parse('emails'));
         $this->assertSame(['database', 'notifications'], $parser->parse('database:notifications'));
         $this->assertSame(['redis', 'foo:bar'], $parser->parse('redis:foo:bar'));
+    }
+
+    public function testPauseAndResumeUseHashTagsOnRedisCluster()
+    {
+        $storage = [];
+        $manager = $this->createManager(new Repository($this->createRedisStore(true, $storage)));
+
+        $manager->pause('redis', 'default');
+        $this->assertTrue($manager->isPaused('redis', 'default'));
+        $this->assertSame(['default'], $manager->getPausedQueues('redis', ['default', 'emails']));
+
+        $manager->resume('redis', 'default');
+        $this->assertFalse($manager->isPaused('redis', 'default'));
+        $this->assertSame([], $manager->getPausedQueues('redis', ['default', 'emails']));
+    }
+
+    public function testPauseForUsesHashTagsOnRedisCluster()
+    {
+        $manager = $this->createManager(new Repository($this->createRedisStore(true)));
+
+        $manager->pauseFor('redis', 'default', 60);
+
+        $this->assertTrue($manager->isPaused('redis', 'default'));
+    }
+
+    public function testPauseAndResumeDoNotUseHashTagsOnNonClusterRedis()
+    {
+        $storage = [];
+        $manager = $this->createManager(new Repository($this->createRedisStore(false, $storage)));
+
+        $manager->pause('redis', 'default');
+        $this->assertTrue($manager->isPaused('redis', 'default'));
+        $this->assertSame(['default'], $manager->getPausedQueues('redis', ['default', 'emails']));
+
+        $manager->resume('redis', 'default');
+        $this->assertFalse($manager->isPaused('redis', 'default'));
+        $this->assertSame([], $manager->getPausedQueues('redis', ['default', 'emails']));
+    }
+
+    public function testPauseForDoesNotUseHashTagsOnNonClusterRedis()
+    {
+        $manager = $this->createManager(new Repository($this->createRedisStore(false)));
+
+        $manager->pauseFor('redis', 'default', 60);
+
+        $this->assertTrue($manager->isPaused('redis', 'default'));
+    }
+
+    protected function createRedisStore(bool $cluster, &$storage = [])
+    {
+        return new class($cluster, $storage) extends RedisStore
+        {
+            protected $cluster;
+            protected $storage;
+
+            public function __construct(bool $cluster, &$storage)
+            {
+                $this->cluster = $cluster;
+                $this->storage = &$storage;
+            }
+
+            public function connection()
+            {
+                $cluster = $this->cluster;
+
+                return new class($cluster)
+                {
+                    public function __construct(protected bool $cluster)
+                    {
+                    }
+
+                    public function isCluster()
+                    {
+                        return $this->cluster;
+                    }
+                };
+            }
+
+            public function forever($key, $value)
+            {
+                $this->storage[$key] = $value;
+            }
+
+            public function put($key, $value, $seconds)
+            {
+                $this->storage[$key] = $value;
+            }
+
+            public function forget($key)
+            {
+                unset($this->storage[$key]);
+            }
+
+            public function get($key)
+            {
+                return $this->storage[$key] ?? null;
+            }
+
+            public function many(array $keys)
+            {
+                if ($this->cluster && count($keys) > 1) {
+                    foreach ($keys as $key) {
+                        if (! str_contains($key, '{paused}')) {
+                            throw new RuntimeException("CROSSSLOT Keys in request don't hash to the same slot");
+                        }
+                    }
+                }
+
+                return array_combine($keys, array_map(fn ($key) => $this->storage[$key] ?? null, $keys));
+            }
+        };
     }
 }
