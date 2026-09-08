@@ -210,6 +210,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $builder->expects('select')->with(Mockery::type(Expression::class))->andReturnSelf();
         $relation->getParent()->expects('qualifyColumn')->andReturn('table.id');
+        $builder->expects('qualifyColumn')->with('table.id')->andReturn('table.id');
         $builder->expects('whereColumn')->with('table.id', '=', 'table.foreign_key')->andReturn($baseQuery);
         $baseQuery->expects('setBindings')->with([], 'select');
 

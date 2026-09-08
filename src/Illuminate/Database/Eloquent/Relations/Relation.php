@@ -339,7 +339,7 @@ abstract class Relation implements BuilderContract
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         return $query->select($columns)->whereColumn(
-            $this->getQualifiedParentKeyName(), '=', $this->getExistenceCompareKey()
+            $parentQuery->qualifyColumn($this->getQualifiedParentKeyName()), '=', $this->getExistenceCompareKey()
         );
     }
 

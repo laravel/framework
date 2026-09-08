@@ -702,7 +702,7 @@ abstract class HasOneOrManyThrough extends Relation
         $this->performJoin($query);
 
         return $query->select($columns)->whereColumn(
-            $this->getQualifiedLocalKeyName(), '=', $this->getQualifiedFirstKeyName()
+            $parentQuery->qualifyColumn($this->getQualifiedLocalKeyName()), '=', $this->getQualifiedFirstKeyName()
         );
     }
 

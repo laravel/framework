@@ -854,7 +854,7 @@ trait QueriesRelationships
         }
 
         if (is_null($this->query->columns)) {
-            $this->query->select([$this->query->from.'.*']);
+            $this->query->select([($this->getTableAlias() ?? $this->query->from).'.*']);
         }
 
         $relations = is_array($relations) ? $relations : [$relations];

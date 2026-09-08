@@ -1402,6 +1402,42 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Child Post', $results->first()->name);
     }
 
+    public function testWhereHasRespectsTheQueryTableAlias()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
+        EloquentTestPost::create(['name' => 'First Post', 'user_id' => $user->id]);
+
+        $results = EloquentTestUser::from('users as u')->whereHas('posts')->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
+    }
+
+    public function testWithCountRespectsTheQueryTableAlias()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
+        EloquentTestPost::create(['name' => 'First Post', 'user_id' => $user->id]);
+
+        $results = EloquentTestUser::from('users as u')->withCount('posts')->orderBy('id')->get();
+
+        $this->assertEquals([1, 0], $results->pluck('posts_count')->all());
+        $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
+    }
+
+    public function testWhereHasOnBelongsToRespectsTheQueryTableAlias()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        EloquentTestPost::create(['name' => 'First Post', 'user_id' => $user->id]);
+        EloquentTestPost::create(['name' => 'Orphan Post', 'user_id' => 0]);
+
+        $results = EloquentTestPost::from('posts as p')->whereHas('user')->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('First Post', $results->first()->name);
+    }
+
     public function testAggregatedValuesOfDatetimeField()
     {
         EloquentTestUser::insert([

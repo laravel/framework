@@ -241,7 +241,7 @@ class BelongsTo extends Relation
         }
 
         return $query->select($columns)->whereColumn(
-            $this->getQualifiedForeignKeyName(), '=', $query->qualifyColumn($this->ownerKey)
+            $parentQuery->qualifyColumn($this->getQualifiedForeignKeyName()), '=', $query->qualifyColumn($this->ownerKey)
         );
     }
 
