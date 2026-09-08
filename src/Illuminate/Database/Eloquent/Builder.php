@@ -280,6 +280,12 @@ class Builder implements BuilderContract
             $id = $id->getKey();
         }
 
+        if ($id instanceof Closure || $id instanceof QueryBuilder || $id instanceof self || $id instanceof Relation) {
+            $this->query->whereIn($this->model->getQualifiedKeyName(), $id, $boolean, $not);
+
+            return $this;
+        }
+
         if (is_array($id) || $id instanceof Arrayable) {
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
                 $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id, $boolean, $not);
