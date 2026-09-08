@@ -316,6 +316,21 @@ class MercureBroadcasterTest extends TestCase
         }
     }
 
+    public function testBroadcastWrapsBuiltInHubRuntimeExceptionsIntoABroadcastException()
+    {
+        $hubException = new RuntimeException('No Mercure hub configured');
+
+        $this->hub->shouldReceive('publish')->andThrow($hubException);
+
+        try {
+            $this->broadcaster->broadcast(['news'], 'Tick');
+            $this->fail('A BroadcastException should have been thrown.');
+        } catch (BroadcastException $e) {
+            $this->assertSame('Mercure error: No Mercure hub configured.', $e->getMessage());
+            $this->assertSame($hubException, $e->getPrevious());
+        }
+    }
+
     public function testAuthMintsAnAnonymousTokenForAGuestOnPublicOnlyChannels()
     {
         $response = $this->broadcaster->auth($this->requestFor(['news'], null));

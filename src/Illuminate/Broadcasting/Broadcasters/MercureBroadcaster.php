@@ -8,6 +8,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use JsonException;
+use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Mercure\Authorization;
 use Symfony\Component\Mercure\Exception\ExceptionInterface as MercureExceptionInterface;
@@ -266,6 +267,9 @@ class MercureBroadcaster extends Broadcaster
             // The actionable cause (401, DNS, timeout) lives on the
             // previous exception; Hub::publish()'s own message is generic.
             throw new BroadcastException(sprintf('Mercure error: %s.', $e->getPrevious()?->getMessage() ?? $e->getMessage()), 0, $e);
+        } catch (RuntimeException $e) {
+            // FrankenPHP's built-in hub throws bare RuntimeExceptions.
+            throw new BroadcastException(sprintf('Mercure error: %s.', $e->getMessage()), 0, $e);
         }
     }
 
