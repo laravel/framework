@@ -79,6 +79,20 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     protected $cursor;
 
     /**
+     * The cursor that points to the previous set of items.
+     *
+     * @var \Illuminate\Pagination\Cursor|null
+     */
+    protected $previousCursor;
+
+    /**
+     * The cursor that points to the next set of items.
+     *
+     * @var \Illuminate\Pagination\Cursor|null
+     */
+    protected $nextCursor;
+
+    /**
      * The paginator parameters for the cursor.
      *
      * @var array
@@ -166,7 +180,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
             return null;
         }
 
-        return $this->getCursorForItem($this->items->first(), false);
+        return $this->previousCursor ?? $this->getCursorForItem($this->items->first(), false);
     }
 
     /**
@@ -185,7 +199,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
             return null;
         }
 
-        return $this->getCursorForItem($this->items->last(), true);
+        return $this->nextCursor ?? $this->getCursorForItem($this->items->last(), true);
     }
 
     /**
@@ -412,6 +426,9 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     public function through(callable $callback)
     {
+        $this->previousCursor = $this->previousCursor();
+        $this->nextCursor = $this->nextCursor();
+
         $this->items->transform($callback);
 
         return $this;

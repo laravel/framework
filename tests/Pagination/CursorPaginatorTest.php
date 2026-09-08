@@ -77,6 +77,21 @@ class CursorPaginatorTest extends TestCase
 
         $this->assertInstanceOf(CursorPaginator::class, $p);
         $this->assertSame([['id' => 6], ['id' => 7]], $p->items());
+        $this->assertSame($this->getCursor(['id' => 5]), $p->nextCursor()->encode());
+    }
+
+    public function testCanTransformPaginatorItemsWhenCursorPointsToPreviousItems()
+    {
+        $cursor = new Cursor(['id' => 6], false);
+        $p = new CursorPaginator([['id' => 5], ['id' => 4], ['id' => 3]], 2, $cursor, [
+            'parameters' => ['id'],
+        ]);
+
+        $p->through(fn ($item) => ['name' => 'Item '.$item['id']]);
+
+        $this->assertSame([['name' => 'Item 4'], ['name' => 'Item 5']], $p->items());
+        $this->assertSame($this->getCursor(['id' => 4], false), $p->previousCursor()->encode());
+        $this->assertSame($this->getCursor(['id' => 5]), $p->nextCursor()->encode());
     }
 
     public function testCursorPaginatorOnFirstAndLastPage()
