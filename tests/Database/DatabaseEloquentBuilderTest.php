@@ -1098,6 +1098,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $nestedQuery = Mockery::mock(Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
+        $nestedQuery->expects('from')->andReturnSelf();
         $nestedQuery->expects('getQuery')->andReturn($nestedRawQuery);
         $nestedQuery->expects('getEagerLoads')->andReturn([]);
         $nestedQuery->expects('removedScopes')->andReturn([]);
@@ -1161,6 +1162,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $nestedQuery = Mockery::mock(Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
+        $nestedQuery->expects('from')->andReturnSelf();
         $nestedQuery->expects('getQuery')->andReturn($nestedRawQuery);
         $nestedQuery->expects('getEagerLoads')->andReturn([]);
         $nestedQuery->expects('removedScopes')->andReturn([]);
@@ -1191,6 +1193,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $nestedQuery = Mockery::mock(Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
+        $nestedQuery->expects('from')->andReturnSelf();
         $nestedQuery->expects('getQuery')->andReturn($nestedRawQuery);
         $nestedQuery->expects('getEagerLoads')->andReturn([]);
         $nestedQuery->expects('removedScopes')->andReturn([]);

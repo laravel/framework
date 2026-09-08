@@ -376,7 +376,7 @@ class Builder implements BuilderContract
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column instanceof Closure && is_null($operator)) {
-            $column($query = $this->model->newQueryWithoutRelationships());
+            $column($query = $this->model->newQueryWithoutRelationships()->from($this->query->from));
 
             $this->eagerLoad = array_merge($this->eagerLoad, $query->getEagerLoads());
 

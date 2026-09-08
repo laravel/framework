@@ -1438,6 +1438,33 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('First Post', $results->first()->name);
     }
 
+    public function testWhereHasInsideNestedWhereRespectsTheQueryTableAlias()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
+        EloquentTestPost::create(['name' => 'First Post', 'user_id' => $user->id]);
+
+        $results = EloquentTestUser::from('users as u')->where(function ($query) {
+            $query->whereHas('posts');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
+    }
+
+    public function testWhereHasMorphRespectsTheQueryTableAlias()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTestPost::create(['name' => 'First Post', 'user_id' => $user->id]);
+        $post->photos()->create(['name' => 'photo.jpg']);
+        EloquentTestPhoto::create(['name' => 'orphan.jpg', 'imageable_id' => 0, 'imageable_type' => EloquentTestPost::class]);
+
+        $results = EloquentTestPhoto::from('photos as p')->whereHasMorph('imageable', [EloquentTestPost::class])->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('photo.jpg', $results->first()->name);
+    }
+
     public function testAggregatedValuesOfDatetimeField()
     {
         EloquentTestUser::insert([
