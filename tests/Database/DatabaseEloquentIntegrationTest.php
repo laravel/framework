@@ -2190,6 +2190,42 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNull($freshNotStoredUser);
     }
 
+    public function testFreshForUpdateMethodOnModel()
+    {
+        $user = EloquentTestUser::create([
+            'id' => 1,
+            'email' => 'taylorotwell@gmail.com',
+        ]);
+
+        EloquentTestPost::create([
+            'user_id' => 1,
+            'name' => 'First Post',
+        ]);
+
+        EloquentTestUser::whereKey($user)->update(['name' => 'Abigail Otwell']);
+
+        $fresh = EloquentTestUser::resolveConnection()->transaction(function () use ($user) {
+            return $user->freshForUpdate();
+        });
+
+        $this->assertNotSame($user, $fresh);
+        $this->assertSame('Abigail Otwell', $fresh->name);
+        $this->assertNull($user->name);
+        $this->assertFalse($fresh->relationLoaded('posts'));
+
+        $freshWithRelations = EloquentTestUser::resolveConnection()->transaction(function () use ($user) {
+            return $user->freshForUpdate('posts');
+        });
+
+        $this->assertNotSame($user, $freshWithRelations);
+        $this->assertSame('Abigail Otwell', $freshWithRelations->name);
+        $this->assertTrue($freshWithRelations->relationLoaded('posts'));
+        $this->assertCount(1, $freshWithRelations->posts);
+
+        $notStoredUser = new EloquentTestUser(['id' => 2]);
+        $this->assertNull($notStoredUser->freshForUpdate());
+    }
+
     public function testFreshMethodOnCollection()
     {
         EloquentTestUser::insert([['id' => 1, 'email' => 'taylorotwell@gmail.com'], ['id' => 2, 'email' => 'taylorotwell@gmail.com']]);

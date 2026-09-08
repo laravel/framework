@@ -745,6 +745,29 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('Abigail', $model->getOriginal('name'));
     }
 
+    public function testFreshForUpdateUsesLockForUpdate()
+    {
+        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model->exists = true;
+        $model->setRawAttributes(['id' => 1, 'name' => 'Taylor'], true);
+
+        $freshModel = new EloquentModelStub;
+        $freshModel->setRawAttributes(['id' => 1, 'name' => 'Abigail']);
+
+        $query = Mockery::mock(Builder::class);
+        $model->expects('newQueryWithoutScopes')->once()->andReturn($query);
+        $query->expects('lockForUpdate')->once()->andReturnSelf();
+        $query->expects('where')->once()->with('id', '=', 1)->andReturnSelf();
+        $query->expects('useWritePdo')->once()->andReturnSelf();
+        $query->expects('with')->once()->with([])->andReturnSelf();
+        $query->expects('first')->once()->andReturn($freshModel);
+
+        $result = $model->freshForUpdate();
+
+        $this->assertSame($freshModel, $result);
+        $this->assertSame('Taylor', $model->name);
+    }
+
     public function testDestroyMethodCallsQueryBuilderCorrectly()
     {
         EloquentModelDestroyStub::destroy(1, 2, 3);

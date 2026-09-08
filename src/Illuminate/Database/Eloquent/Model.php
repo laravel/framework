@@ -2087,9 +2087,42 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return;
         }
 
-        return $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+        return $this->freshUsingQuery(
+            $this->newQueryWithoutScopes(),
+            is_string($with) ? func_get_args() : $with
+        );
+    }
+
+    /**
+     * Reload a fresh model instance from the database while locking it for updating.
+     *
+     * @param  array|string  $with
+     * @return static|null
+     */
+    public function freshForUpdate($with = [])
+    {
+        if (! $this->exists) {
+            return;
+        }
+
+        return $this->freshUsingQuery(
+            $this->newQueryWithoutScopes()->lockForUpdate(),
+            is_string($with) ? func_get_args() : $with
+        );
+    }
+
+    /**
+     * Reload a fresh model instance using the given query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
+     * @param  array  $with
+     * @return static|null
+     */
+    protected function freshUsingQuery(Builder $query, array $with = [])
+    {
+        return $this->setKeysForSelectQuery($query)
             ->useWritePdo()
-            ->with(is_string($with) ? func_get_args() : $with)
+            ->with($with)
             ->first();
     }
 
