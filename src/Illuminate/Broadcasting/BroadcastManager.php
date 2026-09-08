@@ -491,10 +491,12 @@ class BroadcastManager implements FactoryContract
         }
 
         // 0 (the default) delegates the lifetime to the hub's token factory:
-        // "session.cookie_lifetime", or an hour when that setting is 0.
+        // "session.cookie_lifetime", or an hour when that setting is 0. A
+        // set value must survive the truncation to whole seconds, so a
+        // sub-second lifetime can't silently become the default one.
         $publishExpiration = (int) (($config['publish_expiration'] ?? 0) * 60);
 
-        if ($publishExpiration < 0) {
+        if ($publishExpiration < 0 || ($publishExpiration === 0 && ! empty($config['publish_expiration']))) {
             throw new InvalidArgumentException('The Mercure "publish_expiration" configuration value must be a positive number of minutes, or 0 to use the default lifetime.');
         }
 
@@ -607,7 +609,15 @@ class BroadcastManager implements FactoryContract
             return null;
         }
 
-        $key = base64_decode($config['encryption_key'], true);
+        $encodedKey = $config['encryption_key'];
+
+        // Support the framework's key convention (what "key:generate
+        // --show" produces), so an APP_KEY-style value works as-is.
+        if (str_starts_with($encodedKey, 'base64:')) {
+            $encodedKey = substr($encodedKey, 7);
+        }
+
+        $key = base64_decode($encodedKey, true);
 
         if ($key === false || strlen($key) !== 32) {
             throw new InvalidArgumentException('The Mercure "encryption_key" configuration value must be a base64-encoded 32-byte key. You may generate one with: php -r "echo base64_encode(random_bytes(32));"');

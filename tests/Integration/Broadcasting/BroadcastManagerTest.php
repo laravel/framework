@@ -339,6 +339,21 @@ class BroadcastManagerTest extends TestCase
         (new BroadcastManager($this->getApp([])))->mercure($this->mercureConfig(['publish_expiration' => -1]));
     }
 
+    public function testMercureRejectsAPublishExpirationTruncatingToZeroSeconds()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('publish_expiration');
+
+        (new BroadcastManager($this->getApp([])))->mercure($this->mercureConfig(['publish_expiration' => 0.01]));
+    }
+
+    public function testMercureAcceptsASubMinutePublishExpiration()
+    {
+        $hub = (new BroadcastManager($this->getApp([])))->mercure($this->mercureConfig(['publish_expiration' => 0.5]));
+
+        $this->assertNotNull($hub->getProvider()->getJwt());
+    }
+
     public function testMercureRejectsANonPositiveSubscribeExpiration()
     {
         $manager = new BroadcastManager($this->getApp([
@@ -382,6 +397,18 @@ class BroadcastManagerTest extends TestCase
         $this->expectExceptionMessage('encryption_key');
 
         $manager->connection('mercure');
+    }
+
+    public function testMercureAcceptsABase64PrefixedEncryptionKey()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => $this->mercureConfig([
+                'driver' => 'mercure',
+                'encryption_key' => 'base64:'.base64_encode(random_bytes(32)),
+            ])]],
+        ]));
+
+        $this->assertInstanceOf(MercureBroadcaster::class, $manager->connection('mercure'));
     }
 
     public function testMercureDefaultsTheRfc9068Claims()
