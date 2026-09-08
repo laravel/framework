@@ -111,4 +111,23 @@ class ValidationRuleContainsTest extends TestCase
         $v = new Validator($trans, ['flags' => [1]], ['flags' => 'contains:1']);
         $this->assertTrue($v->passes());
     }
+
+    public function testContainsRuleMatchesNonStringScalarParametersFromArraySyntax()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['flags' => [1]], ['flags' => [['contains', 1]]]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['flags' => [true]], ['flags' => [['contains', true]]]);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testContainsRuleDoesNotThrowForNonScalarParameter()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['roles' => ['admin']], ['roles' => [['contains', ['admin']]]]);
+        $this->assertTrue($v->fails());
+    }
 }
