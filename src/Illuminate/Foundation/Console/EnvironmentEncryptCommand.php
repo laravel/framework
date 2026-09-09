@@ -75,15 +75,17 @@ class EnvironmentEncryptCommand extends Command
 
         $encryptedFile = $environmentFile.'.encrypted';
 
+        if (! $this->files->exists($environmentFile)) {
+            $this->fail('Environment file not found.');
+        }
+
         $encryptedFileExists = $this->option('incremental') ? $this->files->exists($encryptedFile) : null;
 
         $key = $this->option('key');
 
         if (! $key && $this->input->isInteractive() && $this->option('incremental') && $encryptedFileExists) {
             $key = password('What is the encryption key?');
-        }
-
-        if (! $key && $this->input->isInteractive()) {
+        } elseif (! $key && $this->input->isInteractive()) {
             $ask = select(
                 label: 'What encryption key would you like to use?',
                 options: [
@@ -98,24 +100,20 @@ class EnvironmentEncryptCommand extends Command
             }
         }
 
+        if ($encryptedFileExists && $this->option('incremental') && ($key === null || $key === '')) {
+            $this->fail('The existing encryption key is required for incremental encryption.');
+        }
+
         $keyPassed = $key !== null;
 
         if (! $keyPassed) {
             $key = Encrypter::generateKey($cipher);
         }
 
-        if (! $this->files->exists($environmentFile)) {
-            $this->fail('Environment file not found.');
-        }
-
         $encryptedFileExists ??= $this->files->exists($encryptedFile);
 
         if ($encryptedFileExists && ! $this->option('force') && ! $this->option('incremental')) {
             $this->fail('Encrypted environment file already exists.');
-        }
-
-        if ($encryptedFileExists && $this->option('incremental') && ! $keyPassed) {
-            $this->fail('The existing encryption key is required for incremental encryption.');
         }
 
         try {
@@ -165,7 +163,13 @@ class EnvironmentEncryptCommand extends Command
     protected function encryptReadableFormat(string $contents, Encrypter $encrypter, ?string $previous = null): string
     {
         $result = '';
-        $existing = $previous === null ? [] : $this->readEncryptedEntries($previous, $encrypter);
+        $existing = [];
+        $previousOutput = '';
+
+        foreach ($previous === null ? [] : $this->readEncryptedEntries($previous, $encrypter) as $entry) {
+            $existing[$entry['name']][] = $entry;
+            $previousOutput .= $entry['name'].'='.$entry['encrypted']."\n";
+        }
 
         foreach (Lines::process(preg_split('/\r\n|\r|\n/', $contents)) as $entry) {
             $pos = strpos($entry, '=');
@@ -177,18 +181,18 @@ class EnvironmentEncryptCommand extends Command
             $name = substr($entry, 0, $pos);
             $value = substr($entry, $pos + 1);
 
-            $entry = empty($existing[$name]) ? null : array_shift($existing[$name]);
+            $existingEntry = empty($existing[$name]) ? null : array_shift($existing[$name]);
 
-            $result .= $name.'='.($entry !== null && $entry['value'] === $value
-                ? $entry['encrypted']
+            $result .= $name.'='.($existingEntry !== null && $existingEntry['value'] === $value
+                ? $existingEntry['encrypted']
                 : $encrypter->encryptString($value))."\n";
         }
 
-        return $result;
+        return $previous !== null && $result === $previousOutput ? $previous : $result;
     }
 
     /**
-     * Authenticate the existing readable entries, preserving duplicate names.
+     * Authenticate the existing readable entries, preserving order and duplicate names.
      *
      * @param  string  $contents
      * @param  \Illuminate\Encryption\Encrypter  $encrypter
@@ -203,7 +207,7 @@ class EnvironmentEncryptCommand extends Command
         $entries = [];
 
         foreach (preg_split('/\r\n|\r|\n/', $contents) as $index => $line) {
-            if ($line === '') {
+            if (trim($line) === '' || str_starts_with(ltrim($line), '#')) {
                 continue;
             }
 
@@ -221,7 +225,9 @@ class EnvironmentEncryptCommand extends Command
                 $this->fail('Unable to decrypt the encrypted environment entry on line '.($index + 1).'.');
             }
 
-            $entries[substr($line, 0, $pos)][] = compact('value', 'encrypted');
+            $name = substr($line, 0, $pos);
+
+            $entries[] = compact('name', 'value', 'encrypted');
         }
 
         return $entries;

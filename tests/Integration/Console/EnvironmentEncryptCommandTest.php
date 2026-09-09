@@ -76,7 +76,6 @@ class EnvironmentEncryptCommandTest extends TestCase
         $this->filesystem->expects('exists')->andReturn(false);
 
         $this->artisan('env:encrypt')
-            ->expectsQuestion('What encryption key would you like to use?', 'generate')
             ->expectsOutputToContain('Environment file not found.')
             ->assertExitCode(1);
     }
