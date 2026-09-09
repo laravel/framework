@@ -378,7 +378,7 @@ class RouteUrlGenerator
     protected function encodeParameter($value)
     {
         return is_string($value) || $value instanceof Stringable
-            ? strtr((string) $value, ['%' => '%25', '?' => '%3F', '#' => '%23'])
+            ? str_replace('%', '%25', (string) $value)
             : $value;
     }
 

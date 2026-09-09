@@ -800,6 +800,24 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com/foo/1', $url->route('foo', ['bar' => 1]));
     }
 
+    public function testQueryStringDelimitersAreNotEncodedInRouteUrls()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $routes->add(new Route(['GET'], 'page/{id}', ['as' => 'page', function () {
+            //
+        }]));
+
+        // Query string ? and & must not be percent-encoded in the final URL
+        $this->assertSame('http://www.foo.com/page/99?q=foo&size=all', $url->route('page', ['id' => 99, 'q' => 'foo', 'size' => 'all']));
+
+        // A ? that is part of a query param value should be encoded
+        $this->assertSame('http://www.foo.com/page/99?q=foo%3Fbar', $url->route('page', ['id' => 99, 'q' => 'foo?bar']));
+    }
+
     public function testSignedUrl()
     {
         $url = new UrlGenerator(
