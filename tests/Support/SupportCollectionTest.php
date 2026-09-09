@@ -4150,7 +4150,7 @@ class SupportCollectionTest extends TestCase
         $c = new $collection([1, null, 2]);
         $this->assertTrue($c->containsStrict(fn ($value) => is_null($value)));
         $this->assertFalse($c->containsStrict(fn ($value) => $value === 0));
-        
+
         $c = new $collection([1, 3, 5, '02']);
 
         $this->assertTrue($c->containsStrict(1));
