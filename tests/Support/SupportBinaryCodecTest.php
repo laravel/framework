@@ -170,6 +170,6 @@ class SupportBinaryCodecTest extends TestCase
 
         // Invalid UTF-8 sequences
         $this->assertTrue(BinaryCodec::isBinary("\xFF\xFE"));
-        $this->assertTrue(BinaryCodec::isBinary(random_bytes(16)));
+        $this->assertTrue(BinaryCodec::isBinary("\xE3\x81"));
     }
 }
