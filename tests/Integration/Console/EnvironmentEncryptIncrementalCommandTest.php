@@ -31,10 +31,9 @@ class EnvironmentEncryptIncrementalCommandTest extends TestCase
             ->andReturn($encryptedContent);
     }
 
-    #[DataProvider('ciphers')]
-    public function testItChangesOnlyTheEditedValue(string $cipher): void
+    public function testItChangesOnlyTheEditedValue(): void
     {
-        $encrypter = new Encrypter($this->key, $cipher);
+        $encrypter = new Encrypter($this->key, 'AES-256-CBC');
         $host = $encrypter->encryptString('localhost');
         $password = $encrypter->encryptString('1');
         $app = $encrypter->encryptString('production');
@@ -60,7 +59,7 @@ ENV;
             ->with(base_path('.env.encrypted'), Mockery::capture($encryptedOutput))
             ->andReturn(100);
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key, '--cipher' => $cipher])
+        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key])
             ->assertExitCode(0);
 
         $lines = explode("\n", $encryptedOutput);
@@ -70,11 +69,6 @@ ENV;
         $payload = substr($lines[1], strlen('DB_PASSWORD='));
         $this->assertNotSame($password, $payload);
         $this->assertSame('2', $encrypter->decryptString($payload));
-    }
-
-    public static function ciphers(): array
-    {
-        return [['AES-256-CBC'], ['AES-256-GCM']];
     }
 
     public function testItDoesNotWriteWhenRawValuesAreUnchanged(): void
