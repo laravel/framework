@@ -418,6 +418,17 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertFalse(Schema::hasIndex('foo', ['bar'], 'unique'));
     }
 
+    public function testHasIndexNameIsCaseInsensitive()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->string('bar')->index('IDX_MyIndex');
+        });
+
+        $this->assertTrue(Schema::hasIndex('foo', 'IDX_MyIndex'));
+        $this->assertTrue(Schema::hasIndex('foo', 'idx_myindex'));
+        $this->assertSame('idx_myindex', Schema::getIndexes('foo')[0]['name']);
+    }
+
     public function testGetUniqueIndexes()
     {
         Schema::create('foo', function (Blueprint $table) {
