@@ -65,6 +65,13 @@ abstract class Job
     protected $queue;
 
     /**
+     * The decoded payload of the job.
+     *
+     * @var array|null
+     */
+    protected $decodedPayload;
+
+    /**
      * Get the job identifier.
      *
      * @return string|int|null
@@ -283,7 +290,7 @@ abstract class Job
      */
     public function payload()
     {
-        return json_decode($this->getRawBody(), true);
+        return $this->decodedPayload ??= json_decode($this->getRawBody(), true);
     }
 
     /**
