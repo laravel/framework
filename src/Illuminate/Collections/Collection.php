@@ -219,7 +219,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
 
         if ($this->useAsCallable($key)) {
-            return ! is_null($this->first($key));
+            return array_any($this->items, $key);
         }
 
         return in_array($key, $this->items, true);
