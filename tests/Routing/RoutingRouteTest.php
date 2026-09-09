@@ -2507,6 +2507,8 @@ class RouteBindingStub
 
 class RouteModelBindingStub extends Model
 {
+    protected $keyType = 'string';
+
     public function getRouteKeyName()
     {
         return 'id';
@@ -2527,6 +2529,8 @@ class RouteModelBindingStub extends Model
 
 class RouteModelBindingNullStub extends Model
 {
+    protected $keyType = 'string';
+
     public function getRouteKeyName()
     {
         return 'id';
@@ -2571,6 +2575,8 @@ class RoutingTestMiddlewareGroupTwo
 
 class RoutingTestUserModel extends Model
 {
+    protected $keyType = 'string';
+
     public function posts()
     {
         return new RoutingTestPostModel;
@@ -2606,6 +2612,8 @@ class RoutingTestUserModel extends Model
 
 class RoutingTestPostModel extends Model
 {
+    protected $keyType = 'string';
+
     public function getRouteKeyName()
     {
         return 'id';
@@ -2626,6 +2634,8 @@ class RoutingTestPostModel extends Model
 
 class RoutingTestTeamModel extends Model
 {
+    protected $keyType = 'string';
+
     public function users()
     {
         return new RoutingTestUserModel;

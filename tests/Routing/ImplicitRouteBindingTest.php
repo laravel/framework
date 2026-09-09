@@ -2,19 +2,34 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\InvalidValueException;
+use Illuminate\Database\QueryException;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Routing\ImplicitRouteBinding;
 use Illuminate\Routing\Route;
 use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
 use Illuminate\Tests\Routing\Fixtures\CategoryEnum;
+use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 include_once 'Fixtures/Enums.php';
 
 class ImplicitRouteBindingTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+        Model::reportRouteModelBindingExceptions();
+
+        parent::tearDown();
+    }
+
     public function test_it_can_resolve_the_implicit_backed_enum_route_bindings_for_the_given_route()
     {
         $action = ['uses' => function (CategoryBackedEnum $category) {
@@ -123,9 +138,76 @@ class ImplicitRouteBindingTest extends TestCase
 
         ImplicitRouteBinding::resolveForRoute($container, $route);
     }
+
+    #[DataProvider('shouldReportProvider')]
+    public function testItThrowsModelNotFoundExceptionOnInvalidValueException(bool $shouldReport): void
+    {
+        Model::reportRouteModelBindingExceptions($shouldReport);
+
+        $mock = m::mock(ExceptionHandler::class);
+
+        if ($shouldReport) {
+            $mock->shouldReceive('report')->once()->with(m::type(InvalidValueException::class), []);
+        } else {
+            $mock->shouldReceive('report')->never();
+        }
+
+        $container = Container::getInstance();
+        $container->instance(ExceptionHandler::class, $mock);
+
+        $action = ['uses' => fn (ImplicitRouteBindingUserWithInvalidValue $user) => $user];
+
+        $route = new Route('GET', '/test', $action);
+        $route->parameters = ['user' => 'invalid-value'];
+        $route->prepareForSerialization();
+        $this->expectException(ModelNotFoundException::class);
+
+        ImplicitRouteBinding::resolveForRoute($container, $route);
+    }
+
+    /** @return list<array{0: bool}> */
+    public static function shouldReportProvider(): array
+    {
+        return [[true], [false]];
+    }
+
+    public function testItDoesNotConvertUnrelatedQueryExceptions(): void
+    {
+        $mock = m::mock(ExceptionHandler::class);
+        $mock->shouldReceive('report')->never();
+
+        $container = Container::getInstance();
+        $container->instance(ExceptionHandler::class, $mock);
+
+        $action = ['uses' => fn (ImplicitRouteBindingUserWithQueryException $user) => $user];
+
+        $route = new Route('GET', '/test', $action);
+        $route->parameters = ['user' => 'invalid-value'];
+        $route->prepareForSerialization();
+
+        $this->expectException(QueryException::class);
+
+        ImplicitRouteBinding::resolveForRoute($container, $route);
+    }
 }
 
 class ImplicitRouteBindingUser extends Model
 {
     //
+}
+
+class ImplicitRouteBindingUserWithInvalidValue extends Model
+{
+    public function resolveRouteBinding($value, $field = null): void
+    {
+        throw new InvalidValueException('pgsql', 'select * from users where id = ?', [$value], new Exception('Out of range value'));
+    }
+}
+
+class ImplicitRouteBindingUserWithQueryException extends Model
+{
+    public function resolveRouteBinding($value, $field = null): void
+    {
+        throw new QueryException('pgsql', 'select * from users where id = ?', [$value], new Exception('Undefined column'));
+    }
 }
