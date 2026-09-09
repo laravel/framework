@@ -26,6 +26,7 @@ use Illuminate\Testing\TestResponseAssert as PHPUnit;
 use LogicException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -452,7 +453,9 @@ class TestResponse implements ArrayAccess
      */
     public function assertDownload($filename = null)
     {
-        $contentDisposition = explode(';', $this->headers->get('content-disposition', ''));
+        $header = $this->headers->get('content-disposition', '');
+
+        $contentDisposition = explode(';', $header);
 
         if (trim($contentDisposition[0]) !== 'attachment') {
             PHPUnit::withResponse($this)->fail(
@@ -463,7 +466,7 @@ class TestResponse implements ArrayAccess
 
         if (! is_null($filename)) {
             if (isset($contentDisposition[1]) &&
-                trim(explode('=', $contentDisposition[1])[0]) !== 'filename') {
+                ! in_array(trim(explode('=', $contentDisposition[1])[0]), ['filename', 'filename*'])) {
                 PHPUnit::withResponse($this)->fail(
                     'Unsupported Content-Disposition header provided.'.PHP_EOL.
                     'Disposition ['.trim(explode('=', $contentDisposition[1])[0]).'] found in header, [filename] expected.'
@@ -475,11 +478,9 @@ class TestResponse implements ArrayAccess
             if (! isset($contentDisposition[1])) {
                 PHPUnit::withResponse($this)->fail($message);
             } else {
-                PHPUnit::withResponse($this)->assertSame(
+                PHPUnit::withResponse($this)->assertContains(
                     $filename,
-                    isset(explode('=', $contentDisposition[1])[1])
-                        ? trim(explode('=', $contentDisposition[1])[1], " \"'")
-                        : '',
+                    $this->contentDispositionFilenames($header),
                     $message
                 );
 
@@ -490,6 +491,33 @@ class TestResponse implements ArrayAccess
 
             return $this;
         }
+    }
+
+    /**
+     * Get the filenames declared by the given Content-Disposition header.
+     *
+     * @param  string  $header
+     * @return array
+     */
+    protected function contentDispositionFilenames($header)
+    {
+        $parameters = HeaderUtils::combine(array_slice(HeaderUtils::split($header, ';='), 1));
+
+        $filenames = [];
+
+        if (is_string($parameters['filename*'] ?? null)) {
+            $value = explode("'", $parameters['filename*'], 3);
+
+            if (count($value) === 3) {
+                $filenames[] = rawurldecode($value[2]);
+            }
+        }
+
+        if (is_string($parameters['filename'] ?? null)) {
+            $filenames[] = trim($parameters['filename'], "'");
+        }
+
+        return $filenames;
     }
 
     /**
