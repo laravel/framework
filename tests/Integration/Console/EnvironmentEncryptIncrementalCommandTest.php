@@ -215,7 +215,13 @@ ENV;
 
     public static function invalidBaselines(): array
     {
-        return array_map(fn ($kind) => [$kind], ['blob', 'wrong-key', 'wrong-cipher', 'malformed', 'corrupt-deleted-entry']);
+        return [
+            'blob' => ['blob'],
+            'wrong-key' => ['wrong-key'],
+            'wrong-cipher' => ['wrong-cipher'],
+            'malformed' => ['malformed'],
+            'corrupt-deleted-entry' => ['corrupt-deleted-entry'],
+        ];
     }
 
     public function testItRequiresReadable(): void
