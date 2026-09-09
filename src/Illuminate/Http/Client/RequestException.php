@@ -3,6 +3,8 @@
 namespace Illuminate\Http\Client;
 
 use GuzzleHttp\Psr7\Message;
+use GuzzleHttp\Psr7\Utils;
+use Psr\Http\Message\ResponseInterface;
 
 class RequestException extends HttpClientException
 {
@@ -113,11 +115,34 @@ class RequestException extends HttpClientException
         $summary = null;
 
         if (is_int($truncateExceptionsAt)) {
-            $summary = Message::bodySummary($psrResponse, $truncateExceptionsAt);
+            $summary = $this->summarize($psrResponse, $truncateExceptionsAt);
         } elseif (($body = $psrResponse->getBody())->isSeekable() && $body->isReadable()) {
             $summary = Message::toString($psrResponse);
         }
 
         return is_null($summary) ? $message : $message.":\n{$summary}\n";
+    }
+
+    /**
+     * Summarize the response, truncating its body at the given length.
+     *
+     * The status line and the headers are always rendered in full. They are
+     * the part of the message that makes a failure diagnosable, they are
+     * bounded in practice, and truncating the body is what the truncation
+     * setting is asking for.
+     *
+     * @param  \Psr\Http\Message\ResponseInterface  $response
+     * @param  int  $truncateAt
+     * @return string|null
+     */
+    protected function summarize(ResponseInterface $response, int $truncateAt)
+    {
+        $body = Message::bodySummary($response, $truncateAt);
+
+        if (is_null($body)) {
+            return null;
+        }
+
+        return Message::toString($response->withBody(Utils::streamFor($body)));
     }
 }

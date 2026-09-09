@@ -1758,12 +1758,12 @@ class HttpClientTest extends TestCase
         }
 
         // Ensure the exception message is truncated according to the request level truncation setting.
-        $this->assertSame("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"e (truncated...)\n", $exception->getMessage());
 
         $exception->report();
 
         // Ensure that the truncation level is not changed when reporting the exception.
-        $this->assertSame("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"e (truncated...)\n", $exception->getMessage());
 
         $this->assertEquals(60, RequestException::$truncateAt);
     }
@@ -1808,7 +1808,7 @@ class HttpClientTest extends TestCase
 
         $exception->report();
 
-        $this->assertSame("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"e (truncated...)\n", $exception->getMessage());
 
         $this->assertFalse(RequestException::$truncateAt);
     }
@@ -1825,8 +1825,57 @@ class HttpClientTest extends TestCase
         $exception->report();
 
         $this->assertInstanceOf(RequestException::class, $exception);
-        $this->assertSame("HTTP request returned status code 403:\n[\"er (truncated...)\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"er (truncated...)\n", $exception->getMessage());
         $this->assertFalse(RequestException::$truncateAt);
+    }
+
+    public function testTruncatedExceptionMessageIncludesTheStatusLineAndHeaders()
+    {
+        RequestException::truncateAt(120);
+
+        $response = new Psr7Response(405, [
+            'Server' => 'nginx/1.20.1',
+            'Content-Type' => 'text/html; charset=utf-8',
+        ], str_repeat('a', 200));
+
+        $exception = new RequestException(new Response($response));
+
+        $this->assertSame(
+            "HTTP request returned status code 405:\nHTTP/1.1 405 Method Not Allowed\r\nServer: nginx/1.20.1\r\nContent-Type: text/html; charset=utf-8\r\n\r\n".str_repeat('a', 120)." (truncated...)\n",
+            $exception->getMessage()
+        );
+    }
+
+    public function testTruncatedAndUntruncatedExceptionMessagesOnlyDifferInTheBody()
+    {
+        $headers = ['Server' => 'nginx/1.20.1', 'Content-Type' => 'application/json'];
+
+        $body = str_repeat('a', 200);
+
+        RequestException::dontTruncate();
+        $untruncated = (new RequestException(new Response(new Psr7Response(405, $headers, $body))))->getMessage();
+
+        RequestException::truncateAt(120);
+        $truncated = (new RequestException(new Response(new Psr7Response(405, $headers, $body))))->getMessage();
+
+        $head = "HTTP request returned status code 405:\nHTTP/1.1 405 Method Not Allowed\r\nServer: nginx/1.20.1\r\nContent-Type: application/json\r\n\r\n";
+
+        $this->assertStringStartsWith($head, $untruncated);
+        $this->assertStringStartsWith($head, $truncated);
+    }
+
+    public function testHeadersAreNotCountedTowardsTheTruncationLimit()
+    {
+        RequestException::truncateAt(10);
+
+        $response = new Psr7Response(500, [
+            'X-Long-Header' => str_repeat('b', 500),
+        ], str_repeat('a', 200));
+
+        $exception = new RequestException(new Response($response));
+
+        $this->assertStringContainsString('X-Long-Header: '.str_repeat('b', 500), $exception->getMessage());
+        $this->assertStringEndsWith("\r\n\r\n".str_repeat('a', 10)." (truncated...)\n", $exception->getMessage());
     }
 
     public function testRequestExceptionEmptyBody()
