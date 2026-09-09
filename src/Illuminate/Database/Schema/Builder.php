@@ -444,6 +444,7 @@ class Builder
     public function hasIndex($table, $index, $type = null)
     {
         $type = is_null($type) ? $type : strtolower($type);
+
         $index = is_string($index) ? strtolower($index) : $index;
 
         foreach ($this->getIndexes($table) as $value) {
