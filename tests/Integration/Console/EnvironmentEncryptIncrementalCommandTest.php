@@ -34,7 +34,21 @@ class EnvironmentEncryptIncrementalCommandTest extends TestCase
         $host = $encrypter->encryptString('localhost');
         $password = $encrypter->encryptString('1');
         $app = $encrypter->encryptString('production');
-        $this->mockFiles("DB_HOST=localhost\nDB_PASSWORD=2\nAPP_ENV=production\n", "DB_HOST=$host\nDB_PASSWORD=$password\nAPP_ENV=$app\n");
+        $source = <<<'ENV'
+DB_HOST=localhost
+DB_PASSWORD=2
+APP_ENV=production
+
+ENV;
+
+        $previous = <<<ENV
+DB_HOST=$host
+DB_PASSWORD=$password
+APP_ENV=$app
+
+ENV;
+
+        $this->mockFiles($source, $previous);
 
         $output = null;
         File::expects('put')->with(base_path('.env.encrypted'), Mockery::capture($output))->andReturn(100);
@@ -58,15 +72,35 @@ class EnvironmentEncryptIncrementalCommandTest extends TestCase
     public function testItDoesNotWriteWhenRawValuesAreUnchanged(): void
     {
         $encrypter = new Encrypter($this->key, 'AES-256-CBC');
-        $values = ['DUP' => ['1', '2'], 'MULTILINE' => ["\"first\nsecond\""], 'REF' => ['"${DUP}"'], 'EMPTY' => ['']];
-        $source = $previous = '';
+        $source = <<<'ENV'
+DUP=1
+DUP=2
+MULTILINE="first
+second"
+REF="${DUP}"
+EMPTY=
 
-        foreach ($values as $name => $entries) {
-            foreach ($entries as $value) {
-                $source .= $name.'='.$value."\n";
-                $previous .= $name.'='.$encrypter->encryptString($value)."\n";
-            }
-        }
+ENV;
+
+        $multilineValue = <<<'VALUE'
+"first
+second"
+VALUE;
+
+        $first = $encrypter->encryptString('1');
+        $second = $encrypter->encryptString('2');
+        $multiline = $encrypter->encryptString($multilineValue);
+        $reference = $encrypter->encryptString('"${DUP}"');
+        $empty = $encrypter->encryptString('');
+
+        $previous = <<<ENV
+DUP=$first
+DUP=$second
+MULTILINE=$multiline
+REF=$reference
+EMPTY=$empty
+
+ENV;
 
         $this->mockFiles($source, $previous);
         File::shouldReceive('put')->never();
@@ -79,7 +113,21 @@ class EnvironmentEncryptIncrementalCommandTest extends TestCase
         $first = $encrypter->encryptString('1');
         $second = $encrypter->encryptString('2');
         $removed = $encrypter->encryptString('secret');
-        $this->mockFiles("NEW=3\nDUP=1\nDUP=changed\n", "DUP=$first\nREMOVED=$removed\nDUP=$second\n");
+        $source = <<<'ENV'
+NEW=3
+DUP=1
+DUP=changed
+
+ENV;
+
+        $previous = <<<ENV
+DUP=$first
+REMOVED=$removed
+DUP=$second
+
+ENV;
+
+        $this->mockFiles($source, $previous);
         $output = null;
         File::expects('put')->with(base_path('.env.encrypted'), Mockery::capture($output))->andReturn(100);
 
@@ -213,7 +261,13 @@ class EnvironmentEncryptIncrementalCommandTest extends TestCase
         $first = $encrypter->encryptString('1');
         $second = $encrypter->encryptString('2');
         $previous = $prefix."FIRST=$first".$separator."SECOND=$second".$suffix;
-        $this->mockFiles("FIRST=1\nSECOND=2\n", $previous);
+        $source = <<<'ENV'
+FIRST=1
+SECOND=2
+
+ENV;
+
+        $this->mockFiles($source, $previous);
         File::shouldReceive('put')->never();
         $this->artisan('env:encrypt', $this->incrementalOptions())->assertExitCode(0);
     }
@@ -233,7 +287,21 @@ class EnvironmentEncryptIncrementalCommandTest extends TestCase
         $encrypter = new Encrypter($this->key, 'AES-256-CBC');
         $first = $encrypter->encryptString('1');
         $second = $encrypter->encryptString('2');
-        $this->mockFiles("FIRST=1\nSECOND=3\n", " # comment\r\nFIRST=$first\r\n\t\r\nSECOND=$second\r\n");
+        $source = <<<'ENV'
+FIRST=1
+SECOND=3
+
+ENV;
+
+        $previous = <<<ENV
+ # comment
+FIRST=$first
+\t
+SECOND=$second
+
+ENV;
+
+        $this->mockFiles($source, str_replace("\n", "\r\n", $previous));
         $output = null;
         File::expects('put')->with(base_path('.env.encrypted'), Mockery::capture($output))->andReturn(100);
         $this->artisan('env:encrypt', $this->incrementalOptions())->assertExitCode(0);
@@ -246,7 +314,14 @@ class EnvironmentEncryptIncrementalCommandTest extends TestCase
 
     public function testItRejectsCorruptionAfterIgnorableBaselineLines(): void
     {
-        $this->mockFiles('FIRST=1', "  # comment\r\n\t\r\nREMOVED=invalid\r\n");
+        $previous = <<<ENV
+  # comment
+\t
+REMOVED=invalid
+
+ENV;
+
+        $this->mockFiles('FIRST=1', str_replace("\n", "\r\n", $previous));
         File::shouldReceive('put')->never();
         File::shouldReceive('delete')->never();
         $this->artisan('env:encrypt', $this->incrementalOptions(['--prune' => true]))
@@ -259,12 +334,30 @@ class EnvironmentEncryptIncrementalCommandTest extends TestCase
         $encrypter = new Encrypter($this->key, 'AES-256-CBC');
         $first = $encrypter->encryptString('1');
         $second = $encrypter->encryptString('2');
-        $this->mockFiles("SECOND=2\nFIRST=1\n", "FIRST=$first\r\nSECOND=$second\r\n");
+        $source = <<<'ENV'
+SECOND=2
+FIRST=1
+
+ENV;
+
+        $previous = <<<ENV
+FIRST=$first
+SECOND=$second
+
+ENV;
+
+        $this->mockFiles($source, str_replace("\n", "\r\n", $previous));
         $output = null;
         File::expects('put')->with(base_path('.env.encrypted'), Mockery::capture($output))->andReturn(100);
         $this->artisan('env:encrypt', $this->incrementalOptions())->assertExitCode(0);
 
-        $this->assertSame("SECOND=$second\nFIRST=$first\n", $output);
+        $expected = <<<ENV
+SECOND=$second
+FIRST=$first
+
+ENV;
+
+        $this->assertSame($expected, $output);
     }
 
     public function testItRejectsAnEmptyInteractiveKeyWithoutOfferingGeneration(): void
