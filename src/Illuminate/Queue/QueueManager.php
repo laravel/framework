@@ -232,12 +232,15 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Pause a queue by its connection and name.
      *
-     * @param  string  $connection
-     * @param  string  $queue
+     * @param  \UnitEnum|string  $connection
+     * @param  \UnitEnum|string  $queue
      * @return void
      */
     public function pause($connection, $queue)
     {
+        $connection = enum_value($connection);
+        $queue = enum_value($queue);
+
         $this->app['cache']
             ->store()
             ->forever("illuminate:queue:paused:{$connection}:{$queue}", true);
@@ -250,13 +253,16 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Pause a queue by its connection and name for a given amount of time.
      *
-     * @param  string  $connection
-     * @param  string  $queue
+     * @param  \UnitEnum|string  $connection
+     * @param  \UnitEnum|string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $ttl
      * @return void
      */
     public function pauseFor($connection, $queue, $ttl)
     {
+        $connection = enum_value($connection);
+        $queue = enum_value($queue);
+
         $this->app['cache']
             ->store()
             ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $ttl);
@@ -285,12 +291,15 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Resume a paused queue by its connection and name.
      *
-     * @param  string  $connection
-     * @param  string  $queue
+     * @param  \UnitEnum|string  $connection
+     * @param  \UnitEnum|string  $queue
      * @return void
      */
     public function resume($connection, $queue)
     {
+        $connection = enum_value($connection);
+        $queue = enum_value($queue);
+
         $this->app['cache']
             ->store()
             ->forget("illuminate:queue:paused:{$connection}:{$queue}");
