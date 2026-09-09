@@ -1930,9 +1930,11 @@ class DatabaseEloquentModelTest extends TestCase
 
         $callbackModel = null;
         $callbackKeys = null;
-        Model::handleDiscardedAttributeViolationUsing(function ($model, $keys) use (&$callbackModel, &$callbackKeys) {
+        $callbackException = null;
+        Model::handleDiscardedAttributeViolationUsing(function ($model, $keys, $exception) use (&$callbackModel, &$callbackKeys, &$callbackException) {
             $callbackModel = $model;
             $callbackKeys = $keys;
+            $callbackException = $exception;
         });
 
         $model = new EloquentModelStub;
@@ -1941,6 +1943,8 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertInstanceOf(EloquentModelStub::class, $callbackModel);
         $this->assertEquals(['Foo'], $callbackKeys);
+        $this->assertInstanceOf(MassAssignmentException::class, $callbackException);
+        $this->assertSame('Add [Foo] to fillable property to allow mass assignment on ['.EloquentModelStub::class.'].', $callbackException->getMessage());
 
         Model::preventSilentlyDiscardingAttributes(false);
         Model::handleDiscardedAttributeViolationUsing(null);
@@ -3545,10 +3549,12 @@ class DatabaseEloquentModelTest extends TestCase
 
         $callbackModel = null;
         $callbackKey = null;
+        $callbackException = null;
 
-        Model::handleMissingAttributeViolationUsing(function ($model, $key) use (&$callbackModel, &$callbackKey) {
+        Model::handleMissingAttributeViolationUsing(function ($model, $key, $exception) use (&$callbackModel, &$callbackKey, &$callbackException) {
             $callbackModel = $model;
             $callbackKey = $key;
+            $callbackException = $exception;
         });
 
         $model = new EloquentModelStub(['id' => 1]);
@@ -3560,6 +3566,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertInstanceOf(EloquentModelStub::class, $callbackModel);
         $this->assertSame('this_attribute_does_not_exist', $callbackKey);
+        $this->assertInstanceOf(MissingAttributeException::class, $callbackException);
 
         Model::preventAccessingMissingAttributes($originalMode);
         Model::handleMissingAttributeViolationUsing(null);

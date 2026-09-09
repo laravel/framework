@@ -593,7 +593,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Register a callback that is responsible for handling lazy loading violations.
      *
-     * @param  (callable(self, string): mixed)|null  $callback
+     * @param  (callable(self, string, \Illuminate\Database\LazyLoadingViolationException): mixed)|null  $callback
      * @return void
      */
     public static function handleLazyLoadingViolationUsing(?callable $callback)
@@ -615,7 +615,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Register a callback that is responsible for handling discarded attribute violations.
      *
-     * @param  (callable(self, array): mixed)|null  $callback
+     * @param  (callable(self, array, \Illuminate\Database\Eloquent\MassAssignmentException): mixed)|null  $callback
      * @return void
      */
     public static function handleDiscardedAttributeViolationUsing(?callable $callback)
@@ -637,7 +637,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Register a callback that is responsible for handling missing attribute violations.
      *
-     * @param  (callable(self, string): mixed)|null  $callback
+     * @param  (callable(self, string, \Illuminate\Database\Eloquent\MissingAttributeException): mixed)|null  $callback
      * @return void
      */
     public static function handleMissingAttributeViolationUsing(?callable $callback)
@@ -687,13 +687,15 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
             } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
+                $exception = new MassAssignmentException(sprintf(
+                    'Add [%s] to fillable property to allow mass assignment on [%s].',
+                    $key, get_class($this)
+                ));
+
                 if (isset(static::$discardedAttributeViolationCallback)) {
-                    call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+                    call_user_func(static::$discardedAttributeViolationCallback, $this, [$key], $exception);
                 } else {
-                    throw new MassAssignmentException(sprintf(
-                        'Add [%s] to fillable property to allow mass assignment on [%s].',
-                        $key, get_class($this)
-                    ));
+                    throw $exception;
                 }
             }
         }
@@ -702,14 +704,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             static::preventsSilentlyDiscardingAttributes()) {
             $keys = array_diff(array_keys($attributes), array_keys($fillable));
 
+            $exception = new MassAssignmentException(sprintf(
+                'Add fillable property [%s] to allow mass assignment on [%s].',
+                implode(', ', $keys),
+                get_class($this)
+            ));
+
             if (isset(static::$discardedAttributeViolationCallback)) {
-                call_user_func(static::$discardedAttributeViolationCallback, $this, $keys);
+                call_user_func(static::$discardedAttributeViolationCallback, $this, $keys, $exception);
             } else {
-                throw new MassAssignmentException(sprintf(
-                    'Add fillable property [%s] to allow mass assignment on [%s].',
-                    implode(', ', $keys),
-                    get_class($this)
-                ));
+                throw $exception;
             }
         }
 
