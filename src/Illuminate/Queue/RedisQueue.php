@@ -42,6 +42,8 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * The expiration time of a job.
      *
+     * @deprecated No longer necessary, reservations are now based on the job timeout.
+     *
      * @var int|null
      */
     protected $retryAfter = 60;
@@ -491,7 +493,8 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $nextJob = $this->getConnection()->eval(
             LuaScripts::pop(), 3, $queue, $queue.':reserved', $queue.':notify',
-            $this->availableAt($this->retryAfter)
+            $this->currentTime(),
+            $this->workerTimeout
         );
 
         if (empty($nextJob)) {

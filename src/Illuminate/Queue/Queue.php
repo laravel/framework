@@ -63,6 +63,13 @@ abstract class Queue
     protected $dispatchAfterCommit;
 
     /**
+     * The job timeout set on the worker processing the queue.
+     *
+     * @var int
+     */
+    protected $workerTimeout = 60;
+
+    /**
      * The create payload callbacks.
      *
      * @var callable[]
@@ -526,6 +533,23 @@ abstract class Queue
     public function setConnectionName($name)
     {
         $this->connectionName = $name;
+
+        return $this;
+    }
+
+    /**
+     * Set the job timeout of the worker processing the queue.
+     *
+     * @param  int|string|null  $timeout
+     * @return $this
+     */
+    public function setWorkerTimeout($timeout)
+    {
+        $this->workerTimeout = match (true) {
+            ! is_numeric($timeout) => 60,
+            $timeout <= 0 => 9999999999,
+            default => (int) $timeout,
+        };
 
         return $this;
     }

@@ -44,6 +44,8 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * The expiration time of a job.
      *
+     * @deprecated No longer necessary, reservations are now based on the job timeout.
+     *
      * @var int|null
      */
     protected $retryAfter = 60;
@@ -597,8 +599,18 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function markJobAsReserved($job)
     {
+        $timeout = json_decode($job->payload, true)['timeout'] ?? null;
+
+        if (! is_numeric($timeout)) {
+            $timeout = $this->workerTimeout;
+        } elseif ($timeout <= 0) {
+            $timeout = 9999999999;
+        }
+
+        $reservationOffset = (int) $timeout + 10 - $this->retryAfter;
+
         $this->database->table($this->table)->where('id', $job->id)->update([
-            'reserved_at' => $job->touch(),
+            'reserved_at' => $job->touch($reservationOffset),
             'attempts' => $job->increment(),
         ]);
 
