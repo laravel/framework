@@ -2410,6 +2410,31 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKey($collection);
     }
 
+    public function testWhereKeyMethodWithClosure()
+    {
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->whereKey(function ($query) {
+            $query->select('id')->from('users')->where('active', true);
+        });
+
+        $this->assertSame('select * from "table" where "table"."id" in (select "id" from "users" where "active" = ?)', $query->toSql());
+        $this->assertEquals([true], $query->getBindings());
+    }
+
+    public function testWhereKeyMethodWithSubquery()
+    {
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $subquery = $model->newQuery()->select('id')->where('active', true);
+        $query = $model->newQuery()->whereKey($subquery);
+
+        $this->assertSame('select * from "table" where "table"."id" in (select "id" from "table" where "active" = ?)', $query->toSql());
+        $this->assertEquals([true], $query->getBindings());
+    }
+
     public function testWhereKeyMethodWithModel()
     {
         $model = new EloquentBuilderTestStubStringPrimaryKey;
@@ -2492,6 +2517,18 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $collection, 'and', true);
 
         $builder->whereKeyNot($collection);
+    }
+
+    public function testWhereKeyNotMethodWithSubquery()
+    {
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $subquery = $model->newQuery()->select('id')->where('active', true);
+        $query = $model->newQuery()->whereKeyNot($subquery);
+
+        $this->assertSame('select * from "table" where "table"."id" not in (select "id" from "table" where "active" = ?)', $query->toSql());
+        $this->assertEquals([true], $query->getBindings());
     }
 
     public function testWhereKeyNotMethodWithModel()
