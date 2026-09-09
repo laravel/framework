@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
@@ -665,6 +666,46 @@ class FilesystemAdapter implements CloudFilesystemContract
         }
 
         return true;
+    }
+
+    /**
+     * Copy a file to another disk.
+     *
+     * @param  string  $from
+     * @param  string  $disk
+     * @param  string|null  $to
+     * @return bool
+     */
+    public function copyToDisk($from, $disk, $to = null)
+    {
+        $stream = $this->readStream($from);
+
+        if (! is_resource($stream)) {
+            return false;
+        }
+
+        try {
+            return Container::getInstance()->make(FilesystemFactory::class)->disk($disk)->writeStream(
+                $to ?? $from, $stream
+            );
+        } finally {
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+        }
+    }
+
+    /**
+     * Move a file to another disk.
+     *
+     * @param  string  $from
+     * @param  string  $disk
+     * @param  string|null  $to
+     * @return bool
+     */
+    public function moveToDisk($from, $disk, $to = null)
+    {
+        return $this->copyToDisk($from, $disk, $to) && $this->delete($from);
     }
 
     /**
