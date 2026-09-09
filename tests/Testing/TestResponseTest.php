@@ -2638,6 +2638,56 @@ EOT
         $files->deleteDirectory($tempDir);
     }
 
+    public function testAssertDownloadOfferedWithANonAsciiFileName(): void
+    {
+        $response = new Response;
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+            'attachment', 'Rechnung-Müller.pdf', 'Rechnung-Muller.pdf'
+        ));
+
+        TestResponse::fromBaseResponse($response)->assertDownload('Rechnung-Müller.pdf');
+    }
+
+    public function testAssertDownloadOfferedWithANonAsciiFileNameAcceptsTheAsciiFallback(): void
+    {
+        $response = new Response;
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+            'attachment', 'Rechnung-Müller.pdf', 'Rechnung-Muller.pdf'
+        ));
+
+        TestResponse::fromBaseResponse($response)->assertDownload('Rechnung-Muller.pdf');
+    }
+
+    public function testAssertDownloadOfferedWithOnlyAnEncodedFileName(): void
+    {
+        $testResponse = TestResponse::fromBaseResponse(new Response('', 200, [
+            'Content-Disposition' => "attachment; filename*=utf-8''r%C3%A9sum%C3%A9.pdf",
+        ]));
+
+        $testResponse->assertDownload('résumé.pdf');
+    }
+
+    public function testAssertDownloadOfferedWithASingleQuotedFileName(): void
+    {
+        $testResponse = TestResponse::fromBaseResponse(new Response('', 200, [
+            'Content-Disposition' => "attachment; filename='single quoted.txt'",
+        ]));
+
+        $testResponse->assertDownload('single quoted.txt');
+    }
+
+    public function testAssertDownloadOfferedFailsWithAnUnexpectedFileName(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = new Response;
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+            'attachment', 'Rechnung-Müller.pdf', 'Rechnung-Muller.pdf'
+        ));
+
+        TestResponse::fromBaseResponse($response)->assertDownload('Rechnung-Schmidt.pdf');
+    }
+
     public function testMacroable(): void
     {
         TestResponse::macro('foo', function () {
