@@ -1135,9 +1135,20 @@ class Application extends Container implements ApplicationContract, CachesConfig
         // finished. This is useful when ordering the boot-up processes we run.
         $this->fireAppCallbacks($this->bootingCallbacks);
 
-        array_walk($this->serviceProviders, function ($p) {
-            $this->bootProvider($p);
-        });
+        // Providers are allowed to register additional providers while booting, so we
+        // will keep looping until every registered provider has been booted. The
+        // provider array must not be passed by reference here, as PHP would then
+        // turn the property into a reference that every clone of the application
+        // would share, letting a write on one clone empty the other's array.
+        $booted = [];
+
+        while (($pending = array_diff_key($this->serviceProviders, $booted)) !== []) {
+            foreach ($pending as $key => $provider) {
+                $booted[$key] = true;
+
+                $this->bootProvider($provider);
+            }
+        }
 
         $this->booted = true;
 

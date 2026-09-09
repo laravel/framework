@@ -383,6 +383,18 @@ class FoundationApplicationTest extends TestCase
         $this->assertEquals(4, $counter);
     }
 
+    public function testProvidersRegisteredWhileBootingAreBooted()
+    {
+        ApplicationLateRegisteredServiceProviderStub::$booted = false;
+
+        $application = new Application;
+        $application->register(new ApplicationProviderRegisteringAnotherProviderStub($application));
+
+        $application->boot();
+
+        $this->assertTrue(ApplicationLateRegisteredServiceProviderStub::$booted);
+    }
+
     public function testGetNamespace()
     {
         $app1 = new Application(realpath(__DIR__.'/Fixtures/laravel1'));
@@ -672,6 +684,24 @@ class ApplicationBasicServiceProviderStub extends ServiceProvider
     public function register()
     {
         //
+    }
+}
+
+class ApplicationLateRegisteredServiceProviderStub extends ServiceProvider
+{
+    public static $booted = false;
+
+    public function boot()
+    {
+        static::$booted = true;
+    }
+}
+
+class ApplicationProviderRegisteringAnotherProviderStub extends ServiceProvider
+{
+    public function boot()
+    {
+        $this->app->register(new ApplicationLateRegisteredServiceProviderStub($this->app));
     }
 }
 
