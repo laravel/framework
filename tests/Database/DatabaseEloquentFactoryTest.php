@@ -269,6 +269,13 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(10, $posts);
     }
 
+    public function test_model_attributes_can_be_created_with_a_count_of_zero()
+    {
+        $posts = FactoryTestPostFactory::new()->count(0)->raw();
+
+        $this->assertSame([], $posts);
+    }
+
     public function test_after_creating_and_making_callbacks_are_called()
     {
         $user = FactoryTestUserFactory::new()
