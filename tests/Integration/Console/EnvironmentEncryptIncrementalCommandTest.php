@@ -182,23 +182,6 @@ ENV;
         $this->assertSame('"1"', $encrypter->decryptString(substr(rtrim($encryptedOutput), strlen('DB_PASSWORD='))));
     }
 
-    public function testForceStillReencryptsAllValuesUnderANewKey(): void
-    {
-        $oldEncrypter = new Encrypter(str_repeat('x', 32), 'AES-256-CBC');
-        $this->mockFiles('DB_PASSWORD=1', 'DB_PASSWORD='.$oldEncrypter->encryptString('1')."\n");
-        $encryptedOutput = null;
-
-        File::expects('put')
-            ->with(base_path('.env.encrypted'), Mockery::capture($encryptedOutput))
-            ->andReturn(100);
-
-        $this->artisan('env:encrypt', ['--readable' => true, '--force' => true, '--key' => $this->key])
-            ->assertExitCode(0);
-
-        $encrypter = new Encrypter($this->key, 'AES-256-CBC');
-        $this->assertSame('1', $encrypter->decryptString(substr(rtrim($encryptedOutput), strlen('DB_PASSWORD='))));
-    }
-
     public function testItCanDeleteAllEntries(): void
     {
         $encrypter = new Encrypter($this->key, 'AES-256-CBC');

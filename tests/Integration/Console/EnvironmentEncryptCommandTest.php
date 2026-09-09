@@ -104,6 +104,37 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->with(base_path('.env.encrypted'), Mockery::any());
     }
 
+    public function testItReencryptsReadableValuesWithANewKeyWhenForcing(): void
+    {
+        $key = 'ANvVbPbE0tWMHpUySh6liY4WaCmAYKXP';
+        $oldEncrypter = new Encrypter(str_repeat('x', 32), 'AES-256-CBC');
+        $encryptedOutput = null;
+
+        File::swap(Mockery::mock(Filesystem::class));
+
+        File::expects('exists')
+            ->with(base_path('.env'))
+            ->andReturn(true);
+        File::expects('exists')
+            ->with(base_path('.env.encrypted'))
+            ->andReturn(true);
+        File::expects('get')
+            ->with(base_path('.env'))
+            ->andReturn('DB_PASSWORD=1');
+        File::shouldReceive('get')
+            ->with(base_path('.env.encrypted'))
+            ->andReturn('DB_PASSWORD='.$oldEncrypter->encryptString('1')."\n");
+        File::expects('put')
+            ->with(base_path('.env.encrypted'), Mockery::capture($encryptedOutput))
+            ->andReturn(100);
+
+        $this->artisan('env:encrypt', ['--readable' => true, '--force' => true, '--key' => $key])
+            ->assertExitCode(0);
+
+        $encrypter = new Encrypter($key, 'AES-256-CBC');
+        $this->assertSame('1', $encrypter->decryptString(substr(rtrim($encryptedOutput), strlen('DB_PASSWORD='))));
+    }
+
     public function testItEncryptsWithGivenKeyAndDisplaysIt(): void
     {
         $this->filesystem->expects('exists')->andReturn(true);
