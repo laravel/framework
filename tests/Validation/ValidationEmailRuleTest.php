@@ -269,6 +269,64 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    public function testWithoutAliases()
+    {
+        $this->fails(
+            (new Email())->withoutAliases(),
+            'username+alias@gmail.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        $this->fails(
+            Rule::email()->withoutAliases(),
+            'username+alias@gmail.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        $this->fails(
+            (new Email())->withoutAliases(),
+            ['taylor+test@laravel.com', 'user.name+tag@example.co.uk', '+user@example.com', 'user+@example.com'],
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        $this->passes(
+            (new Email())->withoutAliases(),
+            'taylor@laravel.com'
+        );
+
+        $this->passes(
+            Rule::email()->withoutAliases(),
+            'taylor@laravel.com'
+        );
+
+        $this->passes(
+            (new Email())->withoutAliases(),
+            ['taylor@laravel.com', 'admin@example.com', 'user.name@example.com']
+        );
+
+        $this->fails(
+            (new Email())->rfcCompliant()->withoutAliases(),
+            'username+alias@gmail.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        $this->fails(
+            Rule::email()->rfcCompliant()->withoutAliases(),
+            'username+alias@gmail.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        $this->passes(
+            (new Email())->rfcCompliant()->withoutAliases(),
+            'taylor@laravel.com'
+        );
+
+        $this->passes(
+            Rule::email()->rfcCompliant()->withoutAliases(),
+            'taylor@laravel.com'
+        );
+    }
+
     public function testWithNativeValidation()
     {
         $this->fails(

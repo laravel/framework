@@ -5026,6 +5026,30 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateEmailWithNoAliasCheck()
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'example@example.com'], ['x' => 'email:no_alias']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'example+alias@example.com'], ['x' => 'email:no_alias']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'example@example.com'], ['x' => 'email:no-alias']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'example+alias@example.com'], ['x' => 'email:no-alias']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'example@example.com'], ['x' => 'email:rfc,no_alias']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'example+alias@example.com'], ['x' => 'email:rfc,no_alias']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo'], ['x' => 'email:no_alias']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateEmailWithCustomClassCheck()
     {
         $container = Mockery::mock(Container::class);
