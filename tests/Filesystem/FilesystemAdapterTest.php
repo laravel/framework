@@ -377,6 +377,21 @@ class FilesystemAdapterTest extends TestCase
         $this->assertFileExists($this->tempDir.'/backup/copy.txt');
     }
 
+    public function testCopyToDiskRejectsSameDiskAndPath()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
+            'disk' => $filesystemAdapter,
+        ]));
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $filesystemAdapter->copyToDisk('local', 'file.txt');
+    }
+
     public function testCopyToDiskWithFilesystem()
     {
         $this->filesystem->write('file.txt', 'Hello World');
@@ -412,21 +427,6 @@ class FilesystemAdapterTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $filesystemAdapter->copyToDisk($filesystemAdapter, 'file.txt');
-    }
-
-    public function testCopyToDiskRejectsSameDiskAndPath()
-    {
-        $this->filesystem->write('file.txt', 'Hello World');
-
-        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
-
-        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
-            'disk' => $filesystemAdapter,
-        ]));
-
-        $this->expectException(InvalidArgumentException::class);
-
-        $filesystemAdapter->copyToDisk('local', 'file.txt');
     }
 
     public function testStream()
