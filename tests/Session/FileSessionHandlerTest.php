@@ -35,6 +35,16 @@ class FileSessionHandlerTest extends TestCase
         $this->assertTrue($this->sessionHandler->close());
     }
 
+    public function test_validate_id_checks_file_exists()
+    {
+        $sessionId = 'session_id';
+        $path = '/path/to/sessions/'.$sessionId;
+
+        $this->files->expects('isFile')->with($path)->andReturn(true);
+
+        $this->assertTrue($this->sessionHandler->validateId($sessionId));
+    }
+
     public function test_read_returns_data_when_file_exists_and_is_valid()
     {
         $sessionId = 'session_id';

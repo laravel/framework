@@ -31,6 +31,13 @@ class CacheBasedSessionHandlerTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function test_validate_id_checks_cache()
+    {
+        $this->cacheMock->expects('has')->with('session_id')->andReturn(true);
+
+        $this->assertTrue($this->sessionHandler->validateId('session_id'));
+    }
+
     public function test_read_returns_data_from_cache()
     {
         $this->cacheMock->expects('get')->with('session_id', '')->andReturn('session_data');
