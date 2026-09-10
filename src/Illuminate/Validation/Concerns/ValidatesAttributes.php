@@ -988,10 +988,9 @@ trait ValidatesAttributes
         $parameters = (new Collection($parameters))->unique()->values()->all();
 
         if (in_array('no_alias', $parameters, true) || in_array('no-alias', $parameters, true)) {
-            $stringValue = (string) $value;
-            $atPosition = strrpos($stringValue, '@');
+            $localPart = strstr((string) $value, '@', true);
 
-            if ($atPosition !== false && str_contains(substr($stringValue, 0, $atPosition), '+')) {
+            if ($localPart !== false && str_contains($localPart, '+')) {
                 return false;
             }
 
