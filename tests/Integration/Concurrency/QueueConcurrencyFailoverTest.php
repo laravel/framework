@@ -357,7 +357,11 @@ class QueueConcurrencyFailoverTest extends TestCase
         config()->set('queue.default', 'database');
 
         Concurrency::driver('queue')->defer([
-            function () {
+            function ($job) {
+                // The queue's own attempt counter, so a retry of the same job
+                // cannot be confused with a fresh dispatch that also ran twice.
+                Cache::store('file')->put('attempts seen', $job->job->attempts(), 60);
+
                 if (Cache::store('file')->increment('attempts') === 1) {
                     throw new RuntimeException('first attempt fails');
                 }
@@ -371,6 +375,7 @@ class QueueConcurrencyFailoverTest extends TestCase
         $this->artisan('queue:work', ['connection' => 'database', '--once' => true, '--tries' => 2, '--sleep' => 0])->run();
 
         $this->assertSame(2, Cache::store('file')->get('attempts'));
+        $this->assertSame(2, Cache::store('file')->get('attempts seen'));
         $this->assertSame('succeeded on retry', Cache::store('file')->get('outcome'));
         $this->assertSame(0, DB::table('failed_jobs')->count());
         $this->assertSame(0, DB::table('jobs')->count());
@@ -455,6 +460,43 @@ class QueueConcurrencyFailoverTest extends TestCase
             'array results' => [false],
             'generator results' => [true],
         ];
+    }
+
+    public function testAFailingDeferredTaskOnSyncIsReportedAndDoesNotStopLaterTasks()
+    {
+        config()->set('queue.default', 'sync');
+
+        Exceptions::fake();
+
+        // On a real queue one task's failure never stops the others, and the
+        // synchronous connection now behaves the same way instead of letting
+        // the first failure escape the callback.
+        Concurrency::driver('queue')->defer([
+            fn () => throw new DomainException('first deferred task failed'),
+            fn () => Cache::store('file')->put('second', 'ran', 60),
+        ])();
+
+        $this->assertSame('ran', Cache::store('file')->get('second'));
+
+        Exceptions::assertReported(DomainException::class);
+    }
+
+    public function testRefusesAProcessLocalStoreWhenAMixedChainCanReachARealQueue()
+    {
+        // A chain is inline only if every link is: a sync link first does not
+        // make [sync, database] safe for a store the database worker cannot see.
+        $this->useChain(['sync', 'database']);
+        config()->set('cache.default', 'array');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('is not shared across processes');
+
+        Concurrency::driver('queue')->run([fn () => 1], timeout: 1);
+    }
+
+    public function testCreateReturnsTheDeferredJobClass()
+    {
+        $this->assertInstanceOf(InvokeDeferredClosure::class, InvokeDeferredClosure::create(fn () => 1));
     }
 
     protected function useChain(array $links): void

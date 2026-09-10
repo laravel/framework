@@ -2,28 +2,38 @@
 
 namespace Illuminate\Concurrency;
 
+use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\Jobs\SyncJob;
+use Laravel\SerializableClosure\SerializableClosure;
 use Throwable;
 
 /**
- * The job QueueDriver::defer() dispatches.
- *
- * It is a CallQueuedClosure, so everything a deferred closure could observe
- * about the job it used to receive still holds: the type it may be hinted
- * on, the batch API, failure callbacks, the worker deciding retries, and a
- * closure whose models are gone being discarded. It differs in one place: on
- * a synchronous queue link a rethrown failure is not a recorded failure, it
- * is what makes a failover queue treat the link as dead and run the task
- * again on the next one, so there it reports the failure and returns.
+ * A CallQueuedClosure that reports a failure on a synchronous queue link
+ * instead of rethrowing it, so a failover queue does not read the task's
+ * failure as a dead link and run the task again on the next one.
  */
 class InvokeDeferredClosure extends CallQueuedClosure
 {
     /**
-     * Execute the job.
+     * Create a new job instance.
+     *
+     * @param  \Closure  $job
+     * @return static
      */
-    public function handle(Container $container): void
+    public static function create(Closure $job)
+    {
+        return new static(new SerializableClosure($job));
+    }
+
+    /**
+     * Execute the job.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return void
+     */
+    public function handle(Container $container)
     {
         try {
             parent::handle($container);
