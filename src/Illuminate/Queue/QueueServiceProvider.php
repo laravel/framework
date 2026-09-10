@@ -15,11 +15,13 @@ use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
+use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
@@ -44,6 +46,37 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->registerListener();
         $this->registerRoutes();
         $this->registerFailedJobServices();
+    }
+
+    /**
+     * Boot the application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->listenForFailedSyncJobs();
+    }
+
+    /**
+     * Listen for failed sync jobs events and store them.
+     *
+     * @return void
+     */
+    protected function listenForFailedSyncJobs()
+    {
+        $this->app['events']->listen(JobFailed::class, function ($event) {
+            if (! $event->job instanceof SyncJob) {
+                return;
+            }
+
+            $this->app['queue.failer']->log(
+                $event->connectionName,
+                $event->job->getQueue(),
+                $event->job->getRawBody(),
+                $event->exception
+            );
+        });
     }
 
     /**
