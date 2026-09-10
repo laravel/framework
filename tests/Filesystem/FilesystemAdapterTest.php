@@ -377,7 +377,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertFileExists($this->tempDir.'/backup/copy.txt');
     }
 
-    public function testCopyToDiskWithFilesystemInstance()
+    public function testCopyToDiskWithFilesystem()
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
@@ -390,7 +390,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertFileExists($this->tempDir.'/backup/file.txt');
     }
 
-    public function testMoveToDiskWithFilesystemInstance()
+    public function testMoveToDiskWithFilesystem()
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
@@ -403,7 +403,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertFileExists($this->tempDir.'/backup/copy.txt');
     }
 
-    public function testCopyToDiskWithFilesystemInstanceRejectsSameDiskAndPath()
+    public function testCopyToDiskWithFilesystemRejectsSameDiskAndPath()
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
