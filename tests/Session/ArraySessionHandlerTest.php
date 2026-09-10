@@ -29,6 +29,17 @@ class ArraySessionHandlerTest extends TestCase
         $this->assertTrue($handler->open('', ''));
     }
 
+    public function test_it_validates_session_ids()
+    {
+        $handler = new ArraySessionHandler(10);
+
+        $this->assertFalse($handler->validateId('foo'));
+
+        $handler->write('foo', 'bar');
+
+        $this->assertTrue($handler->validateId('foo'));
+    }
+
     public function test_it_closes_the_session()
     {
         $handler = new ArraySessionHandler(10);
