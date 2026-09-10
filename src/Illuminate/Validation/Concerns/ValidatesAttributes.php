@@ -985,6 +985,21 @@ trait ValidatesAttributes
             return false;
         }
 
+        $parameters = (new Collection($parameters))->unique()->values()->all();
+
+        if (in_array('no_alias', $parameters, true) || in_array('no-alias', $parameters, true)) {
+            $stringValue = (string) $value;
+            $atPosition = strrpos($stringValue, '@');
+
+            if ($atPosition !== false && str_contains(substr($stringValue, 0, $atPosition), '+')) {
+                return false;
+            }
+
+            $parameters = array_values(array_filter(
+                $parameters, fn ($parameter) => $parameter !== 'no_alias' && $parameter !== 'no-alias'
+            ));
+        }
+
         $validations = (new Collection($parameters))
             ->unique()
             ->map(fn ($validation) => match (true) {

@@ -21,6 +21,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     public bool $nativeValidationWithUnicodeAllowed = false;
     public bool $rfcCompliant = false;
     public bool $strictRfcCompliant = false;
+    public bool $withoutAliases = false;
 
     /**
      * The validator performing the validation.
@@ -148,6 +149,20 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Ensure that the email address does not contain a plus alias (sub-address).
+     *
+     * For example, "username+alias@gmail.com" will fail validation.
+     *
+     * @return $this
+     */
+    public function withoutAliases()
+    {
+        $this->withoutAliases = true;
+
+        return $this;
+    }
+
+    /**
      * Ensure the email address is valid using PHP's native email validation functions.
      *
      * @param  bool  $allowUnicode
@@ -235,6 +250,10 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
 
         if ($this->nativeValidationWithUnicodeAllowed) {
             $rules[] = 'filter_unicode';
+        }
+
+        if ($this->withoutAliases) {
+            $rules[] = 'no_alias';
         }
 
         if ($rules) {
