@@ -429,6 +429,43 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter->copyToDisk($filesystemAdapter, 'file.txt');
     }
 
+    public function testCopyToDiskUsesNativeCopyOnSameDisk()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $filesystemAdapter = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
+        $filesystemAdapter->shouldNotReceive('readStream');
+
+        $this->assertTrue($filesystemAdapter->copyToDisk($filesystemAdapter, 'file.txt', 'copy.txt'));
+
+        $this->assertFileExists($this->tempDir.'/file.txt');
+        $this->assertSame('Hello World', file_get_contents($this->tempDir.'/copy.txt'));
+    }
+
+    public function testMoveToDiskUsesNativeMoveOnSameDisk()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $filesystemAdapter = Mockery::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
+        $filesystemAdapter->shouldNotReceive('readStream', 'delete');
+
+        $this->assertTrue($filesystemAdapter->moveToDisk($filesystemAdapter, 'file.txt', 'copy.txt'));
+
+        Assert::assertFileDoesNotExist($this->tempDir.'/file.txt');
+        $this->assertSame('Hello World', file_get_contents($this->tempDir.'/copy.txt'));
+    }
+
+    public function testMoveToDiskRejectsSameDiskAndPath()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $filesystemAdapter->moveToDisk($filesystemAdapter, 'file.txt');
+    }
+
     public function testStream()
     {
         $this->filesystem->write('file.txt', $original_content = 'Hello World');

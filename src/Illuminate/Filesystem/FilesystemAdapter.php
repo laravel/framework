@@ -678,12 +678,16 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function copyToDisk($disk, $from, $to = null)
     {
-        $destination = $disk instanceof FilesystemContract
-            ? $disk
-            : Container::getInstance()->make(FilesystemFactory::class)->disk($disk);
+        $destination = $this->resolveDisk($disk);
 
-        if ($destination === $this && ($to ?? $from) === $from) {
-            throw new InvalidArgumentException('Cannot copy a file to the same disk and path.');
+        $to ??= $from;
+
+        if ($destination === $this) {
+            if ($to === $from) {
+                throw new InvalidArgumentException('Cannot copy a file to the same disk and path.');
+            }
+
+            return $this->copy($from, $to);
         }
 
         $stream = $this->readStream($from);
@@ -693,7 +697,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         }
 
         try {
-            return $destination->writeStream($to ?? $from, $stream);
+            return $destination->writeStream($to, $stream);
         } finally {
             if (is_resource($stream)) {
                 fclose($stream);
@@ -711,7 +715,26 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function moveToDisk($disk, $from, $to = null)
     {
-        return $this->copyToDisk($disk, $from, $to) && $this->delete($from);
+        $destination = $this->resolveDisk($disk);
+
+        if ($destination === $this && ($to ?? $from) !== $from) {
+            return $this->move($from, $to);
+        }
+
+        return $this->copyToDisk($destination, $from, $to) && $this->delete($from);
+    }
+
+    /**
+     * Resolve the given disk into a filesystem instance.
+     *
+     * @param  string|\Illuminate\Contracts\Filesystem\Filesystem  $disk
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    protected function resolveDisk($disk)
+    {
+        return $disk instanceof FilesystemContract
+            ? $disk
+            : Container::getInstance()->make(FilesystemFactory::class)->disk($disk);
     }
 
     /**
