@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Concurrency;
 
 use Closure;
-use DateInterval;
 use DomainException;
 use Illuminate\Concurrency\InvokeDeferredClosure;
 use Illuminate\Concurrency\InvokeQueuedClosure;
@@ -500,6 +499,11 @@ class QueueConcurrencyFailoverTest extends TestCase
  * A repository that implements exactly the cache contract by delegation and
  * nothing else: no many(), no __call(). A tracing or metrics decorator is the
  * realistic shape of this, and it is legal for Cache::store() to return one.
+ *
+ * The PSR-16 methods take untyped parameters and typed returns, the way
+ * Illuminate\Cache\Repository does, so the class loads against psr/simple-cache
+ * 1, 2 and 3 alike; typed parameters are a fatal against the untyped 1.x
+ * interface.
  */
 class QueueContractOnlyCacheRepository implements Repository
 {
@@ -567,17 +571,17 @@ class QueueContractOnlyCacheRepository implements Repository
         return $this->inner->getStore();
     }
 
-    public function get(string $key, mixed $default = null): mixed
+    public function get($key, $default = null): mixed
     {
         return $this->inner->get($key, $default);
     }
 
-    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
+    public function set($key, $value, $ttl = null): bool
     {
         return $this->inner->set($key, $value, $ttl);
     }
 
-    public function delete(string $key): bool
+    public function delete($key): bool
     {
         return $this->inner->delete($key);
     }
@@ -587,7 +591,7 @@ class QueueContractOnlyCacheRepository implements Repository
         return $this->inner->clear();
     }
 
-    public function getMultiple(iterable $keys, mixed $default = null): iterable
+    public function getMultiple($keys, $default = null): iterable
     {
         $values = $this->inner->getMultiple($keys, $default);
 
@@ -598,17 +602,17 @@ class QueueContractOnlyCacheRepository implements Repository
         })() : $values;
     }
 
-    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
+    public function setMultiple($values, $ttl = null): bool
     {
         return $this->inner->setMultiple($values, $ttl);
     }
 
-    public function deleteMultiple(iterable $keys): bool
+    public function deleteMultiple($keys): bool
     {
         return $this->inner->deleteMultiple($keys);
     }
 
-    public function has(string $key): bool
+    public function has($key): bool
     {
         return $this->inner->has($key);
     }
