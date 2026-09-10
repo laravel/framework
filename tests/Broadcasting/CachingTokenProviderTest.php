@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use Illuminate\Broadcasting\CachingTokenProvider;
+use Illuminate\Broadcasting\Mercure\CachingTokenProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mercure\Jwt\TokenProviderInterface;
 

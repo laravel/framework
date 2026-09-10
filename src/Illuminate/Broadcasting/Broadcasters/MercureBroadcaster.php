@@ -3,7 +3,7 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Broadcasting\BroadcastException;
-use Illuminate\Broadcasting\MercureChannelEncrypter;
+use Illuminate\Broadcasting\Mercure\ChannelEncrypter;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
@@ -45,14 +45,14 @@ class MercureBroadcaster extends Broadcaster
      *
      * @param  \Symfony\Component\Mercure\HubInterface  $hub
      * @param  int  $expiration
-     * @param  \Illuminate\Broadcasting\MercureChannelEncrypter|null  $encrypter
+     * @param  \Illuminate\Broadcasting\Mercure\ChannelEncrypter|null  $encrypter
      * @param  string  $topicPrefix
      * @param  bool  $clientEvents
      */
     public function __construct(
         protected HubInterface $hub,
         protected int $expiration = 300,
-        protected ?MercureChannelEncrypter $encrypter = null,
+        protected ?ChannelEncrypter $encrypter = null,
         protected string $topicPrefix = 'https://laravel.alt/echo/',
         protected bool $clientEvents = true,
     ) {
@@ -89,9 +89,6 @@ class MercureBroadcaster extends Broadcaster
     {
         $channelNames = (array) $request->input('channel_names', []);
 
-        // The cap bounds the channel-callback work a single request can
-        // trigger and keeps the cookie (which also carries the whisper
-        // grants) under browser size limits.
         if ($channelNames === [] ||
             count($channelNames) > 100 ||
             $channelNames !== array_filter($channelNames, 'is_string')) {
@@ -110,8 +107,7 @@ class MercureBroadcaster extends Broadcaster
             $responseChannel = ['name' => $channelName];
 
             if (! $this->isGuardedChannel($channelName)) {
-                // Public: delivery is gated by the Update's "private" flag,
-                // not by a grant here.
+                // Public: delivery is gated by the Update's "private" flag, not by a grant here...
                 $responseChannels[] = $responseChannel;
 
                 continue;
@@ -142,11 +138,6 @@ class MercureBroadcaster extends Broadcaster
                 $responseChannel['jwk'] = $this->encrypter->channelJwk($channelName);
                 $privateTopics[] = $this->channelTopic($channelName);
             } elseif (str_starts_with($channelName, 'presence-')) {
-                // A payload is scoped to its own authorization_details
-                // entry, so each presence channel gets its own grant. The
-                // identifier wrap matches the other drivers' presence shape
-                // and gives the connector a stable member identity, so two
-                // members with identical callback results stay distinct.
                 $presenceGrants[] = new Grant([Grant::ACTION_SUBSCRIBE], [
                     'exact' => [$this->channelTopic($channelName)],
                     'urlpattern' => [$this->subscriptionPattern($channelName)],
@@ -169,15 +160,11 @@ class MercureBroadcaster extends Broadcaster
             array_unshift($grants, new Grant([Grant::ACTION_SUBSCRIBE], $privateTopics));
         }
 
-        // Whispers are published privately, so their topics need "subscribe"
-        // on top of "publish" to be both sendable and receivable.
+        // Whispers are published privately, so their topics need "subscribe" on top of "publish" to be both sendable and receivable...
         if ($this->clientEvents && $whisperTopics !== []) {
             $grants[] = new Grant([Grant::ACTION_SUBSCRIBE, Grant::ACTION_PUBLISH], $whisperTopics);
         }
 
-        // "expires_in" lets the connector refresh the cookie before it
-        // expires, since it can't read the httpOnly cookie itself. The topic
-        // prefix tells it how to map channel names to hub topics.
         return (new JsonResponse([
             'channel_names' => $responseChannels,
             'expires_in' => $this->expiration,
@@ -188,9 +175,6 @@ class MercureBroadcaster extends Broadcaster
 
     /**
      * Return the valid authentication response.
-     *
-     * A pass-through: auth() does the real work once, after collecting every
-     * requested channel's raw authorization result.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $result
@@ -263,9 +247,6 @@ class MercureBroadcaster extends Broadcaster
                 ));
             }
 
-            // The plaintext is channel-independent; only the JWE differs. It
-            // carries no "channels" key: the routing envelope stays outside
-            // the ciphertext (see below).
             $plaintext = $encryptedChannels === [] ? null : $this->updateData(null, $event, $payload, $socket);
 
             foreach ($encryptedChannels as $channel) {
@@ -281,8 +262,6 @@ class MercureBroadcaster extends Broadcaster
         } catch (JsonException $e) {
             throw new BroadcastException(sprintf('Mercure error: %s.', $e->getMessage()), 0, $e);
         } catch (MercureExceptionInterface $e) {
-            // The actionable cause (401, DNS, timeout) lives on the
-            // previous exception; Hub::publish()'s own message is generic.
             throw new BroadcastException(sprintf('Mercure error: %s.', $e->getPrevious()?->getMessage() ?? $e->getMessage()), 0, $e);
         } catch (RuntimeException $e) {
             // FrankenPHP's built-in hub throws bare RuntimeExceptions.
@@ -330,9 +309,6 @@ class MercureBroadcaster extends Broadcaster
     /**
      * Encode the data of an update targeting the given channels.
      *
-     * A null "channels" is omitted, yielding the channel-independent plaintext
-     * an encrypted update seals inside its JWE.
-     *
      * @param  string[]|null  $channels
      * @param  string  $event
      * @param  array<string, mixed>  $payload
@@ -372,8 +348,6 @@ class MercureBroadcaster extends Broadcaster
     {
         $claims = [];
 
-        // The channel-guard-resolved user wins over the default guard's, so
-        // "sub" matches the identity the grants were authorized for.
         if ($user ??= $request->user()) {
             $claims['sub'] = $this->broadcastingIdentifier($user);
         }
@@ -382,8 +356,6 @@ class MercureBroadcaster extends Broadcaster
             return (new Authorization(new HubRegistry($this->hub), $this->expiration))
                 ->createCookie($request, $grants, null, $claims);
         } catch (RuntimeException $e) {
-            // Typically a hub "public_url" that doesn't share a registrable
-            // domain with the app: point the failure at the configuration.
             throw new BroadcastException(sprintf('Mercure error: %s. Adjust the Mercure "public_url" configuration value so the hub [%s] shares a registrable domain with the application host [%s].', rtrim($e->getMessage(), '.'), $this->hub->getPublicUrl(), $request->getHost()), 0, $e);
         }
     }

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Broadcasting;
 
 use Illuminate\Broadcasting\Broadcasters\MercureBroadcaster;
 use Illuminate\Broadcasting\BroadcastException;
-use Illuminate\Broadcasting\MercureChannelEncrypter;
+use Illuminate\Broadcasting\Mercure\ChannelEncrypter;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Http\Request;
 use Jose\Component\Core\AlgorithmManager;
@@ -684,7 +684,7 @@ class MercureBroadcasterTest extends TestCase
 
     protected function encryptedBroadcaster()
     {
-        return new MercureBroadcaster($this->hub, 300, new MercureChannelEncrypter($this->encryptionKey()));
+        return new MercureBroadcaster($this->hub, 300, new ChannelEncrypter($this->encryptionKey()));
     }
 
     /**

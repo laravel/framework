@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use Illuminate\Broadcasting\MercureChannelEncrypter;
+use Illuminate\Broadcasting\Mercure\ChannelEncrypter;
 use InvalidArgumentException;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\Core\JWK;
@@ -23,12 +23,12 @@ class MercureChannelEncrypterTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new MercureChannelEncrypter('too-short');
+        new ChannelEncrypter('too-short');
     }
 
     public function testChannelKeyIsHkdfDerivedAndChannelSpecific()
     {
-        $encrypter = new MercureChannelEncrypter($this->key());
+        $encrypter = new ChannelEncrypter($this->key());
 
         $this->assertSame(
             hash_hkdf('sha256', $this->key(), 32, 'private-encrypted-a'),
@@ -42,7 +42,7 @@ class MercureChannelEncrypterTest extends TestCase
 
     public function testChannelJwkExposesTheChannelKeyAsUnpaddedUrlSafeBase64()
     {
-        $encrypter = new MercureChannelEncrypter($this->key());
+        $encrypter = new ChannelEncrypter($this->key());
 
         $jwk = $encrypter->channelJwk('private-encrypted-a');
 
@@ -58,7 +58,7 @@ class MercureChannelEncrypterTest extends TestCase
 
     public function testEncryptRoundTripsThroughAStandardJweDecrypter()
     {
-        $encrypter = new MercureChannelEncrypter($this->key());
+        $encrypter = new ChannelEncrypter($this->key());
 
         $jwe = (new CompactSerializer)->unserialize(
             $encrypter->encrypt('{"event":"Tick"}', 'private-encrypted-a')

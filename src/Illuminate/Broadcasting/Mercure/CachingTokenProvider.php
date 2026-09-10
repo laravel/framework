@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Broadcasting;
+namespace Illuminate\Broadcasting\Mercure;
 
 use Symfony\Component\Mercure\Jwt\TokenProviderInterface;
 
@@ -26,9 +26,6 @@ class CachingTokenProvider implements TokenProviderInterface
     /**
      * Create a new caching token provider instance.
      *
-     * Reuses the minted token until shortly before its "exp" claim (or
-     * forever, when it carries none), avoiding a re-sign on every broadcast.
-     *
      * @param  \Symfony\Component\Mercure\Jwt\TokenProviderInterface  $provider
      * @param  int  $clockSkew
      */
@@ -48,6 +45,7 @@ class CachingTokenProvider implements TokenProviderInterface
         }
 
         $this->jwt = $this->provider->getJwt();
+
         $this->refreshAfter = ($this->expiresAt($this->jwt) ?? PHP_INT_MAX) - $this->clockSkew;
 
         return $this->jwt;
