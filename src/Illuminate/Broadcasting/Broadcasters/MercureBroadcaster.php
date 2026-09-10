@@ -211,9 +211,9 @@ class MercureBroadcaster extends Broadcaster
      * the hub inside a JWE; the routing envelope stays plaintext so a
      * multiplexing subscriber can select the decryption key.
      *
-     * @param  array  $channels
+     * @param  array<int, \Illuminate\Broadcasting\Channel|string>  $channels
      * @param  string  $event
-     * @param  array  $payload
+     * @param  array<string, mixed>  $payload
      * @return void
      *
      * @throws \Illuminate\Broadcasting\BroadcastException
@@ -333,9 +333,9 @@ class MercureBroadcaster extends Broadcaster
      * A null "channels" is omitted, yielding the channel-independent plaintext
      * an encrypted update seals inside its JWE.
      *
-     * @param  array|null  $channels
+     * @param  string[]|null  $channels
      * @param  string  $event
-     * @param  array  $payload
+     * @param  array<string, mixed>  $payload
      * @param  string|null  $socket
      * @return string
      *
