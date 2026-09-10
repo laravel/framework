@@ -377,6 +377,43 @@ class FilesystemAdapterTest extends TestCase
         $this->assertFileExists($this->tempDir.'/backup/copy.txt');
     }
 
+    public function testCopyToDiskWithFilesystemInstance()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->copyToDisk(new FilesystemAdapter($backupFilesystem, $backupAdapter), 'file.txt');
+
+        $this->assertFileExists($this->tempDir.'/file.txt');
+        $this->assertFileExists($this->tempDir.'/backup/file.txt');
+    }
+
+    public function testMoveToDiskWithFilesystemInstance()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->moveToDisk(new FilesystemAdapter($backupFilesystem, $backupAdapter), 'file.txt', 'copy.txt');
+
+        Assert::assertFileDoesNotExist($this->tempDir.'/file.txt');
+        $this->assertFileExists($this->tempDir.'/backup/copy.txt');
+    }
+
+    public function testCopyToDiskWithFilesystemInstanceRejectsSameDiskAndPath()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $filesystemAdapter->copyToDisk($filesystemAdapter, 'file.txt');
+    }
+
     public function testCopyToDiskRejectsSameDiskAndPath()
     {
         $this->filesystem->write('file.txt', 'Hello World');

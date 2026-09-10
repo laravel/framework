@@ -671,14 +671,16 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Copy a file to another disk.
      *
-     * @param  string  $disk
+     * @param  string|\Illuminate\Contracts\Filesystem\Filesystem  $disk
      * @param  string  $from
      * @param  string|null  $to
      * @return bool
      */
     public function copyToDisk($disk, $from, $to = null)
     {
-        $destination = Container::getInstance()->make(FilesystemFactory::class)->disk($disk);
+        $destination = $disk instanceof FilesystemContract
+            ? $disk
+            : Container::getInstance()->make(FilesystemFactory::class)->disk($disk);
 
         if ($destination === $this && ($to ?? $from) === $from) {
             throw new InvalidArgumentException('Cannot copy a file to the same disk and path.');
@@ -702,7 +704,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Move a file to another disk.
      *
-     * @param  string  $disk
+     * @param  string|\Illuminate\Contracts\Filesystem\Filesystem  $disk
      * @param  string  $from
      * @param  string|null  $to
      * @return bool
