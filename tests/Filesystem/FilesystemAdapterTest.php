@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Filesystem;
 use GuzzleHttp\Psr7\Stream;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
@@ -340,6 +341,55 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertFileExists($this->tempDir.'/foo/foo2.txt');
         $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
+    }
+
+    public function testCopyToDisk()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
+
+        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
+            'disk' => new FilesystemAdapter($backupFilesystem, $backupAdapter),
+        ]));
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->copyToDisk('backup', 'file.txt');
+
+        $this->assertFileExists($this->tempDir.'/file.txt');
+        $this->assertFileExists($this->tempDir.'/backup/file.txt');
+    }
+
+    public function testMoveToDisk()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
+
+        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
+            'disk' => new FilesystemAdapter($backupFilesystem, $backupAdapter),
+        ]));
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->moveToDisk('backup', 'file.txt', 'copy.txt');
+
+        Assert::assertFileDoesNotExist($this->tempDir.'/file.txt');
+        $this->assertFileExists($this->tempDir.'/backup/copy.txt');
+    }
+
+    public function testCopyToDiskRejectsSameDiskAndPath()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
+            'disk' => $filesystemAdapter,
+        ]));
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $filesystemAdapter->copyToDisk('local', 'file.txt');
     }
 
     public function testStream()
