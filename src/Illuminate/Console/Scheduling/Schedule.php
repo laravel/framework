@@ -17,6 +17,8 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
+use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
@@ -457,6 +459,166 @@ class Schedule
             $this->events(),
             static fn (Event $event) => array_any($environments, $event->runsInEnvironment(...))
         ));
+    }
+
+    /**
+     * Assert that the given command or job has been scheduled.
+     *
+     * Jobs may be asserted by their class name unless the event has been renamed.
+     *
+     * @param  \Symfony\Component\Console\Command\Command|object|string  $command
+     * @param  string|null  $expression
+     * @return $this
+     */
+    public function assertScheduled($command, $expression = null)
+    {
+        $command = $this->normalizeScheduledCommand($command);
+
+        $events = $this->scheduledEventsFor($command);
+
+        PHPUnit::assertTrue(
+            $events->isNotEmpty(),
+            "The expected [{$command}] command was not scheduled.".$this->scheduledCommandsForDisplay()
+        );
+
+        if (! is_null($expression)) {
+            PHPUnit::assertTrue(
+                $events->contains(fn (Event $event) => $event->getExpression() === $expression && is_null($event->repeatSeconds)),
+                sprintf(
+                    'The [%s] command was scheduled, but not with the [%s] frequency. Found [%s].',
+                    $command,
+                    $expression,
+                    $events->map(fn (Event $event) => $this->frequencyForDisplay($event))->join('], [')
+                )
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given command or job has not been scheduled.
+     *
+     * @param  \Symfony\Component\Console\Command\Command|object|string  $command
+     * @return $this
+     */
+    public function assertNotScheduled($command)
+    {
+        $command = $this->normalizeScheduledCommand($command);
+
+        PHPUnit::assertTrue(
+            $this->scheduledEventsFor($command)->isEmpty(),
+            "The unexpected [{$command}] command was scheduled."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that no commands or jobs have been scheduled.
+     *
+     * @return $this
+     */
+    public function assertNothingScheduled()
+    {
+        PHPUnit::assertEmpty(
+            $this->events(),
+            'Commands were scheduled unexpectedly.'.$this->scheduledCommandsForDisplay()
+        );
+
+        return $this;
+    }
+
+    /**
+     * Get the scheduled events matching the given command.
+     *
+     * @param  string  $command
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Console\Scheduling\Event>
+     */
+    protected function scheduledEventsFor($command)
+    {
+        $binary = Application::phpBinary().' '.Application::artisanBinary();
+
+        return (new Collection($this->events()))
+            ->filter(function (Event $event) use ($command, $binary) {
+                $scheduled = $this->scheduledCommandName($event, $binary);
+
+                return $scheduled === $command || str_starts_with($scheduled, $command.' ');
+            })
+            ->values();
+    }
+
+    /**
+     * Resolve the given command into the name it is scheduled under.
+     *
+     * @param  \Symfony\Component\Console\Command\Command|object|string  $command
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function normalizeScheduledCommand($command)
+    {
+        if ($command instanceof SymfonyCommand) {
+            $name = $command->getName();
+        } elseif (is_object($command)) {
+            $name = method_exists($command, 'displayName') ? $command->displayName() : $command::class;
+        } elseif (is_string($command) && is_a($command, SymfonyCommand::class, true)) {
+            $name = Container::getInstance()->make($command)->getName();
+        } else {
+            $name = $command;
+        }
+
+        if (! is_string($name) || $name === '') {
+            throw new InvalidArgumentException('Unable to determine the name of the given command.');
+        }
+
+        return $name;
+    }
+
+    /**
+     * Get the name the given event is scheduled under.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param  string  $binary
+     * @return string
+     */
+    protected function scheduledCommandName(Event $event, $binary)
+    {
+        return is_null($event->command)
+            ? $event->getSummaryForDisplay()
+            : trim(str_replace($binary, '', $event->command));
+    }
+
+    /**
+     * Get the frequency of the given event for display within a failure message.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return string
+     */
+    protected function frequencyForDisplay(Event $event)
+    {
+        return is_null($event->repeatSeconds)
+            ? $event->getExpression()
+            : $event->getExpression()." every {$event->repeatSeconds} seconds";
+    }
+
+    /**
+     * Get all of the scheduled commands for display within a failure message.
+     *
+     * @return string
+     */
+    protected function scheduledCommandsForDisplay()
+    {
+        $binary = Application::phpBinary().' '.Application::artisanBinary();
+
+        $scheduled = (new Collection($this->events()))
+            ->map(fn (Event $event) => $this->scheduledCommandName($event, $binary));
+
+        if ($scheduled->isEmpty()) {
+            return ' No commands have been scheduled.';
+        }
+
+        return ' The following commands have been scheduled: ['.$scheduled->join('], [').'].';
     }
 
     /**
