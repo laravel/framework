@@ -55,13 +55,23 @@ class ArraySessionHandler implements SessionHandlerInterface
     }
 
     /**
-     * Create a new session ID.
+     * {@inheritdoc}
      *
      * @return string
      */
     public function create_sid(): string
     {
         return session_create_id() ?: throw new RuntimeException('Unable to create a session ID.');
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
+    public function validateId($id): bool
+    {
+        return isset($this->storage[$id]);
     }
 
     /**

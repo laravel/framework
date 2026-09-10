@@ -76,6 +76,16 @@ class CookieSessionHandler implements SessionHandlerInterface
     /**
      * {@inheritdoc}
      *
+     * @return bool
+     */
+    public function validateId($id): bool
+    {
+        return $this->request->cookies->has($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @return string|false
      */
     public function read($sessionId): string|false

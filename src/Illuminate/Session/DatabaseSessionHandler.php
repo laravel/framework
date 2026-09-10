@@ -89,6 +89,16 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
     /**
      * {@inheritdoc}
      *
+     * @return bool
+     */
+    public function validateId($id): bool
+    {
+        return ! is_null($this->getQuery()->find($id));
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @return string|false
      */
     public function read($sessionId): string|false

@@ -29,6 +29,16 @@ class NullSessionHandler implements SessionHandlerInterface
     /**
      * {@inheritdoc}
      *
+     * @return bool
+     */
+    public function validateId($id): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @return string
      */
     public function read($sessionId): string

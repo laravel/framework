@@ -56,6 +56,16 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
     /**
      * {@inheritdoc}
      *
+     * @return bool
+     */
+    public function validateId($id): bool
+    {
+        return $this->cache->has($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @return string
      */
     public function read($sessionId): string

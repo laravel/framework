@@ -67,6 +67,16 @@ class FileSessionHandler implements SessionHandlerInterface
     /**
      * {@inheritdoc}
      *
+     * @return bool
+     */
+    public function validateId($id): bool
+    {
+        return $this->files->isFile($this->path.'/'.$id);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @return string|false
      */
     public function read($sessionId): string|false
