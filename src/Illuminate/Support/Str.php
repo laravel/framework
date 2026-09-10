@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
@@ -1103,13 +1104,21 @@ class Str
             ] : null,
             'spaces' => $spaces === true ? [' '] : null,
         ]))
-            ->filter()
-            ->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)]))
-            ->flatten();
+            ->filter();
 
-        $length = $length - $password->count();
+        if ($options->isEmpty()) {
+            throw new InvalidArgumentException('At least one character pool must be enabled.');
+        }
 
-        return $password->merge($options->pipe(
+        $allCharacters = $options->flatten();
+
+        $options->shuffle()
+            ->take(max(0, $length))
+            ->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)]));
+
+        $length = max(0, $length - $password->count());
+
+        return $password->merge($allCharacters->pipe(
             fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->count() - 1)])
         ))->shuffle()->implode('');
     }

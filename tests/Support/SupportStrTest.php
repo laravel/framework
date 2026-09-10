@@ -7,6 +7,7 @@ use Generator;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
@@ -2012,6 +2013,26 @@ class SupportStrTest extends TestCase
         $this->assertTrue(
             Str::of(Str::password())->contains(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
         );
+    }
+
+    public function testPasswordReturnsExactLengthWhenBelowPoolCount()
+    {
+        $this->assertSame(1, strlen(Str::password(1)));
+        $this->assertSame(2, strlen(Str::password(2)));
+        $this->assertSame(3, strlen(Str::password(3)));
+    }
+
+    public function testPasswordWithZeroOrNegativeLengthReturnsEmptyString()
+    {
+        $this->assertSame('', Str::password(0));
+        $this->assertSame('', Str::password(-2));
+    }
+
+    public function testPasswordThrowsWhenNoPoolsEnabled()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Str::password(32, false, false, false, false);
     }
 
     public function testToBase64()
