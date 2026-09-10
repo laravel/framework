@@ -82,7 +82,7 @@ class MercureChannelEncrypter
      * API's importKey('jwk', ...).
      *
      * @param  string  $channel
-     * @return array
+     * @return array{kty: string, k: string, alg: string, use: string}
      */
     public function channelJwk($channel)
     {
