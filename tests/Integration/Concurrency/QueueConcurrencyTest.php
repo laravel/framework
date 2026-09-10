@@ -6,13 +6,13 @@ use Carbon\CarbonInterval;
 use Closure;
 use Exception;
 use Illuminate\Concurrency\CapturedTaskException;
+use Illuminate\Concurrency\InvokeDeferredClosure;
 use Illuminate\Concurrency\InvokeQueuedClosure;
 use Illuminate\Concurrency\QueueDriver;
 use Illuminate\Concurrency\TaskResult;
 use Illuminate\Concurrency\TaskTimedOutException;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Cache;
@@ -154,9 +154,11 @@ class QueueConcurrencyTest extends TestCase
             return Concurrency::driver('queue')->run([fn () => 1, fn () => 2]);
         });
 
+        // The result keys go; the cancellation key stays as a tombstone so a
+        // redelivered job refuses to run after the caller has been answered.
         $this->assertNull(Cache::get("illuminate:concurrency:{$ulid}:0"));
         $this->assertNull(Cache::get("illuminate:concurrency:{$ulid}:1"));
-        $this->assertNull(Cache::get("illuminate:concurrency:{$ulid}:cancelled"));
+        $this->assertTrue(Cache::get("illuminate:concurrency:{$ulid}:cancelled"));
     }
 
     #[DataProvider('processLocalCacheStores')]
@@ -307,7 +309,7 @@ class QueueConcurrencyTest extends TestCase
         }
     }
 
-    public function testDeferDispatchesCallQueuedClosureJobs()
+    public function testDeferDispatchesOneDeferredJobPerTask()
     {
         Bus::fake();
 
@@ -317,7 +319,7 @@ class QueueConcurrencyTest extends TestCase
 
         $callback();
 
-        Bus::assertDispatchedTimes(CallQueuedClosure::class, 2);
+        Bus::assertDispatchedTimes(InvokeDeferredClosure::class, 2);
     }
 
     public function testManagerResolvesQueueDriver()

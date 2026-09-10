@@ -8,6 +8,7 @@ use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Carbon;
 use Laravel\SerializableClosure\SerializableClosure;
 use ReflectionFunction;
@@ -58,17 +59,26 @@ class InvokeQueuedClosure implements ShouldQueue
     {
         $repository = $cache->store($this->store);
 
+        // An envelope that already exists means this task has run: the job
+        // was redelivered, or a failover queue pushed it onto a second link.
         if ($repository->get($this->cancellationKey) ||
-            Carbon::now()->getTimestamp() > $this->deadline) {
+            Carbon::now()->getTimestamp() > $this->deadline ||
+            $repository->has($this->resultKey)) {
             return;
         }
+
+        // A job that finds itself on a synchronous link has no worker to
+        // record a failure for. Rethrowing there would only make a failover
+        // queue read the task's failure as a dead link and run the task again
+        // on the next one, so it reports and returns the way plain sync does.
+        $rethrow = $this->rethrowFailures && ! ($this->job instanceof SyncJob);
 
         $failure = null;
 
         try {
             $result = TaskResult::success($container->call($this->task->getClosure()));
         } catch (Throwable $failure) {
-            if (! $this->rethrowFailures) {
+            if (! $rethrow) {
                 report($failure);
             }
 
@@ -77,7 +87,7 @@ class InvokeQueuedClosure implements ShouldQueue
 
         $this->storeResult($repository, $result);
 
-        if ($failure && $this->rethrowFailures) {
+        if ($failure && $rethrow) {
             throw new CapturedTaskException($failure);
         }
     }

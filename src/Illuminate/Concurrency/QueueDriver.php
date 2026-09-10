@@ -9,7 +9,6 @@ use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Concurrency\Driver;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Defer\DeferredCallback;
@@ -51,9 +50,11 @@ class QueueDriver implements Driver
 
         $connection = $this->resolveConnection();
         $store = $this->resolveStore();
-        $inline = $this->queueConnectionDriver($connection) === 'sync';
 
         $this->ensureQueueConnectionIsSupported($connection);
+
+        $inline = $this->resolvesInline($connection);
+
         $this->ensureStoreIsSupported($store, $inline);
 
         $timeout = $this->normalizeTimeout($timeout);
@@ -64,19 +65,19 @@ class QueueDriver implements Driver
         $cancellationKey = $this->cancellationKey($runId);
         $repository = $this->cache->store($store);
 
-        [$keys, $inlineEnvelopes] = $this->dispatchTasks(
+        [$keys, $collected] = $this->dispatchTasks(
             $repository, $tasks, $runId, $cancellationKey, $connection, $store, $inline, $timeout, $ttl, $startedAt,
         );
 
         $envelopes = $inline
             ? $this->ensureInlineEnvelopes(
-                $repository, $keys, $inlineEnvelopes, $startedAt, $timeout, $connection, $store,
+                $repository, $keys, $collected, $startedAt, $timeout, $connection, $store,
             )
             : $this->wait(
-                $repository, $keys, $cancellationKey, $startedAt, $timeout, $ttl, $connection, $store,
+                $repository, $keys, $collected, $cancellationKey, $startedAt, $timeout, $ttl, $connection, $store,
             );
 
-        return $this->resolveResults($repository, $tasks, $keys, $cancellationKey, $envelopes);
+        return $this->resolveResults($repository, $tasks, $keys, $cancellationKey, $envelopes, $ttl);
     }
 
     /**
@@ -99,7 +100,7 @@ class QueueDriver implements Driver
         $deadline = $startedAt->getTimestamp() + $timeout;
 
         $keys = [];
-        $inlineEnvelopes = [];
+        $collected = [];
 
         try {
             foreach (array_values($tasks) as $index => $task) {
@@ -125,12 +126,11 @@ class QueueDriver implements Driver
 
                 $this->bus->dispatch($job);
 
-                // Inline execution is not bounded by the timeout, so each
-                // envelope is collected right away instead of relying on
-                // its expiry outliving the remaining tasks.
-                if ($inline) {
-                    $inlineEnvelopes[$keys[$index]] = $repository->get($keys[$index]);
-                }
+                // Whatever ran during dispatch, inline or a failover chain that
+                // fell through to a synchronous link, is not bounded by the
+                // timeout, so its envelope is collected right away rather than
+                // relying on its expiry outliving the remaining tasks.
+                $collected[$keys[$index]] = $repository->get($keys[$index]);
             }
         } catch (Throwable $e) {
             $repository->put($cancellationKey, true, $ttl);
@@ -140,7 +140,7 @@ class QueueDriver implements Driver
             throw $e;
         }
 
-        return [$keys, $inlineEnvelopes];
+        return [$keys, $collected];
     }
 
     /**
@@ -154,6 +154,7 @@ class QueueDriver implements Driver
         array $keys,
         string $cancellationKey,
         array $envelopes,
+        int $ttl,
     ): array {
         try {
             $results = [];
@@ -164,7 +165,12 @@ class QueueDriver implements Driver
 
             return $results;
         } finally {
-            $repository->deleteMultiple([...array_values($keys), $cancellationKey]);
+            // The cancellation flag stays behind as a tombstone, written before
+            // the envelopes go, so a job redelivered after the caller has been
+            // answered always finds one or the other and refuses to run.
+            $repository->put($cancellationKey, true, $ttl);
+
+            $repository->deleteMultiple(array_values($keys));
         }
     }
 
@@ -179,7 +185,7 @@ class QueueDriver implements Driver
 
         return defer(function () use ($tasks, $connection) {
             foreach (Arr::wrap($tasks) as $task) {
-                $job = CallQueuedClosure::create($task)->onConnection($connection);
+                $job = (new InvokeDeferredClosure(new SerializableClosure($task)))->onConnection($connection);
 
                 if (! is_null($queue = $this->resolveQueue())) {
                     $job->onQueue($queue);
@@ -277,6 +283,7 @@ class QueueDriver implements Driver
     protected function wait(
         CacheRepository $repository,
         array $keys,
+        array $collected,
         string $cancellationKey,
         Carbon $startedAt,
         int $timeout,
@@ -285,6 +292,14 @@ class QueueDriver implements Driver
         ?string $store,
     ): array {
         $envelopes = $repository->many(array_values($keys));
+
+        // An envelope read back at dispatch time wins over a later miss: the
+        // task ran synchronously and its envelope may since have expired.
+        foreach ($collected as $key => $envelope) {
+            if (! is_null($envelope) && is_null($envelopes[$key] ?? null)) {
+                $envelopes[$key] = $envelope;
+            }
+        }
 
         if (! in_array(null, $envelopes, true)) {
             return $envelopes;
@@ -328,13 +343,74 @@ class QueueDriver implements Driver
      *
      * @throws \RuntimeException
      */
-    protected function ensureQueueConnectionIsSupported(?string $connection): void
+    protected function ensureQueueConnectionIsSupported(?string $connection, array $seen = []): void
     {
-        if (in_array($this->queueConnectionDriver($connection), ['deferred', 'null', 'background'], true)) {
+        if (in_array($connection, $seen, true)) {
+            throw new RuntimeException(
+                "The [{$connection}] failover queue connection refers back to itself, so its jobs could never be dispatched."
+            );
+        }
+
+        $driver = $this->queueConnectionDriver($connection);
+
+        if (in_array($driver, ['deferred', 'null', 'background'], true)) {
             throw new RuntimeException(
                 "The [{$connection}] queue connection may not be used with the queue concurrency driver, as its jobs would never run while waiting for results."
             );
         }
+
+        // A failover chain is only as usable as its weakest link, and a chain
+        // with no links at all would only fail later, inside the dispatch.
+        if ($driver === 'failover') {
+            $links = $this->failoverLinks($connection);
+
+            if ($links === []) {
+                throw new RuntimeException(
+                    "The [{$connection}] failover queue connection has no connections to fall through, so its jobs could never be dispatched."
+                );
+            }
+
+            foreach ($links as $link) {
+                $this->ensureQueueConnectionIsSupported($link, [...$seen, $connection]);
+            }
+        }
+    }
+
+    /**
+     * Determine whether tasks dispatched to the given connection run inside the dispatch call.
+     *
+     * A failover chain runs inline only if every link does; a chain that can
+     * reach a real queue needs the asynchronous path and a shared store.
+     */
+    protected function resolvesInline(?string $connection, array $seen = []): bool
+    {
+        $driver = $this->queueConnectionDriver($connection);
+
+        if ($driver !== 'failover') {
+            return $driver === 'sync';
+        }
+
+        $links = $this->failoverLinks($connection);
+
+        if ($links === [] || in_array($connection, $seen, true)) {
+            return false;
+        }
+
+        foreach ($links as $link) {
+            if (! $this->resolvesInline($link, [...$seen, $connection])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the connections a failover queue connection falls through.
+     */
+    protected function failoverLinks(?string $connection): array
+    {
+        return array_values((array) $this->config->get('queue.connections.'.$connection.'.connections', []));
     }
 
     /**
@@ -342,9 +418,25 @@ class QueueDriver implements Driver
      *
      * @throws \RuntimeException
      */
-    protected function ensureStoreIsSupported(?string $store, bool $inline): void
+    protected function ensureStoreIsSupported(?string $store, bool $inline, array $seen = []): void
     {
         $cacheDriver = $this->config->get('cache.stores.'.$store.'.driver');
+
+        // A failover store is only as shared as the store it may fall back to,
+        // and one that falls back to itself would recurse on the first read.
+        if ($cacheDriver === 'failover') {
+            foreach ((array) $this->config->get('cache.stores.'.$store.'.stores', []) as $fallback) {
+                if (in_array($fallback, [...$seen, $store], true)) {
+                    throw new RuntimeException(
+                        "The [{$fallback}] failover cache store refers back to itself, so results could never be read."
+                    );
+                }
+
+                $this->ensureStoreIsSupported($fallback, $inline, [...$seen, $store]);
+            }
+
+            return;
+        }
 
         if (! $inline && in_array($cacheDriver, ['array', 'null', 'session', 'octane', 'apc'], true)) {
             throw new RuntimeException(
