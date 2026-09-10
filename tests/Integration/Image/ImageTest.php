@@ -285,6 +285,19 @@ class ImageTest extends TestCase
         $this->assertSame($file, $large->file());
     }
 
+    public function test_storing_a_variant_does_not_overwrite_the_original()
+    {
+        Storage::fake('local');
+
+        $image = new Image($this->fakeImageContents(800, 600));
+
+        $original = $image->store('photos', 'local');
+        $thumbnail = $image->cover(100, 100)->store('photos', 'local');
+
+        $this->assertNotSame($original, $thumbnail);
+        $this->assertCount(2, Storage::disk('local')->files('photos'));
+    }
+
     public function test_two_variants_from_request_image()
     {
         Storage::fake('local');

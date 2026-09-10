@@ -673,10 +673,9 @@ class ImageTest extends TestCase
         $name1 = $image->hashName();
 
         $clone = $image->blur(1);
-        $name2 = $image->hashName();
 
-        // Same instance returns cached name
-        $this->assertSame($name1, $name2);
+        $this->assertNull($this->getHashName($clone));
+        $this->assertSame($name1, $image->hashName());
     }
 
     public function test_hash_name_is_consistent_on_same_instance()
@@ -1242,5 +1241,10 @@ class ImageTest extends TestCase
     protected function getPipeline(Image $image): ImagePipeline
     {
         return (new \ReflectionProperty($image, 'pipeline'))->getValue($image);
+    }
+
+    protected function getHashName(Image $image): ?string
+    {
+        return (new \ReflectionProperty($image, 'hashName'))->getValue($image);
     }
 }
