@@ -593,6 +593,7 @@ class Image implements Responsable, Stringable
 
         $clone->pipeline = clone $this->pipeline;
         $clone->processed = false;
+        $clone->hashName = null;
 
         return $clone;
     }
