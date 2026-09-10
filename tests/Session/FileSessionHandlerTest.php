@@ -35,6 +35,14 @@ class FileSessionHandlerTest extends TestCase
         $this->assertTrue($this->sessionHandler->close());
     }
 
+    public function test_it_creates_session_ids()
+    {
+        $sessionId = $this->sessionHandler->create_sid();
+
+        $this->assertIsString($sessionId);
+        $this->assertNotEmpty($sessionId);
+    }
+
     public function test_validate_id_checks_file_exists()
     {
         $sessionId = 'session_id';

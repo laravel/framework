@@ -2,6 +2,7 @@
 
 namespace Illuminate\Session;
 
+use RuntimeException;
 use SessionHandlerInterface;
 
 class NullSessionHandler implements SessionHandlerInterface
@@ -24,6 +25,16 @@ class NullSessionHandler implements SessionHandlerInterface
     public function close(): bool
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function create_sid(): string
+    {
+        return session_create_id() ?: throw new RuntimeException('Unable to create a session ID.');
     }
 
     /**
