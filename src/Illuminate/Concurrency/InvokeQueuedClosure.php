@@ -59,18 +59,17 @@ class InvokeQueuedClosure implements ShouldQueue
     {
         $repository = $cache->store($this->store);
 
-        // An envelope that already exists means this task has run: the job
-        // was redelivered, or a failover queue pushed it onto a second link.
+        // Skip the task if the run was cancelled, its deadline has passed, or
+        // its result has already been stored by an earlier run of this job.
         if ($repository->get($this->cancellationKey) ||
             Carbon::now()->getTimestamp() > $this->deadline ||
             $repository->has($this->resultKey)) {
             return;
         }
 
-        // A job that finds itself on a synchronous link has no worker to
-        // record a failure for. Rethrowing there would only make a failover
-        // queue read the task's failure as a dead link and run the task again
-        // on the next one, so it reports and returns the way plain sync does.
+        // On a sync connection there is no worker to record a failure, and
+        // rethrowing would make a failover connection treat it as down and run
+        // the task again, so the failure is reported instead of rethrown.
         $rethrow = $this->rethrowFailures && ! ($this->job instanceof SyncJob);
 
         $failure = null;

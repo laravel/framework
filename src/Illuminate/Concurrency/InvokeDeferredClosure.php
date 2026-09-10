@@ -10,9 +10,9 @@ use Laravel\SerializableClosure\SerializableClosure;
 use Throwable;
 
 /**
- * A CallQueuedClosure that reports a failure on a synchronous queue link
- * instead of rethrowing it, so a failover queue does not read the task's
- * failure as a dead link and run the task again on the next one.
+ * A queued closure that reports a failure on a sync connection instead of
+ * rethrowing it, so a failover connection does not treat the failure as the
+ * connection being down and run the task again.
  */
 class InvokeDeferredClosure extends CallQueuedClosure
 {

@@ -126,10 +126,9 @@ class QueueDriver implements Driver
 
                 $this->bus->dispatch($job);
 
-                // Whatever ran during dispatch, inline or a failover chain that
-                // fell through to a synchronous link, is not bounded by the
-                // timeout, so its envelope is collected right away rather than
-                // relying on its expiry outliving the remaining tasks.
+                // Collect any result written while the job was dispatched,
+                // since a sync connection runs the job right away and its
+                // result is not bound by the timeout.
                 $collected[$keys[$index]] = $repository->get($keys[$index]);
             }
         } catch (Throwable $e) {
@@ -165,9 +164,8 @@ class QueueDriver implements Driver
 
             return $results;
         } finally {
-            // The cancellation flag stays behind as a tombstone, written before
-            // the envelopes go, so a job redelivered after the caller has been
-            // answered always finds one or the other and refuses to run.
+            // Keep the cancellation flag so a job delivered again after this
+            // run finishes will skip itself instead of running the task.
             $repository->put($cancellationKey, true, $ttl);
 
             $repository->deleteMultiple(array_values($keys));
@@ -362,8 +360,8 @@ class QueueDriver implements Driver
             );
         }
 
-        // A failover chain is only as usable as its weakest link, and a chain
-        // with no links at all would only fail later, inside the dispatch.
+        // A failover connection is only usable if each of its connections is,
+        // and one with no connections would only fail once a job is sent.
         if ($driver === 'failover') {
             $links = $this->failoverLinks($connection);
 
@@ -380,10 +378,9 @@ class QueueDriver implements Driver
     }
 
     /**
-     * Determine whether tasks dispatched to the given connection run inside the dispatch call.
+     * Determine if tasks sent to the given connection run during the dispatch call.
      *
-     * A failover chain runs inline only if every link does; a chain that can
-     * reach a real queue needs the asynchronous path and a shared store.
+     * A failover connection runs inline only when every one of its connections does.
      */
     protected function resolvesInline(?string $connection, array $seen = []): bool
     {
@@ -425,8 +422,8 @@ class QueueDriver implements Driver
     {
         $cacheDriver = $this->config->get('cache.stores.'.$store.'.driver');
 
-        // A failover store is only as shared as the store it may fall back to,
-        // and one that falls back to itself would recurse on the first read.
+        // A failover store is only as shared as the stores it falls back to,
+        // and one that falls back to itself would loop on the first read.
         if ($cacheDriver === 'failover') {
             foreach ((array) $this->config->get('cache.stores.'.$store.'.stores', []) as $fallback) {
                 if (in_array($fallback, [...$seen, $store], true)) {
