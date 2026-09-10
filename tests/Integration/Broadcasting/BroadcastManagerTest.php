@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Broadcasting;
 
+use Illuminate\Broadcasting\Broadcasters\MercureBroadcaster;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Broadcasting\UniqueBroadcastEvent;
@@ -304,6 +305,210 @@ class BroadcastManagerTest extends TestCase
         $instance2 = $manager->connection(BroadcastConnectionName::Log);
 
         $this->assertNotSame($instance1, $instance2);
+    }
+
+    public function testMercureRequiresAUrl()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"url"');
+
+        (new BroadcastManager($this->getApp([])))->mercure(['secret' => str_repeat('s', 32)]);
+    }
+
+    public function testMercureRequiresASecret()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"secret"');
+
+        (new BroadcastManager($this->getApp([])))->mercure(['url' => 'https://hub.test/.well-known/mercure']);
+    }
+
+    public function testMercureRejectsAShortHmacSecret()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('at least 32 bytes');
+
+        (new BroadcastManager($this->getApp([])))->mercure($this->mercureConfig(['secret' => 'too-short']));
+    }
+
+    public function testMercureRejectsANegativePublishExpiration()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('publish_expiration');
+
+        (new BroadcastManager($this->getApp([])))->mercure($this->mercureConfig(['publish_expiration' => -1]));
+    }
+
+    public function testMercureRejectsAPublishExpirationTruncatingToZeroSeconds()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('publish_expiration');
+
+        (new BroadcastManager($this->getApp([])))->mercure($this->mercureConfig(['publish_expiration' => 0.01]));
+    }
+
+    public function testMercureAcceptsASubMinutePublishExpiration()
+    {
+        $hub = (new BroadcastManager($this->getApp([])))->mercure($this->mercureConfig(['publish_expiration' => 0.5]));
+
+        $this->assertNotNull($hub->getProvider()->getJwt());
+    }
+
+    public function testMercureRejectsANonPositiveSubscribeExpiration()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => $this->mercureConfig(['driver' => 'mercure', 'subscribe_expiration' => 0])]],
+        ]));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('subscribe_expiration');
+
+        $manager->connection('mercure');
+    }
+
+    public function testMercureRejectsASubscribeExpirationTruncatingToZeroSeconds()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => $this->mercureConfig(['driver' => 'mercure', 'subscribe_expiration' => 0.01])]],
+        ]));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('subscribe_expiration');
+
+        $manager->connection('mercure');
+    }
+
+    public function testMercureAcceptsASubMinuteSubscribeExpiration()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => $this->mercureConfig(['driver' => 'mercure', 'subscribe_expiration' => 0.5])]],
+        ]));
+
+        $this->assertInstanceOf(MercureBroadcaster::class, $manager->connection('mercure'));
+    }
+
+    public function testMercureRejectsAMalformedEncryptionKey()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => $this->mercureConfig(['driver' => 'mercure', 'encryption_key' => 'not-a-valid-key'])]],
+        ]));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('encryption_key');
+
+        $manager->connection('mercure');
+    }
+
+    public function testMercureRejectsASecurePrefixedCookieOverAPlainHttpPublicUrl()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => $this->mercureConfig([
+                'driver' => 'mercure',
+                'public_url' => 'http://localhost/.well-known/mercure',
+            ])]],
+        ]));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('cookie_name');
+
+        $manager->connection('mercure');
+    }
+
+    public function testMercureAcceptsAPlainHttpPublicUrlWithAnUnprefixedCookieName()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => $this->mercureConfig([
+                'driver' => 'mercure',
+                'public_url' => 'http://localhost/.well-known/mercure',
+                'cookie_name' => 'mercureAuthorization',
+            ])]],
+        ]));
+
+        $this->assertInstanceOf(MercureBroadcaster::class, $manager->connection('mercure'));
+    }
+
+    public function testMercureAcceptsABase64PrefixedEncryptionKey()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => $this->mercureConfig([
+                'driver' => 'mercure',
+                'encryption_key' => 'base64:'.base64_encode(random_bytes(32)),
+            ])]],
+        ]));
+
+        $this->assertInstanceOf(MercureBroadcaster::class, $manager->connection('mercure'));
+    }
+
+    public function testMercureDefaultsTheRfc9068Claims()
+    {
+        $manager = new BroadcastManager($this->getApp(['app' => ['url' => 'https://app.test']]));
+
+        $hub = $manager->mercure($this->mercureConfig());
+
+        $claims = $this->decodeJwtClaims($hub->getFactory()->create());
+
+        $this->assertSame('https://app.test', $claims['iss']);
+        $this->assertSame('https://app.test', $claims['client_id']);
+        $this->assertSame('https://hub.test/.well-known/mercure', $claims['aud']);
+        $this->assertSame('anonymous', $claims['sub']);
+
+        $publishClaims = $this->decodeJwtClaims($hub->getProvider()->getJwt());
+
+        $this->assertSame('https://app.test', $publishClaims['iss']);
+        $this->assertSame('https://app.test', $publishClaims['client_id']);
+    }
+
+    public function testMercureExplicitClaimsWinOverTheDefaults()
+    {
+        $manager = new BroadcastManager($this->getApp(['app' => ['url' => 'https://app.test']]));
+
+        $hub = $manager->mercure($this->mercureConfig([
+            'claims' => ['iss' => 'https://issuer.test', 'aud' => 'https://audience.test', 'client_id' => 'my-app'],
+        ]));
+
+        $claims = $this->decodeJwtClaims($hub->getFactory()->create());
+
+        $this->assertSame('https://issuer.test', $claims['iss']);
+        $this->assertSame('https://audience.test', $claims['aud']);
+        $this->assertSame('my-app', $claims['client_id']);
+    }
+
+    public function testMercureSideSpecificSecretsTakePrecedence()
+    {
+        $manager = new BroadcastManager($this->getApp([]));
+
+        $hub = $manager->mercure($this->mercureConfig([
+            'subscribe_secret' => str_repeat('a', 32),
+            'publish_secret' => str_repeat('b', 32),
+        ]));
+
+        $this->assertJwtSignedWith($hub->getFactory()->create(), str_repeat('a', 32));
+        $this->assertJwtSignedWith($hub->getProvider()->getJwt(), str_repeat('b', 32));
+    }
+
+    protected function mercureConfig(array $overrides = [])
+    {
+        return $overrides + [
+            'url' => 'https://hub.test/.well-known/mercure',
+            'secret' => str_repeat('s', 32),
+        ];
+    }
+
+    protected function decodeJwtClaims(string $jwt): array
+    {
+        $payload = explode('.', $jwt)[1];
+
+        return json_decode(base64_decode(strtr($payload, '-_', '+/')), true);
+    }
+
+    protected function assertJwtSignedWith(string $jwt, string $secret): void
+    {
+        [$header, $payload, $signature] = explode('.', $jwt);
+
+        $this->assertSame(
+            rtrim(strtr(base64_encode(hash_hmac('sha256', $header.'.'.$payload, $secret, true)), '+/', '-_'), '='),
+            $signature
+        );
     }
 
     protected function getApp(array $userConfig)

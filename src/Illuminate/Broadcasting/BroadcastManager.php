@@ -10,6 +10,7 @@ use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
+use Illuminate\Broadcasting\Mercure\CreatesMercureDrivers;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
@@ -37,7 +38,7 @@ use function Illuminate\Support\enum_value;
  */
 class BroadcastManager implements FactoryContract
 {
-    use ReadsQueueAttributes, RebindsCallbacksToSelf, ResolvesQueueRoutes;
+    use CreatesMercureDrivers, ReadsQueueAttributes, RebindsCallbacksToSelf, ResolvesQueueRoutes;
 
     /**
      * The application instance.
