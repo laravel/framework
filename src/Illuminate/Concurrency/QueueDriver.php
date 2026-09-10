@@ -291,7 +291,10 @@ class QueueDriver implements Driver
         ?string $connection,
         ?string $store,
     ): array {
-        $envelopes = $repository->many(array_values($keys));
+        // getMultiple() rather than many(): the former is on the cache contract
+        // this method is typed against, the latter only on Laravel's concrete
+        // repository. PSR-16 promises an iterable, so it is materialised once.
+        $envelopes = iterator_to_array($repository->getMultiple(array_values($keys)));
 
         // An envelope read back at dispatch time wins over a later miss: the
         // task ran synchronously and its envelope may since have expired.
@@ -328,7 +331,7 @@ class QueueDriver implements Driver
 
             Sleep::usleep((int) (max(min($poll, $deadline - $now), 1) * 1000));
 
-            foreach ($repository->many(array_keys($envelopes, null, true)) as $key => $envelope) {
+            foreach ($repository->getMultiple(array_keys($envelopes, null, true)) as $key => $envelope) {
                 $envelopes[$key] = $envelope;
             }
 

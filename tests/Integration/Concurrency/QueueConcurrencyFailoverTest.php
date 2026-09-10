@@ -2,11 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Concurrency;
 
+use Closure;
+use DateInterval;
 use DomainException;
 use Illuminate\Concurrency\InvokeDeferredClosure;
 use Illuminate\Concurrency\InvokeQueuedClosure;
 use Illuminate\Concurrency\TaskResult;
+use Illuminate\Concurrency\TaskTimedOutException;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\Events\QueueFailedOver;
@@ -17,7 +21,9 @@ use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Exceptions;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Laravel\SerializableClosure\SerializableClosure;
 use Orchestra\Testbench\TestCase;
@@ -406,6 +412,52 @@ class QueueConcurrencyFailoverTest extends TestCase
         $this->assertFalse(property_exists(InvokeDeferredClosure::class, 'tries'));
     }
 
+    #[DataProvider('contractOnlyRepositories')]
+    public function testCollectsResultsThroughARepositoryThatOnlyImplementsTheContract(bool $generators)
+    {
+        $this->bindContractOnlyStore($generators);
+
+        Queue::fake();
+        Sleep::fake();
+
+        $results = null;
+
+        Str::freezeUlids(function ($ulid) use (&$results) {
+            Cache::store('file')->put("illuminate:concurrency:{$ulid}:0", TaskResult::success('one'), 60);
+            Cache::store('file')->put("illuminate:concurrency:{$ulid}:1", TaskResult::success('two'), 60);
+
+            $results = Concurrency::driver('queue')->run([
+                'a' => fn () => null,
+                'b' => fn () => null,
+            ]);
+        });
+
+        $this->assertSame(['a' => 'one', 'b' => 'two'], $results);
+
+        Sleep::assertNeverSlept();
+    }
+
+    #[DataProvider('contractOnlyRepositories')]
+    public function testPollsThroughARepositoryThatOnlyImplementsTheContract(bool $generators)
+    {
+        $this->bindContractOnlyStore($generators);
+
+        Queue::fake();
+        Sleep::fake(syncWithCarbon: true);
+
+        $this->expectException(TaskTimedOutException::class);
+
+        Concurrency::driver('queue')->run([fn () => 1], timeout: 1);
+    }
+
+    public static function contractOnlyRepositories(): array
+    {
+        return [
+            'array results' => [false],
+            'generator results' => [true],
+        ];
+    }
+
     protected function useChain(array $links): void
     {
         config()->set('queue.connections.chain', ['driver' => 'failover', 'connections' => $links]);
@@ -432,5 +484,132 @@ class QueueConcurrencyFailoverTest extends TestCase
             $table->longText('exception');
             $table->timestamp('failed_at')->useCurrent();
         });
+    }
+
+    protected function bindContractOnlyStore(bool $generators): void
+    {
+        config()->set('queue.default', 'database');
+        config()->set('cache.stores.contract', ['driver' => 'contract']);
+        config()->set('cache.default', 'contract');
+
+        Cache::extend('contract', fn ($app) => new QueueContractOnlyCacheRepository(Cache::store('file'), $generators));
+    }
+}
+
+/**
+ * A repository that implements exactly the cache contract by delegation and
+ * nothing else: no many(), no __call(). A tracing or metrics decorator is the
+ * realistic shape of this, and it is legal for Cache::store() to return one.
+ */
+class QueueContractOnlyCacheRepository implements Repository
+{
+    public function __construct(protected Repository $inner, protected bool $generators = false)
+    {
+    }
+
+    public function pull($key, $default = null)
+    {
+        return $this->inner->pull($key, $default);
+    }
+
+    public function put($key, $value, $ttl = null)
+    {
+        return $this->inner->put($key, $value, $ttl);
+    }
+
+    public function add($key, $value, $ttl = null)
+    {
+        return $this->inner->add($key, $value, $ttl);
+    }
+
+    public function increment($key, $value = 1)
+    {
+        return $this->inner->increment($key, $value);
+    }
+
+    public function decrement($key, $value = 1)
+    {
+        return $this->inner->decrement($key, $value);
+    }
+
+    public function forever($key, $value)
+    {
+        return $this->inner->forever($key, $value);
+    }
+
+    public function remember($key, $ttl, Closure $callback)
+    {
+        return $this->inner->remember($key, $ttl, $callback);
+    }
+
+    public function sear($key, Closure $callback)
+    {
+        return $this->inner->sear($key, $callback);
+    }
+
+    public function rememberForever($key, Closure $callback)
+    {
+        return $this->inner->rememberForever($key, $callback);
+    }
+
+    public function touch($key, $ttl)
+    {
+        return $this->inner->touch($key, $ttl);
+    }
+
+    public function forget($key)
+    {
+        return $this->inner->forget($key);
+    }
+
+    public function getStore()
+    {
+        return $this->inner->getStore();
+    }
+
+    public function get(string $key, mixed $default = null): mixed
+    {
+        return $this->inner->get($key, $default);
+    }
+
+    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
+    {
+        return $this->inner->set($key, $value, $ttl);
+    }
+
+    public function delete(string $key): bool
+    {
+        return $this->inner->delete($key);
+    }
+
+    public function clear(): bool
+    {
+        return $this->inner->clear();
+    }
+
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
+    {
+        $values = $this->inner->getMultiple($keys, $default);
+
+        // PSR-16 only promises an iterable, so a strict implementation may
+        // hand back a generator.
+        return $this->generators ? (function () use ($values) {
+            yield from $values;
+        })() : $values;
+    }
+
+    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
+    {
+        return $this->inner->setMultiple($values, $ttl);
+    }
+
+    public function deleteMultiple(iterable $keys): bool
+    {
+        return $this->inner->deleteMultiple($keys);
+    }
+
+    public function has(string $key): bool
+    {
+        return $this->inner->has($key);
     }
 }
