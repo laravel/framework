@@ -28,8 +28,10 @@ class MercureBroadcaster extends Broadcaster
      * Create a new broadcaster instance.
      *
      * The hub's token factory mints the subscriber cookie token and must be
-     * non-null, already carrying the static RFC 9068 claims; the hub's token
-     * provider mints the (longer-lived) publish token. The encrypter enables
+     * non-null, already carrying the static
+     * [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068.html) claims; the
+     * hub's token provider mints the (longer-lived) publish token. The
+     * encrypter enables
      * end-to-end encrypted channels: without one, using such a channel
      * throws. Presence channels are never encrypted, as their member
      * payloads flow through the hub's subscription API.
@@ -38,7 +40,8 @@ class MercureBroadcaster extends Broadcaster
      * from colliding with other publishers sharing the hub, and lets two
      * applications sharing one hub (and one JWT secret) stay apart. The
      * default is a "laravel.alt" URL: ".alt" is reserved outside the DNS
-     * (RFC 9476), so the IRI is guaranteed non-resolvable and unsquattable.
+     * ([RFC 9476](https://www.rfc-editor.org/rfc/rfc9476.html)), so the
+     * IRI is guaranteed non-resolvable and unsquattable.
      *
      * @param  \Symfony\Component\Mercure\HubInterface  $hub
      * @param  int  $expiration
@@ -341,7 +344,8 @@ class MercureBroadcaster extends Broadcaster
      * resolves the cookie domain so a hub on a sibling subdomain still
      * receives the cookie, and injects an "exp" claim matching the cookie
      * lifetime. Only the per-request "sub" claim is contributed here; the
-     * static RFC 9068 claims come from the hub's factory.
+     * static [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068.html) claims
+     * come from the hub's factory.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Symfony\Component\Mercure\Jwt\Grant[]  $grants
@@ -367,8 +371,10 @@ class MercureBroadcaster extends Broadcaster
     /**
      * Build the hub topic of the given channel.
      *
-     * Channel names are RFC 3986 encoded into a single path segment, so a
-     * name can never escape its namespace, whatever characters it contains.
+     * Channel names are
+     * [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986.html) encoded into a
+     * single path segment, so a name can never escape its namespace,
+     * whatever characters it contains.
      *
      * @param  string  $channelName
      * @return string

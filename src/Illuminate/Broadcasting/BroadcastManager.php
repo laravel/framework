@@ -597,8 +597,10 @@ class BroadcastManager implements FactoryContract
      * configuration, or null when no "encryption_key" is configured
      * (end-to-end encrypted channels then throw when used).
      *
-     * Built eagerly so a missing "web-token/jwt-library" package or a
-     * malformed key surfaces at driver resolution rather than mid-broadcast.
+     * Built eagerly so a missing
+     * "[web-token/jwt-library](https://packagist.org/packages/web-token/jwt-library)"
+     * package or a malformed key surfaces at driver resolution rather than
+     * mid-broadcast.
      *
      * @param  array  $config
      * @return \Illuminate\Broadcasting\MercureChannelEncrypter|null
@@ -682,7 +684,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Get the additional JWT claims for the given Mercure configuration.
      *
-     * RFC 9068 access tokens require "iss", "aud", and "client_id", so each
+     * [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068.html) access tokens
+     * require "iss", "aud", and "client_id", so each
      * defaults to a sensible identifier when not set explicitly (an empty
      * string, e.g. from an unset .env value, counts as not set).
      *

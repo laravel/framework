@@ -16,10 +16,12 @@ use SensitiveParameter;
 /**
  * Encrypts Mercure updates end to end, so the hub never sees their content.
  *
- * As recommended by the Mercure specification, updates are encrypted as JSON
- * Web Encryption (RFC 7516) compact tokens and the keys are shared with
- * subscribers out of band, as JSON Web Keys (RFC 7517) returned by the
- * broadcasting auth endpoint; the hub is not involved in this exchange.
+ * As recommended by the Mercure specification, updates are encrypted as
+ * JSON Web Encryption ([RFC 7516](https://www.rfc-editor.org/rfc/rfc7516.html))
+ * compact tokens and the keys are shared with subscribers out of band, as
+ * JSON Web Keys ([RFC 7517](https://www.rfc-editor.org/rfc/rfc7517.html))
+ * returned by the broadcasting auth endpoint; the hub is not involved in
+ * this exchange.
  *
  * Each channel gets its own AES-256-GCM key, derived from the single
  * configured key with HKDF, so a subscriber's keys only ever decrypt the
