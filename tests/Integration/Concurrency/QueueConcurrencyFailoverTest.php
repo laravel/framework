@@ -494,6 +494,32 @@ class QueueConcurrencyFailoverTest extends TestCase
         Concurrency::driver('queue')->run([fn () => 1], timeout: 1);
     }
 
+    public function testRefusesAProcessLocalStoreWhenASyncLinkComesLast()
+    {
+        // The mirror image: a sync link last does not make [database, sync]
+        // inline either, since the job may well land on the database queue.
+        $this->useChain(['database', 'sync']);
+        config()->set('cache.default', 'array');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('is not shared across processes');
+
+        Concurrency::driver('queue')->run([fn () => 1], timeout: 1);
+    }
+
+    public function testRefusesAProcessLocalStoreWhenANestedChainCanReachARealQueue()
+    {
+        // A nested failover link is only inline if its own links are.
+        config()->set('queue.connections.inner', ['driver' => 'failover', 'connections' => ['database']]);
+        $this->useChain(['inner']);
+        config()->set('cache.default', 'array');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('is not shared across processes');
+
+        Concurrency::driver('queue')->run([fn () => 1], timeout: 1);
+    }
+
     public function testCreateReturnsTheDeferredJobClass()
     {
         $this->assertInstanceOf(InvokeDeferredClosure::class, InvokeDeferredClosure::create(fn () => 1));

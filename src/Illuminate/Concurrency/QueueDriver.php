@@ -185,7 +185,7 @@ class QueueDriver implements Driver
 
         return defer(function () use ($tasks, $connection) {
             foreach (Arr::wrap($tasks) as $task) {
-                $job = (new InvokeDeferredClosure(new SerializableClosure($task)))->onConnection($connection);
+                $job = InvokeDeferredClosure::create($task)->onConnection($connection);
 
                 if (! is_null($queue = $this->resolveQueue())) {
                     $job->onQueue($queue);
