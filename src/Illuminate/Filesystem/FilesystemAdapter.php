@@ -671,13 +671,19 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Copy a file to another disk.
      *
-     * @param  string  $from
      * @param  string  $disk
+     * @param  string  $from
      * @param  string|null  $to
      * @return bool
      */
-    public function copyToDisk($from, $disk, $to = null)
+    public function copyToDisk($disk, $from, $to = null)
     {
+        $destination = Container::getInstance()->make(FilesystemFactory::class)->disk($disk);
+
+        if ($destination === $this && ($to ?? $from) === $from) {
+            throw new InvalidArgumentException('Cannot copy a file to the same disk and path.');
+        }
+
         $stream = $this->readStream($from);
 
         if (! is_resource($stream)) {
@@ -685,9 +691,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         }
 
         try {
-            return Container::getInstance()->make(FilesystemFactory::class)->disk($disk)->writeStream(
-                $to ?? $from, $stream
-            );
+            return $destination->writeStream($to ?? $from, $stream);
         } finally {
             if (is_resource($stream)) {
                 fclose($stream);
@@ -698,14 +702,14 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Move a file to another disk.
      *
-     * @param  string  $from
      * @param  string  $disk
+     * @param  string  $from
      * @param  string|null  $to
      * @return bool
      */
-    public function moveToDisk($from, $disk, $to = null)
+    public function moveToDisk($disk, $from, $to = null)
     {
-        return $this->copyToDisk($from, $disk, $to) && $this->delete($from);
+        return $this->copyToDisk($disk, $from, $to) && $this->delete($from);
     }
 
     /**

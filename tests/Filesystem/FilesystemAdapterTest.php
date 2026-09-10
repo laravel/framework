@@ -354,7 +354,7 @@ class FilesystemAdapterTest extends TestCase
         ]));
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
-        $filesystemAdapter->copyToDisk('file.txt', 'backup');
+        $filesystemAdapter->copyToDisk('backup', 'file.txt');
 
         $this->assertFileExists($this->tempDir.'/file.txt');
         $this->assertFileExists($this->tempDir.'/backup/file.txt');
@@ -371,10 +371,25 @@ class FilesystemAdapterTest extends TestCase
         ]));
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
-        $filesystemAdapter->moveToDisk('file.txt', 'backup', 'copy.txt');
+        $filesystemAdapter->moveToDisk('backup', 'file.txt', 'copy.txt');
 
         Assert::assertFileDoesNotExist($this->tempDir.'/file.txt');
         $this->assertFileExists($this->tempDir.'/backup/copy.txt');
+    }
+
+    public function testCopyToDiskRejectsSameDiskAndPath()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
+            'disk' => $filesystemAdapter,
+        ]));
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $filesystemAdapter->copyToDisk('local', 'file.txt');
     }
 
     public function testStream()

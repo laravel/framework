@@ -32,6 +32,8 @@ use function Illuminate\Support\enum_value;
  * @method static string|false putFile(\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string $path, \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|array|null $file = null, mixed $options = [])
  * @method static string|false putFileAs(\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string $path, \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|array|null $file, string|array|null $name = null, mixed $options = [])
  * @method static bool writeStream(string $path, resource $resource, array $options = [])
+ * @method static bool copyToDisk(string $disk, string $from, string|null $to = null)
+ * @method static bool moveToDisk(string $disk, string $from, string|null $to = null)
  * @method static string getVisibility(string $path)
  * @method static bool setVisibility(string $path, string $visibility)
  * @method static bool prepend(string $path, string $data)
