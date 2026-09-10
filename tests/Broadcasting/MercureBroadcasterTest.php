@@ -143,20 +143,33 @@ class MercureBroadcasterTest extends TestCase
         $this->assertArrayNotHasKey('authorization_details', $claims);
     }
 
-    public function testAuthThrowsAccessDeniedWhenUserIsMissingForAGuardedChannel()
+    public function testAuthFlagsAGuardedChannelDeniedForAGuest()
     {
-        $this->expectException(AccessDeniedHttpException::class);
+        $response = $this->broadcaster->auth($this->requestFor(['private-room.1'], null));
 
-        $this->broadcaster->auth($this->requestFor(['private-room.1'], null));
+        $this->assertSame([['name' => 'private-room.1', 'denied' => true]], $response->getData(true)['channel_names']);
+
+        $claims = $this->decodeJwtClaims($this->cookieValue($response));
+
+        $this->assertArrayNotHasKey('authorization_details', $claims);
     }
 
-    public function testAuthThrowsAccessDeniedWhenTheChannelCallbackReturnsFalse()
+    public function testAuthFlagsADeniedChannelAndKeepsTheGrantedOnes()
     {
-        $this->expectException(AccessDeniedHttpException::class);
+        $this->broadcaster->channel('secret', fn () => false);
+        $this->broadcaster->channel('room.1', fn () => true);
 
-        $this->broadcaster->channel('room.1', fn () => false);
+        $response = $this->broadcaster->auth($this->requestFor(['private-secret', 'private-room.1'], 42));
 
-        $this->broadcaster->auth($this->requestFor(['private-room.1'], 42));
+        $this->assertSame([
+            ['name' => 'private-secret', 'denied' => true],
+            ['name' => 'private-room.1'],
+        ], $response->getData(true)['channel_names']);
+
+        $details = $this->decodeJwtClaims($this->cookieValue($response))['authorization_details'];
+
+        $this->assertSame([['match' => 'https://laravel.alt/echo/channel/private-room.1']], $details[0]['topics']);
+        $this->assertSame([['match' => 'https://laravel.alt/echo/whisper/private-room.1']], $details[1]['topics']);
     }
 
     public function testAuthExcludesPublicChannelsAndGrantsOnlyGuardedOnes()
@@ -194,7 +207,7 @@ class MercureBroadcasterTest extends TestCase
         $claims = $this->decodeJwtClaims($this->cookieValue($response));
         $detail = $claims['authorization_details'][0];
 
-        $this->assertSame(['id' => 42, 'name' => 'alice'], $detail['payload']);
+        $this->assertSame(['user_id' => '42', 'user_info' => ['id' => 42, 'name' => 'alice']], $detail['payload']);
         $this->assertSame([
             ['match' => 'https://laravel.alt/echo/channel/presence-room.1'],
             [
@@ -362,13 +375,13 @@ class MercureBroadcasterTest extends TestCase
             ['match' => 'https://laravel.alt/echo/channel/presence-room.1'],
             ['match' => '/.well-known/mercure/subscriptions/:match_type/https%3A%2F%2Flaravel.alt%2Fecho%2Fchannel%2Fpresence-room.1{/:subscriber}?', 'match_type' => 'urlpattern'],
         ], $details[1]['topics']);
-        $this->assertSame(['id' => 42, 'room' => '1'], $details[1]['payload']);
+        $this->assertSame(['user_id' => '42', 'user_info' => ['id' => 42, 'room' => '1']], $details[1]['payload']);
 
         $this->assertSame([
             ['match' => 'https://laravel.alt/echo/channel/presence-room.2'],
             ['match' => '/.well-known/mercure/subscriptions/:match_type/https%3A%2F%2Flaravel.alt%2Fecho%2Fchannel%2Fpresence-room.2{/:subscriber}?', 'match_type' => 'urlpattern'],
         ], $details[2]['topics']);
-        $this->assertSame(['id' => 42, 'room' => '2'], $details[2]['payload']);
+        $this->assertSame(['user_id' => '42', 'user_info' => ['id' => 42, 'room' => '2']], $details[2]['payload']);
 
         $this->assertSame(['subscribe', 'publish'], $details[3]['actions']);
         $this->assertSame([
@@ -381,9 +394,11 @@ class MercureBroadcasterTest extends TestCase
 
     public function testAuthDeniesAGuestBeforeRevealingEncryptionConfigurationState()
     {
-        $this->expectException(AccessDeniedHttpException::class);
+        $response = $this->broadcaster->auth($this->requestFor(['private-encrypted-room.1'], null));
 
-        $this->broadcaster->auth($this->requestFor(['private-encrypted-room.1'], null));
+        // Denied before the encrypter check: no key material, no hint that
+        // encryption is even configured.
+        $this->assertSame([['name' => 'private-encrypted-room.1', 'denied' => true]], $response->getData(true)['channel_names']);
     }
 
     public function testCookieSubMatchesTheChannelGuardResolvedUser()
@@ -479,9 +494,10 @@ class MercureBroadcasterTest extends TestCase
         $broadcaster = $this->encryptedBroadcaster();
         $broadcaster->channel('orders.{id}', fn () => false);
 
-        $this->expectException(AccessDeniedHttpException::class);
+        $response = $broadcaster->auth($this->requestFor(['private-encrypted-orders.1'], 42));
 
-        $broadcaster->auth($this->requestFor(['private-encrypted-orders.1'], 42));
+        // Denied entries never carry the channel's JWK.
+        $this->assertSame([['name' => 'private-encrypted-orders.1', 'denied' => true]], $response->getData(true)['channel_names']);
     }
 
     public function testBroadcastPublishesOnePrivateUpdatePerEncryptedChannel()
@@ -605,9 +621,14 @@ class MercureBroadcasterTest extends TestCase
         $request = Request::create('https://example.com/broadcasting/auth', 'POST', ['channel_names' => ['private-room.1']]);
         $request->setUserResolver(fn () => new GenericBroadcastingTestUser(42));
 
-        $this->expectException(RuntimeException::class);
-
-        $broadcaster->auth($request);
+        try {
+            $broadcaster->auth($request);
+            $this->fail('A BroadcastException should have been thrown.');
+        } catch (BroadcastException $e) {
+            $this->assertStringContainsString('public_url', $e->getMessage());
+            $this->assertStringContainsString('hub.other.com', $e->getMessage());
+            $this->assertStringContainsString('example.com', $e->getMessage());
+        }
     }
 
     public function testAuthOmitsTheWhisperGrantWhenClientEventsAreDisabled()

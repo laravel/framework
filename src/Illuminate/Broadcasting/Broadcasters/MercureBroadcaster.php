@@ -66,8 +66,9 @@ class MercureBroadcaster extends Broadcaster
      * one authorization cookie, so this reads a "channel_names" array and
      * mints a single token covering every currently-joined channel, public
      * ones included (a hub without the "anonymous" directive rejects
-     * token-less subscribers). The batch is all-or-nothing: one denied
-     * channel rejects the whole request.
+     * token-less subscribers). Authorization is per channel: a denied
+     * channel is flagged in the response and left out of the grants, so
+     * revoking one channel mid-session never takes down the others.
      *
      * Each authorized end-to-end encrypted channel's response entry carries
      * the JSON Web Key decrypting its updates, the out-of-band key exchange
@@ -118,13 +119,20 @@ class MercureBroadcaster extends Broadcaster
 
             $normalizedChannelName = $this->normalizeChannelName($channelName);
 
-            if (! $channelUser = $this->retrieveUser($request, $normalizedChannelName)) {
-                throw new AccessDeniedHttpException;
+            try {
+                if (! $channelUser = $this->retrieveUser($request, $normalizedChannelName)) {
+                    throw new AccessDeniedHttpException;
+                }
+
+                $result = $this->verifyUserCanAccessChannel($request, $normalizedChannelName);
+            } catch (AccessDeniedHttpException) {
+                $responseChannel['denied'] = true;
+                $responseChannels[] = $responseChannel;
+
+                continue;
             }
 
             $user ??= $channelUser;
-
-            $result = $this->verifyUserCanAccessChannel($request, $normalizedChannelName);
 
             if (str_starts_with($channelName, 'private-encrypted-')) {
                 if ($this->encrypter === null) {
@@ -135,11 +143,17 @@ class MercureBroadcaster extends Broadcaster
                 $privateTopics[] = $this->channelTopic($channelName);
             } elseif (str_starts_with($channelName, 'presence-')) {
                 // A payload is scoped to its own authorization_details
-                // entry, so each presence channel gets its own grant.
+                // entry, so each presence channel gets its own grant. The
+                // identifier wrap matches the other drivers' presence shape
+                // and gives the connector a stable member identity, so two
+                // members with identical callback results stay distinct.
                 $presenceGrants[] = new Grant([Grant::ACTION_SUBSCRIBE], [
                     'exact' => [$this->channelTopic($channelName)],
                     'urlpattern' => [$this->subscriptionPattern($channelName)],
-                ], $result);
+                ], [
+                    'user_id' => $this->broadcastingIdentifier($channelUser),
+                    'user_info' => $result,
+                ]);
             } else {
                 $privateTopics[] = $this->channelTopic($channelName);
             }
@@ -351,6 +365,8 @@ class MercureBroadcaster extends Broadcaster
      * @param  \Symfony\Component\Mercure\Jwt\Grant[]  $grants
      * @param  mixed  $user
      * @return \Symfony\Component\HttpFoundation\Cookie
+     *
+     * @throws \Illuminate\Broadcasting\BroadcastException
      */
     protected function makeAuthorizationCookie($request, array $grants, $user = null)
     {
@@ -359,13 +375,30 @@ class MercureBroadcaster extends Broadcaster
         // The channel-guard-resolved user wins over the default guard's, so
         // "sub" matches the identity the grants were authorized for.
         if ($user ??= $request->user()) {
-            $claims['sub'] = (string) (method_exists($user, 'getAuthIdentifierForBroadcasting')
-                ? $user->getAuthIdentifierForBroadcasting()
-                : $user->getAuthIdentifier());
+            $claims['sub'] = $this->broadcastingIdentifier($user);
         }
 
-        return (new Authorization(new HubRegistry($this->hub), $this->expiration))
-            ->createCookie($request, $grants, null, $claims);
+        try {
+            return (new Authorization(new HubRegistry($this->hub), $this->expiration))
+                ->createCookie($request, $grants, null, $claims);
+        } catch (RuntimeException $e) {
+            // Typically a hub "public_url" that doesn't share a registrable
+            // domain with the app: point the failure at the configuration.
+            throw new BroadcastException(sprintf('Mercure error: %s. Adjust the Mercure "public_url" configuration value so the hub [%s] shares a registrable domain with the application host [%s].', rtrim($e->getMessage(), '.'), $this->hub->getPublicUrl(), $request->getHost()), 0, $e);
+        }
+    }
+
+    /**
+     * Get the broadcasting identifier of the given user.
+     *
+     * @param  mixed  $user
+     * @return string
+     */
+    protected function broadcastingIdentifier($user)
+    {
+        return (string) (method_exists($user, 'getAuthIdentifierForBroadcasting')
+            ? $user->getAuthIdentifierForBroadcasting()
+            : $user->getAuthIdentifier());
     }
 
     /**

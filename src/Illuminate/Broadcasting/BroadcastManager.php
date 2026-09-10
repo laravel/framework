@@ -465,6 +465,13 @@ class BroadcastManager implements FactoryContract
             throw new InvalidArgumentException('The Mercure broadcasting connection requires a "secret" (or "subscribe_secret") configuration value.');
         }
 
+        // A "__Secure-"/"__Host-" cookie is rejected by browsers over plain
+        // HTTP, which would otherwise surface as a 500 on every auth call.
+        if (str_starts_with($hub->getCookieName(), '__') &&
+            parse_url($hub->getPublicUrl(), PHP_URL_SCHEME) === 'http') {
+            throw new InvalidArgumentException(sprintf('The Mercure "%s" cookie requires an "https" hub "public_url". Use HTTPS, or configure a "cookie_name" without the "__Secure-" or "__Host-" prefix for plain-HTTP development.', $hub->getCookieName()));
+        }
+
         return new MercureBroadcaster(
             $hub,
             $expiration,

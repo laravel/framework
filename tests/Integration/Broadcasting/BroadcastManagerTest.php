@@ -399,6 +399,34 @@ class BroadcastManagerTest extends TestCase
         $manager->connection('mercure');
     }
 
+    public function testMercureRejectsASecurePrefixedCookieOverAPlainHttpPublicUrl()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => $this->mercureConfig([
+                'driver' => 'mercure',
+                'public_url' => 'http://localhost/.well-known/mercure',
+            ])]],
+        ]));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('cookie_name');
+
+        $manager->connection('mercure');
+    }
+
+    public function testMercureAcceptsAPlainHttpPublicUrlWithAnUnprefixedCookieName()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => ['connections' => ['mercure' => $this->mercureConfig([
+                'driver' => 'mercure',
+                'public_url' => 'http://localhost/.well-known/mercure',
+                'cookie_name' => 'mercureAuthorization',
+            ])]],
+        ]));
+
+        $this->assertInstanceOf(MercureBroadcaster::class, $manager->connection('mercure'));
+    }
+
     public function testMercureAcceptsABase64PrefixedEncryptionKey()
     {
         $manager = new BroadcastManager($this->getApp([
