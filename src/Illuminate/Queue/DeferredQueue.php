@@ -18,4 +18,17 @@ class DeferredQueue extends SyncQueue
     {
         return \Illuminate\Support\defer(fn () => parent::push($job, $data, $queue));
     }
+
+    /**
+     * Push a raw payload onto the queue.
+     *
+     * @param  string  $payload
+     * @param  string|null  $queue
+     * @param  array  $options
+     * @return mixed
+     */
+    public function pushRaw($payload, $queue = null, array $options = [])
+    {
+        return \Illuminate\Support\defer(fn () => parent::pushRaw($payload, $queue, $options));
+    }
 }
