@@ -111,6 +111,56 @@ PHP);
         });
     }
 
+    public function testProcessDriverRunMayLimitTheNumberOfSimultaneousProcesses()
+    {
+        $log = tempnam(sys_get_temp_dir(), 'concurrency');
+
+        $task = function () use ($log) {
+            file_put_contents($log, 'start'.PHP_EOL, FILE_APPEND | LOCK_EX);
+
+            usleep(300000);
+
+            file_put_contents($log, 'end'.PHP_EOL, FILE_APPEND | LOCK_EX);
+
+            return 'done';
+        };
+
+        try {
+            $results = Concurrency::driver('process')->run(array_fill(0, 4, $task), concurrency: 2);
+
+            $this->assertSame(['done', 'done', 'done', 'done'], $results);
+
+            $running = 0;
+            $simultaneous = 0;
+
+            foreach (file($log, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $event) {
+                $running += $event === 'start' ? 1 : -1;
+
+                $simultaneous = max($simultaneous, $running);
+            }
+
+            $this->assertLessThanOrEqual(2, $simultaneous);
+        } finally {
+            @unlink($log);
+        }
+    }
+
+    #[DataProvider('getConcurrencyDrivers')]
+    public function testRunWithConcurrencyLimitPreservesKeysAndOrder(string $driver)
+    {
+        $results = Concurrency::driver($driver)->run([
+            'first' => function () {
+                usleep(300000);
+
+                return 1 + 1;
+            },
+            5 => fn () => 2 + 2,
+            'third' => fn () => 3 + 3,
+        ], concurrency: 2);
+
+        $this->assertSame(['first' => 2, 5 => 4, 'third' => 6], $results);
+    }
+
     public function testDriverCanBeResolvedUsingBackedEnum()
     {
         $this->assertInstanceOf(
