@@ -49,10 +49,12 @@ class SyncQueueFailedJobsTest extends QueueTestCase
         SyncQueueFailedJob::$attempts = 0;
 
         try {
-            SyncQueueFailedJob::dispatch();
+            SyncQueueFailedJob::dispatch()->onConnection('sync');
         } catch (RuntimeException) {
             //
         }
+
+        $this->assertSame(1, DB::table('failed_jobs')->count());
 
         $this->artisan('queue:retry', ['id' => ['all']])->assertSuccessful();
 
