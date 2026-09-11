@@ -33,6 +33,7 @@ class KernelTest extends TestCase
 
         $this->assertEquals([
             \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
+            \Illuminate\Routing\Middleware\CacheStaticResponse::class,
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
@@ -60,6 +61,7 @@ class KernelTest extends TestCase
 
         $this->assertEquals([
             \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
+            \Illuminate\Routing\Middleware\CacheStaticResponse::class,
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
@@ -88,6 +90,7 @@ class KernelTest extends TestCase
 
         $this->assertEquals([
             \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
+            \Illuminate\Routing\Middleware\CacheStaticResponse::class,
             \Illuminate\Routing\Middleware\ValidateSignature::class,
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
