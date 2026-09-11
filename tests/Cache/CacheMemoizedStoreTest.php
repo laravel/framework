@@ -28,6 +28,24 @@ class CacheMemoizedStoreTest extends TestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
+    public function testAddDoesNotOverwriteValueWrittenAfterMissWasMemoized(): void
+    {
+        $repository = new Repository(new ArrayStore);
+        $memoized = new Repository(new MemoizedStore('test', $repository));
+
+        $this->assertNull($memoized->get('foo'));
+
+        $repository->put('foo', 'bar', 30);
+
+        $this->assertFalse($memoized->add('foo', 'baz', 30));
+        $this->assertSame('bar', $memoized->get('foo'));
+        $this->assertSame('bar', $repository->get('foo'));
+
+        $this->assertTrue($memoized->add('new', 'value', 30));
+        $this->assertSame('value', $memoized->get('new'));
+        $this->assertSame('value', $repository->get('new'));
+    }
+
     public function testLocksCanBeFlushedWhenUnderlyingStoreSupportsIt(): void
     {
         $store = new MemoizedStore('test', new Repository(new ArrayStore));

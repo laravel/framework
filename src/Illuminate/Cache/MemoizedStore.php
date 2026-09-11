@@ -104,6 +104,21 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
     }
 
     /**
+     * Store an item in the cache if the key does not exist.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function add($key, $value, $seconds)
+    {
+        unset($this->cache[$this->prefix($key)]);
+
+        return $this->repository->add($key, $value, $seconds);
+    }
+
+    /**
      * Store multiple items in the cache for a given number of seconds.
      *
      * @param  int  $seconds
