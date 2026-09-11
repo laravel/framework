@@ -19,6 +19,6 @@ if (! function_exists('Illuminate\Filesystem\join_paths')) {
             }
         }
 
-        return $basePath.implode('', $paths);
+        return rtrim($basePath ?? '', DIRECTORY_SEPARATOR).implode('', $paths);
     }
 }
