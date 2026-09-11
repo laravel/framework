@@ -325,6 +325,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('This is a...', Str::excerpt('This is a beautiful morning', 'this', ['radius' => 5]));
         $this->assertSame('...iful morning', Str::excerpt('This is a beautiful morning', 'morning', ['radius' => 5]));
         $this->assertNull(Str::excerpt('This is a beautiful morning', 'day'));
+        $this->assertSame("First line\nsecond line", Str::excerpt("First line\nsecond line", 'second'));
+        $this->assertSame("First line\nsecond line", Str::excerpt("First line\nsecond line", 'First'));
+        $this->assertSame('...fine morning', Str::excerpt("This is a beautiful\nfine morning", 'morning', ['radius' => 5]));
+        $this->assertNull(Str::excerpt("First line\nsecond line", 'third'));
         $this->assertSame('...is a beautiful! mor...', Str::excerpt('This is a beautiful! morning', 'Beautiful', ['radius' => 5]));
         $this->assertSame('...is a beautiful? mor...', Str::excerpt('This is a beautiful? morning', 'beautiful', ['radius' => 5]));
         $this->assertSame('', Str::excerpt('', '', ['radius' => 0]));
