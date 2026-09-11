@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
+use Closure;
 use GuzzleHttp\Utils;
 
 /**
@@ -31,6 +32,13 @@ class Pool
     protected $pool = [];
 
     /**
+     * The callback to configure default settings for all requests in the pool.
+     *
+     * @var (Closure(\Illuminate\Http\Client\PendingRequest): \Illuminate\Http\Client\PendingRequest)|null
+     */
+    protected $defaultsCallback = null;
+
+    /**
      * Create a new requests pool.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
@@ -39,6 +47,22 @@ class Pool
     {
         $this->factory = $factory ?: new Factory();
         $this->handler = Utils::chooseHandler();
+    }
+
+    /**
+     * Set default request configuration for all requests in the pool.
+     *
+     * The callback receives a PendingRequest instance and should return it
+     * after applying any desired configuration
+     *
+     * @param  Closure(\Illuminate\Http\Client\PendingRequest): \Illuminate\Http\Client\PendingRequest  $callback
+     * @return $this
+     */
+    public function defaults(Closure $callback)
+    {
+        $this->defaultsCallback = $callback;
+
+        return $this;
     }
 
     /**
@@ -69,7 +93,13 @@ class Pool
      */
     protected function asyncRequest()
     {
-        return $this->factory->setHandler($this->handler)->async();
+        $request = $this->factory->createPendingRequest();
+
+        if ($this->defaultsCallback) {
+            $request = ($this->defaultsCallback)($request);
+        }
+
+        return $request->setHandler($this->handler)->async();
     }
 
     /**

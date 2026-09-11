@@ -5144,6 +5144,180 @@ class HttpClientTest extends TestCase
         $this->assertInstanceOf(ConnectionException::class, $responses[0]);
         $this->assertSame($networkException, $responses[0]->getPrevious());
     }
+    
+    public function testPoolDefaultsAreAppliedToAllRequests()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('ok', 200),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            $pool->defaults(fn (PendingRequest $request) => $request
+                ->withHeader('X-Pool-Default', 'true')
+            );
+
+            return [
+                $pool->as('first')->get('http://foo.com/first'),
+                $pool->as('second')->get('http://foo.com/second'),
+            ];
+        });
+
+        $this->assertTrue($responses['first']->ok());
+        $this->assertTrue($responses['second']->ok());
+
+        $this->factory->assertSentCount(2);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->header('X-Pool-Default') === ['true'];
+        });
+    }
+
+    public function testPoolDefaultsBaseUrlAppliesToAllRequests()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('ok', 200),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            $pool->defaults(fn (PendingRequest $request) => $request
+                ->baseUrl('http://foo.com/api/v1')
+            );
+
+            return [
+                $pool->as('users')->get('/users'),
+                $pool->as('posts')->get('/posts'),
+            ];
+        });
+
+        $this->assertTrue($responses['users']->ok());
+        $this->assertTrue($responses['posts']->ok());
+
+        $this->factory->assertSent(
+            fn (Request $request) => $request->url() === 'http://foo.com/api/v1/users'
+        );
+
+        $this->factory->assertSent(
+            fn (Request $request) => $request->url() === 'http://foo.com/api/v1/posts'
+        );
+    }
+
+    public function testPoolDefaultsWithHeadersAndTokenAppliesToAllRequests()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('ok', 200),
+        ]);
+
+        $this->factory->pool(function (Pool $pool) {
+            $pool->defaults(fn (PendingRequest $request) => $request
+                ->withToken('test-token')
+                ->withHeader('X-Api-Version', '2024-01-01')
+            );
+
+            return [
+                $pool->as('first')->get('http://foo.com/first'),
+                $pool->as('second')->get('http://foo.com/second'),
+            ];
+        });
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->header('Authorization') === ['Bearer test-token']
+                && $request->header('X-Api-Version') === ['2024-01-01'];
+        });
+
+        $this->factory->assertSentCount(2);
+    }
+
+    public function testPoolDefaultsWithRetryAppliesToAllRequests()
+    {
+        $this->factory->fake([
+            'http://foo.com/first' => $this->factory->sequence()
+                ->push('Server Error', 500)
+                ->push('ok', 200),
+
+            'http://foo.com/second' => $this->factory->sequence()
+                ->push('Server Error', 500)
+                ->push('ok', 200),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            $pool->defaults(fn (PendingRequest $request) => $request
+                ->retry(3, 0)
+            );
+
+            return [
+                $pool->as('first')->get('http://foo.com/first'),
+                $pool->as('second')->get('http://foo.com/second'),
+            ];
+        });
+
+        $this->assertTrue($responses['first']->ok());
+        $this->assertTrue($responses['second']->ok());
+
+        $this->factory->assertSentCount(4);
+    }
+
+    public function testPoolDefaultsCombinesMultipleSettings()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('ok', 200),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            $pool->defaults(fn (PendingRequest $request) => $request
+                ->baseUrl('http://foo.com/api')
+                ->withToken('my-token')
+                ->withHeader('X-Custom', 'value')
+            );
+
+            return [
+                $pool->as('first')->get('/endpoint'),
+            ];
+        });
+
+        $this->assertTrue($responses['first']->ok());
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/api/endpoint'
+                && $request->header('Authorization') === ['Bearer my-token']
+                && $request->header('X-Custom') === ['value'];
+        });
+    }
+    
+    public function testPoolDefaultsCanBeOverriddenPerRequest()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('ok', 200),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            $pool->defaults(fn (PendingRequest $request) => $request
+                ->withToken('default-token')
+                ->withHeader('X-Source', 'pool')
+            );
+
+            return [
+                $pool->as('default')->get('http://foo.com/default'),
+                $pool->as('custom')
+                    ->withToken('custom-token')
+                    ->get('http://foo.com/custom'),
+            ];
+        });
+
+        $this->assertTrue($responses['default']->ok());
+        $this->assertTrue($responses['custom']->ok());
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/default'
+                && $request->header('Authorization') === ['Bearer default-token']
+                && $request->header('X-Source') === ['pool'];
+        });
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/custom'
+                && $request->header('Authorization') === ['Bearer custom-token']
+                && $request->header('X-Source') === ['pool'];
+        });
+    }
 
     public function testUrlsWithoutTemplateExpressionsAreNotExpanded()
     {
