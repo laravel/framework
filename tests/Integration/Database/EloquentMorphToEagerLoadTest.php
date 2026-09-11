@@ -25,6 +25,10 @@ class EloquentMorphToEagerLoadTest extends DatabaseTestCase
             $table->string('id')->primary();
         });
 
+        Schema::create('codes', function (Blueprint $table) {
+            $table->string('id')->primary();
+        });
+
         Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('commentable_type');
@@ -34,6 +38,7 @@ class EloquentMorphToEagerLoadTest extends DatabaseTestCase
         $post = Post::create();
         $article = Article::create(['slug' => ArticleSlug::Review->value]);
         $video = Video::create(['id' => '550e8400-e29b-41d4-a716-446655440000']);
+        $code = Code::create(['id' => '0']);
 
         (new Comment)->commentable()->associate($post)->save();
         (new Comment)->commentable()->associate($article)->save();
@@ -42,6 +47,8 @@ class EloquentMorphToEagerLoadTest extends DatabaseTestCase
         $comment->commentable_type = Video::class;
         $comment->commentable_id = (string) $video->id;
         $comment->save();
+
+        (new Comment)->commentable()->associate($code)->save();
     }
 
     public function testEagerLoadingResolvesRelationWithPrimitivePrimaryKey(): void
@@ -63,6 +70,21 @@ class EloquentMorphToEagerLoadTest extends DatabaseTestCase
         $this->assertNotNull($comments[0]->commentable);
         $this->assertInstanceOf(Article::class, $comments[0]->commentable);
         $this->assertSame(ArticleSlug::Review, $comments[0]->commentable->slug);
+    }
+
+    public function testEagerLoadingResolvesRelationWithZeroStringPrimaryKey(): void
+    {
+        $comments = Comment::with('commentable')
+            ->where('commentable_type', Code::class)
+            ->get();
+
+        $this->assertNotNull($comments[0]->commentable);
+        $this->assertInstanceOf(Code::class, $comments[0]->commentable);
+        $this->assertSame('0', $comments[0]->commentable->getKey());
+
+        $lazy = Comment::where('commentable_type', Code::class)->first();
+
+        $this->assertSame($lazy->commentable->getKey(), $comments[0]->commentable->getKey());
     }
 
     public function testEagerLoadingResolvesRelationWithUuidValueObjectPrimaryKey(): void
@@ -125,6 +147,17 @@ class UuidCast implements CastsAttributes
     {
         return (string) $value;
     }
+}
+
+class Code extends Model
+{
+    public $timestamps = false;
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
+    protected $fillable = ['id'];
 }
 
 class Video extends Model
