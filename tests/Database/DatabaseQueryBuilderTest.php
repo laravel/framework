@@ -2239,6 +2239,39 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals($expectedSql, $builder->toSql());
     }
 
+    public function testSqlServerUnionLimitsAndOffsets()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users');
+        $builder->union($this->getSqlServerBuilder()->select('*')->from('dogs'));
+        $builder->orderBy('id')->offset(5)->limit(10);
+        $this->assertSame('select * from (select * from [users]) as [temp_table] union select * from (select * from [dogs]) as [temp_table] order by [id] asc offset 5 rows fetch next 10 rows only', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users');
+        $builder->union($this->getSqlServerBuilder()->select('*')->from('dogs'));
+        $builder->orderBy('id')->limit(10);
+        $this->assertSame('select * from (select * from [users]) as [temp_table] union select * from (select * from [dogs]) as [temp_table] order by [id] asc offset 0 rows fetch next 10 rows only', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users');
+        $builder->union($this->getSqlServerBuilder()->select('*')->from('dogs'));
+        $builder->orderBy('id')->offset(5);
+        $this->assertSame('select * from (select * from [users]) as [temp_table] union select * from (select * from [dogs]) as [temp_table] order by [id] asc offset 5 rows', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users');
+        $builder->union($this->getSqlServerBuilder()->select('*')->from('dogs'));
+        $builder->forPage(2, 15);
+        $this->assertSame('select * from (select * from [users]) as [temp_table] union select * from (select * from [dogs]) as [temp_table] order by (SELECT 0) offset 15 rows fetch next 15 rows only', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->limit(11);
+        $builder->union($this->getSqlServerBuilder()->select('*')->from('dogs')->limit(22));
+        $builder->orderBy('id')->offset(5)->limit(10);
+        $this->assertSame('select * from (select top 11 * from [users]) as [temp_table] union select * from (select top 22 * from [dogs]) as [temp_table] order by [id] asc offset 5 rows fetch next 10 rows only', $builder->toSql());
+    }
+
     public function testUnionWithJoin()
     {
         $builder = $this->getBuilder();

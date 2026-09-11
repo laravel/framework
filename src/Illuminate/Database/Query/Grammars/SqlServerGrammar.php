@@ -55,6 +55,10 @@ class SqlServerGrammar extends Grammar
             $query->orders[] = ['sql' => '(SELECT 0)'];
         }
 
+        if ($query->unions && (isset($query->unionLimit) || $query->unionOffset) && empty($query->unionOrders)) {
+            $query->unionOrders[] = ['sql' => '(SELECT 0)'];
+        }
+
         return parent::compileSelect($query);
     }
 
@@ -381,6 +385,35 @@ class SqlServerGrammar extends Grammar
     protected function compileLock(Builder $query, $value)
     {
         return '';
+    }
+
+    /**
+     * Compile the "union" queries attached to the main query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compileUnions(Builder $query)
+    {
+        $sql = '';
+
+        foreach ($query->unions as $union) {
+            $sql .= $this->compileUnion($union);
+        }
+
+        if (! empty($query->unionOrders)) {
+            $sql .= ' '.$this->compileOrders($query, $query->unionOrders);
+        }
+
+        if (isset($query->unionLimit) || $query->unionOffset) {
+            $sql .= ' offset '.((int) $query->unionOffset).' rows';
+
+            if ((int) $query->unionLimit > 0) {
+                $sql .= ' fetch next '.((int) $query->unionLimit).' rows only';
+            }
+        }
+
+        return ltrim($sql);
     }
 
     /**
