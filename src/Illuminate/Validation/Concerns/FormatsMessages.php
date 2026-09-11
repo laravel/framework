@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\File as FileRule;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -103,7 +104,7 @@ trait FormatsMessages
 
         $keys = ["{$attribute}.{$lowerRule}", $lowerRule, $attribute];
 
-        if ($this->getAttributeType($attribute) !== 'file') {
+        if (! is_a($lowerRule, FileRule::class, true)) {
             $shortRule = "{$attribute}.".Str::snake(class_basename($lowerRule));
 
             if (! in_array($shortRule, $keys)) {

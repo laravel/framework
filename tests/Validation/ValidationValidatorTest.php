@@ -4456,6 +4456,22 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testCustomMessagesForRuleObjectsAreUsedWhenAttributeIsAFile()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new UploadedFile(__FILE__, '', null, null, true);
+
+        $rule = new VirusFree;
+
+        $v = new Validator($trans, ['avatar' => $file], ['avatar' => [$rule]], ['avatar.virus_free' => 'The avatar failed the virus scan.']);
+        $this->assertTrue($v->fails());
+        $this->assertSame(['The avatar failed the virus scan.'], $v->messages()->all());
+
+        $v = new Validator($trans, ['avatar' => 'not-a-file'], ['avatar' => [$rule]], ['avatar.virus_free' => 'The avatar failed the virus scan.']);
+        $this->assertTrue($v->fails());
+        $this->assertSame(['The avatar failed the virus scan.'], $v->messages()->all());
+    }
+
     public function testValidateNotIn()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -10424,6 +10440,14 @@ class ExplicitTableAndConnectionModel extends Model
     protected $guarded = [];
 
     public $timestamps = false;
+}
+
+class VirusFree implements \Illuminate\Contracts\Validation\ValidationRule
+{
+    public function validate(string $attribute, mixed $value, \Closure $fail): void
+    {
+        $fail('validation.virus_free');
+    }
 }
 
 class NonEloquentModel
