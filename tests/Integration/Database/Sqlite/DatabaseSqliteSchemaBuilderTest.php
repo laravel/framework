@@ -61,6 +61,22 @@ class DatabaseSqliteSchemaBuilderTest extends DatabaseTestCase
         Schema::drop('posts');
     }
 
+    public function testInlineUniqueConstraintsSurviveTableRebuild()
+    {
+        DB::statement('create table "accounts" ("id" integer primary key autoincrement, "email" varchar not null unique, "name" varchar)');
+
+        Schema::table('accounts', function (Blueprint $table) {
+            $table->string('name', 100)->nullable()->change();
+        });
+
+        $indexes = collect(Schema::getIndexes('accounts'));
+
+        $this->assertTrue($indexes->contains(fn ($index) => $index['name'] === 'accounts_email_unique' && $index['unique'] && $index['columns'] === ['email']));
+        $this->assertFalse($indexes->contains(fn ($index) => str_starts_with($index['name'], 'sqlite_autoindex')));
+
+        Schema::drop('accounts');
+    }
+
     public function testGetViews()
     {
         DB::connection('conn1')->statement(<<<'SQL'

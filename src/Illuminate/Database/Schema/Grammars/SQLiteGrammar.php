@@ -344,12 +344,18 @@ class SQLiteGrammar extends Grammar
                 );
             })->all();
 
+        [, $tableName] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
+
         $indexes = (new Collection($blueprint->getState()->getIndexes()))
-            ->reject(fn ($index) => str_starts_with('sqlite_', $index->index))
-            ->map(fn ($index) => $this->{'compile'.ucfirst($index->name)}($blueprint, $index))
+            ->map(function ($index) use ($blueprint, $tableName) {
+                if (str_starts_with($index->index, 'sqlite_autoindex_')) {
+                    $index->index = $this->createIndexName($tableName, $index->name, $index->columns);
+                }
+
+                return $this->{'compile'.ucfirst($index->name)}($blueprint, $index);
+            })
             ->all();
 
-        [, $tableName] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
         $tempTable = $this->wrapTable($blueprint, '__temp__'.$this->connection->getTablePrefix());
         $table = $this->wrapTable($blueprint);
         $columnNames = implode(', ', $columnNames);
@@ -368,6 +374,23 @@ class SQLiteGrammar extends Grammar
             sprintf('drop table %s', $table),
             sprintf('alter table %s rename to %s', $tempTable, $this->wrapTable($tableName)),
         ], $indexes, [$foreignKeyConstraintsEnabled ? $this->compileEnableForeignKeyConstraints() : null]));
+    }
+
+    /**
+     * Create a default index name for the given table, type and columns.
+     *
+     * @param  string  $table
+     * @param  string  $type
+     * @param  array  $columns
+     * @return string
+     */
+    protected function createIndexName($table, $type, array $columns)
+    {
+        if ($this->connection->getConfig('prefix_indexes')) {
+            $table = $this->connection->getTablePrefix().$table;
+        }
+
+        return str_replace(['-', '.'], '_', strtolower($table.'_'.implode('_', $columns).'_'.$type));
     }
 
     /** @inheritDoc */
