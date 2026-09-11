@@ -45,6 +45,20 @@ class SleepTest extends TestCase
         unset($_SERVER['__sleep.while']);
     }
 
+    public function testItSleepsForTheFullDurationOnEveryWhileIteration()
+    {
+        $start = microtime(true);
+        Sleep::for(1.5)->seconds()->while(function () {
+            static $results = [true, true, false];
+
+            return array_shift($results);
+        });
+        $elapsed = microtime(true) - $start;
+
+        $this->assertGreaterThanOrEqual(2.9, $elapsed);
+        $this->assertLessThan(3.5, $elapsed);
+    }
+
     public function testItSleepsForSecondsWithMilliseconds()
     {
         $start = microtime(true);

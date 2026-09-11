@@ -330,10 +330,6 @@ class Sleep
             return;
         }
 
-        $remaining = $this->duration->copy();
-
-        $seconds = (int) $remaining->totalSeconds;
-
         $while = $this->while ?: function () {
             static $return = [true, false];
 
@@ -341,6 +337,10 @@ class Sleep
         };
 
         while ($while()) {
+            $remaining = $this->duration->copy();
+
+            $seconds = (int) $remaining->totalSeconds;
+
             if ($seconds > 0) {
                 sleep($seconds);
 
