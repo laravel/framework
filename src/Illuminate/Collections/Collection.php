@@ -167,14 +167,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         $results = [];
 
-        foreach ($this->items as $key => $values) {
+        foreach ($this->items as $values) {
             if ($values instanceof Collection) {
                 $values = $values->all();
             } elseif (! is_array($values)) {
                 continue;
             }
 
-            $results[$key] = $values;
+            $results[] = $values;
         }
 
         if (! $results) {
