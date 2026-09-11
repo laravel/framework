@@ -635,6 +635,19 @@ class AuthGuardTest extends TestCase
         $this->assertFalse($guard->viaRemember());
     }
 
+    public function testUserReturnsNullWhenRecallerUserHasNullPassword()
+    {
+        $guard = $this->getGuard();
+        [$session, $provider, $request, $cookie] = $this->getMocks();
+        $request = Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller|baz']);
+        $guard = new SessionGuard('default', $provider, $session, $request);
+        $guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
+        $user = Mockery::mock(Authenticatable::class);
+        $guard->getProvider()->shouldReceive('retrieveByToken')->once()->with('id', 'recaller')->andReturn($user);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn(null);
+        $this->assertNull($guard->user());
+    }
+
     public function testLoginOnceSetsUser()
     {
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
