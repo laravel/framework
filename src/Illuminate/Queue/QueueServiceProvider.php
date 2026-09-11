@@ -26,6 +26,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use Laravel\SerializableClosure\SerializableClosure;
+use Throwable;
 
 class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -70,12 +71,16 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
                 return;
             }
 
-            $this->app['queue.failer']->log(
-                $event->connectionName,
-                $event->job->getQueue(),
-                $event->job->getRawBody(),
-                $event->exception
-            );
+            try {
+                $this->app['queue.failer']->log(
+                    $event->connectionName,
+                    $event->job->getQueue(),
+                    $event->job->getRawBody(),
+                    $event->exception
+                );
+            } catch (Throwable $e) {
+                $this->app[ExceptionHandler::class]->report($e);
+            }
         });
     }
 
