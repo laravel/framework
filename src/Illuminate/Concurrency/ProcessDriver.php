@@ -30,11 +30,11 @@ class ProcessDriver implements Driver
      *
      * @throws \Throwable
      */
-    public function run(Closure|array $tasks, CarbonInterval|int|null $timeout = null): array
+    public function run(Closure|array $tasks, CarbonInterval|int|null $timeout = null, ?int $concurrency = null): array
     {
         $command = Application::formatCommandString('invoke-serialized-closure');
 
-        $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $command, $timeout) {
+        $pool = $this->processFactory->pool(function (Pool $pool) use ($tasks, $command, $timeout) {
             foreach (Arr::wrap($tasks) as $key => $task) {
                 $process = $pool->as($key)->path(base_path())->env([
                     'LARAVEL_INVOKABLE_CLOSURE' => base64_encode(
@@ -46,9 +46,13 @@ class ProcessDriver implements Driver
                     $process->timeout($timeout);
                 }
             }
-        })->start()->wait();
+        });
 
-        return $results->collect()->mapWithKeys(function ($result, $key) {
+        if ($concurrency > 0) {
+            $pool->concurrency($concurrency);
+        }
+
+        return $pool->wait()->collect()->mapWithKeys(function ($result, $key) {
             if ($result->failed()) {
                 throw new Exception('Concurrent process failed with exit code ['.$result->exitCode().']. Message: '.$result->errorOutput());
             }

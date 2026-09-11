@@ -16,7 +16,7 @@ class ForkDriver implements Driver
     /**
      * Run the given tasks concurrently and return an array containing the results.
      */
-    public function run(Closure|array $tasks, CarbonInterval|int|null $timeout = null): array
+    public function run(Closure|array $tasks, CarbonInterval|int|null $timeout = null, ?int $concurrency = null): array
     {
         $tasks = Arr::wrap($tasks);
 
@@ -24,7 +24,13 @@ class ForkDriver implements Driver
         $values = array_values($tasks);
 
         /** @phpstan-ignore class.notFound (spatie/fork is not installed as it is practically incompatible with Windows) */
-        $results = Fork::new()->run(...$values);
+        $fork = Fork::new();
+
+        if ($concurrency > 0) {
+            $fork = $fork->concurrent($concurrency);
+        }
+
+        $results = $fork->run(...$values);
 
         ksort($results);
 
