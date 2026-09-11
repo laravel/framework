@@ -155,6 +155,9 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('https://foo.com');
         $this->assertSame('https://foo.com/?key=value%20with%20spaces', $request->fullUrlWithQuery(['key' => 'value with spaces']));
+
+        $request = Request::create('https://foo.com?1=a&2=b');
+        $this->assertSame('https://foo.com/?1=a&2=b&coupon=foo', $request->fullUrlWithQuery(['coupon' => 'foo']));
     }
 
     public function testFullUrlWithoutQueryMethod()
