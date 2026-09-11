@@ -2482,6 +2482,137 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testPoolRetryAppliesToAllRequests()
+    {
+        $this->factory->fake([
+            'https://example.com/api/users' => $this->factory->sequence()
+                ->push('Server Error', 500)
+                ->push('{"users": []}', 200),
+            'https://example.com/api/posts' => $this->factory->sequence()
+                ->push('Server Error', 500)
+                ->push('{"posts": []}', 200),
+        ]);
+
+        $responses = $this->factory->pool(fn (Pool $pool) => [
+            $pool->retry(3, 0)->as('users')->get('https://example.com/api/users'),
+            $pool->retry(3, 0)->as('posts')->get('https://example.com/api/posts'),
+        ]);
+
+        // Both requests should have succeeded after retry
+        $this->assertTrue($responses['users']->ok());
+        $this->assertTrue($responses['posts']->ok());
+    }
+
+    public function testPoolLevelRetryAppliesToAllRequests()
+    {
+        $this->factory->fake([
+            'https://example.com/api/users' => $this->factory->sequence()
+                ->push('Server Error', 500)
+                ->push('{"users": []}', 200),
+            'https://example.com/api/posts' => $this->factory->sequence()
+                ->push('Server Error', 500)
+                ->push('{"posts": []}', 200),
+        ]);
+
+        // Using pool-level retry() — the new feature
+        $pool = new Pool($this->factory);
+        $pool->retry(3, 0);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            $pool->retry(3, 0);
+
+            return [
+                $pool->as('users')->get('https://example.com/api/users'),
+                $pool->as('posts')->get('https://example.com/api/posts'),
+            ];
+        });
+
+        $this->assertTrue($responses['users']->ok());
+        $this->assertTrue($responses['posts']->ok());
+    }
+
+    public function testPoolRetryReturnsPoolForFluency()
+    {
+        $pool = new Pool($this->factory);
+
+        $result = $pool->retry(3, 100);
+
+        $this->assertInstanceOf(Pool::class, $result);
+    }
+
+    public function testPoolRetryWithWhenCallback()
+    {
+        $this->factory->fake([
+            'https://example.com/*' => $this->factory->sequence()
+                ->push('Server Error', 500)
+                ->push('OK', 200),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            $pool->retry(3, 0, fn ($exception, $request) => true);
+
+            return [
+                $pool->as('first')->get('https://example.com/test'),
+            ];
+        });
+
+        $this->assertTrue($responses['first']->ok());
+    }
+
+    public function testPoolRetryWithClosureDelay()
+    {
+        $this->factory->fake([
+            'https://example.com/*' => $this->factory->sequence()
+                ->push('Server Error', 500)
+                ->push('OK', 200),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            $pool->retry(3, fn (int $attempt) => $attempt * 10);
+
+            return [
+                $pool->as('first')->get('https://example.com/test'),
+            ];
+        });
+
+        $this->assertTrue($responses['first']->ok());
+    }
+
+    public function testPoolRetryDoesNotAffectRequestsWithOwnRetry()
+    {
+        $this->factory->fake([
+            'https://example.com/no-retry' => $this->factory->sequence()
+                ->push('Server Error', 500)
+                ->push('OK', 200),
+        ]);
+
+        // Pool sets retry(1) but individual request overrides with retry(3)
+        $responses = $this->factory->pool(function (Pool $pool) {
+            $pool->retry(1, 0, throw: false);
+
+            return [
+                // This request overrides the pool-level retry
+                $pool->as('custom')->retry(3, 0)->get('https://example.com/no-retry'),
+            ];
+        });
+
+        $this->assertTrue($responses['custom']->ok());
+    }
+
+    public function testPoolWithoutRetryDoesNotSetRetryOnRequests()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response('OK', 200),
+        ]);
+
+        $responses = $this->factory->pool(fn (Pool $pool) => [
+            $pool->as('first')->get('https://example.com/test'),
+        ]);
+
+        $this->assertTrue($responses['first']->ok());
+        $this->factory->assertSentCount(1);
+    }
+
     public function testTheRequestSendingAndResponseReceivedEventsAreFiredForEveryRetry()
     {
         $events = Mockery::mock(Dispatcher::class);
