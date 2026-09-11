@@ -115,6 +115,12 @@ class ArrayLock extends Lock
             return null;
         }
 
+        $expiresAt = $this->store->locks[$this->name]['expiresAt'];
+
+        if ($expiresAt && ! $expiresAt->isFuture()) {
+            return null;
+        }
+
         return $this->store->locks[$this->name]['owner'];
     }
 

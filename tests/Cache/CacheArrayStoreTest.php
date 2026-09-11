@@ -355,6 +355,23 @@ class CacheArrayStoreTest extends TestCase
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
     }
 
+    public function testExpiredLockIsNotReportedAsHeld()
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $store = new ArrayStore;
+        $lock = $store->lock('foo', 10);
+        $this->assertTrue($lock->get());
+        $this->assertTrue($lock->isLocked());
+        $this->assertTrue($lock->isOwnedByCurrentProcess());
+
+        Carbon::setTestNow($now->addSeconds(10)->addSecond());
+
+        $this->assertFalse($lock->isLocked());
+        $this->assertFalse($lock->isOwnedByCurrentProcess());
+        $this->assertFalse($lock->isOwnedBy($lock->owner()));
+    }
+
     public function testExpiredLockCannotBeRefreshedByPreviousOwner()
     {
         Carbon::setTestNow($now = Carbon::now());
