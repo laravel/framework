@@ -334,17 +334,22 @@ class PostgresGrammar extends Grammar
     {
         $uniqueStatement = 'unique';
 
+        $nullsStatement = '';
+
         if (! is_null($command->nullsNotDistinct)) {
-            $uniqueStatement .= ' nulls '.($command->nullsNotDistinct ? 'not distinct' : 'distinct');
+            $nullsStatement = ' nulls '.($command->nullsNotDistinct ? 'not distinct' : 'distinct');
+
+            $uniqueStatement .= $nullsStatement;
         }
 
         if ($command->online || $command->algorithm) {
-            $createIndexSql = sprintf('create unique index %s%s on %s%s (%s)',
+            $createIndexSql = sprintf('create unique index %s%s on %s%s (%s)%s',
                 $command->online ? 'concurrently ' : '',
                 $this->wrap($command->index),
                 $this->wrapTable($blueprint),
                 $command->algorithm ? ' using '.$command->algorithm : '',
-                $this->columnize($command->columns)
+                $this->columnize($command->columns),
+                $nullsStatement
             );
 
             $sql = sprintf('alter table %s add constraint %s unique using index %s',
