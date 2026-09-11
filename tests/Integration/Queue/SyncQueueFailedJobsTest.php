@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\Attributes\WithMigration;
 use RuntimeException;
@@ -14,6 +15,8 @@ use function Illuminate\Support\defer;
 #[WithMigration('queue')]
 class SyncQueueFailedJobsTest extends QueueTestCase
 {
+    use DatabaseMigrations;
+
     public function test_failed_sync_jobs_are_recorded()
     {
         SyncQueueFailedJob::$attempts = 0;
