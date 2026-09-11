@@ -7350,6 +7350,16 @@ SQL;
         $builder->select('*')->from('users')->whereJsonContains('users.options->language', 'en')->toSql();
         $this->assertSame('select * from "users" where exists (select 1 from json_each("users"."options", \'$."language"\') where "json_each"."value" is ?)', $builder->toSql());
         $this->assertEquals(['en'], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en', 'fr']);
+        $this->assertSame('select * from "users" where (exists (select 1 from json_each("options", \'$."languages"\') where "json_each"."value" is ?) and exists (select 1 from json_each("options", \'$."languages"\') where "json_each"."value" is ?))', $builder->toSql());
+        $this->assertEquals(['en', 'fr'], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en', 'fr']);
+        $this->assertSame('select * from "users" where not (exists (select 1 from json_each("options", \'$."languages"\') where "json_each"."value" is ?) and exists (select 1 from json_each("options", \'$."languages"\') where "json_each"."value" is ?))', $builder->toSql());
+        $this->assertEquals(['en', 'fr'], $builder->getBindings());
     }
 
     public function testWhereJsonContainsSqlServer()

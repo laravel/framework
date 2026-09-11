@@ -204,6 +204,31 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile a "where JSON contains" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereJsonContains(Builder $query, $where)
+    {
+        if (! is_array($where['value'])) {
+            return parent::whereJsonContains($query, $where);
+        }
+
+        $not = $where['not'] ? 'not ' : '';
+
+        if (empty($where['value'])) {
+            return $not.'(1 = 1)';
+        }
+
+        return $not.'('.implode(' and ', array_map(
+            fn ($value) => $this->compileJsonContains($where['column'], $this->parameter($value)),
+            $where['value']
+        )).')';
+    }
+
+    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param  string  $column
