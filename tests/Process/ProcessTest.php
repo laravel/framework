@@ -8,6 +8,7 @@ use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Exceptions\ProcessIdleTimedOutException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
+use LogicException;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
@@ -52,6 +53,117 @@ class ProcessTest extends TestCase
         $this->assertStringContainsString('ProcessTest.php', $results[1]->output());
 
         $this->assertTrue($results->successful());
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testProcessPoolMayLimitConcurrency()
+    {
+        $factory = new Factory;
+
+        $log = tempnam(sys_get_temp_dir(), 'pool');
+
+        try {
+            $results = $factory->pool(function ($pool) use ($log) {
+                foreach (range(1, 4) as $ignored) {
+                    $pool->path(__DIR__)->command("echo start >> {$log}; sleep 0.3; echo end >> {$log}");
+                }
+            })->concurrency(2)->wait();
+
+            $this->assertCount(4, $results->collect());
+            $this->assertTrue($results->successful());
+            $this->assertSame(2, $this->maximumSimultaneousProcesses($log));
+        } finally {
+            @unlink($log);
+        }
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testProcessPoolConcurrencyOfZeroDoesNotLimitTheProcesses()
+    {
+        $factory = new Factory;
+
+        $log = tempnam(sys_get_temp_dir(), 'pool');
+
+        try {
+            $factory->pool(function ($pool) use ($log) {
+                foreach (range(1, 4) as $ignored) {
+                    $pool->path(__DIR__)->command("echo start >> {$log}; sleep 0.3; echo end >> {$log}");
+                }
+            })->concurrency(0)->wait();
+
+            $this->assertSame(4, $this->maximumSimultaneousProcesses($log));
+        } finally {
+            @unlink($log);
+        }
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testProcessPoolWithConcurrencyLimitPreservesKeysAndOrder()
+    {
+        $factory = new Factory;
+
+        $results = $factory->pool(function ($pool) {
+            $pool->as('first')->path(__DIR__)->command('sleep 0.3; echo first');
+            $pool->as('second')->path(__DIR__)->command('echo second');
+        })->concurrency(1)->wait();
+
+        $this->assertSame(['first', 'second'], array_keys($results->collect()->all()));
+        $this->assertStringContainsString('first', $results['first']->output());
+        $this->assertStringContainsString('second', $results['second']->output());
+    }
+
+    public function testProcessPoolWithConcurrencyLimitMayNotBeStarted()
+    {
+        $factory = new Factory;
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Process pools with a concurrency limit must be run instead of started.');
+
+        $factory->pool(function ($pool) {
+            $pool->path(__DIR__)->command($this->ls());
+        })->concurrency(2)->start();
+    }
+
+    public function testProcessPoolWithConcurrencyLimitMayBeFaked()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('DONE')
+                ->runsFor(iterations: 3);
+        });
+
+        $results = $factory->pool(function ($pool) {
+            $pool->command('first');
+            $pool->command('second');
+            $pool->command('third');
+        })->concurrency(2)->wait();
+
+        $this->assertCount(3, $results->collect());
+        $this->assertTrue($results->successful());
+        $this->assertStringContainsString('DONE', $results[0]->output());
+        $this->assertStringContainsString('DONE', $results[2]->output());
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testProcessPoolWithConcurrencyLimitEnforcesTimeouts()
+    {
+        $factory = new Factory;
+
+        $startedAt = microtime(true);
+
+        try {
+            $factory->pool(function ($pool) {
+                $pool->timeout(1)->path(__DIR__)->command('exec sleep 20');
+            })->concurrency(1)->wait();
+
+            $this->fail('The expected exception was not thrown.');
+        } catch (ProcessTimedOutException $e) {
+            $this->assertNotInstanceOf(ProcessIdleTimedOutException::class, $e);
+            $this->assertStringContainsString('exceeded the timeout of 1 seconds', $e->getMessage());
+            $this->assertLessThan(10, microtime(true) - $startedAt);
+        }
     }
 
     public function testProcessPoolFailed()
@@ -1425,6 +1537,23 @@ class ProcessTest extends TestCase
         $factory->assertRanTimes(function ($process) {
             return str_contains($process->command, 'printenv TEST_VAR OTHER_VAR');
         }, 2);
+    }
+
+    /**
+     * Get the highest number of processes that were running at the same time.
+     */
+    protected function maximumSimultaneousProcesses(string $log): int
+    {
+        $running = 0;
+        $maximum = 0;
+
+        foreach (file($log, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $event) {
+            $running += $event === 'start' ? 1 : -1;
+
+            $maximum = max($maximum, $running);
+        }
+
+        return $maximum;
     }
 
     protected function ls()
