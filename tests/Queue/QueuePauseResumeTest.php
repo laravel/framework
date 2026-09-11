@@ -266,6 +266,8 @@ class QueuePauseResumeTest extends TestCase
 
         $this->manager->pauseFor(PauseQueueConnection::Redis, PauseQueueName::Emails, 30);
         $this->assertTrue($this->manager->isPaused('redis', 'emails'));
+        $this->assertTrue($this->manager->isPaused(PauseQueueConnection::Redis, PauseQueueName::Emails));
+        $this->assertSame(['emails'], $this->manager->getPausedQueues(PauseQueueConnection::Redis, [PauseQueueName::Emails, 'default']));
     }
 }
 
