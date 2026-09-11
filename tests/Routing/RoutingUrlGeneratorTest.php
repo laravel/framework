@@ -908,6 +908,30 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertFalse($url->hasValidSignature($request, false));
     }
 
+    public function testSignedRelativeUrlForRootRoute()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $routes->add(new Route(['GET'], '/', ['as' => 'home', function () {
+            //
+        }]));
+
+        $request = Request::create($url->signedRoute('home', [], null, false));
+
+        $this->assertTrue($url->hasValidSignature($request, false));
+        $this->assertTrue($url->hasValidRelativeSignature($request));
+
+        $request = Request::create($url->signedRoute('home', [], null, false).'&tampered=true');
+
+        $this->assertFalse($url->hasValidSignature($request, false));
+    }
+
     public function testSignedUrlParameterCannotBeNamedSignature()
     {
         $url = new UrlGenerator(

@@ -467,7 +467,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         $url = $absolute
             ? rtrim($request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo(), '/')
-            : '/'.$request->path();
+            : '/'.ltrim($request->path(), '/');
 
         $queryString = (new Stringable((string) ($request->server->get('VAPOR_RAW_QUERY_STRING') ?? $request->server->get('QUERY_STRING'))))->explode('&')
             ->reject(function ($parameter) use ($ignoreQuery) {
