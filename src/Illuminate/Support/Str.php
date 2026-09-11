@@ -239,7 +239,7 @@ class Str
      */
     public static function camel($value)
     {
-        return static::$camelCache[$value] ?? static::$camelCache[$value] = lcfirst(static::studly($value));
+        return static::$camelCache[$value] ?? static::$camelCache[$value] = static::lcfirst(static::studly($value));
     }
 
     /**
