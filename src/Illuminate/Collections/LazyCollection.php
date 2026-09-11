@@ -996,7 +996,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             if (is_null($keys)) {
                 yield from $this;
             } else {
-                foreach ($this as $item) {
+                foreach ($this as $itemKey => $item) {
                     $result = [];
 
                     foreach ($keys as $key) {
@@ -1007,7 +1007,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                         }
                     }
 
-                    yield $result;
+                    yield $itemKey => $result;
                 }
             }
         });

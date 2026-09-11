@@ -4854,6 +4854,30 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testSelectPreservesKeys($collection)
+    {
+        $data = new $collection([
+            'taylor' => ['first' => 'Taylor', 'last' => 'Otwell'],
+            'jess' => ['first' => 'Jess', 'last' => 'Archer'],
+        ]);
+
+        $this->assertSame([
+            'taylor' => ['first' => 'Taylor'],
+            'jess' => ['first' => 'Jess'],
+        ], $data->select('first')->all());
+
+        $data = new $collection([
+            7 => (object) ['first' => 'Taylor', 'last' => 'Otwell'],
+            9 => (object) ['first' => 'Jess', 'last' => 'Archer'],
+        ]);
+
+        $this->assertSame([
+            7 => ['first' => 'Taylor'],
+            9 => ['first' => 'Jess'],
+        ], $data->select(['first'])->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testGettingAvgItemsFromCollection($collection)
     {
         $c = new $collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
