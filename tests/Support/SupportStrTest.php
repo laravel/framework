@@ -1323,6 +1323,10 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('foo1Bar', Str::camel('foo1_bar'));
         $this->assertSame('1FooBar', Str::camel('1 foo bar'));
+
+        $this->assertSame('überUns', Str::camel('Über uns'));
+        $this->assertSame('émileZola', Str::camel('émile_zola'));
+        $this->assertSame('élanVital', Str::camel('Élan-vital'));
     }
 
     public function testCharAt()
