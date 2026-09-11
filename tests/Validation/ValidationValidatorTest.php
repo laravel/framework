@@ -4456,6 +4456,32 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateInWithArrayRuleSyntaxAndNonStringParameters()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['name' => 1], ['name' => [['in', 1, 2, 3]]]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => '1'], ['name' => [['in', 1, 2, 3]]]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => 4], ['name' => [['in', 1, 2, 3]]]);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => '01'], ['name' => [['in', 1, 2, 3]]]);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => 1], ['name' => [['not_in', 1, 2, 3]]]);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => '1'], ['name' => [['not_in', 1, 2, 3]]]);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => 4], ['name' => [['not_in', 1, 2, 3]]]);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateNotIn()
     {
         $trans = $this->getIlluminateArrayTranslator();
