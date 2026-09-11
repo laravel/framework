@@ -69,7 +69,7 @@ class DebounceLock
         $firstDispatchedAt = $cache->get($timestampKey);
 
         if (is_null($firstDispatchedAt)) {
-            $cache->put($timestampKey, Carbon::now()->getTimestamp(), $ttl);
+            $cache->put($timestampKey, Carbon::now()->getTimestamp(), $ttl + $maxWait);
 
             return false;
         }

@@ -228,6 +228,25 @@ class DebouncedJobTest extends QueueTestCase
         $this->assertFalse($second['maxWaitExceeded']);
     }
 
+    public function testMaxDebounceWaitIsHonoredWhenLongerThanDebounceTtl()
+    {
+        $cache = $this->app->get(Cache::class);
+        $lock = new DebounceLock($cache);
+        $job = new DebouncedWithLongMaxWaitJob('entity-1');
+
+        $this->assertFalse($lock->acquire($job)['maxWaitExceeded']);
+
+        for ($i = 1; $i < 60; $i++) {
+            $this->travelTo(Carbon::now()->addSeconds(60));
+
+            $this->assertFalse($lock->acquire($job)['maxWaitExceeded']);
+        }
+
+        $this->travelTo(Carbon::now()->addSeconds(60));
+
+        $this->assertTrue($lock->acquire($job)['maxWaitExceeded']);
+    }
+
     public function testSupersededDebouncedJobDoesNotDispatchChain()
     {
         $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
@@ -484,6 +503,25 @@ class DebouncedWithCustomCacheJob implements ShouldQueue
     public function handle()
     {
         static::$handled = true;
+    }
+}
+
+#[DebounceFor(60, maxWait: 3600)]
+class DebouncedWithLongMaxWaitJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public function __construct(public string $entityId)
+    {
+    }
+
+    public function debounceId(): string
+    {
+        return $this->entityId;
+    }
+
+    public function handle()
+    {
     }
 }
 
