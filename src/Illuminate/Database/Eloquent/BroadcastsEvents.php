@@ -121,7 +121,7 @@ trait BroadcastsEvents
     }
 
     /**
-     * Create a new broadcastable model event event.
+     * Create a new broadcastable model event.
      *
      * @param  string  $event
      * @return mixed
