@@ -208,12 +208,13 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model2 = $this->getMockModel();
         $model1->expects('getKeyType')->times(3)->andReturn('int');
         $model2->shouldReceive('getKeyType')->andReturn('int');
+        $model1->expects('newCollection')->andReturn(new Collection);
         $builder->setModel($model1);
         $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2])->times(2);
         $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2, 3]);
         $builder->expects('get')->andReturn(new Collection([$model1, $model2]));
         $builder->expects('get')->with(['column'])->andReturn(new Collection([$model1, $model2]));
-        $builder->expects('get')->andReturn(null);
+        $builder->expects('get')->andReturn(new Collection([$model1, $model2]));
 
         $result = $builder->findOr([1, 2], fn () => 'callback result');
         $this->assertInstanceOf(Collection::class, $result);
@@ -227,6 +228,10 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->findOr([1, 2, 3], fn () => 'callback result');
         $this->assertSame('callback result', $result);
+
+        $result = $builder->findOr([], fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertCount(0, $result);
     }
 
     public function testFindOrMethodWithManyUsingCollection()
@@ -241,7 +246,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2, 3]);
         $builder->expects('get')->andReturn(new Collection([$model1, $model2]));
         $builder->expects('get')->with(['column'])->andReturn(new Collection([$model1, $model2]));
-        $builder->expects('get')->andReturn(null);
+        $builder->expects('get')->andReturn(new Collection([$model1, $model2]));
 
         $result = $builder->findOr(new Collection([1, 2]), fn () => 'callback result');
         $this->assertInstanceOf(Collection::class, $result);

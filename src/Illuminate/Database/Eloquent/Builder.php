@@ -688,7 +688,7 @@ class Builder implements BuilderContract
      * @param  (\Closure(): TValue)|null  $callback
      * @return (
      *     $id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>)
-     *     ? \Illuminate\Database\Eloquent\Collection<int, TModel>
+     *     ? \Illuminate\Database\Eloquent\Collection<int, TModel>|TValue
      *     : TModel|TValue
      * )
      */
@@ -700,8 +700,16 @@ class Builder implements BuilderContract
             $columns = ['*'];
         }
 
-        if (! is_null($model = $this->find($id, $columns))) {
-            return $model;
+        $result = $this->find($id, $columns);
+
+        $id = $id instanceof Arrayable ? $id->toArray() : $id;
+
+        if (is_array($id)) {
+            if (count($result) === count(array_unique($id))) {
+                return $result;
+            }
+        } elseif (! is_null($result)) {
+            return $result;
         }
 
         return $callback();
