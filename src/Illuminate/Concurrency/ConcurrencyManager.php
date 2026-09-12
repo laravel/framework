@@ -2,7 +2,13 @@
 
 namespace Illuminate\Concurrency;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Process\Factory as ProcessFactory;
+use Illuminate\Queue\QueueManager;
+use Illuminate\Support\Arr;
 use Illuminate\Support\MultipleInstanceManager;
 use RuntimeException;
 use Spatie\Fork\Fork;
@@ -28,9 +34,10 @@ class ConcurrencyManager extends MultipleInstanceManager
     /**
      * Create an instance of the process concurrency driver.
      *
+     * @param  array  $config
      * @return \Illuminate\Concurrency\ProcessDriver
      */
-    public function createProcessDriver()
+    public function createProcessDriver(array $config = [])
     {
         return new ProcessDriver($this->app->make(ProcessFactory::class));
     }
@@ -38,11 +45,12 @@ class ConcurrencyManager extends MultipleInstanceManager
     /**
      * Create an instance of the fork concurrency driver.
      *
+     * @param  array  $config
      * @return \Illuminate\Concurrency\ForkDriver
      *
      * @throws \RuntimeException
      */
-    public function createForkDriver()
+    public function createForkDriver(array $config = [])
     {
         if (! $this->app->runningInConsole()) {
             throw new RuntimeException('Due to PHP limitations, the fork driver may not be used within web requests.');
@@ -58,11 +66,36 @@ class ConcurrencyManager extends MultipleInstanceManager
     /**
      * Create an instance of the sync concurrency driver.
      *
+     * @param  array  $config
      * @return \Illuminate\Concurrency\SyncDriver
      */
-    public function createSyncDriver()
+    public function createSyncDriver(array $config = [])
     {
         return new SyncDriver;
+    }
+
+    /**
+     * Create an instance of the queue concurrency driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Concurrency\QueueDriver
+     *
+     * @throws \RuntimeException
+     */
+    public function createQueueDriver(array $config = [])
+    {
+        if (! trait_exists(Queueable::class) ||
+            ! class_exists(QueueManager::class) ||
+            ! class_exists(CacheManager::class)) {
+            throw new RuntimeException('Please install the "illuminate/bus", "illuminate/cache", and "illuminate/queue" Composer packages in order to utilize the "queue" driver.');
+        }
+
+        return new QueueDriver(
+            $this->app->make(Dispatcher::class),
+            $this->app->make(CacheFactory::class),
+            $this->app->make('config'),
+            Arr::except($config, ['driver']),
+        );
     }
 
     /**
@@ -97,6 +130,12 @@ class ConcurrencyManager extends MultipleInstanceManager
      */
     public function getInstanceConfig($name)
     {
+        $config = $this->app['config']->get('concurrency.drivers.'.$name);
+
+        if (is_array($config)) {
+            return array_merge(['driver' => $name], $config);
+        }
+
         return $this->app['config']->get(
             'concurrency.driver.'.$name, ['driver' => $name],
         );
