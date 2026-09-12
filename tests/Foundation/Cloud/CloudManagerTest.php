@@ -35,11 +35,12 @@ class CloudManagerTest extends TestCase
     #[TestWith(['exports', false])]
     public function testIsManagedQueueChecksTheConfiguredManagedQueues(string $queue, bool $managed)
     {
+        $cloudQueue = Mockery::mock(CloudQueue::class);
+        $cloudQueue->shouldReceive('managedQueues')->andReturn(['emails']);
+
         $cloud = Cloud::partialMock();
         $cloud->shouldReceive('usesManagedQueues')->andReturn(true);
-        $cloud->shouldReceive('queue')->andReturn(
-            Mockery::mock(CloudQueue::class)->shouldReceive('managedQueues')->andReturn(['emails'])->getMock()
-        );
+        $cloud->shouldReceive('queue')->andReturn($cloudQueue);
 
         $this->assertSame($managed, Cloud::isManagedQueue($queue));
     }
