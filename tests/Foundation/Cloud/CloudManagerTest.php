@@ -33,7 +33,7 @@ class CloudManagerTest extends TestCase
 
     #[TestWith(['emails', true])]
     #[TestWith(['exports', false])]
-    public function testIsQueueManagedChecksTheConfiguredManagedQueues(string $queue, bool $managed)
+    public function testIsManagedQueueChecksTheConfiguredManagedQueues(string $queue, bool $managed)
     {
         $cloud = Cloud::partialMock();
         $cloud->shouldReceive('usesManagedQueues')->andReturn(true);
@@ -41,7 +41,7 @@ class CloudManagerTest extends TestCase
             Mockery::mock(CloudQueue::class)->shouldReceive('managedQueues')->andReturn(['emails'])->getMock()
         );
 
-        $this->assertSame($managed, Cloud::isQueueManaged($queue));
+        $this->assertSame($managed, Cloud::isManagedQueue($queue));
     }
 
     public function testFacadeResolvesTheCloudManager()
