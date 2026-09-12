@@ -776,6 +776,28 @@ class RoutingUrlGeneratorTest extends TestCase
         $url->route('not_exists_route');
     }
 
+    public function testQuestionMarkInRouteParameterIsNotDoubleEncoded()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $routes->add(new Route(['GET'], 'page/{id}', ['as' => 'page', function () {
+            //
+        }]));
+
+        $this->assertSame(
+            'http://www.foo.com/page/99?q=foo&pageSize=all',
+            $url->route('page', ['id' => 99, 'q' => 'foo', 'pageSize' => 'all'])
+        );
+
+        $this->assertSame(
+            'http://www.foo.com/page/99?q=*0*&pageSize=all',
+            $url->route('page', ['id' => '99?q=*0*&pageSize=all'])
+        );
+    }
+
     public function testRouteParametersContainingPercentSignsAreEncoded()
     {
         $url = new UrlGenerator(
