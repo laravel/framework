@@ -2148,6 +2148,17 @@ return [
                 'description' => 'Encrypt each variable individually with readable, plain-text variable names',
             ],
             [
+                'name' => 'incremental',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => false,
+                'isArray' => false,
+                'acceptValue' => false,
+                'default' => false,
+                'description' => 'Update a readable encrypted file, preserving unchanged values',
+            ],
+            [
                 'name' => 'prune',
                 'shortcut' => null,
                 'negatable' => false,
