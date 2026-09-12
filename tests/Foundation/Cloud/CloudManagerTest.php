@@ -3,7 +3,9 @@
 namespace Illuminate\Tests\Foundation\Cloud;
 
 use Illuminate\Foundation\Cloud\CloudManager;
+use Illuminate\Foundation\Cloud\Queue as CloudQueue;
 use Illuminate\Support\Facades\Cloud;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\TestWith;
 use RuntimeException;
@@ -27,6 +29,19 @@ class CloudManagerTest extends TestCase
         ));
 
         Cloud::queue();
+    }
+
+    #[TestWith(['emails', true])]
+    #[TestWith(['exports', false])]
+    public function testIsQueueManagedChecksTheConfiguredManagedQueues(string $queue, bool $managed)
+    {
+        $cloud = Cloud::partialMock();
+        $cloud->shouldReceive('usesManagedQueues')->andReturn(true);
+        $cloud->shouldReceive('queue')->andReturn(
+            Mockery::mock(CloudQueue::class)->shouldReceive('managedQueues')->andReturn(['emails'])->getMock()
+        );
+
+        $this->assertSame($managed, Cloud::isQueueManaged($queue));
     }
 
     public function testFacadeResolvesTheCloudManager()
