@@ -508,6 +508,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @param  mixed  $key
      * @param  TGetOrPutValue|(\Closure(): TGetOrPutValue)  $value
      * @return TValue|TGetOrPutValue
+     *
+     * @phpstan-this-out static<TKey, TValue|TGetOrPutValue>
      */
     public function getOrPut($key, $value)
     {
