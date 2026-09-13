@@ -504,7 +504,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @template TGetOrPutValue
      *
-     * @param  mixed  $key
+     * @param  TKey  $key
      * @param  TGetOrPutValue|(\Closure(): TGetOrPutValue)  $value
      * @return TValue|TGetOrPutValue
      */
