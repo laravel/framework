@@ -303,6 +303,7 @@ abstract class Facade
             'Notification' => Notification::class,
             'Number' => Number::class,
             'Password' => Password::class,
+            'Pipeline' => Pipeline::class,
             'Process' => Process::class,
             'Queue' => Queue::class,
             'RateLimiter' => RateLimiter::class,
