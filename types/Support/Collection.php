@@ -1029,6 +1029,8 @@ assertType('Illuminate\Support\Collection<int, string>', $collection::make([
 
 assertType('Illuminate\Support\Collection<int, int>', $collection::make([1])->prepend(2));
 assertType('Illuminate\Support\Collection<int, User>', $collection->prepend(new User, 2));
+assertType('Illuminate\Support\Collection<int|string, int>', $collection::make(['foo' => 1])->prepend(2));
+assertType('Illuminate\Support\Collection<string, int>', $collection::make(['bar' => 1])->prepend(2, 'baz'));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection::make([1])->unshift(2));
 assertType('Illuminate\Support\Collection<int|string, User>', $collection::make(['foo' => new User])->unshift(new User));
