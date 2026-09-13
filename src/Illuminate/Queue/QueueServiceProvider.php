@@ -13,6 +13,7 @@ use Illuminate\Queue\Connectors\DeferredConnector;
 use Illuminate\Queue\Connectors\FailoverConnector;
 use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
+use Illuminate\Queue\Connectors\CloudflareConnector;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
@@ -107,7 +108,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function registerConnectors($manager)
     {
-        foreach (['Null', 'Sync', 'Deferred', 'Background', 'Failover', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
+        foreach (['Null', 'Sync', 'Deferred', 'Background', 'Failover', 'Database', 'Redis', 'Beanstalkd', 'Sqs', 'Cloudflare'] as $connector) {
             $this->{"register{$connector}Connector"}($manager);
         }
     }
@@ -229,6 +230,19 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     {
         $manager->addConnector('sqs', function () {
             return new SqsConnector;
+        });
+    }
+
+    /**
+     * Register the Cloudflare queue connector.
+     *
+     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @return void
+     */
+    protected function registerCloudflareConnector($manager)
+    {
+        $manager->addConnector('cloudflare', function () {
+            return new CloudflareConnector($this->app->make(\Illuminate\Http\Client\Factory::class));
         });
     }
 

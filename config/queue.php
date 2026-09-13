@@ -24,7 +24,7 @@ return [
     | used by your application. An example configuration is provided for
     | each backend supported by Laravel. You're also free to add more.
     |
-    | Drivers: "sync", "database", "beanstalkd", "sqs", "redis",
+    | Drivers: "sync", "database", "beanstalkd", "sqs", "cloudflare", "redis",
     |          "deferred", "failover", "null"
     |
     */
@@ -69,6 +69,17 @@ return [
                 'delete_after_processing' => true,
                 'flush_on_clear' => env('SQS_OVERFLOW_FLUSH_ON_CLEAR', false),
             ],
+        ],
+
+        'cloudflare' => [
+            'driver' => 'cloudflare',
+            'account_id' => env('CLOUDFLARE_ACCOUNT_ID'),
+            'queue_id' => env('CLOUDFLARE_QUEUE_ID'),
+            'token' => env('CLOUDFLARE_API_TOKEN'),
+            'queue' => env('CLOUDFLARE_QUEUE', 'default'),
+            'batch_size' => (int) env('CLOUDFLARE_QUEUE_BATCH_SIZE', 1),
+            'visibility_timeout_ms' => (int) env('CLOUDFLARE_QUEUE_VISIBILITY_TIMEOUT_MS', 30_000),
+            'after_commit' => false,
         ],
 
         'redis' => [
