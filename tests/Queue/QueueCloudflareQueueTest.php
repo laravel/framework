@@ -45,7 +45,7 @@ class QueueCloudflareQueueTest extends TestCase
         });
     }
 
-    public function testPushRawWrapsDelaysBeyondTwelveHours()
+    public function testPushRawWrapsDelaysBeyondTwentyFourHours()
     {
         Carbon::setTestNow('2026-01-01 00:00:00');
 
@@ -62,7 +62,7 @@ class QueueCloudflareQueueTest extends TestCase
 
         $payload = json_encode(['uuid' => 'job-uuid', 'job' => 'test']);
 
-        $queue->pushRaw($payload, null, ['delay' => 50_000]);
+        $queue->pushRaw($payload, null, ['delay' => 100_000]);
 
         $http->assertSent(function ($request) {
             $body = json_decode($request['body'], true);
@@ -143,7 +143,7 @@ class QueueCloudflareQueueTest extends TestCase
 
         $wrapper = json_encode([
             CloudflareQueue::DELAY_WRAPPER_KEY => true,
-            '__cf_execute_at' => Carbon::now()->addHours(20)->timestamp,
+            '__cf_execute_at' => Carbon::now()->addHours(30)->timestamp,
             '__cf_payload' => $originalPayload,
         ]);
 
@@ -196,6 +196,60 @@ class QueueCloudflareQueueTest extends TestCase
         $http->assertSent(function ($request) {
             return str_contains($request->url(), '/messages/ack')
                 && $request['acks'] === [['lease_id' => 'wrapper-lease']];
+        });
+    }
+
+    public function testPopRelayWrapperSendsOriginalPayloadOnFinalHop()
+    {
+        Carbon::setTestNow('2026-01-01 00:00:00');
+
+        $originalPayload = json_encode(['uuid' => 'job-uuid', 'job' => 'test']);
+
+        $wrapper = json_encode([
+            CloudflareQueue::DELAY_WRAPPER_KEY => true,
+            '__cf_execute_at' => Carbon::now()->addHours(20)->timestamp,
+            '__cf_payload' => $originalPayload,
+        ]);
+
+        $http = new Factory;
+
+        $http->fake([
+            '*messages/pull' => $http->sequence()
+                ->push([
+                    'success' => true,
+                    'result' => [
+                        'messages' => [
+                            [
+                                'id' => 'wrapper-id',
+                                'lease_id' => 'wrapper-lease',
+                                'attempts' => 1,
+                                'body' => $wrapper,
+                            ],
+                        ],
+                    ],
+                ], 200)
+                ->push([
+                    'success' => true,
+                    'result' => ['messages' => []],
+                ], 200),
+            '*queues/queue-id/messages' => Factory::response([
+                'success' => true,
+                'result' => [],
+            ], 200),
+            '*messages/ack' => Factory::response([
+                'success' => true,
+                'result' => ['ackCount' => 1],
+            ], 200),
+        ]);
+
+        $queue = $this->createQueue($http);
+
+        $this->assertNull($queue->pop());
+
+        $http->assertSent(function ($request) use ($originalPayload) {
+            return str_ends_with($request->url(), '/messages')
+                && $request['body'] === $originalPayload
+                && $request['delay_seconds'] === 20 * 3600;
         });
     }
 

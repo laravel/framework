@@ -13,11 +13,13 @@ use function Illuminate\Support\enum_value;
 class CloudflareQueue extends Queue implements QueueContract, ClearableQueue
 {
     /**
-     * Cloudflare's hard maximum for delay_seconds on a single message (12 hours).
+     * Cloudflare's hard maximum for delay_seconds on a single message (24 hours).
+     *
+     * @see https://developers.cloudflare.com/queues/configuration/batching-retries/#delay-messages
      *
      * @var int
      */
-    const MAX_DELAY_SECONDS = 43_200;
+    const MAX_DELAY_SECONDS = 86_400;
 
     /**
      * Marker key embedded in the message body when a job needs more than one delay hop.
