@@ -1013,8 +1013,13 @@ assertType("'string'|User", $collection->get(0, function () {
     return 'string';
 }));
 
-assertType("'string'|User", $collection->getOrPut(0, 'string'));
-assertType("'string'|User", $collection->getOrPut(0, fn () => 'string'));
+$getOrPutCollection = $collection::make([new User]);
+assertType("'string'|User", $getOrPutCollection->getOrPut(0, 'string'));
+assertType("Illuminate\Support\Collection<int, 'string'|User>", $getOrPutCollection);
+
+$getOrPutCollection = $collection::make([new User]);
+assertType("'string'|User", $getOrPutCollection->getOrPut(0, fn () => 'string'));
+assertType("Illuminate\Support\Collection<int, 'string'|User>", $getOrPutCollection);
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->forget(1));
 assertType('Illuminate\Support\Collection<int, User>', $collection->forget([1, 2]));
@@ -1029,9 +1034,15 @@ assertType('Illuminate\Support\Collection<int, string>', $collection::make([
 
 assertType('Illuminate\Support\Collection<int, int>', $collection::make([1])->prepend(2));
 assertType('Illuminate\Support\Collection<int, User>', $collection->prepend(new User, 2));
+assertType('Illuminate\Support\Collection<int|string, int>', $collection::make(['foo' => 1])->prepend(2));
+assertType('Illuminate\Support\Collection<string, int>', $collection::make(['bar' => 1])->prepend(2, 'baz'));
+
+assertType('Illuminate\Support\Collection<int, int>', $collection::make([1])->unshift(2));
+assertType('Illuminate\Support\Collection<int|string, User>', $collection::make(['foo' => new User])->unshift(new User));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection::make([1])->push(2));
 assertType('Illuminate\Support\Collection<int, User>', $collection->push(new User, new User));
+assertType('Illuminate\Support\Collection<int|string, User>', $collection::make(['foo' => new User])->push(new User));
 
 assertType('User|null', $collection->pull(1));
 assertType("'string'|User", $collection->pull(1, 'string'));
@@ -1088,6 +1099,7 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->transform(fu
 }));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->add(new User));
+assertType('Illuminate\Support\Collection<int|string, User>', $collection::make(['foo' => new User])->add(new User));
 
 /**
  * @template TKey of array-key

@@ -508,6 +508,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @param  mixed  $key
      * @param  TGetOrPutValue|(\Closure(): TGetOrPutValue)  $value
      * @return TValue|TGetOrPutValue
+     *
+     * @phpstan-this-out static<TKey, TValue|TGetOrPutValue>
      */
     public function getOrPut($key, $value)
     {
@@ -1053,8 +1055,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Push an item onto the beginning of the collection.
      *
      * @param  TValue  $value
-     * @param  TKey  $key
+     * @param  TKey|null  $key
      * @return $this
+     *
+     * @phpstan-this-out ($key is null ? static<TKey|int, TValue> : $this)
      */
     public function prepend($value, $key = null)
     {
@@ -1068,6 +1072,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  TValue  ...$values
      * @return $this
+     *
+     * @phpstan-this-out static<TKey|int, TValue>
      */
     public function push(...$values)
     {
@@ -1083,6 +1089,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  TValue  ...$values
      * @return $this
+     *
+     * @phpstan-this-out static<TKey|int, TValue>
      */
     public function unshift(...$values)
     {
@@ -1940,6 +1948,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  TValue  $item
      * @return $this
+     *
+     * @phpstan-this-out static<TKey|int, TValue>
      */
     public function add($item)
     {
