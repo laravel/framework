@@ -1030,8 +1030,12 @@ assertType('Illuminate\Support\Collection<int, string>', $collection::make([
 assertType('Illuminate\Support\Collection<int, int>', $collection::make([1])->prepend(2));
 assertType('Illuminate\Support\Collection<int, User>', $collection->prepend(new User, 2));
 
+assertType('Illuminate\Support\Collection<int, int>', $collection::make([1])->unshift(2));
+assertType('Illuminate\Support\Collection<int|string, User>', $collection::make(['foo' => new User])->unshift(new User));
+
 assertType('Illuminate\Support\Collection<int, int>', $collection::make([1])->push(2));
 assertType('Illuminate\Support\Collection<int, User>', $collection->push(new User, new User));
+assertType('Illuminate\Support\Collection<int|string, User>', $collection::make(['foo' => new User])->push(new User));
 
 assertType('User|null', $collection->pull(1));
 assertType("'string'|User", $collection->pull(1, 'string'));
@@ -1088,6 +1092,7 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->transform(fu
 }));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->add(new User));
+assertType('Illuminate\Support\Collection<int|string, User>', $collection::make(['foo' => new User])->add(new User));
 
 /**
  * @template TKey of array-key
