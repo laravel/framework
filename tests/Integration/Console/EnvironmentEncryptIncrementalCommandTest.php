@@ -59,7 +59,7 @@ ENV;
             ->with(base_path('.env.encrypted'), Mockery::capture($encryptedOutput))
             ->andReturn(100);
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key])
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => $this->key])
             ->assertExitCode(0);
 
         $lines = explode("\n", $encryptedOutput);
@@ -107,7 +107,7 @@ ENV;
         $this->mockFiles($originalContent, $encryptedContent);
         File::shouldReceive('put')->never();
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key])
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => $this->key])
             ->assertExitCode(0);
     }
 
@@ -138,7 +138,7 @@ ENV;
             ->with(base_path('.env.encrypted'), Mockery::capture($encryptedOutput))
             ->andReturn(100);
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key])
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => $this->key])
             ->assertExitCode(0);
 
         $lines = explode("\n", $encryptedOutput);
@@ -158,7 +158,7 @@ ENV;
             ->with(base_path('.env.production.encrypted'), Mockery::capture($encryptedOutput))
             ->andReturn(100);
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--env' => 'production', '--key' => 'base64:'.base64_encode($this->key)])
+        $this->artisan('env:encrypt', ['--readable' => true, '--env' => 'production', '--key' => 'base64:'.base64_encode($this->key)])
             ->assertExitCode(0);
 
         $encrypter = new Encrypter($this->key, 'AES-256-CBC');
@@ -176,7 +176,7 @@ ENV;
             ->with(base_path('.env.encrypted'), Mockery::capture($encryptedOutput))
             ->andReturn(100);
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key])
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => $this->key])
             ->assertExitCode(0);
 
         $this->assertSame('"1"', $encrypter->decryptString(substr(rtrim($encryptedOutput), strlen('DB_PASSWORD='))));
@@ -190,7 +190,7 @@ ENV;
             ->with(base_path('.env.encrypted'), '')
             ->andReturn(0);
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key])
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => $this->key])
             ->assertExitCode(0);
     }
 
@@ -209,7 +209,7 @@ ENV;
         File::shouldReceive('put')->never();
         File::shouldReceive('delete')->never();
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key, '--force' => true, '--prune' => true])
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => $this->key, '--prune' => true])
             ->assertExitCode(1);
     }
 
@@ -224,11 +224,60 @@ ENV;
         ];
     }
 
-    public function testItRequiresReadable(): void
+    #[DataProvider('forcedBaselines')]
+    public function testItRebuildsWithoutReadingTheBaselineWhenForced(string $cipher, string $key): void
     {
-        $this->artisan('env:encrypt', ['--incremental' => true])
-            ->expectsOutputToContain('The --incremental option requires --readable.')
-            ->assertExitCode(1);
+        $encrypter = new Encrypter($this->key, 'AES-256-CBC');
+        $first = $encrypter->encryptString('1');
+        $second = $encrypter->encryptString('2');
+        $this->mockFiles("FIRST=1\nSECOND=2\n", "FIRST=$first\nSECOND=$second\n");
+        File::shouldReceive('get')->with(base_path('.env.encrypted'))->never();
+        $encryptedOutput = null;
+        File::expects('put')
+            ->with(base_path('.env.encrypted'), Mockery::capture($encryptedOutput))
+            ->andReturn(100);
+
+        $this->artisan('env:encrypt', ['--readable' => true, '--force' => true, '--cipher' => $cipher, '--key' => $key])
+            ->assertExitCode(0);
+
+        $lines = explode("\n", $encryptedOutput);
+        $encrypter = new Encrypter($key, $cipher);
+        $this->assertNotSame("FIRST=$first", $lines[0]);
+        $this->assertNotSame("SECOND=$second", $lines[1]);
+        $this->assertSame('1', $encrypter->decryptString(substr($lines[0], strlen('FIRST='))));
+        $this->assertSame('2', $encrypter->decryptString(substr($lines[1], strlen('SECOND='))));
+    }
+
+    public static function forcedBaselines(): array
+    {
+        return [
+            'same key and cipher' => ['AES-256-CBC', 'ANvVbPbE0tWMHpUySh6liY4WaCmAYKXP'],
+            'new key' => ['AES-256-CBC', str_repeat('x', 32)],
+            'new cipher' => ['AES-256-GCM', 'ANvVbPbE0tWMHpUySh6liY4WaCmAYKXP'],
+        ];
+    }
+
+    #[DataProvider('invalidBaselines')]
+    public function testItOverwritesInvalidBaselinesWhenForced(string $kind): void
+    {
+        $encrypter = new Encrypter($this->key, 'AES-256-CBC');
+        $baseline = match ($kind) {
+            'blob' => $encrypter->encrypt("DB_PASSWORD=1\n"),
+            'wrong-key' => 'DB_PASSWORD='.(new Encrypter(str_repeat('x', 32), 'AES-256-CBC'))->encryptString('1'),
+            'wrong-cipher' => 'DB_PASSWORD='.(new Encrypter($this->key, 'AES-256-GCM'))->encryptString('1'),
+            'malformed' => '<<<<<<< HEAD',
+            'corrupt-deleted-entry' => 'REMOVED=invalid',
+        };
+        $this->mockFiles('DB_PASSWORD=1', $baseline);
+        $encryptedOutput = null;
+        File::expects('put')
+            ->with(base_path('.env.encrypted'), Mockery::capture($encryptedOutput))
+            ->andReturn(100);
+
+        $this->artisan('env:encrypt', ['--readable' => true, '--force' => true, '--key' => $this->key])
+            ->assertExitCode(0);
+
+        $this->assertSame('1', $encrypter->decryptString(substr(rtrim($encryptedOutput), strlen('DB_PASSWORD='))));
     }
 
     public function testItRejectsAMissingSource(): void
@@ -236,7 +285,7 @@ ENV;
         $this->mockFiles(null, 'existing');
         File::shouldReceive('put')->never();
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key])
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => $this->key])
             ->expectsOutputToContain('Environment file not found.')
             ->assertExitCode(1);
     }
@@ -246,7 +295,7 @@ ENV;
         $this->mockFiles('DB_PASSWORD=1', 'existing');
         File::shouldReceive('put')->never();
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--no-interaction' => true])
+        $this->artisan('env:encrypt', ['--readable' => true, '--no-interaction' => true])
             ->expectsOutputToContain('The existing encryption key is required')
             ->assertExitCode(1);
     }
@@ -257,20 +306,31 @@ ENV;
         $this->mockFiles('DB_PASSWORD=1', 'DB_PASSWORD='.$encrypter->encryptString('1')."\n");
         File::shouldReceive('put')->never();
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true])
+        $this->artisan('env:encrypt', ['--readable' => true])
             ->expectsQuestion('What is the encryption key?', $this->key)
             ->assertExitCode(0);
     }
 
-    public function testItDoesNotPruneAfterAFailedWrite(): void
+    #[DataProvider('writeModes')]
+    public function testItDoesNotPruneAfterAFailedWrite(bool $readable, bool $force): void
     {
         $this->mockFiles('DB_PASSWORD=1', null);
         File::expects('put')->andReturn(false);
         File::shouldReceive('delete')->never();
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key, '--prune' => true])
+        $this->artisan('env:encrypt', ['--readable' => $readable, '--force' => $force, '--key' => $this->key, '--prune' => true])
             ->expectsOutputToContain('Unable to write the encrypted environment file.')
             ->assertExitCode(1);
+    }
+
+    public static function writeModes(): array
+    {
+        return [
+            'readable' => [true, false],
+            'forced readable' => [true, true],
+            'blob' => [false, false],
+            'forced blob' => [false, true],
+        ];
     }
 
     #[DataProvider('baselineFormatting')]
@@ -289,7 +349,7 @@ ENV;
         $this->mockFiles($originalContent, $encryptedContent);
         File::shouldReceive('put')->never();
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key])
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => $this->key])
             ->assertExitCode(0);
     }
 
@@ -329,7 +389,7 @@ ENV;
             ->with(base_path('.env.encrypted'), Mockery::capture($encryptedOutput))
             ->andReturn(100);
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key])
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => $this->key])
             ->assertExitCode(0);
 
         $lines = explode("\n", $encryptedOutput);
@@ -351,7 +411,7 @@ ENV;
         File::shouldReceive('put')->never();
         File::shouldReceive('delete')->never();
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key, '--prune' => true])
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => $this->key, '--prune' => true])
             ->expectsOutputToContain('Unable to decrypt the encrypted environment entry on line 3.')
             ->assertExitCode(1);
     }
@@ -380,7 +440,7 @@ ENV;
             ->with(base_path('.env.encrypted'), Mockery::capture($encryptedOutput))
             ->andReturn(100);
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => $this->key])
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => $this->key])
             ->assertExitCode(0);
 
         $expected = <<<ENV
@@ -397,9 +457,9 @@ ENV;
         $this->mockFiles('FIRST=1', 'existing');
         File::shouldReceive('put')->never();
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true])
+        $this->artisan('env:encrypt', ['--readable' => true])
             ->expectsQuestion('What is the encryption key?', '')
-            ->expectsOutputToContain('The existing encryption key is required for incremental encryption.')
+            ->expectsOutputToContain('The existing encryption key is required to update the encrypted environment file.')
             ->assertExitCode(1);
     }
 
@@ -408,8 +468,8 @@ ENV;
         $this->mockFiles('FIRST=1', 'existing');
         File::shouldReceive('put')->never();
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true, '--key' => '', '--no-interaction' => true])
-            ->expectsOutputToContain('The existing encryption key is required for incremental encryption.')
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => '', '--no-interaction' => true])
+            ->expectsOutputToContain('The existing encryption key is required to update the encrypted environment file.')
             ->assertExitCode(1);
     }
 
@@ -418,7 +478,7 @@ ENV;
         $this->mockFiles(null, 'existing');
         File::shouldReceive('put')->never();
 
-        $this->artisan('env:encrypt', ['--readable' => true, '--incremental' => true])
+        $this->artisan('env:encrypt', ['--readable' => true])
             ->expectsOutputToContain('Environment file not found.')
             ->assertExitCode(1);
     }

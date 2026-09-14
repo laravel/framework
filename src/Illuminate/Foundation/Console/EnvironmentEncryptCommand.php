@@ -25,10 +25,9 @@ class EnvironmentEncryptCommand extends Command
                     {--key= : The encryption key}
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be encrypted}
-                    {--readable : Encrypt each variable individually with readable, plain-text variable names}
-                    {--incremental : Update a readable encrypted file, preserving unchanged values}
+                    {--readable : Encrypt each variable individually with readable names, updating existing files and preserving unchanged values}
                     {--prune : Delete the original environment file}
-                    {--force : Overwrite the existing encrypted environment file}';
+                    {--force : Re-encrypt all values, overwriting the existing encrypted environment file}';
 
     /**
      * The console command description.
@@ -63,10 +62,6 @@ class EnvironmentEncryptCommand extends Command
      */
     public function handle()
     {
-        if ($this->option('incremental') && ! $this->option('readable')) {
-            $this->fail('The --incremental option requires --readable.');
-        }
-
         $cipher = $this->option('cipher') ?: 'AES-256-CBC';
 
         $environmentFile = $this->option('env')
@@ -79,11 +74,12 @@ class EnvironmentEncryptCommand extends Command
             $this->fail('Environment file not found.');
         }
 
-        $encryptedFileExists = $this->option('incremental') ? $this->files->exists($encryptedFile) : null;
+        $encryptedFileExists = $this->files->exists($encryptedFile);
+        $preserve = $this->option('readable') && $encryptedFileExists && ! $this->option('force');
 
         $key = $this->option('key');
 
-        if (! $key && $this->input->isInteractive() && $this->option('incremental') && $encryptedFileExists) {
+        if (! $key && $this->input->isInteractive() && $preserve) {
             $key = password('What is the encryption key?');
         } elseif (! $key && $this->input->isInteractive()) {
             $ask = select(
@@ -100,8 +96,8 @@ class EnvironmentEncryptCommand extends Command
             }
         }
 
-        if ($encryptedFileExists && $this->option('incremental') && ($key === null || $key === '')) {
-            $this->fail('The existing encryption key is required for incremental encryption.');
+        if ($preserve && ($key === null || $key === '')) {
+            $this->fail('The existing encryption key is required to update the encrypted environment file.');
         }
 
         $keyPassed = $key !== null;
@@ -110,9 +106,7 @@ class EnvironmentEncryptCommand extends Command
             $key = Encrypter::generateKey($cipher);
         }
 
-        $encryptedFileExists ??= $this->files->exists($encryptedFile);
-
-        if ($encryptedFileExists && ! $this->option('force') && ! $this->option('incremental')) {
+        if ($encryptedFileExists && ! $this->option('force') && ! $preserve) {
             $this->fail('Encrypted environment file already exists.');
         }
 
@@ -120,7 +114,7 @@ class EnvironmentEncryptCommand extends Command
             $encrypter = new Encrypter($this->parseKey($key), $cipher);
 
             $contents = $this->files->get($environmentFile);
-            $previous = $this->option('incremental') && $encryptedFileExists
+            $previous = $preserve
                 ? $this->files->get($encryptedFile)
                 : null;
 
@@ -131,7 +125,7 @@ class EnvironmentEncryptCommand extends Command
             if ($encrypted !== $previous) {
                 $written = $this->files->put($encryptedFile, $encrypted);
 
-                if ($this->option('incremental') && $written === false) {
+                if ($written === false) {
                     $this->fail('Unable to write the encrypted environment file.');
                 }
             }
@@ -201,7 +195,7 @@ class EnvironmentEncryptCommand extends Command
     protected function readEncryptedEntries(string $contents, Encrypter $encrypter): array
     {
         if (Encrypter::appearsEncrypted($contents)) {
-            $this->fail('Incremental encryption requires an existing file in readable format.');
+            $this->fail('The existing encrypted environment file is not in readable format. Use --force to overwrite it.');
         }
 
         $entries = [];
