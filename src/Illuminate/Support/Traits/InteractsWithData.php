@@ -177,7 +177,11 @@ trait InteractsWithData
     public function whenEnum($key, string $enumClass, callable $callback, ?callable $default = null)
     {
         if ($this->filled($key) && $this->isBackedEnum($enumClass)) {
-            $value = $enumClass::tryFrom(data_get($this->all(), $key));
+            try {
+                $value = $enumClass::tryFrom(data_get($this->all(), $key));
+            } catch (TypeError) {
+                $value = null;
+            }
 
             if ($value !== null) {
                 return $callback($value) ?: $this;
@@ -390,10 +394,12 @@ trait InteractsWithData
         }
 
         try {
-            return $enumClass::tryFrom($this->data($key)) ?: value($default);
+            $value = $enumClass::tryFrom($this->data($key));
         } catch (TypeError) {
             return value($default);
         }
+
+        return $value ?: value($default);
     }
 
     /**

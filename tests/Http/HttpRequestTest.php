@@ -487,6 +487,30 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($default);
     }
 
+    public function testWhenEnumMethodRunsDefaultWhenValueCannotBeCoercedToBackingType()
+    {
+        $request = Request::create('/', 'GET', ['non_numeric' => 'invalid', 'array' => ['1']]);
+
+        $nonNumeric = $array = false;
+        $defaults = 0;
+
+        $request->whenEnum('non_numeric', TestIntegerEnumBacked::class, function ($value) use (&$nonNumeric) {
+            $nonNumeric = $value;
+        }, function () use (&$defaults) {
+            $defaults++;
+        });
+
+        $request->whenEnum('array', TestIntegerEnumBacked::class, function ($value) use (&$array) {
+            $array = $value;
+        }, function () use (&$defaults) {
+            $defaults++;
+        });
+
+        $this->assertFalse($nonNumeric);
+        $this->assertFalse($array);
+        $this->assertSame(2, $defaults);
+    }
+
     public function testMissingMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
