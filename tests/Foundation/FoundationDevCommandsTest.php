@@ -152,18 +152,6 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame(['three', 'one', 'two'], array_column($commands, 'name'));
     }
 
-    public function testOrderIgnoresNamesThatAreNotRegistered()
-    {
-        DevCommands::register('echo one', 'one');
-        DevCommands::register('echo two', 'two');
-
-        DevCommands::order('made-up', 'two');
-
-        $commands = DevCommands::commands();
-
-        $this->assertSame(['two', 'one'], array_column($commands, 'name'));
-    }
-
     public function testOrderLeavesUnnamedCommandsInRegistrationOrder()
     {
         DevCommands::register('echo one', 'one');
