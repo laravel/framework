@@ -964,6 +964,19 @@ class HttpRequestTest extends TestCase
         $this->assertNull($request->enum('int.doesnt_exist', TestIntegerEnumBacked::class));
     }
 
+    public function testEnumMethodReturnsDefaultWhenValueCannotBeCoercedToBackingType()
+    {
+        $request = Request::create('/', 'GET', [
+            'non_numeric' => 'invalid',
+            'array' => ['1'],
+        ]);
+
+        $this->assertNull($request->enum('non_numeric', TestIntegerEnumBacked::class));
+        $this->assertEquals(TestIntegerEnumBacked::zero, $request->enum('non_numeric', TestIntegerEnumBacked::class, TestIntegerEnumBacked::zero));
+        $this->assertNull($request->enum('array', TestIntegerEnumBacked::class));
+        $this->assertNull($request->enum('array', TestEnumBacked::class));
+    }
+
     public function testEnumsMethod()
     {
         $request = Request::create('/', 'GET', [
@@ -1000,6 +1013,16 @@ class HttpRequestTest extends TestCase
         $this->assertEquals([TestIntegerEnumBacked::zero], $request->enums('int.0', TestIntegerEnumBacked::class));
         $this->assertEquals([TestIntegerEnumBacked::plus_1], $request->enums('int.plus_1', TestIntegerEnumBacked::class));
         $this->assertEmpty($request->enums('int.doesnt_exist', TestIntegerEnumBacked::class));
+    }
+
+    public function testEnumsMethodSkipsValuesThatCannotBeCoercedToBackingType()
+    {
+        $request = Request::create('/', 'GET', [
+            'mixed' => ['1', 'invalid', ['1']],
+        ]);
+
+        $this->assertEquals([TestIntegerEnumBacked::plus_1], $request->enums('mixed', TestIntegerEnumBacked::class));
+        $this->assertEmpty($request->enums('mixed', TestEnumBacked::class));
     }
 
     public function testArrayAccess()

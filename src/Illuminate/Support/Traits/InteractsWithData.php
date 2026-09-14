@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Number;
 use Illuminate\Support\Stringable;
 use stdClass;
+use TypeError;
 
 use function Illuminate\Support\enum_value;
 
@@ -388,7 +389,11 @@ trait InteractsWithData
             return value($default);
         }
 
-        return $enumClass::tryFrom($this->data($key)) ?: value($default);
+        try {
+            return $enumClass::tryFrom($this->data($key)) ?: value($default);
+        } catch (TypeError) {
+            return value($default);
+        }
     }
 
     /**
@@ -407,7 +412,13 @@ trait InteractsWithData
         }
 
         return $this->collect($key)
-            ->map(fn ($value) => $enumClass::tryFrom($value))
+            ->map(function ($value) use ($enumClass) {
+                try {
+                    return $enumClass::tryFrom($value);
+                } catch (TypeError) {
+                    return null;
+                }
+            })
             ->filter()
             ->all();
     }
