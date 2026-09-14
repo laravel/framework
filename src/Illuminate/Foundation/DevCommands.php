@@ -358,7 +358,7 @@ class DevCommands
     }
 
     /**
-     * Sort the given commands according to the order set via the "order" method.
+     * Sort the given commands.
      *
      * @param  array  $commands
      * @return array
