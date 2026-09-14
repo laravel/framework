@@ -101,7 +101,7 @@ trait ResolvesJsonApiElements
             return (string) $resourceId;
         }
 
-        if (! ($this->resource instanceof Model || method_exists($this->resource, 'getKey'))) {
+        if (! ($this->resource instanceof Model || (is_object($this->resource) && method_exists($this->resource, 'getKey')))) {
             throw ResourceIdentificationException::attemptingToDetermineIdFor($this);
         }
 

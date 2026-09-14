@@ -4,7 +4,10 @@ namespace Illuminate\Tests\Http\Resources\JsonApi;
 
 use BadMethodCallException;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException;
+use Illuminate\Http\Resources\JsonApi\JsonApiRequest;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class JsonApiResourceTest extends TestCase
@@ -46,5 +49,24 @@ class JsonApiResourceTest extends TestCase
         JsonApiResource::flushState();
 
         $this->assertSame(5, JsonApiResource::$maxRelationshipDepth);
+    }
+
+    #[DataProvider('unidentifiableResourceProvider')]
+    public function testResolvingTheIdentifierOfAnUnidentifiableResourceThrowsAResourceIdentificationException($resource)
+    {
+        $this->expectException(ResourceIdentificationException::class);
+
+        (new JsonApiResource($resource))->resolveResourceIdentifier(JsonApiRequest::create('/'));
+    }
+
+    public static function unidentifiableResourceProvider()
+    {
+        return [
+            'array' => [['id' => 1, 'name' => 'Taylor']],
+            'integer' => [5],
+            'null' => [null],
+            'string' => ['Taylor'],
+            'object without a getKey() method' => [(object) ['id' => 1]],
+        ];
     }
 }
