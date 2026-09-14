@@ -891,6 +891,7 @@ assertType('Illuminate\Support\Collection<int, int>', $collection::make([1])->so
 assertType('Illuminate\Support\Collection<string, string>', $collection::make(['string' => 'string'])->sortKeysDesc(1));
 
 assertType('mixed', $collection::make([1])->sum('string'));
+assertType('mixed', $collection::make([['count' => 1]])->sum('count'));
 assertType('int<1, 2>', $collection::make(['string'])->sum(function ($string) {
     assertType('string', $string);
 
