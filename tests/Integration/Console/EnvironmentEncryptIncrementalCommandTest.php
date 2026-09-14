@@ -230,9 +230,23 @@ ENV;
         $encrypter = new Encrypter($this->key, 'AES-256-CBC');
         $first = $encrypter->encryptString('1');
         $second = $encrypter->encryptString('2');
-        $this->mockFiles("FIRST=1\nSECOND=2\n", "FIRST=$first\nSECOND=$second\n");
+        $originalContent = <<<'ENV'
+FIRST=1
+SECOND=2
+
+ENV;
+
+        $encryptedContent = <<<ENV
+FIRST=$first
+SECOND=$second
+
+ENV;
+
+        $this->mockFiles($originalContent, $encryptedContent);
         File::shouldReceive('get')->with(base_path('.env.encrypted'))->never();
+
         $encryptedOutput = null;
+
         File::expects('put')
             ->with(base_path('.env.encrypted'), Mockery::capture($encryptedOutput))
             ->andReturn(100);
