@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use ErrorException;
 use Exception;
 use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Contracts\Database\Eloquent\Castable;
@@ -3277,6 +3278,26 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->floatAttribute = NAN;
         $this->assertNan($model->floatAttribute);
+    }
+
+    public function testModelAttributeCastingWithNanDoesNotRaiseAStringConversionWarning()
+    {
+        $model = new EloquentModelCastingStub;
+
+        // The framework's exception handler promotes PHP warnings to exceptions, so a
+        // warning raised while casting is fatal within a real application...
+        set_error_handler(static function ($level, $message, $file = '', $line = 0) {
+            throw new ErrorException($message, 0, $level, $file, $line);
+        });
+
+        try {
+            $model->floatAttribute = NAN;
+
+            $this->assertNan($model->floatAttribute);
+            $this->assertNan($model->toArray()['floatAttribute']);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     public function testModelAttributeCastingWithArrays()

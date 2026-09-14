@@ -1522,6 +1522,10 @@ trait HasAttributes
      */
     public function fromFloat($value)
     {
+        if (is_float($value)) {
+            return $value;
+        }
+
         return match ((string) $value) {
             'Infinity' => INF,
             '-Infinity' => -INF,
