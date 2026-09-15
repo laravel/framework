@@ -158,6 +158,13 @@ class Worker
     public static $timedOutExitCode;
 
     /**
+     * Indicates if the worker should be killed when a job exceeds its timeout.
+     *
+     * @var bool
+     */
+    public static $killOnTimeout = true;
+
+    /**
      * Indicates if the worker should report job exceptions.
      *
      * @var bool
@@ -324,6 +331,10 @@ class Worker
                 $this->events->dispatch(new JobTimedOut(
                     $job->getConnectionName(), $job, $this->timeoutForJob($job, $options)
                 ));
+
+                if (! static::$killOnTimeout) {
+                    throw $e;
+                }
             }
 
             $this->kill(
