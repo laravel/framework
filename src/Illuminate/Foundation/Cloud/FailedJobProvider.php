@@ -130,7 +130,7 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
     }
 
     /**
-     * Get an iterator for the failed jobs from the given URL.
+     * Build an iterator for the failed jobs from the given URL.
      */
     protected function failedJobsIterator(string $url): Iterator
     {
@@ -179,10 +179,9 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
      */
     protected function fetchFailedJobs(string $url): Response
     {
-        // without global
-        return Http::connectTimeout(10)
+        return Http::withoutGlobalConfiguration(fn () => Http::connectTimeout(10)
             ->timeout(10)
-            ->retry(5, fn ($attempt) => $attempt * 500, when: function (Throwable $e) {
+            ->retry(10, fn ($attempt) => 500 * (2 ** ($attempt - 1)), when: function (Throwable $e) {
                 if ($e instanceof RequestException && $e->response->status() === 403) {
                     return false;
                 }
@@ -194,7 +193,7 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
                 'Cloud-Encryption-Cipher' => Config::get('app.cipher'),
             ])
             ->throw()
-            ->get($url);
+            ->get($url));
     }
 
     /**
