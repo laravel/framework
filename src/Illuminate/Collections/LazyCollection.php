@@ -592,10 +592,12 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function has($key)
     {
-        $keys = array_flip(is_array($key) ? $key : func_get_args());
+        $keys = is_array($key) ? $key : func_get_args();
+
+        $keys = array_flip(array_map(fn ($key) => $key ?? '', $keys));
 
         foreach ($this as $key => $value) {
-            unset($keys[$key]);
+            unset($keys[(string) $key]);
 
             if (empty($keys)) {
                 return true;
@@ -613,10 +615,12 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function hasAny($key)
     {
-        $keys = array_flip(is_array($key) ? $key : func_get_args());
+        $keys = is_array($key) ? $key : func_get_args();
+
+        $keys = array_flip(array_map(fn ($key) => $key ?? '', $keys));
 
         foreach ($this as $key => $value) {
-            if (array_key_exists($key, $keys)) {
+            if (array_key_exists((string) $key, $keys)) {
                 return true;
             }
         }

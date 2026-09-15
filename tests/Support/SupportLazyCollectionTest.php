@@ -541,4 +541,30 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertFalse($collection->has(['a', 'b']));
         $this->assertTrue($collection->has('a'));
     }
+
+    public function testHasHandlesNullKey()
+    {
+        $this->assertFalse((new LazyCollection(['foo' => 1]))->has(null));
+        $this->assertTrue((new LazyCollection(['' => 1]))->has(null));
+        $this->assertFalse((new LazyCollection(['foo' => 1]))->has([null, 'foo']));
+
+        $collection = LazyCollection::make(function () {
+            yield null => 1;
+        });
+
+        $this->assertTrue($collection->has(null));
+        $this->assertTrue($collection->has(''));
+    }
+
+    public function testHasAnyHandlesNullKey()
+    {
+        $this->assertFalse((new LazyCollection(['foo' => 1]))->hasAny(null));
+        $this->assertTrue((new LazyCollection(['' => 1]))->hasAny(null));
+
+        $collection = LazyCollection::make(function () {
+            yield null => 1;
+        });
+
+        $this->assertTrue($collection->hasAny(null));
+    }
 }
