@@ -1793,6 +1793,103 @@ class QueueTest extends TestCase
         $this->assertEmpty($eventsFake->emitted);
     }
 
+    public function testRetriesAPaginatedCollectionOfFailedJobsAndDoesNotResolveThemAllEagerly()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        $provider = new FailedJobProvider($this->fakeFailer(), $eventsFake, $this->app['encrypter']);
+        $this->app->instance('queue.failer', $provider);
+
+        $sequence = [];
+
+        // Each page holds a single failed job and links to the next one, so a
+        // page is only fetched once the previous page's job has been retried.
+        Http::fake(function ($request) use (&$sequence) {
+            $page = (int) Str::after($request->url(), 'page=');
+
+            $sequence[] = "fetched page {$page}";
+
+            return Http::response(Crypt::encryptString(json_encode([
+                'data' => [[
+                    'id' => "job-{$page}",
+                    'connection' => 'cloud',
+                    'queue' => 'default',
+                    'payload' => json_encode(['uuid' => "job-{$page}", 'displayName' => MyJob::class]),
+                ]],
+                'links' => [
+                    'self' => $request->url(),
+                    'next' => $page < 3 ? 'https://cloud.laravel.com/api/failed-jobs?page='.($page + 1) : null,
+                ],
+            ])), headers: ['Cloud-Payload-Version' => '1']);
+        });
+
+        $queue = new class($this->app) extends QueueFake
+        {
+            public $recorder;
+
+            public function setContainer($container)
+            {
+                return $this;
+            }
+
+            public function pushRaw($payload, $queue = null, array $options = [])
+            {
+                ($this->recorder)(json_decode($payload, true)['uuid']);
+
+                return parent::pushRaw($payload, $queue, $options);
+            }
+        };
+
+        $queue->recorder = function ($id) use (&$sequence) {
+            $sequence[] = "pushed {$id}";
+        };
+
+        $this->app['queue']->addConnector('cloud', fn () => new class($queue) implements ConnectorInterface
+        {
+            public function __construct(private $queue)
+            {
+                //
+            }
+
+            public function connect($config)
+            {
+                return $this->queue;
+            }
+        });
+
+        $this->artisan('queue:retry', ['id' => ['https://cloud.laravel.com/api/failed-jobs?page=1']])->run();
+
+        $this->assertSame([
+            'fetched page 1',
+            'pushed job-1',
+            'fetched page 2',
+            'pushed job-2',
+            'fetched page 3',
+            'pushed job-3',
+        ], $sequence);
+
+        $this->assertSame([
+            [
+                '_cloud_event' => 'failed_job',
+                'id' => 'job-1',
+                'queue' => 'default',
+                'retried_at' => '2000-01-02 03:04:05.060708',
+            ],
+            [
+                '_cloud_event' => 'failed_job',
+                'id' => 'job-2',
+                'queue' => 'default',
+                'retried_at' => '2000-01-02 03:04:05.060708',
+            ],
+            [
+                '_cloud_event' => 'failed_job',
+                'id' => 'job-3',
+                'queue' => 'default',
+                'retried_at' => '2000-01-02 03:04:05.060708',
+            ],
+        ], $eventsFake->emitted);
+    }
+
     public function testItThrowsManagedQueueNotFoundExceptionWhenQueueDoesNotExist()
     {
         CloudBootstrapper::configureManagedQueues($this->app);
