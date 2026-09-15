@@ -170,7 +170,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      *
      * @param  array<int, class-string>  $attributes
      * @param  array<int, string>  $properties
-     * @return \ReflectionClass<static>|null
+     * @return \ReflectionClass<\Illuminate\Foundation\Http\FormRequest>|null
      */
     protected function nearestConfiguringClass(array $attributes, array $properties = [])
     {
