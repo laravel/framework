@@ -12,7 +12,6 @@ use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Illuminate\Queue\Failed\PrunableFailedJobProvider;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Iterator;
@@ -135,7 +134,6 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
      */
     protected function failedJobsIterator(string $url): Iterator
     {
-        Log::debug('started retrying');
         $payload = $this->resolveFailedJobsPayload($url);
 
         while ($job = array_shift($payload->data)) {
@@ -149,7 +147,6 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
                 $payload = $this->resolveFailedJobsPayload($payload->links->next);
             }
         }
-        Log::debug('finished retrying');
     }
 
     /**
