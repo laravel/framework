@@ -70,7 +70,8 @@ class LazilyRefreshDatabaseTest extends TestCase
                 '--drop-views' => false,
                 '--drop-types' => false,
                 '--seed' => false,
-            ]);
+            ])
+            ->andReturn(0);
 
         $this->refreshDatabase();
         $this->app->make('db')->select('select 1');
@@ -100,7 +101,8 @@ class LazilyRefreshDatabaseTest extends TestCase
                 '--drop-views' => false,
                 '--drop-types' => false,
                 '--seed' => false,
-            ]);
+            ])
+            ->andReturn(0);
 
         $this->refreshDatabase();
 

@@ -72,7 +72,7 @@ trait InteractsWithConsole
     public $expectedChoices = [];
 
     /**
-     * Call artisan command and return code.
+     * Call artisan command and return wrapper or (exit) code.
      *
      * @param  string  $command
      * @param  array  $parameters
@@ -80,11 +80,33 @@ trait InteractsWithConsole
      */
     public function artisan($command, $parameters = [])
     {
-        if (! $this->mockConsoleOutput) {
-            return $this->app[Kernel::class]->call($command, $parameters);
-        }
+        return $this->mockConsoleOutput
+            ? $this->mockArtisan($command, $parameters)
+            : $this->realArtisan($command, $parameters);
+    }
 
+    /**
+     * Call artisan command and return wrapper.
+     *
+     * @param  string  $command
+     * @param  array  $parameters
+     * @return \Illuminate\Testing\PendingCommand
+     */
+    public function mockArtisan($command, $parameters = []): PendingCommand
+    {
         return new PendingCommand($this, $this->app, $command, $parameters);
+    }
+
+    /**
+     * Call artisan command and return (exit) code.
+     *
+     * @param  string  $command
+     * @param  array  $parameters
+     * @return int
+     */
+    public function realArtisan($command, $parameters = []): int
+    {
+        return $this->app[Kernel::class]->call($command, $parameters);
     }
 
     /**

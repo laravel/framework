@@ -8,6 +8,7 @@ use Mockery;
 use Mockery\Exception\InvalidCountException;
 use Mockery\Exception\InvalidOrderException;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\AssertionFailedError;
 
 class ArtisanCommandTest extends TestCase
@@ -320,6 +321,25 @@ class ArtisanCommandTest extends TestCase
                 }
             })
             ->assertExitCode(0);
+    }
+
+    public function test_console_command_returns_code_with_disabled_mocking()
+    {
+        $this->withoutMockingConsoleOutput();
+
+        Assert::assertSame(0, $this->artisan('exit', ['code' => 0]));
+    }
+
+    public function test_mock_console_command_returns_pending_command_with_disabled_mocking()
+    {
+        $this->withoutMockingConsoleOutput();
+
+        $this->mockArtisan('exit', ['code' => 0])->assertOk();
+    }
+
+    public function test_real_console_command_returns_code_with_enabled_mocking()
+    {
+        Assert::assertSame(0, $this->realArtisan('exit', ['code' => 0]));
     }
 
     /**

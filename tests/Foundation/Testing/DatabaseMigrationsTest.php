@@ -66,7 +66,13 @@ class DatabaseMigrationsTest extends TestCase
                 '--drop-views' => false,
                 '--drop-types' => false,
                 '--seed' => false,
-            ]);
+            ])
+            ->andReturn(0);
+
+        // On application teardown
+        $kernel->expects('call')
+            ->with('migrate:rollback', [])
+            ->andReturn(0);
 
         $this->runDatabaseMigrations();
     }
@@ -83,7 +89,13 @@ class DatabaseMigrationsTest extends TestCase
                 '--drop-views' => true,
                 '--drop-types' => false,
                 '--seed' => false,
-            ]);
+            ])
+            ->andReturn(0);
+
+        // On application teardown
+        $kernel->expects('call')
+            ->with('migrate:rollback', [])
+            ->andReturn(0);
 
         $this->runDatabaseMigrations();
     }
@@ -100,7 +112,13 @@ class DatabaseMigrationsTest extends TestCase
                 '--drop-views' => false,
                 '--drop-types' => true,
                 '--seed' => false,
-            ]);
+            ])
+            ->andReturn(0);
+
+        // On application teardown
+        $kernel->expects('call')
+            ->with('migrate:rollback', [])
+            ->andReturn(0);
 
         $this->runDatabaseMigrations();
     }
