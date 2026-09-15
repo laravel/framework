@@ -158,6 +158,13 @@ class Worker
     public static $timedOutExitCode;
 
     /**
+     * Indicates if the worker should be killed when a job exceeds its timeout.
+     *
+     * @var bool
+     */
+    public static $killOnTimeout = true;
+
+    /**
      * Indicates if the worker should report job exceptions.
      *
      * @var bool
@@ -308,6 +315,22 @@ class Worker
         // process if it is running too long because it has frozen. This uses the async
         // signals supported in recent versions of PHP to accomplish it conveniently.
         pcntl_signal(SIGALRM, function () use ($job, $options, $connectionName, $queue) {
+            if (! static::$killOnTimeout) {
+                if (! $job = $this->currentJob) {
+                    return;
+                }
+
+                $this->markJobAsFailedIfItShouldFailOnTimeout(
+                    $job->getConnectionName(), $job, $e = $this->timeoutExceededException($job)
+                );
+
+                $this->events->dispatch(new JobTimedOut(
+                    $job->getConnectionName(), $job, $this->timeoutForJob($job, $options)
+                ));
+
+                throw $e;
+            }
+
             if ($job) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
                     $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
