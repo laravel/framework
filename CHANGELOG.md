@@ -1,6 +1,37 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.31.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.32.0...13.x)
+
+## [v13.32.0](https://github.com/laravel/framework/compare/v13.31.0...v13.32.0) - 2026-09-15
+
+* [12.x] Default memoryExceededExitCode for Cloud by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61432
+* Wrap the closure return type in `withFreshQueryLog()` by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/61458
+* Wrap the autocompleter callback return type in `askWithCompletion()` by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/61487
+* [13.x] Allow enums in queue pause/resume methods by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61464
+* [13.x] Compare lowercased index names in hasIndex by [@dwjordan](https://github.com/dwjordan) in https://github.com/laravel/framework/pull/61506
+* [13.x] Fix containsStrict() returning false when a closure matches a null value by [@bunyaminbilenkaratas](https://github.com/bunyaminbilenkaratas) in https://github.com/laravel/framework/pull/61507
+* [13.x] Pass the exception to Eloquent violation callbacks by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61504
+* [13.x] Change unused variables to named arguments by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/61513
+* [13.x] Update SupportBinaryCodecTest by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61512
+* [13.x] Fix Factory::raw() with a count of zero by [@OpadaAlzaiede](https://github.com/OpadaAlzaiede) in https://github.com/laravel/framework/pull/61510
+* [13.x] Add missing implementation for `SessionHandlerInterface` for PHP 9 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61517
+* [13.x] Add copyToDisk & moveToDisk to FilesystemAdapter by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61511
+* [13.x] Add a Mercure broadcast driver by [@dunglas](https://github.com/dunglas) in https://github.com/laravel/framework/pull/61474
+* [13.x] Accept filesystem instance in `copyToDisk()` and `moveToDisk()` methods by [@ziadoz](https://github.com/ziadoz) in https://github.com/laravel/framework/pull/61519
+* [13.x] Fix Str::password() returning extra characters and throwing Va… by [@bunyaminbilenkaratas](https://github.com/bunyaminbilenkaratas) in https://github.com/laravel/framework/pull/61521
+* [13.x] Fix Str::camel() not lowercasing multibyte first characters by [@rayblair06](https://github.com/rayblair06) in https://github.com/laravel/framework/pull/61545
+* [13.x] Fix collapseWithKeys() crashing when the outer collection has string keys by [@rayblair06](https://github.com/rayblair06) in https://github.com/laravel/framework/pull/61539
+* [13.x] Fix TypeError in SessionGuard::userFromRecaller() when getAuthPassword() is null by [@irabbi360](https://github.com/irabbi360) in https://github.com/laravel/framework/pull/61532
+* Strengthen mocked tests with the real thing by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/61563
+* [13.x] Fix appendToPriorityList() when the referenced middleware is the first item by [@GabeSilvaDev](https://github.com/GabeSilvaDev) in https://github.com/laravel/framework/pull/61567
+* [13.x] Improve collection return types for methods that mutate by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/61571
+* [13.x] Add `isManagedQueue` to CloudManager by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61568
+* [13.x] Fix Redis tagged cache not syncing tag entry expiration on touch by [@Ashot1995](https://github.com/Ashot1995) in https://github.com/laravel/framework/pull/61574
+* [13.x] Decode job payload once by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61526
+* [13.x] Fix `sum()` return type when the key matches a global function name by [@crishoj](https://github.com/crishoj) in https://github.com/laravel/framework/pull/61578
+* [13.x] add UnitEnum to Authorizable contract by [@hosni](https://github.com/hosni) in https://github.com/laravel/framework/pull/61589
+* [13.x] Add support for installing Mercure via broadcasting install command by [@Lea-Bar](https://github.com/Lea-Bar) in https://github.com/laravel/framework/pull/61587
+* [13.x] Preserve unchanged values when encrypting readable environment files by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/61503
 
 ## [v13.31.0](https://github.com/laravel/framework/compare/v13.30.1...v13.31.0) - 2026-09-08
 
