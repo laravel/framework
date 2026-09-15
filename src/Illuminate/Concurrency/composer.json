@@ -22,6 +22,9 @@
         "laravel/serializable-closure": "^2.0.10"
     },
     "suggest": {
+        "illuminate/bus": "Required to use the 'queue' concurrency driver (^13.0).",
+        "illuminate/cache": "Required to use the 'queue' concurrency driver (^13.0).",
+        "illuminate/queue": "Required to use the 'queue' concurrency driver (^13.0).",
         "spatie/fork": "Required to use the 'fork' concurrency driver (^1.2)."
     },
     "minimum-stability": "dev",
