@@ -151,6 +151,8 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
 
     /**
      * Resolve the failed jobs payload for the given URL.
+     *
+     * @return object{data: list<object>, links: object{self: string, next: string|null}}
      */
     protected function resolveFailedJobsPayload(string $url): object
     {
@@ -164,13 +166,7 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
 
         return match ($response->header('Cloud-Payload-Version')) {
             '1' => $payload,
-            default => literal(
-                data: [$payload],
-                links: literal(
-                    self: $url,
-                    next: null,
-                ),
-            ),
+            default => throw new RuntimeException('Unsupported payload version: '.$response->header('Cloud-Payload-Version')),
         };
     }
 
