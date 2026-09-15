@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\QueueFake;
@@ -90,6 +91,7 @@ class QueueTest extends TestCase
         parent::setUp();
 
         $this->app['config']->set('queue.connections.cloud', json_decode($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG'], true));
+        Http::preventStrayRequests();
     }
 
     protected function tearDown(): void
@@ -1670,10 +1672,17 @@ class QueueTest extends TestCase
         $result = $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
 
         $this->assertIsObject($result);
-        $this->assertSame('test-job-id', $result->id);
-        $this->assertSame('cloud', $result->connection);
-        $this->assertSame('default', $result->queue);
-        $this->assertSame('{"job":"App\\\\Jobs\\\\TestJob"}', $result->payload);
+        $this->assertInstanceOf(LazyCollection::class, $result);
+        $count = 0;
+        foreach ($result as $key => $failedJob) {
+            $count++;
+            $this->assertSame('test-job-id', $failedJob->id);
+            $this->assertSame('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc:test-job-id', $key);
+            $this->assertSame('cloud', $failedJob->connection);
+            $this->assertSame('default', $failedJob->queue);
+            $this->assertSame('{"job":"App\\\\Jobs\\\\TestJob"}', $failedJob->payload);
+        }
+        $this->assertSame(1, $count);
         Http::assertSent(fn ($request) => $request->url() === 'https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
     }
 
@@ -1688,7 +1697,11 @@ class QueueTest extends TestCase
         ]);
 
         try {
-            $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
+            $result = $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
+
+            foreach ($result as $failedJob) {
+                // This loop should not be entered to trigger decryption
+            }
             $this->fail();
         } catch (Throwable $e) {
             $this->assertInstanceOf(DecryptException::class, $e);
@@ -1706,7 +1719,10 @@ class QueueTest extends TestCase
         ]);
 
         try {
-            $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
+            $result = $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
+            foreach ($result as $failedJob) {
+                // This loop should not be entered to trigger the HTTP request
+            }
             $this->fail();
         } catch (Throwable $e) {
             $this->assertInstanceOf(RequestException::class, $e);
@@ -1746,10 +1762,15 @@ class QueueTest extends TestCase
         ]);
 
         $url = 'https://cloud.laravel.com/api/jobs/forget-test-id?signature=abc';
-        $provider->find($url);
-        $result = $provider->forget($url);
+        $result = $provider->find($url);
+        $count = 0;
+        foreach ($result as $id => $failedJob) {
+            $count++;
+            $forgotten = $provider->forget($id);
+        }
 
-        $this->assertTrue($result);
+        $this->assertSame(1, $count);
+        $this->assertTrue($forgotten);
         $this->assertSame([
             [
                 '_cloud_event' => 'failed_job',
