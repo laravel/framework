@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\NodePackageManager;
 use Laravel\Pail\PailServiceProvider;
@@ -48,6 +49,13 @@ class DevCommands
      * @var array<int, string>
      */
     protected static $except = [];
+
+    /**
+     * The order in which named commands should run when running the "dev" command.
+     *
+     * @var array<int, string>
+     */
+    protected static $order = [];
 
     /**
      * The mode in which the "dev" command should run.
@@ -212,6 +220,8 @@ class DevCommands
             $commands[] = $cmd;
         }
 
+        $commands = self::applyOrder($commands);
+
         return self::fillInEmptyColors($commands);
     }
 
@@ -348,6 +358,25 @@ class DevCommands
     }
 
     /**
+     * Sort the given commands.
+     *
+     * @param  array  $commands
+     * @return array
+     */
+    protected static function applyOrder(array $commands): array
+    {
+        if (empty(self::$order)) {
+            return $commands;
+        }
+
+        $positions = array_flip(self::$order);
+
+        $commands = Arr::sort($commands, fn ($command) => $positions[$command['name']] ?? PHP_INT_MAX);
+
+        return array_values($commands);
+    }
+
+    /**
      * Fill in any empty colors in the given commands array, ensuring each command has a color assigned.
      *
      * @param  array  $commands
@@ -459,6 +488,17 @@ class DevCommands
     public static function except(...$names): void
     {
         self::$except = $names;
+    }
+
+    /**
+     * Set the order in which named commands should run when running the "dev" command.
+     *
+     * @param  string  ...$names
+     * @return void
+     */
+    public static function order(...$names): void
+    {
+        self::$order = $names;
     }
 
     /**
