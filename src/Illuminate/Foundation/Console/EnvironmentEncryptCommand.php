@@ -75,6 +75,7 @@ class EnvironmentEncryptCommand extends Command
         }
 
         $encryptedFileExists = $this->files->exists($encryptedFile);
+
         $preserve = $this->option('readable') && $encryptedFileExists && ! $this->option('force');
 
         $key = $this->option('key');
@@ -114,12 +115,13 @@ class EnvironmentEncryptCommand extends Command
             $encrypter = new Encrypter($this->parseKey($key), $cipher);
 
             $contents = $this->files->get($environmentFile);
+
             $previous = $preserve
                 ? $this->files->get($encryptedFile)
                 : null;
 
             $encrypted = $this->option('readable')
-                ? $this->encryptReadableFormat($contents, $encrypter, $previous)
+                ? $this->encryptWhileMaintainingReadability($contents, $encrypter, $previous)
                 : $encrypter->encrypt($contents);
 
             if ($encrypted !== $previous) {
@@ -154,7 +156,7 @@ class EnvironmentEncryptCommand extends Command
      * @param  string|null  $previous
      * @return string
      */
-    protected function encryptReadableFormat(string $contents, Encrypter $encrypter, ?string $previous = null): string
+    protected function encryptWhileMaintainingReadability(string $contents, Encrypter $encrypter, ?string $previous = null): string
     {
         $result = '';
         $existing = [];
