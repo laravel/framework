@@ -2156,7 +2156,7 @@ return [
                 'isArray' => false,
                 'acceptValue' => false,
                 'default' => false,
-                'description' => 'Encrypt each variable individually with readable, plain-text variable names',
+                'description' => 'Encrypt each variable individually with readable names, updating existing files and preserving unchanged values',
             ],
             [
                 'name' => 'prune',
@@ -2178,7 +2178,7 @@ return [
                 'isArray' => false,
                 'acceptValue' => false,
                 'default' => false,
-                'description' => 'Overwrite the existing encrypted environment file',
+                'description' => 'Re-encrypt all values, overwriting the existing encrypted environment file',
             ],
         ],
     ],
