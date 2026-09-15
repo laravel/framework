@@ -330,7 +330,7 @@ class Worker
                 static::$timedOutExitCode ?? static::EXIT_ERROR,
                 $options, WorkerStopReason::TimedOut, $connectionName, $queue
             );
-        }, true);
+        });
 
         pcntl_alarm(
             max($this->timeoutForJob($job, $options), 0)
