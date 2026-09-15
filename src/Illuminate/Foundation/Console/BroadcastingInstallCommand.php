@@ -529,28 +529,18 @@ class BroadcastingInstallCommand extends Command
      */
     protected function resolveDriver(): string
     {
-        if ($this->option('reverb')) {
-            return 'reverb';
-        }
-
-        if ($this->option('pusher')) {
-            return 'pusher';
-        }
-
-        if ($this->option('ably')) {
-            return 'ably';
-        }
-
-        if ($this->option('mercure')) {
-            return 'mercure';
-        }
-
-        return select('Which broadcasting driver would you like to use?', [
-            'reverb' => 'Laravel Reverb',
-            'pusher' => 'Pusher',
-            'ably' => 'Ably',
-            'mercure' => 'Mercure',
-        ]);
+        return match (true) {
+            $this->option('reverb') => 'reverb',
+            $this->option('pusher') => 'pusher',
+            $this->option('ably') => 'ably',
+            $this->option('mercure') => 'mercure',
+            default => select('Which broadcasting driver would you like to use?', [
+                'reverb' => 'Laravel Reverb',
+                'pusher' => 'Pusher',
+                'ably' => 'Ably',
+                'mercure' => 'Mercure',
+            ]),
+        };
     }
 
     /**
