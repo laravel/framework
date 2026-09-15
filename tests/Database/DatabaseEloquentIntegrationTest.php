@@ -70,6 +70,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $table->text('json')->default(json_encode([]));
         });
 
+        $this->schema('default')->create('generated_users', function ($table) {
+            $table->increments('id');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('name')->virtualAs("first_name || ' ' || last_name");
+        });
+
         $this->schema('second_connection')->create('test_items', function ($table) {
             $table->increments('id');
             $table->timestamps();
@@ -259,6 +266,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
         foreach ($records as $record) {
             $this->assertEquals(1, $record->id);
         }
+    }
+
+    public function testConfiguredAttributesAreRefreshedAfterInsertAndUpdate()
+    {
+        $user = EloquentTestGeneratedUser::create([
+            'first_name' => 'Taylor',
+            'last_name' => 'Otwell',
+        ]);
+
+        $this->assertSame('Taylor Otwell', $user->name);
+        $this->assertSame('Taylor Otwell', EloquentTestGeneratedUser::$createdName);
+
+        $user->update(['first_name' => 'Abigail']);
+
+        $this->assertSame('Abigail Otwell', $user->name);
+        $this->assertSame('Abigail Otwell', EloquentTestGeneratedUser::$updatedName);
+        $this->assertTrue($user->wasChanged('name'));
     }
 
     public function testBasicModelCollectionRetrieval()
@@ -3080,6 +3104,32 @@ class EloquentTestWithJSON extends Eloquent
     protected $casts = [
         'json' => 'array',
     ];
+}
+
+class EloquentTestGeneratedUser extends Eloquent
+{
+    public $timestamps = false;
+
+    public static $createdName;
+
+    public static $updatedName;
+
+    protected $table = 'generated_users';
+
+    protected $guarded = [];
+
+    protected array $refreshes = ['name'];
+
+    protected function fireModelEvent($event, $halt = true)
+    {
+        if ($event === 'created') {
+            static::$createdName = $this->name;
+        } elseif ($event === 'updated') {
+            static::$updatedName = $this->name;
+        }
+
+        return parent::fireModelEvent($event, $halt);
+    }
 }
 
 class EloquentTestFriendPivot extends Pivot

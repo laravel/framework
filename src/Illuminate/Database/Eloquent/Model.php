@@ -107,6 +107,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected $withCount = [];
 
     /**
+     * The attributes that should be refreshed after the model is written.
+     *
+     * @var list<string>
+     */
+    protected array $refreshes = [];
+
+    /**
      * Indicates whether lazy loading will be prevented on this model.
      *
      * @var bool
@@ -1139,6 +1146,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($column, $amount, $extra), function () use ($column) {
+            $this->refreshSavedAttributes();
+
             $this->syncChanges();
 
             $this->fireModelEvent('updated', false);
@@ -1317,6 +1326,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($dbColumns, $extra), function () use ($columns) {
+            $this->refreshSavedAttributes();
+
             $this->syncChanges();
 
             $this->fireModelEvent('updated', false);
@@ -1521,6 +1532,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if (count($dirty) > 0) {
             $this->setKeysForSaveQuery($query)->update($dirty);
 
+            $this->refreshSavedAttributes();
+
             $this->syncChanges();
 
             $this->fireModelEvent('updated', false);
@@ -1625,6 +1638,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->wasRecentlyCreated = true;
 
+        $this->refreshSavedAttributes();
+
         $this->fireModelEvent('created', false);
 
         return true;
@@ -1674,6 +1689,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->wasRecentlyCreated = true;
 
+        $this->refreshSavedAttributes();
+
         $this->fireModelEvent('created', false);
 
         return true;
@@ -1691,6 +1708,25 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $id = $query->insertGetId($attributes, $keyName = $this->getKeyName());
 
         $this->setAttribute($keyName, $id);
+    }
+
+    /**
+     * Refresh the configured attributes after the model is saved.
+     *
+     * @return void
+     */
+    protected function refreshSavedAttributes()
+    {
+        if ($this->refreshes === []) {
+            return;
+        }
+
+        $attributes = $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+            ->useWritePdo()
+            ->firstOrFail($this->refreshes)
+            ->getAttributes();
+
+        $this->setRawAttributes(array_replace($this->getAttributes(), $attributes));
     }
 
     /**
