@@ -1445,6 +1445,17 @@ return [
                 'description' => 'Install Ably as the default broadcaster',
             ],
             [
+                'name' => 'mercure',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => false,
+                'isArray' => false,
+                'acceptValue' => false,
+                'default' => false,
+                'description' => 'Install Mercure as the default broadcaster',
+            ],
+            [
                 'name' => 'without-node',
                 'shortcut' => null,
                 'negatable' => false,
