@@ -175,9 +175,18 @@ class EnvironmentEncryptCommand extends Command
             $name = substr($entry, 0, $pos);
             $value = substr($entry, $pos + 1);
 
-            $existingEntry = empty($existing[$name]) ? null : array_shift($existing[$name]);
+            $existingEntry = null;
 
-            $result .= $name.'='.($existingEntry !== null && $existingEntry['value'] === $value
+            foreach ($existing[$name] ?? [] as $index => $candidate) {
+                if ($candidate['value'] === $value) {
+                    $existingEntry = $candidate;
+                    unset($existing[$name][$index]);
+
+                    break;
+                }
+            }
+
+            $result .= $name.'='.($existingEntry !== null
                 ? $existingEntry['encrypted']
                 : $encrypter->encryptString($value))."\n";
         }

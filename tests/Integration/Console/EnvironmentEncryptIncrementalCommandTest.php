@@ -149,6 +149,26 @@ ENV;
         $this->assertStringNotContainsString('REMOVED=', $encryptedOutput);
     }
 
+    public function testItPreservesALaterDuplicateWhenAnEarlierDuplicateIsRemoved(): void
+    {
+        $encrypter = new Encrypter($this->key, 'AES-256-CBC');
+        $first = $encrypter->encryptString('1');
+        $second = $encrypter->encryptString('2');
+
+        $this->mockFiles("DUP=2\n", "DUP=$first\nDUP=$second\n");
+
+        $encryptedOutput = null;
+
+        File::expects('put')
+            ->with(base_path('.env.encrypted'), Mockery::capture($encryptedOutput))
+            ->andReturn(100);
+
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => $this->key])
+            ->assertExitCode(0);
+
+        $this->assertSame("DUP=$second\n", $encryptedOutput);
+    }
+
     public function testItCreatesAMissingTargetForTheSelectedEnvironment(): void
     {
         $this->mockFiles("DB_PASSWORD=1\n", null, '.env.production');
