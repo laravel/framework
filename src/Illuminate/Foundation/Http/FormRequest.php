@@ -135,29 +135,63 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function configureFromAttributes()
     {
-        $reflection = new ReflectionClass($this);
-
-        if ($reflection->getAttributes(StopOnFirstFailure::class) !== []) {
+        if ($this->nearestConfiguringClass([StopOnFirstFailure::class], ['stopOnFirstFailure'])) {
             $this->stopOnFirstFailure = true;
         }
 
-        $redirectTo = $reflection->getAttributes(RedirectTo::class);
+        $reflection = $this->nearestConfiguringClass(
+            [RedirectTo::class, RedirectToRoute::class], ['redirect', 'redirectRoute', 'redirectAction']
+        );
 
-        if ($redirectTo !== []) {
-            $this->redirect = $redirectTo[0]->newInstance()->url;
+        if ($reflection) {
+            $redirectTo = $reflection->getAttributes(RedirectTo::class);
+
+            if ($redirectTo !== []) {
+                $this->redirect = $redirectTo[0]->newInstance()->url;
+            }
+
+            $redirectToRoute = $reflection->getAttributes(RedirectToRoute::class);
+
+            if ($redirectToRoute !== []) {
+                $this->redirectRoute = $redirectToRoute[0]->newInstance()->route;
+            }
         }
 
-        $redirectToRoute = $reflection->getAttributes(RedirectToRoute::class);
-
-        if ($redirectToRoute !== []) {
-            $this->redirectRoute = $redirectToRoute[0]->newInstance()->route;
+        if ($reflection = $this->nearestConfiguringClass([ErrorBag::class], ['errorBag'])) {
+            $this->errorBag = $reflection->getAttributes(ErrorBag::class)[0]->newInstance()->name;
         }
+    }
 
-        $errorBag = $reflection->getAttributes(ErrorBag::class);
+    /**
+     * Get the nearest class in the request's hierarchy that applies any of the given attributes.
+     *
+     * The search stops at the first class that declares any of the given properties itself,
+     * so a child request's own configuration always takes precedence over its parent's.
+     *
+     * @param  array<int, class-string>  $attributes
+     * @param  array<int, string>  $properties
+     * @return \ReflectionClass<static>|null
+     */
+    protected function nearestConfiguringClass(array $attributes, array $properties = [])
+    {
+        $reflection = new ReflectionClass($this);
 
-        if ($errorBag !== []) {
-            $this->errorBag = $errorBag[0]->newInstance()->name;
-        }
+        do {
+            foreach ($attributes as $attribute) {
+                if ($reflection->getAttributes($attribute) !== []) {
+                    return $reflection;
+                }
+            }
+
+            foreach ($properties as $property) {
+                if ($reflection->hasProperty($property) &&
+                    $reflection->getProperty($property)->class === $reflection->name) {
+                    return null;
+                }
+            }
+        } while (($reflection = $reflection->getParentClass()) && $reflection->name !== self::class);
+
+        return null;
     }
 
     /**
@@ -213,10 +247,10 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function shouldFailOnUnknownFields(): bool
     {
-        $failOnUnknownFields = (new ReflectionClass($this))->getAttributes(FailOnUnknownFields::class);
+        $reflection = $this->nearestConfiguringClass([FailOnUnknownFields::class]);
 
-        return $failOnUnknownFields !== []
-            ? $failOnUnknownFields[0]->newInstance()->value
+        return $reflection
+            ? $reflection->getAttributes(FailOnUnknownFields::class)[0]->newInstance()->value
             : static::$globalFailOnUnknownFields;
     }
 
