@@ -7,7 +7,7 @@ interface Authorizable
     /**
      * Determine if the entity has a given ability.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|\UnitEnum|string  $abilities
      * @param  mixed  $arguments
      * @return bool
      */
