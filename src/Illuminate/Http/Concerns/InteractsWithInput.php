@@ -107,9 +107,9 @@ trait InteractsWithInput
      * Input values take precedence over files on colliding keys, unless the
      * input does not actually hold a value for the colliding key.
      *
-     * @param  array  $input
-     * @param  array  $files
-     * @return array
+     * @param  array<array-key, mixed>  $input
+     * @param  array<array-key, \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]>  $files
+     * @return array<array-key, mixed>
      */
     protected function mergeFilesIntoInput(array $input, array $files)
     {
