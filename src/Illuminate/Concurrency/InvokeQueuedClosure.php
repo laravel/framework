@@ -40,6 +40,9 @@ class InvokeQueuedClosure implements ShouldQueue
      */
     public $timeout;
 
+    /**
+     * Create a new job instance.
+     */
     public function __construct(
         public string $resultKey,
         public string $cancellationKey,

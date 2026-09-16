@@ -322,6 +322,86 @@ class QueueConcurrencyTest extends TestCase
         Bus::assertDispatchedTimes(InvokeDeferredClosure::class, 2);
     }
 
+    public function testDeferUsesTheSpecifiedConnectionAndQueue()
+    {
+        Bus::fake();
+
+        $callback = Concurrency::driver('queue')->onConnection('redis')->onQueue('reports')->defer([
+            fn () => 1,
+        ]);
+
+        Bus::assertNothingDispatched();
+
+        $callback();
+
+        Bus::assertDispatched(InvokeDeferredClosure::class, function ($job) {
+            return $job->connection === 'redis' && $job->queue === 'reports';
+        });
+    }
+
+    #[DataProvider('configuredJobOptions')]
+    public function testDispatchedJobsUseTheirConfiguredTimeoutAndTtl(string $name, int $ttl, int $expectedTtl)
+    {
+        config()->set('concurrency.drivers.'.$name, [
+            'driver' => 'queue',
+            'timeout' => 7,
+            'ttl' => $ttl,
+        ]);
+
+        Bus::fake();
+
+        Str::freezeUlids(function ($ulid) use ($name) {
+            Cache::put("illuminate:concurrency:{$ulid}:0", TaskResult::success('first'), 60);
+            Cache::put("illuminate:concurrency:{$ulid}:1", TaskResult::success('second'), 60);
+
+            $this->assertSame(['first', 'second'], Concurrency::driver($name)->run([
+                fn () => 'first',
+                fn () => 'second',
+            ]));
+        });
+
+        Bus::assertDispatchedTimes(InvokeQueuedClosure::class, 2);
+
+        foreach (Bus::dispatched(InvokeQueuedClosure::class) as $job) {
+            $this->assertSame(7, $job->timeout);
+            $this->assertSame($expectedTtl, $job->ttl);
+        }
+    }
+
+    public static function configuredJobOptions(): array
+    {
+        return [
+            'queue' => ['queue', 600, 600],
+            'named driver' => ['reports', 600, 600],
+            'minimum ttl' => ['queue', 5, 67],
+        ];
+    }
+
+    public function testRunUsesTheConfiguredTimeoutAndPollInterval()
+    {
+        config()->set('queue.default', 'database');
+        config()->set('cache.default', 'file');
+        config()->set('concurrency.drivers.queue.timeout', 1);
+        config()->set('concurrency.drivers.queue.poll', 250);
+
+        Carbon::setTestNow(Carbon::now());
+        Queue::fake();
+        Sleep::fake(syncWithCarbon: true);
+
+        try {
+            Concurrency::driver('queue')->run([fn () => 1]);
+
+            $this->fail('The expected timeout exception was not thrown.');
+        } catch (TaskTimedOutException $e) {
+            $this->assertSame(1, $e->seconds);
+        } finally {
+            Carbon::setTestNow();
+            Cache::store('file')->flush();
+        }
+
+        Sleep::assertSleptTimes(4);
+    }
+
     public function testManagerResolvesQueueDriver()
     {
         $this->assertInstanceOf(QueueDriver::class, Concurrency::driver('queue'));

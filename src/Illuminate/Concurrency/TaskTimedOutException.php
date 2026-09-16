@@ -6,6 +6,9 @@ use RuntimeException;
 
 class TaskTimedOutException extends RuntimeException
 {
+    /**
+     * Create a new exception instance.
+     */
     public function __construct(
         public int $received,
         public int $total,

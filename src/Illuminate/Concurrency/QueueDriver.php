@@ -363,16 +363,16 @@ class QueueDriver implements Driver
         // A failover connection is only usable if each of its connections is,
         // and one with no connections would only fail once a job is sent.
         if ($driver === 'failover') {
-            $links = $this->failoverLinks($connection);
+            $connections = $this->failoverConnections($connection);
 
-            if ($links === []) {
+            if ($connections === []) {
                 throw new RuntimeException(
                     "The [{$connection}] failover queue connection has no connections to fall through, so its jobs could never be dispatched."
                 );
             }
 
-            foreach ($links as $link) {
-                $this->ensureQueueConnectionIsSupported($link, [...$seen, $connection]);
+            foreach ($connections as $fallback) {
+                $this->ensureQueueConnectionIsSupported($fallback, [...$seen, $connection]);
             }
         }
     }
@@ -390,14 +390,14 @@ class QueueDriver implements Driver
             return $driver === 'sync';
         }
 
-        $links = $this->failoverLinks($connection);
+        $connections = $this->failoverConnections($connection);
 
-        if ($links === [] || in_array($connection, $seen, true)) {
+        if ($connections === [] || in_array($connection, $seen, true)) {
             return false;
         }
 
-        foreach ($links as $link) {
-            if (! $this->resolvesInline($link, [...$seen, $connection])) {
+        foreach ($connections as $fallback) {
+            if (! $this->resolvesInline($fallback, [...$seen, $connection])) {
                 return false;
             }
         }
@@ -408,7 +408,7 @@ class QueueDriver implements Driver
     /**
      * Get the connections a failover queue connection falls through.
      */
-    protected function failoverLinks(?string $connection): array
+    protected function failoverConnections(?string $connection): array
     {
         return array_values((array) $this->config->get('queue.connections.'.$connection.'.connections', []));
     }

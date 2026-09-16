@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Concurrency;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use RuntimeException;
+use Throwable;
 
 #[RequiresOperatingSystem('Linux|Darwin')]
 class ConcurrencyTest extends TestCase
@@ -150,6 +152,18 @@ PHP);
         ]);
     }
 
+    public function testProcessDriverPreservesTheMessageWhenTheExceptionCannotBeReconstructed()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(ExceptionWithRequiredThrowable::class.': Query failed');
+
+        Concurrency::driver('process')->run([
+            fn () => throw new ExceptionWithRequiredThrowable(
+                'Query failed', new RuntimeException('The underlying failure'),
+            ),
+        ]);
+    }
+
     #[DataProvider('falseyExceptionParameters')]
     public function testRunHandlerProcessErrorWithFalseyParam(int|bool|string $value)
     {
@@ -238,5 +252,13 @@ class ExceptionWithFalseyParam extends Exception
     public function __construct(public int|bool|string $value)
     {
         parent::__construct('Exception with falsey parameter');
+    }
+}
+
+class ExceptionWithRequiredThrowable extends Exception
+{
+    public function __construct(string $message, Throwable $previous)
+    {
+        parent::__construct($message, 0, $previous);
     }
 }

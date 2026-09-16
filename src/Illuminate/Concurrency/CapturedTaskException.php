@@ -12,6 +12,9 @@ use Throwable;
  */
 class CapturedTaskException extends RuntimeException
 {
+    /**
+     * Create a new exception instance.
+     */
     public function __construct(Throwable $previous)
     {
         parent::__construct($previous->getMessage(), 0, $previous);

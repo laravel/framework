@@ -98,6 +98,18 @@ class TaskResultTest extends TestCase
         ];
     }
 
+    public function testUnwrapRetriesWithTheMessageWhenTheParametersCannotBeUsed()
+    {
+        $envelope = TaskResult::failure(new TaskResultTestExceptionWithContext(
+            'Query failed', ['connection' => 'mysql'],
+        ));
+
+        $this->expectException(TaskResultTestExceptionWithContext::class);
+        $this->expectExceptionMessage('Query failed');
+
+        TaskResult::unwrap($envelope);
+    }
+
     public function testUnwrapFallsBackWhenTheConstructorCannotBeSatisfied()
     {
         $envelope = TaskResult::failure(new TaskResultTestExceptionWithRequiredThrowable(
@@ -194,5 +206,13 @@ class TaskResultTestExceptionWithRequiredThrowable extends Exception
     public function __construct(string $message, \Throwable $previous)
     {
         parent::__construct($message, 0, $previous);
+    }
+}
+
+class TaskResultTestExceptionWithContext extends Exception
+{
+    public function __construct(string $message, public array $context = [])
+    {
+        parent::__construct($message);
     }
 }
