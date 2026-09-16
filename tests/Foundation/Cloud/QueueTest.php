@@ -92,6 +92,7 @@ class QueueTest extends TestCase
 
         $this->app['config']->set('queue.connections.cloud', json_decode($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG'], true));
         Http::preventStrayRequests();
+        Sleep::fake(syncWithCarbon: true);
     }
 
     protected function tearDown(): void
@@ -1159,7 +1160,6 @@ class QueueTest extends TestCase
 
     public function testPopThrowsWhenTheAgentSocketIsUnreachable()
     {
-        Sleep::fake();
         $this->fakeEvents();
         [$queue] = $this->fakeQueue();
 
@@ -1173,7 +1173,6 @@ class QueueTest extends TestCase
 
     public function testPopRetriesATimedOutLongPollImmediately()
     {
-        Sleep::fake();
         $this->fakeEvents();
         [$queue, $agent] = $this->fakeQueue();
 
@@ -1194,7 +1193,6 @@ class QueueTest extends TestCase
 
     public function testPopThrowsWhenEveryLongPollAttemptTimesOut()
     {
-        Sleep::fake();
         $this->fakeEvents();
         [$queue, $agent] = $this->fakeQueue();
 
@@ -1662,7 +1660,13 @@ class QueueTest extends TestCase
         $failer = $this->fakeFailer();
         $provider = new FailedJobProvider($failer, $eventsFake, $this->app['encrypter']);
 
-        $payload = ['id' => 'test-job-id', 'connection' => 'cloud', 'queue' => 'default', 'payload' => '{"job":"App\\\\Jobs\\\\TestJob"}'];
+        $payload = [
+            'data' => [['id' => 'test-job-id', 'connection' => 'cloud', 'queue' => 'default', 'payload' => '{"job":"App\\\\Jobs\\\\TestJob"}']],
+            'links' => [
+                'next' => null,
+                'self' => 'https://cloud.laravel.com/api/jobs/test-job-id?signature=abc',
+            ],
+        ];
         $encrypted = Crypt::encryptString(json_encode($payload));
 
         Http::fake([
@@ -1756,11 +1760,19 @@ class QueueTest extends TestCase
         $failer = $this->fakeFailer();
         $provider = new FailedJobProvider($failer, $eventsFake, $this->app['encrypter']);
 
-        $payload = ['id' => 'forget-test-id', 'connection' => 'cloud', 'queue' => 'default', 'payload' => '{}'];
+        $payload = [
+            'data' => [['id' => 'forget-test-id', 'connection' => 'cloud', 'queue' => 'default', 'payload' => '{"job":"App\\\\Jobs\\\\TestJob"}']],
+            'links' => [
+                'next' => null,
+                'self' => 'https://cloud.laravel.com/api/jobs/test-job-id?signature=abc',
+            ],
+        ];
         $encrypted = Crypt::encryptString(json_encode($payload));
 
         Http::fake([
-            'https://cloud.laravel.com/*' => Http::response($encrypted),
+            'https://cloud.laravel.com/*' => Http::response($encrypted, headers: [
+                'Cloud-Payload-Version' => '1',
+            ]),
         ]);
 
         $url = 'https://cloud.laravel.com/api/jobs/forget-test-id?signature=abc';
