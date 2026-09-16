@@ -1666,7 +1666,9 @@ class QueueTest extends TestCase
         $encrypted = Crypt::encryptString(json_encode($payload));
 
         Http::fake([
-            'https://cloud.laravel.com/*' => Http::response($encrypted),
+            'https://cloud.laravel.com/*' => Http::response($encrypted, headers: [
+                'Cloud-Payload-Version' => '1',
+            ]),
         ]);
 
         $result = $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
