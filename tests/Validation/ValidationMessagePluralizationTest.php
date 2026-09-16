@@ -12,6 +12,43 @@ use stdClass;
 
 class ValidationMessagePluralizationTest extends TestCase
 {
+    public function testPluralizationIsDisabledByDefault()
+    {
+        $message = '{0} There are none|{1} There is one|[2,*] There are :count';
+        $translator = new Translator(new ArrayLoader, 'en');
+        $translator->addLines(['validation.min.array' => $message], 'en');
+
+        $validator = new Validator($translator, ['items' => ['a', 'b']], ['items' => 'array|min:3']);
+
+        $this->assertSame($message, $validator->errors()->first('items'));
+    }
+
+    public function testCustomReplacersReceiveTheOriginalMessageByDefault()
+    {
+        $message = '{1} There is one|[2,*] There are :count';
+        $translator = new Translator(new ArrayLoader, 'en');
+        $translator->addLines(['validation.min.array' => $message], 'en');
+
+        $validator = new Validator($translator, ['items' => ['a']], ['items' => 'array|min:3']);
+        $validator->addReplacer('min', function ($received, $attribute, $rule, $parameters) use ($translator, $message) {
+            $this->assertSame($message, $received);
+
+            return $translator->choice($received, $parameters[0]);
+        });
+
+        $this->assertSame('There are 3', $validator->errors()->first('items'));
+    }
+
+    public function testPluralizationCanBeDisabledForAnInstance()
+    {
+        $message = '{1} There is one|[2,*] There are :count';
+        $validator = new Validator(new Translator(new ArrayLoader, 'en'), ['items' => ['a', 'b']], ['items' => 'array|min:3'], ['min' => $message]);
+
+        $this->assertSame($validator, $validator->pluralizeMessages());
+        $this->assertSame($validator, $validator->pluralizeMessages(false));
+        $this->assertSame($message, $validator->errors()->first('items'));
+    }
+
     #[DataProvider('arrayCounts')]
     public function testTranslatedMessagesUseTheSubmittedArrayCount($items, $expected)
     {
@@ -20,7 +57,7 @@ class ValidationMessagePluralizationTest extends TestCase
             'validation.min.array' => '{0} There are none|{1} There is one|[2,*] There are :count',
         ], 'en');
 
-        $validator = new Validator($translator, ['items' => $items], ['items' => 'array|min:4']);
+        $validator = $this->makePluralizingValidator($translator, ['items' => $items], ['items' => 'array|min:4']);
 
         $this->assertSame($expected, $validator->errors()->first('items'));
     }
@@ -43,7 +80,7 @@ class ValidationMessagePluralizationTest extends TestCase
             'validation.min.array' => '{1} Default :attribute has one item|[2,*] Default :attribute has :count items',
         ], 'en');
 
-        $validator = new Validator($translator, ['items' => ['a', 'b']], ['items' => 'array|min:3'], $messages, ['items' => 'selected items']);
+        $validator = $this->makePluralizingValidator($translator, ['items' => ['a', 'b']], ['items' => 'array|min:3'], $messages, ['items' => 'selected items']);
         $validator->setFallbackMessages($fallback);
 
         $this->assertSame($expected, $validator->errors()->first('items'));
@@ -74,7 +111,7 @@ class ValidationMessagePluralizationTest extends TestCase
             $key => '{0} None for :attribute|{1} One for :attribute|[2,*] :count for :attribute',
         ], 'en');
 
-        $validator = new Validator($translator, ['value' => $value], ['value' => $rules]);
+        $validator = $this->makePluralizingValidator($translator, ['value' => $value], ['value' => $rules]);
 
         $this->assertSame($expected, $validator->errors()->first('value'));
     }
@@ -100,7 +137,7 @@ class ValidationMessagePluralizationTest extends TestCase
             'validation.max.file' => '{1} :attribute is :count kilobyte|[2,*] :attribute is :count kilobytes',
         ], 'en');
 
-        $validator = new Validator($translator, ['file' => UploadedFile::fake()->create('document.pdf', 2)], ['file' => 'file|max:1']);
+        $validator = $this->makePluralizingValidator($translator, ['file' => UploadedFile::fake()->create('document.pdf', 2)], ['file' => 'file|max:1']);
 
         $this->assertSame('file is 2 kilobytes', $validator->errors()->first('file'));
     }
@@ -112,7 +149,7 @@ class ValidationMessagePluralizationTest extends TestCase
             'validation.custom.groups.*.items.min' => '{1} Group :position has one item|[2,*] Group :position has :count items',
         ], 'en');
 
-        $validator = new Validator($translator, ['groups' => [['items' => ['a']], ['items' => ['a', 'b']]]], ['groups.*.items' => 'array|min:3']);
+        $validator = $this->makePluralizingValidator($translator, ['groups' => [['items' => ['a']], ['items' => ['a', 'b']]]], ['groups.*.items' => 'array|min:3']);
 
         $this->assertSame([
             'groups.0.items' => ['Group 1 has one item'],
@@ -127,7 +164,7 @@ class ValidationMessagePluralizationTest extends TestCase
             'validation.min.array' => '{1} One item|[2,*] :count items',
         ], 'en');
 
-        $validator = new Validator($translator, ['foo.bar' => ['a', 'b'], 'foo' => ['bar' => ['a']]], ['foo\\.bar' => 'array|min:3']);
+        $validator = $this->makePluralizingValidator($translator, ['foo.bar' => ['a', 'b'], 'foo' => ['bar' => ['a']]], ['foo\\.bar' => 'array|min:3']);
 
         $this->assertSame('2 items', $validator->errors()->first('foo.bar'));
     }
@@ -138,14 +175,14 @@ class ValidationMessagePluralizationTest extends TestCase
         $translator->setFallback('en');
         $translator->addLines(['validation.min.array' => '{1} One item|[2,*] :count items'], 'en');
 
-        $validator = new Validator($translator, ['items' => ['a', 'b']], ['items' => 'array|min:3']);
+        $validator = $this->makePluralizingValidator($translator, ['items' => ['a', 'b']], ['items' => 'array|min:3']);
 
         $this->assertSame('2 items', $validator->errors()->first('items'));
     }
 
     public function testExtensionFallbackMessagesArePluralized()
     {
-        $validator = new Validator(new Translator(new ArrayLoader, 'en'), ['items' => ['a', 'b']], ['items' => 'custom']);
+        $validator = $this->makePluralizingValidator(new Translator(new ArrayLoader, 'en'), ['items' => ['a', 'b']], ['items' => 'custom']);
         $validator->addExtension('custom', fn () => false);
         $validator->setFallbackMessages(['custom' => '{1} One item|[2,*] :count items']);
 
@@ -154,7 +191,7 @@ class ValidationMessagePluralizationTest extends TestCase
 
     public function testCustomReplacersReceiveTheSelectedMessage()
     {
-        $validator = new Validator(new Translator(new ArrayLoader, 'en'), ['items' => ['a', 'b']], ['items' => 'custom'], [
+        $validator = $this->makePluralizingValidator(new Translator(new ArrayLoader, 'en'), ['items' => ['a', 'b']], ['items' => 'custom'], [
             'custom' => '{1} One :unit|[2,*] :COUNT :unit',
         ]);
         $validator->addExtension('custom', fn () => false);
@@ -169,7 +206,7 @@ class ValidationMessagePluralizationTest extends TestCase
         $translator = new Translator(new ArrayLoader, 'en');
         $translator->addLines(['validation.min.array' => $message], 'en');
 
-        $validator = new Validator($translator, ['items' => ['a', 'b']], ['items' => 'array|min:3']);
+        $validator = $this->makePluralizingValidator($translator, ['items' => ['a', 'b']], ['items' => 'array|min:3']);
 
         $this->assertSame($message, $validator->errors()->first('items'));
     }
@@ -189,7 +226,7 @@ class ValidationMessagePluralizationTest extends TestCase
         $translator = new Translator(new ArrayLoader, 'en');
         $translator->addLines(['validation.in' => '{1} Invalid :attribute: :input|[2,*] Invalid :attribute (:count): :input'], 'en');
 
-        $validator = new Validator($translator, ['value' => 'a|b'], ['value' => 'in:valid'], [], ['value' => 'A|B']);
+        $validator = $this->makePluralizingValidator($translator, ['value' => 'a|b'], ['value' => 'in:valid'], [], ['value' => 'A|B']);
 
         $this->assertSame('Invalid A|B (3): a|b', $validator->errors()->first('value'));
     }
@@ -205,7 +242,7 @@ class ValidationMessagePluralizationTest extends TestCase
             return $key;
         });
 
-        $validator = new Validator($translator, ['items' => ['a', 'b']], ['items' => 'array|min:3']);
+        $validator = $this->makePluralizingValidator($translator, ['items' => ['a', 'b']], ['items' => 'array|min:3']);
 
         $this->assertSame('2 items', $validator->errors()->first('items'));
     }
@@ -213,7 +250,7 @@ class ValidationMessagePluralizationTest extends TestCase
     public function testUnsupportedValuesDoNotCauseMessageFormattingToThrow()
     {
         $message = '{1} Invalid item|[2,*] Invalid items';
-        $validator = new Validator(new Translator(new ArrayLoader, 'en'), ['value' => new stdClass], ['value' => 'array'], ['array' => $message]);
+        $validator = $this->makePluralizingValidator(new Translator(new ArrayLoader, 'en'), ['value' => new stdClass], ['value' => 'array'], ['array' => $message]);
 
         $this->assertSame($message, $validator->errors()->first('value'));
     }
@@ -222,7 +259,7 @@ class ValidationMessagePluralizationTest extends TestCase
     {
         $message = '{1} Invalid file|[2,*] Invalid files';
         $file = new UploadedFile('', 'document.pdf', null, UPLOAD_ERR_INI_SIZE, true);
-        $validator = new Validator(new Translator(new ArrayLoader, 'en'), ['file' => $file], ['file' => 'file'], ['uploaded' => $message]);
+        $validator = $this->makePluralizingValidator(new Translator(new ArrayLoader, 'en'), ['file' => $file], ['file' => 'file'], ['uploaded' => $message]);
 
         $this->assertSame($message, $validator->errors()->first('file'));
     }
@@ -230,8 +267,13 @@ class ValidationMessagePluralizationTest extends TestCase
     public function testOutOfRangeNumbersDoNotCauseMessageFormattingToThrow()
     {
         $message = '{1} Invalid number|[2,*] Invalid numbers';
-        $validator = new Validator(new Translator(new ArrayLoader, 'en'), ['value' => '1e10000'], ['value' => 'numeric|min:4'], ['min' => $message]);
+        $validator = $this->makePluralizingValidator(new Translator(new ArrayLoader, 'en'), ['value' => '1e10000'], ['value' => 'numeric|min:4'], ['min' => $message]);
 
         $this->assertSame($message, $validator->errors()->first('value'));
+    }
+
+    protected function makePluralizingValidator($translator, $data, $rules, $messages = [], $attributes = [])
+    {
+        return (new Validator($translator, $data, $rules, $messages, $attributes))->pluralizeMessages();
     }
 }

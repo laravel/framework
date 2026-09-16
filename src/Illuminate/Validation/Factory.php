@@ -74,6 +74,13 @@ class Factory implements FactoryContract
     protected $excludeUnvalidatedArrayKeys = true;
 
     /**
+     * Indicates if messages should be pluralized for newly created validators.
+     *
+     * @var bool
+     */
+    protected $pluralizeMessages = false;
+
+    /**
      * The Validator resolver instance.
      *
      * @var \Closure
@@ -122,6 +129,10 @@ class Factory implements FactoryContract
         }
 
         $validator->excludeUnvalidatedArrayKeys = $this->excludeUnvalidatedArrayKeys;
+
+        if ($this->pluralizeMessages) {
+            $validator->pluralizeMessages();
+        }
 
         $this->addExtensions($validator);
 
@@ -265,6 +276,17 @@ class Factory implements FactoryContract
     public function excludeUnvalidatedArrayKeys()
     {
         $this->excludeUnvalidatedArrayKeys = true;
+    }
+
+    /**
+     * Enable or disable message pluralization for newly created validators.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public function pluralizeMessages($value = true)
+    {
+        $this->pluralizeMessages = $value;
     }
 
     /**

@@ -11,6 +11,7 @@ namespace Illuminate\Support\Facades;
  * @method static void replacer(string $rule, \Closure|string $replacer)
  * @method static void includeUnvalidatedArrayKeys()
  * @method static void excludeUnvalidatedArrayKeys()
+ * @method static void pluralizeMessages(bool $value = true)
  * @method static void fakeDnsLookups(bool $value = true)
  * @method static void resolver(\Closure $resolver)
  * @method static \Illuminate\Contracts\Translation\Translator getTranslator()

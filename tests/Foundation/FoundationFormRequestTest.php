@@ -20,6 +20,7 @@ use Illuminate\Translation\Translator as TranslatorConcrete;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\ValidationException;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class FoundationFormRequestTest extends TestCase
@@ -98,7 +99,8 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
     }
 
-    public function testValidationMessagesArePluralizedWithoutOverridingMessages()
+    #[DataProvider('messagePluralizationSettings')]
+    public function testValidationMessagePluralizationFollowsTheFactorySetting($enabled, $expected)
     {
         $translator = new TranslatorConcrete(new ArrayLoader, 'en');
         $translator->addLines([
@@ -106,7 +108,13 @@ class FoundationFormRequestTest extends TestCase
         ], 'en');
 
         $container = new Container;
-        $container->instance(ValidationFactoryContract::class, new ValidationFactory($translator, $container));
+        $factory = new ValidationFactory($translator, $container);
+
+        if ($enabled) {
+            $factory->pluralizeMessages();
+        }
+
+        $container->instance(ValidationFactoryContract::class, $factory);
 
         $request = FoundationTestFormRequestPluralizationStub::create('/', 'POST', ['items' => ['a', 'b']]);
         $request->setContainer($container)->setRedirector($this->createMockRedirector($request));
@@ -115,7 +123,15 @@ class FoundationFormRequestTest extends TestCase
             $request->validateResolved();
         });
 
-        $this->assertSame(['items' => ['There are 2']], $exception->errors());
+        $this->assertSame(['items' => [$expected]], $exception->errors());
+    }
+
+    public static function messagePluralizationSettings()
+    {
+        return [
+            'disabled by default' => [false, '{0} There are none|{1} There is one|[2,*] There are :count'],
+            'enabled globally' => [true, 'There are 2'],
+        ];
     }
 
     public function testValidateThrowsWhenValidationFailsWithConfiguredErrorBagAttribute()
@@ -780,7 +796,7 @@ class FoundationTestFormRequestPluralizationStub extends FormRequest
 {
     public function rules()
     {
-        return ['items' => 'array|min:3'];
+        return ['items' => ['array', 'min:3']];
     }
 }
 

@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\Factory;
 use Illuminate\Validation\PresenceVerifierInterface;
 use Illuminate\Validation\Validator;
@@ -151,6 +153,59 @@ class ValidationFactoryTest extends TestCase
         $this->assertNull($factory->getContainer());
 
         $this->assertSame($container, $factory->setContainer($container)->getContainer());
+    }
+
+    public function testMessagePluralizationOnlyAffectsNewValidatorsFromTheConfiguredFactory()
+    {
+        $message = '{1} There is one|[2,*] There are :count';
+        $translator = new Translator(new ArrayLoader, 'en');
+        $translator->addLines(['validation.min.array' => $message], 'en');
+
+        $factory = new Factory($translator);
+        $default = $factory->make(['items' => ['a', 'b']], ['items' => 'array|min:3']);
+
+        $factory->pluralizeMessages();
+        $enabled = $factory->make(['items' => ['a', 'b']], ['items' => 'array|min:3']);
+
+        $other = (new Factory($translator))->make(['items' => ['a', 'b']], ['items' => 'array|min:3']);
+
+        $factory->pluralizeMessages(false);
+        $disabled = $factory->make(['items' => ['a', 'b']], ['items' => 'array|min:3']);
+
+        $this->assertSame($message, $default->errors()->first('items'));
+        $this->assertSame('There are 2', $enabled->errors()->first('items'));
+        $this->assertSame($message, $other->errors()->first('items'));
+        $this->assertSame($message, $disabled->errors()->first('items'));
+    }
+
+    public function testMessagePluralizationCanBeDisabledForAnIndividualFactoryValidator()
+    {
+        $message = '{1} There is one|[2,*] There are :count';
+        $translator = new Translator(new ArrayLoader, 'en');
+        $translator->addLines(['validation.min.array' => $message], 'en');
+
+        $factory = new Factory($translator);
+        $factory->pluralizeMessages();
+
+        $disabled = $factory->make(['items' => ['a', 'b']], ['items' => 'array|min:3'])->pluralizeMessages(false);
+        $enabled = $factory->make(['items' => ['a', 'b']], ['items' => 'array|min:3']);
+
+        $this->assertSame($message, $disabled->errors()->first('items'));
+        $this->assertSame('There are 2', $enabled->errors()->first('items'));
+    }
+
+    public function testMessagePluralizationWorksWithCustomResolvers()
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+        $translator->addLines(['validation.min.array' => '{1} There is one|[2,*] There are :count'], 'en');
+
+        $factory = new Factory($translator);
+        $factory->resolver(fn ($translator, $data, $rules, $messages, $attributes) => new Validator($translator, $data, $rules, $messages, $attributes));
+        $factory->pluralizeMessages();
+
+        $validator = $factory->make(['items' => ['a', 'b']], ['items' => 'array|min:3']);
+
+        $this->assertSame('There are 2', $validator->errors()->first('items'));
     }
 
     public function testFakeDnsLookupsDelegatesToTheValidator()

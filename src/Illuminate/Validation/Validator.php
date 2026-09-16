@@ -160,6 +160,13 @@ class Validator implements ValidatorContract
     protected $stopOnFirstFailure = false;
 
     /**
+     * Indicates if validation messages should be pluralized.
+     *
+     * @var bool
+     */
+    protected $pluralizeMessages = false;
+
+    /**
      * Indicates that unvalidated array keys should be excluded, even if the parent array was validated.
      *
      * @var bool
@@ -1020,10 +1027,14 @@ class Validator implements ValidatorContract
             $parameters = $this->replaceDotPlaceholderInParameters($parameters);
         }
 
+        $message = $this->getMessage($attributeWithPlaceholders, $rule);
+
+        if ($this->pluralizeMessages) {
+            $message = $this->getPluralizedMessage($message, $attributeWithPlaceholders);
+        }
+
         $this->messages->add($attribute, $this->makeReplacements(
-            $this->getPluralizedMessage(
-                $this->getMessage($attributeWithPlaceholders, $rule), $attributeWithPlaceholders
-            ), $attribute, $rule, $parameters
+            $message, $attribute, $rule, $parameters
         ));
 
         $this->failedRules[$attribute][$rule] = $parameters;
@@ -1381,6 +1392,19 @@ class Validator implements ValidatorContract
     public function stopOnFirstFailure($stopOnFirstFailure = true)
     {
         $this->stopOnFirstFailure = $stopOnFirstFailure;
+
+        return $this;
+    }
+
+    /**
+     * Enable or disable pluralization of validation messages.
+     *
+     * @param  bool  $value
+     * @return $this
+     */
+    public function pluralizeMessages($value = true)
+    {
+        $this->pluralizeMessages = $value;
 
         return $this;
     }
