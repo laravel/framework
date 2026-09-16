@@ -8,6 +8,16 @@ use Psr\SimpleCache\CacheInterface;
 interface Repository extends CacheInterface
 {
     /**
+     * Retrieve multiple items from the cache by key.
+     *
+     * Items not found in the cache will have a null value unless a default is provided.
+     *
+     * @param  array<array-key, mixed>  $keys
+     * @return array<array-key, mixed>
+     */
+    public function many(array $keys);
+
+    /**
      * Retrieve an item from the cache and delete it.
      *
      * @template TCacheValue
@@ -27,6 +37,15 @@ interface Repository extends CacheInterface
      * @return bool
      */
     public function put($key, $value, $ttl = null);
+
+    /**
+     * Store multiple items in the cache.
+     *
+     * @param  array<array-key, mixed>  $values
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return bool
+     */
+    public function putMany(array $values, $ttl = null);
 
     /**
      * Store an item in the cache if the key does not exist.

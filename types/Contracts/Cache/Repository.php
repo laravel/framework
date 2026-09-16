@@ -14,6 +14,12 @@ assertType('mixed', $cache->get('cache', function (): int {
     return 26;
 }));
 
+assertType('array<mixed>', $cache->many(['key']));
+assertType('bool', $cache->putMany(['key' => 'value']));
+assertType('bool', $cache->putMany(['key' => 'value'], 60));
+assertType('bool', $cache->putMany(['key' => 'value'], new DateInterval('PT1M')));
+assertType('bool', $cache->putMany(['key' => 'value'], Carbon::now()->addMinute()));
+
 assertType('mixed', $cache->pull('key'));
 assertType('28', $cache->pull('cache', 28));
 assertType('30', $cache->pull('cache', function (): int {

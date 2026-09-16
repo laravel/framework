@@ -11,6 +11,13 @@ assertType('mixed', Cache::get('cache', function (): int {
     return 26;
 }));
 
+assertType('array<mixed>', Cache::store('redis')->many(['key']));
+assertType('bool', Cache::store('redis')->putMany(['key' => 'value'], 60));
+assertType('array<mixed>', Cache::driver('file')->many(['key']));
+assertType('bool', Cache::driver('file')->putMany(['key' => 'value'], 60));
+assertType('array<mixed>', Cache::memo('array')->many(['key']));
+assertType('bool', Cache::memo('array')->putMany(['key' => 'value'], 60));
+
 assertType('mixed', Cache::pull('key'));
 assertType('mixed', Cache::pull('cache', 28));
 assertType('mixed', Cache::pull('cache', function (): int {
