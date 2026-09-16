@@ -135,11 +135,11 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function configureFromAttributes()
     {
-        if ($this->nearestConfiguringClass([StopOnFirstFailure::class], ['stopOnFirstFailure'])) {
+        if ($this->nearestClassWithAttribute([StopOnFirstFailure::class], ['stopOnFirstFailure'])) {
             $this->stopOnFirstFailure = true;
         }
 
-        $reflection = $this->nearestConfiguringClass(
+        $reflection = $this->nearestClassWithAttribute(
             [RedirectTo::class, RedirectToRoute::class], ['redirect', 'redirectRoute', 'redirectAction']
         );
 
@@ -157,41 +157,9 @@ class FormRequest extends Request implements ValidatesWhenResolved
             }
         }
 
-        if ($reflection = $this->nearestConfiguringClass([ErrorBag::class], ['errorBag'])) {
+        if ($reflection = $this->nearestClassWithAttribute([ErrorBag::class], ['errorBag'])) {
             $this->errorBag = $reflection->getAttributes(ErrorBag::class)[0]->newInstance()->name;
         }
-    }
-
-    /**
-     * Get the nearest class in the request's hierarchy that applies any of the given attributes.
-     *
-     * The search stops at the first class that declares any of the given properties itself,
-     * so a child request's own configuration always takes precedence over its parent's.
-     *
-     * @param  array<int, class-string>  $attributes
-     * @param  array<int, string>  $properties
-     * @return \ReflectionClass<\Illuminate\Foundation\Http\FormRequest>|null
-     */
-    protected function nearestConfiguringClass(array $attributes, array $properties = [])
-    {
-        $reflection = new ReflectionClass($this);
-
-        do {
-            foreach ($attributes as $attribute) {
-                if ($reflection->getAttributes($attribute) !== []) {
-                    return $reflection;
-                }
-            }
-
-            foreach ($properties as $property) {
-                if ($reflection->hasProperty($property) &&
-                    $reflection->getProperty($property)->class === $reflection->name) {
-                    return null;
-                }
-            }
-        } while (($reflection = $reflection->getParentClass()) && $reflection->name !== self::class);
-
-        return null;
     }
 
     /**
@@ -247,7 +215,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function shouldFailOnUnknownFields(): bool
     {
-        $reflection = $this->nearestConfiguringClass([FailOnUnknownFields::class]);
+        $reflection = $this->nearestClassWithAttribute([FailOnUnknownFields::class]);
 
         return $reflection
             ? $reflection->getAttributes(FailOnUnknownFields::class)[0]->newInstance()->value
@@ -441,6 +409,35 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function attributes()
     {
         return [];
+    }
+
+    /**
+     * Get the nearest class in the request's hierarchy that applies any of the given attributes.
+     *
+     * @param  array<int, class-string>  $attributes
+     * @param  array<int, string>  $properties
+     * @return \ReflectionClass<\Illuminate\Foundation\Http\FormRequest>|null
+     */
+    protected function nearestClassWithAttribute(array $attributes, array $properties = [])
+    {
+        $reflection = new ReflectionClass($this);
+
+        do {
+            foreach ($attributes as $attribute) {
+                if ($reflection->getAttributes($attribute) !== []) {
+                    return $reflection;
+                }
+            }
+
+            foreach ($properties as $property) {
+                if ($reflection->hasProperty($property) &&
+                    $reflection->getProperty($property)->class === $reflection->name) {
+                    return null;
+                }
+            }
+        } while (($reflection = $reflection->getParentClass()) && $reflection->name !== self::class);
+
+        return null;
     }
 
     /**
