@@ -49,8 +49,7 @@ class AsArrayObject implements Castable
     }
 
     /**
-     * Specify that a null value assigned to the attribute should be persisted
-     * as a native SQL NULL instead of the JSON "null" literal.
+     * Specify that a null value assigned to the attribute should be persisted as a native SQL NULL instead of the JSON "null" literal.
      *
      * @return string
      */

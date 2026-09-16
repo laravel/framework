@@ -99,8 +99,7 @@ class AsCollection implements Castable
     }
 
     /**
-     * Specify that a null value assigned to the attribute should be persisted
-     * as a native SQL NULL instead of the JSON "null" literal.
+     * Specify that a null value assigned to the attribute should be persisted as a native SQL NULL instead of the JSON "null" literal.
      *
      * @param  class-string|null  $class
      * @param  array{class-string, string}|class-string|null  $map
