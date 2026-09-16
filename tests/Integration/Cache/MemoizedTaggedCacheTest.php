@@ -19,7 +19,8 @@ class MemoizedTaggedCacheTest extends TestCase
         $this->setUpRedis();
 
         Config::set('cache.default', 'redis');
-        Redis::flushAll();
+        Redis::connection(Config::get('cache.stores.redis.connection'))->flushDb();
+        Redis::connection(Config::get('cache.stores.redis.lock_connection'))->flushDb();
     }
 
     protected function tearDown(): void
