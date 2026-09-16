@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Routing;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Routing\EncodedParameter;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
@@ -798,6 +799,25 @@ class RoutingUrlGeneratorTest extends TestCase
         // Values without a percent sign are unaffected...
         $this->assertSame('http://www.foo.com/foo/bar', $url->route('foo', ['bar' => 'bar']));
         $this->assertSame('http://www.foo.com/foo/1', $url->route('foo', ['bar' => 1]));
+    }
+
+    public function testEncodedRouteParametersAreNotEncodedAgain()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $routes->add(new Route(['GET'], 'foo/{bar}', ['as' => 'foo', function () {
+            //
+        }]));
+
+        // Values that are already URL encoded may be marked as such so they are used as-is...
+        $this->assertSame('http://www.foo.com/foo/foo%20bar', $url->route('foo', ['bar' => new EncodedParameter('foo%20bar')]));
+        $this->assertSame('http://www.foo.com/foo/%66oo', $url->route('foo', ['bar' => new EncodedParameter('%66oo')]));
+
+        // While plain strings continue to be encoded...
+        $this->assertSame('http://www.foo.com/foo/foo%2520bar', $url->route('foo', ['bar' => 'foo%20bar']));
     }
 
     public function testSignedUrl()
