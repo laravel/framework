@@ -1439,6 +1439,37 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf(UploadedFile::class, $items[1]['photo']);
     }
 
+    public function testAllInputKeepsFilesWhenCollidingInputIsEmpty()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'doc.pdf');
+        $request = Request::create('/', 'POST', ['documents' => ['']], [], ['documents' => [$file]]);
+
+        $this->assertInstanceOf(UploadedFile::class, $request->file('documents.0'));
+        $this->assertInstanceOf(UploadedFile::class, $request->all()['documents'][0]);
+    }
+
+    public function testAllInputKeepsFilesWhenCollidingInputIsNullOrEmptyArray()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'doc.pdf');
+        $request = Request::create('/', 'POST', ['document' => null, 'documents' => []], [], [
+            'document' => $file,
+            'documents' => [$file],
+        ]);
+
+        $all = $request->all();
+
+        $this->assertInstanceOf(UploadedFile::class, $all['document']);
+        $this->assertInstanceOf(UploadedFile::class, $all['documents'][0]);
+    }
+
+    public function testAllInputStillPrefersFilledInputOverCollidingFiles()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'doc.pdf');
+        $request = Request::create('/', 'POST', ['documents' => ['taylor.pdf']], [], ['documents' => [$file]]);
+
+        $this->assertSame(['documents' => ['taylor.pdf']], $request->all());
+    }
+
     public function testAllInputReturnsInputAfterReplace()
     {
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']]);

@@ -86,9 +86,7 @@ trait InteractsWithInput
      */
     public function all($keys = null)
     {
-        $input = $this->input();
-
-        $input = array_replace_recursive($input, $this->allFiles(), $input);
+        $input = $this->mergeFilesIntoInput($this->input(), $this->allFiles());
 
         if (! $keys) {
             return $input;
@@ -101,6 +99,39 @@ trait InteractsWithInput
         }
 
         return $results;
+    }
+
+    /**
+     * Merge the given uploaded files into the input array.
+     *
+     * Input values take precedence over files on colliding keys, unless the
+     * input does not actually hold a value for the colliding key.
+     *
+     * @param  array  $input
+     * @param  array  $files
+     * @return array
+     */
+    protected function mergeFilesIntoInput(array $input, array $files)
+    {
+        foreach ($files as $key => $value) {
+            if (! array_key_exists($key, $input)) {
+                $input[$key] = $value;
+
+                continue;
+            }
+
+            if (is_array($value) && is_array($input[$key])) {
+                $input[$key] = $this->mergeFilesIntoInput($input[$key], $value);
+
+                continue;
+            }
+
+            if ($input[$key] === null || $input[$key] === '' || $input[$key] === []) {
+                $input[$key] = $value;
+            }
+        }
+
+        return $input;
     }
 
     /**
