@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\QueueFake;
@@ -90,6 +91,8 @@ class QueueTest extends TestCase
         parent::setUp();
 
         $this->app['config']->set('queue.connections.cloud', json_decode($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG'], true));
+        Http::preventStrayRequests();
+        Sleep::fake(syncWithCarbon: true);
     }
 
     protected function tearDown(): void
@@ -1157,7 +1160,6 @@ class QueueTest extends TestCase
 
     public function testPopThrowsWhenTheAgentSocketIsUnreachable()
     {
-        Sleep::fake();
         $this->fakeEvents();
         [$queue] = $this->fakeQueue();
 
@@ -1171,7 +1173,6 @@ class QueueTest extends TestCase
 
     public function testPopRetriesATimedOutLongPollImmediately()
     {
-        Sleep::fake();
         $this->fakeEvents();
         [$queue, $agent] = $this->fakeQueue();
 
@@ -1192,7 +1193,6 @@ class QueueTest extends TestCase
 
     public function testPopThrowsWhenEveryLongPollAttemptTimesOut()
     {
-        Sleep::fake();
         $this->fakeEvents();
         [$queue, $agent] = $this->fakeQueue();
 
@@ -1660,21 +1660,134 @@ class QueueTest extends TestCase
         $failer = $this->fakeFailer();
         $provider = new FailedJobProvider($failer, $eventsFake, $this->app['encrypter']);
 
-        $payload = ['id' => 'test-job-id', 'connection' => 'cloud', 'queue' => 'default', 'payload' => '{"job":"App\\\\Jobs\\\\TestJob"}'];
+        $payload = [
+            'data' => [['id' => 'test-job-id', 'connection' => 'cloud', 'queue' => 'default', 'payload' => '{"job":"App\\\\Jobs\\\\TestJob"}']],
+            'links' => [
+                'next' => null,
+                'self' => 'https://cloud.laravel.com/api/jobs/test-job-id?signature=abc',
+            ],
+        ];
         $encrypted = Crypt::encryptString(json_encode($payload));
 
         Http::fake([
-            'https://cloud.laravel.com/*' => Http::response($encrypted),
+            'https://cloud.laravel.com/*' => Http::response($encrypted, headers: [
+                'Cloud-Payload-Version' => '1',
+            ]),
         ]);
 
         $result = $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
 
         $this->assertIsObject($result);
-        $this->assertSame('test-job-id', $result->id);
-        $this->assertSame('cloud', $result->connection);
-        $this->assertSame('default', $result->queue);
-        $this->assertSame('{"job":"App\\\\Jobs\\\\TestJob"}', $result->payload);
+        $this->assertInstanceOf(LazyCollection::class, $result);
+        $count = 0;
+        foreach ($result as $key => $failedJob) {
+            $count++;
+            $this->assertSame('test-job-id', $failedJob->id);
+            $this->assertSame('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc:test-job-id', $key);
+            $this->assertSame('cloud', $failedJob->connection);
+            $this->assertSame('default', $failedJob->queue);
+            $this->assertSame('{"job":"App\\\\Jobs\\\\TestJob"}', $failedJob->payload);
+        }
+        $this->assertSame(1, $count);
         Http::assertSent(fn ($request) => $request->url() === 'https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
+    }
+
+    public function testFindWrapsTheResponseWhenThePayloadVersionIsMissing()
+    {
+        $eventsFake = $this->fakeEvents();
+        $failer = $this->fakeFailer();
+        $provider = new FailedJobProvider($failer, $eventsFake, $this->app['encrypter']);
+
+        // Responses that don't announce a payload version contain a single,
+        // unpaginated failed job, so they are wrapped in the paginated shape
+        // the iterator expects.
+        $encrypted = Crypt::encryptString(json_encode([
+            'id' => 'test-job-id',
+            'connection' => 'cloud',
+            'queue' => 'default',
+            'payload' => '{"job":"App\\\\Jobs\\\\TestJob"}',
+        ]));
+
+        Http::fake([
+            'https://cloud.laravel.com/*' => Http::response($encrypted),
+        ]);
+
+        $url = 'https://cloud.laravel.com/api/jobs/test-job-id?signature=abc';
+        $jobs = $provider->find($url)->all();
+
+        $this->assertSame([$url.':test-job-id'], array_keys($jobs));
+        $this->assertSame('test-job-id', $jobs[$url.':test-job-id']->id);
+        $this->assertSame('cloud', $jobs[$url.':test-job-id']->connection);
+        $this->assertSame('default', $jobs[$url.':test-job-id']->queue);
+        $this->assertSame('{"job":"App\\\\Jobs\\\\TestJob"}', $jobs[$url.':test-job-id']->payload);
+        Http::assertSentCount(1);
+    }
+
+    #[TestWith(['0'])]
+    #[TestWith(['2'])]
+    #[TestWith(['1.0'])]
+    public function testFindThrowsWhenThePayloadVersionIsNotSupported(string $version)
+    {
+        $eventsFake = $this->fakeEvents();
+        $failer = $this->fakeFailer();
+        $provider = new FailedJobProvider($failer, $eventsFake, $this->app['encrypter']);
+
+        $encrypted = Crypt::encryptString(json_encode([
+            'data' => [['id' => 'test-job-id', 'connection' => 'cloud', 'queue' => 'default', 'payload' => '{"job":"App\\\\Jobs\\\\TestJob"}']],
+            'links' => [
+                'next' => null,
+                'self' => 'https://cloud.laravel.com/api/jobs/test-job-id?signature=abc',
+            ],
+        ]));
+
+        Http::fake([
+            'https://cloud.laravel.com/*' => Http::response($encrypted, headers: [
+                'Cloud-Payload-Version' => $version,
+            ]),
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unsupported payload version: '.$version);
+
+        $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc')->all();
+    }
+
+    public function testForgetEmitsEventAfterFindingAPayloadWithoutAVersion()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        $failer = $this->fakeFailer();
+        $provider = new FailedJobProvider($failer, $eventsFake, $this->app['encrypter']);
+
+        $encrypted = Crypt::encryptString(json_encode([
+            'id' => 'forget-test-id',
+            'connection' => 'cloud',
+            'queue' => 'default',
+            'payload' => '{"job":"App\\\\Jobs\\\\TestJob"}',
+        ]));
+
+        Http::fake([
+            'https://cloud.laravel.com/*' => Http::response($encrypted),
+        ]);
+
+        $url = 'https://cloud.laravel.com/api/jobs/forget-test-id?signature=abc';
+        $count = 0;
+
+        foreach ($provider->find($url) as $id => $failedJob) {
+            $count++;
+            $forgotten = $provider->forget($id);
+        }
+
+        $this->assertSame(1, $count);
+        $this->assertTrue($forgotten);
+        $this->assertSame([
+            [
+                '_cloud_event' => 'failed_job',
+                'id' => 'forget-test-id',
+                'queue' => 'default',
+                'retried_at' => '2000-01-02 03:04:05.060708',
+            ],
+        ], $eventsFake->emitted);
     }
 
     public function testFindReturnsNullWhenDecryptionFails()
@@ -1688,7 +1801,11 @@ class QueueTest extends TestCase
         ]);
 
         try {
-            $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
+            $result = $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
+
+            foreach ($result as $failedJob) {
+                // This loop should not be entered to trigger decryption
+            }
             $this->fail();
         } catch (Throwable $e) {
             $this->assertInstanceOf(DecryptException::class, $e);
@@ -1706,7 +1823,10 @@ class QueueTest extends TestCase
         ]);
 
         try {
-            $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
+            $result = $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
+            foreach ($result as $failedJob) {
+                // This loop should not be entered to trigger the HTTP request
+            }
             $this->fail();
         } catch (Throwable $e) {
             $this->assertInstanceOf(RequestException::class, $e);
@@ -1738,18 +1858,31 @@ class QueueTest extends TestCase
         $failer = $this->fakeFailer();
         $provider = new FailedJobProvider($failer, $eventsFake, $this->app['encrypter']);
 
-        $payload = ['id' => 'forget-test-id', 'connection' => 'cloud', 'queue' => 'default', 'payload' => '{}'];
+        $payload = [
+            'data' => [['id' => 'forget-test-id', 'connection' => 'cloud', 'queue' => 'default', 'payload' => '{"job":"App\\\\Jobs\\\\TestJob"}']],
+            'links' => [
+                'next' => null,
+                'self' => 'https://cloud.laravel.com/api/jobs/test-job-id?signature=abc',
+            ],
+        ];
         $encrypted = Crypt::encryptString(json_encode($payload));
 
         Http::fake([
-            'https://cloud.laravel.com/*' => Http::response($encrypted),
+            'https://cloud.laravel.com/*' => Http::response($encrypted, headers: [
+                'Cloud-Payload-Version' => '1',
+            ]),
         ]);
 
         $url = 'https://cloud.laravel.com/api/jobs/forget-test-id?signature=abc';
-        $provider->find($url);
-        $result = $provider->forget($url);
+        $result = $provider->find($url);
+        $count = 0;
+        foreach ($result as $id => $failedJob) {
+            $count++;
+            $forgotten = $provider->forget($id);
+        }
 
-        $this->assertTrue($result);
+        $this->assertSame(1, $count);
+        $this->assertTrue($forgotten);
         $this->assertSame([
             [
                 '_cloud_event' => 'failed_job',
@@ -1770,6 +1903,103 @@ class QueueTest extends TestCase
 
         $this->assertFalse($result);
         $this->assertEmpty($eventsFake->emitted);
+    }
+
+    public function testRetriesAPaginatedCollectionOfFailedJobsAndDoesNotResolveThemAllEagerly()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        $provider = new FailedJobProvider($this->fakeFailer(), $eventsFake, $this->app['encrypter']);
+        $this->app->instance('queue.failer', $provider);
+
+        $sequence = [];
+
+        // Each page holds a single failed job and links to the next one, so a
+        // page is only fetched once the previous page's job has been retried.
+        Http::fake(function ($request) use (&$sequence) {
+            $page = (int) Str::after($request->url(), 'page=');
+
+            $sequence[] = "fetched page {$page}";
+
+            return Http::response(Crypt::encryptString(json_encode([
+                'data' => [[
+                    'id' => "job-{$page}",
+                    'connection' => 'cloud',
+                    'queue' => 'default',
+                    'payload' => json_encode(['uuid' => "job-{$page}", 'displayName' => MyJob::class]),
+                ]],
+                'links' => [
+                    'self' => $request->url(),
+                    'next' => $page < 3 ? 'https://cloud.laravel.com/api/failed-jobs?page='.($page + 1) : null,
+                ],
+            ])), headers: ['Cloud-Payload-Version' => '1']);
+        });
+
+        $queue = new class($this->app) extends QueueFake
+        {
+            public $recorder;
+
+            public function setContainer($container)
+            {
+                return $this;
+            }
+
+            public function pushRaw($payload, $queue = null, array $options = [])
+            {
+                ($this->recorder)(json_decode($payload, true)['uuid']);
+
+                return parent::pushRaw($payload, $queue, $options);
+            }
+        };
+
+        $queue->recorder = function ($id) use (&$sequence) {
+            $sequence[] = "pushed {$id}";
+        };
+
+        $this->app['queue']->addConnector('cloud', fn () => new class($queue) implements ConnectorInterface
+        {
+            public function __construct(private $queue)
+            {
+                //
+            }
+
+            public function connect($config)
+            {
+                return $this->queue;
+            }
+        });
+
+        $this->artisan('queue:retry', ['id' => ['https://cloud.laravel.com/api/failed-jobs?page=1']])->run();
+
+        $this->assertSame([
+            'fetched page 1',
+            'pushed job-1',
+            'fetched page 2',
+            'pushed job-2',
+            'fetched page 3',
+            'pushed job-3',
+        ], $sequence);
+
+        $this->assertSame([
+            [
+                '_cloud_event' => 'failed_job',
+                'id' => 'job-1',
+                'queue' => 'default',
+                'retried_at' => '2000-01-02 03:04:05.060708',
+            ],
+            [
+                '_cloud_event' => 'failed_job',
+                'id' => 'job-2',
+                'queue' => 'default',
+                'retried_at' => '2000-01-02 03:04:05.060708',
+            ],
+            [
+                '_cloud_event' => 'failed_job',
+                'id' => 'job-3',
+                'queue' => 'default',
+                'retried_at' => '2000-01-02 03:04:05.060708',
+            ],
+        ], $eventsFake->emitted);
     }
 
     public function testItThrowsManagedQueueNotFoundExceptionWhenQueueDoesNotExist()
