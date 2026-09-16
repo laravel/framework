@@ -1025,6 +1025,22 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertNotNull($postWithParents->user_id);
     }
 
+    public function test_factory_use_factory_attribute_is_inherited_from_parent_model()
+    {
+        $factory = FactoryTestUseFactoryAttributeChild::factory();
+
+        $this->assertInstanceOf(FactoryTestUseFactoryAttributeFactory::class, $factory);
+        $this->assertEquals(FactoryTestUseFactoryAttributeChild::class, $factory->modelName());
+    }
+
+    public function test_factory_use_factory_attribute_on_child_overrides_inherited_attribute()
+    {
+        $factory = FactoryTestUseFactoryAttributeOverridingChild::factory();
+
+        $this->assertInstanceOf(FactoryTestOverriddenUseFactoryAttributeFactory::class, $factory);
+        $this->assertEquals(FactoryTestUseFactoryAttributeOverridingChild::class, $factory->modelName());
+    }
+
     public function test_factory_model_names_correct()
     {
         $this->assertEquals(FactoryTestUseFactoryAttribute::class, FactoryTestUseFactoryAttribute::factory()->modelName());
@@ -1368,6 +1384,25 @@ class FactoryTestUseFactoryAttributeFactory extends Factory
 class FactoryTestUseFactoryAttribute extends Eloquent
 {
     use HasFactory;
+}
+
+class FactoryTestUseFactoryAttributeChild extends FactoryTestUseFactoryAttribute
+{
+}
+
+class FactoryTestOverriddenUseFactoryAttributeFactory extends Factory
+{
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name(),
+        ];
+    }
+}
+
+#[UseFactory(FactoryTestOverriddenUseFactoryAttributeFactory::class)]
+class FactoryTestUseFactoryAttributeOverridingChild extends FactoryTestUseFactoryAttribute
+{
 }
 
 class FactoryTestUserWithArray extends Eloquent

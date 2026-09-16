@@ -3,8 +3,11 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelOverridingUseResourceAttribute;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithGuessableResource;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithInheritedUseResourceAttribute;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithUseResourceAttribute;
+use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceCollectionTestResource;
 use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceTestJsonResource;
 use LogicException;
 use PHPUnit\Framework\TestCase;
@@ -68,6 +71,26 @@ class DatabaseEloquentResourceModelTest extends TestCase
         $resource = $model->toResource();
 
         $this->assertInstanceOf(EloquentResourceTestJsonResource::class, $resource);
+        $this->assertSame($model, $resource->resource);
+    }
+
+    public function testItCanTransformToResourceViaUseResourceAttributeInheritedFromParent()
+    {
+        $model = new EloquentResourceTestResourceModelWithInheritedUseResourceAttribute();
+
+        $resource = $model->toResource();
+
+        $this->assertInstanceOf(EloquentResourceTestJsonResource::class, $resource);
+        $this->assertSame($model, $resource->resource);
+    }
+
+    public function testUseResourceAttributeOnChildOverridesTheInheritedAttribute()
+    {
+        $model = new EloquentResourceTestResourceModelOverridingUseResourceAttribute();
+
+        $resource = $model->toResource();
+
+        $this->assertInstanceOf(EloquentResourceCollectionTestResource::class, $resource);
         $this->assertSame($model, $resource->resource);
     }
 }

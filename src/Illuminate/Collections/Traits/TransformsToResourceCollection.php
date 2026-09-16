@@ -97,11 +97,17 @@ trait TransformsToResourceCollection
             return null;
         }
 
-        $attributes = (new ReflectionClass($class))->getAttributes(UseResource::class);
+        $reflection = new ReflectionClass($class);
 
-        return $attributes !== []
-            ? $attributes[0]->newInstance()->class
-            : null;
+        do {
+            $attributes = $reflection->getAttributes(UseResource::class);
+
+            if ($attributes !== []) {
+                return $attributes[0]->newInstance()->class;
+            }
+        } while ($reflection = $reflection->getParentClass());
+
+        return null;
     }
 
     /**
@@ -116,10 +122,16 @@ trait TransformsToResourceCollection
             return null;
         }
 
-        $attributes = (new ReflectionClass($class))->getAttributes(UseResourceCollection::class);
+        $reflection = new ReflectionClass($class);
 
-        return $attributes !== []
-            ? $attributes[0]->newInstance()->class
-            : null;
+        do {
+            $attributes = $reflection->getAttributes(UseResourceCollection::class);
+
+            if ($attributes !== []) {
+                return $attributes[0]->newInstance()->class;
+            }
+        } while ($reflection = $reflection->getParentClass());
+
+        return null;
     }
 }

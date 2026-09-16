@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceCollectionTestModel;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithInheritedUseResourceAttribute;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithInheritedUseResourceCollectionAttribute;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithUseResourceAttribute;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithUseResourceCollectionAttribute;
 use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceCollectionTestResource;
@@ -65,6 +67,29 @@ class DatabaseEloquentResourceCollectionTest extends TestCase
     {
         $collection = new Collection([
             new EloquentResourceTestResourceModelWithUseResourceAttribute(),
+        ]);
+
+        $resource = $collection->toResourceCollection();
+
+        $this->assertInstanceOf(AnonymousResourceCollection::class, $resource);
+        $this->assertInstanceOf(EloquentResourceTestJsonResource::class, $resource[0]);
+    }
+
+    public function testItCanTransformToResourceViaUseResourceCollectionAttributeInheritedFromParent()
+    {
+        $collection = new Collection([
+            new EloquentResourceTestResourceModelWithInheritedUseResourceCollectionAttribute(),
+        ]);
+
+        $resource = $collection->toResourceCollection();
+
+        $this->assertInstanceOf(EloquentResourceTestJsonResourceCollection::class, $resource);
+    }
+
+    public function testItCanTransformToResourceViaUseResourceAttributeInheritedFromParent()
+    {
+        $collection = new Collection([
+            new EloquentResourceTestResourceModelWithInheritedUseResourceAttribute(),
         ]);
 
         $resource = $collection->toResourceCollection();

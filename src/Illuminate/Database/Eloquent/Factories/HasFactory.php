@@ -46,17 +46,22 @@ trait HasFactory
      */
     protected static function getUseFactoryAttribute()
     {
-        $attributes = (new \ReflectionClass(static::class))
-            ->getAttributes(UseFactory::class);
+        $reflection = new \ReflectionClass(static::class);
 
-        if ($attributes !== []) {
-            $useFactory = $attributes[0]->newInstance();
+        do {
+            $attributes = $reflection->getAttributes(UseFactory::class);
 
-            $factory = $useFactory->factoryClass::new();
+            if ($attributes !== []) {
+                $useFactory = $attributes[0]->newInstance();
 
-            $factory->guessModelNamesUsing(fn () => static::class);
+                $factory = $useFactory->factoryClass::new();
 
-            return $factory;
-        }
+                $factory->guessModelNamesUsing(fn () => static::class);
+
+                return $factory;
+            }
+        } while ($reflection = $reflection->getParentClass());
+
+        return null;
     }
 }
