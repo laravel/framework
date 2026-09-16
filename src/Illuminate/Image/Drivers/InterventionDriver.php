@@ -78,11 +78,7 @@ abstract class InterventionDriver implements Driver
      */
     public function process(string $contents, ImagePipeline $pipeline): string
     {
-        $mimeType = (new finfo(FILEINFO_MIME_TYPE))->buffer($contents);
-
-        if (! in_array($mimeType, ['image/jpeg', 'image/png', 'image/bmp', 'image/gif', 'image/webp', 'image/avif', 'image/x-avif', 'image/heic', 'image/x-heic', 'image/heif'])) {
-            throw new ImageException("The image format [{$mimeType}] is not supported.");
-        }
+        $this->assertSupportedMime($contents);
 
         $image = $this->manager->decode($contents);
 
@@ -150,6 +146,8 @@ abstract class InterventionDriver implements Driver
      */
     public function dimensions(string $contents): array
     {
+        $this->assertSupportedMime($contents);
+
         $image = $this->manager->decode($contents);
 
         try {
@@ -170,10 +168,26 @@ abstract class InterventionDriver implements Driver
     }
 
     /**
+     * Ensure the given raw image contents are an allowed image type before decoding.
+     *
+     * @throws ImageException
+     */
+    protected function assertSupportedMime(string $contents): void
+    {
+        $mimeType = (new finfo(FILEINFO_MIME_TYPE))->buffer($contents);
+
+        if (! in_array($mimeType, ['image/jpeg', 'image/png', 'image/bmp', 'image/gif', 'image/webp', 'image/avif', 'image/x-avif', 'image/heic', 'image/x-heic', 'image/heif'])) {
+            throw new ImageException("The image format [{$mimeType}] is not supported.");
+        }
+    }
+
+    /**
      * Get the dominant (average) color of the image as a hex string.
      */
     public function dominantColor(string $contents): string
     {
+        $this->assertSupportedMime($contents);
+
         $image = $this->manager->decode($contents);
 
         try {
