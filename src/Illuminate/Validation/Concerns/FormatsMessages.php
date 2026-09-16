@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
+use Illuminate\Translation\MessageSelector;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -235,6 +236,39 @@ trait FormatsMessages
             $this->getValue($attribute) instanceof File => 'file',
             default => 'string',
         };
+    }
+
+    /**
+     * Select a pluralized message using the size of the attribute being validated.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @return string
+     */
+    protected function getPluralizedMessage($message, $attribute)
+    {
+        if (! str_contains($message, '|') || ! preg_match('/^[\{\[][-?\d|*,\.*]*[\}\]]/', $message)) {
+            return $message;
+        }
+
+        $value = $this->getValue($attribute);
+
+        $count = match (true) {
+            is_array($value) => count($value),
+            is_numeric($value) && $this->hasRule($attribute, $this->numericRules) => $this->trim($value),
+            $this->isValidFileInstance($value) => $value->getSize() / 1024,
+            is_string($value), is_null($value) => mb_strlen($value ?? ''),
+            default => null,
+        };
+
+        if (is_null($count) || ! is_finite((float) $count)) {
+            return $message;
+        }
+
+        return str_replace(
+            [':count', ':Count', ':COUNT'], $count,
+            (new MessageSelector)->choose($message, $count, $this->translator->getLocale())
+        );
     }
 
     /**

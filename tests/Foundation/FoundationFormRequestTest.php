@@ -98,6 +98,26 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
     }
 
+    public function testValidationMessagesArePluralizedWithoutOverridingMessages()
+    {
+        $translator = new TranslatorConcrete(new ArrayLoader, 'en');
+        $translator->addLines([
+            'validation.min.array' => '{0} There are none|{1} There is one|[2,*] There are :count',
+        ], 'en');
+
+        $container = new Container;
+        $container->instance(ValidationFactoryContract::class, new ValidationFactory($translator, $container));
+
+        $request = FoundationTestFormRequestPluralizationStub::create('/', 'POST', ['items' => ['a', 'b']]);
+        $request->setContainer($container)->setRedirector($this->createMockRedirector($request));
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertSame(['items' => ['There are 2']], $exception->errors());
+    }
+
     public function testValidateThrowsWhenValidationFailsWithConfiguredErrorBagAttribute()
     {
         $request = $this->createRequest(['no' => 'name'], FoundationTestFormRequestWithErrorBagAttribute::class);
@@ -753,6 +773,14 @@ class FoundationTestFormRequestNestedStub extends FormRequest
     public function authorize()
     {
         return true;
+    }
+}
+
+class FoundationTestFormRequestPluralizationStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['items' => 'array|min:3'];
     }
 }
 
