@@ -16,7 +16,12 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
      */
     protected $cache = [];
 
-    protected ?MemoizedTaggedCache $taggedCache = null;
+    /**
+     * The memoized tagged cache instances.
+     *
+     * @var array<string, \Illuminate\Cache\MemoizedTaggedCache>
+     */
+    protected $taggedCaches = [];
 
     /**
      * Create a new memoized cache instance.
@@ -261,7 +266,13 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
     {
         $this->cache = [];
 
-        return $this->repository->flush();
+        $result = $this->repository->flush();
+
+        foreach ($this->taggedCaches as $taggedCache) {
+            $taggedCache->flush();
+        }
+
+        return $result;
     }
 
     /**
@@ -295,12 +306,15 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
      */
     public function tags($names)
     {
-        if (! is_null($this->taggedCache)) {
-            return $this->taggedCache;
+        $names = is_array($names) ? $names : func_get_args();
+        $key = serialize($names);
+
+        if (isset($this->taggedCaches[$key])) {
+            return $this->taggedCaches[$key];
         }
 
         $taggedCache = $this->repository->tags($names);
 
-        return $this->taggedCache = new MemoizedTaggedCache($taggedCache->getStore(), $taggedCache->getTags());
+        return $this->taggedCaches[$key] = new MemoizedTaggedCache($taggedCache->getStore(), $taggedCache->getTags());
     }
 }

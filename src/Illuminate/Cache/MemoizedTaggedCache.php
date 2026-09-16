@@ -2,6 +2,8 @@
 
 namespace Illuminate\Cache;
 
+use function Illuminate\Support\enum_value;
+
 class MemoizedTaggedCache extends TaggedCache
 {
     /**
@@ -34,6 +36,10 @@ class MemoizedTaggedCache extends TaggedCache
      */
     public function get($key, $default = null): mixed
     {
+        if (is_array($key)) {
+            return $this->many($key);
+        }
+
         $prefixedKey = $this->itemKey($key);
 
         if (array_key_exists($prefixedKey, $this->cache)) {
@@ -51,11 +57,13 @@ class MemoizedTaggedCache extends TaggedCache
      */
     public function many(array $defaults)
     {
+        $keys = [];
         $memoized = [];
         $missing = [];
 
-        // Check which keys are already memoized
         foreach ($defaults as $key => $value) {
+            $key = array_is_list($defaults) ? enum_value($value) : enum_value($key);
+            $keys[$key] = array_is_list($defaults) ? null : $value;
             $prefixedKey = $this->itemKey($key);
 
             if (array_key_exists($prefixedKey, $this->cache)) {
@@ -65,11 +73,9 @@ class MemoizedTaggedCache extends TaggedCache
             }
         }
 
-        // Fetch missing keys from the parent TaggedCache
         if (! empty($missing)) {
             $retrieved = $this->taggedCache->many($missing);
 
-            // Memoize the retrieved values
             foreach ($retrieved as $key => $value) {
                 $this->cache[$this->itemKey($key)] = $value;
             }
@@ -77,10 +83,11 @@ class MemoizedTaggedCache extends TaggedCache
             $memoized = array_merge($memoized, $retrieved);
         }
 
-        // Ensure the result matches the order of the requested keys
         $result = [];
-        foreach ($defaults as $key => $value) {
-            $result[$key] = $memoized[$key] ?? $value;
+        foreach ($keys as $key => $default) {
+            $result[$key] = array_key_exists($key, $memoized) && ! is_null($memoized[$key])
+                ? $memoized[$key]
+                : value($default);
         }
 
         return $result;

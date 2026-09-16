@@ -179,4 +179,47 @@ class MemoizedTaggedCacheTest extends TestCase
 
         Cache::memo('file')->tags(['foo', 'bar'])->put('name', 'Tim', 60);
     }
+
+    public function test_it_keeps_memoized_values_isolated_between_tag_sets()
+    {
+        Cache::tags(['foo'])->put('name', 'Foo', 60);
+        Cache::tags(['bar'])->put('name', 'Bar', 60);
+
+        $this->assertSame('Foo', Cache::memo()->tags(['foo'])->get('name'));
+        $this->assertSame('Bar', Cache::memo()->tags(['bar'])->get('name'));
+    }
+
+    public function test_scalar_and_array_tag_names_share_the_same_memoized_cache()
+    {
+        Cache::tags(['foo'])->put('name', 'Foo', 60);
+
+        $this->assertSame('Foo', Cache::memo()->tags('foo')->get('name'));
+
+        Cache::tags(['foo'])->put('name', 'Bar', 60);
+
+        $this->assertSame('Foo', Cache::memo()->tags(['foo'])->get('name'));
+    }
+
+    public function test_it_flushes_tagged_memoized_values_when_the_store_is_flushed()
+    {
+        Cache::tags(['foo'])->put('name', 'Foo', 60);
+        Cache::memo()->tags(['foo'])->get('name');
+
+        Cache::memo()->flush();
+
+        $this->assertNull(Cache::memo()->tags(['foo'])->get('name'));
+    }
+
+    public function test_it_resolves_defaults_when_retrieving_multiple_tagged_values()
+    {
+        $this->assertSame(
+            ['missing' => 'fallback'],
+            Cache::memo()->tags(['foo'])->getMultiple(['missing'], fn () => 'fallback'),
+        );
+
+        $this->assertSame(
+            ['missing' => null],
+            Cache::memo()->tags(['foo'])->get(['missing']),
+        );
+    }
 }
