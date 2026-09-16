@@ -493,10 +493,10 @@ class DevCommands
     /**
      * Set the order in which named commands should run when running the "dev" command.
      *
-     * @param  string  ...$names
+     * @param  array<int, string>  $names
      * @return void
      */
-    public static function order(...$names): void
+    public static function order(array $names): void
     {
         self::$order = $names;
     }

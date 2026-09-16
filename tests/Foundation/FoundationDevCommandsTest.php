@@ -145,7 +145,7 @@ class FoundationDevCommandsTest extends TestCase
         DevCommands::register('echo two', 'two');
         DevCommands::register('echo three', 'three');
 
-        DevCommands::order('three', 'one', 'two');
+        DevCommands::order(['three', 'one', 'two']);
 
         $commands = DevCommands::commands();
 
@@ -159,7 +159,7 @@ class FoundationDevCommandsTest extends TestCase
         DevCommands::register('echo three', 'three');
         DevCommands::register('echo four', 'four');
 
-        DevCommands::order('four');
+        DevCommands::order(['four']);
 
         $commands = DevCommands::commands();
 
