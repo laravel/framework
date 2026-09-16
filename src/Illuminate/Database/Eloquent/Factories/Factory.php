@@ -961,11 +961,7 @@ abstract class Factory
     public function modelName()
     {
         if (! array_key_exists(static::class, static::$cachedModelAttributes)) {
-            $attribute = (new ReflectionClass($this))->getAttributes(UseModel::class);
-
-            static::$cachedModelAttributes[static::class] = $attribute !== []
-                ? $attribute[0]->newInstance()->class
-                : false;
+            static::$cachedModelAttributes[static::class] = $this->resolveModelFromAttribute() ?? false;
         }
 
         if (static::$cachedModelAttributes[static::class]) {
@@ -991,6 +987,31 @@ abstract class Factory
         };
 
         return $resolver($this);
+    }
+
+    /**
+     * Resolve the model class name from the UseModel attribute.
+     *
+     * @return class-string<TModel>|null
+     */
+    protected function resolveModelFromAttribute()
+    {
+        $reflection = new ReflectionClass($this);
+
+        do {
+            $attributes = $reflection->getAttributes(UseModel::class);
+
+            if ($attributes !== []) {
+                return $attributes[0]->newInstance()->class;
+            }
+
+            if ($reflection->hasProperty('model') &&
+                $reflection->getProperty('model')->class === $reflection->name) {
+                return null;
+            }
+        } while ($reflection = $reflection->getParentClass());
+
+        return null;
     }
 
     /**

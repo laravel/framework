@@ -10,6 +10,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Factories\CrossJoinSequence;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -1044,6 +1045,26 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertEquals(FactoryTestGuessModel::class, FactoryTestGuessModelFactory::new()->modelName());
     }
 
+    public function test_factory_use_model_attribute()
+    {
+        $this->assertEquals(FactoryTestUser::class, FactoryTestUseModelAttributeFactory::new()->modelName());
+    }
+
+    public function test_factory_use_model_attribute_is_inherited_from_parent_factory()
+    {
+        $this->assertEquals(FactoryTestUser::class, FactoryTestInheritedUseModelAttributeFactory::new()->modelName());
+    }
+
+    public function test_factory_use_model_attribute_on_child_overrides_inherited_attribute()
+    {
+        $this->assertEquals(FactoryTestPost::class, FactoryTestOverridingUseModelAttributeFactory::new()->modelName());
+    }
+
+    public function test_factory_model_property_on_child_takes_precedence_over_inherited_use_model_attribute()
+    {
+        $this->assertEquals(FactoryTestPost::class, FactoryTestModelPropertyUseModelAttributeFactory::new()->modelName());
+    }
+
     public function test_factory_model_has_many_relationship_has_pending_attributes()
     {
         FactoryTestUser::factory()->has(new FactoryTestPostFactory(), 'postsWithFooBarBazAsTitle')->create();
@@ -1400,6 +1421,31 @@ class FactoryTestUserWithArrayFactory extends Factory
             'options' => ['rtj'],
         ];
     }
+}
+
+#[UseModel(FactoryTestUser::class)]
+class FactoryTestUseModelAttributeFactory extends Factory
+{
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name(),
+        ];
+    }
+}
+
+class FactoryTestInheritedUseModelAttributeFactory extends FactoryTestUseModelAttributeFactory
+{
+}
+
+#[UseModel(FactoryTestPost::class)]
+class FactoryTestOverridingUseModelAttributeFactory extends FactoryTestUseModelAttributeFactory
+{
+}
+
+class FactoryTestModelPropertyUseModelAttributeFactory extends FactoryTestUseModelAttributeFactory
+{
+    protected $model = FactoryTestPost::class;
 }
 
 class FactoryTestUserWithCallbacksFactory extends Factory
