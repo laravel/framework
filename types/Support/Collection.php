@@ -1056,6 +1056,10 @@ assertType('Illuminate\Support\Collection<string, string>', $collection::make([
     'string-key-1' => 'string-value-1',
 ])->put('string-key-2', 'string-value-2'));
 
+$putCollection = $collection::make([new User]);
+assertType('Illuminate\Support\Collection<int, string|User>', $putCollection->put(1, 'string'));
+assertType("Illuminate\Support\Collection<int, 'string'|User>", $putCollection);
+
 assertType('User|null', $collection->shift());
 assertType('Illuminate\Support\Collection<int, string>', $collection::make([
     'string-key-1' => 'string-value-1',
