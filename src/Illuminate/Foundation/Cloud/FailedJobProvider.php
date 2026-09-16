@@ -166,6 +166,13 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
 
         return match ($response->header('Cloud-Payload-Version')) {
             '1' => $payload,
+            '' => literal(
+                data: [$payload],
+                links: literal(
+                    self: $url,
+                    next: null,
+                ),
+            ),
             default => throw new RuntimeException('Unsupported payload version: '.$response->header('Cloud-Payload-Version')),
         };
     }

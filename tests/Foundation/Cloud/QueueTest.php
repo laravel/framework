@@ -1692,6 +1692,104 @@ class QueueTest extends TestCase
         Http::assertSent(fn ($request) => $request->url() === 'https://cloud.laravel.com/api/jobs/test-job-id?signature=abc');
     }
 
+    public function testFindWrapsTheResponseWhenThePayloadVersionIsMissing()
+    {
+        $eventsFake = $this->fakeEvents();
+        $failer = $this->fakeFailer();
+        $provider = new FailedJobProvider($failer, $eventsFake, $this->app['encrypter']);
+
+        // Responses that don't announce a payload version contain a single,
+        // unpaginated failed job, so they are wrapped in the paginated shape
+        // the iterator expects.
+        $encrypted = Crypt::encryptString(json_encode([
+            'id' => 'test-job-id',
+            'connection' => 'cloud',
+            'queue' => 'default',
+            'payload' => '{"job":"App\\\\Jobs\\\\TestJob"}',
+        ]));
+
+        Http::fake([
+            'https://cloud.laravel.com/*' => Http::response($encrypted),
+        ]);
+
+        $url = 'https://cloud.laravel.com/api/jobs/test-job-id?signature=abc';
+        $jobs = $provider->find($url)->all();
+
+        $this->assertSame([$url.':test-job-id'], array_keys($jobs));
+        $this->assertSame('test-job-id', $jobs[$url.':test-job-id']->id);
+        $this->assertSame('cloud', $jobs[$url.':test-job-id']->connection);
+        $this->assertSame('default', $jobs[$url.':test-job-id']->queue);
+        $this->assertSame('{"job":"App\\\\Jobs\\\\TestJob"}', $jobs[$url.':test-job-id']->payload);
+        Http::assertSentCount(1);
+    }
+
+    #[TestWith(['0'])]
+    #[TestWith(['2'])]
+    #[TestWith(['1.0'])]
+    public function testFindThrowsWhenThePayloadVersionIsNotSupported(string $version)
+    {
+        $eventsFake = $this->fakeEvents();
+        $failer = $this->fakeFailer();
+        $provider = new FailedJobProvider($failer, $eventsFake, $this->app['encrypter']);
+
+        $encrypted = Crypt::encryptString(json_encode([
+            'data' => [['id' => 'test-job-id', 'connection' => 'cloud', 'queue' => 'default', 'payload' => '{"job":"App\\\\Jobs\\\\TestJob"}']],
+            'links' => [
+                'next' => null,
+                'self' => 'https://cloud.laravel.com/api/jobs/test-job-id?signature=abc',
+            ],
+        ]));
+
+        Http::fake([
+            'https://cloud.laravel.com/*' => Http::response($encrypted, headers: [
+                'Cloud-Payload-Version' => $version,
+            ]),
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unsupported payload version: '.$version);
+
+        $provider->find('https://cloud.laravel.com/api/jobs/test-job-id?signature=abc')->all();
+    }
+
+    public function testForgetEmitsEventAfterFindingAPayloadWithoutAVersion()
+    {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        $eventsFake = $this->fakeEvents();
+        $failer = $this->fakeFailer();
+        $provider = new FailedJobProvider($failer, $eventsFake, $this->app['encrypter']);
+
+        $encrypted = Crypt::encryptString(json_encode([
+            'id' => 'forget-test-id',
+            'connection' => 'cloud',
+            'queue' => 'default',
+            'payload' => '{"job":"App\\\\Jobs\\\\TestJob"}',
+        ]));
+
+        Http::fake([
+            'https://cloud.laravel.com/*' => Http::response($encrypted),
+        ]);
+
+        $url = 'https://cloud.laravel.com/api/jobs/forget-test-id?signature=abc';
+        $count = 0;
+
+        foreach ($provider->find($url) as $id => $failedJob) {
+            $count++;
+            $forgotten = $provider->forget($id);
+        }
+
+        $this->assertSame(1, $count);
+        $this->assertTrue($forgotten);
+        $this->assertSame([
+            [
+                '_cloud_event' => 'failed_job',
+                'id' => 'forget-test-id',
+                'queue' => 'default',
+                'retried_at' => '2000-01-02 03:04:05.060708',
+            ],
+        ], $eventsFake->emitted);
+    }
+
     public function testFindReturnsNullWhenDecryptionFails()
     {
         $eventsFake = $this->fakeEvents();
