@@ -1136,9 +1136,13 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Put an item in the collection by key.
      *
+     * @template TPutValue
+     *
      * @param  TKey  $key
-     * @param  TValue  $value
+     * @param  TPutValue  $value
      * @return $this
+     *
+     * @phpstan-this-out static<TKey, TValue|TPutValue>
      */
     public function put($key, $value)
     {
