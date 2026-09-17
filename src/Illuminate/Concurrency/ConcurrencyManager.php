@@ -132,7 +132,7 @@ class ConcurrencyManager extends MultipleInstanceManager
     {
         $config = $this->app['config']->get('concurrency.drivers.'.$name);
 
-        if (is_array($config)) {
+        if (! is_null($config)) {
             return array_merge(['driver' => $name], $config);
         }
 
