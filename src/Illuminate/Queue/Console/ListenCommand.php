@@ -6,7 +6,13 @@ use Illuminate\Console\Command;
 use Illuminate\Queue\Listener;
 use Illuminate\Queue\ListenerOptions;
 use Illuminate\Support\Stringable;
+use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
+
+use function Illuminate\Support\artisan_binary;
+use function Illuminate\Support\php_binary;
 
 #[AsCommand(name: 'queue:listen')]
 class ListenCommand extends Command
@@ -24,6 +30,8 @@ class ListenCommand extends Command
                             {--force : Force the worker to run even in maintenance mode}
                             {--memory=128 : The memory limit in megabytes}
                             {--queue= : The queue to listen on}
+                            {--watch : Restart a persistent worker when files change}
+                            {--poll : Use polling for file watching with --watch}
                             {--sleep=3 : The number of seconds to sleep when no job is available}
                             {--rest=0 : The number of seconds to rest between jobs}
                             {--timeout=60 : The number of seconds a child process can run}
@@ -44,6 +52,27 @@ class ListenCommand extends Command
     protected $listener;
 
     /**
+     * The queue worker process instance.
+     *
+     * @var \Symfony\Component\Process\Process|null
+     */
+    protected $workerProcess;
+
+    /**
+     * The file watcher process instance.
+     *
+     * @var \Symfony\Component\Process\Process|null
+     */
+    protected $watcherProcess;
+
+    /**
+     * Indicates if a termination signal has been received.
+     *
+     * @var int|null
+     */
+    protected $trappedSignal = null;
+
+    /**
      * Create a new queue listen command.
      *
      * @param  \Illuminate\Queue\Listener  $listener
@@ -58,10 +87,14 @@ class ListenCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int|null
      */
     public function handle()
     {
+        if ($this->option('watch')) {
+            return $this->watch();
+        }
+
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set
         // connection being run for the queue operation currently being executed.
@@ -74,6 +107,171 @@ class ListenCommand extends Command
         $this->listener->listen(
             $connection, $queue, $this->gatherOptions()
         );
+    }
+
+    /**
+     * Run a persistent worker and restart it when files change.
+     *
+     * @return int
+     */
+    protected function watch()
+    {
+        $this->components->info('Starting queue worker and watching for file changes...');
+
+        $this->watcherProcess = $this->startWatcher();
+
+        if ($this->watcherProcess->isTerminated()) {
+            return $this->watcherFailed();
+        }
+
+        if (! $this->startWorker()) {
+            return Command::FAILURE;
+        }
+
+        $this->listenForChanges();
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Start the file watcher process.
+     *
+     * @return \Symfony\Component\Process\Process
+     */
+    protected function startWatcher()
+    {
+        if (empty($paths = $this->laravel['config']->get('queue.watch'))) {
+            throw new InvalidArgumentException(
+                'List of directories / files to watch not found. Please update your "config/queue.php" configuration file.',
+            );
+        }
+
+        $nodeExecutable = (new ExecutableFinder)->find('node');
+
+        if (! $nodeExecutable) {
+            throw new InvalidArgumentException(
+                'Node could not be found. Please ensure Node is installed and available in your system PATH.',
+            );
+        }
+
+        $process = new Process([
+            $nodeExecutable,
+            'file-watcher.cjs',
+            json_encode(collect($paths)->map(fn ($path) => $this->laravel->basePath($path))->values()->all()),
+            $this->option('poll') ? '1' : '',
+        ], __DIR__.'/../resources', ['NODE_PATH' => $this->laravel->basePath('node_modules')], null, null);
+
+        $process->start();
+
+        sleep(1);
+
+        return $process;
+    }
+
+    /**
+     * Start the queue worker process.
+     *
+     * @return bool
+     */
+    protected function startWorker()
+    {
+        $this->workerProcess = $this->createWorkerProcess();
+
+        $this->trap([SIGINT, SIGTERM, SIGQUIT], function ($signal) {
+            $this->trappedSignal = $signal;
+
+            $this->workerProcess->stop(signal: $signal);
+            $this->workerProcess->wait();
+
+            if ($this->watcherProcess) {
+                $this->watcherProcess->stop();
+            }
+        });
+
+        $this->workerProcess->start();
+
+        usleep(100000);
+
+        return ! $this->workerProcess->isTerminated();
+    }
+
+    /**
+     * Listen for file changes and restart the worker when detected.
+     *
+     * @return void
+     */
+    protected function listenForChanges()
+    {
+        while (! $this->trappedSignal) {
+            if ($this->watcherProcess->getIncrementalOutput()) {
+                $this->restartWorker();
+            }
+
+            $this->output->write($this->workerProcess->getIncrementalOutput());
+
+            if (! $this->workerProcess->isRunning()) {
+                break;
+            }
+
+            usleep(500000);
+        }
+    }
+
+    /**
+     * Restart the queue worker process.
+     *
+     * @return void
+     */
+    protected function restartWorker()
+    {
+        $this->components->info('File changed. Restarting queue worker...');
+
+        $this->workerProcess->stop();
+        $this->workerProcess->wait();
+
+        $this->startWorker();
+    }
+
+    /**
+     * Create the persistent queue worker process.
+     *
+     * @return \Symfony\Component\Process\Process
+     */
+    protected function createWorkerProcess()
+    {
+        $command = [php_binary(), artisan_binary(), 'queue:work'];
+
+        if (! is_null($connection = $this->argument('connection'))) {
+            $command[] = $connection;
+        }
+
+        foreach (['name', 'backoff', 'memory', 'queue', 'sleep', 'rest', 'timeout', 'tries', 'env'] as $option) {
+            if (! is_null($value = $this->option($option))) {
+                $command[] = "--{$option}={$value}";
+            }
+        }
+
+        if ($this->option('force')) {
+            $command[] = '--force';
+        }
+
+        return new Process($command, $this->laravel->basePath(), null, null, null);
+    }
+
+    /**
+     * Report a failed file watcher.
+     *
+     * @return int
+     */
+    protected function watcherFailed()
+    {
+        $this->components->error(
+            'Unable to start file watcher. Please ensure Node.js and the chokidar npm package are installed.',
+        );
+
+        $this->output->writeln($this->watcherProcess->getErrorOutput());
+
+        return Command::FAILURE;
     }
 
     /**

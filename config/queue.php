@@ -129,4 +129,28 @@ return [
         'table' => 'failed_jobs',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | File Watcher Configuration
+    |--------------------------------------------------------------------------
+    |
+    | These directories and files will be watched by the queue:listen command
+    | when the --watch option is enabled. The worker will be restarted when
+    | any of these files change so that it can load the updated code.
+    |
+    */
+
+    'watch' => [
+        'app',
+        'bootstrap',
+        'config/**/*.php',
+        'database/**/*.php',
+        'public/**/*.php',
+        'resources/**/*.php',
+        'routes',
+        'composer.lock',
+        'composer.json',
+        '.env',
+    ],
+
 ];
