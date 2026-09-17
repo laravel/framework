@@ -177,7 +177,7 @@ class ListenCommand extends Command
     {
         $this->workerProcess = $this->createWorkerProcess();
 
-        $this->trap([SIGINT, SIGTERM, SIGQUIT], function ($signal) {
+        $this->trap(fn () => [SIGINT, SIGTERM, SIGQUIT], function ($signal) {
             $this->trappedSignal = $signal;
 
             $this->workerProcess->stop(signal: $signal);
