@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Testing\Concerns\WithoutExceptionHandlingHandler;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Testing\Assert;
@@ -102,6 +103,39 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
             $count, $total,
             "The total number of exceptions reported was {$total} instead of {$count}."
         );
+    }
+
+    /**
+     * Assert the number of times an exception of the given type has been reported.
+     *
+     * @param  (\Closure(\Throwable): bool)|class-string<\Throwable>  $exception
+     * @param  int  $times
+     * @return void
+     */
+    public function assertReportedTimes(Closure|string $exception, int $times = 1)
+    {
+        $count = $this->reportedOfType($exception)->count();
+
+        PHPUnit::assertSame(
+            $times, $count,
+            sprintf(
+                'The expected [%s] exception was reported %s %s instead of %s %s.',
+                is_string($exception) ? $exception : $this->firstClosureParameterType($exception),
+                $count, Str::plural('time', $count),
+                $times, Str::plural('time', $times),
+            )
+        );
+    }
+
+    /**
+     * Assert an exception of the given type has been reported exactly once.
+     *
+     * @param  (\Closure(\Throwable): bool)|class-string<\Throwable>  $exception
+     * @return void
+     */
+    public function assertReportedOnce(Closure|string $exception)
+    {
+        $this->assertReportedTimes($exception, 1);
     }
 
     /**
@@ -261,6 +295,21 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     public function reported()
     {
         return $this->reported;
+    }
+
+    /**
+     * Get the reported exceptions matching the given type or truth test.
+     *
+     * @param  (\Closure(\Throwable): bool)|class-string<\Throwable>  $exception
+     * @return \Illuminate\Support\Collection<int, \Throwable>
+     */
+    protected function reportedOfType(Closure|string $exception)
+    {
+        $type = is_string($exception) ? $exception : $this->firstClosureParameterType($exception);
+
+        return (new Collection($this->reported))->filter(
+            fn (Throwable $e) => get_class($e) === $type && (is_string($exception) || $exception($e) === true)
+        );
     }
 
     /**

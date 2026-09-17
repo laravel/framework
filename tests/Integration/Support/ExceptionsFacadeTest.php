@@ -58,6 +58,73 @@ class ExceptionsFacadeTest extends TestCase
         Exceptions::assertReportedCount(1);
     }
 
+    public function testFakeAssertReportedTimes()
+    {
+        Exceptions::fake();
+
+        Exceptions::report(new RuntimeException('test 1'));
+        report(new RuntimeException('test 2'));
+        report(new InvalidArgumentException('test 3'));
+
+        Exceptions::assertReportedTimes(RuntimeException::class, 2);
+        Exceptions::assertReportedTimes(InvalidArgumentException::class, 1);
+        Exceptions::assertReportedTimes(fn (RuntimeException $e) => $e->getMessage() === 'test 1', 1);
+        Exceptions::assertReportedTimes(ModelNotFoundException::class, 0);
+    }
+
+    public function testFakeAssertReportedTimesMayFail()
+    {
+        Exceptions::fake();
+
+        Exceptions::report(new RuntimeException('test 1'));
+        report(new RuntimeException('test 2'));
+
+        $this->expectExceptionObject(new ExpectationFailedException(
+            'The expected [RuntimeException] exception was reported 2 times instead of 1 time.'
+        ));
+
+        Exceptions::assertReportedTimes(RuntimeException::class, 1);
+    }
+
+    public function testFakeAssertReportedOnce()
+    {
+        Exceptions::fake();
+
+        Exceptions::report(new RuntimeException('test 1'));
+        report(new InvalidArgumentException('test 2'));
+
+        Exceptions::assertReportedOnce(RuntimeException::class);
+        Exceptions::assertReportedOnce(fn (InvalidArgumentException $e) => $e->getMessage() === 'test 2');
+    }
+
+    public function testFakeAssertReportedOnceMayFail()
+    {
+        Exceptions::fake();
+
+        Exceptions::report(new RuntimeException('test 1'));
+        report(new RuntimeException('test 2'));
+
+        $this->expectExceptionObject(new ExpectationFailedException(
+            'The expected [RuntimeException] exception was reported 2 times instead of 1 time.'
+        ));
+
+        Exceptions::assertReportedOnce(RuntimeException::class);
+    }
+
+    public function testFakeAssertReportedTimesWithFakedExceptions()
+    {
+        Exceptions::fake([
+            RuntimeException::class,
+        ]);
+
+        Exceptions::report(new RuntimeException('test 1'));
+        report(new RuntimeException('test 2'));
+        report(new InvalidArgumentException('test 3'));
+
+        Exceptions::assertReportedTimes(RuntimeException::class, 2);
+        Exceptions::assertReportedTimes(InvalidArgumentException::class, 0);
+    }
+
     public function testFakeAssertReportedWithFakedExceptions()
     {
         Exceptions::fake([
