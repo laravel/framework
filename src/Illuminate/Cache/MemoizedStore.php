@@ -313,8 +313,8 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
             return $this->taggedCaches[$key];
         }
 
-        $taggedCache = $this->repository->tags($names);
-
-        return $this->taggedCaches[$key] = new MemoizedTaggedCache($taggedCache->getStore(), $taggedCache->getTags());
+        return $this->taggedCaches[$key] = new MemoizedTaggedCache(
+            $this->repository->tags($names), $this
+        );
     }
 }

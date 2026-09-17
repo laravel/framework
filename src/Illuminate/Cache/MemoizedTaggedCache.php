@@ -14,17 +14,25 @@ class MemoizedTaggedCache extends TaggedCache
     protected $cache = [];
 
     /**
-     * The tagged store instance.
+     * The tagged cache instance.
      *
-     * @var \Illuminate\Contracts\Cache\Store
+     * @var \Illuminate\Cache\TaggedCache
      */
     protected TaggedCache $taggedCache;
 
-    public function __construct(TaggableStore $store, TagSet $tags)
-    {
-        $this->taggedCache = $store->tags($tags->getNames());
+    /**
+     * The memoized store instance.
+     *
+     * @var \Illuminate\Cache\MemoizedStore
+     */
+    protected MemoizedStore $memoizedStore;
 
-        parent::__construct($store, $tags);
+    public function __construct(TaggedCache $taggedCache, MemoizedStore $memoizedStore)
+    {
+        $this->taggedCache = $taggedCache;
+        $this->memoizedStore = $memoizedStore;
+
+        parent::__construct($taggedCache->getStore(), $taggedCache->getTags());
     }
 
     /**
@@ -40,6 +48,7 @@ class MemoizedTaggedCache extends TaggedCache
             return $this->many($key);
         }
 
+        $key = enum_value($key);
         $prefixedKey = $this->itemKey($key);
 
         if (array_key_exists($prefixedKey, $this->cache)) {
@@ -103,6 +112,8 @@ class MemoizedTaggedCache extends TaggedCache
      */
     public function put($key, $value, $ttl = null)
     {
+        $key = enum_value($key);
+
         unset($this->cache[$this->itemKey($key)]);
 
         return $this->taggedCache->put($key, $value, $ttl);
@@ -131,6 +142,8 @@ class MemoizedTaggedCache extends TaggedCache
      */
     public function forget($key)
     {
+        $key = enum_value($key);
+
         unset($this->cache[$this->itemKey($key)]);
 
         return $this->taggedCache->forget($key);
@@ -149,6 +162,16 @@ class MemoizedTaggedCache extends TaggedCache
     }
 
     /**
+     * Remove all items from the cache.
+     *
+     * @return bool
+     */
+    public function clear(): bool
+    {
+        return $this->memoizedStore->flush();
+    }
+
+    /**
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
@@ -157,6 +180,8 @@ class MemoizedTaggedCache extends TaggedCache
      */
     public function increment($key, $value = 1)
     {
+        $key = enum_value($key);
+
         unset($this->cache[$this->itemKey($key)]);
 
         return $this->taggedCache->increment($key, $value);
@@ -171,9 +196,60 @@ class MemoizedTaggedCache extends TaggedCache
      */
     public function decrement($key, $value = 1)
     {
+        $key = enum_value($key);
+
         unset($this->cache[$this->itemKey($key)]);
 
         return $this->taggedCache->decrement($key, $value);
+    }
+
+    /**
+     * Store an item in the cache indefinitely.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function forever($key, $value)
+    {
+        $key = enum_value($key);
+
+        unset($this->cache[$this->itemKey($key)]);
+
+        return $this->taggedCache->forever($key, $value);
+    }
+
+    /**
+     * Store an item in the cache if the key does not exist.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  int  $ttl
+     * @return bool
+     */
+    public function add($key, $value, $ttl = null)
+    {
+        $key = enum_value($key);
+
+        unset($this->cache[$this->itemKey($key)]);
+
+        return $this->taggedCache->add($key, $value, $ttl);
+    }
+
+    /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $ttl
+     * @return bool
+     */
+    public function touch($key, $ttl)
+    {
+        $key = enum_value($key);
+
+        unset($this->cache[$this->itemKey($key)]);
+
+        return $this->taggedCache->touch($key, $ttl);
     }
 
     /**
@@ -181,6 +257,6 @@ class MemoizedTaggedCache extends TaggedCache
      */
     protected function itemKey($key)
     {
-        return $this->taggedItemKey($this->getPrefix().$key);
+        return $this->taggedItemKey($this->getPrefix().enum_value($key));
     }
 }

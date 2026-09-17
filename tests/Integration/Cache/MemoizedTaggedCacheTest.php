@@ -2,9 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Cache\Events\CacheEvent;
+use Illuminate\Cache\Events\CacheMissed;
+use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Redis;
 use Orchestra\Testbench\TestCase;
 
@@ -222,4 +226,69 @@ class MemoizedTaggedCacheTest extends TestCase
             Cache::memo()->tags(['foo'])->get(['missing']),
         );
     }
+
+    public function test_it_supports_enum_keys()
+    {
+        Cache::tags(['foo'])->put(MemoizedTaggedCacheTestKey::Name, 'Tim', 60);
+
+        $this->assertSame('Tim', Cache::memo()->tags(['foo'])->get(MemoizedTaggedCacheTestKey::Name));
+    }
+
+    public function test_mutations_forget_memoized_values()
+    {
+        Cache::tags(['foo'])->put('name', 'Tim', 60);
+        Cache::memo()->tags(['foo'])->get('name');
+
+        Cache::memo()->tags(['foo'])->forever('name', 'Taylor');
+        $this->assertSame('Taylor', Cache::memo()->tags(['foo'])->get('name'));
+
+        Cache::tags(['foo'])->put('name', 'Abigail', 60);
+        Cache::memo()->tags(['foo'])->touch('name', 60);
+        $this->assertSame('Abigail', Cache::memo()->tags(['foo'])->get('name'));
+
+        Cache::tags(['foo'])->put('name', 'Nuno', 60);
+        Cache::memo()->tags(['foo'])->get('name');
+        Cache::tags(['foo'])->put('name', 'Jess', 60);
+        $this->assertFalse(Cache::memo()->tags(['foo'])->add('name', 'Adam', 60));
+        $this->assertSame('Jess', Cache::memo()->tags(['foo'])->get('name'));
+    }
+
+    public function test_clear_forgets_all_memoized_values()
+    {
+        Cache::put('untagged', 'Tim', 60);
+        Cache::tags(['foo'])->put('foo', 'Taylor', 60);
+        Cache::tags(['bar'])->put('bar', 'Jess', 60);
+
+        Cache::memo()->get('untagged');
+        Cache::memo()->tags(['foo'])->get('foo');
+        Cache::memo()->tags(['bar'])->get('bar');
+
+        Cache::memo()->tags(['foo'])->clear();
+
+        $this->assertNull(Cache::memo()->get('untagged'));
+        $this->assertNull(Cache::memo()->tags(['foo'])->get('foo'));
+        $this->assertNull(Cache::memo()->tags(['bar'])->get('bar'));
+    }
+
+    public function test_it_dispatches_decorated_driver_events_only()
+    {
+        $events = [];
+
+        Event::listen('*', function ($type, $event) use (&$events) {
+            if ($event[0] instanceof CacheEvent) {
+                $events[] = $event[0];
+            }
+        });
+
+        Cache::memo()->tags(['foo'])->get('name');
+
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf(RetrievingKey::class, $events[0]);
+        $this->assertInstanceOf(CacheMissed::class, $events[1]);
+    }
+}
+
+enum MemoizedTaggedCacheTestKey
+{
+    case Name;
 }
