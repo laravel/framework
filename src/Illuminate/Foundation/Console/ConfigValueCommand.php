@@ -32,7 +32,7 @@ class ConfigValueCommand extends Command
     {
         $config = $this->argument('config');
 
-        if (!config()->has($config)) {
+        if (! config()->has($config)) {
             $this->fail("Configuration file or key {$config} does not exist.");
         }
 
@@ -44,14 +44,14 @@ class ConfigValueCommand extends Command
     /**
      * Render the configuration values.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return void
      */
     public function render($name)
     {
         $data = config($name);
 
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             $this->line($this->formatValue($data));
 
             return;
@@ -71,13 +71,13 @@ class ConfigValueCommand extends Command
     protected function formatValue($value)
     {
         return match (true) {
-            is_bool($value)    => $value ? 'true' : 'false',
-            is_null($value)    => 'null',
+            is_bool($value) => $value ? 'true' : 'false',
+            is_null($value) => 'null',
             is_numeric($value) => $value,
-            is_array($value)   => '[]',
-            is_object($value)  => get_class($value),
-            is_string($value)  => $value,
-            default            => print_r($value, true),
+            is_array($value) => '[]',
+            is_object($value) => get_class($value),
+            is_string($value) => $value,
+            default => print_r($value, true),
         };
     }
 }
