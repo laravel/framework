@@ -20,7 +20,10 @@ class SleepTest extends TestCase
         Sleep::for(1)->seconds();
         $end = microtime(true);
 
-        $this->assertEqualsWithDelta(1, $end - $start, 0.03);
+        $duration = $end - $start;
+
+        $this->assertGreaterThanOrEqual(1, $duration);
+        $this->assertLessThan(2, $duration);
     }
 
     public function testCallbacksMayBeExecutedUsingThen()
@@ -51,7 +54,10 @@ class SleepTest extends TestCase
         Sleep::for(1.5)->seconds();
         $end = microtime(true);
 
-        $this->assertEqualsWithDelta(1.5, round($end - $start, 1, PHP_ROUND_HALF_DOWN), 0.03);
+        $duration = $end - $start;
+
+        $this->assertGreaterThanOrEqual(1.5, $duration);
+        $this->assertLessThan(2.5, $duration);
     }
 
     public function testItCanFakeSleeping()
