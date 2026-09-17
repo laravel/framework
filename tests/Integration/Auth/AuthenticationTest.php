@@ -145,6 +145,10 @@ class AuthenticationTest extends TestCase
         );
         $this->assertInstanceOf(AuthenticationTestUser::class, $this->app['auth']->user());
         $this->assertTrue($this->app['auth']->check());
+        $this->assertSame(
+            $this->app['auth']->guard()->hashPasswordForCookie($this->app['auth']->user()->getAuthPassword()),
+            $this->app['session']->get('password_hash_web')
+        );
 
         Event::assertDispatched(Attempting::class, function ($event) {
             $this->assertSame('web', $event->guard);
