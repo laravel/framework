@@ -203,6 +203,54 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
+    public function testPostgresServerOptionsAreSet()
+    {
+        $dsn = 'pgsql:host=foo;dbname=\'bar\';port=111;options=\'-c statement_timeout=5s -c search_path=public\'';
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'server_options' => ['statement_timeout' => '5s', 'search_path' => 'public']];
+        $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock(PDO::class);
+        $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
+        $statement = m::mock(PDOStatement::class);
+        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
+        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
+    public function testPostgresServerOptionsAreOmittedWhenNotConfigured()
+    {
+        $dsn = 'pgsql:host=foo;dbname=\'bar\';port=111';
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'server_options' => []];
+        $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock(PDO::class);
+        $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
+        $statement = m::mock(PDOStatement::class);
+        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
+        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
+    public function testPostgresServerOptionValuesAreEscaped()
+    {
+        $dsn = 'pgsql:host=foo;dbname=\'bar\';port=111;options=\'-c application_name=my\\\\ app -c custom.tag=o\\\'clock\'';
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'server_options' => ['application_name' => 'my app', 'custom.tag' => "o'clock"]];
+        $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock(PDO::class);
+        $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
+        $statement = m::mock(PDOStatement::class);
+        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
+        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
     public function testPostgresApplicationUseAlternativeDatabaseName()
     {
         $dsn = 'pgsql:dbname=\'baz\'';
