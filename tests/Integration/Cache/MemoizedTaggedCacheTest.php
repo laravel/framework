@@ -272,12 +272,10 @@ class MemoizedTaggedCacheTest extends TestCase
 
     public function test_it_does_not_memoize_default_values()
     {
-        $default = 0;
-
         $cache = Cache::memo()->tags(['foo']);
 
-        $this->assertSame(1, $cache->get('missing', fn () => ++$default));
-        $this->assertSame(2, $cache->get('missing', fn () => ++$default));
+        $this->assertSame('first', $cache->get('missing', 'first'));
+        $this->assertSame('second', $cache->get('missing', 'second'));
     }
 
     public function test_it_supports_enum_keys()
