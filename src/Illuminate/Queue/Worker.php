@@ -165,6 +165,13 @@ class Worker
     public static $killOnTimeout = true;
 
     /**
+     * Indicates if the worker should exit with its status code instead of being signalled.
+     *
+     * @var bool
+     */
+    public static $exitViaExec = false;
+
+    /**
      * Indicates if the worker should report job exceptions.
      *
      * @var bool
@@ -1053,6 +1060,16 @@ class Worker
             $status, $options, $reason, $this->jobsProcessed, $this->lastJobProcessedAt, $this->currentMemoryUsage(),
             $connectionName, $queue
         ));
+
+        if (static::$exitViaExec && function_exists('pcntl_exec')) {
+            $code = (int) $status & 0xFF;
+
+            @pcntl_exec('/bin/sh', ['-c', 'exit '.$code]);
+
+            if (PHP_SAPI === 'cli' && PHP_BINARY !== '') {
+                @pcntl_exec(PHP_BINARY, ['-n', '-r', 'exit('.$code.');']);
+            }
+        }
 
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
