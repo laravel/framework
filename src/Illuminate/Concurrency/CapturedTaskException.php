@@ -6,9 +6,8 @@ use RuntimeException;
 use Throwable;
 
 /**
- * The original task exception has already been captured in the task's
- * result envelope for the caller. This wrapper is rethrown so that the
- * failure remains visible to the queue's failed job machinery.
+ * The original task exception has already been stored for the caller.
+ * This exception is thrown so the queue worker records the failed job.
  */
 class CapturedTaskException extends RuntimeException
 {
