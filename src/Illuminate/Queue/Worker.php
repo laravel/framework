@@ -144,13 +144,6 @@ class Worker
     protected static $popCallbacks = [];
 
     /**
-     * The callback used to kill the worker process.
-     *
-     * @var (callable(int): mixed)|null
-     */
-    protected static $killCallback;
-
-    /**
      * The custom exit code to be used when memory is exceeded.
      *
      * @var int|null
@@ -170,6 +163,13 @@ class Worker
      * @var bool
      */
     public static $killOnTimeout = true;
+
+    /**
+     * The callback used to kill the worker process.
+     *
+     * @var (callable(int): mixed)|null
+     */
+    protected static $killCallback;
 
     /**
      * Indicates if the worker should report job exceptions.
