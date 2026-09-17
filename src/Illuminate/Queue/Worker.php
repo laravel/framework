@@ -137,6 +137,13 @@ class Worker
     protected $pausedQueues = [];
 
     /**
+     * The number of consecutive times the worker has failed to pop a job.
+     *
+     * @var int
+     */
+    protected $popFailures = 0;
+
+    /**
      * The callbacks used to pop jobs from queues.
      *
      * @var callable[]
@@ -170,6 +177,13 @@ class Worker
      * @var bool
      */
     public static $stopOnLostConnection = true;
+
+    /**
+     * The maximum number of consecutive pop failures allowed before stopping the worker.
+     *
+     * @var int|null
+     */
+    public static $maxPopFailures = 60;
 
     /**
      * Indicates if the worker should check for the restart signal in the cache.
@@ -485,7 +499,15 @@ class Worker
 
             $this->stopWorkerIfLostConnection($e);
 
+            if (! is_null(static::$maxPopFailures) && ++$this->popFailures >= static::$maxPopFailures) {
+                $this->lostConnection = true;
+            }
+
             $this->sleep(1);
+        } finally {
+            if (! isset($e)) {
+                $this->popFailures = 0;
+            }
         }
     }
 

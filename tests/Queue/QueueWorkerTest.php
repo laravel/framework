@@ -221,6 +221,76 @@ class QueueWorkerTest extends TestCase
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
     }
 
+    public function testWorkerStopsAfterConsecutivePopFailures()
+    {
+        $workerOptions = new WorkerOptions;
+
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', new BrokenQueueConnection('default', $e = new RuntimeException('AWS SQS request failed'))),
+            $this->events,
+            $this->exceptionHandler,
+            function () {
+                return false;
+            }
+        );
+
+        Worker::$maxPopFailures = 3;
+
+        try {
+            $status = $worker->daemon('default', 'queue', $workerOptions);
+        } finally {
+            Worker::$maxPopFailures = 60;
+        }
+
+        $this->assertSame(0, $status);
+
+        $this->exceptionHandler->shouldHaveReceived('report')->with($e)->times(3);
+
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::on(function ($event) use ($workerOptions) {
+            return $event instanceof WorkerStopping
+                && $event->status === 0
+                && $event->workerOptions === $workerOptions
+                && $event->reason === WorkerStopReason::LostConnection;
+        }));
+    }
+
+    public function testPopFailuresAreResetAfterSuccessfulPop()
+    {
+        $workerOptions = new WorkerOptions;
+
+        $e = new RuntimeException('AWS SQS request failed');
+
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', new FlakyQueueConnection('default', [
+                $e, $e, $job = new WorkerFakeJob, $e, $e, $e,
+            ])),
+            $this->events,
+            $this->exceptionHandler,
+            function () {
+                return false;
+            }
+        );
+
+        Worker::$maxPopFailures = 3;
+
+        try {
+            $worker->daemon('default', 'queue', $workerOptions);
+        } finally {
+            Worker::$maxPopFailures = 60;
+        }
+
+        $this->assertTrue($job->fired);
+
+        $this->exceptionHandler->shouldHaveReceived('report')->with($e)->times(5);
+
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::on(function ($event) use ($workerOptions) {
+            return $event instanceof WorkerStopping
+                && $event->status === 0
+                && $event->workerOptions === $workerOptions
+                && $event->reason === WorkerStopReason::LostConnection;
+        }));
+    }
+
     public function testWorkerSleepsWhenQueueIsEmpty()
     {
         $worker = $this->getWorker('default', ['queue' => []]);
@@ -832,6 +902,34 @@ class BrokenQueueConnection
     public function pop($queue)
     {
         throw $this->exception;
+    }
+
+    public function getConnectionName()
+    {
+        return $this->connectionName;
+    }
+}
+
+class FlakyQueueConnection
+{
+    public $connectionName;
+    public $sequence;
+
+    public function __construct($connectionName, array $sequence)
+    {
+        $this->connectionName = $connectionName;
+        $this->sequence = $sequence;
+    }
+
+    public function pop($queue)
+    {
+        $next = array_shift($this->sequence);
+
+        if ($next instanceof \Throwable) {
+            throw $next;
+        }
+
+        return $next;
     }
 
     public function getConnectionName()
