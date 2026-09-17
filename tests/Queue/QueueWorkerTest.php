@@ -417,6 +417,28 @@ class QueueWorkerTest extends TestCase
         Worker::popUsing('myworker', null);
     }
 
+    public function testWorkerCanBeKilledUsingCustomCallback()
+    {
+        Worker::killUsing(function ($status) {
+            throw new RuntimeException("Killed with status [{$status}].");
+        });
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Killed with status [124].');
+
+        try {
+            $this->getWorker('default', ['queue' => []])->kill(124, new WorkerOptions, WorkerStopReason::TimedOut);
+        } finally {
+            Worker::killUsing(null);
+
+            $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) {
+                return $event instanceof WorkerStopping
+                    && $event->status === 124
+                    && $event->reason === WorkerStopReason::TimedOut;
+            }))->once();
+        }
+    }
+
     public function testWorkerStoppingIsDispatched()
     {
         $workerOptions = new WorkerOptions();
