@@ -1711,6 +1711,18 @@ return [
             ],
         ],
     ],
+    \Illuminate\Foundation\Console\ConfigShowCommand::class => [
+        'name' => 'config:value',
+        'arguments' => [
+            [
+                'name' => 'config',
+                'mode' => 'required',
+                'isArray' => false,
+                'default' => null,
+                'description' => 'The configuration key to show',
+            ],
+        ],
+    ],
     \Illuminate\Foundation\Console\ConsoleMakeCommand::class => [
         'name' => 'make:command',
         'arguments' => [
