@@ -1719,7 +1719,7 @@ return [
                 'mode' => 'required',
                 'isArray' => false,
                 'default' => null,
-                'description' => 'The configuration key to show',
+                'description' => 'The configuration file or key to show',
             ],
         ],
     ],
