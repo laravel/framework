@@ -99,6 +99,14 @@ class QueueConnector implements ConnectorInterface
      */
     protected function configureWorker(Queue $queue): void
     {
+        Worker::$timedOutExitCode = 124;
+
+        Worker::killUsing(function (int $status): void {
+            if (function_exists('pcntl_exec')) {
+                @pcntl_exec('/bin/sh', ['-c', 'exit '.$status]);
+            }
+        });
+
         $this->app['events']->listen(fn (WorkerStopping $event) => match ($event->reason) {
             WorkerStopReason::TimedOut => $queue->finishProcessingJob(default: 'released'),
             default => $queue->finishProcessingJob(),
