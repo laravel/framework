@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Cache\Events\CacheEvent;
+use Illuminate\Cache\Events\CacheFlushed;
+use Illuminate\Cache\Events\CacheFlushing;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
@@ -92,6 +94,22 @@ class MemoizedTaggedCacheTest extends TestCase
         $this->assertSame(['name.0' => null, 'name.1' => null], $memoized);
     }
 
+    public function test_flushing_tags_forgets_values_memoized_by_overlapping_tag_sets()
+    {
+        Cache::tags(['foo'])->put('name', 'Tim', 60);
+        Cache::tags(['foo', 'bar'])->put('name', 'Taylor', 60);
+
+        $foo = Cache::memo()->tags(['foo']);
+        $fooAndBar = Cache::memo()->tags(['foo', 'bar']);
+
+        $this->assertSame('Tim', $foo->get('name'));
+        $this->assertSame('Taylor', $fooAndBar->get('name'));
+
+        $foo->flush();
+
+        $this->assertNull($fooAndBar->get('name'));
+    }
+
     public function test_it_can_forget_memoized_values_with_tags()
     {
         Cache::tags(['foo', 'bar'])->put('name', 'Tim', 60);
@@ -150,6 +168,26 @@ class MemoizedTaggedCacheTest extends TestCase
         $this->assertSame(['name.0' => 'MacDonald', 'name.1' => 'Otwell'], $memoized);
     }
 
+    public function test_put_forgets_memoized_value()
+    {
+        Cache::tags(['foo'])->put('name', 'Tim', 60);
+        Cache::memo()->tags(['foo'])->get('name');
+
+        Cache::memo()->tags(['foo'])->put('name', 'Taylor', 60);
+
+        $this->assertSame('Taylor', Cache::memo()->tags(['foo'])->get('name'));
+    }
+
+    public function test_put_supports_an_array_of_values()
+    {
+        Cache::memo()->tags(['foo'])->put(['first' => 'Tim', 'last' => 'MacDonald'], 60);
+
+        $this->assertSame(
+            ['first' => 'Tim', 'last' => 'MacDonald'],
+            Cache::memo()->tags(['foo'])->get(['first', 'last']),
+        );
+    }
+
     public function test_tagged_memoized_cache_uses_prefixes()
     {
         Cache::tags(['foo', 'bar'])->setPrefix('prefix1_');
@@ -182,6 +220,11 @@ class MemoizedTaggedCacheTest extends TestCase
         $this->expectExceptionMessage('This cache store does not support tagging.');
 
         Cache::memo('file')->tags(['foo', 'bar'])->put('name', 'Tim', 60);
+    }
+
+    public function test_it_forwards_methods_supported_by_the_tagged_cache()
+    {
+        $this->assertTrue(Cache::memo()->tags(['foo'])->flushStale());
     }
 
     public function test_it_keeps_memoized_values_isolated_between_tag_sets()
@@ -227,6 +270,16 @@ class MemoizedTaggedCacheTest extends TestCase
         );
     }
 
+    public function test_it_does_not_memoize_default_values()
+    {
+        $default = 0;
+
+        $cache = Cache::memo()->tags(['foo']);
+
+        $this->assertSame(1, $cache->get('missing', fn () => ++$default));
+        $this->assertSame(2, $cache->get('missing', fn () => ++$default));
+    }
+
     public function test_it_supports_enum_keys()
     {
         Cache::tags(['foo'])->put(MemoizedTaggedCacheTestKey::Name, 'Tim', 60);
@@ -270,6 +323,25 @@ class MemoizedTaggedCacheTest extends TestCase
         $this->assertNull(Cache::memo()->tags(['bar'])->get('bar'));
     }
 
+    public function test_store_flush_clears_existing_tagged_memoized_cache_instances_without_dispatching_tag_flush_events()
+    {
+        $events = [];
+
+        Event::listen([CacheFlushing::class, CacheFlushed::class], function ($event) use (&$events) {
+            $events[] = $event;
+        });
+
+        Cache::tags(['foo'])->put('name', 'Tim', 60);
+
+        $cache = Cache::memo()->tags(['foo']);
+        $cache->get('name');
+
+        Cache::memo()->flush();
+
+        $this->assertNull($cache->get('name'));
+        $this->assertSame([], $events);
+    }
+
     public function test_it_dispatches_decorated_driver_events_only()
     {
         $events = [];
@@ -284,7 +356,11 @@ class MemoizedTaggedCacheTest extends TestCase
 
         $this->assertCount(2, $events);
         $this->assertInstanceOf(RetrievingKey::class, $events[0]);
+        $this->assertSame('redis', $events[0]->storeName);
+        $this->assertSame(['foo'], $events[0]->tags);
         $this->assertInstanceOf(CacheMissed::class, $events[1]);
+        $this->assertSame('redis', $events[1]->storeName);
+        $this->assertSame(['foo'], $events[1]->tags);
     }
 }
 

@@ -245,6 +245,29 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
     }
 
     /**
+     * Begin executing a new tags operation.
+     *
+     * @param  array|mixed  $names
+     * @return \Illuminate\Cache\TaggedCache
+     *
+     * @throws \BadMethodCallException
+     */
+    public function tags($names)
+    {
+        $names = is_array($names) ? $names : func_get_args();
+
+        $key = serialize($names);
+
+        if (isset($this->taggedCaches[$key])) {
+            return $this->taggedCaches[$key];
+        }
+
+        return $this->taggedCaches[$key] = new MemoizedTaggedCache(
+            $this->repository->tags($names), $this
+        );
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
@@ -268,11 +291,21 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
 
         $result = $this->repository->flush();
 
-        foreach ($this->taggedCaches as $taggedCache) {
-            $taggedCache->flush();
-        }
+        $this->flushTagged();
 
         return $result;
+    }
+
+    /**
+     * Remove all memoized items from the tagged caches.
+     *
+     * @return void
+     */
+    public function flushTagged()
+    {
+        foreach ($this->taggedCaches as $taggedCache) {
+            $taggedCache->flushMemoized();
+        }
     }
 
     /**
@@ -294,27 +327,5 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
     protected function prefix($key)
     {
         return $this->getPrefix().$key;
-    }
-
-    /**
-     * Begin executing a new tags operation.
-     *
-     * @param  array|mixed  $names
-     * @return \Illuminate\Cache\TaggedCache
-     *
-     * @throws \BadMethodCallException
-     */
-    public function tags($names)
-    {
-        $names = is_array($names) ? $names : func_get_args();
-        $key = serialize($names);
-
-        if (isset($this->taggedCaches[$key])) {
-            return $this->taggedCaches[$key];
-        }
-
-        return $this->taggedCaches[$key] = new MemoizedTaggedCache(
-            $this->repository->tags($names), $this
-        );
     }
 }

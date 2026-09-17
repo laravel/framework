@@ -27,12 +27,22 @@ class MemoizedTaggedCache extends TaggedCache
      */
     protected MemoizedStore $memoizedStore;
 
+    /**
+     * Create a new memoized tagged cache.
+     */
     public function __construct(TaggedCache $taggedCache, MemoizedStore $memoizedStore)
     {
         $this->taggedCache = $taggedCache;
         $this->memoizedStore = $memoizedStore;
 
         parent::__construct($taggedCache->getStore(), $taggedCache->getTags());
+
+        $this->config = ['store' => $taggedCache->getName()];
+        $this->default = $taggedCache->getDefaultCacheTime();
+
+        if (! is_null($taggedCache->getEventDispatcher())) {
+            $this->setEventDispatcher($taggedCache->getEventDispatcher());
+        }
     }
 
     /**
@@ -49,13 +59,16 @@ class MemoizedTaggedCache extends TaggedCache
         }
 
         $key = enum_value($key);
+
         $prefixedKey = $this->itemKey($key);
 
-        if (array_key_exists($prefixedKey, $this->cache)) {
-            return $this->cache[$prefixedKey];
+        if (! array_key_exists($prefixedKey, $this->cache)) {
+            $this->cache[$prefixedKey] = $this->taggedCache->get($key);
         }
 
-        return $this->cache[$prefixedKey] = $this->taggedCache->get($key, $default);
+        return is_null($this->cache[$prefixedKey])
+            ? value($default)
+            : $this->cache[$prefixedKey];
     }
 
     /**
@@ -71,8 +84,12 @@ class MemoizedTaggedCache extends TaggedCache
         $missing = [];
 
         foreach ($defaults as $key => $value) {
-            $key = array_is_list($defaults) ? enum_value($value) : enum_value($key);
+            $key = array_is_list($defaults)
+                ? enum_value($value)
+                : enum_value($key);
+
             $keys[$key] = array_is_list($defaults) ? null : $value;
+
             $prefixedKey = $this->itemKey($key);
 
             if (array_key_exists($prefixedKey, $this->cache)) {
@@ -93,6 +110,7 @@ class MemoizedTaggedCache extends TaggedCache
         }
 
         $result = [];
+
         foreach ($keys as $key => $default) {
             $result[$key] = array_key_exists($key, $memoized) && ! is_null($memoized[$key])
                 ? $memoized[$key]
@@ -112,6 +130,10 @@ class MemoizedTaggedCache extends TaggedCache
      */
     public function put($key, $value, $ttl = null)
     {
+        if (is_array($key)) {
+            return $this->putMany($key, $value);
+        }
+
         $key = enum_value($key);
 
         unset($this->cache[$this->itemKey($key)]);
@@ -135,40 +157,20 @@ class MemoizedTaggedCache extends TaggedCache
     }
 
     /**
-     * Remove an item from the cache.
+     * Store an item in the cache if the key does not exist.
      *
      * @param  string  $key
+     * @param  mixed  $value
+     * @param  int  $ttl
      * @return bool
      */
-    public function forget($key)
+    public function add($key, $value, $ttl = null)
     {
         $key = enum_value($key);
 
         unset($this->cache[$this->itemKey($key)]);
 
-        return $this->taggedCache->forget($key);
-    }
-
-    /**
-     * Remove all items from the cache.
-     *
-     * @return bool
-     */
-    public function flush()
-    {
-        $this->cache = [];
-
-        return $this->taggedCache->flush();
-    }
-
-    /**
-     * Remove all items from the cache.
-     *
-     * @return bool
-     */
-    public function clear(): bool
-    {
-        return $this->memoizedStore->flush();
+        return $this->taggedCache->add($key, $value, $ttl);
     }
 
     /**
@@ -220,23 +222,6 @@ class MemoizedTaggedCache extends TaggedCache
     }
 
     /**
-     * Store an item in the cache if the key does not exist.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  int  $ttl
-     * @return bool
-     */
-    public function add($key, $value, $ttl = null)
-    {
-        $key = enum_value($key);
-
-        unset($this->cache[$this->itemKey($key)]);
-
-        return $this->taggedCache->add($key, $value, $ttl);
-    }
-
-    /**
      * Adjust the expiration time of a cached item.
      *
      * @param  string  $key
@@ -253,10 +238,73 @@ class MemoizedTaggedCache extends TaggedCache
     }
 
     /**
+     * Remove an item from the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function forget($key)
+    {
+        $key = enum_value($key);
+
+        unset($this->cache[$this->itemKey($key)]);
+
+        return $this->taggedCache->forget($key);
+    }
+
+    /**
+     * Remove all items from the cache.
+     *
+     * @return bool
+     */
+    public function flush()
+    {
+        $this->memoizedStore->flushTagged();
+
+        return $this->taggedCache->flush();
+    }
+
+    /**
+     * Remove all items from the cache.
+     *
+     * @return bool
+     */
+    public function clear(): bool
+    {
+        return $this->memoizedStore->flush();
+    }
+
+    /**
+     * Remove all memoized items from the cache.
+     *
+     * @return void
+     */
+    public function flushMemoized()
+    {
+        $this->cache = [];
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function itemKey($key)
     {
         return $this->taggedItemKey($this->getPrefix().enum_value($key));
+    }
+
+    /**
+     * Handle dynamic calls into macros or pass missing methods to the tagged cache.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
+        return $this->taggedCache->$method(...$parameters);
     }
 }
