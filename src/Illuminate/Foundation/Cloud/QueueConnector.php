@@ -103,7 +103,6 @@ class QueueConnector implements ConnectorInterface
         Worker::$restartable = false;
         Worker::$pausable = false;
         Worker::$memoryExceededExitCode = null;
-
         Worker::$timedOutExitCode = 124;
 
         Worker::killUsing(function (int $status): void {
