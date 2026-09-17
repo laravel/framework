@@ -165,6 +165,13 @@ class Worker
     public static $killOnTimeout = true;
 
     /**
+     * The callback used to kill the worker process.
+     *
+     * @var (callable(int): mixed)|null
+     */
+    protected static $killCallback;
+
+    /**
      * Indicates if the worker should report job exceptions.
      *
      * @var bool
@@ -1054,6 +1061,10 @@ class Worker
             $connectionName, $queue
         ));
 
+        if (static::$killCallback) {
+            call_user_func(static::$killCallback, $status);
+        }
+
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
         }
@@ -1138,6 +1149,17 @@ class Worker
         } else {
             static::$popCallbacks[$workerName] = $callback;
         }
+    }
+
+    /**
+     * Register a callback to be used to kill the worker process.
+     *
+     * @param  (callable(int): mixed)|null  $callback
+     * @return void
+     */
+    public static function killUsing($callback)
+    {
+        static::$killCallback = $callback;
     }
 
     /**

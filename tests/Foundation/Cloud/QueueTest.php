@@ -45,6 +45,7 @@ use InvalidArgumentException;
 use Mockery\MockInterface;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
@@ -76,6 +77,8 @@ class QueueTest extends TestCase
         Worker::$restartable = true;
         Worker::$pausable = true;
         Worker::$memoryExceededExitCode = null;
+        Worker::$timedOutExitCode = null;
+        Worker::killUsing(null);
         $_SERVER['LARAVEL_CLOUD'] = '1';
         $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG'] = json_encode([
             'driver' => 'cloud',
@@ -110,6 +113,8 @@ class QueueTest extends TestCase
         Worker::$restartable = true;
         Worker::$pausable = true;
         Worker::$memoryExceededExitCode = null;
+        Worker::$timedOutExitCode = null;
+        Worker::killUsing(null);
     }
 
     public function testItDisablesQueueRestartPollingForManagedQueues()
@@ -160,6 +165,33 @@ class QueueTest extends TestCase
 
             $this->app['queue']->connection('cloud');
             $this->assertNull(Worker::$memoryExceededExitCode);
+        } finally {
+            $_SERVER['argv'] = $argv;
+        }
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testItExitsWithTheTimedOutExitCodeWhenKilledForManagedQueues()
+    {
+        $argv = $_SERVER['argv'];
+        $_SERVER['argv'] = ['artisan', 'queue:work'];
+
+        try {
+            CloudBootstrapper::registerEvents($this->app);
+            CloudBootstrapper::bootManagedQueues($this->app);
+            $this->assertNull(Worker::$timedOutExitCode);
+
+            $this->app['queue']->connection('cloud');
+            $this->assertSame(124, Worker::$timedOutExitCode);
+
+            if (($pid = pcntl_fork()) === 0) {
+                $this->app['queue.worker']->kill(Worker::$timedOutExitCode, reason: WorkerStopReason::TimedOut);
+            }
+
+            pcntl_waitpid($pid, $status);
+
+            $this->assertTrue(pcntl_wifexited($status));
+            $this->assertSame(124, pcntl_wexitstatus($status));
         } finally {
             $_SERVER['argv'] = $argv;
         }
