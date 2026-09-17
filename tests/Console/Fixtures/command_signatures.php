@@ -3524,7 +3524,7 @@ return [
                 'isArray' => false,
                 'acceptValue' => true,
                 'default' => null,
-                'description' => 'Flush only the failed jobs for the given queue',
+                'description' => 'Flush all of the failed jobs for the specified queue',
             ],
         ],
     ],

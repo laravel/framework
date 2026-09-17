@@ -18,7 +18,7 @@ class FlushFailedCommand extends Command
      */
     protected $signature = 'queue:flush
                             {--hours= : The number of hours to retain failed job data}
-                            {--queue= : Flush only the failed jobs for the given queue}';
+                            {--queue= : Flush all of the failed jobs for the specified queue}';
 
     /**
      * The console command description.
