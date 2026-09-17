@@ -18,11 +18,12 @@ trait InteractsWithComposerPackages
     protected function requireComposerPackages(string $composer, array $packages)
     {
         if ($composer !== 'global') {
-            $command = [$this->phpBinary(), $composer, 'require', '--with-all-dependencies'];
+            $command = [$this->phpBinary(), $composer, 'require'];
         }
 
         $command = array_merge(
             $command ?? ['composer', 'require'],
+            ['--with-all-dependencies'],
             $packages,
         );
 
