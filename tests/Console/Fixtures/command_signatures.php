@@ -1711,7 +1711,7 @@ return [
             ],
         ],
     ],
-    \Illuminate\Foundation\Console\ConfigShowCommand::class => [
+    \Illuminate\Foundation\Console\ConfigValueCommand::class => [
         'name' => 'config:value',
         'arguments' => [
             [
