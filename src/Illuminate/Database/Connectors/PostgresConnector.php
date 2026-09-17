@@ -135,10 +135,6 @@ class PostgresConnector extends Connector implements ConnectorInterface
     /**
      * Add the server options to the DSN.
      *
-     * These options are delivered to the server in the connection startup
-     * packet, which makes them the per-connection equivalent of setting
-     * the "PGOPTIONS" environment variable for the entire process.
-     *
      * @param  string  $dsn
      * @param  array  $config
      * @return string
@@ -149,18 +145,12 @@ class PostgresConnector extends Connector implements ConnectorInterface
             return $dsn;
         }
 
-        // Unescaped spaces separate command line arguments within the "options"
-        // value, so any space that belongs to the value of an option has to
-        // be escaped before the individual options are joined together...
         $options = [];
 
         foreach ($config['server_options'] as $name => $value) {
             $options[] = '-c '.$name.'='.str_replace(['\\', ' '], ['\\\\', '\\ '], (string) $value);
         }
 
-        // The joined options are quoted as a single connection string value, so
-        // they need a second pass to escape the backslashes and quotes that
-        // would otherwise prematurely terminate that quoted string value...
         $options = str_replace(['\\', "'"], ['\\\\', "\\'"], implode(' ', $options));
 
         return $dsn.";options='{$options}'";
