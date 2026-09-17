@@ -42,6 +42,7 @@ use InvalidArgumentException;
 use Mockery\MockInterface;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use Throwable;
@@ -152,6 +153,37 @@ class QueueTest extends TestCase
             $this->app['queue']->connection('cloud');
             $this->assertNull(Worker::$memoryExceededExitCode);
         } finally {
+            $_SERVER['argv'] = $argv;
+        }
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testItExitsWithTheTimedOutExitCodeWhenKilledForManagedQueues()
+    {
+        $argv = $_SERVER['argv'];
+        $_SERVER['argv'] = ['artisan', 'queue:work'];
+
+        try {
+            Cloud::bootManagedQueues($this->app);
+
+            Worker::$timedOutExitCode = null;
+            Worker::killUsing(null);
+            $this->assertNull(Worker::$timedOutExitCode);
+
+            $this->app['queue']->connection('cloud');
+            $this->assertSame(124, Worker::$timedOutExitCode);
+
+            if (($pid = pcntl_fork()) === 0) {
+                $this->app['queue.worker']->kill(Worker::$timedOutExitCode, reason: WorkerStopReason::TimedOut);
+            }
+
+            pcntl_waitpid($pid, $status);
+
+            $this->assertTrue(pcntl_wifexited($status));
+            $this->assertSame(124, pcntl_wexitstatus($status));
+        } finally {
+            Worker::$timedOutExitCode = null;
+            Worker::killUsing(null);
             $_SERVER['argv'] = $argv;
         }
     }
