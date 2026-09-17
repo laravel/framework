@@ -48,6 +48,13 @@ class EventServiceProvider extends ServiceProvider
     protected static $eventDiscoveryPaths;
 
     /**
+     * Idicates if `app/Listeners` should be added to event discovery paths.
+     *
+     * @var bool
+     */
+    protected static $shouldAddDefaultDiscoveryPath = true;
+
+    /**
      * Register the application's event listeners.
      *
      * @return void
@@ -165,8 +172,9 @@ class EventServiceProvider extends ServiceProvider
      */
     protected function discoverEventsWithin()
     {
-        return static::$eventDiscoveryPaths ?: [
-            $this->app->path('Listeners'),
+        return [
+            ...(static::$shouldAddDefaultDiscoveryPath ? [$this->app->path('Listeners')] : []),
+            ...(static::$eventDiscoveryPaths ?? []),
         ];
     }
 
@@ -193,6 +201,7 @@ class EventServiceProvider extends ServiceProvider
     public static function setEventDiscoveryPaths(iterable $paths)
     {
         static::$eventDiscoveryPaths = $paths;
+        static::$shouldAddDefaultDiscoveryPath = false;
     }
 
     /**
