@@ -144,6 +144,13 @@ class Worker
     protected static $popCallbacks = [];
 
     /**
+     * The callback used to kill the worker process.
+     *
+     * @var (callable(int): mixed)|null
+     */
+    protected static $killCallback;
+
+    /**
      * The custom exit code to be used when memory is exceeded.
      *
      * @var int|null
@@ -163,13 +170,6 @@ class Worker
      * @var bool
      */
     public static $killOnTimeout = true;
-
-    /**
-     * Indicates if the worker should exit with its status code instead of being signalled.
-     *
-     * @var bool
-     */
-    public static $exitViaExec = false;
 
     /**
      * Indicates if the worker should report job exceptions.
@@ -1061,14 +1061,8 @@ class Worker
             $connectionName, $queue
         ));
 
-        if (static::$exitViaExec && function_exists('pcntl_exec')) {
-            $code = (int) $status & 0xFF;
-
-            @pcntl_exec('/bin/sh', ['-c', 'exit '.$code]);
-
-            if (PHP_SAPI === 'cli' && PHP_BINARY !== '') {
-                @pcntl_exec(PHP_BINARY, ['-n', '-r', 'exit('.$code.');']);
-            }
+        if (static::$killCallback) {
+            call_user_func(static::$killCallback, $status);
         }
 
         if (extension_loaded('posix')) {
@@ -1155,6 +1149,17 @@ class Worker
         } else {
             static::$popCallbacks[$workerName] = $callback;
         }
+    }
+
+    /**
+     * Register a callback to be used to kill the worker process.
+     *
+     * @param  (callable(int): mixed)|null  $callback
+     * @return void
+     */
+    public static function killUsing($callback)
+    {
+        static::$killCallback = $callback;
     }
 
     /**
