@@ -153,8 +153,10 @@ class ExceptionReporter
     {
         try {
             return (object) Arr::except(Exceptions::contextForException($e), 'exception');
-        } catch (Throwable) {
-            return (object) [];
+        } catch (Throwable $e) {
+            return (object) [
+                '_laravel_cloud_error' => $e->getMessage(),
+            ];
         }
     }
 
@@ -166,7 +168,9 @@ class ExceptionReporter
         try {
             return (object) Context::all();
         } catch (Throwable $e) {
-            return (object) [];
+            return (object) [
+                '_laravel_cloud_error' => $e->getMessage(),
+            ];
         }
     }
 
@@ -175,11 +179,17 @@ class ExceptionReporter
      */
     protected function executionDetails(Throwable $e): array
     {
-        return match (true) {
-            $this->isProcessingJob() => $this->jobExecutionDetails($e),
-            App::runningInConsole() => $this->consoleExecutionDetails($e),
-            default => $this->requestExecutionDetails($e),
-        };
+        try {
+            return match (true) {
+                $this->isProcessingJob() => $this->jobExecutionDetails($e),
+                App::runningInConsole() => $this->consoleExecutionDetails($e),
+                default => $this->requestExecutionDetails($e),
+            };
+        } catch (Throwable $e) {
+            return [
+                '_laravel_cloud_error' => $e->getMessage(),
+            ];
+        }
     }
 
     /**
@@ -241,8 +251,8 @@ class ExceptionReporter
             return $command !== null
                 ? $command::class
                 : null;
-        } catch (Throwable) {
-            return null;
+        } catch (Throwable $e) {
+            return '_laravel_cloud_error: '.$e->getMessage();
         }
     }
 
@@ -376,8 +386,8 @@ class ExceptionReporter
             $identifier = Auth::user()?->getAuthIdentifier();
 
             return $identifier === null ? null : (string) $identifier;
-        } catch (Throwable) {
-            return null;
+        } catch (Throwable $e) {
+            return '_laravel_cloud_error: '.$e->getMessage();
         }
     }
 

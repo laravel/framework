@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Cloud\Events;
@@ -14,6 +15,8 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Queue\Events\JobPopping;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Jobs\Job as QueueJob;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
@@ -568,7 +571,7 @@ class ExceptionReportingTest extends TestCase
         ]);
     }
 
-    public function testItCapturesEmptyExceptionContextWhenTheHandlerDoesNotSupportContextForException(): void
+    public function testItCapturesTheErrorMessageWhenTheHandlerDoesNotSupportContextForException(): void
     {
         $this->app->instance(ExceptionHandler::class, new ExceptionHandlerWithoutContextForException);
 
@@ -579,11 +582,13 @@ class ExceptionReportingTest extends TestCase
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJsonContains([
-            'exception_context' => [],
+            'exception_context' => [
+                '_laravel_cloud_error' => 'Call to undefined method '.ExceptionHandlerWithoutContextForException::class.'::contextForException()',
+            ],
         ]);
     }
 
-    public function testItCapturesEmptyExceptionContextWhenContextForExceptionThrows(): void
+    public function testItCapturesTheErrorMessageWhenContextForExceptionThrows(): void
     {
         $this->app->instance(ExceptionHandler::class, new ExceptionHandlerThatThrowsFromContextForException);
 
@@ -594,7 +599,9 @@ class ExceptionReportingTest extends TestCase
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJsonContains([
-            'exception_context' => [],
+            'exception_context' => [
+                '_laravel_cloud_error' => 'Context error!',
+            ],
         ]);
     }
 
@@ -616,7 +623,7 @@ class ExceptionReportingTest extends TestCase
         ]);
     }
 
-    public function testItCapturesEmptyLaravelContextWhenRetrievingTheContextThrows(): void
+    public function testItCapturesTheErrorMessageWhenRetrievingTheLaravelContextThrows(): void
     {
         $this->app->instance(ContextRepository::class, new ContextRepositoryThatThrows);
         Context::clearResolvedInstances();
@@ -628,7 +635,9 @@ class ExceptionReportingTest extends TestCase
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJsonContains([
-            'laravel_context' => [],
+            'laravel_context' => [
+                '_laravel_cloud_error' => 'Unable to retrieve context.',
+            ],
             'message' => 'Whoops!',
         ]);
     }
@@ -937,7 +946,7 @@ class ExceptionReportingTest extends TestCase
         ]);
     }
 
-    public function testItFallsBackToNullWhenTheUserCannotBeResolved(): void
+    public function testItCapturesTheErrorMessageWhenTheUserCannotBeResolved(): void
     {
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
@@ -948,7 +957,7 @@ class ExceptionReportingTest extends TestCase
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJsonContains([
-            'user_id' => null,
+            'user_id' => '_laravel_cloud_error: Boom while retrieving the auth identifier!',
         ]);
     }
 
@@ -1189,6 +1198,32 @@ class ExceptionReportingTest extends TestCase
                 'connection' => 'database',
                 'queue' => 'default',
             ], $json['execution_context']);
+
+            return true;
+        });
+    }
+
+    public function testItCapturesTheErrorMessageWhenExecutionDetailsCannotBeRetrieved(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        // Some queue drivers, e.g. Beanstalkd, throw when the job is
+        // interacted with after it has been processed.
+        Event::dispatch(new JobProcessing('database', new JobThatThrowsWhenInteractedWith));
+
+        report(new RuntimeException('Whoops!'));
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertArrayNotHasKey('trace_id', $payload);
+            $this->assertArrayNotHasKey('execution_type', $payload);
+            $this->assertArrayNotHasKey('execution_context', $payload);
+
+            $this->assertSame('Unable to interact with the job.', $payload['_laravel_cloud_error']);
+
+            $this->assertSame('Whoops!', $payload['message']);
+            $this->assertSame('RuntimeException', $payload['class']);
 
             return true;
         });
@@ -1460,7 +1495,10 @@ class ExceptionReportingTest extends TestCase
             // as the "previous" exception in the chain.
             $this->assertSame(\Illuminate\Container\EntryNotFoundException::class, $payload['class']);
             $this->assertSame('Boom from the constructor', $payload['previous'][0]['message']);
-            $this->assertNull($payload['execution_context']['class']);
+            $this->assertSame(
+                '_laravel_cloud_error: '.ThrowingConstructorTestCommand::class,
+                $payload['execution_context']['class'],
+            );
 
             return true;
         });
@@ -1986,6 +2024,33 @@ class ExceptionHandlerWithoutContextForException implements ExceptionHandler
     public function renderForConsole($output, Throwable $e)
     {
         //
+    }
+}
+
+class JobThatThrowsWhenInteractedWith extends QueueJob implements JobContract
+{
+    public function attempts()
+    {
+        return 1;
+    }
+
+    public function getJobId()
+    {
+        return 'job-id';
+    }
+
+    public function getRawBody()
+    {
+        return json_encode([
+            'uuid' => '9d3d0e9a-7e3f-4a6d-9a1f-2c0a1f7e8b21',
+            'job' => 'MissingJobClass@handle',
+            'data' => [],
+        ]);
+    }
+
+    public function resolveName()
+    {
+        throw new RuntimeException('Unable to interact with the job.');
     }
 }
 
