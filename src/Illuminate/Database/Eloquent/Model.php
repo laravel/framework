@@ -254,6 +254,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $isBroadcasting = true;
 
     /**
+     * Indicates if invalid value exceptions during implicit route model binding should be reported.
+     */
+    protected static bool $reportRouteModelBindingExceptions = true;
+
+    /**
      * The Eloquent query builder class to use for the model.
      *
      * @var class-string<\Illuminate\Database\Eloquent\Builder<*>>
@@ -643,6 +648,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function handleMissingAttributeViolationUsing(?callable $callback)
     {
         static::$missingAttributeViolationCallback = $callback;
+    }
+
+    /**
+     * Report invalid value exceptions during implicit route model binding.
+     */
+    public static function reportRouteModelBindingExceptions(bool $value = true): void
+    {
+        static::$reportRouteModelBindingExceptions = $value;
     }
 
     /**
@@ -2571,10 +2584,49 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Contracts\Database\Eloquent\Builder
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<static>
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
-        return $query->where($field ?? $this->getRouteKeyName(), $value);
+        $field ??= $this->getRouteKeyName();
+
+        if ($this->getKeyType() === 'int' &&
+            Str::afterLast($field, '.') === $this->getKeyName() &&
+            ! $this->isValidIntegerRouteKey($value)) {
+            $this->handleInvalidRouteKey($value, $field);
+        }
+
+        return $query->where($field, $value);
+    }
+
+    /**
+     * Determine if the given value could address a row in an integer key column.
+     */
+    protected function isValidIntegerRouteKey(mixed $value): bool
+    {
+        if (is_int($value)) {
+            return true;
+        }
+
+        if (! is_string($value) || ! preg_match('/^\s*[+-]?\d+\s*$/', $value)) {
+            return false;
+        }
+
+        // Leading zeros are accepted by the database, so they are stripped before
+        // the value is range checked. Anything that cannot be held by a PHP int
+        // is out of range for every integer column type the database offers.
+        return filter_var(preg_replace('/^(\s*[+-]?)0+(?=\d)/', '$1', $value), FILTER_VALIDATE_INT) !== false;
+    }
+
+    /**
+     * Throw an exception for the given invalid route key.
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<static>
+     */
+    protected function handleInvalidRouteKey(mixed $value, string $field): never
+    {
+        throw (new ModelNotFoundException)->setModel(static::class, [$value]);
     }
 
     /**
@@ -2672,6 +2724,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function preventsAccessingMissingAttributes()
     {
         return static::$modelsShouldPreventAccessingMissingAttributes;
+    }
+
+    /**
+     * Determine if invalid value exceptions during implicit route model binding should be reported.
+     */
+    public static function reportsRouteModelBindingExceptions(): bool
+    {
+        return static::$reportRouteModelBindingExceptions;
     }
 
     /**
