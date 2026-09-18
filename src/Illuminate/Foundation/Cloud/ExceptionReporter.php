@@ -17,8 +17,10 @@ use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Request;
 use Illuminate\View\ViewException;
 use Ramsey\Uuid\Uuid;
+use RuntimeException;
 use Spatie\LaravelIgnition\Exceptions\ViewException as IgnitionViewException;
 use Symfony\Component\ErrorHandler\Error\FatalError;
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
 
 class ExceptionReporter
@@ -67,6 +69,7 @@ class ExceptionReporter
      *    stop: bool,
      *    capture_request_payload: bool,
      *    redact_request_payload_fields: array,
+     *    redact_headers: array,
      * }  $config
      */
     public function __construct(
@@ -268,8 +271,7 @@ class ExceptionReporter
             'execution_type' => 'request',
             'execution_context' => [
                 'timestamp' => $this->laravelStartedAtTimestamp(),
-                // TODO redact headers
-                'headers' => Request::header(),
+                'headers' => $this->requestHeaders(),
                 'method' => Request::method(),
                 'url' => Request::fullUrl(),
                 'ip' => Request::ip(),
@@ -278,6 +280,112 @@ class ExceptionReporter
                 'files' => $this->requestFiles($e),
             ],
         ];
+    }
+
+    /**
+     * Retrieve the request headers.
+     */
+    protected function requestHeaders(): array
+    {
+        $headers = clone Request::instance()->headers;
+
+        $headers = $this->removeSyntheticAuthorizationHeaders($headers);
+        $headers = $this->redactHeaders($headers);
+
+        return $headers->all();
+    }
+
+    protected function removeSyntheticAuthorizationHeaders(HeaderBag $headers): HeaderBag
+    {
+        // The Authorization header already contains these values and they are
+        // not headers the client actually sent, so we remove them to avoid
+        // leaking credentials that have not been redacted.
+        $headers->remove('php-auth-user');
+        $headers->remove('php-auth-pw');
+        $headers->remove('php-auth-digest');
+
+        return $headers;
+    }
+
+    /**
+     * Redact the configured sensitive headers.
+     */
+    protected function redactHeaders(HeaderBag $headers): HeaderBag
+    {
+        foreach ($this->config['redact_headers'] as $key) {
+            if (! $headers->has($key)) {
+                continue;
+            }
+
+            $headers->set($key, array_map(fn ($value) => match (strtolower($key)) {
+                'authorization', 'proxy-authorization' => $this->redactAuthorizationHeaderValue((string) $value),
+                'cookie' => $this->redactCookieHeaderValue((string) $value),
+                default => $this->redactHeaderValue((string) $value),
+            }, $headers->all($key)));
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Redact the given header value.
+     */
+    protected function redactHeaderValue(string $value): string
+    {
+        return '['.strlen($value).' bytes redacted]';
+    }
+
+    /**
+     * Redact the given authorization header value, retaining the scheme.
+     */
+    protected function redactAuthorizationHeaderValue(string $value): string
+    {
+        if (! str_contains($value, ' ')) {
+            return $this->redactHeaderValue($value);
+        }
+
+        [$scheme, $remainder] = explode(' ', $value, 2);
+
+        if (in_array(strtolower($scheme), [
+            'basic',
+            'bearer',
+            'concealed',
+            'digest',
+            'dpop',
+            'gnap',
+            'hoba',
+            'mutual',
+            'negotiate',
+            'oauth',
+            'privatetoken',
+            'scram-sha-1',
+            'scram-sha-256',
+            'vapid',
+        ], true)) {
+            return $scheme.' '.$this->redactHeaderValue($remainder);
+        }
+
+        return $this->redactHeaderValue($value);
+    }
+
+    /**
+     * Redact the given cookie header value, retaining the cookie names.
+     */
+    protected function redactCookieHeaderValue(string $value): string
+    {
+        try {
+            return implode('; ', array_map(function ($cookie) {
+                if (! str_contains($cookie, '=')) {
+                    throw new RuntimeException('Invalid cookie format.');
+                }
+
+                [$name, $value] = explode('=', $cookie, 2);
+
+                return trim($name).'='.$this->redactHeaderValue($value);
+            }, explode(';', $value)));
+        } catch (Throwable) {
+            return $this->redactHeaderValue($value);
+        }
     }
 
     /**

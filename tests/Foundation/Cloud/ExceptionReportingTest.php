@@ -1151,7 +1151,170 @@ class ExceptionReportingTest extends TestCase
 
     public function testItRedactsSensitiveHeaders(): void
     {
-        $this->markTestIncomplete('TODO');
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/test', function () {
+            $this->setRunningInConsole(false);
+
+            throw new RuntimeException('Whoops!');
+        });
+        $this->withBasicAuth('taylor', '$f4c4d3')
+            ->withHeader('Proxy-Authorization', 'Bearer secret-token')
+            ->withHeader('Cookie', 'laravel_session=abc123; XSRF-TOKEN=1234')
+            ->withHeader('X-XSRF-TOKEN', 'secret')
+            ->get('/test')
+            ->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $headers = $payload['execution_context']['headers'];
+
+            $this->assertSame(['Basic [20 bytes redacted]'], $headers['authorization']);
+            $this->assertSame(['Bearer [12 bytes redacted]'], $headers['proxy-authorization']);
+            $this->assertSame(['laravel_session=[6 bytes redacted]; XSRF-TOKEN=[4 bytes redacted]'], $headers['cookie']);
+            $this->assertSame(['[6 bytes redacted]'], $headers['x-xsrf-token']);
+
+            // These are derived from the Authorization header by PHP, rather
+            // than sent by the client, and are not redacted.
+            $this->assertArrayNotHasKey('php-auth-user', $headers);
+            $this->assertArrayNotHasKey('php-auth-pw', $headers);
+
+            return true;
+        });
+    }
+
+    public function testItRedactsConfiguredHeaders(): void
+    {
+        $this->setupExceptionReporting(['redact_headers' => ['Custom']]);
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/test', function () {
+            $this->setRunningInConsole(false);
+
+            throw new RuntimeException('Whoops!');
+        });
+        $this->withHeader('Authorization', 'Bearer secret-token')
+            ->withHeader('Custom', 'secret')
+            ->get('/test')
+            ->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $headers = $payload['execution_context']['headers'];
+
+            $this->assertSame(['[6 bytes redacted]'], $headers['custom']);
+            $this->assertSame(['Bearer secret-token'], $headers['authorization']);
+
+            return true;
+        });
+    }
+
+    public function testItCanDisableHeaderRedaction(): void
+    {
+        $this->setupExceptionReporting(['redact_headers' => []]);
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/test', function () {
+            $this->setRunningInConsole(false);
+
+            throw new RuntimeException('Whoops!');
+        });
+        $this->withBasicAuth('taylor', '$f4c4d3')
+            ->withHeader('Proxy-Authorization', 'Bearer secret-token')
+            ->withHeader('Cookie', 'laravel_session=abc123; XSRF-TOKEN=1234')
+            ->get('/test')
+            ->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $headers = $payload['execution_context']['headers'];
+
+            $this->assertSame(['Basic dGF5bG9yOiRmNGM0ZDM='], $headers['authorization']);
+            $this->assertSame(['Bearer secret-token'], $headers['proxy-authorization']);
+            $this->assertSame(['laravel_session=abc123; XSRF-TOKEN=1234'], $headers['cookie']);
+
+            return true;
+        });
+    }
+
+    public function testItRedactsUnconventionalSensitiveHeaders(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/test', function () {
+            $this->setRunningInConsole(false);
+
+            throw new RuntimeException('Whoops!');
+        });
+        $this->withHeader('Authorization', 'secret-token')
+            ->withHeader('Proxy-Authorization', 'secret-scheme secret-token')
+            ->withHeader('Cookie', 'secret')
+            ->get('/test')
+            ->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $headers = $payload['execution_context']['headers'];
+
+            // Values we cannot confidently parse are redacted in their entirety.
+            $this->assertSame(['[12 bytes redacted]'], $headers['authorization']);
+            $this->assertSame(['[26 bytes redacted]'], $headers['proxy-authorization']);
+            $this->assertSame(['[6 bytes redacted]'], $headers['cookie']);
+
+            return true;
+        });
+    }
+
+    public function testItRedactsEachValueOfRepeatedSensitiveHeaders(): void
+    {
+        $this->setupExceptionReporting(['redact_headers' => ['Custom']]);
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/test', function () {
+            $this->setRunningInConsole(false);
+
+            throw new RuntimeException('Whoops!');
+        });
+        $this->get('/test', ['Custom' => ['first', 'second-value']])
+            ->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame([
+                '[5 bytes redacted]',
+                '[12 bytes redacted]',
+            ], $payload['execution_context']['headers']['custom']);
+
+            return true;
+        });
+    }
+
+    public function testItDoesNotMutateTheRequestHeadersWhenRedacting(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        $authorization = null;
+        Route::get('/test', function () use (&$authorization) {
+            $this->setRunningInConsole(false);
+
+            report(new RuntimeException('Whoops!'));
+
+            $authorization = request()->header('Authorization');
+        });
+        $this->withHeader('Authorization', 'Bearer secret-token')
+            ->get('/test')
+            ->assertOk();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame(['Bearer [12 bytes redacted]'], $payload['execution_context']['headers']['authorization']);
+
+            return true;
+        });
+        $this->assertSame('Bearer secret-token', $authorization);
     }
 
     public function testItCanDisableAndEnableHeaderCapture(): void
