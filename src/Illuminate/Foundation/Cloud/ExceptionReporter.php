@@ -163,7 +163,11 @@ class ExceptionReporter
      */
     protected function laravelContext(): object
     {
-        return (object) Context::all();
+        try {
+            return (object) Context::all();
+        } catch (Throwable $e) {
+            return (object) [];
+        }
     }
 
     /**
