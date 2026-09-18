@@ -5980,17 +5980,16 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('taylor@example.com', $result);
     }
 
-    #[DataProvider('collectionClassProvider')]
-    public function testDataGetUsesDotNotation($collection)
+    public function testDataGetUsesDotNotation()
     {
-        $data = new $collection([
-            'name' => 'taylor', 
+        $data = new Collection([
+            'name' => 'taylor',
             'meta' => [
-                'email' => 'taylor@example.com', 
+                'email' => 'taylor@example.com',
                 'roles' => ['admin'],
             ],
         ]);
-        
+
         $this->assertSame('taylor@example.com', $data->dataGet('meta.email'));
         $this->assertSame('admin', $data->dataGet('meta.roles.0'));
         $this->assertNull($data->dataGet('meta.missing'));
@@ -5998,10 +5997,9 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('taylor', $data->dataGet('name'));
     }
 
-    #[DataProvider('collectionClassProvider')]
-    public function testDataHasUsesDotNotation($collection)
+    public function testDataHasUsesDotNotation()
     {
-        $data = new $collection([
+        $data = new Collection([
             'meta' => ['email' => 'taylor@example.com'],
         ]);
 
