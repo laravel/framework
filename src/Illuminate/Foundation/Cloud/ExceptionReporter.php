@@ -454,7 +454,9 @@ class ExceptionReporter
 
     protected function shouldRedactRequestPayloadField(string $field, mixed $value): bool
     {
-        return in_array($field, $this->config['redact_request_payload_fields']) && is_string($value); // TODO what about sensitive numbers?
+        return in_array($field, $this->config['redact_request_payload_fields'])
+            && is_scalar($value)
+            && ! is_bool($value);
     }
 
     /**

@@ -447,6 +447,113 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
+    public static function redactedRequestPayloadValueProvider(): array
+    {
+        return [
+            'string' => ['super-secret', '[12 bytes redacted]'],
+            // The ConvertEmptyStringsToNull middleware rewrites the value
+            // before it ever reaches the reporter.
+            'empty string' => ['', null],
+            'multi-byte string' => ['One 😎', '[8 bytes redacted]'],
+            'numeric string' => ['4821', '[4 bytes redacted]'],
+            'integer' => [4821, '[4 bytes redacted]'],
+            'zero integer' => [0, '[1 bytes redacted]'],
+            'negative integer' => [-7, '[2 bytes redacted]'],
+            'large integer' => [PHP_INT_MAX, '[19 bytes redacted]'],
+            'float' => [1.5, '[3 bytes redacted]'],
+            'negative float' => [-12.75, '[6 bytes redacted]'],
+            // A float with a zero fraction casts to a string without it.
+            'float with a zero fraction' => [1.0, '[1 bytes redacted]'],
+            // Booleans are passed through. Redacting them would reveal the
+            // value anyway, via the byte count.
+            'true' => [true, true],
+            'false' => [false, false],
+            // `null` is not a scalar, so it is passed through as-is. It does
+            // not reveal the value, only that the field was present.
+            'null' => [null, null],
+        ];
+    }
+
+    #[DataProvider('redactedRequestPayloadValueProvider')]
+    public function testItRedactsScalarRequestPayloadValues(mixed $value, mixed $expected): void
+    {
+        $this->setupExceptionReporting(['capture_request_payload' => true]);
+        $streams = $this->fakeEventsStreams();
+
+        Route::post('/test', function () {
+            $this->setRunningInConsole(false);
+            report(new RuntimeException('Whoops!'));
+        });
+        // The payload is sent as JSON so the value retains its type. A form
+        // request casts every value to a string before it reaches the app.
+        $this->postJson('/test', ['password' => $value])->assertOk();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) use ($expected) {
+            $this->assertSame([
+                'password' => $expected,
+            ], $payload['execution_context']['payload']);
+
+            return true;
+        });
+    }
+
+    public function testItRedactsScalarValuesNestedInTheRequestPayload(): void
+    {
+        $this->setupExceptionReporting(['capture_request_payload' => true]);
+        $streams = $this->fakeEventsStreams();
+
+        Route::post('/test', function () {
+            $this->setRunningInConsole(false);
+            report(new RuntimeException('Whoops!'));
+        });
+        $this->postJson('/test', [
+            'user' => [
+                'username' => 'taylor',
+                'password' => 4821,
+            ],
+        ])->assertOk();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame([
+                'user' => [
+                    'username' => 'taylor',
+                    'password' => '[4 bytes redacted]',
+                ],
+            ], $payload['execution_context']['payload']);
+
+            return true;
+        });
+    }
+
+    public function testItRecursesIntoArrayRequestPayloadValuesRatherThanRedactingThem(): void
+    {
+        $this->setupExceptionReporting(['capture_request_payload' => true]);
+        $streams = $this->fakeEventsStreams();
+
+        Route::post('/test', function () {
+            $this->setRunningInConsole(false);
+            report(new RuntimeException('Whoops!'));
+        });
+        $this->postJson('/test', [
+            'password' => ['first', 'second', ['password' => 4821]],
+        ])->assertOk();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame([
+                'password' => [
+                    'first',
+                    'second',
+                    ['password' => '[4 bytes redacted]'],
+                ],
+            ], $payload['execution_context']['payload']);
+
+            return true;
+        });
+    }
+
     public function testItCapturesUploadedFiles(): void
     {
         $this->setupExceptionReporting(['capture_request_payload' => true]);
