@@ -650,34 +650,54 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
+     * Determine whether the command may be safely retried.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function isRetryable($method, array $parameters)
+    {
+        $method = strtolower($method);
+
+        if ($method === 'set') {
+            return ! isset($parameters[2]);
+        }
+
+        return in_array($method, static::RETRYABLE_COMMANDS, true);
+    }
+
+    /**
      * Run the given callback, retrying it once on a rebuilt client if the connection was lost.
      *
-     * Only safe for operations that have not yet sent a command that could have taken effect,
-     * such as opening a pipeline or a transaction.
+     * For operations that have not yet sent a command that could have taken effect, such as opening a pipeline or a transaction.
      *
      * @param  \Closure  $callback
      * @return mixed
      */
     protected function retryOnceOnLostConnection(Closure $callback)
     {
-        try {
-            return $callback();
-        } catch (RedisClusterException|RedisException|ErrorException $e) {
-            if (! $this->causedByLostConnection($e)) {
-                throw $e;
+        $retries = 1;
+
+        while (true) {
+            try {
+                return $callback();
+            } catch (RedisClusterException|RedisException|ErrorException $e) {
+                if (! $this->causedByLostConnection($e)) {
+                    throw $e;
+                }
+
+                $this->rebuildClient();
+
+                if ($retries-- === 0) {
+                    throw $e;
+                }
             }
-
-            $this->rebuildClient();
-
-            return $callback();
         }
     }
 
     /**
      * Rebuild the client if the given exception was caused by a lost connection.
-     *
-     * The failed operation is not retried, so the caller still receives the exception, but the
-     * next operation on this connection uses a fresh client instead of the dead one.
      *
      * @param  \Throwable  $e
      * @return void
@@ -701,7 +721,16 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             return false;
         }
 
-        return Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'READONLY', 'Connection lost', 'Error processing response from Redis node', 'Connection reset by peer']);
+        return Str::contains($e->getMessage(), [
+            'went away',
+            'socket',
+            'Error while reading',
+            'read error on connection',
+            'READONLY',
+            'Connection lost',
+            'Error processing response from Redis node',
+            'Connection reset by peer'
+        ]);
     }
 
     /**
@@ -712,24 +741,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     protected function rebuildClient()
     {
         $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
-    }
-
-    /**
-     * Determine whether the command may be safely retried.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return bool
-     */
-    protected function isRetryable($method, array $parameters)
-    {
-        $method = strtolower($method);
-
-        if ($method === 'set') {
-            return ! isset($parameters[2]);
-        }
-
-        return in_array($method, static::RETRYABLE_COMMANDS, true);
     }
 
     /**
