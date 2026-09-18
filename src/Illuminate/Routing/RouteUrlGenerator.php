@@ -34,7 +34,7 @@ class RouteUrlGenerator
     public $defaultParameters = [];
 
     /**
-     * Characters that should not be URL encoded.
+     * Characters that should not be URL-encoded.
      *
      * @var array
      */
@@ -372,7 +372,7 @@ class RouteUrlGenerator
     /**
      * Encode a parameter value that is being substituted into a route URI.
      *
-     * Values wrapped in an EncodedParameter are already URL encoded and are used as-is.
+     * Values wrapped in an EncodedParameter are already URL-encoded and are used as-is.
      *
      * @param  mixed  $value
      * @return mixed
