@@ -23,6 +23,7 @@ trait InteractsWithComposerPackages
 
         $command = array_merge(
             $command ?? ['composer', 'require'],
+            ['--with-all-dependencies'],
             $packages,
         );
 
