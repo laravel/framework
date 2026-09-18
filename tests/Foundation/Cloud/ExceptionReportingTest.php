@@ -10,7 +10,9 @@ use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Cloud\Events;
+use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\CloudBootstrapper as Cloud;
+use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Log\Context\Repository as ContextRepository;
@@ -2029,6 +2031,54 @@ class ExceptionReportingTest extends TestCase
     {
         yield 'stop reporting' => [true, false];
         yield  'continue reporting' => [false, true];
+    }
+
+    #[DataProvider('stopReturnValueDataProvider')]
+    public function testItReturnsWhetherReportingShouldContinue(bool $stopConfig, bool $expected): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+
+        $reporter = new ExceptionReporter(
+            $this->app[Events::class],
+            $this->app[BladeMapper::class],
+            $this->app->basePath().DIRECTORY_SEPARATOR,
+            [
+                'stop' => $stopConfig,
+                'capture_request_payload' => false,
+                'redact_request_payload_fields' => [],
+                'redact_headers' => [],
+            ],
+        );
+
+        $this->assertSame($expected, $reporter(new RuntimeException('Whoops!')));
+    }
+
+    public static function stopReturnValueDataProvider(): iterable
+    {
+        yield 'stop reporting' => [true, false];
+        yield 'continue reporting' => [false, true];
+    }
+
+    public function testItReturnsNullWhenTheExceptionCannotBeEmitted(): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        Events::$socketFactory = fn () => false;
+
+        $reporter = new ExceptionReporter(
+            $this->app[Events::class],
+            $this->app[BladeMapper::class],
+            $this->app->basePath().DIRECTORY_SEPARATOR,
+            [
+                'stop' => false,
+                'capture_request_payload' => false,
+                'redact_request_payload_fields' => [],
+                'redact_headers' => [],
+            ],
+        );
+
+        $this->assertNull($reporter(new RuntimeException('Whoops!')));
     }
 
     public function testItDoesBubbleOnWriteFailureWhenConfiguredNotToBubble(): void

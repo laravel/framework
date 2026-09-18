@@ -55,12 +55,16 @@ class ExceptionReporter
     protected array $executionContext = [];
 
     /**
+     * The cached normalized queue names, keyed by "connection:queue".
+     *
      * @var array<string, string>
      */
     protected array $normalizedQueues = [];
 
     /**
      * The cached queue configuration.
+     *
+     * @var array<string, mixed>|null
      */
     protected ?array $connectionConfig = null;
 
@@ -70,8 +74,8 @@ class ExceptionReporter
      * @param  array{
      *    stop: bool,
      *    capture_request_payload: bool,
-     *    redact_request_payload_fields: array,
-     *    redact_headers: array,
+     *    redact_request_payload_fields: list<string>,
+     *    redact_headers: list<string>,
      * }  $config
      */
     public function __construct(
@@ -86,7 +90,7 @@ class ExceptionReporter
     /**
      * Report the given exception.
      */
-    public function __invoke(Throwable $e): ?false
+    public function __invoke(Throwable $e): ?bool
     {
         // TODO prepare for 14.x passing context here.
         // TODO reserve memory and free memory fatal exceptions?
@@ -127,6 +131,8 @@ class ExceptionReporter
 
     /**
      * Create the exception payload.
+     *
+     * @return array<string, mixed>
      */
     protected function payload(Throwable $e): array
     {
@@ -181,6 +187,8 @@ class ExceptionReporter
 
     /**
      * Retrieve the execution context.
+     *
+     * @return array<string, mixed>
      */
     protected function executionDetails(Throwable $e): array
     {
@@ -199,6 +207,8 @@ class ExceptionReporter
 
     /**
      * Retrieve the currently processing job's execution context.
+     *
+     * @return array<string, mixed>
      */
     protected function jobExecutionDetails(Throwable $e): array
     {
@@ -226,6 +236,8 @@ class ExceptionReporter
 
     /**
      * Retrieve the console execution context.
+     *
+     * @return array<string, mixed>
      */
     protected function consoleExecutionDetails(Throwable $e): array
     {
@@ -263,6 +275,8 @@ class ExceptionReporter
 
     /**
      * Retrieve the request execution context.
+     *
+     * @return array<string, mixed>
      */
     protected function requestExecutionDetails(Throwable $e): array
     {
@@ -283,7 +297,9 @@ class ExceptionReporter
     }
 
     /**
-     * Retrieve the request headers.
+     * Retrieve the redacted request headers.
+     *
+     * @return array<string, list<string|null>>
      */
     protected function requestHeaders(): array
     {
@@ -295,6 +311,9 @@ class ExceptionReporter
         return $headers->all();
     }
 
+    /**
+     * Remove the headers PHP derives from the Authorization header.
+     */
     protected function removeSyntheticAuthorizationHeaders(HeaderBag $headers): HeaderBag
     {
         // The Authorization header already contains these values and they are
@@ -389,7 +408,9 @@ class ExceptionReporter
     }
 
     /**
-     * Retrieve the request payload.
+     * Retrieve the redacted request payload.
+     *
+     * @return array<array-key, mixed>|null
      */
     protected function requestPayload(Throwable $e): ?array
     {
@@ -408,6 +429,8 @@ class ExceptionReporter
 
     /**
      * Retrieve the parsed uploaded files.
+     *
+     * @return array<array-key, mixed>|null
      */
     protected function requestFiles(Throwable $e): ?array
     {
@@ -424,6 +447,12 @@ class ExceptionReporter
         }
     }
 
+    /**
+     * Redact the configured sensitive fields in the given payload.
+     *
+     * @param  array<array-key, mixed>  $payload
+     * @return array<array-key, mixed>
+     */
     protected function redactRequestPayload(array $payload): array
     {
         return Arr::map($payload, function ($value, $key) {
@@ -437,6 +466,14 @@ class ExceptionReporter
         });
     }
 
+    /**
+     * Parse the given uploaded files into their reportable details.
+     *
+     * Values are uploaded files, or nested arrays of them.
+     *
+     * @param  array<array-key, mixed>  $files
+     * @return array<array-key, mixed>
+     */
     protected function parseRequestFiles(array $files): array
     {
         return array_map(function ($file) {
@@ -452,6 +489,9 @@ class ExceptionReporter
         }, $files);
     }
 
+    /**
+     * Determine if the given payload field should be redacted.
+     */
     protected function shouldRedactRequestPayloadField(string $field, mixed $value): bool
     {
         return in_array($field, $this->config['redact_request_payload_fields'])
@@ -461,6 +501,8 @@ class ExceptionReporter
 
     /**
      * Retrieve the route specific request execution context.
+     *
+     * @return array<string, mixed>|null
      */
     protected function requestRouteExecutionDetails(): ?array
     {
@@ -532,6 +574,8 @@ class ExceptionReporter
 
     /**
      * Parse the given exception.
+     *
+     * @return array<string, mixed>
      */
     protected function parseException(Throwable $e): array
     {
@@ -545,6 +589,8 @@ class ExceptionReporter
 
     /**
      * Parse the previous exceptions.
+     *
+     * @return list<array<string, mixed>>
      */
     protected function previous(Throwable $e): array
     {
@@ -559,6 +605,8 @@ class ExceptionReporter
 
     /**
      * Parse the stack trace for the given exception.
+     *
+     * @return list<array<string, mixed>>
      */
     protected function trace(Throwable $e): array
     {
@@ -597,6 +645,8 @@ class ExceptionReporter
 
     /**
      * Determine the type information of the given argument.
+     *
+     * @return string|array{string, string}
      */
     protected function argType(mixed $argument, string|int $name): string|array
     {
@@ -618,6 +668,9 @@ class ExceptionReporter
 
     /**
      * Normalize the file and line number.
+     *
+     * @param  array<string, mixed>  $frame
+     * @return array<string, mixed>
      */
     protected function normalizeFrameFileAndLine(array $frame): array
     {
@@ -640,6 +693,9 @@ class ExceptionReporter
 
     /**
      * Map compiled views to their original view file paths.
+     *
+     * @param  array<string, mixed>  $frame
+     * @return array<string, mixed>
      */
     protected function mapCompiledViewFrame(array $frame): array
     {
