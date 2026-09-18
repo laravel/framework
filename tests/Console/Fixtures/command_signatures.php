@@ -1456,6 +1456,17 @@ return [
                 'description' => 'Install Mercure as the default broadcaster',
             ],
             [
+                'name' => 'pretend',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => false,
+                'isArray' => false,
+                'acceptValue' => false,
+                'default' => false,
+                'description' => 'Run dependency installation commands in dry-run mode',
+            ],
+            [
                 'name' => 'without-node',
                 'shortcut' => null,
                 'negatable' => false,
