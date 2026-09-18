@@ -12,6 +12,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use function Illuminate\Support\artisan_binary;
 use function Illuminate\Support\php_binary;
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\note;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
@@ -34,6 +35,7 @@ class BroadcastingInstallCommand extends Command
                     {--pusher : Install Pusher as the default broadcaster}
                     {--ably : Install Ably as the default broadcaster}
                     {--mercure : Install Mercure as the default broadcaster}
+                    {--pretend : Run dependency installation commands in dry-run mode}
                     {--without-node : Do not prompt to install Node dependencies}';
 
     /**
@@ -249,11 +251,15 @@ class BroadcastingInstallCommand extends Command
             return;
         }
 
-        $this->requireComposerPackages($this->option('composer'), array_map(
-            fn ($package, $constraint) => $constraint === '*' ? $package : $package.':'.$constraint,
-            array_keys($packages),
-            $packages,
-        ));
+        $this->requireComposerPackages(
+            $this->option('composer'),
+            array_map(
+                fn ($package, $constraint) => $constraint === '*' ? $package : $package.':'.$constraint,
+                array_keys($packages),
+                $packages,
+            ),
+            $this->option('pretend')
+        );
     }
 
     /**
@@ -456,7 +462,7 @@ class BroadcastingInstallCommand extends Command
 
         $this->requireComposerPackages($this->option('composer'), [
             'laravel/reverb:^1.0',
-        ]);
+        ], $this->option('pretend'));
 
         Process::run([
             php_binary(),
@@ -506,6 +512,12 @@ class BroadcastingInstallCommand extends Command
             $commands[0] .= ' '.$this->frameworkPackages['vue'];
         } elseif ($this->appUsesReact()) {
             $commands[0] .= ' '.$this->frameworkPackages['react'];
+        }
+
+        if ($this->option('pretend')) {
+            note(implode(' && ', $commands));
+
+            return;
         }
 
         $command = Process::command(implode(' && ', $commands))
