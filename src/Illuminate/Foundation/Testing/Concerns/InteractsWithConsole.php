@@ -72,7 +72,7 @@ trait InteractsWithConsole
     public $expectedChoices = [];
 
     /**
-     * Call artisan command and return wrapper or (exit) code.
+     * Invoke an Artisan command and return a mocked pending command or exit code.
      *
      * @param  string  $command
      * @param  array  $parameters
@@ -86,7 +86,7 @@ trait InteractsWithConsole
     }
 
     /**
-     * Call artisan command and return wrapper.
+     * Invoke an Artisan command and return a mocked pending command.
      *
      * @param  string  $command
      * @param  array  $parameters
@@ -98,7 +98,7 @@ trait InteractsWithConsole
     }
 
     /**
-     * Call artisan command and return (exit) code.
+     * Invoke an Artisan command and return the exit code.
      *
      * @param  string  $command
      * @param  array  $parameters
