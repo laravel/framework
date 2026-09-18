@@ -34,6 +34,8 @@ class MaxExceptionsWithRedisTest extends TestCase
 
     public function testMaxExceptionsAreCountedWhenPhpRedisSerializationIsEnabled()
     {
+        $this->app['config']->set('cache.stores.redis.connection', 'default');
+
         $cache = Cache::store('redis');
         $connection = $cache->getStore()->connection();
 
