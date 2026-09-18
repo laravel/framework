@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Attributes\Refreshes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -3106,6 +3107,7 @@ class EloquentTestWithJSON extends Eloquent
     ];
 }
 
+#[Refreshes('name')]
 class EloquentTestGeneratedUser extends Eloquent
 {
     public $timestamps = false;
@@ -3117,8 +3119,6 @@ class EloquentTestGeneratedUser extends Eloquent
     protected $table = 'generated_users';
 
     protected $guarded = [];
-
-    protected array $refreshes = ['name'];
 
     protected function fireModelEvent($event, $halt = true)
     {
