@@ -207,8 +207,12 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         return new static(function () {
             foreach ($this as $values) {
                 if (is_array($values) || $values instanceof Enumerable) {
-                    foreach ($values as $value) {
-                        yield $value;
+                    foreach ($values as $key => $value) {
+                        if (is_string($key)) {
+                            yield $key => $value;
+                        } else {
+                            yield $value;
+                        }
                     }
                 }
             }

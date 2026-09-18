@@ -1936,9 +1936,17 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1, 2, 'foo', 'bar'], $data->collapse()->all());
 
         // Case including collections and arrays
-        $collection = new $collection(['baz', 'boom']);
-        $data = new $collection([[1], [2], [3], ['foo', 'bar'], $collection]);
+        $inner = new $collection(['baz', 'boom']);
+        $data = new $collection([[1], [2], [3], ['foo', 'bar'], $inner]);
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], $data->collapse()->all());
+
+        // Case with string keys preserved and numeric keys renumbered
+        $data = new $collection([['a' => 1, 'b' => 2], [3, 'c' => 4], [5]]);
+        $this->assertSame(['a' => 1, 'b' => 2, 0 => 3, 'c' => 4, 1 => 5], $data->collapse()->all());
+
+        // Case with duplicate string keys, the last value wins
+        $data = new $collection([['x' => 'first'], ['x' => 'second']]);
+        $this->assertSame(['x' => 'second'], $data->collapse()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
