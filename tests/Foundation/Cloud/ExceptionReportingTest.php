@@ -1996,9 +1996,20 @@ class ContextRepositoryThatThrows extends ContextRepository
         parent::__construct(new Dispatcher);
     }
 
+    protected bool $thrown = false;
+
     public function all()
     {
-        throw new RuntimeException('Unable to retrieve context.');
+        // Only throw for the reporter's call. The logger also retrieves the
+        // context while handling the exception, and it should not be
+        // impacted by this test's simulated failure.
+        if (! $this->thrown) {
+            $this->thrown = true;
+
+            throw new RuntimeException('Unable to retrieve context.');
+        }
+
+        return parent::all();
     }
 }
 
