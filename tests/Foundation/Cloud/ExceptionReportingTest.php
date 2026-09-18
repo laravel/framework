@@ -7,10 +7,12 @@ use Exception;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\CloudBootstrapper as Cloud;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -611,6 +613,23 @@ class ExceptionReportingTest extends TestCase
             'laravel_context' => [
                 'laravel' => 'context',
             ],
+        ]);
+    }
+
+    public function testItCapturesEmptyLaravelContextWhenRetrievingTheContextThrows(): void
+    {
+        $this->app->instance(ContextRepository::class, new ContextRepositoryThatThrows);
+        Context::clearResolvedInstances();
+
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        report(new RuntimeException('Whoops!'));
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains([
+            'laravel_context' => [],
+            'message' => 'Whoops!',
         ]);
     }
 
@@ -1967,6 +1986,19 @@ class ExceptionHandlerWithoutContextForException implements ExceptionHandler
     public function renderForConsole($output, Throwable $e)
     {
         //
+    }
+}
+
+class ContextRepositoryThatThrows extends ContextRepository
+{
+    public function __construct()
+    {
+        parent::__construct(new Dispatcher);
+    }
+
+    public function all()
+    {
+        throw new RuntimeException('Unable to retrieve context.');
     }
 }
 
