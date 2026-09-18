@@ -111,6 +111,33 @@ class DatabaseFailedJobProviderTest extends TestCase
         $this->assertSame(0, $this->failedJobsTable()->count());
     }
 
+    public function testCanFlushFailedJobsForASingleQueue()
+    {
+        $this->createFailedJobsRecord(['queue' => 'emails']);
+        $this->createFailedJobsRecord(['queue' => 'emails']);
+        $this->createFailedJobsRecord(['queue' => 'default']);
+
+        $this->provider->flush(queue: 'emails');
+
+        $this->assertSame(1, $this->failedJobsTable()->count());
+        $this->assertSame('default', $this->failedJobsTable()->first()->queue);
+    }
+
+    public function testCanFlushFailedJobsForASingleQueueByHours()
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $this->createFailedJobsRecord(['queue' => 'emails', 'failed_at' => $now->copy()->subDays(10)]);
+        $this->createFailedJobsRecord(['queue' => 'emails', 'failed_at' => $now->copy()->subDays(1)]);
+        $this->createFailedJobsRecord(['queue' => 'default', 'failed_at' => $now->copy()->subDays(10)]);
+
+        $this->provider->flush(5 * 24, 'emails');
+
+        $this->assertSame(2, $this->failedJobsTable()->count());
+        $this->assertSame(1, $this->failedJobsTable()->where('queue', 'emails')->count());
+        $this->assertSame(1, $this->failedJobsTable()->where('queue', 'default')->count());
+    }
+
     public function testCanProperlyLogFailedJob()
     {
         $uuid = Str::uuid();

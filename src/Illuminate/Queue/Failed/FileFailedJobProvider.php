@@ -133,14 +133,24 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     }
 
     /**
-     * Flush all of the failed jobs from storage.
+     * Flush the failed jobs from storage.
      *
      * @param  int|null  $hours
+     * @param  string|null  $queue
      * @return void
      */
-    public function flush($hours = null)
+    public function flush($hours = null, $queue = null)
     {
-        $this->prune(Date::now()->subHours($hours ?: 0));
+        $before = Date::now()->subHours($hours ?: 0)->getTimestamp();
+
+        $this->lock(function () use ($before, $queue) {
+            $this->write((new Collection($this->read()))
+                ->reject(fn ($job) => $job->failed_at_timestamp <= $before
+                    && (is_null($queue) || $job->queue === $queue))
+                ->values()
+                ->all()
+            );
+        });
     }
 
     /**

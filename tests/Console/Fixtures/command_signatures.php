@@ -3526,6 +3526,17 @@ return [
                 'default' => null,
                 'description' => 'The number of hours to retain failed job data',
             ],
+            [
+                'name' => 'queue',
+                'shortcut' => null,
+                'negatable' => false,
+                'valueRequired' => false,
+                'valueOptional' => true,
+                'isArray' => false,
+                'acceptValue' => true,
+                'default' => null,
+                'description' => 'Flush all of the failed jobs for the specified queue',
+            ],
         ],
     ],
     \Illuminate\Queue\Console\ForgetFailedCommand::class => [
