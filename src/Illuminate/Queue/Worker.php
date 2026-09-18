@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -27,6 +28,7 @@ use Illuminate\Queue\Events\WorkerQueueResumed;
 use Illuminate\Queue\Events\WorkerResuming;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Support\Carbon;
 use Throwable;
 
@@ -755,7 +757,9 @@ class Worker
         }
 
         if (! $this->cache->get('job-exceptions:'.$uuid)) {
-            $this->cache->put('job-exceptions:'.$uuid, 0, Carbon::now()->addDay());
+            $this->withoutSerializationOrCompression(
+                fn () => $this->cache->put('job-exceptions:'.$uuid, 0, Carbon::now()->addDay())
+            );
         }
 
         if ($maxExceptions <= $this->cache->increment('job-exceptions:'.$uuid)) {
@@ -763,6 +767,31 @@ class Worker
 
             $this->failJob($job, $e);
         }
+    }
+
+    /**
+     * Execute the given callback without serialization or compression when applicable.
+     *
+     * @template TReturn
+     *
+     * @param  (callable(): TReturn)  $callback
+     * @return TReturn
+     */
+    protected function withoutSerializationOrCompression(callable $callback)
+    {
+        $store = $this->cache->getStore();
+
+        if (! $store instanceof RedisStore) {
+            return $callback();
+        }
+
+        $connection = $store->connection();
+
+        if (! $connection instanceof PhpRedisConnection) {
+            return $callback();
+        }
+
+        return $connection->withoutSerializationOrCompression($callback);
     }
 
     /**
