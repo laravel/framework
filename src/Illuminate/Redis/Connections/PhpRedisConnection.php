@@ -729,7 +729,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             'READONLY',
             'Connection lost',
             'Error processing response from Redis node',
-            'Connection reset by peer'
+            'Connection reset by peer',
         ]);
     }
 
