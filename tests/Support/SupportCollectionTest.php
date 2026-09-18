@@ -5981,6 +5981,37 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testDataGetUsesDotNotation($collection)
+    {
+        $data = new $collection([
+            'name' => 'taylor', 
+            'meta' => [
+                'email' => 'taylor@example.com', 
+                'roles' => ['admin'],
+            ],
+        ]);
+        
+        $this->assertSame('taylor@example.com', $data->dataGet('meta.email'));
+        $this->assertSame('admin', $data->dataGet('meta.roles.0'));
+        $this->assertNull($data->dataGet('meta.missing'));
+        $this->assertSame('default', $data->dataGet('meta.missing', 'default'));
+        $this->assertSame('taylor', $data->dataGet('name'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testDataHasUsesDotNotation($collection)
+    {
+        $data = new $collection([
+            'meta' => ['email' => 'taylor@example.com'],
+        ]);
+
+        $this->assertTrue($data->dataHas('meta.email'));
+        $this->assertTrue($data->dataHas(['meta.email']));
+        $this->assertFalse($data->dataHas('meta.missing'));
+        $this->assertFalse($data->dataHas(['meta.email', 'meta.missing']));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testWhereNull($collection)
     {
         $data = new $collection([

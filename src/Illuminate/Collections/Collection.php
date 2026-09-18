@@ -501,6 +501,20 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get an item from the collection using "dot" notation.
+     *
+     * @template TGetDefault
+     *
+     * @param  TKey|null  $key
+     * @param  TGetDefault|(\Closure(): TGetDefault)  $default
+     * @return TValue|TGetDefault
+     */
+    public function dataGet($key, $default = null)
+    {
+        return Arr::get($this->items, $key, $default);
+    }
+
+    /**
      * Get an item from the collection by key or add it to collection if it does not exist.
      *
      * @template TGetOrPutValue
@@ -612,6 +626,19 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $keys = is_array($key) ? $key : func_get_args();
 
         return array_all($keys, fn ($key) => array_key_exists($key ?? '', $this->items));
+    }
+
+    /**
+     * Determine if an item exists in the collection using "dot" notation.
+     *
+     * @param  TKey|array<array-key, TKey>  $key
+     * @return bool
+     */
+    public function dataHas($key)
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        return Arr::has($this->items, $keys);
     }
 
     /**
