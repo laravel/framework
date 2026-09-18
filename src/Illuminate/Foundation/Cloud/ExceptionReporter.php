@@ -23,6 +23,8 @@ use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
 
+// TODO Octane
+// TODO Livewire
 class ExceptionReporter
 {
     /**
@@ -264,8 +266,6 @@ class ExceptionReporter
      */
     protected function requestExecutionDetails(Throwable $e): array
     {
-        // TODO Octane
-        // TODO Livewire
         return [
             'trace_id' => Request::header('Cloud-Request-ID'),
             'execution_type' => 'request',
@@ -681,7 +681,6 @@ class ExceptionReporter
      */
     protected function laravelStartedAtTimestamp(): string
     {
-        // TODO Octane
         $microtime = defined('LARAVEL_START')
             ? LARAVEL_START
             : $_SERVER['REQUEST_TIME_FLOAT'];
