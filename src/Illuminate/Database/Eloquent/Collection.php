@@ -704,7 +704,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * {@inheritDoc}
      *
-     * @return \Illuminate\Support\Collection<int, mixed>
+     * @return \Illuminate\Support\Collection<mixed, mixed>
      */
     #[\Override]
     public function collapse()

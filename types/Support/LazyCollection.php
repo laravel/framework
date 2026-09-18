@@ -93,7 +93,7 @@ assertType('array<int, float|int>|null', $collection->mode());
 assertType('array<int, float|int>|null', $collection->mode('string'));
 assertType('array<int, float|int>|null', $collection->mode(['string']));
 
-assertType('Illuminate\Support\LazyCollection<int, mixed>', $collection->collapse());
+assertType('Illuminate\Support\LazyCollection<mixed, mixed>', $collection->collapse());
 
 assertType('bool', $collection->some(function ($user) {
     assertType('User', $user);

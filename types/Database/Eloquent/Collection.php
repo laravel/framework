@@ -181,7 +181,7 @@ assertType('Illuminate\Support\Collection<int, int>', $collection->keys());
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, int|User>>', $collection->zip([1]));
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, string|User>>', $collection->zip(['string']));
 
-assertType('Illuminate\Support\Collection<int, mixed>', $collection->collapse());
+assertType('Illuminate\Support\Collection<mixed, mixed>', $collection->collapse());
 
 assertType('Illuminate\Support\Collection<int, mixed>', $collection->flatten());
 assertType('Illuminate\Support\Collection<int, mixed>', $collection->flatten(4));
