@@ -78,10 +78,10 @@ trait CreatesMercureDrivers
         );
 
         return new Hub(
-            $config['url'],
+            url($config['url']),
             new CachingTokenProvider(new FactoryTokenProvider($publishTokenFactory, [new Grant([Grant::ACTION_PUBLISH], ['*'])])),
             $this->mercureSubscribeFactory($config),
-            ($config['public_url'] ?? null) ?: null,
+            (isset($config['public_url']) ? url($config['public_url']) : null) ?: null,
             empty($config['client_options']) ? null : HttpClient::create($config['client_options']),
             ($config['cookie_name'] ?? null) ?: null,
             ProtocolVersion::V1,

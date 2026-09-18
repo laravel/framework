@@ -91,7 +91,9 @@ class PostgresConnector extends Connector implements ConnectorInterface
             $dsn .= ";application_name='".str_replace("'", "\'", $application_name)."'";
         }
 
-        return $this->addKeepaliveOptions($this->addSslOptions($dsn, $config), $config);
+        return $this->addServerOptions(
+            $this->addKeepaliveOptions($this->addSslOptions($dsn, $config), $config), $config
+        );
     }
 
     /**
@@ -128,6 +130,30 @@ class PostgresConnector extends Connector implements ConnectorInterface
         }
 
         return $dsn;
+    }
+
+    /**
+     * Add the server options to the DSN.
+     *
+     * @param  string  $dsn
+     * @param  array  $config
+     * @return string
+     */
+    protected function addServerOptions($dsn, array $config)
+    {
+        if (empty($config['server_options'])) {
+            return $dsn;
+        }
+
+        $options = [];
+
+        foreach ($config['server_options'] as $name => $value) {
+            $options[] = '-c '.$name.'='.str_replace(['\\', ' '], ['\\\\', '\\ '], (string) $value);
+        }
+
+        $options = str_replace(['\\', "'"], ['\\\\', "\\'"], implode(' ', $options));
+
+        return $dsn.";options='{$options}'";
     }
 
     /**

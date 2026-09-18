@@ -140,6 +140,38 @@ jobs:
         env:
           DB_CONNECTION: mariadb
 
+  mariadb_118:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    services:
+      mariadb:
+        image: mariadb:11.8
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: yes
+          MARIADB_DATABASE: laravel
+        ports:
+          - 3306:3306
+        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    name: MariaDB 11.8
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
+        with:
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+
+      - name: Execute tests
+        run: vendor/bin/phpunit tests/Integration/Database
+        env:
+          DB_CONNECTION: mariadb
+
   pgsql_18:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
