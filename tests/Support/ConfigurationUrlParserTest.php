@@ -24,6 +24,8 @@ class ConfigurationUrlParserTest extends TestCase
             'sqlite3' => 'sqlite',
             'redis' => 'tcp',
             'rediss' => 'tls',
+            'valkey' => 'tcp',
+            'valkeys' => 'tls',
         ], ConfigurationUrlParser::getDriverAliases());
 
         ConfigurationUrlParser::addDriverAlias('some-particular-alias', 'mysql');
@@ -36,6 +38,8 @@ class ConfigurationUrlParserTest extends TestCase
             'sqlite3' => 'sqlite',
             'redis' => 'tcp',
             'rediss' => 'tls',
+            'valkey' => 'tcp',
+            'valkeys' => 'tls',
             'some-particular-alias' => 'mysql',
         ], ConfigurationUrlParser::getDriverAliases());
 
@@ -476,6 +480,41 @@ class ConfigurationUrlParserTest extends TestCase
             'Redis Example with rediss scheme' => [
                 [
                     'url' => 'rediss://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111',
+                    'host' => '127.0.0.1',
+                    'password' => null,
+                    'port' => 6379,
+                    'database' => 0,
+                ],
+                [
+                    'driver' => 'tls',
+                    'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
+                    'port' => 111,
+                    'database' => 0,
+                    'username' => 'h',
+                    'password' => 'asdfqwer1234asdf',
+                ],
+            ],
+            'Valkey Example' => [
+                [
+                    // Coming directly from Heroku documentation
+                    'url' => 'valkey://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111',
+                    'host' => '127.0.0.1',
+                    'password' => null,
+                    'port' => 6379,
+                    'database' => 0,
+                ],
+                [
+                    'driver' => 'tcp',
+                    'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
+                    'port' => 111,
+                    'database' => 0,
+                    'username' => 'h',
+                    'password' => 'asdfqwer1234asdf',
+                ],
+            ],
+            'Valkey Example with valkeys scheme' => [
+                [
+                    'url' => 'valkeys://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111',
                     'host' => '127.0.0.1',
                     'password' => null,
                     'port' => 6379,
