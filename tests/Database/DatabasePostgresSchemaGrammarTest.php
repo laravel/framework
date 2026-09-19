@@ -17,6 +17,11 @@ use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresSchemaGrammarTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        PostgresBuilder::defaultTimePrecision(0);
+    }
+
     public function testBasicCreateTable()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');

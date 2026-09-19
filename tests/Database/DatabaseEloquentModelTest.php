@@ -86,6 +86,11 @@ class DatabaseEloquentModelTest extends TestCase
     {
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();
+        Model::$snakeAttributes = true;
+        EloquentModelGetMutatorsStub::resetMutatorCache();
+        Model::preventSilentlyDiscardingAttributes(false);
+        Model::handleDiscardedAttributeViolationUsing(null);
+        Model::reguard();
     }
 
     public function testAttributeManipulation()
@@ -2480,6 +2485,9 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testWithoutEventDispatcher()
     {
+        // Boot the model before the dispatcher is set so booting events aren't dispatched.
+        new EloquentModelSaveStub;
+
         $events = Mockery::mock(Dispatcher::class);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelSaveStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelSaveStub', EloquentTestObserverStub::class.'@saved');

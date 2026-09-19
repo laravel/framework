@@ -324,6 +324,13 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertTrue($model->isRelation('parent'));
         $this->assertFalse($model->isRelation('field'));
     }
+
+    protected function tearDown(): void
+    {
+        Relation::morphMap([], false);
+
+        parent::tearDown();
+    }
 }
 
 class EloquentRelationResetModelStub extends Model

@@ -75,6 +75,8 @@ class EloquentModelCustomCastingTest extends TestCase
      */
     protected function tearDown(): void
     {
+        Model::preventSilentlyDiscardingAttributes(false);
+
         $this->schema()->drop('casting_table');
         $this->schema()->drop('members');
         $this->schema()->drop('documents');

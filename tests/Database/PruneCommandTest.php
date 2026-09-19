@@ -11,6 +11,7 @@ use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
+use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -19,6 +20,8 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class PruneCommandTest extends TestCase
 {
+    use RestoresConnectionResolver;
+
     protected function setUp(): void
     {
         Application::setInstance($container = new Application(__DIR__.'/Fixtures/Pruning'));
@@ -144,6 +147,19 @@ class PruneCommandTest extends TestCase
 
     public function testNonModelFilesAreIgnoredTest()
     {
+        $db = new DB;
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+        $db->bootEloquent();
+        $db->setAsGlobal();
+        DB::connection('default')->getSchemaBuilder()->create('prunables', function ($table) {
+            $table->string('name')->nullable();
+            $table->string('value')->nullable();
+            $table->datetime('deleted_at')->nullable();
+        });
+
         $output = $this->artisan(['--path' => 'Models']);
 
         $output = $output->fetch();
