@@ -54,6 +54,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
+use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 use Illuminate\Tests\Database\Fixtures\TestCast;
 use Illuminate\Tests\Database\Fixtures\TestValueObject;
@@ -70,6 +71,13 @@ include_once 'Fixtures/Enums/Enums.php';
 
 class DatabaseEloquentModelTest extends TestCase
 {
+    use RestoresConnectionResolver;
+
+    protected function setUp(): void
+    {
+        $this->useInMemoryConnection();
+    }
+
     use InteractsWithTime;
 
     protected $encrypter;

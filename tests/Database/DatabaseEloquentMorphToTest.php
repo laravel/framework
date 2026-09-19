@@ -7,12 +7,20 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use Illuminate\Tests\Database\Fixtures\TestEnum;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentMorphToTest extends TestCase
 {
+    use RestoresConnectionResolver;
+
+    protected function setUp(): void
+    {
+        $this->useInMemoryConnection();
+    }
+
     protected $builder;
 
     protected $related;
