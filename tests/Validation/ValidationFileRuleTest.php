@@ -499,6 +499,8 @@ class ValidationFileRuleTest extends TestCase
 
     protected function tearDown(): void
     {
+        File::$defaultCallback = null;
+
         Container::setInstance(null);
 
         Facade::clearResolvedInstances();

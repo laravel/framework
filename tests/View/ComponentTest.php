@@ -46,6 +46,7 @@ class ComponentTest extends TestCase
         Container::setInstance(null);
         Component::flushCache();
         Component::forgetFactory();
+        Component::resolveComponentsUsing(null);
     }
 
     public function testInlineViewsGetCreated()
