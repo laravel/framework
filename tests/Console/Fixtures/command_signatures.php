@@ -2724,7 +2724,7 @@ return [
                 'valueOptional' => true,
                 'isArray' => false,
                 'acceptValue' => true,
-                'default' => null,
+                'default' => false,
                 'description' => 'Create a new Markdown template for the notification',
             ],
         ],
