@@ -42,6 +42,15 @@ class NotificationMakeCommand extends GeneratorCommand
      */
     protected $type = 'Notification';
 
+    #[\Override]
+    protected function configureDefaults(): void
+    {
+        // This defaults to false (not null) so that handle() can distinguish "not
+        // passed at all" from "passed with no value", which can't be expressed as a
+        // literal boolean default in the signature above.
+        $this->getDefinition()->getOption('markdown')->setDefault(false);
+    }
+
     /**
      * Execute the console command.
      *
@@ -53,7 +62,7 @@ class NotificationMakeCommand extends GeneratorCommand
             return;
         }
 
-        if ($this->option('markdown')) {
+        if ($this->option('markdown') !== false) {
             $this->writeMarkdownTemplate();
         }
     }
@@ -72,7 +81,7 @@ class NotificationMakeCommand extends GeneratorCommand
         }
 
         $path = $this->viewPath(
-            str_replace('.', $separator, $this->option('markdown')).'.blade.php'
+            str_replace('.', $separator, $this->getView()).'.blade.php'
         );
 
         if (! $this->files->isDirectory(dirname($path))) {
@@ -94,11 +103,28 @@ class NotificationMakeCommand extends GeneratorCommand
     {
         $class = parent::buildClass($name);
 
-        if ($this->option('markdown')) {
-            $class = str_replace(['DummyView', '{{ view }}'], $this->option('markdown'), $class);
+        if ($this->option('markdown') !== false) {
+            $class = str_replace(['DummyView', '{{ view }}'], $this->getView(), $class);
         }
 
         return $class;
+    }
+
+    /**
+     * Get the view name.
+     *
+     * @return string
+     */
+    protected function getView()
+    {
+        if ($view = $this->option('markdown')) {
+            return $view;
+        }
+
+        return (new Stringable($this->argument('name')))->replace('\\', '/')->explode('/')
+            ->map(fn ($path) => Str::kebab($path))
+            ->prepend('mail')
+            ->implode('.');
     }
 
     /**
@@ -108,7 +134,7 @@ class NotificationMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->option('markdown')
+        return $this->option('markdown') !== false
             ? $this->resolveStubPath('/stubs/markdown-notification.stub')
             : $this->resolveStubPath('/stubs/notification.stub');
     }
@@ -153,12 +179,7 @@ class NotificationMakeCommand extends GeneratorCommand
         $wantsMarkdownView = confirm('Would you like to create a markdown view?');
 
         if ($wantsMarkdownView) {
-            $defaultMarkdownView = (new Stringable($this->argument('name')))->replace('\\', '/')->explode('/')
-                ->map(fn ($path) => Str::kebab($path))
-                ->prepend('mail')
-                ->implode('.');
-
-            $markdownView = text('What should the markdown view be named?', default: $defaultMarkdownView);
+            $markdownView = text('What should the markdown view be named?', default: $this->getView());
 
             $input->setOption('markdown', $markdownView);
         }
