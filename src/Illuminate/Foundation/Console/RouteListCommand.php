@@ -107,11 +107,15 @@ class RouteListCommand extends Command
         }
 
         if (! $this->router->getRoutes()->count()) {
-            return $this->components->error("Your application doesn't have any routes.");
+            return $this->option('json')
+                ? $this->output->writeln('[]')
+                : $this->components->error("Your application doesn't have any routes.");
         }
 
         if (empty($routes = $this->getRoutes())) {
-            return $this->components->error("Your application doesn't have any routes matching the given criteria.");
+            return $this->option('json')
+                ? $this->output->writeln('[]')
+                : $this->components->error("Your application doesn't have any routes matching the given criteria.");
         }
 
         $this->displayRoutes($routes);
