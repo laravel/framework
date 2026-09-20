@@ -45,9 +45,7 @@ class NotificationMakeCommand extends GeneratorCommand
     #[\Override]
     protected function configureDefaults(): void
     {
-        // This defaults to false (not null) so that handle() can distinguish "not
-        // passed at all" from "passed with no value", which can't be expressed as a
-        // literal boolean default in the signature above.
+        // Default to false to distinguish "not passed" from "passed with no value"...
         $this->getDefinition()->getOption('markdown')->setDefault(false);
     }
 
@@ -111,23 +109,6 @@ class NotificationMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the view name.
-     *
-     * @return string
-     */
-    protected function getView()
-    {
-        if ($view = $this->option('markdown')) {
-            return $view;
-        }
-
-        return (new Stringable($this->argument('name')))->replace('\\', '/')->explode('/')
-            ->map(fn ($path) => Str::kebab($path))
-            ->prepend('mail')
-            ->implode('.');
-    }
-
-    /**
      * Get the stub file for the generator.
      *
      * @return string
@@ -183,5 +164,22 @@ class NotificationMakeCommand extends GeneratorCommand
 
             $input->setOption('markdown', $markdownView);
         }
+    }
+
+    /**
+     * Get the view name.
+     *
+     * @return string
+     */
+    protected function getView()
+    {
+        if ($view = $this->option('markdown')) {
+            return $view;
+        }
+
+        return (new Stringable($this->argument('name')))->replace('\\', '/')->explode('/')
+            ->map(fn ($path) => Str::kebab($path))
+            ->prepend('mail')
+            ->implode('.');
     }
 }
