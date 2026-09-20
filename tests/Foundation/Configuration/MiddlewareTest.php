@@ -6,10 +6,10 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Foundation\MaintenanceMode;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -247,7 +247,7 @@ class MiddlewareTest extends TestCase
     public function testEncryptCookies()
     {
         $configuration = new Middleware();
-        $encrypter = Mockery::mock(Encrypter::class);
+        $encrypter = new Encrypter(str_repeat('a', 16));
         $middleware = new EncryptCookies($encrypter);
 
         $this->assertFalse($middleware->isDisabled('aaa'));
@@ -289,7 +289,7 @@ class MiddlewareTest extends TestCase
         $configuration = new Middleware();
         $middleware = new PreventRequestForgery(
             Mockery::mock(Application::class),
-            Mockery::mock(Encrypter::class)
+            new Encrypter(str_repeat('a', 16))
         );
 
         $this->assertSame([], $middleware->getExcludedPaths());

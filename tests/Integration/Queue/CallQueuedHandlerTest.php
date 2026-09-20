@@ -109,7 +109,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->expects('resolveQueuedJobClass')->andReturn(CallQueuedHandlerExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
         $job->expects('delete');
-        $job->shouldReceive('failed')->never();
+        $job->shouldReceive('fail')->never();
 
         $instance->call($job, [
             'command' => serialize(new CallQueuedHandlerExceptionThrower),
@@ -129,7 +129,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->expects('resolveQueuedJobClass')->andReturn(CallQueuedHandlerAttributeExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
         $job->expects('delete');
-        $job->shouldReceive('failed')->never();
+        $job->shouldReceive('fail')->never();
 
         $instance->call($job, [
             'command' => serialize(new CallQueuedHandlerAttributeExceptionThrower()),
@@ -157,7 +157,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->expects('resolveQueuedJobClass')->andReturn(CallQueuedHandlerBatchableExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
         $job->expects('delete');
-        $job->shouldReceive('failed')->never();
+        $job->shouldReceive('fail')->never();
         $job->expects('uuid')->times(3)->andReturn('job-uuid');
         $job->expects('payload')->times(2)->andReturn([
             'deleteWhenMissingModels' => true,

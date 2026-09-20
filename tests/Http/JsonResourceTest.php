@@ -32,10 +32,7 @@ class JsonResourceTest extends TestCase
 
     public function testJsonResourceToJsonSucceedsWithPriorErrors(): void
     {
-        $model = new class extends Model {
-        };
-
-        $resource = Mockery::mock(JsonResource::class, ['resource' => $model])
+        $resource = Mockery::mock(JsonResource::class)
             ->makePartial()
             ->expects('jsonSerialize')->andReturn(['foo' => 'bar'])
             ->getMock();
@@ -49,10 +46,7 @@ class JsonResourceTest extends TestCase
 
     public function testJsonResourceToPrettyPrint(): void
     {
-        $model = new class extends Model {
-        };
-
-        $resource = Mockery::mock(JsonResource::class, ['resource' => $model])
+        $resource = Mockery::mock(JsonResource::class)
             ->makePartial()
             ->expects('jsonSerialize')->times(3)->andReturn(['foo' => 'bar', 'bar' => 'foo', 'number' => 123])
             ->getMock();

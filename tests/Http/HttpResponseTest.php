@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
@@ -213,7 +214,7 @@ class HttpResponseTest extends TestCase
         $this->assertNull($response->getSession());
 
         $request = Request::create('/', 'GET');
-        $session = Mockery::mock(Store::class);
+        $session = new Store('test', new NullSessionHandler);
         $response->setRequest($request);
         $response->setSession($session);
         $this->assertSame($request, $response->getRequest());

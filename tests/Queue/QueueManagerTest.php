@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Queue\Connectors\ConnectorInterface;
 use Illuminate\Queue\QueueManager;
 use Mockery;
@@ -18,7 +18,7 @@ class QueueManagerTest extends TestCase
                 'queue.default' => 'sync',
                 'queue.connections.sync' => ['driver' => 'sync'],
             ],
-            'encrypter' => $encrypter = Mockery::mock(Encrypter::class),
+            'encrypter' => $encrypter = new Encrypter(str_repeat('a', 16)),
         ];
 
         $manager = new QueueManager($app);
@@ -41,7 +41,7 @@ class QueueManagerTest extends TestCase
                 'queue.default' => 'sync',
                 'queue.connections.foo' => ['driver' => 'bar'],
             ],
-            'encrypter' => $encrypter = Mockery::mock(Encrypter::class),
+            'encrypter' => $encrypter = new Encrypter(str_repeat('a', 16)),
         ];
 
         $manager = new QueueManager($app);
@@ -63,7 +63,7 @@ class QueueManagerTest extends TestCase
             'config' => [
                 'queue.default' => 'null',
             ],
-            'encrypter' => $encrypter = Mockery::mock(Encrypter::class),
+            'encrypter' => $encrypter = new Encrypter(str_repeat('a', 16)),
         ];
 
         $manager = new QueueManager($app);
@@ -86,7 +86,7 @@ class QueueManagerTest extends TestCase
                 'queue.default' => 'sync',
                 'queue.connections.sync' => ['driver' => 'sync'],
             ],
-            'encrypter' => $encrypter = Mockery::mock(Encrypter::class),
+            'encrypter' => $encrypter = new Encrypter(str_repeat('a', 16)),
         ];
 
         $manager = new QueueManager($app);
@@ -109,7 +109,7 @@ class QueueManagerTest extends TestCase
                 'queue.default' => 'sync',
                 'queue.connections.sync' => ['driver' => 'sync'],
             ],
-            'encrypter' => $encrypter = Mockery::mock(Encrypter::class),
+            'encrypter' => $encrypter = new Encrypter(str_repeat('a', 16)),
         ];
 
         $manager = new QueueManager($app);

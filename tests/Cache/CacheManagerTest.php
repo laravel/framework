@@ -9,6 +9,7 @@ use Illuminate\Cache\StorageStore;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Events\Dispatcher as Event;
 use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
 use InvalidArgumentException;
@@ -109,7 +110,7 @@ class CacheManagerTest extends TestCase
     {
         $disk = new ArrayFilesystem;
 
-        $filesystem = Mockery::mock();
+        $filesystem = Mockery::mock(FilesystemFactory::class);
         $filesystem->expects('disk')->with('s3')->andReturn($disk);
 
         $app = $this->getApp([

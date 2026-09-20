@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsInverseRelations;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Stringable;
 use Mockery;
+use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -269,24 +271,32 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
     public function testOnlyHydratesInverseRelationOnModels()
     {
-        $relation = Mockery::mock(HasInverseRelationStub::class)->shouldAllowMockingProtectedMethods()->makePartial();
-        $relation->expects('getParent')->andReturn(new HasInverseRelationParentStub);
-        $relation->expects('applyInverseRelationToModel')->times(6);
+        $builder = (new Builder((new SQLiteConnection(new PDO('sqlite::memory:')))->query()))->setModel(new HasInverseRelationRelatedStub);
+        $parent = new HasInverseRelationParentStub();
+        $relation = (new HasInverseRelationStub($builder, $parent))->inverse('test');
+
+        $models = array_map(fn () => new HasInverseRelationRelatedStub(), range(1, 6));
         $relation->exposeApplyInverseRelationToCollection([
-            new HasInverseRelationRelatedStub(),
+            $models[0],
             12345,
-            new HasInverseRelationRelatedStub(),
-            new HasInverseRelationRelatedStub(),
+            $models[1],
+            $models[2],
             Model::class,
-            new HasInverseRelationRelatedStub(),
+            $models[3],
             true,
             [],
-            new HasInverseRelationRelatedStub(),
+            $models[4],
             'foo',
-            new class() {
+            new class()
+            {
             },
-            new HasInverseRelationRelatedStub(),
+            $models[5],
         ]);
+
+        foreach ($models as $model) {
+            $this->assertTrue($model->relationLoaded('test'));
+            $this->assertSame($parent, $model->test);
+        }
     }
 
     public static function guessedParentRelationsDataProvider()

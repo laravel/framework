@@ -2,120 +2,77 @@
 
 namespace Illuminate\Tests\Auth;
 
+use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Hashing\BcryptHasher;
+use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class AuthEloquentUserProviderTest extends TestCase
 {
+    use RestoresConnectionResolver;
+
     public function testRetrieveByIDReturnsUser()
     {
-        $provider = $this->getProviderMock();
-        $mock = Mockery::mock(stdClass::class);
-        $mock->expects('newQuery')->andReturn($mock);
-        $mock->expects('getAuthIdentifierName')->andReturn('id');
-        $mock->expects('where')->with('id', 1)->andReturn($mock);
-        $mock->expects('first')->andReturn('bar');
-        $provider->expects($this->once())->method('createModel')->willReturn($mock);
-        $user = $provider->retrieveById(1);
+        $user = $this->newProvider()->retrieveById(3);
 
-        $this->assertSame('bar', $user);
+        $this->assertInstanceOf(EloquentProviderUserStub::class, $user);
+        $this->assertSame('taylor', $user->name);
     }
 
     public function testRetrieveByTokenReturnsUser()
     {
-        $mockUser = Mockery::mock(Authenticatable::class);
-        $mockUser->expects('getRememberToken')->andReturn('a');
+        $user = $this->newProvider()->retrieveByToken(3, 'a');
 
-        $provider = $this->getProviderMock();
-        $mock = Mockery::mock(stdClass::class);
-        $mock->expects('newQuery')->andReturn($mock);
-        $mock->expects('getAuthIdentifierName')->andReturn('id');
-        $mock->expects('where')->with('id', 1)->andReturn($mock);
-        $mock->expects('first')->andReturn($mockUser);
-        $provider->expects($this->once())->method('createModel')->willReturn($mock);
-        $user = $provider->retrieveByToken(1, 'a');
-
-        $this->assertEquals($mockUser, $user);
+        $this->assertInstanceOf(EloquentProviderUserStub::class, $user);
+        $this->assertSame('taylor', $user->name);
     }
 
     public function testRetrieveTokenWithBadIdentifierReturnsNull()
     {
-        $provider = $this->getProviderMock();
-        $mock = Mockery::mock(stdClass::class);
-        $mock->expects('newQuery')->andReturn($mock);
-        $mock->expects('getAuthIdentifierName')->andReturn('id');
-        $mock->expects('where')->with('id', 1)->andReturn($mock);
-        $mock->expects('first')->andReturn(null);
-        $provider->expects($this->once())->method('createModel')->willReturn($mock);
-        $user = $provider->retrieveByToken(1, 'a');
-
-        $this->assertNull($user);
+        $this->assertNull($this->newProvider()->retrieveByToken(99, 'a'));
     }
 
     public function testRetrievingWithOnlyPasswordCredentialReturnsNull()
     {
-        $provider = $this->getProviderMock();
-        $user = $provider->retrieveByCredentials(['api_password' => 'foo']);
+        $user = $this->newProvider()->retrieveByCredentials(['api_password' => 'foo']);
 
         $this->assertNull($user);
     }
 
     public function testRetrieveByBadTokenReturnsNull()
     {
-        $mockUser = Mockery::mock(Authenticatable::class);
-        $mockUser->expects('getRememberToken')->andReturn(null);
+        $provider = $this->newProvider();
 
-        $provider = $this->getProviderMock();
-        $mock = Mockery::mock(stdClass::class);
-        $mock->expects('newQuery')->andReturn($mock);
-        $mock->expects('getAuthIdentifierName')->andReturn('id');
-        $mock->expects('where')->with('id', 1)->andReturn($mock);
-        $mock->expects('first')->andReturn($mockUser);
-        $provider->expects($this->once())->method('createModel')->willReturn($mock);
-        $user = $provider->retrieveByToken(1, 'a');
-
-        $this->assertNull($user);
+        $this->assertNull($provider->retrieveByToken(1, 'a'));
+        $this->assertNull($provider->retrieveByToken(3, 'b'));
     }
 
     public function testRetrieveByCredentialsReturnsUser()
     {
-        $provider = $this->getProviderMock();
-        $mock = Mockery::mock(stdClass::class);
-        $mock->expects('newQuery')->andReturn($mock);
-        $mock->expects('where')->with('username', 'dayle');
-        $mock->expects('whereIn')->with('group', ['one', 'two']);
-        $mock->expects('first')->andReturn('bar');
-        $provider->expects($this->once())->method('createModel')->willReturn($mock);
-        $user = $provider->retrieveByCredentials(['username' => 'dayle', 'password' => 'foo', 'group' => ['one', 'two']]);
+        $user = $this->newProvider()->retrieveByCredentials(['username' => 'dayle', 'password' => 'foo', 'group' => ['one', 'two']]);
 
-        $this->assertSame('bar', $user);
+        $this->assertInstanceOf(EloquentProviderUserStub::class, $user);
+        $this->assertSame('taylor', $user->name);
     }
 
     public function testRetrieveByCredentialsAcceptsCallback()
     {
-        $provider = $this->getProviderMock();
-        $mock = Mockery::mock(stdClass::class);
-        $mock->expects('newQuery')->andReturn($mock);
-        $mock->expects('where')->with('username', 'dayle');
-        $mock->expects('whereIn')->with('group', ['one', 'two']);
-        $mock->expects('first')->andReturn('bar');
-        $provider->expects($this->once())->method('createModel')->willReturn($mock);
-        $user = $provider->retrieveByCredentials([function ($builder) {
+        $user = $this->newProvider()->retrieveByCredentials([function ($builder) {
             $builder->where('username', 'dayle');
             $builder->whereIn('group', ['one', 'two']);
         }]);
 
-        $this->assertSame('bar', $user);
+        $this->assertSame('taylor', $user->name);
     }
 
     public function testRetrieveByCredentialsWithMultiplyPasswordsReturnsNull()
     {
-        $provider = $this->getProviderMock();
-        $user = $provider->retrieveByCredentials([
+        $user = $this->newProvider()->retrieveByCredentials([
             'password' => 'dayle',
             'password2' => 'night',
         ]);
@@ -165,14 +122,11 @@ class AuthEloquentUserProviderTest extends TestCase
         $hasher->expects('needsRehash')->with('hash')->andReturn(true);
         $hasher->expects('make')->with('plain')->andReturn('rehashed');
 
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getAuthPassword')->andReturn('hash');
-        $user->expects('getAuthPasswordName')->andReturn('password_attribute');
-        $user->expects('forceFill')->with(['password_attribute' => 'rehashed'])->andReturnSelf();
-        $user->expects('save');
-
-        $provider = new EloquentUserProvider($hasher, 'foo');
+        $provider = $this->newProvider($hasher);
+        $user = EloquentProviderUserStub::find(3);
         $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
+
+        $this->assertSame('rehashed', $user->fresh()->password);
     }
 
     public function testDontRehashPasswordIfNotRequired()
@@ -181,19 +135,16 @@ class AuthEloquentUserProviderTest extends TestCase
         $hasher->expects('needsRehash')->with('hash')->andReturn(false);
         $hasher->shouldNotReceive('make');
 
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getAuthPassword')->andReturn('hash');
-        $user->shouldNotReceive('getAuthPasswordName');
-        $user->shouldNotReceive('forceFill');
-        $user->shouldNotReceive('save');
-
-        $provider = new EloquentUserProvider($hasher, 'foo');
+        $provider = $this->newProvider($hasher);
+        $user = EloquentProviderUserStub::find(3);
         $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
+
+        $this->assertSame('hash', $user->fresh()->password);
     }
 
     public function testModelsCanBeCreated()
     {
-        $hasher = Mockery::mock(Hasher::class);
+        $hasher = new BcryptHasher;
         $provider = new EloquentUserProvider($hasher, EloquentProviderUserStub::class);
         $model = $provider->createModel();
 
@@ -206,31 +157,33 @@ class AuthEloquentUserProviderTest extends TestCase
             $builder->whereIn('group', ['one', 'two']);
         };
 
-        $provider = $this->getProviderMock();
-        $mock = Mockery::mock(stdClass::class);
-        $mock->expects('newQuery')->andReturn($mock);
-        $mock->expects('where')->with('username', 'dayle');
-        $mock->expects('whereIn')->with('group', ['one', 'two']);
-        $mock->expects('first')->andReturn('bar');
-        $provider->expects($this->once())->method('createModel')->willReturn($mock);
+        $provider = $this->newProvider();
         $provider->withQuery($callback);
         $user = $provider->retrieveByCredentials([function ($builder) {
             $builder->where('username', 'dayle');
         }]);
 
-        $this->assertSame('bar', $user);
+        $this->assertSame('taylor', $user->name);
         $this->assertSame($callback, $provider->getQueryCallback());
     }
 
-    protected function getProviderMock()
+    protected function newProvider(?Hasher $hasher = null)
     {
-        $hasher = Mockery::mock(Hasher::class);
+        $pdo = $this->useInMemoryConnection()->getPdo();
+        $pdo->exec('create table "users" ("id" integer primary key, "username" text, "group" text, "name" text, "remember_token" text, "password" text)');
+        $pdo->exec("insert into \"users\" values (1, 'dayle', 'three', 'other', null, null)");
+        $pdo->exec("insert into \"users\" values (2, 'sam', 'one', 'third', null, null)");
+        $pdo->exec("insert into \"users\" values (3, 'dayle', 'two', 'taylor', 'a', 'hash')");
 
-        return $this->getMockBuilder(EloquentUserProvider::class)->onlyMethods(['createModel'])->setConstructorArgs([$hasher, 'foo'])->getMock();
+        return new EloquentUserProvider($hasher ?? new BcryptHasher, EloquentProviderUserStub::class);
     }
 }
 
-class EloquentProviderUserStub
+class EloquentProviderUserStub extends Model implements Authenticatable
 {
-    //
+    use AuthenticatableTrait;
+
+    protected $table = 'users';
+
+    public $timestamps = false;
 }

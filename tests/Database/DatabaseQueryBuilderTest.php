@@ -38,6 +38,7 @@ use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 use InvalidArgumentException;
 use Mockery;
 use Mockery\MockInterface;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
@@ -4078,7 +4079,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testFindOrReturnsFirstResultByID()
     {
         $builder = $this->getMockQueryBuilder();
-        $data = Mockery::mock(stdClass::class);
+        $data = new stdClass;
         $builder->expects('first')->andReturn($data);
         $builder->expects('first')->with(['column'])->andReturn($data);
         $builder->expects('first')->andReturn(null);
@@ -5084,11 +5085,11 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testUpdateOrInsertMethod()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = new Connection(new PDO('sqlite::memory:'));
         $builder = Mockery::mock(Builder::class.'[where,exists,insert]', [
             $connection,
             new Grammar($connection),
-            Mockery::mock(Processor::class),
+            new Processor,
         ]);
 
         $builder->expects('where')->with(['email' => 'foo'])->andReturn(Mockery::self());
@@ -5097,11 +5098,11 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
 
-        $connection = Mockery::mock(Connection::class);
+        $connection = new Connection(new PDO('sqlite::memory:'));
         $builder = Mockery::mock(Builder::class.'[where,exists,update]', [
             $connection,
             new Grammar($connection),
-            Mockery::mock(Processor::class),
+            new Processor,
         ]);
 
         $builder->expects('where')->with(['email' => 'foo'])->andReturn(Mockery::self());
@@ -5113,11 +5114,11 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testUpdateOrInsertMethodWorksWithEmptyUpdateValues()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = new Connection(new PDO('sqlite::memory:'));
         $builder = Mockery::spy(Builder::class.'[where,exists,update]', [
             $connection,
             new Grammar($connection),
-            Mockery::mock(Processor::class),
+            new Processor,
         ]);
 
         $builder->expects('where')->with(['email' => 'foo'])->andReturn(Mockery::self());
@@ -5424,7 +5425,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $grammar = new MySqlGrammar($connection);
-        $processor = Mockery::mock(Processor::class);
+        $processor = new Processor;
 
         $connection->expects($this->once())
             ->method('update')
@@ -5442,7 +5443,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $grammar = new MySqlGrammar($connection);
-        $processor = Mockery::mock(Processor::class);
+        $processor = new Processor;
 
         $connection->expects($this->once())
             ->method('update')
@@ -5460,7 +5461,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $grammar = new MySqlGrammar($connection);
-        $processor = Mockery::mock(Processor::class);
+        $processor = new Processor;
 
         $connection->expects($this->once())
             ->method('update')
@@ -5487,7 +5488,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $grammar = new MySqlGrammar($connection);
-        $processor = Mockery::mock(Processor::class);
+        $processor = new Processor;
 
         $connection->expects($this->once())
             ->method('update')
@@ -5510,7 +5511,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $connection = $this->getConnection();
         $grammar = new MySqlGrammar($connection);
-        $processor = Mockery::mock(Processor::class);
+        $processor = new Processor;
 
         $connection->expects('update')
             ->with(
@@ -6247,14 +6248,13 @@ SQL;
         $builder->expects('limit')->times(3)->with(2)->andReturnSelf();
         $builder->expects('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->expects('doSomething')->with($chunk2);
-        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
+        $seen = [];
 
-        $builder->chunk(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $builder->chunk(2, function ($results) use (&$seen) {
+            $seen[] = $results;
         });
+
+        $this->assertSame([$chunk1, $chunk2], $seen);
     }
 
     public function testChunkWithLastChunkPartial()
@@ -6272,13 +6272,13 @@ SQL;
         $builder->expects('limit')->times(2)->with(2)->andReturnSelf();
         $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->expects('doSomething')->with($chunk2);
+        $seen = [];
 
-        $builder->chunk(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $builder->chunk(2, function ($results) use (&$seen) {
+            $seen[] = $results;
         });
+
+        $this->assertSame([$chunk1, $chunk2], $seen);
     }
 
     public function testChunkCanBeStoppedByReturningFalse()
@@ -6294,15 +6294,15 @@ SQL;
         $builder->expects('limit')->with(2)->andReturnSelf();
         $builder->expects('get')->times(1)->andReturn($chunk1);
 
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
+        $seen = [];
 
-        $builder->chunk(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $builder->chunk(2, function ($results) use (&$seen) {
+            $seen[] = $results;
 
             return false;
         });
+
+        $this->assertSame([$chunk1], $seen);
     }
 
     public function testChunkWithCountZero()
@@ -6334,14 +6334,13 @@ SQL;
         $builder->expects('forPageAfterId')->with(2, 11, 'someIdField')->andReturnSelf();
         $builder->expects('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->expects('doSomething')->with($chunk2);
-        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
+        $seen = [];
 
-        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $builder->chunkById(2, function ($results) use (&$seen) {
+            $seen[] = $results;
         }, 'someIdField');
+
+        $this->assertSame([$chunk1, $chunk2], $seen);
     }
 
     public function testChunkPaginatesUsingIdWithLastChunkComplete()
@@ -6357,14 +6356,13 @@ SQL;
         $builder->expects('forPageAfterId')->with(2, 11, 'someIdField')->andReturnSelf();
         $builder->expects('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->expects('doSomething')->with($chunk2);
-        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
+        $seen = [];
 
-        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $builder->chunkById(2, function ($results) use (&$seen) {
+            $seen[] = $results;
         }, 'someIdField');
+
+        $this->assertSame([$chunk1, $chunk2], $seen);
     }
 
     public function testChunkPaginatesUsingIdWithLastChunkPartial()
@@ -6378,13 +6376,13 @@ SQL;
         $builder->expects('forPageAfterId')->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->expects('doSomething')->with($chunk2);
+        $seen = [];
 
-        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $builder->chunkById(2, function ($results) use (&$seen) {
+            $seen[] = $results;
         }, 'someIdField');
+
+        $this->assertSame([$chunk1, $chunk2], $seen);
     }
 
     public function testChunkPaginatesUsingIdWithCountZero()
@@ -6411,13 +6409,13 @@ SQL;
         $builder->expects('forPageAfterId')->with(2, 10, 'table.id')->andReturnSelf();
         $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
+        $seen = [];
 
-        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $builder->chunkById(2, function ($results) use (&$seen) {
+            $seen[] = $results;
         }, 'table.id', 'table_id');
+
+        $this->assertSame([$chunk1], $seen);
     }
 
     public function testChunkPaginatesUsingIdDesc()
@@ -6431,13 +6429,13 @@ SQL;
         $builder->expects('forPageBeforeId')->with(2, 1, 'someIdField')->andReturnSelf();
         $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
+        $seen = [];
 
-        $builder->chunkByIdDesc(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $builder->chunkByIdDesc(2, function ($results) use (&$seen) {
+            $seen[] = $results;
         }, 'someIdField');
+
+        $this->assertSame([$chunk1], $seen);
     }
 
     public function testPaginate()
@@ -7970,7 +7968,7 @@ SQL;
         $grammar->expects('substituteBindingsIntoRawSql')
             ->with('select * from "users" where "email" = ?', ['foo'])
             ->andReturn('select * from "users" where "email" = \'foo\'');
-        $builder = new Builder($connection, $grammar, Mockery::mock(Processor::class));
+        $builder = new Builder($connection, $grammar, new Processor);
         $builder->select('*')->from('users')->where('email', 'foo');
 
         $this->assertSame('select * from "users" where "email" = \'foo\'', $builder->toRawSql());
@@ -8065,7 +8063,7 @@ SQL;
         return Mockery::mock(Builder::class, [
             $connection = $this->getConnection(),
             new Grammar($connection),
-            Mockery::mock(Processor::class),
+            new Processor,
         ])->makePartial();
     }
 }

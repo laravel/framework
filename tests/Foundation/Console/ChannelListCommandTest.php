@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Console;
 
+use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Illuminate\Console\Application;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
 use Illuminate\Foundation\Application as FoundationApplication;
@@ -41,7 +42,7 @@ class ChannelListCommandTest extends TestCase
     {
         $laravel = new FoundationApplication(__DIR__);
 
-        $broadcaster = Mockery::mock(BroadcasterContract::class);
+        $broadcaster = Mockery::mock(Broadcaster::class);
         $broadcaster->expects('getChannels')->andReturn(new Collection($channels));
 
         $laravel->instance(BroadcasterContract::class, $broadcaster);

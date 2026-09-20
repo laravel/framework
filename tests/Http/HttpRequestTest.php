@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image;
 use Illuminate\Routing\Route;
+use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -1812,7 +1813,7 @@ class HttpRequestTest extends TestCase
 
         $this->assertFalse($request->hasSession());
 
-        $session = Mockery::mock(Store::class);
+        $session = new Store('test', new NullSessionHandler);
         $request->setLaravelSession($session);
 
         $this->assertTrue($request->hasSession());

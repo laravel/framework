@@ -4,14 +4,14 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
-use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseAbstractSchemaGrammarTest extends TestCase
 {
     public function testCreateDatabase()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = new Connection(new PDO('sqlite::memory:'));
         $grammar = new class($connection) extends Grammar {
         };
 
@@ -20,7 +20,7 @@ class DatabaseAbstractSchemaGrammarTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = new Connection(new PDO('sqlite::memory:'));
         $grammar = new class($connection) extends Grammar {
         };
 

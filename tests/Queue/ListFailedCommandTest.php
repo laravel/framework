@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\ListFailedCommand;
+use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -52,7 +53,7 @@ class ListFailedCommandTest extends TestCase
     protected function runCommandWithFailedJobs(array $failedJobs, array $arguments = []): string
     {
         $container = new Application;
-        $failer = Mockery::mock();
+        $failer = Mockery::mock(FailedJobProviderInterface::class);
         $container->instance('queue.failer', $failer);
 
         $failer->expects('all')->andReturn($failedJobs);

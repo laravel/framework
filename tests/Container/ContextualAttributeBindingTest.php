@@ -33,6 +33,7 @@ use Illuminate\Http\Request;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Log\LogManager;
 use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use ReflectionParameter;
@@ -202,8 +203,8 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('db', function () {
             $manager = Mockery::mock(DatabaseManager::class);
-            $manager->expects('connection')->with('foo')->andReturn(Mockery::mock(Connection::class));
-            $manager->expects('connection')->with('bar')->andReturn(Mockery::mock(Connection::class));
+            $manager->expects('connection')->with('foo')->andReturn(new Connection(new PDO('sqlite::memory:')));
+            $manager->expects('connection')->with('bar')->andReturn(new Connection(new PDO('sqlite::memory:')));
 
             return $manager;
         });

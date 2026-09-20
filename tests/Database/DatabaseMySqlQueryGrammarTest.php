@@ -78,7 +78,7 @@ class DatabaseMySqlQueryGrammarTest extends TestCase
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
         $connection->shouldReceive('getTablePrefix')->andReturn('');
         $grammar = new MySqlGrammar($connection);
-        $processor = Mockery::mock(Processor::class);
+        $processor = new Processor;
 
         return new Builder($connection, $grammar, $processor);
     }

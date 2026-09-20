@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Mail;
 
 use Aws\Command;
 use Aws\Exception\AwsException;
+use Aws\Result;
 use Aws\SesV2\SesV2Client;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
@@ -58,10 +59,7 @@ class MailSesV2TransportTest extends TestCase
         $message->getHeaders()->addTextHeader('X-SES-LIST-MANAGEMENT-OPTIONS', 'contactListName=TestList;topicName=TestTopic');
 
         $client = Mockery::mock(SesV2Client::class);
-        $sesResult = Mockery::mock();
-        $sesResult->expects('get')
-            ->with('MessageId')
-            ->andReturn('ses-message-id');
+        $sesResult = new Result(['MessageId' => 'ses-message-id']);
         $client->expects('sendEmail')
             ->with(Mockery::on(function ($arg) {
                 return $arg['Source'] === 'myself@example.com' &&
@@ -85,10 +83,7 @@ class MailSesV2TransportTest extends TestCase
         $message->getHeaders()->addTextHeader('X-SES-TENANT-NAME', 'my-tenant');
 
         $client = Mockery::mock(SesV2Client::class);
-        $sesResult = Mockery::mock();
-        $sesResult->expects('get')
-            ->with('MessageId')
-            ->andReturn('ses-message-id');
+        $sesResult = new Result(['MessageId' => 'ses-message-id']);
         $client->expects('sendEmail')
             ->with(Mockery::on(function ($arg) {
                 return $arg['TenantName'] === 'my-tenant';
@@ -107,10 +102,7 @@ class MailSesV2TransportTest extends TestCase
         $message->to('me@example.com');
 
         $client = Mockery::mock(SesV2Client::class);
-        $sesResult = Mockery::mock();
-        $sesResult->expects('get')
-            ->with('MessageId')
-            ->andReturn('ses-message-id');
+        $sesResult = new Result(['MessageId' => 'ses-message-id']);
         $client->expects('sendEmail')
             ->with(Mockery::on(function ($arg) {
                 return ! array_key_exists('TenantName', $arg);

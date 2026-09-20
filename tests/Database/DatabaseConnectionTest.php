@@ -40,7 +40,7 @@ class DatabaseConnectionTest extends TestCase
     public function testSettingDefaultCallsGetDefaultPostProcessor()
     {
         $connection = $this->getMockConnection();
-        $mock = Mockery::mock(Processor::class);
+        $mock = new Processor;
         $connection->expects($this->once())->method('getDefaultPostProcessor')->willReturn($mock);
         $connection->useDefaultPostProcessor();
         $this->assertEquals($mock, $connection->getPostProcessor());
@@ -529,7 +529,7 @@ class DatabaseConnectionTest extends TestCase
     {
         $conn = $this->getMockConnection();
         $conn->setQueryGrammar(Mockery::mock(Grammar::class));
-        $conn->setPostProcessor(Mockery::mock(Processor::class));
+        $conn->setPostProcessor(new Processor);
         $builder = $conn->table('users');
         $this->assertInstanceOf(BaseBuilder::class, $builder);
         $this->assertSame('users', $builder->from);

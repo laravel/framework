@@ -3,10 +3,11 @@
 namespace Illuminate\Tests\Foundation\Testing;
 
 use Illuminate\Config\Repository;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\PostgresBuilder;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -186,7 +187,7 @@ class DatabaseTruncationTest extends TestCase
 
         $connection = Mockery::mock(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
-        $dispatcher = Mockery::mock(Dispatcher::class);
+        $dispatcher = new Dispatcher;
         $connection->expects('getEventDispatcher')->andReturn($dispatcher);
         $connection->expects('unsetEventDispatcher');
         $connection->expects('setEventDispatcher')->with($dispatcher);
@@ -198,7 +199,7 @@ class DatabaseTruncationTest extends TestCase
             ->andReturnUsing(function (string $tableName) use (&$actual) {
                 $actual[] = $tableName;
 
-                $table = Mockery::mock();
+                $table = Mockery::mock(QueryBuilder::class);
                 $table->expects('exists')->andReturnTrue();
                 $table->expects('truncate');
 

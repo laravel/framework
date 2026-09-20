@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Batch;
+use Illuminate\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
@@ -23,14 +24,14 @@ class SupportTestingBusFakeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fake = new BusFake(Mockery::mock(QueueingDispatcher::class));
+        $this->fake = new BusFake(new BusDispatcher(new Container));
     }
 
     public function testItUsesCustomBusRepository()
     {
         $busRepository = new BatchRepositoryFake;
 
-        $fake = new BusFake(Mockery::mock(QueueingDispatcher::class), [], $busRepository);
+        $fake = new BusFake(new BusDispatcher(new Container), [], $busRepository);
 
         $this->assertNull($fake->findBatch('non-existent-batch'));
 
@@ -792,7 +793,7 @@ class SupportTestingBusFakeTest extends TestCase
     {
         $batchRepository = new BatchRepositoryFake;
 
-        $fake = new BusFake(Mockery::mock(QueueingDispatcher::class), [], $batchRepository);
+        $fake = new BusFake(new BusDispatcher(new Container), [], $batchRepository);
 
         $batch = $fake->batch([])->dispatch();
 

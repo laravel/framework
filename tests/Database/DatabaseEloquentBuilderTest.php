@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Database;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Connection;
-use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -18,6 +18,7 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
@@ -309,12 +310,13 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testFirstMethod()
     {
-        $builder = Mockery::mock(Builder::class.'[get,take]', [$this->getMockQueryBuilder()]);
-        $builder->expects('limit')->with(1)->andReturnSelf();
-        $builder->expects('get')->with(['*'])->andReturn(new Collection(['bar']));
+        $connection = $this->newConnection();
+        $builder = $this->newBuilder($connection);
 
         $result = $builder->first();
-        $this->assertSame('bar', $result);
+
+        $this->assertSame('taylor', $result->name);
+        $this->assertSame('select * from "table" limit 1', $connection->getQueryLog()[0]['query']);
     }
 
     public function testQualifyColumn()
@@ -419,285 +421,159 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testChunkWithLastChunkComplete()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,offset,limit,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 3, 4]);
 
-        $chunk1 = new Collection(['foo1', 'foo2']);
-        $chunk2 = new Collection(['foo3', 'foo4']);
-        $chunk3 = new Collection([]);
-
-        $builder->expects('getOffset')->andReturn(null);
-        $builder->expects('getLimit')->andReturn(null);
-        $builder->expects('offset')->with(0)->andReturnSelf();
-        $builder->expects('offset')->with(2)->andReturnSelf();
-        $builder->expects('offset')->with(4)->andReturnSelf();
-        $builder->expects('limit')->times(3)->with(2)->andReturnSelf();
-        $builder->expects('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
-
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->expects('doSomething')->with($chunk2);
-        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
-
-        $builder->chunk(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $chunks = [];
+        $builder->orderBy('id')->chunk(2, function ($results) use (&$chunks) {
+            $chunks[] = $results->pluck('id')->all();
         });
+
+        $this->assertSame([[1, 2], [3, 4]], $chunks);
+        $this->assertSame([
+            'select * from "table" order by "id" asc limit 2 offset 0',
+            'select * from "table" order by "id" asc limit 2 offset 2',
+            'select * from "table" order by "id" asc limit 2 offset 4',
+        ], array_column($connection->getQueryLog(), 'query'));
     }
 
     public function testChunkWithLastChunkPartial()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,offset,limit,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 3]);
 
-        $chunk1 = new Collection(['foo1', 'foo2']);
-        $chunk2 = new Collection(['foo3']);
-        $builder->expects('getOffset')->andReturn(null);
-        $builder->expects('getLimit')->andReturn(null);
-        $builder->expects('offset')->with(0)->andReturnSelf();
-        $builder->expects('offset')->with(2)->andReturnSelf();
-        $builder->expects('limit')->times(2)->with(2)->andReturnSelf();
-        $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
-
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->expects('doSomething')->with($chunk2);
-
-        $builder->chunk(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $chunks = [];
+        $builder->orderBy('id')->chunk(2, function ($results) use (&$chunks) {
+            $chunks[] = $results->pluck('id')->all();
         });
+
+        $this->assertSame([[1, 2], [3]], $chunks);
+        $this->assertSame([
+            'select * from "table" order by "id" asc limit 2 offset 0',
+            'select * from "table" order by "id" asc limit 2 offset 2',
+        ], array_column($connection->getQueryLog(), 'query'));
     }
 
     public function testChunkCanBeStoppedByReturningFalse()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,offset,limit,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 3]);
 
-        $chunk1 = new Collection(['foo1', 'foo2']);
-        $chunk2 = new Collection(['foo3']);
-
-        $builder->expects('getOffset')->andReturn(null);
-        $builder->expects('getLimit')->andReturn(null);
-        $builder->expects('offset')->with(0)->andReturnSelf();
-        $builder->expects('limit')->with(2)->andReturnSelf();
-        $builder->expects('get')->times(1)->andReturn($chunk1);
-
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
-
-        $builder->chunk(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $chunks = [];
+        $builder->orderBy('id')->chunk(2, function ($results) use (&$chunks) {
+            $chunks[] = $results->pluck('id')->all();
 
             return false;
         });
+
+        $this->assertSame([[1, 2]], $chunks);
+        $this->assertSame([
+            'select * from "table" order by "id" asc limit 2 offset 0',
+        ], array_column($connection->getQueryLog(), 'query'));
     }
 
     public function testChunkWithCountZero()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,offset,limit,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 3]);
 
-        $builder->expects('getOffset')->andReturn(null);
-        $builder->expects('getLimit')->andReturn(null);
-        $builder->shouldReceive('offset')->never();
-        $builder->shouldReceive('limit')->never();
-        $builder->shouldReceive('get')->never();
-
-        $builder->chunk(0, function () {
+        $builder->orderBy('id')->chunk(0, function () {
             $this->fail('Should not be called.');
         });
+
+        $this->assertSame([], $connection->getQueryLog());
     }
 
     public function testChunkPaginatesUsingIdWithLastChunkComplete()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,forPageAfterId,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 10, 11], 'someIdField');
 
-        $chunk1 = new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
-        $chunk2 = new Collection([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
-        $chunk3 = new Collection([]);
-        $builder->expects('getOffset')->andReturnNull();
-        $builder->expects('getLimit')->andReturnNull();
-        $builder->expects('forPageAfterId')->with(2, 0, 'someIdField')->andReturnSelf();
-        $builder->expects('forPageAfterId')->with(2, 2, 'someIdField')->andReturnSelf();
-        $builder->expects('forPageAfterId')->with(2, 11, 'someIdField')->andReturnSelf();
-        $builder->expects('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
-
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->expects('doSomething')->with($chunk2);
-        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
-
-        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $chunks = [];
+        $builder->chunkById(2, function ($results) use (&$chunks) {
+            $chunks[] = $results->pluck('someIdField')->all();
         }, 'someIdField');
+
+        $this->assertSame([[1, 2], [10, 11]], $chunks);
+        $this->assertSame([[], [2], [11]], $this->pagedBindings($connection));
+        $this->assertSame(['select * from "table" where "someIdField" is not null order by "someIdField" asc limit 2', 'select * from "table" where "someIdField" > ? order by "someIdField" asc limit 2', 'select * from "table" where "someIdField" > ? order by "someIdField" asc limit 2'], array_column($connection->getQueryLog(), 'query'));
     }
 
     public function testChunkPaginatesUsingIdWithLastChunkPartial()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,forPageAfterId,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 10], 'someIdField');
 
-        $chunk1 = new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
-        $chunk2 = new Collection([(object) ['someIdField' => 10]]);
-        $builder->expects('getOffset')->andReturnNull();
-        $builder->expects('getLimit')->andReturnNull();
-        $builder->expects('forPageAfterId')->with(2, 0, 'someIdField')->andReturnSelf();
-        $builder->expects('forPageAfterId')->with(2, 2, 'someIdField')->andReturnSelf();
-        $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
-
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->expects('doSomething')->with($chunk1);
-        $callbackAssertor->expects('doSomething')->with($chunk2);
-
-        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
-            $callbackAssertor->doSomething($results);
+        $chunks = [];
+        $builder->chunkById(2, function ($results) use (&$chunks) {
+            $chunks[] = $results->pluck('someIdField')->all();
         }, 'someIdField');
+
+        $this->assertSame([[1, 2], [10]], $chunks);
+        $this->assertSame([[], [2]], $this->pagedBindings($connection));
+        $this->assertSame(['select * from "table" where "someIdField" is not null order by "someIdField" asc limit 2', 'select * from "table" where "someIdField" > ? order by "someIdField" asc limit 2'], array_column($connection->getQueryLog(), 'query'));
     }
 
     public function testChunkPaginatesUsingIdWithCountZero()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,forPageAfterId,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
-
-        $builder->expects('getOffset')->andReturnNull();
-        $builder->expects('getLimit')->andReturnNull();
-        $builder->shouldReceive('forPageAfterId')->never();
-        $builder->shouldReceive('get')->never();
-
-        $callbackAssertor = Mockery::mock(stdClass::class);
-        $callbackAssertor->shouldReceive('doSomething')->never();
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 10], 'someIdField');
 
         $builder->chunkById(0, function () {
             $this->fail('Should never be called.');
         }, 'someIdField');
+
+        $this->assertSame([], $connection->getQueryLog());
     }
 
     public function testLazyWithLastChunkComplete()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,offset,limit,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 3, 4]);
 
-        $builder->expects('getOffset')->andReturnNull();
-        $builder->expects('getLimit')->andReturnNull();
-        $builder->expects('offset')->with(0)->andReturnSelf();
-        $builder->expects('offset')->with(2)->andReturnSelf();
-        $builder->expects('offset')->with(4)->andReturnSelf();
-        $builder->expects('limit')->times(3)->with(2)->andReturnSelf();
-        $builder->expects('get')->times(3)->andReturn(
-            new Collection(['foo1', 'foo2']),
-            new Collection(['foo3', 'foo4']),
-            new Collection([])
-        );
-
-        $this->assertEquals(
-            ['foo1', 'foo2', 'foo3', 'foo4'],
-            $builder->lazy(2)->all()
-        );
+        $this->assertSame([1, 2, 3, 4], $builder->orderBy('id')->lazy(2)->map(fn ($model) => $model->id)->all());
+        $this->assertSame([
+            'select * from "table" order by "id" asc limit 2 offset 0',
+            'select * from "table" order by "id" asc limit 2 offset 2',
+            'select * from "table" order by "id" asc limit 2 offset 4',
+        ], array_column($connection->getQueryLog(), 'query'));
     }
 
     public function testLazyWithLastChunkPartial()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,offset,limit,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 3]);
 
-        $builder->expects('getOffset')->andReturnNull();
-        $builder->expects('getLimit')->andReturnNull();
-        $builder->expects('offset')->with(0)->andReturnSelf();
-        $builder->expects('offset')->with(2)->andReturnSelf();
-        $builder->expects('limit')->twice()->with(2)->andReturnSelf();
-        $builder->expects('get')->times(2)->andReturn(
-            new Collection(['foo1', 'foo2']),
-            new Collection(['foo3'])
-        );
-
-        $this->assertEquals(
-            ['foo1', 'foo2', 'foo3'],
-            $builder->lazy(2)->all()
-        );
+        $this->assertSame([1, 2, 3], $builder->orderBy('id')->lazy(2)->map(fn ($model) => $model->id)->all());
+        $this->assertSame([
+            'select * from "table" order by "id" asc limit 2 offset 0',
+            'select * from "table" order by "id" asc limit 2 offset 2',
+        ], array_column($connection->getQueryLog(), 'query'));
     }
 
     public function testLazyIsLazy()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,offset,limit,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 3, 4]);
 
-        $builder->expects('getOffset')->andReturnNull();
-        $builder->expects('getLimit')->andReturnNull();
-        $builder->expects('offset')->with(0)->andReturnSelf();
-        $builder->expects('limit')->with(2)->andReturnSelf();
-        $builder->expects('get')->andReturn(new Collection(['foo1', 'foo2']));
-
-        $this->assertEquals(['foo1', 'foo2'], $builder->lazy(2)->take(2)->all());
+        $this->assertSame([1, 2], $builder->orderBy('id')->lazy(2)->take(2)->map(fn ($model) => $model->id)->all());
+        $this->assertSame([
+            'select * from "table" order by "id" asc limit 2 offset 0',
+        ], array_column($connection->getQueryLog(), 'query'));
     }
 
     public function testLazyByIdWithLastChunkComplete()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,forPageAfterId,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 10, 11], 'someIdField');
 
-        $chunk1 = new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
-        $chunk2 = new Collection([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
-        $chunk3 = new Collection([]);
-        $builder->expects('getOffset')->andReturnNull();
-        $builder->expects('getLimit')->andReturnNull();
-        $builder->expects('forPageAfterId')->with(2, 0, 'someIdField')->andReturnSelf();
-        $builder->expects('forPageAfterId')->with(2, 2, 'someIdField')->andReturnSelf();
-        $builder->expects('forPageAfterId')->with(2, 11, 'someIdField')->andReturnSelf();
-        $builder->expects('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
-
-        $this->assertEquals(
-            [
-                (object) ['someIdField' => 1],
-                (object) ['someIdField' => 2],
-                (object) ['someIdField' => 10],
-                (object) ['someIdField' => 11],
-            ],
-            $builder->lazyById(2, 'someIdField')->all()
-        );
+        $this->assertSame([1, 2, 10, 11], $builder->lazyById(2, 'someIdField')->map(fn ($model) => $model->someIdField)->all());
+        $this->assertSame([[], [2], [11]], $this->pagedBindings($connection));
     }
 
     public function testLazyByIdWithLastChunkPartial()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,forPageAfterId,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 10], 'someIdField');
 
-        $chunk1 = new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
-        $chunk2 = new Collection([(object) ['someIdField' => 10]]);
-        $builder->expects('getOffset')->andReturnNull();
-        $builder->expects('getLimit')->andReturnNull();
-        $builder->expects('forPageAfterId')->with(2, 0, 'someIdField')->andReturnSelf();
-        $builder->expects('forPageAfterId')->with(2, 2, 'someIdField')->andReturnSelf();
-        $builder->expects('get')->times(2)->andReturn($chunk1, $chunk2);
-
-        $this->assertEquals(
-            [
-                (object) ['someIdField' => 1],
-                (object) ['someIdField' => 2],
-                (object) ['someIdField' => 10],
-            ],
-            $builder->lazyById(2, 'someIdField')->all()
-        );
+        $this->assertSame([1, 2, 10], $builder->lazyById(2, 'someIdField')->map(fn ($model) => $model->someIdField)->all());
+        $this->assertSame([[], [2]], $this->pagedBindings($connection));
     }
 
     public function testLazyByIdIsLazy()
     {
-        $builder = Mockery::mock(Builder::class.'[getOffset,getLimit,forPageAfterId,get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+        [$connection, $builder] = $this->newPagedBuilder([1, 2, 10, 11], 'someIdField');
 
-        $chunk1 = new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
-        $builder->expects('getOffset')->andReturnNull();
-        $builder->expects('getLimit')->andReturnNull();
-        $builder->expects('forPageAfterId')->with(2, 0, 'someIdField')->andReturnSelf();
-        $builder->expects('get')->andReturn($chunk1);
-
-        $this->assertEquals(
-            [
-                (object) ['someIdField' => 1],
-                (object) ['someIdField' => 2],
-            ],
-            $builder->lazyById(2, 'someIdField')->take(2)->all()
-        );
+        $this->assertSame([1, 2], $builder->lazyById(2, 'someIdField')->take(2)->map(fn ($model) => $model->someIdField)->all());
+        $this->assertSame([[]], $this->pagedBindings($connection));
     }
 
     public function testPluckReturnsTheMutatedAttributesOfAModel()
@@ -803,9 +679,9 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         unset($_SERVER['__test.builder']);
         $builder = new Builder(new BaseBuilder(
-            Mockery::mock(ConnectionInterface::class),
+            new Connection(new PDO('sqlite::memory:')),
             Mockery::mock(Grammar::class),
-            Mockery::mock(Processor::class)
+            new Processor
         ));
         $builder->macro('fooBar', function ($builder) {
             $_SERVER['__test.builder'] = $builder;
@@ -846,17 +722,13 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testGetModelsProperlyHydratesModels()
     {
-        $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
-        $records[] = ['name' => 'taylor', 'age' => 26];
-        $records[] = ['name' => 'dayle', 'age' => 28];
-        $builder->getQuery()->expects('get')->with(['foo'])->andReturn(new BaseCollection($records));
-        $model = Mockery::mock(Model::class.'[getTable,hydrate]');
-        $model->expects('getTable')->andReturn('foo_table');
-        $builder->setModel($model);
-        $model->expects('hydrate')->with($records)->andReturn(new Collection(['hydrated']));
-        $models = $builder->getModels(['foo']);
+        $builder = $this->newBuilder($this->newConnection());
 
-        $this->assertEquals(['hydrated'], $models);
+        $models = $builder->getModels(['name', 'age']);
+
+        $this->assertContainsOnlyInstancesOf(EloquentBuilderTestStub::class, $models);
+        $this->assertSame(['taylor', 'dayle'], array_map(fn ($model) => $model->name, $models));
+        $this->assertSame(28, $models[1]->age);
     }
 
     public function testEagerLoadRelationsLoadTopLevelRelationships()
@@ -894,11 +766,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setEagerLoads(['orders' => function ($query) {
             $_SERVER['__eloquent.constrain'] = $query;
         }]);
-        $relation = Mockery::mock(stdClass::class);
+        $relation = Mockery::mock(Relation::class);
         $relation->expects('addEagerConstraints')->with(['models']);
         $relation->expects('initRelation')->with(['models'], 'orders')->andReturn(['models']);
-        $relation->expects('getEager')->andReturn(['results']);
-        $relation->expects('match')->with(['models'], ['results'], 'orders')->andReturn(['models.matched']);
+        $relation->expects('getEager')->andReturn($eager = new Collection(['results']));
+        $relation->expects('match')->with(['models'], $eager, 'orders')->andReturn(['models.matched']);
         $builder->expects('getRelation')->with('orders')->andReturn($relation);
         $results = $builder->eagerLoadRelations(['models']);
 
@@ -2769,7 +2641,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $connection = Mockery::mock(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
-        $query = new BaseBuilder($connection, new Grammar($connection), Mockery::mock(Processor::class));
+        $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -2785,7 +2657,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $connection = Mockery::mock(Connection::class);
         $connection->expects('getTablePrefix')->times(2)->andReturn('');
-        $query = new BaseBuilder($connection, new Grammar($connection), Mockery::mock(Processor::class));
+        $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -2801,7 +2673,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $connection = Mockery::mock(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
-        $query = new BaseBuilder($connection, new Grammar($connection), Mockery::mock(Processor::class));
+        $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -2817,7 +2689,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $connection = Mockery::mock(Connection::class);
         $connection->expects('getTablePrefix')->andReturn('');
-        $query = new BaseBuilder($connection, new Grammar($connection), Mockery::mock(Processor::class));
+        $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStubWithoutTimestamp;
         $this->mockConnectionForModel($model, '');
@@ -2835,7 +2707,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $connection = Mockery::mock(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
-        $query = new BaseBuilder($connection, new Grammar($connection), Mockery::mock(Processor::class));
+        $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -2853,7 +2725,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $connection = Mockery::mock(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
-        $query = new BaseBuilder($connection, new Grammar($connection), Mockery::mock(Processor::class));
+        $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -2976,7 +2848,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $connection = Mockery::mock(Connection::class);
         $connection->expects('getTablePrefix')->times(2)->andReturn('');
-        $query = new BaseBuilder($connection, new Grammar($connection), Mockery::mock(Processor::class));
+        $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
         $builder->select('*')->from('users');
         $clone = $builder->clone()->where('email', 'foo');
@@ -2990,7 +2862,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $connection = Mockery::mock(Connection::class);
         $connection->expects('getTablePrefix')->times(2)->andReturn('');
-        $query = new BaseBuilder($connection, new Grammar($connection), Mockery::mock(Processor::class));
+        $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = (new Builder($query))->setModel(new EloquentBuilderTestStub);
         $builder->select('*')->from('users');
 
@@ -3186,6 +3058,48 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->shouldReceive('getQualifiedKeyName')->andReturn('foo_table.foo');
 
         return $model;
+    }
+
+    protected function newPagedBuilder(array $ids, string $column = 'id'): array
+    {
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->exec('create table "table" ("'.$column.'" integer primary key)');
+
+        foreach ($ids as $id) {
+            $pdo->exec('insert into "table" values ('.$id.')');
+        }
+
+        $connection = new SQLiteConnection($pdo);
+        $connection->enableQueryLog();
+
+        return [$connection, $this->newBuilder($connection)];
+    }
+
+    protected function pagedBindings(SQLiteConnection $connection): array
+    {
+        return array_column($connection->getQueryLog(), 'bindings');
+    }
+
+    protected function newConnection(): SQLiteConnection
+    {
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->exec('create table "table" ("id" integer primary key, "name" text, "age" integer)');
+        $pdo->exec("insert into \"table\" values (1, 'taylor', 26)");
+        $pdo->exec("insert into \"table\" values (2, 'dayle', 28)");
+
+        $connection = new SQLiteConnection($pdo);
+        $connection->enableQueryLog();
+
+        return $connection;
+    }
+
+    protected function newBuilder(SQLiteConnection $connection): Builder
+    {
+        $resolver = new ConnectionResolver(['default' => $connection]);
+        $resolver->setDefaultConnection('default');
+        EloquentBuilderTestStub::setConnectionResolver($resolver);
+
+        return (new Builder($connection->query()))->setModel(new EloquentBuilderTestStub);
     }
 
     protected function getMockQueryBuilder()

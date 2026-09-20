@@ -54,7 +54,6 @@ class ConsoleApplicationTest extends TestCase
     {
         $artisan = $this->getMockConsole(['addToParent']);
         $command = Mockery::mock(SymfonyCommand::class);
-        $command->shouldReceive('setLaravel')->never();
         $artisan->expects($this->once())->method('addToParent')->with($command)->willReturn($command);
         $result = $artisan->add($command);
 

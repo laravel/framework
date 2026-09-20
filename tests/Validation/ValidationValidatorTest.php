@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
@@ -36,7 +37,6 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use RuntimeException;
-use stdClass;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -443,12 +443,8 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.foo' => 'foo!'], 'en');
         $v = new Validator($trans, [], ['name' => 'required']);
-        $container = Mockery::mock(Container::class);
-        $v->setContainer($container);
-        $v->addReplacer('required', 'Foo@bar');
-        $foo = Mockery::mock(stdClass::class);
-        $container->expects('make')->with('Foo')->andReturn($foo);
-        $foo->expects('bar')->andReturn('replaced!');
+        $v->setContainer(new Container);
+        $v->addReplacer('required', ClassBasedValidatorStub::class.'@replace');
         $v->passes();
         $v->messages()->setFormat(':message');
         $this->assertSame('replaced!', $v->messages()->first('name'));
@@ -1314,9 +1310,10 @@ class ValidationValidatorTest extends TestCase
     public function testValidateCurrentPassword()
     {
         // Fails when user is not logged in.
-        $auth = Mockery::mock(Guard::class);
-        $auth->expects('guard')->andReturn($auth);
-        $auth->expects('guest')->andReturn(true);
+        $guard = Mockery::mock(Guard::class);
+        $guard->expects('guest')->andReturn(true);
+        $auth = Mockery::mock(AuthFactory::class);
+        $auth->expects('guard')->andReturn($guard);
 
         $hasher = Mockery::mock(Hasher::class);
 
@@ -1336,10 +1333,11 @@ class ValidationValidatorTest extends TestCase
         $user = Mockery::mock(Authenticatable::class);
         $user->expects('getAuthPassword');
 
-        $auth = Mockery::mock(Guard::class);
-        $auth->expects('guard')->andReturn($auth);
-        $auth->expects('guest')->andReturn(false);
-        $auth->expects('user')->andReturn($user);
+        $guard = Mockery::mock(Guard::class);
+        $guard->expects('guest')->andReturn(false);
+        $guard->expects('user')->andReturn($user);
+        $auth = Mockery::mock(AuthFactory::class);
+        $auth->expects('guard')->andReturn($guard);
 
         $hasher = Mockery::mock(Hasher::class);
         $hasher->expects('check')->andReturn(false);
@@ -1360,10 +1358,11 @@ class ValidationValidatorTest extends TestCase
         $user = Mockery::mock(Authenticatable::class);
         $user->expects('getAuthPassword');
 
-        $auth = Mockery::mock(Guard::class);
-        $auth->expects('guard')->andReturn($auth);
-        $auth->expects('guest')->andReturn(false);
-        $auth->expects('user')->andReturn($user);
+        $guard = Mockery::mock(Guard::class);
+        $guard->expects('guest')->andReturn(false);
+        $guard->expects('user')->andReturn($user);
+        $auth = Mockery::mock(AuthFactory::class);
+        $auth->expects('guard')->andReturn($guard);
 
         $hasher = Mockery::mock(Hasher::class);
         $hasher->expects('check')->andReturn(true);
@@ -1384,10 +1383,11 @@ class ValidationValidatorTest extends TestCase
         $user = Mockery::mock(Authenticatable::class);
         $user->expects('getAuthPassword');
 
-        $auth = Mockery::mock(Guard::class);
-        $auth->expects('guard')->with('custom')->andReturn($auth);
-        $auth->expects('guest')->andReturn(false);
-        $auth->expects('user')->andReturn($user);
+        $guard = Mockery::mock(Guard::class);
+        $guard->expects('guest')->andReturn(false);
+        $guard->expects('user')->andReturn($user);
+        $auth = Mockery::mock(AuthFactory::class);
+        $auth->expects('guard')->with('custom')->andReturn($guard);
 
         $hasher = Mockery::mock(Hasher::class);
         $hasher->expects('check')->andReturn(true);
@@ -7379,12 +7379,8 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.foo' => 'foo!'], 'en');
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo']);
-        $container = Mockery::mock(Container::class);
-        $v->setContainer($container);
-        $v->addExtension('foo', 'Foo@bar');
-        $foo = Mockery::mock(stdClass::class);
-        $container->expects('make')->with('Foo')->andReturn($foo);
-        $foo->expects('bar')->andReturn(false);
+        $v->setContainer(new Container);
+        $v->addExtension('foo', ClassBasedValidatorStub::class.'@bar');
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('foo!', $v->messages()->first('name'));
@@ -7395,12 +7391,8 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.foo' => 'foo!'], 'en');
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo']);
-        $container = Mockery::mock(Container::class);
-        $v->setContainer($container);
-        $v->addExtension('foo', 'Foo');
-        $foo = Mockery::mock(stdClass::class);
-        $container->expects('make')->with('Foo')->andReturn($foo);
-        $foo->expects('validate')->andReturn(false);
+        $v->setContainer(new Container);
+        $v->addExtension('foo', ConventionalValidatorStub::class);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('foo!', $v->messages()->first('name'));
@@ -10387,6 +10379,27 @@ class ValidationValidatorTest extends TestCase
         return new Translator(
             new ArrayLoader, 'en'
         );
+    }
+}
+
+class ClassBasedValidatorStub
+{
+    public function replace()
+    {
+        return 'replaced!';
+    }
+
+    public function bar()
+    {
+        return false;
+    }
+}
+
+class ConventionalValidatorStub
+{
+    public function validate()
+    {
+        return false;
     }
 }
 

@@ -156,18 +156,19 @@ class BroadcastEventTest extends TestCase
     {
         $event = new class
         {
+            public $failedWith;
+
             public function failed(?Throwable $e = null): void
             {
-                $e->validateCall();
+                $this->failedWith = $e;
             }
         };
 
         $job = new BroadcastEvent($event);
 
-        $exception = Mockery::mock(Exception::class);
-        $exception->expects('validateCall');
+        $job->failed($exception = new Exception);
 
-        $job->failed($exception);
+        $this->assertSame($exception, $event->failedWith);
     }
 }
 

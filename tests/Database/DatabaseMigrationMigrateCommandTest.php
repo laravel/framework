@@ -4,10 +4,10 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Console\CommandMutex;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Schema\SchemaState;
 use Illuminate\Foundation\Application;
 use Mockery;
@@ -47,7 +47,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $command->setLaravel($app);
         $migrator->expects('paths')->andReturn([]);
         $migrator->expects('hasRunAnyMigrations')->andReturn(false);
-        $connection = Mockery::mock(Connection::class);
+        $connection = Mockery::mock(MySqlConnection::class);
         $migrator->expects('resolveConnection')->andReturn($connection);
         $connection->expects('getName')->andReturn('mysql');
         $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
@@ -160,7 +160,6 @@ class ApplicationDatabaseMigrationStub extends Application
     {
         $mutex = Mockery::mock(CommandMutex::class);
         $mutex->shouldReceive('create')->andReturn(true);
-        $mutex->shouldReceive('release')->andReturn(true);
         $this->instance(CommandMutex::class, $mutex);
 
         foreach ($data as $abstract => $instance) {

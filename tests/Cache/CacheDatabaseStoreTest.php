@@ -159,7 +159,7 @@ class CacheDatabaseStoreTest extends TestCase
     {
         $store = $this->getStore();
         $table = Mockery::mock(Builder::class);
-        $cache = Mockery::mock(stdClass::class);
+        $cache = new stdClass;
 
         $store->getConnection()->expects('transaction')->with(Mockery::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();
@@ -198,7 +198,7 @@ class CacheDatabaseStoreTest extends TestCase
     {
         $store = $this->getStore();
         $table = Mockery::mock(Builder::class);
-        $cache = Mockery::mock(stdClass::class);
+        $cache = new stdClass;
 
         $store->getConnection()->expects('transaction')->with(Mockery::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();

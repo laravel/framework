@@ -24,7 +24,6 @@ use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionFunction;
-use stdClass;
 
 class ViewFactoryTest extends TestCase
 {
@@ -470,30 +469,22 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->expects('listen')->with('composing: foo', Mockery::type(Closure::class));
-        $container = Mockery::mock(Container::class);
-        $factory->setContainer($container);
-        $composer = Mockery::mock(stdClass::class);
-        $container->expects('make')->with('FooComposer')->andReturn($composer);
-        $composer->expects('compose')->with('view')->andReturn('composed');
-        $callback = $factory->composer('foo', 'FooComposer');
+        $factory->setContainer(new Container);
+        $callback = $factory->composer('foo', ViewComposerStub::class);
         $callback = $callback[0];
 
-        $this->assertSame('composed', $callback('view'));
+        $this->assertSame('view composed', $callback('view'));
     }
 
     public function testClassCallbacksWithMethods()
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->expects('listen')->with('composing: foo', Mockery::type(Closure::class));
-        $container = Mockery::mock(Container::class);
-        $factory->setContainer($container);
-        $composer = Mockery::mock(stdClass::class);
-        $container->expects('make')->with('FooComposer')->andReturn($composer);
-        $composer->expects('doComposer')->with('view')->andReturn('composed');
-        $callback = $factory->composer('foo', 'FooComposer@doComposer');
+        $factory->setContainer(new Container);
+        $callback = $factory->composer('foo', ViewComposerStub::class.'@doComposer');
         $callback = $callback[0];
 
-        $this->assertSame('composed', $callback('view'));
+        $this->assertSame('view do-composed', $callback('view'));
     }
 
     public function testCallComposerCallsProperEvent()
@@ -1090,5 +1081,18 @@ class ViewFactoryTest extends TestCase
             Mockery::mock(ViewFinderInterface::class),
             Mockery::mock(DispatcherContract::class),
         ];
+    }
+}
+
+class ViewComposerStub
+{
+    public function compose($view)
+    {
+        return $view.' composed';
+    }
+
+    public function doComposer($view)
+    {
+        return $view.' do-composed';
     }
 }
