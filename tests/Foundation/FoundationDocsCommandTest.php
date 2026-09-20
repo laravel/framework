@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Console\DocsCommand;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Http;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithEnv;
@@ -31,6 +32,9 @@ class FoundationDocsCommandTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Testbench disables putenv when it creates the app.
+        Env::enablePutenv();
 
         Http::preventStrayRequests()->fake([
             'https://laravel.com/docs/8.x/index.json' => Http::response(file_get_contents(__DIR__.'/Fixtures/docs.json')),
