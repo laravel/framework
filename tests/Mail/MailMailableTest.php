@@ -1111,6 +1111,8 @@ class MailMailableTest extends TestCase
 
     public function testAssertHasAttachmentFromStorage(): void
     {
+        $this->stubMailer();
+
         $mailable = new class() extends Mailable
         {
             public function build()
