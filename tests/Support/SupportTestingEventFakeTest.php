@@ -99,6 +99,22 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->assertDispatchedTimes(EventStub::class, 2);
     }
 
+    public function testAssertDispatchedTimesWithClosure()
+    {
+        $this->fake->dispatch(new PayloadEventStub('foo'));
+        $this->fake->dispatch(new PayloadEventStub('bar'));
+        $this->fake->dispatch(new PayloadEventStub('foo'));
+
+        $this->fake->assertDispatchedTimes(fn (PayloadEventStub $event) => $event->value === 'foo', 2);
+
+        try {
+            $this->fake->assertDispatchedTimes(fn (PayloadEventStub $event) => $event->value === 'bar', 2);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\PayloadEventStub] event was dispatched 1 time instead of 2 times.', $e->getMessage());
+        }
+    }
+
     public function testAssertNotDispatched()
     {
         $this->fake->assertNotDispatched(EventStub::class);
@@ -167,6 +183,14 @@ class SupportTestingEventFakeTest extends TestCase
 class EventStub
 {
     //
+}
+
+class PayloadEventStub
+{
+    public function __construct(public string $value)
+    {
+        //
+    }
 }
 
 class ListenerStub

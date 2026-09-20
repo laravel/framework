@@ -183,6 +183,22 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushed(JobStub::class, 2);
     }
 
+    public function testAssertPushedTimesWithClosure()
+    {
+        $this->fake->push(new PayloadJobStub('foo'));
+        $this->fake->push(new PayloadJobStub('bar'));
+        $this->fake->push(new PayloadJobStub('foo'));
+
+        $this->fake->assertPushedTimes(fn (PayloadJobStub $job) => $job->value === 'foo', 2);
+
+        try {
+            $this->fake->assertPushedTimes(fn (PayloadJobStub $job) => $job->value === 'bar', 2);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\PayloadJobStub] job was pushed 1 time instead of 2 times.', $e->getMessage());
+        }
+    }
+
     public function testAssertCount()
     {
         $this->fake->push(function () {
@@ -848,6 +864,19 @@ enum QueueNameEnumStub: string
 
 class JobStub
 {
+    public function handle()
+    {
+        //
+    }
+}
+
+class PayloadJobStub
+{
+    public function __construct(public string $value)
+    {
+        //
+    }
+
     public function handle()
     {
         //
