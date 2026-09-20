@@ -53,9 +53,28 @@ runs:
       shell: bash
       run: composer config version "${{ inputs.framework-version }}"
 
+    - name: Resolve Composer command
+      id: composer-command
+      shell: bash
+      run: |
+        composer_command=$(cat <<'EOF'
+        ${{ inputs.composer-command }}
+        EOF
+        )
+
+        if php -r 'exit(preg_match("/(?:alpha|beta|RC|dev)/i", PHP_VERSION) ? 0 : 1);'; then
+          composer_command="$composer_command --ignore-platform-req=php+"
+        fi
+
+        {
+          echo 'command<<EOF'
+          echo "$composer_command"
+          echo 'EOF'
+        } >> "$GITHUB_OUTPUT"
+
     - name: Install dependencies
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
       with:
         timeout_minutes: 5
         max_attempts: 5
-        command: ${{ inputs.composer-command }}
+        command: ${{ steps.composer-command.outputs.command }}
