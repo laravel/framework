@@ -682,6 +682,22 @@ class ViewFactoryTest extends TestCase
         $this->assertSame('laravel.com', $contents);
     }
 
+    public function testSlotAttributesAreConsumableWhileTheSlotIsRendered()
+    {
+        $factory = $this->getFactory();
+        $factory->getFinder()->expects('find')->andReturn(__DIR__.'/Fixtures/component.php');
+        $factory->getEngineResolver()->expects('resolve')->andReturn(new PhpEngine(new Filesystem));
+        $factory->getDispatcher()->expects('hasListeners')->times(2)->andReturn(false);
+        $factory->startComponent('component', ['name' => 'Taylor']);
+        $factory->slot('title', null, ['highlighted' => true]);
+        $highlighted = $factory->getConsumableComponentData('highlighted', false);
+        $factory->endSlot();
+        $factory->slot('website', 'laravel.com', []);
+        $factory->renderComponent();
+
+        $this->assertTrue($highlighted);
+    }
+
     public function testFlushStateResetsSlots()
     {
         $factory = $this->getFactory();

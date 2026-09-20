@@ -162,6 +162,17 @@ class BladeTest extends TestCase
 <div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
     }
 
+    public function test_consume_from_named_slot_attributes()
+    {
+        $content = Blade::render('<x-menu-with-header>
+<x-slot:header color="blue"><x-menu-item>A</x-menu-item></x-slot:header>
+<x-menu-item>B</x-menu-item>
+</x-menu-with-header>');
+
+        $this->assertSame('<div>Slot: A, Color: blue, Default: foo</div>
+<div>Slot: B, Color: red, Default: foo</div>', trim($content));
+    }
+
     public function test_name_attribute_can_be_used_if_using_short_slot_names()
     {
         $content = Blade::render('<x-input-with-slot>

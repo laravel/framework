@@ -148,6 +148,12 @@ trait ManagesComponents
         }
 
         for ($i = $currentComponent - 1; $i >= 0; $i--) {
+            foreach (array_reverse($this->slotStack[$i] ?? []) as [, $attributes]) {
+                if (array_key_exists($key, $attributes)) {
+                    return $attributes[$key];
+                }
+            }
+
             $data = $this->componentData[$i] ?? [];
 
             if (array_key_exists($key, $data)) {
