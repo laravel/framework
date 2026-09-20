@@ -161,13 +161,19 @@ class QueueFake extends QueueManager implements Fake, Queue
     /**
      * Assert if a job was pushed a number of times.
      *
-     * @param  string  $job
+     * @param  string|\Closure  $job
      * @param  int  $times
      * @return void
      */
     public function assertPushedTimes($job, $times = 1)
     {
-        $count = $this->pushed($job)->count();
+        $callback = null;
+
+        if ($job instanceof Closure) {
+            [$job, $callback] = [$this->firstClosureParameterType($job), $job];
+        }
+
+        $count = $this->pushed($job, $callback)->count();
 
         PHPUnit::assertSame(
             $times, $count,
@@ -182,7 +188,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     /**
      * Assert if a job was pushed exactly once.
      *
-     * @param  string  $job
+     * @param  string|\Closure  $job
      * @return void
      */
     public function assertPushedOnce($job)
