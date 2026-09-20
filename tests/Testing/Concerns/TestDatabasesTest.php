@@ -17,6 +17,9 @@ class TestDatabasesTest extends TestCase
     {
         Container::setInstance($container = new Container);
 
+        DB::clearResolvedInstance();
+        DB::setFacadeApplication(null);
+
         $container->singleton('config', function () {
             return Mockery::mock(Config::class)
                 ->expects('get')
