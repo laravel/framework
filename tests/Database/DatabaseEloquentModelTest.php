@@ -520,6 +520,40 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('asEnumCollectionAttribute'));
     }
 
+    public function testEnumCollectionCanUseACustomCollectionClass()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asEnumCollectionWithCustomCollectionAttribute' => '["draft", "pending"]',
+        ]);
+        $model->syncOriginal();
+
+        $collection = $model->asEnumCollectionWithCustomCollectionAttribute;
+
+        $this->assertInstanceOf(CustomCollection::class, $collection);
+        $this->assertSame([StringStatus::draft, StringStatus::pending], $collection->all());
+        $this->assertFalse($model->isDirty('asEnumCollectionWithCustomCollectionAttribute'));
+
+        $model->asEnumCollectionWithCustomCollectionAttribute = [StringStatus::draft, StringStatus::done];
+        $this->assertTrue($model->isDirty('asEnumCollectionWithCustomCollectionAttribute'));
+        $this->assertSame('["draft","done"]', $model->getAttributes()['asEnumCollectionWithCustomCollectionAttribute']);
+    }
+
+    public function testEnumCollectionThrowsWhenTheCustomCollectionClassIsInvalid()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->mergeCasts([
+            'asEnumCollectionWithCustomCollectionAttribute' => AsEnumCollection::using(EloquentModelCastingStub::class, StringStatus::class),
+        ]);
+        $model->setRawAttributes([
+            'asEnumCollectionWithCustomCollectionAttribute' => '["draft"]',
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $model->asEnumCollectionWithCustomCollectionAttribute;
+    }
+
     public function testDirtyOnCustomEnumCollectionObject()
     {
         $model = new EloquentModelCastingStub;
@@ -4539,6 +4573,7 @@ class EloquentModelCastingStub extends Model
             'asEncryptedCustomCollectionAttribute' => AsEncryptedCollection::using(CustomCollection::class),
             'asEncryptedCustomCollectionAsArrayAttribute' => [AsEncryptedCollection::class, CustomCollection::class],
             'asCustomEnumCollectionAttribute' => AsEnumCollection::of(StringStatus::class),
+            'asEnumCollectionWithCustomCollectionAttribute' => AsEnumCollection::using(CustomCollection::class, StringStatus::class),
             'asCustomEnumArrayObjectAttribute' => AsEnumArrayObject::of(StringStatus::class),
             'singleElementInArrayAttribute' => [AsCollection::class],
             'duplicatedAttribute' => 'int',
