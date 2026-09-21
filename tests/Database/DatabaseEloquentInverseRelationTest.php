@@ -287,8 +287,7 @@ class DatabaseEloquentInverseRelationTest extends TestCase
             [],
             $models[4],
             'foo',
-            new class()
-            {
+            new class() {
             },
             $models[5],
         ]);
