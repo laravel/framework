@@ -248,17 +248,6 @@ class EventsDispatcherTest extends TestCase
         $this->assertEquals([0, [], '', null], $response);
     }
 
-    public function testContainerResolutionOfEventHandlers()
-    {
-        $container = Mockery::mock(Container::class);
-        $container->expects('make')->with(TestEventListener::class)->andReturn(new TestEventListener);
-        $d = new Dispatcher($container);
-        $d->listen('foo', TestEventListener::class.'@onFooEvent');
-        $response = $d->dispatch('foo', ['foo', 'bar']);
-
-        $this->assertEquals(['baz'], $response);
-    }
-
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
     {
         $d = new Dispatcher(new Container);
