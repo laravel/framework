@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Notification;
@@ -15,7 +16,7 @@ class NotificationDatabaseChannelTest extends TestCase
     {
         $notification = new NotificationDatabaseChannelTestNotification;
         $notification->id = 1;
-        $notifiable = Mockery::mock();
+        $notifiable = Mockery::mock(AnonymousNotifiable::class);
 
         $notifiable->expects('routeNotificationFor->create')->with([
             'id' => 1,
@@ -32,7 +33,7 @@ class NotificationDatabaseChannelTest extends TestCase
     {
         $notification = new NotificationDatabaseChannelTestNotification;
         $notification->id = 1;
-        $notifiable = Mockery::mock();
+        $notifiable = Mockery::mock(AnonymousNotifiable::class);
 
         $notifiable->expects('routeNotificationFor->create')->with([
             'id' => 1,
@@ -50,7 +51,7 @@ class NotificationDatabaseChannelTest extends TestCase
     {
         $notification = new NotificationDatabaseChannelCustomizeTypeTestNotification;
         $notification->id = 1;
-        $notifiable = Mockery::mock();
+        $notifiable = Mockery::mock(AnonymousNotifiable::class);
 
         $notifiable->expects('routeNotificationFor->create')->with([
             'id' => 1,

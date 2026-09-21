@@ -8,6 +8,7 @@ use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\ChannelManager;
+use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Notifiable;
@@ -212,7 +213,7 @@ class NotificationSenderTest extends TestCase
 
         $notifiable = new AnonymousNotifiable;
         $manager = Mockery::mock(ChannelManager::class);
-        $driver = Mockery::mock();
+        $driver = Mockery::mock(MailChannel::class);
         $manager->expects('driver')->andReturn($driver);
         $response = Mockery::mock(ResponseInterface::class);
         $driver->expects('send')->andThrow(new HttpTransportException('Transport error', $response));
@@ -234,7 +235,7 @@ class NotificationSenderTest extends TestCase
     {
         $notifiable = new AnonymousNotifiable;
         $manager = Mockery::mock(ChannelManager::class);
-        $driver = Mockery::mock();
+        $driver = Mockery::mock(MailChannel::class);
         $manager->expects('driver')->andReturn($driver);
         $driver->expects('send')->withArgs(function ($notifiable, $notification) {
             return $notification->channelData === 'default';

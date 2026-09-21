@@ -464,7 +464,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $redis = Mockery::mock(Factory::class);
         $connection = Mockery::mock(PhpRedisClusterConnection::class);
-        $client = Mockery::mock();
+        $client = Mockery::mock(\RedisCluster::class);
 
         $redis->expects('connection')->andReturn($connection);
         $connection->expects('client')->andReturn($client);
