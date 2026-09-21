@@ -10,6 +10,7 @@ use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Queue\Connectors\SqsConnector;
+use Illuminate\Support\Env;
 use Monolog\Handler\SocketHandler;
 use PDO;
 
@@ -58,7 +59,7 @@ class CloudBootstrapper
             return;
         }
 
-        $defaultDisk = $_SERVER['FILESYSTEM_DISK'] ?? null;
+        $defaultDisk = Env::get('FILESYSTEM_DISK');
 
         $disks = json_decode($_SERVER['LARAVEL_CLOUD_DISK_CONFIG'], true);
 
@@ -85,7 +86,7 @@ class CloudBootstrapper
             }
 
             if (($disk['is_default'] ?? false) &&
-                ($defaultDisk === null || $defaultDisk === $disk['disk'])) {
+                (blank($defaultDisk) || $defaultDisk === $disk['disk'])) {
                 $app['config']->set('filesystems.default', $disk['disk']);
             }
         }
