@@ -61,6 +61,86 @@ class DatabaseConcernsHasAttributesTest extends TestCase
 
         $this->assertFalse($instance->cachedAttributeIsset('cacheableProperty'));
     }
+
+    public function testAttributesMarkedAsAppendableAreAppended()
+    {
+        $instance = new HasAppendableAttributes();
+
+        $this->assertSame(['full_name'], $instance->getAppends());
+        $this->assertSame(['full_name' => 'Taylor Otwell'], $instance->toArray());
+    }
+
+    public function testAppendableAttributesAreMergedWithTheAppendsProperty()
+    {
+        $instance = new HasAppendableAndAppendedAttributes();
+
+        $this->assertSame(['initials', 'full_name'], $instance->getAppends());
+    }
+
+    public function testAppendableAttributesCanBeRemoved()
+    {
+        $instance = new HasAppendableAttributes();
+
+        $this->assertSame([], $instance->withoutAppends()->toArray());
+    }
+
+    public function testAppendableAttributesAreInheritedFromParentsAndTraits()
+    {
+        $instance = new HasInheritedAppendableAttributes();
+
+        $this->assertEqualsCanonicalizing(['full_name', 'nickname'], $instance->getAppends());
+    }
+
+    public function testAttributesWithoutAccessorsAreNotAppended()
+    {
+        $instance = new HasAppendableMutatorOnly();
+
+        $this->assertSame([], $instance->getAppends());
+    }
+}
+
+class HasAppendableAttributes extends Model
+{
+    public function fullName(): Attribute
+    {
+        return Attribute::get(fn () => 'Taylor Otwell')->shouldAppend();
+    }
+}
+
+trait HasNickname
+{
+    protected function nickname(): Attribute
+    {
+        return Attribute::get(fn () => 'Taylor')->shouldAppend();
+    }
+}
+
+class HasInheritedAppendableAttributes extends HasAppendableAttributes
+{
+    use HasNickname;
+}
+
+class HasAppendableMutatorOnly extends Model
+{
+    protected function fullName(): Attribute
+    {
+        return Attribute::set(fn ($value) => $value)->shouldAppend();
+    }
+}
+
+class HasAppendableAndAppendedAttributes extends Model
+{
+    protected $appends = ['initials'];
+
+    public function initials(): Attribute
+    {
+        return Attribute::get(fn () => 'TO');
+    }
+
+    public function fullName(): Attribute
+    {
+        return Attribute::get(fn () => 'Taylor Otwell')->shouldAppend();
+    }
 }
 
 class HasAttributesWithoutConstructor
