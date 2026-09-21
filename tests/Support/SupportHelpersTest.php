@@ -37,6 +37,10 @@ class SupportHelpersTest extends TestCase
 
     protected function tearDown(): void
     {
+        unset($_ENV['foo'], $_SERVER['foo'], $_SERVER['required-exists']);
+        SupportLazyClass::$constructorCalled = false;
+        SupportLazyClassWithArrayParameter::$constructorCalled = false;
+
         if (is_dir(__DIR__.'/tmp')) {
             (new Filesystem)->deleteDirectory(__DIR__.'/tmp');
         }

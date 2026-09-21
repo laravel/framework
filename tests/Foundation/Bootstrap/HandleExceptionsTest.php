@@ -38,6 +38,7 @@ class HandleExceptionsTest extends TestCase
     {
         Application::setInstance(null);
         HandleExceptions::flushState($this);
+        Env::getRepository()->clear('LOG_DEPRECATIONS_WHILE_TESTING');
     }
 
     public function testPhpDeprecations()

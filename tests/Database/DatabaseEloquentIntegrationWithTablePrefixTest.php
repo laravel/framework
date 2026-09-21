@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use PHPUnit\Framework\TestCase;
 
+require_once __DIR__.'/DatabaseEloquentIntegrationTest.php';
+
 class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
 {
     /**

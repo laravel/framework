@@ -103,6 +103,7 @@ class DatabaseEloquentBelongsToManyExpressionTest extends TestCase
      */
     protected function tearDown(): void
     {
+        Eloquent::clearBootedModels();
         $this->schema()->drop('posts');
         $this->schema()->drop('tags');
         $this->schema()->drop('taggables');

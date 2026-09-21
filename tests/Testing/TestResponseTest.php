@@ -37,6 +37,16 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TestResponseTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Container::setInstance(new Container);
+    }
+
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+    }
+
     public function testAssertViewIs(): void
     {
         $response = $this->makeMockResponse([
@@ -2861,7 +2871,8 @@ EOT
 
         $store->setPreviousUrl('https://url.com');
 
-        app('url')->setSessionResolver(fn () => app('session.store'));
+        app()->instance('url', $url = new UrlGenerator(new RouteCollection, new Request));
+        $url->setSessionResolver(fn () => app('session.store'));
 
         $response = TestResponse::fromBaseResponse(
             (new Response('', 302))->withHeaders(['Location' => 'https://url.com'])

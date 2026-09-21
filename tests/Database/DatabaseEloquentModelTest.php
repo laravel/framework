@@ -54,6 +54,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
+use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 use Illuminate\Tests\Database\Fixtures\TestCast;
 use Illuminate\Tests\Database\Fixtures\TestValueObject;
@@ -70,6 +71,13 @@ include_once 'Fixtures/Enums/Enums.php';
 
 class DatabaseEloquentModelTest extends TestCase
 {
+    use RestoresConnectionResolver;
+
+    protected function setUp(): void
+    {
+        $this->useInMemoryConnection();
+    }
+
     use InteractsWithTime;
 
     protected $encrypter;
@@ -78,6 +86,11 @@ class DatabaseEloquentModelTest extends TestCase
     {
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();
+        Model::$snakeAttributes = true;
+        EloquentModelGetMutatorsStub::resetMutatorCache();
+        Model::preventSilentlyDiscardingAttributes(false);
+        Model::handleDiscardedAttributeViolationUsing(null);
+        Model::reguard();
     }
 
     public function testAttributeManipulation()
@@ -2472,6 +2485,9 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testWithoutEventDispatcher()
     {
+        // Boot the model before the dispatcher is set so booting events aren't dispatched.
+        new EloquentModelSaveStub;
+
         $events = Mockery::mock(Dispatcher::class);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelSaveStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelSaveStub', EloquentTestObserverStub::class.'@saved');

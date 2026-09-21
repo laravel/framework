@@ -201,6 +201,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      */
     protected function tearDown(): void
     {
+        Model::clearBootedModels();
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
             $this->schema($connection)->drop('friends');
@@ -211,6 +212,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Relation::morphMap([], false);
         Eloquent::unsetConnectionResolver();
+        Paginator::currentPageResolver(fn () => 1);
+        CursorPaginator::currentCursorResolver(fn () => null);
 
         Str::createUuidsNormally();
         DB::flushQueryLog();

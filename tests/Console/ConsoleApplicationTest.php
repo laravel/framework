@@ -13,6 +13,7 @@ use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Foundation\Console\Kernel;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithArrayInputPrompting;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
+use Laravel\Prompts\Prompt;
 use Mockery;
 use Orchestra\Testbench\Concerns\InteractsWithMockery;
 use Orchestra\Testbench\Foundation\Application as Testbench;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
+use Symfony\Component\Console\Output\NullOutput;
 use Throwable;
 
 use function Illuminate\Filesystem\join_paths;
@@ -33,6 +35,8 @@ class ConsoleApplicationTest extends TestCase
     protected function tearDown(): void
     {
         $this->tearDownTheTestEnvironmentUsingMockery();
+
+        Prompt::setOutput(new NullOutput);
     }
 
     public function testAddSetsLaravelInstance()
