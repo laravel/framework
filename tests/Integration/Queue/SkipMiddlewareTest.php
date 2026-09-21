@@ -4,12 +4,11 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\Skip;
 use Laravel\SerializableClosure\SerializableClosure;
-use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class SkipMiddlewareTest extends TestCase
@@ -85,16 +84,13 @@ class SkipMiddlewareTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->expects('isDeletedOrReleased')->andReturn(false);
-        $job->expects('delete');
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($class),
         ]);
+
+        $this->assertTrue($job->isDeleted());
 
         $this->assertEquals($expectedHandledValue, $class::$handled);
     }

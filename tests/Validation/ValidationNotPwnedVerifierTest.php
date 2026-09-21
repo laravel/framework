@@ -5,10 +5,11 @@ namespace Illuminate\Tests\Validation;
 use Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use Illuminate\Validation\NotPwnedVerifier;
-use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -97,8 +98,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $exceptionHandler = Mockery::mock(ExceptionHandler::class);
-        $exceptionHandler->expects('report')->with(Mockery::type(ConnectionException::class));
+        $exceptionHandler = new ExceptionHandlerFake(new Handler($container));
         $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
             return $exceptionHandler;
         });
@@ -111,6 +111,8 @@ class ValidationNotPwnedVerifierTest extends TestCase
             'value' => 123123123,
             'threshold' => 0,
         ]));
+
+        $exceptionHandler->assertReported(ConnectionException::class);
 
         unset($container[ExceptionHandler::class]);
     }

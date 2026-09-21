@@ -5,10 +5,13 @@ namespace Illuminate\Tests\Bus;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
+use Illuminate\Bus\Events\BatchDispatched;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Testing\Fakes\EventFake;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -20,9 +23,7 @@ class BusPendingBatchTest extends TestCase
     {
         $container = new Container;
 
-        $eventDispatcher = Mockery::mock(Dispatcher::class);
-        $eventDispatcher->expects('dispatch');
-
+        $eventDispatcher = new EventFake(new EventsDispatcher);
         $container->instance(Dispatcher::class, $eventDispatcher);
 
         $job = new class
@@ -60,6 +61,8 @@ class BusPendingBatchTest extends TestCase
         $container->instance(BatchRepository::class, $repository);
 
         $pendingBatch->dispatch();
+
+        $eventDispatcher->assertDispatchedOnce(BatchDispatched::class);
     }
 
     public function test_batch_is_deleted_from_storage_if_exception_thrown_during_batching()
@@ -95,8 +98,7 @@ class BusPendingBatchTest extends TestCase
     {
         $container = new Container;
 
-        $eventDispatcher = Mockery::mock(Dispatcher::class);
-        $eventDispatcher->expects('dispatch');
+        $eventDispatcher = new EventFake(new EventsDispatcher);
         $container->instance(Dispatcher::class, $eventDispatcher);
 
         $job = new class
@@ -117,14 +119,15 @@ class BusPendingBatchTest extends TestCase
         $result = $pendingBatch->dispatchIf(true);
 
         $this->assertInstanceOf(Batch::class, $result);
+
+        $eventDispatcher->assertDispatchedOnce(BatchDispatched::class);
     }
 
     public function test_batch_is_not_dispatched_when_dispatchif_is_false()
     {
         $container = new Container;
 
-        $eventDispatcher = Mockery::mock(Dispatcher::class);
-        $eventDispatcher->shouldNotReceive('dispatch');
+        $eventDispatcher = new EventFake(new EventsDispatcher);
         $container->instance(Dispatcher::class, $eventDispatcher);
 
         $job = new class
@@ -140,14 +143,15 @@ class BusPendingBatchTest extends TestCase
         $result = $pendingBatch->dispatchIf(false);
 
         $this->assertNull($result);
+
+        $eventDispatcher->assertNothingDispatched();
     }
 
     public function test_batch_is_dispatched_when_dispatchunless_is_false()
     {
         $container = new Container;
 
-        $eventDispatcher = Mockery::mock(Dispatcher::class);
-        $eventDispatcher->expects('dispatch');
+        $eventDispatcher = new EventFake(new EventsDispatcher);
         $container->instance(Dispatcher::class, $eventDispatcher);
 
         $job = new class
@@ -168,14 +172,15 @@ class BusPendingBatchTest extends TestCase
         $result = $pendingBatch->dispatchUnless(false);
 
         $this->assertInstanceOf(Batch::class, $result);
+
+        $eventDispatcher->assertDispatchedOnce(BatchDispatched::class);
     }
 
     public function test_batch_is_not_dispatched_when_dispatchunless_is_true()
     {
         $container = new Container;
 
-        $eventDispatcher = Mockery::mock(Dispatcher::class);
-        $eventDispatcher->shouldNotReceive('dispatch');
+        $eventDispatcher = new EventFake(new EventsDispatcher);
         $container->instance(Dispatcher::class, $eventDispatcher);
 
         $job = new class
@@ -191,15 +196,15 @@ class BusPendingBatchTest extends TestCase
         $result = $pendingBatch->dispatchUnless(true);
 
         $this->assertNull($result);
+
+        $eventDispatcher->assertNothingDispatched();
     }
 
     public function test_batch_before_event_is_called()
     {
         $container = new Container;
 
-        $eventDispatcher = Mockery::mock(Dispatcher::class);
-        $eventDispatcher->expects('dispatch');
-
+        $eventDispatcher = new EventFake(new EventsDispatcher);
         $container->instance(Dispatcher::class, $eventDispatcher);
 
         $job = new class
@@ -226,6 +231,8 @@ class BusPendingBatchTest extends TestCase
         $pendingBatch->dispatch();
 
         $this->assertTrue($beforeCalled);
+
+        $eventDispatcher->assertDispatchedOnce(BatchDispatched::class);
     }
 
     public function test_it_throws_exception_if_batched_job_is_not_batchable(): void

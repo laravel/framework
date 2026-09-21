@@ -2,15 +2,16 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Message;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Testing\Fakes\EventFake;
 use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -295,15 +296,16 @@ class MailMailerTest extends TestCase
     {
         $view = $this->viewFactory('rendered.view');
 
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('until')->with(Mockery::type(MessageSending::class));
-        $events->expects('dispatch')->with(Mockery::type(MessageSent::class));
+        $events = new EventFake(new Dispatcher);
 
         $mailer = new Mailer('array', $view, new ArrayTransport, $events);
 
         $mailer->send('foo', ['data'], function (Message $message) {
             $message->to('taylor@laravel.com')->from('hello@laravel.com');
         });
+
+        $events->assertDispatchedOnce(MessageSending::class);
+        $events->assertDispatchedOnce(MessageSent::class);
     }
 
     public function testMacroable(): void

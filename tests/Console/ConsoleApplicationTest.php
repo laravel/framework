@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Console;
 use Composer\Autoload\ClassLoader;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Filesystem\Filesystem;
@@ -303,7 +302,7 @@ class ConsoleApplicationTest extends TestCase
     protected function getMockConsole(array $methods)
     {
         $app = Mockery::mock(ApplicationContract::class, ['version' => '6.0']);
-        $events = Mockery::mock(Dispatcher::class, ['dispatch' => null]);
+        $events = new EventsDispatcher;
 
         return $this->getMockBuilder(Application::class)->onlyMethods($methods)->setConstructorArgs([
             $app, $events, 'test-version',

@@ -9,7 +9,9 @@ use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Schema\SchemaState;
+use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Testing\Fakes\EventFake;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -40,7 +42,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
     public function testMigrationsCanBeRunWithStoredSchema()
     {
         $migrator = Mockery::mock(Migrator::class);
-        $dispatcher = Mockery::mock(Dispatcher::class);
+        $dispatcher = new EventFake(new EventsDispatcher);
         $command = new MigrateCommand($migrator, $dispatcher);
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
@@ -58,12 +60,13 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $connection->expects('getSchemaState')->andReturn($schemaState);
         $schemaState->expects('handleOutputUsing')->andReturnSelf();
         $schemaState->expects('load')->with(__DIR__.'/Fixtures/schema.sql');
-        $dispatcher->expects('dispatch')->with(Mockery::type(SchemaLoaded::class));
         $migrator->expects('setOutput')->andReturn($migrator);
         $migrator->expects('run')->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
         $migrator->expects('repositoryExists')->andReturn(true);
 
         $this->runCommand($command, ['--schema-path' => __DIR__.'/Fixtures/schema.sql']);
+
+        $dispatcher->assertDispatchedOnce(SchemaLoaded::class);
     }
 
     public function testMigrationRepositoryCreatedWhenNecessary()

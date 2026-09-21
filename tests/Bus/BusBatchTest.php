@@ -23,6 +23,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Queue\CallQueuedClosure;
@@ -30,6 +31,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Testing\Fakes\EventFake;
+use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -260,10 +263,10 @@ class BusBatchTest extends TestCase
 
     public function test_batch_finished_event_is_dispatched()
     {
-        $events = Mockery::mock(EventDispatcher::class);
+        $events = new EventFake(new EventsDispatcher);
         Container::getInstance()->instance(EventDispatcher::class, $events);
 
-        $queue = Mockery::mock(Factory::class);
+        $queue = new QueueFake(Container::getInstance());
         $batch = $this->createTestBatch($queue);
 
         $job = new class
@@ -271,35 +274,28 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $connection = Mockery::mock(QueueContract::class);
-        $queue->expects('connection')
-            ->with('test-connection')
-            ->andReturn($connection);
-
-        $connection->expects('bulk');
-
         $batch = $batch->add([$job]);
 
-        $events->expects('dispatch')->with(Mockery::on(function ($event) use ($batch) {
-            return $event instanceof BatchStarted && $event->batch === $batch;
-        }));
+        $batch->recordSuccessfulJob('test-id');
 
-        $events->expects('dispatch')->with(Mockery::on(function ($event) use ($batch) {
-            return $event instanceof BatchFinished
-                && $event->batch->id === $batch->id
+        $events->assertDispatchedOnce(BatchStarted::class);
+        $events->assertDispatched(BatchStarted::class, function ($event) use ($batch) {
+            return $event->batch === $batch;
+        });
+        $events->assertDispatchedOnce(BatchFinished::class);
+        $events->assertDispatched(BatchFinished::class, function ($event) use ($batch) {
+            return $event->batch->id === $batch->id
                 && $event->batch->finished()
                 && $event->batch->pendingJobs === 0;
-        }));
-
-        $batch->recordSuccessfulJob('test-id');
+        });
     }
 
     public function test_batch_started_event_is_dispatched()
     {
-        $events = Mockery::mock(EventDispatcher::class);
+        $events = new EventFake(new EventsDispatcher);
         Container::getInstance()->instance(EventDispatcher::class, $events);
 
-        $queue = Mockery::mock(Factory::class);
+        $queue = new QueueFake(Container::getInstance());
         $batch = $this->createTestBatch($queue);
 
         $job = new class
@@ -312,33 +308,24 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $connection = Mockery::mock(QueueContract::class);
-        $queue->expects('connection')
-            ->with('test-connection')
-            ->andReturn($connection);
-
-        $connection->expects('bulk');
-
         $batch = $batch->add([$job, $secondJob]);
-
-        $events->expects('dispatch')->with(Mockery::on(function ($event) use ($batch) {
-            return $event instanceof BatchStarted && $event->batch === $batch;
-        }));
-
-        $events->expects('dispatch')->with(Mockery::on(function ($event) {
-            return $event instanceof BatchFinished;
-        }));
 
         $batch->recordSuccessfulJob('test-id-1');
         $batch->recordSuccessfulJob('test-id-2');
+
+        $events->assertDispatchedOnce(BatchStarted::class);
+        $events->assertDispatched(BatchStarted::class, function ($event) use ($batch) {
+            return $event->batch === $batch;
+        });
+        $events->assertDispatchedOnce(BatchFinished::class);
     }
 
     public function test_batch_started_event_is_dispatched_when_first_job_fails()
     {
-        $events = Mockery::mock(EventDispatcher::class);
+        $events = new EventFake(new EventsDispatcher);
         Container::getInstance()->instance(EventDispatcher::class, $events);
 
-        $queue = Mockery::mock(Factory::class);
+        $queue = new QueueFake(Container::getInstance());
         $batch = $this->createTestBatch($queue, $allowFailures = true);
 
         $job = new class
@@ -351,21 +338,15 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $connection = Mockery::mock(QueueContract::class);
-        $queue->expects('connection')
-            ->with('test-connection')
-            ->andReturn($connection);
-
-        $connection->expects('bulk');
-
         $batch = $batch->add([$job, $secondJob]);
-
-        $events->expects('dispatch')->with(Mockery::on(function ($event) use ($batch) {
-            return $event instanceof BatchStarted && $event->batch === $batch;
-        }));
 
         $batch->recordFailedJob('test-id-1', new RuntimeException('Something went wrong.'));
         $batch->recordFailedJob('test-id-2', new RuntimeException('Something else went wrong.'));
+
+        $events->assertDispatchedOnce(BatchStarted::class);
+        $events->assertDispatched(BatchStarted::class, function ($event) use ($batch) {
+            return $event->batch === $batch;
+        });
     }
 
     public function test_failed_jobs_can_be_recorded_while_not_allowing_failures()
@@ -547,22 +528,22 @@ class BusBatchTest extends TestCase
 
     public function test_batch_cancelled_event_is_dispatched()
     {
-        $events = Mockery::mock(EventDispatcher::class);
+        $events = new EventFake(new EventsDispatcher);
         Container::getInstance()->instance(EventDispatcher::class, $events);
 
-        $queue = Mockery::mock(Factory::class);
+        $queue = new QueueFake(Container::getInstance());
         $batch = $this->createTestBatch($queue);
 
         $exception = new RuntimeException('Something went wrong.');
 
-        $events->expects('dispatch')->with(Mockery::on(function ($event) use ($batch, $exception) {
-            return $event instanceof BatchCanceled
-                && $event->batch->id === $batch->id
+        $batch->cancel($exception);
+
+        $events->assertDispatchedOnce(BatchCanceled::class);
+        $events->assertDispatched(BatchCanceled::class, function ($event) use ($batch, $exception) {
+            return $event->batch->id === $batch->id
                 && $event->batch->cancelled()
                 && $event->exception === $exception;
-        }));
-
-        $batch->cancel($exception);
+        });
     }
 
     public function test_batch_can_be_deleted()
