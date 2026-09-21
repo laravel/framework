@@ -84,6 +84,8 @@ class LostConnectionDetector implements LostConnectionDetectorContract
             'Channel connection is closed',
             'Connection lost',
             'Broken pipe',
+            'read error on connection',
+            'protocol error',
             'SQLSTATE[25006]: Read only sql transaction: 7',
             'failed: Connection refused',
 

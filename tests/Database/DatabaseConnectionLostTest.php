@@ -24,6 +24,8 @@ class DatabaseConnectionLostTest extends TestCase
             ['SQLSTATE[HY000]: General error: 2006 MySQL server has gone away'],
             ['SQLSTATE[08S01]: [Microsoft][ODBC Driver 17 for SQL Server]TCP Provider: Error code 0x68'],
             ['SQLSTATE[08S02]: [Microsoft][ODBC Driver 13 for SQL Server]SMux Provider: Physical connection is not usable [xFFFFFFFF]'],
+            ['read error on connection to tcp://example.redis.com:6379'],
+            ["protocol error, got 'R' as reply type byte"],
         ];
     }
 }
