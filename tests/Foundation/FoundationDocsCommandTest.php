@@ -5,10 +5,13 @@ namespace Illuminate\Tests\Foundation;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Console\DocsCommand;
 use Illuminate\Support\Facades\Http;
+use Orchestra\Testbench\Attributes\WithConfig;
+use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
+#[WithConfig('cache.default', 'array')]
 class FoundationDocsCommandTest extends TestCase
 {
     /**
@@ -34,14 +37,6 @@ class FoundationDocsCommandTest extends TestCase
         ]);
 
         $this->app[Kernel::class]->registerCommand($this->command());
-    }
-
-    protected function tearDown(): void
-    {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY');
-        putenv('ARTISAN_DOCS_OPEN_STRATEGY');
-
-        parent::tearDown();
     }
 
     public function testItCanOpenTheLaravelDocumentation(): void
@@ -128,10 +123,9 @@ class FoundationDocsCommandTest extends TestCase
         $this->assertSame('https://laravel.com/docs/8.x/localization', $this->openedUrl);
     }
 
+    #[WithEnv('ARTISAN_DOCS_ASK_STRATEGY', __DIR__.'/Fixtures/always-dusk-ask-strategy.php')]
     public function testItCanUseCustomAskStrategy()
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/Fixtures/always-dusk-ask-strategy.php');
-
         $this->artisan('docs')
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
             ->assertSuccessful();
@@ -139,10 +133,9 @@ class FoundationDocsCommandTest extends TestCase
         $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
+    #[WithEnv('ARTISAN_DOCS_ASK_STRATEGY', __DIR__.'/Fixtures/bad-syntax-strategy.php')]
     public function testItFallsbackToAutocompleteWhenAskStrategyContainsBadSyntax(): void
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/Fixtures/bad-syntax-strategy.php');
-
         $this->artisan('docs')
             ->expectsQuestion('Which page would you like to open?', 'laravel dusk')
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
@@ -151,10 +144,9 @@ class FoundationDocsCommandTest extends TestCase
         $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
+    #[WithEnv('ARTISAN_DOCS_ASK_STRATEGY', __DIR__.'/Fixtures/bad-return-strategy.php')]
     public function testItFallsbackToAutocompleteWithBadAskStrategyReturnValue(): void
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/Fixtures/bad-return-strategy.php');
-
         $this->artisan('docs')
             ->expectsQuestion('Which page would you like to open?', 'laravel dusk')
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
@@ -163,26 +155,23 @@ class FoundationDocsCommandTest extends TestCase
         $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
+    #[WithEnv('ARTISAN_DOCS_ASK_STRATEGY', __DIR__.'/Fixtures/process-interrupt-strategy.php')]
     public function testItCatchesAndHandlesProcessInterruptExceptionsInAskStrategies()
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/Fixtures/process-interrupt-strategy.php');
-
         $this->artisan('docs')->assertExitCode(130);
     }
 
+    #[WithEnv('ARTISAN_DOCS_ASK_STRATEGY', __DIR__.'/Fixtures/exception-throwing-strategy.php')]
     public function testItBubblesUpAskStrategyExceptions()
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/Fixtures/exception-throwing-strategy.php');
-
         $this->expectExceptionObject(new RuntimeException('strategy failed'));
 
         $this->artisan('docs');
     }
 
+    #[WithEnv('ARTISAN_DOCS_ASK_STRATEGY', __DIR__.'/Fixtures/process-failure-strategy.php')]
     public function testItBubblesUpNonProcessInterruptExceptionsInAskStrategies()
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/Fixtures/process-failure-strategy.php');
-
         $this->expectException(ProcessFailedException::class);
 
         if (PHP_OS_FAMILY === 'Windows') {
@@ -229,10 +218,10 @@ Working directory: expected-working-directory');
         $this->assertSame('https://laravel.com/docs/8.x/eloquent-collections', $this->openedUrl);
     }
 
+    #[WithEnv('ARTISAN_DOCS_OPEN_STRATEGY', __DIR__.'/Fixtures/open-strategy.php')]
     public function testItCanSpecifyCustomOpenCommandsViaEnvVariables()
     {
         $GLOBALS['open-strategy-output-path'] = __DIR__.'/output.txt';
-        putenv('ARTISAN_DOCS_OPEN_STRATEGY='.__DIR__.'/Fixtures/open-strategy.php');
         $this->app[Kernel::class]->registerCommand($this->command()->setUrlOpener(null));
 
         @unlink($GLOBALS['open-strategy-output-path']);
@@ -251,9 +240,9 @@ Working directory: expected-working-directory');
         unset($GLOBALS['open-strategy-output-path']);
     }
 
+    #[WithEnv('ARTISAN_DOCS_OPEN_STRATEGY', __DIR__.'/Fixtures/bad-syntax-strategy.php')]
     public function testItHandlesBadSyntaxInOpeners()
     {
-        putenv('ARTISAN_DOCS_OPEN_STRATEGY='.__DIR__.'/Fixtures/bad-syntax-strategy.php');
         $this->app[Kernel::class]->registerCommand($this->command()->setUrlOpener(null));
 
         $this->artisan('docs installation')
@@ -261,9 +250,9 @@ Working directory: expected-working-directory');
             ->assertSuccessful();
     }
 
+    #[WithEnv('ARTISAN_DOCS_OPEN_STRATEGY', __DIR__.'/Fixtures/bad-return-strategy.php')]
     public function testItHandlesBadReturnTypesInOpeners()
     {
-        putenv('ARTISAN_DOCS_OPEN_STRATEGY='.__DIR__.'/Fixtures/bad-return-strategy.php');
         $this->app[Kernel::class]->registerCommand($this->command()->setUrlOpener(null));
 
         $this->artisan('docs installation')
