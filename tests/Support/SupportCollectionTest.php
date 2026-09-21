@@ -1063,6 +1063,17 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testHigherOrderSole($collection)
+    {
+        $c = new $collection([
+            new TestSupportCollectionHigherOrderItem('Adam'),
+            new TestSupportCollectionHigherOrderItem('Taylor'),
+        ]);
+
+        $this->assertSame('Taylor', $c->sole->is('Taylor')->name);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testWhere($collection)
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
