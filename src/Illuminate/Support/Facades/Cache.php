@@ -42,6 +42,8 @@ use Mockery;
  * @method static array rememberWithWarmth(\UnitEnum|string $key, \Closure|\DateTimeInterface|\DateInterval|int|null $ttl, \Closure $callback)
  * @method static mixed sear(\UnitEnum|string $key, \Closure $callback)
  * @method static mixed rememberForever(\UnitEnum|string $key, \Closure $callback)
+ * @method static mixed rememberOnly(\UnitEnum|string $key, \DateTimeInterface|\DateInterval|int $ttl, \Closure $callback, \Closure $rules)
+ * @method static mixed rememberIfNotNull(\UnitEnum|string $key, \DateTimeInterface|\DateInterval|int $ttl, \Closure $callback)
  * @method static mixed flexible(\UnitEnum|string $key, array $ttl, callable $callback, array|null $lock = null, bool $alwaysDefer = false)
  * @method static bool touch(\UnitEnum|string $key, \DateTimeInterface|\DateInterval|int $ttl)
  * @method static mixed withoutOverlapping(\UnitEnum|string $key, callable $callback, int $lockFor = 0, int $waitFor = 10, string|null $owner = null)

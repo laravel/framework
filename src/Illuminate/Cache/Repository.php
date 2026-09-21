@@ -638,6 +638,52 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Get an item from the cache, or execute the given Closure and store the result
+     * if the given rules pass.
+     *
+     * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure  $callback
+     * @param  \Closure  $rules
+     * @return mixed
+     */
+    public function rememberOnly($key, $ttl, Closure $callback, Closure $rules)
+    {
+        $value = $this->get($key);
+
+        if (! is_null($value)) {
+            return $value;
+        }
+
+        $value = $callback();
+
+        if ($rules($value)) {
+            $this->put($key, $value, $ttl);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get an item from the cache, or execute the given Closure and store the result
+     * if it is not null.
+     *
+     * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    public function rememberIfNotNull($key, $ttl, Closure $callback)
+    {
+        return $this->rememberOnly(
+            $key,
+            $ttl,
+            $callback,
+            fn ($value) => ! is_null($value),
+        );
+    }
+
+    /**
      * Retrieve an item from the cache by key, refreshing it in the background if it is stale.
      *
      * @template TCacheValue

@@ -183,6 +183,70 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testRememberOnlyMethodCallsPutWhenRulePasses()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->expects('get')->andReturn(null);
+        $repo->getStore()->expects('put')->with('foo', 'bar', 60);
+        $result = $repo->rememberOnly('foo', 60, function () {
+            return 'bar';
+        }, function ($value) {
+            return $value === 'bar';
+        });
+        $this->assertSame('bar', $result);
+    }
+
+    public function testRememberOnlyMethodDoesNotCallPutWhenRuleFails()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->expects('get')->andReturn(null);
+        $repo->getStore()->expects('put')->never();
+        $result = $repo->rememberOnly('foo', 60, function () {
+            return 'bar';
+        }, function ($value) {
+            return false;
+        });
+        $this->assertSame('bar', $result);
+    }
+
+    public function testRememberOnlyMethodReturnsCachedValue()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->expects('get')->andReturn('cached');
+        $result = $repo->rememberOnly('foo', 60,
+            function () {
+                $this->fail('Callback should not be called.');
+            },
+            function () {
+                $this->fail('Rule should not be called.');
+            }
+        );
+        $this->assertSame('cached', $result);
+    }
+
+    public function testRememberIfNotNullMethodCachesNonNullValue()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->expects('get')->andReturn(null);
+        $repo->getStore()->expects('put')->with('foo', 'bar', 60);
+        $result = $repo->rememberIfNotNull('foo', 60, function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
+    }
+
+    public function testRememberIfNotNullMethodDoesNotCacheNull()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->expects('get')->andReturn(null);
+        $repo->getStore()->expects('put')->never();
+
+        $result = $repo->rememberIfNotNull('foo', 60, function () {
+            return null;
+        });
+        $this->assertNull($result);
+    }
+
     public function testPuttingMultipleItemsInCache()
     {
         $repo = $this->getRepository();
