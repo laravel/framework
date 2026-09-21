@@ -8,6 +8,61 @@ use Orchestra\Testbench\TestCase;
 
 class CloudBootstrapperTest extends TestCase
 {
+    public function test_it_configures_a_read_replica_connection()
+    {
+        $_SERVER['DB_READ_HOST'] = 'read.example.com';
+        $this->app['config']->set('database.default', 'mysql');
+        $this->app['config']->set('database.connections.mysql', [
+            'driver' => 'mysql',
+            'host' => 'write.example.com',
+        ]);
+
+        CloudBootstrapper::configureReadReplicaConnection($this->app);
+
+        $this->assertSame('read.example.com', $this->app['config']->get('database.connections.mysql.read.host'));
+        $this->assertSame('write.example.com', $this->app['config']->get('database.connections.mysql.host'));
+
+        unset($_SERVER['DB_READ_HOST']);
+    }
+
+    public function test_it_does_not_configure_a_read_replica_connection_without_a_read_host()
+    {
+        $connection = [
+            'driver' => 'mysql',
+            'host' => 'write.example.com',
+        ];
+
+        $this->app['config']->set('database.default', 'mysql');
+        $this->app['config']->set('database.connections.mysql', $connection);
+
+        CloudBootstrapper::configureReadReplicaConnection($this->app);
+
+        $this->assertSame($connection, $this->app['config']->get('database.connections.mysql'));
+    }
+
+    public function test_it_preserves_existing_read_replica_configuration()
+    {
+        $_SERVER['DB_READ_HOST'] = 'read.example.com';
+        $this->app['config']->set('database.default', 'mysql');
+        $this->app['config']->set('database.connections.mysql', [
+            'driver' => 'mysql',
+            'host' => 'write.example.com',
+            'read' => [
+                'host' => 'old-read.example.com',
+                'username' => 'read-user',
+            ],
+        ]);
+
+        CloudBootstrapper::configureReadReplicaConnection($this->app);
+
+        $this->assertSame([
+            'host' => 'read.example.com',
+            'username' => 'read-user',
+        ], $this->app['config']->get('database.connections.mysql.read'));
+
+        unset($_SERVER['DB_READ_HOST']);
+    }
+
     #[WithConfig('database.connections.pgsql', ['host' => 'test-pooler.pg.laravel.cloud', 'username' => 'test-username', 'password' => 'test-password'])]
     public function test_it_can_resolve_core_container_aliases()
     {
