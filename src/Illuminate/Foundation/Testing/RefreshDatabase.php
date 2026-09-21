@@ -155,7 +155,8 @@ trait RefreshDatabase
 
                 $connection->unsetEventDispatcher();
 
-                if ($connection->getPdo() && ! $connection->getPdo()->inTransaction()) {
+                if (! $this->usesDatabaseTruncation() &&
+                    $connection->getPdo() && ! $connection->getPdo()->inTransaction()) {
                     RefreshDatabaseState::$migrated = false;
                 }
 
@@ -164,6 +165,18 @@ trait RefreshDatabase
                 $connection->disconnect();
             }
         });
+    }
+
+    /**
+     * Determine if the test case also truncates the database between tests.
+     *
+     * @return bool
+     */
+    protected function usesDatabaseTruncation()
+    {
+        $uses = $this->traitsUsedByTest ?? class_uses_recursive(static::class);
+
+        return isset($uses[DatabaseTruncation::class]);
     }
 
     /**

@@ -80,6 +80,19 @@ class RefreshDatabaseTest extends TestCase
         $this->refreshTestDatabase();
     }
 
+    public function testCommittedTransactionInvalidatesTheMigratedState()
+    {
+        RefreshDatabaseState::$migrated = true;
+
+        $this->beginDatabaseTransaction();
+
+        $this->app->make('db')->connection()->commit();
+
+        $this->callBeforeApplicationDestroyedCallbacks();
+
+        $this->assertFalse(RefreshDatabaseState::$migrated);
+    }
+
     public function testRefreshTestDatabaseWithDropTypesOption()
     {
         $this->dropTypes = true;
