@@ -6,6 +6,7 @@ use BackedEnum;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
 use function Illuminate\Support\enum_value;
 
@@ -16,8 +17,10 @@ class AsEnumCollection implements Castable
      *
      * @template TEnum of \UnitEnum
      *
-     * @param  array{class-string<TEnum>}  $arguments
+     * @param  array{class-string<TEnum>, class-string<\Illuminate\Support\Collection>|null}  $arguments
      * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<\Illuminate\Support\Collection<array-key, TEnum>, iterable<TEnum>>
+     *
+     * @throws \InvalidArgumentException
      */
     public static function castUsing(array $arguments)
     {
@@ -44,7 +47,13 @@ class AsEnumCollection implements Castable
 
                 $enumClass = $this->arguments[0];
 
-                return (new Collection($data))->map(function ($value) use ($enumClass) {
+                $collectionClass = empty($this->arguments[1]) ? Collection::class : $this->arguments[1];
+
+                if (! is_a($collectionClass, Collection::class, true)) {
+                    throw new InvalidArgumentException('The provided class must extend ['.Collection::class.'].');
+                }
+
+                return (new $collectionClass($data))->map(function ($value) use ($enumClass) {
                     return is_subclass_of($enumClass, BackedEnum::class)
                         ? $enumClass::from($value)
                         : constant($enumClass.'::'.$value);
@@ -89,5 +98,17 @@ class AsEnumCollection implements Castable
     public static function of($class)
     {
         return static::class.':'.$class;
+    }
+
+    /**
+     * Specify the collection type for the cast.
+     *
+     * @param  class-string<\Illuminate\Support\Collection>  $collectionClass
+     * @param  class-string<\UnitEnum>  $enumClass
+     * @return string
+     */
+    public static function using($collectionClass, $enumClass)
+    {
+        return static::class.':'.implode(',', [$enumClass, $collectionClass]);
     }
 }
