@@ -151,6 +151,13 @@ trait HasAttributes
     protected $appends = [];
 
     /**
+     * Indicates if the self-appending accessors have been merged into the appends.
+     *
+     * @var bool
+     */
+    protected $appendsResolved = false;
+
+    /**
      * Indicates whether attributes are snake cased on arrays.
      *
      * @var bool
@@ -163,6 +170,13 @@ trait HasAttributes
      * @var array
      */
     protected static $mutatorCache = [];
+
+    /**
+     * The cache of the accessors that append themselves for each class.
+     *
+     * @var array
+     */
+    protected static $appendableAttributeCache = [];
 
     /**
      * The cache of the "Attribute" return type marked mutated attributes for each class.
@@ -2466,6 +2480,14 @@ trait HasAttributes
      */
     public function getAppends()
     {
+        if (! $this->appendsResolved) {
+            $this->appendsResolved = true;
+
+            $this->appends = array_values(array_unique(
+                array_merge($this->appends, $this->appendableAttributes())
+            ));
+        }
+
         return $this->appends;
     }
 
@@ -2477,6 +2499,8 @@ trait HasAttributes
      */
     public function setAppends(array $appends)
     {
+        $this->appendsResolved = true;
+
         $this->appends = $appends;
 
         return $this;
@@ -2546,7 +2570,9 @@ trait HasAttributes
 
         $class = $reflection->getName();
 
-        static::$getAttributeMutatorCache[$class] = (new Collection($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance)))
+        $instance = is_object($classOrInstance) ? $classOrInstance : new $class;
+
+        static::$getAttributeMutatorCache[$class] = (new Collection($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($instance)))
             ->mapWithKeys(fn ($match) => [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true])
             ->all();
 
@@ -2554,6 +2580,26 @@ trait HasAttributes
             ->merge($attributeMutatorMethods)
             ->map(fn ($match) => lcfirst(static::$snakeAttributes ? Str::snake($match) : $match))
             ->all();
+
+        static::$appendableAttributeCache[$class] = (new Collection($attributeMutatorMethods))
+            ->filter(fn ($method) => $instance->{$method}()->withAppending)
+            ->map(fn ($match) => lcfirst(static::$snakeAttributes ? Str::snake($match) : $match))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Get the accessors that append themselves to the model's array form.
+     *
+     * @return array
+     */
+    protected function appendableAttributes()
+    {
+        if (! isset(static::$appendableAttributeCache[static::class])) {
+            static::cacheMutatedAttributes($this);
+        }
+
+        return static::$appendableAttributeCache[static::class];
     }
 
     /**

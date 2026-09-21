@@ -33,6 +33,13 @@ class Attribute
     public $withObjectCaching = true;
 
     /**
+     * Indicates if the attribute should be appended to the model's array form.
+     *
+     * @var bool
+     */
+    public $withAppending = false;
+
+    /**
      * Create a new attribute accessor / mutator.
      *
      * @param  callable|null  $get
@@ -98,6 +105,18 @@ class Attribute
     public function shouldCache()
     {
         $this->withCaching = true;
+
+        return $this;
+    }
+
+    /**
+     * Append the attribute to the model's array and JSON form.
+     *
+     * @return $this
+     */
+    public function shouldAppend()
+    {
+        $this->withAppending = true;
 
         return $this;
     }
