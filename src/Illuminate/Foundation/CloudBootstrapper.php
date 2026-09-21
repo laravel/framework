@@ -37,6 +37,7 @@ class CloudBootstrapper
         (match ($bootstrapper) {
             LoadConfiguration::class => function () use ($app) {
                 static::configureDisks($app);
+                static::configureReadReplicaConnection($app);
                 static::configureUnpooledPostgresConnection($app);
                 static::ensureMigrationsUseUnpooledConnection($app);
                 static::configureManagedQueues($app);
@@ -90,6 +91,20 @@ class CloudBootstrapper
                 $app['config']->set('filesystems.default', $disk['disk']);
             }
         }
+    }
+
+    /**
+     * Configure the Laravel Cloud read replica if applicable.
+     */
+    public static function configureReadReplicaConnection(Application $app): void
+    {
+        if (! isset($_SERVER['DB_READ_HOST'])) {
+            return;
+        }
+
+        $connection = $app['config']->get('database.default');
+
+        $app['config']->set("database.connections.{$connection}.read.host", $_SERVER['DB_READ_HOST']);
     }
 
     /**
