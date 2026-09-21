@@ -17,7 +17,7 @@ class AsEnumCollection implements Castable
      *
      * @template TEnum of \UnitEnum
      *
-     * @param  array{class-string<TEnum>, class-string<\Illuminate\Support\Collection>|null}  $arguments
+     * @param  array{0: class-string<TEnum>, 1?: class-string<\Illuminate\Support\Collection>}  $arguments
      * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<\Illuminate\Support\Collection<array-key, TEnum>, iterable<TEnum>>
      *
      * @throws \InvalidArgumentException
