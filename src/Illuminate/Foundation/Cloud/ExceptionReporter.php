@@ -29,6 +29,8 @@ use Throwable;
 
 // TODO Octane
 // TODO Livewire
+// TODO prepare for 14.x passing context here.
+// TODO reserve memory and free memory fatal exceptions?
 class ExceptionReporter
 {
     /**
@@ -112,9 +114,6 @@ class ExceptionReporter
      */
     public function __invoke(Throwable $e): ?bool
     {
-        // TODO prepare for 14.x passing context here.
-        // TODO reserve memory and free memory fatal exceptions?
-
         $previousReportingViewException = $this->reportingViewException;
         $this->reportingViewException = false;
 
