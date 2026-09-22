@@ -15,6 +15,7 @@ use Illuminate\Foundation\CloudBootstrapper as Cloud;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Foundation\Testing\WithConsoleEvents;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessing;
@@ -47,7 +48,7 @@ use Throwable;
 #[WithMigration('laravel', 'queue')]
 class ExceptionReportingTest extends TestCase
 {
-    use LazilyRefreshDatabase;
+    use LazilyRefreshDatabase, WithConsoleEvents;
 
     protected $serverSettingsToRestore = [];
 
@@ -459,13 +460,13 @@ class ExceptionReportingTest extends TestCase
             'multi-byte string' => ['One 😎', '[8 bytes redacted]'],
             'numeric string' => ['4821', '[4 bytes redacted]'],
             'integer' => [4821, '[4 bytes redacted]'],
-            'zero integer' => [0, '[1 bytes redacted]'],
+            'zero integer' => [0, '[1 byte redacted]'],
             'negative integer' => [-7, '[2 bytes redacted]'],
             'large integer' => [PHP_INT_MAX, '[19 bytes redacted]'],
             'float' => [1.5, '[3 bytes redacted]'],
             'negative float' => [-12.75, '[6 bytes redacted]'],
             // A float with a zero fraction casts to a string without it.
-            'float with a zero fraction' => [1.0, '[1 bytes redacted]'],
+            'float with a zero fraction' => [1.0, '[1 byte redacted]'],
             // Booleans are passed through. Redacting them would reveal the
             // value anyway, via the byte count.
             'true' => [true, true],
@@ -1549,6 +1550,12 @@ class ExceptionReportingTest extends TestCase
     public function testExceptionsBetweenJobsAreAttributtedToTheQueueWorkCommand(): void
     {
         $this->freezeTime();
+
+        // The database is migrated on the first query, which runs a command
+        // of its own. It is triggered here, before the reporter is listening,
+        // so that the worker is the first command the reporter sees.
+        DB::select('select 1');
+
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
         Config::set('queue.default', 'database');
@@ -1613,7 +1620,7 @@ class ExceptionReportingTest extends TestCase
                 'timestamp' => now()->subMinutes(3)->format('Y-m-d H:i:s.u'),
                 'name' => 'queue:work',
                 'class' => \Illuminate\Queue\Console\WorkCommand::class,
-                'command' => 'queue:work',
+                'command' => 'queue:work --max-jobs=2 --sleep=0 --stop-when-empty --tries=1',
             ], $secondWrite['execution_context']);
 
             // Second job
@@ -1668,14 +1675,13 @@ class ExceptionReportingTest extends TestCase
         $streams = $this->fakeEventsStreams();
         Artisan::registerCommand(new ExceptionReportingTestCommand);
 
-        $_SERVER['argv'] = ['artisan', 'test-class-command', '--flag', 'value'];
-        $this->artisan('test-class-command', ['--flag' => 'value'])->assertOk();
+        $this->runArtisanCommand(['artisan', 'test-class-command', '--flag', 'value']);
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(ExceptionReportingTestCommand::class, $payload['execution_context']['class']);
             $this->assertSame('test-class-command', $payload['execution_context']['name']);
-            $this->assertSame('test-class-command --flag value', $payload['execution_context']['command']);
+            $this->assertSame('test-class-command --flag=value', $payload['execution_context']['command']);
 
             return true;
         });
@@ -1752,12 +1758,12 @@ class ExceptionReportingTest extends TestCase
             report($e);
         }
 
-        // Our own console-class lookup re-resolves the command by name
-        // while reporting the exception it threw, which unavoidably
-        // attempts construction a second time (Symfony's own
-        // Application::has() resolves the command as a side effect of
-        // checking whether it exists — there's no cheaper check). What
-        // matters is that the second failure doesn't swallow the report.
+        // The command never starts, so nothing is captured for it and the
+        // reporter resolves it by name, attempting construction a second time
+        // (Symfony's own Application::has() resolves the command as a side
+        // effect of checking whether it exists — there's no cheaper check).
+        // The failure is remembered, so reporting the class and the command
+        // line does not attempt it again.
         $this->assertSame(2, ThrowingConstructorTestCommand::$constructionAttempts);
 
         $this->assertCount(1, $streams);
@@ -1767,10 +1773,470 @@ class ExceptionReportingTest extends TestCase
             // as the "previous" exception in the chain.
             $this->assertSame(\Illuminate\Container\EntryNotFoundException::class, $payload['class']);
             $this->assertSame('Boom from the constructor', $payload['previous'][0]['message']);
+            // The command cannot be resolved while reporting, as doing so
+            // constructs it, which is what threw in the first place. The name
+            // falls back to the console input, while the values that need the
+            // command itself report the reason instead.
+            $this->assertArrayNotHasKey('_laravel_cloud_error', $payload);
+
+            $error = '_laravel_cloud_error: '.ThrowingConstructorTestCommand::class;
+
+            $this->assertSame('throwing-constructor-command', $payload['execution_context']['name']);
+            $this->assertSame($error, $payload['execution_context']['class']);
+            $this->assertSame($error, $payload['execution_context']['command']);
+
+            return true;
+        });
+    }
+
+    public function testItRedactsSensitiveCommandArgumentsAndOptions(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', '--secret=shh', '--keep=this']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                '_laravel_cloud_error: '.ThrowingConstructorTestCommand::class,
-                $payload['execution_context']['class'],
+                'test-sensitive-command taylor [7 bytes redacted] --secret=[3 bytes redacted] --keep=this',
+                $payload['execution_context']['command'],
             );
+
+            return true;
+        });
+    }
+
+    public function testItRedactsSensitiveCommandOptionsGivenAsSeparateTokens(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', '--secret', 'shh']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            // The command line is rebuilt from the parsed input, so an option
+            // given as separate tokens is reported in the "=" form.
+            $this->assertSame(
+                'test-sensitive-command taylor [7 bytes redacted] --secret=[3 bytes redacted]',
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItRedactsSensitiveCommandOptionsGivenByTheirShortcut(): void
+    {
+        $this->setupExceptionReporting(['redact_command_input_fields' => ['proxy']]);
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', '-p', 'shh']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            // The shortcut is reported by the option's name, and the password
+            // argument is not redacted, as the configured fields have been
+            // replaced.
+            $this->assertSame(
+                'test-sensitive-command taylor hunter2 --proxy=[3 bytes redacted]',
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItRedactsEachValueOfSensitiveArrayCommandOptions(): void
+    {
+        $this->setupExceptionReporting(['redact_command_input_fields' => ['token']]);
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', '--token=first', '--token=second']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame(
+                'test-sensitive-command taylor hunter2 --token=[5 bytes redacted] --token=[6 bytes redacted]',
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItReportsNegatedBooleanCommandOptions(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', '--no-ansi']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame(
+                'test-sensitive-command taylor [7 bytes redacted] --no-ansi',
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItReportsGivenBooleanCommandOptions(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', '--ansi']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame(
+                'test-sensitive-command taylor [7 bytes redacted] --ansi',
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItDoesNotRedactBooleanCommandOptions(): void
+    {
+        $this->setupExceptionReporting(['redact_command_input_fields' => ['force', 'ansi']]);
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', '--force', '--no-ansi']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            // Only string values are redacted, and a boolean's value is
+            // the presence of the flag, which redacting would not hide.
+            $this->assertSame(
+                'test-sensitive-command taylor hunter2 --force --no-ansi',
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItReportsCommandInputGivenAnEmptyValue(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        // An unset shell variable, such as "--secret=$TOKEN", arrives as an
+        // empty value rather than as an option given without one.
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', '', 'hunter2', '--secret=', '--keep=']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame(
+                "test-sensitive-command '' [7 bytes redacted] --secret=[0 bytes redacted] --keep=''",
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItReportsArrayCommandOptionsGivenWithoutAValue(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', '--token=first', '--token']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            // The second occurrence has no value to redact.
+            $this->assertSame(
+                'test-sensitive-command taylor [7 bytes redacted] --token=[5 bytes redacted] --token',
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItReportsEachValueOfVariadicCommandArguments(): void
+    {
+        // The files argument is not sensitive under this configuration.
+        $this->setupExceptionReporting(['redact_command_input_fields' => ['password']]);
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', 'first', 'second file']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame(
+                "test-sensitive-command taylor [7 bytes redacted] first 'second file'",
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItRedactsEachValueOfSensitiveVariadicCommandArguments(): void
+    {
+        $this->setupExceptionReporting(['redact_command_input_fields' => ['files']]);
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', 'first', 'second']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame(
+                'test-sensitive-command taylor hunter2 [5 bytes redacted] [6 bytes redacted]',
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItReportsEachValueOfArrayCommandOptions(): void
+    {
+        // The token option is not sensitive under this configuration.
+        $this->setupExceptionReporting(['redact_command_input_fields' => ['password']]);
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', '--token=first', '--token=second value']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame(
+                "test-sensitive-command taylor [7 bytes redacted] --token=first --token='second value'",
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItReportsNamespacedCommandNamesUnescaped(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Artisan::command('test:namespaced-command {user}', function () {
+            $_SERVER['argv'] = ['artisan', 'test:namespaced-command', 'taylor'];
+            report(new RuntimeException('Whoops!'));
+        });
+
+        $this->artisan('test:namespaced-command', ['user' => 'taylor'])->assertOk();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame(
+                'test:namespaced-command taylor',
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItCapturesTheCommandNameAsItWasEntered(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Artisan::command('test:canonical-command', fn () => report(new RuntimeException('Whoops!')));
+
+        $this->runArtisanCommand(['artisan', 'test:canonical-command']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame('test:canonical-command', $payload['execution_context']['name']);
+            $this->assertSame('test:canonical-command', $payload['execution_context']['command']);
+
+            return true;
+        });
+    }
+
+    public function testItCapturesTheCanonicalCommandNameWhenAbbreviated(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Artisan::command('test:canonical-command', fn () => report(new RuntimeException('Whoops!')));
+
+        // Artisan resolves the abbreviation to the command above, so the
+        // canonical name is reported rather than the abbreviation.
+        $this->runArtisanCommand(['artisan', 'test:can']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame('test:canonical-command', $payload['execution_context']['name']);
+            $this->assertSame('test:can', $payload['execution_context']['command']);
+
+            return true;
+        });
+    }
+
+    public function testItAttributesExceptionsToTheCommandTheProcessWasGiven(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Artisan::command('test:inner-command', fn () => report(new RuntimeException('Whoops!')));
+        Artisan::command('test:outer-command {user}', fn () => Artisan::call('test:inner-command'));
+
+        $this->runArtisanCommand(['artisan', 'test:outer-command', 'taylor']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            // The inner command starts while the outer one is still running.
+            // The outer one is what the process was given, so it is reported,
+            // and the inner one is not recorded anywhere.
+            $this->assertSame('test:outer-command', $payload['execution_context']['name']);
+            $this->assertSame('test:outer-command taylor', $payload['execution_context']['command']);
+            $this->assertSame('Whoops!', $payload['message']);
+
+            return true;
+        });
+    }
+
+    public function testItReportsSensitiveCommandOptionsGivenWithoutAValue(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', '--secret']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            // There is no value to redact, and the option carries nothing
+            // beyond the fact that it was given.
+            $this->assertSame(
+                'test-sensitive-command taylor [7 bytes redacted] --secret',
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItReportsTheCommandLineAsItWasGiven(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        $this->runArtisanCommand(['artisan', 'test-sensitive-command', 'taylor', 'hunter2', '--force']);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            // Only the given tokens are reported, so the options carrying
+            // their default values are left out.
+            $this->assertSame(
+                'test-sensitive-command taylor [7 bytes redacted] --force',
+                $payload['execution_context']['command'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItReportsAnErrorWhenTheCommandInputCannotBeParsed(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Artisan::registerCommand(new ExceptionReportingSensitiveInputTestCommand);
+
+        // The option is not defined on the command, so the command never
+        // starts and the reporter parses the console input itself, where
+        // binding the input against the definition throws.
+        $_SERVER['argv'] = ['artisan', 'test-sensitive-command', 'taylor', 'hunter2', '--nope=1'];
+
+        ($this->exceptionReporter())(new RuntimeException('Whoops!'));
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            // The command itself resolves, so only the command line is
+            // unavailable. The rest of the context is still reported.
+            $this->assertArrayNotHasKey('_laravel_cloud_error', $payload);
+            $this->assertSame('test-sensitive-command', $payload['execution_context']['name']);
+            $this->assertSame(
+                '_laravel_cloud_error: The "--nope" option does not exist.',
+                $payload['execution_context']['command'],
+            );
+            $this->assertSame('Whoops!', $payload['message']);
+
+            return true;
+        });
+    }
+
+    public function testItReportsAnErrorWhenTheCommandArgumentsAreInvalid(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Artisan::command('test-command', fn () => null);
+
+        // The command takes no arguments, so the given values have nowhere
+        // to bind when the reporter parses the input.
+        $_SERVER['argv'] = ['artisan', 'test-command', 'one', 'two'];
+
+        ($this->exceptionReporter())(new RuntimeException('Whoops!'));
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            // The command itself resolves, so only the command line is
+            // unavailable. The rest of the context is still reported.
+            $this->assertArrayNotHasKey('_laravel_cloud_error', $payload);
+            $this->assertSame('test-command', $payload['execution_context']['name']);
+            $this->assertSame(
+                '_laravel_cloud_error: No arguments expected for "test-command" command, got "one".',
+                $payload['execution_context']['command'],
+            );
+            $this->assertSame('Whoops!', $payload['message']);
+
+            return true;
+        });
+    }
+
+    public function testItReportsAnErrorWhenTheCommandCannotBeResolved(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        $_SERVER['argv'] = ['artisan', 'unknown-command', 'hunter2'];
+
+        ($this->exceptionReporter())(new RuntimeException('Whoops!'));
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            // The name falls back to the console input, and the class is
+            // simply unknown. Only the command line, which cannot be parsed
+            // without the command, reports the reason.
+            $this->assertArrayNotHasKey('_laravel_cloud_error', $payload);
+            $this->assertSame('command', $payload['execution_type']);
+
+            $this->assertSame('unknown-command', $payload['execution_context']['name']);
+            $this->assertNull($payload['execution_context']['class']);
+            $this->assertSame(
+                '_laravel_cloud_error: The command [unknown-command] does not exist.',
+                $payload['execution_context']['command'],
+            );
+            $this->assertSame('Whoops!', $payload['message']);
 
             return true;
         });
@@ -2104,12 +2570,20 @@ class ExceptionReportingTest extends TestCase
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
 
-        dispatch(function () {
-            report(new RuntimeException('Whoops!'));
-        })->onQueue('sync');
-        dispatch_sync(function () {
-            report(new RuntimeException('Whoops!'));
+        // The jobs are dispatched from a command, as the queue would be, so
+        // that the reporter has a command to resolve from the console input.
+        Artisan::command('test-command', function () {
+            $_SERVER['argv'] = ['artisan', 'test-command'];
+
+            dispatch(function () {
+                report(new RuntimeException('Whoops!'));
+            })->onQueue('sync');
+            dispatch_sync(function () {
+                report(new RuntimeException('Whoops!'));
+            });
         });
+
+        $this->artisan('test-command')->assertOk();
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJsonContains([
@@ -2197,6 +2671,47 @@ class ExceptionReportingTest extends TestCase
         FakeStream::flush();
 
         return FakeStream::instances();
+    }
+
+    /**
+     * Create a reporter that has not seen an Artisan command start.
+     *
+     * Such a reporter falls back to the console input, as it would when an
+     * exception is reported before the command has started, e.g. when the
+     * given input cannot be bound to the command.
+     */
+    protected function exceptionReporter(array $config = []): ExceptionReporter
+    {
+        return new ExceptionReporter(
+            $this->app[Events::class],
+            $this->app[BladeMapper::class],
+            $this->app->basePath().DIRECTORY_SEPARATOR,
+            [
+                'stop' => true,
+                'capture_request_payload' => false,
+                'redact_request_payload_fields' => [],
+                'redact_headers' => [],
+                'redact_command_input_fields' => ['password', 'secret'],
+                ...$config,
+            ],
+        );
+    }
+
+    /**
+     * Run the given command line, as a console process would.
+     *
+     * The command is given the console input it was invoked with, rather than
+     * the input the "artisan" test helper builds from named parameters, so
+     * that the tests may exercise the command line as it would be typed.
+     */
+    protected function runArtisanCommand(array $argv): int
+    {
+        $_SERVER['argv'] = $argv;
+
+        return $this->app[\Illuminate\Contracts\Console\Kernel::class]->handle(
+            new \Symfony\Component\Console\Input\ArgvInput($argv),
+            new \Symfony\Component\Console\Output\NullOutput,
+        );
     }
 
     protected function setupExceptionReporting(array $config = []): void
@@ -2505,6 +3020,24 @@ class ExceptionReportingJobThatReportsException implements ShouldQueue
     {
         call_user_func($this->callback);
 
+        report(new RuntimeException('Whoops!'));
+    }
+}
+
+class ExceptionReportingSensitiveInputTestCommand extends \Illuminate\Console\Command
+{
+    protected $signature = 'test-sensitive-command
+        {user}
+        {password}
+        {files?*}
+        {--secret=}
+        {--keep=}
+        {--token=*}
+        {--p|proxy=}
+        {--force}';
+
+    public function handle()
+    {
         report(new RuntimeException('Whoops!'));
     }
 }

@@ -19,6 +19,11 @@ use Illuminate\View\ViewException;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use Spatie\LaravelIgnition\Exceptions\ViewException as IgnitionViewException;
+use Symfony\Component\Console\Command\Command as ConsoleCommand;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\Input as ConsoleInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
@@ -62,6 +67,29 @@ class ExceptionReporter
     protected array $normalizedQueues = [];
 
     /**
+     * The name of the currently running Artisan command.
+     */
+    protected ?string $currentlyRunningCommandName = null;
+
+    /**
+     * The console input of the currently running Artisan command.
+     */
+    protected ?ConsoleInput $currentConsoleInput = null;
+
+    /**
+     * The console input built from the process arguments.
+     */
+    protected ?ArgvInput $currentArgvInput = null;
+
+    /**
+     * The resolved Artisan commands, or the reason they could not be
+     * resolved, keyed by their names.
+     *
+     * @var array<string, \Symfony\Component\Console\Command\Command|\Throwable|null>
+     */
+    protected array $resolvedConsoleCommands = [];
+
+    /**
      * The cached queue configuration.
      *
      * @var array<string, mixed>|null
@@ -76,6 +104,7 @@ class ExceptionReporter
      *    capture_request_payload: bool,
      *    redact_request_payload_fields: list<string>,
      *    redact_headers: list<string>,
+     *    redact_command_input_fields: list<string>,
      * }  $config
      */
     public function __construct(
@@ -246,31 +275,199 @@ class ExceptionReporter
             'execution_type' => 'command',
             'execution_context' => [
                 'timestamp' => $this->laravelStartedAtTimestamp(),
-                'name' => $name = $_SERVER['argv'][1] ?? null,
-                'class' => $this->consoleCommandClass($name),
-                'command' => implode(' ', array_slice($_SERVER['argv'] ?? [], 1)),
+                'name' => $this->consoleCommandName(),
+                'class' => $this->consoleCommandClass(),
+                'command' => $this->consoleCommandLine(),
             ],
         ];
     }
 
     /**
+     * Retrieve the name of the currently running Artisan command.
+     */
+    protected function consoleCommandName(): ?string
+    {
+        return $this->currentlyRunningCommandName ?? $this->currentArgvInput()->getFirstArgument();
+    }
+
+    /**
+     * Retrieve the console input built from the process arguments.
+     */
+    protected function currentArgvInput(): ArgvInput
+    {
+        return $this->currentArgvInput ??= new ArgvInput;
+    }
+
+    /**
      * Retrieve the class name of the currently running Artisan command.
      */
-    protected function consoleCommandClass(?string $name): ?string
+    protected function consoleCommandClass(): ?string
     {
-        if ($name === null) {
-            return null;
-        }
-
         try {
-            $command = Artisan::findCommand($name);
+            $name = $this->consoleCommandName();
 
-            return $command !== null
-                ? $command::class
-                : null;
+            if ($name === null) {
+                return null;
+            }
+
+            $command = $this->findConsoleCommand($name);
+
+            return $command === null
+                ? null
+                : $command::class;
         } catch (Throwable $e) {
             return '_laravel_cloud_error: '.$e->getMessage();
         }
+    }
+
+    /**
+     * Retrieve the Artisan command with the given name.
+     *
+     * Resolving a command constructs it, which is able to throw, e.g. when
+     * the constructor is the source of the exception being reported, so the
+     * outcome is remembered either way.
+     */
+    protected function findConsoleCommand(string $name): ?ConsoleCommand
+    {
+        if (array_key_exists($name, $this->resolvedConsoleCommands)) {
+            $command = $this->resolvedConsoleCommands[$name];
+
+            if ($command instanceof Throwable) {
+                throw $command;
+            }
+
+            return $command;
+        }
+
+        try {
+            return $this->resolvedConsoleCommands[$name] = Artisan::findCommand($name);
+        } catch (Throwable $e) {
+            $this->resolvedConsoleCommands[$name] = $e;
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Prepare to process the given command.
+     */
+    public function prepareForCommand(string $name, InputInterface $input): void
+    {
+        $this->currentlyRunningCommandName = $name === '' ? null : $name;
+
+        $this->currentConsoleInput = $input instanceof ConsoleInput ? $input : null;
+    }
+
+    /**
+     * Retrieve the console input of the currently running Artisan command.
+     */
+    protected function currentConsoleInput(): ConsoleInput
+    {
+        if ($this->currentConsoleInput !== null) {
+            return $this->currentConsoleInput;
+        }
+
+        $input = $this->currentArgvInput();
+
+        $name = $input->getFirstArgument();
+
+        $command = $name === null
+            ? null
+            : $this->findConsoleCommand($name);
+
+        if ($command === null) {
+            throw new CommandNotFoundException("The command [{$name}] does not exist.");
+        }
+
+        $command->mergeApplicationDefinition();
+
+        $input->bind($command->getDefinition());
+
+        return $this->currentConsoleInput = $input;
+    }
+
+    /**
+     * Retrieve the redacted command line.
+     */
+    protected function consoleCommandLine(): string
+    {
+        try {
+            $input = $this->currentConsoleInput();
+
+            $tokens = Arr::wrap($input->getFirstArgument());
+
+            foreach ($input->getRawArguments() as $name => $value) {
+                if ($name === 'command' || is_int($name)) {
+                    continue;
+                }
+
+                if ($this->shouldRedactConsoleInput($name)) {
+                    if (is_array($value)) {
+                        $tokens = [
+                            ...$tokens,
+                            ...array_map(fn ($v) => $this->redactValue($v), $value),
+                        ];
+                    } else {
+                        $tokens[] = $this->redactValue($value);
+                    }
+                } else {
+                    if (is_array($value)) {
+                        $tokens = [
+                            ...$tokens,
+                            ...array_map(fn ($v) => $input->escapeToken($v), $value),
+                        ];
+                    } else {
+                        $tokens[] = $input->escapeToken($value);
+                    }
+                }
+            }
+
+            foreach ($input->getRawOptions() as $name => $value) {
+                if (is_bool($value)) {
+                    $tokens[] = $value ? "--{$name}" : "--no-{$name}";
+
+                    continue;
+                } elseif (is_null($value)) {
+                    $tokens[] = "--{$name}";
+
+                    continue;
+                } elseif ($this->shouldRedactConsoleInput($name)) {
+                    if (is_array($value)) {
+                        $tokens = [
+                            ...$tokens,
+                            ...array_map(fn ($v) => $v === null
+                                ? "--{$name}"
+                                : "--{$name}={$this->redactValue($v)}", $value),
+                        ];
+                    } else {
+                        $tokens[] = "--{$name}={$this->redactValue($value)}";
+                    }
+                } else {
+                    if (is_array($value)) {
+                        $tokens = [
+                            ...$tokens,
+                            ...array_map(fn ($v) => $v === null
+                                ? "--{$name}"
+                                : "--{$name}={$input->escapeToken($v)}", $value),
+                        ];
+                    } else {
+                        $tokens[] = "--{$name}={$input->escapeToken($value)}";
+                    }
+                }
+            }
+
+            return implode(' ', $tokens);
+        } catch (Throwable $e) {
+            return '_laravel_cloud_error: '.$e->getMessage();
+        }
+    }
+
+    /**
+     * Determine if the given command argument or option should be redacted.
+     */
+    protected function shouldRedactConsoleInput(string $name): bool
+    {
+        return in_array($name, $this->config['redact_command_input_fields'], true);
     }
 
     /**
@@ -303,12 +500,18 @@ class ExceptionReporter
      */
     protected function requestHeaders(): array
     {
-        $headers = clone Request::instance()->headers;
+        try {
+            $headers = clone Request::instance()->headers;
 
-        $headers = $this->removeSyntheticAuthorizationHeaders($headers);
-        $headers = $this->redactHeaders($headers);
+            $headers = $this->removeSyntheticAuthorizationHeaders($headers);
+            $headers = $this->redactHeaders($headers);
 
-        return $headers->all();
+            return $headers->all();
+        } catch (Throwable $e) {
+            return [
+                '_laravel_cloud_error' => [$e->getMessage()],
+            ];
+        }
     }
 
     /**
@@ -351,7 +554,19 @@ class ExceptionReporter
      */
     protected function redactHeaderValue(string $value): string
     {
-        return '['.strlen($value).' bytes redacted]';
+        return $this->redactValue($value);
+    }
+
+    /**
+     * Redact the given value.
+     */
+    protected function redactValue(string $value): string
+    {
+        $length = strlen($value);
+
+        $bytes = $length === 1 ? 'byte' : 'bytes';
+
+        return "[{$length} {$bytes} redacted]";
     }
 
     /**
@@ -461,7 +676,7 @@ class ExceptionReporter
             }
 
             return $this->shouldRedactRequestPayloadField($key, $value)
-                ? '['.strlen((string) $value).' bytes redacted]'
+                ? $this->redactValue((string) $value)
                 : $value;
         });
     }
@@ -506,25 +721,31 @@ class ExceptionReporter
      */
     protected function requestRouteExecutionDetails(): ?array
     {
-        $route = Request::route();
+        try {
+            $route = Request::route();
 
-        if (! ($route instanceof Route)) {
-            return null;
+            if (! ($route instanceof Route)) {
+                return null;
+            }
+
+            return [
+                'name' => $route->getName(),
+                'methods' => collect($route->methods())
+                    ->sort()
+                    ->values()
+                    ->all(),
+                'domain' => $route->domain(),
+                'path' => match ($route->uri()) {
+                    '/' => '/',
+                    default => "/{$route->uri()}",
+                },
+                'action' => $route->getActionName(),
+            ];
+        } catch (Throwable $e) {
+            return [
+                '_laravel_cloud_error' => $e->getMessage(),
+            ];
         }
-
-        return [
-            'name' => $route->getName(),
-            'methods' => collect($route->methods())
-                ->sort()
-                ->values()
-                ->all(),
-            'domain' => $route->domain(),
-            'path' => match ($route->uri()) {
-                '/' => '/',
-                default => "/{$route->uri()}",
-            },
-            'action' => $route->getActionName(),
-        ];
     }
 
     /**
@@ -550,7 +771,6 @@ class ExceptionReporter
     {
         // TODO jobs should inherit this from the queue worker
         // TODO scheduled tasks
-        // TODO tied to command ID in Cloud?
         return $this->artisanCommandTraceId ??= (string) Uuid::uuid4();
     }
 
@@ -737,11 +957,15 @@ class ExceptionReporter
      */
     protected function laravelStartedAtTimestamp(): string
     {
-        $microtime = defined('LARAVEL_START')
+        try {
+            $microtime = defined('LARAVEL_START')
             ? LARAVEL_START
             : $_SERVER['REQUEST_TIME_FLOAT'];
 
-        return Date::createFromTimestampUTC($microtime)->toDateTimeString('microsecond');
+            return Date::createFromTimestampUTC($microtime)->toDateTimeString('microsecond');
+        } catch (Throwable $e) {
+            return '_laravel_cloud_error: '.$e->getMessage();
+        }
     }
 
     /**
@@ -795,7 +1019,7 @@ class ExceptionReporter
             return $this->normalizedQueues[$key];
         }
 
-        // trim .fifo
+        // TODO trim .fifo
 
         $this->connectionConfig ??= Config::get("queue.connections.{$connection}") ?? [];
 
