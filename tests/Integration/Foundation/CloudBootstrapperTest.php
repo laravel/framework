@@ -59,7 +59,11 @@ class CloudBootstrapperTest extends TestCase
         $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode([
             [
                 'disk' => 'aws-bucket',
+                'access_key_id' => null,
+                'access_key_secret' => null,
                 'bucket' => 'arn:aws:s3:us-east-2:123456789012:accesspoint/environment-bucket',
+                'url' => null,
+                'endpoint' => null,
                 'default_region' => 'us-east-2',
                 'credentials' => 'ecs',
             ],
