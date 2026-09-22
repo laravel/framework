@@ -1759,12 +1759,13 @@ class ExceptionReportingTest extends TestCase
         }
 
         // The command never starts, so nothing is captured for it and the
-        // reporter resolves it by name, attempting construction a second time
-        // (Symfony's own Application::has() resolves the command as a side
-        // effect of checking whether it exists — there's no cheaper check).
-        // The failure is remembered, so reporting the class and the command
-        // line does not attempt it again.
-        $this->assertSame(2, ThrowingConstructorTestCommand::$constructionAttempts);
+        // reporter resolves it by name to report its class and its command
+        // line. Each of those attempts construction again, as Symfony's own
+        // Application::has() resolves the command as a side effect of
+        // checking whether it exists, and a failed resolution leaves nothing
+        // for it to remember. What matters is that the failures do not
+        // swallow the report.
+        $this->assertSame(3, ThrowingConstructorTestCommand::$constructionAttempts);
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {

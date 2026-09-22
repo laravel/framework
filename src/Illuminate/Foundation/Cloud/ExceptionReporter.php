@@ -19,7 +19,6 @@ use Illuminate\View\ViewException;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use Spatie\LaravelIgnition\Exceptions\ViewException as IgnitionViewException;
-use Symfony\Component\Console\Command\Command as ConsoleCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\Input as ConsoleInput;
@@ -80,14 +79,6 @@ class ExceptionReporter
      * The console input built from the process arguments.
      */
     protected ?ArgvInput $currentArgvInput = null;
-
-    /**
-     * The resolved Artisan commands, or the reason they could not be
-     * resolved, keyed by their names.
-     *
-     * @var array<string, \Symfony\Component\Console\Command\Command|\Throwable|null>
-     */
-    protected array $resolvedConsoleCommands = [];
 
     /**
      * The cached queue configuration.
@@ -310,41 +301,13 @@ class ExceptionReporter
                 return null;
             }
 
-            $command = $this->findConsoleCommand($name);
+            $command = Artisan::findCommand($name);
 
             return $command === null
                 ? null
                 : $command::class;
         } catch (Throwable $e) {
             return '_laravel_cloud_error: '.$e->getMessage();
-        }
-    }
-
-    /**
-     * Retrieve the Artisan command with the given name.
-     *
-     * Resolving a command constructs it, which is able to throw, e.g. when
-     * the constructor is the source of the exception being reported, so the
-     * outcome is remembered either way.
-     */
-    protected function findConsoleCommand(string $name): ?ConsoleCommand
-    {
-        if (array_key_exists($name, $this->resolvedConsoleCommands)) {
-            $command = $this->resolvedConsoleCommands[$name];
-
-            if ($command instanceof Throwable) {
-                throw $command;
-            }
-
-            return $command;
-        }
-
-        try {
-            return $this->resolvedConsoleCommands[$name] = Artisan::findCommand($name);
-        } catch (Throwable $e) {
-            $this->resolvedConsoleCommands[$name] = $e;
-
-            throw $e;
         }
     }
 
@@ -375,7 +338,7 @@ class ExceptionReporter
 
         $command = $name === null
             ? null
-            : $this->findConsoleCommand($name);
+            : Artisan::findCommand($name);
 
         if ($command === null) {
             throw new CommandNotFoundException("The command [{$name}] does not exist.");
