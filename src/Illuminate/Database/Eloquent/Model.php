@@ -2613,10 +2613,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
-        // Leading zeros are accepted by the database, so they are stripped before
-        // the value is range checked. Anything that cannot be held by a PHP int
-        // is out of range for every integer column type the database offers.
-        return filter_var(preg_replace('/^(\s*[+-]?)0+(?=\d)/', '$1', $value), FILTER_VALIDATE_INT) !== false;
+        return filter_var(
+            preg_replace('/^(\s*[+-]?)0+(?=\d)/', '$1', $value),
+            FILTER_VALIDATE_INT
+        ) !== false;
     }
 
     /**

@@ -82,7 +82,9 @@ class MySqlConnection extends Connection
         return (bool) preg_match('#Integrity constraint violation: 1062#i', $exception->getMessage());
     }
 
-    /** @inheritDoc */
+    /**
+     * Determine if the given database exception was caused by an invalid or out of range value.
+     */
     protected function isDataTypeError(Exception $exception): bool
     {
         return in_array($exception->getCode(), [

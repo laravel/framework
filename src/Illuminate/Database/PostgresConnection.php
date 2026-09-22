@@ -80,7 +80,9 @@ class PostgresConnection extends Connection
         return '23505' === $exception->getCode();
     }
 
-    /** @inheritDoc */
+    /**
+     * Determine if the given database exception was caused by an invalid or out of range value.
+     */
     protected function isDataTypeError(Exception $exception): bool
     {
         return in_array($exception->getCode(), [
