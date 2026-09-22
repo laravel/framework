@@ -89,6 +89,22 @@ class SqlServerConnection extends Connection
     }
 
     /**
+     * Determine if the given database exception was caused by an invalid or out of range value.
+     */
+    protected function isDataTypeError(Exception $exception): bool
+    {
+        return in_array($exception->getCode(), [
+            '22001', // String data, right truncation
+            '22003', // Numeric value out of range
+            '22007', // Invalid datetime format
+            '22018', // Invalid character value for cast specification
+        ], true)
+            // 220: Arithmetic overflow error, 245: Conversion failed,
+            // 8114: Error converting data type
+            || (bool) preg_match('#(Arithmetic overflow error|Conversion failed when converting|Error converting data type)#i', $exception->getMessage());
+    }
+
+    /**
      * Extract the index that caused a unique constraint violation.
      *
      * @param  Exception  $exception

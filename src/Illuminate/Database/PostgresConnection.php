@@ -81,6 +81,20 @@ class PostgresConnection extends Connection
     }
 
     /**
+     * Determine if the given database exception was caused by an invalid or out of range value.
+     */
+    protected function isDataTypeError(Exception $exception): bool
+    {
+        return in_array($exception->getCode(), [
+            '22001', // string_data_right_truncation
+            '22003', // numeric_value_out_of_range
+            '22007', // invalid_datetime_format
+            '22008', // datetime_field_overflow
+            '22P02', // invalid_text_representation
+        ], true);
+    }
+
+    /**
      * Extract the index and columns that caused a unique constraint violation.
      *
      * @param  Exception  $exception
