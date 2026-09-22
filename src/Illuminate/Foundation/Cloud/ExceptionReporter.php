@@ -378,7 +378,7 @@ class ExceptionReporter
      * @param  callable(string): string  $transformer
      * @return list<string>
      */
-    protected function applyTransformationToConsoleInput(null|string|array $value, callable $transformer): array
+    protected function applyTransformationToConsoleInput(null|bool|string|array $value, callable $transformer): array
     {
         return array_map($transformer, $value === null ? [null] : Arr::wrap($value));
     }
