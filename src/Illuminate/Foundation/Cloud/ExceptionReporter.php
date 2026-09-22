@@ -430,7 +430,7 @@ class ExceptionReporter
      */
     protected function shouldRedactConsoleInput(string $name): bool
     {
-        return in_array($name, $this->config['redact_command_input_fields'], true);
+        return in_array($name, $this->config['redact_command_input_fields']);
     }
 
     /**
@@ -467,7 +467,7 @@ class ExceptionReporter
                 'timestamp' => $this->laravelStartedAtTimestamp(),
                 'headers' => $this->requestHeaders(),
                 'method' => Request::method(),
-                'url' => Request::fullUrl(),
+                'url' => Request::fullUrl(), // TODO redact query strings parameters
                 'ip' => Request::ip(),
                 'route' => $this->requestRouteExecutionDetails(),
                 'payload' => $this->requestPayload($e),
@@ -540,7 +540,7 @@ class ExceptionReporter
         }
 
         try {
-            return $this->redactRequestPayload(request()->request->all());
+            return $this->redactRequestPayload(Request::getFacadeRoot()->request->all());
         } catch (Throwable $e) {
             return [
                 '_laravel_cloud_error' => $e->getMessage(),
@@ -645,7 +645,7 @@ class ExceptionReporter
             'scram-sha-1',
             'scram-sha-256',
             'vapid',
-        ], true)) {
+        ])) {
             return $scheme.' '.$this->redactValue($remainder);
         }
 
