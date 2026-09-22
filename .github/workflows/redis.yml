@@ -17,7 +17,7 @@ jobs:
 
     services:
       redis:
-        image: ${{ matrix.redis }}
+        image: redis:${{ matrix.redis }}
         ports:
           - 6379:6379
         options: --entrypoint redis-server
@@ -26,9 +26,9 @@ jobs:
       fail-fast: true
       matrix:
         client: ["phpredis", "predis"]
-        redis: ["redis:7.0", "redis:8.0"]
+        redis: ["7.0", "8.0"]
 
-    name: Redis (${{ matrix.client}}) Driver
+    name: Redis:${{ matrix.redis }} (${{ matrix.client}}) Driver
 
     steps:
       - name: Checkout code
