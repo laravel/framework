@@ -323,6 +323,12 @@ class Worker
         // signals supported in recent versions of PHP to accomplish it conveniently.
         pcntl_signal(SIGALRM, function () use ($job, $options, $connectionName, $queue) {
             if ($job) {
+                try {
+                    $this->notifyJobOfSignal(SIGALRM);
+                } catch (Throwable $exception) {
+                    $this->exceptions->report($exception);
+                }
+
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
                     $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
                 );
