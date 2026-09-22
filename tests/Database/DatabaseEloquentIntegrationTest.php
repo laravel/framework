@@ -76,6 +76,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $table->string('first_name');
             $table->string('last_name');
             $table->string('name')->virtualAs("first_name || ' ' || last_name");
+            $table->integer('votes')->default(0);
         });
 
         $this->schema('second_connection')->create('test_items', function ($table) {
@@ -287,6 +288,57 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Abigail Otwell', $user->name);
         $this->assertSame('Abigail Otwell', EloquentTestGeneratedUser::$updatedName);
         $this->assertTrue($user->wasChanged('name'));
+    }
+
+    public function testConfiguredAttributesAreRefreshedAfterIncrementAndDecrement()
+    {
+        $user = EloquentTestGeneratedUser::create([
+            'first_name' => 'Taylor',
+            'last_name' => 'Otwell',
+            'votes' => 1,
+        ]);
+
+        $user->increment('votes', 1);
+
+        $this->assertSame(2, $user->votes);
+        $this->assertFalse($user->isDirty());
+        $this->assertSame([], $user->getDirty());
+
+        $user->save();
+
+        $user->decrement('votes', 1);
+
+        $this->assertSame(1, $user->votes);
+        $this->assertFalse($user->isDirty());
+        $this->assertSame([], $user->getDirty());
+
+        $user->save();
+
+        $user->incrementEach(['votes' => 2]);
+
+        $this->assertSame(3, $user->votes);
+        $this->assertFalse($user->isDirty());
+        $this->assertSame([], $user->getDirty());
+
+        $user->save();
+
+        $user->decrementEach(['votes' => 1]);
+
+        $this->assertSame(2, $user->votes);
+        $this->assertFalse($user->isDirty());
+        $this->assertSame([], $user->getDirty());
+
+        $user->save();
+
+        $user->increment('votes', 1, ['first_name' => 'Abigail']);
+
+        $this->assertSame(3, $user->votes);
+        $this->assertSame('Abigail', $user->first_name);
+        $this->assertSame('Abigail Otwell', $user->name);
+        $this->assertFalse($user->isDirty('name'));
+        $this->assertTrue($user->isDirty('first_name'));
+
+        $user->save();
     }
 
     public function testBasicModelCollectionRetrieval()

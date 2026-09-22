@@ -1157,7 +1157,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             $this->fireModelEvent('updated', false);
 
-            $this->syncOriginalAttribute($column);
+            $this->syncOriginalAttributes(array_merge([$column], $this->refreshes));
         });
     }
 
@@ -1337,7 +1337,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             $this->fireModelEvent('updated', false);
 
-            $this->syncOriginalAttributes(array_keys($columns));
+            $this->syncOriginalAttributes(array_merge(array_keys($columns), $this->refreshes));
         });
     }
 
