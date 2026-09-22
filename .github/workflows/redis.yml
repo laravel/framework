@@ -55,6 +55,12 @@ jobs:
           REDIS_CLIENT: ${{ matrix.client }}
           QUEUE_CONNECTION: redis
 
+
+      - name: Execute Redis tests
+        run: vendor/bin/phpunit tests/Redis
+        env:
+          REDIS_CLIENT: ${{ matrix.client }}
+
   redis-cluster:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
