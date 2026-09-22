@@ -1534,6 +1534,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // models are updated, giving them a chance to do any special processing.
         $dirty = $this->getDirtyForUpdate();
 
+        if ($immutable = array_values(array_filter(array_keys($dirty), $this->isImmutable(...)))) {
+            throw new ImmutableAttributeException($this, $immutable);
+        }
+
         if (count($dirty) > 0) {
             $this->setKeysForSaveQuery($query)->update($dirty);
 

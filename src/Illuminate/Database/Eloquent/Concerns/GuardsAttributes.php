@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\Immutable;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -23,6 +24,13 @@ trait GuardsAttributes
      * @var array<string>
      */
     protected $guarded = ['*'];
+
+    /**
+     * The attributes that cannot be changed once the model exists.
+     *
+     * @var array<int, string>
+     */
+    protected $immutable = [];
 
     /**
      * Indicates if all mass assignment is enabled.
@@ -47,6 +55,10 @@ trait GuardsAttributes
     public function initializeGuardsAttributes()
     {
         $this->mergeFillable(static::resolveClassAttribute(Fillable::class, 'columns') ?? []);
+
+        $this->immutable = array_values(array_unique(array_merge(
+            $this->immutable, static::resolveClassAttribute(Immutable::class, 'columns') ?? []
+        )));
 
         $default = $this instanceof Pivot ? [] : ['*'];
 
@@ -97,6 +109,27 @@ trait GuardsAttributes
         $this->fillable = array_values(array_unique(array_merge($this->fillable, $fillable)));
 
         return $this;
+    }
+
+    /**
+     * Get the immutable attributes for the model.
+     *
+     * @return array<int, string>
+     */
+    public function getImmutable()
+    {
+        return $this->immutable;
+    }
+
+    /**
+     * Determine if the given attribute is immutable.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function isImmutable($key)
+    {
+        return in_array($key, $this->getImmutable(), true);
     }
 
     /**
