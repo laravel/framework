@@ -510,7 +510,7 @@ class ExceptionReporter
     }
 
     /**
-     * Retrieve the redacted request payload.
+     * Retrieve the request payload.
      *
      * @return array<array-key, mixed>|null
      */
