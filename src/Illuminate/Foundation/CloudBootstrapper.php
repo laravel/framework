@@ -10,7 +10,10 @@ use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Queue\Connectors\SqsConnector;
+use Illuminate\Support\Arr;
+use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Env;
+use Illuminate\Support\Str;
 use Monolog\Handler\SocketHandler;
 use PDO;
 
@@ -38,8 +41,7 @@ class CloudBootstrapper
             LoadConfiguration::class => function () use ($app) {
                 static::configureDisks($app);
                 static::configureReadReplicaConnection($app);
-                static::configureUnpooledPostgresConnection($app);
-                static::ensureMigrationsUseUnpooledConnection($app);
+                static::configurePostgresConnections($app);
                 static::configureManagedQueues($app);
                 static::configureQueueCredentialCaching($app);
             },
@@ -105,6 +107,62 @@ class CloudBootstrapper
         $connection = $app['config']->get('database.default');
 
         $app['config']->set("database.connections.{$connection}.read.host", $_SERVER['DB_READ_HOST']);
+    }
+
+    /**
+     * Configure Laravel Postgres connections, opting into native pooling with DB_POOLING.
+     */
+    public static function configurePostgresConnections(Application $app): void
+    {
+        if (is_null($pooled = Env::get('DB_POOLING'))) {
+            static::configureUnpooledPostgresConnection($app);
+            static::ensureMigrationsUseUnpooledConnection($app);
+
+            return;
+        }
+
+        $connections = $app['config']->get('database.connections', []);
+
+        foreach ($connections as $name => $config) {
+            if ($name === 'pgsql-unpooled') {
+                continue;
+            }
+
+            $config = (new ConfigurationUrlParser)->parseConfiguration($config);
+
+            $host = $config['host'] ?? null;
+
+            if (($config['driver'] ?? null) !== 'pgsql' ||
+                ! is_string($host) || ! str_ends_with($host, '.pg.laravel.cloud')) {
+                continue;
+            }
+
+            [$endpoint, $domain] = explode('.', $host, 2);
+
+            $endpoint = Str::chopEnd($endpoint, '-pooler');
+
+            $config['direct'] = array_replace([
+                'host' => "{$endpoint}.{$domain}",
+            ], $config['direct'] ?? []);
+
+            // Keep the legacy connection and opt-out independent of the pooler...
+            $direct = Arr::except(array_replace($config, $config['direct']), [
+                'read', 'write', 'direct', 'pooled', 'connect_via_database', 'connect_via_port',
+            ]);
+
+            $direct['options'][PDO::ATTR_EMULATE_PREPARES] = $config['direct']['options'][PDO::ATTR_EMULATE_PREPARES] ?? false;
+
+            if ($name === 'pgsql') {
+                $connections['pgsql-unpooled'] ??= $direct;
+            }
+
+            $config['host'] = "{$endpoint}-pooler.{$domain}";
+            $config['pooled'] = true;
+
+            $connections[$name] = $pooled ? $config : $direct + ['pooled' => false];
+        }
+
+        $app['config']->set('database.connections', $connections);
     }
 
     /**
