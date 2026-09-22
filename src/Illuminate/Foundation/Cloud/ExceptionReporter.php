@@ -273,6 +273,14 @@ class ExceptionReporter
     }
 
     /**
+     * Retrieve the name of the currently running Artisan command.
+     */
+    protected function consoleCommandName(): ?string
+    {
+        return $this->currentlyRunningCommandName ?? $this->currentFallbackArgvInput()->getFirstArgument();
+    }
+
+    /**
      * Retrieve the class name of the currently running Artisan command.
      */
     protected function consoleCommandClass(): ?string
@@ -404,14 +412,6 @@ class ExceptionReporter
     protected function shouldRedactConsoleInput(string $name): bool
     {
         return in_array($name, $this->config['redact_command_input_fields'], true);
-    }
-
-    /**
-     * Retrieve the name of the currently running Artisan command.
-     */
-    protected function consoleCommandName(): ?string
-    {
-        return $this->currentlyRunningCommandName ?? $this->currentFallbackArgvInput()->getFirstArgument();
     }
 
     /**
