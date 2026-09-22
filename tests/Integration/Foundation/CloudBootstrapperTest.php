@@ -63,7 +63,7 @@ class CloudBootstrapperTest extends TestCase
                 'access_key_secret' => null,
                 'bucket' => 'arn:aws:s3:us-east-2:123456789012:accesspoint/environment-bucket',
                 'url' => null,
-                'endpoint' => null,
+                'endpoint' => 'https://s3-accesspoint.us-east-2.amazonaws.com',
                 'region' => 'us-east-2',
                 'credentials' => 'ecs',
             ],
@@ -76,7 +76,8 @@ class CloudBootstrapperTest extends TestCase
 
             $this->assertSame('us-east-2', $config['region']);
             $this->assertSame('ecs', $config['credentials']);
-            $this->assertTrue($config['ignore_configured_endpoint_urls']);
+            $this->assertSame('https://s3-accesspoint.us-east-2.amazonaws.com', $config['endpoint']);
+            $this->assertArrayNotHasKey('ignore_configured_endpoint_urls', $config);
             $this->assertArrayNotHasKey('auth_mode', $config);
             $this->assertNull($config['key']);
             $this->assertNull($config['secret']);

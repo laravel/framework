@@ -78,10 +78,7 @@ class CloudBootstrapper
                     'url' => $disk['url'],
                     'endpoint' => $disk['endpoint'],
                     'region' => $disk['region'] ?? 'auto',
-                    ...(isset($disk['credentials']) ? [
-                        'credentials' => $disk['credentials'],
-                        'ignore_configured_endpoint_urls' => true,
-                    ] : []),
+                    'credentials' => $disk['credentials'] ?? null,
                     'use_path_style_endpoint' => false,
                     'throw' => false,
                     'report' => false,

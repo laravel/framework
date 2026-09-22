@@ -29,11 +29,12 @@ class FilesystemManagerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testEcsS3DiskIgnoresStaticCredentialsAndCanIgnoreAmbientEndpoint()
+    public function testEcsS3DiskUsesExplicitEndpointAndIgnoresStaticCredentials()
     {
         $environment = [
             'AWS_ACCESS_KEY_ID' => 'ambient-r2-key',
             'AWS_SECRET_ACCESS_KEY' => 'ambient-r2-secret',
+            'AWS_ENDPOINT_URL' => 'https://r2.example.com',
             'AWS_ENDPOINT_URL_S3' => 'https://r2.example.com',
             'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI' => '',
             'AWS_CONTAINER_CREDENTIALS_FULL_URI' => 'http://192.0.2.1/credentials',
@@ -53,12 +54,12 @@ class FilesystemManagerTest extends TestCase
                 'bucket' => 'arn:aws:s3:us-east-2:123456789012:accesspoint/environment-bucket',
                 'key' => 'disk-r2-key',
                 'secret' => 'disk-r2-secret',
-                'ignore_configured_endpoint_urls' => true,
+                'endpoint' => 'https://s3-accesspoint.us-east-2.amazonaws.com',
             ]);
 
             $client = $disk->getClient();
             $this->assertSame('us-east-2', $client->getRegion());
-            $this->assertStringNotContainsString('r2.example.com', (string) $client->getEndpoint());
+            $this->assertSame('https://s3-accesspoint.us-east-2.amazonaws.com', (string) $client->getEndpoint());
 
             // An invalid container host fails before HTTP, rather than falling back to R2 keys.
             $this->expectException(CredentialsException::class);
@@ -68,6 +69,46 @@ class FilesystemManagerTest extends TestCase
             foreach ($previous as $key => $value) {
                 putenv($value === false ? $key : $key.'='.$value);
             }
+        }
+    }
+
+    public function testS3DisksRouteAccessPointsAndR2ToTheirOwnEndpoints()
+    {
+        $previous = getenv('AWS_ENDPOINT_URL');
+        putenv('AWS_ENDPOINT_URL=https://ambient.example.com');
+        $manager = new FilesystemManager(new Application);
+
+        try {
+            $aws = $manager->build([
+                'driver' => 's3',
+                'region' => 'us-east-2',
+                'endpoint' => 'https://s3-accesspoint.us-east-2.amazonaws.com',
+                'bucket' => 'arn:aws:s3:us-east-2:123456789012:accesspoint/environment-bucket',
+                'credentials' => false,
+            ]);
+            $r2 = $manager->build([
+                'driver' => 's3',
+                'region' => 'auto',
+                'endpoint' => 'https://account.r2.cloudflarestorage.com',
+                'bucket' => 'archive',
+                'key' => 'r2-key',
+                'secret' => 'r2-secret',
+            ]);
+
+            // Serialize requests without sending them to either provider.
+            foreach (['GetObject', 'PutObject', 'DeleteObject'] as $operation) {
+                $awsRequest = \Aws\serialize($aws->getClient()->getCommand($operation, [
+                    'Bucket' => $aws->getConfig()['bucket'], 'Key' => 'hello.txt',
+                ]));
+                $r2Request = \Aws\serialize($r2->getClient()->getCommand($operation, [
+                    'Bucket' => $r2->getConfig()['bucket'], 'Key' => 'hello.txt',
+                ]));
+
+                $this->assertSame('https://environment-bucket-123456789012.s3-accesspoint.us-east-2.amazonaws.com/hello.txt', (string) $awsRequest->getUri());
+                $this->assertSame('https://archive.account.r2.cloudflarestorage.com/hello.txt', (string) $r2Request->getUri());
+            }
+        } finally {
+            putenv($previous === false ? 'AWS_ENDPOINT_URL' : 'AWS_ENDPOINT_URL='.$previous);
         }
     }
 
