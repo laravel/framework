@@ -458,7 +458,7 @@ class ExceptionReporter
     }
 
     /**
-     * Retrieve the redacted request headers.
+     * Retrieve the request headers.
      *
      * @return array<string, list<string|null>>
      */
