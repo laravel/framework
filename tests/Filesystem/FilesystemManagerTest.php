@@ -26,6 +26,48 @@ class FilesystemManagerTest extends TestCase
         parent::tearDown();
     }
 
+    public function testIamS3DiskIgnoresStaticCredentialsAndAmbientEndpoint()
+    {
+        $environment = [
+            'AWS_ACCESS_KEY_ID' => 'ambient-r2-key',
+            'AWS_SECRET_ACCESS_KEY' => 'ambient-r2-secret',
+            'AWS_ENDPOINT_URL_S3' => 'https://r2.example.com',
+            'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI' => '',
+            'AWS_CONTAINER_CREDENTIALS_FULL_URI' => 'http://192.0.2.1/credentials',
+        ];
+        $previous = [];
+
+        foreach ($environment as $key => $value) {
+            $previous[$key] = getenv($key);
+            putenv($key.'='.$value);
+        }
+
+        try {
+            $disk = (new FilesystemManager(new Application))->build([
+                'driver' => 's3',
+                'auth_mode' => 'iam',
+                'region' => 'us-east-2',
+                'bucket' => 'arn:aws:s3:us-east-2:123456789012:accesspoint/environment-bucket',
+                'key' => 'disk-r2-key',
+                'secret' => 'disk-r2-secret',
+                'endpoint' => 'https://r2.example.com',
+            ]);
+
+            $client = $disk->getClient();
+            $this->assertSame('us-east-2', $client->getRegion());
+            $this->assertStringNotContainsString('r2.example.com', (string) $client->getEndpoint());
+
+            // An invalid container host fails before HTTP, rather than falling back to R2 keys.
+            $this->expectException(\Aws\Exception\CredentialsException::class);
+            $this->expectExceptionMessage('unsupported host');
+            $client->getCredentials()->wait();
+        } finally {
+            foreach ($previous as $key => $value) {
+                putenv($value === false ? $key : $key.'='.$value);
+            }
+        }
+    }
+
     public function testExceptionThrownOnUnsupportedDriver()
     {
         $this->expectExceptionObject(new InvalidArgumentException('Disk [local] does not have a configured driver.'));

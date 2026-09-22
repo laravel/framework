@@ -2,6 +2,7 @@
 
 namespace Illuminate\Filesystem;
 
+use Aws\Credentials\CredentialProvider;
 use Aws\S3\S3Client;
 use Closure;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
@@ -320,7 +321,13 @@ class FilesystemManager implements FactoryContract
     {
         $config += ['version' => 'latest'];
 
-        if (! empty($config['key']) && ! empty($config['secret'])) {
+        if (($config['auth_mode'] ?? null) === 'iam') {
+            // Cloud's Pod Identity credentials must not fall back to ambient R2 keys.
+            $config['credentials'] = CredentialProvider::memoize(CredentialProvider::ecsCredentials());
+            $config['ignore_configured_endpoint_urls'] = true;
+            $config['use_arn_region'] = true;
+            unset($config['key'], $config['secret'], $config['endpoint']);
+        } elseif (! empty($config['key']) && ! empty($config['secret'])) {
             $config['credentials'] = Arr::only($config, ['key', 'secret']);
 
             if (! empty($config['token'])) {
@@ -328,7 +335,7 @@ class FilesystemManager implements FactoryContract
             }
         }
 
-        return Arr::except($config, ['token']);
+        return Arr::except($config, ['token', 'auth_mode']);
     }
 
     /**

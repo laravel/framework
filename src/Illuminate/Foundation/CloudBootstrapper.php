@@ -72,12 +72,13 @@ class CloudBootstrapper
             } else {
                 $app['config']->set('filesystems.disks.'.$disk['disk'], [
                     'driver' => 's3',
-                    'key' => $disk['access_key_id'],
-                    'secret' => $disk['access_key_secret'],
+                    'key' => $disk['access_key_id'] ?? null,
+                    'secret' => $disk['access_key_secret'] ?? null,
                     'bucket' => $disk['bucket'],
-                    'url' => $disk['url'],
-                    'endpoint' => $disk['endpoint'],
-                    'region' => 'auto',
+                    'url' => $disk['url'] ?? null,
+                    'endpoint' => $disk['endpoint'] ?? null,
+                    'region' => $disk['default_region'] ?? 'auto',
+                    'auth_mode' => $disk['auth_mode'] ?? null,
                     'use_path_style_endpoint' => false,
                     'throw' => false,
                     'report' => false,

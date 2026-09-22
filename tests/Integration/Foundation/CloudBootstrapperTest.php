@@ -49,8 +49,35 @@ class CloudBootstrapperTest extends TestCase
 
         $this->assertSame('test-disk-2', $this->app['config']->get('filesystems.default'));
         $this->assertSame('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
+        $this->assertSame('auto', $this->app['config']->get('filesystems.disks.test-disk.region'));
 
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
+    }
+
+    public function test_it_configures_iam_disks_with_cacheable_configuration()
+    {
+        $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode([
+            [
+                'disk' => 'aws-bucket',
+                'bucket' => 'arn:aws:s3:us-east-2:123456789012:accesspoint/environment-bucket',
+                'default_region' => 'us-east-2',
+                'auth_mode' => 'iam',
+            ],
+        ]);
+
+        try {
+            CloudBootstrapper::configureDisks($this->app);
+
+            $config = $this->app['config']->get('filesystems.disks.aws-bucket');
+
+            $this->assertSame('us-east-2', $config['region']);
+            $this->assertSame('iam', $config['auth_mode']);
+            $this->assertNull($config['key']);
+            $this->assertNull($config['secret']);
+            $this->assertSame($config, eval('return '.var_export($config, true).';'));
+        } finally {
+            unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
+        }
     }
 
     public function test_it_does_not_override_a_different_filesystem_disk()
