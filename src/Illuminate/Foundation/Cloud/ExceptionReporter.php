@@ -927,8 +927,8 @@ class ExceptionReporter
     {
         try {
             $microtime = defined('LARAVEL_START')
-            ? LARAVEL_START
-            : $_SERVER['REQUEST_TIME_FLOAT'];
+                ? LARAVEL_START
+                : $_SERVER['REQUEST_TIME_FLOAT'];
 
             return Date::createFromTimestampUTC($microtime)->toDateTimeString('microsecond');
         } catch (Throwable $e) {
