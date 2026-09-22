@@ -510,18 +510,6 @@ class ExceptionReporter
     }
 
     /**
-     * Redact the given value.
-     */
-    protected function redactValue(string $value): string
-    {
-        $length = strlen($value);
-
-        $bytes = $length === 1 ? 'byte' : 'bytes';
-
-        return "[{$length} {$bytes} redacted]";
-    }
-
-    /**
      * Redact the given authorization header value, retaining the scheme.
      */
     protected function redactAuthorizationHeaderValue(string $value): string
@@ -572,6 +560,18 @@ class ExceptionReporter
         } catch (Throwable) {
             return $this->redactValue($value);
         }
+    }
+
+    /**
+     * Redact the given value.
+     */
+    protected function redactValue(string $value): string
+    {
+        $length = strlen($value);
+
+        $bytes = $length === 1 ? 'byte' : 'bytes';
+
+        return "[{$length} {$bytes} redacted]";
     }
 
     /**
