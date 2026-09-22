@@ -1157,7 +1157,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             $this->fireModelEvent('updated', false);
 
-            $this->syncOriginalAttributes(array_merge([$column], array_keys($extra), $this->refreshes));
+            $this->syncOriginalAttributes($this->normalizeJsonPathAttributes(
+                array_merge([$column], array_keys($extra), $this->refreshes)
+            ));
         });
     }
 
@@ -1337,8 +1339,24 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             $this->fireModelEvent('updated', false);
 
-            $this->syncOriginalAttributes(array_merge(array_keys($columns), array_keys($extra), $this->refreshes));
+            $this->syncOriginalAttributes($this->normalizeJsonPathAttributes(
+                array_merge(array_keys($columns), array_keys($extra), $this->refreshes)
+            ));
         });
+    }
+
+    /**
+     * Normalize the given attribute keys by stripping JSON paths.
+     *
+     * @param  array<string>  $attributes
+     * @return array<string>
+     */
+    protected function normalizeJsonPathAttributes(array $attributes)
+    {
+        return array_values(array_unique(array_map(
+            static fn ($attribute) => str_contains((string) $attribute, '->') ? explode('->', (string) $attribute, 2)[0] : $attribute,
+            $attributes
+        )));
     }
 
     /**

@@ -2939,6 +2939,50 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty('category'));
     }
 
+    public function testIncrementOnExistingModelWithJsonPathExtraAttributes()
+    {
+        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->foo = 2;
+        $model->meta = json_encode(['views' => 1]);
+        $model->syncOriginalAttribute('meta');
+
+        $query = Mockery::mock(Builder::class);
+        $model->expects('newQueryWithoutScopes')->once()->andReturn($query);
+        $query->expects('where')->once()->andReturn($query);
+        $query->expects('increment')->once();
+
+        $model->publicIncrement('foo', 1, ['meta->views' => 2]);
+        $this->assertEquals(3, $model->foo);
+        $this->assertEquals(json_encode(['views' => 2]), $model->meta);
+        $this->assertFalse($model->isDirty('meta'));
+        $this->assertFalse($model->isDirty());
+    }
+
+    public function testIncrementEachOnExistingModelWithJsonPathExtraAttributes()
+    {
+        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->foo = 2;
+        $model->meta = json_encode(['views' => 1]);
+        $model->syncOriginalAttribute('meta');
+
+        $query = Mockery::mock(Builder::class);
+        $model->expects('newQueryWithoutScopes')->once()->andReturn($query);
+        $query->expects('where')->once()->andReturn($query);
+        $query->expects('incrementEach')->once();
+
+        $model->publicIncrementEach(['foo' => 1], ['meta->views' => 2]);
+        $this->assertEquals(3, $model->foo);
+        $this->assertEquals(json_encode(['views' => 2]), $model->meta);
+        $this->assertFalse($model->isDirty('meta'));
+        $this->assertFalse($model->isDirty());
+    }
+
     public function testIncrementEachQuietlyCanBeCalledDynamicallyOnModelInstance()
     {
         $model = new EloquentModelDynamicIncrementEachStub(['foo' => 2, 'bar' => 5]);
