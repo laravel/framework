@@ -636,7 +636,7 @@ class ExceptionReporter
             }
 
             return $this->shouldRedactRequestPayloadField($key, $value)
-                ? $this->redactValue((string) $value)
+                ? $this->redactValue($value === false ? '0' : (string) $value)
                 : $value;
         });
     }
@@ -670,8 +670,7 @@ class ExceptionReporter
     protected function shouldRedactRequestPayloadField(string $field, mixed $value): bool
     {
         return in_array($field, $this->config['redact_request_payload_fields'])
-            && is_scalar($value)
-            && ! is_bool($value);
+            && is_scalar($value);
     }
 
     /**
