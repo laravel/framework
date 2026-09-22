@@ -322,6 +322,8 @@ class ExceptionReporter
     protected function consoleCommandLine(): ?string
     {
         try {
+            // If we are unable to retrieve the console input, we are unable to confidently
+            // redact input values, so we return null to avoid leaking sensitive information.
             try {
                 $input = $this->currentConsoleInput();
             } catch (CommandNotFoundException $e) {
