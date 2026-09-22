@@ -7,6 +7,7 @@ use Illuminate\Routing\Attributes\Controllers\Middleware;
 use Illuminate\Routing\Controller as RoutingController;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Route;
+use Illuminate\Tests\Routing\Fixtures\AttributeWithMissingBaseClass;
 use Override;
 use PHPUnit\Framework\TestCase;
 
@@ -39,6 +40,14 @@ class RoutingControllerAttributeTest extends TestCase
         $route->setContainer(new Container);
 
         $this->assertEquals(['dynamic-middleware', 'attribute-middleware-1', 'attribute-middleware-2'], $route->gatherMiddleware());
+    }
+
+    public function testControllerMiddlewareIgnoresAttributesThatCannotBeLoaded()
+    {
+        $route = new Route('GET', 'foo', ['uses' => UnloadableAttributeController::class.'@index']);
+        $route->setContainer(new Container);
+
+        $this->assertEquals(['auth', 'log'], $route->gatherMiddleware());
     }
 }
 
@@ -103,6 +112,18 @@ class DynamicMiddlewareController extends RoutingController
     }
 
     #[Middleware('attribute-middleware-2')]
+    public function index()
+    {
+        //
+    }
+}
+
+#[Middleware('auth')]
+#[AttributeWithMissingBaseClass]
+class UnloadableAttributeController extends Controller
+{
+    #[Middleware('log')]
+    #[AttributeWithMissingBaseClass]
     public function index()
     {
         //

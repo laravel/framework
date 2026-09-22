@@ -28,7 +28,9 @@ use LogicException;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionMethod;
 use Symfony\Component\Routing\Route as SymfonyRoute;
+use Throwable;
 
 use function Illuminate\Support\enum_value;
 
@@ -1190,9 +1192,7 @@ class Route
         $current = $reflectionClass;
 
         while ($current) {
-            $classAttributes = array_reverse($current->getAttributes(
-                MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF
-            ));
+            $classAttributes = array_reverse($this->loadableAttributes($current, MiddlewareAttribute::class));
 
             foreach ($classAttributes as $attribute) {
                 $attributes->prepend($attribute);
@@ -1202,7 +1202,7 @@ class Route
         }
 
         return $attributes->merge(
-            $reflectionMethod->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF)
+            $this->loadableAttributes($reflectionMethod, MiddlewareAttribute::class)
         )->map(function (ReflectionAttribute $attribute) use ($method) {
             $instance = $attribute->newInstance();
 
@@ -1255,9 +1255,7 @@ class Route
         $current = $reflectionClass;
 
         while ($current) {
-            $classAttributes = array_reverse($current->getAttributes(
-                WithoutMiddleware::class, ReflectionAttribute::IS_INSTANCEOF
-            ));
+            $classAttributes = array_reverse($this->loadableAttributes($current, WithoutMiddleware::class));
 
             foreach ($classAttributes as $attribute) {
                 $attributes->prepend($attribute);
@@ -1267,7 +1265,7 @@ class Route
         }
 
         return $attributes->merge(
-            $reflectionMethod->getAttributes(WithoutMiddleware::class, ReflectionAttribute::IS_INSTANCEOF)
+            $this->loadableAttributes($reflectionMethod, WithoutMiddleware::class)
         )->map(function (ReflectionAttribute $attribute) use ($method) {
             $instance = $attribute->newInstance();
 
@@ -1278,6 +1276,25 @@ class Route
             ->filter()
             ->values()
             ->all();
+    }
+
+    /**
+     * Get the attributes of the given type, ignoring any attribute that cannot be loaded.
+     *
+     * @return array<int, \ReflectionAttribute>
+     */
+    protected function loadableAttributes(ReflectionClass|ReflectionMethod $reflector, string $type): array
+    {
+        return array_values(array_filter(
+            $reflector->getAttributes(),
+            function (ReflectionAttribute $attribute) use ($type) {
+                try {
+                    return is_a($attribute->getName(), $type, true);
+                } catch (Throwable) {
+                    return false;
+                }
+            }
+        ));
     }
 
     /**
