@@ -76,9 +76,9 @@ class ExceptionReporter
     protected ?ConsoleInput $currentConsoleInput = null;
 
     /**
-     * The console input built from the process arguments.
+     * The console input built from the process arguments. Fallback when console input is not yet set.
      */
-    protected ?ArgvInput $currentArgvInput = null;
+    protected ?ArgvInput $currentFallbackArgvInput = null;
 
     /**
      * The cached queue configuration.
@@ -278,15 +278,15 @@ class ExceptionReporter
      */
     protected function consoleCommandName(): ?string
     {
-        return $this->currentlyRunningCommandName ?? $this->currentArgvInput()->getFirstArgument();
+        return $this->currentlyRunningCommandName ?? $this->currentFallbackArgvInput()->getFirstArgument();
     }
 
     /**
      * Retrieve the console input built from the process arguments.
      */
-    protected function currentArgvInput(): ArgvInput
+    protected function currentFallbackArgvInput(): ArgvInput
     {
-        return $this->currentArgvInput ??= new ArgvInput;
+        return $this->currentFallbackArgvInput ??= new ArgvInput;
     }
 
     /**
@@ -332,7 +332,7 @@ class ExceptionReporter
             return $this->currentConsoleInput;
         }
 
-        $input = $this->currentArgvInput();
+        $input = $this->currentFallbackArgvInput();
 
         $name = $input->getFirstArgument();
 
