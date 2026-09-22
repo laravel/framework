@@ -353,7 +353,9 @@ class ExceptionReporter
      */
     public function prepareForCommand(string $name, InputInterface $input): void
     {
-        $this->currentlyRunningCommandName = $name === '' ? null : $name;
+        $this->currentlyRunningCommandName = $name !== ''
+            ? $name
+            : null;
 
         $this->currentConsoleInput = $input instanceof ConsoleInput ? $input : null;
     }
