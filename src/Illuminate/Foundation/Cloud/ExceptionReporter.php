@@ -273,6 +273,20 @@ class ExceptionReporter
     }
 
     /**
+     * Retrieve the console execution trace ID.
+     */
+    protected function consoleTraceId(): string
+    {
+        // TODO jobs should inherit this from the queue worker
+        // TODO scheduled tasks
+        if (isset($_SERVER['LARAVEL_CLOUD_COMMAND_UUID'])) {
+            return $this->artisanCommandTraceId ??= str($_SERVER['LARAVEL_CLOUD_COMMAND_UUID'])->after('comm-')->toString();
+        }
+
+        return $this->artisanCommandTraceId ??= (string) Uuid::uuid4();
+    }
+
+    /**
      * Retrieve the name of the currently running Artisan command.
      */
     protected function consoleCommandName(): ?string
@@ -718,20 +732,6 @@ class ExceptionReporter
         } catch (Throwable $e) {
             return '_laravel_cloud_error: '.$e->getMessage();
         }
-    }
-
-    /**
-     * Retrieve the console execution trace ID.
-     */
-    protected function consoleTraceId(): string
-    {
-        // TODO jobs should inherit this from the queue worker
-        // TODO scheduled tasks
-        if (isset($_SERVER['LARAVEL_CLOUD_COMMAND_UUID'])) {
-            return $this->artisanCommandTraceId ??= str($_SERVER['LARAVEL_CLOUD_COMMAND_UUID'])->after('comm-')->toString();
-        }
-
-        return $this->artisanCommandTraceId ??= (string) Uuid::uuid4();
     }
 
     /**
