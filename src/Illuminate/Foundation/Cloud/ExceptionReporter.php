@@ -313,69 +313,68 @@ class ExceptionReporter
             $tokens = Arr::wrap($input->getFirstArgument());
 
             foreach ($input->getRawArguments() as $name => $value) {
+                // Skip the initial argument, which is the command name. We have already captured that above
+                // and do not want to apply any special handling to it.
                 if ($name === 'command' || is_int($name)) {
                     continue;
                 }
 
-                if ($this->shouldRedactConsoleInput($name)) {
-                    if (is_array($value)) {
-                        $tokens = [
-                            ...$tokens,
-                            ...array_map(fn ($v) => $this->redactValue($v), $value),
-                        ];
-                    } else {
-                        $tokens[] = $this->redactValue($value);
-                    }
-                } else {
-                    if (is_array($value)) {
-                        $tokens = [
-                            ...$tokens,
-                            ...array_map(fn ($v) => $input->escapeToken($v), $value),
-                        ];
-                    } else {
-                        $tokens[] = $input->escapeToken($value);
-                    }
-                }
+                $transformer = $this->consoleArgumentTransformer($name, $input);
+
+                $tokens = [
+                    ...$tokens,
+                    ...$this->applyTransformationToConsoleInput($value, $transformer),
+                ];
             }
 
             foreach ($input->getRawOptions() as $name => $value) {
-                if (is_bool($value)) {
-                    $tokens[] = $value ? "--{$name}" : "--no-{$name}";
+                $transformer = $this->consoleOptionTransformer($name, $input);
 
-                    continue;
-                } elseif (is_null($value)) {
-                    $tokens[] = "--{$name}";
-
-                    continue;
-                } elseif ($this->shouldRedactConsoleInput($name)) {
-                    if (is_array($value)) {
-                        $tokens = [
-                            ...$tokens,
-                            ...array_map(fn ($v) => $v === null
-                                ? "--{$name}"
-                                : "--{$name}={$this->redactValue($v)}", $value),
-                        ];
-                    } else {
-                        $tokens[] = "--{$name}={$this->redactValue($value)}";
-                    }
-                } else {
-                    if (is_array($value)) {
-                        $tokens = [
-                            ...$tokens,
-                            ...array_map(fn ($v) => $v === null
-                                ? "--{$name}"
-                                : "--{$name}={$input->escapeToken($v)}", $value),
-                        ];
-                    } else {
-                        $tokens[] = "--{$name}={$input->escapeToken($value)}";
-                    }
-                }
+                $tokens = [
+                    ...$tokens,
+                    ...$this->applyTransformationToConsoleInput($value, $transformer),
+                ];
             }
 
             return implode(' ', $tokens);
         } catch (Throwable $e) {
             return '_laravel_cloud_error: '.$e->getMessage();
         }
+    }
+
+    protected function consoleArgumentTransformer(string $name, ConsoleInput $input): callable
+    {
+        return $this->shouldRedactConsoleInput($name)
+            ? $this->redactValue(...)
+            : $input->escapeToken(...);
+    }
+
+    protected function consoleOptionTransformer(string $name, ConsoleInput $input): callable
+    {
+        return function ($value) use ($name, $input) {
+            if (is_bool($value)) {
+                return $value ? "--{$name}" : "--no-{$name}";
+            }
+
+            if ($value === null) {
+                return "--{$name}";
+            }
+
+            if ($this->shouldRedactConsoleInput($name)) {
+                return "--{$name}={$this->redactValue($value)}";
+            }
+
+            return "--{$name}={$input->escapeToken($value)}";
+        };
+    }
+
+    /**
+     * @param  callable(string): string  $transformer
+     * @return list<string>
+     */
+    protected function applyTransformationToConsoleInput(null|string|array $value, callable $transformer): array
+    {
+        return array_map($transformer, $value === null ? [null] : Arr::wrap($value));
     }
 
     /**
