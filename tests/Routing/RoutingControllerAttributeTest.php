@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Routing;
 
 use Illuminate\Container\Container;
 use Illuminate\Routing\Attributes\Controllers\Middleware;
+use Illuminate\Routing\Attributes\Controllers\WithoutMiddleware;
 use Illuminate\Routing\Controller as RoutingController;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Route;
@@ -48,6 +49,14 @@ class RoutingControllerAttributeTest extends TestCase
         $route->setContainer(new Container);
 
         $this->assertEquals(['auth', 'log'], $route->gatherMiddleware());
+    }
+
+    public function testExcludedControllerMiddlewareIgnoresAttributesThatCannotBeLoaded()
+    {
+        $route = new Route('GET', 'foo', ['uses' => UnloadableAttributeController::class.'@index']);
+        $route->setContainer(new Container);
+
+        $this->assertEquals(['excluded'], $route->excludedControllerMiddleware());
     }
 }
 
@@ -119,6 +128,7 @@ class DynamicMiddlewareController extends RoutingController
 }
 
 #[Middleware('auth')]
+#[WithoutMiddleware('excluded')]
 #[AttributeWithMissingBaseClass]
 class UnloadableAttributeController extends Controller
 {

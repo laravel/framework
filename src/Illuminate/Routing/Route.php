@@ -1281,6 +1281,8 @@ class Route
     /**
      * Get the attributes of the given type, ignoring any attribute that cannot be loaded.
      *
+     * @param  \ReflectionClass|\ReflectionMethod  $reflector
+     * @param  string  $type
      * @return array<int, \ReflectionAttribute>
      */
     protected function loadableAttributes(ReflectionClass|ReflectionMethod $reflector, string $type): array
