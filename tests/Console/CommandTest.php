@@ -12,7 +12,9 @@ use Illuminate\Console\Command;
 use Illuminate\Console\CommandInput;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
+use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Support\Carbon;
+use Laravel\Prompts\Prompt;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -24,6 +26,11 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class CommandTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Prompt::setOutput(new NullOutput);
+    }
+
     public function testCallingClassCommandResolveCommandViaApplicationResolution()
     {
         $command = new class extends Command
@@ -95,7 +102,7 @@ class CommandTest extends TestCase
             }
         };
 
-        $application = app();
+        $application = new FoundationApplication(__DIR__);
         $command->setLaravel($application);
 
         $input = new ArrayInput([

@@ -6,6 +6,9 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
+use Illuminate\Tests\Database\Fixtures\Models\MorphEagerLoading\User;
+use Illuminate\Tests\Database\Fixtures\Models\MorphEagerLoading\Video;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
@@ -56,16 +59,6 @@ class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
     }
 }
 
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-}
-
 class Post extends Model
 {
     public $timestamps = false;
@@ -76,15 +69,4 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
-}
-
-class User extends Model
-{
-    public $timestamps = false;
-}
-
-class Video extends Model
-{
-    public $timestamps = false;
-    protected $primaryKey = 'video_id';
 }

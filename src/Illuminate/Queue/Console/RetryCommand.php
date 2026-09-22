@@ -8,6 +8,7 @@ use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -45,11 +46,25 @@ class RetryCommand extends Command
         }
 
         foreach ($ids as $id) {
-            $job = $this->laravel['queue.failer']->find($id);
+            $found = $this->laravel['queue.failer']->find($id);
 
-            if (is_null($job)) {
+            if (is_null($found)) {
                 $this->components->error("Unable to find failed job with ID [{$id}].");
-            } else {
+
+                continue;
+            }
+
+            if (! $found instanceof Enumerable) {
+                $found = new Collection([$id => $found]);
+            }
+
+            if ($found->isEmpty()) {
+                $this->components->error("Unable to find any failed jobs with ID [{$id}].");
+
+                continue;
+            }
+
+            foreach ($found as $id => $job) {
                 $this->laravel['events']->dispatch(new JobRetryRequested($job));
 
                 $this->components->task($id, fn () => $this->retryJob($job));

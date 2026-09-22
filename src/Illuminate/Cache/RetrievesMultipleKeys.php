@@ -4,6 +4,8 @@ namespace Illuminate\Cache;
 
 use Illuminate\Support\Collection;
 
+use function Illuminate\Support\enum_value;
+
 trait RetrievesMultipleKeys
 {
     /**
@@ -19,7 +21,7 @@ trait RetrievesMultipleKeys
         $return = [];
 
         $keys = (new Collection($keys))
-            ->mapWithKeys(fn ($value, $key) => [is_string($key) ? $key : $value => is_string($key) ? $value : null])
+            ->mapWithKeys(fn ($value, $key) => [is_string($key) ? $key : enum_value($value) => is_string($key) ? $value : null])
             ->all();
 
         foreach ($keys as $key => $default) {

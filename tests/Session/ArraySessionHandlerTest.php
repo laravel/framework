@@ -14,11 +14,30 @@ class ArraySessionHandlerTest extends TestCase
         $this->assertInstanceOf(SessionHandlerInterface::class, new ArraySessionHandler(10));
     }
 
+    public function test_it_creates_session_ids()
+    {
+        $sessionId = (new ArraySessionHandler(10))->create_sid();
+
+        $this->assertIsString($sessionId);
+        $this->assertNotEmpty($sessionId);
+    }
+
     public function test_it_initializes_the_session()
     {
         $handler = new ArraySessionHandler(10);
 
         $this->assertTrue($handler->open('', ''));
+    }
+
+    public function test_it_validates_session_ids()
+    {
+        $handler = new ArraySessionHandler(10);
+
+        $this->assertFalse($handler->validateId('foo'));
+
+        $handler->write('foo', 'bar');
+
+        $this->assertTrue($handler->validateId('foo'));
     }
 
     public function test_it_closes_the_session()

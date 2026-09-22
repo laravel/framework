@@ -2,11 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database\MariaDb;
 
-use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\IntTimestampCasts\UserWithIntTimestampsViaAttribute;
+use Illuminate\Tests\Database\Fixtures\Models\IntTimestampCasts\UserWithIntTimestampsViaCasts;
+use Illuminate\Tests\Database\Fixtures\Models\IntTimestampCasts\UserWithIntTimestampsViaMutator;
+use Illuminate\Tests\Database\Fixtures\Models\IntTimestampCasts\UserWithUpdatedAtViaMutator;
 
 class EloquentCastTest extends MariaDbTestCase
 {
@@ -142,96 +143,5 @@ class EloquentCastTest extends MariaDbTestCase
 
         $this->assertSame($updatedAt, $mutatorUser->updated_at->getTimestamp());
         $this->assertSame($updatedAt, $mutatorUser->fresh()->updated_at->getTimestamp());
-    }
-}
-
-class UserWithIntTimestampsViaCasts extends Model
-{
-    protected $table = 'users';
-
-    protected $fillable = ['email'];
-
-    protected $casts = [
-        'created_at' => UnixTimeStampToCarbon::class,
-        'updated_at' => UnixTimeStampToCarbon::class,
-    ];
-}
-
-class UnixTimeStampToCarbon implements CastsAttributes
-{
-    public function get($model, string $key, $value, array $attributes)
-    {
-        return Carbon::parse($value);
-    }
-
-    public function set($model, string $key, $value, array $attributes)
-    {
-        return Carbon::parse($value)->getTimestamp();
-    }
-}
-
-class UserWithIntTimestampsViaAttribute extends Model
-{
-    protected $table = 'users';
-
-    protected $fillable = ['email'];
-
-    protected function updatedAt(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => Carbon::parse($value),
-            set: fn ($value) => Carbon::parse($value)->getTimestamp(),
-        );
-    }
-
-    protected function createdAt(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => Carbon::parse($value),
-            set: fn ($value) => Carbon::parse($value)->getTimestamp(),
-        );
-    }
-}
-
-class UserWithIntTimestampsViaMutator extends Model
-{
-    protected $table = 'users';
-
-    protected $fillable = ['email'];
-
-    protected function getUpdatedAtAttribute($value)
-    {
-        return Carbon::parse($value);
-    }
-
-    protected function setUpdatedAtAttribute($value)
-    {
-        $this->attributes['updated_at'] = Carbon::parse($value)->getTimestamp();
-    }
-
-    protected function getCreatedAtAttribute($value)
-    {
-        return Carbon::parse($value);
-    }
-
-    protected function setCreatedAtAttribute($value)
-    {
-        $this->attributes['created_at'] = Carbon::parse($value)->getTimestamp();
-    }
-}
-
-class UserWithUpdatedAtViaMutator extends Model
-{
-    protected $table = 'users_nullable_timestamps';
-
-    protected $fillable = ['email', 'updated_at'];
-
-    public function setUpdatedAtAttribute($value)
-    {
-        if (! $this->id) {
-            return;
-        }
-
-        $this->updated_at = $value;
     }
 }

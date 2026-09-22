@@ -6,6 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Tests\Pagination\Fixtures\Models\PaginatorResourceTestModel;
 use LogicException;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 class PaginatorResourceTest extends TestCase
@@ -32,6 +33,7 @@ class PaginatorResourceTest extends TestCase
         $paginator->toResourceCollection();
     }
 
+    #[RunInSeparateProcess]
     public function testItCanGuessResourceWhenNotProvided()
     {
         $paginator = new PaginatorResourceTestPaginator([

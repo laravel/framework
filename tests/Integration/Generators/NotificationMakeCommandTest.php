@@ -7,6 +7,7 @@ class NotificationMakeCommandTest extends TestCase
     protected $files = [
         'app/Notifications/FooNotification.php',
         'resources/views/foo-notification.blade.php',
+        'resources/views/mail/foo-notification.blade.php',
         'tests/Feature/Notifications/FooNotificationTest.php',
     ];
 
@@ -40,6 +41,22 @@ class NotificationMakeCommandTest extends TestCase
         $this->assertFileContains([
             '<x-mail::message>',
         ], 'resources/views/foo-notification.blade.php');
+    }
+
+    public function testItCanGenerateNotificationFileWithMarkdownOptionWithoutValue()
+    {
+        $this->artisan('make:notification', ['name' => 'FooNotification', '--markdown' => null])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Notifications;',
+            'class FooNotification extends Notification',
+            "return (new MailMessage)->markdown('mail.foo-notification')",
+        ], 'app/Notifications/FooNotification.php');
+
+        $this->assertFileContains([
+            '<x-mail::message>',
+        ], 'resources/views/mail/foo-notification.blade.php');
     }
 
     public function testItCanGenerateNotificationFileWithTest()

@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Tests\Integration\Routing\Fixtures\CategoryBackedEnum;
+use Illuminate\Tests\Routing\Fixtures\Integration\CategoryBackedEnum;
 use Orchestra\Testbench\TestCase;
 
 class ImplicitBackedEnumRouteBindingTest extends TestCase
@@ -18,7 +18,7 @@ class ImplicitBackedEnumRouteBindingTest extends TestCase
         $this->defineCacheRoutes(<<<PHP
 <?php
 
-use Illuminate\Tests\Integration\Routing\Fixtures\CategoryBackedEnum;
+use Illuminate\Tests\Routing\Fixtures\Integration\CategoryBackedEnum;
 
 Route::get('/categories/{category}', function (CategoryBackedEnum \$category) {
     return \$category->value;

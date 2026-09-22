@@ -7,12 +7,20 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use Illuminate\Tests\Database\Fixtures\TestEnum;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentMorphToTest extends TestCase
 {
+    use RestoresConnectionResolver;
+
+    protected function setUp(): void
+    {
+        $this->useInMemoryConnection();
+    }
+
     protected $builder;
 
     protected $related;
@@ -193,169 +201,6 @@ class DatabaseEloquentMorphToTest extends TestCase
         $parent->expects('setRelation')->with('relation', null);
 
         $relation->dissociate();
-    }
-
-    public function testIsNotNull()
-    {
-        $relation = $this->getRelation();
-
-        $relation->getRelated()->shouldReceive('getTable')->never();
-        $relation->getRelated()->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is(null));
-    }
-
-    public function testIsModel()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->expects('getConnectionName')->andReturn('relation');
-
-        $model = Mockery::mock(Model::class);
-        $model->expects('getAttribute')->with('id')->andReturn('foreign.value');
-        $model->expects('getTable')->andReturn('relation');
-        $model->expects('getConnectionName')->andReturn('relation');
-
-        $this->assertTrue($relation->is($model));
-    }
-
-    public function testIsModelWithIntegerParentKey()
-    {
-        $parent = Mockery::mock(Model::class);
-        // when addConstraints is called we need to return the foreign value
-        $parent->expects('getAttribute')->with('foreign_key')->andReturn('foreign.value');
-        // when getParentKey is called we want to return an integer
-        $parent->expects('getAttribute')->with('foreign_key')->andReturn(1);
-
-        $relation = $this->getRelation($parent);
-
-        $this->related->expects('getConnectionName')->andReturn('relation');
-
-        $model = Mockery::mock(Model::class);
-        $model->expects('getAttribute')->with('id')->andReturn('1');
-        $model->expects('getTable')->andReturn('relation');
-        $model->expects('getConnectionName')->andReturn('relation');
-
-        $this->assertTrue($relation->is($model));
-    }
-
-    public function testIsModelWithIntegerRelatedKey()
-    {
-        $parent = Mockery::mock(Model::class);
-        // when addConstraints is called we need to return the foreign value
-        $parent->expects('getAttribute')->with('foreign_key')->andReturn('foreign.value');
-        // when getParentKey is called we want to return a string
-        $parent->expects('getAttribute')->with('foreign_key')->andReturn('1');
-
-        $relation = $this->getRelation($parent);
-
-        $this->related->expects('getConnectionName')->andReturn('relation');
-
-        $model = Mockery::mock(Model::class);
-        $model->expects('getAttribute')->with('id')->andReturn(1);
-        $model->expects('getTable')->andReturn('relation');
-        $model->expects('getConnectionName')->andReturn('relation');
-
-        $this->assertTrue($relation->is($model));
-    }
-
-    public function testIsModelWithIntegerKeys()
-    {
-        $parent = Mockery::mock(Model::class);
-
-        // when addConstraints is called we need to return the foreign value
-        $parent->expects('getAttribute')->with('foreign_key')->andReturn('foreign.value');
-        // when getParentKey is called we want to return an integer
-        $parent->expects('getAttribute')->with('foreign_key')->andReturn(1);
-
-        $relation = $this->getRelation($parent);
-
-        $this->related->expects('getConnectionName')->andReturn('relation');
-
-        $model = Mockery::mock(Model::class);
-        $model->expects('getAttribute')->with('id')->andReturn(1);
-        $model->expects('getTable')->andReturn('relation');
-        $model->expects('getConnectionName')->andReturn('relation');
-
-        $this->assertTrue($relation->is($model));
-    }
-
-    public function testIsNotModelWithNullParentKey()
-    {
-        $parent = Mockery::mock(Model::class);
-
-        // when addConstraints is called we need to return the foreign value
-        $parent->expects('getAttribute')->with('foreign_key')->andReturn('foreign.value');
-        // when getParentKey is called we want to return null
-
-        $parent->expects('getAttribute')->with('foreign_key')->andReturn(null);
-
-        $relation = $this->getRelation($parent);
-
-        $this->related->shouldReceive('getConnectionName')->never();
-
-        $model = Mockery::mock(Model::class);
-        $model->expects('getAttribute')->with('id')->andReturn('foreign.value');
-        $model->shouldReceive('getTable')->never();
-        $model->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is($model));
-    }
-
-    public function testIsNotModelWithNullRelatedKey()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getConnectionName')->never();
-
-        $model = Mockery::mock(Model::class);
-        $model->expects('getAttribute')->with('id')->andReturn(null);
-        $model->shouldReceive('getTable')->never();
-        $model->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is($model));
-    }
-
-    public function testIsNotModelWithAnotherKey()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getConnectionName')->never();
-
-        $model = Mockery::mock(Model::class);
-        $model->expects('getAttribute')->with('id')->andReturn('foreign.value.two');
-        $model->shouldReceive('getTable')->never();
-        $model->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is($model));
-    }
-
-    public function testIsNotModelWithAnotherTable()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->shouldReceive('getConnectionName')->never();
-
-        $model = Mockery::mock(Model::class);
-        $model->expects('getAttribute')->with('id')->andReturn('foreign.value');
-        $model->expects('getTable')->andReturn('table.two');
-        $model->shouldReceive('getConnectionName')->never();
-
-        $this->assertFalse($relation->is($model));
-    }
-
-    public function testIsNotModelWithAnotherConnection()
-    {
-        $relation = $this->getRelation();
-
-        $this->related->expects('getConnectionName')->andReturn('relation');
-
-        $model = Mockery::mock(Model::class);
-        $model->expects('getAttribute')->with('id')->andReturn('foreign.value');
-        $model->expects('getTable')->andReturn('relation');
-        $model->expects('getConnectionName')->andReturn('relation.two');
-
-        $this->assertFalse($relation->is($model));
     }
 
     public function testMatchToMorphParentsNormalizesKeyWhenOwnerKeyIsNullAndResultKeyIsObject()

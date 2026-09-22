@@ -169,7 +169,7 @@ class ReadThroughFilesystemAdapter implements FilesystemAdapter
      */
     public function setVisibility(string $path, string $visibility): void
     {
-        $this->primary->setVisibility($path, $visibility);
+        $this->readerFor($path)->setVisibility($path, $visibility);
     }
 
     /**

@@ -258,6 +258,38 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->assertQueued(MailableStub::class, 2);
     }
 
+    public function testAssertSentOnce()
+    {
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->fake->assertSentOnce(MailableStub::class);
+
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+
+        try {
+            $this->fake->assertSentOnce(MailableStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was sent 2 times instead of 1 time.', $e->getMessage());
+        }
+    }
+
+    public function testAssertQueuedOnce()
+    {
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->fake->assertQueuedOnce(MailableStub::class);
+
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        try {
+            $this->fake->assertQueuedOnce(MailableStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was queued 2 times instead of 1 time.', $e->getMessage());
+        }
+    }
+
     public function testAssertQueuedTimesCalledDirectly()
     {
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);

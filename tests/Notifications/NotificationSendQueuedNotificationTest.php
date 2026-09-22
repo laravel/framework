@@ -3,14 +3,13 @@
 namespace Illuminate\Tests\Notifications;
 
 use Illuminate\Contracts\Database\ModelIdentifier;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\ChannelManager;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Support\Collection;
+use Illuminate\Tests\Notifications\Fixtures\Models\NotifiableUser;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -70,14 +69,6 @@ class NotificationSendQueuedNotificationTest extends TestCase
 
         $this->assertTrue($job->failOnTimeout);
     }
-}
-
-class NotifiableUser extends Model
-{
-    use Notifiable;
-
-    public $table = 'users';
-    public $timestamps = false;
 }
 
 class TestNotification extends Notification

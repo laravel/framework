@@ -115,6 +115,30 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest($buildDir);
     }
 
+    public function testItCanRetrieveTheDevServerUrl()
+    {
+        $this->makeViteHotFile();
+
+        $this->assertSame('http://localhost:3000', app(Vite::class)->devServerUrl());
+    }
+
+    public function testTheDevServerUrlIsNullWhenNotRunningHot()
+    {
+        $this->assertNull(app(Vite::class)->devServerUrl());
+    }
+
+    public function testTheDevServerUrlRespectsACustomHotFile()
+    {
+        $this->makeViteHotFile(__DIR__.'/custom-hot');
+
+        $this->assertSame(
+            'http://localhost:3000',
+            app(Vite::class)->useHotFile(__DIR__.'/custom-hot')->devServerUrl()
+        );
+
+        unlink(__DIR__.'/custom-hot');
+    }
+
     public function testViteHotModuleReplacementWithJsOnly()
     {
         $this->makeViteHotFile();

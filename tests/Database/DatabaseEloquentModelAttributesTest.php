@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\DateFormat;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Refreshes;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
@@ -368,6 +369,27 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $model = new ModelWithTouchesAttributeVariadic;
 
         $this->assertSame(['post', 'author'], $model->getTouchedRelations());
+    }
+
+    public function test_refreshes_attribute(): void
+    {
+        $model = new ModelWithRefreshesAttribute;
+
+        $this->assertSame(['name', 'slug'], $model->getRefreshes());
+    }
+
+    public function test_refreshes_attribute_variadic(): void
+    {
+        $model = new ModelWithRefreshesAttributeVariadic;
+
+        $this->assertSame(['name', 'slug'], $model->getRefreshes());
+    }
+
+    public function test_refreshes_property_takes_precedence(): void
+    {
+        $model = new ModelWithRefreshesAttributeAndProperty;
+
+        $this->assertSame(['email'], $model->getRefreshes());
     }
 
     public function test_merge_fillable_works_with_attribute(): void
@@ -791,6 +813,27 @@ class ModelWithTouchesAttribute extends Model
 class ModelWithTouchesAttributeVariadic extends Model
 {
     //
+}
+
+#[Refreshes(['name', 'slug'])]
+class ModelWithRefreshesAttribute extends Model
+{
+    public function getRefreshes(): array
+    {
+        return $this->refreshes;
+    }
+}
+
+#[Refreshes('name', 'slug')]
+class ModelWithRefreshesAttributeVariadic extends ModelWithRefreshesAttribute
+{
+    //
+}
+
+#[Refreshes(['name', 'slug'])]
+class ModelWithRefreshesAttributeAndProperty extends ModelWithRefreshesAttribute
+{
+    protected array $refreshes = ['email'];
 }
 
 #[DateFormat('Y-m-d')]

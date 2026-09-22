@@ -250,6 +250,10 @@ abstract class Factory
             return $this->state($attributes)->getExpandedAttributes($parent);
         }
 
+        if ($this->count < 1) {
+            return [];
+        }
+
         return array_map(function () use ($attributes, $parent) {
             return $this->state($attributes)->getExpandedAttributes($parent);
         }, range(1, $this->count));

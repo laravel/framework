@@ -421,6 +421,23 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertSame([1 => $two, 2 => $three], $duplicates);
     }
 
+    public function testCollectionDuplicatesWithKey()
+    {
+        $one = new TestEloquentCollectionModel;
+        $two = new TestEloquentCollectionModel;
+        $three = new TestEloquentCollectionModel;
+
+        $one->someAttribute = '1';
+        $two->someAttribute = '2';
+        $three->someAttribute = '1';
+
+        $duplicates = Collection::make([$one, $two, $three])->duplicates('someAttribute')->all();
+        $this->assertSame([2 => '1'], $duplicates);
+
+        $duplicates = Collection::make([$one, $two, $three])->duplicatesStrict('someAttribute')->all();
+        $this->assertSame([2 => '1'], $duplicates);
+    }
+
     public function testCollectionIntersectWithNull()
     {
         $one = Mockery::mock(Model::class);

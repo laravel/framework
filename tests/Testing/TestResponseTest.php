@@ -37,6 +37,16 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TestResponseTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Container::setInstance(new Container);
+    }
+
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+    }
+
     public function testAssertViewIs(): void
     {
         $response = $this->makeMockResponse([
@@ -1862,6 +1872,44 @@ EOT
         $response->assertJsonMissingPath('numeric_keys.3');
     }
 
+    public function testAssertJsonMissingPathWithWildcard(): void
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('bars.*.missing');
+        $response->assertJsonMissingPath('missing.*.bar');
+
+        // A wildcard matches a single segment, so this must not match "barfoo.*.bar.foo"...
+        $response->assertJsonMissingPath('barfoo.*.foo');
+    }
+
+    public function testAssertJsonMissingPathWithTrailingWildcardCanFail(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('bars.*');
+    }
+
+    public function testAssertJsonMissingPathWithWildcardCanFail(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('bars.*.bar');
+    }
+
+    public function testAssertJsonMissingPathWithWildcardCanFailWhenPresentOnSomeItems(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('barfoo.*.bar.foo');
+    }
+
     public function testAssertJsonMissingPaths(): void
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
@@ -2823,7 +2871,8 @@ EOT
 
         $store->setPreviousUrl('https://url.com');
 
-        app('url')->setSessionResolver(fn () => app('session.store'));
+        app()->instance('url', $url = new UrlGenerator(new RouteCollection, new Request));
+        $url->setSessionResolver(fn () => app('session.store'));
 
         $response = TestResponse::fromBaseResponse(
             (new Response('', 302))->withHeaders(['Location' => 'https://url.com'])

@@ -54,6 +54,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
+use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 use Illuminate\Tests\Database\Fixtures\TestCast;
 use Illuminate\Tests\Database\Fixtures\TestValueObject;
@@ -70,6 +71,13 @@ include_once 'Fixtures/Enums/Enums.php';
 
 class DatabaseEloquentModelTest extends TestCase
 {
+    use RestoresConnectionResolver;
+
+    protected function setUp(): void
+    {
+        $this->useInMemoryConnection();
+    }
+
     use InteractsWithTime;
 
     protected $encrypter;
@@ -78,6 +86,11 @@ class DatabaseEloquentModelTest extends TestCase
     {
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();
+        Model::$snakeAttributes = true;
+        EloquentModelGetMutatorsStub::resetMutatorCache();
+        Model::preventSilentlyDiscardingAttributes(false);
+        Model::handleDiscardedAttributeViolationUsing(null);
+        Model::reguard();
     }
 
     public function testAttributeManipulation()
@@ -1930,9 +1943,11 @@ class DatabaseEloquentModelTest extends TestCase
 
         $callbackModel = null;
         $callbackKeys = null;
-        Model::handleDiscardedAttributeViolationUsing(function ($model, $keys) use (&$callbackModel, &$callbackKeys) {
+        $callbackException = null;
+        Model::handleDiscardedAttributeViolationUsing(function ($model, $keys, $exception) use (&$callbackModel, &$callbackKeys, &$callbackException) {
             $callbackModel = $model;
             $callbackKeys = $keys;
+            $callbackException = $exception;
         });
 
         $model = new EloquentModelStub;
@@ -1941,6 +1956,8 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertInstanceOf(EloquentModelStub::class, $callbackModel);
         $this->assertEquals(['Foo'], $callbackKeys);
+        $this->assertInstanceOf(MassAssignmentException::class, $callbackException);
+        $this->assertSame('Add [Foo] to fillable property to allow mass assignment on ['.EloquentModelStub::class.'].', $callbackException->getMessage());
 
         Model::preventSilentlyDiscardingAttributes(false);
         Model::handleDiscardedAttributeViolationUsing(null);
@@ -2468,6 +2485,9 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testWithoutEventDispatcher()
     {
+        // Boot the model before the dispatcher is set so booting events aren't dispatched.
+        new EloquentModelSaveStub;
+
         $events = Mockery::mock(Dispatcher::class);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelSaveStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelSaveStub', EloquentTestObserverStub::class.'@saved');
@@ -3545,10 +3565,12 @@ class DatabaseEloquentModelTest extends TestCase
 
         $callbackModel = null;
         $callbackKey = null;
+        $callbackException = null;
 
-        Model::handleMissingAttributeViolationUsing(function ($model, $key) use (&$callbackModel, &$callbackKey) {
+        Model::handleMissingAttributeViolationUsing(function ($model, $key, $exception) use (&$callbackModel, &$callbackKey, &$callbackException) {
             $callbackModel = $model;
             $callbackKey = $key;
+            $callbackException = $exception;
         });
 
         $model = new EloquentModelStub(['id' => 1]);
@@ -3560,6 +3582,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertInstanceOf(EloquentModelStub::class, $callbackModel);
         $this->assertSame('this_attribute_does_not_exist', $callbackKey);
+        $this->assertInstanceOf(MissingAttributeException::class, $callbackException);
 
         Model::preventAccessingMissingAttributes($originalMode);
         Model::handleMissingAttributeViolationUsing(null);
@@ -4021,6 +4044,24 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(CustomBuilder::class, $eloquentBuilder);
     }
 
+    public function testUseEloquentBuilderAttributeIsInherited()
+    {
+        $model = new EloquentModelInheritingBuilderStub();
+
+        $query = $this->createStub(\Illuminate\Database\Query\Builder::class);
+
+        $this->assertInstanceOf(CustomBuilder::class, $model->newEloquentBuilder($query));
+    }
+
+    public function testUseEloquentBuilderAttributeOnChildClassOverridesParentAttribute()
+    {
+        $model = new EloquentModelOverridingBuilderStub();
+
+        $query = $this->createStub(\Illuminate\Database\Query\Builder::class);
+
+        $this->assertInstanceOf(ChildCustomBuilder::class, $model->newEloquentBuilder($query));
+    }
+
     public function testDefaultBuilderIsUsedWhenUseEloquentBuilderAttributeIsNotPresent()
     {
         $model = new EloquentModelWithoutUseEloquentBuilderAttributeStub();
@@ -4050,8 +4091,21 @@ class CustomBuilder extends Builder
 {
 }
 
+class ChildCustomBuilder extends Builder
+{
+}
+
 #[\Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder(CustomBuilder::class)]
 class EloquentModelWithUseEloquentBuilderAttributeStub extends Model
+{
+}
+
+class EloquentModelInheritingBuilderStub extends EloquentModelWithUseEloquentBuilderAttributeStub
+{
+}
+
+#[\Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder(ChildCustomBuilder::class)]
+class EloquentModelOverridingBuilderStub extends EloquentModelWithUseEloquentBuilderAttributeStub
 {
 }
 

@@ -794,6 +794,39 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Retrieve duplicate items from the collection.
+     *
+     * @param  (callable(TModel): mixed)|string|null  $callback
+     * @param  bool  $strict
+     * @return \Illuminate\Support\Collection<array-key, mixed>|static
+     */
+    #[\Override]
+    public function duplicates($callback = null, $strict = false)
+    {
+        if (! is_null($callback)) {
+            return $this->toBase()->duplicates($callback, $strict);
+        }
+
+        return parent::duplicates($callback, $strict);
+    }
+
+    /**
+     * Retrieve duplicate items from the collection using strict comparison.
+     *
+     * @param  (callable(TModel): mixed)|string|null  $callback
+     * @return \Illuminate\Support\Collection<array-key, mixed>|static
+     */
+    #[\Override]
+    public function duplicatesStrict($callback = null)
+    {
+        if (! is_null($callback)) {
+            return $this->toBase()->duplicatesStrict($callback);
+        }
+
+        return parent::duplicatesStrict($callback);
+    }
+
+    /**
      * Get the comparison function to detect duplicates.
      *
      * @return callable(TModel, TModel): bool

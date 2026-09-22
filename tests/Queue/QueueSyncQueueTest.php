@@ -21,6 +21,7 @@ class QueueSyncQueueTest extends TestCase
 {
     protected function tearDown(): void
     {
+        SyncQueue::createPayloadUsing(null);
         Container::setInstance(null);
     }
 

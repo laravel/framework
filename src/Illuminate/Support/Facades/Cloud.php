@@ -8,6 +8,7 @@ use Illuminate\Foundation\Cloud\CloudManager;
  * @method static bool hosted()
  * @method static bool usesManagedQueues()
  * @method static \Illuminate\Foundation\Cloud\Queue queue()
+ * @method static bool isManagedQueue(string $queue)
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)

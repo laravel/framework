@@ -3,6 +3,7 @@
 namespace Illuminate\Redis\Connections;
 
 use Closure;
+use ErrorException;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -476,7 +477,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function pipeline(?callable $callback = null)
     {
-        $pipeline = $this->client()->pipeline();
+        $pipeline = $this->retryOnceOnLostConnection(fn () => $this->client()->pipeline());
 
         if (is_null($callback)) {
             return $pipeline;
@@ -486,6 +487,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             return tap($pipeline, $callback)->exec();
         } catch (Throwable $e) {
             rescue(fn () => $this->client()->discard(), null, false);
+
+            $this->rebuildClientOnLostConnection($e);
 
             throw $e;
         }
@@ -499,7 +502,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function transaction(?callable $callback = null)
     {
-        $transaction = $this->client()->multi();
+        $transaction = $this->retryOnceOnLostConnection(fn () => $this->client()->multi());
 
         if (is_null($callback)) {
             return $transaction;
@@ -509,6 +512,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             return tap($transaction, $callback)->exec();
         } catch (Throwable $e) {
             rescue(fn () => $this->client()->discard(), null, false);
+
+            $this->rebuildClientOnLostConnection($e);
 
             throw $e;
         }
@@ -630,12 +635,12 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         while (true) {
             try {
                 return parent::command($method, $parameters);
-            } catch (RedisClusterException|RedisException $e) {
-                if (! Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'READONLY', 'Connection lost', 'Error processing response from Redis node'])) {
+            } catch (RedisClusterException|RedisException|ErrorException $e) {
+                if (! $this->causedByLostConnection($e)) {
                     throw $e;
                 }
 
-                $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+                $this->rebuildClient();
 
                 if ($retries-- === 0) {
                     throw $e;
@@ -660,6 +665,82 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         }
 
         return in_array($method, static::RETRYABLE_COMMANDS, true);
+    }
+
+    /**
+     * Run the given callback, retrying it once on a rebuilt client if the connection was lost.
+     *
+     * For operations that have not yet sent a command that could have taken effect, such as opening a pipeline or a transaction.
+     *
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    protected function retryOnceOnLostConnection(Closure $callback)
+    {
+        $retries = 1;
+
+        while (true) {
+            try {
+                return $callback();
+            } catch (RedisClusterException|RedisException|ErrorException $e) {
+                if (! $this->causedByLostConnection($e)) {
+                    throw $e;
+                }
+
+                $this->rebuildClient();
+
+                if ($retries-- === 0) {
+                    throw $e;
+                }
+            }
+        }
+    }
+
+    /**
+     * Rebuild the client if the given exception was caused by a lost connection.
+     *
+     * @param  \Throwable  $e
+     * @return void
+     */
+    protected function rebuildClientOnLostConnection(Throwable $e)
+    {
+        if ($this->causedByLostConnection($e)) {
+            $this->rebuildClient();
+        }
+    }
+
+    /**
+     * Determine if the given exception was caused by a lost connection to the Redis server.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function causedByLostConnection(Throwable $e)
+    {
+        if (! $e instanceof RedisClusterException && ! $e instanceof RedisException && ! $e instanceof ErrorException) {
+            return false;
+        }
+
+        return Str::contains($e->getMessage(), [
+            'went away',
+            'socket',
+            'Error while reading',
+            'read error on connection',
+            'READONLY',
+            'Connection lost',
+            'Error processing response from Redis node',
+            'Connection reset by peer',
+        ]);
+    }
+
+    /**
+     * Replace the underlying client with a freshly connected one.
+     *
+     * @return void
+     */
+    protected function rebuildClient()
+    {
+        $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
     }
 
     /**

@@ -445,6 +445,8 @@ class Builder
     {
         $type = is_null($type) ? $type : strtolower($type);
 
+        $index = is_string($index) ? strtolower($index) : $index;
+
         foreach ($this->getIndexes($table) as $value) {
             $typeMatches = is_null($type)
                 || ($type === 'primary' && $value['primary'])

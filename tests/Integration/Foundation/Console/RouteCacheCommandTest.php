@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
+use Illuminate\Container\Container;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,13 @@ class RouteCacheCommandTest extends TestCase
         $this->artisan('route:cache')->assertSuccessful();
 
         $this->assertSame($this->app, Facade::getFacadeApplication());
+    }
+
+    public function testItRestoresTheContainerInstanceAfterBootingAFreshApplication(): void
+    {
+        $this->artisan('route:cache')->assertSuccessful();
+
+        $this->assertSame($this->app, Container::getInstance());
     }
 
     public function testItLeavesTheFacadeRootsPointingAtTheCurrentApplication(): void

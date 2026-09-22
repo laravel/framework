@@ -65,6 +65,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
      */
     protected function tearDown(): void
     {
+        Eloquent::clearBootedModels();
         $this->schema()->drop('users');
         $this->schema()->drop('logins');
         $this->schema()->drop('states');

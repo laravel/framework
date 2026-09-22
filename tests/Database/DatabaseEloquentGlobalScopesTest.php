@@ -21,6 +21,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
     protected function tearDown(): void
     {
+        Model::clearBootedModels();
         Model::unsetConnectionResolver();
     }
 

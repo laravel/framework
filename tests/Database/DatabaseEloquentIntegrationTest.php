@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Attributes\Refreshes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -25,8 +26,8 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Illuminate\Tests\Integration\Database\Fixtures\Post;
-use Illuminate\Tests\Integration\Database\Fixtures\User;
+use Illuminate\Tests\Database\Fixtures\Models\Integration\Post;
+use Illuminate\Tests\Database\Fixtures\Models\Integration\User;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentIntegrationTest extends TestCase
@@ -68,6 +69,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->schema('default')->create('with_json', function ($table) {
             $table->increments('id');
             $table->text('json')->default(json_encode([]));
+        });
+
+        $this->schema('default')->create('generated_users', function ($table) {
+            $table->increments('id');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('name')->virtualAs("first_name || ' ' || last_name");
         });
 
         $this->schema('second_connection')->create('test_items', function ($table) {
@@ -193,6 +201,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      */
     protected function tearDown(): void
     {
+        Model::clearBootedModels();
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
             $this->schema($connection)->drop('friends');
@@ -203,6 +212,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Relation::morphMap([], false);
         Eloquent::unsetConnectionResolver();
+        Paginator::currentPageResolver(fn () => 1);
+        CursorPaginator::currentCursorResolver(fn () => null);
 
         Str::createUuidsNormally();
         DB::flushQueryLog();
@@ -259,6 +270,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
         foreach ($records as $record) {
             $this->assertEquals(1, $record->id);
         }
+    }
+
+    public function testConfiguredAttributesAreRefreshedAfterInsertAndUpdate()
+    {
+        $user = EloquentTestGeneratedUser::create([
+            'first_name' => 'Taylor',
+            'last_name' => 'Otwell',
+        ]);
+
+        $this->assertSame('Taylor Otwell', $user->name);
+        $this->assertSame('Taylor Otwell', EloquentTestGeneratedUser::$createdName);
+
+        $user->update(['first_name' => 'Abigail']);
+
+        $this->assertSame('Abigail Otwell', $user->name);
+        $this->assertSame('Abigail Otwell', EloquentTestGeneratedUser::$updatedName);
+        $this->assertTrue($user->wasChanged('name'));
     }
 
     public function testBasicModelCollectionRetrieval()
@@ -938,6 +966,72 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
 
         $this->assertEquals(2, $chunks);
+    }
+
+    public function testLazyWithLimits()
+    {
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
+
+        DB::enableQueryLog();
+
+        $users = EloquentTestUser::query()->orderBy('id', 'asc')->limit(2)->lazy(2);
+
+        $this->assertSame(['First', 'Second'], $users->pluck('name')->all());
+        $this->assertCount(1, DB::getQueryLog());
+    }
+
+    public function testLazyWithLimitsAndOffsets()
+    {
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+            ['name' => 'Fourth', 'email' => 'fourth@example.com'],
+            ['name' => 'Fifth', 'email' => 'fifth@example.com'],
+            ['name' => 'Sixth', 'email' => 'sixth@example.com'],
+            ['name' => 'Seventh', 'email' => 'seventh@example.com'],
+        ]);
+
+        $users = EloquentTestUser::query()->orderBy('id', 'asc')->offset(2)->limit(3)->lazy(2);
+
+        $this->assertSame(['Third', 'Fourth', 'Fifth'], $users->pluck('name')->all());
+    }
+
+    public function testLazyByIdWithLimits()
+    {
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
+
+        DB::enableQueryLog();
+
+        $users = EloquentTestUser::query()->limit(2)->lazyById(2);
+
+        $this->assertSame(['First', 'Second'], $users->pluck('name')->all());
+        $this->assertCount(1, DB::getQueryLog());
+    }
+
+    public function testLazyByIdWithLimitsAndOffsets()
+    {
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+            ['name' => 'Fourth', 'email' => 'fourth@example.com'],
+            ['name' => 'Fifth', 'email' => 'fifth@example.com'],
+            ['name' => 'Sixth', 'email' => 'sixth@example.com'],
+            ['name' => 'Seventh', 'email' => 'seventh@example.com'],
+        ]);
+
+        $users = EloquentTestUser::query()->offset(2)->limit(3)->lazyById(2);
+
+        $this->assertSame(['Third', 'Fourth', 'Fifth'], $users->pluck('name')->all());
     }
 
     public function testChunkByIdWithNonIncrementingKey()
@@ -3014,6 +3108,31 @@ class EloquentTestWithJSON extends Eloquent
     protected $casts = [
         'json' => 'array',
     ];
+}
+
+#[Refreshes('name')]
+class EloquentTestGeneratedUser extends Eloquent
+{
+    public $timestamps = false;
+
+    public static $createdName;
+
+    public static $updatedName;
+
+    protected $table = 'generated_users';
+
+    protected $guarded = [];
+
+    protected function fireModelEvent($event, $halt = true)
+    {
+        if ($event === 'created') {
+            static::$createdName = $this->name;
+        } elseif ($event === 'updated') {
+            static::$updatedName = $this->name;
+        }
+
+        return parent::fireModelEvent($event, $halt);
+    }
 }
 
 class EloquentTestFriendPivot extends Pivot

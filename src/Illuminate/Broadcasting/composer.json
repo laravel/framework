@@ -27,7 +27,10 @@
     "suggest": {
         "ext-hash": "Required to use the Ably and Pusher broadcast drivers.",
         "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0 || ^7.0)."
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0 || ^7.0).",
+        "symfony/http-client": "Required to set the Mercure \"client_options\" configuration value (^7.4).",
+        "symfony/mercure": "Required to use the Mercure broadcast driver (^0.8).",
+        "web-token/jwt-library": "Required to sign Mercure JWTs and use end-to-end encrypted channels (^4.1)."
     },
     "minimum-stability": "dev",
     "autoload": {

@@ -285,7 +285,10 @@ class BusBatchTest extends TestCase
         }));
 
         $events->expects('dispatch')->with(Mockery::on(function ($event) use ($batch) {
-            return $event instanceof BatchFinished && $event->batch === $batch;
+            return $event instanceof BatchFinished
+                && $event->batch->id === $batch->id
+                && $event->batch->finished()
+                && $event->batch->pendingJobs === 0;
         }));
 
         $batch->recordSuccessfulJob('test-id');
@@ -555,6 +558,7 @@ class BusBatchTest extends TestCase
         $events->expects('dispatch')->with(Mockery::on(function ($event) use ($batch, $exception) {
             return $event instanceof BatchCanceled
                 && $event->batch->id === $batch->id
+                && $event->batch->cancelled()
                 && $event->exception === $exception;
         }));
 

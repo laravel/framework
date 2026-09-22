@@ -6,6 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Tests\Pagination\Fixtures\Models\CursorResourceTestModel;
 use LogicException;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 class CursorResourceTest extends TestCase
@@ -32,6 +33,7 @@ class CursorResourceTest extends TestCase
         $paginator->toResourceCollection();
     }
 
+    #[RunInSeparateProcess]
     public function testItCanGuessResourceWhenNotProvided()
     {
         $paginator = new CursorResourceTestPaginator([

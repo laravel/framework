@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Tests\Integration\Routing\Fixtures\ApiResourceTaskController;
-use Illuminate\Tests\Integration\Routing\Fixtures\ApiResourceTestController;
+use Illuminate\Tests\Routing\Fixtures\ApiResourceTaskController;
+use Illuminate\Tests\Routing\Fixtures\ApiResourceTestController;
 use Orchestra\Testbench\TestCase;
 
 class RouteApiResourceTest extends TestCase

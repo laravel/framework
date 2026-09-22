@@ -22,7 +22,7 @@ jobs:
           MYSQL_DATABASE: laravel
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: --health-cmd="mysqladmin ping" --health-start-period=30s --health-interval=10s --health-timeout=5s --health-retries=3
 
     name: MySQL Innovation
 
