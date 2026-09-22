@@ -256,7 +256,7 @@ class CloudBootstrapper
                 'capture_request_payload' => false,
                 'redact_request_payload_fields' => ['_token', 'password', 'password_confirmation', 'current_password'],
                 'redact_headers' => ['Authorization', 'Cookie', 'Proxy-Authorization', 'X-XSRF-TOKEN'],
-                'redact_command_input_fields' => ['password', 'password_confirmation', 'current_password', 'secret', 'token'],
+                'redact_command_input_fields' => ['token', 'password', 'key', 'secret'],
                 ...json_decode($_SERVER['LARAVEL_CLOUD_EXCEPTIONS'], associative: true, flags: JSON_THROW_ON_ERROR),
             ];
 
