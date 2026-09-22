@@ -510,71 +510,6 @@ class ExceptionReporter
     }
 
     /**
-     * Redact the given authorization header value, retaining the scheme.
-     */
-    protected function redactAuthorizationHeaderValue(string $value): string
-    {
-        if (! str_contains($value, ' ')) {
-            return $this->redactValue($value);
-        }
-
-        [$scheme, $remainder] = explode(' ', $value, 2);
-
-        if (in_array(strtolower($scheme), [
-            'basic',
-            'bearer',
-            'concealed',
-            'digest',
-            'dpop',
-            'gnap',
-            'hoba',
-            'mutual',
-            'negotiate',
-            'oauth',
-            'privatetoken',
-            'scram-sha-1',
-            'scram-sha-256',
-            'vapid',
-        ], true)) {
-            return $scheme.' '.$this->redactValue($remainder);
-        }
-
-        return $this->redactValue($value);
-    }
-
-    /**
-     * Redact the given cookie header value, retaining the cookie names.
-     */
-    protected function redactCookieHeaderValue(string $value): string
-    {
-        try {
-            return implode('; ', array_map(function ($cookie) {
-                if (! str_contains($cookie, '=')) {
-                    throw new RuntimeException('Invalid cookie format.');
-                }
-
-                [$name, $value] = explode('=', $cookie, 2);
-
-                return trim($name).'='.$this->redactValue($value);
-            }, explode(';', $value)));
-        } catch (Throwable) {
-            return $this->redactValue($value);
-        }
-    }
-
-    /**
-     * Redact the given value.
-     */
-    protected function redactValue(string $value): string
-    {
-        $length = strlen($value);
-
-        $bytes = $length === 1 ? 'byte' : 'bytes';
-
-        return "[{$length} {$bytes} redacted]";
-    }
-
-    /**
      * Retrieve the redacted request payload.
      *
      * @return array<array-key, mixed>|null
@@ -663,6 +598,71 @@ class ExceptionReporter
     {
         return in_array($field, $this->config['redact_request_payload_fields'])
             && is_scalar($value);
+    }
+
+    /**
+     * Redact the given authorization header value, retaining the scheme.
+     */
+    protected function redactAuthorizationHeaderValue(string $value): string
+    {
+        if (! str_contains($value, ' ')) {
+            return $this->redactValue($value);
+        }
+
+        [$scheme, $remainder] = explode(' ', $value, 2);
+
+        if (in_array(strtolower($scheme), [
+            'basic',
+            'bearer',
+            'concealed',
+            'digest',
+            'dpop',
+            'gnap',
+            'hoba',
+            'mutual',
+            'negotiate',
+            'oauth',
+            'privatetoken',
+            'scram-sha-1',
+            'scram-sha-256',
+            'vapid',
+        ], true)) {
+            return $scheme.' '.$this->redactValue($remainder);
+        }
+
+        return $this->redactValue($value);
+    }
+
+    /**
+     * Redact the given cookie header value, retaining the cookie names.
+     */
+    protected function redactCookieHeaderValue(string $value): string
+    {
+        try {
+            return implode('; ', array_map(function ($cookie) {
+                if (! str_contains($cookie, '=')) {
+                    throw new RuntimeException('Invalid cookie format.');
+                }
+
+                [$name, $value] = explode('=', $cookie, 2);
+
+                return trim($name).'='.$this->redactValue($value);
+            }, explode(';', $value)));
+        } catch (Throwable) {
+            return $this->redactValue($value);
+        }
+    }
+
+    /**
+     * Redact the given value.
+     */
+    protected function redactValue(string $value): string
+    {
+        $length = strlen($value);
+
+        $bytes = $length === 1 ? 'byte' : 'bytes';
+
+        return "[{$length} {$bytes} redacted]";
     }
 
     /**
