@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation;
 
+use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\BootProviders;
@@ -255,6 +256,7 @@ class CloudBootstrapper
                 'capture_request_payload' => false,
                 'redact_request_payload_fields' => ['_token', 'password', 'password_confirmation', 'current_password'],
                 'redact_headers' => ['Authorization', 'Cookie', 'Proxy-Authorization', 'X-XSRF-TOKEN'],
+                'redact_command_input_fields' => ['password', 'password_confirmation', 'current_password', 'secret', 'token'],
                 ...json_decode($_SERVER['LARAVEL_CLOUD_EXCEPTIONS'], associative: true, flags: JSON_THROW_ON_ERROR),
             ];
 
@@ -264,6 +266,19 @@ class CloudBootstrapper
                 $app->basePath().DIRECTORY_SEPARATOR,
                 $config,
             ));
+
+            if (! $app->runningInConsole()) {
+                return;
+            }
+
+            $preparedForCommand = false;
+            $app['events']->listen(function (CommandStarting $event) use ($exceptionReporter, &$preparedForCommand) {
+                if (! $preparedForCommand) {
+                    $exceptionReporter->prepareForCommand($event->command, $event->input);
+
+                    $preparedForCommand = true;
+                }
+            });
 
             $app['events']->listen(function (JobProcessing $event) use ($exceptionReporter) {
                 if ($event->connectionName !== 'sync') {
