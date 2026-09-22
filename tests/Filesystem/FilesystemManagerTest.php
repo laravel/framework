@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use Aws\Exception\CredentialsException;
+use GuzzleHttp\Promise\Create;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
@@ -26,7 +29,7 @@ class FilesystemManagerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testIamS3DiskIgnoresStaticCredentialsAndAmbientEndpoint()
+    public function testEcsS3DiskIgnoresStaticCredentialsAndCanIgnoreAmbientEndpoint()
     {
         $environment = [
             'AWS_ACCESS_KEY_ID' => 'ambient-r2-key',
@@ -45,12 +48,13 @@ class FilesystemManagerTest extends TestCase
         try {
             $disk = (new FilesystemManager(new Application))->build([
                 'driver' => 's3',
-                'auth_mode' => 'iam',
+                'credentials' => 'ecs',
                 'region' => 'us-east-2',
                 'bucket' => 'arn:aws:s3:us-east-2:123456789012:accesspoint/environment-bucket',
                 'key' => 'disk-r2-key',
                 'secret' => 'disk-r2-secret',
-                'endpoint' => 'https://r2.example.com',
+                'ignore_configured_endpoint_urls' => true,
+                'use_arn_region' => true,
             ]);
 
             $client = $disk->getClient();
@@ -58,7 +62,7 @@ class FilesystemManagerTest extends TestCase
             $this->assertStringNotContainsString('r2.example.com', (string) $client->getEndpoint());
 
             // An invalid container host fails before HTTP, rather than falling back to R2 keys.
-            $this->expectException(\Aws\Exception\CredentialsException::class);
+            $this->expectException(CredentialsException::class);
             $this->expectExceptionMessage('unsupported host');
             $client->getCredentials()->wait();
         } finally {
@@ -66,6 +70,79 @@ class FilesystemManagerTest extends TestCase
                 putenv($value === false ? $key : $key.'='.$value);
             }
         }
+    }
+
+    public function testS3CredentialProviderOptionsAndMemoization()
+    {
+        $previous = getenv('AWS_CONTAINER_CREDENTIALS_RELATIVE_URI');
+        putenv('AWS_CONTAINER_CREDENTIALS_RELATIVE_URI=/credentials');
+        $requests = 0;
+
+        try {
+            $config = $this->s3Config([
+                'credentials' => [
+                    'provider' => 'ecs',
+                    'timeout' => 7,
+                    'client' => function ($request, $options) use (&$requests) {
+                        $requests++;
+                        $this->assertEquals(7, $options['timeout']);
+
+                        return Create::promiseFor(new Response(200, [], json_encode([
+                            'AccessKeyId' => 'container-key',
+                            'SecretAccessKey' => 'container-secret',
+                            'Token' => 'container-token',
+                            'Expiration' => gmdate('c', time() + 3600),
+                        ])));
+                    },
+                ],
+                'endpoint' => 'https://custom-s3.example.com',
+            ]);
+
+            $this->assertSame('container-key', $config['credentials']()->wait()->getAccessKeyId());
+            $this->assertSame('container-token', $config['credentials']()->wait()->getSecurityToken());
+            $this->assertSame(1, $requests);
+            $this->assertSame('https://custom-s3.example.com', $config['endpoint']);
+        } finally {
+            putenv($previous === false ? 'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI' : 'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI='.$previous);
+        }
+    }
+
+    public function testS3InstanceCredentialProvider()
+    {
+        $config = $this->s3Config(['credentials' => 'instance']);
+
+        $this->assertIsCallable($config['credentials']);
+    }
+
+    public function testS3RejectsUnknownCredentialProviders()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid credential provider [unknown].');
+
+        $this->s3Config(['credentials' => 'unknown']);
+    }
+
+    public function testS3PreservesExistingCredentialConfigurations()
+    {
+        foreach ([false, ['key' => 'key', 'secret' => 'secret'], fn () => null] as $credentials) {
+            $this->assertSame($credentials, $this->s3Config(['credentials' => $credentials])['credentials']);
+        }
+
+        $this->assertArrayNotHasKey('credentials', $this->s3Config([]));
+        $this->assertSame(['key' => 'key', 'secret' => 'secret', 'token' => 'token'], $this->s3Config([
+            'key' => 'key', 'secret' => 'secret', 'token' => 'token',
+        ])['credentials']);
+    }
+
+    protected function s3Config(array $config): array
+    {
+        return (new class(new Application) extends FilesystemManager
+        {
+            public function config(array $config): array
+            {
+                return $this->formatS3Config($config);
+            }
+        })->config($config);
     }
 
     public function testExceptionThrownOnUnsupportedDriver()

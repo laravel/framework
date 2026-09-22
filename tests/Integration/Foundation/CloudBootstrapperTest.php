@@ -54,14 +54,14 @@ class CloudBootstrapperTest extends TestCase
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
     }
 
-    public function test_it_configures_iam_disks_with_cacheable_configuration()
+    public function test_it_configures_disks_with_cacheable_credential_providers()
     {
         $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode([
             [
                 'disk' => 'aws-bucket',
                 'bucket' => 'arn:aws:s3:us-east-2:123456789012:accesspoint/environment-bucket',
                 'default_region' => 'us-east-2',
-                'auth_mode' => 'iam',
+                'credentials' => 'ecs',
             ],
         ]);
 
@@ -71,7 +71,10 @@ class CloudBootstrapperTest extends TestCase
             $config = $this->app['config']->get('filesystems.disks.aws-bucket');
 
             $this->assertSame('us-east-2', $config['region']);
-            $this->assertSame('iam', $config['auth_mode']);
+            $this->assertSame('ecs', $config['credentials']);
+            $this->assertTrue($config['ignore_configured_endpoint_urls']);
+            $this->assertTrue($config['use_arn_region']);
+            $this->assertArrayNotHasKey('auth_mode', $config);
             $this->assertNull($config['key']);
             $this->assertNull($config['secret']);
             $this->assertSame($config, eval('return '.var_export($config, true).';'));

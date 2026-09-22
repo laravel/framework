@@ -321,12 +321,8 @@ class FilesystemManager implements FactoryContract
     {
         $config += ['version' => 'latest'];
 
-        if (($config['auth_mode'] ?? null) === 'iam') {
-            // Cloud's Pod Identity credentials must not fall back to ambient R2 keys.
-            $config['credentials'] = CredentialProvider::memoize(CredentialProvider::ecsCredentials());
-            $config['ignore_configured_endpoint_urls'] = true;
-            $config['use_arn_region'] = true;
-            unset($config['key'], $config['secret'], $config['endpoint']);
+        if ($credentials = $this->resolveCredentialProvider($config)) {
+            $config['credentials'] = $credentials;
         } elseif (! empty($config['key']) && ! empty($config['secret'])) {
             $config['credentials'] = Arr::only($config, ['key', 'secret']);
 
@@ -335,7 +331,36 @@ class FilesystemManager implements FactoryContract
             }
         }
 
-        return Arr::except($config, ['token', 'auth_mode']);
+        return Arr::except($config, ['token']);
+    }
+
+    /**
+     * Resolve a credential provider from the given config.
+     *
+     * @param  array  $config
+     * @return callable|null
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function resolveCredentialProvider(array $config)
+    {
+        $credentials = $config['credentials'] ?? null;
+
+        $provider = is_array($credentials) ? ($credentials['provider'] ?? null) : $credentials;
+
+        if (! is_string($provider)) {
+            return $provider;
+        }
+
+        $options = is_array($credentials) ? Arr::except($credentials, ['provider']) : [];
+
+        return CredentialProvider::memoize(match ($provider) {
+            'ecs' => CredentialProvider::ecsCredentials($options),
+            'instance' => CredentialProvider::instanceProfile($options),
+            default => throw new InvalidArgumentException(
+                "Invalid credential provider [{$provider}]."
+            ),
+        });
     }
 
     /**
