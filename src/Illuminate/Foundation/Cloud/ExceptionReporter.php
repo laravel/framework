@@ -273,15 +273,7 @@ class ExceptionReporter
     }
 
     /**
-     * Retrieve the name of the currently running Artisan command.
-     */
-    protected function consoleCommandName(): ?string
-    {
-        return $this->currentlyRunningCommandName ?? $this->currentFallbackArgvInput()->getFirstArgument();
-    }
-
-    /**
-     * Retrieve the console input built from the process arguments.
+     * Retrieve the fallback console input built from the process arguments.
      */
     protected function currentFallbackArgvInput(): ArgvInput
     {
@@ -308,18 +300,6 @@ class ExceptionReporter
         } catch (Throwable $e) {
             return '_laravel_cloud_error: '.$e->getMessage();
         }
-    }
-
-    /**
-     * Prepare to process the given command.
-     */
-    public function prepareForCommand(string $name, InputInterface $input): void
-    {
-        $this->currentlyRunningCommandName = $name !== ''
-            ? $name
-            : null;
-
-        $this->currentConsoleInput = $input instanceof ConsoleInput ? $input : null;
     }
 
     /**
@@ -432,6 +412,26 @@ class ExceptionReporter
     protected function shouldRedactConsoleInput(string $name): bool
     {
         return in_array($name, $this->config['redact_command_input_fields'], true);
+    }
+
+    /**
+     * Retrieve the name of the currently running Artisan command.
+     */
+    protected function consoleCommandName(): ?string
+    {
+        return $this->currentlyRunningCommandName ?? $this->currentFallbackArgvInput()->getFirstArgument();
+    }
+
+    /**
+     * Prepare to process the given command.
+     */
+    public function prepareForCommand(string $name, InputInterface $input): void
+    {
+        $this->currentlyRunningCommandName = $name !== ''
+            ? $name
+            : null;
+
+        $this->currentConsoleInput = $input instanceof ConsoleInput ? $input : null;
     }
 
     /**
