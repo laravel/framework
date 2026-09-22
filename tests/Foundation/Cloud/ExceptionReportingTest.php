@@ -17,8 +17,8 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\WithConsoleEvents;
 use Illuminate\Log\Context\Repository as ContextRepository;
+use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\JobPopping;
-use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Jobs\Job as QueueJob;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -1484,7 +1484,7 @@ class ExceptionReportingTest extends TestCase
 
         // Some queue drivers, e.g. Beanstalkd, throw when the job is
         // interacted with after it has been processed.
-        Event::dispatch(new JobProcessing('database', new JobThatThrowsWhenInteractedWith));
+        Event::dispatch(new JobPopped('database', new JobThatThrowsWhenInteractedWith));
 
         report(new RuntimeException('Whoops!'));
 

@@ -14,7 +14,7 @@ use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Queue\Connectors\SqsConnector;
-use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
 use Monolog\Handler\SocketHandler;
@@ -281,8 +281,8 @@ class CloudBootstrapper
                 }
             });
 
-            $app['events']->listen(function (JobProcessing $event) use ($exceptionReporter) {
-                if ($event->connectionName !== 'sync') {
+            $app['events']->listen(function (JobPopped $event) use ($exceptionReporter) {
+                if ($event->job !== null) {
                     $exceptionReporter->prepareForJob($event->job);
                 }
             });
