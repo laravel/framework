@@ -1150,14 +1150,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $amount = (clone $this)->setAttribute($column, $amount)->getAttributeFromArray($column);
         }
 
-        return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($column, $amount, $extra), function () use ($column) {
+        return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($column, $amount, $extra), function () use ($column, $extra) {
             $this->refreshSavedAttributes();
 
             $this->syncChanges();
 
             $this->fireModelEvent('updated', false);
 
-            $this->syncOriginalAttribute($column);
+            $this->syncOriginalAttributes(array_merge([$column], array_keys($extra), $this->refreshes));
         });
     }
 
@@ -1330,14 +1330,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             }
         }
 
-        return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($dbColumns, $extra), function () use ($columns) {
+        return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($dbColumns, $extra), function () use ($columns, $extra) {
             $this->refreshSavedAttributes();
 
             $this->syncChanges();
 
             $this->fireModelEvent('updated', false);
 
-            $this->syncOriginalAttributes(array_keys($columns));
+            $this->syncOriginalAttributes(array_merge(array_keys($columns), array_keys($extra), $this->refreshes));
         });
     }
 
