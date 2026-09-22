@@ -342,6 +342,9 @@ class ExceptionReporter
         }
     }
 
+    /**
+     * Retrieve a transformer for the given console argument.
+     */
     protected function consoleArgumentTransformer(string $name, ConsoleInput $input): callable
     {
         return $this->shouldRedactConsoleInput($name)
@@ -349,6 +352,9 @@ class ExceptionReporter
             : $input->escapeToken(...);
     }
 
+    /**
+     * Retrieve a transformer for the given console option.
+     */
     protected function consoleOptionTransformer(string $name, ConsoleInput $input): callable
     {
         return function ($value) use ($name, $input) {
