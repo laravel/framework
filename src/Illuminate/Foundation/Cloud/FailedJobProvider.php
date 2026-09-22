@@ -226,12 +226,13 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
     }
 
     /**
-     * Flush all of the failed jobs from storage.
+     * Flush the failed jobs from storage.
      *
      * @param  int|null  $hours
+     * @param  string|null  $queue
      * @return void
      */
-    public function flush($hours = null)
+    public function flush($hours = null, $queue = null)
     {
         $this->failer->flush(...func_get_args());
     }
