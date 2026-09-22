@@ -273,14 +273,6 @@ class ExceptionReporter
     }
 
     /**
-     * Retrieve the fallback console input built from the process arguments.
-     */
-    protected function currentFallbackArgvInput(): ArgvInput
-    {
-        return $this->currentFallbackArgvInput ??= new ArgvInput;
-    }
-
-    /**
      * Retrieve the class name of the currently running Artisan command.
      */
     protected function consoleCommandClass(): ?string
@@ -420,6 +412,14 @@ class ExceptionReporter
     protected function consoleCommandName(): ?string
     {
         return $this->currentlyRunningCommandName ?? $this->currentFallbackArgvInput()->getFirstArgument();
+    }
+
+    /**
+     * Retrieve the fallback console input built from the process arguments.
+     */
+    protected function currentFallbackArgvInput(): ArgvInput
+    {
+        return $this->currentFallbackArgvInput ??= new ArgvInput;
     }
 
     /**
