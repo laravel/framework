@@ -182,11 +182,11 @@ class ExceptionReporter
     protected function exceptionContext(Throwable $e): object
     {
         try {
-            return (object) Arr::except(Exceptions::contextForException($e), 'exception');
+            return literal(Arr::except(Exceptions::contextForException($e), 'exception'));
         } catch (Throwable $e) {
-            return (object) [
-                '_laravel_cloud_error' => $e->getMessage(),
-            ];
+            return literal(
+                _laravel_cloud_error: $e->getMessage(),
+            );
         }
     }
 
@@ -196,11 +196,11 @@ class ExceptionReporter
     protected function laravelContext(): object
     {
         try {
-            return (object) Context::all();
+            return literal(Context::all());
         } catch (Throwable $e) {
-            return (object) [
-                '_laravel_cloud_error' => $e->getMessage(),
-            ];
+            return literal(
+                _laravel_cloud_error: $e->getMessage(),
+            );
         }
     }
 
