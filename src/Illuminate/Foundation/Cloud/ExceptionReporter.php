@@ -467,8 +467,8 @@ class ExceptionReporter
         try {
             $headers = clone Request::instance()->headers;
 
-            $headers = $this->removeSyntheticAuthorizationHeaders($headers);
-            $headers = $this->redactHeaders($headers);
+            $this->removeSyntheticAuthorizationHeaders($headers);
+            $this->redactHeaders($headers);
 
             return $headers->all();
         } catch (Throwable $e) {
@@ -481,7 +481,7 @@ class ExceptionReporter
     /**
      * Remove the headers PHP derives from the Authorization header.
      */
-    protected function removeSyntheticAuthorizationHeaders(HeaderBag $headers): HeaderBag
+    protected function removeSyntheticAuthorizationHeaders(HeaderBag $headers): void
     {
         // The Authorization header already contains these values and they are
         // not headers the client actually sent, so we remove them to avoid
@@ -489,14 +489,12 @@ class ExceptionReporter
         $headers->remove('php-auth-user');
         $headers->remove('php-auth-pw');
         $headers->remove('php-auth-digest');
-
-        return $headers;
     }
 
     /**
      * Redact the configured sensitive headers.
      */
-    protected function redactHeaders(HeaderBag $headers): HeaderBag
+    protected function redactHeaders(HeaderBag $headers): void
     {
         foreach ($this->config['redact_headers'] as $key) {
             if (! $headers->has($key)) {
@@ -509,8 +507,6 @@ class ExceptionReporter
                 default => $this->redactHeaderValue((string) $value),
             }, $headers->all($key)));
         }
-
-        return $headers;
     }
 
     /**
