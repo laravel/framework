@@ -129,6 +129,7 @@ class CloudBootstrapper
             }
 
             $config = (new ConfigurationUrlParser)->parseConfiguration($config);
+
             $host = $config['host'] ?? null;
 
             if (($config['driver'] ?? null) !== 'pgsql' ||
@@ -137,15 +138,18 @@ class CloudBootstrapper
             }
 
             [$endpoint, $domain] = explode('.', $host, 2);
+
             $endpoint = Str::chopEnd($endpoint, '-pooler');
+
             $config['direct'] = array_replace([
                 'host' => "{$endpoint}.{$domain}",
             ], $config['direct'] ?? []);
 
-            // Keep the legacy connection and opt-out independent of the pooler.
+            // Keep the legacy connection and opt-out independent of the pooler...
             $direct = Arr::except(array_replace($config, $config['direct']), [
                 'read', 'write', 'direct', 'pooled', 'connect_via_database', 'connect_via_port',
             ]);
+
             $direct['options'][PDO::ATTR_EMULATE_PREPARES] = $config['direct']['options'][PDO::ATTR_EMULATE_PREPARES] ?? false;
 
             if ($name === 'pgsql') {
@@ -154,6 +158,7 @@ class CloudBootstrapper
 
             $config['host'] = "{$endpoint}-pooler.{$domain}";
             $config['pooled'] = true;
+
             $connections[$name] = $pooled ? $config : $direct + ['pooled' => false];
         }
 
