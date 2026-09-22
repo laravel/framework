@@ -467,10 +467,11 @@ class ExceptionReportingTest extends TestCase
             'negative float' => [-12.75, '[6 bytes redacted]'],
             // A float with a zero fraction casts to a string without it.
             'float with a zero fraction' => [1.0, '[1 byte redacted]'],
-            // Booleans are passed through. Redacting them would reveal the
-            // value anyway, via the byte count.
-            'true' => [true, true],
-            'false' => [false, false],
+            // "false" is cast to a zero rather than an empty string, so that
+            // both booleans redact to the same length and the value is not
+            // revealed by the byte count.
+            'true' => [true, '[1 byte redacted]'],
+            'false' => [false, '[1 byte redacted]'],
             // `null` is not a scalar, so it is passed through as-is. It does
             // not reveal the value, only that the field was present.
             'null' => [null, null],

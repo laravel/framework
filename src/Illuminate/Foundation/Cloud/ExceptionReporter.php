@@ -182,7 +182,7 @@ class ExceptionReporter
     protected function exceptionContext(Throwable $e): object
     {
         try {
-            return literal(Arr::except(Exceptions::contextForException($e), 'exception'));
+            return (object) Arr::except(Exceptions::contextForException($e), 'exception');
         } catch (Throwable $e) {
             return literal(
                 _laravel_cloud_error: $e->getMessage(),
@@ -196,7 +196,7 @@ class ExceptionReporter
     protected function laravelContext(): object
     {
         try {
-            return literal(Context::all());
+            return (object) Context::all();
         } catch (Throwable $e) {
             return literal(
                 _laravel_cloud_error: $e->getMessage(),
@@ -504,17 +504,9 @@ class ExceptionReporter
             $headers->set($key, array_map(fn ($value) => match (strtolower($key)) {
                 'authorization', 'proxy-authorization' => $this->redactAuthorizationHeaderValue((string) $value),
                 'cookie' => $this->redactCookieHeaderValue((string) $value),
-                default => $this->redactHeaderValue((string) $value),
+                default => $this->redactValue((string) $value),
             }, $headers->all($key)));
         }
-    }
-
-    /**
-     * Redact the given header value.
-     */
-    protected function redactHeaderValue(string $value): string
-    {
-        return $this->redactValue($value);
     }
 
     /**
@@ -535,7 +527,7 @@ class ExceptionReporter
     protected function redactAuthorizationHeaderValue(string $value): string
     {
         if (! str_contains($value, ' ')) {
-            return $this->redactHeaderValue($value);
+            return $this->redactValue($value);
         }
 
         [$scheme, $remainder] = explode(' ', $value, 2);
@@ -556,10 +548,10 @@ class ExceptionReporter
             'scram-sha-256',
             'vapid',
         ], true)) {
-            return $scheme.' '.$this->redactHeaderValue($remainder);
+            return $scheme.' '.$this->redactValue($remainder);
         }
 
-        return $this->redactHeaderValue($value);
+        return $this->redactValue($value);
     }
 
     /**
@@ -575,10 +567,10 @@ class ExceptionReporter
 
                 [$name, $value] = explode('=', $cookie, 2);
 
-                return trim($name).'='.$this->redactHeaderValue($value);
+                return trim($name).'='.$this->redactValue($value);
             }, explode(';', $value)));
         } catch (Throwable) {
-            return $this->redactHeaderValue($value);
+            return $this->redactValue($value);
         }
     }
 
