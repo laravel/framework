@@ -54,7 +54,6 @@ class FilesystemManagerTest extends TestCase
                 'key' => 'disk-r2-key',
                 'secret' => 'disk-r2-secret',
                 'ignore_configured_endpoint_urls' => true,
-                'use_arn_region' => true,
             ]);
 
             $client = $disk->getClient();
