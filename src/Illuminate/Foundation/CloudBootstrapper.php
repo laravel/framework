@@ -16,6 +16,7 @@ use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerStopping;
 use Monolog\Handler\SocketHandler;
 use PDO;
 use Throwable;
@@ -287,6 +288,7 @@ class CloudBootstrapper
             });
 
             $app['events']->listen(fn (Looping $event) => $exceptionReporter->flushJobContext());
+            $app['events']->listen(fn (WorkerStopping $event) => $exceptionReporter->flushJobContext());
         } catch (Throwable) {
             return;
         }
