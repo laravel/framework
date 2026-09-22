@@ -303,34 +303,6 @@ class ExceptionReporter
     }
 
     /**
-     * Retrieve the console input of the currently running Artisan command.
-     */
-    protected function currentConsoleInput(): ConsoleInput
-    {
-        if ($this->currentConsoleInput !== null) {
-            return $this->currentConsoleInput;
-        }
-
-        $input = $this->currentFallbackArgvInput();
-
-        $name = $input->getFirstArgument();
-
-        $command = $name === null
-            ? null
-            : Artisan::findCommand($name);
-
-        if ($command === null) {
-            throw new CommandNotFoundException("The command [{$name}] does not exist.");
-        }
-
-        $command->mergeApplicationDefinition();
-
-        $input->bind($command->getDefinition());
-
-        return $this->currentConsoleInput = $input;
-    }
-
-    /**
      * Retrieve the redacted command line.
      */
     protected function consoleCommandLine(): string
@@ -404,6 +376,34 @@ class ExceptionReporter
         } catch (Throwable $e) {
             return '_laravel_cloud_error: '.$e->getMessage();
         }
+    }
+
+    /**
+     * Retrieve the console input of the currently running Artisan command.
+     */
+    protected function currentConsoleInput(): ConsoleInput
+    {
+        if ($this->currentConsoleInput !== null) {
+            return $this->currentConsoleInput;
+        }
+
+        $input = $this->currentFallbackArgvInput();
+
+        $name = $input->getFirstArgument();
+
+        $command = $name === null
+            ? null
+            : Artisan::findCommand($name);
+
+        if ($command === null) {
+            throw new CommandNotFoundException("The command [{$name}] does not exist.");
+        }
+
+        $command->mergeApplicationDefinition();
+
+        $input->bind($command->getDefinition());
+
+        return $this->currentConsoleInput = $input;
     }
 
     /**
