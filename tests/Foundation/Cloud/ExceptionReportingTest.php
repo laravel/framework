@@ -1219,6 +1219,87 @@ class ExceptionReportingTest extends TestCase
         $this->markTestIncomplete('TODO');
     }
 
+    public function testItReportsTheUrlAsItWasRequested(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/users/{user}', function () {
+            $this->setRunningInConsole(false);
+
+            throw new RuntimeException('Whoops!');
+        });
+
+        // The parameters are out of order, one is given twice, one holds a
+        // character that would be encoded, one is an array, and one is given
+        // without a value.
+        $this->get('http://localhost/users/123?b=2&a=1&a=3&filter=a b&x[]=1&x[]=2&flag')->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame(
+                'http://localhost/users/123?b=2&a=1&a=3&filter=a b&x[]=1&x[]=2&flag',
+                $payload['execution_context']['url'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItReportsTheRequestedPathWithoutTrimmingIt(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/users/{user}', function () {
+            $this->setRunningInConsole(false);
+
+            throw new RuntimeException('Whoops!');
+        });
+
+        // The request is handled directly, as the test helpers trim trailing
+        // slashes from the URL before the application sees them.
+        $this->app->make(\Illuminate\Contracts\Http\Kernel::class)->handle(
+            \Illuminate\Http\Request::create('http://localhost/users/123/')
+        );
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            // The trailing slash is retained, rather than being trimmed.
+            $this->assertSame(
+                'http://localhost/users/123/',
+                $payload['execution_context']['url'],
+            );
+
+            return true;
+        });
+    }
+
+    public function testItReportsTheRootPathAsItWasRequested(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/', function () {
+            $this->setRunningInConsole(false);
+
+            throw new RuntimeException('Whoops!');
+        });
+
+        $this->get('http://localhost/')->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            // The root path is reported, rather than the host alone.
+            $this->assertSame(
+                'http://localhost/',
+                $payload['execution_context']['url'],
+            );
+
+            return true;
+        });
+    }
+
     public function testItCapturesRequestExecutionContext(): void
     {
         $this->freezeTime();
@@ -2226,18 +2307,15 @@ class ExceptionReportingTest extends TestCase
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
-            // The name falls back to the console input, and the class is
-            // simply unknown. Only the command line, which cannot be parsed
-            // without the command, reports the reason.
+            // The name falls back to the console input, while the class and
+            // the command line, which both need the command itself, are
+            // simply unknown.
             $this->assertArrayNotHasKey('_laravel_cloud_error', $payload);
             $this->assertSame('command', $payload['execution_type']);
 
             $this->assertSame('unknown-command', $payload['execution_context']['name']);
             $this->assertNull($payload['execution_context']['class']);
-            $this->assertSame(
-                '_laravel_cloud_error: The command [unknown-command] does not exist.',
-                $payload['execution_context']['command'],
-            );
+            $this->assertNull($payload['execution_context']['command']);
             $this->assertSame('Whoops!', $payload['message']);
 
             return true;

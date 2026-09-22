@@ -214,7 +214,7 @@ class ExceptionReporter
         try {
             return match (true) {
                 $this->isProcessingJob() => $this->jobExecutionDetails($e),
-                App::runningInConsole() => $this->consoleExecutionDetails($e),
+                App::runningInConsole() => $this->consoleCommandExecutionDetails($e),
                 default => $this->requestExecutionDetails($e),
             };
         } catch (Throwable $e) {
@@ -258,10 +258,10 @@ class ExceptionReporter
      *
      * @return array<string, mixed>
      */
-    protected function consoleExecutionDetails(Throwable $e): array
+    protected function consoleCommandExecutionDetails(Throwable $e): array
     {
         return [
-            'trace_id' => $this->consoleTraceId(),
+            'trace_id' => $this->consoleCommandTraceId(),
             'execution_type' => 'command',
             'execution_context' => [
                 'timestamp' => $this->laravelStartedAtTimestamp(),
@@ -273,9 +273,9 @@ class ExceptionReporter
     }
 
     /**
-     * Retrieve the console execution trace ID.
+     * Retrieve the console command execution trace ID.
      */
-    protected function consoleTraceId(): string
+    protected function consoleCommandTraceId(): string
     {
         // TODO jobs should inherit this from the queue worker
         // TODO scheduled tasks
@@ -319,10 +319,14 @@ class ExceptionReporter
     /**
      * Retrieve the redacted command line.
      */
-    protected function consoleCommandLine(): string
+    protected function consoleCommandLine(): ?string
     {
         try {
-            $input = $this->currentConsoleInput();
+            try {
+                $input = $this->currentConsoleInput();
+            } catch (CommandNotFoundException $e) {
+                return null;
+            }
 
             $tokens = Arr::wrap($input->getFirstArgument());
 
@@ -467,13 +471,28 @@ class ExceptionReporter
                 'timestamp' => $this->laravelStartedAtTimestamp(),
                 'headers' => $this->requestHeaders(),
                 'method' => Request::method(),
-                'url' => Request::fullUrl(), // TODO redact query strings parameters
+                'url' => $this->requestUrl(), // TODO redact query strings parameters
                 'ip' => Request::ip(),
                 'route' => $this->requestRouteExecutionDetails(),
                 'payload' => $this->requestPayload($e),
                 'files' => $this->requestFiles($e),
             ],
         ];
+    }
+
+    /**
+     * Retrieve the requested URL.
+     */
+    protected function requestUrl(): string
+    {
+        $request = Request::instance();
+
+        $query = (string) $request->server->get('QUERY_STRING');
+
+        return $request->getSchemeAndHttpHost()
+            .$request->getBaseUrl()
+            .$request->getPathInfo()
+            .($query === '' ? '' : "?{$query}");
     }
 
     /**
@@ -540,7 +559,7 @@ class ExceptionReporter
         }
 
         try {
-            return $this->redactRequestPayload(Request::getFacadeRoot()->request->all());
+            return $this->redactRequestPayload(Request::instance()->request->all());
         } catch (Throwable $e) {
             return [
                 '_laravel_cloud_error' => $e->getMessage(),

@@ -3,6 +3,9 @@
 namespace Illuminate\Foundation;
 
 use Illuminate\Console\Events\CommandStarting;
+use Illuminate\Console\Events\ScheduledTaskFinished;
+use Illuminate\Console\Events\ScheduledTaskSkipped;
+use Illuminate\Console\Events\ScheduledTaskStarting;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\BootProviders;
