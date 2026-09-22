@@ -1593,6 +1593,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereValueBetween(new Raw(1), ['created_at', 'updated_at']);
         $this->assertSame('select * from "users" where 1 between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testOrWhereValueBetween()
@@ -1615,6 +1616,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('id', 2)->orWhereValueBetween(new Raw(1), ['created_at', 'updated_at']);
         $this->assertSame('select * from "users" where "id" = ? or 1 between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => 2], $builder->getBindings());
     }
 
     public function testWhereValueNotBetween()
@@ -1637,6 +1639,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereValueNotBetween(new Raw(1), ['created_at', 'updated_at']);
         $this->assertSame('select * from "users" where 1 not between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testOrWhereValueNotBetween()
@@ -1659,6 +1662,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('id', 2)->orWhereValueNotBetween(new Raw(1), ['created_at', 'updated_at']);
         $this->assertSame('select * from "users" where "id" = ? or 1 not between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => 2], $builder->getBindings());
     }
 
     public function testBasicOrWheres()
