@@ -66,6 +66,13 @@ class ExceptionReporter
     protected array $normalizedQueues = [];
 
     /**
+     * The cached queue configuration.
+     *
+     * @var array<string, mixed>|null
+     */
+    protected ?array $connectionConfig = null;
+
+    /**
      * The name of the currently running Artisan command.
      */
     protected ?string $currentlyRunningCommandName = null;
@@ -79,13 +86,6 @@ class ExceptionReporter
      * The console input built from the process arguments. Fallback when console input is not yet set.
      */
     protected ?ArgvInput $currentFallbackArgvInput = null;
-
-    /**
-     * The cached queue configuration.
-     *
-     * @var array<string, mixed>|null
-     */
-    protected ?array $connectionConfig = null;
 
     /**
      * Create a new Exception Reporter instance.
