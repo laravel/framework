@@ -402,7 +402,7 @@ class Worker
      * Pause the worker for the current loop.
      *
      * @param  \Illuminate\Queue\WorkerOptions  $options
-     * @param  int  $lastRestart
+     * @param  int|null  $lastRestart
      * @param  int|float  $startTime
      * @return array|null
      */
@@ -417,7 +417,7 @@ class Worker
      * Determine the exit code to stop the process if necessary.
      *
      * @param  \Illuminate\Queue\WorkerOptions  $options
-     * @param  int  $lastRestart
+     * @param  int|null  $lastRestart
      * @param  int|float  $startTime
      * @param  mixed  $job
      * @return array|null
