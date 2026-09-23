@@ -1216,9 +1216,11 @@ class HttpClientTest extends TestCase
 
         $pendingRequest = new PendingRequest($this->factory);
 
-        $pendingRequest->setHandler(function ($request, $options) use (&$bodies) {
+        $pendingRequest->setHandler(function ($request) use (&$bodies) {
             $bodies[] = $request->getBody()->getContents();
 
+            // Force Guzzle's stream wrapper to close the underlying resource between attempts,
+            // the same way it does outside of tests once the wrapping object is destroyed...
             gc_collect_cycles();
 
             if (count($bodies) < 3) {
@@ -1228,16 +1230,18 @@ class HttpClientTest extends TestCase
             return Create::promiseFor(new Psr7Response(200));
         });
 
-        $pendingRequest->retry(3, 0)
-            ->attach('file', fopen($path, 'rb'), 'hello.txt')
-            ->post('http://foo.com/upload');
+        try {
+            $pendingRequest->retry(3, 0)
+                ->attach('file', fopen($path, 'rb'), 'hello.txt')
+                ->post('http://foo.com/upload');
 
-        $this->assertCount(3, $bodies);
-        $this->assertStringContainsString('hello-stream', $bodies[0]);
-        $this->assertStringContainsString('hello-stream', $bodies[1]);
-        $this->assertStringContainsString('hello-stream', $bodies[2]);
-
-        unlink($path);
+            $this->assertCount(3, $bodies);
+            $this->assertStringContainsString('hello-stream', $bodies[0]);
+            $this->assertStringContainsString('hello-stream', $bodies[1]);
+            $this->assertStringContainsString('hello-stream', $bodies[2]);
+        } finally {
+            unlink($path);
+        }
     }
 
     public function testItCanSendToken()

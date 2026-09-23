@@ -1064,15 +1064,15 @@ class PendingRequest
 
         [$this->pendingBody, $this->pendingFiles] = [null, []];
 
+        $multipartStreams = isset($options['multipart']) ? $this->multipartStreamMetadata($options['multipart']) : [];
+
         if ($this->async) {
             return $this->promise = new LazyPromise(
-                fn () => $this->makePromise($method, $url, $options)
+                fn () => $this->makePromise($method, $url, $options, 1, $multipartStreams)
             );
         }
 
         $shouldRetry = null;
-
-        $multipartStreams = isset($options['multipart']) ? $this->multipartStreamUris($options['multipart']) : [];
 
         return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry, $multipartStreams) {
             if ($attempt > 1 && $multipartStreams) {
@@ -1206,49 +1206,52 @@ class PendingRequest
     }
 
     /**
-     * Gather the file path and mode for each multipart stream resource backed by a real file.
+     * Gather the stream metadata for each multipart part backed by a real file, so it can be
+     * rewound or reopened if a retry attempt finds the underlying resource consumed or closed.
      *
      * @param  array  $multipart
      * @return array
      */
-    protected function multipartStreamUris(array $multipart)
+    protected function multipartStreamMetadata(array $multipart)
     {
-        $uris = [];
+        $streams = [];
 
         foreach ($multipart as $index => $part) {
             $contents = $part['contents'] ?? null;
 
             if (is_resource($contents) && is_file(stream_get_meta_data($contents)['uri'] ?? '')) {
-                $uris[$index] = stream_get_meta_data($contents);
+                $streams[$index] = stream_get_meta_data($contents);
             }
         }
 
-        return $uris;
+        return $streams;
     }
 
     /**
      * Rewind or reopen multipart stream resources that were consumed or closed by a previous attempt.
      *
      * @param  array  $multipart
-     * @param  array  $uris
+     * @param  array  $streams
      * @return void
      */
-    protected function reopenMultipartStreams(array &$multipart, array $uris)
+    protected function reopenMultipartStreams(array &$multipart, array $streams)
     {
-        foreach ($uris as $index => $meta) {
+        foreach ($streams as $index => $meta) {
             $contents = $multipart[$index]['contents'] ?? null;
 
+            if (is_resource($contents) && $meta['seekable']) {
+                rewind($contents);
+
+                continue;
+            }
+
             if (is_resource($contents)) {
-                if ($meta['seekable']) {
-                    rewind($contents);
-
-                    continue;
-                }
-
                 fclose($contents);
             }
 
-            $multipart[$index]['contents'] = fopen($meta['uri'], $meta['mode']);
+            // Always reopen for reading, regardless of the mode the caller originally used, so a
+            // stream opened for writing or appending can't be truncated by a retried attempt.
+            $multipart[$index]['contents'] = fopen($meta['uri'], 'rb');
         }
     }
 
@@ -1259,10 +1262,15 @@ class PendingRequest
      * @param  string  $url
      * @param  array  $options
      * @param  int  $attempt
+     * @param  array  $multipartStreams
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    protected function makePromise(string $method, string $url, array $options = [], int $attempt = 1)
+    protected function makePromise(string $method, string $url, array $options = [], int $attempt = 1, array $multipartStreams = [])
     {
+        if ($attempt > 1 && $multipartStreams) {
+            $this->reopenMultipartStreams($options['multipart'], $multipartStreams);
+        }
+
         return $this->promise = $this->sendRequest($method, $url, $options)
             ->then(function (MessageInterface $message) {
                 $response = $this->newResponse($message);
@@ -1294,8 +1302,8 @@ class PendingRequest
 
                 return $e;
             })
-            ->then(function (Response|Throwable $response) use ($method, $url, $options, $attempt) {
-                return $this->handlePromiseResponse($response, $method, $url, $options, $attempt);
+            ->then(function (Response|Throwable $response) use ($method, $url, $options, $attempt, $multipartStreams) {
+                return $this->handlePromiseResponse($response, $method, $url, $options, $attempt, $multipartStreams);
             });
     }
 
@@ -1307,9 +1315,10 @@ class PendingRequest
      * @param  string  $url
      * @param  array  $options
      * @param  int  $attempt
+     * @param  array  $multipartStreams
      * @return mixed
      */
-    protected function handlePromiseResponse(Response|Throwable $response, $method, $url, $options, $attempt)
+    protected function handlePromiseResponse(Response|Throwable $response, $method, $url, $options, $attempt, array $multipartStreams = [])
     {
         if ($response instanceof Response && $response->successful()) {
             return $response;
@@ -1336,7 +1345,7 @@ class PendingRequest
         if ($attempt < $this->getMaximumAttempts() && $shouldRetry) {
             $options['delay'] = $this->retryDelayInMilliseconds($attempt, $exception);
 
-            return $this->makePromise($method, $url, $options, $attempt + 1);
+            return $this->makePromise($method, $url, $options, $attempt + 1, $multipartStreams);
         }
 
         if ($response instanceof Response &&
