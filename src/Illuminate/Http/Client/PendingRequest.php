@@ -1072,7 +1072,13 @@ class PendingRequest
 
         $shouldRetry = null;
 
-        return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
+        $multipartStreams = isset($options['multipart']) ? $this->multipartStreamUris($options['multipart']) : [];
+
+        return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry, $multipartStreams) {
+            if ($attempt > 1 && $multipartStreams) {
+                $this->reopenMultipartStreams($options['multipart'], $multipartStreams);
+            }
+
             try {
                 return tap($this->newResponse($this->sendRequest($method, $url, $options)), function (&$response) use ($attempt, &$shouldRetry) {
                     $this->populateResponse($response);
@@ -1197,6 +1203,53 @@ class PendingRequest
             })
             ->values()
             ->all();
+    }
+
+    /**
+     * Gather the file path and mode for each multipart stream resource backed by a real file.
+     *
+     * @param  array  $multipart
+     * @return array
+     */
+    protected function multipartStreamUris(array $multipart)
+    {
+        $uris = [];
+
+        foreach ($multipart as $index => $part) {
+            $contents = $part['contents'] ?? null;
+
+            if (is_resource($contents) && is_file(stream_get_meta_data($contents)['uri'] ?? '')) {
+                $uris[$index] = stream_get_meta_data($contents);
+            }
+        }
+
+        return $uris;
+    }
+
+    /**
+     * Rewind or reopen multipart stream resources that were consumed or closed by a previous attempt.
+     *
+     * @param  array  $multipart
+     * @param  array  $uris
+     * @return void
+     */
+    protected function reopenMultipartStreams(array &$multipart, array $uris)
+    {
+        foreach ($uris as $index => $meta) {
+            $contents = $multipart[$index]['contents'] ?? null;
+
+            if (is_resource($contents)) {
+                if ($meta['seekable']) {
+                    rewind($contents);
+
+                    continue;
+                }
+
+                fclose($contents);
+            }
+
+            $multipart[$index]['contents'] = fopen($meta['uri'], $meta['mode']);
+        }
     }
 
     /**

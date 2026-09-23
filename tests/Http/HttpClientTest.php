@@ -1207,6 +1207,39 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testAttachedStreamIsRewoundOnRetry()
+    {
+        $path = tempnam(sys_get_temp_dir(), 'attach');
+        file_put_contents($path, 'hello-stream');
+
+        $bodies = [];
+
+        $pendingRequest = new PendingRequest($this->factory);
+
+        $pendingRequest->setHandler(function ($request, $options) use (&$bodies) {
+            $bodies[] = $request->getBody()->getContents();
+
+            gc_collect_cycles();
+
+            if (count($bodies) < 3) {
+                throw new ConnectException('Connection refused', $request);
+            }
+
+            return Create::promiseFor(new Psr7Response(200));
+        });
+
+        $pendingRequest->retry(3, 0)
+            ->attach('file', fopen($path, 'rb'), 'hello.txt')
+            ->post('http://foo.com/upload');
+
+        $this->assertCount(3, $bodies);
+        $this->assertStringContainsString('hello-stream', $bodies[0]);
+        $this->assertStringContainsString('hello-stream', $bodies[1]);
+        $this->assertStringContainsString('hello-stream', $bodies[2]);
+
+        unlink($path);
+    }
+
     public function testItCanSendToken()
     {
         $this->factory->fake();
