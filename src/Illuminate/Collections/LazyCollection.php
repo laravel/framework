@@ -1240,6 +1240,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function skip($count)
     {
+        if ($count < 0) {
+            return $this->passthru(__FUNCTION__, func_get_args());
+        }
+
         return new static(function () use ($count) {
             $iterator = $this->getIterator();
 

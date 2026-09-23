@@ -592,6 +592,12 @@ class SupportCollectionTest extends TestCase
 
         // Total items to skip is more than collection length
         $this->assertSame([], $data->skip(10)->values()->all());
+
+        // Negative count keeps the last items, like slice()
+        $this->assertSame([5, 6], $data->skip(-2)->values()->all());
+
+        // Negative count larger than collection length keeps every item
+        $this->assertSame([1, 2, 3, 4, 5, 6], $data->skip(-10)->values()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
