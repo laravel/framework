@@ -126,11 +126,12 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function mode($key = null)
     {
-        if ($this->isEmpty()) {
+        $collection = (isset($key) ? $this->pluck($key) : $this)
+            ->reject(fn ($item) => is_null($item));
+
+        if ($collection->isEmpty()) {
             return;
         }
-
-        $collection = isset($key) ? $this->pluck($key) : $this;
 
         $counts = $this->newInstance();
 

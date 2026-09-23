@@ -5297,6 +5297,27 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testModeOnCollectionWithNull($collection)
+    {
+        $data = new $collection([
+            (object) ['foo' => 5],
+            (object) ['foo' => null],
+            (object) ['foo' => null],
+        ]);
+        $this->assertEquals([5], $data->mode('foo'));
+
+        $data = new $collection([null, 3]);
+        $this->assertEquals([3], $data->mode());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testModeOnCollectionWithOnlyNullsReturnsNull($collection)
+    {
+        $data = new $collection([null, null]);
+        $this->assertNull($data->mode());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testSliceOffset($collection)
     {
         $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8]);
