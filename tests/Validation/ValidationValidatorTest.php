@@ -6942,6 +6942,23 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testDateComparisonDoesNotThrowForNonDateValues()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        foreach (['after', 'after_or_equal', 'before', 'before_or_equal', 'date_equals'] as $rule) {
+            $invalidString = new Validator($trans, ['start' => '2024-01-01', 'end' => 'not-a-date'], ['start' => "{$rule}:end"]);
+            $array = new Validator($trans, ['start' => '2024-01-01', 'end' => ['2024-02-01']], ['start' => "{$rule}:end"]);
+            $this->assertSame($invalidString->passes(), $array->passes());
+
+            $v = new Validator($trans, ['start' => '2024-01-01', 'end' => ['2024-02-01']], ['start' => "date_format:Y-m-d|{$rule}:end"]);
+            $this->assertTrue($v->fails());
+        }
+
+        $v = new Validator($trans, ['start' => new Carbon('2024-01-01')], ['start' => 'date_format:Y-m-d|after:2020-01-01']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testWeakBeforeAndAfter()
     {
         $trans = $this->getIlluminateArrayTranslator();

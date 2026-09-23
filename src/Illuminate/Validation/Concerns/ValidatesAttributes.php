@@ -350,7 +350,7 @@ trait ValidatesAttributes
      */
     protected function getDateTimeWithOptionalFormat($format, $value)
     {
-        if ($date = DateTime::createFromFormat('!'.$format, $value)) {
+        if ((is_string($value) || is_numeric($value)) && ($date = DateTime::createFromFormat('!'.$format, $value))) {
             return $date;
         }
 
@@ -365,6 +365,10 @@ trait ValidatesAttributes
      */
     protected function getDateTime($value)
     {
+        if (! is_string($value) && ! is_numeric($value) && ! $value instanceof DateTimeInterface) {
+            return null;
+        }
+
         try {
             return @Date::parse($value) ?: null;
         } catch (Exception) {
