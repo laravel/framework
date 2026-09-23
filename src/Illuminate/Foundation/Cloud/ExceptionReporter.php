@@ -286,6 +286,7 @@ class ExceptionReporter
             'execution_context' => [
                 ...$this->executionContext['scheduled_task'],
                 'name' => $this->scheduledTaskName(),
+                'class' => $this->scheduledTaskClass(),
                 'cron' => $this->currentlyRunningScheduledTask->expression,
                 'timezone' => $this->scheduledTaskTimezone(),
                 'repeat_seconds' => $this->currentlyRunningScheduledTask->repeatSeconds,
@@ -316,6 +317,61 @@ class ExceptionReporter
     }
 
     /**
+     * Retrieve the class name of the currently running scheduled task.
+     */
+    protected function scheduledTaskClass(): ?string
+    {
+        try {
+            if ($this->currentlyRunningScheduledTask instanceof CallbackTask) {
+                return $this->scheduledCallbackTaskClass();
+            }
+
+            $prefix = 'php '.preg_replace("#['\"]#", '', ConsoleApplication::artisanBinary()).' ';
+
+            if (! str_starts_with($this->scheduledTaskName(), $prefix)) {
+                return null;
+            }
+
+            $command = Artisan::findCommand(
+                explode(' ', substr($this->scheduledTaskName(), strlen($prefix)))[0]
+            );
+
+            return $command === null
+                ? null
+                : $command::class;
+        } catch (Throwable $e) {
+            return '_laravel_cloud_error: '.$e->getMessage();
+        }
+    }
+
+    /**
+     * Retrieve the class name of the currently running scheduled callback task.
+     */
+    protected function scheduledCallbackTaskClass(): ?string
+    {
+        return match (true) {
+            is_object($this->scheduledTaskCallback()) => $this->scheduledTaskCallback()::class,
+            is_array($this->scheduledTaskCallback()) => is_string($this->scheduledTaskCallback()[0])
+                ? $this->scheduledTaskCallback()[0]
+                : $this->scheduledTaskCallback()[0]::class,
+            is_string($this->scheduledTaskCallback()) => class_exists($class = explode('@', $this->scheduledTaskCallback())[0])
+                ? $class
+                : null,
+            default => null,
+        };
+    }
+
+    /**
+     * Retrieve the callback of the currently running scheduled task.
+     */
+    protected function scheduledTaskCallback(): mixed
+    {
+        return (new ReflectionClass($this->currentlyRunningScheduledTask))
+            ->getProperty('callback')
+            ->getValue($this->currentlyRunningScheduledTask);
+    }
+
+    /**
      * Retrieve the name of the currently running scheduled callback task.
      */
     protected function scheduledCallbackTaskName(): string
@@ -326,15 +382,13 @@ class ExceptionReporter
             return $name;
         }
 
-        $callback = (new ReflectionClass($this->currentlyRunningScheduledTask))
-            ->getProperty('callback')
-            ->getValue($this->currentlyRunningScheduledTask);
-
         return match (true) {
-            $callback instanceof Closure => $this->scheduledClosureTaskName($callback),
-            is_string($callback) => $callback,
-            is_array($callback) => is_string($callback[0]) ? $callback[0] : $callback[0]::class,
-            default => $callback::class,
+            $this->scheduledTaskCallback() instanceof Closure => $this->scheduledClosureTaskName($this->scheduledTaskCallback()),
+            is_string($this->scheduledTaskCallback()) => $this->scheduledTaskCallback(),
+            is_array($this->scheduledTaskCallback()) => is_string($this->scheduledTaskCallback()[0])
+                ? $this->scheduledTaskCallback()[0]
+                : $this->scheduledTaskCallback()[0]::class,
+            default => $this->scheduledTaskCallback()::class,
         };
     }
 
@@ -355,7 +409,7 @@ class ExceptionReporter
     /**
      * Retrieve the timezone of the currently running scheduled task.
      */
-    protected function scheduledTaskTimezone(): string
+    protected function scheduledTaskTimezone(): ?string
     {
         return $this->currentlyRunningScheduledTask->timezone instanceof DateTimeZone
             ? $this->currentlyRunningScheduledTask->timezone->getName()
