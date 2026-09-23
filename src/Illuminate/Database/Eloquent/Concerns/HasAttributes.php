@@ -1730,6 +1730,16 @@ trait HasAttributes
     }
 
     /**
+     * Get the default attribute values for the model.
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaults()
+    {
+        return [];
+    }
+
+    /**
      * Determine whether a value is Date / DateTime castable for inbound manipulation.
      *
      * @param  string  $key
