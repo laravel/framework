@@ -692,6 +692,26 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Refresh an item in the cache using the flexible caching strategy.
+     *
+     * @template TCacheValue
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  array{ 0: \DateTimeInterface|\DateInterval|int, 1: \DateTimeInterface|\DateInterval|int }  $ttl
+     * @param  (callable(): TCacheValue)  $callback
+     * @return TCacheValue
+     */
+    public function refreshFlexible($key, $ttl, $callback)
+    {
+        $key = enum_value($key);
+
+        return tap(value($callback), fn ($value) => $this->putMany([
+            $key => $value,
+            self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
+        ], $ttl[1]));
+    }
+
+    /**
      * Set the expiration of a cached item.
      *
      * @param  \UnitEnum|string  $key

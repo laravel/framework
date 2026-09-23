@@ -239,6 +239,40 @@ class RepositoryTest extends TestCase
         $this->assertTrue($cache->missing(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'count'));
     }
 
+    public function testRefreshFlexiblePutsFreshDataInTheCache(): void
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00');
+        $cache = Cache::driver('array');
+        $count = 0;
+
+        $value = $cache->flexible('foo', [10, 20], function () use (&$count) {
+            return ++$count;
+        });
+
+        $this->assertSame(1, $value);
+        $this->assertSame(1, $cache->get('foo'));
+        $this->assertSame(946684800, $cache->get(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo'));
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(5));
+
+        $value = $cache->refreshFlexible('foo', [10, 20], function () use (&$count) {
+            return ++$count;
+        });
+
+        $this->assertSame(2, $value);
+        $this->assertSame(2, $cache->get('foo'));
+        $this->assertSame(946684805, $cache->get(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo'));
+        $this->assertCount(0, defer());
+
+        // The cache should now be considered fresh again by flexible()...
+        $value = $cache->flexible('foo', [10, 20], function () use (&$count) {
+            return ++$count;
+        });
+
+        $this->assertSame(2, $value);
+        $this->assertCount(0, defer());
+    }
+
     public function testItCanAlwaysDefer()
     {
         $this->freezeTime();
@@ -320,8 +354,9 @@ class RepositoryTest extends TestCase
         $this->assertTrue($cache->forget(TestCacheKey::FOO));
         $this->assertNull($cache->get(TestCacheKey::FOO));
 
-        // flexible / withoutOverlapping
+        // flexible / refreshFlexible / withoutOverlapping
         $this->assertSame('flexible', $cache->flexible(TestCacheKey::FOO, [5, 10], fn () => 'flexible'));
+        $this->assertSame('refreshed', $cache->refreshFlexible(TestCacheKey::FOO, [5, 10], fn () => 'refreshed'));
         $this->assertSame('overlapping', $cache->withoutOverlapping(TestCacheKey::FOO, fn () => 'overlapping'));
 
         // many / getMultiple
