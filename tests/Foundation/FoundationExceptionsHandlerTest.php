@@ -168,6 +168,25 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new OutOfRangeException('Custom message'));
     }
 
+    public function testHandlerReportsExceptionWithInlineLogLevel()
+    {
+        $logger = Mockery::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+
+        $logger->expects('warning')->withArgs([
+            'Warning message',
+            Mockery::subset(['from' => 'user@example.com']),
+        ]);
+
+        $this->handler->level(InvalidArgumentException::class, LogLevel::CRITICAL);
+
+        $this->handler->report(
+            new InvalidArgumentException('Warning message'),
+            ['from' => 'user@example.com'],
+            LogLevel::WARNING,
+        );
+    }
+
     public function testHandlerIgnoresNotReportableExceptions()
     {
         $logger = Mockery::mock(LoggerInterface::class);

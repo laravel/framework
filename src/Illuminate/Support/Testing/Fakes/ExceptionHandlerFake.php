@@ -147,14 +147,15 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      *
      * @param  \Throwable  $e
      * @param  array<string, mixed>  $context
+     * @param  \Psr\Log\LogLevel::*|null  $level
      * @return void
      *
      * @throws \Throwable
      */
-    public function report($e, array $context = [])
+    public function report($e, array $context = [], ?string $level = null)
     {
         if (! $this->isFakedException($e)) {
-            $this->handler->report($e, $context);
+            $this->handler->report($e, $context, $level);
 
             return;
         }

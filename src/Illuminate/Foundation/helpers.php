@@ -720,14 +720,15 @@ if (! function_exists('report')) {
      *
      * @param  \Throwable|string  $exception
      * @param  array<string, mixed>  $context
+     * @param  \Psr\Log\LogLevel::*|null  $level
      */
-    function report($exception, array $context = []): void
+    function report($exception, array $context = [], ?string $level = null): void
     {
         if (is_string($exception)) {
             $exception = new Exception($exception);
         }
 
-        app(ExceptionHandler::class)->report($exception, $context);
+        app(ExceptionHandler::class)->report($exception, $context, $level);
     }
 }
 
@@ -738,11 +739,12 @@ if (! function_exists('report_if')) {
      * @param  bool  $boolean
      * @param  \Throwable|string  $exception
      * @param  array<string, mixed>  $context
+     * @param  \Psr\Log\LogLevel::*|null  $level
      */
-    function report_if($boolean, $exception, array $context = []): void
+    function report_if($boolean, $exception, array $context = [], ?string $level = null): void
     {
         if ($boolean) {
-            report($exception, $context);
+            report($exception, $context, $level);
         }
     }
 }
@@ -754,11 +756,12 @@ if (! function_exists('report_unless')) {
      * @param  bool  $boolean
      * @param  \Throwable|string  $exception
      * @param  array<string, mixed>  $context
+     * @param  \Psr\Log\LogLevel::*|null  $level
      */
-    function report_unless($boolean, $exception, array $context = []): void
+    function report_unless($boolean, $exception, array $context = [], ?string $level = null): void
     {
         if (! $boolean) {
-            report($exception, $context);
+            report($exception, $context, $level);
         }
     }
 }

@@ -14,11 +14,12 @@ interface ExceptionHandler
      *
      * @param  \Throwable  $e
      * @param  array<string, mixed>  $context
+     * @param  \Psr\Log\LogLevel::*|null  $level
      * @return void
      *
      * @throws \Throwable
      */
-    public function report(Throwable $e, array $context = []);
+    public function report(Throwable $e, array $context = [], ?string $level = null);
 
     /**
      * Determine if the exception should be reported.
