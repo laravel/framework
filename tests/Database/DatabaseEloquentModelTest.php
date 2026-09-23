@@ -4075,6 +4075,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty());
     }
 
+    public function testDefaultsMethodIsNotReappliedWhenUnserializing()
+    {
+        $model = new EloquentModelWithDefaultsMethodStub(['status' => 'published']);
+
+        $model = unserialize(serialize($model));
+
+        $this->assertSame(['status' => 'published', 'views' => 0], $model->getAttributes());
+    }
+
     public function testDefaultsMethodIsEvaluatedForEachNewModel()
     {
         EloquentModelWithRuntimeDefaultsStub::$trialDays = 14;
