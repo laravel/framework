@@ -74,7 +74,7 @@ class Number
      */
     public static function parseInt(string $string, ?string $locale = null): int|false
     {
-        return self::parse($string, NumberFormatter::TYPE_INT32, $locale);
+        return self::parse($string, NumberFormatter::TYPE_INT64, $locale);
     }
 
     /**

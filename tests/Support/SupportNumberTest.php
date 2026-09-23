@@ -427,6 +427,10 @@ class SupportNumberTest extends TestCase
 
         $this->assertSame(1234, Number::parseInt('1.234', locale: 'de'));
         $this->assertSame(1234, Number::parseInt('1 234', locale: 'fr'));
+
+        $this->assertSame(3000000000, Number::parseInt('3,000,000,000'));
+        $this->assertSame(-3000000000, Number::parseInt('-3,000,000,000'));
+        $this->assertSame(PHP_INT_MAX, Number::parseInt((string) PHP_INT_MAX));
     }
 
     #[RequiresPhpExtension('intl')]
