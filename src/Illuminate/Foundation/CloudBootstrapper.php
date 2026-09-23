@@ -292,6 +292,11 @@ class CloudBootstrapper
 
             $app['events']->listen(fn (Looping $event) => $exceptionReporter->flushJobContext());
             $app['events']->listen(fn (WorkerStopping $event) => $exceptionReporter->flushJobContext());
+
+            $app['events']->listen(fn (ScheduledTaskStarting $event) => $exceptionReporter->prepareForScheduledTask($event->task));
+
+            $app['events']->listen(fn (ScheduledTaskFinished $event) => $exceptionReporter->finishScheduledTask($event->task));
+            $app['events']->listen(fn (ScheduledTaskSkipped $event) => $exceptionReporter->flushScheduledTaskContext());
         } catch (Throwable) {
             return;
         }

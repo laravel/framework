@@ -2,6 +2,11 @@
 
 namespace Illuminate\Foundation\Cloud;
 
+use Closure;
+use DateTimeZone;
+use Illuminate\Console\Application as ConsoleApplication;
+use Illuminate\Console\Scheduling\CallbackEvent as CallbackTask;
+use Illuminate\Console\Scheduling\Event as ScheduledTask;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
@@ -17,6 +22,8 @@ use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Request;
 use Illuminate\View\ViewException;
 use Ramsey\Uuid\Uuid;
+use ReflectionClass;
+use ReflectionFunction;
 use RuntimeException;
 use Spatie\LaravelIgnition\Exceptions\ViewException as IgnitionViewException;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
@@ -49,16 +56,32 @@ class ExceptionReporter
     protected ?Job $currentlyProcessingJob = null;
 
     /**
+     * The currently running scheduled task.
+     */
+    protected ?ScheduledTask $currentlyRunningScheduledTask = null;
+
+    /**
+     * Indicates the currently running scheduled task has finished with its failure yet to be reported.
+     */
+    protected bool $scheduledTaskAwaitingFailureReport = false;
+
+    /**
      * The currently executing job attempt ID.
      */
     protected ?string $currentlyProcessingJobAttemptId = null;
 
     /**
-     * Proactively captured execution context.
+     * Proactively captured execution context, keyed by execution type.
      *
-     * @var array<string, mixed>
+     * @var array{
+     *    job: array<string, mixed>,
+     *    scheduled_task: array<string, mixed>,
+     * }
      */
-    protected array $executionContext = [];
+    protected array $executionContext = [
+        'job' => [],
+        'scheduled_task' => [],
+    ];
 
     /**
      * The cached normalized queue names, keyed by "connection:queue".
@@ -131,6 +154,10 @@ class ExceptionReporter
             return null;
         } finally {
             $this->reportingViewException = $previousReportingViewException;
+
+            if ($this->scheduledTaskAwaitingFailureReport) {
+                $this->flushScheduledTaskContext();
+            }
         }
     }
 
@@ -214,6 +241,7 @@ class ExceptionReporter
         try {
             return match (true) {
                 $this->isProcessingJob() => $this->jobExecutionDetails($e),
+                $this->isRunningScheduledTask() => $this->scheduledTaskExecutionDetails($e),
                 App::runningInConsole() => $this->consoleCommandExecutionDetails($e),
                 default => $this->requestExecutionDetails($e),
             };
@@ -235,7 +263,7 @@ class ExceptionReporter
             'trace_id' => 'TODO',
             'execution_type' => 'job',
             'execution_context' => [
-                ...$this->executionContext,
+                ...$this->executionContext['job'],
                 'attempt_id' => $this->currentlyProcessingJobAttemptId(),
                 'uuid' => $this->currentlyProcessingJob->uuid(),
                 'name' => $this->currentlyProcessingJob->resolveName(),
@@ -243,6 +271,95 @@ class ExceptionReporter
                 'queue' => $this->normalizedQueue(),
             ],
         ];
+    }
+
+    /**
+     * Retrieve the currently running scheduled task's execution context.
+     *
+     * @return array<string, mixed>
+     */
+    protected function scheduledTaskExecutionDetails(Throwable $e): array
+    {
+        return [
+            'trace_id' => $this->consoleCommandTraceId(),
+            'execution_type' => 'scheduled_task',
+            'execution_context' => [
+                ...$this->executionContext['scheduled_task'],
+                'name' => $this->scheduledTaskName(),
+                'cron' => $this->currentlyRunningScheduledTask->expression,
+                'timezone' => $this->scheduledTaskTimezone(),
+                'repeat_seconds' => $this->currentlyRunningScheduledTask->repeatSeconds,
+                'without_overlapping' => $this->currentlyRunningScheduledTask->withoutOverlapping,
+                'on_one_server' => $this->currentlyRunningScheduledTask->onOneServer,
+                'run_in_background' => $this->currentlyRunningScheduledTask->runInBackground,
+                'even_in_maintenance_mode' => $this->currentlyRunningScheduledTask->evenInMaintenanceMode,
+            ],
+        ];
+    }
+
+    /**
+     * Retrieve the name of the currently running scheduled task.
+     */
+    protected function scheduledTaskName(): string
+    {
+        if ($this->currentlyRunningScheduledTask instanceof CallbackTask) {
+            return $this->scheduledCallbackTaskName();
+        }
+
+        return str_replace([
+            ConsoleApplication::phpBinary(),
+            ConsoleApplication::artisanBinary(),
+        ], [
+            'php',
+            preg_replace("#['\"]#", '', ConsoleApplication::artisanBinary()),
+        ], $this->currentlyRunningScheduledTask->command ?? '');
+    }
+
+    /**
+     * Retrieve the name of the currently running scheduled callback task.
+     */
+    protected function scheduledCallbackTaskName(): string
+    {
+        $name = $this->currentlyRunningScheduledTask->getSummaryForDisplay();
+
+        if (! in_array($name, ['Closure', 'Callback'])) {
+            return $name;
+        }
+
+        $callback = (new ReflectionClass($this->currentlyRunningScheduledTask))
+            ->getProperty('callback')
+            ->getValue($this->currentlyRunningScheduledTask);
+
+        return match (true) {
+            $callback instanceof Closure => $this->scheduledClosureTaskName($callback),
+            is_string($callback) => $callback,
+            is_array($callback) => is_string($callback[0]) ? $callback[0] : $callback[0]::class,
+            default => $callback::class,
+        };
+    }
+
+    /**
+     * Retrieve the name of the given scheduled closure task.
+     */
+    protected function scheduledClosureTaskName(Closure $callback): string
+    {
+        $function = new ReflectionFunction($callback);
+
+        return sprintf(
+            'Closure at: %s:%s',
+            $this->normalizeBasePath($function->getFileName() ?: ''),
+            $function->getStartLine(),
+        );
+    }
+
+    /**
+     * Retrieve the timezone of the currently running scheduled task.
+     */
+    protected function scheduledTaskTimezone(): string
+    {
+        return $this->currentlyRunningScheduledTask->timezone instanceof DateTimeZone
+            ? $this->currentlyRunningScheduledTask->timezone->getName()
+            : $this->currentlyRunningScheduledTask->timezone;
     }
 
     /**
@@ -278,7 +395,6 @@ class ExceptionReporter
     protected function consoleCommandTraceId(): string
     {
         // TODO jobs should inherit this from the queue worker
-        // TODO scheduled tasks
         if (isset($_SERVER['LARAVEL_CLOUD_COMMAND_UUID'])) {
             return $this->artisanCommandTraceId ??= str($_SERVER['LARAVEL_CLOUD_COMMAND_UUID'])->after('comm-')->toString();
         }
@@ -325,34 +441,34 @@ class ExceptionReporter
             // If we are unable to retrieve the console input, we are unable to confidently
             // redact input values, so we return null to avoid leaking sensitive information.
             try {
-                $input = $this->currentConsoleInput();
+                $this->currentConsoleInput();
             } catch (CommandNotFoundException $e) {
                 return null;
             }
 
-            $tokens = Arr::wrap($input->getFirstArgument());
+            $tokens = Arr::wrap($this->currentConsoleInput()->getFirstArgument());
 
-            foreach ($input->getRawArguments() as $name => $value) {
+            foreach ($this->currentConsoleInput()->getRawArguments() as $name => $value) {
                 // Skip the initial argument, which is the command name. We have already captured that above
                 // and do not want to apply any special handling to it.
                 if ($name === 'command' || is_int($name)) {
                     continue;
                 }
 
-                $transformer = $this->consoleArgumentTransformer($name, $input);
+                $transformer = $this->consoleArgumentTransformer($name);
 
                 $tokens = [
                     ...$tokens,
-                    ...$this->applyTransformationToConsoleInput($value, $transformer),
+                    ...$this->applyTransformationToConsoleInputValue($value, $transformer),
                 ];
             }
 
-            foreach ($input->getRawOptions() as $name => $value) {
-                $transformer = $this->consoleOptionTransformer($name, $input);
+            foreach ($this->currentConsoleInput()->getRawOptions() as $name => $value) {
+                $transformer = $this->consoleOptionTransformer($name);
 
                 $tokens = [
                     ...$tokens,
-                    ...$this->applyTransformationToConsoleInput($value, $transformer),
+                    ...$this->applyTransformationToConsoleInputValue($value, $transformer),
                 ];
             }
 
@@ -365,40 +481,33 @@ class ExceptionReporter
     /**
      * Retrieve a transformer for the given console argument.
      */
-    protected function consoleArgumentTransformer(string $name, ConsoleInput $input): callable
+    protected function consoleArgumentTransformer(string $name): callable
     {
-        return $this->shouldRedactConsoleInput($name)
+        return $this->shouldRedactConsoleInputValue($name)
             ? $this->redactValue(...)
-            : $input->escapeToken(...);
+            : $this->currentConsoleInput()->escapeToken(...);
     }
 
     /**
      * Retrieve a transformer for the given console option.
      */
-    protected function consoleOptionTransformer(string $name, ConsoleInput $input): callable
+    protected function consoleOptionTransformer(string $name): callable
     {
-        return function ($value) use ($name, $input) {
-            if (is_bool($value)) {
-                return $value ? "--{$name}" : "--no-{$name}";
-            }
-
-            if ($value === null) {
-                return "--{$name}";
-            }
-
-            if ($this->shouldRedactConsoleInput($name)) {
-                return "--{$name}={$this->redactValue($value)}";
-            }
-
-            return "--{$name}={$input->escapeToken($value)}";
+        return fn ($value) => match (true) {
+            is_bool($value) => $value ? "--{$name}" : "--no-{$name}",
+            is_null($value) => "--{$name}",
+            $this->shouldRedactConsoleInputValue($name) => "--{$name}={$this->redactValue($value)}",
+            default => "--{$name}={$this->currentConsoleInput()->escapeToken($value)}",
         };
     }
 
     /**
+     * Apply the given transformation to each of the given input's values.
+     *
      * @param  callable(string): string  $transformer
      * @return list<string>
      */
-    protected function applyTransformationToConsoleInput(null|bool|string|array $value, callable $transformer): array
+    protected function applyTransformationToConsoleInputValue(null|bool|string|array $value, callable $transformer): array
     {
         return array_map($transformer, $value === null ? [null] : Arr::wrap($value));
     }
@@ -412,9 +521,7 @@ class ExceptionReporter
             return $this->currentConsoleInput;
         }
 
-        $input = $this->currentFallbackArgvInput();
-
-        $name = $input->getFirstArgument();
+        $name = $this->currentFallbackArgvInput()->getFirstArgument();
 
         $command = $name === null
             ? null
@@ -426,15 +533,15 @@ class ExceptionReporter
 
         $command->mergeApplicationDefinition();
 
-        $input->bind($command->getDefinition());
+        $this->currentFallbackArgvInput()->bind($command->getDefinition());
 
-        return $this->currentConsoleInput = $input;
+        return $this->currentConsoleInput = $this->currentFallbackArgvInput();
     }
 
     /**
      * Determine if the given command argument or option should be redacted.
      */
-    protected function shouldRedactConsoleInput(string $name): bool
+    protected function shouldRedactConsoleInputValue(string $name): bool
     {
         return in_array($name, $this->config['redact_command_input_fields']);
     }
@@ -958,13 +1065,62 @@ class ExceptionReporter
     }
 
     /**
+     * Determine if a scheduled task is running.
+     */
+    protected function isRunningScheduledTask(): bool
+    {
+        return $this->currentlyRunningScheduledTask !== null;
+    }
+
+    /**
+     * Prepare to run the given scheduled task.
+     */
+    public function prepareForScheduledTask(ScheduledTask $task): void
+    {
+        $this->currentlyRunningScheduledTask = $task;
+        $this->scheduledTaskAwaitingFailureReport = false;
+
+        $this->executionContext['scheduled_task'] = [
+            'timestamp' => $this->timestamp(),
+        ];
+    }
+
+    /**
+     * Handle the given scheduled task finishing.
+     */
+    public function finishScheduledTask(ScheduledTask $task): void
+    {
+        // The order of failed scheduled task events means when we fail,
+        // we haven't yet received the exception to report. We'll set the
+        // reporter into a waiting state, so that when the exception does
+        // arrive, we also flush the scheduled task state.
+        if ($task->command !== null && $task->exitCode !== 0 && ! $task->runInBackground) {
+            $this->scheduledTaskAwaitingFailureReport = true;
+
+            return;
+        }
+
+        $this->flushScheduledTaskContext();
+    }
+
+    /**
+     * Flush the currently running scheduled task context.
+     */
+    public function flushScheduledTaskContext(): void
+    {
+        $this->currentlyRunningScheduledTask = null;
+        $this->scheduledTaskAwaitingFailureReport = false;
+        $this->executionContext['scheduled_task'] = [];
+    }
+
+    /**
      * Prepare to process the given job.
      */
     public function prepareForJob(Job $job): void
     {
         $this->currentlyProcessingJob = $job;
 
-        $this->executionContext = [
+        $this->executionContext['job'] = [
             'timestamp' => $this->timestamp(),
             // Beanstalkd throws an exception when attempting to retrieve the job
             // after it has been processed. Instead of capturing this value when
@@ -979,7 +1135,7 @@ class ExceptionReporter
      */
     public function flushJobContext(): void
     {
-        $this->executionContext = [];
+        $this->executionContext['job'] = [];
         $this->currentlyProcessingJob = null;
         $this->currentlyProcessingJobAttemptId = null;
     }
