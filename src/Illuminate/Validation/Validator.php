@@ -57,7 +57,7 @@ class Validator implements ValidatorContract
     /**
      * Attributes that should be excluded from the validated data.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $excludeAttributes = [];
 
@@ -571,8 +571,19 @@ class Validator implements ValidatorContract
      */
     protected function shouldBeExcluded($attribute)
     {
-        return array_any($this->excludeAttributes, fn ($excludeAttribute) => $attribute === $excludeAttribute ||
-            Str::startsWith($attribute, $excludeAttribute.'.'));
+        $prefix = '';
+
+        foreach (explode('.', $attribute) as $segment) {
+            $prefix .= $segment;
+
+            if (isset($this->excludeAttributes[$prefix])) {
+                return true;
+            }
+
+            $prefix .= '.';
+        }
+
+        return false;
     }
 
     /**
@@ -658,13 +669,15 @@ class Validator implements ValidatorContract
 
         $missingValue = new stdClass;
 
+        $parentKeys = $this->excludeUnvalidatedArrayKeys ? $this->parentRuleKeys() : [];
+
         foreach ($this->getRules() as $key => $rules) {
             $value = data_get($this->getData(), $key, $missingValue);
 
             if ($this->excludeUnvalidatedArrayKeys &&
                 (in_array('array', $rules) || in_array('list', $rules)) &&
                 $value !== null &&
-                ! empty(preg_grep('/^'.preg_quote($key, '/').'\.+/', array_keys($this->getRules())))) {
+                isset($parentKeys[$key])) {
                 continue;
             }
 
@@ -674,6 +687,26 @@ class Validator implements ValidatorContract
         }
 
         return $this->replacePlaceholders($results);
+    }
+
+    /**
+     * Get the rule keys that have nested rules beneath them.
+     *
+     * @return array<string, true>
+     */
+    protected function parentRuleKeys()
+    {
+        $parentKeys = [];
+
+        foreach (array_keys($this->getRules()) as $key) {
+            while (str_contains($key, '.')) {
+                $key = Str::beforeLast($key, '.');
+
+                $parentKeys[$key] = true;
+            }
+        }
+
+        return $parentKeys;
     }
 
     /**
@@ -1035,9 +1068,7 @@ class Validator implements ValidatorContract
      */
     protected function excludeAttribute(string $attribute)
     {
-        $this->excludeAttributes[] = $attribute;
-
-        $this->excludeAttributes = array_unique($this->excludeAttributes);
+        $this->excludeAttributes[$attribute] = $attribute;
     }
 
     /**
