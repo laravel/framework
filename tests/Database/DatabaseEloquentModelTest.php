@@ -4074,6 +4074,17 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame(['status' => 'published'], $model->getAttributes());
         $this->assertFalse($model->isDirty());
     }
+
+    public function testDefaultsMethodIsEvaluatedForEachNewModel()
+    {
+        EloquentModelWithRuntimeDefaultsStub::$trialDays = 14;
+
+        $this->assertSame(['trial_days' => 14], (new EloquentModelWithRuntimeDefaultsStub)->getAttributes());
+
+        EloquentModelWithRuntimeDefaultsStub::$trialDays = 30;
+
+        $this->assertSame(['trial_days' => 30], (new EloquentModelWithRuntimeDefaultsStub)->getAttributes());
+    }
 }
 
 class CustomBuilder extends Builder
@@ -5127,6 +5138,16 @@ class EloquentModelWithDefaultsMethodStub extends Model
     protected function defaults(): array
     {
         return ['status' => 'draft', 'views' => 0];
+    }
+}
+
+class EloquentModelWithRuntimeDefaultsStub extends Model
+{
+    public static $trialDays = 14;
+
+    protected function defaults(): array
+    {
+        return ['trial_days' => static::$trialDays];
     }
 }
 
