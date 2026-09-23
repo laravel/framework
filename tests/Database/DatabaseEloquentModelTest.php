@@ -4044,6 +4044,36 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertSame('slug', $model->getRouteKeyName());
     }
+
+    public function testDefaultsMethodSetsDefaultAttributeValues()
+    {
+        $model = new EloquentModelWithDefaultsMethodStub;
+
+        $this->assertSame(['status' => 'draft', 'views' => 0], $model->getAttributes());
+        $this->assertFalse($model->isDirty());
+    }
+
+    public function testDefaultsMethodTakesPrecedenceOverAttributesProperty()
+    {
+        $model = new EloquentModelWithDefaultsMethodAndPropertyStub;
+
+        $this->assertSame(['title' => 'Untitled', 'status' => 'draft'], $model->getAttributes());
+    }
+
+    public function testDefaultsMethodValuesMayBeOverriddenOnInstantiation()
+    {
+        $model = new EloquentModelWithDefaultsMethodStub(['status' => 'published']);
+
+        $this->assertSame(['status' => 'published', 'views' => 0], $model->getAttributes());
+    }
+
+    public function testDefaultsMethodIsNotAppliedToExistingModels()
+    {
+        $model = (new EloquentModelWithDefaultsMethodStub)->newFromBuilder(['status' => 'published']);
+
+        $this->assertSame(['status' => 'published'], $model->getAttributes());
+        $this->assertFalse($model->isDirty());
+    }
 }
 
 class CustomBuilder extends Builder
@@ -5088,4 +5118,27 @@ class EloquentModelWithRouteKeyAttributeStub extends Model
 class EloquentModelInheritingRouteKeyAttributeStub extends EloquentModelWithRouteKeyAttributeStub
 {
     //
+}
+
+class EloquentModelWithDefaultsMethodStub extends Model
+{
+    protected $guarded = [];
+
+    protected function defaults(): array
+    {
+        return ['status' => 'draft', 'views' => 0];
+    }
+}
+
+class EloquentModelWithDefaultsMethodAndPropertyStub extends Model
+{
+    protected $attributes = [
+        'title' => 'Untitled',
+        'status' => 'pending',
+    ];
+
+    protected function defaults(): array
+    {
+        return ['status' => 'draft'];
+    }
 }
