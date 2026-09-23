@@ -24,6 +24,35 @@ class TranslationFileLoaderTest extends TestCase
         $this->assertEquals(['foo' => 'bar', 'baz' => 'backagesplash'], $loader->load('en', 'messages'));
     }
 
+    public function testLoadMethodIgnoresLocalesAndGroupsContainingPathTraversal()
+    {
+        $files = m::mock(Filesystem::class);
+        $files->shouldNotReceive('exists');
+        $files->shouldNotReceive('getRequire');
+        $loader = new FileLoader($files, __DIR__);
+        $loader->addNamespace('namespace', __DIR__.'/namespace');
+
+        $this->assertEquals([], $loader->load('../secret', 'config'));
+        $this->assertEquals([], $loader->load('..\\secret', 'config'));
+        $this->assertEquals([], $loader->load('..', 'secret/config'));
+        $this->assertEquals([], $loader->load("en\0", 'messages'));
+        $this->assertEquals([], $loader->load('en', '../../secret/config'));
+        $this->assertEquals([], $loader->load('en', '..\\secret\\config'));
+        $this->assertEquals([], $loader->load('../secret', 'config', 'namespace'));
+        $this->assertEquals([], $loader->load('../secret', '*', '*'));
+    }
+
+    public function testLoadMethodAllowsGroupsInSubdirectories()
+    {
+        $files = m::mock(Filesystem::class);
+        $loader = new FileLoader($files, __DIR__);
+
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/en/admin/messages.php')->andReturn(true);
+        $files->shouldReceive('getRequire')->once()->with(__DIR__.'/en/admin/messages.php')->andReturn(['foo' => 'bar']);
+
+        $this->assertEquals(['foo' => 'bar'], $loader->load('en', 'admin/messages'));
+    }
+
     public function testLoadMethodHandlesMissingAddedPath()
     {
         $files = m::mock(Filesystem::class);

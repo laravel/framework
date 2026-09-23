@@ -537,7 +537,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function setLocale($locale)
     {
-        if (Str::contains($locale, ['/', '\\'])) {
+        if (Str::contains($locale, ['/', '\\', '..', "\0"])) {
             throw new InvalidArgumentException('Invalid characters present in locale.');
         }
 
