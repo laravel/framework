@@ -1024,8 +1024,6 @@ class ExceptionReporter
             return $this->normalizedQueues[$key];
         }
 
-        // TODO trim .fifo
-
         $this->connectionConfig ??= Config::get("queue.connections.{$connection}") ?? [];
 
         if (($this->connectionConfig['driver'] ?? null) === 'cloud') {
@@ -1045,7 +1043,7 @@ class ExceptionReporter
         if ($this->connectionConfig['suffix'] ?? null) {
             $suffix = preg_quote($this->connectionConfig['suffix'], '#');
 
-            $queue = preg_replace("#{$suffix}$#", '', $queue) ?? $queue;
+            $queue = preg_replace("#{$suffix}(\.fifo)?$#", '$1', $queue) ?? $queue;
         }
 
         return $this->normalizedQueues[$key] = $queue;

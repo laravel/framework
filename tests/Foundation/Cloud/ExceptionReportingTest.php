@@ -1022,6 +1022,38 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
+    public function testItNormalizesSqsFifoQueueNames(): void
+    {
+        $this->freezeTime();
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Config::set('queue.default', 'database');
+
+        // The suffix of a FIFO queue sits before the ".fifo" extension, as
+        // that is where SQS requires it.
+        ExceptionReportingJobThatReportsException::dispatch(fn () => Config::set('queue.connections.database', [
+            'driver' => 'sqs',
+            'prefix' => 'https://sqs.us-east-1.amazonaws.com/your-account-id',
+            'queue' => 'queue-name.fifo',
+            'suffix' => '-production',
+        ]))->onQueue('https://sqs.us-east-1.amazonaws.com/your-account-id/queue-name-production.fifo');
+
+        Artisan::call('queue:work', [
+            '--queue' => 'https://sqs.us-east-1.amazonaws.com/your-account-id/queue-name-production.fifo',
+            '--max-jobs' => 1,
+            '--sleep' => 0,
+            '--stop-when-empty' => true,
+            '--tries' => 1,
+        ]);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $json) {
+            $this->assertSame('queue-name.fifo', $json['execution_context']['queue']);
+
+            return true;
+        });
+    }
+
     public function testItNormalizesCloudQueueNames(): void
     {
         $this->freezeTime();
