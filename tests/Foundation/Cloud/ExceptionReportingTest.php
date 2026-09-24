@@ -3503,9 +3503,15 @@ class ExceptionReportingTest extends TestCase
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function ($json) {
-            $this->assertStringStartsWith("class@anonymous\0/", $json['trace'][1]['args']['types'][0]);
-            $this->assertStringStartsWith("stdClass@anonymous\0/", $json['trace'][1]['args']['types'][1]);
-            $this->assertStringStartsWith("Illuminate\Support\Arr@anonymous\0/", $json['trace'][1]['args']['types'][2]);
+            // The name carries the path of the file the class was
+            // declared in, which is not the same shape on every platform.
+            $this->assertStringStartsWith("class@anonymous\0", $json['trace'][1]['args']['types'][0]);
+            $this->assertStringStartsWith("stdClass@anonymous\0", $json['trace'][1]['args']['types'][1]);
+            $this->assertStringStartsWith("Illuminate\Support\Arr@anonymous\0", $json['trace'][1]['args']['types'][2]);
+
+            foreach ($json['trace'][1]['args']['types'] as $type) {
+                $this->assertStringContainsString('ExceptionReportingTest.php', $type);
+            }
 
             return true;
         });
@@ -3522,7 +3528,10 @@ class ExceptionReportingTest extends TestCase
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function ($json) {
-            $this->assertStringStartsWith("RuntimeException@anonymous\0/", $json['class']);
+            // The name carries the path of the file the class was
+            // declared in, which is not the same shape on every platform.
+            $this->assertStringStartsWith("RuntimeException@anonymous\0", $json['class']);
+            $this->assertStringContainsString('ExceptionReportingTest.php', $json['class']);
 
             return true;
         });
