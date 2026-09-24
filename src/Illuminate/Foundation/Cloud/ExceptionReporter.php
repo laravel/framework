@@ -569,7 +569,6 @@ class ExceptionReporter
      */
     protected function consoleCommandTraceId(): string
     {
-        // TODO jobs should inherit this from the queue worker
         if (isset($_SERVER['LARAVEL_CLOUD_COMMAND_UUID'])) {
             return $this->artisanCommandTraceId ??= str($_SERVER['LARAVEL_CLOUD_COMMAND_UUID'])->after('comm-')->toString();
         }
