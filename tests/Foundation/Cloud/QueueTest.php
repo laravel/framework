@@ -684,6 +684,22 @@ class QueueTest extends TestCase
         );
     }
 
+    public function testItDoesNotEmitTheExceptionIdWhenExceptionReportingIsDisabled()
+    {
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $failedJobProvider = new FailedJobProvider($this->fakeFailer(), $eventsFake, $this->app['encrypter']);
+        $failedJobProvider->setQueue($queue);
+
+        $agent->pushJob();
+        $queue->pop()->fail();
+        $failedJobProvider->log('cloud', 'default', json_encode([]), new RuntimeException('Whoops!'));
+
+        // There is no reporter to identify the exception, so the failed job
+        // carries no reference to one.
+        $this->assertArrayNotHasKey('exception_id', $eventsFake->emitted[1]);
+    }
+
     public function testItEmitsFailedJobEventsWithExceptionPreviewWithMessage()
     {
         $this->travelTo('2000-01-02 03:04:05.060708');

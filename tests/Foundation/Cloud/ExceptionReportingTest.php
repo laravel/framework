@@ -47,6 +47,8 @@ use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\ErrorHandler\Error\FatalError;
+use Symfony\Component\HttpFoundation\FileBag;
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
 
 #[WithMigration]
@@ -56,6 +58,8 @@ class ExceptionReportingTest extends TestCase
     use LazilyRefreshDatabase, WithConsoleEvents;
 
     protected $serverSettingsToRestore = [];
+
+    protected $iniSettingsToRestore = [];
 
     protected $reportedScheduledTaskStreams = null;
 
@@ -80,6 +84,10 @@ class ExceptionReportingTest extends TestCase
 
     protected function tearDown(): void
     {
+        foreach ($this->iniSettingsToRestore as $key => $value) {
+            ini_set($key, $value);
+        }
+
         foreach ($this->serverSettingsToRestore as $key => $value) {
             if ($value === '__undefined__') {
                 unset($_SERVER[$key]);
@@ -1968,6 +1976,101 @@ class ExceptionReportingTest extends TestCase
         $this->assertSame('Bearer secret-token', $authorization);
     }
 
+    public function testItReportsNoHeadersWhenTheyCannotBeRetrieved(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/test', function () {
+            $this->setRunningInConsole(false);
+
+            request()->headers = new HeaderBagThatThrows;
+
+            throw new RuntimeException('Whoops!');
+        });
+        $this->get('/test')->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertNull($payload['execution_context']['headers']);
+            $this->assertSame('Whoops!', $payload['message']);
+
+            return true;
+        });
+    }
+
+    public function testItReportsNoRouteWhenItCannotBeRetrieved(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/test', function () {
+            $this->setRunningInConsole(false);
+
+            request()->setRouteResolver(fn () => new RouteThatThrows('GET', '/test', []));
+
+            throw new RuntimeException('Whoops!');
+        });
+        $this->get('/test')->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertNull($payload['execution_context']['route']);
+            $this->assertSame('Whoops!', $payload['message']);
+
+            return true;
+        });
+    }
+
+    public function testItReportsNoRequestPayloadWhenItCannotBeRetrieved(): void
+    {
+        // The redacted fields are given by the platform as JSON, so they
+        // may not be the list the reporter expects.
+        $this->setupExceptionReporting([
+            'capture_request_payload' => true,
+            'redact_request_payload_fields' => 'password',
+        ]);
+        $streams = $this->fakeEventsStreams();
+
+        Route::post('/test', function () {
+            $this->setRunningInConsole(false);
+
+            throw new RuntimeException('Whoops!');
+        });
+        $this->post('/test', ['key' => 'value'])->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertNull($payload['execution_context']['payload']);
+            $this->assertSame('Whoops!', $payload['message']);
+
+            return true;
+        });
+    }
+
+    public function testItReportsNoFilesWhenTheyCannotBeRetrieved(): void
+    {
+        $this->setupExceptionReporting(['capture_request_payload' => true]);
+        $streams = $this->fakeEventsStreams();
+
+        Route::post('/test', function () {
+            $this->setRunningInConsole(false);
+
+            request()->files = new FileBagThatThrows;
+
+            throw new RuntimeException('Whoops!');
+        });
+        $this->post('/test', ['key' => 'value'])->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertNull($payload['execution_context']['files']);
+            $this->assertSame('Whoops!', $payload['message']);
+
+            return true;
+        });
+    }
+
     public function testItCapturesJobExecutionContext(): void
     {
         $this->freezeTime();
@@ -2033,6 +2136,7 @@ class ExceptionReportingTest extends TestCase
 
     public function testItCapturesTheRawSerializableClosureStreamInTracesForQueuedClosures(): void
     {
+        $this->captureTraceArguments();
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
         Config::set('queue.default', 'database');
@@ -3239,6 +3343,7 @@ class ExceptionReportingTest extends TestCase
 
     public function testItFormatsTraces(): void
     {
+        $this->captureTraceArguments();
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
         $closedResource = fopen('php://memory', 'r');
@@ -3290,18 +3395,41 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
+    public function testItReportsNoTraceArgumentsWhenPhpDoesNotRetainThem(): void
+    {
+        $this->captureTraceArguments(false);
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        (function ($one, $two) {
+            report(new RuntimeException('Whoops!'));
+        })('a', 'b');
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function ($json) {
+            $this->assertArrayNotHasKey('args', $json['trace'][1]);
+            $this->assertSame('Whoops!', $json['message']);
+
+            return true;
+        });
+    }
+
     public function testItCapturesTheRawClassNameForAnonymousClassTraceArgs(): void
     {
+        $this->captureTraceArguments();
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
 
         (function ($anonymousArgOne, $anonymousArgTwo) {
             report(new RuntimeException('Whoops!'));
-        })(new class {
+        })(new class
+        {
             //
-        }, new class extends stdClass {
+        }, new class extends stdClass
+        {
             //
-        }, new class extends Arr {
+        }, new class extends Arr
+        {
             //
         });
 
@@ -3320,7 +3448,8 @@ class ExceptionReportingTest extends TestCase
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
 
-        report(new class('Whoops!') extends RuntimeException {
+        report(new class('Whoops!') extends RuntimeException
+        {
             //
         });
 
@@ -3666,6 +3795,19 @@ class ExceptionReportingTest extends TestCase
         Cloud::registerExceptionReporting($this->app);
     }
 
+    /**
+     * Capture the arguments of trace frames.
+     *
+     * PHP does not retain them when "zend.exception_ignore_args" is enabled,
+     * which it is in the production configuration PHP ships with.
+     */
+    protected function captureTraceArguments(bool $capture = true): void
+    {
+        $this->iniSettingsToRestore['zend.exception_ignore_args'] ??= ini_get('zend.exception_ignore_args');
+
+        ini_set('zend.exception_ignore_args', $capture ? '0' : '1');
+    }
+
     protected function setRunningInConsole(bool $runningInConsole): void
     {
         (function () use ($runningInConsole) {
@@ -3830,6 +3972,30 @@ class JobThatThrowsWhenInteractedWith extends QueueJob implements JobContract
     public function resolveName()
     {
         throw new RuntimeException('Unable to interact with the job.');
+    }
+}
+
+class HeaderBagThatThrows extends HeaderBag
+{
+    public function __clone(): void
+    {
+        throw new RuntimeException('Unable to retrieve the headers.');
+    }
+}
+
+class FileBagThatThrows extends FileBag
+{
+    public function all(?string $key = null): array
+    {
+        throw new RuntimeException('Unable to retrieve the files.');
+    }
+}
+
+class RouteThatThrows extends \Illuminate\Routing\Route
+{
+    public function getName()
+    {
+        throw new RuntimeException('Unable to retrieve the route.');
     }
 }
 
