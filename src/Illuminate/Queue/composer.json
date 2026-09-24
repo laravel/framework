@@ -35,6 +35,7 @@
         "ext-pdo": "Required to use the database queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.322.9).",
+        "illuminate/http": "Required to use remote jobs (^13.0).",
         "illuminate/redis": "Required to use the Redis queue driver (^13.0).",
         "pda/pheanstalk": "Required to use the Beanstalk queue driver (^7.0 || ^8.0)."
     },

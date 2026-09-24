@@ -2,20 +2,19 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Contracts\Queue\ShouldBeEncrypted;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldRunRemotely;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Queue\Attributes\Backoff;
-use Illuminate\Queue\Attributes\Queue as OnQueue;
+use Illuminate\Http\Client\Request;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Queue\Attributes\RemoteName;
-use Illuminate\Queue\Attributes\Tries;
+use Illuminate\Queue\Attributes\Service;
 use Illuminate\Queue\InteractsWithRemoteWorker;
 use Illuminate\Queue\RemoteJobFailed;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
@@ -36,6 +35,7 @@ class RemoteJobTest extends DatabaseTestCase
 
         $app['config']->set('app.key', Str::random(32));
         $app['config']->set('queue.default', 'database');
+        $app['config']->set('services.images', ['url' => 'http://images.test', 'token' => 'secret']);
     }
 
     protected function tearDown(): void
@@ -45,168 +45,123 @@ class RemoteJobTest extends DatabaseTestCase
         parent::tearDown();
     }
 
-    public function testPayloadIsPlainJson()
+    public function testCallSendsTheJobToTheServiceAndReturnsTheResponse()
     {
-        ResizeImage::dispatch('s3://bucket/cat.jpg', 800);
+        Http::fake(['images.test/resize_image' => Http::response(['url' => 's3://bucket/cat-800.jpg'])]);
 
-        $payload = $this->payload();
+        $this->assertSame(['url' => 's3://bucket/cat-800.jpg'], ResizeImage::call('s3://bucket/cat.jpg', 800));
 
-        $this->assertSame('resize_image', $payload['job']);
-        $this->assertSame(ResizeImage::class, $payload['displayName']);
-        $this->assertSame(['path' => 's3://bucket/cat.jpg', 'width' => 800], $payload['data']);
-        $this->assertSame(3, $payload['maxTries']);
-        $this->assertSame('5,30', $payload['backoff']);
-        $this->assertSame('images', DB::table('jobs')->first()->queue);
-        $this->assertArrayNotHasKey('reply', $payload);
+        Http::assertSent(fn (Request $request) => $request->method() === 'POST'
+            && $request->url() === 'http://images.test/resize_image'
+            && $request->hasHeader('Authorization', 'Bearer secret')
+            && $request->data() === ['path' => 's3://bucket/cat.jpg', 'width' => 800]);
+    }
+
+    public function testCallThrowsWhenTheServiceFails()
+    {
+        Http::fake(['images.test/*' => Http::response(['message' => 'Unsupported format'], 422)]);
+
+        $this->expectException(RemoteJobFailed::class);
+        $this->expectExceptionMessage('Unsupported format');
+        $this->expectExceptionCode(422);
+
+        ResizeImage::call('s3://bucket/cat.psd', 800);
     }
 
     public function testNameAndDataMayBeCustomized()
     {
-        TranscodeVideo::dispatch(42);
+        Http::fake(['images.test/videos.transcode' => Http::response(['ok' => true])]);
 
-        $payload = $this->payload();
+        TranscodeVideo::call(42);
 
-        $this->assertSame('videos.transcode', $payload['job']);
-        $this->assertSame(['video' => ['id' => 42]], $payload['data']);
+        Http::assertSent(fn (Request $request) => $request->data() === ['video' => ['id' => 42]]);
     }
 
-    public function testContextTravelsWithThePayload()
+    public function testServiceMustHaveAUrl()
     {
-        Context::add('tenant', 'acme');
+        config(['services.images.url' => null]);
 
-        ResizeImage::dispatch('s3://bucket/cat.jpg', 800);
+        $this->expectExceptionObject(new LogicException('Service [images] does not have a URL configured.'));
 
-        $this->assertArrayHasKey('illuminate:log:context', $this->payload());
+        ResizeImage::call('s3://bucket/cat.jpg', 800);
     }
 
-    public function testThenCallbackRunsWhenRemoteWorkerCompletes()
+    public function testDispatchedJobCallsTheServiceFromTheQueueAndRunsThen()
     {
+        Http::fake(['images.test/*' => Http::response(['url' => 's3://bucket/cat-800.jpg'])]);
+
         ResizeImage::dispatch('s3://bucket/cat.jpg', 800)
             ->then(fn (array $result) => RemoteJobTest::$result = $result['url']);
 
-        $reply = $this->payload()['reply'];
+        Http::assertNothingSent();
 
-        $this->assertSame('default', $reply['queue']);
+        $uuid = json_decode(DB::table('jobs')->first()->payload)->uuid;
 
-        $this->replyAsRemoteWorker($reply, ['status' => 'completed', 'result' => ['url' => 's3://bucket/cat-800.jpg']]);
+        Queue::pop()->fire();
 
         $this->assertSame('s3://bucket/cat-800.jpg', static::$result);
-        $this->assertSame(0, DB::table('jobs')->count());
+
+        Http::assertSent(fn (Request $request) => $request->hasHeader('Idempotency-Key', $uuid));
     }
 
-    public function testCatchCallbackRunsWhenRemoteWorkerFails()
+    public function testClientErrorsFailTheJobWithoutRetrying()
     {
+        Http::fake(['images.test/*' => Http::response(['message' => 'Unsupported format'], 422)]);
+
+        ResizeImage::dispatch('s3://bucket/cat.psd', 800)
+            ->catch(fn (RemoteJobFailed $e) => RemoteJobTest::$result = [$e->job, $e->getMessage(), $e->getCode()]);
+
+        $job = Queue::pop();
+        $job->fire();
+
+        $this->assertTrue($job->hasFailed());
+        $this->assertSame(['resize_image', 'Unsupported format', 422], static::$result);
+    }
+
+    public function testServerErrorsAreRetried()
+    {
+        Http::fake(['images.test/*' => Http::response('Bad Gateway', 502)]);
+
         ResizeImage::dispatch('s3://bucket/cat.jpg', 800)
-            ->replyOn('callbacks')
-            ->catch(fn (RemoteJobFailed $e) => RemoteJobTest::$result = [$e->job, $e->getMessage(), $e->type]);
+            ->catch(fn () => RemoteJobTest::$result = 'caught');
 
-        $reply = $this->payload()['reply'];
-
-        $this->assertSame('callbacks', $reply['queue']);
-
-        $this->replyAsRemoteWorker($reply, ['status' => 'failed', 'error' => ['message' => 'Unsupported format', 'type' => 'ValueError']]);
-
-        $this->assertSame(['resize_image', 'Unsupported format', 'ValueError'], static::$result);
-    }
-
-    public function testTamperedReplyTokenIsRejected()
-    {
-        ResizeImage::dispatch('s3://bucket/cat.jpg', 800)->then(fn () => RemoteJobTest::$result = 'ran');
-
-        $reply = $this->payload()['reply'];
-        $reply['token'] = base64_encode('{"iv":"x","value":"y","mac":"z"}');
-
-        $this->expectException(DecryptException::class);
+        $this->expectException(RequestException::class);
 
         try {
-            $this->replyAsRemoteWorker($reply, ['status' => 'completed', 'result' => []]);
+            Queue::pop()->fire();
         } finally {
             $this->assertNull(static::$result);
         }
     }
 
-    public function testRemoteJobsCannotBeDispatchedSynchronously()
+    public function testRemoteJobsWorkInChains()
     {
-        $this->expectException(LogicException::class);
+        Http::fake(['images.test/*' => Http::response(['url' => 's3://bucket/cat-800.jpg'])]);
 
-        ResizeImage::dispatch('s3://bucket/cat.jpg', 800)->onConnection('sync');
-    }
+        Bus::chain([new ResizeImage('s3://bucket/cat.jpg', 800), new NotifyOwner])
+            ->onConnection('sync')
+            ->dispatch();
 
-    public function testProtectedConstructorPropertiesAreSent()
-    {
-        ArchiveFile::dispatch('s3://bucket/report.pdf');
-
-        $this->assertSame(['path' => 's3://bucket/report.pdf'], $this->payload()['data']);
-    }
-
-    public function testRemoteJobsCannotBeDeferred()
-    {
-        $this->expectExceptionMessage('cannot be dispatched to a sync connection');
-
-        ResizeImage::dispatch('s3://bucket/cat.jpg', 800)->onConnection('deferred');
-    }
-
-    public function testRemoteJobsCannotBeChained()
-    {
-        $this->expectExceptionMessage('cannot be chained or batched');
-
-        Bus::chain([new ResizeImage('s3://bucket/a.jpg', 800), new ResizeImage('s3://bucket/b.jpg', 800)])->dispatch();
-    }
-
-    public function testRemoteJobsCannotBeEncrypted()
-    {
-        $this->expectException(LogicException::class);
-
-        EncryptedRemoteJob::dispatch();
-    }
-
-    public function testRemoteJobsCanBeFaked()
-    {
-        Queue::fake();
-
-        ResizeImage::dispatch('s3://bucket/cat.jpg', 800);
-
-        Queue::assertPushed(ResizeImage::class, fn ($job) => $job->width === 800);
-    }
-
-    protected function payload()
-    {
-        return json_decode(DB::table('jobs')->first()->payload, true);
-    }
-
-    /**
-     * Do what a remote SDK does: acknowledge the job, then push the reply for Laravel to pick up.
-     */
-    protected function replyAsRemoteWorker(array $reply, array $outcome)
-    {
-        DB::table('jobs')->delete();
-
-        Queue::pushRaw(json_encode([
-            'uuid' => (string) Str::uuid(),
-            'job' => $reply['job'],
-            'data' => ['token' => $reply['token'], ...$outcome],
-            'attempts' => 0,
-        ]), $reply['queue']);
-
-        Queue::pop($reply['queue'])->fire();
+        Http::assertSentCount(1);
+        $this->assertSame('notified', static::$result);
     }
 }
 
-#[Tries(3), Backoff([5, 30]), OnQueue('images')]
+#[Service('images')]
 class ResizeImage implements ShouldRunRemotely
 {
     use Queueable, InteractsWithRemoteWorker;
 
-    public function __construct(public string $path, public int $width)
+    public function __construct(public string $path, protected int $width)
     {
         //
     }
 }
 
-#[RemoteName('videos.transcode')]
+#[Service('images'), RemoteName('videos.transcode')]
 class TranscodeVideo implements ShouldRunRemotely
 {
-    use Queueable;
+    use Queueable, InteractsWithRemoteWorker;
 
     public function __construct(public int $videoId)
     {
@@ -219,17 +174,12 @@ class TranscodeVideo implements ShouldRunRemotely
     }
 }
 
-class ArchiveFile implements ShouldRunRemotely
+class NotifyOwner implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(protected string $path)
+    public function handle()
     {
-        //
+        RemoteJobTest::$result = 'notified';
     }
-}
-
-class EncryptedRemoteJob implements ShouldRunRemotely, ShouldBeEncrypted
-{
-    use Queueable;
 }
