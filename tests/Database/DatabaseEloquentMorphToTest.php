@@ -239,15 +239,7 @@ class DatabaseEloquentMorphToTest extends TestCase
 
         Relation::requireMorphMap();
 
-        $parent = new EloquentMorphToModelStub;
-        $builder = Mockery::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn(new EloquentMorphToRelatedStub);
-
-        $relation = MorphTo::noConstraints(
-            fn () => new MorphTo($builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation')
-        );
-
-        $relation->createModelByType('poisoned');
+        $this->getRelationWithRealQuery()->createModelByType('poisoned');
     }
 
     protected function tearDown(): void
