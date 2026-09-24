@@ -282,7 +282,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     public function isReporting(Throwable $e): bool
     {
-        return false;
+        return $this->handler->isReporting($e);
     }
 
     /**
@@ -292,7 +292,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     public function buildContextForException(Throwable $e)
     {
-        return [];
+        return $this->handler->buildContextForException($e);
     }
 
     /**
