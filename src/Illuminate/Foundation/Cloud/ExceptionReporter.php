@@ -1189,10 +1189,7 @@ class ExceptionReporter
 
             $frame = $this->normalizeFrameFileAndLine($frame);
 
-            // TODO: add setting to capture values. Max depth. Only iterate once. Sensitive arguments / property values?
             if (is_array($args = $frame['args'] ?? null)) {
-                // Should this be 'args' => [[TYPE, VALUE], [TYPE, VALUE]
-                // Should this be 'args' => [[TYPE], [TYPE]
                 $frame['args'] = [
                     'types' => array_map($this->argType(...), $args, array_keys($args)),
                 ];
