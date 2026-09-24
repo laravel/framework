@@ -252,7 +252,7 @@ class Worker
                 [$status, $reason] = $this->pauseWorker($options, $lastRestart, $startTime);
 
                 if (! is_null($status)) {
-                    return $this->stop($status, $options, $reason, $connectionName, $queue);
+                    return $this->stop($connectionName, $queue, $status, $options, $reason);
                 }
 
                 continue;
@@ -302,7 +302,7 @@ class Worker
             [$status, $reason] = $this->stopIfNecessary($options, $lastRestart, $startTime, $job);
 
             if (! is_null($status)) {
-                return $this->stop($status, $options, $reason, $connectionName, $queue);
+                return $this->stop($connectionName, $queue, $status, $options, $reason);
             }
         }
     }
@@ -345,8 +345,8 @@ class Worker
             }
 
             $this->kill(
-                static::$timedOutExitCode ?? static::EXIT_ERROR,
-                $options, WorkerStopReason::TimedOut, $connectionName, $queue
+                $connectionName, $queue, static::$timedOutExitCode ?? static::EXIT_ERROR,
+                $options, WorkerStopReason::TimedOut
             );
         });
 
@@ -1027,14 +1027,14 @@ class Worker
     /**
      * Stop listening and bail out of the script.
      *
+     * @param  string  $connectionName
+     * @param  string  $queue
      * @param  int  $status
      * @param  WorkerOptions|null  $options
      * @param  WorkerStopReason|null  $reason
-     * @param  string|null  $connectionName
-     * @param  string|null  $queue
      * @return int
      */
-    public function stop($status = 0, $options = null, $reason = null, $connectionName = null, $queue = null)
+    public function stop($connectionName, $queue, $status = 0, $options = null, $reason = null)
     {
         $this->events->dispatch(new WorkerStopping(
             $connectionName, $queue, $status, $options, $reason, $this->jobsProcessed,
@@ -1047,14 +1047,14 @@ class Worker
     /**
      * Kill the process.
      *
+     * @param  string  $connectionName
+     * @param  string  $queue
      * @param  int  $status
      * @param  \Illuminate\Queue\WorkerOptions|null  $options
      * @param  \Illuminate\Queue\WorkerStopReason|null  $reason
-     * @param  string|null  $connectionName
-     * @param  string|null  $queue
      * @return never
      */
-    public function kill($status = 0, $options = null, $reason = null, $connectionName = null, $queue = null)
+    public function kill($connectionName, $queue, $status = 0, $options = null, $reason = null)
     {
         $this->events->dispatch(new WorkerStopping(
             $connectionName, $queue, $status, $options, $reason, $this->jobsProcessed,
