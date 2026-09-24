@@ -48,6 +48,11 @@ class SupportNumberTest extends TestCase
 
         $this->assertSame('∞', Number::format(INF));
         $this->assertSame('NaN', Number::format(NAN));
+
+        $this->assertSame('0', Number::format(-0.0));
+        $this->assertSame('0', Number::format(-0.4, precision: 0));
+        $this->assertSame('0.0', Number::format(-0.04, precision: 1));
+        $this->assertSame('-0.1', Number::format(-0.06, precision: 1));
     }
 
     #[RequiresPhpExtension('intl')]
@@ -135,6 +140,11 @@ class SupportNumberTest extends TestCase
         $this->assertSame('0.00%', Number::percentage(0, precision: 2));
         $this->assertSame('0.12%', Number::percentage(0.12345, precision: 2));
         $this->assertSame('0.1235%', Number::percentage(0.12345, precision: 4));
+
+        $this->assertSame('0%', Number::percentage(-0.4));
+        $this->assertSame('0.0%', Number::percentage(-0.04, precision: 1));
+        $this->assertSame('-0.4%', Number::percentage(-0.4, precision: 1));
+        $this->assertSame('-5%', Number::percentage(-5));
     }
 
     #[RequiresPhpExtension('intl')]
@@ -155,6 +165,11 @@ class SupportNumberTest extends TestCase
         $this->assertSame('$0', Number::currency(0, precision: 0));
         $this->assertSame('$5', Number::currency(5.00, precision: 0));
         $this->assertSame('$10', Number::currency(10.252, precision: 0));
+
+        $this->assertSame('$0.00', Number::currency(-0.001));
+        $this->assertSame('$0.00', Number::currency(0.1 + 0.2 - 0.3 - 0.0000000001));
+        $this->assertSame('$0', Number::currency(-0.4, precision: 0));
+        $this->assertSame('-$0.01', Number::currency(-0.006));
     }
 
     #[RequiresPhpExtension('intl')]
