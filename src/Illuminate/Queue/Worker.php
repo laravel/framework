@@ -1037,8 +1037,8 @@ class Worker
     public function stop($status = 0, $options = null, $reason = null, $connectionName = null, $queue = null)
     {
         $this->events->dispatch(new WorkerStopping(
-            $status, $options, $reason, $this->jobsProcessed, $this->lastJobProcessedAt, $this->currentMemoryUsage(),
-            $connectionName, $queue
+            $connectionName, $queue, $status, $options, $reason, $this->jobsProcessed,
+            $this->lastJobProcessedAt, $this->currentMemoryUsage()
         ));
 
         return $status;
@@ -1057,8 +1057,8 @@ class Worker
     public function kill($status = 0, $options = null, $reason = null, $connectionName = null, $queue = null)
     {
         $this->events->dispatch(new WorkerStopping(
-            $status, $options, $reason, $this->jobsProcessed, $this->lastJobProcessedAt, $this->currentMemoryUsage(),
-            $connectionName, $queue
+            $connectionName, $queue, $status, $options, $reason, $this->jobsProcessed,
+            $this->lastJobProcessedAt, $this->currentMemoryUsage()
         ));
 
         if (static::$killCallback) {

@@ -7,24 +7,24 @@ class WorkerStopping
     /**
      * Create a new event instance.
      *
+     * @param  string|null  $connectionName  The connection name.
+     * @param  string|null  $queue  The queue name.
      * @param  int  $status  The worker exit status.
      * @param  \Illuminate\Queue\WorkerOptions|null  $workerOptions  The worker options.
      * @param  \Illuminate\Queue\WorkerStopReason|null  $reason  The reason why the worker is stopping.
      * @param  int|null  $jobsProcessed  The number of jobs processed by the worker.
      * @param  int|float|null  $lastJobProcessedAt  The timestamp of the last job processed by the worker.
      * @param  int|float|null  $memoryUsage  The memory usage of the worker in MB.
-     * @param  string|null  $connectionName  The connection name.
-     * @param  string|null  $queue  The queue name.
      */
     public function __construct(
+        public $connectionName = null,
+        public $queue = null,
         public $status = 0,
         public $workerOptions = null,
         public $reason = null,
         public $jobsProcessed = null,
         public $lastJobProcessedAt = null,
         public $memoryUsage = null,
-        public $connectionName = null,
-        public $queue = null,
     ) {
     }
 }

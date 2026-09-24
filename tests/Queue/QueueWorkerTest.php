@@ -588,14 +588,14 @@ class QueueWorkerTest extends TestCase
 
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::on(function ($event) use ($workerOptions) {
             return $event instanceof WorkerStopping
+                && $event->connectionName === 'default'
+                && $event->queue === 'queue'
                 && $event->status === 0
                 && $event->workerOptions === $workerOptions
                 && $event->reason === WorkerStopReason::QueueEmpty
                 && $event->jobsProcessed === 2
                 && $event->lastJobProcessedAt !== null
-                && $event->memoryUsage > 0
-                && $event->connectionName === 'default'
-                && $event->queue === 'queue';
+                && $event->memoryUsage > 0;
         }));
     }
 
