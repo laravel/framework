@@ -101,11 +101,12 @@ trait InteractsWithExceptionHandling
              *
              * @param  \Throwable  $e
              * @param  array<string, mixed>  $context
+             * @param  \Psr\Log\LogLevel::*|null  $level
              * @return void
              *
              * @throws \Exception
              */
-            public function report(Throwable $e, array $context = [])
+            public function report(Throwable $e, array $context = [], ?string $level = null)
             {
                 //
             }

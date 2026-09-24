@@ -8,9 +8,24 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
+use Psr\Log\LogLevel;
 
 class FoundationHelpersTest extends TestCase
 {
+    public function testReportHelpersForwardContextAndLevel()
+    {
+        $handler = new FakeHandler;
+        $this->app->instance(ExceptionHandler::class, $handler);
+
+        report($first = new Exception('First'), ['id' => 1], LogLevel::WARNING);
+        report_if(true, $second = new Exception('Second'), ['id' => 2], LogLevel::NOTICE);
+        report_unless(false, $third = new Exception('Third'), ['id' => 3], LogLevel::INFO);
+
+        $this->assertSame([$first, $second, $third], $handler->reported);
+        $this->assertSame([['id' => 1], ['id' => 2], ['id' => 3]], $handler->contexts);
+        $this->assertSame([LogLevel::WARNING, LogLevel::NOTICE, LogLevel::INFO], $handler->levels);
+    }
+
     public function testRescue()
     {
         $this->assertSame(
@@ -164,10 +179,14 @@ class FoundationHelpersTest extends TestCase
 class FakeHandler
 {
     public $reported = [];
+    public $contexts = [];
+    public $levels = [];
 
-    public function report($exception)
+    public function report($exception, array $context = [], ?string $level = null)
     {
         $this->reported[] = $exception;
+        $this->contexts[] = $context;
+        $this->levels[] = $level;
     }
 
     public function render($exception)

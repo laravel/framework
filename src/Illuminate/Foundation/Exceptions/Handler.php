@@ -419,11 +419,12 @@ class Handler implements ExceptionHandlerContract
      *
      * @param  \Throwable  $e
      * @param  array<string, mixed>  $context
+     * @param  \Psr\Log\LogLevel::*|null  $level
      * @return void
      *
      * @throws \Throwable
      */
-    public function report(Throwable $e, array $context = [])
+    public function report(Throwable $e, array $context = [], ?string $level = null)
     {
         $e = $this->mapException($e);
 
@@ -431,7 +432,7 @@ class Handler implements ExceptionHandlerContract
             return;
         }
 
-        $this->reportThrowable($e, $context);
+        $this->reportThrowable($e, $context, $level);
     }
 
     /**
@@ -439,11 +440,12 @@ class Handler implements ExceptionHandlerContract
      *
      * @param  \Throwable  $e
      * @param  array<string, mixed>  $context
+     * @param  \Psr\Log\LogLevel::*|null  $level
      * @return void
      *
      * @throws \Throwable
      */
-    protected function reportThrowable(Throwable $e, array $context = []): void
+    protected function reportThrowable(Throwable $e, array $context = [], ?string $level = null): void
     {
         $this->reportedExceptionMap[$e] = true;
 
@@ -466,7 +468,7 @@ class Handler implements ExceptionHandlerContract
             throw $e;
         }
 
-        $level = $this->mapLogLevel($e);
+        $level ??= $this->mapLogLevel($e);
 
         $originallyReporting = $this->currentlyReporting;
 
