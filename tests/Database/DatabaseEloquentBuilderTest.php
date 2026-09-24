@@ -1961,6 +1961,40 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals([$relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
     }
 
+    public function testWhereMorphedToWithCustomOwnerKey()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $relatedModel->id = 1;
+        $relatedModel->uuid = 'related-uuid';
+
+        $builder = $model->whereMorphedTo('morphWithOwnerKey', $relatedModel);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where (("eloquent_builder_test_model_parent_stubs"."morph_type" = ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?)))', $builder->toSql());
+        $this->assertEquals([$relatedModel->getMorphClass(), 'related-uuid'], $builder->getBindings());
+    }
+
+    public function testWhereMorphedToCollectionWithCustomOwnerKey()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $firstRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $firstRelatedModel->id = 1;
+        $firstRelatedModel->uuid = 'first-uuid';
+
+        $secondRelatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $secondRelatedModel->id = 2;
+        $secondRelatedModel->uuid = 'second-uuid';
+
+        $builder = $model->whereMorphedTo('morphWithOwnerKey', new Collection([$firstRelatedModel, $secondRelatedModel]));
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where (("eloquent_builder_test_model_parent_stubs"."morph_type" = ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?, ?)))', $builder->toSql());
+        $this->assertEquals([$firstRelatedModel->getMorphClass(), 'first-uuid', 'second-uuid'], $builder->getBindings());
+    }
+
     public function testWhereMorphedToCollection()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -2019,6 +2053,21 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not (("eloquent_builder_test_model_parent_stubs"."morph_type" is not distinct from ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?)))', $builder->toSql());
         $this->assertEquals([$relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
+    }
+
+    public function testWhereNotMorphedToWithCustomOwnerKey()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $relatedModel->id = 1;
+        $relatedModel->uuid = 'related-uuid';
+
+        $builder = $model->whereNotMorphedTo('morphWithOwnerKey', $relatedModel);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not (("eloquent_builder_test_model_parent_stubs"."morph_type" is not distinct from ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?)))', $builder->toSql());
+        $this->assertEquals([$relatedModel->getMorphClass(), 'related-uuid'], $builder->getBindings());
     }
 
     public function testWhereNotMorphedToCollection()
@@ -3260,6 +3309,11 @@ class EloquentBuilderTestModelParentStub extends Model
     public function morph()
     {
         return $this->morphTo();
+    }
+
+    public function morphWithOwnerKey()
+    {
+        return $this->morphTo('morph', null, null, 'uuid');
     }
 }
 
