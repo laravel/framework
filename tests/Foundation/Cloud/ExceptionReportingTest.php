@@ -1646,11 +1646,6 @@ class ExceptionReportingTest extends TestCase
         ]);
     }
 
-    public function testItCapturesTraceIdInScheduledTasks(): void
-    {
-        $this->markTestIncomplete('TODO');
-    }
-
     public function testItReportsTheUrlAsItWasRequested(): void
     {
         $this->setupExceptionReporting();
@@ -1939,16 +1934,6 @@ class ExceptionReportingTest extends TestCase
             return true;
         });
         $this->assertSame('Bearer secret-token', $authorization);
-    }
-
-    public function testItCanDisableAndEnableHeaderCapture(): void
-    {
-        $this->markTestIncomplete('TODO');
-    }
-
-    public function testItCanDisableIPCapture(): void
-    {
-        $this->markTestIncomplete('TODO');
     }
 
     public function testItCapturesJobExecutionContext(): void
@@ -3195,11 +3180,6 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
-    public function testItSkipsInternalFramesFromHandleExceptionsForFatalErrors(): void
-    {
-        $this->markTestIncomplete('TODO');
-    }
-
     public function testItAppendsTheExceptionFileAndLineAsTheFirstFrameInTheTrace(): void
     {
         $this->setupExceptionReporting();
@@ -3285,14 +3265,11 @@ class ExceptionReportingTest extends TestCase
 
         (function ($anonymousArgOne, $anonymousArgTwo) {
             report(new RuntimeException('Whoops!'));
-        })(new class
-        {
+        })(new class {
             //
-        }, new class extends stdClass
-        {
+        }, new class extends stdClass {
             //
-        }, new class extends Arr
-        {
+        }, new class extends Arr {
             //
         });
 
@@ -3311,8 +3288,7 @@ class ExceptionReportingTest extends TestCase
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
 
-        report(new class('Whoops!') extends RuntimeException
-        {
+        report(new class('Whoops!') extends RuntimeException {
             //
         });
 
