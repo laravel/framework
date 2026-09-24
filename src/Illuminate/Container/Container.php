@@ -1215,9 +1215,11 @@ class Container implements ArrayAccess, ContainerContract
 
         $this->buildStack[] = $concrete;
 
-        $instance = $this->call([$concrete, 'newInstance']);
-
-        array_pop($this->buildStack);
+        try {
+            $instance = $this->call([$concrete, 'newInstance']);
+        } finally {
+            array_pop($this->buildStack);
+        }
 
         $this->fireAfterResolvingAttributeCallbacks(
             $reflector->getAttributes(), $instance

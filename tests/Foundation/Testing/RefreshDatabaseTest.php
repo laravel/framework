@@ -56,7 +56,8 @@ class RefreshDatabaseTest extends TestCase
                 '--drop-views' => false,
                 '--drop-types' => false,
                 '--seed' => false,
-            ]);
+            ])
+            ->andReturn(0);
 
         $this->refreshTestDatabase();
     }
@@ -73,7 +74,8 @@ class RefreshDatabaseTest extends TestCase
                 '--drop-views' => true,
                 '--drop-types' => false,
                 '--seed' => false,
-            ]);
+            ])
+            ->andReturn(0);
 
         $this->refreshTestDatabase();
     }
@@ -90,7 +92,8 @@ class RefreshDatabaseTest extends TestCase
                 '--drop-views' => false,
                 '--drop-types' => true,
                 '--seed' => false,
-            ]);
+            ])
+            ->andReturn(0);
 
         $this->refreshTestDatabase();
     }

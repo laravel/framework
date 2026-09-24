@@ -32,12 +32,28 @@ class BuildableIntegrationTest extends TestCase
 
         config(['aim.away_message.duration' => 5]);
 
-        try {
-            $this->app->make(AolInstantMessengerConfig::class);
-        } catch (ValidationException $exception) {
-            $this->assertArrayHasKey('away_message.duration', $exception->errors());
-            $this->assertStringContainsString('60', $exception->errors()['away_message.duration'][0]);
+        for ($attempt = 1; $attempt <= 2; $attempt++) {
+            try {
+                $this->app->make(AolInstantMessengerConfig::class);
+
+                $this->fail("Expected a validation exception on attempt {$attempt}.");
+            } catch (ValidationException $exception) {
+                $this->assertArrayHasKey('away_message.duration', $exception->errors());
+                $this->assertStringContainsString('60', $exception->errors()['away_message.duration'][0]);
+            }
         }
+
+        config([
+            'aim.away_message.duration' => 60,
+            'aim.away_message.body' => 'back online',
+        ]);
+
+        $config = $this->app->make(AolInstantMessengerConfig::class);
+
+        $this->assertEquals(60, $config->awayMessageDuration);
+        $this->assertSame('back online', $config->awayMessage);
+        $this->assertSame('api-key', $config->apiKey);
+        $this->assertSame('cosmastech', $config->userName);
     }
 }
 

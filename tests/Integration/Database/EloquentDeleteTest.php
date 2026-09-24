@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\Fixtures\Post;
+use Illuminate\Tests\Database\Fixtures\Models\Integration\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\PostStringyKey;
 
 class EloquentDeleteTest extends DatabaseTestCase
@@ -53,7 +53,7 @@ class EloquentDeleteTest extends DatabaseTestCase
     {
         $ignoredDrivers = ['sqlsrv', 'mysql', 'mariadb'];
 
-        if (in_array($this->driver, $ignoredDrivers)) {
+        if (in_array($this->driver, $ignoredDrivers) && ! $this->supportsDeleteWithLimitAndJoin()) {
             $this->markTestSkipped("{$this->driver} does not support LIMIT on DELETE statements with JOIN clauses.");
         }
 
@@ -78,10 +78,17 @@ class EloquentDeleteTest extends DatabaseTestCase
         $this->assertEquals($totalPosts - $deleteLimit, Post::query()->count());
     }
 
+    protected function supportsDeleteWithLimitAndJoin(): bool
+    {
+        // MariaDB 11.8.1 added ORDER BY and LIMIT support for multi-table DELETE (MDEV-30469).
+        return $this->driver === 'mariadb'
+            && version_compare($this->getConnection()->getServerVersion(), '11.8.1', '>=');
+    }
+
     public function testDeleteWithLimitAndJoinThrowsExceptionOnMySql(): void
     {
-        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
-            $this->markTestSkipped('This test only applies to MySQL/MariaDB.');
+        if (! in_array($this->driver, ['mysql', 'mariadb']) || $this->supportsDeleteWithLimitAndJoin()) {
+            $this->markTestSkipped('This test only applies to MySQL and MariaDB < 11.8.1.');
         }
 
         $this->expectException(QueryException::class);

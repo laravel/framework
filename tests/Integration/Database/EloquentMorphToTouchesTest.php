@@ -6,6 +6,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\MorphToTarget\Post;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphToTouchesTest extends DatabaseTestCase
@@ -56,9 +57,4 @@ class Comment extends Model
     {
         return $this->morphTo(null, null, null, 'id');
     }
-}
-
-class Post extends Model
-{
-    //
 }

@@ -258,7 +258,11 @@ trait BuildsQueries
             throw new InvalidArgumentException('The chunk size should be at least 1');
         }
 
-        return new LazyCollection(function () use ($chunkSize) {
+
+        $skip = $this->getOffset();
+        $remaining = $this->getLimit();
+
+        return new LazyCollection(function () use ($chunkSize, $skip, $remaining) {
             $clone = clone $this;
 
             $clone->enforceOrderBy();
@@ -266,15 +270,31 @@ trait BuildsQueries
             $page = 1;
 
             while (true) {
-                $results = $clone->forPage($page++, $chunkSize)->get();
+                $offset = (($page - 1) * $chunkSize) + (int) $skip;
+
+                $limit = is_null($remaining) ? $chunkSize : min($chunkSize, $remaining);
+
+                if ($limit === 0) {
+                    return;
+                }
+
+                $results = $clone->offset($offset)->limit($limit)->get();
 
                 foreach ($results as $result) {
                     yield $result;
                 }
 
-                if ($results->count() < $chunkSize) {
+                $countResults = $results->count();
+
+                if (! is_null($remaining)) {
+                    $remaining = max($remaining - $countResults, 0);
+                }
+
+                if ($countResults < $chunkSize) {
                     return;
                 }
+
+                $page++;
             }
         });
     }
@@ -331,22 +351,43 @@ trait BuildsQueries
 
         $alias ??= $column;
 
-        return new LazyCollection(function () use ($chunkSize, $column, $alias, $descending) {
+        $skip = $this->getOffset();
+        $remaining = $this->getLimit();
+
+        return new LazyCollection(function () use ($chunkSize, $column, $alias, $descending, $skip, $remaining) {
             $lastId = null;
+
+            $page = 1;
 
             while (true) {
                 $clone = clone $this;
 
+                if ($skip && $page > 1) {
+                    $clone->offset(0);
+                }
+
+                $limit = is_null($remaining) ? $chunkSize : min($chunkSize, $remaining);
+
+                if ($limit === 0) {
+                    return;
+                }
+
                 $results = match ($descending) {
-                    SortDirection::Ascending, false => $clone->forPageAfterId($chunkSize, $lastId, $column)->get(),
-                    SortDirection::Descending, true => $clone->forPageBeforeId($chunkSize, $lastId, $column)->get(),
+                    SortDirection::Ascending, false => $clone->forPageAfterId($limit, $lastId, $column)->get(),
+                    SortDirection::Descending, true => $clone->forPageBeforeId($limit, $lastId, $column)->get(),
                 };
 
                 foreach ($results as $result) {
                     yield $result;
                 }
 
-                if ($results->count() < $chunkSize) {
+                $countResults = $results->count();
+
+                if (! is_null($remaining)) {
+                    $remaining = max($remaining - $countResults, 0);
+                }
+
+                if ($countResults < $chunkSize) {
                     return;
                 }
 
@@ -355,6 +396,8 @@ trait BuildsQueries
                 if ($lastId === null) {
                     throw new RuntimeException("The lazyById operation was aborted because the [{$alias}] column is not present in the query result.");
                 }
+
+                $page++;
             }
         });
     }

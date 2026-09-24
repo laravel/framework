@@ -17,7 +17,7 @@ jobs:
 
     services:
       redis:
-        image: redis:7.0
+        image: redis:${{ matrix.redis }}
         ports:
           - 6379:6379
         options: --entrypoint redis-server
@@ -26,8 +26,9 @@ jobs:
       fail-fast: true
       matrix:
         client: ["phpredis", "predis"]
+        redis: ["7.0", "8.0"]
 
-    name: Redis (${{ matrix.client}}) Driver
+    name: Redis:${{ matrix.redis }} (${{ matrix.client}}) Driver
 
     steps:
       - name: Checkout code
@@ -54,6 +55,38 @@ jobs:
         env:
           REDIS_CLIENT: ${{ matrix.client }}
           QUEUE_CONNECTION: redis
+
+  redis-unit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    services:
+      redis:
+        image: redis:${{ matrix.redis }}
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
+    strategy:
+      fail-fast: true
+      matrix:
+        redis: ["7.0", "8.0"]
+
+    name: Redis:${{ matrix.redis }} unit testing
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP project
+        uses: ./.github/actions/setup-php-project
+        with:
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+
+      - name: Execute Redis tests
+        run: vendor/bin/phpunit tests/Redis
 
   redis-cluster:
     runs-on: ubuntu-24.04

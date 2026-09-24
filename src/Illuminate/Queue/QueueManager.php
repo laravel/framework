@@ -232,13 +232,14 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Pause a queue by its name and connection.
      *
-     * @param  string  $queue
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string  $queue
+     * @param  \UnitEnum|string|null  $connection
      * @return void
      */
     public function pause($queue, $connection = null)
     {
-        $connection ??= $this->getDefaultDriver();
+        $queue = enum_value($queue);
+        $connection = enum_value($connection) ?: $this->getDefaultDriver();
 
         $this->app['cache']
             ->store()
@@ -252,14 +253,15 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Pause a queue by its name and connection for a given amount of time.
      *
-     * @param  string  $queue
+     * @param  \UnitEnum|string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $ttl
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string|null  $connection
      * @return void
      */
     public function pauseFor($queue, $ttl, $connection = null)
     {
-        $connection ??= $this->getDefaultDriver();
+        $queue = enum_value($queue);
+        $connection = enum_value($connection) ?: $this->getDefaultDriver();
 
         $this->app['cache']
             ->store()
@@ -289,13 +291,14 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Resume a paused queue by its connection and name.
      *
-     * @param  string  $queue
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string  $queue
+     * @param  \UnitEnum|string|null  $connection
      * @return void
      */
     public function resume($queue, $connection = null)
     {
-        $connection ??= $this->getDefaultDriver();
+        $queue = enum_value($queue);
+        $connection = enum_value($connection) ?: $this->getDefaultDriver();
 
         $this->app['cache']
             ->store()

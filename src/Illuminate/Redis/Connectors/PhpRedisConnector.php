@@ -55,7 +55,9 @@ class PhpRedisConnector implements Connector
             array_map($this->buildClusterConnectionString(...), $config), $options
         );
 
-        return new PhpRedisClusterConnection($connector(), $connector, $config);
+        return new PhpRedisClusterConnection($connector(), $connector, array_merge($config, [
+            'command_retries' => (int) Arr::get($options, 'command_retries', 0),
+        ]));
     }
 
     /**

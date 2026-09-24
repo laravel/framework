@@ -50,6 +50,15 @@ include_once __DIR__.'/Fixtures/Enums.php';
 
 class RoutingRouteTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        ResourceRegistrar::singularParameters();
+        ResourceRegistrar::setParameters();
+        ResourceRegistrar::verbs(['create' => 'create', 'edit' => 'edit']);
+
+        parent::tearDown();
+    }
+
     public function testBasicDispatchingOfRoutes()
     {
         $router = $this->getRouter();

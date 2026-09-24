@@ -12,6 +12,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use function Illuminate\Support\artisan_binary;
 use function Illuminate\Support\php_binary;
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\note;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
@@ -33,6 +34,8 @@ class BroadcastingInstallCommand extends Command
                     {--reverb : Install Laravel Reverb as the default broadcaster}
                     {--pusher : Install Pusher as the default broadcaster}
                     {--ably : Install Ably as the default broadcaster}
+                    {--mercure : Install Mercure as the default broadcaster}
+                    {--pretend : Run dependency installation commands in dry-run mode}
                     {--without-node : Do not prompt to install Node dependencies}';
 
     /**
@@ -48,6 +51,17 @@ class BroadcastingInstallCommand extends Command
      * @var string|null
      */
     protected $driver = null;
+
+    /**
+     * The Composer packages required by each broadcasting driver.
+     *
+     * @var array<string, array<string, string>>
+     */
+    protected $driverPackages = [
+        'pusher' => ['pusher/pusher-php-server' => '*'],
+        'ably' => ['ably/ably-php' => '*'],
+        'mercure' => ['symfony/mercure' => '^0.8', 'web-token/jwt-library' => '^4.1'],
+    ];
 
     /**
      * The framework packages to install.
@@ -215,6 +229,7 @@ class BroadcastingInstallCommand extends Command
         match ($this->driver) {
             'pusher' => $this->collectPusherConfig(),
             'ably' => $this->collectAblyConfig(),
+            'mercure' => $this->collectMercureConfig(),
             default => null,
         };
     }
@@ -226,17 +241,25 @@ class BroadcastingInstallCommand extends Command
      */
     protected function installDriverPackages()
     {
-        $package = match ($this->driver) {
-            'pusher' => 'pusher/pusher-php-server',
-            'ably' => 'ably/ably-php',
-            default => null,
-        };
+        $packages = array_filter(
+            $this->driverPackages[$this->driver] ?? [],
+            fn ($package) => ! InstalledVersions::isInstalled($package),
+            ARRAY_FILTER_USE_KEY,
+        );
 
-        if (! $package || InstalledVersions::isInstalled($package)) {
+        if ($packages === []) {
             return;
         }
 
-        $this->requireComposerPackages($this->option('composer'), [$package]);
+        $this->requireComposerPackages(
+            $this->option('composer'),
+            array_map(
+                fn ($package, $constraint) => $constraint === '*' ? $package : $package.':'.$constraint,
+                array_keys($packages),
+                $packages,
+            ),
+            $this->option('pretend')
+        );
     }
 
     /**
@@ -295,6 +318,64 @@ class BroadcastingInstallCommand extends Command
             'ABLY_PUBLIC_KEY' => $publicKey,
             'VITE_ABLY_PUBLIC_KEY' => '${ABLY_PUBLIC_KEY}',
         ], $this->laravel->basePath('.env'));
+    }
+
+    /**
+     * Collect the Mercure configuration.
+     *
+     * @return void
+     */
+    protected function collectMercureConfig()
+    {
+        $variables = [];
+
+        $hub = select('Which Mercure hub would you like to use?', [
+            'frankenphp' => "FrankenPHP's built-in hub",
+            'standalone' => 'A standalone Mercure hub',
+        ]);
+
+        if ($hub === 'standalone') {
+            $url = text(
+                'Mercure Hub URL',
+                'https://example.com/.well-known/mercure',
+                required: true,
+                hint: 'The URL your application publishes updates to.',
+            );
+
+            $publicUrl = text(
+                'Mercure Hub Public URL',
+                default: $url,
+                required: true,
+                hint: 'The URL browsers subscribe to updates from.',
+            );
+
+            $variables = [
+                'MERCURE_URL' => $url,
+                'MERCURE_PUBLIC_URL' => $publicUrl,
+                'VITE_MERCURE_HUB_URL' => '${MERCURE_PUBLIC_URL}',
+            ];
+
+            if (parse_url($publicUrl, PHP_URL_SCHEME) === 'http') {
+                $variables['MERCURE_COOKIE_NAME'] = 'mercure_access_token';
+
+                $this->components->warn('Set "cookie_name mercure_access_token" on your Mercure hub.');
+            }
+        }
+
+        $variables['MERCURE_JWT_SECRET'] = password(
+            'Mercure JWT Secret',
+            'Leave empty to generate a random secret',
+            validate: fn ($value) => $value === '' || strlen($value) >= 32
+                ? null
+                : 'The secret must be at least 32 bytes long.',
+            hint: 'Signs the tokens that let your app publish and browsers subscribe.',
+        ) ?: bin2hex(random_bytes(32));
+
+        if (confirm('Would you like to enable end-to-end encrypted channels ?', default: false)) {
+            $variables['MERCURE_ENCRYPTION_KEY'] = 'base64:'.base64_encode(random_bytes(32));
+        }
+
+        Env::writeVariables($variables, $this->laravel->basePath('.env'));
     }
 
     /**
@@ -381,7 +462,7 @@ class BroadcastingInstallCommand extends Command
 
         $this->requireComposerPackages($this->option('composer'), [
             'laravel/reverb:^1.0',
-        ]);
+        ], $this->option('pretend'));
 
         Process::run([
             php_binary(),
@@ -433,6 +514,12 @@ class BroadcastingInstallCommand extends Command
             $commands[0] .= ' '.$this->frameworkPackages['react'];
         }
 
+        if ($this->option('pretend')) {
+            note(implode(' && ', $commands));
+
+            return;
+        }
+
         $command = Process::command(implode(' && ', $commands))
             ->path(base_path());
 
@@ -454,23 +541,18 @@ class BroadcastingInstallCommand extends Command
      */
     protected function resolveDriver(): string
     {
-        if ($this->option('reverb')) {
-            return 'reverb';
-        }
-
-        if ($this->option('pusher')) {
-            return 'pusher';
-        }
-
-        if ($this->option('ably')) {
-            return 'ably';
-        }
-
-        return select('Which broadcasting driver would you like to use?', [
-            'reverb' => 'Laravel Reverb',
-            'pusher' => 'Pusher',
-            'ably' => 'Ably',
-        ]);
+        return match (true) {
+            $this->option('reverb') => 'reverb',
+            $this->option('pusher') => 'pusher',
+            $this->option('ably') => 'ably',
+            $this->option('mercure') => 'mercure',
+            default => select('Which broadcasting driver would you like to use?', [
+                'reverb' => 'Laravel Reverb',
+                'pusher' => 'Pusher',
+                'ably' => 'Ably',
+                'mercure' => 'Mercure',
+            ]),
+        };
     }
 
     /**

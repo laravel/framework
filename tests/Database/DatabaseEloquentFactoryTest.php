@@ -105,6 +105,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     {
         $this->schema()->drop('users');
 
+        Factory::flushState();
         Container::setInstance(null);
     }
 
@@ -267,6 +268,13 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertIsArray($posts);
 
         $this->assertCount(10, $posts);
+    }
+
+    public function test_model_attributes_can_be_created_with_a_count_of_zero()
+    {
+        $posts = FactoryTestPostFactory::new()->count(0)->raw();
+
+        $this->assertSame([], $posts);
     }
 
     public function test_after_creating_and_making_callbacks_are_called()
@@ -1178,6 +1186,11 @@ class FactoryTestUserFactory extends Factory
 class FactoryTestUser extends Eloquent
 {
     use HasFactory;
+
+    protected static function newFactory()
+    {
+        return FactoryTestUserFactory::new();
+    }
 
     protected $table = 'users';
     protected $hidden = ['options'];

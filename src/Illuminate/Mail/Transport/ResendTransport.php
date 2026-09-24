@@ -126,7 +126,11 @@ class ResendTransport extends AbstractTransport
 
         $messageId = $result->id;
 
-        $email->getHeaders()->addHeader('X-Resend-Email-ID', $messageId);
+        $message->setMessageId($messageId);
+
+        if ($message->getOriginalMessage() instanceof \Symfony\Component\Mime\Message) {
+            $message->getOriginalMessage()->getHeaders()->addHeader('X-Resend-Email-ID', $messageId);
+        }
     }
 
     /**

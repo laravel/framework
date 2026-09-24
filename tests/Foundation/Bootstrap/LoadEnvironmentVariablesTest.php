@@ -4,11 +4,18 @@ namespace Illuminate\Tests\Foundation\Bootstrap;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Illuminate\Support\Env;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class LoadEnvironmentVariablesTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        // Testbench disables putenv and may not re-enable it.
+        Env::enablePutenv();
+    }
+
     protected function tearDown(): void
     {
         unset($_ENV['FOO'], $_SERVER['FOO']);

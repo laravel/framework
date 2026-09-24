@@ -28,6 +28,7 @@ class FoundationViteFontsTest extends TestCase
         $this->cleanHotFile();
         $this->cleanHotFile(__DIR__.'/custom-hot-dir/hot');
         app(Vite::class)->flush();
+        (new ViteFonts)->flush();
 
         parent::tearDown();
     }

@@ -428,10 +428,11 @@ class MySqlGrammar extends Grammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('alter table %s add primary key %s(%s)%s',
+        return sprintf('alter table %s add primary key %s(%s)%s%s',
             $this->wrapTable($blueprint),
             $command->algorithm ? 'using '.$command->algorithm : '',
             $this->columnize($command->columns),
+            $command->inplace ? ', algorithm=inplace' : '',
             $command->lock ? ', lock='.$command->lock : ''
         );
     }
@@ -494,12 +495,13 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
-        return sprintf('alter table %s add %s %s%s(%s)%s',
+        return sprintf('alter table %s add %s %s%s(%s)%s%s',
             $this->wrapTable($blueprint),
             $type,
             $this->wrap($command->index),
             $command->algorithm ? ' using '.$command->algorithm : '',
             $this->columnize($command->columns),
+            $command->inplace ? ', algorithm=inplace' : '',
             $command->lock ? ', lock='.$command->lock : ''
         );
     }
@@ -626,6 +628,10 @@ class MySqlGrammar extends Grammar
     public function compileForeign(Blueprint $blueprint, Fluent $command)
     {
         $sql = parent::compileForeign($blueprint, $command);
+
+        if ($command->inplace) {
+            $sql .= ', algorithm=inplace';
+        }
 
         if ($command->lock) {
             $sql .= ', lock='.$command->lock;

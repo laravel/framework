@@ -7,6 +7,8 @@ use FooController;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Routing\CallableDispatcher;
+use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\RouteRegistrar;
 use Illuminate\Tests\Routing\Fixtures\CategoryBackedEnum;
@@ -29,7 +31,10 @@ class RouteRegistrarTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->router = new Router(Mockery::mock(Dispatcher::class), Container::getInstance());
+        $container = new Container;
+        $container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
+
+        $this->router = new Router(Mockery::mock(Dispatcher::class), $container);
     }
 
     public function testMiddlewareFluentRegistration()

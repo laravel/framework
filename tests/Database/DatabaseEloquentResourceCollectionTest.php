@@ -12,6 +12,7 @@ use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceCollectionTestR
 use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceTestJsonResource;
 use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceTestJsonResourceCollection;
 use LogicException;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentResourceCollectionTest extends TestCase
@@ -37,6 +38,7 @@ class DatabaseEloquentResourceCollectionTest extends TestCase
         $collection->toResourceCollection();
     }
 
+    #[RunInSeparateProcess]
     public function testItCanGuessResourceWhenNotProvided()
     {
         $collection = new Collection([

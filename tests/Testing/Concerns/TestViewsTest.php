@@ -22,6 +22,7 @@ class TestViewsTest extends TestCase
         Container::setInstance($container = new Container);
 
         Facade::setFacadeApplication($container);
+        ParallelTestingFacade::clearResolvedInstance();
 
         $container->singleton('config', fn () => new Config([
             'view' => [

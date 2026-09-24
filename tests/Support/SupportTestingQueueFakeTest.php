@@ -634,6 +634,15 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertTrue($pending->contains(fn ($job) => $job->name === JobToFakeStub::class));
     }
 
+    public function testTotalSize()
+    {
+        $this->fake->push($this->job, '', 'foo');
+        $this->fake->later(10, new JobToFakeStub, '', 'bar');
+        $this->fake->reserve(new JobToFakeStub, 'baz');
+
+        $this->assertSame(3, $this->fake->totalSize());
+    }
+
     public function testTotalPendingSize()
     {
         $this->fake->push($this->job, '', 'foo');

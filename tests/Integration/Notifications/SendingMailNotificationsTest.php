@@ -5,16 +5,15 @@ namespace Illuminate\Tests\Integration\Notifications;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Mail\Markdown;
 use Illuminate\Mail\Message;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Tests\Notifications\Fixtures\Models\NotifiableUser;
 use Mockery;
 use Orchestra\Testbench\TestCase;
 
@@ -369,14 +368,6 @@ class SendingMailNotificationsTest extends TestCase
 
         $user->notify($notification);
     }
-}
-
-class NotifiableUser extends Model
-{
-    use Notifiable;
-
-    public $table = 'users';
-    public $timestamps = false;
 }
 
 class NotifiableUserWithNamedAddress extends NotifiableUser

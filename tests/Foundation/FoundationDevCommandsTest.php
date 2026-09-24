@@ -26,6 +26,7 @@ class FoundationDevCommandsTest extends TestCase
             'commands' => [],
             'except' => [],
             'only' => [],
+            'order' => [],
             'colorCount' => 0,
             'mode' => DevCommandMode::TABS,
             'withTimestamps' => false,
@@ -136,6 +137,33 @@ class FoundationDevCommandsTest extends TestCase
 
         $this->assertCount(1, $commands);
         $this->assertSame('one', $commands[0]['name']);
+    }
+
+    public function testOrderSortsCommands()
+    {
+        DevCommands::register('echo one', 'one');
+        DevCommands::register('echo two', 'two');
+        DevCommands::register('echo three', 'three');
+
+        DevCommands::order(['three', 'one', 'two']);
+
+        $commands = DevCommands::commands();
+
+        $this->assertSame(['three', 'one', 'two'], array_column($commands, 'name'));
+    }
+
+    public function testOrderLeavesUnnamedCommandsInRegistrationOrder()
+    {
+        DevCommands::register('echo one', 'one');
+        DevCommands::register('echo two', 'two');
+        DevCommands::register('echo three', 'three');
+        DevCommands::register('echo four', 'four');
+
+        DevCommands::order(['four']);
+
+        $commands = DevCommands::commands();
+
+        $this->assertSame(['four', 'one', 'two', 'three'], array_column($commands, 'name'));
     }
 
     public function testCommandsGetAutoAssignedColors()

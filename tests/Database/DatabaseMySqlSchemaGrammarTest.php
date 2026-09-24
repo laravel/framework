@@ -1738,6 +1738,116 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add index `custom_idx` using btree(`name`), lock=none', $statements[0]);
     }
 
+    public function testAddingIndexWithInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('name')->inplace();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `users_name_index`(`name`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingUniqueIndexWithInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->inplace();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add unique `users_email_unique`(`email`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingPrimaryKeyWithInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->primary('id')->inplace();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add primary key (`id`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingForeignKeyWithInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->foreign('user_id')->references('id')->on('accounts')->inplace();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add constraint `users_user_id_foreign` foreign key (`user_id`) references `accounts` (`id`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingFullTextIndexWithInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->fullText('content')->inplace();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add fulltext `users_content_fulltext`(`content`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingSpatialIndexWithInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->spatialIndex('location')->inplace();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add spatial index `users_location_spatialindex`(`location`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingIndexWithInplaceAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('name')->inplace()->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `users_name_index`(`name`), algorithm=inplace, lock=none', $statements[0]);
+    }
+
+    public function testAddingPrimaryKeyWithInplaceAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->primary('id')->inplace()->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add primary key (`id`), algorithm=inplace, lock=none', $statements[0]);
+    }
+
+    public function testAddingForeignKeyWithInplaceAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->foreign('user_id')->references('id')->on('accounts')->inplace()->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add constraint `users_user_id_foreign` foreign key (`user_id`) references `accounts` (`id`), algorithm=inplace, lock=none', $statements[0]);
+    }
+
+    public function testAddingIndexWithoutInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('name')->inplace(false);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `users_name_index`(`name`)', $statements[0]);
+    }
+
+    public function testAddingIndexWithIndexTypeAndInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('name', 'custom_idx')->algorithm('btree')->inplace()->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `custom_idx` using btree(`name`), algorithm=inplace, lock=none', $statements[0]);
+    }
+
     public function getGrammar(?Connection $connection = null)
     {
         return new MySqlGrammar($connection ?? $this->getConnection());

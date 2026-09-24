@@ -38,6 +38,7 @@ class CacheRedisTaggedCacheTest extends TestCase
             'add' => ['add', ['value', 60], 'add', ['value', 60], [60], true],
             'increment' => ['increment', [2], 'increment', [2], [null, 'NX'], 2],
             'decrement' => ['decrement', [2], 'decrement', [2], [null, 'NX'], -2],
+            'touch' => ['touch', [60], 'touch', [60], [60], true],
         ];
     }
 
@@ -64,6 +65,7 @@ class CacheRedisTaggedCacheTest extends TestCase
             'add' => ['add', ['value', 60], 'add', ['value', 60]],
             'increment' => ['increment', [2], 'increment', [2]],
             'decrement' => ['decrement', [2], 'decrement', [2]],
+            'touch' => ['touch', [60], 'touch', [60]],
         ];
     }
 
