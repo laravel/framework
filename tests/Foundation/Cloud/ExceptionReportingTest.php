@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Illuminate\View\ViewException;
 use Laravel\SerializableClosure\SerializableClosure;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
@@ -222,6 +223,23 @@ class ExceptionReportingTest extends TestCase
         $streams[0]->assertWrittenJsonContains([
             'id' => $this->app[ExceptionReporter::class]->exceptionId($exception),
             'message' => 'Whoops!',
+        ]);
+    }
+
+    public function testItCapturesTheSameExceptionIdForAViewExceptionAndTheExceptionItWraps(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        report($exception = new ViewException('Whoops!', previous: new RuntimeException('The original!')));
+
+        // The view exception is unwrapped before it is reported, while other
+        // callers, e.g. the failed job provider, have the exception as it was
+        // thrown. Both identify the same exception.
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains([
+            'id' => $this->app[ExceptionReporter::class]->exceptionId($exception),
+            'message' => 'The original!',
         ]);
     }
 
@@ -886,6 +904,40 @@ class ExceptionReportingTest extends TestCase
 
             return true;
         });
+    }
+
+    public function testItUnwrapsNestedViewExceptions(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        // A component that throws while rendering within a view is wrapped
+        // once for the component and again for the view.
+        report(new ViewException('Whoops! (View: layout.blade.php)', previous: new ViewException(
+            'Whoops! (View: profile.blade.php)', previous: new RuntimeException('The original!'),
+        )));
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains([
+            'class' => RuntimeException::class,
+            'message' => 'The original!',
+        ]);
+    }
+
+    public function testItReportsViewExceptionsThatWrapNothing(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        report(new ViewException('Whoops!'));
+
+        // There is nothing to unwrap, so the view exception is reported as it
+        // was given.
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains([
+            'class' => ViewException::class,
+            'message' => 'Whoops!',
+        ]);
     }
 
     public function testReportingViewExceptionStateIsNotClobberedByANestedReportCall(): void

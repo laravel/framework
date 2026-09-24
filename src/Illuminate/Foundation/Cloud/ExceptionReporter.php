@@ -153,9 +153,10 @@ class ExceptionReporter
     public function __invoke(Throwable $e): ?bool
     {
         $previousReportingViewException = $this->reportingViewException;
-        $this->reportingViewException = false;
 
         try {
+            $this->reportingViewException = $this->isViewException($e);
+
             $e = $this->unwrapViewException($e);
 
             $emitted = $this->events->emit($this->payload($e));
@@ -181,7 +182,7 @@ class ExceptionReporter
      */
     public function exceptionId(Throwable $e): string
     {
-        return $this->exceptionIds[$e] ??= (string) Uuid::uuid4();
+        return $this->exceptionIds[$this->unwrapViewException($e)] ??= (string) Uuid::uuid4();
     }
 
     /**
@@ -190,8 +191,6 @@ class ExceptionReporter
     protected function unwrapViewException(Throwable $e): Throwable
     {
         while ($this->isViewException($e) && $e->getPrevious()) {
-            $this->reportingViewException = true;
-
             $e = $e->getPrevious();
         }
 
