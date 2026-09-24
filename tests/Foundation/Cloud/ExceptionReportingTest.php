@@ -873,8 +873,11 @@ class ExceptionReportingTest extends TestCase
             report($e);
         }
 
+        $compiledComponent = $this->reportedCompiledViewPath(__DIR__.'/components/profile.blade.php');
+        $compiledView = $this->reportedCompiledViewPath(__DIR__.'/foo.blade.php');
+
         $this->assertCount(1, $streams);
-        $streams[0]->assertWritten(function ($stream) {
+        $streams[0]->assertWritten(function ($stream) use ($compiledComponent, $compiledView) {
             $writes = explode("\n", $stream, 2);
             $this->assertCount(2, $writes);
 
@@ -884,23 +887,23 @@ class ExceptionReportingTest extends TestCase
             ] = array_map(fn ($payload) => json_decode($payload, associative: true, flags: JSON_THROW_ON_ERROR), $writes);
 
             $this->assertSame([
-                'file' => 'vendor/orchestra/testbench-core/laravel/storage/framework/views/eb85da9afb77a41f4af911a05a42817b.php',
+                'file' => $compiledComponent,
                 'line' => 4,
             ], $reportedInView['trace'][0]);
             $this->assertSame([
                 'file' => 'tests/Foundation/Cloud/components/profile.blade.php',
                 'line' => 3,
-                'compiled_view' => 'vendor/orchestra/testbench-core/laravel/storage/framework/views/eb85da9afb77a41f4af911a05a42817b.php',
+                'compiled_view' => $compiledComponent,
             ], $thrownInView['trace'][0]);
 
             $this->assertSame([
-                'file' => 'vendor/orchestra/testbench-core/laravel/storage/framework/views/5158369fa173396ed4292b6aa122f8fa.php',
+                'file' => $compiledView,
                 'line' => 12,
             ], Arr::except($reportedInView['trace'][9], ['function', 'class', 'type', 'args']));
             $this->assertSame([
                 'file' => 'tests/Foundation/Cloud/foo.blade.php',
                 'line' => 3,
-                'compiled_view' => 'vendor/orchestra/testbench-core/laravel/storage/framework/views/5158369fa173396ed4292b6aa122f8fa.php',
+                'compiled_view' => $compiledView,
             ], Arr::except($thrownInView['trace'][9], ['function', 'class', 'type', 'args']));
 
             unset($reportedInView['trace'][0], $thrownInView['trace'][0], $thrownInView['trace'][9], $reportedInView['trace'][9]);
@@ -2572,7 +2575,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                "test-sensitive-command '' [7 bytes redacted] --secret=[0 bytes redacted] --keep=''",
+                'test-sensitive-command '.escapeshellarg('').' [7 bytes redacted] --secret=[0 bytes redacted] --keep='.escapeshellarg(''),
                 $payload['execution_context']['command'],
             );
 
@@ -2612,7 +2615,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                "test-sensitive-command taylor [7 bytes redacted] first 'second file'",
+                'test-sensitive-command taylor [7 bytes redacted] first '.escapeshellarg('second file'),
                 $payload['execution_context']['command'],
             );
 
@@ -2651,7 +2654,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                "test-sensitive-command taylor [7 bytes redacted] --token=first --token='second value'",
+                'test-sensitive-command taylor [7 bytes redacted] --token=first --token='.escapeshellarg('second value'),
                 $payload['execution_context']['command'],
             );
 
@@ -3830,6 +3833,18 @@ class ExceptionReportingTest extends TestCase
         $this->iniSettingsToRestore['zend.exception_ignore_args'] ??= ini_get('zend.exception_ignore_args');
 
         ini_set('zend.exception_ignore_args', $capture ? '0' : '1');
+    }
+
+    /**
+     * Retrieve the path the given view's compiled file is reported as.
+     */
+    protected function reportedCompiledViewPath(string $view): string
+    {
+        return str_replace(
+            [$this->app->basePath().DIRECTORY_SEPARATOR, '\\'],
+            ['', '/'],
+            Blade::getCompiledPath($view),
+        );
     }
 
     protected function setRunningInConsole(bool $runningInConsole): void
