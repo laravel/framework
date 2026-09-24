@@ -136,7 +136,7 @@ class ExceptionReporter
      */
     public function __construct(
         protected Events $events,
-        protected BladeMapper $bladeMapper,
+        protected Closure|BladeMapper $bladeMapper,
         protected string $basePath,
         protected array $config,
     ) {
@@ -1255,7 +1255,7 @@ class ExceptionReporter
      */
     protected function mapCompiledViewFrame(array $frame): array
     {
-        $normalizedView = $this->bladeMapper->findCompiledView($frame['file']);
+        $normalizedView = $this->bladeMapper()->findCompiledView($frame['file']);
 
         if (! $normalizedView) {
             return $frame;
@@ -1263,9 +1263,22 @@ class ExceptionReporter
 
         $frame['compiled_view'] = $frame['file'];
         $frame['file'] = $normalizedView;
-        $frame['line'] = $this->bladeMapper->detectLineNumber($normalizedView, $frame['line']);
+        $frame['line'] = $this->bladeMapper()->detectLineNumber($normalizedView, $frame['line']);
 
         return $frame;
+    }
+
+    /**
+     * Retrieve the Blade mapper.
+     *
+     * The mapper is only needed while reporting a view exception, and is
+     * resolved when it is first needed.
+     */
+    protected function bladeMapper(): BladeMapper
+    {
+        return $this->bladeMapper instanceof Closure
+            ? $this->bladeMapper = ($this->bladeMapper)()
+            : $this->bladeMapper;
     }
 
     /**

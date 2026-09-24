@@ -860,6 +860,34 @@ class ExceptionReportingTest extends TestCase
         ], write: 1);
     }
 
+    public function testItResolvesTheBladeMapperWhenAViewExceptionIsReported(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        $resolved = 0;
+
+        // The mapper is given as a closure, as the bootstrapper cannot build
+        // lazy proxies on every supported version of PHP.
+        $reporter = new ExceptionReporter(
+            $this->app[Events::class],
+            function () use (&$resolved) {
+                $resolved++;
+
+                return $this->app[BladeMapper::class];
+            },
+            $this->app->basePath().DIRECTORY_SEPARATOR,
+            ['stop' => true],
+        );
+
+        $reporter(new RuntimeException('Whoops!'));
+        $this->assertSame(0, $resolved);
+
+        $reporter(new ViewException('Whoops!', previous: new RuntimeException('The original!')));
+        $this->assertSame(1, $resolved);
+
+        $this->assertCount(1, $streams);
+    }
+
     public function testItNormalizesViewExceptions(): void
     {
         $this->setupExceptionReporting();
@@ -3461,14 +3489,11 @@ class ExceptionReportingTest extends TestCase
 
         (function ($anonymousArgOne, $anonymousArgTwo) {
             report(new RuntimeException('Whoops!'));
-        })(new class
-        {
+        })(new class {
             //
-        }, new class extends stdClass
-        {
+        }, new class extends stdClass {
             //
-        }, new class extends Arr
-        {
+        }, new class extends Arr {
             //
         });
 
@@ -3487,8 +3512,7 @@ class ExceptionReportingTest extends TestCase
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
 
-        report(new class('Whoops!') extends RuntimeException
-        {
+        report(new class('Whoops!') extends RuntimeException {
             //
         });
 

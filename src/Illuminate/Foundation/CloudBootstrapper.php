@@ -343,7 +343,7 @@ class CloudBootstrapper
 
             $exceptionReporter = $app->instance(ExceptionReporter::class, new ExceptionReporter(
                 $app[Events::class],
-                proxy(fn (): BladeMapper => $app[BladeMapper::class]),
+                fn (): BladeMapper => $app[BladeMapper::class],
                 $app->basePath().DIRECTORY_SEPARATOR,
                 $config,
             ));
