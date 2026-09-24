@@ -729,6 +729,8 @@ trait EnumeratesValues
      */
     public function whereBetween($key, $values)
     {
+        $values = $this->getArrayableItems($values);
+
         return $this->where($key, '>=', reset($values))->where($key, '<=', end($values));
     }
 
@@ -741,6 +743,8 @@ trait EnumeratesValues
      */
     public function whereNotBetween($key, $values)
     {
+        $values = $this->getArrayableItems($values);
+
         return $this->filter(
             fn ($item) => data_get($item, $key) < reset($values) || data_get($item, $key) > end($values)
         );
