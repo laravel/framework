@@ -176,6 +176,40 @@ class DatabaseLockTest extends DatabaseTestCase
         }
     }
 
+    #[TestWith([1, true])]
+    #[TestWith([0, false])]
+    public function testAcquireThrowsConcurrencyExceptionInsideTransaction(int $transactionLevel, bool $shouldThrow)
+    {
+        $connection = Mockery::mock(Connection::class);
+        $insertBuilder = Mockery::mock(Builder::class);
+        $updateBuilder = Mockery::mock(Builder::class);
+
+        $insertBuilder->expects('insert')->andThrow(
+            new QueryException(
+                'mysql',
+                'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
+                [],
+                new PDOException('Deadlock found when trying to get lock', 1213)
+            )
+        );
+
+        $updateBuilder->allows('where')->andReturnSelf();
+        $updateBuilder->allows('update')->andReturn(1);
+
+        $connection->allows('transactionLevel')->andReturn($transactionLevel);
+        $connection->allows('table')->with('cache_locks')->andReturn($insertBuilder, $updateBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, lottery: null);
+
+        if ($shouldThrow) {
+            $this->expectException(QueryException::class);
+            $this->expectExceptionMessage('Deadlock found when trying to get lock');
+            $lock->acquire();
+        } else {
+            $this->assertTrue($lock->acquire());
+        }
+    }
+
     #[TestWith(['Serialization failure: 1213 Deadlock', 40001, true])]
     #[TestWith(['Table does not exist', 1146, false])]
     public function testReleaseIgnoresConcurrencyException(string $message, int $code, bool $hasConcurrencyError)
