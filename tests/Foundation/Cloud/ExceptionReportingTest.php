@@ -3493,14 +3493,11 @@ class ExceptionReportingTest extends TestCase
 
         (function ($anonymousArgOne, $anonymousArgTwo) {
             report(new RuntimeException('Whoops!'));
-        })(new class
-        {
+        })(new class {
             //
-        }, new class extends stdClass
-        {
+        }, new class extends stdClass {
             //
-        }, new class extends Arr
-        {
+        }, new class extends Arr {
             //
         });
 
@@ -3519,8 +3516,7 @@ class ExceptionReportingTest extends TestCase
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
 
-        report(new class('Whoops!') extends RuntimeException
-        {
+        report(new class('Whoops!') extends RuntimeException {
             //
         });
 
