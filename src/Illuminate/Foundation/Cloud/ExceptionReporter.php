@@ -162,7 +162,7 @@ class ExceptionReporter
             }
 
             return ! $this->config['stop'];
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return null;
         } finally {
             $this->reportingViewException = $previousReportingViewException;
@@ -233,28 +233,24 @@ class ExceptionReporter
     /**
      * Retrieve the context for the given exception.
      */
-    protected function exceptionContext(Throwable $e): object
+    protected function exceptionContext(Throwable $e): ?object
     {
         try {
             return (object) Arr::except(Exceptions::contextForException($e), 'exception');
-        } catch (Throwable $e) {
-            return literal(
-                _laravel_cloud_error: $e->getMessage(),
-            );
+        } catch (Throwable) {
+            return null;
         }
     }
 
     /**
      * Retrieve the current Laravel Context.
      */
-    protected function laravelContext(): object
+    protected function laravelContext(): ?object
     {
         try {
             return (object) Context::all();
-        } catch (Throwable $e) {
-            return literal(
-                _laravel_cloud_error: $e->getMessage(),
-            );
+        } catch (Throwable) {
+            return null;
         }
     }
 
@@ -272,10 +268,8 @@ class ExceptionReporter
                 App::runningInConsole() => $this->consoleCommandExecutionDetails($e),
                 default => $this->requestExecutionDetails($e),
             };
-        } catch (Throwable $e) {
-            return [
-                '_laravel_cloud_error' => $e->getMessage(),
-            ];
+        } catch (Throwable) {
+            return [];
         }
     }
 
@@ -307,7 +301,7 @@ class ExceptionReporter
      *
      * @return array<string, list<string|null>>
      */
-    protected function requestHeaders(): array
+    protected function requestHeaders(): ?array
     {
         try {
             $headers = clone Request::instance()->headers;
@@ -316,10 +310,8 @@ class ExceptionReporter
             $this->redactHeaders($headers);
 
             return $headers->all();
-        } catch (Throwable $e) {
-            return [
-                '_laravel_cloud_error' => [$e->getMessage()],
-            ];
+        } catch (Throwable) {
+            return null;
         }
     }
 
@@ -449,10 +441,8 @@ class ExceptionReporter
                 },
                 'action' => $route->getActionName(),
             ];
-        } catch (Throwable $e) {
-            return [
-                '_laravel_cloud_error' => $e->getMessage(),
-            ];
+        } catch (Throwable) {
+            return null;
         }
     }
 
@@ -469,10 +459,8 @@ class ExceptionReporter
 
         try {
             return $this->redactRequestPayload(Request::instance()->request->all());
-        } catch (Throwable $e) {
-            return [
-                '_laravel_cloud_error' => $e->getMessage(),
-            ];
+        } catch (Throwable) {
+            return null;
         }
     }
 
@@ -517,10 +505,8 @@ class ExceptionReporter
 
         try {
             return $this->parseRequestFiles(Request::allFiles());
-        } catch (Throwable $e) {
-            return [
-                '_laravel_cloud_error' => $e->getMessage(),
-            ];
+        } catch (Throwable) {
+            return null;
         }
     }
 
@@ -616,8 +602,8 @@ class ExceptionReporter
             return $command === null
                 ? null
                 : $command::class;
-        } catch (Throwable $e) {
-            return '_laravel_cloud_error: '.$e->getMessage();
+        } catch (Throwable) {
+            return null;
         }
     }
 
@@ -631,7 +617,7 @@ class ExceptionReporter
             // redact input values, so we return null to avoid leaking sensitive information.
             try {
                 $this->currentConsoleInput();
-            } catch (CommandNotFoundException $e) {
+            } catch (CommandNotFoundException) {
                 return null;
             }
 
@@ -662,8 +648,8 @@ class ExceptionReporter
             }
 
             return implode(' ', $tokens);
-        } catch (Throwable $e) {
-            return '_laravel_cloud_error: '.$e->getMessage();
+        } catch (Throwable) {
+            return null;
         }
     }
 
@@ -893,8 +879,8 @@ class ExceptionReporter
             return $command === null
                 ? null
                 : $command::class;
-        } catch (Throwable $e) {
-            return '_laravel_cloud_error: '.$e->getMessage();
+        } catch (Throwable) {
+            return null;
         }
     }
 
@@ -1103,8 +1089,8 @@ class ExceptionReporter
             }
 
             return $this->userIdFromContext();
-        } catch (Throwable $e) {
-            return '_laravel_cloud_error: '.$e->getMessage();
+        } catch (Throwable) {
+            return null;
         }
     }
 
@@ -1315,7 +1301,7 @@ class ExceptionReporter
     /**
      * Retrieve the time Laravel started.
      */
-    protected function laravelStartedAtTimestamp(): string
+    protected function laravelStartedAtTimestamp(): ?string
     {
         try {
             $microtime = defined('LARAVEL_START')
@@ -1323,8 +1309,8 @@ class ExceptionReporter
                 : $_SERVER['REQUEST_TIME_FLOAT'];
 
             return Date::createFromTimestampUTC($microtime)->toDateTimeString('microsecond');
-        } catch (Throwable $e) {
-            return '_laravel_cloud_error: '.$e->getMessage();
+        } catch (Throwable) {
+            return null;
         }
     }
 }
