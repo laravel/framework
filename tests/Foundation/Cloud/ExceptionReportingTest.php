@@ -1010,6 +1010,7 @@ class ExceptionReportingTest extends TestCase
         Artisan::call('queue:work', [
             '--queue' => 'https://sqs.us-east-1.amazonaws.com/your-account-id/queue-name-production',
             '--max-jobs' => 1,
+            '--memory' => 1024,
             '--sleep' => 0,
             '--stop-when-empty' => true,
             '--tries' => 1,
@@ -1052,6 +1053,7 @@ class ExceptionReportingTest extends TestCase
         Artisan::call('queue:work', [
             '--queue' => 'https://sqs.us-east-1.amazonaws.com/your-account-id/queue-name-production.fifo',
             '--max-jobs' => 1,
+            '--memory' => 1024,
             '--sleep' => 0,
             '--stop-when-empty' => true,
             '--tries' => 1,
@@ -1087,6 +1089,7 @@ class ExceptionReportingTest extends TestCase
         Artisan::call('queue:work', [
             '--queue' => 'https://sqs.us-east-1.amazonaws.com/your-account-id/queue-name-production',
             '--max-jobs' => 1,
+            '--memory' => 1024,
             '--sleep' => 0,
             '--stop-when-empty' => true,
             '--tries' => 1,
@@ -1283,6 +1286,7 @@ class ExceptionReportingTest extends TestCase
 
         Artisan::call('queue:work', [
             '--max-jobs' => 2,
+            '--memory' => 1024,
             '--sleep' => 0,
             '--stop-when-empty' => true,
             '--tries' => 1,
@@ -1474,6 +1478,7 @@ class ExceptionReportingTest extends TestCase
 
         Artisan::call('queue:work', [
             '--max-jobs' => 1,
+            '--memory' => 1024,
             '--sleep' => 0,
             '--stop-when-empty' => true,
             '--tries' => 1,
@@ -1500,6 +1505,7 @@ class ExceptionReportingTest extends TestCase
 
         Artisan::call('queue:work', [
             '--max-jobs' => 1,
+            '--memory' => 1024,
             '--sleep' => 0,
             '--stop-when-empty' => true,
             '--tries' => 1,
@@ -1524,6 +1530,7 @@ class ExceptionReportingTest extends TestCase
 
         Artisan::call('queue:work', [
             '--max-jobs' => 1,
+            '--memory' => 1024,
             '--sleep' => 0,
             '--stop-when-empty' => true,
             '--tries' => 1,
@@ -1563,6 +1570,7 @@ class ExceptionReportingTest extends TestCase
 
         Artisan::call('queue:work', [
             '--max-jobs' => 1,
+            '--memory' => 1024,
             '--sleep' => 0,
             '--stop-when-empty' => true,
             '--tries' => 1,
@@ -1674,6 +1682,7 @@ class ExceptionReportingTest extends TestCase
 
         Artisan::call('queue:work', [
             '--max-jobs' => 1,
+            '--memory' => 1024,
             '--sleep' => 0,
             '--stop-when-empty' => true,
             '--tries' => 1,
@@ -2088,6 +2097,7 @@ class ExceptionReportingTest extends TestCase
 
         Artisan::call('queue:work', [
             '--max-jobs' => 1,
+            '--memory' => 1024,
             '--sleep' => 0,
             '--stop-when-empty' => true,
             '--tries' => 1,
@@ -2150,6 +2160,7 @@ class ExceptionReportingTest extends TestCase
 
         Artisan::call('queue:work', [
             '--max-jobs' => 1,
+            '--memory' => 1024,
             '--sleep' => 0,
             '--stop-when-empty' => true,
             '--tries' => 1,
@@ -2216,6 +2227,7 @@ class ExceptionReportingTest extends TestCase
         $this->travel(1)->minute();
         Artisan::call('queue:work', [
             '--max-jobs' => 2,
+            '--memory' => 1024,
             '--sleep' => 0,
             '--stop-when-empty' => true,
             '--tries' => 1,
@@ -2256,7 +2268,7 @@ class ExceptionReportingTest extends TestCase
                 'timestamp' => now()->subMinutes(3)->format('Y-m-d H:i:s.u'),
                 'name' => 'queue:work',
                 'class' => \Illuminate\Queue\Console\WorkCommand::class,
-                'command' => 'queue:work --max-jobs=2 --sleep=0 --stop-when-empty --tries=1',
+                'command' => 'queue:work --max-jobs=2 --memory=1024 --sleep=0 --stop-when-empty --tries=1',
             ], $secondWrite['execution_context']);
 
             // Second job
