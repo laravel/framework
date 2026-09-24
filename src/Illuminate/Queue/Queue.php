@@ -13,11 +13,13 @@ use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Contracts\Queue\ShouldRunRemotely;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Attributes\RemoteName;
 use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\Events\JobQueued;
@@ -27,6 +29,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\Str;
+use LogicException;
+use ReflectionClass;
 use RuntimeException;
 use Throwable;
 
@@ -157,9 +161,90 @@ abstract class Queue
      */
     protected function createPayloadArray($job, $queue, $data = '')
     {
+        if ($job instanceof ShouldRunRemotely) {
+            return $this->createRemotePayload($job, $queue);
+        }
+
         return is_object($job)
             ? $this->createObjectPayload($job, $queue)
             : $this->createStringPayload($job, $queue, $data);
+    }
+
+    /**
+     * Create a JSON-only payload for a job handled by a worker outside of this application.
+     *
+     * @param  \Illuminate\Contracts\Queue\ShouldRunRemotely  $job
+     * @param  string  $queue
+     * @return array
+     *
+     * @throws \LogicException
+     */
+    protected function createRemotePayload($job, $queue)
+    {
+        if ($this instanceof SyncQueue) {
+            throw new LogicException(sprintf('Remote job [%s] cannot be dispatched to a sync connection.', get_class($job)));
+        }
+
+        if ($this->jobShouldBeEncrypted($job)) {
+            throw new LogicException(sprintf('Remote job [%s] cannot be encrypted.', get_class($job)));
+        }
+
+        $name = $this->getAttributeInstance($job, RemoteName::class)?->name
+            ?? Str::snake(class_basename($job));
+
+        $payload = array_merge($this->createStringPayload($name, $queue, $this->getRemoteJobData($job)), [
+            'displayName' => $this->getDisplayName($job),
+            'maxTries' => $this->getJobTries($job),
+            'backoff' => $this->getJobBackoff($job),
+            'timeout' => $this->getAttributeValue($job, Timeout::class, 'timeout'),
+            'retryUntil' => $this->getJobExpiration($job),
+        ]);
+
+        if (method_exists($job, 'remoteCallbacks') &&
+            ($callbacks = $job->remoteCallbacks()) !== ['then' => [], 'catch' => []]) {
+            $payload['reply'] = [
+                'queue' => $job->replyQueue() ?? $this->getDefaultReplyQueue(),
+                'job' => RemoteReply::class.'@handle',
+                'token' => $this->container[Encrypter::class]->encryptString(
+                    serialize(['name' => $name, ...$callbacks])
+                ),
+            ];
+        }
+
+        return $payload;
+    }
+
+    /**
+     * Get the data sent to the remote worker, which defaults to the job's constructor arguments.
+     *
+     * @param  object  $job
+     * @return mixed
+     */
+    protected function getRemoteJobData($job)
+    {
+        if (method_exists($job, 'toPayload')) {
+            return json_decode(json_encode($job->toPayload()), true);
+        }
+
+        $parameters = (new ReflectionClass($job))->getConstructor()?->getParameters() ?? [];
+
+        return json_decode(json_encode(
+            (new Collection($parameters))
+                ->mapWithKeys(fn ($parameter) => [$parameter->getName() => $job->{$parameter->getName()} ?? null])
+                ->all()
+        ), true);
+    }
+
+    /**
+     * Get the queue remote workers reply to when the job does not specify one.
+     *
+     * @return string
+     */
+    protected function getDefaultReplyQueue()
+    {
+        return ($this->container->bound('config')
+            ? $this->container['config']->get("queue.connections.{$this->getConnectionName()}.queue")
+            : null) ?? 'default';
     }
 
     /**
