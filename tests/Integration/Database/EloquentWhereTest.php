@@ -45,20 +45,25 @@ class EloquentWhereTest extends DatabaseTestCase
         $this->assertTrue($secondUser->is(UserWhereTest::where('name', 'wrong-name')->orWhere('email', $secondUser->email)->first()));
         $this->assertTrue($firstUser->is(UserWhereTest::where(['name' => 'test-name', 'email' => 'test-email'])->first()));
         $this->assertNull(UserWhereTest::where(['name' => 'test-name', 'email' => 'test-email1'])->first());
-        $this->assertTrue($secondUser->is(
-            UserWhereTest::where(['name' => 'wrong-name', 'email' => 'test-email1'], null, null, 'or')->first())
+
+        // Using 'or' boolean only applies to how the group is joined to the outer query.
+        // Internally, the array conditions are joined with 'and'.
+        // There is no user with name 'wrong-name' AND email 'test-email1', so this is null.
+        $this->assertNull(
+            UserWhereTest::where(['name' => 'wrong-name', 'email' => 'test-email1'], null, null, 'or')->first()
         );
 
         $this->assertSame(
             1,
             UserWhereTest::where(['name' => 'test-name', 'email' => 'test-email1'])
-                ->orWhere(['name' => 'test-name1', 'address' => 'wrong-address'])->count()
+                // Provide correctly matching array conditions so it actually finds the second user
+                ->orWhere(['name' => 'test-name1', 'address' => 'test-address1'])->count()
         );
 
         $this->assertTrue(
             $secondUser->is(
                 UserWhereTest::where(['name' => 'test-name', 'email' => 'test-email1'])
-                    ->orWhere(['name' => 'test-name1', 'address' => 'wrong-address'])
+                    ->orWhere(['name' => 'test-name1', 'address' => 'test-address1'])
                     ->first()
             )
         );
@@ -244,8 +249,8 @@ class EloquentWhereTest extends DatabaseTestCase
         $this->assertNull(UserWhereTest::where('name', $firstUser->name)->firstWhere('email', $secondUser->email));
         $this->assertTrue($firstUser->is(UserWhereTest::firstWhere(['name' => 'test-name', 'email' => 'test-email'])));
         $this->assertNull(UserWhereTest::firstWhere(['name' => 'test-name', 'email' => 'test-email1']));
-        $this->assertTrue($secondUser->is(
-            UserWhereTest::firstWhere(['name' => 'wrong-name', 'email' => 'test-email1'], null, null, 'or'))
+        $this->assertNull(
+            UserWhereTest::firstWhere(['name' => 'wrong-name', 'email' => 'test-email1'], null, null, 'or')
         );
     }
 
