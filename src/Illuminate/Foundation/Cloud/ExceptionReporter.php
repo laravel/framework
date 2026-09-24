@@ -178,7 +178,7 @@ class ExceptionReporter
      */
     public function exceptionId(Throwable $e): string
     {
-        return $this->exceptionIds[$this->unwrapViewException($e)] ??= (string) Uuid::uuid4();
+        return $this->exceptionIds[$this->unwrapViewException($e)] ??= (string) Uuid::uuid7();
     }
 
     /**
@@ -573,7 +573,7 @@ class ExceptionReporter
             return $this->artisanCommandTraceId ??= str($_SERVER['LARAVEL_CLOUD_COMMAND_UUID'])->after('comm-')->toString();
         }
 
-        return $this->artisanCommandTraceId ??= (string) Uuid::uuid4();
+        return $this->artisanCommandTraceId ??= (string) Uuid::uuid7();
     }
 
     /**
@@ -1005,7 +1005,7 @@ class ExceptionReporter
      */
     protected function currentlyProcessingJobAttemptId(): string
     {
-        return $this->currentlyProcessingJobAttemptId ??= (string) Uuid::uuid4();
+        return $this->currentlyProcessingJobAttemptId ??= (string) Uuid::uuid7();
     }
 
     /**
