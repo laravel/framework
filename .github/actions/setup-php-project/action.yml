@@ -4,7 +4,7 @@ description: Set up PHP, configure the framework development version, and instal
 inputs:
   php-version:
     description: PHP version to install
-    default: '8.3'
+    default: '8.4'
   extensions:
     description: PHP extensions to install
     required: false
