@@ -17,11 +17,11 @@ use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
+use Illuminate\Log\Context\Events\ContextDehydrating;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
-use Illuminate\Support\Facades\Context;
 use Monolog\Handler\SocketHandler;
 use PDO;
 use Throwable;
@@ -273,7 +273,7 @@ class CloudBootstrapper
                 $config,
             ));
 
-            Context::dehydrating(fn ($context) => $exceptionReporter->rememberUserIdInContext($context));
+            $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->rememberUserIdInContext($event->context));
 
             if (! $app->runningInConsole()) {
                 $app['events']->listen(function (Logout $event) use ($exceptionReporter) {

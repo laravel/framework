@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Exceptions;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -108,6 +109,39 @@ class ExceptionReportingTest extends TestCase
 
         report(new RuntimeException('Whoops!'));
         $this->assertCount(1, $streams);
+    }
+
+    public function testItRegistersExceptionReportingBeforeTheFacadesHaveTheApplication(): void
+    {
+        $streams = $this->fakeEventsStreams();
+
+        // Exception reporting is registered while the "HandleExceptions"
+        // bootstrapper is bootstrapped, which is before the "RegisterFacades"
+        // bootstrapper has given the application to the facades.
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
+
+        try {
+            $this->setupExceptionReporting();
+        } finally {
+            Facade::setFacadeApplication($this->app);
+        }
+
+        $this->app->make(Schedule::class)
+            ->call(fn () => throw new RuntimeException('Whoops!'))
+            ->name('test-scheduled-task')
+            ->everyMinute();
+
+        $this->runArtisanCommand(['artisan', 'schedule:run']);
+
+        // The listeners are registered after the reporter itself, so a failure
+        // to register them is not seen in the reported exception, only in the
+        // execution it is attributed to.
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains([
+            'message' => 'Whoops!',
+            'execution_type' => 'scheduled_task',
+        ]);
     }
 
     public function testItEmitsExceptionsAsEvents(): void
