@@ -189,8 +189,8 @@ class QueuePauseResumeTest extends TestCase
     {
         $this->manager->pauseAll();
 
-        $this->assertTrue($this->manager->isPaused('redis', 'default'));
-        $this->assertTrue($this->manager->isPaused('database', 'emails'));
+        $this->assertTrue($this->manager->isPaused('default', 'redis'));
+        $this->assertTrue($this->manager->isPaused('emails', 'database'));
         $this->assertSame(
             ['default', 'emails'],
             $this->manager->getPausedQueues(['default', 'emails'], 'redis')
@@ -198,8 +198,20 @@ class QueuePauseResumeTest extends TestCase
 
         $this->manager->resumeAll();
 
-        $this->assertFalse($this->manager->isPaused('redis', 'default'));
+        $this->assertFalse($this->manager->isPaused('default', 'redis'));
         $this->assertSame([], $this->manager->getPausedQueues(['default', 'emails'], 'redis'));
+    }
+
+    public function testResumeAllDoesNotResumeQueuesPausedIndividually()
+    {
+        $this->manager->pause('emails', 'database');
+
+        $this->manager->pauseAll();
+        $this->manager->resumeAll();
+
+        $this->assertTrue($this->manager->isPaused('emails', 'database'));
+        $this->assertFalse($this->manager->isPaused('emails', 'redis'));
+        $this->assertFalse($this->manager->isPaused('default', 'database'));
     }
 
     public function testPauseChecksDoNotBatchTheGlobalKeyWithQueueKeys()
@@ -218,12 +230,12 @@ class QueuePauseResumeTest extends TestCase
 
         $manager = $this->createManager(new Repository($store));
 
-        $this->assertFalse($manager->isPaused('redis', 'default'));
+        $this->assertFalse($manager->isPaused('default', 'redis'));
         $this->assertSame([], $manager->getPausedQueues(['default'], 'redis'));
 
         $manager->pauseAll();
 
-        $this->assertTrue($manager->isPaused('redis', 'default'));
+        $this->assertTrue($manager->isPaused('default', 'redis'));
         $this->assertSame(['default'], $manager->getPausedQueues(['default'], 'redis'));
     }
 
