@@ -26,11 +26,14 @@ class PhpRedisLock extends RedisLock
     {
         $seconds ??= $this->seconds;
 
+        [$owner] = $this->redis->pack([$this->owner]);
+
         return (bool) $this->redis->eval(
             LuaScripts::refreshLock(),
             1,
             $this->name,
-            ...$this->redis->pack([$this->owner, $seconds])
+            $owner,
+            $seconds
         );
     }
 

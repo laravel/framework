@@ -29,6 +29,7 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 use SortDirection;
+use Traversable;
 use UnitEnum;
 
 use function Illuminate\Support\enum_value;
@@ -1676,6 +1677,8 @@ class Builder implements BuilderContract
 
         if ($values instanceof DatePeriod) {
             $values = $this->resolveDatePeriodBounds($values);
+        } elseif ($values instanceof Traversable) {
+            $values = iterator_to_array($values, false);
         }
 
         $this->wheres[] = ['type' => $type, 'column' => $column, 'values' => $values, 'boolean' => $boolean, 'not' => $not];
@@ -1792,7 +1795,9 @@ class Builder implements BuilderContract
 
         $this->wheres[] = ['type' => $type, 'value' => $value, 'columns' => $columns, 'boolean' => $boolean, 'not' => $not];
 
-        $this->addBinding($value, 'where');
+        if (! $value instanceof ExpressionContract) {
+            $this->addBinding($value, 'where');
+        }
 
         return $this;
     }
@@ -2921,6 +2926,8 @@ class Builder implements BuilderContract
 
         if ($values instanceof DatePeriod) {
             $values = $this->resolveDatePeriodBounds($values);
+        } elseif ($values instanceof Traversable) {
+            $values = iterator_to_array($values, false);
         }
 
         $this->havings[] = ['type' => $type, 'column' => $column, 'values' => $values, 'boolean' => $boolean, 'not' => $not];

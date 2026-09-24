@@ -20,6 +20,7 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use Mockery;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -27,6 +28,18 @@ use stdClass;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
+    use RestoresConnectionResolver;
+
+    protected function tearDown(): void
+    {
+        Model::clearBootedModels();
+    }
+
+    protected function setUp(): void
+    {
+        $this->useInMemoryConnection();
+    }
+
     public function testFindMethod()
     {
         $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
@@ -1453,7 +1466,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         // alias has a dynamic hash, so replace with a static string for comparison
         $alias = 'self_alias_hash';
-        $aliasRegex = '/\b(laravel_reserved_\d)(\b|$)/i';
+        $aliasRegex = '/\b(laravel_reserved_\d+)(\b|$)/i';
 
         $sql = preg_replace($aliasRegex, $alias, $sql);
 
@@ -1618,7 +1631,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         // alias has a dynamic hash, so replace with a static string for comparison
         $alias = 'self_alias_hash';
-        $aliasRegex = '/\b(laravel_reserved_\d)(\b|$)/i';
+        $aliasRegex = '/\b(laravel_reserved_\d+)(\b|$)/i';
 
         $sql = preg_replace($aliasRegex, $alias, $sql);
 
@@ -1859,7 +1872,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         // alias has a dynamic hash, so replace with a static string for comparison
         $alias = 'self_alias_hash';
-        $aliasRegex = '/\b(laravel_reserved_\d)(\b|$)/i';
+        $aliasRegex = '/\b(laravel_reserved_\d+)(\b|$)/i';
 
         $nestedSql = preg_replace($aliasRegex, $alias, $nestedSql);
         $dotSql = preg_replace($aliasRegex, $alias, $dotSql);
@@ -1875,7 +1888,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         // alias has a dynamic hash, so replace with a static string for comparison
         $alias = 'self_alias_hash';
-        $aliasRegex = '/\b(laravel_reserved_\d)(\b|$)/i';
+        $aliasRegex = '/\b(laravel_reserved_\d+)(\b|$)/i';
 
         $sql = preg_replace($aliasRegex, $alias, $sql);
 

@@ -20,6 +20,25 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class FoundationHelpersTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        $app = new Application;
+        $app['config'] = Mockery::mock(Repository::class);
+        $app['config']->shouldReceive('get')->with('app.mix_url');
+        $app['config']->shouldReceive('get')->with('app.mix_hot_proxy_url');
+    }
+
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+
+        foreach (['hot', 'mix-manifest.json', 'mix/hot', 'mix/mix-manifest.json'] as $file) {
+            @unlink(__DIR__.'/'.$file);
+        }
+
+        @rmdir(__DIR__.'/mix');
+    }
+
     public function testCache()
     {
         $app = new Application;

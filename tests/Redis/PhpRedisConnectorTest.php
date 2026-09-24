@@ -484,6 +484,166 @@ class PhpRedisConnectorTest extends TestCase
         $this->assertSame('bar', $connection->command('get', ['foo']));
         $this->assertSame($healthyClient, $connection->client());
     }
+
+    #[RequiresPhpExtension('redis')]
+    public function testPipelineIsReopenedOnARebuiltClientWhenTheConnectionWasLost()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('pipeline')->willThrowException(new RedisException('Redis server went away'));
+        $failedClient->expects($this->never())->method('exec');
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('pipeline')->willReturnSelf();
+        $healthyClient->expects($this->once())->method('set')->with('foo', 'bar');
+        $healthyClient->expects($this->once())->method('exec')->willReturn([true]);
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $result = $connection->pipeline(function ($pipe) {
+            $pipe->set('foo', 'bar');
+        });
+
+        $this->assertSame([true], $result);
+        $this->assertSame($healthyClient, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testPipelineRebuildsItsClientWhenTheRetryAlsoLosesTheConnection()
+    {
+        $firstFailedClient = $this->createMock(\Redis::class);
+        $firstFailedClient->expects($this->once())->method('pipeline')->willThrowException(new RedisException('Redis server went away'));
+
+        $secondFailedClient = $this->createMock(\Redis::class);
+        $secondFailedClient->expects($this->once())->method('pipeline')->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->never())->method('pipeline');
+
+        $reconnects = 0;
+        $connection = new PhpRedisConnection($firstFailedClient, function () use (&$reconnects, $secondFailedClient, $healthyClient) {
+            return [
+                $secondFailedClient,
+                $healthyClient,
+            ][$reconnects++];
+        });
+
+        try {
+            $connection->pipeline();
+
+            $this->fail('Expected RedisException was not thrown.');
+        } catch (RedisException $e) {
+            $this->assertSame('Connection lost', $e->getMessage());
+        }
+
+        $this->assertSame($healthyClient, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testTransactionIsReopenedOnARebuiltClientWhenTheConnectionWasLost()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('multi')->willThrowException(new RedisException('Connection lost'));
+        $failedClient->expects($this->never())->method('exec');
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('multi')->willReturnSelf();
+        $healthyClient->expects($this->once())->method('incr')->with('foo');
+        $healthyClient->expects($this->once())->method('exec')->willReturn([1]);
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $result = $connection->transaction(function ($transaction) {
+            $transaction->incr('foo');
+        });
+
+        $this->assertSame([1], $result);
+        $this->assertSame($healthyClient, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testPipelineRebuildsItsClientWithoutRetryingWhenExecutionLosesTheConnection()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('pipeline')->willReturnSelf();
+        $failedClient->expects($this->once())->method('exec')->willThrowException(new RedisException('Redis server went away'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->never())->method('pipeline');
+        $healthyClient->expects($this->never())->method('exec');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        try {
+            $connection->pipeline(function ($pipe) {
+                $pipe->incr('foo');
+            });
+
+            $this->fail('Expected RedisException was not thrown.');
+        } catch (RedisException $e) {
+            $this->assertSame('Redis server went away', $e->getMessage());
+        }
+
+        $this->assertSame($healthyClient, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testTransactionRebuildsItsClientWithoutRetryingWhenExecutionLosesTheConnection()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('multi')->willReturnSelf();
+        $failedClient->expects($this->once())->method('exec')->willThrowException(new RedisException('Connection lost'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->never())->method('multi');
+        $healthyClient->expects($this->never())->method('exec');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        try {
+            $connection->transaction(function ($transaction) {
+                $transaction->incr('foo');
+            });
+
+            $this->fail('Expected RedisException was not thrown.');
+        } catch (RedisException $e) {
+            $this->assertSame('Connection lost', $e->getMessage());
+        }
+
+        $this->assertSame($healthyClient, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testPipelineKeepsItsClientWhenExecutionFailsForAnotherReason()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('pipeline')->willReturnSelf();
+        $failedClient->expects($this->once())->method('exec')->willThrowException(new RedisException('ERR wrong number of arguments'));
+
+        $connection = new PhpRedisConnection($failedClient, function () {
+            $this->fail('The client should not have been rebuilt.');
+        });
+
+        $this->expectExceptionObject(new RedisException('ERR wrong number of arguments'));
+
+        $connection->pipeline(function ($pipe) {
+            $pipe->incr('foo');
+        });
+    }
+
+    #[RequiresPhpExtension('redis')]
+    public function testPipelineWithoutCallbackIsReopenedOnARebuiltClientWhenTheConnectionWasLost()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('pipeline')->willThrowException(new RedisException('Redis server went away'));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('pipeline')->willReturnSelf();
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->assertSame($healthyClient, $connection->pipeline());
+        $this->assertSame($healthyClient, $connection->client());
+    }
 }
 
 class ClusterStubPhpRedisConnector extends PhpRedisConnector

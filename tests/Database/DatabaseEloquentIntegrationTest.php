@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Attributes\Refreshes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -68,6 +69,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->schema('default')->create('with_json', function ($table) {
             $table->increments('id');
             $table->text('json')->default(json_encode([]));
+        });
+
+        $this->schema('default')->create('generated_users', function ($table) {
+            $table->increments('id');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('name')->virtualAs("first_name || ' ' || last_name");
+            $table->integer('votes')->default(0);
         });
 
         $this->schema('second_connection')->create('test_items', function ($table) {
@@ -193,6 +202,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      */
     protected function tearDown(): void
     {
+        Model::clearBootedModels();
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
             $this->schema($connection)->drop('friends');
@@ -203,6 +213,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Relation::morphMap([], false);
         Eloquent::unsetConnectionResolver();
+        Paginator::currentPageResolver(fn () => 1);
+        CursorPaginator::currentCursorResolver(fn () => null);
 
         Str::createUuidsNormally();
         DB::flushQueryLog();
@@ -259,6 +271,74 @@ class DatabaseEloquentIntegrationTest extends TestCase
         foreach ($records as $record) {
             $this->assertEquals(1, $record->id);
         }
+    }
+
+    public function testConfiguredAttributesAreRefreshedAfterInsertAndUpdate()
+    {
+        $user = EloquentTestGeneratedUser::create([
+            'first_name' => 'Taylor',
+            'last_name' => 'Otwell',
+        ]);
+
+        $this->assertSame('Taylor Otwell', $user->name);
+        $this->assertSame('Taylor Otwell', EloquentTestGeneratedUser::$createdName);
+
+        $user->update(['first_name' => 'Abigail']);
+
+        $this->assertSame('Abigail Otwell', $user->name);
+        $this->assertSame('Abigail Otwell', EloquentTestGeneratedUser::$updatedName);
+        $this->assertTrue($user->wasChanged('name'));
+    }
+
+    public function testConfiguredAttributesAreRefreshedAfterIncrementAndDecrement()
+    {
+        $user = EloquentTestGeneratedUser::create([
+            'first_name' => 'Taylor',
+            'last_name' => 'Otwell',
+            'votes' => 1,
+        ]);
+
+        $user->increment('votes', 1);
+
+        $this->assertSame(2, $user->votes);
+        $this->assertFalse($user->isDirty());
+        $this->assertSame([], $user->getDirty());
+
+        $user->save();
+
+        $user->decrement('votes', 1);
+
+        $this->assertSame(1, $user->votes);
+        $this->assertFalse($user->isDirty());
+        $this->assertSame([], $user->getDirty());
+
+        $user->save();
+
+        $user->incrementEach(['votes' => 2]);
+
+        $this->assertSame(3, $user->votes);
+        $this->assertFalse($user->isDirty());
+        $this->assertSame([], $user->getDirty());
+
+        $user->save();
+
+        $user->decrementEach(['votes' => 1]);
+
+        $this->assertSame(2, $user->votes);
+        $this->assertFalse($user->isDirty());
+        $this->assertSame([], $user->getDirty());
+
+        $user->save();
+
+        $user->increment('votes', 1, ['first_name' => 'Abigail']);
+
+        $this->assertSame(3, $user->votes);
+        $this->assertSame('Abigail', $user->first_name);
+        $this->assertSame('Abigail Otwell', $user->name);
+        $this->assertFalse($user->isDirty('name'));
+        $this->assertTrue($user->isDirty('first_name'));
+
+        $user->save();
     }
 
     public function testBasicModelCollectionRetrieval()
@@ -3080,6 +3160,31 @@ class EloquentTestWithJSON extends Eloquent
     protected $casts = [
         'json' => 'array',
     ];
+}
+
+#[Refreshes('name')]
+class EloquentTestGeneratedUser extends Eloquent
+{
+    public $timestamps = false;
+
+    public static $createdName;
+
+    public static $updatedName;
+
+    protected $table = 'generated_users';
+
+    protected $guarded = [];
+
+    protected function fireModelEvent($event, $halt = true)
+    {
+        if ($event === 'created') {
+            static::$createdName = $this->name;
+        } elseif ($event === 'updated') {
+            static::$updatedName = $this->name;
+        }
+
+        return parent::fireModelEvent($event, $halt);
+    }
 }
 
 class EloquentTestFriendPivot extends Pivot

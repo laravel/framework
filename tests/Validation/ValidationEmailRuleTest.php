@@ -928,6 +928,8 @@ class ValidationEmailRuleTest extends TestCase
 
     protected function tearDown(): void
     {
+        Email::$defaultCallback = null;
+
         Container::setInstance(null);
 
         Facade::clearResolvedInstances();

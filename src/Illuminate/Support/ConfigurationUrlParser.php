@@ -22,6 +22,8 @@ class ConfigurationUrlParser
         'sqlite3' => 'sqlite',
         'redis' => 'tcp',
         'rediss' => 'tls',
+        'valkey' => 'tcp',
+        'valkeys' => 'tls',
     ];
 
     /**

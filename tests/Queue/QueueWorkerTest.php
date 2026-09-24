@@ -60,7 +60,9 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobPopping::class))->once();
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobPopped::class))->once();
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobProcessing::class))->once();
-        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobProcessed::class))->once();
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::on(function ($event) {
+            return $event instanceof JobProcessed && is_float($event->duration);
+        }))->once();
     }
 
     public function testJobPoppingEvent()

@@ -1063,6 +1063,17 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testHigherOrderSole($collection)
+    {
+        $c = new $collection([
+            new TestSupportCollectionHigherOrderItem('Adam'),
+            new TestSupportCollectionHigherOrderItem('Taylor'),
+        ]);
+
+        $this->assertSame('Taylor', $c->sole->is('Taylor')->name);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testWhere($collection)
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
@@ -2868,6 +2879,14 @@ class SupportCollectionTest extends TestCase
         $data = new $collection(['taylor', 'dayle', 'shawn']);
         $data = $data->take(-2);
         $this->assertEquals([1 => 'dayle', 2 => 'shawn'], $data->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testTakeLastWithLimitGreaterThanCollectionSize($collection)
+    {
+        $data = new $collection(['taylor', 'dayle', 'shawn']);
+        $data = $data->take(-5);
+        $this->assertEquals([0 => 'taylor', 1 => 'dayle', 2 => 'shawn'], $data->all());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -5275,6 +5294,27 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([1, 2, 2, 1]);
         $this->assertEquals([1, 2], $data->mode());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testModeOnCollectionWithNull($collection)
+    {
+        $data = new $collection([
+            (object) ['foo' => 5],
+            (object) ['foo' => null],
+            (object) ['foo' => null],
+        ]);
+        $this->assertEquals([5], $data->mode('foo'));
+
+        $data = new $collection([null, 3]);
+        $this->assertEquals([3], $data->mode());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testModeOnCollectionWithOnlyNullsReturnsNull($collection)
+    {
+        $data = new $collection([null, null]);
+        $this->assertNull($data->mode());
     }
 
     #[DataProvider('collectionClassProvider')]

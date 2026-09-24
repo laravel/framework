@@ -54,4 +54,42 @@ class DatabaseSqliteSchemaStateTest extends TestCase
 
         $pdo->shouldHaveReceived('exec')->with('CREATE TABLE IF NOT EXISTS "migrations" ("id" integer not null primary key autoincrement, "migration" varchar not null, "batch" integer not null);');
     }
+
+    public function testDumpRemovesShadowTables(): void
+    {
+        $connection = new SQLiteConnection(new PDO('sqlite::memory:'), config: ['database' => ':memory:']);
+        $connection->statement('create virtual table posts using fts5(body)');
+        $connection->statement('create table "logs_data" ("id" integer primary key)');
+        $connection->statement('create virtual table temp.logs using fts5(message)');
+
+        $process = Mockery::mock(Process::class);
+        $process->allows('setTimeout')->andReturnSelf();
+        $process->allows('mustRun')->andReturnSelf();
+        $process->allows('getOutput')->andReturn(<<<'SQL'
+            CREATE VIRTUAL TABLE posts using fts5(body)
+            /* posts(body) */;
+            CREATE TABLE IF NOT EXISTS 'posts_data'(id INTEGER PRIMARY KEY, block BLOB);
+            CREATE TABLE IF NOT EXISTS 'posts_idx'(
+              segid,
+              term,
+              pgno,
+              PRIMARY KEY(segid, term)
+            ) WITHOUT ROWID;
+            CREATE TABLE IF NOT EXISTS "logs_data"("id" integer primary key);
+
+            SQL);
+
+        $files = Mockery::spy(Filesystem::class);
+
+        (new SqliteSchemaState($connection, $files, fn () => $process))
+            ->withMigrationTable(null)
+            ->dump($connection, 'schema.sql');
+
+        $files->shouldHaveReceived('put')->with('schema.sql', <<<'SQL'
+            CREATE VIRTUAL TABLE posts using fts5(body)
+            /* posts(body) */;
+            CREATE TABLE IF NOT EXISTS "logs_data"("id" integer primary key);
+
+            SQL.PHP_EOL);
+    }
 }

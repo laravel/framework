@@ -29,6 +29,7 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use Illuminate\Tests\Database\Fixtures\Enums\IntegerStatus;
@@ -1438,6 +1439,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "id" between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetween('id', LazyCollection::make([1, 2]));
+        $this->assertSame('select * from "users" where "id" between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
         $subqueryBuilder = $this->getBuilder();
         $subqueryBuilder->select('id')->from('posts')->where('status', 'published')->orderByDesc('created_at')->limit(1);
         $builder = $this->getBuilder();
@@ -1593,6 +1599,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereValueBetween(new Raw(1), ['created_at', 'updated_at']);
         $this->assertSame('select * from "users" where 1 between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testOrWhereValueBetween()
@@ -1615,6 +1622,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('id', 2)->orWhereValueBetween(new Raw(1), ['created_at', 'updated_at']);
         $this->assertSame('select * from "users" where "id" = ? or 1 between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => 2], $builder->getBindings());
     }
 
     public function testWhereValueNotBetween()
@@ -1637,6 +1645,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereValueNotBetween(new Raw(1), ['created_at', 'updated_at']);
         $this->assertSame('select * from "users" where 1 not between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testOrWhereValueNotBetween()
@@ -1659,6 +1668,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('id', 2)->orWhereValueNotBetween(new Raw(1), ['created_at', 'updated_at']);
         $this->assertSame('select * from "users" where "id" = ? or 1 not between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => 2], $builder->getBindings());
     }
 
     public function testBasicOrWheres()
@@ -2316,6 +2326,11 @@ class DatabaseQueryBuilderTest extends TestCase
             $query->from('videos')->select('count(*)')->whereColumn('posts.id', '=', 'videos.post_id');
         }, 'videos_count')->having('videos_count', '>', 1);
         $builder->count();
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->havingBetween('id', LazyCollection::make([1, 2]));
+        $this->assertSame('select * from "users" having "id" between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 
     public function testSubSelectWhereIns()

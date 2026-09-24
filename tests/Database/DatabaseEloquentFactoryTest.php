@@ -105,6 +105,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     {
         $this->schema()->drop('users');
 
+        Factory::flushState();
         Container::setInstance(null);
     }
 
@@ -1185,6 +1186,11 @@ class FactoryTestUserFactory extends Factory
 class FactoryTestUser extends Eloquent
 {
     use HasFactory;
+
+    protected static function newFactory()
+    {
+        return FactoryTestUserFactory::new();
+    }
 
     protected $table = 'users';
     protected $hidden = ['options'];

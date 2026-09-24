@@ -323,6 +323,12 @@ class Worker
         // signals supported in recent versions of PHP to accomplish it conveniently.
         pcntl_signal(SIGALRM, function () use ($job, $options, $connectionName, $queue) {
             if ($job) {
+                try {
+                    $this->notifyJobOfSignal(SIGALRM);
+                } catch (Throwable $exception) {
+                    $this->exceptions->report($exception);
+                }
+
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
                     $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
                 );
@@ -396,7 +402,7 @@ class Worker
      * Pause the worker for the current loop.
      *
      * @param  \Illuminate\Queue\WorkerOptions  $options
-     * @param  int  $lastRestart
+     * @param  int|null  $lastRestart
      * @param  int|float  $startTime
      * @return array|null
      */
@@ -411,7 +417,7 @@ class Worker
      * Determine the exit code to stop the process if necessary.
      *
      * @param  \Illuminate\Queue\WorkerOptions  $options
-     * @param  int  $lastRestart
+     * @param  int|null  $lastRestart
      * @param  int|float  $startTime
      * @param  mixed  $job
      * @return array|null
@@ -614,9 +620,13 @@ class Worker
             // Here we will fire off the job and let it process. We will catch any exceptions, so
             // they can be reported to the developer's logs, etc. Once the job is finished the
             // proper events will be fired to let any listeners know this job has completed.
+            $startedAt = $this->currentTime();
+
             $job->fire();
 
-            $this->raiseAfterJobEvent($connectionName, $job);
+            $duration = round(($this->currentTime() - $startedAt) * 1000, 2);
+
+            $this->raiseAfterJobEvent($connectionName, $job, $duration);
 
             if ($job->isReleased() && ! $job->isDeleted()) {
                 $this->events->dispatch(new JobReleased(
@@ -884,12 +894,13 @@ class Worker
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  float|null  $duration
      * @return void
      */
-    protected function raiseAfterJobEvent($connectionName, $job)
+    protected function raiseAfterJobEvent($connectionName, $job, $duration = null)
     {
         $this->events->dispatch(new JobProcessed(
-            $connectionName, $job
+            $connectionName, $job, $duration
         ));
     }
 

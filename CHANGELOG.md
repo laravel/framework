@@ -1,6 +1,55 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.32.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.33.0...13.x)
+
+## [v13.33.0](https://github.com/laravel/framework/compare/v13.32.0...v13.33.0) - 2026-09-22
+
+* [13.x] Drop restart_syscalls from pcntl_signal in Worker by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61590
+* Adjust when password hash is stored for authenticated sessions by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/61594
+* [13.x] Ability to opt out of killing the worker on job timeout by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61591
+* [13.x] Fix enum keys in tagged cache many() and get() by [@Meacue](https://github.com/Meacue) in https://github.com/laravel/framework/pull/61603
+* [13.x] Add opt-in support for persisting real NULL on AsCollection/AsArrayObject by [@zeinrahmad76](https://github.com/zeinrahmad76) in https://github.com/laravel/framework/pull/61596
+* [13.x] Fix Eloquent Collection duplicates() with a key or callback by [@lazerg](https://github.com/lazerg) in https://github.com/laravel/framework/pull/61597
+* Improve Cloud job retries by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/61584
+* [13.x] Support brick/math 0.20 & 1.0 by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61382
+* [13.x] add health-start-period to workflows by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61608
+* [13.x] Resolve FormRequest attributes from parent classes by [@mdsukkur](https://github.com/mdsukkur) in https://github.com/laravel/framework/pull/61586
+* [13.x] Add order() to DevCommands by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61575
+* [13.x] Add EncodedParameter to RouteUrlGenerator by [@bytestream](https://github.com/bytestream) in https://github.com/laravel/framework/pull/61610
+* [13.x] Add inplace() DDL algorithm modifier for index and foreign key operations by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/61602
+* [13.x] Improve the value types of the Collection put method by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/61611
+* Allow relative URLs for Mercure hub by [@barryvdh](https://github.com/barryvdh) in https://github.com/laravel/framework/pull/61629
+* [13.x] Add server options to PostgreSQL connections by [@DGarbs51](https://github.com/DGarbs51) in https://github.com/laravel/framework/pull/61627
+* [13.x] Make the worker timed out exit code reachable by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/61622
+* Ci mariadb 11 by [@Rhaima96](https://github.com/Rhaima96) in https://github.com/laravel/framework/pull/61615
+* [13.x] Tagged memoized cache by [@joostdebruijn](https://github.com/joostdebruijn) in https://github.com/laravel/framework/pull/61593
+* Add "valkey://" and "valkeys://" protocol support by [@cweiske](https://github.com/cweiske) in https://github.com/laravel/framework/pull/61635
+* [13.x] Fix SQLite schema dumps containing shadow tables by [@jhm-ciberman](https://github.com/jhm-ciberman) in https://github.com/laravel/framework/pull/61637
+* [13.x] Make spelling consistent across docblocks by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/61631
+* [13.x] Use `composer require --with-all-dependencies` to install additional requirements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61617
+* [13.x] Rebuild the phpredis client when a pipeline or transaction loses the connection by [@maduonline](https://github.com/maduonline) in https://github.com/laravel/framework/pull/61632
+* Apply fixes from StyleCI by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/61638
+* [13.x] Add `--pretend` option to `install:broadcasting` command by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61633
+* [13.x] Improved artisan mocking by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/61588
+* [13.x] feat: refresh configured model attributes after writes by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/61523
+* [13.x] Pass fresh batch to `BatchFinished` and `BatchCanceled` events by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61644
+* [13.x] Output empty JSON array from route:list --json when no routes match by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61642
+* [13.x] Test against MariaDB 12.3 by [@Rhaima96](https://github.com/Rhaima96) in https://github.com/laravel/framework/pull/61641
+* [13.x] Use default view when make:notification --markdown has no value by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61643
+* [13.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61660
+* [13.x] Fix `LazyCollection::take()` with a negative limit larger than the collection by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61659
+* [13.x] Skip batches that cannot be retried in queue:retry-batch by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61653
+* [13.x] Consolidate overlapping tests by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/61648
+* [13.x] Fix order-dependent tests by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/61647
+* [13.x] Respect FILESYSTEM_DISK override when configuring Cloud disks by [@DGarbs51](https://github.com/DGarbs51) in https://github.com/laravel/framework/pull/61664
+* [13.x] Configure Laravel Cloud database read replicas by [@WendellAdriel](https://github.com/WendellAdriel) in https://github.com/laravel/framework/pull/61665
+* [13.x] Remove non-string headers from NotPwndVerifier by [@kylemilloy](https://github.com/kylemilloy) in https://github.com/laravel/framework/pull/61666
+* [13.x] Fix ERR invalid cursor returned when calling `$predisClient->scan(null, ...)` while using Redis 7.4 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61673
+* [13.x] Restore query logging when a pretend callback throws by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61671
+* [13.x] add sole to higher order proxies by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61667
+* [13.x] Add `createQuietly` and `createManyQuietly` to `BelongsToMany` by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61669
+* [13.x] Fix `whereValueBetween()` binding expression values by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61670
+* [13.x] Add opt-in native Postgres pooling for Laravel Cloud by [@DGarbs51](https://github.com/DGarbs51) in https://github.com/laravel/framework/pull/61668
 
 ## [v13.32.0](https://github.com/laravel/framework/compare/v13.31.0...v13.32.0) - 2026-09-15
 

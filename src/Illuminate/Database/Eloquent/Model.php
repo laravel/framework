@@ -16,6 +16,7 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\Boot;
 use Illuminate\Database\Eloquent\Attributes\Connection;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
+use Illuminate\Database\Eloquent\Attributes\Refreshes;
 use Illuminate\Database\Eloquent\Attributes\RouteKey;
 use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -105,6 +106,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var array
      */
     protected $withCount = [];
+
+    /**
+     * The attributes that should be refreshed after the model is written.
+     *
+     * @var list<string>
+     */
+    protected array $refreshes = [];
 
     /**
      * Indicates whether lazy loading will be prevented on this model.
@@ -462,6 +470,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->incrementing = false;
         } elseif ($table && $table->incrementing !== null) {
             $this->incrementing = $table->incrementing;
+        }
+
+        if ($this->refreshes === []) {
+            $this->refreshes = static::resolveClassAttribute(Refreshes::class, 'columns') ?? [];
         }
     }
 
@@ -1139,11 +1151,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($column, $amount, $extra), function () use ($column) {
+            $this->refreshSavedAttributes();
+
             $this->syncChanges();
 
             $this->fireModelEvent('updated', false);
 
-            $this->syncOriginalAttribute($column);
+            $this->syncOriginalAttributes(array_merge([$column], $this->refreshes));
         });
     }
 
@@ -1317,11 +1331,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($dbColumns, $extra), function () use ($columns) {
+            $this->refreshSavedAttributes();
+
             $this->syncChanges();
 
             $this->fireModelEvent('updated', false);
 
-            $this->syncOriginalAttributes(array_keys($columns));
+            $this->syncOriginalAttributes(array_merge(array_keys($columns), $this->refreshes));
         });
     }
 
@@ -1521,6 +1537,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if (count($dirty) > 0) {
             $this->setKeysForSaveQuery($query)->update($dirty);
 
+            $this->refreshSavedAttributes();
+
             $this->syncChanges();
 
             $this->fireModelEvent('updated', false);
@@ -1625,6 +1643,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->wasRecentlyCreated = true;
 
+        $this->refreshSavedAttributes();
+
         $this->fireModelEvent('created', false);
 
         return true;
@@ -1674,6 +1694,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->wasRecentlyCreated = true;
 
+        $this->refreshSavedAttributes();
+
         $this->fireModelEvent('created', false);
 
         return true;
@@ -1691,6 +1713,25 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $id = $query->insertGetId($attributes, $keyName = $this->getKeyName());
 
         $this->setAttribute($keyName, $id);
+    }
+
+    /**
+     * Refresh the configured attributes after the model is saved.
+     *
+     * @return void
+     */
+    protected function refreshSavedAttributes()
+    {
+        if ($this->refreshes === []) {
+            return;
+        }
+
+        $attributes = $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+            ->useWritePdo()
+            ->firstOrFail($this->refreshes)
+            ->getAttributes();
+
+        $this->setRawAttributes(array_replace($this->getAttributes(), $attributes));
     }
 
     /**

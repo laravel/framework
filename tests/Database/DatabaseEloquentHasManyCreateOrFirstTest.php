@@ -119,6 +119,59 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
+    public function testCreateOrFirstMethodCreatesNewRecordWithoutValues(): void
+    {
+        $model = new HasManyCreateOrFirstTestParentModel();
+        $model->id = 123;
+        $this->mockConnectionForModel($model, 'SQLite', [456]);
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()->expects('insert')->with(
+            'insert into "child_table" ("attr", "parent_id", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['foo', 123, '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+        )->andReturnTrue();
+
+        $result = $model->children()->createOrFirst(['attr' => 'foo']);
+        $this->assertTrue($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 456,
+            'parent_id' => 123,
+            'attr' => 'foo',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testFirstOrCreateMethodCreatesNewRecordWithoutValues(): void
+    {
+        $model = new HasManyCreateOrFirstTestParentModel();
+        $model->id = 123;
+        $this->mockConnectionForModel($model, 'SQLite', [456]);
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "child_table" where "child_table"."parent_id" = ? and "child_table"."parent_id" is not null and ("attr" = ?) limit 1', [123, 'foo'], true, [])
+            ->andReturn([]);
+
+        $model->getConnection()->expects('insert')->with(
+            'insert into "child_table" ("attr", "parent_id", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['foo', 123, '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+        )->andReturnTrue();
+
+        $result = $model->children()->firstOrCreate(['attr' => 'foo']);
+        $this->assertTrue($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 456,
+            'parent_id' => 123,
+            'attr' => 'foo',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
     public function testFirstOrCreateMethodRetrievesExistingRecord(): void
     {
         $model = new HasManyCreateOrFirstTestParentModel();
