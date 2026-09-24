@@ -58,7 +58,7 @@ class PauseCommand extends Command
 
         [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 
-        $manager->pause($connection, $queue);
+        $manager->pause($queue, $connection);
 
         $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused.");
 
