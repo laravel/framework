@@ -216,6 +216,7 @@ class CloudBootstrapper
 
         $app->singleton('queue.failer', fn ($app) => new FailedJobProvider(
             $failer, $app[Events::class], $app['encrypter'],
+            $app->bound(ExceptionReporter::class) ? $app[ExceptionReporter::class] : null,
         ));
     }
 
@@ -266,12 +267,14 @@ class CloudBootstrapper
                 ...json_decode($_SERVER['LARAVEL_CLOUD_EXCEPTIONS'], associative: true, flags: JSON_THROW_ON_ERROR),
             ];
 
-            $app[ExceptionHandlerContract::class]->reportable($exceptionReporter = new ExceptionReporter(
+            $exceptionReporter = $app->instance(ExceptionReporter::class, new ExceptionReporter(
                 $app[Events::class],
                 proxy(fn (): BladeMapper => $app[BladeMapper::class]),
                 $app->basePath().DIRECTORY_SEPARATOR,
                 $config,
             ));
+
+            $app[ExceptionHandlerContract::class]->reportable($exceptionReporter);
 
             $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->rememberUserIdInContext($event->context));
 

@@ -35,6 +35,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
+use WeakMap;
 
 // TODO Octane
 // TODO Livewire
@@ -46,6 +47,13 @@ class ExceptionReporter
      * Indicates the currently reporting exception is a view exception.
      */
     protected bool $reportingViewException = false;
+
+    /**
+     * The captured identifiers, keyed by exception.
+     *
+     * @var \WeakMap<\Throwable, string>
+     */
+    protected WeakMap $exceptionIds;
 
     /**
      * The name of the currently running Artisan command.
@@ -136,7 +144,7 @@ class ExceptionReporter
         protected string $basePath,
         protected array $config,
     ) {
-        //
+        $this->exceptionIds = new WeakMap;
     }
 
     /**
@@ -166,6 +174,14 @@ class ExceptionReporter
                 $this->flushScheduledTaskContext();
             }
         }
+    }
+
+    /**
+     * Retrieve the identifier for the given exception.
+     */
+    public function exceptionId(Throwable $e): string
+    {
+        return $this->exceptionIds[$e] ??= (string) Uuid::uuid4();
     }
 
     /**
@@ -199,6 +215,7 @@ class ExceptionReporter
     {
         return [
             '_cloud_event' => 'exception',
+            'id' => $this->exceptionId($e),
             'timestamp' => $this->timestamp(),
             'exception_context' => $this->exceptionContext($e),
             'laravel_context' => $this->laravelContext(),

@@ -161,6 +161,9 @@ class ExceptionReportingTest extends TestCase
         $streams[0]->assertWrittenJson(function (array $payload) {
             unset($payload['trace']); // we will test this in isolation
 
+            $this->assertTrue(Str::isUuid($payload['id']));
+            unset($payload['id']);
+
             $this->assertSame([
                 '_cloud_event' => 'exception',
                 'timestamp' => now()->format('Y-m-d H:i:s.u'),
@@ -204,6 +207,22 @@ class ExceptionReportingTest extends TestCase
 
             return true;
         });
+    }
+
+    public function testItCapturesTheExceptionId(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        report($exception = new RuntimeException('Whoops!'));
+
+        // The identifier is the one the failed job provider reports, so that
+        // a failed job can be tied back to the exception that failed it.
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains([
+            'id' => $this->app[ExceptionReporter::class]->exceptionId($exception),
+            'message' => 'Whoops!',
+        ]);
     }
 
     public function testItPreservesZeroFractionsInRequestPayload(): void
@@ -3075,54 +3094,61 @@ class ExceptionReportingTest extends TestCase
         $this->get('/test', ['Cloud-Request-ID' => '465ebb4e-2f86-434f-8e1b-cc364f317cef'])->assertOk();
 
         $this->assertCount(1, $streams);
-        $streams[0]->assertWrittenJson([
-            '_cloud_event' => 'exception',
-            'timestamp' => now()->format('Y-m-d H:i:s.u'),
-            'exception_context' => [],
-            'laravel_context' => [],
-            'trace_id' => '465ebb4e-2f86-434f-8e1b-cc364f317cef',
-            'execution_type' => 'request',
-            'execution_context' => [
-                'timestamp' => now()->subMinute()->format('Y-m-d H:i:s.u'),
-                'headers' => [
-                    'host' => ['localhost'],
-                    'user-agent' => ['Symfony'],
-                    'accept' => ['text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'],
-                    'accept-language' => ['en-us,en;q=0.5'],
-                    'accept-charset' => ['ISO-8859-1,utf-8;q=0.7,*;q=0.7'],
-                    'cloud-request-id' => [
-                        '465ebb4e-2f86-434f-8e1b-cc364f317cef',
+        $streams[0]->assertWrittenJson(function (array $payload) use ($line) {
+            $this->assertTrue(Str::isUuid($payload['id']));
+            unset($payload['id']);
+
+            $this->assertSame([
+                '_cloud_event' => 'exception',
+                'timestamp' => now()->format('Y-m-d H:i:s.u'),
+                'exception_context' => [],
+                'laravel_context' => [],
+                'trace_id' => '465ebb4e-2f86-434f-8e1b-cc364f317cef',
+                'execution_type' => 'request',
+                'execution_context' => [
+                    'timestamp' => now()->subMinute()->format('Y-m-d H:i:s.u'),
+                    'headers' => [
+                        'host' => ['localhost'],
+                        'user-agent' => ['Symfony'],
+                        'accept' => ['text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'],
+                        'accept-language' => ['en-us,en;q=0.5'],
+                        'accept-charset' => ['ISO-8859-1,utf-8;q=0.7,*;q=0.7'],
+                        'cloud-request-id' => [
+                            '465ebb4e-2f86-434f-8e1b-cc364f317cef',
+                        ],
+                    ],
+                    'method' => 'GET',
+                    'url' => 'http://localhost/test',
+                    'ip' => '127.0.0.1',
+                    'route' => [
+                        'name' => null,
+                        'methods' => [
+                            0 => 'GET',
+                            1 => 'HEAD',
+                        ],
+                        'domain' => null,
+                        'path' => '/test',
+                        'action' => 'Closure',
+                    ],
+                    'payload' => null,
+                    'files' => null,
+                ],
+                'user_id' => null,
+                'handled' => false,
+                'class' => "Symfony\Component\ErrorHandler\Error\FatalError",
+                'code' => '0',
+                'message' => 'Out of memory',
+                'trace' => [
+                    [
+                        'file' => 'tests/Foundation/Cloud/ExceptionReportingTest.php',
+                        'line' => $line,
                     ],
                 ],
-                'method' => 'GET',
-                'url' => 'http://localhost/test',
-                'ip' => '127.0.0.1',
-                'route' => [
-                    'name' => null,
-                    'methods' => [
-                        0 => 'GET',
-                        1 => 'HEAD',
-                    ],
-                    'domain' => null,
-                    'path' => '/test',
-                    'action' => 'Closure',
-                ],
-                'payload' => null,
-                'files' => null,
-            ],
-            'user_id' => null,
-            'handled' => false,
-            'class' => "Symfony\Component\ErrorHandler\Error\FatalError",
-            'code' => '0',
-            'message' => 'Out of memory',
-            'trace' => [
-                [
-                    'file' => 'tests/Foundation/Cloud/ExceptionReportingTest.php',
-                    'line' => $line,
-                ],
-            ],
-            'previous' => [],
-        ]);
+                'previous' => [],
+            ], $payload);
+
+            return true;
+        });
     }
 
     public function testItSkipsInternalFramesFromHandleExceptionsForFatalErrors(): void
@@ -3415,6 +3441,9 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             unset($payload['trace']); // we will test this in isolation
+
+            $this->assertTrue(Str::isUuid($payload['id']));
+            unset($payload['id']);
 
             $this->assertSame([
                 '_cloud_event' => 'exception',

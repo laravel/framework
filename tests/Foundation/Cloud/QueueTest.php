@@ -15,11 +15,13 @@ use Illuminate\Foundation\Cloud\AgentAwareLostConnectionDetector;
 use Illuminate\Foundation\Cloud\AgentUnreachableException;
 use Illuminate\Foundation\Cloud\CloudJob;
 use Illuminate\Foundation\Cloud\Events;
+use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\ManagedQueueNotFoundException;
 use Illuminate\Foundation\Cloud\Queue;
 use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Foundation\CloudBootstrapper;
+use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
@@ -637,6 +639,49 @@ class QueueTest extends TestCase
                 'duration_ms' => 0,
             ],
         ], $eventsFake->emitted);
+    }
+
+    public function testItEmitsTheExceptionIdWithFailedJobEvents()
+    {
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $reporter = new ExceptionReporter(
+            $eventsFake,
+            $this->app[BladeMapper::class],
+            $this->app->basePath().DIRECTORY_SEPARATOR,
+            ['stop' => true],
+        );
+        $failedJobProvider = new FailedJobProvider($this->fakeFailer(), $eventsFake, $this->app['encrypter'], $reporter);
+        $failedJobProvider->setQueue($queue);
+
+        $agent->pushJob();
+        $queue->pop()->fail();
+        $failedJobProvider->log('cloud', 'default', json_encode([]), $exception = new RuntimeException('Whoops!'));
+
+        // The exception is reported after the job is logged as failed, so the
+        // identifier the reporter will use must be the one emitted here.
+        $this->assertTrue(Str::isUuid($eventsFake->emitted[1]['exception_id']));
+        $this->assertSame($reporter->exceptionId($exception), $eventsFake->emitted[1]['exception_id']);
+    }
+
+    public function testTheQueueFailerReportsTheExceptionIdWhenExceptionReportingIsEnabled()
+    {
+        CloudBootstrapper::registerEvents($this->app);
+        $eventsFake = $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $_SERVER['LARAVEL_CLOUD_EXCEPTIONS'] = json_encode([]);
+        CloudBootstrapper::registerExceptionReporting($this->app);
+        CloudBootstrapper::bootManagedQueues($this->app);
+
+        $this->app['queue.failer']->setQueue($queue);
+        $agent->pushJob();
+        $queue->pop()->fail();
+        $this->app['queue.failer']->log('cloud', 'default', json_encode([]), $exception = new RuntimeException('Whoops!'));
+
+        $this->assertSame(
+            $this->app[ExceptionReporter::class]->exceptionId($exception),
+            $eventsFake->emitted[1]['exception_id'],
+        );
     }
 
     public function testItEmitsFailedJobEventsWithExceptionPreviewWithMessage()
