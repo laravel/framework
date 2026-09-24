@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\ClassMorphViolationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -233,6 +234,29 @@ class DatabaseEloquentMorphToTest extends TestCase
         $relation->callMatchToMorphParents('type_1', new EloquentCollection([$result]));
 
         $this->assertSame($result, $parent->getRelation('relation'));
+    }
+
+    public function testCreateModelByTypeThrowsWhenTypeNotInMorphMapAndRequireMorphMapIsOn()
+    {
+        $this->expectException(ClassMorphViolationException::class);
+
+        Relation::requireMorphMap();
+
+        $parent = new EloquentMorphToModelStub;
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('getModel')->andReturn(new EloquentMorphToRelatedStub);
+
+        $relation = MorphTo::noConstraints(
+            fn () => new MorphTo($builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation')
+        );
+
+        $relation->createModelByType('poisoned');
+    }
+
+    protected function tearDown(): void
+    {
+        Relation::morphMap([], false);
+        Relation::requireMorphMap(false);
     }
 
     protected function getRelationAssociate($parent)
