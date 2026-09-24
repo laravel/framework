@@ -761,7 +761,7 @@ class ExceptionReportingTest extends TestCase
         ]);
     }
 
-    public function testItCapturesTheErrorMessageWhenTheHandlerDoesNotSupportContextForException(): void
+    public function testItReportsNoExceptionContextWhenTheHandlerDoesNotSupportContextForException(): void
     {
         $this->app->instance(ExceptionHandler::class, new ExceptionHandlerWithoutContextForException);
 
@@ -772,13 +772,12 @@ class ExceptionReportingTest extends TestCase
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJsonContains([
-            'exception_context' => [
-                '_laravel_cloud_error' => 'Call to undefined method '.ExceptionHandlerWithoutContextForException::class.'::contextForException()',
-            ],
+            'exception_context' => null,
+            'message' => 'Whoops!',
         ]);
     }
 
-    public function testItCapturesTheErrorMessageWhenContextForExceptionThrows(): void
+    public function testItReportsNoExceptionContextWhenContextForExceptionThrows(): void
     {
         $this->app->instance(ExceptionHandler::class, new ExceptionHandlerThatThrowsFromContextForException);
 
@@ -789,9 +788,8 @@ class ExceptionReportingTest extends TestCase
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJsonContains([
-            'exception_context' => [
-                '_laravel_cloud_error' => 'Context error!',
-            ],
+            'exception_context' => null,
+            'message' => 'Whoops!',
         ]);
     }
 
@@ -813,7 +811,7 @@ class ExceptionReportingTest extends TestCase
         ]);
     }
 
-    public function testItCapturesTheErrorMessageWhenRetrievingTheLaravelContextThrows(): void
+    public function testItReportsNoLaravelContextWhenRetrievingItThrows(): void
     {
         $this->app->instance(ContextRepository::class, new ContextRepositoryThatThrows);
         Context::clearResolvedInstances();
@@ -825,9 +823,7 @@ class ExceptionReportingTest extends TestCase
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJsonContains([
-            'laravel_context' => [
-                '_laravel_cloud_error' => 'Unable to retrieve context.',
-            ],
+            'laravel_context' => null,
             'message' => 'Whoops!',
         ]);
     }
@@ -1187,7 +1183,7 @@ class ExceptionReportingTest extends TestCase
         ]);
     }
 
-    public function testItCapturesTheErrorMessageWhenTheUserIdentifierCannotBeRetrieved(): void
+    public function testItReportsNoUserIdWhenTheUserIdentifierCannotBeRetrieved(): void
     {
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
@@ -1198,7 +1194,8 @@ class ExceptionReportingTest extends TestCase
 
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJsonContains([
-            'user_id' => '_laravel_cloud_error: Boom while retrieving the auth identifier!',
+            'user_id' => null,
+            'message' => 'Whoops!',
         ]);
     }
 
@@ -1269,7 +1266,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $this->assertCount(1, array_filter(explode("\n", $streams[0]->stream)));
         $streams[0]->assertWrittenJsonContains([
-            'user_id' => '_laravel_cloud_error: Boom while retrieving the auth identifier!',
+            'user_id' => null,
             'message' => 'Whoops!',
         ]);
     }
@@ -1993,7 +1990,7 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
-    public function testItCapturesTheErrorMessageWhenExecutionDetailsCannotBeRetrieved(): void
+    public function testItReportsNoExecutionDetailsWhenTheyCannotBeRetrieved(): void
     {
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
@@ -2009,8 +2006,6 @@ class ExceptionReportingTest extends TestCase
             $this->assertArrayNotHasKey('trace_id', $payload);
             $this->assertArrayNotHasKey('execution_type', $payload);
             $this->assertArrayNotHasKey('execution_context', $payload);
-
-            $this->assertSame('Unable to interact with the job.', $payload['_laravel_cloud_error']);
 
             $this->assertSame('Whoops!', $payload['message']);
             $this->assertSame('RuntimeException', $payload['class']);
@@ -2294,14 +2289,10 @@ class ExceptionReportingTest extends TestCase
             // The command cannot be resolved while reporting, as doing so
             // constructs it, which is what threw in the first place. The name
             // falls back to the console input, while the values that need the
-            // command itself report the reason instead.
-            $this->assertArrayNotHasKey('_laravel_cloud_error', $payload);
-
-            $error = '_laravel_cloud_error: '.ThrowingConstructorTestCommand::class;
-
+            // command itself are unavailable.
             $this->assertSame('throwing-constructor-command', $payload['execution_context']['name']);
-            $this->assertSame($error, $payload['execution_context']['class']);
-            $this->assertSame($error, $payload['execution_context']['command']);
+            $this->assertNull($payload['execution_context']['class']);
+            $this->assertNull($payload['execution_context']['command']);
 
             return true;
         });
@@ -2673,7 +2664,7 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
-    public function testItReportsAnErrorWhenTheCommandInputCannotBeParsed(): void
+    public function testItReportsNoCommandLineWhenTheCommandInputCannotBeParsed(): void
     {
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
@@ -2690,19 +2681,15 @@ class ExceptionReportingTest extends TestCase
         $streams[0]->assertWrittenJson(function (array $payload) {
             // The command itself resolves, so only the command line is
             // unavailable. The rest of the context is still reported.
-            $this->assertArrayNotHasKey('_laravel_cloud_error', $payload);
             $this->assertSame('test-sensitive-command', $payload['execution_context']['name']);
-            $this->assertSame(
-                '_laravel_cloud_error: The "--nope" option does not exist.',
-                $payload['execution_context']['command'],
-            );
+            $this->assertNull($payload['execution_context']['command']);
             $this->assertSame('Whoops!', $payload['message']);
 
             return true;
         });
     }
 
-    public function testItReportsAnErrorWhenTheCommandArgumentsAreInvalid(): void
+    public function testItReportsNoCommandLineWhenTheCommandArgumentsAreInvalid(): void
     {
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
@@ -2719,19 +2706,15 @@ class ExceptionReportingTest extends TestCase
         $streams[0]->assertWrittenJson(function (array $payload) {
             // The command itself resolves, so only the command line is
             // unavailable. The rest of the context is still reported.
-            $this->assertArrayNotHasKey('_laravel_cloud_error', $payload);
             $this->assertSame('test-command', $payload['execution_context']['name']);
-            $this->assertSame(
-                '_laravel_cloud_error: No arguments expected for "test-command" command, got "one".',
-                $payload['execution_context']['command'],
-            );
+            $this->assertNull($payload['execution_context']['command']);
             $this->assertSame('Whoops!', $payload['message']);
 
             return true;
         });
     }
 
-    public function testItReportsAnErrorWhenTheCommandCannotBeResolved(): void
+    public function testItReportsNoClassOrCommandLineWhenTheCommandCannotBeResolved(): void
     {
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
@@ -2745,7 +2728,6 @@ class ExceptionReportingTest extends TestCase
             // The name falls back to the console input, while the class and
             // the command line, which both need the command itself, are
             // simply unknown.
-            $this->assertArrayNotHasKey('_laravel_cloud_error', $payload);
             $this->assertSame('command', $payload['execution_type']);
 
             $this->assertSame('unknown-command', $payload['execution_context']['name']);
@@ -3303,11 +3285,14 @@ class ExceptionReportingTest extends TestCase
 
         (function ($anonymousArgOne, $anonymousArgTwo) {
             report(new RuntimeException('Whoops!'));
-        })(new class {
+        })(new class
+        {
             //
-        }, new class extends stdClass {
+        }, new class extends stdClass
+        {
             //
-        }, new class extends Arr {
+        }, new class extends Arr
+        {
             //
         });
 
@@ -3326,7 +3311,8 @@ class ExceptionReportingTest extends TestCase
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
 
-        report(new class('Whoops!') extends RuntimeException {
+        report(new class('Whoops!') extends RuntimeException
+        {
             //
         });
 
