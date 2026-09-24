@@ -310,8 +310,8 @@ class Worker
     /**
      * Register the worker timeout handler.
      *
-     * @param  string|null  $connectionName
-     * @param  string|null  $queue
+     * @param  string  $connectionName
+     * @param  string  $queue
      * @param  \Illuminate\Contracts\Queue\Job|null  $job
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
