@@ -10,6 +10,7 @@ use function Orchestra\Testbench\remote;
 
 class AboutCommandTest extends TestCase
 {
+    #[WithEnv('APP_URL', 'http://localhost')]
     public function testItCanDisplayAboutCommandAsJson()
     {
         $process = remote('about --json', ['APP_ENV' => 'local'])->mustRun();
