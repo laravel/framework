@@ -18,6 +18,8 @@ class BackgroundQueue extends SyncQueue
      */
     public function push($job, $data = '', $queue = null)
     {
+        $this->ensureJobCanRunLocally($job);
+
         Concurrency::driver('process')->defer(
             fn () => \Illuminate\Support\Facades\Queue::connection('sync')->push($job, $data, $queue)
         );

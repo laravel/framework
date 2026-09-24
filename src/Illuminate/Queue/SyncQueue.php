@@ -4,12 +4,14 @@ namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Contracts\Queue\ShouldRunRemotely;
 use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Collection;
+use LogicException;
 use Throwable;
 
 class SyncQueue extends Queue implements QueueContract
@@ -194,6 +196,8 @@ class SyncQueue extends Queue implements QueueContract
      */
     public function push($job, $data = '', $queue = null)
     {
+        $this->ensureJobCanRunLocally($job);
+
         if ($this->shouldDispatchAfterCommit($job) &&
             $this->container->bound('db.transactions')) {
             $this->registerRollbackCallbacksForJobsThatDispatchAfterCommit($job);
@@ -204,6 +208,21 @@ class SyncQueue extends Queue implements QueueContract
         }
 
         return $this->executeJob($job, $data, $queue);
+    }
+
+    /**
+     * Ensure the given job can be handled by this application.
+     *
+     * @param  mixed  $job
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    protected function ensureJobCanRunLocally($job)
+    {
+        if ($job instanceof ShouldRunRemotely) {
+            throw new LogicException(sprintf('Remote job [%s] cannot be dispatched to a sync connection.', get_class($job)));
+        }
     }
 
     /**

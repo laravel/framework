@@ -16,6 +16,8 @@ class DeferredQueue extends SyncQueue
      */
     public function push($job, $data = '', $queue = null)
     {
+        $this->ensureJobCanRunLocally($job);
+
         return \Illuminate\Support\defer(fn () => parent::push($job, $data, $queue));
     }
 }

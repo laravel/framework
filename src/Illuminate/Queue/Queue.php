@@ -181,12 +181,13 @@ abstract class Queue
      */
     protected function createRemotePayload($job, $queue)
     {
-        if ($this instanceof SyncQueue) {
-            throw new LogicException(sprintf('Remote job [%s] cannot be dispatched to a sync connection.', get_class($job)));
-        }
-
         if ($this->jobShouldBeEncrypted($job)) {
             throw new LogicException(sprintf('Remote job [%s] cannot be encrypted.', get_class($job)));
+        }
+
+        // The remote worker never runs Laravel's queued handler, so a chain or batch would silently stall...
+        if (! empty($job->chained ?? null) || isset($job->batchId)) {
+            throw new LogicException(sprintf('Remote job [%s] cannot be chained or batched.', get_class($job)));
         }
 
         $name = $this->getAttributeInstance($job, RemoteName::class)?->name
@@ -195,6 +196,8 @@ abstract class Queue
         $payload = array_merge($this->createStringPayload($name, $queue, $this->getRemoteJobData($job)), [
             'displayName' => $this->getDisplayName($job),
             'maxTries' => $this->getJobTries($job),
+            'maxExceptions' => $this->getAttributeValue($job, MaxExceptions::class, 'maxExceptions'),
+            'failOnTimeout' => $this->getAttributeValue($job, FailOnTimeout::class, 'failOnTimeout') ?? false,
             'backoff' => $this->getJobBackoff($job),
             'timeout' => $this->getAttributeValue($job, Timeout::class, 'timeout'),
             'retryUntil' => $this->getJobExpiration($job),
@@ -223,16 +226,20 @@ abstract class Queue
     protected function getRemoteJobData($job)
     {
         if (method_exists($job, 'toPayload')) {
-            return json_decode(json_encode($job->toPayload()), true);
+            return $job->toPayload();
         }
 
-        $parameters = (new ReflectionClass($job))->getConstructor()?->getParameters() ?? [];
+        $reflection = new ReflectionClass($job);
 
-        return json_decode(json_encode(
-            (new Collection($parameters))
-                ->mapWithKeys(fn ($parameter) => [$parameter->getName() => $job->{$parameter->getName()} ?? null])
-                ->all()
-        ), true);
+        return (new Collection($reflection->getConstructor()?->getParameters() ?? []))
+            ->mapWithKeys(function ($parameter) use ($job, $reflection) {
+                $property = $reflection->hasProperty($name = $parameter->getName())
+                    ? $reflection->getProperty($name)
+                    : null;
+
+                return [$name => $property?->isInitialized($job) ? $property->getValue($job) : null];
+            })
+            ->all();
     }
 
     /**

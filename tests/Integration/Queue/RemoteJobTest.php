@@ -13,6 +13,7 @@ use Illuminate\Queue\Attributes\RemoteName;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\InteractsWithRemoteWorker;
 use Illuminate\Queue\RemoteJobFailed;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -131,6 +132,27 @@ class RemoteJobTest extends DatabaseTestCase
         ResizeImage::dispatch('s3://bucket/cat.jpg', 800)->onConnection('sync');
     }
 
+    public function testProtectedConstructorPropertiesAreSent()
+    {
+        ArchiveFile::dispatch('s3://bucket/report.pdf');
+
+        $this->assertSame(['path' => 's3://bucket/report.pdf'], $this->payload()['data']);
+    }
+
+    public function testRemoteJobsCannotBeDeferred()
+    {
+        $this->expectExceptionMessage('cannot be dispatched to a sync connection');
+
+        ResizeImage::dispatch('s3://bucket/cat.jpg', 800)->onConnection('deferred');
+    }
+
+    public function testRemoteJobsCannotBeChained()
+    {
+        $this->expectExceptionMessage('cannot be chained or batched');
+
+        Bus::chain([new ResizeImage('s3://bucket/a.jpg', 800), new ResizeImage('s3://bucket/b.jpg', 800)])->dispatch();
+    }
+
     public function testRemoteJobsCannotBeEncrypted()
     {
         $this->expectException(LogicException::class);
@@ -194,6 +216,16 @@ class TranscodeVideo implements ShouldRunRemotely
     public function toPayload(): array
     {
         return ['video' => ['id' => $this->videoId]];
+    }
+}
+
+class ArchiveFile implements ShouldRunRemotely
+{
+    use Queueable;
+
+    public function __construct(protected string $path)
+    {
+        //
     }
 }
 
