@@ -19,6 +19,8 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use SortDirection;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
  * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
@@ -809,6 +811,8 @@ class BelongsToMany extends Relation
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
+            $id = array_map(enum_value(...), $id);
+
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }
@@ -846,6 +850,8 @@ class BelongsToMany extends Relation
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
+            $id = array_map(enum_value(...), $id);
+
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }

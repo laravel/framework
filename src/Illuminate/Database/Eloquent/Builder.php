@@ -24,6 +24,8 @@ use ReflectionClass;
 use ReflectionMethod;
 use SortDirection;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
  *
@@ -628,6 +630,8 @@ class Builder implements BuilderContract
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
+            $id = array_map(enum_value(...), $id);
+
             if (count($result) !== count(array_unique($id))) {
                 throw (new ModelNotFoundException)->setModel(
                     get_class($this->model), array_diff($id, $result->modelKeys())
@@ -689,6 +693,8 @@ class Builder implements BuilderContract
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
+            $id = array_map(enum_value(...), $id);
+
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }

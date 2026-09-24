@@ -1095,6 +1095,20 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf(EloquentTestUser::class, $multiple[1]);
     }
 
+    public function testFindOrAndFindOrFailWithBackedEnumIds()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $this->assertCount(2, EloquentTestUser::findOr([EloquentTestUserId::One, EloquentTestUserId::Two], fn () => 'missing'));
+        $this->assertSame('missing', EloquentTestUser::findOr([EloquentTestUserId::One, EloquentTestUserId::Three], fn () => 'missing'));
+        $this->assertCount(2, EloquentTestUser::findOrFail([EloquentTestUserId::One, EloquentTestUserId::Two]));
+
+        $this->expectException(ModelNotFoundException::class);
+
+        EloquentTestUser::findOrFail([EloquentTestUserId::One, EloquentTestUserId::Three]);
+    }
+
     public function testFindOrFailWithSingleIdThrowsModelNotFoundException()
     {
         $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1'));
@@ -3146,4 +3160,11 @@ enum StringBackedRole: string
 {
     case User = 'user';
     case Admin = 'admin';
+}
+
+enum EloquentTestUserId: int
+{
+    case One = 1;
+    case Two = 2;
+    case Three = 3;
 }

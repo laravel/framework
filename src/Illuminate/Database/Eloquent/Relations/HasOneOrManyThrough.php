@@ -13,6 +13,8 @@ use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Arr;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
  * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
@@ -405,6 +407,8 @@ abstract class HasOneOrManyThrough extends Relation
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
+            $id = array_map(enum_value(...), $id);
+
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }
@@ -442,6 +446,8 @@ abstract class HasOneOrManyThrough extends Relation
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
+            $id = array_map(enum_value(...), $id);
+
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }
