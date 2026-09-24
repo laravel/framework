@@ -3341,6 +3341,30 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
+    public function testItReportsWindowsPathsWithForwardSlashes(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        // Paths are reported the same way whichever platform the application
+        // runs on, so that a file is the same file everywhere.
+        $reporter = new ExceptionReporter(
+            $this->app[Events::class],
+            $this->app[BladeMapper::class],
+            'D:\\a\\framework\\framework\\',
+            ['stop' => true],
+        );
+
+        $reporter(new ExceptionThrownOnWindows);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame('tests/Foundation/Cloud/Whoops.php', $payload['trace'][0]['file']);
+
+            return true;
+        });
+    }
+
     public function testItFormatsTraces(): void
     {
         $this->captureTraceArguments();
@@ -3972,6 +3996,17 @@ class JobThatThrowsWhenInteractedWith extends QueueJob implements JobContract
     public function resolveName()
     {
         throw new RuntimeException('Unable to interact with the job.');
+    }
+}
+
+class ExceptionThrownOnWindows extends RuntimeException
+{
+    public function __construct()
+    {
+        parent::__construct('Whoops!');
+
+        $this->file = 'D:\\a\\framework\\framework\\tests\\Foundation\\Cloud\\Whoops.php';
+        $this->line = 1;
     }
 }
 

@@ -1289,7 +1289,7 @@ class ExceptionReporter
             return $path;
         }
 
-        return substr($path, strlen($this->basePath));
+        return str_replace('\\', '/', substr($path, strlen($this->basePath)));
     }
 
     /**
