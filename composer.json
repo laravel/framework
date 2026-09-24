@@ -129,6 +129,7 @@
         "illuminate/redis": "self.version",
         "illuminate/reflection": "self.version",
         "illuminate/routing": "self.version",
+        "illuminate/services": "self.version",
         "illuminate/session": "self.version",
         "illuminate/support": "self.version",
         "illuminate/testing": "self.version",

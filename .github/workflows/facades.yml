@@ -72,6 +72,7 @@ jobs:
             Illuminate\\Support\\Facades\\Route \
             Illuminate\\Support\\Facades\\Schedule \
             Illuminate\\Support\\Facades\\Schema \
+            Illuminate\\Support\\Facades\\Service \
             Illuminate\\Support\\Facades\\Session \
             Illuminate\\Support\\Facades\\Storage \
             Illuminate\\Support\\Facades\\URL \

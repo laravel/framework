@@ -49,6 +49,7 @@ remote queue git@github.com:illuminate/queue.git
 remote reflection git@github.com:illuminate/reflection.git
 remote redis git@github.com:illuminate/redis.git
 remote routing git@github.com:illuminate/routing.git
+remote services git@github.com:illuminate/services.git
 remote session git@github.com:illuminate/session.git
 remote support git@github.com:illuminate/support.git
 remote testing git@github.com:illuminate/testing.git
@@ -87,6 +88,7 @@ split 'src/Illuminate/Queue' queue
 split 'src/Illuminate/Reflection' reflection
 split 'src/Illuminate/Redis' redis
 split 'src/Illuminate/Routing' routing
+split 'src/Illuminate/Services' services
 split 'src/Illuminate/Session' session
 split 'src/Illuminate/Support' support
 split 'src/Illuminate/Testing' testing

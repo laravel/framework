@@ -1,11 +1,11 @@
 <?php
 
-namespace Illuminate\Queue\Attributes;
+namespace Illuminate\Services\Attributes;
 
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS)]
-class Service
+class RemoteName
 {
     /**
      * Create a new attribute instance.

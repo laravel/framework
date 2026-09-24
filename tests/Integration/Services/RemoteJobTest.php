@@ -1,21 +1,23 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Queue;
+namespace Illuminate\Tests\Integration\Services;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Contracts\Queue\ShouldRunRemotely;
+use Illuminate\Contracts\Services\ShouldRunRemotely;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Queue\Attributes\RemoteName;
-use Illuminate\Queue\Attributes\Service;
-use Illuminate\Queue\InteractsWithRemoteWorker;
-use Illuminate\Queue\RemoteJobFailed;
+use Illuminate\Services\Attributes\RemoteName;
+use Illuminate\Services\Attributes\Service as OnService;
+use Illuminate\Services\InteractsWithRemoteWorker;
+use Illuminate\Services\RemoteJobFailed;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Service;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use LogicException;
@@ -36,6 +38,7 @@ class RemoteJobTest extends DatabaseTestCase
         $app['config']->set('app.key', Str::random(32));
         $app['config']->set('queue.default', 'database');
         $app['config']->set('services.images', ['url' => 'http://images.test', 'token' => 'secret']);
+        $app['config']->set('services.token', 'inbound-secret');
     }
 
     protected function tearDown(): void
@@ -145,9 +148,68 @@ class RemoteJobTest extends DatabaseTestCase
         Http::assertSentCount(1);
         $this->assertSame('notified', static::$result);
     }
+
+    public function testServicesCanBeCalledWithoutAJobClass()
+    {
+        Http::fake(['images.test/resize' => Http::response(['url' => 's3://bucket/cat-800.jpg'])]);
+
+        $this->assertSame(['url' => 's3://bucket/cat-800.jpg'], Service::images()->resize(path: 'cat.jpg', width: 800));
+
+        Http::assertSent(fn (Request $request) => $request->data() === ['path' => 'cat.jpg', 'width' => 800]);
+    }
+
+    public function testServicesCanBeDispatchedWithoutAJobClass()
+    {
+        Http::fake(['images.test/resize' => Http::response(['url' => 's3://bucket/cat-800.jpg'])]);
+
+        Service::images()->dispatch('resize', ['path' => 'cat.jpg'])
+            ->then(fn (array $result) => RemoteJobTest::$result = $result['url']);
+
+        Queue::pop()->fire();
+
+        $this->assertSame('s3://bucket/cat-800.jpg', static::$result);
+    }
+
+    public function testServiceCallsCanBeFaked()
+    {
+        Service::fake([
+            ResizeImage::class => ['url' => 's3://bucket/cat-800.jpg'],
+            'images/resize' => ['url' => 's3://bucket/dog-800.jpg'],
+        ]);
+
+        $this->assertSame(['url' => 's3://bucket/cat-800.jpg'], ResizeImage::call('cat.jpg', 800));
+        $this->assertSame(['url' => 's3://bucket/dog-800.jpg'], Service::images()->resize(path: 'dog.jpg'));
+
+        Service::assertCalled(ResizeImage::class, fn (array $data) => $data['width'] === 800);
+        Service::assertCalled('images/resize', fn (array $data) => $data['path'] === 'dog.jpg');
+    }
+
+    public function testOtherServicesCanCallJobsInThisApplication()
+    {
+        Queue::fake();
+
+        Route::services([ImageProcessed::class, CountImages::class]);
+
+        $this->postJson('_services/image_processed', ['imageId' => 42], ['Authorization' => 'Bearer inbound-secret'])
+            ->assertStatus(202);
+
+        Queue::assertPushed(ImageProcessed::class, fn ($job) => $job->imageId === 42);
+
+        $this->postJson('_services/images.count', ['album' => 'cats'], ['Authorization' => 'Bearer inbound-secret'])
+            ->assertOk()
+            ->assertExactJson(['album' => 'cats', 'count' => 3]);
+    }
+
+    public function testServiceRoutesRequireTheServiceToken()
+    {
+        Route::services([CountImages::class]);
+
+        $this->postJson('_services/images.count', ['album' => 'cats'])->assertUnauthorized();
+        $this->postJson('_services/images.count', ['album' => 'cats'], ['Authorization' => 'Bearer wrong'])->assertUnauthorized();
+    }
 }
 
-#[Service('images')]
+#[OnService('images')]
 class ResizeImage implements ShouldRunRemotely
 {
     use Queueable, InteractsWithRemoteWorker;
@@ -158,7 +220,7 @@ class ResizeImage implements ShouldRunRemotely
     }
 }
 
-#[Service('images'), RemoteName('videos.transcode')]
+#[OnService('images'), RemoteName('videos.transcode')]
 class TranscodeVideo implements ShouldRunRemotely
 {
     use Queueable, InteractsWithRemoteWorker;
@@ -181,5 +243,34 @@ class NotifyOwner implements ShouldQueue
     public function handle()
     {
         RemoteJobTest::$result = 'notified';
+    }
+}
+
+class ImageProcessed implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct(public int $imageId)
+    {
+        //
+    }
+
+    public function handle()
+    {
+        //
+    }
+}
+
+#[RemoteName('images.count')]
+class CountImages
+{
+    public function __construct(public string $album)
+    {
+        //
+    }
+
+    public function handle()
+    {
+        return ['album' => $this->album, 'count' => 3];
     }
 }

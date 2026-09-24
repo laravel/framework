@@ -1,0 +1,43 @@
+{
+    "name": "illuminate/services",
+    "description": "The Illuminate Services package.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylor@laravel.com"
+        }
+    ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
+    "require": {
+        "php": "^8.3",
+        "illuminate/bus": "^13.0",
+        "illuminate/container": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/http": "^13.0",
+        "illuminate/queue": "^13.0",
+        "illuminate/support": "^13.0",
+        "laravel/serializable-closure": "^2.0.10"
+    },
+    "suggest": {
+        "illuminate/routing": "Required to let other services call this application using Route::services() (^13.0)."
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Services\\": ""
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "13.0.x-dev"
+        }
+    }
+}

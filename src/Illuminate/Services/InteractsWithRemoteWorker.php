@@ -1,12 +1,11 @@
 <?php
 
-namespace Illuminate\Queue;
+namespace Illuminate\Services;
 
 use Closure;
 use Illuminate\Container\Container;
-use Illuminate\Queue\Attributes\RemoteName;
-use Illuminate\Queue\Attributes\Service;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Services\Attributes\RemoteName;
+use Illuminate\Services\Attributes\Service;
 use Illuminate\Support\Str;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
@@ -28,7 +27,7 @@ trait InteractsWithRemoteWorker
      * @param  mixed  ...$arguments
      * @return mixed
      *
-     * @throws \Illuminate\Queue\RemoteJobFailed
+     * @throws \Illuminate\Services\RemoteJobFailed
      */
     public static function call(...$arguments)
     {
@@ -143,26 +142,27 @@ trait InteractsWithRemoteWorker
     }
 
     /**
-     * Send the job's data to the configured service.
+     * Get the name of the service that handles this job.
      *
-     * @return \Illuminate\Http\Client\Response
+     * @return string
      *
      * @throws \LogicException
      */
+    public function remoteService()
+    {
+        return $this->classAttribute(Service::class)?->name
+            ?? throw new LogicException(sprintf('Remote job [%s] must declare its service using the #[Service] attribute.', static::class));
+    }
+
+    /**
+     * Send the job's data to its service.
+     *
+     * @return \Illuminate\Http\Client\Response
+     */
     protected function sendToService()
     {
-        $service = $this->classAttribute(Service::class)?->name
-            ?? throw new LogicException(sprintf('Remote job [%s] must declare its service using the #[Service] attribute.', static::class));
-
-        $config = Container::getInstance()->make('config')->get("services.{$service}", []);
-
-        if (! is_string($url = $config['url'] ?? null) || $url === '') {
-            throw new LogicException("Service [{$service}] does not have a URL configured.");
-        }
-
-        return Http::baseUrl($url)
-            ->acceptJson()
-            ->when($config['token'] ?? null, fn ($request, $token) => $request->withToken($token))
+        return Container::getInstance()->make(ServiceManager::class)
+            ->http($this->remoteService())
             ->when(isset($this->job) ? $this->job->uuid() : null, fn ($request, $uuid) => $request->withHeaders(['Idempotency-Key' => $uuid]))
             ->post($this->remoteName(), $this->remoteData());
     }
