@@ -1359,7 +1359,7 @@ class QueueTest extends TestCase
             $queue->pop();
             $this->travel(2)->seconds();
 
-            $this->app['events']->dispatch(new WorkerStopping(0, null, WorkerStopReason::TimedOut));
+            $this->app['events']->dispatch(new WorkerStopping(reason: WorkerStopReason::TimedOut));
 
             $this->assertSame([
                 [
@@ -1407,7 +1407,7 @@ class QueueTest extends TestCase
                 $agent->pushJob();
                 $queue->pop();
 
-                $this->app['events']->dispatch(new WorkerStopping(0, null, $reason));
+                $this->app['events']->dispatch(new WorkerStopping(reason: $reason));
 
                 $this->assertSame([
                     '_cloud_event' => 'queue',
@@ -1475,7 +1475,7 @@ class QueueTest extends TestCase
             $job = $queue->pop();
             $job->fail();
 
-            $this->app['events']->dispatch(new WorkerStopping(0, null, WorkerStopReason::TimedOut));
+            $this->app['events']->dispatch(new WorkerStopping(reason: WorkerStopReason::TimedOut));
 
             $this->assertSame('failed', $eventsFake->emitted[1]['type']);
         } finally {
@@ -1499,7 +1499,7 @@ class QueueTest extends TestCase
             $job = $queue->pop();
             $job->release();
 
-            $this->app['events']->dispatch(new WorkerStopping(0, null, WorkerStopReason::MaxJobsExceeded));
+            $this->app['events']->dispatch(new WorkerStopping(reason: WorkerStopReason::MaxJobsExceeded));
 
             $this->assertSame('released', $eventsFake->emitted[1]['type']);
         } finally {
@@ -1518,8 +1518,8 @@ class QueueTest extends TestCase
             $eventsFake = $this->fakeEvents();
             $this->fakeQueue();
 
-            $this->app['events']->dispatch(new WorkerStopping(0, null, WorkerStopReason::TimedOut));
-            $this->app['events']->dispatch(new WorkerStopping(0, null, WorkerStopReason::QueueEmpty));
+            $this->app['events']->dispatch(new WorkerStopping(reason: WorkerStopReason::TimedOut));
+            $this->app['events']->dispatch(new WorkerStopping(reason: WorkerStopReason::QueueEmpty));
 
             $this->assertSame([], $eventsFake->emitted);
         } finally {
@@ -1542,7 +1542,7 @@ class QueueTest extends TestCase
             $agent->pushJob();
             $queue->pop();
 
-            $this->app['events']->dispatch(new WorkerStopping(0, null, WorkerStopReason::TimedOut));
+            $this->app['events']->dispatch(new WorkerStopping(reason: WorkerStopReason::TimedOut));
 
             $this->assertSame([
                 [
