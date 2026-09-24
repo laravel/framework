@@ -2173,6 +2173,19 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testSortByManyWithNumericFlagComparesFractionalValues($collection)
+    {
+        $data = new $collection([['price' => 1.5], ['price' => '10.5'], ['price' => 1.2], ['price' => '10.2'], ['price' => 1.9]]);
+
+        $this->assertSame([1.2, 1.5, 1.9, '10.2', '10.5'], $data->sortBy([['price', 'asc']], SORT_NUMERIC)->pluck('price')->values()->all());
+        $this->assertSame(['10.5', '10.2', 1.9, 1.5, 1.2], $data->sortBy([['price', 'desc']], SORT_NUMERIC)->pluck('price')->values()->all());
+        $this->assertSame(
+            $data->sortBy('price', SORT_NUMERIC)->pluck('price')->values()->all(),
+            $data->sortBy([['price', 'asc']], SORT_NUMERIC)->pluck('price')->values()->all(),
+        );
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testSortByMany($collection)
     {
         $defaultLocale = setlocale(LC_ALL, 0);
