@@ -258,7 +258,6 @@ trait BuildsQueries
             throw new InvalidArgumentException('The chunk size should be at least 1');
         }
 
-
         $skip = $this->getOffset();
         $remaining = $this->getLimit();
 
