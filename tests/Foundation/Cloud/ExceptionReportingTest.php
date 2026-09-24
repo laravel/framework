@@ -68,6 +68,7 @@ class ExceptionReportingTest extends TestCase
         foreach ([
             'LARAVEL_CLOUD',
             'LARAVEL_CLOUD_EXCEPTIONS',
+            'LARAVEL_CLOUD_COMMAND_UUID',
             'REQUEST_TIME_FLOAT',
             'argv',
         ] as $key) {
@@ -1621,7 +1622,31 @@ class ExceptionReportingTest extends TestCase
 
     public function testItCapturesTraceIdInJobs(): void
     {
-        $this->markTestIncomplete('TODO');
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Config::set('queue.default', 'database');
+        $_SERVER['LARAVEL_CLOUD_COMMAND_UUID'] = 'comm-465ebb4e-2f86-434f-8e1b-cc364f317cef';
+
+        Artisan::command('test-command', function () {
+            ExceptionReportingJobThatReportsException::dispatch(fn () => true);
+        });
+        $this->artisan('test-command')->assertOk();
+
+        Artisan::call('queue:work', [
+            '--max-jobs' => 1,
+            '--sleep' => 0,
+            '--stop-when-empty' => true,
+            '--tries' => 1,
+        ]);
+
+        // The job is part of the execution that dispatched it, so it is
+        // reported under the trace of the command.
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains([
+            'trace_id' => '465ebb4e-2f86-434f-8e1b-cc364f317cef',
+            'execution_type' => 'job',
+            'message' => 'Whoops!',
+        ]);
     }
 
     public function testItCapturesTraceIdInScheduledTasks(): void

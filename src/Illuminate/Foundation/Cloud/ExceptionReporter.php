@@ -37,10 +37,6 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
 use WeakMap;
 
-// TODO Octane
-// TODO Livewire
-// TODO prepare for 14.x passing context here.
-// TODO reserve memory and free memory fatal exceptions?
 class ExceptionReporter
 {
     /**
@@ -218,7 +214,7 @@ class ExceptionReporter
             'timestamp' => $this->timestamp(),
             'exception_context' => $this->exceptionContext($e),
             'laravel_context' => $this->laravelContext(),
-            ...$this->executionDetails($e), // up to here
+            ...$this->executionDetails($e),
             'user_id' => $this->userId(),
             'handled' => $this->handled($e),
             ...$this->parseException($e),
@@ -297,7 +293,7 @@ class ExceptionReporter
                 'timestamp' => $this->laravelStartedAtTimestamp(),
                 'headers' => $this->requestHeaders(),
                 'method' => Request::method(),
-                'url' => $this->requestUrl(), // TODO redact query strings parameters
+                'url' => $this->requestUrl(),
                 'ip' => Request::ip(),
                 'route' => $this->requestRouteExecutionDetails(),
                 'payload' => $this->requestPayload($e),
@@ -967,6 +963,18 @@ class ExceptionReporter
     }
 
     /**
+     * Capture the trace identifier of the current execution in the given context.
+     */
+    public function rememberTraceIdInContext(ContextRepository $context): void
+    {
+        try {
+            $context->addHidden('laravel_cloud_trace_id', $this->traceIdFromContext() ?? $this->consoleCommandTraceId());
+        } catch (Throwable) {
+            //
+        }
+    }
+
+    /**
      * Determine if a queue worker is running.
      */
     protected function isProcessingJob(): bool
@@ -982,7 +990,7 @@ class ExceptionReporter
     protected function jobExecutionDetails(Throwable $e): array
     {
         return [
-            'trace_id' => 'TODO',
+            'trace_id' => $this->traceIdFromContext(),
             'execution_type' => 'job',
             'execution_context' => [
                 ...$this->executionContext['job'],
@@ -993,6 +1001,18 @@ class ExceptionReporter
                 'queue' => $this->normalizedQueue(),
             ],
         ];
+    }
+
+    /**
+     * Retrieve the trace identifier the current job belongs to.
+     */
+    protected function traceIdFromContext(): ?string
+    {
+        try {
+            return Context::getHidden('laravel_cloud_trace_id');
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     /**
@@ -1093,7 +1113,11 @@ class ExceptionReporter
      */
     protected function userIdFromContext(): ?string
     {
-        return Context::getHidden('laravel_cloud_user_id');
+        try {
+            return Context::getHidden('laravel_cloud_user_id');
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     /**
@@ -1115,7 +1139,7 @@ class ExceptionReporter
             return false;
         }
 
-        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, limit: 20) as $frame) { // PR to framework
+        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, limit: 20) as $frame) {
             if ($frame['function'] === 'report' && ! isset($frame['type'])) {
                 return true;
             }

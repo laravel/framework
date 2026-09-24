@@ -285,6 +285,8 @@ class CloudBootstrapper
                     }
                 });
             } else {
+                $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->rememberTraceIdInContext($event->context));
+
                 $preparedForCommand = false;
                 $app['events']->listen(function (CommandStarting $event) use ($exceptionReporter, &$preparedForCommand) {
                     if (! $preparedForCommand) {
