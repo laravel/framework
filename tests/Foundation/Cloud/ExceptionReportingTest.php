@@ -613,7 +613,7 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
-    public function testRequestPayloadCaptureIsOffByDefault(): void
+    public function testItDoesNotCaptureTheRequestPayloadByDefault(): void
     {
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
@@ -1048,6 +1048,23 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
+    public function testItDoesNotResolveTheAuthGuardsWhenCapturingTheUserId(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        // Resolving a guard may hit the session or the database, and may
+        // itself fail, which should not happen as a side effect of reporting
+        // an exception.
+        Auth::extend('exploding', fn () => throw new RuntimeException('The guard was resolved!'));
+        Config::set('auth.guards.web.driver', 'exploding');
+
+        report(new RuntimeException('Whoops!'));
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains(['user_id' => null]);
+    }
+
     public function testItCapturesUserIdInRequests(): void
     {
         $this->setupExceptionReporting();
@@ -1064,7 +1081,7 @@ class ExceptionReportingTest extends TestCase
         ]);
     }
 
-    public function testItCapturesTheErrorMessageWhenTheUserCannotBeResolved(): void
+    public function testItCapturesTheErrorMessageWhenTheUserIdentifierCannotBeRetrieved(): void
     {
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
@@ -1081,12 +1098,293 @@ class ExceptionReportingTest extends TestCase
 
     public function testItCapturesUserIdInRequestsAfterLogout(): void
     {
-        $this->markTestIncomplete('TODO');
+        $this->setRunningInConsole(false);
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/test', function () {
+            $this->setRunningInConsole(false);
+
+            Auth::logout();
+
+            throw new RuntimeException('Whoops!');
+        });
+
+        $this->actingAs(new GenericUser(['id' => 'abc123', 'remember_token' => '']))
+            ->get('/test')
+            ->assertServerError();
+
+        // The user is no longer authenticated, but the exception is still
+        // theirs, so the user they were is reported.
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains(['user_id' => 'abc123', 'message' => 'Whoops!']);
     }
 
-    public function testItDoesntCauseRecursionWhenRetrievingUserId(): void
+    public function testItDoesNotRememberTheUserWhenTheyLogOutInAJob(): void
     {
-        $this->markTestIncomplete('TODO');
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Config::set('queue.default', 'database');
+
+        // A worker handles many jobs, so remembering the user would attribute
+        // them to every job that follows. The user a job belongs to is the one
+        // captured when the job was dispatched.
+        ExceptionReportingJobThatReportsException::dispatch(function () {
+            Auth::setUser(new GenericUser(['id' => 'abc123', 'remember_token' => '']));
+            Auth::logout();
+        });
+        ExceptionReportingJobThatReportsException::dispatch(fn () => true);
+
+        Artisan::call('queue:work', [
+            '--max-jobs' => 2,
+            '--sleep' => 0,
+            '--stop-when-empty' => true,
+            '--tries' => 1,
+        ]);
+
+        // The reporter writes to the socket it has already opened, so each
+        // report within the worker is another write to the same stream.
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains(['user_id' => null, 'message' => 'Whoops!'], write: 0);
+        $streams[0]->assertWrittenJsonContains(['user_id' => null, 'message' => 'Whoops!'], write: 1);
+    }
+
+    public function testItDoesNotCauseRecursionWhenRetrievingUserId(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        // Retrieving the user's identifier may itself throw, which must not
+        // be reported, as reporting it would retrieve the identifier again.
+        Auth::setUser(new UserThatThrowsWhenItsAuthIdentifierIsRetrieved);
+
+        report(new RuntimeException('Whoops!'));
+
+        $this->assertCount(1, $streams);
+        $this->assertCount(1, array_filter(explode("\n", $streams[0]->stream)));
+        $streams[0]->assertWrittenJsonContains([
+            'user_id' => '_laravel_cloud_error: Boom while retrieving the auth identifier!',
+            'message' => 'Whoops!',
+        ]);
+    }
+
+    public function testItDoesNotCaptureUserIdForGuests(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/test', fn () => throw new RuntimeException('Whoops!'));
+
+        $this->get('/test')->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains(['user_id' => null, 'message' => 'Whoops!']);
+    }
+
+    public function testItCapturesUserIdWhenTheUserLogsInDuringARequest(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/test', function () {
+            Auth::login(new GenericUser(['id' => 'abc123', 'password' => 'secret', 'remember_token' => '']));
+
+            throw new RuntimeException('Whoops!');
+        });
+
+        $this->get('/test')->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains(['user_id' => 'abc123', 'message' => 'Whoops!']);
+    }
+
+    public function testItCapturesTheUserResolvedByLaravelsExceptionContext(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        // The reporter never retrieves the user itself, although Laravel's
+        // exception context calls "Auth::id()", which retrieves them from the
+        // resolved guard before the identifier is captured.
+        $guard = new GuardThatCountsUserRetrievals;
+        Auth::extend('counting', fn () => $guard);
+        Config::set('auth.guards.web.driver', 'counting');
+        Auth::guard();
+
+        ($this->exceptionReporter())(new RuntimeException('Whoops!'));
+
+        // The guard is hit by the exception context and again by the
+        // reporter, which reads the user the guard has now retrieved.
+        $this->assertSame(2, $guard->calls);
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains(['user_id' => 'abc123', 'message' => 'Whoops!']);
+    }
+
+    public function testItFallsBackToTheUserIdInTheContextWhenNoUserIsAuthenticated(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Context::addHidden('laravel_cloud_user_id', 'abc123');
+
+        Route::get('/test', function () {
+            report(new RuntimeException('Whoops before the guards are resolved!'));
+
+            Auth::guard();
+
+            report(new RuntimeException('Whoops after the guards are resolved!'));
+
+            return 'ok';
+        });
+
+        $this->get('/test')->assertOk();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains([
+            'user_id' => 'abc123',
+            'message' => 'Whoops before the guards are resolved!',
+        ], write: 0);
+        $streams[0]->assertWrittenJsonContains([
+            'user_id' => 'abc123',
+            'message' => 'Whoops after the guards are resolved!',
+        ], write: 1);
+    }
+
+    public function testItAddsTheUserIdToTheContextWhenDispatchingJobsDuringRequests(): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        Config::set('queue.default', 'database');
+
+        Route::get('/test', function () {
+            ExceptionReportingJobThatReportsException::dispatch(fn () => true);
+
+            return 'ok';
+        });
+
+        $this->actingAs(new GenericUser(['id' => 'abc123']))->get('/test')->assertOk();
+
+        $this->assertSame('abc123', $this->userIdInJobPayload(DB::table('jobs')->soleValue('payload')));
+    }
+
+    public function testItDoesNotAddTheUserIdToTheContextForJobsDispatchedBeforeTheUserLogsIn(): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        Config::set('queue.default', 'database');
+
+        Route::get('/test', function () {
+            ExceptionReportingJobThatReportsException::dispatch(fn () => true);
+
+            Auth::login(new GenericUser(['id' => 'abc123', 'password' => 'secret', 'remember_token' => '']));
+
+            ExceptionReportingJobThatReportsException::dispatch(fn () => true);
+
+            return 'ok';
+        });
+
+        $this->get('/test')->assertOk();
+
+        $payloads = DB::table('jobs')->orderBy('id')->pluck('payload');
+        $this->assertCount(2, $payloads);
+        $this->assertNull($this->userIdInJobPayload($payloads[0]));
+        $this->assertSame('abc123', $this->userIdInJobPayload($payloads[1]));
+    }
+
+    public function testItAddsTheUserIdToTheContextWhenDispatchingJobsAfterTheUserLogsOut(): void
+    {
+        $this->setRunningInConsole(false);
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        Config::set('queue.default', 'database');
+
+        Route::get('/test', function () {
+            Auth::logout();
+
+            ExceptionReportingJobThatReportsException::dispatch(fn () => true);
+
+            return 'ok';
+        });
+
+        $this->actingAs(new GenericUser(['id' => 'abc123', 'password' => 'secret', 'remember_token' => '']))
+            ->get('/test')
+            ->assertOk();
+
+        // The request was performed by the user, so the jobs it dispatched
+        // belong to them as well.
+        $this->assertSame('abc123', $this->userIdInJobPayload(DB::table('jobs')->soleValue('payload')));
+    }
+
+    public function testItPreservesTheUserIdInTheContextWhenJobsDispatchJobs(): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        Config::set('queue.default', 'database');
+
+        Context::addHidden('laravel_cloud_user_id', 'abc123');
+        ExceptionReportingJobThatReportsException::dispatch(
+            fn () => ExceptionReportingJobThatReportsException::dispatch(fn () => true)
+        );
+
+        Artisan::call('queue:work', [
+            '--max-jobs' => 1,
+            '--sleep' => 0,
+            '--stop-when-empty' => true,
+            '--tries' => 1,
+        ]);
+
+        // The job the worker dispatched belongs to the user the original job
+        // was dispatched by.
+        $this->assertSame('abc123', $this->userIdInJobPayload(DB::table('jobs')->soleValue('payload')));
+    }
+
+    public function testItCapturesTheDispatchingUserIdWhenAUserLogsOutDuringAJob(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Config::set('queue.default', 'database');
+
+        // A job belongs to the user that dispatched it, rather than to any
+        // user authenticated while handling it.
+        Context::addHidden('laravel_cloud_user_id', 'dispatcher');
+        ExceptionReportingJobThatReportsException::dispatch(function () {
+            Auth::setUser(new GenericUser(['id' => 'impersonated', 'remember_token' => '']));
+            Auth::logout();
+        });
+
+        Artisan::call('queue:work', [
+            '--max-jobs' => 1,
+            '--sleep' => 0,
+            '--stop-when-empty' => true,
+            '--tries' => 1,
+        ]);
+
+        $streams[0]->assertWrittenJsonContains(['user_id' => 'dispatcher', 'message' => 'Whoops!']);
+    }
+
+    public function testItCapturesUserIdInJobsWhenTheUserLogsInDuringTheJob(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Config::set('queue.default', 'database');
+
+        ExceptionReportingJobThatReportsException::dispatch(function () {
+            Auth::login(new GenericUser(['id' => 'abc123', 'password' => 'secret', 'remember_token' => '']));
+        });
+
+        // The worker is a separate process, so the guards have not been
+        // resolved while the job is processed.
+        Auth::forgetGuards();
+
+        Artisan::call('queue:work', [
+            '--max-jobs' => 1,
+            '--sleep' => 0,
+            '--stop-when-empty' => true,
+            '--tries' => 1,
+        ]);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains(['user_id' => 'abc123', 'message' => 'Whoops!']);
     }
 
     public function testItCapturesUserIdInConsole(): void
@@ -1110,7 +1408,22 @@ class ExceptionReportingTest extends TestCase
 
     public function testItCapturesUserIdInJobs(): void
     {
-        $this->markTestIncomplete('TODO');
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Config::set('queue.default', 'database');
+
+        Context::addHidden('laravel_cloud_user_id', 'abc123');
+        ExceptionReportingJobThatReportsException::dispatch(fn () => true);
+
+        Artisan::call('queue:work', [
+            '--max-jobs' => 1,
+            '--sleep' => 0,
+            '--stop-when-empty' => true,
+            '--tries' => 1,
+        ]);
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains(['user_id' => 'abc123', 'message' => 'Whoops!']);
     }
 
     public function testItCapturesTraceIdInRequests(): void
@@ -1636,7 +1949,7 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
-    public function testExceptionsBetweenJobsAreAttributtedToTheQueueWorkCommand(): void
+    public function testExceptionsBetweenJobsAreAttributedToTheQueueWorkCommand(): void
     {
         $this->freezeTime();
 
@@ -2414,7 +2727,7 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
-    public function testItCapturesScheduledTasksWithoutATimezone(): void
+    public function testItCapturesANullTimezoneForScheduledTasksWithoutOne(): void
     {
         $this->freezeTime();
         $this->setupExceptionReporting();
@@ -2574,7 +2887,7 @@ class ExceptionReportingTest extends TestCase
         );
     }
 
-    public function testItReportsTheExecutedCommandAsTheScheduledTaskName(): void
+    public function testItReportsTheShellCommandAsTheScheduledTaskName(): void
     {
         $this->setupExceptionReporting();
 
@@ -2615,7 +2928,7 @@ class ExceptionReportingTest extends TestCase
         );
     }
 
-    public function testItReportsTheCallbackAsTheScheduledTaskName(): void
+    public function testItReportsTheCallbackClassAsTheScheduledTaskName(): void
     {
         $this->setupExceptionReporting();
 
@@ -2783,7 +3096,7 @@ class ExceptionReportingTest extends TestCase
         $this->markTestIncomplete('TODO');
     }
 
-    public function testItAppendsTheExceptionFileAndLineAsTheFirstFrameInTheTrace()
+    public function testItAppendsTheExceptionFileAndLineAsTheFirstFrameInTheTrace(): void
     {
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
@@ -2907,7 +3220,7 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
-    public function testItSerializesToJsonCorrectly(): void
+    public function testItEncodesTheEventWithoutEscapingOrLosingData(): void
     {
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
@@ -3005,7 +3318,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertNull($reporter(new RuntimeException('Whoops!')));
     }
 
-    public function testItDoesBubbleOnWriteFailureWhenConfiguredNotToBubble(): void
+    public function testItDoesNotStopReportingWhenTheEventCannotBeWritten(): void
     {
         $this->setupExceptionReporting(['stop' => true]);
         $streams = $this->fakeEventsStreams();
@@ -3129,6 +3442,18 @@ class ExceptionReportingTest extends TestCase
         FakeStream::flush();
 
         return FakeStream::instances();
+    }
+
+    /**
+     * Retrieve the user's identifier captured in the given job payload.
+     */
+    protected function userIdInJobPayload(string $payload): ?string
+    {
+        $context = json_decode($payload, associative: true, flags: JSON_THROW_ON_ERROR)['illuminate:log:context'] ?? [];
+
+        return isset($context['hidden']['laravel_cloud_user_id'])
+            ? unserialize($context['hidden']['laravel_cloud_user_id'])
+            : null;
     }
 
     /**
@@ -3453,6 +3778,25 @@ class ExceptionHandlerThatThrowsFromContextForException implements ExceptionHand
     public function contextForException(Throwable $e)
     {
         throw new RuntimeException('Context error!');
+    }
+}
+
+class GuardThatCountsUserRetrievals implements \Illuminate\Contracts\Auth\Guard
+{
+    use \Illuminate\Auth\GuardHelpers;
+
+    public int $calls = 0;
+
+    public function user()
+    {
+        $this->calls++;
+
+        return $this->user ??= new GenericUser(['id' => 'abc123']);
+    }
+
+    public function validate(array $credentials = [])
+    {
+        return true;
     }
 }
 

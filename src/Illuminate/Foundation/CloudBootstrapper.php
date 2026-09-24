@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation;
 
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskSkipped;
@@ -20,6 +21,7 @@ use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
+use Illuminate\Support\Facades\Context;
 use Monolog\Handler\SocketHandler;
 use PDO;
 use Throwable;
@@ -271,32 +273,38 @@ class CloudBootstrapper
                 $config,
             ));
 
+            Context::dehydrating(fn ($context) => $exceptionReporter->rememberUserIdInContext($context));
+
             if (! $app->runningInConsole()) {
-                return;
+                $app['events']->listen(function (Logout $event) use ($exceptionReporter) {
+                    if ($event->user !== null) {
+                        $exceptionReporter->rememberUser($event->user);
+                    }
+                });
+            } else {
+                $preparedForCommand = false;
+                $app['events']->listen(function (CommandStarting $event) use ($exceptionReporter, &$preparedForCommand) {
+                    if (! $preparedForCommand) {
+                        $exceptionReporter->prepareForCommand($event->command, $event->input);
+
+                        $preparedForCommand = true;
+                    }
+                });
+
+                $app['events']->listen(function (JobPopped $event) use ($exceptionReporter) {
+                    if ($event->job !== null) {
+                        $exceptionReporter->prepareForJob($event->job);
+                    }
+                });
+
+                $app['events']->listen(fn (Looping $event) => $exceptionReporter->flushJobContext());
+                $app['events']->listen(fn (WorkerStopping $event) => $exceptionReporter->flushJobContext());
+
+                $app['events']->listen(fn (ScheduledTaskStarting $event) => $exceptionReporter->prepareForScheduledTask($event->task));
+
+                $app['events']->listen(fn (ScheduledTaskFinished $event) => $exceptionReporter->finishScheduledTask($event->task));
+                $app['events']->listen(fn (ScheduledTaskSkipped $event) => $exceptionReporter->flushScheduledTaskContext());
             }
-
-            $preparedForCommand = false;
-            $app['events']->listen(function (CommandStarting $event) use ($exceptionReporter, &$preparedForCommand) {
-                if (! $preparedForCommand) {
-                    $exceptionReporter->prepareForCommand($event->command, $event->input);
-
-                    $preparedForCommand = true;
-                }
-            });
-
-            $app['events']->listen(function (JobPopped $event) use ($exceptionReporter) {
-                if ($event->job !== null) {
-                    $exceptionReporter->prepareForJob($event->job);
-                }
-            });
-
-            $app['events']->listen(fn (Looping $event) => $exceptionReporter->flushJobContext());
-            $app['events']->listen(fn (WorkerStopping $event) => $exceptionReporter->flushJobContext());
-
-            $app['events']->listen(fn (ScheduledTaskStarting $event) => $exceptionReporter->prepareForScheduledTask($event->task));
-
-            $app['events']->listen(fn (ScheduledTaskFinished $event) => $exceptionReporter->finishScheduledTask($event->task));
-            $app['events']->listen(fn (ScheduledTaskSkipped $event) => $exceptionReporter->flushScheduledTaskContext());
         } catch (Throwable) {
             return;
         }

@@ -7,9 +7,11 @@ use DateTimeZone;
 use Illuminate\Console\Application as ConsoleApplication;
 use Illuminate\Console\Scheduling\CallbackEvent as CallbackTask;
 use Illuminate\Console\Scheduling\Event as ScheduledTask;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
+use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
@@ -98,6 +100,11 @@ class ExceptionReporter
      * @var array<string, mixed>|null
      */
     protected ?array $connectionConfig = null;
+
+    /**
+     * The user that logged out.
+     */
+    protected ?Authenticatable $rememberedUser = null;
 
     /**
      * Proactively captured execution context, keyed by execution type.
@@ -1024,19 +1031,63 @@ class ExceptionReporter
     }
 
     /**
+     * Remember the given user as they log out.
+     */
+    public function rememberUser(Authenticatable $user): void
+    {
+        $this->rememberedUser = $user;
+    }
+
+    /**
+     * Capture the authenticated user's identifier in the given context.
+     */
+    public function rememberUserIdInContext(ContextRepository $context): void
+    {
+        try {
+            $context->addHidden('laravel_cloud_user_id', $this->userId());
+        } catch (Throwable) {
+            //
+        }
+    }
+
+    /**
      * Retrieve the current user ID.
      */
     protected function userId(): ?string
     {
-        // TODO ensure we don't hit recursion.
-        // TODO jobs
         try {
-            $identifier = Auth::user()?->getAuthIdentifier();
+            if (Auth::hasResolvedGuards()) {
+                if (Auth::hasUser()) {
+                    return $this->userIdentifier(Auth::user());
+                }
 
-            return $identifier === null ? null : (string) $identifier;
+                if ($this->rememberedUser !== null) {
+                    return $this->userIdentifier($this->rememberedUser);
+                }
+            }
+
+            return $this->userIdFromContext();
         } catch (Throwable $e) {
             return '_laravel_cloud_error: '.$e->getMessage();
         }
+    }
+
+    /**
+     * Retrieve the authenticated user's identifier from the context.
+     */
+    protected function userIdFromContext(): ?string
+    {
+        return Context::getHidden('laravel_cloud_user_id');
+    }
+
+    /**
+     * Retrieve the identifier of the given user.
+     */
+    protected function userIdentifier(Authenticatable $user): ?string
+    {
+        return $user->getAuthIdentifier() === null
+            ? null
+            : (string) $user->getAuthIdentifier();
     }
 
     /**
