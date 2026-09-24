@@ -147,7 +147,7 @@ class DatabaseLock extends Lock
                 ->where('owner', $this->owner)
                 ->delete() > 0;
         } catch (Throwable $e) {
-            if ($this->causedByConcurrencyError($e)) {
+            if ($this->causedByConcurrencyError($e) && $this->connection->transactionLevel() === 0) {
                 return true;
             }
 
@@ -181,7 +181,7 @@ class DatabaseLock extends Lock
                 ->where('expiration', '<=', $this->currentTime())
                 ->delete();
         } catch (Throwable $e) {
-            if (! $this->causedByConcurrencyError($e)) {
+            if (! $this->causedByConcurrencyError($e) || $this->connection->transactionLevel() > 0) {
                 throw $e;
             }
         }
