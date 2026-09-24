@@ -35,6 +35,7 @@ use SortDirection;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use UnexpectedValueException;
+use ValueError;
 use WeakMap;
 
 include_once 'Fixtures/Common.php';
@@ -5003,6 +5004,22 @@ class SupportCollectionTest extends TestCase
         $actual = $keyCollection->combine($valueCollection)->toArray();
 
         $this->assertSame($expected, $actual);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testCombineWithFewerValuesThanKeysThrows($collection)
+    {
+        $this->expectException(ValueError::class);
+
+        (new $collection([1, 2]))->combine([3])->all();
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testCombineWithMoreValuesThanKeysThrows($collection)
+    {
+        $this->expectException(ValueError::class);
+
+        (new $collection([1]))->combine([2, 3])->all();
     }
 
     #[DataProvider('collectionClassProvider')]
