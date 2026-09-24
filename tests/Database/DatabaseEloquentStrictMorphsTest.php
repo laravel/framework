@@ -66,6 +66,39 @@ class DatabaseEloquentStrictMorphsTest extends TestCase
         $pivotModel->getMorphClass();
     }
 
+    public function testGetActualClassNameForMorphReturnsMappedClassWhenRequireMorphMapIsOn()
+    {
+        Relation::morphMap([
+            'test' => TestModel::class,
+        ]);
+
+        $this->assertSame(TestModel::class, Model::getActualClassNameForMorph('test'));
+    }
+
+    public function testGetActualClassNameForMorphThrowsWhenTypeNotInMorphMapAndRequireMorphMapIsOn()
+    {
+        $this->expectException(ClassMorphViolationException::class);
+
+        Model::getActualClassNameForMorph('not-in-morph-map');
+    }
+
+    public function testGetActualClassNameForMorphFallsBackToRawStringWhenRequireMorphMapIsOff()
+    {
+        Relation::requireMorphMap(false);
+
+        $this->assertSame(TestModel::class, Model::getActualClassNameForMorph(TestModel::class));
+    }
+
+    public function testMorphToLazyLoadingThrowsWhenTypeNotInMorphMapAndRequireMorphMapIsOn()
+    {
+        $this->expectException(ClassMorphViolationException::class);
+
+        $model = new TestModel;
+        $model->relation_type = 'poisoned';
+
+        $model->relation();
+    }
+
     protected function tearDown(): void
     {
         Relation::morphMap([], false);
@@ -75,6 +108,10 @@ class DatabaseEloquentStrictMorphsTest extends TestCase
 
 class TestModel extends Model
 {
+    public function relation()
+    {
+        return $this->morphTo();
+    }
 }
 
 class TestPivotModel extends Pivot
