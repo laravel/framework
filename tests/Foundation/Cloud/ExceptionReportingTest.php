@@ -1654,21 +1654,6 @@ class ExceptionReportingTest extends TestCase
         $this->markTestIncomplete('TODO');
     }
 
-    public function testItCapturesExecutionSourceInCommands(): void
-    {
-        $this->markTestIncomplete('TODO');
-    }
-
-    public function testItCapturesExecutionSourceInJobs(): void
-    {
-        $this->markTestIncomplete('TODO');
-    }
-
-    public function testItCapturesExecutionSourceInScheduledTasks(): void
-    {
-        $this->markTestIncomplete('TODO');
-    }
-
     public function testItReportsTheUrlAsItWasRequested(): void
     {
         $this->setupExceptionReporting();
@@ -3318,14 +3303,11 @@ class ExceptionReportingTest extends TestCase
 
         (function ($anonymousArgOne, $anonymousArgTwo) {
             report(new RuntimeException('Whoops!'));
-        })(new class
-        {
+        })(new class {
             //
-        }, new class extends stdClass
-        {
+        }, new class extends stdClass {
             //
-        }, new class extends Arr
-        {
+        }, new class extends Arr {
             //
         });
 
@@ -3344,8 +3326,7 @@ class ExceptionReportingTest extends TestCase
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
 
-        report(new class('Whoops!') extends RuntimeException
-        {
+        report(new class('Whoops!') extends RuntimeException {
             //
         });
 
@@ -3980,7 +3961,7 @@ class UserThatThrowsWhenItsAuthIdentifierIsRetrieved implements \Illuminate\Cont
 
 class ExceptionWithContext extends Exception
 {
-    public function __construct(protected array $context, string $message = '', int $code = 0, Throwable|null $previous = null)
+    public function __construct(protected array $context, string $message = '', int $code = 0, ?Throwable $previous = null)
     {
         return parent::__construct($message, $code, $previous);
     }
