@@ -45,7 +45,7 @@ class Number
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
-        return $formatter->format($number);
+        return $formatter->format(static::withoutNegativeZero($number, $formatter->format(...)));
     }
 
     /**
@@ -170,7 +170,7 @@ class Number
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
-        return $formatter->format($number / 100);
+        return $formatter->format(static::withoutNegativeZero($number / 100, $formatter->format(...)));
     }
 
     /**
@@ -192,7 +192,12 @@ class Number
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
-        return $formatter->formatCurrency($number, ! empty($in) ? $in : static::$currency);
+        $currency = ! empty($in) ? $in : static::$currency;
+
+        return $formatter->formatCurrency(
+            static::withoutNegativeZero($number, fn ($number) => $formatter->formatCurrency($number, $currency)),
+            $currency,
+        );
     }
 
     /**
@@ -475,5 +480,21 @@ class Number
 
             throw new RuntimeException('The "intl" PHP extension is required to use the ['.$method.'] method.');
         }
+    }
+
+    /**
+     * Replace a negative number that would be formatted as zero with zero, avoiding a "-0" result.
+     *
+     * @param  int|float  $number
+     * @param  callable(int|float): (string|false)  $format
+     * @return int|float
+     */
+    protected static function withoutNegativeZero(int|float $number, callable $format)
+    {
+        if ($number == 0) {
+            return 0;
+        }
+
+        return $number < 0 && $format(abs($number)) === $format(0) ? 0 : $number;
     }
 }
