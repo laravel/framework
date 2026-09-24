@@ -32,6 +32,7 @@ use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\Input as ConsoleInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\RawInputInterface;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
@@ -617,6 +618,10 @@ class ExceptionReporter
             try {
                 $this->currentConsoleInput();
             } catch (CommandNotFoundException) {
+                return null;
+            }
+
+            if (! $this->currentConsoleInput() instanceof RawInputInterface) {
                 return null;
             }
 

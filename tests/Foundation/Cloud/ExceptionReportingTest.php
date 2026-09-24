@@ -46,6 +46,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use stdClass;
+use Symfony\Component\Console\Input\RawInputInterface;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\HeaderBag;
@@ -2212,7 +2213,10 @@ class ExceptionReportingTest extends TestCase
             $this->assertSame([
                 'file' => 'src/Illuminate/Container/BoundMethod.php',
                 'line' => 36,
-                'function' => "{closure:laravel-serializable-closure://function (\$foo = null) {\n            throw new \\RuntimeException('Whoops from a queued closure!');\n        }:2}",
+                // PHP only names the file and line of a closure from 8.4.
+                'function' => PHP_VERSION_ID < 80400
+                    ? '{closure}'
+                    : "{closure:laravel-serializable-closure://function (\$foo = null) {\n            throw new \\RuntimeException('Whoops from a queued closure!');\n        }:2}",
                 'class' => 'Illuminate\Tests\Foundation\Cloud\ExceptionReportingTest',
                 'type' => '::',
                 'args' => ['types' => ['null', 'Illuminate\Queue\CallQueuedClosure']],
@@ -2296,7 +2300,7 @@ class ExceptionReportingTest extends TestCase
                 'timestamp' => now()->subMinutes(3)->format('Y-m-d H:i:s.u'),
                 'name' => 'queue:work',
                 'class' => \Illuminate\Queue\Console\WorkCommand::class,
-                'command' => 'queue:work --max-jobs=2 --memory=1024 --sleep=0 --stop-when-empty --tries=1',
+                'command' => $this->reportedCommandLine('queue:work --max-jobs=2 --memory=1024 --sleep=0 --stop-when-empty --tries=1'),
             ], $secondWrite['execution_context']);
 
             // Second job
@@ -2340,7 +2344,7 @@ class ExceptionReportingTest extends TestCase
                 'timestamp' => now()->subMinute()->format('Y-m-d H:i:s.u'),
                 'name' => 'test-command',
                 'class' => \Illuminate\Foundation\Console\ClosureCommand::class,
-                'command' => 'test-command',
+                'command' => $this->reportedCommandLine('test-command'),
             ],
         ]);
     }
@@ -2357,7 +2361,7 @@ class ExceptionReportingTest extends TestCase
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(ExceptionReportingTestCommand::class, $payload['execution_context']['class']);
             $this->assertSame('test-class-command', $payload['execution_context']['name']);
-            $this->assertSame('test-class-command --flag=value', $payload['execution_context']['command']);
+            $this->assertSame($this->reportedCommandLine('test-class-command --flag=value'), $payload['execution_context']['command']);
 
             return true;
         });
@@ -2473,7 +2477,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                'test-sensitive-command taylor [7 bytes redacted] --secret=[3 bytes redacted] --keep=this',
+                $this->reportedCommandLine('test-sensitive-command taylor [7 bytes redacted] --secret=[3 bytes redacted] --keep=this'),
                 $payload['execution_context']['command'],
             );
 
@@ -2494,7 +2498,7 @@ class ExceptionReportingTest extends TestCase
             // The command line is rebuilt from the parsed input, so an option
             // given as separate tokens is reported in the "=" form.
             $this->assertSame(
-                'test-sensitive-command taylor [7 bytes redacted] --secret=[3 bytes redacted]',
+                $this->reportedCommandLine('test-sensitive-command taylor [7 bytes redacted] --secret=[3 bytes redacted]'),
                 $payload['execution_context']['command'],
             );
 
@@ -2516,7 +2520,7 @@ class ExceptionReportingTest extends TestCase
             // argument is not redacted, as the configured fields have been
             // replaced.
             $this->assertSame(
-                'test-sensitive-command taylor hunter2 --proxy=[3 bytes redacted]',
+                $this->reportedCommandLine('test-sensitive-command taylor hunter2 --proxy=[3 bytes redacted]'),
                 $payload['execution_context']['command'],
             );
 
@@ -2535,7 +2539,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                'test-sensitive-command taylor hunter2 --token=[5 bytes redacted] --token=[6 bytes redacted]',
+                $this->reportedCommandLine('test-sensitive-command taylor hunter2 --token=[5 bytes redacted] --token=[6 bytes redacted]'),
                 $payload['execution_context']['command'],
             );
 
@@ -2554,7 +2558,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                'test-sensitive-command taylor [7 bytes redacted] --no-ansi',
+                $this->reportedCommandLine('test-sensitive-command taylor [7 bytes redacted] --no-ansi'),
                 $payload['execution_context']['command'],
             );
 
@@ -2573,7 +2577,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                'test-sensitive-command taylor [7 bytes redacted] --ansi',
+                $this->reportedCommandLine('test-sensitive-command taylor [7 bytes redacted] --ansi'),
                 $payload['execution_context']['command'],
             );
 
@@ -2594,7 +2598,7 @@ class ExceptionReportingTest extends TestCase
             // Only string values are redacted, and a boolean's value is
             // the presence of the flag, which redacting would not hide.
             $this->assertSame(
-                'test-sensitive-command taylor hunter2 --force --no-ansi',
+                $this->reportedCommandLine('test-sensitive-command taylor hunter2 --force --no-ansi'),
                 $payload['execution_context']['command'],
             );
 
@@ -2615,7 +2619,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                'test-sensitive-command '.escapeshellarg('').' [7 bytes redacted] --secret=[0 bytes redacted] --keep='.escapeshellarg(''),
+                $this->reportedCommandLine('test-sensitive-command '.escapeshellarg('').' [7 bytes redacted] --secret=[0 bytes redacted] --keep='.escapeshellarg('')),
                 $payload['execution_context']['command'],
             );
 
@@ -2635,7 +2639,7 @@ class ExceptionReportingTest extends TestCase
         $streams[0]->assertWrittenJson(function (array $payload) {
             // The second occurrence has no value to redact.
             $this->assertSame(
-                'test-sensitive-command taylor [7 bytes redacted] --token=[5 bytes redacted] --token',
+                $this->reportedCommandLine('test-sensitive-command taylor [7 bytes redacted] --token=[5 bytes redacted] --token'),
                 $payload['execution_context']['command'],
             );
 
@@ -2655,7 +2659,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                'test-sensitive-command taylor [7 bytes redacted] first '.escapeshellarg('second file'),
+                $this->reportedCommandLine('test-sensitive-command taylor [7 bytes redacted] first '.escapeshellarg('second file')),
                 $payload['execution_context']['command'],
             );
 
@@ -2674,7 +2678,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                'test-sensitive-command taylor hunter2 [5 bytes redacted] [6 bytes redacted]',
+                $this->reportedCommandLine('test-sensitive-command taylor hunter2 [5 bytes redacted] [6 bytes redacted]'),
                 $payload['execution_context']['command'],
             );
 
@@ -2694,7 +2698,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                'test-sensitive-command taylor [7 bytes redacted] --token=first --token='.escapeshellarg('second value'),
+                $this->reportedCommandLine('test-sensitive-command taylor [7 bytes redacted] --token=first --token='.escapeshellarg('second value')),
                 $payload['execution_context']['command'],
             );
 
@@ -2717,7 +2721,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame(
-                'test:namespaced-command taylor',
+                $this->reportedCommandLine('test:namespaced-command taylor'),
                 $payload['execution_context']['command'],
             );
 
@@ -2737,7 +2741,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame('test:canonical-command', $payload['execution_context']['name']);
-            $this->assertSame('test:canonical-command', $payload['execution_context']['command']);
+            $this->assertSame($this->reportedCommandLine('test:canonical-command'), $payload['execution_context']['command']);
 
             return true;
         });
@@ -2757,7 +2761,7 @@ class ExceptionReportingTest extends TestCase
         $this->assertCount(1, $streams);
         $streams[0]->assertWrittenJson(function (array $payload) {
             $this->assertSame('test:canonical-command', $payload['execution_context']['name']);
-            $this->assertSame('test:can', $payload['execution_context']['command']);
+            $this->assertSame($this->reportedCommandLine('test:can'), $payload['execution_context']['command']);
 
             return true;
         });
@@ -2779,7 +2783,7 @@ class ExceptionReportingTest extends TestCase
             // The outer one is what the process was given, so it is reported,
             // and the inner one is not recorded anywhere.
             $this->assertSame('test:outer-command', $payload['execution_context']['name']);
-            $this->assertSame('test:outer-command taylor', $payload['execution_context']['command']);
+            $this->assertSame($this->reportedCommandLine('test:outer-command taylor'), $payload['execution_context']['command']);
             $this->assertSame('Whoops!', $payload['message']);
 
             return true;
@@ -2799,7 +2803,7 @@ class ExceptionReportingTest extends TestCase
             // There is no value to redact, and the option carries nothing
             // beyond the fact that it was given.
             $this->assertSame(
-                'test-sensitive-command taylor [7 bytes redacted] --secret',
+                $this->reportedCommandLine('test-sensitive-command taylor [7 bytes redacted] --secret'),
                 $payload['execution_context']['command'],
             );
 
@@ -2820,7 +2824,7 @@ class ExceptionReportingTest extends TestCase
             // Only the given tokens are reported, so the options carrying
             // their default values are left out.
             $this->assertSame(
-                'test-sensitive-command taylor [7 bytes redacted] --force',
+                $this->reportedCommandLine('test-sensitive-command taylor [7 bytes redacted] --force'),
                 $payload['execution_context']['command'],
             );
 
@@ -3273,7 +3277,7 @@ class ExceptionReportingTest extends TestCase
                 \Illuminate\Console\Scheduling\ScheduleRunCommand::class,
                 $payload['execution_context']['class'],
             );
-            $this->assertSame('schedule:run', $payload['execution_context']['command']);
+            $this->assertSame($this->reportedCommandLine('schedule:run'), $payload['execution_context']['command']);
 
             return true;
         });
@@ -3489,11 +3493,14 @@ class ExceptionReportingTest extends TestCase
 
         (function ($anonymousArgOne, $anonymousArgTwo) {
             report(new RuntimeException('Whoops!'));
-        })(new class {
+        })(new class
+        {
             //
-        }, new class extends stdClass {
+        }, new class extends stdClass
+        {
             //
-        }, new class extends Arr {
+        }, new class extends Arr
+        {
             //
         });
 
@@ -3512,7 +3519,8 @@ class ExceptionReportingTest extends TestCase
         $this->setupExceptionReporting();
         $streams = $this->fakeEventsStreams();
 
-        report(new class('Whoops!') extends RuntimeException {
+        report(new class('Whoops!') extends RuntimeException
+        {
             //
         });
 
@@ -3881,6 +3889,17 @@ class ExceptionReportingTest extends TestCase
             ['', '/'],
             Blade::getCompiledPath($view),
         );
+    }
+
+    /**
+     * Retrieve the command line the reporter is able to report.
+     *
+     * The command line is rebuilt from the raw console input, which is only
+     * available from symfony/console 8.
+     */
+    protected function reportedCommandLine(string $command): ?string
+    {
+        return interface_exists(RawInputInterface::class) ? $command : null;
     }
 
     protected function setRunningInConsole(bool $runningInConsole): void
