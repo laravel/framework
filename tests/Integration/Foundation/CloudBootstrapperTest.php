@@ -88,6 +88,25 @@ class CloudBootstrapperTest extends TestCase
         ];
     }
 
+    #[WithEnv('DB_POOLING', null)]
+    public function test_legacy_pooler_configuration_preserves_existing_pdo_options()
+    {
+        $options = [PDO::ATTR_TIMEOUT => 5, PDO::ATTR_PERSISTENT => true];
+        $this->app['config']->set('database.connections.pgsql', [
+            'driver' => 'pgsql',
+            'host' => 'test-pooler.pg.laravel.cloud',
+            'options' => $options,
+        ]);
+
+        CloudBootstrapper::configureUnpooledPostgresConnection($this->app);
+
+        $this->assertSame(
+            [PDO::ATTR_TIMEOUT => 5, PDO::ATTR_PERSISTENT => true, PDO::ATTR_EMULATE_PREPARES => true],
+            $this->app['config']->get('database.connections.pgsql.options')
+        );
+        $this->assertSame($options, $this->app['config']->get('database.connections.pgsql-unpooled.options'));
+    }
+
     #[DataProvider('postgresHosts')]
     #[WithEnv('DB_POOLING', 'true')]
     public function test_it_configures_native_pooled_connections_and_a_legacy_direct_connection($host, $pooledHost, $directHost)
