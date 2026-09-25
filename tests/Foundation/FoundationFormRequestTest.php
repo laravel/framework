@@ -16,7 +16,10 @@ use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Routing\Route;
+use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator as TranslatorConcrete;
@@ -115,8 +118,7 @@ class FoundationFormRequestTest extends TestCase
     public function testAttributesAreInheritedFromParentRequest()
     {
         $request = $this->createRequest(['unexpected' => 'value'], FoundationTestFormRequestInheritingAttributesStub::class, 'POST');
-
-        $this->mocks['generator']->shouldReceive('to')->with('/parent')->andReturn('http://localhost/parent');
+        $request->setRedirector($this->realRedirector());
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
             $request->validateResolved();
@@ -132,8 +134,7 @@ class FoundationFormRequestTest extends TestCase
     public function testChildAttributesOverrideParentAttributes()
     {
         $request = $this->createRequest(['unexpected' => 'value'], FoundationTestFormRequestOverridingParentAttributesStub::class, 'POST');
-
-        $this->mocks['generator']->shouldReceive('route')->with('child.route')->andReturn('http://localhost/child');
+        $request->setRedirector($this->realRedirector(['child.route' => '/child']));
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
             $request->validateResolved();
@@ -147,8 +148,7 @@ class FoundationFormRequestTest extends TestCase
     public function testChildPropertiesOverrideParentAttributes()
     {
         $request = $this->createRequest([], FoundationTestFormRequestOverridingParentAttributesWithPropertiesStub::class, 'POST');
-
-        $this->mocks['generator']->shouldReceive('to')->with('/child')->andReturn('http://localhost/child');
+        $request->setRedirector($this->realRedirector());
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
             $request->validateResolved();
@@ -176,12 +176,22 @@ class FoundationFormRequestTest extends TestCase
 
     public function testValidateDoesntThrowExceptionFromResponseAllowed()
     {
-        $this->createRequest([], FoundationTestFormRequestPassesWithResponseStub::class)->validateResolved();
+        $request = $this->createRequest([], FoundationTestFormRequestPassesWithResponseStub::class);
+
+        $request->validateResolved();
+
+        $this->assertSame([], $request->validated());
     }
 
     public function testPrepareForValidationRunsBeforeValidation()
     {
-        $this->createRequest([], FoundationTestFormRequestHooks::class)->validateResolved();
+        $request = $this->createRequest([], FoundationTestFormRequestHooks::class);
+
+        $request->validateResolved();
+
+        // 'name' is required; the only way validation can succeed against an
+        // empty payload is if prepareForValidation() injected it beforehand.
+        $this->assertSame(['name' => 'Taylor'], $request->validated());
     }
 
     public function testAfterValidationRunsAfterValidation()
@@ -736,6 +746,23 @@ class FoundationFormRequestTest extends TestCase
         $translator->shouldReceive('choice')->zeroOrMoreTimes()->andReturn('error');
 
         return new ValidationFactory($translator, $container);
+    }
+
+    /**
+     * Create a real redirector backed by a real URL generator, optionally
+     * with named routes registered for tests that redirect by route name.
+     *
+     * @param  array<string, string>  $routes  route name => URI
+     */
+    protected function realRedirector(array $routes = []): Redirector
+    {
+        $collection = new RouteCollection;
+
+        foreach ($routes as $name => $uri) {
+            $collection->add((new Route('GET', $uri, []))->name($name));
+        }
+
+        return new Redirector(new UrlGenerator($collection, Request::create('/')));
     }
 
     /**

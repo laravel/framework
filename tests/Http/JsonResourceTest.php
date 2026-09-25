@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Http;
 
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MissingValue;
 use Mockery;
@@ -32,16 +34,19 @@ class JsonResourceTest extends TestCase
 
     public function testJsonResourceToJsonSucceedsWithPriorErrors(): void
     {
-        $resource = Mockery::mock(JsonResource::class)
-            ->makePartial()
-            ->expects('jsonSerialize')->andReturn(['foo' => 'bar'])
-            ->getMock();
+        Container::getInstance()->instance('request', Request::create('/'));
+
+        $resource = new JsonResource(['foo' => 'bar']);
 
         // Simulate a JSON error
         json_decode('{');
         $this->assertNotSame(JSON_ERROR_NONE, json_last_error());
 
-        $this->assertSame('{"foo":"bar"}', $resource->toJson(JSON_THROW_ON_ERROR));
+        try {
+            $this->assertSame('{"foo":"bar"}', $resource->toJson(JSON_THROW_ON_ERROR));
+        } finally {
+            Container::getInstance()->forgetInstance('request');
+        }
     }
 
     public function testJsonResourceToPrettyPrint(): void
