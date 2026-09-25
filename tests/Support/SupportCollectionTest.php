@@ -2307,6 +2307,49 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testStringSortByManyWithNull($collection)
+    {
+        $itemFoo = new \stdClass();
+        $itemFoo->first = 'f';
+        $itemFoo->second = null;
+        $itemBar = new \stdClass();
+        $itemBar->first = 'f';
+        $itemBar->second = 's';
+
+        $deprecations = [];
+
+        set_error_handler(function ($errno, $errstr) use (&$deprecations) {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, E_DEPRECATED);
+
+        try {
+            foreach ([SORT_STRING, SORT_LOCALE_STRING, SORT_STRING | SORT_FLAG_CASE, SORT_NATURAL | SORT_FLAG_CASE] as $options) {
+                $data = (new $collection([$itemFoo, $itemBar]))->sortBy([
+                    ['first', 'desc'],
+                    ['second', 'desc'],
+                ], $options);
+
+                $this->assertEquals($itemBar, $data->first());
+                $this->assertEquals($itemFoo, $data->skip(1)->first());
+
+                $data = (new $collection([$itemBar, $itemFoo]))->sortBy([
+                    ['first', 'asc'],
+                    ['second', 'asc'],
+                ], $options);
+
+                $this->assertEquals($itemFoo, $data->first());
+                $this->assertEquals($itemBar, $data->skip(1)->first());
+            }
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $deprecations);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testSortKeys($collection)
     {
         $data = new $collection(['b' => 'dayle', 'a' => 'taylor']);

@@ -1664,16 +1664,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
                     if (($options & SORT_FLAG_CASE) === SORT_FLAG_CASE) {
                         if (($options & SORT_NATURAL) === SORT_NATURAL) {
-                            $result = strnatcasecmp($values[0], $values[1]);
+                            $result = strnatcasecmp((string) $values[0], (string) $values[1]);
                         } else {
-                            $result = strcasecmp($values[0], $values[1]);
+                            $result = strcasecmp((string) $values[0], (string) $values[1]);
                         }
                     } else {
                         $result = match ($options) {
                             SORT_NUMERIC => (float) $values[0] <=> (float) $values[1],
-                            SORT_STRING => strcmp($values[0], $values[1]),
+                            SORT_STRING => strcmp((string) $values[0], (string) $values[1]),
                             SORT_NATURAL => strnatcmp((string) $values[0], (string) $values[1]),
-                            SORT_LOCALE_STRING => strcoll($values[0], $values[1]),
+                            SORT_LOCALE_STRING => strcoll((string) $values[0], (string) $values[1]),
                             default => $values[0] <=> $values[1],
                         };
                     }
