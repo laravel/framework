@@ -2836,6 +2836,103 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testRetriedMultipartRequestsResendAttachedStreamContents()
+    {
+        $bodies = [];
+
+        $this->factory->fake(function (Request $request) use (&$bodies) {
+            $bodies[] = $request->toPsrRequest()->getBody()->getContents();
+
+            return count($bodies) < 3
+                ? ($this->factory::failedConnection())($request)
+                : $this->factory::response(['ok' => true]);
+        });
+
+        $stream = fopen('php://temp', 'r+');
+        fwrite($stream, 'attached-file-contents');
+        rewind($stream);
+
+        $response = $this->factory
+            ->retry(3, 0)
+            ->attach('file', $stream, 'file.txt')
+            ->post('http://foo.com/upload');
+
+        $this->assertTrue($response->successful());
+        $this->assertCount(3, $bodies);
+
+        foreach ($bodies as $body) {
+            $this->assertStringContainsString('attached-file-contents', $body);
+        }
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasFile('file', 'attached-file-contents', 'file.txt');
+        });
+    }
+
+    public function testAsyncRetriedMultipartRequestsResendAttachedStreamContents()
+    {
+        $bodies = [];
+
+        $this->factory->fake(function (Request $request) use (&$bodies) {
+            $bodies[] = $request->toPsrRequest()->getBody()->getContents();
+
+            return count($bodies) < 3
+                ? ($this->factory::failedConnection())($request)
+                : $this->factory::response(['ok' => true]);
+        });
+
+        $stream = fopen('php://temp', 'r+');
+        fwrite($stream, 'attached-file-contents');
+        rewind($stream);
+
+        $response = $this->factory
+            ->async()
+            ->retry(3, 0)
+            ->attach('file', $stream, 'file.txt')
+            ->post('http://foo.com/upload')
+            ->wait();
+
+        $this->assertTrue($response->successful());
+        $this->assertCount(3, $bodies);
+
+        foreach ($bodies as $body) {
+            $this->assertStringContainsString('attached-file-contents', $body);
+        }
+    }
+
+    public function testExhaustedRetriesWithAttachedStreamThrowConnectionException()
+    {
+        $bodies = [];
+
+        $this->factory->fake(function (Request $request) use (&$bodies) {
+            $bodies[] = $request->toPsrRequest()->getBody()->getContents();
+
+            return ($this->factory::failedConnection())($request);
+        });
+
+        $stream = fopen('php://temp', 'r+');
+        fwrite($stream, 'attached-file-contents');
+        rewind($stream);
+
+        $exception = null;
+
+        try {
+            $this->factory
+                ->retry(3, 0)
+                ->attach('file', $stream, 'file.txt')
+                ->post('http://foo.com/upload');
+        } catch (Exception $e) {
+            $exception = $e;
+        }
+
+        $this->assertInstanceOf(ConnectionException::class, $exception);
+        $this->assertCount(3, $bodies);
+
+        foreach ($bodies as $body) {
+            $this->assertStringContainsString('attached-file-contents', $body);
+        }
+    }
+
     public function testExceptionThrownInRetryCallbackWithoutRetrying()
     {
         $this->factory->fake([
