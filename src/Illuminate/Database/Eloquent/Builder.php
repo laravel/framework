@@ -433,6 +433,12 @@ class Builder implements BuilderContract
      */
     public function whereNot($column, $operator = null, $value = null, $boolean = 'and')
     {
+        if (is_array($column)) {
+            $this->query->whereNot($column, $operator, $value, $boolean);
+
+            return $this;
+        }
+
         return $this->where($column, $operator, $value, $boolean.' not');
     }
 
