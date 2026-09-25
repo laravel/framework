@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\CountCrashesAsExceptions;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
@@ -151,6 +152,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
             $this->assertSame('13', $payload['backoff']);
             $this->assertSame(11, $payload['maxExceptions']);
             $this->assertFalse($payload['failOnTimeout']);
+            $this->assertFalse($payload['countCrashesAsExceptions']);
         });
 
         $queue->push(new ChildJobWithPropertiesOverridingParentAttributes, ['data']);
@@ -174,6 +176,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
             $this->assertSame('9', $payload['backoff']);
             $this->assertSame(3, $payload['maxExceptions']);
             $this->assertTrue($payload['failOnTimeout']);
+            $this->assertTrue($payload['countCrashesAsExceptions']);
         });
 
         $queue->push(new JobWithAttributesAndDefaultProperties, ['data']);
@@ -594,6 +597,7 @@ class AfterCommitJob implements ShouldQueue
 }
 
 #[Backoff(9)]
+#[CountCrashesAsExceptions]
 #[FailOnTimeout]
 #[MaxExceptions(3)]
 #[Timeout(40)]
@@ -606,6 +610,8 @@ class ChildJobWithPropertiesOverridingParentAttributes extends ParentJobWithAttr
 {
     public $backoff = 13;
 
+    public $countCrashesAsExceptions = false;
+
     public $failOnTimeout = false;
 
     public $maxExceptions = 11;
@@ -616,6 +622,7 @@ class ChildJobWithPropertiesOverridingParentAttributes extends ParentJobWithAttr
 }
 
 #[Backoff(9)]
+#[CountCrashesAsExceptions]
 #[FailOnTimeout]
 #[MaxExceptions(3)]
 #[Timeout(40)]
@@ -623,6 +630,8 @@ class ChildJobWithPropertiesOverridingParentAttributes extends ParentJobWithAttr
 class JobWithAttributesAndDefaultProperties implements ShouldQueue
 {
     public $backoff = 13;
+
+    public $countCrashesAsExceptions = false;
 
     public $failOnTimeout = false;
 

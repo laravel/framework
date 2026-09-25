@@ -348,6 +348,10 @@ class Worker
                 if (! static::$killOnTimeout) {
                     throw $e;
                 }
+
+                if ($this->cache && ($job->payload()['countCrashesAsExceptions'] ?? false)) {
+                    $this->cache->forget('job-processing:'.$job->uuid());
+                }
             }
 
             $this->kill(
@@ -613,6 +617,8 @@ class Worker
                 $connectionName, $job, (int) $options->maxTries
             );
 
+            $this->markJobAsFailedIfAlreadyExceedsMaxExceptions($connectionName, $job);
+
             if ($job->isDeleted()) {
                 return $this->raiseAfterJobEvent($connectionName, $job);
             }
@@ -638,6 +644,10 @@ class Worker
 
             $this->handleJobException($connectionName, $job, $options, $e);
         } finally {
+            if ($this->cache && ($job->payload()['countCrashesAsExceptions'] ?? false)) {
+                $this->cache->forget('job-processing:'.$job->uuid());
+            }
+
             $this->events->dispatch(new JobAttempted(
                 $connectionName, $job, $exceptionOccurred ?? null
             ));
@@ -725,6 +735,38 @@ class Worker
         $this->failJob($job, $e = $this->maxAttemptsExceededException($job));
 
         throw $e;
+    }
+
+    /**
+     * Mark the given job as failed if it has exceeded the maximum allowed exceptions.
+     *
+     * This will likely be because the worker previously died while processing the job.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    protected function markJobAsFailedIfAlreadyExceedsMaxExceptions($connectionName, $job)
+    {
+        if (! $this->cache || ! ($job->payload()['countCrashesAsExceptions'] ?? false) ||
+            is_null($uuid = $job->uuid()) || is_null($job->maxExceptions())) {
+            return;
+        }
+
+        // If the previous attempt's marker is still present, that attempt never finished...
+        if ($this->cache->add('job-processing:'.$uuid, true, Carbon::now()->addDay())) {
+            return;
+        }
+
+        $this->markJobAsFailedIfWillExceedMaxExceptions(
+            $connectionName, $job, $e = $this->maxAttemptsExceededException($job)
+        );
+
+        if ($job->hasFailed()) {
+            throw $e;
+        }
     }
 
     /**

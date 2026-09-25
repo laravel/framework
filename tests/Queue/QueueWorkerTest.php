@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Queue;
 
 use Exception;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -366,6 +368,82 @@ class QueueWorkerTest extends TestCase
         $this->exceptionHandler->assertReported(MaxAttemptsExceededException::class);
         $this->events->assertDispatchedOnce(JobExceptionOccurred::class);
         $this->events->assertNotDispatched(JobProcessed::class);
+    }
+
+    public function testCrashesAreNotCountedUnlessTheJobCountsCrashesAsExceptions()
+    {
+        $worker = $this->getWorker();
+        $worker->setCache($cache = new Repository(new ArrayStore));
+
+        $job = new WorkerFakeJob;
+        $job->uuid = 'uuid';
+        $job->maxExceptions = 1;
+
+        $cache->put('job-processing:uuid', true);
+        $worker->process('default', $job, $this->workerOptions());
+
+        $this->assertTrue($job->fired);
+        $this->assertFalse($job->hasFailed());
+        $this->assertNull($cache->get('job-exceptions:uuid'));
+    }
+
+    public function testJobIsFailedIfTheWorkerDiedWhileProcessingItAndItHasExceededMaxExceptions()
+    {
+        $worker = $this->getWorker();
+        $worker->setCache($cache = new Repository(new ArrayStore));
+
+        $first = new WorkerFakeJob;
+        $second = new WorkerFakeJob;
+        $first->uuid = $second->uuid = 'uuid';
+        $first->maxExceptions = $second->maxExceptions = 2;
+        $first->payload = $second->payload = ['countCrashesAsExceptions' => true];
+
+        // Simulate the worker dying during the previous attempt by leaving its marker behind...
+        $cache->put('job-processing:uuid', true);
+        $worker->process('default', $first, $this->workerOptions());
+
+        $this->assertTrue($first->fired);
+        $this->assertFalse($first->hasFailed());
+        $this->assertSame(1, $cache->get('job-exceptions:uuid'));
+
+        $cache->put('job-processing:uuid', true);
+
+        try {
+            $worker->process('default', $second, $this->workerOptions());
+        } catch (MaxAttemptsExceededException) {
+            //
+        }
+
+        $this->assertFalse($second->fired);
+        $this->assertInstanceOf(MaxAttemptsExceededException::class, $second->failedWith);
+        $this->assertNull($cache->get('job-processing:uuid'));
+    }
+
+    public function testAttemptsThatFinishDoNotLeaveTheirMarkerBehind()
+    {
+        $worker = $this->getWorker();
+        $worker->setCache($cache = new Repository(new ArrayStore));
+
+        $released = new WorkerFakeJob(fn ($job) => $job->release());
+        $thrown = new WorkerFakeJob(fn () => throw new RuntimeException);
+        $released->uuid = $thrown->uuid = 'uuid';
+        $released->maxExceptions = $thrown->maxExceptions = 2;
+        $released->payload = $thrown->payload = ['countCrashesAsExceptions' => true];
+
+        $worker->process('default', $released, $this->workerOptions());
+
+        $this->assertNull($cache->get('job-exceptions:uuid'));
+        $this->assertNull($cache->get('job-processing:uuid'));
+
+        try {
+            $worker->process('default', $thrown, $this->workerOptions());
+        } catch (RuntimeException) {
+            //
+        }
+
+        $this->assertFalse($thrown->hasFailed());
+        $this->assertSame(1, $cache->get('job-exceptions:uuid'));
+        $this->assertNull($cache->get('job-processing:uuid'));
     }
 
     public function testJobIsFailedIfItHasAlreadyExpired()
@@ -911,6 +989,7 @@ class WorkerFakeJob implements QueueJobContract
     public $connectionName = '';
     public $queue = '';
     public $rawBody = '';
+    public $payload = [];
     public $resolvedJob = null;
 
     public function __construct($callback = null)
@@ -933,7 +1012,7 @@ class WorkerFakeJob implements QueueJobContract
 
     public function payload()
     {
-        return [];
+        return $this->payload;
     }
 
     public function maxTries()
