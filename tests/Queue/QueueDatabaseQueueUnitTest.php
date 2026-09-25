@@ -188,7 +188,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $job = new stdClass;
         $job->invalid = "\xc3\x28";
 
-        $queue = Mockery::mock(Queue::class)->makePartial();
+        $queue = new DatabaseQueue(Mockery::mock(Connection::class), 'table', 'default');
         $class = new ReflectionClass(Queue::class);
 
         $createPayload = $class->getMethod('createPayload');
@@ -202,7 +202,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
 
-        $queue = Mockery::mock(Queue::class)->makePartial();
+        $queue = new DatabaseQueue(Mockery::mock(Connection::class), 'table', 'default');
         $class = new ReflectionClass(Queue::class);
 
         $createPayload = $class->getMethod('createPayload');
@@ -306,8 +306,9 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
     public function testBuildDatabaseRecordWithPayloadAtTheEnd()
     {
-        $queue = Mockery::mock(DatabaseQueue::class);
-        $record = $queue->buildDatabaseRecord('queue', 'any_payload', 0);
+        $queue = new DatabaseQueue(Mockery::mock(Connection::class), 'table', 'default');
+        $class = new ReflectionClass(DatabaseQueue::class);
+        $record = $class->getMethod('buildDatabaseRecord')->invoke($queue, 'queue', 'any_payload', 0);
         $this->assertArrayHasKey('payload', $record);
         $this->assertArrayHasKey('payload', array_slice($record, -1, 1, true));
     }

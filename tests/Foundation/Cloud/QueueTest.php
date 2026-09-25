@@ -239,7 +239,7 @@ class QueueTest extends TestCase
         CloudBootstrapper::registerEvents($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
 
-        $this->app[QueueConnector::class];
+        $this->assertInstanceOf(QueueConnector::class, $this->app[QueueConnector::class]);
     }
 
     public function testItBindsCloudQueue()
@@ -858,9 +858,9 @@ class QueueTest extends TestCase
         // With the agent disabled (the default) the queue receives from SQS.
         Http::fake();
         $this->fakeEvents();
-        [$queue, $client] = $this->mockedQueue();
 
-        $client->expects('receiveMessage')->andReturn(new Result([
+        $mock = new MockHandler();
+        $mock->append(fn (CommandInterface $cmd) => new Result([
             'Messages' => [[
                 'MessageId' => 'message-id',
                 'ReceiptHandle' => 'receipt-handle',
@@ -868,6 +868,8 @@ class QueueTest extends TestCase
                 'Attributes' => ['ApproximateReceiveCount' => 1],
             ]],
         ]));
+
+        $queue = $this->realQueue($mock);
 
         $job = $queue->pop();
 
@@ -881,9 +883,11 @@ class QueueTest extends TestCase
     public function testPopReturnsNullWhenSqsHasNoMessageAndTheAgentIsDisabled()
     {
         $this->fakeEvents();
-        [$queue, $client] = $this->mockedQueue();
 
-        $client->expects('receiveMessage')->andReturn(new Result(['Messages' => null]));
+        $mock = new MockHandler();
+        $mock->append(fn (CommandInterface $cmd) => new Result(['Messages' => null]));
+
+        $queue = $this->realQueue($mock);
 
         $this->assertNull($queue->pop());
     }
@@ -2085,8 +2089,11 @@ class QueueTest extends TestCase
         CloudBootstrapper::configureManagedQueues($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
-        [$queue, $client] = $this->mockedQueue();
-        $client->expects('sendMessage')->times(1)->andReturn(new Result());
+
+        $mock = new MockHandler();
+        $mock->append(fn (CommandInterface $cmd) => new Result());
+
+        $queue = $this->realQueue($mock);
 
         unset($_SERVER['SQS_PREFIX'], $_SERVER['SQS_SUFFIX']);
 
@@ -2100,8 +2107,11 @@ class QueueTest extends TestCase
         CloudBootstrapper::configureManagedQueues($this->app);
         CloudBootstrapper::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
-        [$queue, $client] = $this->mockedQueue();
-        $client->expects('sendMessage')->times(1)->andReturn(new Result());
+
+        $mock = new MockHandler();
+        $mock->append(fn (CommandInterface $cmd) => new Result());
+
+        $queue = $this->realQueue($mock);
 
         $queue->push(new FakeJob, queue: 'orders.fifo');
 
@@ -2175,6 +2185,44 @@ class QueueTest extends TestCase
         ]));
 
         $this->assertSame(6, $queue->totalReservedSize());
+    }
+
+    /**
+     * Build a Cloud queue backed by a real SqsClient whose HTTP layer is
+     * stubbed via an Aws\MockHandler, instead of mocking the client itself.
+     */
+    private function realQueue(MockHandler $handler): Queue
+    {
+        $client = new SqsClient([
+            'region' => 'us-east-2',
+            'version' => 'latest',
+            'handler' => $handler,
+            'credentials' => false,
+        ]);
+
+        $this->app->instance(QueueConnector::class, new QueueConnector(new class($client) implements ConnectorInterface
+        {
+            public function __construct(private $client)
+            {
+                //
+            }
+
+            public function connect($config)
+            {
+                return new SqsQueue(
+                    $this->client,
+                    $config['queue'],
+                    $config['prefix'] ?? '',
+                    $config['suffix'] ?? '',
+                    $config['after_commit'] ?? null,
+                    $config['overflow'] ?? [],
+                );
+            }
+        }, $this->app));
+
+        $this->app['queue']->addConnector('cloud', $this->app->factory(QueueConnector::class));
+
+        return $this->app['queue']->connection('cloud');
     }
 
     /**

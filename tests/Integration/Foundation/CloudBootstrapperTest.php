@@ -6,7 +6,6 @@ use Illuminate\Database\Connectors\ConnectorInterface;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\CloudBootstrapper;
-use Mockery;
 use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\TestCase;
 use PDO;
@@ -237,20 +236,31 @@ class CloudBootstrapperTest extends TestCase
             ]);
         }
         $this->app['config']->set('database.default', 'pgsql');
-        $connector = Mockery::mock(ConnectorInterface::class);
+        $connector = new class implements ConnectorInterface
+        {
+            public array $configs = [];
+
+            public array $pdos = [];
+
+            public function connect(array $config)
+            {
+                $this->configs[] = $config;
+
+                return $this->pdos[] = new PDO('sqlite::memory:');
+            }
+        };
         $this->app->instance('db.connector.pgsql', $connector);
 
         CloudBootstrapper::bootstrapped($this->app, LoadConfiguration::class);
 
-        foreach (['pgsql', 'reporting'] as $name) {
-            $pdo = new PDO('sqlite::memory:');
-            $connector->shouldReceive('connect')->once()->with(Mockery::on(fn ($config) => $config['host'] === "{$name}.pg.laravel.cloud" &&
-                $config['options'][PDO::ATTR_EMULATE_PREPARES] === false
-            ))->andReturn($pdo);
-
+        foreach (['pgsql', 'reporting'] as $index => $name) {
             $connection = $this->app['migrator']->resolveConnection($name);
+
+            $this->assertCount($index + 1, $connector->configs);
+            $this->assertSame("{$name}.pg.laravel.cloud", $connector->configs[$index]['host']);
+            $this->assertFalse($connector->configs[$index]['options'][PDO::ATTR_EMULATE_PREPARES]);
             $this->assertSame("{$name}::direct", $connection->getNameWithReadWriteType());
-            $this->assertSame($pdo, $connection->getPdo());
+            $this->assertSame($connector->pdos[$index], $connection->getPdo());
         }
     }
 

@@ -84,13 +84,15 @@ class CallQueuedHandlerTest extends TestCase
     {
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
-        $job->expects('payload')->andReturn(['deleteWhenMissingModels' => false]);
-        $job->expects('fail');
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize(new CallQueuedHandlerExceptionThrowerWithoutDelete),
         ]);
+
+        $this->assertTrue($job->hasFailed());
+        $this->assertInstanceOf(ModelNotFoundException::class, $job->failedWith);
+        $this->assertFalse($job->isDeleted());
     }
 
     public function testJobIsDeletedIfHasDeleteProperty()

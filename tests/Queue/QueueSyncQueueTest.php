@@ -47,6 +47,10 @@ class QueueSyncQueueTest extends TestCase
         $container = new Container;
         Container::setInstance($container);
         $events = new EventsDispatcher;
+        $dispatched = [];
+        $events->listen('*', function ($event) use (&$dispatched) {
+            $dispatched[] = $event;
+        });
         $container->instance('events', $events);
         $container->instance(Dispatcher::class, $events);
         $sync->setContainer($container);
@@ -56,6 +60,8 @@ class QueueSyncQueueTest extends TestCase
         } catch (Exception) {
             $this->assertTrue($_SERVER['__sync.failed']);
         }
+
+        $this->assertCount(4, $dispatched);
 
         Container::setInstance();
     }

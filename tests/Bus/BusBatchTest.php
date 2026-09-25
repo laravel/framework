@@ -209,7 +209,7 @@ class BusBatchTest extends TestCase
 
     public function test_processed_jobs_can_be_calculated()
     {
-        $queue = Mockery::mock(Factory::class);
+        $queue = new QueueFake(Container::getInstance());
 
         $batch = $this->createTestBatch($queue);
 
@@ -515,7 +515,7 @@ class BusBatchTest extends TestCase
 
     public function test_batch_can_be_cancelled()
     {
-        $queue = Mockery::mock(Factory::class);
+        $queue = new QueueFake(Container::getInstance());
 
         $batch = $this->createTestBatch($queue);
 
@@ -548,7 +548,7 @@ class BusBatchTest extends TestCase
 
     public function test_batch_can_be_deleted()
     {
-        $queue = Mockery::mock(Factory::class);
+        $queue = new QueueFake(Container::getInstance());
 
         $batch = $this->createTestBatch($queue);
 
@@ -561,7 +561,7 @@ class BusBatchTest extends TestCase
 
     public function test_batch_state_can_be_inspected()
     {
-        $queue = Mockery::mock(Factory::class);
+        $queue = new QueueFake(Container::getInstance());
 
         $batch = $this->createTestBatch($queue);
 
