@@ -942,7 +942,9 @@ class ExceptionReporter
     public function rememberTraceIdInContext(ContextRepository $context): void
     {
         try {
-            $context->addHidden('laravel_cloud_trace_id', $this->traceIdFromContext() ?? $this->consoleCommandTraceId());
+            $context->addHidden('laravel_cloud_trace_id', $this->traceIdFromContext() ?? (
+                App::runningInConsole() ? $this->consoleCommandTraceId() : Request::header('Cloud-Request-ID')
+            ));
         } catch (Throwable) {
             //
         }

@@ -365,6 +365,7 @@ class CloudBootstrapper
                 : $app->afterResolving(ExceptionHandlerContract::class, $registerReporter);
 
             $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->rememberUserIdInContext($event->context));
+            $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->rememberTraceIdInContext($event->context));
 
             if (! $app->runningInConsole()) {
                 $app['events']->listen(function (Logout $event) use ($exceptionReporter) {
@@ -373,8 +374,6 @@ class CloudBootstrapper
                     }
                 });
             } else {
-                $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->rememberTraceIdInContext($event->context));
-
                 $preparedForCommand = false;
 
                 $app['events']->listen(function (CommandStarting $event) use ($exceptionReporter, &$preparedForCommand) {

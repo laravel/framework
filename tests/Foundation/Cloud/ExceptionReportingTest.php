@@ -1806,6 +1806,64 @@ class ExceptionReportingTest extends TestCase
         ]);
     }
 
+    public function testItCapturesTraceIdInJobsDispatchedFromRequests(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+        Config::set('queue.default', 'database');
+
+        Route::get('/test', function () {
+            $this->setRunningInConsole(false);
+
+            ExceptionReportingJobThatReportsException::dispatch(
+                fn () => ExceptionReportingJobThatReportsException::dispatch(fn () => true)
+            );
+
+            return 'ok';
+        });
+        $this->get('/test', ['Cloud-Request-ID' => '465ebb4e-2f86-434f-8e1b-cc364f317cef'])->assertOk();
+
+        $this->assertSame('465ebb4e-2f86-434f-8e1b-cc364f317cef', $this->traceIdInJobPayload(DB::table('jobs')->soleValue('payload')));
+
+        $this->setRunningInConsole(true);
+        Artisan::call('queue:work', [
+            '--max-jobs' => 1,
+            '--memory' => 1024,
+            '--sleep' => 0,
+            '--stop-when-empty' => true,
+            '--tries' => 1,
+        ]);
+
+        // The job is part of the request that dispatched it, as is the job it
+        // dispatched in turn, so both are reported under the request's trace.
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains([
+            'trace_id' => '465ebb4e-2f86-434f-8e1b-cc364f317cef',
+            'execution_type' => 'job',
+            'message' => 'Whoops!',
+        ]);
+        $this->assertSame('465ebb4e-2f86-434f-8e1b-cc364f317cef', $this->traceIdInJobPayload(DB::table('jobs')->soleValue('payload')));
+    }
+
+    public function testItDoesNotCaptureTraceIdInJobsDispatchedFromRequestsWithoutARequestId(): void
+    {
+        $this->setupExceptionReporting();
+        $this->fakeEventsStreams();
+        Config::set('queue.default', 'database');
+
+        Route::get('/test', function () {
+            $this->setRunningInConsole(false);
+
+            ExceptionReportingJobThatReportsException::dispatch(fn () => true);
+
+            return 'ok';
+        });
+        $this->get('/test')->assertOk();
+
+        // The request is reported without a trace, so its jobs are as well.
+        $this->assertNull($this->traceIdInJobPayload(DB::table('jobs')->soleValue('payload')));
+    }
+
     public function testItReportsTheUrlAsItWasRequested(): void
     {
         $this->setupExceptionReporting();
@@ -3854,6 +3912,18 @@ class ExceptionReportingTest extends TestCase
 
         return isset($context['hidden']['laravel_cloud_user_id'])
             ? unserialize($context['hidden']['laravel_cloud_user_id'])
+            : null;
+    }
+
+    /**
+     * Retrieve the trace identifier captured in the given job payload.
+     */
+    protected function traceIdInJobPayload(string $payload): ?string
+    {
+        $context = json_decode($payload, associative: true, flags: JSON_THROW_ON_ERROR)['illuminate:log:context'] ?? [];
+
+        return isset($context['hidden']['laravel_cloud_trace_id'])
+            ? unserialize($context['hidden']['laravel_cloud_trace_id'])
             : null;
     }
 
