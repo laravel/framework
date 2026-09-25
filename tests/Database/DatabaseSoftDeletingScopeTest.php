@@ -38,9 +38,10 @@ class DatabaseSoftDeletingScopeTest extends TestCase
 
     public function testRestoreOrCreateExtension()
     {
+        $connection = new Connection(new PDO('sqlite::memory:'));
         $builder = new EloquentBuilder(new BaseBuilder(
-            new Connection(new PDO('sqlite::memory:')),
-            Mockery::mock(Grammar::class),
+            $connection,
+            new Grammar($connection),
             new Processor
         ));
 
@@ -61,9 +62,10 @@ class DatabaseSoftDeletingScopeTest extends TestCase
 
     public function testCreateOrRestoreExtension()
     {
+        $connection = new Connection(new PDO('sqlite::memory:'));
         $builder = new EloquentBuilder(new BaseBuilder(
-            new Connection(new PDO('sqlite::memory:')),
-            Mockery::mock(Grammar::class),
+            $connection,
+            new Grammar($connection),
             new Processor
         ));
 

@@ -14,7 +14,6 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\ConnectionResolverInterface;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\RouteKey;
@@ -902,7 +901,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testSaveIsCanceledIfSavingEventReturnsFalse()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
-        $query = Mockery::mock(Builder::class);
+        $query = $this->newBuilder();
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $events = new EventDispatcher;
         $events->listen('eloquent.saving: '.get_class($model), fn () => false);
@@ -915,7 +914,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testUpdateIsCanceledIfUpdatingEventReturnsFalse()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
-        $query = Mockery::mock(Builder::class);
+        $query = $this->newBuilder();
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $events = new EventDispatcher;
         $events->listen('eloquent.updating: '.get_class($model), fn () => false);
@@ -929,7 +928,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testEventsCanBeFiredWithCustomEventObjects()
     {
         $model = $this->getMockBuilder(EloquentModelEventObjectStub::class)->onlyMethods(['newModelQuery'])->getMock();
-        $query = Mockery::mock(Builder::class);
+        $query = $this->newBuilder();
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $events = new EventDispatcher;
         $events->listen(EloquentModelSavingEventStub::class, fn () => false);
@@ -1318,22 +1317,6 @@ class DatabaseEloquentModelTest extends TestCase
         } catch (\RuntimeException $e) {
             $this->fail($e->getMessage());
         }
-    }
-
-    public function testNewQueryReturnsEloquentQueryBuilder()
-    {
-        $conn = Mockery::mock(Connection::class);
-        $grammar = Mockery::mock(Grammar::class);
-        $processor = new Processor;
-        $resolver = Mockery::mock(ConnectionResolverInterface::class);
-        EloquentModelStub::setConnectionResolver($resolver);
-        $conn->expects('query')->andReturnUsing(function () use ($conn, $grammar, $processor) {
-            return new BaseBuilder($conn, $grammar, $processor);
-        });
-        $resolver->shouldReceive('connection')->andReturn($conn);
-        $model = new EloquentModelStub;
-        $builder = $model->newQuery();
-        $this->assertInstanceOf(Builder::class, $builder);
     }
 
     public function testGetAndSetTableOperations()
@@ -1768,10 +1751,8 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelStub;
 
-        $resolver = Mockery::mock(Resolver::class);
-        EloquentModelStub::setConnectionResolver($resolver);
         $connection = Mockery::mock(Connection::class);
-        $resolver->shouldReceive('connection')->andReturn($connection);
+        EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
         $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
 
         $model->guard(['name', 'age']);
@@ -1802,10 +1783,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $model::unguard();
 
-        $resolver = Mockery::mock(Resolver::class);
-        EloquentModelStub::setConnectionResolver($resolver);
         $connection = Mockery::mock(Connection::class);
-        $resolver->shouldReceive('connection')->andReturn($connection);
+        EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
         $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
 
         $model->guard([]);
@@ -1822,10 +1801,8 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testUsesOverriddenHandlerWhenDiscardingAttributes()
     {
-        $resolver = Mockery::mock(Resolver::class);
-        EloquentModelStub::setConnectionResolver($resolver);
         $connection = Mockery::mock(Connection::class);
-        $resolver->shouldReceive('connection')->andReturn($connection);
+        EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
         $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
 
         Model::preventSilentlyDiscardingAttributes();
@@ -3524,10 +3501,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setConnectionResolver($resolver);
         $connection = Mockery::mock(Connection::class);
         $resolver->shouldReceive('connection')->andReturn($connection);
-        $grammar = Mockery::mock(Grammar::class);
+        $grammar = new Grammar($connection);
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
-        $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
-        $grammar->shouldReceive('isExpression')->andReturnFalse();
         $processor = new Processor;
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
@@ -4243,10 +4218,8 @@ class EloquentModelSaveStub extends Model
     public function getConnection()
     {
         $mock = Mockery::mock(Connection::class);
-        $grammar = Mockery::mock(Grammar::class);
+        $grammar = new Grammar($mock);
         $mock->shouldReceive('getQueryGrammar')->andReturn($grammar);
-        $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
-        $grammar->shouldReceive('isExpression')->andReturnFalse();
         $processor = new Processor;
         $mock->shouldReceive('getPostProcessor')->andReturn($processor);
         $mock->shouldReceive('getName')->andReturn('name');

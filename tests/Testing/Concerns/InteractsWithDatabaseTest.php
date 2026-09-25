@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Testing\Concerns;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Support\Facades\DB;
@@ -149,7 +150,9 @@ class InteractsWithDatabaseTest extends TestCase
             return "'".$value."'";
         });
 
-        DB::shouldReceive('connection')->with(null)->andReturn($connection);
+        $resolver = new ConnectionResolver(['default' => $connection]);
+        $resolver->setDefaultConnection('default');
+        DB::swap($resolver);
 
         $instance = new class
         {

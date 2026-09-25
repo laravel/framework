@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
-use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Eloquent\Casts\AsVector;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Expression;
@@ -143,8 +143,8 @@ class DatabaseEloquentAsVectorCastTest extends TestCase
         $grammar = new $grammar($connection);
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
 
-        $resolver = m::mock(ConnectionResolverInterface::class);
-        $resolver->shouldReceive('connection')->andReturn($connection);
+        $resolver = new ConnectionResolver(['default' => $connection]);
+        $resolver->setDefaultConnection('default');
 
         Model::setConnectionResolver($resolver);
 

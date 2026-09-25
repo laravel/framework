@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -53,7 +54,7 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
 
         $mockQueryBuilder = Mockery::mock(QueryBuilder::class);
         $builder->shouldReceive('getQuery')->andReturn($mockQueryBuilder);
-        $mockQueryBuilder->shouldReceive('getGrammar')->andReturn(Mockery::mock(Grammar::class, ['isExpression' => false]));
+        $mockQueryBuilder->shouldReceive('getGrammar')->andReturn(new Grammar(Mockery::mock(Connection::class)));
 
         return [
             $builder,

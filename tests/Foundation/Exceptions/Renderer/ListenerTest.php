@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Exceptions\Renderer;
 
+use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
@@ -10,12 +11,17 @@ use PHPUnit\Framework\TestCase;
 
 class ListenerTest extends TestCase
 {
+    protected function realConnection(): Connection
+    {
+        $capsule = new Manager;
+        $capsule->addConnection(['driver' => 'sqlite', 'database' => ':memory:'], 'testing');
+
+        return $capsule->getConnection('testing');
+    }
+
     public function test_queries_returns_expected_shape_after_query_executed()
     {
-        $connection = Mockery::mock(Connection::class);
-
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->with(['foo'])->andReturn(['foo']);
+        $connection = $this->realConnection();
 
         $event = new QueryExecuted('select * from users where id = ?', ['foo'], 5.2, $connection);
 
@@ -64,9 +70,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock(Connection::class);
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
+        $connection = $this->realConnection();
 
         $largeSql = str_repeat('x', 5000);
         $listener->onQueryExecuted(
@@ -80,9 +84,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock(Connection::class);
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
+        $connection = $this->realConnection();
 
         // Build SQL with 500 placeholders — when truncated to 2000 bytes,
         // only some ? will remain, and bindings should match that count.
@@ -104,9 +106,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock(Connection::class);
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
+        $connection = $this->realConnection();
 
         // 1 placeholder but 1000 bindings — only 1 binding should be kept
         $listener->onQueryExecuted(
@@ -120,9 +120,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock(Connection::class);
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
+        $connection = $this->realConnection();
 
         $sql = 'select * from users where name = ?';
         $listener->onQueryExecuted(
@@ -137,9 +135,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock(Connection::class);
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
+        $connection = $this->realConnection();
 
         $listener->onQueryExecuted(
             new QueryExecuted('select count(*) from users', [], 1.0, $connection)
@@ -153,9 +149,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock(Connection::class);
-        $connection->expects('getName')->andReturn('testing');
-        $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
+        $connection = $this->realConnection();
 
         $sql = 'select * from users where id = ? and name = ? and email = ?';
         $bindings = [1, 'John', 'john@example.com'];

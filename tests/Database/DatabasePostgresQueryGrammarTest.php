@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
+use Illuminate\Database\Query\Processors\Processor;
 use Mockery;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -49,7 +50,7 @@ class DatabasePostgresQueryGrammarTest extends TestCase
         $connection->expects('getTablePrefix')->times(3)->andReturn('');
 
         $postgres = new PostgresGrammar($connection);
-        $builder = Mockery::mock(Builder::class);
+        $builder = new Builder($connection, $postgres, new Processor);
         $builder->from = 'users';
 
         $this->assertEquals([

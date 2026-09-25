@@ -212,7 +212,7 @@ class DatabaseEloquentMorphToTest extends TestCase
         };
 
         $builder = Mockery::mock(Builder::class);
-        $related = Mockery::mock(Model::class);
+        $related = new EloquentMorphToRelatedStub;
         $builder->expects('getModel')->andReturn($related);
 
         $parent = new EloquentMorphToModelStub;
