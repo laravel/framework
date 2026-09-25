@@ -15,6 +15,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\CloudBootstrapper as Cloud;
+use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -39,6 +40,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\View\ViewException;
 use Laravel\SerializableClosure\SerializableClosure;
+use LogicException;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Assert;
@@ -153,6 +155,50 @@ class ExceptionReportingTest extends TestCase
             'message' => 'Whoops!',
             'execution_type' => 'scheduled_task',
         ]);
+    }
+
+    public function testItDoesNotResolveTheExceptionHandlerWhileRegisteringExceptionReporting(): void
+    {
+        $streams = $this->fakeEventsStreams();
+
+        // Mirror a freshly bootstrapping application, where nothing has resolved
+        // the handler yet and its "withExceptions" callback may use facades.
+        unset($this->app[ExceptionHandler::class]);
+        $this->app->singleton(ExceptionHandler::class, Handler::class);
+        $this->app->afterResolving(Handler::class, function (Handler $handler) {
+            if (Config::get('app.debug') !== null) {
+                $handler->dontReport(LogicException::class);
+            }
+        });
+
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
+
+        try {
+            $this->setupExceptionReporting();
+
+            $this->assertFalse($this->app->resolved(ExceptionHandler::class));
+        } finally {
+            Facade::setFacadeApplication($this->app);
+        }
+
+        report(new LogicException('Ignored!'));
+        report(new RuntimeException('Whoops!'));
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains([
+            'message' => 'Whoops!',
+        ]);
+    }
+
+    public function testItIgnoresExceptionHandlersThatCannotRegisterReportables(): void
+    {
+        unset($this->app[ExceptionHandler::class]);
+        $this->app->singleton(ExceptionHandler::class, ExceptionHandlerWithoutReportable::class);
+
+        $this->setupExceptionReporting();
+
+        $this->assertInstanceOf(ExceptionHandlerWithoutReportable::class, $this->app[ExceptionHandler::class]);
     }
 
     public function testItEmitsExceptionsAsEvents(): void
@@ -1862,6 +1908,7 @@ class ExceptionReportingTest extends TestCase
         $this->withBasicAuth('taylor', '$f4c4d3')
             ->withHeader('Proxy-Authorization', 'Bearer secret-token')
             ->withHeader('Cookie', 'laravel_session=abc123; XSRF-TOKEN=1234')
+            ->withHeader('X-CSRF-TOKEN', 'csrf-token')
             ->withHeader('X-XSRF-TOKEN', 'secret')
             ->get('/test')
             ->assertServerError();
@@ -1873,6 +1920,7 @@ class ExceptionReportingTest extends TestCase
             $this->assertSame(['Basic [20 bytes redacted]'], $headers['authorization']);
             $this->assertSame(['Bearer [12 bytes redacted]'], $headers['proxy-authorization']);
             $this->assertSame(['laravel_session=[6 bytes redacted]; XSRF-TOKEN=[4 bytes redacted]'], $headers['cookie']);
+            $this->assertSame(['[10 bytes redacted]'], $headers['x-csrf-token']);
             $this->assertSame(['[6 bytes redacted]'], $headers['x-xsrf-token']);
 
             // These are derived from the Authorization header by PHP, rather
@@ -4029,6 +4077,29 @@ class ExceptionHandlerWithoutContextForException implements ExceptionHandler
         foreach ($this->reportUsingCallbacks as $reportUsing) {
             $reportUsing($e);
         }
+    }
+
+    public function shouldReport(Throwable $e)
+    {
+        return true;
+    }
+
+    public function render($request, Throwable $e)
+    {
+        //
+    }
+
+    public function renderForConsole($output, Throwable $e)
+    {
+        //
+    }
+}
+
+class ExceptionHandlerWithoutReportable implements ExceptionHandler
+{
+    public function report(Throwable $e)
+    {
+        //
     }
 
     public function shouldReport(Throwable $e)

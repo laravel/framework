@@ -325,6 +325,9 @@ class CloudBootstrapper
         }
     }
 
+    /**
+     * Register the Laravel Cloud exception reporter if applicable.
+     */
     public static function registerExceptionReporting(Application $app): void
     {
         try {
@@ -336,7 +339,7 @@ class CloudBootstrapper
                 'stop' => true,
                 'capture_request_payload' => false,
                 'redact_request_payload_fields' => ['_token', 'password', 'password_confirmation', 'current_password'],
-                'redact_headers' => ['Authorization', 'Cookie', 'Proxy-Authorization', 'X-XSRF-TOKEN'],
+                'redact_headers' => ['Authorization', 'Cookie', 'Proxy-Authorization', 'X-CSRF-TOKEN', 'X-XSRF-TOKEN'],
                 'redact_command_input_fields' => ['token', 'password', 'key', 'secret'],
                 ...json_decode($_SERVER['LARAVEL_CLOUD_EXCEPTIONS'], associative: true, flags: JSON_THROW_ON_ERROR),
             ];
@@ -348,7 +351,18 @@ class CloudBootstrapper
                 $config,
             ));
 
-            $app[ExceptionHandlerContract::class]->reportable($exceptionReporter);
+            // Defer registration of the reporter until exception handler is resolved...
+            $registerReporter = function ($handler) use ($exceptionReporter) {
+                try {
+                    $handler->reportable($exceptionReporter);
+                } catch (Throwable) {
+                    //
+                }
+            };
+
+            $app->resolved(ExceptionHandlerContract::class)
+                ? $registerReporter($app[ExceptionHandlerContract::class])
+                : $app->afterResolving(ExceptionHandlerContract::class, $registerReporter);
 
             $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->rememberUserIdInContext($event->context));
 
@@ -362,6 +376,7 @@ class CloudBootstrapper
                 $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->rememberTraceIdInContext($event->context));
 
                 $preparedForCommand = false;
+
                 $app['events']->listen(function (CommandStarting $event) use ($exceptionReporter, &$preparedForCommand) {
                     if (! $preparedForCommand) {
                         $exceptionReporter->prepareForCommand($event->command, $event->input);
@@ -377,12 +392,10 @@ class CloudBootstrapper
                 });
 
                 $app['events']->listen(fn (Looping $event) => $exceptionReporter->flushJobContext());
-                $app['events']->listen(fn (WorkerStopping $event) => $exceptionReporter->flushJobContext());
-
-                $app['events']->listen(fn (ScheduledTaskStarting $event) => $exceptionReporter->prepareForScheduledTask($event->task));
-
                 $app['events']->listen(fn (ScheduledTaskFinished $event) => $exceptionReporter->finishScheduledTask($event->task));
                 $app['events']->listen(fn (ScheduledTaskSkipped $event) => $exceptionReporter->flushScheduledTaskContext());
+                $app['events']->listen(fn (ScheduledTaskStarting $event) => $exceptionReporter->prepareForScheduledTask($event->task));
+                $app['events']->listen(fn (WorkerStopping $event) => $exceptionReporter->flushJobContext());
             }
         } catch (Throwable) {
             return;

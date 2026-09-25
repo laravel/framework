@@ -321,9 +321,7 @@ class ExceptionReporter
      */
     protected function removeSyntheticAuthorizationHeaders(HeaderBag $headers): void
     {
-        // The Authorization header already contains these values and they are
-        // not headers the client actually sent, so we remove them to avoid
-        // leaking credentials that have not been redacted.
+        // Remove PHP's unredacted copies of the Authorization header credentials...
         $headers->remove('php-auth-user');
         $headers->remove('php-auth-pw');
         $headers->remove('php-auth-digest');
@@ -613,8 +611,7 @@ class ExceptionReporter
     protected function consoleCommandLine(): ?string
     {
         try {
-            // If we are unable to retrieve the console input, we are unable to confidently
-            // redact input values, so we return null to avoid leaking sensitive information.
+            // Without the console input we cannot safely redact values, so report nothing...
             try {
                 $this->currentConsoleInput();
             } catch (CommandNotFoundException) {
@@ -628,8 +625,7 @@ class ExceptionReporter
             $tokens = Arr::wrap($this->currentConsoleInput()->getFirstArgument());
 
             foreach ($this->currentConsoleInput()->getRawArguments() as $name => $value) {
-                // Skip the initial argument, which is the command name. We have already captured that above
-                // and do not want to apply any special handling to it.
+                // Skip the initial argument, which is the command name. We have already captured that above...
                 if ($name === 'command' || is_int($name)) {
                     continue;
                 }
@@ -751,10 +747,7 @@ class ExceptionReporter
      */
     public function finishScheduledTask(ScheduledTask $task): void
     {
-        // The order of failed scheduled task events means when we fail,
-        // we haven't yet received the exception to report. We'll set the
-        // reporter into a waiting state, so that when the exception does
-        // arrive, we also flush the scheduled task state.
+        // Failed commands are reported after finishing, so keep the task context until then...
         if ($task->command !== null && $task->exitCode !== 0 && ! $task->runInBackground) {
             $this->scheduledTaskAwaitingFailureReport = true;
 
@@ -934,10 +927,6 @@ class ExceptionReporter
 
         $this->executionContext['job'] = [
             'timestamp' => $this->timestamp(),
-            // Beanstalkd throws an exception when attempting to retrieve the job
-            // after it has been processed. Instead of capturing this value when
-            // an exception occurs, we need to proactively capture the value
-            // before the job has been processed.
             'attempt' => $job->attempts(),
         ];
     }
