@@ -458,6 +458,12 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($items->shift());
     }
 
+    public function testShiftManyReturnsEmptyCollectionOnEmptyCollection()
+    {
+        $this->assertEquals(new Collection, (new Collection)->shift(0));
+        $this->assertEquals(new Collection, (new Collection)->shift(2));
+    }
+
     #[DataProvider('collectionClassProvider')]
     public function testSliding($collection)
     {
