@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,22 @@ class RouteCacheCommandTest extends TestCase
         $this->artisan('route:cache')->assertSuccessful();
 
         $this->assertSame($this->app, Container::getInstance());
+    }
+
+    public function testItRestoresTheEloquentConnectionResolverAfterBootingAFreshApplication(): void
+    {
+        $resolver = Model::getConnectionResolver();
+
+        $this->artisan('route:cache')->assertSuccessful();
+        $this->assertSame($resolver, Model::getConnectionResolver());
+    }
+
+    public function testItRestoresTheEloquentEventDispatcherAfterBootingAFreshApplication(): void
+    {
+        $dispatcher = Model::getEventDispatcher();
+
+        $this->artisan('route:cache')->assertSuccessful();
+        $this->assertSame($dispatcher, Model::getEventDispatcher());
     }
 
     public function testItLeavesTheFacadeRootsPointingAtTheCurrentApplication(): void

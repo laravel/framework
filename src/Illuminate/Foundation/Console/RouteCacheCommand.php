@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Facades\Facade;
@@ -92,13 +93,18 @@ class RouteCacheCommand extends Command
      */
     protected function getFreshApplication()
     {
-        return tap(require $this->laravel->bootstrapPath('app.php'), function ($app) {
+        $connectionResolver = Model::getConnectionResolver();
+        $eventDispatcher = Model::getEventDispatcher();
+
+        return tap(require $this->laravel->bootstrapPath('app.php'), function ($app) use ($connectionResolver, $eventDispatcher) {
             $app->make(ConsoleKernelContract::class)->bootstrap();
 
             Facade::clearResolvedInstances();
 
             Facade::setFacadeApplication($this->laravel);
             Container::setInstance($this->laravel);
+            Model::setConnectionResolver($connectionResolver);
+            Model::setEventDispatcher($eventDispatcher);
         });
     }
 
