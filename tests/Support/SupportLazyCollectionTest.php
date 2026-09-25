@@ -86,6 +86,17 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertSame('negative', $data->get(-1));
     }
 
+    public function testGetSkipsNonArrayKeyGeneratorKeys()
+    {
+        $data = LazyCollection::make(function () {
+            yield new \stdClass => 'object';
+            yield 1 => 'one';
+        });
+
+        $this->assertSame('one', $data->get(1));
+        $this->assertSame('missing', $data->get(2, 'missing'));
+    }
+
     public function testCanCreateCollectionFromNonGeneratorFunction()
     {
         $data = LazyCollection::make(function () {

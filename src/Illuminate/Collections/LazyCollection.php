@@ -545,7 +545,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         $keys = [$key => true];
 
         foreach ($this as $outerKey => $outerValue) {
-            if (array_key_exists($outerKey, $keys)) {
+            if ((is_int($outerKey) || is_string($outerKey)) && array_key_exists($outerKey, $keys)) {
                 return $outerValue;
             }
         }
