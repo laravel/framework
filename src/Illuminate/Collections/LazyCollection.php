@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use ArgumentCountError;
 use ArrayIterator;
 use Closure;
 use DateInterval;
@@ -810,8 +811,22 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function map(callable $callback)
     {
         return new static(function () use ($callback) {
+            $unary = false;
+
             foreach ($this as $key => $value) {
-                yield $key => $callback($value, $key);
+                if ($unary) {
+                    yield $key => $callback($value);
+
+                    continue;
+                }
+
+                try {
+                    yield $key => $callback($value, $key);
+                } catch (ArgumentCountError) {
+                    $unary = true;
+
+                    yield $key => $callback($value);
+                }
             }
         });
     }

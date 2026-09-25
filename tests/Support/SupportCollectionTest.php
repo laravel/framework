@@ -3357,6 +3357,20 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testMapWithNativeUnaryCallable($collection)
+    {
+        $data = new $collection(['first' => 'TAYLOR', 'last' => 'OTWELL']);
+
+        $mapped = $data->map(strtolower(...));
+
+        $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $mapped->all());
+
+        $mapped = (new $collection(['a b', 'c d']))->map(rawurlencode(...));
+
+        $this->assertEquals(['a%20b', 'c%20d'], $mapped->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testMapSpread($collection)
     {
         $c = new $collection([[1, 'a'], [2, 'b']]);
