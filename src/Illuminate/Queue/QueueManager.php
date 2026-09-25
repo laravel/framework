@@ -330,12 +330,15 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Determine if a queue is paused.
      *
-     * @param  string  $connection
-     * @param  string  $queue
+     * @param  \UnitEnum|string  $connection
+     * @param  \UnitEnum|string  $queue
      * @return bool
      */
     public function isPaused($connection, $queue)
     {
+        $connection = enum_value($connection);
+        $queue = enum_value($queue);
+
         $cache = $this->app['cache']->store();
 
         return (bool) ($cache->get('illuminate:queues:paused')
