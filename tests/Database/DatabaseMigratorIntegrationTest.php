@@ -111,6 +111,31 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertTrue(Str::contains($ran[1], 'password_resets'));
     }
 
+    public function testMigrationsDefaultConnectionCanBeChangedUsingEnum()
+    {
+        $ran = $this->migrator->usingConnection(MigratorTestConnection::Sqlite2, function () {
+            return $this->migrator->run([__DIR__.'/Fixtures/migrations/one']);
+        });
+
+        $this->assertFalse($this->db::schema()->hasTable('users'));
+        $this->assertTrue($this->db::schema('sqlite2')->hasTable('users'));
+        $this->assertTrue($this->db::schema('sqlite2')->hasTable('password_resets'));
+
+        $this->assertTrue(Str::contains($ran[0], 'users'));
+        $this->assertTrue(Str::contains($ran[1], 'password_resets'));
+    }
+
+    public function testMigrationsCanDefineConnectionUsingEnum()
+    {
+        $ran = $this->migrator->run([__DIR__.'/Fixtures/migrations/connection_configured_enum']);
+
+        $this->assertFalse($this->db::schema()->hasTable('flights'));
+        $this->assertFalse($this->db::schema('sqlite2')->hasTable('flights'));
+        $this->assertTrue($this->db::schema('sqlite3')->hasTable('flights'));
+
+        $this->assertTrue(Str::contains($ran[0], 'flights'));
+    }
+
     public function testMigrationsCanEachDefineConnection()
     {
         $ran = $this->migrator->run([__DIR__.'/Fixtures/migrations/connection_configured']);
@@ -295,4 +320,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->reset([__DIR__.'/Fixtures/migrations/one'], ['database' => 'sqlite2']);
         $this->assertSame('default', $this->migrator->getConnection());
     }
+}
+
+enum MigratorTestConnection: string
+{
+    case Sqlite2 = 'sqlite2';
+    case Sqlite3 = 'sqlite3';
 }

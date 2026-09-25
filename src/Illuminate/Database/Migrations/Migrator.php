@@ -22,6 +22,8 @@ use Illuminate\Support\Str;
 use ReflectionClass;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function Illuminate\Support\enum_value;
+
 class Migrator
 {
     /**
@@ -657,7 +659,7 @@ class Migrator
      *
      * @template TReturn
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @param  (callable(): TReturn)  $callback
      * @return TReturn
      */
@@ -681,7 +683,7 @@ class Migrator
     /**
      * Set the default connection name.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return void
      */
     public function setConnection($name)
@@ -712,7 +714,7 @@ class Migrator
     /**
      * Resolve the database connection instance.
      *
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string|null  $connection
      * @return \Illuminate\Database\Connection
      */
     public function resolveConnection($connection)
@@ -721,7 +723,7 @@ class Migrator
             return call_user_func(
                 static::$connectionResolverCallback,
                 $this->resolver,
-                $connection ?: $this->connection
+                enum_value($connection ?: $this->connection)
             );
         } else {
             return $this->resolver->connection(
@@ -733,12 +735,12 @@ class Migrator
     /**
      * Resolve the direct connection variant when one is configured.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return string
      */
     protected function directConnectionName($name)
     {
-        $name ??= $this->resolver->getDefaultConnection();
+        $name = enum_value($name) ?? $this->resolver->getDefaultConnection();
 
         if (Str::endsWith($name, ['::read', '::write', '::direct'])) {
             return $name;

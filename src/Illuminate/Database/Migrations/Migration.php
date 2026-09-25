@@ -7,7 +7,7 @@ abstract class Migration
     /**
      * The name of the database connection to use.
      *
-     * @var string|null
+     * @var \UnitEnum|string|null
      */
     protected $connection;
 
@@ -21,7 +21,7 @@ abstract class Migration
     /**
      * Get the migration connection name.
      *
-     * @return string|null
+     * @return \UnitEnum|string|null
      */
     public function getConnection()
     {
