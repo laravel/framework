@@ -36,6 +36,7 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
         protected FailedJobProviderInterface $failer,
         protected Events $events,
         protected StringEncrypter $encrypter,
+        protected ?ExceptionReporter $reporter = null,
     ) {
         //
     }
@@ -79,6 +80,9 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
             ),
             'job_name' => (json_decode($payload, associative: true) ?? [])['displayName'] ?? '',
             'exception' => (string) $exception,
+            ...$this->reporter === null ? [] : [
+                'exception_id' => $this->reporter->exceptionId($exception),
+            ],
         ]);
 
         $this->queue->finishProcessingJob(timestamp: $timestamp);
