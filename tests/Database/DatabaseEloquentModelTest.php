@@ -4085,6 +4085,56 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertSame('slug', $model->getRouteKeyName());
     }
+
+    public function testDefaultsMethodSetsDefaultAttributeValues()
+    {
+        $model = new EloquentModelWithDefaultsMethodStub;
+
+        $this->assertSame(['status' => 'draft', 'views' => 0], $model->getAttributes());
+        $this->assertFalse($model->isDirty());
+    }
+
+    public function testDefaultsMethodTakesPrecedenceOverAttributesProperty()
+    {
+        $model = new EloquentModelWithDefaultsMethodAndPropertyStub;
+
+        $this->assertSame(['title' => 'Untitled', 'status' => 'draft'], $model->getAttributes());
+    }
+
+    public function testDefaultsMethodValuesMayBeOverriddenOnInstantiation()
+    {
+        $model = new EloquentModelWithDefaultsMethodStub(['status' => 'published']);
+
+        $this->assertSame(['status' => 'published', 'views' => 0], $model->getAttributes());
+    }
+
+    public function testDefaultsMethodIsNotAppliedToExistingModels()
+    {
+        $model = (new EloquentModelWithDefaultsMethodStub)->newFromBuilder(['status' => 'published']);
+
+        $this->assertSame(['status' => 'published'], $model->getAttributes());
+        $this->assertFalse($model->isDirty());
+    }
+
+    public function testDefaultsMethodIsNotReappliedWhenUnserializing()
+    {
+        $model = new EloquentModelWithDefaultsMethodStub(['status' => 'published']);
+
+        $model = unserialize(serialize($model));
+
+        $this->assertSame(['status' => 'published', 'views' => 0], $model->getAttributes());
+    }
+
+    public function testDefaultsMethodIsEvaluatedForEachNewModel()
+    {
+        EloquentModelWithRuntimeDefaultsStub::$trialDays = 14;
+
+        $this->assertSame(['trial_days' => 14], (new EloquentModelWithRuntimeDefaultsStub)->getAttributes());
+
+        EloquentModelWithRuntimeDefaultsStub::$trialDays = 30;
+
+        $this->assertSame(['trial_days' => 30], (new EloquentModelWithRuntimeDefaultsStub)->getAttributes());
+    }
 }
 
 class CustomBuilder extends Builder
@@ -5142,4 +5192,37 @@ class EloquentModelWithRouteKeyAttributeStub extends Model
 class EloquentModelInheritingRouteKeyAttributeStub extends EloquentModelWithRouteKeyAttributeStub
 {
     //
+}
+
+class EloquentModelWithDefaultsMethodStub extends Model
+{
+    protected $guarded = [];
+
+    protected function defaults(): array
+    {
+        return ['status' => 'draft', 'views' => 0];
+    }
+}
+
+class EloquentModelWithRuntimeDefaultsStub extends Model
+{
+    public static $trialDays = 14;
+
+    protected function defaults(): array
+    {
+        return ['trial_days' => static::$trialDays];
+    }
+}
+
+class EloquentModelWithDefaultsMethodAndPropertyStub extends Model
+{
+    protected $attributes = [
+        'title' => 'Untitled',
+        'status' => 'pending',
+    ];
+
+    protected function defaults(): array
+    {
+        return ['status' => 'draft'];
+    }
 }
