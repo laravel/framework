@@ -3,11 +3,9 @@
 namespace Illuminate\Tests\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
-use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
-use Mockery;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
@@ -48,53 +46,41 @@ class RefreshDatabaseTest extends TestCase
 
     public function testRefreshTestDatabaseDefault()
     {
-        $kernel = Mockery::spy(ConsoleKernel::class);
+        $kernel = new RecordingConsoleKernel;
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
-        $kernel->expects('call')
-            ->with('migrate:fresh', [
-                '--drop-views' => false,
-                '--drop-types' => false,
-                '--seed' => false,
-            ])
-            ->andReturn(0);
-
         $this->refreshTestDatabase();
+
+        $this->assertSame([
+            ['migrate:fresh', ['--drop-views' => false, '--drop-types' => false, '--seed' => false]],
+        ], $kernel->calls);
     }
 
     public function testRefreshTestDatabaseWithDropViewsOption()
     {
         $this->dropViews = true;
 
-        $kernel = Mockery::spy(ConsoleKernel::class);
+        $kernel = new RecordingConsoleKernel;
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
-        $kernel->expects('call')
-            ->with('migrate:fresh', [
-                '--drop-views' => true,
-                '--drop-types' => false,
-                '--seed' => false,
-            ])
-            ->andReturn(0);
-
         $this->refreshTestDatabase();
+
+        $this->assertSame([
+            ['migrate:fresh', ['--drop-views' => true, '--drop-types' => false, '--seed' => false]],
+        ], $kernel->calls);
     }
 
     public function testRefreshTestDatabaseWithDropTypesOption()
     {
         $this->dropTypes = true;
 
-        $kernel = Mockery::spy(ConsoleKernel::class);
+        $kernel = new RecordingConsoleKernel;
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
-        $kernel->expects('call')
-            ->with('migrate:fresh', [
-                '--drop-views' => false,
-                '--drop-types' => true,
-                '--seed' => false,
-            ])
-            ->andReturn(0);
-
         $this->refreshTestDatabase();
+
+        $this->assertSame([
+            ['migrate:fresh', ['--drop-views' => false, '--drop-types' => true, '--seed' => false]],
+        ], $kernel->calls);
     }
 }

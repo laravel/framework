@@ -9,6 +9,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
 use Illuminate\Tests\Queue\Fixtures\JobToTestWithSchedule;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,8 +25,7 @@ final class ScheduleTest extends TestCase
     {
         $this->container = new Container;
         Container::setInstance($this->container);
-        $eventMutex = Mockery::mock(EventMutex::class);
-        $this->container->instance(EventMutex::class, $eventMutex);
+        $this->container->instance(EventMutex::class, new FakeEventMutex);
         $schedulingMutex = Mockery::mock(SchedulingMutex::class);
         $this->container->instance(SchedulingMutex::class, $schedulingMutex);
     }

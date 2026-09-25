@@ -5,10 +5,9 @@ namespace Illuminate\Tests\Console\View;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components;
 use Illuminate\Database\Migrations\MigrationResult;
-use Mockery;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class ComponentsTest extends TestCase
 {
@@ -68,33 +67,32 @@ class ComponentsTest extends TestCase
 
     public function testConfirm()
     {
-        $output = Mockery::mock(OutputStyle::class);
+        $result = (new Components\Confirm($this->outputStyleWithAnswer('')))->render('Question?');
+        $this->assertFalse($result);
 
-        $output->expects('confirm')
-            ->with('Question?', false)
-            ->andReturnTrue();
-
-        $result = (new Components\Confirm($output))->render('Question?');
-        $this->assertTrue($result);
-
-        $output->expects('confirm')
-            ->with('Question?', true)
-            ->andReturnTrue();
-
-        $result = (new Components\Confirm($output))->render('Question?', true);
+        $result = (new Components\Confirm($this->outputStyleWithAnswer('')))->render('Question?', true);
         $this->assertTrue($result);
     }
 
     public function testChoice()
     {
-        $output = Mockery::mock(OutputStyle::class);
-
-        $output->expects('askQuestion')
-            ->with(Mockery::type(ChoiceQuestion::class))
-            ->andReturn('a');
-
-        $result = (new Components\Choice($output))->render('Question?', ['a', 'b']);
+        $result = (new Components\Choice($this->outputStyleWithAnswer('a')))->render('Question?', ['a', 'b']);
         $this->assertSame('a', $result);
+    }
+
+    /**
+     * Build a real OutputStyle whose interactive input is pre-fed the given typed answer.
+     */
+    protected function outputStyleWithAnswer($answer)
+    {
+        $input = new ArrayInput([]);
+
+        $stream = fopen('php://memory', 'w+');
+        fwrite($stream, $answer."\n");
+        rewind($stream);
+        $input->setStream($stream);
+
+        return new OutputStyle($input, new BufferedOutput);
     }
 
     public function testTask()

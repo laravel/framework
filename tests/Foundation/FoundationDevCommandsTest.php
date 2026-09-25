@@ -348,43 +348,51 @@ class FoundationDevCommandsTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRegisterDefaultsRegistersExpectedCommands()
     {
-        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnTrue();
+        touch($packageJson = base_path('package.json'));
 
-        $provider = Mockery::mock('alias:Laravel\Pail\PailServiceProvider');
-        $provider->shouldReceive('register');
+        try {
+            $provider = Mockery::mock('alias:Laravel\Pail\PailServiceProvider');
+            $provider->shouldReceive('register');
 
-        Application::getInstance()->register($provider);
+            Application::getInstance()->register($provider);
 
-        DevCommands::registerDefaults();
+            DevCommands::registerDefaults();
 
-        $commands = DevCommands::commands();
+            $commands = DevCommands::commands();
 
-        $this->assertCount(4, $commands);
+            $this->assertCount(4, $commands);
 
-        $names = array_column($commands, 'name');
-        $this->assertContains('server', $names);
-        $this->assertSame('php artisan serve', collect($commands)->firstWhere('name', 'server')['command']);
-        $this->assertContains('queue', $names);
-        $this->assertContains('logs', $names);
-        $this->assertContains('vite', $names);
+            $names = array_column($commands, 'name');
+            $this->assertContains('server', $names);
+            $this->assertSame('php artisan serve', collect($commands)->firstWhere('name', 'server')['command']);
+            $this->assertContains('queue', $names);
+            $this->assertContains('logs', $names);
+            $this->assertContains('vite', $names);
+        } finally {
+            @unlink($packageJson);
+        }
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRegisterDefaultsExcludesPailWhenNotInstalled()
     {
-        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnTrue();
+        touch($packageJson = base_path('package.json'));
 
-        DevCommands::registerDefaults();
+        try {
+            DevCommands::registerDefaults();
 
-        $commands = DevCommands::commands();
+            $commands = DevCommands::commands();
 
-        $this->assertCount(3, $commands);
+            $this->assertCount(3, $commands);
 
-        $names = array_column($commands, 'name');
-        $this->assertContains('server', $names);
-        $this->assertContains('queue', $names);
-        $this->assertContains('vite', $names);
-        $this->assertNotContains('logs', $names);
+            $names = array_column($commands, 'name');
+            $this->assertContains('server', $names);
+            $this->assertContains('queue', $names);
+            $this->assertContains('vite', $names);
+            $this->assertNotContains('logs', $names);
+        } finally {
+            @unlink($packageJson);
+        }
     }
 
     #[RequiresOperatingSystem('Windows')]
@@ -407,7 +415,7 @@ class FoundationDevCommandsTest extends TestCase
 
     public function testRegisterDefaultsExcludesViteWithoutPackageJson()
     {
-        File::shouldReceive('exists')->with(base_path('package.json'))->andReturnFalse();
+        @unlink(base_path('package.json'));
 
         DevCommands::registerDefaults();
 
