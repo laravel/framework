@@ -427,6 +427,46 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `geo` add spatial index `geo_coordinates_spatialindex`(`coordinates`)', $statements[1]);
     }
 
+    public function testAddingVectorIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vectorIndex('embeddings');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `posts` add vector index `posts_embeddings_vectorindex`(`embeddings`) M=6 DISTANCE=cosine', $statements[0]);
+    }
+
+    public function testAddingVectorIndexWithName()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vectorIndex('embeddings', 'my_vector_index');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `posts` add vector index `my_vector_index`(`embeddings`) M=6 DISTANCE=cosine', $statements[0]);
+    }
+
+    public function testAddingFluentVectorIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vector('embeddings', 1536)->vectorIndex();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `posts` add vector index `posts_embeddings_vectorindex`(`embeddings`) M=6 DISTANCE=cosine', $statements[1]);
+    }
+
+    public function testAddingFluentIndexOnVectorColumn()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vector('embeddings', 1536)->index();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `posts` add vector index `posts_embeddings_vectorindex`(`embeddings`) M=6 DISTANCE=cosine', $statements[1]);
+    }
+
     public function testAddingRawIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -1385,6 +1425,16 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame("alter table `users` add `foo` varchar(255) not null comment 'Escape \\' when using words like it\\'s'", $statements[0]);
+    }
+
+    public function testAddingVector()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'embeddings');
+        $blueprint->vector('embedding', 384);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `embeddings` add `embedding` vector(384) not null', $statements[0]);
     }
 
     public function testCreateDatabase()
