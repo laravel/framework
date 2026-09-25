@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Foundation;
 
 use Exception;
 use Illuminate\Broadcasting\FakePendingBroadcast;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository as CacheRepositoryImplementation;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository;
@@ -42,25 +44,21 @@ class FoundationHelpersTest extends TestCase
     public function testCache()
     {
         $app = new Application;
-        $app['cache'] = $cache = Mockery::mock(CacheRepository::class);
+        $app['cache'] = new CacheRepositoryImplementation(new ArrayStore);
 
         // 1. cache()
         $this->assertInstanceOf(CacheRepository::class, cache());
 
         // 2. cache(['foo' => 'bar'], 1);
-        $cache->expects('put')->with('foo', 'bar', 1);
         cache(['foo' => 'bar'], 1);
 
         // 3. cache('foo');
-        $cache->expects('get')->with('foo', null)->andReturn('bar');
         $this->assertSame('bar', cache('foo'));
 
         // 4. cache('foo', null);
-        $cache->expects('get')->with('foo', null)->andReturn('bar');
         $this->assertSame('bar', cache('foo', null));
 
         // 5. cache('baz', 'default');
-        $cache->expects('get')->with('baz', 'default')->andReturn('default');
         $this->assertSame('default', cache('baz', 'default'));
     }
 
