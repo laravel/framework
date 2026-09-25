@@ -227,4 +227,33 @@ class CacheRateLimiterTest extends TestCase
 
         $this->assertTrue($rateLimiter->tooManyAttempts($key, 1));
     }
+
+    public function testRemainingSanitizesKeyOnlyOnce()
+    {
+        $cache = Mockery::mock(Cache::class);
+        $rateLimiter = new RateLimiter($cache);
+
+        $key = "john'doe";
+        $cleanedKey = $rateLimiter->cleanRateLimiterKey($key);
+
+        $cache->expects('get')->with($cleanedKey, 0)->andReturn(3);
+        $cache->expects('getStore')->andReturn(new ArrayStore);
+
+        $this->assertEquals(2, $rateLimiter->remaining($key, 5));
+    }
+
+    public function testClearSanitizesKeyOnlyOnce()
+    {
+        $cache = Mockery::mock(Cache::class);
+        $rateLimiter = new RateLimiter($cache);
+
+        $key = "john'doe";
+        $cleanedKey = $rateLimiter->cleanRateLimiterKey($key);
+
+        $cache->expects('forget')->with($cleanedKey);
+        $cache->expects('forget')->with("$cleanedKey:timer");
+        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+
+        $rateLimiter->clear($key);
+    }
 }

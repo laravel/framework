@@ -229,8 +229,6 @@ class RateLimiter
      */
     public function remaining($key, $maxAttempts)
     {
-        $key = $this->cleanRateLimiterKey($key);
-
         $attempts = $this->attempts($key);
 
         return max(0, $maxAttempts - $attempts);
@@ -256,11 +254,9 @@ class RateLimiter
      */
     public function clear($key)
     {
-        $key = $this->cleanRateLimiterKey($key);
-
         $this->resetAttempts($key);
 
-        $this->cache->forget($key.':timer');
+        $this->cache->forget($this->cleanRateLimiterKey($key).':timer');
     }
 
     /**
