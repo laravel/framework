@@ -8,6 +8,7 @@ use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
@@ -22,7 +23,7 @@ class DatabaseMigratorTest extends TestCase
     {
         $resolver = Mockery::mock(ConnectionResolverInterface::class);
         $baseConnection = Mockery::mock(Connection::class);
-        $directConnection = Mockery::mock(Connection::class);
+        $directConnection = new Connection(new PDO('sqlite::memory:'));
 
         $resolver->expects('connection')->with('pgsql')->andReturn($baseConnection);
         $baseConnection->expects('hasDirectConnection')->andReturn(true);
@@ -34,7 +35,7 @@ class DatabaseMigratorTest extends TestCase
     public function testResolveConnectionLeavesExplicitSuffixesUntouched()
     {
         $resolver = Mockery::mock(ConnectionResolverInterface::class);
-        $connection = Mockery::mock(Connection::class);
+        $connection = new Connection(new PDO('sqlite::memory:'));
 
         $resolver->expects('connection')->with('pgsql::write')->andReturn($connection);
 
@@ -55,7 +56,7 @@ class DatabaseMigratorTest extends TestCase
     public function testCustomConnectionResolverCallbackKeepsPriority()
     {
         $resolver = Mockery::mock(ConnectionResolverInterface::class);
-        $connection = Mockery::mock(Connection::class);
+        $connection = new Connection(new PDO('sqlite::memory:'));
 
         Migrator::resolveConnectionsUsing(function ($resolver, $name) use ($connection) {
             $this->assertSame('pgsql', $name);

@@ -316,7 +316,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
-        $queue->setContainer(Mockery::spy(Container::class));
+        $queue->setContainer(new Container);
 
         $payload = json_encode(['uuid' => 'test-uuid', 'displayName' => 'MyTestJob', 'job' => 'foo', 'data' => [], 'createdAt' => 1000000]);
 
@@ -343,7 +343,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
-        $queue->setContainer(Mockery::spy(Container::class));
+        $queue->setContainer(new Container);
 
         $payload = json_encode(['uuid' => 'test-uuid', 'displayName' => 'MyDelayedJob', 'job' => 'foo', 'data' => [], 'createdAt' => 1000000]);
 
@@ -370,7 +370,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
-        $queue->setContainer(Mockery::spy(Container::class));
+        $queue->setContainer(new Container);
 
         $payload = json_encode(['uuid' => 'test-uuid', 'displayName' => 'MyTestJob', 'job' => 'foo', 'data' => [], 'createdAt' => 1000000]);
 
@@ -396,7 +396,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
-        $queue->setContainer(Mockery::spy(Container::class));
+        $queue->setContainer(new Container);
 
         $payload1 = json_encode(['uuid' => 'uuid-1', 'displayName' => 'JobA', 'job' => 'foo', 'data' => [], 'createdAt' => 1000000]);
         $payload2 = json_encode(['uuid' => 'uuid-2', 'displayName' => 'JobB', 'job' => 'foo', 'data' => [], 'createdAt' => 1000001]);
@@ -429,7 +429,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
-        $queue->setContainer(Mockery::spy(Container::class));
+        $queue->setContainer(new Container);
 
         $payload1 = json_encode(['uuid' => 'uuid-1', 'displayName' => 'JobA', 'job' => 'foo', 'data' => [], 'createdAt' => 1000000]);
         $payload2 = json_encode(['uuid' => 'uuid-2', 'displayName' => 'JobB', 'job' => 'foo', 'data' => [], 'createdAt' => 1000001]);
@@ -462,7 +462,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
-        $queue->setContainer(Mockery::spy(Container::class));
+        $queue->setContainer(new Container);
 
         $payload1 = json_encode(['uuid' => 'uuid-1', 'displayName' => 'JobA', 'job' => 'foo', 'data' => [], 'createdAt' => 1000000]);
         $payload2 = json_encode(['uuid' => 'uuid-2', 'displayName' => 'JobB', 'job' => 'foo', 'data' => [], 'createdAt' => 1000001]);
@@ -495,7 +495,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
-        $queue->setContainer(Mockery::spy(Container::class));
+        $queue->setContainer(new Container);
 
         $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
@@ -508,7 +508,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
-        $queue->setContainer(Mockery::spy(Container::class));
+        $queue->setContainer(new Container);
 
         $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
@@ -523,7 +523,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
-        $queue->setContainer(Mockery::spy(Container::class));
+        $queue->setContainer(new Container);
 
         $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);
@@ -538,7 +538,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $database = Mockery::mock(Connection::class);
         $queue = new DatabaseQueue($database, 'table', 'default');
-        $queue->setContainer(Mockery::spy(Container::class));
+        $queue->setContainer(new Container);
 
         $query = Mockery::mock(QueryBuilder::class);
         $database->expects('table')->with('table')->andReturn($query);

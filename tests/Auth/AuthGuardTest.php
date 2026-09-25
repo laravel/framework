@@ -10,12 +10,16 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\Validated;
+use Illuminate\Auth\GenericUser;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Cookie\CookieJar;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Session\ArraySessionHandler;
+use Illuminate\Session\Store;
+use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Timebox;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -27,133 +31,147 @@ class AuthGuardTest extends TestCase
 {
     public function testBasicReturnsNullOnValidAttempt()
     {
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $guard = Mockery::mock(SessionGuard::class.'[check,attempt]', ['default', $provider, $session]);
-        $guard->expects('check')->andReturn(false);
-        $guard->expects('attempt')->with(['email' => 'foo@bar.com', 'password' => 'secret'])->andReturn(true);
-        $request = Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
-        $guard->setRequest($request);
+        [$guard, $provider, $session] = $this->getRealGuard();
 
-        $guard->basic('email');
+        $user = new GenericUser(['id' => 10, 'password' => 'secret']);
+        $credentials = ['email' => 'foo@bar.com', 'password' => 'secret'];
+        $provider->expects('retrieveByCredentials')->with($credentials)->andReturn($user);
+        $provider->expects('validateCredentials')->with($user, $credentials)->andReturn(true);
+        $provider->expects('rehashPasswordIfRequired')->with($user, $credentials);
+        $guard->setRequest(Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']));
+
+        $this->assertNull($guard->basic('email'));
+        $this->assertSame($user, $guard->user());
+        $this->assertSame(10, $session->get($guard->getName()));
     }
 
     public function testBasicReturnsNullWhenAlreadyLoggedIn()
     {
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $guard = Mockery::mock(SessionGuard::class.'[check]', ['default', $provider, $session]);
-        $guard->expects('check')->andReturn(true);
-        $guard->shouldReceive('attempt')->never();
-        $request = Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
-        $guard->setRequest($request);
+        [$guard, $provider] = $this->getRealGuard();
 
-        $guard->basic('email');
+        $user = new GenericUser(['id' => 10, 'password' => 'secret']);
+        $guard->setUser($user);
+        $provider->shouldNotReceive('retrieveByCredentials');
+        $guard->setRequest(Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']));
+
+        $this->assertNull($guard->basic('email'));
+        $this->assertSame($user, $guard->user());
     }
 
     public function testBasicReturnsResponseOnFailure()
     {
         $this->expectException(UnauthorizedHttpException::class);
 
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $guard = Mockery::mock(SessionGuard::class.'[check,attempt]', ['default', $provider, $session]);
-        $guard->expects('check')->andReturn(false);
-        $guard->expects('attempt')->with(['email' => 'foo@bar.com', 'password' => 'secret'])->andReturn(false);
-        $request = Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
-        $guard->setRequest($request);
+        [$guard, $provider] = $this->getRealGuard();
+
+        $user = new GenericUser(['id' => 10, 'password' => 'secret']);
+        $credentials = ['email' => 'foo@bar.com', 'password' => 'secret'];
+        $provider->expects('retrieveByCredentials')->with($credentials)->andReturn($user);
+        $provider->expects('validateCredentials')->with($user, $credentials)->andReturn(false);
+        $provider->shouldNotReceive('rehashPasswordIfRequired');
+        $guard->setRequest(Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']));
+
         $guard->basic('email');
     }
 
     public function testBasicWithExtraConditions()
     {
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $guard = Mockery::mock(SessionGuard::class.'[check,attempt]', ['default', $provider, $session]);
-        $guard->expects('check')->andReturn(false);
-        $guard->expects('attempt')->with(['email' => 'foo@bar.com', 'password' => 'secret', 'active' => 1])->andReturn(true);
-        $request = Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
-        $guard->setRequest($request);
+        [$guard, $provider, $session] = $this->getRealGuard();
 
-        $guard->basic('email', ['active' => 1]);
+        $user = new GenericUser(['id' => 10, 'password' => 'secret']);
+        $credentials = ['email' => 'foo@bar.com', 'password' => 'secret', 'active' => 1];
+        $provider->expects('retrieveByCredentials')->with($credentials)->andReturn($user);
+        $provider->expects('validateCredentials')->with($user, $credentials)->andReturn(true);
+        $provider->expects('rehashPasswordIfRequired')->with($user, $credentials);
+        $guard->setRequest(Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']));
+
+        $this->assertNull($guard->basic('email', ['active' => 1]));
+        $this->assertSame($user, $guard->user());
+        $this->assertSame(10, $session->get($guard->getName()));
     }
 
     public function testBasicWithExtraArrayConditions()
     {
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $guard = Mockery::mock(SessionGuard::class.'[check,attempt]', ['default', $provider, $session]);
-        $guard->expects('check')->andReturn(false);
-        $guard->expects('attempt')->with(['email' => 'foo@bar.com', 'password' => 'secret', 'active' => 1, 'type' => [1, 2, 3]])->andReturn(true);
-        $request = Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
-        $guard->setRequest($request);
+        [$guard, $provider, $session] = $this->getRealGuard();
 
-        $guard->basic('email', ['active' => 1, 'type' => [1, 2, 3]]);
+        $user = new GenericUser(['id' => 10, 'password' => 'secret']);
+        $credentials = ['email' => 'foo@bar.com', 'password' => 'secret', 'active' => 1, 'type' => [1, 2, 3]];
+        $provider->expects('retrieveByCredentials')->with($credentials)->andReturn($user);
+        $provider->expects('validateCredentials')->with($user, $credentials)->andReturn(true);
+        $provider->expects('rehashPasswordIfRequired')->with($user, $credentials);
+        $guard->setRequest(Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']));
+
+        $this->assertNull($guard->basic('email', ['active' => 1, 'type' => [1, 2, 3]]));
+        $this->assertSame($user, $guard->user());
+        $this->assertSame(10, $session->get($guard->getName()));
     }
 
     public function testAttemptCallsRetrieveByCredentials()
     {
         $guard = $this->getGuard();
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new EventFake(new Dispatcher);
         $guard->setDispatcher($events);
         $timebox = $guard->getTimebox();
         $timebox->expects('call')->andReturnUsing(function ($callback) use ($timebox) {
             return $callback($timebox);
         });
-        $events->expects('dispatch')->with(Mockery::type(Attempting::class));
-        $events->expects('dispatch')->with(Mockery::type(Failed::class));
-        $events->shouldNotReceive('dispatch')->with(Mockery::type(Validated::class));
         $guard->getProvider()->expects('retrieveByCredentials')->with(['foo']);
         $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
         $guard->attempt(['foo']);
+
+        $events->assertDispatchedOnce(Attempting::class);
+        $events->assertDispatchedOnce(Failed::class);
+        $events->assertNotDispatched(Validated::class);
     }
 
     public function testAttemptReturnsUserInterface()
     {
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
         $guard = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['login'])->setConstructorArgs(['default', $provider, $session, $request, $timebox])->getMock();
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new EventFake(new Dispatcher);
         $guard->setDispatcher($events);
         $timebox->expects('call')->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox->expects('returnEarly')->getMock());
         });
-        $events->expects('dispatch')->with(Mockery::type(Attempting::class));
-        $events->expects('dispatch')->with(Mockery::type(Validated::class));
         $user = $this->createStub(Authenticatable::class);
         $guard->getProvider()->expects('retrieveByCredentials')->andReturn($user);
         $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->expects('rehashPasswordIfRequired')->with($user, ['foo']);
         $guard->expects($this->once())->method('login')->with($user);
         $this->assertTrue($guard->attempt(['foo']));
+
+        $events->assertDispatchedOnce(Attempting::class);
+        $events->assertDispatchedOnce(Validated::class);
     }
 
     public function testAttemptReturnsFalseIfUserNotGiven()
     {
         $mock = $this->getGuard();
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new EventFake(new Dispatcher);
         $mock->setDispatcher($events);
         $timebox = $mock->getTimebox();
         $timebox->expects('call')->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox);
         });
-        $events->expects('dispatch')->with(Mockery::type(Attempting::class));
-        $events->expects('dispatch')->with(Mockery::type(Failed::class));
-        $events->shouldNotReceive('dispatch')->with(Mockery::type(Validated::class));
         $mock->getProvider()->expects('retrieveByCredentials')->andReturn(null);
         $mock->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
         $this->assertFalse($mock->attempt(['foo']));
+
+        $events->assertDispatchedOnce(Attempting::class);
+        $events->assertDispatchedOnce(Failed::class);
+        $events->assertNotDispatched(Validated::class);
     }
 
     public function testAttemptAndWithCallbacks()
     {
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName'])->setConstructorArgs(['default', $provider, $session, $request, $timebox])->getMock();
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new EventFake(new Dispatcher);
         $mock->setDispatcher($events);
         $timebox->shouldReceive('call')->andReturnUsing(function ($callback) use ($timebox) {
             return $callback($timebox->shouldReceive('returnEarly')->getMock());
         });
         $user = Mockery::mock(Authenticatable::class);
-        $events->expects('dispatch')->times(3)->with(Mockery::type(Attempting::class));
-        $events->expects('dispatch')->with(Mockery::type(Login::class));
-        $events->expects('dispatch')->with(Mockery::type(Authenticated::class));
-        $events->expects('dispatch')->times(2)->with(Mockery::type(Validated::class));
-        $events->expects('dispatch')->times(2)->with(Mockery::type(Failed::class));
         $mock->expects($this->once())->method('getName')->willReturn('foo');
         $user->expects('getAuthIdentifier')->andReturn('bar');
         $user->expects('getAuthPassword')->andReturn(null);
@@ -185,25 +203,32 @@ class AuthGuardTest extends TestCase
         }));
 
         $this->assertFalse($executed);
+
+        $events->assertDispatchedTimes(Attempting::class, 3);
+        $events->assertDispatchedOnce(Login::class);
+        $events->assertDispatchedOnce(Authenticated::class);
+        $events->assertDispatchedTimes(Validated::class, 2);
+        $events->assertDispatchedTimes(Failed::class, 2);
     }
 
     public function testAttemptRehashesPasswordWhenRequired()
     {
         [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
         $guard = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['login'])->setConstructorArgs(['default', $provider, $session, $request, $timebox])->getMock();
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new EventFake(new Dispatcher);
         $guard->setDispatcher($events);
         $timebox->expects('call')->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox->expects('returnEarly')->getMock());
         });
-        $events->expects('dispatch')->with(Mockery::type(Attempting::class));
-        $events->expects('dispatch')->with(Mockery::type(Validated::class));
         $user = $this->createStub(Authenticatable::class);
         $guard->getProvider()->expects('retrieveByCredentials')->andReturn($user);
         $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->expects('rehashPasswordIfRequired')->with($user, ['foo']);
         $guard->expects($this->once())->method('login')->with($user);
         $this->assertTrue($guard->attempt(['foo']));
+
+        $events->assertDispatchedOnce(Attempting::class);
+        $events->assertDispatchedOnce(Validated::class);
     }
 
     public function testAttemptDoesntRehashPasswordWhenDisabled()
@@ -212,19 +237,20 @@ class AuthGuardTest extends TestCase
         $guard = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['login'])
             ->setConstructorArgs(['default', $provider, $session, $request, $timebox, $rehashOnLogin = false])
             ->getMock();
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new EventFake(new Dispatcher);
         $guard->setDispatcher($events);
         $timebox->expects('call')->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox->expects('returnEarly')->getMock());
         });
-        $events->expects('dispatch')->with(Mockery::type(Attempting::class));
-        $events->expects('dispatch')->with(Mockery::type(Validated::class));
         $user = $this->createStub(Authenticatable::class);
         $guard->getProvider()->expects('retrieveByCredentials')->andReturn($user);
         $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
         $guard->expects($this->once())->method('login')->with($user);
         $this->assertTrue($guard->attempt(['foo']));
+
+        $events->assertDispatchedOnce(Attempting::class);
+        $events->assertDispatchedOnce(Validated::class);
     }
 
     public function testLoginStoresIdentifierInSession()
@@ -274,39 +300,41 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new EventFake(new Dispatcher);
         $mock->setDispatcher($events);
         $user = Mockery::mock(Authenticatable::class);
-        $events->expects('dispatch')->with(Mockery::type(Login::class));
-        $events->expects('dispatch')->with(Mockery::type(Authenticated::class));
         $mock->expects($this->once())->method('getName')->willReturn('foo');
         $user->expects('getAuthIdentifier')->andReturn('bar');
         $user->expects('getAuthPassword')->andReturn(null);
         $mock->getSession()->expects('put')->with('foo', 'bar');
         $session->expects('regenerate');
         $mock->login($user);
+
+        $events->assertDispatchedOnce(Login::class);
+        $events->assertDispatchedOnce(Authenticated::class);
     }
 
     public function testFailedAttemptFiresFailedEvent()
     {
         $guard = $this->getGuard();
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new EventFake(new Dispatcher);
         $guard->setDispatcher($events);
         $timebox = $guard->getTimebox();
         $timebox->expects('call')->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox);
         });
-        $events->expects('dispatch')->with(Mockery::type(Attempting::class));
-        $events->expects('dispatch')->with(Mockery::type(Failed::class));
-        $events->shouldNotReceive('dispatch')->with(Mockery::type(Validated::class));
         $guard->getProvider()->expects('retrieveByCredentials')->with(['foo'])->andReturn(null);
         $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
         $guard->attempt(['foo']);
+
+        $events->assertDispatchedOnce(Attempting::class);
+        $events->assertDispatchedOnce(Failed::class);
+        $events->assertNotDispatched(Validated::class);
     }
 
     public function testAuthenticateReturnsUserWhenUserIsNotNull()
     {
-        $user = Mockery::mock(Authenticatable::class);
+        $user = new GenericUser([]);
         $guard = $this->getGuard();
         $guard->setUser($user);
 
@@ -315,12 +343,13 @@ class AuthGuardTest extends TestCase
 
     public function testSetUserFiresAuthenticatedEvent()
     {
-        $user = Mockery::mock(Authenticatable::class);
+        $user = new GenericUser([]);
         $guard = $this->getGuard();
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->with(Mockery::type(Authenticated::class));
+        $events = new EventFake(new Dispatcher);
         $guard->setDispatcher($events);
         $guard->setUser($user);
+
+        $events->assertDispatchedOnce(Authenticated::class);
     }
 
     public function testAuthenticateThrowsWhenUserIsNull()
@@ -335,7 +364,7 @@ class AuthGuardTest extends TestCase
 
     public function testHasUserReturnsTrueWhenUserIsNotNull()
     {
-        $user = Mockery::mock(Authenticatable::class);
+        $user = new GenericUser([]);
         $guard = $this->getGuard();
         $guard->setUser($user);
 
@@ -352,7 +381,7 @@ class AuthGuardTest extends TestCase
 
     public function testIsAuthedReturnsTrueWhenUserIsNotNull()
     {
-        $user = Mockery::mock(Authenticatable::class);
+        $user = new GenericUser([]);
         $mock = $this->getGuard();
         $mock->setUser($user);
         $this->assertTrue($mock->check());
@@ -370,7 +399,7 @@ class AuthGuardTest extends TestCase
 
     public function testUserMethodReturnsCachedUser()
     {
-        $user = Mockery::mock(Authenticatable::class);
+        $user = new GenericUser([]);
         $mock = $this->getGuard();
         $mock->setUser($user);
         $this->assertSame($user, $mock->user());
@@ -387,7 +416,7 @@ class AuthGuardTest extends TestCase
     {
         $mock = $this->getGuard();
         $mock->getSession()->expects('get')->andReturn(1);
-        $user = Mockery::mock(Authenticatable::class);
+        $user = new GenericUser([]);
         $mock->getProvider()->expects('retrieveById')->with(1)->andReturn($user);
         $this->assertSame($user, $mock->user());
         $this->assertSame($user, $mock->getUser());
@@ -442,14 +471,15 @@ class AuthGuardTest extends TestCase
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['clearUserDataFromStorage'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $mock->expects($this->once())->method('clearUserDataFromStorage');
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new EventFake(new Dispatcher);
         $mock->setDispatcher($events);
         $user = Mockery::mock(Authenticatable::class);
         $user->expects('getRememberToken')->andReturn(null);
-        $events->expects('dispatch')->with(Mockery::type(Authenticated::class));
         $mock->setUser($user);
-        $events->expects('dispatch')->with(Mockery::type(Logout::class));
         $mock->logout();
+
+        $events->assertDispatchedOnce(Authenticated::class);
+        $events->assertDispatchedOnce(Logout::class);
     }
 
     public function testLogoutDoesNotSetRememberTokenIfNotPreviouslySet()
@@ -472,7 +502,7 @@ class AuthGuardTest extends TestCase
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $cookies = Mockery::mock(CookieJar::class);
         $mock->setCookieJar($cookies);
-        $user = Mockery::mock(Authenticatable::class);
+        $user = new GenericUser([]);
         $mock->expects($this->once())->method('getName')->willReturn('foo');
         $mock->expects($this->exactly(2))->method('getRecallerName')->willReturn($recallerName = 'bar');
         $mock->expects($this->once())->method('recaller')->willReturn('non-null-cookie');
@@ -493,7 +523,7 @@ class AuthGuardTest extends TestCase
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $cookies = Mockery::mock(CookieJar::class);
         $mock->setCookieJar($cookies);
-        $user = Mockery::mock(Authenticatable::class);
+        $user = new GenericUser([]);
         $mock->expects($this->once())->method('getName')->willReturn('foo');
         $mock->expects($this->once())->method('getRecallerName')->willReturn($recallerName = 'bar');
         $mock->expects($this->once())->method('recaller')->willReturn(null);
@@ -510,13 +540,14 @@ class AuthGuardTest extends TestCase
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['clearUserDataFromStorage'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $mock->expects($this->once())->method('clearUserDataFromStorage');
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new EventFake(new Dispatcher);
         $mock->setDispatcher($events);
-        $user = Mockery::mock(Authenticatable::class);
-        $events->expects('dispatch')->with(Mockery::type(Authenticated::class));
+        $user = new GenericUser([]);
         $mock->setUser($user);
-        $events->expects('dispatch')->with(Mockery::type(CurrentDeviceLogout::class));
         $mock->logoutCurrentDevice();
+
+        $events->assertDispatchedOnce(Authenticated::class);
+        $events->assertDispatchedOnce(CurrentDeviceLogout::class);
     }
 
     public function testLoginMethodQueuesCookieWhenRemembering()
@@ -587,49 +618,47 @@ class AuthGuardTest extends TestCase
 
     public function testLoginUsingIdLogsInWithUser()
     {
-        [$session, $provider, $request, $cookie] = $this->getMocks();
+        [$guard, $provider, $session] = $this->getRealGuard();
 
-        $guard = Mockery::mock(SessionGuard::class, ['default', $provider, $session])->makePartial();
-
-        $user = Mockery::mock(Authenticatable::class);
-        $guard->getProvider()->expects('retrieveById')->with(10)->andReturn($user);
-        $guard->expects('login')->with($user, false);
+        $user = new GenericUser(['id' => 10, 'password' => 'secret']);
+        $provider->expects('retrieveById')->with(10)->andReturn($user);
 
         $this->assertSame($user, $guard->loginUsingId(10));
+        $this->assertSame($user, $guard->user());
+        $this->assertSame(10, $session->get($guard->getName()));
     }
 
     public function testLoginUsingIdFailure()
     {
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $guard = Mockery::mock(SessionGuard::class, ['default', $provider, $session])->makePartial();
+        [$guard, $provider, $session] = $this->getRealGuard();
 
-        $guard->getProvider()->expects('retrieveById')->with(11)->andReturn(null);
-        $guard->shouldNotReceive('login');
+        $provider->expects('retrieveById')->with(11)->andReturn(null);
 
         $this->assertFalse($guard->loginUsingId(11));
+        $this->assertNull($guard->user());
+        $this->assertNull($session->get($guard->getName()));
     }
 
     public function testOnceUsingIdSetsUser()
     {
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $guard = Mockery::mock(SessionGuard::class, ['default', $provider, $session])->makePartial();
+        [$guard, $provider, $session] = $this->getRealGuard();
 
-        $user = Mockery::mock(Authenticatable::class);
-        $guard->getProvider()->expects('retrieveById')->with(10)->andReturn($user);
-        $guard->expects('setUser')->with($user);
+        $user = new GenericUser(['id' => 10, 'password' => 'secret']);
+        $provider->expects('retrieveById')->with(10)->andReturn($user);
 
         $this->assertSame($user, $guard->onceUsingId(10));
+        $this->assertSame($user, $guard->user());
+        $this->assertNull($session->get($guard->getName()));
     }
 
     public function testOnceUsingIdFailure()
     {
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $guard = Mockery::mock(SessionGuard::class, ['default', $provider, $session])->makePartial();
+        [$guard, $provider] = $this->getRealGuard();
 
-        $guard->getProvider()->expects('retrieveById')->with(11)->andReturn(null);
-        $guard->shouldNotReceive('setUser');
+        $provider->expects('retrieveById')->with(11)->andReturn(null);
 
         $this->assertFalse($guard->onceUsingId(11));
+        $this->assertNull($guard->user());
     }
 
     public function testUserUsesRememberCookieIfItExists()
@@ -676,40 +705,46 @@ class AuthGuardTest extends TestCase
 
     public function testLoginOnceSetsUser()
     {
-        [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
-        $guard = Mockery::mock(SessionGuard::class, ['default', $provider, $session, $request, $timebox])->makePartial();
-        $user = Mockery::mock(Authenticatable::class);
-        $timebox->expects('call')->andReturnUsing(function ($callback) use ($timebox) {
-            return $callback($timebox->expects('returnEarly')->getMock());
-        });
-        $guard->getProvider()->expects('retrieveByCredentials')->with(['foo'])->andReturn($user);
-        $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->andReturn(true);
-        $guard->getProvider()->expects('rehashPasswordIfRequired')->with($user, ['foo']);
-        $guard->expects('setUser')->with($user);
+        [$guard, $provider, $session] = $this->getRealGuard();
+
+        $user = new GenericUser(['id' => 10, 'password' => 'secret']);
+        $provider->expects('retrieveByCredentials')->with(['foo'])->andReturn($user);
+        $provider->expects('validateCredentials')->with($user, ['foo'])->andReturn(true);
+        $provider->expects('rehashPasswordIfRequired')->with($user, ['foo']);
+
         $this->assertTrue($guard->once(['foo']));
+        $this->assertSame($user, $guard->user());
+        $this->assertNull($session->get($guard->getName()));
     }
 
     public function testLoginOnceFailure()
     {
-        [$session, $provider, $request, $cookie, $timebox] = $this->getMocks();
-        $guard = Mockery::mock(SessionGuard::class, ['default', $provider, $session, $request, $timebox])->makePartial();
-        $user = Mockery::mock(Authenticatable::class);
-        $timebox->expects('call')->andReturnUsing(function ($callback) use ($timebox) {
-            return $callback($timebox);
-        });
-        $guard->getProvider()->expects('retrieveByCredentials')->with(['foo'])->andReturn($user);
-        $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->andReturn(false);
-        $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
+        [$guard, $provider] = $this->getRealGuard();
+
+        $user = new GenericUser(['id' => 10, 'password' => 'secret']);
+        $provider->expects('retrieveByCredentials')->with(['foo'])->andReturn($user);
+        $provider->expects('validateCredentials')->with($user, ['foo'])->andReturn(false);
+        $provider->shouldNotReceive('rehashPasswordIfRequired');
+
         $this->assertFalse($guard->once(['foo']));
+        $this->assertNull($guard->user());
     }
 
     public function testForgetUserSetsUserToNull()
     {
-        $user = Mockery::mock(Authenticatable::class);
+        $user = new GenericUser([]);
         $guard = $this->getGuard();
         $guard->setUser($user);
         $guard->forgetUser();
         $this->assertNull($guard->getUser());
+    }
+
+    protected function getRealGuard()
+    {
+        $session = new Store('test', new ArraySessionHandler(10));
+        $provider = Mockery::mock(UserProvider::class);
+
+        return [new SessionGuard('default', $provider, $session, timeboxDuration: 0), $provider, $session];
     }
 
     protected function getGuard()

@@ -834,9 +834,8 @@ class SupportHelpersTest extends TestCase
             $object->id = 2;
         })->id);
 
-        $mock = Mockery::mock();
-        $mock->expects('foo')->andReturn('bar');
-        $this->assertEquals($mock, tap($mock)->foo());
+        $collection = collect();
+        $this->assertSame($collection, tap($collection)->all());
     }
 
     public function testThrow()

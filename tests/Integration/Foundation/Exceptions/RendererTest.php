@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Exceptions;
 
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
@@ -103,7 +102,7 @@ class RendererTest extends TestCase
         $listener->shouldReceive('registerListeners')->never();
 
         $this->app->instance(Listener::class, $listener);
-        Event::swap(Mockery::mock(Dispatcher::class));
+        Event::fake();
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
@@ -128,7 +127,7 @@ class RendererTest extends TestCase
         $listener->shouldReceive('registerListeners')->never();
 
         $this->app->instance(Listener::class, $listener);
-        Event::swap(Mockery::mock(Dispatcher::class));
+        Event::fake();
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
@@ -144,7 +143,7 @@ class RendererTest extends TestCase
         $listener->expects('registerListeners');
 
         $this->app->instance(Listener::class, $listener);
-        Event::swap(Mockery::mock(Dispatcher::class));
+        Event::fake();
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();

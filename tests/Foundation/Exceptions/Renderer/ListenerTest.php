@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Exceptions\Renderer;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
 use Mockery;
@@ -11,7 +12,7 @@ class ListenerTest extends TestCase
 {
     public function test_queries_returns_expected_shape_after_query_executed()
     {
-        $connection = Mockery::mock();
+        $connection = Mockery::mock(Connection::class);
 
         $connection->expects('getName')->andReturn('testing');
         $connection->expects('prepareBindings')->with(['foo'])->andReturn(['foo']);
@@ -44,7 +45,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
+        $connection = Mockery::mock(Connection::class);
         $connection->expects('getName')->times(150)->andReturn('testing');
         $connection->expects('prepareBindings')->times(100)->andReturnUsing(fn ($b) => $b);
 
@@ -63,7 +64,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
+        $connection = Mockery::mock(Connection::class);
         $connection->expects('getName')->andReturn('testing');
         $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
 
@@ -79,7 +80,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
+        $connection = Mockery::mock(Connection::class);
         $connection->expects('getName')->andReturn('testing');
         $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
 
@@ -103,7 +104,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
+        $connection = Mockery::mock(Connection::class);
         $connection->expects('getName')->andReturn('testing');
         $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
 
@@ -119,7 +120,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
+        $connection = Mockery::mock(Connection::class);
         $connection->expects('getName')->andReturn('testing');
         $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
 
@@ -136,7 +137,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
+        $connection = Mockery::mock(Connection::class);
         $connection->expects('getName')->andReturn('testing');
         $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
 
@@ -152,7 +153,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock();
+        $connection = Mockery::mock(Connection::class);
         $connection->expects('getName')->andReturn('testing');
         $connection->expects('prepareBindings')->andReturnUsing(fn ($b) => $b);
 

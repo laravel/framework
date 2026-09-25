@@ -3,13 +3,17 @@
 namespace Illuminate\Tests\Database;
 
 use Foo\Bar\EloquentModelNamespacedStub;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
 use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentMorphTest extends TestCase
@@ -21,22 +25,26 @@ class DatabaseEloquentMorphTest extends TestCase
 
     public function testMorphOneSetsProperConstraints()
     {
-        $this->getOneRelation();
+        $relation = $this->getRelationWithRealQuery(MorphOne::class);
+
+        $this->assertSame('select * from "eloquent_morph_reset_model_stubs" where "table"."morph_type" = ? and "table"."morph_id" = ? and "table"."morph_id" is not null', $relation->toSql());
+        $this->assertSame([EloquentMorphResetModelStub::class, 1], $relation->getBindings());
     }
 
     public function testMorphOneEagerConstraintsAreProperlyAdded()
     {
-        $relation = $this->getOneRelation();
-        $relation->getParent()->expects('getKeyName')->andReturn('id');
-        $relation->getParent()->expects('getKeyType')->andReturn('string');
-        $relation->getQuery()->expects('whereIn')->with('table.morph_id', [1, 2]);
-        $relation->getQuery()->expects('where')->with('table.morph_type', get_class($relation->getParent()));
+        $parent = new EloquentMorphResetModelStub;
+        $parent->setKeyType('string');
+        $relation = $this->getRelationWithRealQuery(MorphOne::class, $parent);
 
         $model1 = new EloquentMorphResetModelStub;
         $model1->id = 1;
         $model2 = new EloquentMorphResetModelStub;
         $model2->id = 2;
         $relation->addEagerConstraints([$model1, $model2]);
+
+        $this->assertSame('select * from "eloquent_morph_reset_model_stubs" where "table"."morph_type" = ? and "table"."morph_id" = ? and "table"."morph_id" is not null and "table"."morph_id" in (?, ?) and "table"."morph_type" = ?', $relation->toSql());
+        $this->assertSame([EloquentMorphResetModelStub::class, '1', 1, 2, EloquentMorphResetModelStub::class], $relation->getBindings());
     }
 
     /**
@@ -45,22 +53,24 @@ class DatabaseEloquentMorphTest extends TestCase
      */
     public function testMorphManySetsProperConstraints()
     {
-        $this->getManyRelation();
+        $relation = $this->getRelationWithRealQuery(MorphMany::class);
+
+        $this->assertSame('select * from "eloquent_morph_reset_model_stubs" where "table"."morph_type" = ? and "table"."morph_id" = ? and "table"."morph_id" is not null', $relation->toSql());
+        $this->assertSame([EloquentMorphResetModelStub::class, 1], $relation->getBindings());
     }
 
     public function testMorphManyEagerConstraintsAreProperlyAdded()
     {
-        $relation = $this->getManyRelation();
-        $relation->getParent()->expects('getKeyName')->andReturn('id');
-        $relation->getParent()->expects('getKeyType')->andReturn('int');
-        $relation->getQuery()->expects('whereIntegerInRaw')->with('table.morph_id', [1, 2]);
-        $relation->getQuery()->expects('where')->with('table.morph_type', get_class($relation->getParent()));
+        $relation = $this->getRelationWithRealQuery(MorphMany::class);
 
         $model1 = new EloquentMorphResetModelStub;
         $model1->id = 1;
         $model2 = new EloquentMorphResetModelStub;
         $model2->id = 2;
         $relation->addEagerConstraints([$model1, $model2]);
+
+        $this->assertSame('select * from "eloquent_morph_reset_model_stubs" where "table"."morph_type" = ? and "table"."morph_id" = ? and "table"."morph_id" is not null and "table"."morph_id" in (1, 2) and "table"."morph_type" = ?', $relation->toSql());
+        $this->assertSame([EloquentMorphResetModelStub::class, 1, EloquentMorphResetModelStub::class], $relation->getBindings());
     }
 
     public function testMorphRelationUpsertFillsForeignKey()
@@ -98,6 +108,17 @@ class DatabaseEloquentMorphTest extends TestCase
             ['email'],
             ['name']
         );
+    }
+
+    protected function getRelationWithRealQuery(string $relation, ?Model $parent = null)
+    {
+        $connection = new Connection(new PDO('sqlite::memory:'));
+        $builder = (new Builder(new QueryBuilder($connection, new Grammar($connection), new Processor)))->setModel(new EloquentMorphResetModelStub);
+
+        $parent ??= new EloquentMorphResetModelStub;
+        $parent->id = 1;
+
+        return new $relation($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
     }
 
     protected function getOneRelation()

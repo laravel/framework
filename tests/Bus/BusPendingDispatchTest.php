@@ -101,7 +101,7 @@ class BusPendingDispatchTest extends TestCase
 
     public function testDynamicallyProxyMethods()
     {
-        $newJob = Mockery::mock(stdClass::class);
+        $newJob = new stdClass;
         $this->job->expects('appendToChain')->with($newJob);
         $this->pendingDispatch->appendToChain($newJob);
     }

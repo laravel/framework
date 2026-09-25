@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\FailoverQueue;
 use Illuminate\Queue\QueueManager;
@@ -26,10 +27,10 @@ class FailoverQueueTest extends TestCase
             'sync',
         ]);
 
-        $redis = Mockery::mock('stdClass');
+        $redis = Mockery::mock(Queue::class);
         $queue->expects('connection')->with('redis')->andReturn($redis);
 
-        $sync = Mockery::mock('stdClass');
+        $sync = Mockery::mock(Queue::class);
         $queue->expects('connection')->with('sync')->andReturn($sync);
 
         $events->expects('dispatch');
@@ -48,7 +49,7 @@ class FailoverQueueTest extends TestCase
         $queue = Mockery::mock(QueueManager::class);
         $failover = new FailoverQueue($queue, Mockery::mock(Dispatcher::class), ['sync']);
 
-        $sync = Mockery::mock('stdClass');
+        $sync = Mockery::mock(Queue::class);
         $queue->expects('connection')->times(3)->with('sync')->andReturn($sync);
 
         $sync->expects('later')->with(15, Mockery::type(FailoverJobWithDelayAttribute::class), '', null);

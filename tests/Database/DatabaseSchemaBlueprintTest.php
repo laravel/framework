@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
@@ -710,11 +711,12 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     protected function getConnection(?string $grammar = null, string $prefix = '')
     {
-        $connection = Mockery::mock(Connection::class);
+        $grammar ??= 'MySql';
+
+        $connection = Mockery::mock($grammar === 'MySql' ? MySqlConnection::class : Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
         $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true);
 
-        $grammar ??= 'MySql';
         $grammarClass = 'Illuminate\Database\Schema\Grammars\\'.$grammar.'Grammar';
         $builderClass = 'Illuminate\Database\Schema\\'.$grammar.'Builder';
 

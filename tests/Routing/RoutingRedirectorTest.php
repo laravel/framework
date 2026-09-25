@@ -21,7 +21,7 @@ class RoutingRedirectorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->headers = Mockery::mock(HeaderBag::class);
+        $this->headers = new HeaderBag;
 
         $this->request = Mockery::mock(Request::class);
         $this->request->shouldReceive('isMethod')->andReturn(true)->byDefault();

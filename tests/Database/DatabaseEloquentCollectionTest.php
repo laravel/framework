@@ -12,7 +12,6 @@ use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 use function Orchestra\Testbench\phpunit_version_compare;
 
@@ -282,12 +281,12 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testLoadMethodEagerLoadsGivenRelationships()
     {
-        $c = $this->getMockBuilder(Collection::class)->onlyMethods(['first'])->setConstructorArgs([['foo']])->getMock();
-        $mockItem = Mockery::mock(stdClass::class);
-        $c->expects($this->once())->method('first')->willReturn($mockItem);
-        $mockItem->expects('newQueryWithoutRelationships')->andReturn($mockItem);
-        $mockItem->expects('with')->with(['bar', 'baz'])->andReturn($mockItem);
-        $mockItem->expects('eagerLoadRelations')->with(['foo'])->andReturn(['results']);
+        $model = Mockery::mock(Model::class);
+        $builder = Mockery::mock(Builder::class);
+        $model->expects('newQueryWithoutRelationships')->andReturn($builder);
+        $builder->expects('with')->with(['bar', 'baz'])->andReturnSelf();
+        $builder->expects('eagerLoadRelations')->with([$model])->andReturn(['results']);
+        $c = new Collection([$model]);
         $c->load('bar', 'baz');
 
         $this->assertEquals(['results'], $c->all());

@@ -340,7 +340,7 @@ class QueueRedisQueueTest extends TestCase
         $redis = Mockery::mock(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = Mockery::spy(Container::class);
+        $container = new Container;
         $queue->setContainer($container);
 
         $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
@@ -374,7 +374,7 @@ class QueueRedisQueueTest extends TestCase
         $redis = Mockery::mock(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = Mockery::spy(Container::class);
+        $container = new Container;
         $queue->setContainer($container);
 
         $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
@@ -464,7 +464,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $redis = Mockery::mock(Factory::class);
         $connection = Mockery::mock(PhpRedisClusterConnection::class);
-        $client = Mockery::mock();
+        $client = Mockery::mock(\RedisCluster::class);
 
         $redis->expects('connection')->andReturn($connection);
         $connection->expects('client')->andReturn($client);

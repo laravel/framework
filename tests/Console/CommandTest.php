@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Console;
 
-use Illuminate\Console\Application;
 use Illuminate\Console\Attributes\Aliases;
 use Illuminate\Console\Attributes\Help;
 use Illuminate\Console\Attributes\Hidden;
@@ -40,14 +39,14 @@ class CommandTest extends TestCase
             }
         };
 
-        $application = Mockery::mock(Application::class);
+        $application = Mockery::mock(FoundationApplication::class);
         $command->setLaravel($application);
 
         $input = new ArrayInput([]);
         $output = new NullOutput;
-        $outputStyle = Mockery::mock(OutputStyle::class);
+        $outputStyle = new OutputStyle($input, $output);
         $application->expects('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
-        $application->expects('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(Mockery::mock(Factory::class));
+        $application->expects('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(new Factory($outputStyle));
 
         $application->expects('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command, $application) {
             $commandCalled = Mockery::mock(Command::class);
@@ -149,7 +148,7 @@ class CommandTest extends TestCase
             }
         };
 
-        $application = Mockery::mock(Application::class);
+        $application = Mockery::mock(FoundationApplication::class);
         $command->setLaravel($application);
 
         $input = new ArrayInput([
@@ -160,9 +159,9 @@ class CommandTest extends TestCase
             '--role' => 'user',
         ]);
         $output = new NullOutput;
-        $outputStyle = Mockery::mock(OutputStyle::class);
+        $outputStyle = new OutputStyle($input, $output);
         $application->expects('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
-        $application->expects('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(Mockery::mock(Factory::class));
+        $application->expects('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(new Factory($outputStyle));
         $application->shouldReceive('runningUnitTests')->andReturn(true);
         $application->expects('call')->with([$command, 'handle'])->andReturn(0);
 

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Http\Middleware;
 
-use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Session\Session;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Exceptions\OriginMismatchException;
 use Illuminate\Http\Request;
@@ -141,7 +141,7 @@ class PreventRequestForgeryTest extends TestCase
     {
         return new PreventRequestForgeryTestStub(
             Mockery::mock(Application::class),
-            Mockery::mock(Encrypter::class)
+            new Encrypter(str_repeat('a', 16))
         );
     }
 }

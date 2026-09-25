@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
@@ -1584,7 +1585,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         ?MySqlBuilder $builder = null,
         string $prefix = ''
     ) {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Mockery::mock(MySqlConnection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
         $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
         $connection->shouldReceive('isMaria')->andReturn(false);

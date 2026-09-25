@@ -47,7 +47,7 @@ class DatabaseMySqlBuilderTest extends TestCase
     public function testDeleteWithJoinCompilesOrderByAndLimit(): void
     {
         $connection = Mockery::mock(Connection::class);
-        $processor = Mockery::mock(Processor::class);
+        $processor = new Processor;
         $grammar = new MySqlGrammar($connection);
 
         $connection->expects('getTablePrefix')->times(5)->andReturn('');

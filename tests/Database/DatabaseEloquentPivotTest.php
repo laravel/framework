@@ -24,7 +24,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $resolver->expects('connection')->times(2)->andReturn($connection);
         $grammar = Mockery::mock(Grammar::class);
         $connection->expects('getQueryGrammar')->times(2)->andReturn($grammar);
-        $processor = Mockery::mock(Processor::class);
+        $processor = new Processor;
         $parent->getConnection()->getQueryGrammar()->expects('getDateFormat')->andReturn('Y-m-d H:i:s');
         $parent->setDateFormat('Y-m-d H:i:s');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);

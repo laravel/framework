@@ -327,7 +327,7 @@ class AuthorizeMiddlewareTest extends TestCase
             return true;
         });
 
-        $request = Mockery::mock(Request::class);
+        $request = new Request;
 
         $next = function () {
             //

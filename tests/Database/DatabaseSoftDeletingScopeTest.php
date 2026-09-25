@@ -2,56 +2,46 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\SQLiteConnection;
 use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSoftDeletingScopeTest extends TestCase
 {
     public function testApplyingScopeToABuilder()
     {
-        $scope = Mockery::mock(SoftDeletingScope::class.'[extend]');
-        $builder = Mockery::mock(EloquentBuilder::class);
-        $model = Mockery::mock(Model::class);
-        $model->expects('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
-        $builder->expects('qualifyColumn')->with('table.deleted_at')->andReturn('table.deleted_at');
-        $builder->expects('whereNull')->with('table.deleted_at');
+        $builder = $this->newBuilder(scoped: false);
 
-        $scope->apply($builder, $model);
+        (new SoftDeletingScope)->apply($builder, $builder->getModel());
+
+        $this->assertSame('select * from "users" where "users"."deleted_at" is null', $builder->toSql());
     }
 
     public function testRestoreExtension()
     {
-        $builder = new EloquentBuilder(new BaseBuilder(
-            Mockery::mock(ConnectionInterface::class),
-            Mockery::mock(Grammar::class),
-            Mockery::mock(Processor::class)
-        ));
-        $scope = new SoftDeletingScope;
-        $scope->extend($builder);
-        $callback = $builder->getMacro('restore');
-        $givenBuilder = Mockery::mock(EloquentBuilder::class);
-        $givenBuilder->expects('withTrashed');
-        $model = Mockery::mock(Model::class);
-        $givenBuilder->expects('getModel')->andReturn($model);
-        $model->expects('getDeletedAtColumn')->andReturn('deleted_at');
-        $givenBuilder->expects('update')->with(['deleted_at' => null]);
+        $connection = $this->newConnection();
+        $builder = $this->newBuilder($connection);
 
-        $callback($givenBuilder);
+        $builder->restore();
+
+        $this->assertSame(0, $connection->table('users')->whereNotNull('deleted_at')->count());
     }
 
     public function testRestoreOrCreateExtension()
     {
         $builder = new EloquentBuilder(new BaseBuilder(
-            Mockery::mock(ConnectionInterface::class),
+            new Connection(new PDO('sqlite::memory:')),
             Mockery::mock(Grammar::class),
-            Mockery::mock(Processor::class)
+            new Processor
         ));
 
         $scope = new SoftDeletingScope;
@@ -72,9 +62,9 @@ class DatabaseSoftDeletingScopeTest extends TestCase
     public function testCreateOrRestoreExtension()
     {
         $builder = new EloquentBuilder(new BaseBuilder(
-            Mockery::mock(ConnectionInterface::class),
+            new Connection(new PDO('sqlite::memory:')),
             Mockery::mock(Grammar::class),
-            Mockery::mock(Processor::class)
+            new Processor
         ));
 
         $scope = new SoftDeletingScope;
@@ -94,63 +84,55 @@ class DatabaseSoftDeletingScopeTest extends TestCase
 
     public function testWithTrashedExtension()
     {
-        $builder = new EloquentBuilder(new BaseBuilder(
-            Mockery::mock(ConnectionInterface::class),
-            Mockery::mock(Grammar::class),
-            Mockery::mock(Processor::class)
-        ));
-        $scope = Mockery::mock(SoftDeletingScope::class.'[remove]');
-        $scope->extend($builder);
-        $callback = $builder->getMacro('withTrashed');
-        $givenBuilder = Mockery::mock(EloquentBuilder::class);
-        $model = Mockery::mock(Model::class);
-        $givenBuilder->expects('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
-        $result = $callback($givenBuilder);
+        $builder = $this->newBuilder();
 
-        $this->assertEquals($givenBuilder, $result);
+        $this->assertSame('select * from "users" where "users"."deleted_at" is null', $builder->toSql());
+        $this->assertSame('select * from "users"', $builder->withTrashed()->toSql());
     }
 
     public function testOnlyTrashedExtension()
     {
-        $builder = new EloquentBuilder(new BaseBuilder(
-            Mockery::mock(ConnectionInterface::class),
-            Mockery::mock(Grammar::class),
-            Mockery::mock(Processor::class)
-        ));
-        $model = Mockery::mock(Model::class)->makePartial();
-        $scope = Mockery::mock(SoftDeletingScope::class.'[remove]');
-        $scope->extend($builder);
-        $callback = $builder->getMacro('onlyTrashed');
-        $givenBuilder = Mockery::mock(EloquentBuilder::class);
-        $givenBuilder->expects('getModel')->andReturn($model);
-        $givenBuilder->expects('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
-        $model->expects('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
-        $givenBuilder->expects('qualifyColumn')->with('table.deleted_at')->andReturn('table.deleted_at');
-        $givenBuilder->expects('whereNotNull')->with('table.deleted_at');
-        $result = $callback($givenBuilder);
+        $builder = $this->newBuilder();
 
-        $this->assertEquals($givenBuilder, $result);
+        $this->assertSame('select * from "users" where "users"."deleted_at" is not null', $builder->onlyTrashed()->toSql());
     }
 
     public function testWithoutTrashedExtension()
     {
-        $builder = new EloquentBuilder(new BaseBuilder(
-            Mockery::mock(ConnectionInterface::class),
-            Mockery::mock(Grammar::class),
-            Mockery::mock(Processor::class)
-        ));
-        $model = Mockery::mock(Model::class)->makePartial();
-        $scope = Mockery::mock(SoftDeletingScope::class.'[remove]');
-        $scope->extend($builder);
-        $callback = $builder->getMacro('withoutTrashed');
-        $givenBuilder = Mockery::mock(EloquentBuilder::class);
-        $givenBuilder->expects('getModel')->andReturn($model);
-        $givenBuilder->expects('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
-        $model->expects('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
-        $givenBuilder->expects('qualifyColumn')->with('table.deleted_at')->andReturn('table.deleted_at');
-        $givenBuilder->expects('whereNull')->with('table.deleted_at');
-        $result = $callback($givenBuilder);
+        $builder = $this->newBuilder();
 
-        $this->assertEquals($givenBuilder, $result);
+        $this->assertSame('select * from "users" where "users"."deleted_at" is null', $builder->withoutTrashed()->toSql());
     }
+
+    protected function newConnection(): SQLiteConnection
+    {
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->exec('create table "users" ("id" integer primary key, "deleted_at" text, "updated_at" text)');
+        $pdo->exec("insert into \"users\" values (1, '2023-01-01 00:00:00', null)");
+        $pdo->exec('insert into "users" values (2, null, null)');
+
+        return new SQLiteConnection($pdo);
+    }
+
+    protected function newBuilder(?SQLiteConnection $connection = null, bool $scoped = true): EloquentBuilder
+    {
+        $builder = (new EloquentBuilder(($connection ?? new SQLiteConnection(new PDO('sqlite::memory:')))->query()))
+            ->setModel(new SoftDeletingScopeModelStub);
+
+        if ($scoped) {
+            $scope = new SoftDeletingScope;
+            $builder->withGlobalScope(SoftDeletingScope::class, $scope);
+            $scope->extend($builder);
+        }
+
+        return $builder;
+    }
+}
+
+class SoftDeletingScopeModelStub extends Model
+{
+    use SoftDeletes;
+
+    protected $table = 'users';
+    protected $dateFormat = 'Y-m-d H:i:s';
 }

@@ -18,8 +18,8 @@ use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\TransferStats;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Client\Batch;
 use Illuminate\Http\Client\BatchInProgressException;
 use Illuminate\Http\Client\ConnectionException;
@@ -42,10 +42,10 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
+use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Uri;
 use InvalidArgumentException;
 use JsonSerializable;
-use Mockery;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -2449,9 +2449,7 @@ class HttpClientTest extends TestCase
 
     public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSent()
     {
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->times(5)->with(Mockery::type(RequestSending::class));
-        $events->expects('dispatch')->times(5)->with(Mockery::type(ResponseReceived::class));
+        $events = new EventFake(new Dispatcher);
 
         $factory = new Factory($events);
         $factory->fake();
@@ -2461,13 +2459,13 @@ class HttpClientTest extends TestCase
         $factory->post('https://example.com');
         $factory->patch('https://example.com');
         $factory->delete('https://example.com');
+        $events->assertDispatchedTimes(RequestSending::class, 5);
+        $events->assertDispatchedTimes(ResponseReceived::class, 5);
     }
 
     public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSentAsync()
     {
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->times(5)->with(Mockery::type(RequestSending::class));
-        $events->expects('dispatch')->times(5)->with(Mockery::type(ResponseReceived::class));
+        $events = new EventFake(new Dispatcher);
 
         $factory = new Factory($events);
         $factory->fake();
@@ -2480,13 +2478,13 @@ class HttpClientTest extends TestCase
                 $pool->delete('https://example.com'),
             ];
         });
+        $events->assertDispatchedTimes(RequestSending::class, 5);
+        $events->assertDispatchedTimes(ResponseReceived::class, 5);
     }
 
     public function testTheRequestSendingAndResponseReceivedEventsAreFiredForEveryRetry()
     {
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->times(2)->with(Mockery::type(RequestSending::class));
-        $events->expects('dispatch')->times(2)->with(Mockery::type(ResponseReceived::class));
+        $events = new EventFake(new Dispatcher);
 
         $factory = new Factory($events);
         $factory->fake([
@@ -2498,6 +2496,8 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->failed());
 
         $factory->assertSentCount(2);
+        $events->assertDispatchedTimes(RequestSending::class, 2);
+        $events->assertDispatchedTimes(ResponseReceived::class, 2);
     }
 
     public function testTheTransferStatsAreCalledSafelyWhenFakingTheRequest()
@@ -2522,9 +2522,7 @@ class HttpClientTest extends TestCase
 
     public function testClonedClientsWorkSuccessfullyWithTheRequestObject()
     {
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->with(Mockery::type(RequestSending::class));
-        $events->expects('dispatch')->with(Mockery::type(ResponseReceived::class));
+        $events = new EventFake(new Dispatcher);
 
         $factory = new Factory($events);
         $factory->fake(['example.com' => $factory::response('foo', 200)]);
@@ -2533,6 +2531,8 @@ class HttpClientTest extends TestCase
         $clonedClient = clone $client;
 
         $clonedClient->get('https://example.com');
+        $events->assertDispatchedTimes(RequestSending::class, 1);
+        $events->assertDispatchedTimes(ResponseReceived::class, 1);
     }
 
     public function testRequestIsMacroable()

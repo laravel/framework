@@ -157,9 +157,7 @@ class RedisBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithUserForChannel($channel)
     {
-        $request = Mockery::mock(Request::class);
-        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
-        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
+        $request = Request::create('/', 'POST', ['channel_name' => $channel]);
 
         $user = Mockery::mock('User');
         $user->shouldReceive('getAuthIdentifierForBroadcasting')
@@ -167,8 +165,7 @@ class RedisBroadcasterTest extends TestCase
         $user->shouldReceive('getAuthIdentifier')
             ->andReturn(42);
 
-        $request->shouldReceive('user')
-            ->andReturn($user);
+        $request->setUserResolver(fn () => $user);
 
         return $request;
     }
@@ -179,12 +176,6 @@ class RedisBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithoutUserForChannel($channel)
     {
-        $request = Mockery::mock(Request::class);
-        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
-
-        $request->shouldReceive('user')
-            ->andReturn(null);
-
-        return $request;
+        return Request::create('/', 'POST', ['channel_name' => $channel]);
     }
 }

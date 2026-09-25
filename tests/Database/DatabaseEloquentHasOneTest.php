@@ -2,13 +2,16 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Contracts\Database\Query\Expression;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
 use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasOneTest extends TestCase
@@ -103,15 +106,15 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     public function testEagerConstraintsAreProperlyAdded()
     {
-        $relation = $this->getRelation();
-        $relation->getParent()->expects('getKeyName')->andReturn('id');
-        $relation->getParent()->expects('getKeyType')->andReturn('int');
-        $relation->getQuery()->expects('whereIntegerInRaw')->with('table.foreign_key', [1, 2]);
+        $relation = $this->getRelationWithRealQuery();
         $model1 = new EloquentHasOneModelStub;
         $model1->id = 1;
         $model2 = new EloquentHasOneModelStub;
         $model2->id = 2;
         $relation->addEagerConstraints([$model1, $model2]);
+
+        $this->assertSame('select * from "eloquent_has_one_model_stubs" where "table"."foreign_key" = ? and "table"."foreign_key" is not null and "table"."foreign_key" in (1, 2)', $relation->toSql());
+        $this->assertSame([1], $relation->getBindings());
     }
 
     public function testModelsAreProperlyMatchedToParents()
@@ -150,23 +153,27 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     public function testRelationCountQueryCanBeBuilt()
     {
-        $relation = $this->getRelation();
-        $builder = Mockery::mock(Builder::class);
+        $relation = $this->getRelationWithRealQuery();
 
-        $baseQuery = Mockery::mock(BaseBuilder::class);
-        $baseQuery->from = 'one';
-        $parentQuery = Mockery::mock(BaseBuilder::class);
-        $parentQuery->from = 'two';
+        $query = $relation->getRelationExistenceCountQuery($this->newBuilder('one'), $this->newBuilder('two'));
 
-        $builder->expects('getQuery')->andReturn($baseQuery);
-        $builder->expects('getQuery')->andReturn($parentQuery);
+        $this->assertSame('select count(*) from "one" where "eloquent_has_one_model_stubs"."id" = "table"."foreign_key"', $query->toSql());
+    }
 
-        $builder->expects('select')->with(Mockery::type(Expression::class))->andReturnSelf();
-        $relation->getParent()->expects('qualifyColumn')->andReturn('table.id');
-        $builder->expects('whereColumn')->with('table.id', '=', 'table.foreign_key')->andReturn($baseQuery);
-        $baseQuery->expects('setBindings')->with([], 'select');
+    protected function newBuilder($table = null)
+    {
+        $connection = new Connection(new PDO('sqlite::memory:'));
+        $builder = (new Builder(new BaseBuilder($connection, new Grammar($connection), new Processor)))->setModel(new EloquentHasOneModelStub);
 
-        $relation->getRelationExistenceCountQuery($builder, $builder);
+        return $table ? $builder->from($table) : $builder;
+    }
+
+    protected function getRelationWithRealQuery()
+    {
+        $parent = new EloquentHasOneModelStub;
+        $parent->id = 1;
+
+        return new HasOne($this->newBuilder(), $parent, 'table.foreign_key', 'id');
     }
 
     protected function getRelation()

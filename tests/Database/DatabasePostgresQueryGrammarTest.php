@@ -6,6 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresQueryGrammarTest extends TestCase
@@ -29,7 +30,7 @@ class DatabasePostgresQueryGrammarTest extends TestCase
         PostgresGrammar::customOperators(['@@@', '@>', '']);
         PostgresGrammar::customOperators(['@@>', 1]);
 
-        $connection = Mockery::mock(Connection::class);
+        $connection = new Connection(new PDO('sqlite::memory:'));
         $grammar = new PostgresGrammar($connection);
 
         $operators = $grammar->getOperators();

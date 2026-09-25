@@ -9,6 +9,7 @@ use Illuminate\Database\Console\Concerns\InteractsWithPooledConnections;
 use Illuminate\Database\Console\DbCommand;
 use Illuminate\Foundation\Application;
 use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -18,7 +19,7 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
     {
         $resolver = Mockery::mock(ConnectionResolverInterface::class);
         $baseConnection = Mockery::mock(Connection::class);
-        $directConnection = Mockery::mock(Connection::class);
+        $directConnection = new Connection(new PDO('sqlite::memory:'));
         $command = new DatabaseConsoleDirectConnectionTestCommand;
 
         $resolver->expects('getDefaultConnection')->andReturn('pgsql');

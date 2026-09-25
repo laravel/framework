@@ -257,9 +257,7 @@ class AuthenticateMiddlewareTest extends TestCase
      */
     protected function authenticate(...$guards)
     {
-        $request = Mockery::mock(Request::class);
-
-        $request->shouldReceive('expectsJson')->andReturn(false);
+        $request = Request::create('/');
 
         $nextParam = null;
 

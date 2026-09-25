@@ -27,7 +27,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $command = new RefreshCommand;
 
         $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
-        $events = Mockery::mock();
+        $events = Mockery::mock(Dispatcher::class);
         $dispatcher = $app->instance(Dispatcher::class, $events);
         $console = Mockery::mock(ConsoleApplication::class)->makePartial();
         $console->__construct();
@@ -53,7 +53,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $command = new RefreshCommand;
 
         $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
-        $events = Mockery::mock();
+        $events = Mockery::mock(Dispatcher::class);
         $dispatcher = $app->instance(Dispatcher::class, $events);
         $console = Mockery::mock(ConsoleApplication::class)->makePartial();
         $console->__construct();
@@ -79,7 +79,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $command = new RefreshCommand;
 
         $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
-        $events = Mockery::mock();
+        $events = Mockery::mock(Dispatcher::class);
         $dispatcher = $app->instance(Dispatcher::class, $events);
         $console = Mockery::mock(ConsoleApplication::class)->makePartial();
         $console->__construct();

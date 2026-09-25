@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Auth\AuthManager;
+use Illuminate\Auth\GenericUser;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -84,7 +85,7 @@ class FoundationAuthenticationTest extends TestCase
 
     protected function setupProvider(array $credentials)
     {
-        $user = Mockery::mock(Authenticatable::class);
+        $user = new GenericUser([]);
 
         $provider = Mockery::mock(UserProvider::class);
 

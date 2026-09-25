@@ -6,14 +6,13 @@ use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Redis\Connection;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\RateLimitedWithRedis;
 use Illuminate\Support\Str;
-use Mockery;
 use Orchestra\Testbench\Attributes\RequiresEnv;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -178,16 +177,13 @@ class RateLimitedWithRedisTest extends TestCase
         $testJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('hasFailed')->andReturn(false);
-        $job->expects('isReleased')->times(2)->andReturn(false);
-        $job->expects('isDeletedOrReleased')->andReturn(false);
-        $job->expects('delete');
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($testJob),
         ]);
+
+        $this->assertTrue($job->isDeleted());
 
         $this->assertTrue($testJob::$handled);
     }
@@ -197,16 +193,13 @@ class RateLimitedWithRedisTest extends TestCase
         $testJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('hasFailed')->andReturn(false);
-        $job->expects('release');
-        $job->expects('isReleased')->times(2)->andReturn(true);
-        $job->expects('isDeletedOrReleased')->andReturn(true);
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($testJob),
         ]);
+
+        $this->assertTrue($job->isReleased());
 
         $this->assertFalse($testJob::$handled);
     }
@@ -216,16 +209,13 @@ class RateLimitedWithRedisTest extends TestCase
         $testJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
-
-        $job->expects('hasFailed')->andReturn(false);
-        $job->expects('isReleased')->times(2)->andReturn(false);
-        $job->expects('isDeletedOrReleased')->andReturn(false);
-        $job->expects('delete');
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($testJob),
         ]);
+
+        $this->assertTrue($job->isDeleted());
 
         $this->assertFalse($testJob::$handled);
     }

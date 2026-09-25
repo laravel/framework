@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Mockery;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -42,12 +43,8 @@ class SupportTestingEventFakeTest extends TestCase
 
     public function testAssertListening()
     {
-        $listener = ListenerStub::class;
-
-        $dispatcher = Mockery::mock(Dispatcher::class);
-        $dispatcher->expects('getListeners')->andReturn([function ($event, $payload) use ($listener) {
-            return $listener(...array_values($payload));
-        }]);
+        $dispatcher = new EventDispatcher;
+        $dispatcher->listen(EventStub::class, ListenerStub::class);
 
         $fake = new EventFake($dispatcher);
 
