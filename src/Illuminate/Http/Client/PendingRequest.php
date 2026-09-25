@@ -13,6 +13,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\UriTemplate\UriTemplate;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
@@ -1064,6 +1065,10 @@ class PendingRequest
 
         [$this->pendingBody, $this->pendingFiles] = [null, []];
 
+        if (isset($options['multipart']) && is_array($options['multipart'])) {
+            $options['multipart'] = $this->wrapMultipartStreams($options['multipart']);
+        }
+
         if ($this->async) {
             return $this->promise = new LazyPromise(
                 fn () => $this->makePromise($method, $url, $options)
@@ -1073,6 +1078,10 @@ class PendingRequest
         $shouldRetry = null;
 
         return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
+            if ($attempt > 1) {
+                $this->rewindMultipartStreams($options);
+            }
+
             try {
                 return tap($this->newResponse($this->sendRequest($method, $url, $options)), function (&$response) use ($attempt, &$shouldRetry) {
                     $this->populateResponse($response);
@@ -1200,6 +1209,44 @@ class PendingRequest
     }
 
     /**
+     * Wrap the multipart stream resources in PSR-7 streams so they are not closed between retry attempts.
+     *
+     * @param  array  $multipart
+     * @return array
+     */
+    protected function wrapMultipartStreams(array $multipart)
+    {
+        return array_map(function ($part) {
+            if (is_array($part) && isset($part['contents']) && is_resource($part['contents'])) {
+                $part['contents'] = Utils::streamFor($part['contents']);
+            }
+
+            return $part;
+        }, $multipart);
+    }
+
+    /**
+     * Rewind the seekable multipart streams so retried requests contain the full part contents.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function rewindMultipartStreams(array $options)
+    {
+        if (! is_array($options['multipart'] ?? null)) {
+            return;
+        }
+
+        foreach ($options['multipart'] as $part) {
+            $contents = is_array($part) ? ($part['contents'] ?? null) : null;
+
+            if ($contents instanceof StreamInterface && $contents->isSeekable()) {
+                $contents->rewind();
+            }
+        }
+    }
+
+    /**
      * Send an asynchronous request to the given URL.
      *
      * @param  string  $method
@@ -1210,6 +1257,10 @@ class PendingRequest
      */
     protected function makePromise(string $method, string $url, array $options = [], int $attempt = 1)
     {
+        if ($attempt > 1) {
+            $this->rewindMultipartStreams($options);
+        }
+
         return $this->promise = $this->sendRequest($method, $url, $options)
             ->then(function (MessageInterface $message) {
                 $response = $this->newResponse($message);
