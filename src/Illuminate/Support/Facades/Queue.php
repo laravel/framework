@@ -22,7 +22,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void pauseAll()
  * @method static void resume(\UnitEnum|string $connection, \UnitEnum|string $queue)
  * @method static void resumeAll()
- * @method static bool isPaused(string $connection, string $queue)
+ * @method static bool isPaused(\UnitEnum|string $connection, \UnitEnum|string $queue)
  * @method static array getPausedQueues(string $connection, array $queues)
  * @method static void withoutInterruptionPolling()
  * @method static void extend(string $driver, \Closure $resolver)
