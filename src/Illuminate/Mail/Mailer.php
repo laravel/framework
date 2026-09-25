@@ -316,6 +316,13 @@ class Mailer implements MailerContract, MailQueueContract
             $callback($message);
         }
 
+        // When a global reply address was specified we will set it on the message if
+        // the developer has not given the message a reply address of its own. This
+        // lets individual messages override the global reply address as needed.
+        if (! empty($this->replyTo['address']) && empty($message->getReplyTo())) {
+            $message->replyTo($this->replyTo['address'], $this->replyTo['name']);
+        }
+
         // If a global "to" address has been set, we will set that address on the mail
         // message. This is primarily useful during local development in which each
         // message should be delivered into a single mail address for inspection.
@@ -561,13 +568,6 @@ class Mailer implements MailerContract, MailQueueContract
         // they create a new message. We'll just go ahead and push this address.
         if (! empty($this->from['address'])) {
             $message->from($this->from['address'], $this->from['name']);
-        }
-
-        // When a global reply address was specified we will set this on every message
-        // instance so the developer does not have to repeat themselves every time
-        // they create a new message. We will just go ahead and push this address.
-        if (! empty($this->replyTo['address'])) {
-            $message->replyTo($this->replyTo['address'], $this->replyTo['name']);
         }
 
         if (! empty($this->returnPath['address'])) {

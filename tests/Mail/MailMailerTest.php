@@ -271,6 +271,38 @@ class MailMailerTest extends TestCase
         $this->assertStringContainsString('Reply-To: Taylor Otwell <taylor@laravel.com>', $sentMessage->toString());
     }
 
+    public function testGlobalReplyToIsOverriddenByMessageReplyTo(): void
+    {
+        $view = Mockery::mock(Factory::class);
+        $view->expects('make')->andReturn($view);
+        $view->expects('render')->andReturn('rendered.view');
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+        $mailer->alwaysReplyTo('taylor@laravel.com', 'Taylor Otwell');
+
+        $sentMessage = $mailer->send('foo', ['data'], function (Message $message) {
+            $message->to('dries@laravel.com')->from('hello@laravel.com')->replyTo('nuno@laravel.com', 'Nuno Maduro');
+        });
+
+        $this->assertStringContainsString('Reply-To: Nuno Maduro <nuno@laravel.com>', $sentMessage->toString());
+        $this->assertStringNotContainsString('taylor@laravel.com', $sentMessage->toString());
+    }
+
+    public function testGlobalReplyToIsOverriddenByMessageReplyToArray(): void
+    {
+        $view = Mockery::mock(Factory::class);
+        $view->expects('make')->andReturn($view);
+        $view->expects('render')->andReturn('rendered.view');
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+        $mailer->alwaysReplyTo('taylor@laravel.com', 'Taylor Otwell');
+
+        $sentMessage = $mailer->send('foo', ['data'], function (Message $message) {
+            $message->to('dries@laravel.com')->from('hello@laravel.com')->replyTo(['nuno@laravel.com']);
+        });
+
+        $this->assertStringContainsString('Reply-To: nuno@laravel.com', $sentMessage->toString());
+        $this->assertStringNotContainsString('taylor@laravel.com', $sentMessage->toString());
+    }
+
     public function testGlobalToIsRespectedOnAllMessages(): void
     {
         $view = Mockery::mock(Factory::class);
