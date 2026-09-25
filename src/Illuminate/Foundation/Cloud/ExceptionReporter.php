@@ -107,11 +107,6 @@ class ExceptionReporter
     protected ?array $connectionConfig = null;
 
     /**
-     * The user that logged out.
-     */
-    protected ?Authenticatable $rememberedUser = null;
-
-    /**
      * Proactively captured execution context, keyed by execution type.
      *
      * @var array{
@@ -1048,7 +1043,12 @@ class ExceptionReporter
      */
     public function rememberUser(Authenticatable $user): void
     {
-        $this->rememberedUser = $user;
+        // The context is scoped to the current request, so the user is not remembered in later requests...
+        try {
+            Context::addHidden('laravel_cloud_user_id', $this->userIdentifier($user));
+        } catch (Throwable) {
+            //
+        }
     }
 
     /**
@@ -1069,14 +1069,8 @@ class ExceptionReporter
     protected function userId(): ?string
     {
         try {
-            if (Auth::hasResolvedGuards()) {
-                if (Auth::hasUser()) {
-                    return $this->userIdentifier(Auth::user());
-                }
-
-                if ($this->rememberedUser !== null) {
-                    return $this->userIdentifier($this->rememberedUser);
-                }
+            if (Auth::hasResolvedGuards() && Auth::hasUser()) {
+                return $this->userIdentifier(Auth::user());
             }
 
             return $this->userIdFromContext();

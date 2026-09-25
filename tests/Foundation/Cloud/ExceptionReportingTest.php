@@ -1344,6 +1344,39 @@ class ExceptionReportingTest extends TestCase
         $streams[0]->assertWrittenJsonContains(['user_id' => 'abc123', 'message' => 'Whoops!']);
     }
 
+    public function testItDoesNotRememberTheUserThatLoggedOutInLaterRequests(): void
+    {
+        $this->setRunningInConsole(false);
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        Route::get('/logout', function () {
+            Auth::logout();
+
+            return 'ok';
+        });
+        Route::get('/test', function () {
+            Auth::check();
+
+            throw new RuntimeException('Whoops!');
+        });
+
+        $this->actingAs(new GenericUser(['id' => 'abc123', 'remember_token' => '']))
+            ->get('/logout')
+            ->assertOk();
+
+        // Octane serves many requests with the same application, flushing the
+        // scoped instances and authentication state between each of them.
+        $this->app->forgetScopedInstances();
+        Facade::clearResolvedInstances();
+        Auth::forgetGuards();
+
+        $this->get('/test')->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains(['user_id' => null, 'message' => 'Whoops!']);
+    }
+
     public function testItDoesNotRememberTheUserWhenTheyLogOutInAJob(): void
     {
         $this->setupExceptionReporting();
