@@ -38,8 +38,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testMutatorsAreCalledFromConstructor()
     {
-        $parent = Mockery::mock(Model::class.'[getConnectionName]');
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent = new DummyModel;
 
         $pivot = DatabaseEloquentPivotTestMutatorStub::fromAttributes($parent, ['foo' => 'bar'], 'table', true);
 
@@ -106,8 +105,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testKeysCanBeSetProperly()
     {
-        $parent = Mockery::mock(Model::class.'[getConnectionName]');
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent = new DummyModel;
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar'], 'table');
         $pivot->setPivotKeys('foreign', 'other');
 
@@ -139,9 +137,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testPivotModelWithParentReturnsParentsTimestampColumns()
     {
-        $parent = Mockery::mock(Model::class);
-        $parent->expects('getCreatedAtColumn')->andReturn('parent_created_at');
-        $parent->expects('getUpdatedAtColumn')->andReturn('parent_updated_at');
+        $parent = new DatabaseEloquentPivotTestCustomTimestampsModel;
 
         $pivotWithParent = new Pivot;
         $pivotWithParent->pivotParent = $parent;
@@ -221,4 +217,10 @@ class DatabaseEloquentPivotTestJsonCastStub extends Pivot
 class DummyModel extends Model
 {
     //
+}
+
+class DatabaseEloquentPivotTestCustomTimestampsModel extends Model
+{
+    const CREATED_AT = 'parent_created_at';
+    const UPDATED_AT = 'parent_updated_at';
 }

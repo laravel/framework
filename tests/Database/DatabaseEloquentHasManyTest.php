@@ -56,14 +56,15 @@ class DatabaseEloquentHasManyTest extends TestCase
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
-        $model = Mockery::mock(Model::class);
+        $model = new EloquentHasManyModelStub;
         $relation->getRelated()->expects('newCollection')->andReturnUsing(function ($array = []) {
             return new Collection($array);
         });
-        $model->expects('setRelation')->with('foo', Mockery::type(Collection::class));
         $models = $relation->initRelation([$model], 'foo');
 
         $this->assertEquals([$model], $models);
+        $this->assertInstanceOf(Collection::class, $model->getRelation('foo'));
+        $this->assertCount(0, $model->getRelation('foo'));
     }
 
     public function testEagerConstraintsAreProperlyAdded()

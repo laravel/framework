@@ -3,12 +3,12 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Container\Container;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\SQLiteBuilder;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\File;
-use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseSQLiteBuilderTest extends TestCase
@@ -31,8 +31,7 @@ class DatabaseSQLiteBuilderTest extends TestCase
 
     public function testCreateDatabase()
     {
-        $connection = Mockery::mock(Connection::class);
-        $connection->expects('getSchemaGrammar');
+        $connection = new SQLiteConnection(new PDO('sqlite::memory:'));
 
         $builder = new SQLiteBuilder($connection);
 
@@ -51,8 +50,7 @@ class DatabaseSQLiteBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $connection = Mockery::mock(Connection::class);
-        $connection->expects('getSchemaGrammar');
+        $connection = new SQLiteConnection(new PDO('sqlite::memory:'));
 
         $builder = new SQLiteBuilder($connection);
 
