@@ -482,7 +482,10 @@ class NotificationChannelManagerTest extends TestCase
         $bus->expects('dispatch')->times(2)->withArgs(function ($job) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
             $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
-            $this->assertEquals($job->notification->deduplicationId(...), $job->deduplicator->getClosure());
+            $this->assertSame(
+                $job->notification->deduplicationId('payload', 'queue'),
+                ($job->deduplicator->getClosure())('payload', 'queue')
+            );
 
             return true;
         });

@@ -236,7 +236,10 @@ class MailableQueuedTest extends TestCase
 
         $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
         $this->assertInstanceOf(SerializableClosure::class, $pushedJob->deduplicator);
-        $this->assertEquals($mailable->deduplicationId(...), $pushedJob->deduplicator->getClosure());
+        $this->assertSame(
+            $mailable->deduplicationId('payload', 'queue'),
+            ($pushedJob->deduplicator->getClosure())('payload', 'queue')
+        );
     }
 
     public function testQueueSetsBackedEnumQueueOnMailable(): void
