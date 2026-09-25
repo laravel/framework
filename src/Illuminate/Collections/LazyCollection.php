@@ -343,7 +343,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             $counts = [];
 
             foreach ($this as $key => $value) {
-                $group = enum_value($countBy($value, $key));
+                $group = enum_value($countBy($value, $key)) ?? '';
 
                 if (empty($counts[$group])) {
                     $counts[$group] = 0;
@@ -793,7 +793,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                         $itemKey = (string) $itemKey;
                     }
 
-                    yield $itemKey => $itemValue;
+                    yield $itemKey ?? '' => $itemValue;
                 }
             }
         });
@@ -894,7 +894,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                     throw new ValueError($errorMessage);
                 }
 
-                yield $key => $values->current();
+                yield $key ?? '' => $values->current();
 
                 $values->next();
             }

@@ -3975,6 +3975,30 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testPluckWithNullKey($collection)
+    {
+        $data = new $collection([['name' => 'a', 'parent' => 1], ['name' => 'b', 'parent' => null]]);
+
+        $this->assertEquals([1 => 'a', '' => 'b'], $data->pluck('name', 'parent')->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testCountByNull($collection)
+    {
+        $data = new $collection(['a', null, 'a', null, null]);
+
+        $this->assertEquals(['a' => 2, '' => 3], $data->countBy()->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testCombineWithNullKey($collection)
+    {
+        $data = new $collection(['a', null]);
+
+        $this->assertEquals(['a' => 1, '' => 2], $data->combine([1, 2])->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testKeyByNull($collection)
     {
         $data = new $collection([['rating' => 1, 'name' => '1'], ['rating' => 2, 'name' => null]]);
