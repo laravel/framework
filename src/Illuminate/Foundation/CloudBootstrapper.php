@@ -2,20 +2,33 @@
 
 namespace Illuminate\Foundation;
 
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Console\Events\CommandStarting;
+use Illuminate\Console\Events\ScheduledTaskFinished;
+use Illuminate\Console\Events\ScheduledTaskSkipped;
+use Illuminate\Console\Events\ScheduledTaskStarting;
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\BootProviders;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Cloud\Events;
+use Illuminate\Foundation\Cloud\ExceptionReporter;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\QueueConnector;
+use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
+use Illuminate\Log\Context\Events\ContextDehydrating;
 use Illuminate\Queue\Connectors\SqsConnector;
+use Illuminate\Queue\Events\JobPopped;
+use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Monolog\Handler\SocketHandler;
 use PDO;
+use Throwable;
 
 class CloudBootstrapper
 {
@@ -48,6 +61,7 @@ class CloudBootstrapper
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
                 static::registerEvents($app);
+                static::registerExceptionReporting($app);
             },
             default => fn () => true,
         })();
@@ -276,6 +290,7 @@ class CloudBootstrapper
 
         $app->singleton('queue.failer', fn ($app) => new FailedJobProvider(
             $failer, $app[Events::class], $app['encrypter'],
+            $app->bound(ExceptionReporter::class) ? $app[ExceptionReporter::class] : null,
         ));
     }
 
@@ -307,6 +322,82 @@ class CloudBootstrapper
 
         if (! $app['config']->has('logging.channels.cloud')) {
             $app['config']->set('logging.channels.cloud', $channel);
+        }
+    }
+
+    /**
+     * Register the Laravel Cloud exception reporter if applicable.
+     */
+    public static function registerExceptionReporting(Application $app): void
+    {
+        try {
+            if (! isset($_SERVER['LARAVEL_CLOUD_EXCEPTIONS'])) {
+                return;
+            }
+
+            $config = [
+                'stop' => true,
+                'capture_request_payload' => false,
+                'redact_request_payload_fields' => ['_token', 'password', 'password_confirmation', 'current_password'],
+                'redact_headers' => ['Authorization', 'Cookie', 'Proxy-Authorization', 'X-CSRF-TOKEN', 'X-XSRF-TOKEN'],
+                'redact_command_input_fields' => ['token', 'password', 'key', 'secret'],
+                ...json_decode($_SERVER['LARAVEL_CLOUD_EXCEPTIONS'], associative: true, flags: JSON_THROW_ON_ERROR),
+            ];
+
+            $exceptionReporter = $app->instance(ExceptionReporter::class, new ExceptionReporter(
+                $app[Events::class],
+                $app->factory(BladeMapper::class),
+                $app->basePath().DIRECTORY_SEPARATOR,
+                $config,
+            ));
+
+            // Defer registration of the reporter until exception handler is resolved...
+            $registerReporter = function ($handler) use ($exceptionReporter) {
+                try {
+                    $handler->reportable($exceptionReporter);
+                } catch (Throwable) {
+                    //
+                }
+            };
+
+            $app->resolved(ExceptionHandlerContract::class)
+                ? $registerReporter($app[ExceptionHandlerContract::class])
+                : $app->afterResolving(ExceptionHandlerContract::class, $registerReporter);
+
+            $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->rememberUserIdInContext($event->context));
+            $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->rememberTraceIdInContext($event->context));
+
+            if (! $app->runningInConsole()) {
+                $app['events']->listen(function (Logout $event) use ($exceptionReporter) {
+                    if ($event->user !== null) {
+                        $exceptionReporter->rememberUser($event->user);
+                    }
+                });
+            } else {
+                $preparedForCommand = false;
+
+                $app['events']->listen(function (CommandStarting $event) use ($exceptionReporter, &$preparedForCommand) {
+                    if (! $preparedForCommand) {
+                        $exceptionReporter->prepareForCommand($event->command, $event->input);
+
+                        $preparedForCommand = true;
+                    }
+                });
+
+                $app['events']->listen(function (JobPopped $event) use ($exceptionReporter) {
+                    if ($event->job !== null) {
+                        $exceptionReporter->prepareForJob($event->job);
+                    }
+                });
+
+                $app['events']->listen(fn (Looping $event) => $exceptionReporter->flushJobContext());
+                $app['events']->listen(fn (ScheduledTaskFinished $event) => $exceptionReporter->finishScheduledTask($event->task));
+                $app['events']->listen(fn (ScheduledTaskSkipped $event) => $exceptionReporter->flushScheduledTaskContext());
+                $app['events']->listen(fn (ScheduledTaskStarting $event) => $exceptionReporter->prepareForScheduledTask($event->task));
+                $app['events']->listen(fn (WorkerStopping $event) => $exceptionReporter->flushJobContext());
+            }
+        } catch (Throwable) {
+            return;
         }
     }
 
