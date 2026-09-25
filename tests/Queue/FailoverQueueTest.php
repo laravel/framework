@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\FailoverQueue;
 use Illuminate\Queue\QueueManager;
@@ -21,7 +21,7 @@ class FailoverQueueTest extends TestCase
     public function test_push_fails_over_on_exception()
     {
         $queue = Mockery::mock(QueueManager::class);
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new Dispatcher;
         $failover = new FailoverQueue($queue, $events, [
             'redis',
             'sync',
@@ -32,8 +32,6 @@ class FailoverQueueTest extends TestCase
 
         $sync = Mockery::mock(Queue::class);
         $queue->expects('connection')->with('sync')->andReturn($sync);
-
-        $events->expects('dispatch');
 
         $redis->expects('push')->andReturnUsing(
             fn () => throw new \Exception('error')
@@ -47,7 +45,7 @@ class FailoverQueueTest extends TestCase
     public function test_bulk_respects_job_delays()
     {
         $queue = Mockery::mock(QueueManager::class);
-        $failover = new FailoverQueue($queue, Mockery::mock(Dispatcher::class), ['sync']);
+        $failover = new FailoverQueue($queue, new Dispatcher, ['sync']);
 
         $sync = Mockery::mock(Queue::class);
         $queue->expects('connection')->times(3)->with('sync')->andReturn($sync);

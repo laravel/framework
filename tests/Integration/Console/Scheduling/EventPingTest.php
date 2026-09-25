@@ -11,16 +11,39 @@ use Illuminate\Console\Scheduling\Event;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
-use Mockery;
 use Orchestra\Testbench\TestCase;
+use Throwable;
 
 class EventPingTest extends TestCase
 {
     public function testPingRescuesTransferExceptions()
     {
-        $this->spy(ExceptionHandler::class)
-            ->expects('report')
-            ->with(Mockery::type(ServerException::class));
+        $handler = new class implements ExceptionHandler
+        {
+            public array $reported = [];
+
+            public function report(Throwable $e)
+            {
+                $this->reported[] = $e;
+            }
+
+            public function shouldReport(Throwable $e)
+            {
+                return true;
+            }
+
+            public function render($request, Throwable $e)
+            {
+                //
+            }
+
+            public function renderForConsole($output, Throwable $e)
+            {
+                //
+            }
+        };
+
+        $this->swap(ExceptionHandler::class, $handler);
 
         $httpMock = new HttpClient([
             'handler' => HandlerStack::create(
@@ -43,5 +66,7 @@ class EventPingTest extends TestCase
         $event->callAfterCallbacks($this->app->make(Container::class));
 
         $this->assertTrue($thenCalled);
+        $this->assertCount(1, $handler->reported);
+        $this->assertInstanceOf(ServerException::class, $handler->reported[0]);
     }
 }
