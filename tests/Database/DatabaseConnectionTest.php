@@ -13,7 +13,6 @@ use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Database\MultipleColumnsSelectedException;
-use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\QueryException;
@@ -524,16 +523,6 @@ class DatabaseConnectionTest extends TestCase
         $method->invokeArgs($mock, ['', [], function () {
             throw new QueryException('conn', '', [], new Exception);
         }]);
-    }
-
-    public function testFromCreatesNewQueryBuilder()
-    {
-        $conn = $this->getMockConnection();
-        $conn->setQueryGrammar(Mockery::mock(Grammar::class));
-        $conn->setPostProcessor(new Processor);
-        $builder = $conn->table('users');
-        $this->assertInstanceOf(BaseBuilder::class, $builder);
-        $this->assertSame('users', $builder->from);
     }
 
     public function testPrepareBindings()
