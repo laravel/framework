@@ -11,7 +11,7 @@ jobs:
   mysql_innovation:
     if: github.repository == 'laravel/framework'
 
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
 
     services:
@@ -45,7 +45,7 @@ jobs:
   mariadb:
     if: github.repository == 'laravel/framework'
 
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     continue-on-error: true
     timeout-minutes: 10
 
