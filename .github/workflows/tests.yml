@@ -91,7 +91,7 @@ jobs:
   windows_tests:
     if: github.event_name != 'schedule' || github.repository == 'laravel/framework'
 
-    runs-on: windows-2022
+    runs-on: windows-2025
     timeout-minutes: 10
 
     strategy:
