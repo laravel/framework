@@ -267,6 +267,15 @@ class QueuePauseResumeTest extends TestCase
         $this->manager->pauseFor(PauseQueueConnection::Redis, PauseQueueName::Emails, 30);
         $this->assertTrue($this->manager->isPaused('redis', 'emails'));
     }
+
+    public function testEnumsAreAcceptedWhenCheckingIfAQueueIsPaused()
+    {
+        $this->assertFalse($this->manager->isPaused(PauseQueueConnection::Redis, PauseQueueName::Emails));
+
+        $this->manager->pause('redis', 'emails');
+
+        $this->assertTrue($this->manager->isPaused(PauseQueueConnection::Redis, PauseQueueName::Emails));
+    }
 }
 
 enum PauseQueueConnection: string
