@@ -35,6 +35,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 use function Illuminate\Filesystem\join_paths;
+use function Illuminate\Support\enum_value;
 
 class Application extends Container implements ApplicationContract, CachesConfiguration, CachesRoutes, HttpKernelInterface
 {
@@ -750,7 +751,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get or check the current application environment.
      *
-     * @param  string|array  ...$environments
+     * @param  \UnitEnum|string|array  ...$environments
      * @return string|bool
      */
     public function environment(...$environments)
@@ -758,7 +759,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         if ($environments !== []) {
             $patterns = is_array($environments[0]) ? $environments[0] : $environments;
 
-            return Str::is($patterns, $this['env']);
+            return Str::is(array_map(enum_value(...), $patterns), $this['env']);
         }
 
         return $this['env'];
