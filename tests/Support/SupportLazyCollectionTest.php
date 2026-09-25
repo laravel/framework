@@ -73,6 +73,19 @@ class SupportLazyCollectionTest extends TestCase
         ], $data->all());
     }
 
+    public function testGetUsesArraySemanticsForNumericStringGeneratorKeys()
+    {
+        $data = LazyCollection::make(function () {
+            yield '1' => 'value';
+            yield '0' => 'zero';
+            yield '-1' => 'negative';
+        });
+
+        $this->assertSame('value', $data->get(1));
+        $this->assertSame('zero', $data->get(0));
+        $this->assertSame('negative', $data->get(-1));
+    }
+
     public function testCanCreateCollectionFromNonGeneratorFunction()
     {
         $data = LazyCollection::make(function () {

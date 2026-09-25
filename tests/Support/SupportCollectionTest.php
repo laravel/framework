@@ -6057,6 +6057,17 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testGetUsesArrayKeySemantics($collection)
+    {
+        $data = new $collection(['01' => 'leading-zero', 1 => 'integer']);
+
+        $this->assertSame('integer', $data->get(1));
+        $this->assertSame('integer', $data->get('1'));
+        $this->assertSame('leading-zero', $data->get('01'));
+        $this->assertSame('missing', $data->get('001', 'missing'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testWhereNull($collection)
     {
         $data = new $collection([
