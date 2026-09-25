@@ -36,7 +36,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Foundation\Application loadEnvironmentFrom(string $file)
  * @method static string environmentFile()
  * @method static string environmentFilePath()
- * @method static string|bool environment(string|array ...$environments)
+ * @method static string|bool environment(\UnitEnum|string|array ...$environments)
  * @method static bool isLocal()
  * @method static bool isProduction()
  * @method static string detectEnvironment(\Closure $callback)

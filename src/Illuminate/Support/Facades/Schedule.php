@@ -25,7 +25,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes withoutOverlapping(int $expiresAt = 1440, bool $releaseOnTerminationSignals = true)
  * @method static void mergeAttributes(\Illuminate\Console\Scheduling\Event $event)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes user(string $user)
- * @method static \Illuminate\Console\Scheduling\PendingEventAttributes environments(mixed $environments)
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes environments(\UnitEnum|string|array $environments)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes evenInMaintenanceMode()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes evenWhenPaused()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes onOneServer()
