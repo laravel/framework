@@ -1200,6 +1200,24 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $query->getBindings());
     }
 
+    public function testWhereNotWithArrayConditions()
+    {
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->whereNot(['foo' => 1, 'bar' => 2]);
+        $this->assertSame('select * from "table" where not (("foo" = ? and "bar" = ?))', $query->toSql());
+        $this->assertEquals([1, 2], $query->getBindings());
+
+        $query = $model->newQuery()->whereNot([['foo', 1], ['bar', '<', 2]]);
+        $this->assertSame('select * from "table" where not (("foo" = ? and "bar" < ?))', $query->toSql());
+        $this->assertEquals([1, 2], $query->getBindings());
+
+        $query = $model->newQuery()->where('baz', 3)->orWhereNot(['foo' => 1, 'bar' => 2]);
+        $this->assertSame('select * from "table" where "baz" = ? or not (("foo" = ? or "bar" = ?))', $query->toSql());
+        $this->assertEquals([3, 1, 2], $query->getBindings());
+    }
+
     public function testOrWhereNot()
     {
         $nestedQuery = Mockery::mock(Builder::class);
