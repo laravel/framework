@@ -185,7 +185,7 @@ class QueueTest extends TestCase
             $this->assertSame(124, Worker::$timedOutExitCode);
 
             if (($pid = pcntl_fork()) === 0) {
-                $this->app['queue.worker']->kill(Worker::$timedOutExitCode, reason: WorkerStopReason::TimedOut);
+                $this->app['queue.worker']->kill('cloud', 'default', Worker::$timedOutExitCode, reason: WorkerStopReason::TimedOut);
             }
 
             pcntl_waitpid($pid, $status);

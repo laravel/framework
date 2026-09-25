@@ -524,7 +524,7 @@ class QueueWorkerTest extends TestCase
         $this->expectExceptionMessage('Killed with status [124].');
 
         try {
-            $this->getWorker('default', ['queue' => []])->kill(124, new WorkerOptions, WorkerStopReason::TimedOut);
+            $this->getWorker('default', ['queue' => []])->kill('default', 'default', 124, new WorkerOptions, WorkerStopReason::TimedOut);
         } finally {
             Worker::killUsing(null);
 
@@ -787,9 +787,9 @@ class InsomniacWorker extends Worker
         parent::notifyJobOfSignal($signal);
     }
 
-    public function stop($status = 0, $options = null, $reason = null, $connectionName = null, $queue = null)
+    public function stop($connectionName, $queue, $status = 0, $options = null, $reason = null)
     {
-        return parent::stop($status, $options, $reason, $connectionName, $queue);
+        return parent::stop($connectionName, $queue, $status, $options, $reason);
     }
 
     public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
