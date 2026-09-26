@@ -17,15 +17,14 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testPropertiesAreSetCorrectly()
     {
         $parent = Mockery::mock(Model::class.'[getConnectionName]');
-        $parent->expects('getConnectionName')->times(2)->andReturn('connection');
+        $parent->expects('getConnectionName')->times(1)->andReturn('connection');
         $resolver = Mockery::mock(ConnectionResolverInterface::class);
         $parent->setConnectionResolver($resolver);
         $connection = Mockery::mock(Connection::class);
-        $resolver->expects('connection')->times(2)->andReturn($connection);
-        $grammar = Mockery::mock(Grammar::class);
-        $connection->expects('getQueryGrammar')->times(2)->andReturn($grammar);
+        $resolver->expects('connection')->times(1)->andReturn($connection);
+        $grammar = new Grammar($connection);
+        $connection->expects('getQueryGrammar')->times(1)->andReturn($grammar);
         $processor = new Processor;
-        $parent->getConnection()->getQueryGrammar()->expects('getDateFormat')->andReturn('Y-m-d H:i:s');
         $parent->setDateFormat('Y-m-d H:i:s');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
 

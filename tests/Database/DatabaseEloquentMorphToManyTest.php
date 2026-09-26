@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -125,9 +126,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $builder->expects('where')->with('taggables.taggable_id', '=', 1);
         $builder->expects('where')->with('taggables.taggable_type', get_class($parent));
 
-        $grammar = Mockery::mock(Grammar::class);
-        $grammar->shouldReceive('isExpression')->with(Mockery::type(Expression::class))->andReturnTrue();
-        $grammar->shouldReceive('isExpression')->with(Mockery::type('string'))->andReturnFalse();
+        $grammar = new Grammar(Mockery::mock(Connection::class));
         $builder->shouldReceive('getQuery')->andReturn(
             Mockery::mock(QueryBuilder::class, ['getGrammar' => $grammar])
         );
