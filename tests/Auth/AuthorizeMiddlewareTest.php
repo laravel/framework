@@ -16,7 +16,6 @@ use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContrac
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Router;
 use Illuminate\Tests\Auth\Fixtures\AbilitiesEnum;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -319,7 +318,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testModelInstanceAsParameter()
     {
-        $instance = Mockery::mock(Model::class);
+        $instance = new class extends Model {};
 
         $this->gate()->define('success', function ($user, $model) use ($instance) {
             $this->assertSame($model, $instance);

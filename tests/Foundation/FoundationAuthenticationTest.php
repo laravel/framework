@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\GenericUser;
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -48,37 +49,89 @@ class FoundationAuthenticationTest extends TestCase
         return $guard;
     }
 
+    /**
+     * @return \Illuminate\Contracts\Auth\Guard
+     */
+    protected function realGuard(?Authenticatable $user = null)
+    {
+        $guard = new class($user) implements Guard
+        {
+            public function __construct(protected ?Authenticatable $user)
+            {
+            }
+
+            public function check()
+            {
+                return ! is_null($this->user);
+            }
+
+            public function guest()
+            {
+                return is_null($this->user);
+            }
+
+            public function user()
+            {
+                return $this->user;
+            }
+
+            public function id()
+            {
+                return $this->user?->getAuthIdentifier();
+            }
+
+            public function validate(array $credentials = [])
+            {
+                return false;
+            }
+
+            public function hasUser()
+            {
+                return ! is_null($this->user);
+            }
+
+            public function setUser(Authenticatable $user)
+            {
+                $this->user = $user;
+
+                return $this;
+            }
+        };
+
+        $this->app = new Application;
+        $this->app['config'] = new ConfigRepository([
+            'auth' => [
+                'defaults' => ['guard' => 'web'],
+                'guards' => ['web' => ['driver' => 'test']],
+            ],
+        ]);
+
+        $auth = new AuthManager($this->app);
+        $auth->extend('test', fn () => $guard);
+        $this->app->instance('auth', $auth);
+
+        return $guard;
+    }
+
     public function testAssertAuthenticated()
     {
-        $this->mockGuard()
-            ->expects('check')
-            ->andReturn(true);
+        $this->realGuard(new GenericUser(['id' => 1]));
 
         $this->assertAuthenticated();
     }
 
     public function testAssertGuest()
     {
-        $this->mockGuard()
-            ->expects('check')
-            ->andReturn(false);
+        $this->realGuard();
 
         $this->assertGuest();
     }
 
     public function testAssertAuthenticatedAs()
     {
-        $expected = Mockery::mock(Authenticatable::class);
-        $expected->expects('getAuthIdentifier')
-            ->andReturn('1');
+        $this->realGuard(new GenericUser(['id' => 1]));
 
-        $this->mockGuard()
-            ->expects('user')
-            ->andReturn($expected);
-
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getAuthIdentifier')
-            ->andReturn('1');
+        $user = new GenericUser(['id' => 1]);
 
         $this->assertAuthenticatedAs($user);
     }
