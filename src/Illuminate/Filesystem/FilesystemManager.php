@@ -2,6 +2,7 @@
 
 namespace Illuminate\Filesystem;
 
+use Aws\Credentials\CredentialProvider;
 use Aws\S3\S3Client;
 use Closure;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
@@ -315,12 +316,32 @@ class FilesystemManager implements FactoryContract
      *
      * @param  array  $config
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function formatS3Config(array $config)
     {
         $config += ['version' => 'latest'];
 
-        if (! empty($config['key']) && ! empty($config['secret'])) {
+        $credentials = $config['credentials'] ?? null;
+
+        $provider = is_array($credentials) ? ($credentials['provider'] ?? null) : $credentials;
+
+        if (is_string($provider)) {
+            $options = is_array($credentials) ? Arr::except($credentials, ['provider']) : [];
+
+            $provider = CredentialProvider::memoize(match ($provider) {
+                'ecs' => CredentialProvider::ecsCredentials($options),
+                'instance' => CredentialProvider::instanceProfile($options),
+                default => throw new InvalidArgumentException(
+                    "Invalid credential provider [{$provider}]."
+                ),
+            });
+        }
+
+        if ($provider) {
+            $config['credentials'] = $provider;
+        } elseif (! empty($config['key']) && ! empty($config['secret'])) {
             $config['credentials'] = Arr::only($config, ['key', 'secret']);
 
             if (! empty($config['token'])) {
