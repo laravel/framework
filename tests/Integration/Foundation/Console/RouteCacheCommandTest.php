@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Generators\TestCase;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 
@@ -31,6 +34,13 @@ class RouteCacheCommandTest extends TestCase
         $this->assertSame($this->app, Container::getInstance());
     }
 
+    public function testItRestoresTheEloquentConnectionResolverAfterBootingAFreshApplication(): void
+    {
+        $this->artisan('route:cache')->assertSuccessful();
+
+        $this->assertSame($this->app['db'], Model::getConnectionResolver());
+    }
+
     public function testItLeavesTheFacadeRootsPointingAtTheCurrentApplication(): void
     {
         $this->artisan('route:cache')->assertSuccessful();
@@ -49,6 +59,24 @@ class RouteCacheCommandTest extends TestCase
         $this->assertNotNull($route, 'The registered route is no longer reachable through the route facade.');
         $this->assertInstanceOf(RouteCacheCommandTestController::class, $route->getController());
     }
+
+    public function testEloquentUsesTheCurrentApplicationDatabaseAfterBootingAFreshApplication(): void
+    {
+        Schema::create('route_cache_test_models', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+        });
+
+        $this->artisan('route:cache')->assertSuccessful();
+
+        RouteCacheCommandTestModel::create([
+            'name' => 'Laravel',
+        ]);
+
+        $this->assertDatabaseHas('route_cache_test_models', [
+            'name' => 'Laravel',
+        ]);
+    }
 }
 
 class RouteCacheCommandTestController extends Controller
@@ -57,4 +85,13 @@ class RouteCacheCommandTestController extends Controller
     {
         return 'ok';
     }
+}
+
+class RouteCacheCommandTestModel extends Model
+{
+    public $timestamps = false;
+
+    protected $table = 'route_cache_test_models';
+
+    protected $guarded = [];
 }

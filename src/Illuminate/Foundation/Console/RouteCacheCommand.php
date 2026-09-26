@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Facades\Facade;
@@ -99,6 +100,7 @@ class RouteCacheCommand extends Command
 
             Facade::setFacadeApplication($this->laravel);
             Container::setInstance($this->laravel);
+            Model::setConnectionResolver($this->laravel['db']);
         });
     }
 
