@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -64,7 +65,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $related->shouldReceive('qualifyColumn');
         $builder->shouldReceive('join', 'where');
         $builder->shouldReceive('getQuery')->andReturn(
-            Mockery::mock(QueryBuilder::class, ['getGrammar' => Mockery::mock(Grammar::class, ['isExpression' => false])])
+            Mockery::mock(QueryBuilder::class, ['getGrammar' => new Grammar(Mockery::mock(Connection::class))])
         );
 
         return new BelongsToMany(

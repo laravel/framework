@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
+use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
 use Mockery;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
@@ -19,7 +20,7 @@ class EventTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testBuildCommandUsingUnix()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $this->assertSame("php -i > '/dev/null' 2>&1", $event->buildCommand());
     }
@@ -27,7 +28,7 @@ class EventTest extends TestCase
     #[RequiresOperatingSystem('Windows')]
     public function testBuildCommandUsingWindows()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $this->assertSame('php -i > "NUL" 2>&1', $event->buildCommand());
     }
@@ -35,7 +36,7 @@ class EventTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testBuildCommandInBackgroundUsingUnix()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
         $event->runInBackground();
 
         $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
@@ -46,7 +47,7 @@ class EventTest extends TestCase
     #[RequiresOperatingSystem('Windows')]
     public function testBuildCommandInBackgroundUsingWindows()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
         $event->runInBackground();
 
         $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
@@ -57,7 +58,7 @@ class EventTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testBuildCommandWithUserUsingUnix()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
         $event->user('forge');
 
         $this->assertSame("sudo -u forge -- sh -c 'php -i > '\''/dev/null'\'' 2>&1'", $event->buildCommand());
@@ -66,7 +67,7 @@ class EventTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testBuildCommandWithUserAndSpacesInOutputPathUsingUnix()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
         $event->user('forge')->sendOutputTo('/my folder/foo.log');
 
         $this->assertSame("sudo -u forge -- sh -c 'php -i > '\''/my folder/foo.log'\'' 2>&1'", $event->buildCommand());
@@ -75,7 +76,7 @@ class EventTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testBuildCommandWithUserAndSingleQuotesInOutputPathUsingUnix()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
         $event->user('forge')->sendOutputTo("/tmp/o'brien.log");
 
         $this->assertSame("sudo -u forge -- sh -c 'php -i > '\''/tmp/o'\''\'\'''\''brien.log'\'' 2>&1'", $event->buildCommand());
@@ -84,7 +85,7 @@ class EventTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testBuildCommandInBackgroundWithUserUsingUnix()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
         $event->user('forge')->runInBackground();
 
         $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
@@ -98,12 +99,12 @@ class EventTest extends TestCase
     {
         $quote = (DIRECTORY_SEPARATOR === '\\') ? '"' : "'";
 
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $event->sendOutputTo('/dev/null');
         $this->assertSame("php -i > {$quote}/dev/null{$quote} 2>&1", $event->buildCommand());
 
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $event->sendOutputTo('/my folder/foo.log');
         $this->assertSame("php -i > {$quote}/my folder/foo.log{$quote} 2>&1", $event->buildCommand());
@@ -113,7 +114,7 @@ class EventTest extends TestCase
     {
         $quote = (DIRECTORY_SEPARATOR === '\\') ? '"' : "'";
 
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $event->appendOutputTo('/dev/null');
         $this->assertSame("php -i >> {$quote}/dev/null{$quote} 2>&1", $event->buildCommand());
@@ -121,7 +122,7 @@ class EventTest extends TestCase
 
     public function testNextRunDate()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
         $event->dailyAt('10:15');
 
         $this->assertSame('10:15:00', $event->nextRunDate()->toTimeString());
@@ -129,7 +130,7 @@ class EventTest extends TestCase
 
     public function testCustomMutexName()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
         $event->description('Fancy command description');
 
         $this->assertSame('framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822', $event->mutexName());
@@ -146,7 +147,7 @@ class EventTest extends TestCase
         $container = new Container;
         $beforeEvent = null;
         $afterEvent = null;
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $event->before(function (Event $event) use (&$beforeEvent) {
             $beforeEvent = $event;
@@ -168,7 +169,7 @@ class EventTest extends TestCase
         $container = new Container;
         $filterEvent = null;
         $rejectEvent = null;
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $event->when(function (Event $event) use (&$filterEvent) {
             $filterEvent = $event;
@@ -192,7 +193,7 @@ class EventTest extends TestCase
         $container = new Container;
         $beforeEvent = null;
         $filterEvent = null;
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $event->before(function (Event $scheduledEvent) use (&$beforeEvent) {
             $beforeEvent = $scheduledEvent;
@@ -215,7 +216,7 @@ class EventTest extends TestCase
     {
         $container = new Container;
         $stringValue = null;
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $container->instance(Stringable::class, Str::of('injected-string'));
 
@@ -253,7 +254,7 @@ class EventTest extends TestCase
                 return false;
             }
         };
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $event->when($filter);
         $event->skip($reject);
@@ -326,26 +327,26 @@ class EventTest extends TestCase
 
     public function testDaysOfMonthMethod()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $event->daysOfMonth(1, 15);
         $this->assertSame('0 0 1,15 * *', $event->getExpression());
 
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
         $event->daysOfMonth([1, 10, 20, 30]);
         $this->assertSame('0 0 1,10,20,30 * *', $event->getExpression());
     }
 
     public function testEventDoesNotRunWhenPausedByDefault()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
 
         $this->assertFalse($event->runsWhenPaused());
     }
 
     public function testEventRunsWhenMarkedAsEvenWhenPaused()
     {
-        $event = new Event(Mockery::mock(EventMutex::class), 'php -i');
+        $event = new Event(new FakeEventMutex, 'php -i');
         $event->evenWhenPaused();
 
         $this->assertTrue($event->runsWhenPaused());

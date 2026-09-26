@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Routing;
 use BadMethodCallException;
 use FooController;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\CallableDispatcher;
 use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
@@ -16,7 +16,6 @@ use Illuminate\Tests\Routing\Fixtures\IntegerEnum;
 use Illuminate\Tests\Routing\Fixtures\RouteDomainEnum;
 use Illuminate\Tests\Routing\Fixtures\RouteNameEnum;
 use InvalidArgumentException;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use Stringable;
 
@@ -34,7 +33,7 @@ class RouteRegistrarTest extends TestCase
         $container = new Container;
         $container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
 
-        $this->router = new Router(Mockery::mock(Dispatcher::class), $container);
+        $this->router = new Router(new Dispatcher, $container);
     }
 
     public function testMiddlewareFluentRegistration()

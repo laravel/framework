@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Queue;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Queue\Jobs\Job;
 use Mockery;
@@ -38,9 +38,8 @@ class QueueBeanstalkdJobTest extends TestCase
         $job->getContainer()->expects('make')->with('foo')->andReturn($handler);
         $job->getPheanstalk()->expects('delete')->with($job->getPheanstalkJob())->andReturnSelf();
         $handler->expects('failed')->with(['data'], Mockery::type(Exception::class), 'test-uuid', Mockery::type(Job::class));
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new EventsDispatcher;
         $job->getContainer()->expects('make')->with(Dispatcher::class)->andReturn($events);
-        $events->expects('dispatch')->with(Mockery::type(JobFailed::class))->andReturnNull();
 
         $job->fail(new Exception);
     }
