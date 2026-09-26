@@ -34,7 +34,7 @@ class MemcachedLock extends Lock
     public function acquire()
     {
         return $this->memcached->add(
-            $this->name, $this->owner, $this->seconds
+            $this->name, $this->owner, $this->calculateExpiration($this->seconds)
         );
     }
 
@@ -54,7 +54,7 @@ class MemcachedLock extends Lock
             return false;
         }
 
-        return $this->memcached->cas($value['cas'], $this->name, $this->owner, $seconds);
+        return $this->memcached->cas($value['cas'], $this->name, $this->owner, $this->calculateExpiration($seconds));
     }
 
     /**
@@ -89,5 +89,18 @@ class MemcachedLock extends Lock
     protected function getCurrentOwner()
     {
         return $this->memcached->get($this->name);
+    }
+
+    /**
+     * Get the Memcached expiration value for the given number of seconds.
+     *
+     * Memcached treats expirations over 30 days as UNIX timestamps, so long durations are converted to timestamps.
+     *
+     * @param  int  $seconds
+     * @return int
+     */
+    protected function calculateExpiration($seconds)
+    {
+        return $seconds > 60 * 60 * 24 * 10 ? $this->availableAt($seconds) : $seconds;
     }
 }
