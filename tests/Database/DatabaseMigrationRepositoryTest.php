@@ -112,7 +112,8 @@ class DatabaseMigrationRepositoryTest extends TestCase
     protected function resolver($connection = null)
     {
         $resolver = new ConnectionResolver;
-        $resolver->addConnection(null, $connection ?: Mockery::mock(Connection::class));
+        $resolver->addConnection('default', $connection ?: Mockery::mock(Connection::class));
+        $resolver->setDefaultConnection('default');
 
         return $resolver;
     }
