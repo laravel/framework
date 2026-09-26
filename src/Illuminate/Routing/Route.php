@@ -17,6 +17,7 @@ use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Illuminate\Routing\Matching\UriValidator;
+use Illuminate\Routing\Middleware\CacheStaticResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -1095,6 +1096,35 @@ class Route
         );
 
         return $this;
+    }
+
+    /**
+     * Specify that the route's response should be safe to cache by shared caches.
+     *
+     * @param  int|null  $ttl
+     * @param  int|null  $browserTtl
+     * @param  array|null  $stripCookies
+     * @param  array|null  $stripMiddleware
+     * @param  array|null  $vary
+     * @return $this
+     *
+     * @named-arguments-supported
+     */
+    public function static(?int $ttl = null, ?int $browserTtl = null, ?array $stripCookies = null, ?array $stripMiddleware = null, ?array $vary = null): static
+    {
+        $options = array_filter([
+            'ttl' => $ttl,
+            'browser_ttl' => $browserTtl,
+            'strip_cookies' => $stripCookies,
+            'strip_middleware' => $stripMiddleware,
+            'vary' => $vary,
+        ], fn ($value) => ! is_null($value));
+
+        $this->action['static_cache'] = array_merge(
+            (array) ($this->action['static_cache'] ?? []), $options
+        );
+
+        return $this->middleware(CacheStaticResponse::class);
     }
 
     /**
