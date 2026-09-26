@@ -34,7 +34,7 @@ class MemcachedLock extends Lock
     public function acquire()
     {
         return $this->memcached->add(
-            $this->name, $this->owner, $this->seconds
+            $this->name, $this->owner, $this->toTimestamp($this->seconds)
         );
     }
 
@@ -54,7 +54,7 @@ class MemcachedLock extends Lock
             return false;
         }
 
-        return $this->memcached->cas($value['cas'], $this->name, $this->owner, $seconds);
+        return $this->memcached->cas($value['cas'], $this->name, $this->owner, $this->toTimestamp($seconds));
     }
 
     /**
@@ -79,6 +79,17 @@ class MemcachedLock extends Lock
     public function forceRelease()
     {
         $this->memcached->delete($this->name);
+    }
+
+    /**
+     * Get the UNIX timestamp for the given number of seconds.
+     *
+     * @param  int  $seconds
+     * @return int
+     */
+    protected function toTimestamp($seconds)
+    {
+        return $seconds > 0 ? $this->availableAt($seconds) : 0;
     }
 
     /**
