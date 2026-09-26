@@ -7,7 +7,6 @@ use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Tests\Events\Fixtures\ExampleEvent;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class EventsDispatcherTest extends TestCase
@@ -712,27 +711,27 @@ class EventsDispatcherTest extends TestCase
     public function testEventDispatchesUsingNamedArguments()
     {
         $container = new Container;
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new Dispatcher;
         $container->instance('events', $events);
 
         $originalContainer = Container::getInstance();
         Container::setInstance($container);
 
         try {
-            $events->expects('dispatch')
-                ->with(Mockery::on(function ($event) {
-                    $this->assertInstanceOf(DispatchableNamedArgumentsEvent::class, $event);
-                    $this->assertSame('first-value', $event->first);
-                    $this->assertSame('second-value', $event->second);
+            $captured = null;
+            $events->listen(DispatchableNamedArgumentsEvent::class, function ($event) use (&$captured) {
+                $captured = $event;
 
-                    return true;
-                }))
-                ->andReturn(['dispatched']);
+                return 'dispatched';
+            });
 
             $this->assertSame(
                 ['dispatched'],
                 DispatchableNamedArgumentsEvent::dispatch(second: 'second-value', first: 'first-value')
             );
+            $this->assertInstanceOf(DispatchableNamedArgumentsEvent::class, $captured);
+            $this->assertSame('first-value', $captured->first);
+            $this->assertSame('second-value', $captured->second);
         } finally {
             Container::setInstance($originalContainer);
         }

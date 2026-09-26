@@ -9,8 +9,8 @@ use Illuminate\Cache\Repository as CacheRepositoryImplementation;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -65,9 +65,9 @@ class FoundationHelpersTest extends TestCase
     public function testEvents()
     {
         $app = new Application;
-        $app['events'] = $dispatcher = Mockery::mock(Dispatcher::class);
+        $app['events'] = $dispatcher = new Dispatcher;
 
-        $dispatcher->expects('dispatch')->with('a', 'b', 'c')->andReturn('foo');
+        $dispatcher->listen('a', fn ($payload) => $payload === 'b' ? 'foo' : null);
         $this->assertSame('foo', event('a', 'b', 'c'));
     }
 
