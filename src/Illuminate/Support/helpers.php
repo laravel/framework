@@ -336,9 +336,13 @@ if (! function_exists('retry')) {
             if ($sleepMilliseconds) {
                 $duration = value($sleepMilliseconds, $attempts, $e);
 
-                $duration instanceof CarbonInterval
-                    ? Sleep::usleep($duration->totalMicroseconds)
-                    : Sleep::usleep($duration * 1000);
+                $microseconds = $duration instanceof CarbonInterval
+                    ? $duration->totalMicroseconds
+                    : $duration * 1000;
+
+                if ($microseconds > 0) {
+                    Sleep::usleep($microseconds);
+                }
             }
 
             goto beginning;

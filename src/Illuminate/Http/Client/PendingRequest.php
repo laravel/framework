@@ -21,6 +21,7 @@ use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Client\Promises\FluentPromise;
 use Illuminate\Http\Client\Promises\LazyPromise;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
@@ -1072,7 +1073,7 @@ class PendingRequest
 
         $shouldRetry = null;
 
-        return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
+        return retry($this->getMaximumAttempts(), function ($attempt) use ($method, $url, $options, &$shouldRetry) {
             try {
                 return tap($this->newResponse($this->sendRequest($method, $url, $options)), function (&$response) use ($attempt, &$shouldRetry) {
                     $this->populateResponse($response);
@@ -1119,7 +1120,7 @@ class PendingRequest
 
                 throw $e;
             }
-        }, $this->retryDelay ?? 100, function ($exception) use (&$shouldRetry) {
+        }, fn ($attempt, $exception) => $this->retryDelayInMilliseconds($attempt, $exception), function ($exception) use (&$shouldRetry) {
             $result = $shouldRetry !== null ? $shouldRetry : ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this, $this->request?->toPsrRequest()->getMethod()) : true);
 
             $shouldRetry = null;
@@ -1324,9 +1325,41 @@ class PendingRequest
      */
     protected function retryDelayInMilliseconds($attempt, $exception)
     {
+        if (! $this->retryDelay instanceof Closure &&
+            ! is_null($retryAfter = $this->retryAfterInMilliseconds($exception))) {
+            return $retryAfter;
+        }
+
         return is_array($this->tries)
             ? $this->tries[$attempt - 1] ?? 0
             : value($this->retryDelay ?? 100, $attempt, $exception);
+    }
+
+    /**
+     * Get the delay in milliseconds requested by the response's "Retry-After" header.
+     *
+     * @param  mixed  $exception
+     * @return int|null
+     */
+    protected function retryAfterInMilliseconds($exception)
+    {
+        $response = $exception->response ?? null;
+
+        if (! $response instanceof Response) {
+            return null;
+        }
+
+        $retryAfter = trim($response->header('Retry-After'));
+
+        if (ctype_digit($retryAfter)) {
+            return (int) $retryAfter * 1000;
+        }
+
+        if ($retryAfter !== '' && ($timestamp = strtotime($retryAfter)) !== false) {
+            return max(0, $timestamp - Carbon::now()->getTimestamp()) * 1000;
+        }
+
+        return null;
     }
 
     /**

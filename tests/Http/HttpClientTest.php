@@ -3103,6 +3103,121 @@ class HttpClientTest extends TestCase
         ]);
     }
 
+    public function testRetryWaitsForRetryAfterHeaderInSeconds()
+    {
+        Sleep::fake();
+
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 429, ['Retry-After' => '5'])
+                ->push(['error'], 503, ['Retry-After' => '0'])
+                ->push(['ok'], 200),
+        ]);
+
+        $this->factory->retry(3, 100)->get('http://foo.com/get');
+
+        $this->factory->assertSentCount(3);
+
+        Sleep::assertSequence([
+            Sleep::usleep(5_000_000),
+        ]);
+    }
+
+    public function testRetryWaitsForRetryAfterHeaderAsHttpDate()
+    {
+        Sleep::fake();
+        Carbon::setTestNow(Carbon::parse('2026-09-26 12:00:00', 'UTC'));
+
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 503, ['Retry-After' => 'Sat, 26 Sep 2026 12:00:07 GMT'])
+                ->push(['error'], 503, ['Retry-After' => 'Sat, 26 Sep 2026 11:59:00 GMT'])
+                ->push(['ok'], 200),
+        ]);
+
+        $this->factory->retry([100, 200], 0)->get('http://foo.com/get');
+
+        $this->factory->assertSentCount(3);
+
+        Sleep::assertSequence([
+            Sleep::usleep(7_000_000),
+        ]);
+
+        Carbon::setTestNow();
+    }
+
+    public function testRetryUsesConfiguredDelayWhenRetryAfterHeaderIsMissingOrInvalid()
+    {
+        Sleep::fake();
+
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 500)
+                ->push(['error'], 429, ['Retry-After' => 'soon'])
+                ->push(['ok'], 200),
+        ]);
+
+        $this->factory->retry(3, 100)->get('http://foo.com/get');
+
+        Sleep::assertSequence([
+            Sleep::usleep(100_000),
+            Sleep::usleep(100_000),
+        ]);
+    }
+
+    public function testRetryWithoutDelayDoesNotSleep()
+    {
+        Sleep::fake();
+
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 500)
+                ->push(['error'], 500)
+                ->push(['ok'], 200),
+        ]);
+
+        $this->factory->retry(3)->get('http://foo.com/get');
+
+        $this->factory->assertSentCount(3);
+
+        Sleep::assertNeverSlept();
+    }
+
+    public function testRetryDelayClosureTakesPrecedenceOverRetryAfterHeader()
+    {
+        Sleep::fake();
+
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 429, ['Retry-After' => '3600'])
+                ->push(['ok'], 200),
+        ]);
+
+        $this->factory->retry(2, fn ($attempt, $exception) => min((int) $exception->response->header('Retry-After'), 2) * 1000)->get('http://foo.com/get');
+
+        Sleep::assertSequence([
+            Sleep::usleep(2_000_000),
+        ]);
+    }
+
+    public function testAsyncRetryWaitsForRetryAfterHeader()
+    {
+        $delays = [];
+
+        $this->factory->fake(function ($request, $options) use (&$delays) {
+            $delays[] = $options['delay'] ?? null;
+
+            return count($delays) === 1
+                ? $this->factory->response(['error'], 429, ['Retry-After' => '2'])
+                : $this->factory->response(['ok'], 200);
+        });
+
+        $response = $this->factory->retry(2, 100)->async()->get('http://foo.com/get')->wait();
+
+        $this->assertSame(200, $response->status());
+        $this->assertSame(2000, $delays[1]);
+    }
+
     public function testFailedRequest()
     {
         $requestException = $this->factory::failedRequest(['code' => 'not_found'], 404, ['X-RateLimit-Remaining' => 199]);
