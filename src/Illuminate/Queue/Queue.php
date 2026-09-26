@@ -14,6 +14,7 @@ use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\CountCrashesAsExceptions;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
@@ -180,6 +181,7 @@ abstract class Queue
             'maxTries' => $this->getJobTries($job),
             'maxExceptions' => $this->getAttributeValue($job, MaxExceptions::class, 'maxExceptions'),
             'failOnTimeout' => $this->getAttributeValue($job, FailOnTimeout::class, 'failOnTimeout') ?? false,
+            'countCrashesAsExceptions' => $this->getAttributeValue($job, CountCrashesAsExceptions::class, 'countCrashesAsExceptions') ?? false,
             'backoff' => $this->getJobBackoff($job),
             'timeout' => $this->getAttributeValue($job, Timeout::class, 'timeout'),
             'retryUntil' => $this->getJobExpiration($job),
