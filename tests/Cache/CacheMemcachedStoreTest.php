@@ -109,6 +109,14 @@ class CacheMemcachedStoreTest extends TestCase
         $this->assertTrue($store->lock('foo', 60 * 60 * 24 * 31, 'owner')->acquire());
     }
 
+    public function testLockAcquireWithShortDurationProperlyCallsMemcache()
+    {
+        $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['add'])->getMock();
+        $memcache->expects($this->once())->method('add')->with('foo', 'owner', 10)->willReturn(true);
+        $store = new MemcachedStore($memcache);
+        $this->assertTrue($store->lock('foo', 10, 'owner')->acquire());
+    }
+
     public function testLockAcquireWithoutExpirationProperlyCallsMemcache()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['add'])->getMock();
@@ -122,7 +130,16 @@ class CacheMemcachedStoreTest extends TestCase
         Carbon::setTestNow($now = Carbon::now());
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'cas'])->getMock();
         $memcache->expects($this->once())->method('get')->with('foo', null, Memcached::GET_EXTENDED)->willReturn(['value' => 'owner', 'cas' => 7]);
-        $memcache->expects($this->once())->method('cas')->with(7, 'foo', 'owner', $now->copy()->addMinute()->getTimestamp())->willReturn(true);
+        $memcache->expects($this->once())->method('cas')->with(7, 'foo', 'owner', $now->copy()->addDays(31)->getTimestamp())->willReturn(true);
+        $store = new MemcachedStore($memcache);
+        $this->assertTrue($store->lock('foo', 10, 'owner')->refresh(60 * 60 * 24 * 31));
+    }
+
+    public function testLockRefreshWithShortDurationProperlyCallsMemcache()
+    {
+        $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'cas'])->getMock();
+        $memcache->expects($this->once())->method('get')->with('foo', null, Memcached::GET_EXTENDED)->willReturn(['value' => 'owner', 'cas' => 7]);
+        $memcache->expects($this->once())->method('cas')->with(7, 'foo', 'owner', 60)->willReturn(true);
         $store = new MemcachedStore($memcache);
         $this->assertTrue($store->lock('foo', 10, 'owner')->refresh(60));
     }
