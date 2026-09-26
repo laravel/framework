@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\DatabaseTransactionsManager;
+use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
@@ -45,8 +46,7 @@ class QueueSyncQueueTest extends TestCase
         $sync = new SyncQueue;
         $container = new Container;
         Container::setInstance($container);
-        $events = Mockery::mock(Dispatcher::class);
-        $events->expects('dispatch')->times(4);
+        $events = new EventsDispatcher;
         $container->instance('events', $events);
         $container->instance(Dispatcher::class, $events);
         $sync->setContainer($container);
