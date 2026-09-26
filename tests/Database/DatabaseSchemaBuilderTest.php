@@ -14,8 +14,7 @@ class DatabaseSchemaBuilderTest extends TestCase
     public function testCreateDatabase()
     {
         $connection = Mockery::mock(Connection::class);
-        $grammar = new class($connection) extends Grammar
-        {
+        $grammar = new class($connection) extends Grammar {
         };
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('statement')->with($grammar->compileCreateDatabase('foo'))->andReturnTrue();
@@ -27,8 +26,7 @@ class DatabaseSchemaBuilderTest extends TestCase
     public function testDropDatabaseIfExists()
     {
         $connection = Mockery::mock(Connection::class);
-        $grammar = new class($connection) extends Grammar
-        {
+        $grammar = new class($connection) extends Grammar {
         };
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('statement')->with($grammar->compileDropDatabaseIfExists('foo'))->andReturnTrue();
