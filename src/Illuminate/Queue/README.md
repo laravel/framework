@@ -1,6 +1,6 @@
 ## Illuminate Queue
 
-The Laravel Queue component provides a unified API across a variety of different queue services. Queues allow you to defer the processing of a time consuming task, such as sending an e-mail, until a later time, thus drastically speeding up the web requests to your application.
+The Laravel Queue component provides a unified API across a variety of different queue services. Queues allow you to defer the processing of a time-consuming task, such as sending an e-mail, until a later time, thus drastically speeding up the web requests to your application.
 
 ### Usage Instructions
 
@@ -21,7 +21,7 @@ $queue->addConnection([
 $queue->setAsGlobal();
 ```
 
-Once the Capsule instance has been registered. You may use it like so:
+Once the Capsule instance has been registered, you may use it like so:
 
 ```PHP
 // As an instance...
