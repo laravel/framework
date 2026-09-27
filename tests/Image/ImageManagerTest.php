@@ -44,7 +44,7 @@ class ImageManagerTest extends TestCase
     {
         $app = $this->makeApp(['images.default' => 'custom']);
 
-        $mockDriver = Mockery::mock(Driver::class);
+        $mockDriver = new ImageManagerTestDriverStub;
 
         $manager = new ImageManager($app);
         $manager->extend('custom', function ($app) use ($mockDriver) {
@@ -58,7 +58,7 @@ class ImageManagerTest extends TestCase
     {
         $app = $this->makeApp([]);
 
-        $mockDriver = Mockery::mock(Driver::class);
+        $mockDriver = new ImageManagerTestDriverStub;
 
         $manager = new ImageManager($app);
         $manager->extend('custom', function () use ($mockDriver) {
@@ -99,15 +99,10 @@ class ImageManagerTest extends TestCase
         $file = UploadedFile::fake()->image('test.jpg', 100, 100);
         $path = $file->getRealPath();
 
-        $filesystem = Mockery::mock(Filesystem::class);
-        $filesystem->expects('get')
-            ->with($path)
-            ->andReturn(file_get_contents($path));
-
         $app = $this->makeApp([]);
         $app->expects('make')
             ->with(Filesystem::class)
-            ->andReturn($filesystem);
+            ->andReturn(new Filesystem);
 
         $manager = new ImageManager($app);
         $image = $manager->fromPath($path);
@@ -423,8 +418,8 @@ class ImageManagerTest extends TestCase
     {
         $app = $this->makeApp([]);
 
-        $firstDriver = Mockery::mock(Driver::class);
-        $secondDriver = Mockery::mock(Driver::class);
+        $firstDriver = new ImageManagerTestDriverStub;
+        $secondDriver = new ImageManagerTestDriverStub;
 
         $manager = new ImageManager($app);
         $manager->extend('custom', fn () => $firstDriver);
@@ -437,8 +432,8 @@ class ImageManagerTest extends TestCase
     {
         $app = $this->makeApp([]);
 
-        $driver1 = Mockery::mock(Driver::class);
-        $driver2 = Mockery::mock(Driver::class);
+        $driver1 = new ImageManagerTestDriverStub;
+        $driver2 = new ImageManagerTestDriverStub;
 
         $manager = new ImageManager($app);
         $manager->extend('one', fn () => $driver1);
@@ -556,4 +551,27 @@ class ImageManagerTest extends TestCase
 enum ImageDiskStub: string
 {
     case Public = 'public';
+}
+
+class ImageManagerTestDriverStub implements Driver
+{
+    public function process(string $contents, ImagePipeline $pipeline): string
+    {
+        return $contents;
+    }
+
+    public function dominantColor(string $contents): string
+    {
+        return '#000000';
+    }
+
+    public function dimensions(string $contents): array
+    {
+        return [0, 0];
+    }
+
+    public function transformUsing(string $transformation, callable $callback): static
+    {
+        return $this;
+    }
 }
