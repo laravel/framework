@@ -2206,6 +2206,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->getCreatedAtColumn(),
             $this->getUpdatedAtColumn(),
             ...$this->uniqueIds(),
+            ...$this->refreshes,
             'laravel_through_key',
         ]));
 
