@@ -5,7 +5,6 @@ namespace Illuminate\Http;
 use DateInterval;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Carbon;
-use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
 
@@ -123,20 +122,10 @@ trait ResponseTrait
      * @param  string|null  $link
      * @param  string|null  $type
      * @return $this
-     *
-     * @throws \InvalidArgumentException
      */
     public function deprecated($at = null, $link = null, $type = null)
     {
-        $at = $this->parseHeaderDate($at);
-
-        $sunset = $this->headers->get('Sunset');
-
-        if (! is_null($sunset) && ($sunsetAt = strtotime($sunset)) !== false && $sunsetAt < $at) {
-            throw new InvalidArgumentException('The [Sunset] date must not be earlier than the [Deprecation] date.');
-        }
-
-        $this->headers->set('Deprecation', '@'.$at);
+        $this->headers->set('Deprecation', '@'.$this->parseHeaderDate($at));
 
         return is_null($link) ? $this : $this->withLink($link, 'deprecation', $type);
     }
@@ -148,20 +137,10 @@ trait ResponseTrait
      * @param  string|null  $link
      * @param  string|null  $type
      * @return $this
-     *
-     * @throws \InvalidArgumentException
      */
     public function sunset($at, $link = null, $type = null)
     {
-        $at = $this->parseHeaderDate($at);
-
-        $deprecation = $this->headers->get('Deprecation');
-
-        if (! is_null($deprecation) && $at < (int) ltrim($deprecation, '@')) {
-            throw new InvalidArgumentException('The [Sunset] date must not be earlier than the [Deprecation] date.');
-        }
-
-        $this->headers->set('Sunset', gmdate('D, d M Y H:i:s', $at).' GMT');
+        $this->headers->set('Sunset', gmdate('D, d M Y H:i:s', $this->parseHeaderDate($at)).' GMT');
 
         return is_null($link) ? $this : $this->withLink($link, 'sunset', $type);
     }

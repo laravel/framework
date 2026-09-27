@@ -16,7 +16,6 @@ use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use InvalidArgumentException;
 use JsonSerializable;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -389,30 +388,6 @@ class HttpResponseTest extends TestCase
             '<https://example.com/deprecations>; rel="deprecation"',
             '<https://example.com/sunset>; rel="sunset"',
         ], $response->headers->all('Link'));
-    }
-
-    public function testSunsetMayNotBeEarlierThanTheDeprecationDate()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('The [Sunset] date must not be earlier than the [Deprecation] date.');
-
-        (new Response)->deprecated('2026-10-01 00:00:00')->sunset('2026-09-01 00:00:00');
-    }
-
-    public function testDeprecationMayNotBeLaterThanTheSunsetDate()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageIsOrContains('The [Sunset] date must not be earlier than the [Deprecation] date.');
-
-        (new Response)->sunset('2026-09-01 00:00:00')->deprecated('2026-10-01 00:00:00');
-    }
-
-    public function testSunsetMayEqualTheDeprecationDate()
-    {
-        $response = (new Response)->deprecated('2026-10-01 00:00:00')->sunset('2026-10-01 00:00:00');
-
-        $this->assertSame('@'.strtotime('2026-10-01 00:00:00'), $response->headers->get('Deprecation'));
-        $this->assertSame('Thu, 01 Oct 2026 00:00:00 GMT', $response->headers->get('Sunset'));
     }
 
     public function testDeprecationHeadersMayBeSetOnJsonResponses()
