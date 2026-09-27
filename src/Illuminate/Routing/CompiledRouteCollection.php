@@ -4,6 +4,10 @@ namespace Illuminate\Routing;
 
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Matching\HostValidator;
+use Illuminate\Routing\Matching\MethodValidator;
+use Illuminate\Routing\Matching\SchemeValidator;
+use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Support\Collection;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -69,6 +73,13 @@ class CompiledRouteCollection extends AbstractRouteCollection
      * @var array<string, string>|null
      */
     protected $routeNameByAction;
+
+    /**
+     * Indicates if the compiled matcher reports the same allowed methods as a scan of the cached routes.
+     *
+     * @var bool|null
+     */
+    protected $compiledAllowedMethodsAreReliable;
 
     /**
      * Create a new CompiledRouteCollection instance.
@@ -141,11 +152,19 @@ class CompiledRouteCollection extends AbstractRouteCollection
             if ($result = $matcher->matchRequest($trimmedRequest)) {
                 $route = $this->getByName($result['_route']);
             }
-        } catch (ResourceNotFoundException|MethodNotAllowedException) {
+        } catch (ResourceNotFoundException) {
             try {
                 return $this->routes->match($request);
             } catch (NotFoundHttpException) {
                 //
+            }
+        } catch (MethodNotAllowedException $e) {
+            try {
+                return $this->routes->match($request);
+            } catch (NotFoundHttpException) {
+                if (count($others = $this->alternateVerbsFromCompiledMatcher($request, $e->getAllowedMethods())) > 0) {
+                    return $this->getRouteForMethods($request, $others);
+                }
             }
         }
 
@@ -162,6 +181,105 @@ class CompiledRouteCollection extends AbstractRouteCollection
         }
 
         return $this->handleMatchedRoute($request, $route);
+    }
+
+    /**
+     * Get the alternate HTTP verbs for the request from the methods allowed by the compiled matcher.
+     *
+     * An empty array is returned when the compiled matcher's methods can't be trusted to be the same
+     * as the ones found by scanning every cached route, in which case the routes should be scanned.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $allowedMethods
+     * @return array
+     */
+    protected function alternateVerbsFromCompiledMatcher(Request $request, array $allowedMethods)
+    {
+        if (! $this->canUseCompiledAllowedMethods() || $this->decodedPathHasTrailingSlash($request)) {
+            return [];
+        }
+
+        return array_values(array_intersect(
+            array_diff(Router::$verbs, [$request->getMethod()]), $allowedMethods
+        ));
+    }
+
+    /**
+     * Determine if the request path ends with an encoded slash.
+     *
+     * The compiled matcher trims trailing slashes after decoding the path while the route validators trim them
+     * before decoding, so the two may disagree on which routes match a path such as "/users/1%2F".
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function decodedPathHasTrailingSlash(Request $request)
+    {
+        return str_ends_with(rawurldecode(rtrim($request->getPathInfo(), '/')), '/');
+    }
+
+    /**
+     * Determine if the compiled matcher's allowed methods may be used instead of scanning the cached routes.
+     *
+     * @return bool
+     */
+    protected function canUseCompiledAllowedMethods()
+    {
+        // Dynamically added routes take precedence over cached routes with the same URI when scanning, and
+        // custom route validators are not known to the compiled matcher, so both need the complete scan...
+        if (count($this->routes) > 0 || ! $this->usesDefaultRouteValidators()) {
+            return false;
+        }
+
+        return $this->compiledAllowedMethodsAreReliable ??= $this->compiledAllowedMethodsMatchCachedRoutes();
+    }
+
+    /**
+     * Determine if only the default route validators are being used to match routes.
+     *
+     * @return bool
+     */
+    protected function usesDefaultRouteValidators()
+    {
+        $validators = array_map(get_class(...), Route::getValidators());
+
+        sort($validators);
+
+        return $validators === [
+            HostValidator::class, MethodValidator::class, SchemeValidator::class, UriValidator::class,
+        ];
+    }
+
+    /**
+     * Determine if every cached route is matched by the compiled matcher the same way it is when scanned.
+     *
+     * @return bool
+     */
+    protected function compiledAllowedMethodsMatchCachedRoutes()
+    {
+        $uris = [];
+
+        foreach ($this->attributes as $attributes) {
+            $action = $attributes['action'] ?? [];
+
+            // Route caches compiled by earlier versions don't include each route's scheme, so these are scanned...
+            if (in_array('http', $action, true) || in_array('https', $action, true)) {
+                return false;
+            }
+
+            // When scanning, a cached route hides any previous route with the same method, domain, and URI...
+            $key = str_replace(['http://', 'https://'], '', $action['domain'] ?? '').$attributes['uri'];
+
+            foreach ($attributes['methods'] as $method) {
+                if (isset($uris[$method][$key])) {
+                    return false;
+                }
+
+                $uris[$method][$key] = true;
+            }
+        }
+
+        return true;
     }
 
     /**

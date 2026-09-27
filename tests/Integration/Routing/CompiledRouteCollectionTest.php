@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Integration\Routing;
 
 use ArrayIterator;
 use Illuminate\Http\Request;
+use Illuminate\Routing\CompiledRouteCollection;
+use Illuminate\Routing\Matching\ValidatorInterface;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Arr;
@@ -597,6 +599,209 @@ class CompiledRouteCollectionTest extends TestCase
                 'same/path' => $routes['no_domain'],
             ],
         ], $this->collection()->getRoutesByMethod());
+    }
+
+    public function testMethodNotAllowedUsesTheMethodsAllowedByTheCompiledMatcher()
+    {
+        $this->addResourceRoutes();
+
+        $routes = $this->scanTrackingCollection();
+
+        try {
+            $routes->match(Request::create('/users', 'DELETE'));
+
+            $this->fail('A method not allowed exception was not thrown.');
+        } catch (MethodNotAllowedHttpException $e) {
+            $this->assertSame('The DELETE method is not supported for route users. Supported methods: GET, HEAD, POST.', $e->getMessage());
+            $this->assertSame(['Allow' => 'GET, HEAD, POST'], $e->getHeaders());
+        }
+
+        try {
+            $routes->match(Request::create('/users/1/', 'POST'));
+
+            $this->fail('A method not allowed exception was not thrown.');
+        } catch (MethodNotAllowedHttpException $e) {
+            $this->assertSame('The POST method is not supported for route users/1. Supported methods: GET, HEAD, PUT, PATCH, DELETE.', $e->getMessage());
+            $this->assertSame(['Allow' => 'GET, HEAD, PUT, PATCH, DELETE'], $e->getHeaders());
+        }
+
+        $this->assertFalse($routes->scanned);
+    }
+
+    public function testOptionsRequestUsesTheMethodsAllowedByTheCompiledMatcher()
+    {
+        $this->addResourceRoutes();
+
+        $routes = $this->scanTrackingCollection();
+
+        $route = $routes->match(Request::create('/users/1', 'OPTIONS'));
+        $response = $route->getAction('uses')();
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('GET,HEAD,PUT,PATCH,DELETE', $response->headers->get('Allow'));
+        $this->assertFalse($routes->scanned);
+    }
+
+    public function testMethodNotAllowedIgnoresNonStandardMethodsAllowedByTheCompiledMatcher()
+    {
+        $this->addResourceRoutes();
+        $this->routeCollection->add($this->newRoute('PURGE', 'users/{user}', ['uses' => 'UserController@purge']));
+        $this->routeCollection->add($this->newRoute('PURGE', 'cache', ['uses' => 'CacheController@purge']));
+
+        $routes = $this->scanTrackingCollection();
+
+        try {
+            $routes->match(Request::create('/users/1', 'POST'));
+
+            $this->fail('A method not allowed exception was not thrown.');
+        } catch (MethodNotAllowedHttpException $e) {
+            $this->assertSame(['Allow' => 'GET, HEAD, PUT, PATCH, DELETE'], $e->getHeaders());
+        }
+
+        $this->assertFalse($routes->scanned);
+
+        try {
+            $routes->match(Request::create('/cache', 'POST'));
+
+            $this->fail('A not found exception was not thrown.');
+        } catch (NotFoundHttpException) {
+            $this->assertTrue($routes->scanned);
+        }
+    }
+
+    public function testMethodNotAllowedScansRoutesWhenRoutesAreRestrictedToAScheme()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'foo', ['https', 'uses' => 'FooController@index']));
+        $this->routeCollection->add($this->newRoute('DELETE', 'foo', ['uses' => 'FooController@destroy']));
+
+        $routes = $this->scanTrackingCollection();
+
+        try {
+            $routes->match(Request::create('http://localhost/foo', 'POST'));
+
+            $this->fail('A method not allowed exception was not thrown.');
+        } catch (MethodNotAllowedHttpException $e) {
+            $this->assertSame(['Allow' => 'DELETE'], $e->getHeaders());
+        }
+
+        $this->assertTrue($routes->scanned);
+    }
+
+    public function testMethodNotAllowedScansRoutesWhenCachedRoutesShareTheSameMethodAndUri()
+    {
+        $this->routeCollection->add($this->newRoute(['GET', 'DELETE'], 'foo/{id}', ['uses' => 'FooController@show', 'as' => 'numeric'])->where('id', '[0-9]+'));
+        $this->routeCollection->add($this->newRoute('GET', 'foo/{id}', ['uses' => 'FooController@show', 'as' => 'alpha'])->where('id', '[a-z]+'));
+
+        $routes = $this->scanTrackingCollection();
+
+        try {
+            $routes->match(Request::create('/foo/123', 'PUT'));
+
+            $this->fail('A method not allowed exception was not thrown.');
+        } catch (MethodNotAllowedHttpException $e) {
+            $this->assertSame(['Allow' => 'DELETE'], $e->getHeaders());
+        }
+
+        $this->assertTrue($routes->scanned);
+    }
+
+    public function testMethodNotAllowedScansRoutesWhenRoutesAreAddedDynamically()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'foo/{id}', ['uses' => 'FooController@show']));
+
+        $routes = $this->scanTrackingCollection();
+
+        $routes->add($this->newRoute('GET', 'foo/{id}', ['uses' => 'FooController@show'])->where('id', '[a-z]+'));
+
+        try {
+            $routes->match(Request::create('/foo/123', 'POST'));
+
+            $this->fail('A not found exception was not thrown.');
+        } catch (NotFoundHttpException) {
+            $this->assertTrue($routes->scanned);
+        }
+    }
+
+    public function testMethodNotAllowedScansRoutesWhenCustomRouteValidatorsAreUsed()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'foo', ['uses' => 'FooController@index', 'as' => 'hidden']));
+        $this->routeCollection->add($this->newRoute('DELETE', 'foo', ['uses' => 'FooController@destroy']));
+
+        $routes = $this->scanTrackingCollection();
+
+        Route::$validators = array_merge(Route::getValidators(), [new class implements ValidatorInterface
+        {
+            public function matches(Route $route, Request $request)
+            {
+                return $route->getName() !== 'hidden';
+            }
+        }]);
+
+        try {
+            $routes->match(Request::create('/foo', 'POST'));
+
+            $this->fail('A method not allowed exception was not thrown.');
+        } catch (MethodNotAllowedHttpException $e) {
+            $this->assertSame(['Allow' => 'DELETE'], $e->getHeaders());
+        } finally {
+            Route::$validators = null;
+        }
+
+        $this->assertTrue($routes->scanned);
+    }
+
+    public function testMethodNotAllowedScansRoutesWhenThePathEndsWithAnEncodedSlash()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'files/{path}/{version?}', ['uses' => 'FileController@show'])->where('path', '.+'));
+        $this->routeCollection->add($this->newRoute('DELETE', 'files/{id}', ['uses' => 'FileController@destroy'])->where('id', '.*'));
+
+        $routes = $this->scanTrackingCollection();
+
+        try {
+            $routes->match(Request::create('/files/a%2F', 'POST'));
+
+            $this->fail('A method not allowed exception was not thrown.');
+        } catch (MethodNotAllowedHttpException $e) {
+            $this->assertSame(['Allow' => 'GET, HEAD, DELETE'], $e->getHeaders());
+        }
+
+        $this->assertTrue($routes->scanned);
+    }
+
+    /**
+     * Add resource style routes for the "users" resource to the route collection.
+     *
+     * @return void
+     */
+    protected function addResourceRoutes()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'users', ['uses' => 'UserController@index']));
+        $this->routeCollection->add($this->newRoute('POST', 'users', ['uses' => 'UserController@store']));
+        $this->routeCollection->add($this->newRoute('GET', 'users/{user}', ['uses' => 'UserController@show']));
+        $this->routeCollection->add($this->newRoute(['PUT', 'PATCH'], 'users/{user}', ['uses' => 'UserController@update']));
+        $this->routeCollection->add($this->newRoute('DELETE', 'users/{user}', ['uses' => 'UserController@destroy']));
+    }
+
+    /**
+     * Compile the routes into a collection that tracks if the cached routes are scanned by method.
+     *
+     * @return \Illuminate\Routing\CompiledRouteCollection
+     */
+    protected function scanTrackingCollection()
+    {
+        ['compiled' => $compiled, 'attributes' => $attributes] = $this->routeCollection->compile();
+
+        return (new class($compiled, $attributes) extends CompiledRouteCollection
+        {
+            public $scanned = false;
+
+            public function get($method = null)
+            {
+                $this->scanned = true;
+
+                return parent::get($method);
+            }
+        })->setRouter($this->router)->setContainer($this->app);
     }
 
     /**
