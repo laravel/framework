@@ -26,6 +26,19 @@ class FoundationHelpersTest extends TestCase
         $this->assertSame([LogLevel::WARNING, LogLevel::NOTICE, LogLevel::INFO], $handler->levels);
     }
 
+    public function testReportHelpersOnlyForwardLevelWhenGiven()
+    {
+        $exception = new Exception('Test');
+
+        $this->mock(ExceptionHandler::class, function ($mock) use ($exception) {
+            $mock->expects('report')->times(3)->withArgs(fn (...$arguments) => $arguments === [$exception, ['id' => 1]]);
+        });
+
+        report($exception, ['id' => 1]);
+        report_if(true, $exception, ['id' => 1]);
+        report_unless(false, $exception, ['id' => 1]);
+    }
+
     public function testRescue()
     {
         $this->assertSame(
