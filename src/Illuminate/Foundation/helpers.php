@@ -728,6 +728,12 @@ if (! function_exists('report')) {
             $exception = new Exception($exception);
         }
 
+        if (is_null($level)) {
+            app(ExceptionHandler::class)->report($exception, $context);
+
+            return;
+        }
+
         app(ExceptionHandler::class)->report($exception, $context, $level);
     }
 }
