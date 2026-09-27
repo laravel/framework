@@ -11,7 +11,8 @@ use Illuminate\Foundation\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use Mockery;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator as TranslatorImpl;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -23,14 +24,14 @@ class FoundationApplicationTest extends TestCase
     {
         $app = new Application;
 
-        $app['config'] = $config = Mockery::mock(Repository::class);
-        $config->expects('get')->with('app.locale')->andReturn('bar');
-        $config->expects('set')->with('app.locale', 'foo');
-        $app['translator'] = $trans = Mockery::mock(Translator::class);
-        $trans->expects('setLocale')->with('foo');
+        $app['config'] = $config = new Repository(['app' => ['locale' => 'bar']]);
+        $app['translator'] = $trans = new TranslatorImpl(new ArrayLoader, 'bar');
         $app['events'] = $events = new EventFake(new Dispatcher);
 
         $app->setLocale('foo');
+
+        $this->assertSame('foo', $config->get('app.locale'));
+        $this->assertSame('foo', $trans->getLocale());
 
         $events->assertDispatchedOnce(LocaleUpdated::class);
         $events->assertDispatched(LocaleUpdated::class, function (LocaleUpdated $event) {
@@ -40,13 +41,11 @@ class FoundationApplicationTest extends TestCase
 
     public function testServiceProvidersAreCorrectlyRegistered()
     {
-        $provider = Mockery::mock(ApplicationBasicServiceProviderStub::class);
-        $class = get_class($provider);
-        $provider->expects('register');
         $app = new Application;
+        $provider = new ApplicationBasicServiceProviderStub($app);
         $app->register($provider);
 
-        $this->assertArrayHasKey($class, $app->getLoadedProviders());
+        $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
     }
 
     public function testClassesAreBoundWhenServiceProviderIsRegistered()
@@ -93,24 +92,20 @@ class FoundationApplicationTest extends TestCase
 
     public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotFilled()
     {
-        $provider = Mockery::mock(ServiceProvider::class);
-        $class = get_class($provider);
-        $provider->expects('register');
         $app = new Application;
+        $provider = new class($app) extends ServiceProvider {};
         $app->register($provider);
 
-        $this->assertArrayHasKey($class, $app->getLoadedProviders());
+        $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
     }
 
     public function testServiceProvidersCouldBeLoaded()
     {
-        $provider = Mockery::mock(ServiceProvider::class);
-        $class = get_class($provider);
-        $provider->expects('register');
         $app = new Application;
+        $provider = new class($app) extends ServiceProvider {};
         $app->register($provider);
 
-        $this->assertTrue($app->providerIsLoaded($class));
+        $this->assertTrue($app->providerIsLoaded(get_class($provider)));
         $this->assertFalse($app->providerIsLoaded(ApplicationBasicServiceProviderStub::class));
     }
 

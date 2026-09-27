@@ -7,10 +7,13 @@ use ErrorException;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\Env;
 use Mockery;
 use Monolog\Handler\NullHandler;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger as Monolog;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
@@ -22,9 +25,13 @@ class HandleExceptionsTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->app = Mockery::mock(Application::setInstance(new Application));
+        $this->app = Application::setInstance(new Application);
 
         $this->app->instance('config', $this->config = new Config());
+
+        (new ReflectionClass(Application::class))
+            ->getProperty('hasBeenBootstrapped')
+            ->setValue($this->app, true);
     }
 
     protected function handleExceptions()
@@ -32,6 +39,19 @@ class HandleExceptionsTest extends TestCase
         return tap(new HandleExceptions(), function ($instance) {
             (new ReflectionClass($instance))->getProperty('app')->setValue($instance, $this->app);
         });
+    }
+
+    protected function realLogger(): TestHandler
+    {
+        $handler = new TestHandler;
+
+        $manager = new LogManager($this->app);
+        $manager->extend('capture', fn () => new Logger(tap(new Monolog('testbench'), fn ($monolog) => $monolog->pushHandler($handler))));
+
+        $this->config->set('logging.channels.null', ['driver' => 'capture']);
+        $this->app->instance(LogManager::class, $manager);
+
+        return $handler;
     }
 
     protected function tearDown(): void
@@ -43,17 +63,7 @@ class HandleExceptionsTest extends TestCase
 
     public function testPhpDeprecations()
     {
-        $logger = Mockery::mock(LogManager::class);
-        $this->app->instance(LogManager::class, $logger);
-        $this->app->expects('runningUnitTests')->andReturn(false);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
-
-        $logger->expects('channel')->with('deprecations')->andReturnSelf();
-        $logger->expects('warning')->with(sprintf('%s in %s on line %s',
-            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
-            '/home/user/laravel/routes/web.php',
-            17
-        ));
+        $handler = $this->realLogger();
 
         $this->handleExceptions()->handleError(
             E_DEPRECATED,
@@ -61,60 +71,49 @@ class HandleExceptionsTest extends TestCase
             '/home/user/laravel/routes/web.php',
             17
         );
+
+        $this->assertTrue($handler->hasWarningThatContains(sprintf('%s in %s on line %s',
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+            '/home/user/laravel/routes/web.php',
+            17
+        )));
     }
 
     public function testPhpDeprecationsWithStackTraces()
     {
-        $logger = Mockery::mock(LogManager::class);
-        $this->app->instance(LogManager::class, $logger);
-        $this->app->expects('runningUnitTests')->andReturn(false);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
+        $handler = $this->realLogger();
 
         $this->config->set('logging.deprecations', [
             'channel' => 'null',
             'trace' => true,
         ]);
 
-        $logger->expects('channel')->with('deprecations')->andReturnSelf();
-        $logger->expects('warning')->with(
-            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
-            Mockery::on(function (array $context) {
-                $exception = $context['exception'] ?? null;
-
-                return $exception instanceof \ErrorException
-                    && $exception->getSeverity() === E_DEPRECATED
-                    && $exception->getFile() === '/home/user/laravel/routes/web.php'
-                    && $exception->getLine() === 17
-                    && $exception->getTrace();
-            })
-        );
-
         $this->handleExceptions()->handleError(
             E_DEPRECATED,
             'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
             '/home/user/laravel/routes/web.php',
             17
         );
+
+        $this->assertTrue($handler->hasWarningThatContains('str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated'));
+
+        $exception = $handler->getRecords()[0]->context['exception'];
+
+        $this->assertInstanceOf(ErrorException::class, $exception);
+        $this->assertSame(E_DEPRECATED, $exception->getSeverity());
+        $this->assertSame('/home/user/laravel/routes/web.php', $exception->getFile());
+        $this->assertSame(17, $exception->getLine());
+        $this->assertNotEmpty($exception->getTrace());
     }
 
     public function testNullValueAsChannelUsesNullDriver()
     {
-        $logger = Mockery::mock(LogManager::class);
-        $this->app->instance(LogManager::class, $logger);
-        $this->app->expects('runningUnitTests')->andReturn(false);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
+        $this->app->instance(LogManager::class, new LogManager($this->app));
 
         $this->config->set('logging.deprecations', [
             'channel' => null,
             'trace' => false,
         ]);
-
-        $logger->expects('channel')->with('deprecations')->andReturnSelf();
-        $logger->expects('warning')->with(sprintf('%s in %s on line %s',
-            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
-            '/home/user/laravel/routes/web.php',
-            17
-        ));
 
         $this->handleExceptions()->handleError(
             E_DEPRECATED,
@@ -131,17 +130,7 @@ class HandleExceptionsTest extends TestCase
 
     public function testUserDeprecations()
     {
-        $logger = Mockery::mock(LogManager::class);
-        $this->app->instance(LogManager::class, $logger);
-        $this->app->expects('runningUnitTests')->andReturn(false);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
-
-        $logger->expects('channel')->with('deprecations')->andReturnSelf();
-        $logger->expects('warning')->with(sprintf('%s in %s on line %s',
-            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
-            '/home/user/laravel/routes/web.php',
-            17
-        ));
+        $handler = $this->realLogger();
 
         $this->handleExceptions()->handleError(
             E_USER_DEPRECATED,
@@ -149,40 +138,39 @@ class HandleExceptionsTest extends TestCase
             '/home/user/laravel/routes/web.php',
             17
         );
+
+        $this->assertTrue($handler->hasWarningThatContains(sprintf('%s in %s on line %s',
+            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+            '/home/user/laravel/routes/web.php',
+            17
+        )));
     }
 
     public function testUserDeprecationsWithStackTraces()
     {
-        $logger = Mockery::mock(LogManager::class);
-        $this->app->instance(LogManager::class, $logger);
-        $this->app->expects('runningUnitTests')->andReturn(false);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
+        $handler = $this->realLogger();
 
         $this->config->set('logging.deprecations', [
             'channel' => 'null',
             'trace' => true,
         ]);
 
-        $logger->expects('channel')->with('deprecations')->andReturnSelf();
-        $logger->expects('warning')->with(
-            'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
-            Mockery::on(function (array $context) {
-                $exception = $context['exception'] ?? null;
-
-                return $exception instanceof \ErrorException
-                    && $exception->getSeverity() === E_USER_DEPRECATED
-                    && $exception->getFile() === '/home/user/laravel/routes/web.php'
-                    && $exception->getLine() === 17
-                    && $exception->getTrace();
-            })
-        );
-
         $this->handleExceptions()->handleError(
             E_USER_DEPRECATED,
             'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
             '/home/user/laravel/routes/web.php',
             17
         );
+
+        $this->assertTrue($handler->hasWarningThatContains('str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated'));
+
+        $exception = $handler->getRecords()[0]->context['exception'];
+
+        $this->assertInstanceOf(ErrorException::class, $exception);
+        $this->assertSame(E_USER_DEPRECATED, $exception->getSeverity());
+        $this->assertSame('/home/user/laravel/routes/web.php', $exception->getFile());
+        $this->assertSame(17, $exception->getLine());
+        $this->assertNotEmpty($exception->getTrace());
     }
 
     public function testErrors()
@@ -205,13 +193,7 @@ class HandleExceptionsTest extends TestCase
 
     public function testEnsuresDeprecationsDriver()
     {
-        $logger = Mockery::mock(LogManager::class);
-        $this->app->instance(LogManager::class, $logger);
-        $this->app->expects('runningUnitTests')->andReturn(false);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
-
-        $logger->expects('channel')->andReturnSelf();
-        $logger->expects('warning');
+        $this->app->instance(LogManager::class, new LogManager($this->app));
 
         $this->config->set('logging.channels.stack', [
             'driver' => 'stack',
@@ -239,13 +221,7 @@ class HandleExceptionsTest extends TestCase
 
     public function testEnsuresNullDeprecationsDriver()
     {
-        $logger = Mockery::mock(LogManager::class);
-        $this->app->instance(LogManager::class, $logger);
-        $this->app->expects('runningUnitTests')->andReturn(false);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
-
-        $logger->expects('channel')->andReturnSelf();
-        $logger->expects('warning');
+        $this->app->instance(LogManager::class, new LogManager($this->app));
 
         $this->handleExceptions()->handleError(
             E_USER_DEPRECATED,
@@ -262,13 +238,7 @@ class HandleExceptionsTest extends TestCase
 
     public function testEnsuresNullLogDriver()
     {
-        $logger = Mockery::mock(LogManager::class);
-        $this->app->instance(LogManager::class, $logger);
-        $this->app->expects('runningUnitTests')->andReturn(false);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
-
-        $logger->expects('channel')->andReturnSelf();
-        $logger->expects('warning');
+        $this->app->instance(LogManager::class, new LogManager($this->app));
 
         $this->handleExceptions()->handleError(
             E_USER_DEPRECATED,
@@ -285,13 +255,7 @@ class HandleExceptionsTest extends TestCase
 
     public function testDoNotOverrideExistingNullLogDriver()
     {
-        $logger = Mockery::mock(LogManager::class);
-        $this->app->instance(LogManager::class, $logger);
-        $this->app->expects('runningUnitTests')->andReturn(false);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
-
-        $logger->expects('channel')->andReturnSelf();
-        $logger->expects('warning');
+        $this->app->instance(LogManager::class, new LogManager($this->app));
 
         $this->config->set('logging.channels.null', [
             'driver' => 'monolog',
@@ -319,8 +283,9 @@ class HandleExceptionsTest extends TestCase
 
     public function testIgnoreDeprecationIfLoggerUnresolvable()
     {
-        $this->app->expects('runningUnitTests')->andReturn(false);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
+        $this->app->bind(LogManager::class, function () {
+            throw new RuntimeException('unresolvable');
+        });
 
         $this->handleExceptions()->handleError(
             E_DEPRECATED,
@@ -328,16 +293,17 @@ class HandleExceptionsTest extends TestCase
             '/home/user/laravel/routes/web.php',
             17
         );
+
+        $this->assertTrue(true);
     }
 
     public function testIgnoreDeprecationIfLoggingFails()
     {
-        $logger = Mockery::mock(LogManager::class);
-        $this->app->instance(LogManager::class, $logger);
-        $this->app->expects('runningUnitTests')->andReturn(false);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
+        $manager = new LogManager($this->app);
+        $manager->extend('capture', fn () => throw new Error('Class "Monolog\Logger" not found'));
 
-        $logger->expects('channel')->with('deprecations')->andThrow(new Error('Class "Monolog\Logger" not found'));
+        $this->config->set('logging.channels.null', ['driver' => 'capture']);
+        $this->app->instance(LogManager::class, $manager);
 
         $this->handleExceptions()->handleError(
             E_DEPRECATED,
@@ -345,6 +311,8 @@ class HandleExceptionsTest extends TestCase
             '/home/user/laravel/routes/web.php',
             17
         );
+
+        $this->assertTrue(true);
     }
 
     public function testItIgnoreDeprecationLoggingWhenRunningUnitTests()
@@ -355,8 +323,7 @@ class HandleExceptionsTest extends TestCase
 
             throw new RuntimeException();
         });
-        $this->app->expects('runningUnitTests')->andReturn(true);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
+        $this->app->instance('env', 'testing');
 
         $this->handleExceptions()->handleError(
             E_DEPRECATED,
@@ -370,12 +337,8 @@ class HandleExceptionsTest extends TestCase
 
     public function testItCanForceViaConfigDeprecationLoggingWhenRunningUnitTests()
     {
-        $logger = Mockery::mock(LogManager::class);
-        $logger->expects('channel')->andReturnSelf();
-        $logger->expects('warning');
-        $this->app->instance(LogManager::class, $logger);
-        $this->app->expects('runningUnitTests')->andReturn(true);
-        $this->app->expects('hasBeenBootstrapped')->andReturn(true);
+        $handler = $this->realLogger();
+        $this->app->instance('env', 'testing');
 
         Env::getRepository()->set('LOG_DEPRECATIONS_WHILE_TESTING', true);
 
@@ -385,6 +348,8 @@ class HandleExceptionsTest extends TestCase
             '/home/user/laravel/routes/web.php',
             17
         );
+
+        $this->assertTrue($handler->hasWarningRecords());
     }
 
     public function testForgetApp()
@@ -408,9 +373,7 @@ class HandleExceptionsTest extends TestCase
 
         $this->assertSame($this->app, $appResolver());
 
-        $instance->bootstrap($newApp = tap(Mockery::mock(Application::class), function ($app) {
-            $app->expects('environment')->andReturn(true);
-        }));
+        $instance->bootstrap($newApp = tap(new Application, fn ($app) => $app->instance('env', 'testing')));
 
         $this->assertNotSame($this->app, $appResolver());
         $this->assertSame($newApp, $appResolver());
