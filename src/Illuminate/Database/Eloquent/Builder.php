@@ -746,6 +746,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the first record matching the attributes or create it without raising any events.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @return TModel
+     */
+    public function firstOrCreateQuietly(array $attributes = [], Closure|array $values = [])
+    {
+        return Model::withoutEvents(fn () => $this->firstOrCreate($attributes, $values));
+    }
+
+    /**
      * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
      * @param  array  $attributes
@@ -764,6 +776,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Attempt to create the record without raising any events. If a unique constraint violation occurs, attempt to find the matching record.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @return TModel
+     *
+     * @throws \Illuminate\Database\UniqueConstraintViolationException
+     */
+    public function createOrFirstQuietly(array $attributes = [], Closure|array $values = [])
+    {
+        return Model::withoutEvents(fn () => $this->createOrFirst($attributes, $values));
+    }
+
+    /**
      * Create or update a record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes
@@ -777,6 +803,18 @@ class Builder implements BuilderContract
                 $instance->fill(value($values))->save();
             }
         });
+    }
+
+    /**
+     * Create or update a record matching the attributes, and fill it with values without raising any events.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @return TModel
+     */
+    public function updateOrCreateQuietly(array $attributes, Closure|array $values = [])
+    {
+        return Model::withoutEvents(fn () => $this->updateOrCreate($attributes, $values));
     }
 
     /**

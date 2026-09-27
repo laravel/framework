@@ -233,6 +233,18 @@ abstract class HasOneOrManyThrough extends Relation
     }
 
     /**
+     * Get the first record matching the attributes or create it without raising any events.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @return TRelatedModel
+     */
+    public function firstOrCreateQuietly(array $attributes = [], Closure|array $values = [])
+    {
+        return Model::withoutEvents(fn () => $this->firstOrCreate($attributes, $values));
+    }
+
+    /**
      * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
      * @param  array  $attributes
@@ -251,6 +263,20 @@ abstract class HasOneOrManyThrough extends Relation
     }
 
     /**
+     * Attempt to create the record without raising any events. If a unique constraint violation occurs, attempt to find the matching record.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @return TRelatedModel
+     *
+     * @throws \Illuminate\Database\UniqueConstraintViolationException
+     */
+    public function createOrFirstQuietly(array $attributes = [], Closure|array $values = [])
+    {
+        return Model::withoutEvents(fn () => $this->createOrFirst($attributes, $values));
+    }
+
+    /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes
@@ -264,6 +290,18 @@ abstract class HasOneOrManyThrough extends Relation
                 $instance->fill($values)->save();
             }
         });
+    }
+
+    /**
+     * Create or update a related record matching the attributes, and fill it with values without raising any events.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return TRelatedModel
+     */
+    public function updateOrCreateQuietly(array $attributes, array $values = [])
+    {
+        return Model::withoutEvents(fn () => $this->updateOrCreate($attributes, $values));
     }
 
     /**

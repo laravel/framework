@@ -702,6 +702,20 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Get the first related record matching the attributes or create it without raising any events and attach it.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @param  array  $joining
+     * @param  bool  $touch
+     * @return TRelatedModel&object{pivot: TPivotModel}
+     */
+    public function firstOrCreateQuietly(array $attributes = [], Closure|array $values = [], array $joining = [], $touch = true)
+    {
+        return Model::withoutEvents(fn () => $this->firstOrCreate($attributes, $values, $joining, $touch));
+    }
+
+    /**
      * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
      * @param  array  $attributes
@@ -730,6 +744,22 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Attempt to create the record without raising any events. If a unique constraint violation occurs, attempt to find the matching record.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @param  array  $joining
+     * @param  bool  $touch
+     * @return TRelatedModel&object{pivot: TPivotModel}
+     *
+     * @throws \Illuminate\Database\UniqueConstraintViolationException
+     */
+    public function createOrFirstQuietly(array $attributes = [], Closure|array $values = [], array $joining = [], $touch = true)
+    {
+        return Model::withoutEvents(fn () => $this->createOrFirst($attributes, $values, $joining, $touch));
+    }
+
+    /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes
@@ -747,6 +777,20 @@ class BelongsToMany extends Relation
                 $instance->save(['touch' => false]);
             }
         });
+    }
+
+    /**
+     * Create or update a related record matching the attributes, and fill it with values without raising any events.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @param  array  $joining
+     * @param  bool  $touch
+     * @return TRelatedModel&object{pivot: TPivotModel}
+     */
+    public function updateOrCreateQuietly(array $attributes, Closure|array $values = [], array $joining = [], $touch = true)
+    {
+        return Model::withoutEvents(fn () => $this->updateOrCreate($attributes, $values, $joining, $touch));
     }
 
     /**

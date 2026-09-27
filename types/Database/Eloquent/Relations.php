@@ -62,10 +62,13 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->firstOrNew());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->firstOrFail());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->firstOrCreate());
+    assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->firstOrCreateQuietly());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->create());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->createQuietly());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->createOrFirst());
+    assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->createOrFirstQuietly());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->updateOrCreate([]));
+    assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->updateOrCreateQuietly([]));
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->save(new Role()));
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->saveQuietly(new Role()));
     $roles = $user->roles()->getResults();

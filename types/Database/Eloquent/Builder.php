@@ -55,13 +55,18 @@ function test(
     assertType('Illuminate\Types\Builder\User', $query->firstOrNew(['id' => 1]));
     assertType('Illuminate\Types\Builder\User', $query->findOrNew(1));
     assertType('Illuminate\Types\Builder\User', $query->firstOrCreate(['id' => 1]));
+    assertType('Illuminate\Types\Builder\User', $query->firstOrCreateQuietly(['id' => 1]));
     assertType('Illuminate\Types\Builder\User', $query->create(['name' => 'John']));
+    assertType('Illuminate\Types\Builder\User', $query->createQuietly(['name' => 'John']));
+    assertType('Illuminate\Types\Builder\User', $query->createOrFirst(['name' => 'John']));
+    assertType('Illuminate\Types\Builder\User', $query->createOrFirstQuietly(['name' => 'John']));
     assertType('Illuminate\Types\Builder\User', $query->forceCreate(['name' => 'John']));
     assertType('Illuminate\Types\Builder\User', $query->forceCreateQuietly(['name' => 'John']));
     assertType('Illuminate\Types\Builder\User', $query->getModel());
     assertType('Illuminate\Types\Builder\User', $query->make(['name' => 'John']));
     assertType('Illuminate\Types\Builder\User', $query->forceCreate(['name' => 'John']));
     assertType('Illuminate\Types\Builder\User', $query->updateOrCreate(['id' => 1], ['name' => 'John']));
+    assertType('Illuminate\Types\Builder\User', $query->updateOrCreateQuietly(['id' => 1], ['name' => 'John']));
     assertType('Illuminate\Types\Builder\User', $query->firstOrFail());
     assertType('Illuminate\Types\Builder\User', $query->findSole(1));
     assertType('Illuminate\Types\Builder\User', $query->sole());
