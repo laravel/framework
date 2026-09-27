@@ -7,7 +7,6 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Jobs\SqsJob;
-use Illuminate\Queue\SqsQueue;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -79,8 +78,6 @@ class QueueSqsJobTest extends TestCase
     public function testDeleteRemovesTheJobFromSqs()
     {
         $this->mockedSqsClient = Mockery::mock(SqsClient::class)->makePartial();
-        $queue = Mockery::mock(SqsQueue::class, [$this->mockedSqsClient, $this->queueName, $this->account])->makePartial();
-        $queue->setContainer($this->mockedContainer);
         $job = $this->getJob();
         $job->getSqs()->expects('deleteMessage')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle]);
         $job->delete();
@@ -89,8 +86,6 @@ class QueueSqsJobTest extends TestCase
     public function testReleaseProperlyReleasesTheJobOntoSqs()
     {
         $this->mockedSqsClient = Mockery::mock(SqsClient::class)->makePartial();
-        $queue = Mockery::mock(SqsQueue::class, [$this->mockedSqsClient, $this->queueName, $this->account])->makePartial();
-        $queue->setContainer($this->mockedContainer);
         $job = $this->getJob();
         $job->getSqs()->expects('changeMessageVisibility')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle, 'VisibilityTimeout' => $this->releaseDelay]);
         $job->release($this->releaseDelay);

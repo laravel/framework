@@ -362,7 +362,6 @@ class QueuedEventsTest extends TestCase
     public function testDispatchesOnQueueDefinedWithEnum()
     {
         $d = new Dispatcher;
-        $queue = Mockery::mock(Queue::class);
 
         $fakeQueue = new QueueFake(new Container);
 

@@ -394,7 +394,7 @@ class FoundationExceptionsHandlerTest extends TestCase
             return $redirector;
         });
 
-        $file = Mockery::mock(UploadedFile::class);
+        $file = new UploadedFile(__FILE__, 'photo.jpg', null, null, true);
 
         $request = Request::create('/', 'POST', $argumentExpected, [], ['photo' => $file]);
 

@@ -5028,11 +5028,8 @@ class ValidationValidatorTest extends TestCase
 
     public function testValidateEmailWithCustomClassCheck()
     {
-        $container = Mockery::mock(Container::class);
-        $container->expects('make')->with(NoRFCWarningsValidation::class)->andReturn(new NoRFCWarningsValidation);
-
         $v = new Validator($this->getIlluminateArrayTranslator(), ['x' => 'foo@bar '], ['x' => 'email:'.NoRFCWarningsValidation::class]);
-        $v->setContainer($container);
+        $v->setContainer(new Container);
 
         $this->assertFalse($v->passes());
     }

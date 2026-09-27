@@ -727,7 +727,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testEagerLoadRelationsCanBeFlushed()
     {
-        $builder = Mockery::mock(Builder::class.'[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
+        $builder = new Builder($this->getMockQueryBuilder());
 
         $builder->setEagerLoads(['foo']);
 
