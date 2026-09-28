@@ -385,6 +385,19 @@ class Builder
     }
 
     /**
+     *  Get the column for a given table.
+     *
+     * @param string  $table
+     * @param string  $column
+     * @return array{name: string, type: string, type_name: string, collation: string|null, nullable: bool, default: mixed, auto_increment: bool, comment: string|null, generation: array{type: string, expression: string|null}|null}
+     */
+    public function getColumn($table, $column)
+    {
+        return array_first(array_filter($this->getColumns($table), function($col) use($column) {
+            return $col['name'] === $column;
+        })) ?? [];
+    }
+    /**
      * Get the columns for a given table.
      *
      * @param  string  $table
