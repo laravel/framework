@@ -20,7 +20,7 @@ use Illuminate\Queue\Attributes\Queue;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use Illuminate\Tests\Notifications\Fixtures\RecordingChannel;
+use Illuminate\Tests\Notifications\Fixtures\ChannelSpy;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
@@ -224,7 +224,7 @@ class NotificationSenderTest extends TestCase
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
-        $driver = new RecordingChannel;
+        $driver = new ChannelSpy;
         $response = Mockery::mock(ResponseInterface::class);
         $driver->exception = new HttpTransportException('Transport error', $response);
         $manager->expects('driver')->andReturn($driver);
@@ -252,7 +252,7 @@ class NotificationSenderTest extends TestCase
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
-        $driver = new RecordingChannel;
+        $driver = new ChannelSpy;
         $manager->expects('driver')->andReturn($driver);
         $bus = new BusFake(new BusDispatcher(new Container));
 

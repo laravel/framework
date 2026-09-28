@@ -118,7 +118,7 @@ class FoundationFormRequestTest extends TestCase
     public function testAttributesAreInheritedFromParentRequest()
     {
         $request = $this->createRequest(['unexpected' => 'value'], FoundationTestFormRequestInheritingAttributesStub::class, 'POST');
-        $request->setRedirector($this->realRedirector());
+        $request->setRedirector($this->getRealRedirector());
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
             $request->validateResolved();
@@ -134,7 +134,7 @@ class FoundationFormRequestTest extends TestCase
     public function testChildAttributesOverrideParentAttributes()
     {
         $request = $this->createRequest(['unexpected' => 'value'], FoundationTestFormRequestOverridingParentAttributesStub::class, 'POST');
-        $request->setRedirector($this->realRedirector(['child.route' => '/child']));
+        $request->setRedirector($this->getRealRedirector(['child.route' => '/child']));
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
             $request->validateResolved();
@@ -148,7 +148,7 @@ class FoundationFormRequestTest extends TestCase
     public function testChildPropertiesOverrideParentAttributes()
     {
         $request = $this->createRequest([], FoundationTestFormRequestOverridingParentAttributesWithPropertiesStub::class, 'POST');
-        $request->setRedirector($this->realRedirector());
+        $request->setRedirector($this->getRealRedirector());
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
             $request->validateResolved();
@@ -754,7 +754,7 @@ class FoundationFormRequestTest extends TestCase
      *
      * @param  array<string, string>  $routes  route name => URI
      */
-    protected function realRedirector(array $routes = []): Redirector
+    protected function getRealRedirector(array $routes = []): Redirector
     {
         $collection = new RouteCollection;
 

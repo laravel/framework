@@ -188,6 +188,7 @@ class HttpResponseTest extends TestCase
         $response->onlyInput('name');
 
         $this->assertSame(['name' => 'Taylor'], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testExceptInputOnRedirect()
@@ -199,6 +200,7 @@ class HttpResponseTest extends TestCase
         $response->exceptInput('age');
 
         $this->assertSame(['name' => 'Taylor'], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testFlashingErrorsOnRedirect()
@@ -211,6 +213,7 @@ class HttpResponseTest extends TestCase
         $provider->expects('getMessageBag')->andReturn(new MessageBag(['name' => ['required']]));
         $response->withErrors($provider);
 
+        $this->assertContains('errors', $session->get('_flash.new', []));
         $errors = $session->get('errors');
         $this->assertInstanceOf(ViewErrorBag::class, $errors);
         $this->assertSame(['required'], $errors->getBag('default')->get('name'));
@@ -239,6 +242,7 @@ class HttpResponseTest extends TestCase
         $provider = ['foo' => 'bar'];
         $response->withErrors($provider);
 
+        $this->assertContains('errors', $session->get('_flash.new', []));
         $errors = $session->get('errors');
         $this->assertInstanceOf(ViewErrorBag::class, $errors);
         $this->assertSame(['bar'], $errors->getBag('default')->get('foo'));
@@ -293,6 +297,7 @@ class HttpResponseTest extends TestCase
         $response->withFoo('bar');
 
         $this->assertSame('bar', $session->get('foo'));
+        $this->assertContains('foo', $session->get('_flash.new', []));
     }
 
     public function testMagicCallException()

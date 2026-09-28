@@ -13,17 +13,19 @@ use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\Console\Concerns\CreatesAnsweredOutputStyles;
 use Laravel\Prompts\Prompt;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class CommandTest extends TestCase
 {
+    use CreatesAnsweredOutputStyles;
+
     protected function tearDown(): void
     {
         Prompt::setOutput(new NullOutput);
@@ -268,21 +270,6 @@ class CommandTest extends TestCase
         $answer = $command->choice('Select all that apply.', ['option-1', 'option-2', 'option-3'], null, null, true);
 
         $this->assertSame(['option-1', 'option-2'], $answer);
-    }
-
-    /**
-     * Build a real OutputStyle whose interactive input is pre-fed the given typed answer.
-     */
-    protected function outputStyleWithAnswer($answer)
-    {
-        $input = new ArrayInput([]);
-
-        $stream = fopen('php://memory', 'w+');
-        fwrite($stream, $answer."\n");
-        rewind($stream);
-        $input->setStream($stream);
-
-        return new OutputStyle($input, new BufferedOutput);
     }
 
     public function testSignatureAttributeCanSetAliases()

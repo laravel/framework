@@ -10,7 +10,7 @@ use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Cache\Factory;
+use Illuminate\Tests\Console\Fixtures\FakeCacheFactory;
 use PHPUnit\Framework\TestCase;
 
 class ConsoleEventSchedulerTest extends TestCase
@@ -24,13 +24,7 @@ class ConsoleEventSchedulerTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $cache = new class implements Factory
-        {
-            public function store($name = null)
-            {
-                //
-            }
-        };
+        $cache = new FakeCacheFactory;
 
         $container->instance(EventMutex::class, new CacheEventMutex($cache));
 

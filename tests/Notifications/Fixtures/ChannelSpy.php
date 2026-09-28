@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Notifications\Fixtures;
 
-class RecordingChannel
+class ChannelSpy
 {
     public array $sent = [];
 

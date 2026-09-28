@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\Attributes\Delay;
+use Illuminate\Queue\Events\QueueFailedOver;
 use Illuminate\Queue\FailoverQueue;
 use Illuminate\Queue\QueueManager;
 use Mockery;
@@ -22,6 +23,10 @@ class FailoverQueueTest extends TestCase
     {
         $queue = Mockery::mock(QueueManager::class);
         $events = new Dispatcher;
+        $failedOver = [];
+        $events->listen(QueueFailedOver::class, function ($event) use (&$failedOver) {
+            $failedOver[] = $event;
+        });
         $failover = new FailoverQueue($queue, $events, [
             'redis',
             'sync',
@@ -40,6 +45,11 @@ class FailoverQueueTest extends TestCase
         $sync->expects('push');
 
         $failover->push('some-job');
+
+        $this->assertCount(1, $failedOver);
+        $this->assertSame('redis', $failedOver[0]->connectionName);
+        $this->assertSame('some-job', $failedOver[0]->command);
+        $this->assertSame('error', $failedOver[0]->exception->getMessage());
     }
 
     public function test_bulk_respects_job_delays()

@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Auth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User;
 use PHPUnit\Framework\TestCase;
 
 class AuthListenersSendEmailVerificationNotificationHandleFunctionTest extends TestCase
@@ -29,15 +28,27 @@ class AuthListenersSendEmailVerificationNotificationHandleFunctionTest extends T
      */
     public function testUserIsNotInstanceOfMustVerifyEmail()
     {
-        $user = new User;
+        // Has the verification methods but doesn't implement MustVerifyEmail.
+        $user = new class
+        {
+            public $notificationSent = false;
+
+            public function hasVerifiedEmail()
+            {
+                return false;
+            }
+
+            public function sendEmailVerificationNotification()
+            {
+                $this->notificationSent = true;
+            }
+        };
 
         $listener = new SendEmailVerificationNotification;
 
-        // The listener would fatal by calling an undefined method if it
-        // failed to skip a user that doesn't implement MustVerifyEmail.
         $listener->handle(new Registered($user));
 
-        $this->addToAssertionCount(1);
+        $this->assertFalse($user->notificationSent);
     }
 
     /**

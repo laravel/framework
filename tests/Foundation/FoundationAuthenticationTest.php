@@ -52,7 +52,7 @@ class FoundationAuthenticationTest extends TestCase
     /**
      * @return \Illuminate\Contracts\Auth\Guard
      */
-    protected function realGuard(?Authenticatable $user = null)
+    protected function getRealGuard(?Authenticatable $user = null)
     {
         $guard = new class($user) implements Guard
         {
@@ -115,21 +115,21 @@ class FoundationAuthenticationTest extends TestCase
 
     public function testAssertAuthenticated()
     {
-        $this->realGuard(new GenericUser(['id' => 1]));
+        $this->getRealGuard(new GenericUser(['id' => 1]));
 
         $this->assertAuthenticated();
     }
 
     public function testAssertGuest()
     {
-        $this->realGuard();
+        $this->getRealGuard();
 
         $this->assertGuest();
     }
 
     public function testAssertAuthenticatedAs()
     {
-        $this->realGuard(new GenericUser(['id' => 1]));
+        $this->getRealGuard(new GenericUser(['id' => 1]));
 
         $user = new GenericUser(['id' => 1]);
 

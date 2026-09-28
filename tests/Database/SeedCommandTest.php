@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Database\ConnectionResolver;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Eloquent\Model;
@@ -69,7 +70,8 @@ class SeedCommandTest extends TestCase
         $seeder->expects('setCommand')->andReturnSelf();
         $seeder->expects('__invoke')->andThrow(new RuntimeException('Seeding failed.'));
 
-        $resolver = new SeedCommandTestConnectionResolver('mysql');
+        $resolver = new SeedCommandTestConnectionResolver;
+        $resolver->default = 'mysql';
 
         $container = Mockery::mock(Application::class);
         $container->expects('call');
@@ -191,23 +193,28 @@ class UserWithoutModelEventsSeeder extends Seeder
     }
 }
 
-class SeedCommandTestConnectionResolver extends ConnectionResolver
+class SeedCommandTestConnectionResolver implements ConnectionResolverInterface
 {
+    public $default;
+
+    public $connections = [];
+
     public $log = [];
 
-    public function __construct($default = null)
+    public function connection($name = null)
     {
-        parent::__construct();
+        return $this->connections[$name ?? $this->default];
+    }
 
-        $this->setDefaultConnection($default);
-
-        $this->log = [];
+    public function getDefaultConnection()
+    {
+        return $this->default;
     }
 
     public function setDefaultConnection($name)
     {
         $this->log[] = $name;
 
-        parent::setDefaultConnection($name);
+        $this->default = $name;
     }
 }

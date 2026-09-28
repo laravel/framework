@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\File;
-use Illuminate\Tests\Integration\Console\Fixtures\InMemoryFilesystem;
+use Illuminate\Tests\Integration\Console\Fixtures\ArrayFilesystem;
 use Orchestra\Testbench\TestCase;
 
 class EnvironmentEncryptCommandTest extends TestCase
@@ -15,7 +15,7 @@ class EnvironmentEncryptCommandTest extends TestCase
     {
         parent::setUp();
 
-        $this->filesystem = new InMemoryFilesystem;
+        $this->filesystem = new ArrayFilesystem;
         $this->filesystem->files[base_path('.env')] = 'APP_NAME=Laravel';
 
         File::swap($this->filesystem);

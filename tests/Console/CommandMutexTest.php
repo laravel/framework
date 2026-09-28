@@ -7,10 +7,10 @@ use Illuminate\Cache\StorageStore;
 use Illuminate\Console\CacheCommandMutex;
 use Illuminate\Console\Command;
 use Illuminate\Console\CommandMutex;
-use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Foundation\Application;
 use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
+use Illuminate\Tests\Console\Fixtures\FakeCacheFactory;
 use Orchestra\Testbench\Concerns\InteractsWithMockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -42,7 +42,7 @@ class CommandMutexTest extends TestCase
             }
         };
 
-        $this->commandMutex = new CacheCommandMutex(new CommandMutexTestFactory(
+        $this->commandMutex = new CacheCommandMutex(new FakeCacheFactory(
             new Repository(new StorageStore(new ArrayFilesystem, 'cache'))
         ));
 
@@ -94,17 +94,5 @@ class CommandMutexTest extends TestCase
         $input = new ArrayInput(['--isolated' => $withIsolated]);
         $output = new NullOutput;
         $this->command->run($input, $output);
-    }
-}
-
-class CommandMutexTestFactory implements Factory
-{
-    public function __construct(protected Repository $repository)
-    {
-    }
-
-    public function store($name = null)
-    {
-        return $this->repository;
     }
 }

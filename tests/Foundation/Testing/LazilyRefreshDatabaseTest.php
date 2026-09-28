@@ -7,6 +7,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Illuminate\Tests\Foundation\Testing\Fixtures\ConsoleKernelSpy;
 use Mockery;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
@@ -62,7 +63,7 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testDatabaseIsRefreshedOnInteraction()
     {
-        $kernel = new RecordingConsoleKernel;
+        $kernel = new ConsoleKernelSpy;
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $this->refreshDatabase();
@@ -89,7 +90,7 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testNonDefaultConnectionTriggersRefresh()
     {
-        $kernel = new RecordingConsoleKernel;
+        $kernel = new ConsoleKernelSpy;
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $this->refreshDatabase();

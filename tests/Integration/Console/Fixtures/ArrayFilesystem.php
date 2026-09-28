@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Console\Fixtures;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 
-class InMemoryFilesystem extends Filesystem
+class ArrayFilesystem extends Filesystem
 {
     /**
      * The file contents, keyed by path.

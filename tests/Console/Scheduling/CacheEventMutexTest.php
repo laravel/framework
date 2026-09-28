@@ -7,8 +7,8 @@ use Illuminate\Cache\Repository;
 use Illuminate\Cache\StorageStore;
 use Illuminate\Console\Scheduling\CacheEventMutex;
 use Illuminate\Console\Scheduling\Event;
-use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
+use Illuminate\Tests\Console\Fixtures\FakeCacheFactory;
 use PHPUnit\Framework\TestCase;
 
 class CacheEventMutexTest extends TestCase
@@ -24,13 +24,13 @@ class CacheEventMutexTest extends TestCase
     protected $event;
 
     /**
-     * @var \Illuminate\Tests\Console\Scheduling\CacheEventMutexTestFactory
+     * @var \Illuminate\Tests\Console\Fixtures\FakeCacheFactory
      */
     protected $cacheFactory;
 
     protected function setUp(): void
     {
-        $this->cacheMutex = new CacheEventMutex($this->cacheFactory = new CacheEventMutexTestFactory);
+        $this->cacheMutex = new CacheEventMutex($this->cacheFactory = new FakeCacheFactory);
         $this->event = new Event($this->cacheMutex, 'command');
     }
 
@@ -133,27 +133,5 @@ class CacheEventMutexTest extends TestCase
         $this->cacheMutex->forget($this->event);
 
         $this->assertFalse($this->cacheMutex->exists($this->event));
-    }
-}
-
-class CacheEventMutexTestFactory implements Factory
-{
-    /**
-     * @var \Illuminate\Contracts\Cache\Repository
-     */
-    public $repository;
-
-    /**
-     * The last store name that was requested.
-     *
-     * @var string|null
-     */
-    public $name;
-
-    public function store($name = null)
-    {
-        $this->name = $name;
-
-        return $this->repository;
     }
 }

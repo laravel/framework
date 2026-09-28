@@ -72,6 +72,7 @@ class HttpRedirectResponseTest extends TestCase
         $response->withInput();
 
         $this->assertSame(['name' => 'Taylor', 'age' => 26], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testWithCookies()
@@ -95,6 +96,7 @@ class HttpRedirectResponseTest extends TestCase
         $response->onlyInput('name');
 
         $this->assertSame(['name' => 'Taylor'], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testExceptInputOnRedirect()
@@ -106,6 +108,7 @@ class HttpRedirectResponseTest extends TestCase
         $response->exceptInput('age');
 
         $this->assertSame(['name' => 'Taylor'], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testFlashingErrorsOnRedirect()
@@ -118,6 +121,7 @@ class HttpRedirectResponseTest extends TestCase
         $provider->expects('getMessageBag')->andReturn(new MessageBag(['name' => ['required']]));
         $response->withErrors($provider);
 
+        $this->assertContains('errors', $session->get('_flash.new', []));
         $errors = $session->get('errors');
         $this->assertInstanceOf(ViewErrorBag::class, $errors);
         $this->assertSame(['required'], $errors->getBag('default')->get('name'));
@@ -209,6 +213,7 @@ class HttpRedirectResponseTest extends TestCase
         $provider = ['foo' => 'bar'];
         $response->withErrors($provider);
 
+        $this->assertContains('errors', $session->get('_flash.new', []));
         $errors = $session->get('errors');
         $this->assertInstanceOf(ViewErrorBag::class, $errors);
         $this->assertSame(['bar'], $errors->getBag('default')->get('foo'));
@@ -223,6 +228,7 @@ class HttpRedirectResponseTest extends TestCase
         $response->withFoo('bar');
 
         $this->assertSame('bar', $session->get('foo'));
+        $this->assertContains('foo', $session->get('_flash.new', []));
     }
 
     public function testMagicCallException()

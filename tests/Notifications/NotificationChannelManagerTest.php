@@ -23,7 +23,7 @@ use Illuminate\Queue\QueueRoutes;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\EventFake;
-use Illuminate\Tests\Notifications\Fixtures\RecordingChannel;
+use Illuminate\Tests\Notifications\Fixtures\ChannelSpy;
 use Laravel\SerializableClosure\SerializableClosure;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +46,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Dispatcher::class, $events);
         Container::setInstance($container);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
-        $driver = new RecordingChannel;
+        $driver = new ChannelSpy;
         $manager->expects('driver')->andReturn($driver);
 
         $manager->send($notifiable = new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
@@ -101,7 +101,7 @@ class NotificationChannelManagerTest extends TestCase
         });
         Container::setInstance($container);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
-        $driver = new RecordingChannel;
+        $driver = new ChannelSpy;
         $manager->expects('driver')->andReturn($driver);
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotificationWithTwoChannels);
@@ -139,7 +139,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Dispatcher::class, $events);
         Container::setInstance($container);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
-        $driver = new RecordingChannel;
+        $driver = new ChannelSpy;
         $manager->expects('driver')->andReturn($driver);
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotCancelledNotification);
@@ -161,7 +161,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Dispatcher::class, $events);
         Container::setInstance($container);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
-        $driver = new RecordingChannel;
+        $driver = new ChannelSpy;
         $driver->exception = new Exception();
         $manager->expects('driver')->andReturn($driver);
 
@@ -519,7 +519,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Dispatcher::class, $events);
         Container::setInstance($container);
         $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
-        $driver = new RecordingChannel;
+        $driver = new ChannelSpy;
         $manager->expects('driver')->andReturn($driver);
         $driver->response = $response = new stdClass;
 

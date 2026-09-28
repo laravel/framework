@@ -47,6 +47,8 @@ class CacheEventsTest extends TestCase
         $this->assertTrue($repository->tags('taylor')->has('baz'));
         $this->assertEventDispatched(RetrievingKey::class, ['storeName' => 'array', 'key' => 'baz', 'tags' => ['taylor']]);
         $this->assertEventDispatched(CacheHit::class, ['storeName' => 'array', 'key' => 'baz', 'value' => 'qux', 'tags' => ['taylor']]);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testGetTriggersEvents()
@@ -74,6 +76,8 @@ class CacheEventsTest extends TestCase
         $this->assertSame('qux', $repository->tags('taylor')->get('baz'));
         $this->assertEventDispatched(RetrievingKey::class, ['storeName' => 'array', 'key' => 'baz', 'tags' => ['taylor']]);
         $this->assertEventDispatched(CacheHit::class, ['storeName' => 'array', 'key' => 'baz', 'value' => 'qux', 'tags' => ['taylor']]);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testPullTriggersEvents()
@@ -86,6 +90,8 @@ class CacheEventsTest extends TestCase
         $this->assertEventDispatched(CacheHit::class, ['storeName' => 'array', 'key' => 'baz', 'value' => 'qux']);
         $this->assertEventDispatched(ForgettingKey::class, ['storeName' => 'array', 'key' => 'baz']);
         $this->assertEventDispatched(KeyForgotten::class, ['storeName' => 'array', 'key' => 'baz']);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testPullTriggersEventsUsingTags()
@@ -98,6 +104,8 @@ class CacheEventsTest extends TestCase
         $this->assertEventDispatched(CacheHit::class, ['storeName' => 'array', 'key' => 'baz', 'value' => 'qux', 'tags' => ['taylor']]);
         $this->assertEventDispatched(ForgettingKey::class, ['storeName' => 'array', 'key' => 'baz', 'tags' => ['taylor']]);
         $this->assertEventDispatched(KeyForgotten::class, ['storeName' => 'array', 'key' => 'baz', 'tags' => ['taylor']]);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testPutTriggersEvents()
@@ -117,6 +125,8 @@ class CacheEventsTest extends TestCase
         $repository->tags('taylor')->put('foo', 'bar', 99);
         $this->assertEventDispatched(WritingKey::class, ['storeName' => 'array', 'key' => 'foo', 'value' => 'bar', 'seconds' => 99, 'tags' => ['taylor']]);
         $this->assertEventDispatched(KeyWritten::class, ['storeName' => 'array', 'key' => 'foo', 'value' => 'bar', 'seconds' => 99, 'tags' => ['taylor']]);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testAddTriggersEvents()
@@ -135,6 +145,8 @@ class CacheEventsTest extends TestCase
         $this->assertEventDispatched(CacheMissed::class, ['storeName' => 'array', 'key' => 'foo', 'tags' => ['taylor']]);
         $this->assertEventDispatched(WritingKey::class, ['storeName' => 'array', 'key' => 'foo', 'value' => 'bar', 'seconds' => 99, 'tags' => ['taylor']]);
         $this->assertEventDispatched(KeyWritten::class, ['storeName' => 'array', 'key' => 'foo', 'value' => 'bar', 'seconds' => 99, 'tags' => ['taylor']]);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testForeverTriggersEvents()
@@ -149,6 +161,8 @@ class CacheEventsTest extends TestCase
         $repository->tags('taylor')->forever('foo', 'bar');
         $this->assertEventDispatched(WritingKey::class, ['storeName' => 'array', 'key' => 'foo', 'value' => 'bar', 'seconds' => null, 'tags' => ['taylor']]);
         $this->assertEventDispatched(KeyWritten::class, ['storeName' => 'array', 'key' => 'foo', 'value' => 'bar', 'seconds' => null, 'tags' => ['taylor']]);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testRememberTriggersEvents()
@@ -171,6 +185,8 @@ class CacheEventsTest extends TestCase
         $this->assertEventDispatched(CacheMissed::class, ['storeName' => 'array', 'key' => 'foo', 'tags' => ['taylor']]);
         $this->assertEventDispatched(WritingKey::class, ['storeName' => 'array', 'key' => 'foo', 'value' => 'bar', 'seconds' => 99, 'tags' => ['taylor']]);
         $this->assertEventDispatched(KeyWritten::class, ['storeName' => 'array', 'key' => 'foo', 'value' => 'bar', 'seconds' => 99, 'tags' => ['taylor']]);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testRememberForeverTriggersEvents()
@@ -193,6 +209,8 @@ class CacheEventsTest extends TestCase
         $this->assertEventDispatched(CacheMissed::class, ['storeName' => 'array', 'key' => 'foo', 'tags' => ['taylor']]);
         $this->assertEventDispatched(WritingKey::class, ['storeName' => 'array', 'key' => 'foo', 'value' => 'bar', 'seconds' => null, 'tags' => ['taylor']]);
         $this->assertEventDispatched(KeyWritten::class, ['storeName' => 'array', 'key' => 'foo', 'value' => 'bar', 'seconds' => null, 'tags' => ['taylor']]);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testForgetTriggersEvents()
@@ -207,6 +225,8 @@ class CacheEventsTest extends TestCase
         $this->assertTrue($repository->tags('taylor')->forget('baz'));
         $this->assertEventDispatched(ForgettingKey::class, ['storeName' => 'array', 'key' => 'baz', 'tags' => ['taylor']]);
         $this->assertEventDispatched(KeyForgotten::class, ['storeName' => 'array', 'key' => 'baz', 'tags' => ['taylor']]);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testForgetDoesTriggerFailedEventOnFailure()
@@ -220,6 +240,8 @@ class CacheEventsTest extends TestCase
         $this->assertFalse($repository->forget('baz'));
         $this->assertEventDispatched(ForgettingKey::class, ['key' => 'baz']);
         $this->assertEventDispatched(KeyForgetFailed::class, ['key' => 'baz']);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testFlushTriggersEvents()
@@ -230,6 +252,8 @@ class CacheEventsTest extends TestCase
         $this->assertTrue($repository->clear());
         $this->assertEventDispatched(CacheFlushing::class, ['storeName' => 'array']);
         $this->assertEventDispatched(CacheFlushed::class, ['storeName' => 'array']);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testFlushLocksTriggersEvents()
@@ -240,6 +264,8 @@ class CacheEventsTest extends TestCase
         $this->assertTrue($repository->flushLocks());
         $this->assertEventDispatched(CacheLocksFlushing::class, ['storeName' => 'array']);
         $this->assertEventDispatched(CacheLocksFlushed::class, ['storeName' => 'array']);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testFlushFailureDoesDispatchEvent()
@@ -256,6 +282,8 @@ class CacheEventsTest extends TestCase
         $this->assertFalse($repository->clear());
         $this->assertEventDispatched(CacheFlushing::class, ['storeName' => 'array']);
         $this->assertEventDispatched(CacheFlushFailed::class, ['storeName' => 'array']);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     public function testFlushLocksFailureDoesDispatchEvent()
@@ -272,6 +300,8 @@ class CacheEventsTest extends TestCase
         $this->assertFalse($repository->flushLocks());
         $this->assertEventDispatched(CacheLocksFlushing::class, ['storeName' => 'array']);
         $this->assertEventDispatched(CacheLocksFlushFailed::class, ['storeName' => 'array']);
+
+        $this->assertSame([], $this->dispatchedEvents);
     }
 
     protected $dispatchedEvents = [];

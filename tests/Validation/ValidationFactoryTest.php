@@ -27,7 +27,7 @@ class ValidationFactoryTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $validator->getData());
         $this->assertEquals(['baz' => ['boom']], $validator->getRules());
 
-        $presence = new PresenceVerifierFake;
+        $presence = new FakePresenceVerifier;
         $noop1 = function () {
             //
         };
@@ -47,7 +47,7 @@ class ValidationFactoryTest extends TestCase
         $this->assertEquals(['replacer' => $noop3], $validator->replacers);
         $this->assertEquals($presence, $validator->getPresenceVerifier());
 
-        $presence = new PresenceVerifierFake;
+        $presence = new FakePresenceVerifier;
         $factory->extend('foo', $noop1, 'foo!');
         $factory->extendImplicit('implicit', $noop2, 'implicit!');
         $factory->extendImplicit('dependent', $noop3, 'dependent!');
@@ -154,7 +154,7 @@ class ValidationFactoryTest extends TestCase
     }
 }
 
-class PresenceVerifierFake implements PresenceVerifierInterface
+class FakePresenceVerifier implements PresenceVerifierInterface
 {
     public function getCount($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = [])
     {

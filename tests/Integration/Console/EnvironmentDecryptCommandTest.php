@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\File;
-use Illuminate\Tests\Integration\Console\Fixtures\InMemoryFilesystem;
+use Illuminate\Tests\Integration\Console\Fixtures\ArrayFilesystem;
 use Orchestra\Testbench\TestCase;
 
 class EnvironmentDecryptCommandTest extends TestCase
@@ -15,7 +15,7 @@ class EnvironmentDecryptCommandTest extends TestCase
     {
         parent::setUp();
 
-        $this->filesystem = new InMemoryFilesystem;
+        $this->filesystem = new ArrayFilesystem;
 
         File::swap($this->filesystem);
     }

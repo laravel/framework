@@ -41,7 +41,7 @@ class HandleExceptionsTest extends TestCase
         });
     }
 
-    protected function realLogger(): TestHandler
+    protected function getRealLogger(): TestHandler
     {
         $handler = new TestHandler;
 
@@ -63,7 +63,7 @@ class HandleExceptionsTest extends TestCase
 
     public function testPhpDeprecations()
     {
-        $handler = $this->realLogger();
+        $handler = $this->getRealLogger();
 
         $this->handleExceptions()->handleError(
             E_DEPRECATED,
@@ -81,7 +81,7 @@ class HandleExceptionsTest extends TestCase
 
     public function testPhpDeprecationsWithStackTraces()
     {
-        $handler = $this->realLogger();
+        $handler = $this->getRealLogger();
 
         $this->config->set('logging.deprecations', [
             'channel' => 'null',
@@ -130,7 +130,7 @@ class HandleExceptionsTest extends TestCase
 
     public function testUserDeprecations()
     {
-        $handler = $this->realLogger();
+        $handler = $this->getRealLogger();
 
         $this->handleExceptions()->handleError(
             E_USER_DEPRECATED,
@@ -148,7 +148,7 @@ class HandleExceptionsTest extends TestCase
 
     public function testUserDeprecationsWithStackTraces()
     {
-        $handler = $this->realLogger();
+        $handler = $this->getRealLogger();
 
         $this->config->set('logging.deprecations', [
             'channel' => 'null',
@@ -337,7 +337,7 @@ class HandleExceptionsTest extends TestCase
 
     public function testItCanForceViaConfigDeprecationLoggingWhenRunningUnitTests()
     {
-        $handler = $this->realLogger();
+        $handler = $this->getRealLogger();
         $this->app->instance('env', 'testing');
 
         Env::getRepository()->set('LOG_DEPRECATIONS_WHILE_TESTING', true);

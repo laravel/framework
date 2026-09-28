@@ -82,7 +82,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $this->expectExceptionObject(new ExpectationFailedException('The table is empty.'));
 
-        $this->useRealConnection();
+        $this->useInMemoryConnection();
 
         $this->assertDatabaseHas($this->table, $this->data);
     }
@@ -91,7 +91,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $row = ['title' => 'Spark', 'name' => 'Forge'];
 
-        $this->useRealConnection()->table($this->table)->insert($row);
+        $this->useInMemoryConnection()->table($this->table)->insert($row);
 
         $this->expectExceptionObject(new ExpectationFailedException('Found similar results: '.json_encode([$row], JSON_PRETTY_PRINT)));
 
@@ -102,7 +102,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $row = ['title' => 'Spark', 'name' => 'Forge'];
 
-        $this->useRealConnection()->table($this->table)->insert(array_fill(0, 5, $row));
+        $this->useInMemoryConnection()->table($this->table)->insert(array_fill(0, 5, $row));
 
         $this->expectExceptionObject(new ExpectationFailedException('Found similar results: '.json_encode(array_fill(0, 3, $row), JSON_PRETTY_PRINT).' and 2 others.'));
 
@@ -156,7 +156,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $this->expectException(ExpectationFailedException::class);
 
-        $this->useRealConnection()->table($this->table)->insert($this->data);
+        $this->useInMemoryConnection()->table($this->table)->insert($this->data);
 
         $this->assertDatabaseMissing($this->table, $this->data);
     }
@@ -178,7 +178,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testAssertDatabaseCountSupportsArraysOfTablesAndCounts()
     {
-        $connection = $this->useRealConnection();
+        $connection = $this->useInMemoryConnection();
         $connection->table('products')->insert([
             ['title' => 'Spark', 'name' => 'Laravel'],
             ['title' => 'Forge', 'name' => 'Laravel'],
@@ -287,14 +287,14 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $this->expectException(ExpectationFailedException::class);
 
-        $this->useRealConnection()->table($this->table)->insert($this->data);
+        $this->useInMemoryConnection()->table($this->table)->insert($this->data);
 
         $this->assertDatabaseMissing($this->table, $this->data);
     }
 
     public function testAssertModelMissingPassesWhenDoesNotFindModelResults()
     {
-        $this->useRealConnection();
+        $this->useInMemoryConnection();
 
         $this->assertModelMissing(new ProductStub(['id' => 1]));
     }
@@ -303,7 +303,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $this->expectException(ExpectationFailedException::class);
 
-        $this->useRealConnection()->table($this->table)->insert(['id' => 1, 'title' => 'Spark', 'name' => 'Laravel']);
+        $this->useInMemoryConnection()->table($this->table)->insert(['id' => 1, 'title' => 'Spark', 'name' => 'Laravel']);
 
         $this->assertModelMissing(new ProductStub(['id' => 1]));
     }
@@ -312,7 +312,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $this->expectException(ExpectationFailedException::class);
 
-        $this->useRealConnection();
+        $this->useInMemoryConnection();
 
         $this->assertModelExists(new ProductStub(['id' => 1]));
     }
@@ -335,7 +335,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $this->expectExceptionObject(new ExpectationFailedException('The table is empty.'));
 
-        $this->useRealConnection();
+        $this->useInMemoryConnection();
 
         $this->assertSoftDeleted($this->table, $this->data);
     }
@@ -344,7 +344,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $this->expectExceptionObject(new ExpectationFailedException('The table is empty.'));
 
-        $this->useRealConnection();
+        $this->useInMemoryConnection();
 
         $this->assertSoftDeleted(new ProductStub(['id' => 1]));
     }
@@ -355,7 +355,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $model = new CustomProductStub(['id' => 1, 'name' => 'Laravel']);
 
-        $this->useRealConnection();
+        $this->useInMemoryConnection();
 
         $this->assertSoftDeleted($model, ['name' => 'Tailwind']);
     }
@@ -366,7 +366,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $model = new CustomProductStub(['id' => 1, 'name' => 'Laravel']);
 
-        $this->useRealConnection();
+        $this->useInMemoryConnection();
 
         $this->assertSoftDeleted(CustomProductStub::class, ['id' => $model->id]);
     }
@@ -389,7 +389,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $this->expectExceptionObject(new ExpectationFailedException('Failed asserting that any existing row'));
 
-        $this->useRealConnection();
+        $this->useInMemoryConnection();
 
         $this->assertNotSoftDeleted(ProductStub::class, $this->data);
     }
@@ -398,7 +398,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $this->expectExceptionObject(new ExpectationFailedException('The table is empty.'));
 
-        $this->useRealConnection();
+        $this->useInMemoryConnection();
 
         $this->assertNotSoftDeleted($this->table, $this->data);
     }
@@ -407,7 +407,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $this->expectExceptionObject(new ExpectationFailedException('The table is empty.'));
 
-        $this->useRealConnection();
+        $this->useInMemoryConnection();
 
         $this->assertNotSoftDeleted(new ProductStub(['id' => 1]));
     }
@@ -418,7 +418,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $model = new CustomProductStub(['id' => 1, 'name' => 'Laravel']);
 
-        $this->useRealConnection();
+        $this->useInMemoryConnection();
 
         $this->assertNotSoftDeleted($model, ['name' => 'Tailwind']);
     }
@@ -429,14 +429,14 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $model = new CustomProductStub(['id' => 1, 'name' => 'Laravel']);
 
-        $this->useRealConnection();
+        $this->useInMemoryConnection();
 
         $this->assertNotSoftDeleted(CustomProductStub::class, ['id' => $model->id]);
     }
 
     public function testAssertExistsPassesWhenFindsResults()
     {
-        $this->useRealConnection()->table($this->table)->insert(['id' => 1, 'title' => 'Spark', 'name' => 'Laravel']);
+        $this->useInMemoryConnection()->table($this->table)->insert(['id' => 1, 'title' => 'Spark', 'name' => 'Laravel']);
 
         $this->assertModelExists(new ProductStub(['id' => 1]));
     }
@@ -589,7 +589,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         return $this->connection;
     }
 
-    protected function useRealConnection()
+    protected function useInMemoryConnection()
     {
         $capsule = new Manager;
         $capsule->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);

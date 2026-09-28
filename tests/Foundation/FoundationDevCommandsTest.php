@@ -18,6 +18,8 @@ use ReflectionClass;
 
 class FoundationDevCommandsTest extends TestCase
 {
+    protected $temporaryBasePath;
+
     protected function setUp(): void
     {
         $ref = new ReflectionClass(DevCommands::class);
@@ -47,10 +49,32 @@ class FoundationDevCommandsTest extends TestCase
 
     protected function tearDown(): void
     {
+        if ($this->temporaryBasePath) {
+            (new Filesystem)->deleteDirectory($this->temporaryBasePath);
+
+            $this->temporaryBasePath = null;
+        }
+
         Facade::clearResolvedInstances();
         Container::setInstance(null);
 
         parent::tearDown();
+    }
+
+    /**
+     * Point the application at an isolated base path so package.json is never touched in the repository.
+     */
+    protected function useTemporaryBasePath(bool $withPackageJson): void
+    {
+        $this->temporaryBasePath = sys_get_temp_dir().'/dev_commands_test_'.uniqid();
+
+        mkdir($this->temporaryBasePath);
+
+        if ($withPackageJson) {
+            touch($this->temporaryBasePath.'/package.json');
+        }
+
+        Application::getInstance()->setBasePath($this->temporaryBasePath);
     }
 
     public function testRegisterAddsCommand()
@@ -348,51 +372,43 @@ class FoundationDevCommandsTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRegisterDefaultsRegistersExpectedCommands()
     {
-        touch($packageJson = base_path('package.json'));
+        $this->useTemporaryBasePath(withPackageJson: true);
 
-        try {
-            $provider = Mockery::mock('alias:Laravel\Pail\PailServiceProvider');
-            $provider->shouldReceive('register');
+        $provider = Mockery::mock('alias:Laravel\Pail\PailServiceProvider');
+        $provider->shouldReceive('register');
 
-            Application::getInstance()->register($provider);
+        Application::getInstance()->register($provider);
 
-            DevCommands::registerDefaults();
+        DevCommands::registerDefaults();
 
-            $commands = DevCommands::commands();
+        $commands = DevCommands::commands();
 
-            $this->assertCount(4, $commands);
+        $this->assertCount(4, $commands);
 
-            $names = array_column($commands, 'name');
-            $this->assertContains('server', $names);
-            $this->assertSame('php artisan serve', collect($commands)->firstWhere('name', 'server')['command']);
-            $this->assertContains('queue', $names);
-            $this->assertContains('logs', $names);
-            $this->assertContains('vite', $names);
-        } finally {
-            @unlink($packageJson);
-        }
+        $names = array_column($commands, 'name');
+        $this->assertContains('server', $names);
+        $this->assertSame('php artisan serve', collect($commands)->firstWhere('name', 'server')['command']);
+        $this->assertContains('queue', $names);
+        $this->assertContains('logs', $names);
+        $this->assertContains('vite', $names);
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRegisterDefaultsExcludesPailWhenNotInstalled()
     {
-        touch($packageJson = base_path('package.json'));
+        $this->useTemporaryBasePath(withPackageJson: true);
 
-        try {
-            DevCommands::registerDefaults();
+        DevCommands::registerDefaults();
 
-            $commands = DevCommands::commands();
+        $commands = DevCommands::commands();
 
-            $this->assertCount(3, $commands);
+        $this->assertCount(3, $commands);
 
-            $names = array_column($commands, 'name');
-            $this->assertContains('server', $names);
-            $this->assertContains('queue', $names);
-            $this->assertContains('vite', $names);
-            $this->assertNotContains('logs', $names);
-        } finally {
-            @unlink($packageJson);
-        }
+        $names = array_column($commands, 'name');
+        $this->assertContains('server', $names);
+        $this->assertContains('queue', $names);
+        $this->assertContains('vite', $names);
+        $this->assertNotContains('logs', $names);
     }
 
     #[RequiresOperatingSystem('Windows')]
@@ -415,7 +431,7 @@ class FoundationDevCommandsTest extends TestCase
 
     public function testRegisterDefaultsExcludesViteWithoutPackageJson()
     {
-        @unlink(base_path('package.json'));
+        $this->useTemporaryBasePath(withPackageJson: false);
 
         DevCommands::registerDefaults();
 

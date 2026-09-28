@@ -869,7 +869,7 @@ class QueueTest extends TestCase
             ]],
         ]));
 
-        $queue = $this->realQueue($mock);
+        $queue = $this->getRealQueue($mock);
 
         $job = $queue->pop();
 
@@ -887,7 +887,7 @@ class QueueTest extends TestCase
         $mock = new MockHandler();
         $mock->append(fn (CommandInterface $cmd) => new Result(['Messages' => null]));
 
-        $queue = $this->realQueue($mock);
+        $queue = $this->getRealQueue($mock);
 
         $this->assertNull($queue->pop());
     }
@@ -2093,7 +2093,7 @@ class QueueTest extends TestCase
         $mock = new MockHandler();
         $mock->append(fn (CommandInterface $cmd) => new Result());
 
-        $queue = $this->realQueue($mock);
+        $queue = $this->getRealQueue($mock);
 
         unset($_SERVER['SQS_PREFIX'], $_SERVER['SQS_SUFFIX']);
 
@@ -2111,7 +2111,7 @@ class QueueTest extends TestCase
         $mock = new MockHandler();
         $mock->append(fn (CommandInterface $cmd) => new Result());
 
-        $queue = $this->realQueue($mock);
+        $queue = $this->getRealQueue($mock);
 
         $queue->push(new FakeJob, queue: 'orders.fifo');
 
@@ -2191,7 +2191,7 @@ class QueueTest extends TestCase
      * Build a Cloud queue backed by a real SqsClient whose HTTP layer is
      * stubbed via an Aws\MockHandler, instead of mocking the client itself.
      */
-    private function realQueue(MockHandler $handler): Queue
+    private function getRealQueue(MockHandler $handler): Queue
     {
         $client = new SqsClient([
             'region' => 'us-east-2',

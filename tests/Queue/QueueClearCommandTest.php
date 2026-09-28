@@ -16,7 +16,7 @@ class QueueClearCommandTest extends TestCase
 {
     public function testClearingDefaultQueue()
     {
-        $queue = new ClearableQueueFake(['default' => 2]);
+        $queue = new FakeClearableQueue(['default' => 2]);
 
         $output = $this->runClearCommand($queue);
 
@@ -26,7 +26,7 @@ class QueueClearCommandTest extends TestCase
 
     public function testClearingMultipleQueues()
     {
-        $queue = new ClearableQueueFake(['high' => 3, 'low' => 0, 'emails' => 1]);
+        $queue = new FakeClearableQueue(['high' => 3, 'low' => 0, 'emails' => 1]);
 
         $output = $this->runClearCommand($queue, ['--queue' => 'high,low,emails']);
 
@@ -36,7 +36,7 @@ class QueueClearCommandTest extends TestCase
 
     public function testClearingMultipleQueuesWithWhitespace()
     {
-        $queue = new ClearableQueueFake(['high' => 3, 'low' => 0]);
+        $queue = new FakeClearableQueue(['high' => 3, 'low' => 0]);
 
         $output = $this->runClearCommand($queue, ['--queue' => 'high, low']);
 
@@ -46,7 +46,7 @@ class QueueClearCommandTest extends TestCase
 
     public function testClearingMultipleQueuesWithEmptyValues()
     {
-        $queue = new ClearableQueueFake(['high' => 3, 'low' => 0]);
+        $queue = new FakeClearableQueue(['high' => 3, 'low' => 0]);
 
         $output = $this->runClearCommand($queue, ['--queue' => 'high,,low']);
 
@@ -56,7 +56,7 @@ class QueueClearCommandTest extends TestCase
 
     public function testClearingMultipleQueuesWithDuplicates()
     {
-        $queue = new ClearableQueueFake(['high' => 3, 'low' => 0]);
+        $queue = new FakeClearableQueue(['high' => 3, 'low' => 0]);
 
         $output = $this->runClearCommand($queue, ['--queue' => 'high,low,high']);
 
@@ -90,7 +90,7 @@ class QueueClearCommandTest extends TestCase
     }
 }
 
-class ClearableQueueFake implements ClearableQueue
+class FakeClearableQueue implements ClearableQueue
 {
     public array $cleared = [];
 

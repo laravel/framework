@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\File;
-use Illuminate\Tests\Integration\Console\Fixtures\InMemoryFilesystem;
+use Illuminate\Tests\Integration\Console\Fixtures\ArrayFilesystem;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -12,11 +12,11 @@ class EnvironmentEncryptIncrementalCommandTest extends TestCase
 {
     protected string $key = 'ANvVbPbE0tWMHpUySh6liY4WaCmAYKXP';
 
-    protected InMemoryFilesystem $filesystem;
+    protected ArrayFilesystem $filesystem;
 
     protected function seedFiles(?string $originalContent, ?string $encryptedContent, string $env = '.env'): void
     {
-        $this->filesystem = new InMemoryFilesystem;
+        $this->filesystem = new ArrayFilesystem;
 
         if ($originalContent !== null) {
             $this->filesystem->files[base_path($env)] = $originalContent;

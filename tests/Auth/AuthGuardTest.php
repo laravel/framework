@@ -664,6 +664,7 @@ class AuthGuardTest extends TestCase
     public function testUserUsesRememberCookieIfItExists()
     {
         [$guard, $provider, $session] = $this->getRealGuard();
+        $sessionId = $session->getId();
         $guard->setRequest(Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller|baz']));
         $user = Mockery::mock(Authenticatable::class);
         $provider->expects('retrieveByToken')->with('id', 'recaller')->andReturn($user);
@@ -673,6 +674,7 @@ class AuthGuardTest extends TestCase
         $this->assertSame($user, $guard->user());
         $this->assertTrue($guard->viaRemember());
         $this->assertSame('bar', $session->get($guard->getName()));
+        $this->assertNotSame($sessionId, $session->getId());
     }
 
     public function testUserReturnsNullWhenRememberCookieTokenDoesNotMatchAnyUser()

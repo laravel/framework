@@ -1,10 +1,10 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Testing;
+namespace Illuminate\Tests\Foundation\Testing\Fixtures;
 
 use Illuminate\Contracts\Console\Kernel;
 
-class RecordingConsoleKernel implements Kernel
+class ConsoleKernelSpy implements Kernel
 {
     public array $calls = [];
 

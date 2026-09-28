@@ -1527,9 +1527,11 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/');
         $session = new Store('test', new NullSessionHandler);
         $session->flashInput(['foo' => 'bar']);
+        $session->ageFlashData();
         $request->setLaravelSession($session);
         $request->flush();
         $this->assertSame([], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testExpectsJson()
@@ -2023,6 +2025,7 @@ class HttpRequestTest extends TestCase
         $request->setLaravelSession($session);
         $request->flash();
         $this->assertSame(['name' => 'Taylor', 'email' => 'foo'], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testHttpRequestFlashOnlyCallsFlashWithProperParameters()
@@ -2032,6 +2035,7 @@ class HttpRequestTest extends TestCase
         $request->setLaravelSession($session);
         $request->flashOnly(['name']);
         $this->assertSame(['name' => 'Taylor'], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testHttpRequestFlashExceptCallsFlashWithProperParameters()
@@ -2041,6 +2045,7 @@ class HttpRequestTest extends TestCase
         $request->setLaravelSession($session);
         $request->flashExcept(['email']);
         $this->assertSame(['name' => 'Taylor'], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testGeneratingJsonRequestFromParentRequestUsesCorrectType()

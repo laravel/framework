@@ -1056,6 +1056,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder, $result);
     }
 
+    public function testRealQueryDynamicScopesWithNamedArguments()
+    {
+        $model = new EloquentBuilderTestDynamicScopeStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->dynamic(bar: 'baz');
+        $this->assertSame('select * from "table" where "foo" = ?', $query->toSql());
+        $this->assertEquals(['baz'], $query->getBindings());
+    }
+
     public function testRealQueryHigherOrderOrWhereScopes()
     {
         $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
@@ -3015,6 +3024,16 @@ class EloquentBuilderTestHigherOrderWhereScopeStub extends Model
     public function scopeThree($query)
     {
         $query->where('three', 'baz');
+    }
+}
+
+class EloquentBuilderTestDynamicScopeStub extends Model
+{
+    protected $table = 'table';
+
+    public function scopeDynamic($query, $foo = 'foo', $bar = 'bar')
+    {
+        $query->where($foo, $bar);
     }
 }
 

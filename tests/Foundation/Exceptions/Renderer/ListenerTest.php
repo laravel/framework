@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class ListenerTest extends TestCase
 {
-    protected function realConnection(): Connection
+    protected function getRealConnection(): Connection
     {
         $capsule = new Manager;
         $capsule->addConnection(['driver' => 'sqlite', 'database' => ':memory:'], 'testing');
@@ -21,7 +21,7 @@ class ListenerTest extends TestCase
 
     public function test_queries_returns_expected_shape_after_query_executed()
     {
-        $connection = $this->realConnection();
+        $connection = $this->getRealConnection();
 
         $event = new QueryExecuted('select * from users where id = ?', ['foo'], 5.2, $connection);
 
@@ -70,7 +70,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = $this->realConnection();
+        $connection = $this->getRealConnection();
 
         $largeSql = str_repeat('x', 5000);
         $listener->onQueryExecuted(
@@ -84,7 +84,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = $this->realConnection();
+        $connection = $this->getRealConnection();
 
         // Build SQL with 500 placeholders — when truncated to 2000 bytes,
         // only some ? will remain, and bindings should match that count.
@@ -106,7 +106,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = $this->realConnection();
+        $connection = $this->getRealConnection();
 
         // 1 placeholder but 1000 bindings — only 1 binding should be kept
         $listener->onQueryExecuted(
@@ -120,7 +120,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = $this->realConnection();
+        $connection = $this->getRealConnection();
 
         $sql = 'select * from users where name = ?';
         $listener->onQueryExecuted(
@@ -135,7 +135,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = $this->realConnection();
+        $connection = $this->getRealConnection();
 
         $listener->onQueryExecuted(
             new QueryExecuted('select count(*) from users', [], 1.0, $connection)
@@ -149,7 +149,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = $this->realConnection();
+        $connection = $this->getRealConnection();
 
         $sql = 'select * from users where id = ? and name = ? and email = ?';
         $bindings = [1, 'John', 'john@example.com'];

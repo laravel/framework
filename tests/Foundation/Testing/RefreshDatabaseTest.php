@@ -6,6 +6,7 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Illuminate\Tests\Foundation\Testing\Fixtures\ConsoleKernelSpy;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +47,7 @@ class RefreshDatabaseTest extends TestCase
 
     public function testRefreshTestDatabaseDefault()
     {
-        $kernel = new RecordingConsoleKernel;
+        $kernel = new ConsoleKernelSpy;
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $this->refreshTestDatabase();
@@ -60,7 +61,7 @@ class RefreshDatabaseTest extends TestCase
     {
         $this->dropViews = true;
 
-        $kernel = new RecordingConsoleKernel;
+        $kernel = new ConsoleKernelSpy;
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $this->refreshTestDatabase();
@@ -74,7 +75,7 @@ class RefreshDatabaseTest extends TestCase
     {
         $this->dropTypes = true;
 
-        $kernel = new RecordingConsoleKernel;
+        $kernel = new ConsoleKernelSpy;
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $this->refreshTestDatabase();

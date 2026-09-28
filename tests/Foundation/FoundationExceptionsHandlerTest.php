@@ -33,8 +33,8 @@ use Mockery;
 use OutOfRangeException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
@@ -84,49 +84,49 @@ class FoundationExceptionsHandlerTest extends TestCase
         Container::setInstance(null);
     }
 
-    protected function realLogger(): RecordingLogger
+    protected function getRealLogger(): LoggerSpy
     {
-        $this->container->instance(LoggerInterface::class, $logger = new RecordingLogger);
+        $this->container->instance(LoggerInterface::class, $logger = new LoggerSpy);
 
         return $logger;
     }
 
     public function testHandlerReportsExceptionAsContext()
     {
-        $logger = $this->realLogger();
+        $logger = $this->getRealLogger();
 
         $this->handler->report(new RuntimeException('Exception message'));
 
-        $this->assertSame('error', $logger->records[0]['level']);
-        $this->assertSame('Exception message', $logger->records[0]['message']);
-        $this->assertArrayHasKey('exception', $logger->records[0]['context']);
+        $this->assertSame('error', $logger->logs[0]['level']);
+        $this->assertSame('Exception message', $logger->logs[0]['message']);
+        $this->assertArrayHasKey('exception', $logger->logs[0]['context']);
     }
 
     public function testHandlerCallsContextMethodIfPresent()
     {
-        $logger = $this->realLogger();
+        $logger = $this->getRealLogger();
 
         $this->handler->report(new ContextProvidingException('Exception message'));
 
-        $this->assertSame('error', $logger->records[0]['level']);
-        $this->assertSame('Exception message', $logger->records[0]['message']);
-        $this->assertSame('bar', $logger->records[0]['context']['foo']);
+        $this->assertSame('error', $logger->logs[0]['level']);
+        $this->assertSame('Exception message', $logger->logs[0]['message']);
+        $this->assertSame('bar', $logger->logs[0]['context']['foo']);
     }
 
     public function testHandlerReportsExceptionWhenUnReportable()
     {
-        $logger = $this->realLogger();
+        $logger = $this->getRealLogger();
 
         $this->handler->report(new UnReportableException('Exception message'));
 
-        $this->assertSame('error', $logger->records[0]['level']);
-        $this->assertSame('Exception message', $logger->records[0]['message']);
-        $this->assertArrayHasKey('exception', $logger->records[0]['context']);
+        $this->assertSame('error', $logger->logs[0]['level']);
+        $this->assertSame('Exception message', $logger->logs[0]['message']);
+        $this->assertArrayHasKey('exception', $logger->logs[0]['context']);
     }
 
     public function testHandlerReportsExceptionWithCustomLogLevel()
     {
-        $logger = $this->realLogger();
+        $logger = $this->getRealLogger();
 
         $this->handler->level(InvalidArgumentException::class, LogLevel::CRITICAL);
         $this->handler->level(OutOfRangeException::class, 'custom');
@@ -135,17 +135,17 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new RuntimeException('Error message'));
         $this->handler->report(new OutOfRangeException('Custom message'));
 
-        $this->assertSame('critical', $logger->records[0]['level']);
-        $this->assertSame('Critical message', $logger->records[0]['message']);
-        $this->assertArrayHasKey('exception', $logger->records[0]['context']);
+        $this->assertSame('critical', $logger->logs[0]['level']);
+        $this->assertSame('Critical message', $logger->logs[0]['message']);
+        $this->assertArrayHasKey('exception', $logger->logs[0]['context']);
 
-        $this->assertSame('error', $logger->records[1]['level']);
-        $this->assertSame('Error message', $logger->records[1]['message']);
-        $this->assertArrayHasKey('exception', $logger->records[1]['context']);
+        $this->assertSame('error', $logger->logs[1]['level']);
+        $this->assertSame('Error message', $logger->logs[1]['message']);
+        $this->assertArrayHasKey('exception', $logger->logs[1]['context']);
 
-        $this->assertSame('custom', $logger->records[2]['level']);
-        $this->assertSame('Custom message', $logger->records[2]['message']);
-        $this->assertArrayHasKey('exception', $logger->records[2]['context']);
+        $this->assertSame('custom', $logger->logs[2]['level']);
+        $this->assertSame('Custom message', $logger->logs[2]['message']);
+        $this->assertArrayHasKey('exception', $logger->logs[2]['context']);
     }
 
     public function testHandlerIgnoresNotReportableExceptions()
@@ -445,13 +445,13 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testMultipleRecordsFoundIsReported()
     {
-        $logger = $this->realLogger();
+        $logger = $this->getRealLogger();
 
         $this->handler->report(new MultipleRecordsFoundException(2));
 
-        $this->assertSame('error', $logger->records[0]['level']);
-        $this->assertSame('2 records were found.', $logger->records[0]['message']);
-        $this->assertArrayHasKey('exception', $logger->records[0]['context']);
+        $this->assertSame('error', $logger->logs[0]['level']);
+        $this->assertSame('2 records were found.', $logger->logs[0]['message']);
+        $this->assertArrayHasKey('exception', $logger->logs[0]['context']);
     }
 
     public function testItReturnsSpecificErrorViewIfExists()
@@ -509,7 +509,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->container->instance(ResponseFactoryContract::class, new ResponseFactory(
             $viewFactory, Mockery::mock(Redirector::class)
         ));
-        $this->container->instance(LoggerInterface::class, new RecordingLogger);
+        $this->container->instance(LoggerInterface::class, new LoggerSpy);
 
         $this->container->instance('config', new Config(['app' => ['debug' => $debug]]));
 
@@ -1035,13 +1035,19 @@ class ContextProvidingException extends Exception
     }
 }
 
-class RecordingLogger extends AbstractLogger
+class LoggerSpy implements LoggerInterface
 {
-    public array $records = [];
+    use LoggerTrait;
 
-    public function log($level, $message, array $context = []): void
+    public array $logs = [];
+
+    public function log($level, \Stringable|string $message, array $context = []): void
     {
-        $this->records[] = compact('level', 'message', 'context');
+        $this->logs[] = [
+            'level' => $level,
+            'message' => $message,
+            'context' => $context,
+        ];
     }
 }
 
