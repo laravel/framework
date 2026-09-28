@@ -28,6 +28,13 @@ class ScheduleInterruptCommandTest extends TestCase
         $this->assertFalse($schedule->interruptedSince(Carbon::now()->addSecond()));
     }
 
+    public function testReadsTheTimestampAsStoresSuchAsRedisReturnIt()
+    {
+        $this->app['cache']->forever('illuminate:schedule:interrupt', (string) Carbon::now()->getTimestampMs());
+
+        $this->assertTrue($this->app->make(Schedule::class)->interruptedSince(Carbon::now()->subSecond()));
+    }
+
     public function testDoesNotInterruptWhenInterruptingIsDisabled()
     {
         $this->artisan('schedule:interrupt');

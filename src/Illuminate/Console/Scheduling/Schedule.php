@@ -518,7 +518,7 @@ class Schedule
 
         $interruptedAt = Container::getInstance()->make(Cache::class)->get('illuminate:schedule:interrupt');
 
-        return is_int($interruptedAt) && $interruptedAt >= Date::instance($time)->getTimestampMs();
+        return is_numeric($interruptedAt) && (int) $interruptedAt >= Date::instance($time)->getTimestampMs();
     }
 
     /**
