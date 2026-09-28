@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
@@ -207,6 +208,37 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
 
         HasManyThroughTestCountry::first()->posts()->findOrFail(new Collection([1, 2]));
+    }
+
+    public function testFindOrFailAndFindOrWithEnumIds()
+    {
+        $country = HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us']);
+        $country->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->createMany([
+                ['id' => 5, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
+                ['id' => 6, 'title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+            ]);
+
+        $ids = [Bar::FOO, 6, Bar::FOO, 5];
+
+        foreach ([$ids, new Collection($ids)] as $ids) {
+            $this->assertEqualsCanonicalizing([5, 6], $country->posts()->findOrFail($ids)->modelKeys());
+            $this->assertEqualsCanonicalizing([5, 6], $country->posts()->findOr($ids, fn () => $this->fail('Unexpected callback.'))->modelKeys());
+        }
+
+        $country->posts()->whereKey(5)->delete();
+
+        foreach ([[Bar::FOO, 6], new Collection([Bar::FOO, 6])] as $ids) {
+            $this->assertSame('missing', $country->posts()->findOr($ids, fn () => 'missing'));
+
+            try {
+                $country->posts()->findOrFail($ids);
+                $this->fail('Expected ModelNotFoundException was not thrown.');
+            } catch (ModelNotFoundException $exception) {
+                $this->assertSame(HasManyThroughTestPost::class, $exception->getModel());
+                $this->assertSame([5, 6], $exception->getIds());
+            }
+        }
     }
 
     public function testFindOrMethod()

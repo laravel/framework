@@ -22,8 +22,10 @@ use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
+use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use Mockery;
 use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -196,6 +198,52 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2]);
         $builder->expects('get')->with(['column'])->andReturn(new Collection([$model]));
         $builder->findOrFail(new Collection([1, 2]), ['column']);
+    }
+
+    #[DataProvider('enumIdsProvider')]
+    public function testFindOrFailWithEnumIds($id, $value, $useCollection)
+    {
+        $model = new EloquentBuilderTestStub;
+        $model->setAttribute($model->getKeyName(), $value);
+
+        $builder = Mockery::mock(Builder::class.'[find]', [$model->getConnection()->query()]);
+        $builder->setModel($model);
+        $models = new Collection([$model]);
+        $ids = [$id, $id, $value];
+        $ids = $useCollection ? new BaseCollection($ids) : $ids;
+        $builder->expects('find')->with($ids, ['column'])->andReturn($models);
+
+        $this->assertSame($models, $builder->findOrFail($ids, ['column']));
+    }
+
+    #[DataProvider('enumIdsProvider')]
+    public function testFindOrFailWithMissingEnumIds($id, $value, $useCollection)
+    {
+        $model = new EloquentBuilderTestStub;
+        $model->setKeyType('string');
+        $model->setAttribute($model->getKeyName(), 'existing');
+
+        $builder = Mockery::mock(Builder::class.'[find]', [$model->getConnection()->query()]);
+        $builder->setModel($model);
+        $ids = ['existing', $id];
+        $ids = $useCollection ? new BaseCollection($ids) : $ids;
+        $builder->expects('find')->with($ids, ['*'])->andReturn(new Collection([$model]));
+
+        try {
+            $builder->findOrFail($ids);
+            $this->fail('Expected ModelNotFoundException was not thrown.');
+        } catch (ModelNotFoundException $exception) {
+            $this->assertSame(EloquentBuilderTestStub::class, $exception->getModel());
+            $this->assertSame([$value], array_values($exception->getIds()));
+        }
+    }
+
+    public static function enumIdsProvider()
+    {
+        foreach ([false, true] as $useCollection) {
+            yield [Bar::FOO, 5, $useCollection];
+            yield [EloquentBuilderTestBackedEnum::Bar, 'bar', $useCollection];
+        }
     }
 
     public function testFindOrMethod()
