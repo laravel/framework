@@ -85,7 +85,7 @@
         "orchestra/testbench-core": "^11.5.0",
         "pda/pheanstalk": "^7.0.0 || ^8.0.0",
         "php-http/discovery": "^1.15",
-        "phpstan/phpstan": "2.2.14",
+        "phpstan/phpstan": "2.2.15",
         "phpunit/phpunit": "^11.5.50 || ^12.5.8 || ^13.0.3",
         "predis/predis": "^2.3 || ^3.0",
         "rector/rector": "2.6.3",

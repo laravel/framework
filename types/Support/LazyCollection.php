@@ -431,18 +431,18 @@ assertType('Illuminate\Support\LazyCollection<(int|string), Illuminate\Support\L
 assertType('Illuminate\Support\LazyCollection<(int|string), Illuminate\Support\LazyCollection<int, User>>', $collection->groupBy(static fn ($user) => NamedDigit::One));
 assertType('Illuminate\Support\LazyCollection<(int|string), Illuminate\Support\LazyCollection<int, User>>', $collection->groupBy(static fn ($user) => NumberedDigit::One));
 
-assertType("Illuminate\Support\LazyCollection<string, Illuminate\Support\LazyCollection<'bar', User>>", $collection->keyBy(fn ($user) => 'bar')->groupBy(function ($user) {
+assertType("Illuminate\Support\LazyCollection<string, Illuminate\Support\LazyCollection<string, User>>", $collection->keyBy(fn ($user) => 'bar')->groupBy(function ($user) {
     return 'foo';
 }, preserveKeys: true));
 
 assertType('Illuminate\Support\LazyCollection<(int|string), User>', $collection->keyBy('name'));
-assertType("Illuminate\Support\LazyCollection<'foo', User>", $collection->keyBy(function ($user, $int) {
+assertType('Illuminate\Support\LazyCollection<string, User>', $collection->keyBy(function ($user, $int) {
     assertType('User', $user);
     assertType('int', $int);
 
     return 'foo';
 }));
-assertType("Illuminate\Support\LazyCollection<0, User>", $collection->keyBy(static fn ($user): int => 0));
+assertType('Illuminate\Support\LazyCollection<int, User>', $collection->keyBy(static fn ($user): int => 0));
 assertType('Illuminate\Support\LazyCollection<(int|string), User>', $collection->keyBy(static fn ($user) => Digit::One));
 assertType('Illuminate\Support\LazyCollection<(int|string), User>', $collection->keyBy(static fn ($user) => NamedDigit::One));
 assertType('Illuminate\Support\LazyCollection<(int|string), User>', $collection->keyBy(static fn ($user) => NumberedDigit::One));
