@@ -313,6 +313,32 @@ class CompiledRouteCollectionTest extends TestCase
         $this->collection()->match(Request::create('/foo'));
     }
 
+    public function testMatchingRespectsHttpsOnlyRoutes()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'account', ['https', 'uses' => 'FooController@index', 'as' => 'account']));
+
+        $routes = $this->collection();
+
+        $this->assertSame('account', $routes->match(Request::create('https://localhost/account'))->getName());
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $routes->match(Request::create('http://localhost/account'));
+    }
+
+    public function testMatchingRespectsHttpOnlyRoutes()
+    {
+        $this->routeCollection->add($this->newRoute('GET', 'account', ['http', 'uses' => 'FooController@index', 'as' => 'account']));
+
+        $routes = $this->collection();
+
+        $this->assertSame('account', $routes->match(Request::create('http://localhost/account'))->getName());
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $routes->match(Request::create('https://localhost/account'));
+    }
+
     public function testMatchingThrowsMethodNotAllowedHttpExceptionWhenMethodIsNotAllowed()
     {
         $this->routeCollection->add($this->newRoute('GET', '/foo', ['uses' => 'FooController@index']));
