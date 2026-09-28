@@ -60,7 +60,8 @@ jobs:
           QUEUE_CONNECTION: database
 
   beanstalkd:
-    runs-on: ubuntu-26.04
+    # Build of beanstalkd fails on 26.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     strategy:
