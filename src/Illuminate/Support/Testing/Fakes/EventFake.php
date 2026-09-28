@@ -16,7 +16,7 @@ use ReflectionFunction;
 
 class EventFake implements Dispatcher, Fake
 {
-    use ForwardsCalls, ReflectsClosures;
+    use ForwardsCalls, MatchesProperties, ReflectsClosures;
 
     /**
      * The original event dispatcher.
@@ -128,7 +128,7 @@ class EventFake implements Dispatcher, Fake
      * Assert if an event was dispatched based on a truth-test callback.
      *
      * @param  string|\Closure  $event
-     * @param  callable|int|null  $callback
+     * @param  callable|array<string, mixed>|int|null  $callback
      * @return void
      */
     public function assertDispatched($event, $callback = null)
@@ -183,7 +183,7 @@ class EventFake implements Dispatcher, Fake
      * Determine if an event was dispatched based on a truth-test callback.
      *
      * @param  string|\Closure  $event
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return void
      */
     public function assertNotDispatched($event, $callback = null)
@@ -226,7 +226,7 @@ class EventFake implements Dispatcher, Fake
      * Get all of the events matching a truth-test callback.
      *
      * @param  string  $event
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return \Illuminate\Support\Collection
      */
     public function dispatched($event, $callback = null)
@@ -235,7 +235,7 @@ class EventFake implements Dispatcher, Fake
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $this->propertiesCallback($callback) ?: fn () => true;
 
         return (new Collection($this->events[$event]))->filter(
             fn ($arguments) => $callback(...$arguments)

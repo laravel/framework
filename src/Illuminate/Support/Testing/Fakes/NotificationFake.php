@@ -17,7 +17,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
 
 class NotificationFake implements Fake, NotificationDispatcher, NotificationFactory
 {
-    use Macroable, ReflectsClosures;
+    use Macroable, MatchesProperties, ReflectsClosures;
 
     /**
      * All of the notifications that have been sent.
@@ -59,7 +59,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      *
      * @param  mixed  $notifiable
      * @param  string|\Closure  $notification
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return void
      *
      * @throws \Exception
@@ -150,7 +150,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      *
      * @param  mixed  $notifiable
      * @param  string|\Closure  $notification
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return void
      *
      * @throws \Exception
@@ -267,7 +267,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      *
      * @param  mixed  $notifiable
      * @param  string  $notification
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return \Illuminate\Support\Collection
      */
     public function sent($notifiable, $notification, $callback = null)
@@ -276,7 +276,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $this->propertiesCallback($callback) ?: fn () => true;
 
         $notifications = new Collection($this->notificationsFor($notifiable, $notification));
 

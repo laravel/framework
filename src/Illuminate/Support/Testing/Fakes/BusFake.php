@@ -16,7 +16,7 @@ use RuntimeException;
 
 class BusFake implements Fake, QueueingDispatcher
 {
-    use ReflectsClosures;
+    use MatchesProperties, ReflectsClosures;
 
     /**
      * The original Bus dispatcher implementation.
@@ -112,7 +112,7 @@ class BusFake implements Fake, QueueingDispatcher
      * Assert if a job was dispatched based on a truth-test callback.
      *
      * @param  string|\Closure  $command
-     * @param  callable|int|null  $callback
+     * @param  callable|array<string, mixed>|int|null  $callback
      * @return void
      */
     public function assertDispatched($command, $callback = null)
@@ -177,7 +177,7 @@ class BusFake implements Fake, QueueingDispatcher
      * Determine if a job was dispatched based on a truth-test callback.
      *
      * @param  string|\Closure  $command
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return void
      */
     public function assertNotDispatched($command, $callback = null)
@@ -558,7 +558,7 @@ class BusFake implements Fake, QueueingDispatcher
      * Get all of the jobs matching a truth-test callback.
      *
      * @param  string  $command
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return \Illuminate\Support\Collection
      */
     public function dispatched($command, $callback = null)
@@ -567,7 +567,7 @@ class BusFake implements Fake, QueueingDispatcher
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $this->propertiesCallback($callback) ?: fn () => true;
 
         return (new Collection($this->commands[$command]))->filter(fn ($command) => $callback($command));
     }
@@ -576,7 +576,7 @@ class BusFake implements Fake, QueueingDispatcher
      * Get all of the jobs dispatched synchronously matching a truth-test callback.
      *
      * @param  string  $command
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return \Illuminate\Support\Collection
      */
     public function dispatchedSync(string $command, $callback = null)
@@ -585,7 +585,7 @@ class BusFake implements Fake, QueueingDispatcher
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $this->propertiesCallback($callback) ?: fn () => true;
 
         return (new Collection($this->commandsSync[$command]))->filter(fn ($command) => $callback($command));
     }
@@ -594,7 +594,7 @@ class BusFake implements Fake, QueueingDispatcher
      * Get all of the jobs dispatched after the response was sent matching a truth-test callback.
      *
      * @param  string  $command
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return \Illuminate\Support\Collection
      */
     public function dispatchedAfterResponse(string $command, $callback = null)
@@ -603,7 +603,7 @@ class BusFake implements Fake, QueueingDispatcher
             return new Collection;
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $this->propertiesCallback($callback) ?: fn () => true;
 
         return (new Collection($this->commandsAfterResponse[$command]))->filter(fn ($command) => $callback($command));
     }
