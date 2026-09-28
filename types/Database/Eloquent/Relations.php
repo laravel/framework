@@ -257,6 +257,10 @@ class User extends Model
             'Illuminate\Database\Eloquent\Relations\HasManyThrough<Illuminate\Types\Relations\Part, Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User)>',
             $this->through($this->mechanic())->has(fn ($mechanic) => $mechanic->parts()),
         );
+        assertType(
+            'Illuminate\Database\Eloquent\Relations\HasManyThrough<Illuminate\Types\Relations\Part, Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User)>',
+            $this->through($this->mechanic())->has(fn ($mechanic) => $mechanic->morphMany(Part::class, 'partable')),
+        );
 
         return $hasManyThrough;
     }
