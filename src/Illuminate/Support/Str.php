@@ -1610,7 +1610,10 @@ class Str
         if ($charlist === null) {
             $trimDefaultCharacters = " \n\r\t\v\0";
 
-            return preg_replace('~^[\s'.self::INVISIBLE_CHARACTERS.$trimDefaultCharacters.']+|[\s'.self::INVISIBLE_CHARACTERS.$trimDefaultCharacters.']+$~u', '', $value) ?? trim($value);
+            $whitespace = '[\s'.self::INVISIBLE_CHARACTERS.$trimDefaultCharacters.']';
+
+            // The trailing match may only begin at the first character of a whitespace run, keeping this linear...
+            return preg_replace('~^'.$whitespace.'+|'.$whitespace.'(?<!'.$whitespace.$whitespace.')'.$whitespace.'*+$~u', '', $value) ?? trim($value);
         }
 
         return trim($value, $charlist);
@@ -1646,7 +1649,10 @@ class Str
         if ($charlist === null) {
             $rtrimDefaultCharacters = " \n\r\t\v\0";
 
-            return preg_replace('~[\s'.self::INVISIBLE_CHARACTERS.$rtrimDefaultCharacters.']+$~u', '', $value) ?? rtrim($value);
+            $whitespace = '[\s'.self::INVISIBLE_CHARACTERS.$rtrimDefaultCharacters.']';
+
+            // The match may only begin at the first character of a whitespace run, keeping this linear...
+            return preg_replace('~'.$whitespace.'(?<!'.$whitespace.$whitespace.')'.$whitespace.'*+$~u', '', $value) ?? rtrim($value);
         }
 
         return rtrim($value, $charlist);
