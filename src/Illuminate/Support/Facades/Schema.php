@@ -25,6 +25,7 @@ namespace Illuminate\Support\Facades;
  * @method static void whenTableDoesntHaveIndex(string $table, string|array $index, \Closure $callback, string|null $type = null)
  * @method static string getColumnType(string $table, string $column, bool $fullDefinition = false)
  * @method static array getColumnListing(string $table)
+ * @method static array getColumn(string $table, string $column)
  * @method static array getColumns(string $table)
  * @method static array getIndexes(string $table)
  * @method static array getIndexListing(string $table)
