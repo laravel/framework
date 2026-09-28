@@ -132,6 +132,50 @@ class CacheTest extends TestCase
         $this->assertSame('"XYZ"', $response->getEtag());
     }
 
+    public function testGenerateWeakEtag()
+    {
+        $response = (new Cache)->handle(new Request, function () {
+            return new Response('some content');
+        }, 'etag;weak_etag;max_age=100;s_maxage=200');
+
+        $this->assertSame('W/"4f1b32bff4356281946800d355007128"', $response->getEtag());
+        $this->assertSame('max-age=100, public, s-maxage=200', $response->headers->get('Cache-Control'));
+    }
+
+    public function testWeakEtagWithArrayOptions()
+    {
+        $signature = (string) Cache::using(['etag' => true, 'weak_etag' => true]);
+        $this->assertSame('Illuminate\Http\Middleware\SetCacheHeaders:etag;weak_etag', $signature);
+
+        $response = (new Cache)->handle(new Request, function () {
+            return new Response('some content');
+        }, ['etag' => 'ABC', 'weak_etag' => true]);
+
+        $this->assertSame('W/"ABC"', $response->getEtag());
+    }
+
+    public function testWeakEtagWithoutEtagIsIgnored()
+    {
+        $response = (new Cache)->handle(new Request, function () {
+            return new Response('some content');
+        }, 'weak_etag;max_age=100');
+
+        $this->assertNull($response->getEtag());
+        $this->assertSame('max-age=100, private', $response->headers->get('Cache-Control'));
+    }
+
+    public function testIsNotModifiedWithWeakEtag()
+    {
+        $request = new Request;
+        $request->headers->set('If-None-Match', 'W/"4f1b32bff4356281946800d355007128"');
+
+        $response = (new Cache)->handle($request, function () {
+            return new Response('some content');
+        }, 'etag;weak_etag');
+
+        $this->assertSame(304, $response->getStatusCode());
+    }
+
     public function testIsNotModified()
     {
         $request = new Request;

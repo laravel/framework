@@ -65,6 +65,12 @@ class SetCacheHeaders
 
         if (isset($options['etag']) && $options['etag'] === true) {
             $options['etag'] = $response->getEtag() ?? ($response->getContent() ? hash('xxh128', $response->getContent()) : null);
+
+            if (isset($options['weak_etag'])) {
+                $response->setEtag($options['etag'], (bool) $options['weak_etag']);
+
+                unset($options['weak_etag'], $options['etag']);
+            }
         }
 
         if (isset($options['last_modified'])) {
