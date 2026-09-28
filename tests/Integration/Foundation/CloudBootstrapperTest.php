@@ -307,12 +307,46 @@ class CloudBootstrapperTest extends TestCase
 
         $this->assertSame('test-disk-2', $this->app['config']->get('filesystems.default'));
         $this->assertSame('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
+        $this->assertSame('auto', $this->app['config']->get('filesystems.disks.test-disk.region'));
 
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
 
         [$_ENV['FILESYSTEM_DISK'], $_SERVER['FILESYSTEM_DISK'], $putenvDisk] = $filesystemDisk;
 
         $putenvDisk === false ? putenv('FILESYSTEM_DISK') : putenv('FILESYSTEM_DISK='.$putenvDisk);
+    }
+
+    public function test_it_configures_disks_with_cacheable_credential_providers()
+    {
+        $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode([
+            [
+                'disk' => 'aws-bucket',
+                'access_key_id' => null,
+                'access_key_secret' => null,
+                'bucket' => 'arn:aws:s3:us-east-2:123456789012:accesspoint/environment-bucket',
+                'url' => null,
+                'endpoint' => 'https://s3-accesspoint.us-east-2.amazonaws.com',
+                'region' => 'us-east-2',
+                'credentials' => 'ecs',
+            ],
+        ]);
+
+        try {
+            CloudBootstrapper::configureDisks($this->app);
+
+            $config = $this->app['config']->get('filesystems.disks.aws-bucket');
+
+            $this->assertSame('us-east-2', $config['region']);
+            $this->assertSame('ecs', $config['credentials']);
+            $this->assertSame('https://s3-accesspoint.us-east-2.amazonaws.com', $config['endpoint']);
+            $this->assertArrayNotHasKey('ignore_configured_endpoint_urls', $config);
+            $this->assertArrayNotHasKey('auth_mode', $config);
+            $this->assertNull($config['key']);
+            $this->assertNull($config['secret']);
+            $this->assertSame($config, eval('return '.var_export($config, true).';'));
+        } finally {
+            unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
+        }
     }
 
     public function test_it_does_not_override_a_different_filesystem_disk()
