@@ -1188,6 +1188,18 @@ class SupportStrTest extends TestCase
         }
     }
 
+    public function testTrimAndRtrimHandleLongInteriorWhitespaceRuns()
+    {
+        $run = str_repeat(" \u{200B}\t", 20000);
+
+        $this->assertSame("[{$run}x", Str::trim("{$run}[{$run}x{$run}"));
+        $this->assertSame("{$run}[{$run}x", Str::rtrim("{$run}[{$run}x{$run}"));
+        $this->assertSame('', Str::trim($run));
+        $this->assertSame('', Str::rtrim($run));
+        $this->assertSame('a b c', Str::trim(" a b c\u{00A0}\u{FEFF}\n"));
+        $this->assertSame(' a  b', Str::rtrim(" a  b \u{3000}\r\n"));
+    }
+
     public function testSquish()
     {
         $this->assertSame('laravel php framework', Str::squish(' laravel   php  framework '));
