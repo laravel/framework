@@ -44,10 +44,17 @@ jobs:
 
     strategy:
       fail-fast: true
+      continue-on-error: ${{ matrix.experimental }}
       matrix:
         php: [8.3, 8.4, 8.5]
         phpunit: ['11.5.50', '12.5.8', '13.0.3']
         stability: [prefer-lowest, prefer-stable]
+        experimental: [false]
+        include:
+          - php: 8.6
+            phpunit: '13.0.3'
+            stability: prefer-stable
+            experimental: true
         exclude:
           - php: 8.3
             phpunit: '13.0.3'
@@ -69,6 +76,7 @@ jobs:
           redis-configure-opts: --enable-redis --enable-redis-igbinary --enable-redis-msgpack --enable-redis-lzf --with-liblzf --enable-redis-zstd --with-libzstd --enable-redis-lz4 --with-liblz4
           redis-libs: liblz4-dev, liblzf-dev, libzstd-dev
           composer-command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}"
+          experimental: ${{ matrix.experimental }}
 
       - name: Execute tests
         run: vendor/bin/phpunit --display-deprecation ${{ matrix.stability == 'prefer-stable' && '--fail-on-deprecation' || '' }} --no-coverage

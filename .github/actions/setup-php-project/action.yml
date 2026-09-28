@@ -33,6 +33,8 @@ inputs:
   composer-command:
     description: Composer command used to install dependencies
     default: 'composer update --prefer-stable --prefer-dist --no-interaction --no-progress'
+  experimental:
+    default: false
 
 runs:
   using: composite
@@ -58,4 +60,4 @@ runs:
       with:
         timeout_minutes: 5
         max_attempts: 5
-        command: ${{ inputs.composer-command }}
+        command: "${{ inputs.composer-command }} ${{ inputs.experimental == true ? && '--ignore-platform-reqs' || '' }}"
