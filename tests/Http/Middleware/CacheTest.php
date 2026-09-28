@@ -132,6 +132,15 @@ class CacheTest extends TestCase
         $this->assertSame('"XYZ"', $response->getEtag());
     }
 
+    public function testDoesNotOverrideWeakEtag()
+    {
+        $response = (new Cache)->handle(new Request, function () {
+            return (new Response('some content'))->setEtag('XYZ', true);
+        }, 'etag');
+
+        $this->assertSame('W/"XYZ"', $response->getEtag());
+    }
+
     public function testGenerateWeakEtag()
     {
         $response = (new Cache)->handle(new Request, function () {
@@ -149,19 +158,18 @@ class CacheTest extends TestCase
 
         $response = (new Cache)->handle(new Request, function () {
             return new Response('some content');
-        }, ['etag' => 'ABC', 'weak_etag' => true]);
+        }, ['etag' => true, 'weak_etag' => true]);
 
-        $this->assertSame('W/"ABC"', $response->getEtag());
+        $this->assertSame('W/"4f1b32bff4356281946800d355007128"', $response->getEtag());
     }
 
-    public function testWeakEtagWithoutEtagIsIgnored()
+    public function testWeakEtagWithoutEtagIsInvalid()
     {
-        $response = (new Cache)->handle(new Request, function () {
+        $this->expectException(InvalidArgumentException::class);
+
+        (new Cache)->handle(new Request, function () {
             return new Response('some content');
         }, 'weak_etag;max_age=100');
-
-        $this->assertNull($response->getEtag());
-        $this->assertSame('max-age=100, private', $response->headers->get('Cache-Control'));
     }
 
     public function testIsNotModifiedWithWeakEtag()

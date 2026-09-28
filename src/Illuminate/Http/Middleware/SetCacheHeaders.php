@@ -64,13 +64,14 @@ class SetCacheHeaders
         }
 
         if (isset($options['etag']) && $options['etag'] === true) {
-            $options['etag'] = $response->getEtag() ?? ($response->getContent() ? hash('xxh128', $response->getContent()) : null);
-
-            if (isset($options['weak_etag'])) {
-                $response->setEtag($options['etag'], (bool) $options['weak_etag']);
-
-                unset($options['weak_etag'], $options['etag']);
+            if ($response->getEtag() === null) {
+                $response->setEtag(
+                    $response->getContent() ? hash('xxh128', $response->getContent()) : null,
+                    (bool) ($options['weak_etag'] ?? false)
+                );
             }
+
+            unset($options['etag'], $options['weak_etag']);
         }
 
         if (isset($options['last_modified'])) {
