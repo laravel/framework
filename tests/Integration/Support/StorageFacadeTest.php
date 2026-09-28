@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\UnableToReadFile;
@@ -73,6 +74,21 @@ class StorageFacadeTest extends TestCase
         ])->put('file.txt', 'contents');
 
         $fake->assertExists('file.txt');
+    }
+
+    public function testFakingOnDemandDiskDoesNotAffectScopedDisks()
+    {
+        Config::set('filesystems.disks.photos', ['driver' => 'local', 'root' => $root = sys_get_temp_dir().'/'.uniqid('photos')]);
+        Config::set('filesystems.disks.avatars', ['driver' => 'scoped', 'disk' => 'photos', 'prefix' => 'avatars']);
+
+        $fake = Storage::fake('ondemand');
+
+        Storage::disk('avatars')->put('file.txt', 'contents');
+
+        $fake->assertMissing('file.txt');
+        $this->assertFileExists($root.'/avatars/file.txt');
+
+        (new Filesystem)->deleteDirectory($root);
     }
 }
 

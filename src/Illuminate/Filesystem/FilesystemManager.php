@@ -287,11 +287,11 @@ class FilesystemManager implements FactoryContract
         }
 
         $primary = is_array($config['primary'])
-            ? $this->build($config['primary'])
+            ? $this->resolve('ondemand', $config['primary'])
             : $this->disk($config['primary']);
 
         $fallback = is_array($config['fallback'])
-            ? $this->build($config['fallback'])
+            ? $this->resolve('ondemand', $config['fallback'])
             : $this->disk($config['fallback']);
 
         $adapter = new ReadThroughFilesystemAdapter(
@@ -347,7 +347,7 @@ class FilesystemManager implements FactoryContract
             throw new InvalidArgumentException('Scoped disk is missing "prefix" configuration option.');
         }
 
-        return $this->build(tap(
+        return $this->resolve('ondemand', tap(
             is_string($config['disk']) ? $this->getConfig($config['disk']) : $config['disk'],
             function (&$parent) use ($config) {
                 if (empty($parent['prefix'])) {
