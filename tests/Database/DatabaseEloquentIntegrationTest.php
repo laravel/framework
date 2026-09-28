@@ -26,6 +26,7 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use Illuminate\Tests\Database\Fixtures\Models\Integration\Post;
 use Illuminate\Tests\Database\Fixtures\Models\Integration\User;
 use PHPUnit\Framework\TestCase;
@@ -1291,6 +1292,35 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::findOrFail(new Collection([1, 1, 2, 3]));
+    }
+
+    public function testBelongsToManyFindOrFailAndFindOrWithEnumIds()
+    {
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 5, 'email' => 'first@example.com']);
+        EloquentTestUser::create(['id' => 6, 'email' => 'second@example.com']);
+        $user->friends()->attach([5, 6]);
+
+        $ids = [Bar::FOO, 6, Bar::FOO, 5];
+
+        foreach ([$ids, new Collection($ids)] as $ids) {
+            $this->assertEqualsCanonicalizing([5, 6], $user->friends()->findOrFail($ids)->modelKeys());
+            $this->assertEqualsCanonicalizing([5, 6], $user->friends()->findOr($ids, fn () => $this->fail('Unexpected callback.'))->modelKeys());
+        }
+
+        $user->friends()->detach(5);
+
+        foreach ([[Bar::FOO, 6], new Collection([Bar::FOO, 6])] as $ids) {
+            $this->assertSame('missing', $user->friends()->findOr($ids, fn () => 'missing'));
+
+            try {
+                $user->friends()->findOrFail($ids);
+                $this->fail('Expected ModelNotFoundException was not thrown.');
+            } catch (ModelNotFoundException $exception) {
+                $this->assertSame(EloquentTestUser::class, $exception->getModel());
+                $this->assertSame([5, 6], $exception->getIds());
+            }
+        }
     }
 
     public function testOneToOneRelationship()
