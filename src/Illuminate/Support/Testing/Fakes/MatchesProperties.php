@@ -8,8 +8,6 @@ use Illuminate\Support\Collection;
 trait MatchesProperties
 {
     /**
-     * Resolve a truth-test callback from the given callback or array of properties.
-     *
      * @param  callable|array<string, mixed>|null  $callback
      * @return callable|null
      */
