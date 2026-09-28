@@ -98,15 +98,9 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testContainsIndicatesIfModelInArray()
     {
-        $mockModel = Mockery::mock(Model::class);
-        $mockModel->shouldReceive('is')->with($mockModel)->andReturn(true);
-        $mockModel->shouldReceive('is')->andReturn(false);
-        $mockModel2 = Mockery::mock(Model::class);
-        $mockModel2->shouldReceive('is')->with($mockModel2)->andReturn(true);
-        $mockModel2->shouldReceive('is')->andReturn(false);
-        $mockModel3 = Mockery::mock(Model::class);
-        $mockModel3->shouldReceive('is')->with($mockModel3)->andReturn(true);
-        $mockModel3->shouldReceive('is')->andReturn(false);
+        $mockModel = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
+        $mockModel2 = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
+        $mockModel3 = (new TestEloquentCollectionModel)->forceFill(['id' => 3]);
         $c = new Collection([$mockModel, $mockModel2]);
 
         $this->assertTrue($c->contains($mockModel));
@@ -120,12 +114,8 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testContainsIndicatesIfDifferentModelInArray()
     {
-        $mockModelFoo = Mockery::namedMock('Foo', Model::class);
-        $mockModelFoo->shouldReceive('is')->with($mockModelFoo)->andReturn(true);
-        $mockModelFoo->shouldReceive('is')->andReturn(false);
-        $mockModelBar = Mockery::namedMock('Bar', Model::class);
-        $mockModelBar->shouldReceive('is')->with($mockModelBar)->andReturn(true);
-        $mockModelBar->shouldReceive('is')->andReturn(false);
+        $mockModelFoo = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
+        $mockModelBar = (new EloquentTestUserModel)->forceFill(['id' => 1]);
         $c = new Collection([$mockModelFoo]);
 
         $this->assertTrue($c->contains($mockModelFoo));
@@ -137,11 +127,9 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testContainsIndicatesIfKeyedModelInArray()
     {
-        $mockModel = Mockery::mock(Model::class);
-        $mockModel->shouldReceive('getKey')->andReturn('1');
+        $mockModel = (new TestEloquentCollectionModel)->forceFill(['id' => '1']);
         $c = new Collection([$mockModel]);
-        $mockModel2 = Mockery::mock(Model::class);
-        $mockModel2->shouldReceive('getKey')->andReturn('2');
+        $mockModel2 = (new TestEloquentCollectionModel)->forceFill(['id' => '2']);
         $c->add($mockModel2);
 
         $this->assertTrue($c->contains(1));
@@ -155,12 +143,8 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testContainsKeyAndValueIndicatesIfModelInArray()
     {
-        $mockModel1 = Mockery::mock(Model::class);
-        $mockModel1->shouldReceive('offsetExists')->with('name')->andReturn(true);
-        $mockModel1->shouldReceive('offsetGet')->with('name')->andReturn('Taylor');
-        $mockModel2 = Mockery::mock(Model::class);
-        $mockModel2->shouldReceive('offsetExists')->andReturn(true);
-        $mockModel2->shouldReceive('offsetGet')->with('name')->andReturn('Abigail');
+        $mockModel1 = (new TestEloquentCollectionModel)->forceFill(['name' => 'Taylor']);
+        $mockModel2 = (new TestEloquentCollectionModel)->forceFill(['name' => 'Abigail']);
         $c = new Collection([$mockModel1, $mockModel2]);
 
         $this->assertTrue($c->contains('name', 'Taylor'));
@@ -174,10 +158,8 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testContainsClosureIndicatesIfModelInArray()
     {
-        $mockModel1 = Mockery::mock(Model::class);
-        $mockModel1->shouldReceive('getKey')->andReturn(1);
-        $mockModel2 = Mockery::mock(Model::class);
-        $mockModel2->shouldReceive('getKey')->andReturn(2);
+        $mockModel1 = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
+        $mockModel2 = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
         $c = new Collection([$mockModel1, $mockModel2]);
 
         $this->assertTrue($c->contains(function ($model) {
@@ -197,8 +179,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testFindMethodFindsModelById()
     {
-        $mockModel = Mockery::mock(Model::class);
-        $mockModel->expects('getKey')->times(2)->andReturn(1);
+        $mockModel = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
         $c = new Collection([$mockModel]);
 
         $this->assertSame($mockModel, $c->find(1));
@@ -231,8 +212,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testFindOrFailFindsModelById()
     {
-        $mockModel = Mockery::mock(Model::class);
-        $mockModel->expects('getKey')->andReturn(1);
+        $mockModel = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
         $c = new Collection([$mockModel]);
 
         $this->assertSame($mockModel, $c->findOrFail(1));
@@ -294,14 +274,11 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testCollectionDictionaryReturnsModelKeys()
     {
-        $one = Mockery::mock(Model::class);
-        $one->shouldReceive('getKey')->andReturn(1);
+        $one = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
 
-        $two = Mockery::mock(Model::class);
-        $two->shouldReceive('getKey')->andReturn(2);
+        $two = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
 
-        $three = Mockery::mock(Model::class);
-        $three->shouldReceive('getKey')->andReturn(3);
+        $three = (new TestEloquentCollectionModel)->forceFill(['id' => 3]);
 
         $c = new Collection([$one, $two, $three]);
 
@@ -310,14 +287,11 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testCollectionMergesWithGivenCollection()
     {
-        $one = Mockery::mock(Model::class);
-        $one->shouldReceive('getKey')->andReturn(1);
+        $one = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
 
-        $two = Mockery::mock(Model::class);
-        $two->shouldReceive('getKey')->andReturn(2);
+        $two = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
 
-        $three = Mockery::mock(Model::class);
-        $three->shouldReceive('getKey')->andReturn(3);
+        $three = (new TestEloquentCollectionModel)->forceFill(['id' => 3]);
 
         $c1 = new Collection([$one, $two]);
         $c2 = new Collection([$two, $three]);
@@ -327,8 +301,8 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testMap()
     {
-        $one = Mockery::mock(Model::class);
-        $two = Mockery::mock(Model::class);
+        $one = new TestEloquentCollectionModel;
+        $two = new TestEloquentCollectionModel;
 
         $c = new Collection([$one, $two]);
 
@@ -342,8 +316,8 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testMappingToNonModelsReturnsABaseCollection()
     {
-        $one = Mockery::mock(Model::class);
-        $two = Mockery::mock(Model::class);
+        $one = new TestEloquentCollectionModel;
+        $two = new TestEloquentCollectionModel;
 
         $c = (new Collection([$one, $two]))->map(function ($item) {
             return 'not-a-model';
@@ -354,8 +328,8 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testMapWithKeys()
     {
-        $one = Mockery::mock(Model::class);
-        $two = Mockery::mock(Model::class);
+        $one = new TestEloquentCollectionModel;
+        $two = new TestEloquentCollectionModel;
 
         $c = new Collection([$one, $two]);
 
@@ -370,8 +344,8 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testMapWithKeysToNonModelsReturnsABaseCollection()
     {
-        $one = Mockery::mock(Model::class);
-        $two = Mockery::mock(Model::class);
+        $one = new TestEloquentCollectionModel;
+        $two = new TestEloquentCollectionModel;
 
         $key = 0;
         $c = (new Collection([$one, $two]))->mapWithKeys(function ($item) use (&$key) {
@@ -383,14 +357,11 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testCollectionDiffsWithGivenCollection()
     {
-        $one = Mockery::mock(Model::class);
-        $one->shouldReceive('getKey')->andReturn(1);
+        $one = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
 
-        $two = Mockery::mock(Model::class);
-        $two->shouldReceive('getKey')->andReturn(2);
+        $two = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
 
-        $three = Mockery::mock(Model::class);
-        $three->shouldReceive('getKey')->andReturn(3);
+        $three = (new TestEloquentCollectionModel)->forceFill(['id' => 3]);
 
         $c1 = new Collection([$one, $two]);
         $c2 = new Collection([$two, $three]);
@@ -439,14 +410,11 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testCollectionIntersectWithNull()
     {
-        $one = Mockery::mock(Model::class);
-        $one->shouldReceive('getKey')->andReturn(1);
+        $one = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
 
-        $two = Mockery::mock(Model::class);
-        $two->shouldReceive('getKey')->andReturn(2);
+        $two = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
 
-        $three = Mockery::mock(Model::class);
-        $three->shouldReceive('getKey')->andReturn(3);
+        $three = (new TestEloquentCollectionModel)->forceFill(['id' => 3]);
 
         $c1 = new Collection([$one, $two, $three]);
 
@@ -455,14 +423,11 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testCollectionIntersectsWithGivenCollection()
     {
-        $one = Mockery::mock(Model::class);
-        $one->shouldReceive('getKey')->andReturn(1);
+        $one = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
 
-        $two = Mockery::mock(Model::class);
-        $two->shouldReceive('getKey')->andReturn(2);
+        $two = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
 
-        $three = Mockery::mock(Model::class);
-        $three->shouldReceive('getKey')->andReturn(3);
+        $three = (new TestEloquentCollectionModel)->forceFill(['id' => 3]);
 
         $c1 = new Collection([$one, $two]);
         $c2 = new Collection([$two, $three]);
@@ -472,11 +437,9 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testCollectionReturnsUniqueItems()
     {
-        $one = Mockery::mock(Model::class);
-        $one->shouldReceive('getKey')->andReturn(1);
+        $one = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
 
-        $two = Mockery::mock(Model::class);
-        $two->shouldReceive('getKey')->andReturn(2);
+        $two = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
 
         $c = new Collection([$one, $two, $two]);
 
@@ -507,14 +470,11 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testOnlyReturnsCollectionWithGivenModelKeys()
     {
-        $one = Mockery::mock(Model::class);
-        $one->shouldReceive('getKey')->andReturn(1);
+        $one = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
 
-        $two = Mockery::mock(Model::class);
-        $two->shouldReceive('getKey')->andReturn(2);
+        $two = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
 
-        $three = Mockery::mock(Model::class);
-        $three->shouldReceive('getKey')->andReturn(3);
+        $three = (new TestEloquentCollectionModel)->forceFill(['id' => 3]);
 
         $c = new Collection([$one, $two, $three]);
 
@@ -525,14 +485,11 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testExceptReturnsCollectionWithoutGivenModelKeys()
     {
-        $one = Mockery::mock(Model::class);
-        $one->shouldReceive('getKey')->andReturn(1);
+        $one = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
 
-        $two = Mockery::mock(Model::class);
-        $two->shouldReceive('getKey')->andReturn(2);
+        $two = (new TestEloquentCollectionModel)->forceFill(['id' => 2]);
 
-        $three = Mockery::mock(Model::class);
-        $three->shouldReceive('getKey')->andReturn(3);
+        $three = (new TestEloquentCollectionModel)->forceFill(['id' => 3]);
 
         $c = new Collection([$one, $two, $three]);
 
@@ -764,12 +721,10 @@ class DatabaseEloquentCollectionTest extends TestCase
     public function testWithNonScalarKey()
     {
         $fooKey = new EloquentTestKey('foo');
-        $foo = Mockery::mock(Model::class);
-        $foo->shouldReceive('getKey')->andReturn($fooKey);
+        $foo = (new EloquentTestNonIncrementingModel)->forceFill(['id' => $fooKey]);
 
         $barKey = new EloquentTestKey('bar');
-        $bar = Mockery::mock(Model::class);
-        $bar->shouldReceive('getKey')->andReturn($barKey);
+        $bar = (new EloquentTestNonIncrementingModel)->forceFill(['id' => $barKey]);
 
         $collection = new Collection([$foo, $bar]);
 
@@ -849,6 +804,11 @@ class TestEloquentCollectionModel extends Model
     {
         return 'test';
     }
+}
+
+class EloquentTestNonIncrementingModel extends Model
+{
+    public $incrementing = false;
 }
 
 class EloquentTestUserModel extends Model

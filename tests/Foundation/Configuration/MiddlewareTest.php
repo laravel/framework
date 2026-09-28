@@ -6,10 +6,9 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Foundation\MaintenanceMode;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -19,7 +18,6 @@ use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Session\Middleware\AuthenticateSession;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -204,7 +202,7 @@ class MiddlewareTest extends TestCase
 
     public function testTrustHosts()
     {
-        $app = Mockery::mock(Application::class);
+        $app = new FoundationApplication;
         $configuration = new Middleware();
         $middleware = new class($app) extends TrustHosts
         {
@@ -266,8 +264,7 @@ class MiddlewareTest extends TestCase
     {
         $configuration = new Middleware();
 
-        $mode = Mockery::mock(MaintenanceMode::class);
-        $app = Mockery::mock(Application::class);
+        $app = new FoundationApplication;
         $middleware = new PreventRequestsDuringMaintenance($app);
 
         $reflection = new ReflectionClass($middleware);
@@ -288,7 +285,7 @@ class MiddlewareTest extends TestCase
     {
         $configuration = new Middleware();
         $middleware = new PreventRequestForgery(
-            Mockery::mock(Application::class),
+            new FoundationApplication,
             new Encrypter(str_repeat('a', 16))
         );
 

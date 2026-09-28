@@ -14,7 +14,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
-use Mockery;
+use PHPUnit\Framework\ExpectationFailedException;
 
 class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 {
@@ -194,16 +194,52 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
     private function assertHandldedBroadcastableEvent(BroadcastableModelEventOccurred $event, Closure $closure)
     {
-        $broadcaster = Mockery::mock(Broadcaster::class);
-        $broadcaster->expects('broadcast')
-            ->withArgs(function (array $channels, string $eventName, array $payload) use ($closure) {
-                return $closure($channels, $eventName, $payload);
-            });
+        $broadcaster = new class($closure) implements Broadcaster
+        {
+            public $broadcasts = 0;
 
-        $manager = Mockery::mock(BroadcastingFactory::class);
-        $manager->expects('connection')->with(null)->andReturn($broadcaster);
+            public function __construct(protected Closure $closure)
+            {
+            }
+
+            public function auth($request)
+            {
+            }
+
+            public function validAuthenticationResponse($request, $result)
+            {
+            }
+
+            public function broadcast(array $channels, $event, array $payload = [])
+            {
+                $this->broadcasts++;
+
+                if (! ($this->closure)($channels, $event, $payload)) {
+                    throw new ExpectationFailedException('Broadcast arguments did not match.');
+                }
+            }
+        };
+
+        $manager = new class($broadcaster) implements BroadcastingFactory
+        {
+            public $requested = [];
+
+            public function __construct(protected Broadcaster $broadcaster)
+            {
+            }
+
+            public function connection($name = null)
+            {
+                $this->requested[] = $name;
+
+                return $this->broadcaster;
+            }
+        };
 
         (new BroadcastEvent($event))->handle($manager);
+
+        $this->assertSame(1, $broadcaster->broadcasts);
+        $this->assertSame([null], $manager->requested);
 
         return true;
     }

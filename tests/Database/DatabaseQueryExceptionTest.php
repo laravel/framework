@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,11 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseQueryExceptionTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        DB::clearResolvedInstance('db');
+    }
+
     public function testIfItEmbedsBindingsIntoSql()
     {
         $connection = $this->getConnection();
@@ -24,7 +30,7 @@ class DatabaseQueryExceptionTest extends TestCase
         $pdoException = new PDOException('Mock SQL error');
         $exception = new QueryException($connection->getName(), $sql, $bindings, $pdoException);
 
-        DB::shouldReceive('connection')->andReturn($connection);
+        DB::swap($this->getConnectionResolver($connection));
         $result = $exception->getRawSql();
 
         $this->assertSame($expectedSql, $result);
@@ -42,7 +48,7 @@ class DatabaseQueryExceptionTest extends TestCase
         $pdoException = new PDOException('Mock SQL error');
         $exception = new QueryException($connection->getName(), $sql, $bindings, $pdoException);
 
-        DB::shouldReceive('connection')->andReturn($connection);
+        DB::swap($this->getConnectionResolver($connection));
         $result = $exception->getRawSql();
 
         $this->assertSame($expectedSql, $result);
@@ -186,5 +192,13 @@ class DatabaseQueryExceptionTest extends TestCase
         $connection->shouldReceive('escape')->with('br', false)->andReturn("'br'");
 
         return $connection;
+    }
+
+    protected function getConnectionResolver($connection)
+    {
+        $resolver = new ConnectionResolver(['default' => $connection]);
+        $resolver->setDefaultConnection('default');
+
+        return $resolver;
     }
 }

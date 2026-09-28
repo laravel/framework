@@ -20,8 +20,6 @@ class SupportServiceProviderTest extends TestCase
         ServiceProvider::$publishGroups = [];
 
         $this->app = $app = Mockery::mock(Application::class)->makePartial();
-        $config = Mockery::mock(Config::class)->makePartial();
-
         $config = new Config();
 
         $app->instance('config', $config);

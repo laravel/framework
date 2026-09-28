@@ -2,125 +2,101 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Illuminate\Container\Container;
 use Illuminate\Encryption\Encrypter;
-use Illuminate\Queue\Connectors\ConnectorInterface;
+use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\QueueManager;
-use Mockery;
+use Illuminate\Queue\SyncQueue;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class QueueManagerTest extends TestCase
 {
     public function testDefaultConnectionCanBeResolved()
     {
-        $app = [
-            'config' => [
-                'queue.default' => 'sync',
-                'queue.connections.sync' => ['driver' => 'sync'],
-            ],
-            'encrypter' => $encrypter = new Encrypter(str_repeat('a', 16)),
+        $app = new Container;
+        $app['config'] = [
+            'queue.default' => 'sync',
+            'queue.connections.sync' => ['driver' => 'sync'],
         ];
+        $app['encrypter'] = new Encrypter(str_repeat('a', 16));
 
         $manager = new QueueManager($app);
-        $connector = Mockery::mock(ConnectorInterface::class);
-        $queue = Mockery::mock(stdClass::class);
-        $queue->expects('setConnectionName')->with('sync')->andReturnSelf();
-        $connector->expects('connect')->with(['driver' => 'sync'])->andReturn($queue);
-        $manager->addConnector('sync', function () use ($connector) {
-            return $connector;
-        });
+        $manager->addConnector('sync', fn () => new SyncConnector);
 
-        $queue->expects('setContainer')->with($app);
-        $this->assertSame($queue, $manager->connection('sync'));
+        $queue = $manager->connection('sync');
+
+        $this->assertInstanceOf(SyncQueue::class, $queue);
+        $this->assertSame('sync', $queue->getConnectionName());
+        $this->assertSame($app, $queue->getContainer());
     }
 
     public function testOtherConnectionCanBeResolved()
     {
-        $app = [
-            'config' => [
-                'queue.default' => 'sync',
-                'queue.connections.foo' => ['driver' => 'bar'],
-            ],
-            'encrypter' => $encrypter = new Encrypter(str_repeat('a', 16)),
+        $app = new Container;
+        $app['config'] = [
+            'queue.default' => 'sync',
+            'queue.connections.foo' => ['driver' => 'bar'],
         ];
+        $app['encrypter'] = new Encrypter(str_repeat('a', 16));
 
         $manager = new QueueManager($app);
-        $connector = Mockery::mock(ConnectorInterface::class);
-        $queue = Mockery::mock(stdClass::class);
-        $queue->expects('setConnectionName')->with('foo')->andReturnSelf();
-        $connector->expects('connect')->with(['driver' => 'bar'])->andReturn($queue);
-        $manager->addConnector('bar', function () use ($connector) {
-            return $connector;
-        });
-        $queue->expects('setContainer')->with($app);
+        $manager->addConnector('bar', fn () => new SyncConnector);
 
-        $this->assertSame($queue, $manager->connection('foo'));
+        $queue = $manager->connection('foo');
+
+        $this->assertInstanceOf(SyncQueue::class, $queue);
+        $this->assertSame('foo', $queue->getConnectionName());
+        $this->assertSame($app, $queue->getContainer());
     }
 
     public function testNullConnectionCanBeResolved()
     {
-        $app = [
-            'config' => [
-                'queue.default' => 'null',
-            ],
-            'encrypter' => $encrypter = new Encrypter(str_repeat('a', 16)),
+        $app = new Container;
+        $app['config'] = [
+            'queue.default' => 'null',
         ];
+        $app['encrypter'] = new Encrypter(str_repeat('a', 16));
 
         $manager = new QueueManager($app);
-        $connector = Mockery::mock(ConnectorInterface::class);
-        $queue = Mockery::mock(stdClass::class);
-        $queue->expects('setConnectionName')->with('null')->andReturnSelf();
-        $connector->expects('connect')->with(['driver' => 'null'])->andReturn($queue);
-        $manager->addConnector('null', function () use ($connector) {
-            return $connector;
-        });
-        $queue->expects('setContainer')->with($app);
+        $manager->addConnector('null', fn () => new SyncConnector);
 
-        $this->assertSame($queue, $manager->connection('null'));
+        $queue = $manager->connection('null');
+
+        $this->assertInstanceOf(SyncQueue::class, $queue);
+        $this->assertSame('null', $queue->getConnectionName());
+        $this->assertSame($app, $queue->getContainer());
     }
 
     public function testEnumConnectionCanBeResolved()
     {
-        $app = [
-            'config' => [
-                'queue.default' => 'sync',
-                'queue.connections.sync' => ['driver' => 'sync'],
-            ],
-            'encrypter' => $encrypter = new Encrypter(str_repeat('a', 16)),
+        $app = new Container;
+        $app['config'] = [
+            'queue.default' => 'sync',
+            'queue.connections.sync' => ['driver' => 'sync'],
         ];
+        $app['encrypter'] = new Encrypter(str_repeat('a', 16));
 
         $manager = new QueueManager($app);
-        $connector = Mockery::mock(ConnectorInterface::class);
-        $queue = Mockery::mock(stdClass::class);
-        $queue->expects('setConnectionName')->with('sync')->andReturnSelf();
-        $connector->expects('connect')->with(['driver' => 'sync'])->andReturn($queue);
-        $manager->addConnector('sync', function () use ($connector) {
-            return $connector;
-        });
-        $queue->expects('setContainer')->with($app);
+        $manager->addConnector('sync', fn () => new SyncConnector);
 
-        $this->assertSame($queue, $manager->connection(QueueConnectionName::Sync));
+        $queue = $manager->connection(QueueConnectionName::Sync);
+
+        $this->assertInstanceOf(SyncQueue::class, $queue);
+        $this->assertSame('sync', $queue->getConnectionName());
+        $this->assertSame($app, $queue->getContainer());
     }
 
     public function testEnumConnectionCanBeChecked()
     {
-        $app = [
-            'config' => [
-                'queue.default' => 'sync',
-                'queue.connections.sync' => ['driver' => 'sync'],
-            ],
-            'encrypter' => $encrypter = new Encrypter(str_repeat('a', 16)),
+        $app = new Container;
+        $app['config'] = [
+            'queue.default' => 'sync',
+            'queue.connections.sync' => ['driver' => 'sync'],
         ];
+        $app['encrypter'] = new Encrypter(str_repeat('a', 16));
 
         $manager = new QueueManager($app);
-        $connector = Mockery::mock(ConnectorInterface::class);
-        $queue = Mockery::mock(stdClass::class);
-        $queue->expects('setConnectionName')->with('sync')->andReturnSelf();
-        $connector->expects('connect')->with(['driver' => 'sync'])->andReturn($queue);
-        $manager->addConnector('sync', function () use ($connector) {
-            return $connector;
-        });
-        $queue->expects('setContainer')->with($app);
+        $manager->addConnector('sync', fn () => new SyncConnector);
 
         $this->assertFalse($manager->connected(QueueConnectionName::Sync));
         $manager->connection(QueueConnectionName::Sync);

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Queue;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Queue\Jobs\Job;
@@ -38,11 +39,18 @@ class QueueBeanstalkdJobTest extends TestCase
         $job->getContainer()->expects('make')->with('foo')->andReturn($handler);
         $job->getPheanstalk()->expects('delete')->with($job->getPheanstalkJob())->andReturnSelf();
         $handler->expects('failed')->with(['data'], Mockery::type(Exception::class), 'test-uuid', Mockery::type(Job::class));
-        $events = Mockery::mock(Dispatcher::class);
+        $events = new EventsDispatcher;
+        $failed = [];
+        $events->listen(JobFailed::class, function ($event) use (&$failed) {
+            $failed[] = $event;
+        });
         $job->getContainer()->expects('make')->with(Dispatcher::class)->andReturn($events);
-        $events->expects('dispatch')->with(Mockery::type(JobFailed::class))->andReturnNull();
 
-        $job->fail(new Exception);
+        $job->fail($exception = new Exception);
+
+        $this->assertCount(1, $failed);
+        $this->assertSame($job, $failed[0]->job);
+        $this->assertSame($exception, $failed[0]->exception);
     }
 
     public function testDeleteRemovesTheJobFromBeanstalkd()

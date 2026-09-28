@@ -110,8 +110,13 @@ class ViewTest extends TestCase
 
     public function testViewAcceptsArrayableImplementations()
     {
-        $arrayable = Mockery::mock(Arrayable::class);
-        $arrayable->expects('toArray')->andReturn(['foo' => 'bar', 'baz' => ['qux', 'corge']]);
+        $arrayable = new class implements Arrayable
+        {
+            public function toArray()
+            {
+                return ['foo' => 'bar', 'baz' => ['qux', 'corge']];
+            }
+        };
 
         $view = $this->getView($arrayable);
 

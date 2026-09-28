@@ -361,7 +361,7 @@ class ThrottlesExceptionsTest extends TestCase
 
     public function testUsesJobClassNameForCacheKey()
     {
-        $rateLimiter = $this->mock(RateLimiter::class);
+        $rateLimiter = $this->app->make(RateLimiter::class);
 
         $job = new class
         {
@@ -377,13 +377,6 @@ class ThrottlesExceptionsTest extends TestCase
 
         $expectedKey = 'laravel_throttles_exceptions:'.hash('xxh128', get_class($job));
 
-        $rateLimiter->expects('tooManyAttempts')
-            ->with($expectedKey, 10)
-            ->andReturn(false);
-
-        $rateLimiter->expects('hit')
-            ->with($expectedKey, 600);
-
         $next = function ($job) {
             throw new RuntimeException('Whoops!');
         };
@@ -392,11 +385,12 @@ class ThrottlesExceptionsTest extends TestCase
         $middleware->handle($job, $next);
 
         $this->assertTrue($job->released);
+        $this->assertSame(1, $rateLimiter->attempts($expectedKey));
     }
 
     public function testUsesDisplayNameForCacheKeyWhenAvailable()
     {
-        $rateLimiter = $this->mock(RateLimiter::class);
+        $rateLimiter = $this->app->make(RateLimiter::class);
 
         $job = new class
         {
@@ -417,13 +411,6 @@ class ThrottlesExceptionsTest extends TestCase
 
         $expectedKey = 'laravel_throttles_exceptions:'.hash('xxh128', 'App\\Actions\\ThrottlesExceptionsTestAction');
 
-        $rateLimiter->expects('tooManyAttempts')
-            ->with($expectedKey, 10)
-            ->andReturn(false);
-
-        $rateLimiter->expects('hit')
-            ->with($expectedKey, 600);
-
         $next = function ($job) {
             throw new RuntimeException('Whoops!');
         };
@@ -432,6 +419,7 @@ class ThrottlesExceptionsTest extends TestCase
         $middleware->handle($job, $next);
 
         $this->assertTrue($job->released);
+        $this->assertSame(1, $rateLimiter->attempts($expectedKey));
     }
 }
 

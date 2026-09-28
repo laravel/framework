@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use Exception;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\ProviderRepository;
@@ -15,51 +16,57 @@ class FoundationProviderRepositoryTest extends TestCase
 {
     public function testServicesAreRegisteredWhenManifestIsNotRecompiled()
     {
-        $app = Mockery::mock(Application::class);
+        $app = new Application;
 
-        $repo = Mockery::mock(ProviderRepository::class.'[createProvider,loadManifest,shouldRecompile]', [$app, Mockery::mock(Filesystem::class), [__DIR__.'/services.php']]);
-        $repo->expects('loadManifest')->andReturn(['eager' => ['foo'], 'deferred' => ['deferred'], 'providers' => ['providers'], 'when' => []]);
-        $repo->expects('shouldRecompile')->andReturn(false);
+        $base = tempnam(sys_get_temp_dir(), 'services');
+        $manifestPath = $base.'.php';
+        file_put_contents($manifestPath, '<?php return '.var_export([
+            'eager' => [RepositoryTestEagerProviderStub::class],
+            'deferred' => ['deferred.service' => RepositoryTestDeferredProviderStub::class],
+            'providers' => [RepositoryTestEagerProviderStub::class],
+            'when' => [],
+        ], true).';');
 
-        $app->expects('register')->with('foo');
-        $app->expects('addDeferredServices')->with(['deferred']);
+        $repo = new ProviderRepository($app, new Filesystem, $manifestPath);
 
-        $repo->load([]);
+        $repo->load([RepositoryTestEagerProviderStub::class]);
+
+        $this->assertInstanceOf(RepositoryTestEagerProviderStub::class, $app->getProvider(RepositoryTestEagerProviderStub::class));
+        $this->assertSame(['deferred.service' => RepositoryTestDeferredProviderStub::class], $app->getDeferredServices());
+
+        unlink($manifestPath);
+        unlink($base);
     }
 
     public function testManifestIsProperlyRecompiled()
     {
-        $app = Mockery::mock(Application::class);
+        $app = new Application;
 
-        $repo = Mockery::mock(ProviderRepository::class.'[createProvider,loadManifest,writeManifest,shouldRecompile]', [$app, Mockery::mock(Filesystem::class), [__DIR__.'/services.php']]);
+        $base = tempnam(sys_get_temp_dir(), 'services');
+        $manifestPath = $base.'.php';
 
-        $repo->expects('loadManifest')->andReturn(['eager' => [], 'deferred' => ['deferred']]);
-        $repo->expects('shouldRecompile')->andReturn(true);
+        $repo = new ProviderRepository($app, new Filesystem, $manifestPath);
 
-        // foo mock is just a deferred provider
-        $fooMock = Mockery::mock(ServiceProvider::class);
-        $repo->expects('createProvider')->with('foo')->andReturn($fooMock);
-        $fooMock->expects('isDeferred')->andReturn(true);
-        $fooMock->expects('provides')->andReturn(['foo.provides1', 'foo.provides2']);
-        $fooMock->expects('when')->andReturn([]);
+        $repo->load([RepositoryTestDeferredProviderStub::class, RepositoryTestEagerProviderStub::class]);
 
-        // bar mock is added to eagers since it's not reserved
-        $barMock = Mockery::mock(ServiceProvider::class);
-        $repo->expects('createProvider')->with('bar')->andReturn($barMock);
-        $barMock->expects('isDeferred')->andReturn(false);
-        $repo->expects('writeManifest')->andReturnUsing(function ($manifest) {
-            return $manifest;
-        });
+        $this->assertInstanceOf(RepositoryTestEagerProviderStub::class, $app->getProvider(RepositoryTestEagerProviderStub::class));
+        $this->assertNull($app->getProvider(RepositoryTestDeferredProviderStub::class));
+        $this->assertSame([
+            'foo.provides1' => RepositoryTestDeferredProviderStub::class,
+            'foo.provides2' => RepositoryTestDeferredProviderStub::class,
+        ], $app->getDeferredServices());
 
-        $app->expects('register')->with('bar');
-        $app->expects('addDeferredServices')->with(['foo.provides1' => 'foo', 'foo.provides2' => 'foo']);
+        $written = include $manifestPath;
+        $this->assertSame([RepositoryTestDeferredProviderStub::class, RepositoryTestEagerProviderStub::class], $written['providers']);
+        $this->assertSame([RepositoryTestEagerProviderStub::class], $written['eager']);
 
-        $repo->load(['foo', 'bar']);
+        unlink($manifestPath);
+        unlink($base);
     }
 
     public function testShouldRecompileReturnsCorrectValue()
     {
-        $repo = new ProviderRepository(Mockery::mock(ApplicationContract::class), new Filesystem, __DIR__.'/services.php');
+        $repo = new ProviderRepository(new Application, new Filesystem, __DIR__.'/services.php');
         $this->assertTrue($repo->shouldRecompile(null, []));
         $this->assertTrue($repo->shouldRecompile(['providers' => ['foo']], ['foo', 'bar']));
         $this->assertFalse($repo->shouldRecompile(['providers' => ['foo']], ['foo']));
@@ -67,23 +74,33 @@ class FoundationProviderRepositoryTest extends TestCase
 
     public function testLoadManifestReturnsParsedJSON()
     {
-        $files = Mockery::mock(Filesystem::class);
-        $files->expects('exists')->with(__DIR__.'/services.php')->andReturn(true);
-        $files->expects('getRequire')->with(__DIR__.'/services.php')->andReturn($array = ['users' => ['dayle' => true], 'when' => []]);
-        $repo = new ProviderRepository(Mockery::mock(ApplicationContract::class), $files, __DIR__.'/services.php');
+        $base = tempnam(sys_get_temp_dir(), 'services');
+        $manifestPath = $base.'.php';
+        $array = ['users' => ['dayle' => true], 'when' => []];
+        file_put_contents($manifestPath, '<?php return '.var_export($array, true).';');
+
+        $repo = new ProviderRepository(new Application, new Filesystem, $manifestPath);
 
         $this->assertEquals($array, $repo->loadManifest());
+
+        unlink($manifestPath);
+        unlink($base);
     }
 
     public function testWriteManifestStoresToProperLocation()
     {
-        $files = Mockery::mock(Filesystem::class);
-        $files->expects('replace')->with(__DIR__.'/services.php', '<?php return '.var_export(['foo'], true).';');
-        $repo = new ProviderRepository(Mockery::mock(ApplicationContract::class), $files, __DIR__.'/services.php');
+        $base = tempnam(sys_get_temp_dir(), 'services');
+        $manifestPath = $base.'.php';
+
+        $repo = new ProviderRepository(new Application, new Filesystem, $manifestPath);
 
         $result = $repo->writeManifest(['foo']);
 
         $this->assertEquals(['foo', 'when' => []], $result);
+        $this->assertSame('<?php return '.var_export(['foo'], true).';', file_get_contents($manifestPath));
+
+        unlink($manifestPath);
+        unlink($base);
     }
 
     public function testWriteManifestThrowsExceptionIfManifestDirDoesntExist()
@@ -96,5 +113,24 @@ class FoundationProviderRepositoryTest extends TestCase
         $repo = new ProviderRepository(Mockery::mock(ApplicationContract::class), $files, __DIR__.'/cache/services.php');
 
         $repo->writeManifest(['foo']);
+    }
+}
+
+class RepositoryTestEagerProviderStub extends ServiceProvider
+{
+    public function register()
+    {
+    }
+}
+
+class RepositoryTestDeferredProviderStub extends ServiceProvider implements DeferrableProvider
+{
+    public function register()
+    {
+    }
+
+    public function provides()
+    {
+        return ['foo.provides1', 'foo.provides2'];
     }
 }

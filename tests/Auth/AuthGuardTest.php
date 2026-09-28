@@ -14,6 +14,7 @@ use Illuminate\Auth\GenericUser;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Events\Dispatcher;
@@ -268,19 +269,18 @@ class AuthGuardTest extends TestCase
 
     public function testLoginStoresPasswordHashInSession()
     {
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $guard = new SessionGuard('default', $provider, $session, $request);
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getAuthIdentifier')->andReturn('foo');
-        $user->expects('getAuthPassword')->andReturn('bar');
-        $session->expects('put')->with($guard->getName(), 'foo');
-        $session->expects('regenerate');
-        $session->expects('put')->with(
-            'password_hash_default',
-            hash_hmac('sha256', 'bar', 'base-key-for-password-hash-mac')
-        );
+        [$guard, , $session] = $this->getRealGuard();
+        $sessionId = $session->getId();
+        $user = new GenericUser(['id' => 'foo', 'password' => 'bar']);
 
         $guard->login($user);
+
+        $this->assertSame('foo', $session->get($guard->getName()));
+        $this->assertSame(
+            hash_hmac('sha256', 'bar', 'base-key-for-password-hash-mac'),
+            $session->get('password_hash_default')
+        );
+        $this->assertNotSame($sessionId, $session->getId());
     }
 
     public function testSessionGuardIsMacroable()
@@ -356,8 +356,7 @@ class AuthGuardTest extends TestCase
     {
         $this->expectExceptionObject(new AuthenticationException('Unauthenticated.'));
 
-        $guard = $this->getGuard();
-        $guard->getSession()->expects('get')->andReturn(null);
+        [$guard] = $this->getRealGuard();
 
         $guard->authenticate();
     }
@@ -390,11 +389,10 @@ class AuthGuardTest extends TestCase
 
     public function testIsAuthedReturnsFalseWhenUserIsNull()
     {
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['user'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $mock->expects($this->exactly(2))->method('user')->willReturn(null);
-        $this->assertFalse($mock->check());
-        $this->assertTrue($mock->guest());
+        [$guard] = $this->getRealGuard();
+
+        $this->assertFalse($guard->check());
+        $this->assertTrue($guard->guest());
     }
 
     public function testUserMethodReturnsCachedUser()
@@ -407,19 +405,20 @@ class AuthGuardTest extends TestCase
 
     public function testNullIsReturnedForUserIfNoUserFound()
     {
-        $mock = $this->getGuard();
-        $mock->getSession()->expects('get')->andReturn(null);
-        $this->assertNull($mock->user());
+        [$guard] = $this->getRealGuard();
+
+        $this->assertNull($guard->user());
     }
 
     public function testUserIsSetToRetrievedUser()
     {
-        $mock = $this->getGuard();
-        $mock->getSession()->expects('get')->andReturn(1);
+        [$guard, $provider, $session] = $this->getRealGuard();
+        $session->put($guard->getName(), 1);
         $user = new GenericUser([]);
-        $mock->getProvider()->expects('retrieveById')->with(1)->andReturn($user);
-        $this->assertSame($user, $mock->user());
-        $this->assertSame($user, $mock->getUser());
+        $provider->expects('retrieveById')->with(1)->andReturn($user);
+
+        $this->assertSame($user, $guard->user());
+        $this->assertSame($user, $guard->getUser());
     }
 
     public function testLogoutRemovesSessionTokenAndRememberMeCookie()
@@ -436,7 +435,7 @@ class AuthGuardTest extends TestCase
         $mock->expects($this->once())->method('recaller')->willReturn('non-null-cookie');
         $provider->expects('updateRememberToken');
 
-        $cookie = Mockery::mock(Cookie::class);
+        $cookie = new Cookie('bar');
         $cookies->expects('forget')->with('bar')->andReturn($cookie);
         $cookies->expects('queue')->with($cookie);
         $cookies->expects('unqueue')->with($recallerName);
@@ -468,16 +467,16 @@ class AuthGuardTest extends TestCase
 
     public function testLogoutFiresLogoutEvent()
     {
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['clearUserDataFromStorage'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $mock->expects($this->once())->method('clearUserDataFromStorage');
+        [$guard, , $session] = $this->getRealGuard();
+        $guard->setCookieJar($this->getCookieJar());
         $events = new EventFake(new Dispatcher);
-        $mock->setDispatcher($events);
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getRememberToken')->andReturn(null);
-        $mock->setUser($user);
-        $mock->logout();
+        $guard->setDispatcher($events);
+        $user = new GenericUser(['id' => 10, 'remember_token' => null]);
+        $guard->setUser($user);
+        $session->put($guard->getName(), $user->getAuthIdentifier());
+        $guard->logout();
 
+        $this->assertNull($session->get($guard->getName()));
         $events->assertDispatchedOnce(Authenticated::class);
         $events->assertDispatchedOnce(Logout::class);
     }
@@ -507,7 +506,7 @@ class AuthGuardTest extends TestCase
         $mock->expects($this->exactly(2))->method('getRecallerName')->willReturn($recallerName = 'bar');
         $mock->expects($this->once())->method('recaller')->willReturn('non-null-cookie');
 
-        $cookie = Mockery::mock(Cookie::class);
+        $cookie = new Cookie('bar');
         $cookies->expects('forget')->with('bar')->andReturn($cookie);
         $cookies->expects('queue')->with($cookie);
         $cookies->expects('unqueue')->with($recallerName);
@@ -537,15 +536,16 @@ class AuthGuardTest extends TestCase
 
     public function testLogoutCurrentDeviceFiresLogoutEvent()
     {
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['clearUserDataFromStorage'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $mock->expects($this->once())->method('clearUserDataFromStorage');
+        [$guard, , $session] = $this->getRealGuard();
+        $guard->setCookieJar($this->getCookieJar());
         $events = new EventFake(new Dispatcher);
-        $mock->setDispatcher($events);
-        $user = new GenericUser([]);
-        $mock->setUser($user);
-        $mock->logoutCurrentDevice();
+        $guard->setDispatcher($events);
+        $user = new GenericUser(['id' => 10]);
+        $guard->setUser($user);
+        $session->put($guard->getName(), $user->getAuthIdentifier());
+        $guard->logoutCurrentDevice();
 
+        $this->assertNull($session->get($guard->getName()));
         $events->assertDispatchedOnce(Authenticated::class);
         $events->assertDispatchedOnce(CurrentDeviceLogout::class);
     }
@@ -663,19 +663,18 @@ class AuthGuardTest extends TestCase
 
     public function testUserUsesRememberCookieIfItExists()
     {
-        $guard = $this->getGuard();
-        [$session, $provider, $request, $cookie] = $this->getMocks();
-        $request = Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller|baz']);
-        $guard = new SessionGuard('default', $provider, $session, $request);
-        $guard->getSession()->expects('get')->with($guard->getName())->andReturn(null);
+        [$guard, $provider, $session] = $this->getRealGuard();
+        $sessionId = $session->getId();
+        $guard->setRequest(Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller|baz']));
         $user = Mockery::mock(Authenticatable::class);
-        $guard->getProvider()->expects('retrieveByToken')->with('id', 'recaller')->andReturn($user);
+        $provider->expects('retrieveByToken')->with('id', 'recaller')->andReturn($user);
         $user->expects('getAuthIdentifier')->andReturn('bar');
         $user->expects('getAuthPassword')->andReturn('baz');
-        $guard->getSession()->expects('put')->with($guard->getName(), 'bar');
-        $session->expects('regenerate');
+
         $this->assertSame($user, $guard->user());
         $this->assertTrue($guard->viaRemember());
+        $this->assertSame('bar', $session->get($guard->getName()));
+        $this->assertNotSame($sessionId, $session->getId());
     }
 
     public function testUserReturnsNullWhenRememberCookieTokenDoesNotMatchAnyUser()

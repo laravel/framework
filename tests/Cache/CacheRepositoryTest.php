@@ -13,7 +13,6 @@ use Illuminate\Cache\Lock;
 use Illuminate\Cache\MemcachedStore;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
-use Illuminate\Cache\TaggableStore;
 use Illuminate\Cache\TaggedCache;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\LockProvider;
@@ -461,7 +460,7 @@ class CacheRepositoryTest extends TestCase
 
     public function testTaggableRepositoriesSupportTags()
     {
-        $taggable = Mockery::mock(TaggableStore::class);
+        $taggable = new ArrayStore;
         $taggableRepo = new Repository($taggable);
 
         $this->assertTrue($taggableRepo->supportsTags());
@@ -469,7 +468,7 @@ class CacheRepositoryTest extends TestCase
 
     public function testNonTaggableRepositoryDoesNotSupportTags()
     {
-        $nonTaggable = Mockery::mock(FileStore::class);
+        $nonTaggable = new FileStore(new Filesystem, sys_get_temp_dir());
         $nonTaggableRepo = new Repository($nonTaggable);
 
         $this->assertFalse($nonTaggableRepo->supportsTags());

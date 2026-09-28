@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Console\CommandMutex;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;
@@ -22,7 +21,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
     public function testBasicMigrationsCallMigratorWithProperArguments()
     {
         $migrator = Mockery::mock(Migrator::class);
-        $dispatcher = Mockery::mock(Dispatcher::class);
+        $dispatcher = new EventsDispatcher;
         $command = new MigrateCommand($migrator, $dispatcher);
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
@@ -72,7 +71,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
     public function testMigrationRepositoryCreatedWhenNecessary()
     {
         $migrator = Mockery::mock(Migrator::class);
-        $dispatcher = Mockery::mock(Dispatcher::class);
+        $dispatcher = new EventsDispatcher;
         $params = [$migrator, $dispatcher];
         $command = $this->getMockBuilder(MigrateCommand::class)->onlyMethods(['callSilent'])->setConstructorArgs($params)->getMock();
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
@@ -94,7 +93,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
     public function testTheCommandMayBePretended()
     {
         $migrator = Mockery::mock(Migrator::class);
-        $dispatcher = Mockery::mock(Dispatcher::class);
+        $dispatcher = new EventsDispatcher;
         $command = new MigrateCommand($migrator, $dispatcher);
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
@@ -114,7 +113,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
     public function testTheDatabaseMayBeSet()
     {
         $migrator = Mockery::mock(Migrator::class);
-        $dispatcher = Mockery::mock(Dispatcher::class);
+        $dispatcher = new EventsDispatcher;
         $command = new MigrateCommand($migrator, $dispatcher);
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
@@ -134,7 +133,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
     public function testStepMayBeSet()
     {
         $migrator = Mockery::mock(Migrator::class);
-        $dispatcher = Mockery::mock(Dispatcher::class);
+        $dispatcher = new EventsDispatcher;
         $command = new MigrateCommand($migrator, $dispatcher);
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);

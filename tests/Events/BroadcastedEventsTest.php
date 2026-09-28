@@ -14,9 +14,20 @@ use PHPUnit\Framework\TestCase;
 
 class BroadcastedEventsTest extends TestCase
 {
+    protected function exposedDispatcher(): Dispatcher
+    {
+        return new class extends Dispatcher
+        {
+            public function shouldBroadcast(array $payload)
+            {
+                return parent::shouldBroadcast($payload);
+            }
+        };
+    }
+
     public function testShouldBroadcastSuccess()
     {
-        $d = Mockery::mock(Dispatcher::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $d = $this->exposedDispatcher();
 
         $event = new BroadcastEvent;
 
@@ -47,7 +58,7 @@ class BroadcastedEventsTest extends TestCase
 
     public function testShouldBroadcastFail()
     {
-        $d = Mockery::mock(Dispatcher::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $d = $this->exposedDispatcher();
 
         $event = new BroadcastFalseCondition;
 

@@ -106,11 +106,9 @@ class AuthDatabaseUserProviderTest extends TestCase
     public function testCredentialValidation()
     {
         $conn = new Connection(new PDO('sqlite::memory:'));
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->expects('check')->with('plain', 'hash')->andReturn(true);
+        $hasher = new BcryptHasher;
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getAuthPassword')->andReturn('hash');
+        $user = new GenericUser(['password' => $hasher->make('plain')]);
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
         $this->assertTrue($result);
@@ -119,12 +117,10 @@ class AuthDatabaseUserProviderTest extends TestCase
     public function testCredentialValidationFails()
     {
         $conn = new Connection(new PDO('sqlite::memory:'));
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->expects('check')->with('plain', 'hash')->andReturn(false);
+        $hasher = new BcryptHasher;
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getAuthPassword')->andReturn('hash');
-        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+        $user = new GenericUser(['password' => $hasher->make('plain')]);
+        $result = $provider->validateCredentials($user, ['password' => 'wrong']);
 
         $this->assertFalse($result);
     }

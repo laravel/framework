@@ -113,13 +113,18 @@ class ContainerCallTest extends TestCase
     public function testClosureCallWithInjectedDependency()
     {
         $container = new Container;
-        $container->call(function (ContainerCallConcreteStub $stub) {
-            //
+        $resolved = $container->call(function (ContainerCallConcreteStub $stub) {
+            return $stub;
         }, ['foo' => 'bar']);
 
-        $container->call(function (ContainerCallConcreteStub $stub) {
-            //
-        }, ['foo' => 'bar', 'stub' => new ContainerCallConcreteStub]);
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $resolved);
+
+        $given = new ContainerCallConcreteStub;
+        $resolved = $container->call(function (ContainerCallConcreteStub $stub) {
+            return $stub;
+        }, ['foo' => 'bar', 'stub' => $given]);
+
+        $this->assertSame($given, $resolved);
     }
 
     public function testCallWithDependencies()

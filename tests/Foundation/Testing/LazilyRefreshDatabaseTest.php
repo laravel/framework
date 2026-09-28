@@ -7,6 +7,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Illuminate\Tests\Foundation\Testing\Fixtures\ConsoleKernelSpy;
 use Mockery;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
@@ -62,19 +63,15 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testDatabaseIsRefreshedOnInteraction()
     {
-        $kernel = Mockery::spy(ConsoleKernel::class);
+        $kernel = new ConsoleKernelSpy;
         $this->app->instance(ConsoleKernelContract::class, $kernel);
-
-        $kernel->expects('call')
-            ->with('migrate:fresh', [
-                '--drop-views' => false,
-                '--drop-types' => false,
-                '--seed' => false,
-            ])
-            ->andReturn(0);
 
         $this->refreshDatabase();
         $this->app->make('db')->select('select 1');
+
+        $this->assertSame([
+            ['migrate:fresh', ['--drop-views' => false, '--drop-types' => false, '--seed' => false]],
+        ], $kernel->calls);
     }
 
     public function testDatabaseIsNotRefreshedWithoutInteraction()
@@ -93,19 +90,15 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testNonDefaultConnectionTriggersRefresh()
     {
-        $kernel = Mockery::spy(ConsoleKernel::class);
+        $kernel = new ConsoleKernelSpy;
         $this->app->instance(ConsoleKernelContract::class, $kernel);
-
-        $kernel->expects('call')
-            ->with('migrate:fresh', [
-                '--drop-views' => false,
-                '--drop-types' => false,
-                '--seed' => false,
-            ])
-            ->andReturn(0);
 
         $this->refreshDatabase();
 
         $this->app->make('db')->connection('testing2')->select('select 1');
+
+        $this->assertSame([
+            ['migrate:fresh', ['--drop-views' => false, '--drop-types' => false, '--seed' => false]],
+        ], $kernel->calls);
     }
 }

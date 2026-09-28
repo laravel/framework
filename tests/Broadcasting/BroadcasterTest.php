@@ -110,6 +110,9 @@ class BroadcasterTest extends TestCase
         });
 
         $this->broadcaster->channel('somethingelse', DummyBroadcastingChannel::class);
+
+        $this->assertSame([], $this->broadcaster->retrieveChannelOptions('something'));
+        $this->assertSame([], $this->broadcaster->retrieveChannelOptions('somethingelse'));
     }
 
     public function testNotFoundThrowsHttpException()
@@ -127,14 +130,8 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->channel('somechannel', function () {
             //
         });
-    }
 
-    public function testCanRegisterChannelsWithOptions()
-    {
-        $options = ['a' => ['b', 'c']];
-        $this->broadcaster->channel('somechannel', function () {
-            //
-        }, $options);
+        $this->assertSame([], $this->broadcaster->retrieveChannelOptions('somechannel'));
     }
 
     public function testCanRetrieveChannelsOptions()

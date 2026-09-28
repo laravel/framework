@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Auth;
 
 use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Auth\GenericUser;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Eloquent\Model;
@@ -82,11 +83,9 @@ class AuthEloquentUserProviderTest extends TestCase
 
     public function testCredentialValidation()
     {
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->expects('check')->with('plain', 'hash')->andReturn(true);
+        $hasher = new BcryptHasher;
         $provider = new EloquentUserProvider($hasher, 'foo');
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getAuthPassword')->andReturn('hash');
+        $user = new GenericUser(['password' => $hasher->make('plain')]);
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
         $this->assertTrue($result);
@@ -94,12 +93,10 @@ class AuthEloquentUserProviderTest extends TestCase
 
     public function testCredentialValidationFailed()
     {
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->expects('check')->with('plain', 'hash')->andReturn(false);
+        $hasher = new BcryptHasher;
         $provider = new EloquentUserProvider($hasher, 'foo');
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getAuthPassword')->andReturn('hash');
-        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+        $user = new GenericUser(['password' => $hasher->make('plain')]);
+        $result = $provider->validateCredentials($user, ['password' => 'wrong']);
 
         $this->assertFalse($result);
     }
@@ -118,15 +115,16 @@ class AuthEloquentUserProviderTest extends TestCase
 
     public function testRehashPasswordIfRequired()
     {
-        $hasher = Mockery::mock(Hasher::class);
-        $hasher->expects('needsRehash')->with('hash')->andReturn(true);
-        $hasher->expects('make')->with('plain')->andReturn('rehashed');
-
+        $hasher = new BcryptHasher(['rounds' => 5]);
         $provider = $this->newProvider($hasher);
         $user = EloquentProviderUserStub::find(3);
+        $user->forceFill(['password' => (new BcryptHasher(['rounds' => 4]))->make('plain')])->save();
+
         $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
 
-        $this->assertSame('rehashed', $user->fresh()->password);
+        $hash = $user->fresh()->password;
+        $this->assertTrue($hasher->check('plain', $hash));
+        $this->assertFalse($hasher->needsRehash($hash));
     }
 
     public function testDontRehashPasswordIfNotRequired()

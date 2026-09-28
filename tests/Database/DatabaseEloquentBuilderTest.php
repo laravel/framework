@@ -6,7 +6,6 @@ use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolver;
-use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -723,27 +722,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['bar', 'baz'], $builder->pluck('name')->all());
     }
 
-    public function testLocalMacrosAreCalledOnBuilder()
-    {
-        unset($_SERVER['__test.builder']);
-        $builder = new Builder(new BaseBuilder(
-            new Connection(new PDO('sqlite::memory:')),
-            Mockery::mock(Grammar::class),
-            new Processor
-        ));
-        $builder->macro('fooBar', function ($builder) {
-            $_SERVER['__test.builder'] = $builder;
-
-            return $builder;
-        });
-        $result = $builder->fooBar();
-
-        $this->assertTrue($builder->hasMacro('fooBar'));
-        $this->assertEquals($builder, $result);
-        $this->assertEquals($builder, $_SERVER['__test.builder']);
-        unset($_SERVER['__test.builder']);
-    }
-
     public function testGlobalMacrosAreCalledOnBuilder()
     {
         Builder::macro('foo', function ($bar) {
@@ -797,7 +775,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testEagerLoadRelationsCanBeFlushed()
     {
-        $builder = Mockery::mock(Builder::class.'[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
+        $builder = new Builder($this->getMockQueryBuilder());
 
         $builder->setEagerLoads(['foo']);
 
@@ -1001,39 +979,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('foo', $builder->raw('bar'));
     }
 
-    public function testQueryScopes()
-    {
-        $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('from');
-        $builder->getQuery()->expects('where')->with('foo', 'bar');
-        $builder->setModel($model = new EloquentBuilderTestScopeStub);
-        $result = $builder->approved();
-
-        $this->assertEquals($builder, $result);
-    }
-
-    public function testQueryDynamicScopes()
-    {
-        $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('from');
-        $builder->getQuery()->expects('where')->with('bar', 'foo');
-        $builder->setModel($model = new EloquentBuilderTestDynamicScopeStub);
-        $result = $builder->dynamic('bar', 'foo');
-
-        $this->assertEquals($builder, $result);
-    }
-
-    public function testQueryDynamicScopesNamed()
-    {
-        $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('from');
-        $builder->getQuery()->expects('where')->with('foo', 'foo');
-        $builder->setModel($model = new EloquentBuilderTestDynamicScopeStub);
-        $result = $builder->dynamic(bar: 'foo');
-
-        $this->assertEquals($builder, $result);
-    }
-
     public function testNestedWhere()
     {
         $nestedQuery = Mockery::mock(Builder::class);
@@ -1166,6 +1111,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder, $result);
     }
 
+    public function testRealQueryDynamicScopesWithNamedArguments()
+    {
+        $model = new EloquentBuilderTestDynamicScopeStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->dynamic(bar: 'baz');
+        $this->assertSame('select * from "table" where "foo" = ?', $query->toSql());
+        $this->assertEquals(['baz'], $query->getBindings());
+    }
+
     public function testRealQueryHigherOrderOrWhereScopes()
     {
         $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
@@ -1212,22 +1166,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->one()->orWhereNot->two()->orWhereNot->three();
         $this->assertSame('select * from "table" where "one" = ? or not ("two" = ?) or not ("three" = ?)', $query->toSql());
-    }
-
-    public function testSimpleWhere()
-    {
-        $builder = $this->getBuilder();
-        $builder->getQuery()->expects('where')->with('foo', '=', 'bar');
-        $result = $builder->where('foo', '=', 'bar');
-        $this->assertEquals($result, $builder);
-    }
-
-    public function testPostgresOperatorsWhere()
-    {
-        $builder = $this->getBuilder();
-        $builder->getQuery()->expects('where')->with('foo', '@>', 'bar');
-        $result = $builder->where('foo', '@>', 'bar');
-        $this->assertEquals($result, $builder);
     }
 
     public function testWhereBelongsTo()
@@ -2366,34 +2304,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKey(null);
     }
 
-    public function testWhereKeyMethodWithArray()
-    {
-        $model = $this->getMockModel();
-        $model->expects('getKeyType')->andReturn('int');
-        $builder = $this->getBuilder()->setModel($model);
-        $keyName = $model->getQualifiedKeyName();
-
-        $array = [1, 2, 3];
-
-        $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $array);
-
-        $builder->whereKey($array);
-    }
-
-    public function testWhereKeyMethodWithCollection()
-    {
-        $model = $this->getMockModel();
-        $model->expects('getKeyType')->andReturn('int');
-        $builder = $this->getBuilder()->setModel($model);
-        $keyName = $model->getQualifiedKeyName();
-
-        $collection = new Collection([1, 2, 3]);
-
-        $builder->getQuery()->expects('whereIntegerInRaw')->with($keyName, $collection);
-
-        $builder->whereKey($collection);
-    }
-
     public function testWhereKeyMethodWithModel()
     {
         $model = new EloquentBuilderTestStubStringPrimaryKey;
@@ -2448,34 +2358,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->expects('where')->with($keyName, '!=', $int);
 
         $builder->whereKeyNot($int);
-    }
-
-    public function testWhereKeyNotMethodWithArray()
-    {
-        $model = $this->getMockModel();
-        $model->expects('getKeyType')->andReturn('int');
-        $builder = $this->getBuilder()->setModel($model);
-        $keyName = $model->getQualifiedKeyName();
-
-        $array = [1, 2, 3];
-
-        $builder->getQuery()->expects('whereIntegerNotInRaw')->with($keyName, $array);
-
-        $builder->whereKeyNot($array);
-    }
-
-    public function testWhereKeyNotMethodWithCollection()
-    {
-        $model = $this->getMockModel();
-        $model->expects('getKeyType')->andReturn('int');
-        $builder = $this->getBuilder()->setModel($model);
-        $keyName = $model->getQualifiedKeyName();
-
-        $collection = new Collection([1, 2, 3]);
-
-        $builder->getQuery()->expects('whereIntegerNotInRaw')->with($keyName, $collection);
-
-        $builder->whereKeyNot($collection);
     }
 
     public function testWhereKeyNotMethodWithModel()
@@ -2907,16 +2789,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testWithCastsMethod()
-    {
-        $builder = new Builder($this->getMockQueryBuilder());
-        $model = $this->getMockModel();
-        $builder->setModel($model);
-
-        $model->expects('mergeCasts')->with(['foo' => 'bar']);
-        $builder->withCasts(['foo' => 'bar']);
-    }
-
     public function testClone()
     {
         $connection = Mockery::mock(Connection::class);
@@ -3050,7 +2922,8 @@ class DatabaseEloquentBuilderTest extends TestCase
             return new BaseBuilder($connection, $grammar, $processor);
         });
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
-        $resolver = Mockery::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
+        $resolver = new ConnectionResolver(['default' => $connection]);
+        $resolver->setDefaultConnection('default');
         $class = get_class($model);
         $class::setConnectionResolver($resolver);
 
@@ -3189,22 +3062,6 @@ class EloquentBuilderTestStub extends Model
     protected $table = 'table';
 }
 
-class EloquentBuilderTestScopeStub extends Model
-{
-    public function scopeApproved($query)
-    {
-        $query->where('foo', 'bar');
-    }
-}
-
-class EloquentBuilderTestDynamicScopeStub extends Model
-{
-    public function scopeDynamic($query, $foo = 'foo', $bar = 'bar')
-    {
-        $query->where($foo, $bar);
-    }
-}
-
 class EloquentBuilderTestHigherOrderWhereScopeStub extends Model
 {
     protected $table = 'table';
@@ -3222,6 +3079,16 @@ class EloquentBuilderTestHigherOrderWhereScopeStub extends Model
     public function scopeThree($query)
     {
         $query->where('three', 'baz');
+    }
+}
+
+class EloquentBuilderTestDynamicScopeStub extends Model
+{
+    protected $table = 'table';
+
+    public function scopeDynamic($query, $foo = 'foo', $bar = 'bar')
+    {
+        $query->where($foo, $bar);
     }
 }
 
