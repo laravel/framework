@@ -98,6 +98,13 @@ class BelongsToMany extends Relation
     protected $pivotWhereIns = [];
 
     /**
+     * Any pivot table restrictions for whereBetween clauses.
+     *
+     * @var array
+     */
+    protected $pivotWhereBetweens = [];
+
+    /**
      * Any pivot table restrictions for whereNull clauses.
      *
      * @var array
@@ -430,6 +437,8 @@ class BelongsToMany extends Relation
      */
     public function wherePivotBetween($column, array $values, $boolean = 'and', $not = false)
     {
+        $this->pivotWhereBetweens[] = func_get_args();
+
         return $this->whereBetween($this->qualifyPivotColumn($column), $values, $boolean, $not);
     }
 

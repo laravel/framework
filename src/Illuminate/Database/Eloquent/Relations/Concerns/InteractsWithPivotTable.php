@@ -678,6 +678,10 @@ trait InteractsWithPivotTable
             $query->whereIn(...$arguments);
         }
 
+        foreach ($this->pivotWhereBetweens as $arguments) {
+            $query->whereBetween(...$arguments);
+        }
+
         foreach ($this->pivotWhereNulls as $arguments) {
             $query->whereNull(...$arguments);
         }

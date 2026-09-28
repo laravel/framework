@@ -1173,6 +1173,39 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
+    public function testWherePivotBetweenIsAppliedToPivotTableOperations()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => '2024'],
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => '2025'],
+            ['post_id' => $post->id, 'tag_id' => $tag3->id, 'flag' => '2026'],
+        ]);
+
+        $post->tagsWithExtraPivot()->wherePivotBetween('flag', ['2026', '2026'])->sync([$tag4->id => ['flag' => '2026']]);
+
+        $this->assertEquals(
+            [$tag1->id, $tag2->id, $tag4->id],
+            $post->tagsWithExtraPivot()->orderBy('tags.id')->pluck('tags.id')->all()
+        );
+
+        $post->tagsWithExtraPivot()->wherePivotNotBetween('flag', ['2024', '2025'])->detach();
+
+        $this->assertEquals(
+            [$tag1->id, $tag2->id],
+            $post->tagsWithExtraPivot()->orderBy('tags.id')->pluck('tags.id')->all()
+        );
+
+        $post->tagsWithExtraPivot()->wherePivotBetween('flag', ['2025', '2025'])->updateExistingPivot($tag1->id, ['flag' => 'updated']);
+
+        $this->assertSame('2024', $post->tagsWithExtraPivot()->find($tag1->id)->pivot->flag);
+    }
+
     public function testWherePivotInMethod()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
