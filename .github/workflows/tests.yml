@@ -17,6 +17,7 @@ jobs:
     if: github.event_name != 'schedule' || github.repository == 'laravel/framework'
 
     runs-on: ubuntu-24.04
+    continue-on-error: ${{ matrix.experimental }}
     timeout-minutes: 10
 
     services:
@@ -44,7 +45,6 @@ jobs:
 
     strategy:
       fail-fast: true
-      continue-on-error: ${{ matrix.experimental }}
       matrix:
         php: [8.3, 8.4, 8.5]
         phpunit: ['11.5.50', '12.5.8', '13.0.3']
