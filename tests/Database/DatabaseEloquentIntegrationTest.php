@@ -341,6 +341,26 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user->save();
     }
 
+    public function testConfiguredAttributesAreExcludedWhenReplicating()
+    {
+        $user = EloquentTestGeneratedUser::create([
+            'first_name' => 'Taylor',
+            'last_name' => 'Otwell',
+        ]);
+
+        $replica = $user->replicate();
+        $replica->save();
+
+        $this->assertSame(2, $replica->id);
+        $this->assertSame('Taylor Otwell', $replica->name);
+
+        $quietReplica = $user->replicateQuietly();
+        $quietReplica->save();
+
+        $this->assertSame(3, $quietReplica->id);
+        $this->assertSame('Taylor Otwell', $quietReplica->name);
+    }
+
     public function testBasicModelCollectionRetrieval()
     {
         EloquentTestUser::insert([['id' => 1, 'email' => 'taylorotwell@gmail.com'], ['id' => 2, 'email' => 'abigailotwell@gmail.com']]);
