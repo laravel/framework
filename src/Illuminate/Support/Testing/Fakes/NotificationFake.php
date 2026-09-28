@@ -276,7 +276,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
             return new Collection;
         }
 
-        $callback = $this->propertiesCallback($callback) ?: fn () => true;
+        $callback = $this->resolveCallback($callback) ?: fn () => true;
 
         $notifications = new Collection($this->notificationsFor($notifiable, $notification));
 

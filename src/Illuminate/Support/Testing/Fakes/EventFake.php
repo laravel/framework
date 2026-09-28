@@ -235,7 +235,7 @@ class EventFake implements Dispatcher, Fake
             return new Collection;
         }
 
-        $callback = $this->propertiesCallback($callback) ?: fn () => true;
+        $callback = $this->resolveCallback($callback) ?: fn () => true;
 
         return (new Collection($this->events[$event]))->filter(
             fn ($arguments) => $callback(...$arguments)

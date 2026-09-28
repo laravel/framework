@@ -206,7 +206,7 @@ class QueueFake extends QueueManager implements Fake, Queue
 
         $queue = enum_value($queue);
 
-        $callback = $this->propertiesCallback($callback);
+        $callback = $this->resolveCallback($callback);
 
         $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
             if (enum_value($pushedQueue) !== $queue) {
@@ -391,7 +391,7 @@ class QueueFake extends QueueManager implements Fake, Queue
             return new Collection;
         }
 
-        $callback = $this->propertiesCallback($callback) ?: fn () => true;
+        $callback = $this->resolveCallback($callback) ?: fn () => true;
 
         return (new Collection($this->jobs[$job]))->filter(
             fn ($data) => $callback($data['job'], $data['queue'], $data['data'])

@@ -8,10 +8,12 @@ use Illuminate\Support\Collection;
 trait MatchesProperties
 {
     /**
+     * Resolve a truth-test callback from the given callback or array of properties.
+     *
      * @param  callable|array<string, mixed>|null  $callback
      * @return callable|null
      */
-    protected function propertiesCallback($callback)
+    protected function resolveCallback($callback)
     {
         if (! is_array($callback) || is_callable($callback)) {
             return $callback;
