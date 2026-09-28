@@ -195,7 +195,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      *
      * @param  \UnitEnum|string  $queue
      * @param  string|\Closure  $job
-     * @param  callable|null  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return void
      */
     public function assertPushedOn($queue, $job, $callback = null)
@@ -205,6 +205,8 @@ class QueueFake extends QueueManager implements Fake, Queue
         }
 
         $queue = enum_value($queue);
+
+        $callback = $this->propertiesCallback($callback);
 
         $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
             if (enum_value($pushedQueue) !== $queue) {
