@@ -867,6 +867,13 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertInstanceOf(Closure::class, $eagers['orders.lines']);
 
         $builder = $this->getBuilder();
+        $builder->with('orders', null);
+        $eagers = $builder->getEagerLoads();
+
+        $this->assertEquals(['orders'], array_keys($eagers));
+        $this->assertInstanceOf(Closure::class, $eagers['orders']);
+
+        $builder = $this->getBuilder();
         $builder->with(['orders.lines']);
         $eagers = $builder->getEagerLoads();
 

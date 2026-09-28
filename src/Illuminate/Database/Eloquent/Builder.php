@@ -1773,7 +1773,7 @@ class Builder implements BuilderContract
         if ($callback instanceof Closure) {
             $eagerLoad = $this->parseWithRelations([$relations => $callback]);
         } else {
-            $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+            $eagerLoad = $this->parseWithRelations(is_string($relations) ? array_filter(func_get_args()) : $relations);
         }
 
         $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
