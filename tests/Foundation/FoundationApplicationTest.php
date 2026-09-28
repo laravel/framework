@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
