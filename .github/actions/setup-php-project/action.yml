@@ -60,4 +60,4 @@ runs:
       with:
         timeout_minutes: 5
         max_attempts: 5
-        command: "${{ inputs.composer-command }} ${{ inputs.experimental == true ? && '--ignore-platform-reqs' || '' }}"
+        command: "${{ inputs.composer-command }} ${{ inputs.experimental == true && '--ignore-platform-reqs' || '' }}"
