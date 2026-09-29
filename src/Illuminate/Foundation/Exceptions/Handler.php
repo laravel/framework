@@ -82,7 +82,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * The callbacks that inspect PHP errors to determine if they should be reported instead of thrown.
      *
-     * @var array
+     * @var (callable(\ErrorException): bool)[]
      */
     protected $dontThrowErrorCallbacks = [];
 
@@ -356,13 +356,10 @@ class Handler implements ExceptionHandlerContract
      */
     public function shouldThrowError(ErrorException $e)
     {
-        foreach ($this->dontThrowErrorCallbacks as $dontThrowCallback) {
-            if ($dontThrowCallback($e) === true) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all(
+            $this->dontThrowErrorCallbacks,
+            fn (callable $dontThrowCallback) => $dontThrowCallback($e) !== true,
+        );
     }
 
     /**
