@@ -5,12 +5,19 @@ namespace Illuminate\Tests\Queue;
 use Illuminate\Container\Container;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Queue\Connectors\SyncConnector;
+use Illuminate\Queue\Queue;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\SyncQueue;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 class QueueManagerTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Queue::createPayloadUsing(null);
+    }
+
     public function testDefaultConnectionCanBeResolved()
     {
         $app = new Container;
@@ -101,6 +108,26 @@ class QueueManagerTest extends TestCase
         $this->assertFalse($manager->connected(QueueConnectionName::Sync));
         $manager->connection(QueueConnectionName::Sync);
         $this->assertTrue($manager->connected(QueueConnectionName::Sync));
+    }
+
+    public function testCreatePayloadUsingDoesNotResolveTheDefaultConnection()
+    {
+        $app = new Container;
+        $app['config'] = [
+            'queue.default' => 'cloud',
+        ];
+
+        $manager = new QueueManager($app);
+
+        $manager->createPayloadUsing(function ($connection, $queue, $payload) {
+            return ['foo' => 'bar'];
+        });
+
+        $this->assertFalse($manager->connected('cloud'));
+
+        $callbacks = (new ReflectionProperty(Queue::class, 'createPayloadCallbacks'))->getValue();
+
+        $this->assertSame(['foo' => 'bar'], $callbacks[array_key_last($callbacks)](null, null, null));
     }
 
     public function testSetDefaultDriverAcceptsBackedEnum()
