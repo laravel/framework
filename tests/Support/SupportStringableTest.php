@@ -879,6 +879,23 @@ class SupportStringableTest extends TestCase
         $this->assertSame('', (string) $this->stringable('foobarbar')->betweenFirst('foo', 'bar'));
     }
 
+    public function testBetweenLast()
+    {
+        $this->assertSame('abc', (string) $this->stringable('abc')->betweenLast('', 'c'));
+        $this->assertSame('abc', (string) $this->stringable('abc')->betweenLast('a', ''));
+        $this->assertSame('abc', (string) $this->stringable('abc')->betweenLast('', ''));
+        $this->assertSame('b', (string) $this->stringable('abc')->betweenLast('a', 'c'));
+        $this->assertSame('b', (string) $this->stringable('dddabc')->betweenLast('a', 'c'));
+        $this->assertSame('b', (string) $this->stringable('abcddd')->betweenLast('a', 'c'));
+        $this->assertSame('b', (string) $this->stringable('dddabcddd')->betweenLast('a', 'c'));
+        $this->assertSame('nn', (string) $this->stringable('hannah')->betweenLast('ha', 'ah'));
+        $this->assertSame('b', (string) $this->stringable('[a]ab[b]')->betweenLast('[', ']'));
+        $this->assertSame('', (string) $this->stringable('foofoobar')->betweenLast('foo', 'bar'));
+        $this->assertSame('', (string) $this->stringable('foobarbar')->betweenLast('foo', 'bar'));
+        $this->assertSame('3', (string) $this->stringable('foo [1] bar [2] baz [3] qux')->betweenLast('[', ']'));
+        $this->assertSame('nothing', (string) $this->stringable('nothing')->betweenLast('foo', 'bar'));
+    }
+
     public function testAfter()
     {
         $this->assertSame('nah', (string) $this->stringable('hannah')->after('han'));

@@ -189,6 +189,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Get the portion of a string between the last occurrence of a given value and the subsequent occurrence of another value.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return static
+     */
+    public function betweenLast($from, $to)
+    {
+        return new static(Str::betweenLast($this->value, $from, $to));
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @return static

@@ -442,6 +442,23 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::betweenFirst('foobarbar', 'foo', 'bar'));
     }
 
+    public function testStrBetweenLast()
+    {
+        $this->assertSame('abc', Str::betweenLast('abc', '', 'c'));
+        $this->assertSame('abc', Str::betweenLast('abc', 'a', ''));
+        $this->assertSame('abc', Str::betweenLast('abc', '', ''));
+        $this->assertSame('b', Str::betweenLast('abc', 'a', 'c'));
+        $this->assertSame('b', Str::betweenLast('dddabc', 'a', 'c'));
+        $this->assertSame('b', Str::betweenLast('abcddd', 'a', 'c'));
+        $this->assertSame('b', Str::betweenLast('dddabcddd', 'a', 'c'));
+        $this->assertSame('nn', Str::betweenLast('hannah', 'ha', 'ah'));
+        $this->assertSame('b', Str::betweenLast('[a]ab[b]', '[', ']'));
+        $this->assertSame('', Str::betweenLast('foofoobar', 'foo', 'bar'));
+        $this->assertSame('', Str::betweenLast('foobarbar', 'foo', 'bar'));
+        $this->assertSame('3', Str::betweenLast('foo [1] bar [2] baz [3] qux', '[', ']'));
+        $this->assertSame('nothing', Str::betweenLast('nothing', 'foo', 'bar'));
+    }
+
     public function testStrAfter()
     {
         $this->assertSame('nah', Str::after('hannah', 'han'));

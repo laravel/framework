@@ -232,6 +232,23 @@ class Str
     }
 
     /**
+     * Get the portion of a string between the last occurrence of a given value and the subsequent occurrence of another value.
+     *
+     * @param  string  $subject
+     * @param  string  $from
+     * @param  string  $to
+     * @return string
+     */
+    public static function betweenLast($subject, $from, $to)
+    {
+        if ($from === '' || $to === '') {
+            return $subject;
+        }
+
+        return static::before(static::afterLast($subject, $from), $to);
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @param  string  $value
