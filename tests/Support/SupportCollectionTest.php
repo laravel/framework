@@ -2196,6 +2196,7 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testSortByMany($collection)
     {
+        $sortLocaleString = PHP_VERSION_ID === 80600 || version_compare(PHP_VERSION, '8.6.0', '>=') ? 5 : SORT_LOCALE_STRING;
         $defaultLocale = setlocale(LC_ALL, 0);
 
         $data = new $collection([['item' => '1'], ['item' => '10'], ['item' => 5], ['item' => 20]]);
@@ -2274,14 +2275,14 @@ class SupportCollectionTest extends TestCase
         $data = $data->sortBy(['item']);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
-        $collator = new Collator('');
-        $sortLocaleString = PHP_VERSION_ID === 80600 || version_compare(PHP_VERSION, '8.6.0', '>=') ? 5 : SORT_LOCALE_STRING;
+        $collator = new Collator($defaultLocale);
 
         usort($expected, [$collator, 'compare']);
         $data = $data->sortBy(['item'], $sortLocaleString);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
         $collator = new Collator('de_DE');
+        setlocale(LC_ALL, 'de_DE');
 
         usort($expected, [$collator, 'compare']);
         $data = $data->sortBy(['item'], $sortLocaleString);
