@@ -15,6 +15,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
@@ -514,6 +515,23 @@ class Schedule
     {
         static::$pausable = false;
         static::$interruptible = false;
+    }
+
+    /**
+     * Determine if the schedule has been interrupted since the given time.
+     *
+     * @param  \DateTimeInterface  $time
+     * @return bool
+     */
+    public function hasBeenInterruptedSince(DateTimeInterface $time)
+    {
+        if (! static::$interruptible) {
+            return false;
+        }
+
+        $interruptedAt = Container::getInstance()->make(Cache::class)->get('illuminate:schedule:interrupt');
+
+        return is_numeric($interruptedAt) && (int) $interruptedAt >= Date::instance($time)->getTimestampMs();
     }
 
     /**

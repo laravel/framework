@@ -50,7 +50,7 @@ class ScheduleInterruptCommand extends Command
      */
     public function handle()
     {
-        $this->cache->put('illuminate:schedule:interrupt', true, Date::now()->endOfMinute());
+        $this->cache->forever('illuminate:schedule:interrupt', Date::now()->getTimestampMs());
 
         $this->components->info('Broadcasting schedule interrupt signal.');
     }
