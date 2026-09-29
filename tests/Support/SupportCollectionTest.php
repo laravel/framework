@@ -38,6 +38,8 @@ use UnexpectedValueException;
 use ValueError;
 use WeakMap;
 
+use function Orchestra\Testbench\php_version_compare;
+
 include_once 'Fixtures/Common.php';
 include_once 'Fixtures/Enums.php';
 
@@ -2274,13 +2276,23 @@ class SupportCollectionTest extends TestCase
         $data = $data->sortBy(['item']);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
-        usort($expected, [collator_create($defaultLocale), 'compare']);
+        if (php_version_compare('8.6', '>=')) {
+            usort($expected, [collator_create($defaultLocale), 'compare']);
+        } else {
+            sort($expected, SORT_LOCALE_STRING);
+        }
+
         $data = $data->sortBy(['item'], $sortLocaleString);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
         setlocale(LC_ALL, 'de_DE');
 
-        usort($expected, [collator_create('de_DE'), 'compare']);
+        if (php_version_compare('8.6', '>=')) {
+            usort($expected, [collator_create('de_DE'), 'compare']);
+        } else {
+            sort($expected, SORT_LOCALE_STRING);
+        }
+
         $data = $data->sortBy(['item'], $sortLocaleString);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
