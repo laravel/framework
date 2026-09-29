@@ -1,6 +1,11 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.69.2...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.69.3...12.x)
+
+## [v12.69.3](https://github.com/laravel/framework/compare/v12.69.2...v12.69.3) - 2026-09-29
+
+* [12.x] Make the worker timed out exit code reachable by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/61623
+* [12.x] Support named S3 credential providers and Cloud IAM disks by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/61757
 
 ## [v12.69.2](https://github.com/laravel/framework/compare/v12.69.1...v12.69.2) - 2026-09-08
 
