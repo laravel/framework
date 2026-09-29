@@ -2320,6 +2320,28 @@ class DatabaseEloquentBuilderTest extends TestCase
         });
     }
 
+    public function testWhereKeyMethodWithStringPrimaryKeyAndEnum()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->expects('where')->with($keyName, '=', 'bar');
+
+        $builder->whereKey(EloquentBuilderTestBackedEnum::Bar);
+    }
+
+    public function testWhereKeyMethodWithStringPrimaryKeyAndUnitEnum()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->expects('where')->with($keyName, '=', 'Baz');
+
+        $builder->whereKey(EloquentBuilderTestUnitEnum::Baz);
+    }
+
     public function testWhereKeyNotMethodWithStringZero()
     {
         $model = new EloquentBuilderTestStubStringPrimaryKey;
@@ -2374,6 +2396,28 @@ class DatabaseEloquentBuilderTest extends TestCase
         {
             protected $attributes = ['id' => 1];
         });
+    }
+
+    public function testWhereKeyNotMethodWithStringPrimaryKeyAndEnum()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->expects('where')->with($keyName, '!=', 'bar');
+
+        $builder->whereKeyNot(EloquentBuilderTestBackedEnum::Bar);
+    }
+
+    public function testWhereKeyNotMethodWithStringPrimaryKeyAndUnitEnum()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->expects('where')->with($keyName, '!=', 'Baz');
+
+        $builder->whereKeyNot(EloquentBuilderTestUnitEnum::Baz);
     }
 
     public function testOrWhereKeyMethodWithInt()

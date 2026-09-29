@@ -294,7 +294,7 @@ class Builder implements BuilderContract
         }
 
         if ($id !== null && $this->model->getKeyType() === 'string') {
-            $id = (string) $id;
+            $id = (string) enum_value($id);
         }
 
         return $this->where($this->model->getQualifiedKeyName(), '=', $id);
@@ -323,7 +323,7 @@ class Builder implements BuilderContract
         }
 
         if ($id !== null && $this->model->getKeyType() === 'string') {
-            $id = (string) $id;
+            $id = (string) enum_value($id);
         }
 
         return $this->where($this->model->getQualifiedKeyName(), '!=', $id);

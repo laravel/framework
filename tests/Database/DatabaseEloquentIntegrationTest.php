@@ -1217,6 +1217,30 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame(['first', 'second'], EloquentTestUniqueUserWithCustomKey::orderBy('screen_name')->modelKeys());
     }
 
+    public function testWhereKeyAndFindWithEnumOnStringPrimaryKeyModel()
+    {
+        EloquentTestUniqueUserWithCustomKey::insert([
+            ['screen_name' => 'admin', 'email' => 'admin@example.com'],
+            ['screen_name' => 'user', 'email' => 'user@example.com'],
+        ]);
+
+        $admin = EloquentTestUniqueUserWithCustomKey::find(StringBackedRole::Admin);
+        $this->assertNotNull($admin);
+        $this->assertSame('admin', $admin->screen_name);
+
+        $adminOrFail = EloquentTestUniqueUserWithCustomKey::findOrFail(StringBackedRole::Admin);
+        $this->assertSame('admin', $adminOrFail->screen_name);
+
+        $adminWhereKey = EloquentTestUniqueUserWithCustomKey::whereKey(StringBackedRole::Admin)->first();
+        $this->assertSame('admin', $adminWhereKey->screen_name);
+
+        $userWhereKeyNot = EloquentTestUniqueUserWithCustomKey::whereKeyNot(StringBackedRole::Admin)->first();
+        $this->assertSame('user', $userWhereKeyNot->screen_name);
+
+        $both = EloquentTestUniqueUserWithCustomKey::whereKey([StringBackedRole::Admin, StringBackedRole::User])->get();
+        $this->assertCount(2, $both);
+    }
+
     public function testModelKeysWithQueryConstraints()
     {
         EloquentTestUser::insert([
