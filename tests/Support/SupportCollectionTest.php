@@ -6,7 +6,6 @@ use ArrayAccess;
 use ArrayIterator;
 use ArrayObject;
 use CachingIterator;
-use Collator;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
@@ -2275,16 +2274,13 @@ class SupportCollectionTest extends TestCase
         $data = $data->sortBy(['item']);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
-        $collator = new Collator($defaultLocale);
-
-        usort($expected, [$collator, 'compare']);
+        usort($expected, [collator_create($defaultLocale), 'compare']);
         $data = $data->sortBy(['item'], $sortLocaleString);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
-        $collator = new Collator('de_DE');
         setlocale(LC_ALL, 'de_DE');
 
-        usort($expected, [$collator, 'compare']);
+        usort($expected, [collator_create('de_DE'), 'compare']);
         $data = $data->sortBy(['item'], $sortLocaleString);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
