@@ -24,15 +24,15 @@ class ScheduleInterruptCommandTest extends TestCase
 
         $this->artisan('schedule:interrupt');
 
-        $this->assertTrue($schedule->interruptedSince($startedAt));
-        $this->assertFalse($schedule->interruptedSince(Carbon::now()->addSecond()));
+        $this->assertTrue($schedule->hasBeenInterruptedSince($startedAt));
+        $this->assertFalse($schedule->hasBeenInterruptedSince(Carbon::now()->addSecond()));
     }
 
     public function testReadsTheTimestampAsStoresSuchAsRedisReturnIt()
     {
         $this->app['cache']->forever('illuminate:schedule:interrupt', (string) Carbon::now()->getTimestampMs());
 
-        $this->assertTrue($this->app->make(Schedule::class)->interruptedSince(Carbon::now()->subSecond()));
+        $this->assertTrue($this->app->make(Schedule::class)->hasBeenInterruptedSince(Carbon::now()->subSecond()));
     }
 
     public function testDoesNotInterruptWhenInterruptingIsDisabled()
@@ -41,6 +41,6 @@ class ScheduleInterruptCommandTest extends TestCase
 
         Schedule::$interruptible = false;
 
-        $this->assertFalse($this->app->make(Schedule::class)->interruptedSince(Carbon::now()->subMinute()));
+        $this->assertFalse($this->app->make(Schedule::class)->hasBeenInterruptedSince(Carbon::now()->subMinute()));
     }
 }

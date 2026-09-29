@@ -306,6 +306,6 @@ class ScheduleRunCommand extends Command
      */
     protected function shouldInterrupt()
     {
-        return $this->schedule->interruptedSince($this->startedAt);
+        return $this->schedule->hasBeenInterruptedSince($this->startedAt);
     }
 }

@@ -505,23 +505,6 @@ class Schedule
     }
 
     /**
-     * Determine if the schedule has been interrupted since the given time.
-     *
-     * @param  \DateTimeInterface  $time
-     * @return bool
-     */
-    public function interruptedSince(DateTimeInterface $time)
-    {
-        if (! static::$interruptible) {
-            return false;
-        }
-
-        $interruptedAt = Container::getInstance()->make(Cache::class)->get('illuminate:schedule:interrupt');
-
-        return is_numeric($interruptedAt) && (int) $interruptedAt >= Date::instance($time)->getTimestampMs();
-    }
-
-    /**
      * Indicate that the scheduler should not poll for pause or interrupt signals.
      *
      * This prevents the scheduler from hitting the application cache to determine if it needs to pause or interrupt.
@@ -532,6 +515,23 @@ class Schedule
     {
         static::$pausable = false;
         static::$interruptible = false;
+    }
+
+    /**
+     * Determine if the schedule has been interrupted since the given time.
+     *
+     * @param  \DateTimeInterface  $time
+     * @return bool
+     */
+    public function hasBeenInterruptedSince(DateTimeInterface $time)
+    {
+        if (! static::$interruptible) {
+            return false;
+        }
+
+        $interruptedAt = Container::getInstance()->make(Cache::class)->get('illuminate:schedule:interrupt');
+
+        return is_numeric($interruptedAt) && (int) $interruptedAt >= Date::instance($time)->getTimestampMs();
     }
 
     /**
