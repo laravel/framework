@@ -99,6 +99,16 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertNotPushed(JobWithPropertiesStub::class, ['model' => new ModelForQueueFakeStub(['id' => 2])]);
     }
 
+    public function testAssertPushedWithArrayOfPropertiesDoesNotMatchMissingOrMismatchedProperties()
+    {
+        $this->fake->push(new JobWithPropertiesStub('pending'));
+
+        $this->fake->assertNotPushed(JobWithPropertiesStub::class, ['status' => new ModelForQueueFakeStub(['id' => 1])]);
+        $this->fake->assertNotPushed(JobWithPropertiesStub::class, ['model' => new ModelForQueueFakeStub(['id' => 1])]);
+        $this->fake->assertNotPushed(JobWithPropertiesStub::class, ['missing' => null]);
+        $this->fake->assertPushed(JobWithPropertiesStub::class, ['model' => null]);
+    }
+
     public function testQueueSize()
     {
         $this->assertEquals(0, $this->fake->size());

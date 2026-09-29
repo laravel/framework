@@ -18,9 +18,15 @@ trait MatchesProperties
         }
 
         return fn ($object) => (new Collection($callback))->every(function ($expected, $property) use ($object) {
+            if (! property_exists($object, $property) && ! isset($object->{$property})) {
+                return false;
+            }
+
             $actual = $object->{$property} ?? null;
 
-            return $expected instanceof Model ? $expected->is($actual) : $actual === $expected;
+            return $expected instanceof Model && $actual instanceof Model
+                ? $expected->is($actual)
+                : $actual === $expected;
         });
     }
 }
