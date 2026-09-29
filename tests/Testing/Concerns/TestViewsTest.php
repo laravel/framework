@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Testing\Concerns;
 
+use ErrorException;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\ParallelTesting as ParallelTestingFacade;
 use Illuminate\Testing\Concerns\TestViews;
 use Illuminate\Testing\ParallelTesting;
@@ -142,6 +144,102 @@ class TestViewsTest extends TestCase
         $tearDownCallbacks = (new ReflectionProperty($parallelTesting, 'tearDownProcessCallbacks'))->getValue($parallelTesting);
 
         $this->assertCount(1, $tearDownCallbacks);
+    }
+
+    public function testSetUpProcessToleratesDirectoryCreatedByConcurrentRun()
+    {
+        $compiled = sys_get_temp_dir().'/laravel-test-views-'.uniqid();
+        $path = $compiled.'/test_9';
+
+        // Another parallel run with the same worker token created the directory after this run checked for it...
+        mkdir($path, 0755, true);
+
+        $this->bootTestViewsUsingFilesystem($compiled, '9', new class extends Filesystem
+        {
+            public function isDirectory($directory)
+            {
+                return false;
+            }
+        });
+
+        try {
+            $this->withWarningsAsExceptions(
+                fn () => Container::getInstance()->make(ParallelTesting::class)->callSetUpProcessCallbacks()
+            );
+
+            $this->assertDirectoryExists($path);
+        } finally {
+            (new Filesystem)->deleteDirectory($compiled);
+        }
+    }
+
+    public function testTearDownProcessToleratesDirectoryRemovedByConcurrentRun()
+    {
+        $compiled = sys_get_temp_dir().'/laravel-test-views-'.uniqid();
+        $path = $compiled.'/test_9';
+
+        // Another parallel run with the same worker token removed the directory after this run checked for it...
+        $this->bootTestViewsUsingFilesystem($compiled, '9', new class extends Filesystem
+        {
+            public function isDirectory($directory)
+            {
+                return true;
+            }
+        });
+
+        $this->withWarningsAsExceptions(
+            fn () => Container::getInstance()->make(ParallelTesting::class)->callTearDownProcessCallbacks()
+        );
+
+        $this->assertDirectoryDoesNotExist($path);
+    }
+
+    protected function bootTestViewsUsingFilesystem($compiled, $token, Filesystem $files)
+    {
+        $container = Container::getInstance();
+
+        $container['config']->set('view.compiled', $compiled);
+        $container->make(ParallelTesting::class)->resolveTokenUsing(fn () => $token);
+        $container->instance('files', $files);
+
+        File::clearResolvedInstance();
+
+        $instance = new class
+        {
+            use TestViews;
+
+            public $app;
+
+            public function __construct()
+            {
+                $this->app = Container::getInstance();
+            }
+        };
+
+        (new ReflectionProperty($instance::class, 'originalCompiledViewPath'))->setValue(null, null);
+
+        (new ReflectionMethod($instance, 'bootTestViews'))->invoke($instance);
+    }
+
+    protected function withWarningsAsExceptions(callable $callback)
+    {
+        $reporting = error_reporting();
+
+        set_error_handler(function ($severity, $message, $file, $line) use ($reporting) {
+            // A changed level means the warning was silenced with the @ operator...
+            if (error_reporting() !== $reporting) {
+                return false;
+            }
+
+            throw new ErrorException($message, 0, $severity, $file, $line);
+        });
+
+        try {
+            $callback();
+        } finally {
+            restore_error_handler();
+            File::clearResolvedInstance();
+        }
     }
 
     public function switchToCompiledViewPath($path)

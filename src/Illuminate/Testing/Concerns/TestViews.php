@@ -4,6 +4,7 @@ namespace Illuminate\Testing\Concerns;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\ParallelTesting;
+use UnexpectedValueException;
 
 trait TestViews
 {
@@ -23,7 +24,8 @@ trait TestViews
     {
         ParallelTesting::setUpProcess(function () {
             if ($path = $this->parallelSafeCompiledViewPath()) {
-                File::ensureDirectoryExists($path);
+                // The token is a worker index, so a concurrent parallel run may create this directory first...
+                File::makeDirectory($path, 0755, true, true);
             }
         });
 
@@ -35,7 +37,11 @@ trait TestViews
 
         ParallelTesting::tearDownProcess(function () {
             if ($path = $this->parallelSafeCompiledViewPath()) {
-                File::deleteDirectory($path);
+                try {
+                    File::deleteDirectory($path);
+                } catch (UnexpectedValueException) {
+                    // A concurrent parallel run removed the directory first, which is the state we want...
+                }
             }
         });
     }
