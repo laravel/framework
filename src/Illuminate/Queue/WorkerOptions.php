@@ -21,7 +21,7 @@ class WorkerOptions
     /**
      * The maximum amount of RAM the worker may consume.
      *
-     * @var int
+     * @var int|string
      */
     public $memory;
 
@@ -93,7 +93,7 @@ class WorkerOptions
      *
      * @param  string  $name
      * @param  int|int[]  $backoff
-     * @param  int  $memory
+     * @param  int|string  $memory
      * @param  int  $timeout
      * @param  int  $sleep
      * @param  int  $maxTries

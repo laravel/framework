@@ -192,6 +192,26 @@ class QueueWorkerTest extends TestCase
         $this->assertFalse($worker->memoryExceeded(-1));
     }
 
+    public function testWorkerMemoryExceededWhenMemoryIsAPercentage()
+    {
+        $worker = new class(...$this->workerDependencies()) extends Worker
+        {
+            protected function currentMemoryUsage()
+            {
+                return 512;
+            }
+        };
+
+        $original = ini_set('memory_limit', '1G');
+
+        try {
+            $this->assertTrue($worker->memoryExceeded('50%'));
+            $this->assertFalse($worker->memoryExceeded('51%'));
+        } finally {
+            ini_set('memory_limit', $original);
+        }
+    }
+
     public function testJobCanBeFiredBasedOnPriority()
     {
         $worker = $this->getWorker('default', [
