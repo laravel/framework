@@ -711,6 +711,7 @@ class ExceptionReportingTest extends TestCase
             $this->assertSame([
                 'avatar' => [
                     'originalName' => 'avatar.png',
+                    'mimeType' => 'image/png',
                     'size' => 12288,
                     'error' => 0,
                 ],
