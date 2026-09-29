@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery;
 use PHPUnit\Framework\Attributes\AfterClass;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -184,6 +185,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($store->touch($key, $ttl));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testStoreItemProperlySetsPermissions()
     {
         $files = Mockery::mock(Filesystem::class)->shouldIgnoreMissing();
@@ -203,6 +205,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testStoreItemDirectoryProperlySetsPermissions()
     {
         $files = Mockery::mock(Filesystem::class)->shouldIgnoreMissing();

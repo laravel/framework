@@ -12,6 +12,7 @@ use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
 use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 class TranslationTranslatorTest extends TestCase
@@ -137,6 +138,7 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('breeze <p>test</p>', $t->get('foo.bar', [], 'en'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testGetMethodProperlyLoadsAndRetrievesItemWithCapitalization()
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods([])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();

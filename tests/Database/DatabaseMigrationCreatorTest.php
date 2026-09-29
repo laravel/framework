@@ -7,10 +7,12 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMigrationCreatorTest extends TestCase
 {
+    #[AllowMockObjectsWithoutExpectations]
     public function testBasicCreateMethodStoresMigrationFile()
     {
         $creator = $this->getCreator();
@@ -26,6 +28,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         $creator->create('create_bar', 'foo');
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testBasicCreateMethodCallsPostCreateHooks()
     {
         $table = 'baz';
@@ -53,6 +56,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         unset($_SERVER['__migration.creator.table'], $_SERVER['__migration.creator.path']);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testTableUpdateMigrationStoresMigrationFile()
     {
         $creator = $this->getCreator();
@@ -67,6 +71,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         $creator->create('create_bar', 'foo', 'baz');
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testTableCreationMigrationStoresMigrationFile()
     {
         $creator = $this->getCreator();
@@ -81,6 +86,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         $creator->create('create_bar', 'foo', 'baz', true);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testTableUpdateMigrationWontCreateDuplicateClass()
     {
         $this->expectExceptionObject(new InvalidArgumentException('A MigrationCreatorFakeMigration class already exists.'));

@@ -1011,7 +1011,8 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->make();
 
         $this->assertNull($comment->user_id);
-        $this->assertNull($comment->commentable->id);
+        $this->assertNull($comment->commentable);
+        $this->assertNull($comment->commentable?->id);
     }
 
     public function test_can_default_to_without_parents()

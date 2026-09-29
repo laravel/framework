@@ -12,6 +12,7 @@ use Illuminate\Mail\MailManager;
 use Illuminate\Mail\Transport\SesV2Transport;
 use Illuminate\View\Factory;
 use Mockery;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
@@ -129,6 +130,7 @@ class MailSesV2TransportTest extends TestCase
         (new SesV2Transport($client))->send($message);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSesV2LocalConfiguration(): void
     {
         $container = new Container;

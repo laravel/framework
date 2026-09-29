@@ -32,6 +32,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -2469,6 +2470,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testGreaterThan()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2567,6 +2569,7 @@ class ValidationValidatorTest extends TestCase
         ], $v->messages()->keys());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testLessThan()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2608,6 +2611,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testGreaterThanOrEqual()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2649,6 +2653,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testLessThanOrEqual()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3899,6 +3904,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateSize()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3943,6 +3949,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateBetween()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3999,6 +4006,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateMin()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4058,6 +4066,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateMax()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4207,6 +4216,7 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testProperMessagesAreReturnedForSizes()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4230,6 +4240,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('file', $v->messages()->first('photo'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateGtPlaceHolderIsReplacedProperly()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4272,6 +4283,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(4, $v->messages()->first('items'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateLtPlaceHolderIsReplacedProperly()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4314,6 +4326,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(2, $v->messages()->first('items'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateGtePlaceHolderIsReplacedProperly()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4356,6 +4369,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(4, $v->messages()->first('items'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateLtePlaceHolderIsReplacedProperly()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4719,6 +4733,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateGtMessagesAreCorrect()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4759,6 +4774,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The array field must have more than 4 items.', $v->messages()->first('array'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateGteMessagesAreCorrect()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4799,6 +4815,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The array field must have 4 items or more.', $v->messages()->first('array'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateLtMessagesAreCorrect()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4839,6 +4856,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The array field must have less than 2 items.', $v->messages()->first('array'));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateLteMessagesAreCorrect()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5425,6 +5443,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($property->getValue());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateImage()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5498,6 +5517,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateImageDoesNotAllowPhpExtensionsOnImageMime()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5642,6 +5662,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateMimetypes()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5668,6 +5689,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateMime()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5698,6 +5720,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateExtension()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -5730,6 +5753,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testValidateMimeEnforcesPhpCheck()
     {
         $trans = $this->getIlluminateArrayTranslator();
