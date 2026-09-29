@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Database\Connection;
+use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Support\Carbon;
@@ -16,6 +17,8 @@ use Throwable;
 
 class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
 {
+    use DetectsLostConnections;
+
     /**
      * The database connection instance.
      *
@@ -295,8 +298,9 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
                 }
             });
         } catch (Throwable $e) {
-            // Potentially invalid job that we need to fail (#58978)...
-            if ($jobRecord) {
+            // Potentially invalid job that we need to fail (#58978). A lost connection
+            // says nothing about the job itself, so leave it on the queue to be retried...
+            if ($jobRecord && ! $this->causedByLostConnection($e)) {
                 try {
                     (new DatabaseJob(
                         $this->container, $this, $jobRecord, $this->connectionName, $queue

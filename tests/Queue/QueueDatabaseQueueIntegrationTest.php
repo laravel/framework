@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Queue;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\DatabaseQueue;
@@ -12,6 +13,7 @@ use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use PDOException;
 use PHPUnit\Framework\TestCase;
 
 class QueueDatabaseQueueIntegrationTest extends TestCase
@@ -273,5 +275,68 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
         $this->assertIsArray($jobQueuedEvent->payload());
         $this->assertSame('expected-job-uuid', $jobQueuedEvent->payload()['uuid']);
+    }
+
+    public function testJobIsNotFailedWhenReservingLosesTheConnection()
+    {
+        $this->insertAvailableJob();
+
+        $queue = $this->queueThatThrowsWhileReserving('SQLSTATE[HY000]: General error: 2006 MySQL server has gone away');
+
+        try {
+            $queue->pop('default');
+            $this->fail('Expected the lost connection exception to be rethrown.');
+        } catch (QueryException) {
+            //
+        }
+
+        $this->assertTrue($this->connection()->table('jobs')->where('id', 1)->exists());
+    }
+
+    public function testJobIsFailedWhenReservingThrowsForAnotherReason()
+    {
+        $this->insertAvailableJob();
+
+        $queue = $this->queueThatThrowsWhileReserving('SQLSTATE[22003]: Numeric value out of range');
+
+        try {
+            $queue->pop('default');
+            $this->fail('Expected the exception to be rethrown.');
+        } catch (QueryException) {
+            //
+        }
+
+        $this->assertFalse($this->connection()->table('jobs')->where('id', 1)->exists());
+    }
+
+    protected function insertAvailableJob()
+    {
+        $this->connection()->table('jobs')->insert([
+            'id' => 1,
+            'queue' => 'default',
+            'payload' => json_encode(['job' => 'foo', 'data' => []]),
+            'attempts' => 0,
+            'reserved_at' => null,
+            'available_at' => Carbon::now()->subSeconds(1)->getTimestamp(),
+            'created_at' => Carbon::now()->getTimestamp(),
+        ]);
+    }
+
+    protected function queueThatThrowsWhileReserving(string $message)
+    {
+        $queue = new class($this->connection(), $this->table) extends DatabaseQueue
+        {
+            public $message;
+
+            protected function markJobAsReserved($job)
+            {
+                throw new QueryException('sqlite', 'update "jobs" ...', [], new PDOException($this->message));
+            }
+        };
+
+        $queue->message = $message;
+        $queue->setContainer($this->container);
+
+        return $queue;
     }
 }
