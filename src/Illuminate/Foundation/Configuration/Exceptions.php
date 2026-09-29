@@ -179,6 +179,19 @@ class Exceptions
     }
 
     /**
+     * Register a callback to determine if a PHP error should be reported instead of thrown.
+     *
+     * @param  (\Closure(\ErrorException): bool)  $dontThrowWhen
+     * @return $this
+     */
+    public function dontThrowErrorsWhen(Closure $dontThrowWhen)
+    {
+        $this->handler->dontThrowErrorsWhen($dontThrowWhen);
+
+        return $this;
+    }
+
+    /**
      * Register a callback to determine if an exception should stop job retries.
      *
      * @param  (\Closure(\Throwable): bool)  $dontRetryWhen

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Configuration;
 
+use ErrorException;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -48,5 +49,17 @@ class ExceptionsTest extends TestCase
         $exceptions->shouldRenderJsonWhen(fn () => false);
         $shouldReturnJson = (fn () => $this->shouldReturnJson(new Request, new Exception()))->call($exceptions->handler);
         $this->assertFalse($shouldReturnJson);
+    }
+
+    public function testDontThrowErrorsWhen()
+    {
+        $exceptions = new Exceptions($handler = new Handler(new Container));
+
+        $this->assertTrue($handler->shouldThrowError(new ErrorException('foo')));
+
+        $this->assertSame($exceptions, $exceptions->dontThrowErrorsWhen(fn (ErrorException $e) => $e->getMessage() === 'foo'));
+
+        $this->assertFalse($handler->shouldThrowError(new ErrorException('foo')));
+        $this->assertTrue($handler->shouldThrowError(new ErrorException('bar')));
     }
 }

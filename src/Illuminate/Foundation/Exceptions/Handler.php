@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Exceptions;
 
 use Closure;
+use ErrorException;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -77,6 +78,13 @@ class Handler implements ExceptionHandlerContract
      * @var array
      */
     protected $dontReportCallbacks = [];
+
+    /**
+     * The callbacks that inspect PHP errors to determine if they should be reported instead of thrown.
+     *
+     * @var array
+     */
+    protected $dontThrowErrorCallbacks = [];
 
     /**
      * A list of the exception types that should stop job retries.
@@ -321,6 +329,40 @@ class Handler implements ExceptionHandlerContract
         $this->dontReportCallbacks[] = $dontReportWhen;
 
         return $this;
+    }
+
+    /**
+     * Register a callback to determine if a PHP error should be reported instead of thrown.
+     *
+     * @param  (callable(\ErrorException): bool)  $dontThrowWhen
+     * @return $this
+     */
+    public function dontThrowErrorsWhen(callable $dontThrowWhen)
+    {
+        if (! $dontThrowWhen instanceof Closure) {
+            $dontThrowWhen = Closure::fromCallable($dontThrowWhen);
+        }
+
+        $this->dontThrowErrorCallbacks[] = $dontThrowWhen;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the given PHP error should be thrown as an exception.
+     *
+     * @param  \ErrorException  $e
+     * @return bool
+     */
+    public function shouldThrowError(ErrorException $e)
+    {
+        foreach ($this->dontThrowErrorCallbacks as $dontThrowCallback) {
+            if ($dontThrowCallback($e) === true) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

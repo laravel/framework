@@ -6,6 +6,7 @@ use ErrorException;
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\Env;
 use Monolog\Handler\NullHandler;
@@ -73,8 +74,31 @@ class HandleExceptions
         if ($this->isDeprecation($level)) {
             $this->handleDeprecationError($message, $file, $line, $level);
         } elseif (error_reporting() & $level) {
-            throw new ErrorException($message, 0, $level, $file, $line);
+            $e = new ErrorException($message, 0, $level, $file, $line);
+
+            if ($this->shouldThrowError($e)) {
+                throw $e;
+            }
+
+            $this->getExceptionHandler()->report($e);
         }
+    }
+
+    /**
+     * Determine if the given PHP error should be thrown as an exception.
+     *
+     * @param  \ErrorException  $e
+     * @return bool
+     */
+    protected function shouldThrowError(ErrorException $e)
+    {
+        if (! static::$app->bound(ExceptionHandler::class)) {
+            return true;
+        }
+
+        $handler = $this->getExceptionHandler();
+
+        return ! $handler instanceof Handler || $handler->shouldThrowError($e);
     }
 
     /**

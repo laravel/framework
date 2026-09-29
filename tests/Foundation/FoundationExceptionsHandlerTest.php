@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Closure;
+use ErrorException;
 use Exception;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\NullStore;
@@ -713,6 +714,34 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report($e1);
 
         $this->assertSame($reported, [$e2]);
+    }
+
+    public function testItThrowsErrorsByDefault()
+    {
+        $this->assertTrue($this->handler->shouldThrowError(new ErrorException('foo', 0, E_USER_WARNING)));
+    }
+
+    public function testItCanSkipThrowingErrorsUsingCallback()
+    {
+        $this->handler->dontThrowErrorsWhen(fn (ErrorException $e) => $e->getSeverity() === E_USER_WARNING);
+        $this->handler->dontThrowErrorsWhen(fn (ErrorException $e) => 'truthy but not true');
+
+        $this->assertFalse($this->handler->shouldThrowError(new ErrorException('foo', 0, E_USER_WARNING)));
+        $this->assertTrue($this->handler->shouldThrowError(new ErrorException('foo', 0, E_WARNING)));
+    }
+
+    public function testItAcceptsCallablesForSkippingThrowingErrors()
+    {
+        $this->handler->dontThrowErrorsWhen(new class
+        {
+            public function __invoke(ErrorException $e)
+            {
+                return $e->getMessage() === 'foo';
+            }
+        });
+
+        $this->assertFalse($this->handler->shouldThrowError(new ErrorException('foo')));
+        $this->assertTrue($this->handler->shouldThrowError(new ErrorException('bar')));
     }
 
     public function testItDoesNotThrottleExceptionsByDefault()

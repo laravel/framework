@@ -5,8 +5,10 @@ namespace Illuminate\Tests\Foundation\Bootstrap;
 use Error;
 use ErrorException;
 use Illuminate\Config\Repository as Config;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\Env;
@@ -39,6 +41,17 @@ class HandleExceptionsTest extends TestCase
         return tap(new HandleExceptions(), function ($instance) {
             (new ReflectionClass($instance))->getProperty('app')->setValue($instance, $this->app);
         });
+    }
+
+    protected function withErrorReporting(int $level, callable $callback): void
+    {
+        $previous = error_reporting($level);
+
+        try {
+            $callback();
+        } finally {
+            error_reporting($previous);
+        }
     }
 
     protected function getRealLogger(): TestHandler
@@ -189,6 +202,77 @@ class HandleExceptionsTest extends TestCase
             '/home/user/laravel/src/Providers/AppServiceProvider.php',
             17
         );
+    }
+
+    public function testErrorsAreReportedInsteadOfThrownWhenHandlerAllows()
+    {
+        $reported = [];
+
+        $handler = new Handler($this->app);
+        $handler->reportable(function (ErrorException $e) use (&$reported) {
+            $reported[] = $e;
+        })->stop();
+        $handler->dontThrowErrorsWhen(fn (ErrorException $e) => str_contains($e->getFile(), '/vendor/stripe/'));
+
+        $this->app->instance(ExceptionHandler::class, $handler);
+
+        $this->withErrorReporting(E_ALL, fn () => $this->handleExceptions()->handleError(
+            E_USER_WARNING,
+            'This API version is outdated.',
+            '/home/user/laravel/vendor/stripe/stripe-php/lib/ApiRequestor.php',
+            660
+        ));
+
+        $this->assertCount(1, $reported);
+        $this->assertSame('This API version is outdated.', $reported[0]->getMessage());
+        $this->assertSame(E_USER_WARNING, $reported[0]->getSeverity());
+        $this->assertSame('/home/user/laravel/vendor/stripe/stripe-php/lib/ApiRequestor.php', $reported[0]->getFile());
+        $this->assertSame(660, $reported[0]->getLine());
+    }
+
+    public function testErrorsAreThrownWhenHandlerCallbackDoesNotMatch()
+    {
+        $reported = [];
+
+        $handler = new Handler($this->app);
+        $handler->reportable(function (ErrorException $e) use (&$reported) {
+            $reported[] = $e;
+        })->stop();
+        $handler->dontThrowErrorsWhen(fn (ErrorException $e) => str_contains($e->getFile(), '/vendor/stripe/'));
+
+        $this->app->instance(ExceptionHandler::class, $handler);
+
+        try {
+            $this->withErrorReporting(E_ALL, fn () => $this->handleExceptions()->handleError(
+                E_WARNING,
+                'Undefined array key "name"',
+                '/home/user/laravel/app/Providers/AppServiceProvider.php',
+                17
+            ));
+
+            $this->fail('The error was not thrown.');
+        } catch (ErrorException $e) {
+            $this->assertSame('Undefined array key "name"', $e->getMessage());
+        }
+
+        $this->assertSame([], $reported);
+    }
+
+    public function testErrorsAreThrownWhenExceptionHandlerIsNotTheFrameworkHandler()
+    {
+        $handler = Mockery::mock(ExceptionHandler::class);
+        $handler->shouldNotReceive('report');
+
+        $this->app->instance(ExceptionHandler::class, $handler);
+
+        $this->expectExceptionObject(new ErrorException('Something went wrong'));
+
+        $this->withErrorReporting(E_ALL, fn () => $this->handleExceptions()->handleError(
+            E_USER_WARNING,
+            'Something went wrong',
+            '/home/user/laravel/src/Providers/AppServiceProvider.php',
+            17
+        ));
     }
 
     public function testEnsuresDeprecationsDriver()
