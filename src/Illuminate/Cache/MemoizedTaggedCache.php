@@ -106,7 +106,7 @@ class MemoizedTaggedCache extends TaggedCache
                 $this->cache[$this->itemKey($key)] = $value;
             }
 
-            $memoized = array_merge($memoized, $retrieved);
+            $memoized += $retrieved;
         }
 
         $result = [];
