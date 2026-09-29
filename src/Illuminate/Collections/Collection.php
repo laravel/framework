@@ -1642,10 +1642,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $items = $this->items;
 
-        $php86 = PHP_VERSION_ID === 80600 || version_compare(PHP_VERSION, '8.6.0', '>=');
-        $sortLocaleString = $php86 === true ? 5 : SORT_LOCALE_STRING;
+        $sortLocaleString = PHP_VERSION_ID === 80600 || version_compare(PHP_VERSION, '8.6.0', '>=') ? 5 : SORT_LOCALE_STRING;
 
-        uasort($items, function ($a, $b) use ($comparisons, $options, $php86, $sortLocaleString) {
+        uasort($items, function ($a, $b) use ($comparisons, $options, $sortLocaleString) {
             foreach ($comparisons as $comparison) {
                 $comparison = Arr::wrap($comparison);
 
@@ -1677,7 +1676,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                             SORT_NUMERIC => (float) $values[0] <=> (float) $values[1],
                             SORT_STRING => strcmp($values[0], $values[1]),
                             SORT_NATURAL => strnatcmp((string) $values[0], (string) $values[1]),
-                            $sortLocaleString => $php86 === true ? Collator::create('')->compare($values[0], $values[1]) : strcoll($values[0], $values[1]),
+                            $sortLocaleString => Collator::create('')->compare($values[0], $values[1]),
                             default => $values[0] <=> $values[1],
                         };
                     }
