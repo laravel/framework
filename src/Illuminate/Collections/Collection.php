@@ -1676,7 +1676,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                             SORT_NUMERIC => (float) $values[0] <=> (float) $values[1],
                             SORT_STRING => strcmp($values[0], $values[1]),
                             SORT_NATURAL => strnatcmp((string) $values[0], (string) $values[1]),
-                            $sortLocaleString => Collator::create('')->compare($values[0], $values[1]),
+                            $sortLocaleString => Collator::create('')->setStrength(Collator::TERTIARY)->compare($values[0], $values[1]),
                             default => $values[0] <=> $values[1],
                         };
                     }
