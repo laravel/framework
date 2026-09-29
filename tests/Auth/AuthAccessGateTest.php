@@ -653,6 +653,21 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame(404, $response->status());
     }
 
+    public function testForUserMethodPreservesClassCallbacksForGuests()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', AccessGateTestClassForGuest::class.'@foo');
+        $gate->define('bar', AccessGateTestClassForGuest::class.'@bar');
+        $gate->define('invokable', AccessGateTestGuestInvokableClass::class);
+
+        $guestGate = $gate->forUser(null);
+
+        $this->assertTrue($guestGate->check('foo'));
+        $this->assertTrue($guestGate->check('bar'));
+        $this->assertTrue($guestGate->check('invokable'));
+    }
+
     #[DataProvider('notCallableDataProvider')]
     public function testDefineSecondParameterShouldBeStringOrCallable($callback)
     {

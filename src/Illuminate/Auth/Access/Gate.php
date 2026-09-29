@@ -881,6 +881,7 @@ class Gate implements GateContract
             $this->guessPolicyNamesUsingCallback,
         );
 
+        $gate->stringCallbacks = $this->stringCallbacks;
         $gate->defaultDenialResponse = $this->defaultDenialResponse;
 
         return $gate;
