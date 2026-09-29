@@ -354,7 +354,7 @@ class Handler implements ExceptionHandlerContract
      * @param  \ErrorException  $e
      * @return bool
      */
-    public function shouldThrowError(ErrorException $e)
+    public function shouldThrowError(ErrorException $e): bool
     {
         return array_all(
             $this->dontThrowErrorCallbacks,

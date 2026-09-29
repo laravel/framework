@@ -90,7 +90,7 @@ class HandleExceptions
      * @param  \ErrorException  $e
      * @return bool
      */
-    protected function shouldThrowError(ErrorException $e)
+    protected function shouldThrowError(ErrorException $e): bool
     {
         if (! static::$app->bound(ExceptionHandler::class)) {
             return true;
