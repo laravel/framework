@@ -2269,6 +2269,8 @@ class SupportCollectionTest extends TestCase
         $data = $data->sortBy(['item'], SORT_FLAG_CASE | SORT_NUMERIC);
         $this->assertEquals($expected, $data->pluck('item')->toArray());
 
+        setlocale(LC_ALL, 'en_US');
+
         $data = new $collection([['item' => 'Österreich'], ['item' => 'Oesterreich'], ['item' => 'Zeta']]);
         $expected = $data->pluck('item')->toArray();
 
