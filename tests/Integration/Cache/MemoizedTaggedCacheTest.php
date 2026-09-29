@@ -270,6 +270,26 @@ class MemoizedTaggedCacheTest extends TestCase
         );
     }
 
+    public function test_it_uses_correct_keys_when_retrieving_multiple_values_with_numeric_keys()
+    {
+        Cache::tags(['foo'])->put(10, 'Taylor', 60);
+        Cache::tags(['foo'])->put(20, 'Tim', 60);
+
+        $this->assertSame([10 => 'Taylor', 20 => 'Tim'], Cache::memo()->tags(['foo'])->many([10, 20]));
+        // ensure correct on the second memoized retrieval
+        $this->assertSame([10 => 'Taylor', 20 => 'Tim'], Cache::memo()->tags(['foo'])->many([10, 20]));
+    }
+
+    public function test_it_uses_correct_keys_when_retrieving_partially_memoized_values_with_numeric_keys()
+    {
+        Cache::tags(['foo'])->put(10, 'Taylor', 60);
+        Cache::tags(['foo'])->put(20, 'Tim', 60);
+
+        $this->assertSame('Taylor', Cache::memo()->tags(['foo'])->get(10));
+
+        $this->assertSame([10 => 'Taylor', 20 => 'Tim'], Cache::memo()->tags(['foo'])->many([10, 20]));
+    }
+
     public function test_it_does_not_memoize_default_values()
     {
         $cache = Cache::memo()->tags(['foo']);
