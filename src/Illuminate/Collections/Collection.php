@@ -1677,7 +1677,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                             SORT_NUMERIC => (float) $values[0] <=> (float) $values[1],
                             SORT_STRING => strcmp($values[0], $values[1]),
                             SORT_NATURAL => strnatcmp((string) $values[0], (string) $values[1]),
-                            SORT_LOCALE_STRING => strcoll($values[0], $values[1]),
                             $sortLocaleString => $php86 === true
                                 ? Collator::create('')->compare($values[0], $values[1])
                                 : strcoll($values[0], $values[1]),
