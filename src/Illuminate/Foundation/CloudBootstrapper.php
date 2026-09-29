@@ -361,8 +361,10 @@ class CloudBootstrapper
                 ? $registerReporter($app[ExceptionHandlerContract::class])
                 : $app->afterResolving(ExceptionHandlerContract::class, $registerReporter);
 
-            $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->rememberUserIdInContext($event->context));
-            $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->rememberTraceIdInContext($event->context));
+            $app['events']->listen(function (ContextDehydrating $event) use ($exceptionReporter) {
+                $exceptionReporter->rememberUserIdInContext($event->context);
+                $exceptionReporter->rememberTraceIdInContext($event->context);
+            });
 
             if (! $app->runningInConsole()) {
                 $app['events']->listen(function (Logout $event) use ($exceptionReporter) {
