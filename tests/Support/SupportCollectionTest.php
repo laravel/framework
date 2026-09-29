@@ -2284,11 +2284,10 @@ class SupportCollectionTest extends TestCase
 
         $data = $data->sortBy(['item'], $sortLocaleString);
         $this->assertSame($expected, $data->pluck('item')->toArray());
-        $this->assertSame([
-            'Oesterreich',
-            'Österreich',
-            'Zeta',
-        ], $data->pluck('item')->toArray());
+        $this->assertSame(match (true) {
+            php_version_compare('8.4', '>=') => ['Oesterreich', 'Österreich', 'Zeta'],
+            default => ['Oesterreich', 'Zeta', 'Österreich'],
+        }, $data->pluck('item')->toArray());
 
         setlocale(LC_ALL, 'de_DE');
 
