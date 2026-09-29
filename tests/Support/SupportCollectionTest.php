@@ -2274,7 +2274,7 @@ class SupportCollectionTest extends TestCase
 
         sort($expected);
         $data = $data->sortBy(['item']);
-        $this->assertEquals($expected, $data->pluck('item')->toArray());
+        $this->assertSame($expected, $data->pluck('item')->toArray());
 
         if (php_version_compare('8.6', '>=')) {
             usort($expected, [collator_create($defaultLocale), 'compare']);
@@ -2283,7 +2283,12 @@ class SupportCollectionTest extends TestCase
         }
 
         $data = $data->sortBy(['item'], $sortLocaleString);
-        $this->assertEquals($expected, $data->pluck('item')->toArray());
+        $this->assertSame($expected, $data->pluck('item')->toArray());
+        $this->assertSame([
+            'Oesterreich',
+            'Österreich',
+            'Zeta',
+        ], $data->pluck('item')->toArray());
 
         setlocale(LC_ALL, 'de_DE');
 
@@ -2294,7 +2299,12 @@ class SupportCollectionTest extends TestCase
         }
 
         $data = $data->sortBy(['item'], $sortLocaleString);
-        $this->assertEquals($expected, $data->pluck('item')->toArray());
+        $this->assertSame($expected, $data->pluck('item')->toArray());
+        $this->assertSame([
+            'Oesterreich',
+            'Österreich',
+            'Zeta',
+        ], $data->pluck('item')->toArray());
 
         setlocale(LC_ALL, $defaultLocale);
     }
