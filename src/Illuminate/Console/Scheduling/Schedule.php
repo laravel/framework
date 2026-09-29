@@ -117,6 +117,13 @@ class Schedule
     public static $interruptible = true;
 
     /**
+     * Indicates if every event should only run on one server for each cron expression.
+     *
+     * @var bool
+     */
+    public static $alwaysOnOneServer = false;
+
+    /**
      * Create a new schedule instance.
      *
      * @param  \DateTimeZone|string|null  $timezone
@@ -433,7 +440,7 @@ class Schedule
      */
     public function dueEvents($app)
     {
-        return (new Collection($this->events))->filter->isDue($app);
+        return (new Collection($this->events()))->filter->isDue($app);
     }
 
     /**
@@ -443,6 +450,16 @@ class Schedule
      */
     public function events()
     {
+        if (static::$alwaysOnOneServer) {
+            foreach ($this->events as $event) {
+                if ($event instanceof CallbackEvent && ! isset($event->description)) {
+                    continue;
+                }
+
+                $event->onOneServer();
+            }
+        }
+
         return $this->events;
     }
 
@@ -515,6 +532,16 @@ class Schedule
     {
         static::$pausable = false;
         static::$interruptible = false;
+    }
+
+    /**
+     * Indicate that every event on the schedule should only run on one server for each cron expression.
+     *
+     * @return void
+     */
+    public static function alwaysOnOneServer()
+    {
+        static::$alwaysOnOneServer = true;
     }
 
     /**
