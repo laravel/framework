@@ -28,6 +28,7 @@ class FailoverConnector implements ConnectorInterface
             $this->manager,
             $this->events,
             $config['connections'],
+            $config['default_fallback_queue'] ?? null,
         );
     }
 }

@@ -25,7 +25,8 @@ class FailoverQueue extends Queue implements QueueContract
     public function __construct(
         public QueueManager $manager,
         public EventDispatcher $events,
-        public array $connections
+        public array $connections,
+        public ?string $defaultFallbackQueue = null
     ) {
     }
 
@@ -273,7 +274,24 @@ class FailoverQueue extends Queue implements QueueContract
         [$lastException, $failedQueues] = [null, []];
 
         try {
-            foreach ($this->connections as $connection) {
+            foreach ($this->connections as $index => $connection) {
+                $useDefaultFallbackQueue = $index > 0
+                    && $this->defaultFallbackQueue !== null;
+
+                if ($useDefaultFallbackQueue) {
+                    if ($method === 'later') {
+                        // preserve the default value otherwise getting wrong index when doing spread below
+                        $arguments[2] = !empty($arguments[2]) ? $arguments[2] : '';
+                        $arguments[3] = $this->defaultFallbackQueue ?? $arguments[3];
+                    } elseif ($method === 'pushRaw') {
+                        $arguments[1] = $this->defaultFallbackQueue ?? $arguments[1];
+                    } elseif ($method === 'push') {
+                        // preserve the default value otherwise getting wrong index when doing spread below
+                        $arguments[1] = !empty($arguments[1]) ? $arguments[1] : '';
+                        $arguments[2] = $this->defaultFallbackQueue ?? $arguments[2];
+                    }
+                }
+
                 try {
                     return $this->manager->connection($connection)->{$method}(...$arguments);
                 } catch (Throwable $e) {

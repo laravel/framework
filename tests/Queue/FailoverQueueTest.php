@@ -52,6 +52,96 @@ class FailoverQueueTest extends TestCase
         $this->assertSame('error', $failedOver[0]->exception->getMessage());
     }
 
+    public function test_push_fails_over_on_exception_use_default_fallback_queue()
+    {
+        $queue = Mockery::mock(QueueManager::class);
+        $events = Mockery::mock(Dispatcher::class);
+        $failover = new FailoverQueue($queue, $events, [
+            'redis',
+            'database',
+            'sync',
+        ], 'default');
+
+        $redis = Mockery::mock(Queue::class);
+        $queue->expects('connection')->with('redis')->andReturn($redis);
+
+        $database = Mockery::mock(Queue::class);
+        $queue->expects('connection')->with('database')->andReturn($database);
+
+        $events->expects('dispatch');
+
+        $redis->expects('push')
+            ->with('some-job', '', 'hello')
+            ->andReturnUsing(
+                fn () => throw new \Exception('error')
+            );
+
+        $database->expects('push')
+            ->with('some-job', '', 'default');
+
+        $failover->push('some-job', queue: 'hello');
+    }
+
+    public function test_push_raw_fails_over_on_exception_use_default_fallback_queue()
+    {
+        $queue = Mockery::mock(QueueManager::class);
+        $events = Mockery::mock(Dispatcher::class);
+        $failover = new FailoverQueue($queue, $events, [
+            'redis',
+            'database',
+            'sync',
+        ], 'default');
+
+        $redis = Mockery::mock(Queue::class);
+        $queue->expects('connection')->with('redis')->andReturn($redis);
+
+        $database = Mockery::mock(Queue::class);
+        $queue->expects('connection')->with('database')->andReturn($database);
+
+        $events->expects('dispatch')->never();
+
+        $redis->expects('pushRaw')
+            ->with('pretty-raw-payload', 'raw')
+            ->andReturnUsing(
+                fn () => throw new \Exception('error')
+            );
+
+        $database->expects('pushRaw')
+            ->with('pretty-raw-payload', 'default');
+
+        $failover->pushRaw('pretty-raw-payload', queue: 'raw');
+    }
+
+    public function test_later_fails_over_on_exception_use_default_fallback_queue()
+    {
+        $queue = Mockery::mock(QueueManager::class);
+        $events = Mockery::mock(Dispatcher::class);
+        $failover = new FailoverQueue($queue, $events, [
+            'redis',
+            'database',
+            'sync',
+        ], 'default');
+
+        $redis = Mockery::mock(Queue::class);
+        $queue->expects('connection')->with('redis')->andReturn($redis);
+
+        $database = Mockery::mock(Queue::class);
+        $queue->expects('connection')->with('database')->andReturn($database);
+
+        $events->expects('dispatch');
+
+        $redis->expects('later')
+            ->with(15, 'run-later', '', 'long')
+            ->andReturnUsing(
+                fn () => throw new \Exception('error')
+            );
+
+        $database->expects('later')
+            ->with(15, 'run-later', '', 'default');
+
+        $failover->later(15, 'run-later', queue: 'long');
+    }
+
     public function test_bulk_respects_job_delays()
     {
         $queue = Mockery::mock(QueueManager::class);
