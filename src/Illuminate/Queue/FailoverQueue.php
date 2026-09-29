@@ -281,13 +281,13 @@ class FailoverQueue extends Queue implements QueueContract
                 if ($useDefaultFallbackQueue) {
                     if ($method === 'later') {
                         // preserve the default value otherwise getting wrong index when doing spread below
-                        $arguments[2] = !empty($arguments[2]) ? $arguments[2] : '';
+                        $arguments[2] = ! empty($arguments[2]) ? $arguments[2] : '';
                         $arguments[3] = $this->defaultFallbackQueue ?? $arguments[3];
                     } elseif ($method === 'pushRaw') {
                         $arguments[1] = $this->defaultFallbackQueue ?? $arguments[1];
                     } elseif ($method === 'push') {
                         // preserve the default value otherwise getting wrong index when doing spread below
-                        $arguments[1] = !empty($arguments[1]) ? $arguments[1] : '';
+                        $arguments[1] = ! empty($arguments[1]) ? $arguments[1] : '';
                         $arguments[2] = $this->defaultFallbackQueue ?? $arguments[2];
                     }
                 }
