@@ -256,7 +256,7 @@ class FilesystemManager implements FactoryContract
             $config['visibility'] ?? Visibility::PUBLIC
         );
 
-        $streamReads = $s3Config['stream_reads'] ?? false;
+        $streamReads = $s3Config['stream_reads'] ?? true;
 
         $client = new S3Client($s3Config);
 
