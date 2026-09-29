@@ -521,6 +521,7 @@ class ExceptionReporter
 
             return [
                 'originalName' => $file->getClientOriginalName(),
+                'mimeType' => $file->getMimeType(),
                 'size' => $file->getSize(),
                 'error' => $file->getError(),
             ];
