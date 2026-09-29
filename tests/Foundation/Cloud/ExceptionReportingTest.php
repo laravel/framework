@@ -4407,7 +4407,7 @@ class ExceptionWithContext extends Exception
 {
     public function __construct(protected array $context, string $message = '', int $code = 0, ?Throwable $previous = null)
     {
-        return parent::__construct($message, $code, $previous);
+        parent::__construct($message, $code, $previous);
     }
 
     public function context(): array
