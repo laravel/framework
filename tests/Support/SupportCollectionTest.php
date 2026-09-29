@@ -6,6 +6,7 @@ use ArrayAccess;
 use ArrayIterator;
 use ArrayObject;
 use CachingIterator;
+use Collator;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
@@ -2273,14 +2274,17 @@ class SupportCollectionTest extends TestCase
         $data = $data->sortBy(['item']);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
-        sort($expected, SORT_LOCALE_STRING);
-        $data = $data->sortBy(['item'], SORT_LOCALE_STRING);
+        $collator = new Collator('');
+        $sortLocaleString = PHP_VERSION_ID === 80600 || version_compare(PHP_VERSION, '8.6.0', '>=') ? 5 : SORT_LOCALE_STRING;
+
+        usort($expected, [$collator, 'compare']);
+        $data = $data->sortBy(['item'], $sortLocaleString);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
-        setlocale(LC_ALL, 'de_DE');
+        $collator = new Collator('de_DE');
 
-        sort($expected, SORT_LOCALE_STRING);
-        $data = $data->sortBy(['item'], SORT_LOCALE_STRING);
+        usort($expected, [$collator, 'compare']);
+        $data = $data->sortBy(['item'], $sortLocaleString);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
         setlocale(LC_ALL, $defaultLocale);
