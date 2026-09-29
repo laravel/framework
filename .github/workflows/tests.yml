@@ -75,8 +75,7 @@ jobs:
           ini-values: error_reporting=E_ALL
           redis-configure-opts: --enable-redis --enable-redis-igbinary --enable-redis-msgpack --enable-redis-lzf --with-liblzf --enable-redis-zstd --with-libzstd --enable-redis-lz4 --with-liblz4
           redis-libs: liblz4-dev, liblzf-dev, libzstd-dev
-          composer-command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}"
-          experimental: ${{ matrix.experimental }}
+          composer-command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}  ${{ matrix.experimental == true && '--ignore-platform-reqs' || '' }}"
 
       - name: Execute tests
         run: vendor/bin/phpunit --display-deprecation ${{ matrix.stability == 'prefer-stable' && '--fail-on-deprecation' || '' }} --no-coverage
