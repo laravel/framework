@@ -11,7 +11,7 @@ trait MatchesProperties
      * @param  callable|array<string, mixed>|null  $callback
      * @return callable|null
      */
-    protected function resolveCallback($callback)
+    protected function resolveTruthTest($callback)
     {
         if (! is_array($callback) || is_callable($callback)) {
             return $callback;

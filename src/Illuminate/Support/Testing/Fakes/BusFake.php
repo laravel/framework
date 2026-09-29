@@ -567,7 +567,7 @@ class BusFake implements Fake, QueueingDispatcher
             return new Collection;
         }
 
-        $callback = $this->resolveCallback($callback) ?: fn () => true;
+        $callback = $this->resolveTruthTest($callback) ?: fn () => true;
 
         return (new Collection($this->commands[$command]))->filter(fn ($command) => $callback($command));
     }
@@ -585,7 +585,7 @@ class BusFake implements Fake, QueueingDispatcher
             return new Collection;
         }
 
-        $callback = $this->resolveCallback($callback) ?: fn () => true;
+        $callback = $this->resolveTruthTest($callback) ?: fn () => true;
 
         return (new Collection($this->commandsSync[$command]))->filter(fn ($command) => $callback($command));
     }
@@ -603,7 +603,7 @@ class BusFake implements Fake, QueueingDispatcher
             return new Collection;
         }
 
-        $callback = $this->resolveCallback($callback) ?: fn () => true;
+        $callback = $this->resolveTruthTest($callback) ?: fn () => true;
 
         return (new Collection($this->commandsAfterResponse[$command]))->filter(fn ($command) => $callback($command));
     }
