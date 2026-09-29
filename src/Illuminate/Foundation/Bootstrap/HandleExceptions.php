@@ -86,9 +86,6 @@ class HandleExceptions
 
     /**
      * Determine if the given PHP error should be thrown as an exception.
-     *
-     * @param  \ErrorException  $e
-     * @return bool
      */
     protected function shouldThrowError(ErrorException $e): bool
     {

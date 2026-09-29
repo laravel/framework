@@ -350,9 +350,6 @@ class Handler implements ExceptionHandlerContract
 
     /**
      * Determine if the given PHP error should be thrown as an exception.
-     *
-     * @param  \ErrorException  $e
-     * @return bool
      */
     public function shouldThrowError(ErrorException $e): bool
     {
