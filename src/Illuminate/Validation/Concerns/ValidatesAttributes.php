@@ -1320,7 +1320,7 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Gt');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if (is_null($comparedToValue) && ($this->isNumeric($value) && $this->isNumeric($parameters[0]))) {
             try {
                 return BigNumber::of($this->getSize($attribute, $value))->isGreaterThan($this->trim($parameters[0]));
             } catch (MathException|BrickMathException) {
@@ -1328,11 +1328,11 @@ trait ValidatesAttributes
             }
         }
 
-        if (is_numeric($parameters[0])) {
+        if ($this->isNumeric($parameters[0])) {
             return false;
         }
 
-        if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
+        if ($this->hasRule($attribute, $this->numericRules) && $this->isNumeric($value) && $this->isNumeric($comparedToValue)) {
             try {
                 return BigNumber::of($this->trim($value))->isGreaterThan($this->trim($comparedToValue));
             } catch (MathException|BrickMathException) {
@@ -1367,7 +1367,7 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Lt');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if (is_null($comparedToValue) && ($this->isNumeric($value) && $this->isNumeric($parameters[0]))) {
             try {
                 return BigNumber::of($this->getSize($attribute, $value))->isLessThan($this->trim($parameters[0]));
             } catch (MathException|BrickMathException) {
@@ -1375,11 +1375,11 @@ trait ValidatesAttributes
             }
         }
 
-        if (is_numeric($parameters[0])) {
+        if ($this->isNumeric($parameters[0])) {
             return false;
         }
 
-        if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
+        if ($this->hasRule($attribute, $this->numericRules) && $this->isNumeric($value) && $this->isNumeric($comparedToValue)) {
             try {
                 return BigNumber::of($this->trim($value))->isLessThan($this->trim($comparedToValue));
             } catch (MathException|BrickMathException) {
@@ -1414,7 +1414,7 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Gte');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if (is_null($comparedToValue) && ($this->isNumeric($value) && $this->isNumeric($parameters[0]))) {
             try {
                 return BigNumber::of($this->getSize($attribute, $value))->isGreaterThanOrEqualTo($this->trim($parameters[0]));
             } catch (MathException|BrickMathException) {
@@ -1422,11 +1422,11 @@ trait ValidatesAttributes
             }
         }
 
-        if (is_numeric($parameters[0])) {
+        if ($this->isNumeric($parameters[0])) {
             return false;
         }
 
-        if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
+        if ($this->hasRule($attribute, $this->numericRules) && $this->isNumeric($value) && $this->isNumeric($comparedToValue)) {
             try {
                 return BigNumber::of($this->trim($value))->isGreaterThanOrEqualTo($this->trim($comparedToValue));
             } catch (MathException|BrickMathException) {
@@ -1461,7 +1461,7 @@ trait ValidatesAttributes
 
         $this->shouldBeNumeric($attribute, 'Lte');
 
-        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+        if (is_null($comparedToValue) && ($this->isNumeric($value) && $this->isNumeric($parameters[0]))) {
             try {
                 return BigNumber::of($this->getSize($attribute, $value))->isLessThanOrEqualTo($this->trim($parameters[0]));
             } catch (MathException|BrickMathException) {
@@ -1469,11 +1469,11 @@ trait ValidatesAttributes
             }
         }
 
-        if (is_numeric($parameters[0])) {
+        if ($this->isNumeric($parameters[0])) {
             return false;
         }
 
-        if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
+        if ($this->hasRule($attribute, $this->numericRules) && $this->isNumeric($value) && $this->isNumeric($comparedToValue)) {
             try {
                 return BigNumber::of($this->trim($value))->isLessThanOrEqualTo($this->trim($comparedToValue));
             } catch (MathException|BrickMathException) {
@@ -2025,7 +2025,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return is_numeric($value);
+        return $this->isNumeric($value);
     }
 
     /**
@@ -2822,7 +2822,7 @@ trait ValidatesAttributes
         // return the proper size accordingly. If it is a number, then number itself
         // is the size. If it is a file, we take kilobytes, and for a string the
         // entire length of the string will be considered the attribute size.
-        if (is_numeric($value) && $hasNumeric) {
+        if ($this->isNumeric($value) && $hasNumeric) {
             return (string) $this->ensureExponentWithinAllowedRange($attribute, $this->trim($value));
         } elseif (is_array($value)) {
             return count($value);
@@ -2925,7 +2925,7 @@ trait ValidatesAttributes
      */
     protected function shouldBeNumeric($attribute, $rule)
     {
-        if (is_numeric($this->getValue($attribute))) {
+        if ($this->isNumeric($this->getValue($attribute))) {
             $this->numericRules[] = $rule;
         }
     }
@@ -2939,6 +2939,17 @@ trait ValidatesAttributes
     protected function trim($value)
     {
         return is_string($value) ? trim($value) : (string) $value;
+    }
+
+    /**
+     * Determine if a value is numeric without vertical tab or form feed whitespace.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function isNumeric($value)
+    {
+        return is_numeric($value) && (! is_string($value) || strpbrk($value, "\x0B\x0C") === false);
     }
 
     /**
