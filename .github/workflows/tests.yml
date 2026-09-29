@@ -52,7 +52,7 @@ jobs:
         experimental: [false]
         include:
           - php: 8.6
-            phpunit: '13.0.3'
+            phpunit: '13.3'
             stability: prefer-stable
             experimental: true
         exclude:
@@ -111,7 +111,7 @@ jobs:
         experimental: [false]
         include:
           - php: 8.6
-            phpunit: '13.0.3'
+            phpunit: '13.3'
             stability: prefer-stable
             experimental: true
         exclude:
