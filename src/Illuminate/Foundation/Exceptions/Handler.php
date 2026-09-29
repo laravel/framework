@@ -920,6 +920,18 @@ class Handler implements ExceptionHandlerContract
      * @param  \Throwable  $e
      * @return bool
      */
+    public function shouldRenderJson($request, Throwable $e)
+    {
+        return $this->shouldReturnJson($request, $e);
+    }
+
+    /**
+     * Determine if the exception handler response should be JSON.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $e
+     * @return bool
+     */
     protected function shouldReturnJson($request, Throwable $e)
     {
         return $this->shouldRenderJsonWhenCallback

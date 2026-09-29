@@ -231,6 +231,50 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame(6, Assert::getCount());
     }
 
+    public function testShouldRenderJson()
+    {
+        $e = new Exception('My custom error message');
+
+        $this->assertTrue($this->handler->shouldRenderJson(
+            Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']), $e
+        ));
+
+        $this->assertFalse($this->handler->shouldRenderJson(Request::create('/'), $e));
+    }
+
+    public function testShouldRenderJsonUsesShouldRenderJsonWhenCallback()
+    {
+        $exception = new Exception('My custom error message');
+
+        $this->handler->shouldRenderJsonWhen(function ($request, $e) use ($exception) {
+            $this->assertSame($exception, $e);
+
+            return $request->is('api/*');
+        });
+
+        $this->assertTrue($this->handler->shouldRenderJson(Request::create('/api/users'), $exception));
+
+        $this->assertFalse($this->handler->shouldRenderJson(
+            Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']), $exception
+        ));
+    }
+
+    public function testShouldRenderJsonUsesOverriddenShouldReturnJson()
+    {
+        $handler = new class($this->container) extends Handler
+        {
+            protected function shouldReturnJson($request, \Throwable $e)
+            {
+                return $request->is('api/*');
+            }
+        };
+
+        $e = new Exception('My custom error message');
+
+        $this->assertTrue($handler->shouldRenderJson(Request::create('/api/users'), $e));
+        $this->assertFalse($handler->shouldRenderJson(Request::create('/'), $e));
+    }
+
     public function testReturnsJsonWithStackTraceWhenAjaxRequestAndDebugTrue()
     {
         $this->container->instance('config', new Config(['app' => ['debug' => true]]));
