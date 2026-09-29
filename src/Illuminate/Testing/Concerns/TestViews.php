@@ -24,7 +24,6 @@ trait TestViews
     {
         ParallelTesting::setUpProcess(function () {
             if ($path = $this->parallelSafeCompiledViewPath()) {
-                // The token is a worker index, so a concurrent parallel run may create this directory first...
                 File::makeDirectory($path, 0755, true, true);
             }
         });
