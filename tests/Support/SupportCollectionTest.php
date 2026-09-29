@@ -2300,7 +2300,7 @@ class SupportCollectionTest extends TestCase
         $data = $data->sortBy(['item'], $sortLocaleString);
         $this->assertSame($expected, $data->pluck('item')->toArray());
         $this->assertSame(match (true) {
-            php_version_compare('8.4', '>=') && php_version_compare('8.6', '<') => ['Oesterreich', 'Österreich', 'Zeta'],
+            php_version_compare('8.4', '>=') && php_version_compare('8.5', '<') => ['Oesterreich', 'Österreich', 'Zeta'],
             default => ['Oesterreich', 'Zeta', 'Österreich'],
         }, $data->pluck('item')->toArray());
 
