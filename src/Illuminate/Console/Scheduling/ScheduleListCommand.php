@@ -114,8 +114,29 @@ class ScheduleListCommand extends Command
                 'has_mutex' => $event->mutex->exists($event),
                 'repeat_seconds' => $event->isRepeatable() ? $event->repeatSeconds : null,
                 'environments' => $event->environments,
+                ...$this->getVerboseEventData($event),
             ]);
         })->values()->toJson());
+    }
+
+    /**
+     * Get the additional event information that should only be listed when the output is very verbose.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return array<string, mixed>
+     */
+    protected function getVerboseEventData($event)
+    {
+        if (! $this->output->isVeryVerbose()) {
+            return [];
+        }
+
+        return [
+            'on_one_server' => $event->onOneServer,
+            'without_overlapping' => $event->withoutOverlapping,
+            'expires_at' => $event->expiresAt,
+            'mutex_name' => $event->mutexName(),
+        ];
     }
 
     /**
