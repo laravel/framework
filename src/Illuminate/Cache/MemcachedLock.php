@@ -88,7 +88,9 @@ class MemcachedLock extends Lock
      */
     protected function getCurrentOwner()
     {
-        return $this->memcached->get($this->name);
+        $owner = $this->memcached->get($this->name);
+
+        return $this->memcached->getResultCode() === \Memcached::RES_SUCCESS ? $owner : null;
     }
 
     /**
