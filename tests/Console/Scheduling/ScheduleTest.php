@@ -143,7 +143,7 @@ final class ScheduleTest extends TestCase
             $this->assertTrue($closure->onOneServer);
             $this->assertFalse($unnamedClosure->onOneServer);
         } finally {
-            Schedule::$alwaysOnOneServer = false;
+            Schedule::alwaysOnOneServer(false);
         }
     }
 }

@@ -452,7 +452,7 @@ class Schedule
     {
         if (static::$alwaysOnOneServer) {
             foreach ($this->events as $event) {
-                if ($event instanceof CallbackEvent && ! isset($event->description)) {
+                if ($event instanceof CallbackEvent && is_null($event->description)) {
                     continue;
                 }
 
@@ -537,11 +537,12 @@ class Schedule
     /**
      * Indicate that every event on the schedule should only run on one server for each cron expression.
      *
+     * @param  bool  $value
      * @return void
      */
-    public static function alwaysOnOneServer()
+    public static function alwaysOnOneServer($value = true)
     {
-        static::$alwaysOnOneServer = true;
+        static::$alwaysOnOneServer = $value;
     }
 
     /**
