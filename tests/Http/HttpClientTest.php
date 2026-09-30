@@ -57,6 +57,7 @@ use RuntimeException;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use Throwable;
+use WeakReference;
 
 class HttpClientTest extends TestCase
 {
@@ -2518,6 +2519,25 @@ class HttpClientTest extends TestCase
         $effectiveUri = $this->factory->get('https://example.com')->effectiveUri();
 
         $this->assertSame('https://example.com', (string) $effectiveUri);
+    }
+
+    public function testPendingRequestIsReleasedWithoutGarbageCollectionAfterThrow()
+    {
+        $this->factory->fake(['https://example.com' => $this->factory::response(str_repeat('x', 1024))]);
+
+        gc_disable();
+
+        try {
+            $pendingRequest = $this->factory->throw();
+            $pendingRequest->get('https://example.com');
+
+            $reference = WeakReference::create($pendingRequest);
+            unset($pendingRequest);
+
+            $this->assertNull($reference->get());
+        } finally {
+            gc_enable();
+        }
     }
 
     public function testClonedClientsWorkSuccessfullyWithTheRequestObject()

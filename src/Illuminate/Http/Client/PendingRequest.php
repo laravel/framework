@@ -781,7 +781,7 @@ class PendingRequest
      */
     public function throw(?callable $callback = null)
     {
-        $this->throwCallback = $callback ?: fn () => null;
+        $this->throwCallback = $callback ?: static fn () => null;
 
         return $this;
     }
