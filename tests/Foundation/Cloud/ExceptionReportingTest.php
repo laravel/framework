@@ -1389,6 +1389,9 @@ class ExceptionReportingTest extends TestCase
         // captured when the job was dispatched.
         ExceptionReportingJobThatReportsException::dispatch(function () {
             Auth::setUser(new GenericUser(['id' => 'abc123', 'remember_token' => '']));
+
+            report(new RuntimeException('While logged in!'));
+
             Auth::logout();
         });
         ExceptionReportingJobThatReportsException::dispatch(fn () => true);
@@ -1404,8 +1407,54 @@ class ExceptionReportingTest extends TestCase
         // The reporter writes to the socket it has already opened, so each
         // report within the worker is another write to the same stream.
         $this->assertCount(1, $streams);
-        $streams[0]->assertWrittenJsonContains(['user_id' => null, 'message' => 'Whoops!'], write: 0);
+        $streams[0]->assertWrittenJsonContains(['user_id' => 'abc123', 'message' => 'While logged in!'], write: 0);
         $streams[0]->assertWrittenJsonContains(['user_id' => null, 'message' => 'Whoops!'], write: 1);
+        $streams[0]->assertWrittenJsonContains(['user_id' => null, 'message' => 'Whoops!'], write: 2);
+    }
+
+    public function testItDoesNotRememberTheUserWhenTheyLogOutInAScheduledTask(): void
+    {
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        // The scheduler runs every task in the one process, so remembering the
+        // user would attribute them to the rest of the run.
+        $schedule = $this->app->make(Schedule::class);
+
+        $schedule->call(function () {
+            Auth::login(new GenericUser(['id' => 'abc123', 'password' => 'secret', 'remember_token' => '']));
+
+            report(new RuntimeException('While logged in!'));
+
+            Auth::logout();
+
+            report(new RuntimeException('Whoops!'));
+        })->name('first-task')->everyMinute();
+
+        $schedule->call(fn () => report(new RuntimeException('Whoops!')))
+            ->name('second-task')
+            ->everyMinute();
+
+        $this->runArtisanCommand(['artisan', 'schedule:run']);
+
+        // The reporter writes to the socket it has already opened, so each
+        // report within the run is another write to the same stream.
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJsonContains([
+            'user_id' => 'abc123',
+            'execution_type' => 'scheduled_task',
+            'message' => 'While logged in!',
+        ], write: 0);
+        $streams[0]->assertWrittenJsonContains([
+            'user_id' => null,
+            'execution_type' => 'scheduled_task',
+            'message' => 'Whoops!',
+        ], write: 1);
+        $streams[0]->assertWrittenJsonContains([
+            'user_id' => null,
+            'execution_type' => 'scheduled_task',
+            'message' => 'Whoops!',
+        ], write: 2);
     }
 
     public function testItDoesNotCauseRecursionWhenRetrievingUserId(): void
