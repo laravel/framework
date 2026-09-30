@@ -490,6 +490,55 @@ class ScheduleListCommandTest extends TestCase
         $this->assertStringContainsString('ScheduleListCommandTest.php', $data[2]['command']);
     }
 
+    public static function veryVerboseJsonProvider()
+    {
+        return [
+            // [options, whether the very verbose fields should be listed]
+            'default' => [[], false],
+            'verbose' => [['-v' => true], false],
+            'very verbose' => [['-vv' => true], true],
+            'debug' => [['-vvv' => true], true],
+        ];
+    }
+
+    #[DataProvider('veryVerboseJsonProvider')]
+    public function testDisplayScheduleAsJsonInVeryVerboseMode($options, $shouldBeListed)
+    {
+        $this->schedule->command(FooCommand::class)->quarterly()->onOneServer();
+        $this->schedule->command('inspire')->everyMinute()->withoutOverlapping(10);
+        $this->schedule->call(fn () => '')->everyMinute();
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, ['--json' => true] + $options);
+        $output = Artisan::output();
+
+        $this->assertJson($output);
+        $data = json_decode($output, true);
+
+        $this->assertCount(3, $data);
+
+        foreach ($data as $task) {
+            foreach (['on_one_server', 'without_overlapping', 'expires_at', 'mutex_name'] as $field) {
+                $this->assertSame($shouldBeListed, array_key_exists($field, $task));
+            }
+        }
+
+        if (! $shouldBeListed) {
+            return;
+        }
+
+        $this->assertSame([true, false, false], array_column($data, 'on_one_server'));
+        $this->assertSame([false, true, false], array_column($data, 'without_overlapping'));
+        $this->assertSame([1440, 10, 1440], array_column($data, 'expires_at'));
+
+        $mutexNames = array_column($data, 'mutex_name');
+
+        $this->assertCount(3, array_unique($mutexNames));
+
+        foreach ($mutexNames as $mutexName) {
+            $this->assertStringContainsString('schedule-', $mutexName);
+        }
+    }
+
     public function testDisplayScheduleWithSort()
     {
         $this->schedule->command(FooCommand::class)->quarterly();
