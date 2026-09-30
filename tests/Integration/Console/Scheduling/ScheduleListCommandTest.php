@@ -106,6 +106,7 @@ class ScheduleListCommandTest extends TestCase
         $this->assertFalse($data[0]['has_mutex']);
         $this->assertIsArray($data[0]['environments']);
         $this->assertEmpty($data[0]['environments']);
+        $this->assertFalse($data[0]['on_one_server']);
 
         $this->assertSame('* * * * *', $data[2]['expression']);
         $this->assertSame('php artisan foobar a='.ProcessUtils::escapeArgument('b'), $data[2]['command']);
@@ -136,6 +137,24 @@ class ScheduleListCommandTest extends TestCase
         $this->assertIsArray($data[0]['environments']);
         $this->assertNotEmpty($data[0]['environments']);
         $this->assertContains($environment, $data[0]['environments']);
+    }
+
+    public function testDisplayScheduleAsJsonWithOnOneServerData()
+    {
+        $this->schedule->command(FooCommand::class)->quarterly()->onOneServer();
+        $this->schedule->command('inspire')->everyMinute();
+        $this->schedule->call(fn () => '')->name('foo-callback')->everyMinute()->onOneServer();
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, ['--json' => true]);
+        $output = Artisan::output();
+
+        $this->assertJson($output);
+        $data = json_decode($output, true);
+
+        $this->assertIsArray($data);
+        $this->assertCount(3, $data);
+
+        $this->assertSame([true, false, true], array_column($data, 'on_one_server'));
     }
 
     public function testDisplayScheduleWithEnvironmentFilterAsJson()
