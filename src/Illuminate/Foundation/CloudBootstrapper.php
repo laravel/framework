@@ -361,10 +361,7 @@ class CloudBootstrapper
                 ? $registerReporter($app[ExceptionHandlerContract::class])
                 : $app->afterResolving(ExceptionHandlerContract::class, $registerReporter);
 
-            $app['events']->listen(function (ContextDehydrating $event) use ($exceptionReporter) {
-                $exceptionReporter->rememberUserIdInContext($event->context);
-                $exceptionReporter->rememberTraceIdInContext($event->context);
-            });
+            $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->handleContextDehydrating($event->context));
 
             if (! $app->runningInConsole()) {
                 $app['events']->listen('Laravel\Octane\Events\RequestReceived', fn () => $exceptionReporter->prepareForOctaneRequest());

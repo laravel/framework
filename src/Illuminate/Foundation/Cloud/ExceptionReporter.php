@@ -951,20 +951,6 @@ class ExceptionReporter
     }
 
     /**
-     * Capture the trace identifier of the current execution in the given context.
-     */
-    public function rememberTraceIdInContext(ContextRepository $context): void
-    {
-        try {
-            $context->addHidden('laravel_cloud_trace_id', $this->traceIdFromContext() ?? (
-                App::runningInConsole() ? $this->consoleCommandTraceId() : Request::header('Cloud-Request-ID')
-            ));
-        } catch (Throwable) {
-            //
-        }
-    }
-
-    /**
      * Determine if a queue worker is running.
      */
     protected function isProcessingJob(): bool
@@ -1068,12 +1054,35 @@ class ExceptionReporter
     }
 
     /**
+     * Handle context dehydrating.
+     */
+    public function handleContextDehydrating(ContextRepository $context): void
+    {
+        $this->rememberUserIdInContext($context);
+        $this->rememberTraceIdInContext($context);
+    }
+
+    /**
      * Capture the authenticated user's identifier in the given context.
      */
-    public function rememberUserIdInContext(ContextRepository $context): void
+    protected function rememberUserIdInContext(ContextRepository $context): void
     {
         try {
             $context->addHidden('laravel_cloud_user_id', $this->userId());
+        } catch (Throwable) {
+            //
+        }
+    }
+
+    /**
+     * Capture the trace identifier of the current execution in the given context.
+     */
+    protected function rememberTraceIdInContext(ContextRepository $context): void
+    {
+        try {
+            $context->addHidden('laravel_cloud_trace_id', $this->traceIdFromContext() ?? (
+                App::runningInConsole() ? $this->consoleCommandTraceId() : Request::header('Cloud-Request-ID')
+            ));
         } catch (Throwable) {
             //
         }
