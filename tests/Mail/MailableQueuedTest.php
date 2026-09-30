@@ -17,11 +17,13 @@ use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Laravel\SerializableClosure\SerializableClosure;
 use Mockery;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class MailableQueuedTest extends TestCase
 {
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableSent(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -36,6 +38,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableWithAttachmentSent(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -55,6 +58,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableWithAttachmentFromDiskSent(): void
     {
         $app = new Application;
@@ -83,6 +87,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableForwardsMessageGroupFromMethodToQueueJob(): void
     {
         $mockedMessageGroupId = 'group-1';
@@ -104,6 +109,7 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals($mockedMessageGroupId, $pushedJob->messageGroup);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableForwardsMessageGroupFromPropertyOverridingMethodToQueueJob(): void
     {
         $mockedMessageGroupId = 'group-1';
@@ -127,6 +133,7 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals($mockedMessageGroupId, $pushedJob->messageGroup);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableForwardsDeduplicatorToQueueJob(): void
     {
         $mockedDeduplicator = fn ($payload, $queue) => 'deduplication-id-1';
@@ -147,6 +154,7 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals($mockedDeduplicator, $pushedJob->deduplicator->getClosure());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableRespectsDelayAttribute(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -164,6 +172,7 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals(30, $pushedJob->delay);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableDelayPropertyOverridesAttribute(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -182,6 +191,7 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals(60, $pushedJob->delay);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableRespectsQueueAndConnectionAttributes(): void
     {
         $queueFake = new MailableQueueFake(new Application);
@@ -201,6 +211,7 @@ class MailableQueuedTest extends TestCase
         $this->assertSame('redis', $pushedJob->connection);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDelayedQueuedMailableRespectsQueueAndConnectionAttributes(): void
     {
         $queueFake = new MailableQueueFake(new Application);
@@ -221,6 +232,7 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals(30, $pushedJob->delay);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testQueuedMailableForwardsDeduplicationIdMethodToQueueJob(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -253,6 +265,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn('emails', SendQueuedMailable::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testLaterSetsQueueOnMailable(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -270,6 +283,7 @@ class MailableQueuedTest extends TestCase
         });
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testLaterWithoutQueueUsesDefault(): void
     {
         $queueFake = new QueueFake(new Application);

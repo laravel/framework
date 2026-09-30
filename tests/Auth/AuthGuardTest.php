@@ -23,6 +23,7 @@ use Illuminate\Session\Store;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Timebox;
 use Mockery;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -481,6 +482,7 @@ class AuthGuardTest extends TestCase
         $events->assertDispatchedOnce(Logout::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testLogoutDoesNotSetRememberTokenIfNotPreviouslySet()
     {
         [$session, $provider, $request] = $this->getMocks();

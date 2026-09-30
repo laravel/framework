@@ -6,6 +6,7 @@ use ErrorException;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connectors\PhpRedisConnector;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use RedisException;
@@ -442,6 +443,7 @@ class PhpRedisConnectorTest extends TestCase
         $connection->command('set', ['foo', 'bar', ['ex' => 60]]);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     #[RequiresPhpExtension('redis')]
     public function testConnectionStopsRetryingAfterConfiguredAttempts()
     {

@@ -64,6 +64,7 @@ use InvalidArgumentException;
 use LogicException;
 use Mockery;
 use PDO;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -976,6 +977,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame(['eloquent.saving', 'eloquent.updating', 'eloquent.updated', 'eloquent.saved'], $events->getArrayCopy());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testTimestampsAreReturnedAsObjects()
     {
         $model = $this->getMockBuilder(EloquentDateModelStub::class)->onlyMethods(['getDateFormat'])->getMock();
@@ -989,6 +991,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $model->updated_at);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testTimestampsAreReturnedAsObjectsFromPlainDatesAndTimestamps()
     {
         $model = $this->getMockBuilder(EloquentDateModelStub::class)->onlyMethods(['getDateFormat'])->getMock();
@@ -1080,6 +1083,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($model->fromDateTime(null));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testFromDateTimeMilliseconds()
     {
         $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentDateModelStub')->onlyMethods(['getDateFormat'])->getMock();

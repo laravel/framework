@@ -6,12 +6,14 @@ use Generator;
 use Illuminate\Database\MariaDbConnection;
 use Illuminate\Database\Schema\MariaDbSchemaState;
 use Pdo\Mysql;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
 class DatabaseMariaDbSchemaStateTest extends TestCase
 {
+    #[AllowMockObjectsWithoutExpectations]
     #[DataProvider('provider')]
     public function testConnectionString(string $expectedConnectionString, array $expectedVariables, array $dbConfig): void
     {
