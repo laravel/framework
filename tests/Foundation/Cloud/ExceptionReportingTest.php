@@ -1995,6 +1995,31 @@ class ExceptionReportingTest extends TestCase
         });
     }
 
+    public function testItCapturesTheTimestampOfTheRequestOctaneReceived(): void
+    {
+        $this->freezeTime();
+        $this->setRunningInConsole(false);
+        $this->setupExceptionReporting();
+        $streams = $this->fakeEventsStreams();
+
+        // Octane workers handle many requests, so the timestamp the process
+        // started with is the time the worker booted.
+        $_SERVER['REQUEST_TIME_FLOAT'] = (float) now()->subHour()->format('U.u');
+
+        Route::get('/test', fn () => throw new RuntimeException('Whoops!'));
+
+        Event::dispatch('Laravel\Octane\Events\RequestReceived');
+
+        $this->get('/test')->assertServerError();
+
+        $this->assertCount(1, $streams);
+        $streams[0]->assertWrittenJson(function (array $payload) {
+            $this->assertSame(now()->format('Y-m-d H:i:s.u'), $payload['execution_context']['timestamp']);
+
+            return true;
+        });
+    }
+
     public function testItCapturesRequestExecutionContext(): void
     {
         $this->freezeTime();

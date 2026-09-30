@@ -367,6 +367,8 @@ class CloudBootstrapper
             });
 
             if (! $app->runningInConsole()) {
+                $app['events']->listen('Laravel\Octane\Events\RequestReceived', fn () => $exceptionReporter->prepareForOctaneRequest());
+
                 $app['events']->listen(function (Logout $event) use ($exceptionReporter) {
                     if ($event->user !== null) {
                         $exceptionReporter->rememberUser($event->user);

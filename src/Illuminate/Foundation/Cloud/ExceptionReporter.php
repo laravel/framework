@@ -53,6 +53,11 @@ class ExceptionReporter
     protected WeakMap $exceptionIds;
 
     /**
+     * The time the Octane request was received.
+     */
+    protected ?float $octaneRequestReceivedAt = null;
+
+    /**
      * The name of the currently running Artisan command.
      */
     protected ?string $currentlyRunningCommandName = null;
@@ -267,6 +272,14 @@ class ExceptionReporter
         } catch (Throwable) {
             return [];
         }
+    }
+
+    /**
+     * Prepare for an incoming Octane request.
+     */
+    public function prepareForOctaneRequest(): void
+    {
+        $this->octaneRequestReceivedAt = (float) Date::now()->format('U.u');
     }
 
     /**
@@ -1302,9 +1315,11 @@ class ExceptionReporter
     protected function laravelStartedAtTimestamp(): ?string
     {
         try {
-            $microtime = defined('LARAVEL_START')
-                ? LARAVEL_START
-                : $_SERVER['REQUEST_TIME_FLOAT'];
+            $microtime = match (true) {
+                $this->octaneRequestReceivedAt !== null => $this->octaneRequestReceivedAt,
+                defined('LARAVEL_START') => LARAVEL_START,
+                default => $_SERVER['REQUEST_TIME_FLOAT'],
+            };
 
             return Date::createFromTimestampUTC($microtime)->toDateTimeString('microsecond');
         } catch (Throwable) {
