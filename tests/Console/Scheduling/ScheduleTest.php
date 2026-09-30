@@ -114,4 +114,36 @@ final class ScheduleTest extends TestCase
         $this->assertSame(['team' => 'platform'], $events[0]->attributes);
         $this->assertSame([], $events[1]->attributes);
     }
+
+    public function testEventsDoNotRunOnOneServerByDefault(): void
+    {
+        $schedule = new Schedule();
+
+        $schedule->command('inspire')->everyMinute();
+
+        $this->assertFalse($schedule->events()[0]->onOneServer);
+    }
+
+    public function testEveryEventMayRunOnOneServer(): void
+    {
+        Schedule::alwaysOnOneServer();
+
+        try {
+            $schedule = new Schedule();
+
+            $schedule->command('inspire')->everyMinute();
+            $schedule->job(JobToTestWithSchedule::class)->daily();
+            $schedule->call(fn () => null)->name('prune')->hourly();
+            $schedule->call(fn () => null)->hourly();
+
+            [$command, $job, $closure, $unnamedClosure] = $schedule->events();
+
+            $this->assertTrue($command->onOneServer);
+            $this->assertTrue($job->onOneServer);
+            $this->assertTrue($closure->onOneServer);
+            $this->assertFalse($unnamedClosure->onOneServer);
+        } finally {
+            Schedule::alwaysOnOneServer(false);
+        }
+    }
 }
