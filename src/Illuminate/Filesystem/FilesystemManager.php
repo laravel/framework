@@ -190,7 +190,8 @@ class FilesystemManager implements FactoryContract
             : LocalAdapter::DISALLOW_LINKS;
 
         $adapter = new LocalAdapter(
-            $config['root'], $visibility, $config['lock'] ?? LOCK_EX, $links
+            $config['root'], $visibility, $config['lock'] ?? LOCK_EX, $links,
+            lazyRootCreation: $config['lazy_root_creation'] ?? false,
         );
 
         return (new LocalFilesystemAdapter(
