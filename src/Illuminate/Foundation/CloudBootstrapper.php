@@ -26,6 +26,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
+use Laravel\Octane\Events\RequestReceived;
 use Monolog\Handler\SocketHandler;
 use PDO;
 use Throwable;
@@ -364,7 +365,7 @@ class CloudBootstrapper
             $app['events']->listen(fn (ContextDehydrating $event) => $exceptionReporter->handleContextDehydrating($event->context));
 
             if (! $app->runningInConsole()) {
-                $app['events']->listen('Laravel\Octane\Events\RequestReceived', fn () => $exceptionReporter->prepareForOctaneRequest());
+                $app['events']->listen(fn (RequestReceived $event) => $exceptionReporter->prepareForOctaneRequest());
 
                 $app['events']->listen(function (Logout $event) use ($exceptionReporter) {
                     if ($event->user !== null) {

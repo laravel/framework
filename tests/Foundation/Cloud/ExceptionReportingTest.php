@@ -39,6 +39,7 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\View\ViewException;
+use Laravel\Octane\Events\RequestReceived;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -2008,7 +2009,14 @@ class ExceptionReportingTest extends TestCase
 
         Route::get('/test', fn () => throw new RuntimeException('Whoops!'));
 
-        Event::dispatch('Laravel\Octane\Events\RequestReceived');
+        // Octane is not installed, so the event it hands the worker is faked.
+        // The event is dispatched by name, as the fake carries the name of
+        // the event by alias rather than by declaration.
+        if (! class_exists(RequestReceived::class)) {
+            class_alias(FakeOctaneRequestReceived::class, RequestReceived::class);
+        }
+
+        Event::dispatch(RequestReceived::class, new RequestReceived);
 
         $this->get('/test')->assertServerError();
 
@@ -4332,6 +4340,11 @@ class ExceptionThrownOnWindows extends RuntimeException
         $this->file = 'D:\\a\\framework\\framework\\tests\\Foundation\\Cloud\\Whoops.php';
         $this->line = 1;
     }
+}
+
+class FakeOctaneRequestReceived
+{
+    //
 }
 
 class HeaderBagThatThrows extends HeaderBag
