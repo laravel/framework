@@ -559,6 +559,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('/test/string', Str::start('test/string', '/'));
         $this->assertSame('/test/string', Str::start('/test/string', '/'));
         $this->assertSame('/test/string', Str::start('//test/string', '/'));
+        $this->assertSame('test/string', Str::start('test/string', ''));
+        $this->assertSame('', Str::start('', ''));
     }
 
     public function testFlushCache()
@@ -581,6 +583,11 @@ class SupportStrTest extends TestCase
         $this->assertSame('abbc', Str::finish('ab', 'bc'));
         $this->assertSame('abbc', Str::finish('abbcbc', 'bc'));
         $this->assertSame('abcbbc', Str::finish('abcbbcbc', 'bc'));
+        $this->assertSame('test/string/', Str::finish('test/string', '/'));
+        $this->assertSame('test/string/', Str::finish('test/string/', '/'));
+        $this->assertSame('test/string/', Str::finish('test/string//', '/'));
+        $this->assertSame('test/string', Str::finish('test/string', ''));
+        $this->assertSame('', Str::finish('', ''));
     }
 
     public function testWrap()

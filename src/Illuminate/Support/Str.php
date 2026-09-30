@@ -495,6 +495,18 @@ class Str
      */
     public static function finish($value, $cap)
     {
+        if ($cap === '') {
+            return $value;
+        }
+
+        if (! str_ends_with($value, $cap)) {
+            return $value.$cap;
+        }
+
+        if (! str_ends_with($value, $cap.$cap)) {
+            return $value;
+        }
+
         $quoted = preg_quote($cap, '/');
 
         return preg_replace('/(?:'.$quoted.')+$/u', '', $value).$cap;
@@ -1498,6 +1510,18 @@ class Str
      */
     public static function start($value, $prefix)
     {
+        if ($prefix === '') {
+            return $value;
+        }
+
+        if (! str_starts_with($value, $prefix)) {
+            return $prefix.$value;
+        }
+
+        if (! str_starts_with($value, $prefix.$prefix)) {
+            return $value;
+        }
+
         $quoted = preg_quote($prefix, '/');
 
         return $prefix.preg_replace('/^(?:'.$quoted.')+/u', '', $value);
