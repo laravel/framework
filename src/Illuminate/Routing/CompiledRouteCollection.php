@@ -176,6 +176,12 @@ class CompiledRouteCollection extends AbstractRouteCollection
 
         $parts = explode('?', $request->server->get('REQUEST_URI'), 2);
 
+        // When the application is served from a subdirectory, trimming the trailing slash from
+        // the root URI (e.g. "/app/" to "/app") breaks base URL detection, so the request is matched as is.
+        if (rtrim($parts[0], '/') === rtrim($request->getBaseUrl(), '/')) {
+            return $trimmedRequest;
+        }
+
         $trimmedRequest->server->set(
             'REQUEST_URI', rtrim($parts[0], '/').(isset($parts[1]) ? '?'.$parts[1] : '')
         );
