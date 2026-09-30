@@ -166,6 +166,7 @@ class CacheDatabaseStoreTest extends TestCase
         });
         $store->getConnection()->expects('table')->with('table')->andReturn($table);
         $table->expects('where')->with('key', 'prefixfoo')->andReturn($table);
+        $table->expects('where')->with('expiration', '>', Mockery::type('int'))->andReturn($table);
         $table->expects('lockForUpdate')->andReturn($table);
         $table->expects('first')->andReturn(null);
         $this->assertFalse($store->increment('foo'));
@@ -176,6 +177,7 @@ class CacheDatabaseStoreTest extends TestCase
         });
         $store->getConnection()->expects('table')->with('table')->andReturn($table);
         $table->expects('where')->with('key', 'prefixfoo')->andReturn($table);
+        $table->expects('where')->with('expiration', '>', Mockery::type('int'))->andReturn($table);
         $table->expects('lockForUpdate')->andReturn($table);
         $table->expects('first')->andReturn($cache);
         $this->assertFalse($store->increment('foo'));
@@ -186,6 +188,7 @@ class CacheDatabaseStoreTest extends TestCase
         });
         $store->getConnection()->expects('table')->with('table')->andReturn($table);
         $table->expects('where')->with('key', 'prefixfoo')->andReturn($table);
+        $table->expects('where')->with('expiration', '>', Mockery::type('int'))->andReturn($table);
         $table->expects('lockForUpdate')->andReturn($table);
         $table->expects('first')->andReturn($cache);
         $store->getConnection()->expects('table')->with('table')->andReturn($table);
@@ -205,6 +208,7 @@ class CacheDatabaseStoreTest extends TestCase
         });
         $store->getConnection()->expects('table')->with('table')->andReturn($table);
         $table->expects('where')->with('key', 'prefixfoo')->andReturn($table);
+        $table->expects('where')->with('expiration', '>', Mockery::type('int'))->andReturn($table);
         $table->expects('lockForUpdate')->andReturn($table);
         $table->expects('first')->andReturn(null);
         $this->assertFalse($store->decrement('foo'));
@@ -215,6 +219,7 @@ class CacheDatabaseStoreTest extends TestCase
         });
         $store->getConnection()->expects('table')->with('table')->andReturn($table);
         $table->expects('where')->with('key', 'prefixfoo')->andReturn($table);
+        $table->expects('where')->with('expiration', '>', Mockery::type('int'))->andReturn($table);
         $table->expects('lockForUpdate')->andReturn($table);
         $table->expects('first')->andReturn($cache);
         $this->assertFalse($store->decrement('foo'));
@@ -225,6 +230,7 @@ class CacheDatabaseStoreTest extends TestCase
         });
         $store->getConnection()->expects('table')->with('table')->andReturn($table);
         $table->expects('where')->with('key', 'prefixbar')->andReturn($table);
+        $table->expects('where')->with('expiration', '>', Mockery::type('int'))->andReturn($table);
         $table->expects('lockForUpdate')->andReturn($table);
         $table->expects('first')->andReturn($cache);
         $store->getConnection()->expects('table')->with('table')->andReturn($table);

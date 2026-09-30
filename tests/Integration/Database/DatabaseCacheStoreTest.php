@@ -124,6 +124,26 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         $this->assertSame('new-bar', $store->get('foo'));
     }
 
+    public function testIncrementOperationShouldNotIncrementExpired()
+    {
+        $store = $this->getStore();
+
+        $this->insertToCacheTable('foo', 5, 0);
+
+        $this->assertFalse($store->increment('foo'));
+        $this->assertNull($store->get('foo'));
+    }
+
+    public function testDecrementOperationShouldNotDecrementExpired()
+    {
+        $store = $this->getStore();
+
+        $this->insertToCacheTable('foo', 5, 0);
+
+        $this->assertFalse($store->decrement('foo'));
+        $this->assertNull($store->get('foo'));
+    }
+
     public function testGetOperationReturnNullIfExpired()
     {
         $store = $this->getStore();

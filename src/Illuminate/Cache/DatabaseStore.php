@@ -276,6 +276,7 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
             $prefixed = $this->prefix.$key;
 
             $cache = $this->table()->where('key', $prefixed)
+                ->where('expiration', '>', $this->getTime())
                 ->lockForUpdate()->first();
 
             // If there is no value in the cache, we will return false here. Otherwise the
