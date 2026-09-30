@@ -670,23 +670,34 @@ trait InteractsWithPivotTable
     {
         $query = $this->newPivotStatement();
 
-        foreach ($this->pivotWheres as $arguments) {
-            $query->where(...$arguments);
+        $query->where($this->getQualifiedForeignPivotKeyName(), $this->parent->{$this->parentKey});
+
+        $hasPivotConditions = ! empty($this->pivotWheres)
+            || ! empty($this->pivotWhereIns)
+            || ! empty($this->pivotWhereBetweens)
+            || ! empty($this->pivotWhereNulls);
+
+        if ($hasPivotConditions) {
+            $query->where(function ($subQuery) {
+                foreach ($this->pivotWheres as $arguments) {
+                    $subQuery->where(...$arguments);
+                }
+
+                foreach ($this->pivotWhereIns as $arguments) {
+                    $subQuery->whereIn(...$arguments);
+                }
+
+                foreach ($this->pivotWhereBetweens as $arguments) {
+                    $subQuery->whereBetween(...$arguments);
+                }
+
+                foreach ($this->pivotWhereNulls as $arguments) {
+                    $subQuery->whereNull(...$arguments);
+                }
+            });
         }
 
-        foreach ($this->pivotWhereIns as $arguments) {
-            $query->whereIn(...$arguments);
-        }
-
-        foreach ($this->pivotWhereBetweens as $arguments) {
-            $query->whereBetween(...$arguments);
-        }
-
-        foreach ($this->pivotWhereNulls as $arguments) {
-            $query->whereNull(...$arguments);
-        }
-
-        return $query->where($this->getQualifiedForeignPivotKeyName(), $this->parent->{$this->parentKey});
+        return $query;
     }
 
     /**

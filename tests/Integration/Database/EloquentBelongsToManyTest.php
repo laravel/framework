@@ -1206,6 +1206,33 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertSame('2024', $post->tagsWithExtraPivot()->find($tag1->id)->pivot->flag);
     }
 
+    public function testOrWherePivotDoesNotAffectOtherParentsInPivotOperations()
+    {
+        $post1 = Post::create(['title' => Str::random()]);
+        $post2 = Post::create(['title' => Str::random()]);
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post1->id, 'tag_id' => $tag1->id, 'flag' => 'bar'],
+            ['post_id' => $post2->id, 'tag_id' => $tag2->id, 'flag' => 'foo'],
+        ]);
+
+        $post1->tagsWithExtraPivot()->wherePivot('flag', 'foo')->orWherePivot('flag', 'bar')->detach();
+
+        $this->assertNull(DB::table('posts_tags')->where('post_id', $post1->id)->where('tag_id', $tag1->id)->first());
+        $this->assertNotNull(DB::table('posts_tags')->where('post_id', $post2->id)->where('tag_id', $tag2->id)->first());
+
+        $post1->tagsWithExtraPivot()->wherePivot('flag', 'foo')->orWherePivot('flag', 'bar')->sync([$tag3->id => ['flag' => 'bar']]);
+
+        $this->assertNotNull(DB::table('posts_tags')->where('post_id', $post2->id)->where('tag_id', $tag2->id)->first());
+
+        $post1->tagsWithExtraPivot()->wherePivot('flag', 'foo')->orWherePivot('flag', 'bar')->updateExistingPivot($tag2->id, ['flag' => 'updated']);
+
+        $this->assertSame('foo', DB::table('posts_tags')->where('post_id', $post2->id)->where('tag_id', $tag2->id)->value('flag'));
+    }
+
     public function testWherePivotInMethod()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
