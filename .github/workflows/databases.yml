@@ -310,6 +310,7 @@ jobs:
           DB_PASSWORD: password
 
   mssql_2019:
+    # Errs on Ubuntu 26.04 (likely 24.04 as well)
     runs-on: ubuntu-22.04
     timeout-minutes: 10
 
@@ -344,6 +345,7 @@ jobs:
           DB_PASSWORD: Forge123
 
   mssql_2017:
+    # Errs on Ubuntu 26.04 (likely 24.04 as well)
     runs-on: ubuntu-22.04
     timeout-minutes: 10
 
