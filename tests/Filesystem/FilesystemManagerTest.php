@@ -212,6 +212,38 @@ class FilesystemManagerTest extends TestCase
         rmdir(__DIR__.'/../../my-custom-path');
     }
 
+    public function testCanBuildLocalDisksThatLazilyCreateTheirRootDirectory()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $root = $this->temporaryDirectory('lazy-root');
+
+        $disk = $filesystem->build([
+            'driver' => 'local',
+            'root' => $root,
+            'lazy_root_creation' => true,
+        ]);
+
+        $this->assertDirectoryDoesNotExist($root);
+
+        $disk->put('filename.txt', 'file content');
+
+        $this->assertDirectoryExists($root);
+        $this->assertSame('file content', $disk->get('filename.txt'));
+    }
+
+    public function testCanBuildLocalDisksThatEagerlyCreateTheirRootDirectory()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $root = $this->temporaryDirectory('eager-root');
+
+        $filesystem->build([
+            'driver' => 'local',
+            'root' => $root,
+        ]);
+
+        $this->assertDirectoryExists($root);
+    }
+
     public function testCanBuildReadOnlyDisks()
     {
         $filesystem = new FilesystemManager(new Application);
@@ -772,7 +804,7 @@ class FilesystemManagerTest extends TestCase
 
     protected function temporaryDirectory(string $name): string
     {
-        return $this->temporaryDirectories[] = sys_get_temp_dir().'/laravel-read-through-'.$name.'-'.uniqid();
+        return $this->temporaryDirectories[] = sys_get_temp_dir().'/laravel-disk-'.$name.'-'.uniqid();
     }
 }
 
