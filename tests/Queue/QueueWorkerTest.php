@@ -21,6 +21,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleased;
 use Illuminate\Queue\Events\JobReleasedAfterException;
+use Illuminate\Queue\Events\JobTimedOut;
 use Illuminate\Queue\Events\WorkerIdle;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
@@ -33,6 +34,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
 use Mockery;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -824,6 +826,60 @@ class QueueWorkerTest extends TestCase
         });
     }
 
+    #[RequiresPhpExtension('pcntl')]
+    public function testInterruptibleJobIsNotifiedWhenTheJobTimesOut()
+    {
+        $interruptible = new class implements Interruptible
+        {
+            public ?int $receivedSignal = null;
+
+            public function interrupted(int $signal): void
+            {
+                $this->receivedSignal = $signal;
+            }
+        };
+
+        $handler = Mockery::mock(CallQueuedHandler::class);
+        $handler->expects('getRunningCommand')->andReturn($interruptible);
+
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $job = new WorkerFakeJob;
+        $job->resolvedJob = $handler;
+
+        $worker->currentJob = $job;
+
+        $this->timeOutJob($worker, $job);
+
+        $this->assertSame(SIGALRM, $interruptible->receivedSignal);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testTimeoutIsStillHandledWhenNotifyingTheJobFails()
+    {
+        $interruptible = new class implements Interruptible
+        {
+            public function interrupted(int $signal): void
+            {
+                throw new Exception('Failed to interrupt.');
+            }
+        };
+
+        $handler = Mockery::mock(CallQueuedHandler::class);
+        $handler->expects('getRunningCommand')->andReturn($interruptible);
+
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $job = new WorkerFakeJob;
+        $job->resolvedJob = $handler;
+
+        $worker->currentJob = $job;
+
+        $this->timeOutJob($worker, $job);
+
+        $this->exceptionHandler->assertReported(fn (Exception $reported) => $reported->getMessage() === 'Failed to interrupt.');
+
+        $this->events->assertDispatchedOnce(JobTimedOut::class);
+    }
+
     /**
      * Helpers...
      */
@@ -856,6 +912,23 @@ class QueueWorkerTest extends TestCase
 
         return $options;
     }
+
+    private function timeOutJob(InsomniacWorker $worker, $job)
+    {
+        Worker::killUsing(fn () => throw new RuntimeException('Killed.'));
+
+        try {
+            $worker->registerTimeoutHandler('default', 'queue', $job, $this->workerOptions(['timeout' => 0]));
+
+            pcntl_signal_get_handler(SIGALRM)(SIGALRM);
+        } catch (RuntimeException) {
+            //
+        } finally {
+            Worker::killUsing(null);
+
+            pcntl_signal(SIGALRM, SIG_DFL);
+        }
+    }
 }
 
 /**
@@ -884,6 +957,11 @@ class InsomniacWorker extends Worker
     public function notifyJobOfSignal(int $signal): void
     {
         parent::notifyJobOfSignal($signal);
+    }
+
+    public function registerTimeoutHandler($connectionName, $queue, $job, WorkerOptions $options)
+    {
+        parent::registerTimeoutHandler($connectionName, $queue, $job, $options);
     }
 
     public function stop($status = 0, $options = null, $reason = null, $connectionName = null, $queue = null)
