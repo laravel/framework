@@ -23,6 +23,21 @@ class RouteUriTest extends TestCase
     {
         return [
             [
+                '',
+                '',
+                [],
+            ],
+            [
+                '/',
+                '/',
+                [],
+            ],
+            [
+                'http://localhost:8080/foo/{bar}',
+                'http://localhost:8080/foo/{bar}',
+                [],
+            ],
+            [
                 '/foo',
                 '/foo',
                 [],
