@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ItemNotFoundException;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
 use Illuminate\Tests\Support\Fixtures\TestArrayableObject;
 use Illuminate\Tests\Support\Fixtures\TestBackedEnum;
@@ -126,6 +127,10 @@ class SupportArrTest extends TestCase
         $collection = collect(['baz', 'boom']);
         $mixedArray = [[1], [2], [3], ['foo', 'bar'], $collection];
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($mixedArray));
+
+        // Case including lazy collections
+        $mixedArray = [[1], new LazyCollection([2, 3]), collect([4])];
+        $this->assertEquals([1, 2, 3, 4], Arr::collapse($mixedArray));
     }
 
     public function testCrossJoin()
@@ -558,6 +563,12 @@ class SupportArrTest extends TestCase
         // Nested arrays containing arrays containing arrays are flattened
         $array = [['#foo', new Collection(['#bar', ['#zap']])], ['#baz']];
         $this->assertEquals(['#foo', '#bar', '#zap', '#baz'], Arr::flatten($array));
+    }
+
+    public function testFlattenWithLazyCollections()
+    {
+        $array = [new LazyCollection(['#foo', ['#bar']]), ['#baz', new LazyCollection(['#zap'])]];
+        $this->assertEquals(['#foo', '#bar', '#baz', '#zap'], Arr::flatten($array));
     }
 
     public function testFlattenWithDepth()
