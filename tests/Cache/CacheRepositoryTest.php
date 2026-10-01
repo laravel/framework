@@ -21,6 +21,7 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Defer\DeferredCallbackCollection;
 use InvalidArgumentException;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -169,6 +170,38 @@ class CacheRepositoryTest extends TestCase
         });
 
         $this->assertSame(['bar', false], $result);
+    }
+
+    public function testFlexibleDoesNotRefreshBeforeAnAbsoluteFreshnessDeadline(): void
+    {
+        $previousContainer = Container::getInstance();
+        $container = new Container;
+        $container->instance(DeferredCallbackCollection::class, $deferred = new DeferredCallbackCollection);
+        Container::setInstance($container);
+
+        try {
+            $now = Carbon::now()->toImmutable();
+            $freshUntil = $now->addMinute();
+            $repository = new Repository(new ArrayStore);
+
+            $this->assertSame('initial', $repository->flexible('report', [$freshUntil, 120], fn () => 'initial'));
+
+            Carbon::setTestNow($now->addSeconds(45));
+
+            $this->assertSame('initial', $repository->flexible('report', [$freshUntil, 120], fn () => 'refreshed'));
+            $this->assertCount(0, $deferred);
+
+            Carbon::setTestNow($freshUntil);
+
+            $this->assertSame('initial', $repository->flexible('report', [$freshUntil, 120], fn () => 'refreshed'));
+            $this->assertCount(1, $deferred);
+
+            ($deferred->first())();
+
+            $this->assertSame('refreshed', $repository->get('report'));
+        } finally {
+            Container::setInstance($previousContainer);
+        }
     }
 
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()

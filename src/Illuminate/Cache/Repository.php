@@ -665,7 +665,11 @@ class Repository implements ArrayAccess, CacheContract
             ], $ttl[1]));
         }
 
-        if (($created + $this->getSeconds($ttl[0])) > Carbon::now()->getTimestamp()) {
+        $freshUntil = $ttl[0] instanceof DateTimeInterface
+            ? $ttl[0]->getTimestamp()
+            : $created + $this->getSeconds($ttl[0]);
+
+        if ($freshUntil > Carbon::now()->getTimestamp()) {
             return $value;
         }
 
