@@ -20,6 +20,20 @@ class CronExpressionTimezoneConverter
      */
     public static function forEvent(Event $event, DateTimeZone $timezone)
     {
+        return static::tryForEvent($event, $timezone) ?? [$event->expression];
+    }
+
+    /**
+     * Attempt to convert an event cron expression to the display timezone.
+     *
+     * Returns null when the expression cannot be represented in the display timezone.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param  \DateTimeZone  $timezone
+     * @return array<string>|null
+     */
+    public static function tryForEvent(Event $event, DateTimeZone $timezone)
+    {
         $eventTimezone = static::resolveEventTimezone($event, $timezone);
 
         $offsetComponents = static::offsetComponents(
@@ -27,7 +41,7 @@ class CronExpressionTimezoneConverter
         );
 
         if (is_null($offsetComponents)) {
-            return [$event->expression];
+            return null;
         }
 
         [$totalOffsetMinutes, $hourOffset, $minuteOffset] = $offsetComponents;
@@ -39,10 +53,10 @@ class CronExpressionTimezoneConverter
         $segments = preg_split("/\s+/", trim($event->expression));
 
         if (count($segments) !== 5) {
-            return [$event->expression];
+            return null;
         }
 
-        return static::convert($segments, $hourOffset, $minuteOffset) ?? [$event->expression];
+        return static::convert($segments, $hourOffset, $minuteOffset);
     }
 
     /**
@@ -52,7 +66,7 @@ class CronExpressionTimezoneConverter
      * @param  \DateTimeZone  $defaultTimezone
      * @return \DateTimeZone
      */
-    protected static function resolveEventTimezone(Event $event, DateTimeZone $defaultTimezone)
+    public static function resolveEventTimezone(Event $event, DateTimeZone $defaultTimezone)
     {
         return $event->timezone instanceof DateTimeZone
             ? $event->timezone

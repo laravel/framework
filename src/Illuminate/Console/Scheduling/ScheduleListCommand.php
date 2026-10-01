@@ -104,8 +104,16 @@ class ScheduleListCommand extends Command
                 }
             }
 
-            return (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))->map(fn ($expression) => [
+            $expressions = CronExpressionTimezoneConverter::tryForEvent($event, $timezone);
+
+            // Expressions that can't be converted (e.g. when the next runs straddle a DST change) stay in the event's timezone...
+            $expressionTimezone = is_null($expressions)
+                ? CronExpressionTimezoneConverter::resolveEventTimezone($event, $timezone)
+                : $timezone;
+
+            return (new Collection($expressions ?? [$event->expression]))->map(fn ($expression) => [
                 'expression' => $expression,
+                'expression_timezone' => $expressionTimezone->getName(),
                 'command' => $command,
                 'description' => $event->description ?? null,
                 'next_due_date' => $nextDueDate->format('Y-m-d H:i:s P'),

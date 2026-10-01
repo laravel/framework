@@ -447,6 +447,45 @@ class ScheduleListCommandTest extends TestCase
         $data = json_decode(Artisan::output(), true);
 
         $this->assertSame(['0 0,2 * * *'], array_column($data, 'expression'));
+        $this->assertSame(['Europe/London'], array_column($data, 'expression_timezone'));
+    }
+
+    public function testExpressionTimezoneIsReportedWhenMonthlyRunsStraddleDstTransition()
+    {
+        // The next run (Oct 1st) is in CEST and the one after (Nov 1st) is in CET, so
+        // no single UTC expression matches both and the expression stays in Berlin.
+        Carbon::setTestNow('2026-09-30 12:00:00 UTC');
+
+        $this->schedule->command('inspire')->monthlyOn(1, '06:00')->timezone('Europe/Berlin');
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, [
+            '--timezone' => 'UTC',
+            '--json' => true,
+        ]);
+
+        $data = json_decode(Artisan::output(), true);
+
+        $this->assertSame('0 6 1 * *', $data[0]['expression']);
+        $this->assertSame('Europe/Berlin', $data[0]['expression_timezone']);
+        $this->assertSame('UTC', $data[0]['timezone']);
+        $this->assertSame('2026-10-01 04:00:00 +00:00', $data[0]['next_due_date']);
+    }
+
+    public function testExpressionTimezoneIsDisplayTimezoneWhenExpressionIsConverted()
+    {
+        Carbon::setTestNow('2026-10-15 12:00:00 UTC');
+
+        $this->schedule->command('inspire')->monthlyOn(1, '06:00')->timezone('Europe/Berlin');
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, [
+            '--timezone' => 'UTC',
+            '--json' => true,
+        ]);
+
+        $data = json_decode(Artisan::output(), true);
+
+        $this->assertSame('0 5 1 * *', $data[0]['expression']);
+        $this->assertSame('UTC', $data[0]['expression_timezone']);
     }
 
     public function testDisplayScheduleCliSplitsExpressionWhenMixedCarry()
