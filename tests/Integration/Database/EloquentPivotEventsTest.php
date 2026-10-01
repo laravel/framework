@@ -45,7 +45,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
             $table->foreignId('equipment_id');
         });
 
-        Schema::create('equipmentables_without_id', function (Blueprint $table) {
+        Schema::create('equipmentables_no_id', function (Blueprint $table) {
             $table->morphs('equipmentable');
             $table->foreignId('equipment_id');
         });
@@ -267,7 +267,7 @@ class PivotEventsTestProject extends Model
 
     public function touchingEquipments()
     {
-        return $this->morphToMany(PivotEventsTestEquipment::class, 'equipmentable', 'equipmentables_without_id')
+        return $this->morphToMany(PivotEventsTestEquipment::class, 'equipmentable', 'equipmentables_no_id')
             ->using(PivotEventsTestTouchingModelEquipment::class);
     }
 }
@@ -338,7 +338,7 @@ class PivotEventsTestModelEquipment extends MorphPivot
 
 class PivotEventsTestTouchingModelEquipment extends MorphPivot
 {
-    public $table = 'equipmentables_without_id';
+    public $table = 'equipmentables_no_id';
 
     protected $touches = ['equipment'];
 
