@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 
 class EloquentPivotEventsTest extends DatabaseTestCase
@@ -40,6 +41,11 @@ class EloquentPivotEventsTest extends DatabaseTestCase
 
         Schema::create('equipmentables', function (Blueprint $table) {
             $table->increments('id');
+            $table->morphs('equipmentable');
+            $table->foreignId('equipment_id');
+        });
+
+        Schema::create('equipmentables_without_id', function (Blueprint $table) {
             $table->morphs('equipmentable');
             $table->foreignId('equipment_id');
         });
@@ -190,6 +196,23 @@ class EloquentPivotEventsTest extends DatabaseTestCase
             PivotEventsTestModelEquipment::$eventsMorphTypes
         );
     }
+
+    public function testCustomMorphPivotWithoutPrimaryKeyTouchesOwnersOnDetach()
+    {
+        Carbon::setTestNow('2017-10-10 10:10:10');
+
+        $project = PivotEventsTestProject::forceCreate(['name' => 'Test Project']);
+        $equipment = PivotEventsTestEquipment::forceCreate(['name' => 'important-equipment']);
+
+        $project->touchingEquipments()->attach($equipment);
+
+        Carbon::setTestNow('2017-10-10 11:10:10');
+
+        $project->touchingEquipments()->detach($equipment);
+
+        $this->assertSame(0, $project->touchingEquipments()->count());
+        $this->assertSame('2017-10-10 11:10:10', $equipment->refresh()->updated_at->toDateTimeString());
+    }
 }
 
 class PivotEventsTestUser extends Model
@@ -240,6 +263,12 @@ class PivotEventsTestProject extends Model
     public function equipments()
     {
         return $this->morphToMany(PivotEventsTestEquipment::class, 'equipmentable')->using(PivotEventsTestModelEquipment::class);
+    }
+
+    public function touchingEquipments()
+    {
+        return $this->morphToMany(PivotEventsTestEquipment::class, 'equipmentable', 'equipmentables_without_id')
+            ->using(PivotEventsTestTouchingModelEquipment::class);
     }
 }
 
@@ -304,6 +333,18 @@ class PivotEventsTestModelEquipment extends MorphPivot
     public function equipmentable()
     {
         return $this->morphTo();
+    }
+}
+
+class PivotEventsTestTouchingModelEquipment extends MorphPivot
+{
+    public $table = 'equipmentables_without_id';
+
+    protected $touches = ['equipment'];
+
+    public function equipment()
+    {
+        return $this->belongsTo(PivotEventsTestEquipment::class);
     }
 }
 
