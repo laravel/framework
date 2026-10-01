@@ -110,6 +110,7 @@ class Kernel implements KernelContract
         \Illuminate\Routing\Middleware\ThrottleRequests::class,
         \Illuminate\Routing\Middleware\ThrottleRequestsWithRedis::class,
         \Illuminate\Contracts\Session\Middleware\AuthenticatesSessions::class,
+        \Illuminate\Http\Middleware\HandleIdempotencyKeys::class,
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
         \Illuminate\Auth\Middleware\Authorize::class,
     ];
