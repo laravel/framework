@@ -114,15 +114,43 @@ class HandleIdempotencyKeysTest extends TestCase
         $this->assertSame(1, $this->executions);
     }
 
-    public function testReusingKeyOnDifferentRouteIsRejected()
+    public function testKeysAreScopedToTheRequestedUrl()
     {
         $this->registerRoute();
         $this->registerRoute(uri: '/refunds');
 
-        $this->postJson('/orders', ['item' => 'book'], ['Idempotency-Key' => 'key-1'])->assertOk();
-        $this->postJson('/refunds', ['item' => 'book'], ['Idempotency-Key' => 'key-1'])->assertUnprocessable();
+        $this->postJson('/orders', ['item' => 'book'], ['Idempotency-Key' => 'key-1'])->assertJson(['id' => 1]);
+        $this->postJson('/refunds', ['item' => 'book'], ['Idempotency-Key' => 'key-1'])->assertJson(['id' => 2]);
+        $this->postJson('/orders', ['item' => 'book'], ['Idempotency-Key' => 'key-1'])->assertJson(['id' => 1]);
+        $this->postJson('/refunds', ['item' => 'book'], ['Idempotency-Key' => 'key-1'])->assertJson(['id' => 2]);
 
-        $this->assertSame(1, $this->executions);
+        $this->assertSame(2, $this->executions);
+    }
+
+    public function testKeysAreScopedToTheRequestMethod()
+    {
+        Route::match(['POST', 'PATCH'], '/orders', function () {
+            return ['id' => ++$this->executions];
+        })->middleware(HandleIdempotencyKeys::class);
+
+        $this->postJson('/orders', [], ['Idempotency-Key' => 'key-1'])->assertJson(['id' => 1]);
+        $this->patchJson('/orders', [], ['Idempotency-Key' => 'key-1'])->assertJson(['id' => 2]);
+        $this->postJson('/orders', [], ['Idempotency-Key' => 'key-1'])->assertJson(['id' => 1]);
+
+        $this->assertSame(2, $this->executions);
+    }
+
+    public function testKeysAreNotBlockedByInFlightRequestsToOtherUrls()
+    {
+        $this->registerRoute(uri: '/refunds');
+
+        $lock = Cache::lock($this->lockKey('key-1', '/orders'), 10);
+
+        $this->assertTrue($lock->get());
+
+        $this->postJson('/refunds', ['item' => 'book'], ['Idempotency-Key' => 'key-1'])->assertOk();
+
+        $lock->release();
     }
 
     public function testUploadedFilesArePartOfTheFingerprint()
@@ -132,6 +160,58 @@ class HandleIdempotencyKeysTest extends TestCase
         $this->post('/orders', ['receipt' => UploadedFile::fake()->createWithContent('receipt.txt', 'foo')], ['Idempotency-Key' => 'key-1'])->assertOk();
         $this->post('/orders', ['receipt' => UploadedFile::fake()->createWithContent('receipt.txt', 'foo')], ['Idempotency-Key' => 'key-1'])->assertHeader('Idempotent-Replayed', 'true');
         $this->post('/orders', ['receipt' => UploadedFile::fake()->createWithContent('receipt.txt', 'bar')], ['Idempotency-Key' => 'key-1'])->assertUnprocessable();
+        $this->post('/orders', ['receipt' => UploadedFile::fake()->createWithContent('invoice.txt', 'foo')], ['Idempotency-Key' => 'key-1'])->assertUnprocessable();
+        $this->post('/orders', ['receipt' => UploadedFile::fake()->createWithContent('receipt.exe', 'foo')], ['Idempotency-Key' => 'key-1'])->assertUnprocessable();
+
+        file_put_contents($path = tempnam(sys_get_temp_dir(), 'receipt'), 'foo');
+
+        $this->post('/orders', ['receipt' => new UploadedFile($path, 'receipt.txt', 'application/octet-stream', null, true)], ['Idempotency-Key' => 'key-1'])->assertUnprocessable();
+
+        unlink($path);
+
+        $this->assertSame(1, $this->executions);
+    }
+
+    public function testRawBodiesArePartOfTheFingerprint()
+    {
+        $this->registerRoute();
+
+        $this->call('POST', '/orders', server: $this->serverVariables('application/xml'), content: '<order>book</order>')->assertOk();
+        $this->call('POST', '/orders', server: $this->serverVariables('application/xml'), content: '<order>book</order>')->assertHeader('Idempotent-Replayed', 'true');
+        $this->call('POST', '/orders', server: $this->serverVariables('application/xml'), content: '<order>pen</order>')->assertUnprocessable();
+
+        $this->assertSame(1, $this->executions);
+    }
+
+    public function testJsonKeyOrderDoesNotAffectTheFingerprint()
+    {
+        $this->registerRoute();
+
+        $this->call('POST', '/orders', server: $this->serverVariables(), content: '{"amount":100,"currency":"GBP","items":[1,2]}')->assertOk();
+        $this->call('POST', '/orders', server: $this->serverVariables(), content: '{"currency":"GBP","amount":100,"items":[1,2]}')->assertHeader('Idempotent-Replayed', 'true');
+        $this->call('POST', '/orders', server: $this->serverVariables(), content: '{"amount":100,"currency":"GBP","items":[2,1]}')->assertUnprocessable();
+
+        $this->assertSame(1, $this->executions);
+    }
+
+    public function testQueryStringIsFingerprintedSeparatelyFromTheBody()
+    {
+        $this->registerRoute();
+
+        $this->postJson('/orders?item=book', [], ['Idempotency-Key' => 'key-1'])->assertOk();
+        $this->postJson('/orders?item=book', [], ['Idempotency-Key' => 'key-1'])->assertHeader('Idempotent-Replayed', 'true');
+        $this->postJson('/orders', ['item' => 'book'], ['Idempotency-Key' => 'key-1'])->assertUnprocessable();
+        $this->postJson('/orders?item=pen', [], ['Idempotency-Key' => 'key-1'])->assertUnprocessable();
+
+        $this->assertSame(1, $this->executions);
+    }
+
+    public function testContentTypeIsPartOfTheFingerprint()
+    {
+        $this->registerRoute();
+
+        $this->postJson('/orders', ['item' => 'book'], ['Idempotency-Key' => 'key-1'])->assertOk();
+        $this->post('/orders', ['item' => 'book'], ['Idempotency-Key' => 'key-1'])->assertUnprocessable();
 
         $this->assertSame(1, $this->executions);
     }
@@ -140,7 +220,7 @@ class HandleIdempotencyKeysTest extends TestCase
     {
         $this->registerRoute();
 
-        $lock = Cache::lock('idempotency:'.hash('sha256', '127.0.0.1|key-1').':lock', 10);
+        $lock = Cache::lock($this->lockKey('key-1'), 10);
 
         $this->assertTrue($lock->get());
 
@@ -161,7 +241,25 @@ class HandleIdempotencyKeysTest extends TestCase
 
         $this->postJson('/orders', ['item' => 'book'], ['Idempotency-Key' => 'key-1'])->assertOk();
 
-        $this->assertTrue(Cache::lock('idempotency:'.hash('sha256', '127.0.0.1|key-1').':lock', 10)->get());
+        $this->assertTrue(Cache::lock($this->lockKey('key-1'), 10)->get());
+    }
+
+    public function testLockDurationMayBeCustomized()
+    {
+        Route::post('/default', function () {
+            $this->travel(2)->seconds();
+
+            return ['acquired' => Cache::lock($this->lockKey('key-1', '/default'), 10)->get()];
+        })->middleware(HandleIdempotencyKeys::class);
+
+        Route::post('/custom', function () {
+            $this->travel(2)->seconds();
+
+            return ['acquired' => Cache::lock($this->lockKey('key-1', '/custom'), 10)->get()];
+        })->middleware(HandleIdempotencyKeys::using(lock: 1));
+
+        $this->postJson('/default', [], ['Idempotency-Key' => 'key-1'])->assertJson(['acquired' => false]);
+        $this->postJson('/custom', [], ['Idempotency-Key' => 'key-1'])->assertJson(['acquired' => true]);
     }
 
     public function testServerErrorsAreNotStored()
@@ -289,9 +387,20 @@ class HandleIdempotencyKeysTest extends TestCase
 
     public function testUsingGeneratesMiddlewareDefinition()
     {
-        $this->assertSame(HandleIdempotencyKeys::class.':86400', HandleIdempotencyKeys::using());
-        $this->assertSame(HandleIdempotencyKeys::class.':60', HandleIdempotencyKeys::using(60));
-        $this->assertSame(HandleIdempotencyKeys::class.':60,required', HandleIdempotencyKeys::using(60, true));
+        $this->assertSame(HandleIdempotencyKeys::class.':86400,60', HandleIdempotencyKeys::using());
+        $this->assertSame(HandleIdempotencyKeys::class.':3600,60', HandleIdempotencyKeys::using(3600));
+        $this->assertSame(HandleIdempotencyKeys::class.':3600,60,required', HandleIdempotencyKeys::using(3600, true));
+        $this->assertSame(HandleIdempotencyKeys::class.':3600,120,required', HandleIdempotencyKeys::using(ttl: 3600, required: true, lock: 120));
+    }
+
+    protected function lockKey($key, $uri = '/orders', $method = 'POST', $scope = '127.0.0.1')
+    {
+        return 'idempotency:'.hash('sha256', serialize([$scope, $method, 'http://localhost'.$uri, $key])).':lock';
+    }
+
+    protected function serverVariables($contentType = 'application/json', $key = 'key-1')
+    {
+        return ['CONTENT_TYPE' => $contentType, 'HTTP_IDEMPOTENCY_KEY' => $key];
     }
 
     protected function registerRoute($middleware = HandleIdempotencyKeys::class, $uri = '/orders')

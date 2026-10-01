@@ -27,11 +27,11 @@ class HandleIdempotencyKeys
     const DEFAULT_TTL = 86400;
 
     /**
-     * The number of seconds a request may hold an idempotency key while it is being processed.
+     * The default number of seconds a request may hold an idempotency key while it is being processed.
      *
      * @var int
      */
-    protected $lockSeconds = 60;
+    const DEFAULT_LOCK = 60;
 
     /**
      * Create a new middleware instance.
@@ -47,11 +47,12 @@ class HandleIdempotencyKeys
      *
      * @param  int  $ttl
      * @param  bool  $required
+     * @param  int  $lock
      * @return string
      */
-    public static function using($ttl = self::DEFAULT_TTL, $required = false)
+    public static function using($ttl = self::DEFAULT_TTL, $required = false, $lock = self::DEFAULT_LOCK)
     {
-        return static::class.':'.$ttl.($required ? ',required' : '');
+        return static::class.':'.$ttl.','.$lock.($required ? ',required' : '');
     }
 
     /**
@@ -86,7 +87,7 @@ class HandleIdempotencyKeys
             return $this->replay($stored, $fingerprint);
         }
 
-        $lock = $this->cache->lock($key.':lock', $this->lockSeconds);
+        $lock = $this->cache->lock($key.':lock', $this->option($options, 1, static::DEFAULT_LOCK));
 
         if (! $lock->get()) {
             throw new ConflictHttpException('A request with this idempotency key is currently being processed.');
@@ -105,7 +106,7 @@ class HandleIdempotencyKeys
                     'status' => $response->getStatusCode(),
                     'headers' => $response->headers->allPreserveCaseWithoutCookies(),
                     'content' => $response->getContent(),
-                ], $this->ttl($options));
+                ], $this->option($options, 0, static::DEFAULT_TTL));
             }
 
             return $response;
@@ -136,7 +137,7 @@ class HandleIdempotencyKeys
     /**
      * Get the cache key for the given request and idempotency key.
      *
-     * Keys are scoped to the authenticated user, or to the client's IP address for guests.
+     * Keys are scoped to the request method and URL, and to the authenticated user or the client's IP address for guests.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $key
@@ -144,11 +145,14 @@ class HandleIdempotencyKeys
      */
     protected function cacheKey($request, $key)
     {
-        $scope = ($user = $request->user())
-            ? $user::class.'|'.$user->getAuthIdentifier()
-            : $request->ip();
+        $user = $request->user();
 
-        return 'idempotency:'.hash('sha256', $scope.'|'.$key);
+        return 'idempotency:'.hash('sha256', serialize([
+            $user ? [$user::class, $user->getAuthIdentifier()] : $request->ip(),
+            $request->method(),
+            $request->url(),
+            $key,
+        ]));
     }
 
     /**
@@ -162,12 +166,34 @@ class HandleIdempotencyKeys
         $files = $request->allFiles();
 
         array_walk_recursive($files, function (&$file) {
-            $file = $file->isValid() ? hash_file('xxh128', $file->getRealPath()) : $file->getError();
+            $file = [
+                $file->getClientOriginalName(),
+                $file->getClientMimeType(),
+                $file->isValid() ? hash_file('xxh128', $file->getRealPath()) : $file->getError(),
+            ];
         });
 
         return hash('xxh128', serialize([
-            $request->method(), $request->path(), $request->input(), $files,
+            $request->getContentTypeFormat(),
+            $this->normalize($request->query->all()),
+            $this->normalize($request->request->all()) ?: $request->getContent(),
+            $this->normalize($files),
         ]));
+    }
+
+    /**
+     * Recursively sort the keys of the given array so key order does not affect the fingerprint.
+     *
+     * @param  array  $input
+     * @return array
+     */
+    protected function normalize(array $input)
+    {
+        if (! array_is_list($input)) {
+            ksort($input);
+        }
+
+        return array_map(fn ($value) => is_array($value) ? $this->normalize($value) : $value, $input);
     }
 
     /**
@@ -203,19 +229,15 @@ class HandleIdempotencyKeys
     }
 
     /**
-     * Get the number of seconds a response should be stored for.
+     * Get the numeric option at the given position from the middleware options.
      *
      * @param  array  $options
+     * @param  int  $position
+     * @param  int  $default
      * @return int
      */
-    protected function ttl(array $options)
+    protected function option(array $options, $position, $default)
     {
-        foreach ($options as $option) {
-            if (is_numeric($option)) {
-                return (int) $option;
-            }
-        }
-
-        return static::DEFAULT_TTL;
+        return (int) (array_values(array_filter($options, is_numeric(...)))[$position] ?? $default);
     }
 }
