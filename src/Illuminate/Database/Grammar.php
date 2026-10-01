@@ -102,6 +102,10 @@ abstract class Grammar
             return $this->wrapJsonSelector($value);
         }
 
+        if (! str_contains($value, '.')) {
+            return $this->wrapValue($value);
+        }
+
         return $this->wrapSegments(explode('.', $value));
     }
 

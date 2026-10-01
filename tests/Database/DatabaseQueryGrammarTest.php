@@ -73,4 +73,18 @@ class DatabaseQueryGrammarTest extends TestCase
 
         $this->assertSame('order by field(status, ?, ?) asc', strtolower($sql));
     }
+
+    public function testWrap()
+    {
+        $connection = new Connection(new PDO('sqlite::memory:'));
+        $grammar = new Grammar($connection);
+
+        $this->assertSame('"id"', $grammar->wrap('id'));
+        $this->assertSame('*', $grammar->wrap('*'));
+        $this->assertSame('"users"."id"', $grammar->wrap('users.id'));
+        $this->assertSame('"users".*', $grammar->wrap('users.*'));
+        $this->assertSame('"id" as "user_id"', $grammar->wrap('id as user_id'));
+        $this->assertSame('"users"."id" as "user_id"', $grammar->wrap('users.id as user_id'));
+        $this->assertSame('count(*)', $grammar->wrap(new Expression('count(*)')));
+    }
 }
