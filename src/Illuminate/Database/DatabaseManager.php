@@ -398,12 +398,12 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Set the default connection name.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @return void
      */
     public function setDefaultConnection($name)
     {
-        $this->app['config']['database.default'] = $name;
+        $this->app['config']['database.default'] = enum_value($name);
     }
 
     /**
