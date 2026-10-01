@@ -602,6 +602,24 @@ class DatabaseConnectionTest extends TestCase
     }
 
     #[AllowMockObjectsWithoutExpectations]
+    public function testPretendRestoresQueryLoggingWhenTheCallbackThrows()
+    {
+        $connection = $this->getMockConnection();
+        $connection->disableQueryLog();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('foo');
+
+        try {
+            $connection->pretend(function () {
+                throw new Exception('foo');
+            });
+        } finally {
+            $this->assertFalse($connection->logging());
+        }
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
     public function testSchemaBuilderCanBeCreated()
     {
         $connection = $this->getMockConnection();
