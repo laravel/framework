@@ -536,6 +536,41 @@ class RoutingRouteTest extends TestCase
         $router->dispatch(Request::create('foo/bar/baz', 'GET'))->getContent();
     }
 
+    public function testQueryRoutesAreDispatched()
+    {
+        $router = $this->getRouter();
+        $router->query('products/search', function () use ($router) {
+            return $router->getCurrentRequest()->input('name');
+        });
+
+        $request = Request::create('products/search', 'QUERY', ['name' => 'taylor']);
+
+        $this->assertSame('taylor', $router->dispatch($request)->getContent());
+        $this->assertSame(['QUERY'], $router->getRoutes()->getRoutes()[0]->methods());
+    }
+
+    public function testQueryRoutesReceiveJsonBody()
+    {
+        $router = $this->getRouter();
+        $router->query('products/search', function () use ($router) {
+            return $router->getCurrentRequest()->input('filters.name');
+        });
+
+        $request = Request::create('products/search', 'QUERY', [], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode(['filters' => ['name' => 'taylor']]));
+
+        $this->assertSame('taylor', $router->dispatch($request)->getContent());
+    }
+
+    public function testAnyRoutesRespondToQueryRequests()
+    {
+        $router = $this->getRouter();
+        $router->any('foo', function () {
+            return 'hello';
+        });
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo', 'QUERY'))->getContent());
+    }
+
     public function testOptionsResponsesAreGeneratedByDefault()
     {
         $router = $this->getRouter();
