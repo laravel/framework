@@ -162,6 +162,47 @@ class ValidationUniqueRuleTest extends TestCase
         $rule = new Unique('table', 'column');
         $rule->where('foo', 0);
         $this->assertSame('unique:table,column,NULL,id,foo,"0"', (string) $rule);
+
+        $rule = new Unique('table', 'column');
+        $rule->where('foo', true);
+        $this->assertSame('unique:table,column,NULL,id,foo,"1"', (string) $rule);
+
+        $rule = new Unique('table', 'column');
+        $rule->where('foo', false);
+        $this->assertSame('unique:table,column,NULL,id,foo,"0"', (string) $rule);
+
+        $rule = new Unique('table', 'column');
+        $rule->whereNot('foo', true);
+        $this->assertSame('unique:table,column,NULL,id,foo,"!1"', (string) $rule);
+
+        $rule = new Unique('table', 'column');
+        $rule->whereNot('foo', false);
+        $this->assertSame('unique:table,column,NULL,id,foo,"!0"', (string) $rule);
+    }
+
+    public function testItValidatesUniqueRuleWithBooleanWhere()
+    {
+        EloquentModelStub::create(['id_column' => 1, 'type' => 'admin', 'active' => false]);
+        EloquentModelStub::create(['id_column' => 2, 'type' => 'admin', 'active' => true]);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['id_column' => (new Unique('table', 'id_column'))->where('active', false)]);
+        $v->setPresenceVerifier(new DatabasePresenceVerifier(Model::getConnectionResolver()));
+
+        $v->setData(['id_column' => 1]);
+        $this->assertFalse($v->passes());
+
+        $v->setData(['id_column' => 2]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [], ['id_column' => (new Unique('table', 'id_column'))->whereNot('active', false)]);
+        $v->setPresenceVerifier(new DatabasePresenceVerifier(Model::getConnectionResolver()));
+
+        $v->setData(['id_column' => 1]);
+        $this->assertTrue($v->passes());
+
+        $v->setData(['id_column' => 2]);
+        $this->assertFalse($v->passes());
     }
 
     public function testItValidatesUniqueRuleWithWhereInAndWhereNotIn()
@@ -200,6 +241,7 @@ class ValidationUniqueRuleTest extends TestCase
         $this->connection()->getSchemaBuilder()->create('table', function ($table) {
             $table->unsignedInteger('id_column');
             $table->string('type');
+            $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }
