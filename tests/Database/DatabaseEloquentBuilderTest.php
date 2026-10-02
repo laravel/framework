@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\AsBinary;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -621,6 +622,29 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $this->assertSame([1, 2], $builder->lazyById(2, 'someIdField')->take(2)->map(fn ($model) => $model->someIdField)->all());
         $this->assertSame([[]], $this->pagedBindings($connection));
+    }
+
+    public function testChunkByIdUsesTheRawKeyOfCastModels()
+    {
+        [$connection, $builder, $ids] = $this->newBinaryUuidPagedBuilder();
+
+        $chunks = [];
+        $builder->chunkById(2, function ($results) use (&$chunks) {
+            $chunks[] = $results->pluck('id')->all();
+
+            return count($chunks) < 3;
+        });
+
+        $this->assertSame([[$ids[0], $ids[1]], [$ids[2]]], $chunks);
+        $this->assertSame([[], [hex2bin(str_replace('-', '', $ids[1]))]], $this->pagedBindings($connection));
+    }
+
+    public function testLazyByIdUsesTheRawKeyOfCastModels()
+    {
+        [$connection, $builder, $ids] = $this->newBinaryUuidPagedBuilder();
+
+        $this->assertSame($ids, $builder->lazyById(2)->take(4)->map(fn ($model) => $model->id)->all());
+        $this->assertSame([[], [hex2bin(str_replace('-', '', $ids[1]))]], $this->pagedBindings($connection));
     }
 
     public function testPluckReturnsTheMutatedAttributesOfAModel()
@@ -3021,6 +3045,33 @@ class DatabaseEloquentBuilderTest extends TestCase
         return [$connection, $this->newBuilder($connection)];
     }
 
+    protected function newBinaryUuidPagedBuilder(): array
+    {
+        $ids = [
+            '00000000-0000-0000-0000-000000000001',
+            '00000000-0000-0000-0000-000000000002',
+            '00000000-0000-0000-0000-000000000003',
+        ];
+
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->exec('create table "table" ("id" blob primary key)');
+
+        foreach ($ids as $id) {
+            $pdo->prepare('insert into "table" values (?)')->execute([hex2bin(str_replace('-', '', $id))]);
+        }
+
+        $connection = new SQLiteConnection($pdo);
+        $connection->enableQueryLog();
+
+        $resolver = new ConnectionResolver(['default' => $connection]);
+        $resolver->setDefaultConnection('default');
+        EloquentBuilderTestBinaryUuidStub::setConnectionResolver($resolver);
+
+        $builder = (new Builder($connection->query()))->setModel(new EloquentBuilderTestBinaryUuidStub);
+
+        return [$connection, $builder, $ids];
+    }
+
     protected function pagedBindings(SQLiteConnection $connection): array
     {
         return array_column($connection->getQueryLog(), 'bindings');
@@ -3060,6 +3111,20 @@ class DatabaseEloquentBuilderTest extends TestCase
 class EloquentBuilderTestStub extends Model
 {
     protected $table = 'table';
+}
+
+class EloquentBuilderTestBinaryUuidStub extends Model
+{
+    protected $table = 'table';
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
+    protected function casts(): array
+    {
+        return ['id' => AsBinary::uuid()];
+    }
 }
 
 class EloquentBuilderTestHigherOrderWhereScopeStub extends Model
