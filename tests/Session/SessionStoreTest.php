@@ -731,6 +731,26 @@ class SessionStoreTest extends TestCase
         $this->assertTrue($session->has(SessionTestKey::User));
     }
 
+    public function testBackedEnumKeyOnly()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+        $session->put(SessionTestKey::Settings, 'dark-mode');
+        $session->put('foo', 'bar');
+
+        $this->assertSame(['user' => 'Taylor', 'foo' => 'bar'], $session->only([SessionTestKey::User, 'foo']));
+    }
+
+    public function testBackedEnumKeyExcept()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+        $session->put(SessionTestKey::Settings, 'dark-mode');
+        $session->put('foo', 'bar');
+
+        $this->assertSame(['settings' => 'dark-mode'], $session->except([SessionTestKey::User, 'foo']));
+    }
+
     public function testRememberMethodCallsPutAndReturnsDefault()
     {
         $session = $this->getSession();
