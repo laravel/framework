@@ -327,6 +327,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->bootIfNotBooted();
         $this->initializeTraits();
         $this->initializeModelAttributes();
+        $this->mergeDefaultAttributes();
         $this->syncOriginal();
         $this->fill($attributes);
     }
@@ -2990,6 +2991,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->bootIfNotBooted();
         $this->initializeTraits();
         $this->initializeModelAttributes();
+        // $this->mergeDefaultAttributes();
 
         if (static::isAutomaticallyEagerLoadingRelationships()) {
             $this->withRelationshipAutoloading();
