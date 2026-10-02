@@ -68,4 +68,31 @@ class SeeInHtmlTest extends TestCase
         $this->assertTrue($constraint->matches(['Hello', 'beautiful', 'World']));
         $this->assertFalse($constraint->matches(['World', 'Hello']));
     }
+
+    public function testMatchesZero()
+    {
+        $this->assertTrue((new SeeInHtml('<p>0</p>'))->matches(['0']));
+        $this->assertFalse((new SeeInHtml('<p>1</p>'))->matches(['0']));
+    }
+
+    public function testNegateInvertsTheAssertionForZero()
+    {
+        $this->assertFalse((new SeeInHtml('<p>0</p>', negate: true))->matches(['0']));
+        $this->assertTrue((new SeeInHtml('<p>1</p>', negate: true))->matches(['0']));
+    }
+
+    public function testOrderedRespectsSequenceWithZero()
+    {
+        $values = ['before', '0', 'after'];
+
+        $this->assertTrue((new SeeInHtml('<p>before 0 after</p>', ordered: true))->matches($values));
+        $this->assertFalse((new SeeInHtml('<p>before after</p>', ordered: true))->matches($values));
+        $this->assertFalse((new SeeInHtml('<p>0 before after</p>', ordered: true))->matches($values));
+    }
+
+    public function testSkipsEmptyStringsAndNull()
+    {
+        $this->assertTrue((new SeeInHtml('Hello World', ordered: true))->matches(['', null, 'Hello', '', 'World', null]));
+        $this->assertTrue((new SeeInHtml('Hello World', negate: true))->matches(['', null, 'Goodbye']));
+    }
 }
