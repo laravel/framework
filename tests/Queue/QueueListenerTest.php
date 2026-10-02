@@ -34,6 +34,59 @@ class QueueListenerTest extends TestCase
         $listener->runProcess($process, 1);
     }
 
+    public function testListenerMemoryExceededWhenMemoryIsAPercentage()
+    {
+        $listener = new class(__DIR__) extends Listener
+        {
+            protected function currentMemoryUsage()
+            {
+                return 512;
+            }
+        };
+
+        $original = ini_set('memory_limit', '1G');
+
+        try {
+            $this->assertTrue($listener->memoryExceeded('50%'));
+            $this->assertFalse($listener->memoryExceeded('51%'));
+        } finally {
+            ini_set('memory_limit', $original);
+        }
+    }
+
+    public function testListenerMemoryIsNotExceededWhenPercentageOfUnlimitedMemory()
+    {
+        $listener = new class(__DIR__) extends Listener
+        {
+            protected function currentMemoryUsage()
+            {
+                return 900;
+            }
+        };
+
+        $original = ini_set('memory_limit', '-1');
+
+        try {
+            $this->assertFalse($listener->memoryExceeded('80%'));
+        } finally {
+            ini_set('memory_limit', $original);
+        }
+    }
+
+    public function testListenerMemoryExceededWithMegabytes()
+    {
+        $listener = new class(__DIR__) extends Listener
+        {
+            protected function currentMemoryUsage()
+            {
+                return 512;
+            }
+        };
+
+        $this->assertTrue($listener->memoryExceeded(512));
+        $this->assertFalse($listener->memoryExceeded(513));
+    }
+
     public function testMakeProcessCorrectlyFormatsCommandLine()
     {
         $listener = new Listener(__DIR__);

@@ -3632,7 +3632,7 @@ return [
                 'isArray' => false,
                 'acceptValue' => true,
                 'default' => '128',
-                'description' => 'The memory limit in megabytes',
+                'description' => 'The memory limit in megabytes, or as a percentage of the PHP memory limit',
             ],
             [
                 'name' => 'queue',

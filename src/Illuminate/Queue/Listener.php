@@ -172,7 +172,7 @@ class Listener
      * Run the given process.
      *
      * @param  \Symfony\Component\Process\Process  $process
-     * @param  int  $memory
+     * @param  int|string  $memory
      * @return void
      */
     public function runProcess(Process $process, $memory)
@@ -206,12 +206,30 @@ class Listener
     /**
      * Determine if the memory limit has been exceeded.
      *
-     * @param  int  $memoryLimit
+     * @param  int|string  $memoryLimit
      * @return bool
      */
     public function memoryExceeded($memoryLimit)
     {
-        return (memory_get_usage(true) / 1024 / 1024) >= $memoryLimit;
+        if (str_ends_with((string) $memoryLimit, '%')) {
+            $memoryLimit = ini_parse_quantity(ini_get('memory_limit')) / 1024 / 1024 * ((float) $memoryLimit / 100);
+
+            if ($memoryLimit <= 0) {
+                return false;
+            }
+        }
+
+        return $this->currentMemoryUsage() >= $memoryLimit;
+    }
+
+    /**
+     * Get the current memory usage in MB.
+     *
+     * @return int|float
+     */
+    protected function currentMemoryUsage()
+    {
+        return memory_get_usage(true) / 1024 / 1024;
     }
 
     /**
