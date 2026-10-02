@@ -8,6 +8,9 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\Delay;
+use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Support\Testing\Fakes\QueueFake;
@@ -60,6 +63,28 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherTestSpecificQueueAndDelayCommand);
+
+        Container::setInstance(null);
+    }
+
+    public function testCommandsAreQueuedUsingAttributesInheritedFromParentClass()
+    {
+        $container = new Container;
+        $container->instance('queue.routes', new QueueRoutes);
+        Container::setInstance($container);
+        $usedConnection = null;
+        $dispatcher = new Dispatcher($container, function ($connection) use (&$usedConnection) {
+            $usedConnection = $connection;
+
+            $mock = Mockery::mock(Queue::class);
+            $mock->expects('later')->with(10, Mockery::type(BusDispatcherTestQueueableChildCommand::class), '', 'foo');
+
+            return $mock;
+        });
+
+        $dispatcher->dispatch(new BusDispatcherTestQueueableChildCommand);
+
+        $this->assertSame('redis', $usedConnection);
 
         Container::setInstance(null);
     }
@@ -242,6 +267,19 @@ class BusDispatcherTestSpecificQueueAndDelayCommand implements ShouldQueue
 class BusDispatcherTestSpecificQueueCommand implements ShouldQueue
 {
     public $queue = 'high';
+}
+
+#[Connection('redis')]
+#[QueueAttribute('foo')]
+#[Delay(10)]
+abstract class BusDispatcherTestParentCommandWithAttributes implements ShouldQueue
+{
+    //
+}
+
+class BusDispatcherTestQueueableChildCommand extends BusDispatcherTestParentCommandWithAttributes
+{
+    use Queueable;
 }
 
 class BusDispatcherQueueable implements ShouldQueue
