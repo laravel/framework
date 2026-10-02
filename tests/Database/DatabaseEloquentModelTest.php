@@ -2137,6 +2137,13 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('id', $model->getRouteKeyName());
     }
 
+    public function testRouteNameCanBeConfiguredUsingRouteKeyAttribute()
+    {
+        $model = new EloquentModelWithRouteKeyAttributeStub;
+
+        $this->assertSame('slug', $model->getRouteKeyName());
+    }
+
     public function testCloneModelMakesAFreshCopyOfTheModel()
     {
         $class = new EloquentModelStub;
@@ -4510,6 +4517,12 @@ class EloquentModelNonIncrementingStub extends Model
     protected $table = 'stub';
     protected $guarded = [];
     public $incrementing = false;
+}
+
+#[RouteKey('slug')]
+class EloquentModelWithRouteKeyAttributeStub extends Model
+{
+    //
 }
 
 class EloquentNoConnectionModelStub extends EloquentModelStub
