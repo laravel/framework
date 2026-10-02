@@ -105,6 +105,37 @@ class SupportArrTest extends TestCase
         Arr::push($array, 'foo.bar', 'baz');
     }
 
+    public function testPushReturnsTheFullArray()
+    {
+        $array = [];
+
+        $result = Arr::push($array, 'office.furniture', 'Desk');
+        $this->assertSame(['office' => ['furniture' => ['Desk']]], $result);
+        $this->assertSame($array, $result);
+
+        $result = Arr::push($array, 'office.furniture', 'Chair', 'Lamp');
+        $this->assertSame(['office' => ['furniture' => ['Desk', 'Chair', 'Lamp']]], $result);
+        $this->assertSame($array, $result);
+
+        $array = ['name' => 'Taylor'];
+
+        $result = Arr::push($array, 'tags.languages', 'PHP');
+        $this->assertSame(['name' => 'Taylor', 'tags' => ['languages' => ['PHP']]], $result);
+        $this->assertSame($array, $result);
+
+        $array = [];
+
+        $result = Arr::push($array, 'names', 'Chris', 'Nuno');
+        $this->assertSame(['names' => ['Chris', 'Nuno']], $result);
+        $this->assertSame($array, $result);
+
+        $array = [];
+
+        $result = Arr::push($array, null, 'Chris', 'Nuno');
+        $this->assertSame(['Chris', 'Nuno'], $result);
+        $this->assertSame($array, $result);
+    }
+
     public function testCollapse()
     {
         // Normal case: a two-dimensional array with different elements

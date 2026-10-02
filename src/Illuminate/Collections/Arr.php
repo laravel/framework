@@ -1059,7 +1059,9 @@ class Arr
 
         array_push($target, ...$values);
 
-        return static::set($array, $key, $target);
+        static::set($array, $key, $target);
+
+        return $array;
     }
 
     /**
