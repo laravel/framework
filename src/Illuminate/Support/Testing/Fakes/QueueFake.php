@@ -900,6 +900,10 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function releaseUniqueJobLocks()
     {
+        if (empty($this->uniqueJobs)) {
+            return;
+        }
+
         $lock = new UniqueLock($this->app->make(Cache::class));
 
         foreach ($this->uniqueJobs as $job) {
