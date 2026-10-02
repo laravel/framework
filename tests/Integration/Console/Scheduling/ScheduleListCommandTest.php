@@ -433,8 +433,11 @@ class ScheduleListCommandTest extends TestCase
         $this->assertSame(['0 0 30 10 *', '0 23 29 6 *'], array_column($data, 'expression'));
     }
 
-    public function testExpressionTimezoneConversionFallsBackAcrossDstTransition()
+    public function testExpressionTimezoneConversionUsesNextRunOffsetAcrossDstTransition()
     {
+        // The next run (2024-10-27 00:00 BST, 23:00 UTC) and the run after it
+        // (2024-10-27 02:00 GMT, 02:00 UTC) fall on opposite sides of a DST
+        // change, so the expression converts with the next run's offset.
         Carbon::setTestNow('2024-10-26 22:30:00 UTC');
 
         $this->schedule->command('inspire')->cron('0 0,2 * * *')->timezone('Europe/London');
@@ -446,7 +449,29 @@ class ScheduleListCommandTest extends TestCase
 
         $data = json_decode(Artisan::output(), true);
 
-        $this->assertSame(['0 0,2 * * *'], array_column($data, 'expression'));
+        $this->assertSame(['0 1,23 * * *'], array_column($data, 'expression'));
+    }
+
+    public function testExpressionTimezoneConversionOfMonthlyTaskAcrossDstTransition()
+    {
+        // A monthly task straddles the DST change for a whole month: the next
+        // run is 2026-10-01 06:00 CEST (04:00 UTC) while the run after it is
+        // 2026-11-01 06:00 CET (05:00 UTC). The expression must agree with
+        // next_due_date rather than fall back to the unconverted expression,
+        // which would read as 06:00 UTC and match neither run.
+        Carbon::setTestNow('2026-09-30 12:00:00 UTC');
+
+        $this->schedule->command('inspire')->monthlyOn(1, '06:00')->timezone('Europe/Berlin');
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, [
+            '--timezone' => 'UTC',
+            '--json' => true,
+        ]);
+
+        $data = json_decode(Artisan::output(), true);
+
+        $this->assertSame('0 4 1 * *', $data[0]['expression']);
+        $this->assertSame('2026-10-01 04:00:00 +00:00', $data[0]['next_due_date']);
     }
 
     public function testDisplayScheduleCliSplitsExpressionWhenMixedCarry()
