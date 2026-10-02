@@ -103,6 +103,12 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
         $this->assertSame('select "logins".* from "logins" inner join "intermediates" on "intermediates"."id" = "logins"."intermediate_id" inner join (select MAX("logins"."id") as "id_aggregate", "intermediates"."user_id" from "logins" inner join "intermediates" on "intermediates"."id" = "logins"."intermediate_id" where "intermediates"."user_id" = ? group by "intermediates"."user_id") as "latest_login" on "latest_login"."id_aggregate" = "logins"."id" and "latest_login"."user_id" = "intermediates"."user_id" where "intermediates"."user_id" = ?', $relation->getQuery()->toSql());
     }
 
+    public function testCorrectLatestOfManyExistenceQuery(): void
+    {
+        $query = HasOneThroughOfManyTestUser::has('latest_login');
+        $this->assertSame('select * from "users" where exists (select * from "logins" inner join "intermediates" on "intermediates"."id" = "logins"."intermediate_id" inner join (select MAX("logins"."id") as "id_aggregate", "intermediates"."user_id" from "logins" inner join "intermediates" on "intermediates"."id" = "logins"."intermediate_id" group by "intermediates"."user_id") as "latest_login" on "latest_login"."id_aggregate" = "logins"."id" and "latest_login"."user_id" = "intermediates"."user_id" where "users"."id" = "intermediates"."user_id")', $query->toSql());
+    }
+
     public function testEagerLoadingAppliesConstraintsToInnerJoinSubQuery(): void
     {
         $user = HasOneThroughOfManyTestUser::create();
