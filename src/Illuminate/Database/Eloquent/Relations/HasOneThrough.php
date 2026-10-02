@@ -111,6 +111,16 @@ class HasOneThrough extends HasOneOrManyThrough implements SupportsPartialRelati
     }
 
     /** @inheritDoc */
+    public function is($model)
+    {
+        return ! is_null($model) &&
+               ! is_null($this->getParentKey()) &&
+               $this->related->getTable() === $model->getTable() &&
+               $this->related->getConnectionName() === $model->getConnectionName() &&
+               (clone $this->query)->whereKey($model->getKey())->exists();
+    }
+
+    /** @inheritDoc */
     protected function getRelatedKeyFrom(Model $model)
     {
         return $model->getAttribute($this->getForeignKeyName());
