@@ -264,12 +264,41 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertSame('high', $events[0]->queue);
     }
 
+    public function testQueueAttributeWithClosureResolvesQueueAtDispatchTime()
+    {
+        if (PHP_VERSION_ID < 80500) {
+            $this->markTestSkipped('Closures in attribute arguments require PHP 8.5.');
+        }
+
+        Config::set('queue.default', 'database');
+        Config::set('queue.dynamic_queue', 'dynamic');
+        $events = [];
+        $this->app['events']->listen(function (JobQueued $e) use (&$events) {
+            $events[] = $e;
+        });
+
+        JobWithClosureQueueAttribute::dispatch();
+
+        $this->assertCount(1, $events);
+        $this->assertSame('dynamic', $events[0]->queue);
+    }
+
     /**
      * Helpers.
      */
     private function getJobLock($job, $value = null)
     {
         return $this->app->get(Repository::class)->lock('laravel_unique_job:'.$job.':'.$value, 10)->get();
+    }
+}
+
+if (PHP_VERSION_ID >= 80500) {
+    #[\Illuminate\Queue\Attributes\Queue(static function ($app) {
+        return $app['config']['queue.dynamic_queue'];
+    })]
+    class JobWithClosureQueueAttribute implements \Illuminate\Contracts\Queue\ShouldQueue
+    {
+        use \Illuminate\Foundation\Bus\Dispatchable;
     }
 }
 
