@@ -145,6 +145,14 @@ class Date implements Stringable
     }
 
     /**
+     * Ensure the date is equal to the given date or date field.
+     */
+    public function equals(DateTimeInterface|string $date): static
+    {
+        return $this->addRule('date_equals:'.$this->formatDate($date));
+    }
+
+    /**
      * Add custom rules to the validation rules array.
      */
     protected function addRule(array|string $rules): static
