@@ -108,13 +108,13 @@ jobs:
         env:
           DB_CONNECTION: mysql
 
-  mariadb:
+  mariadb_10:
     runs-on: ubuntu-26.04
     timeout-minutes: 10
 
     services:
       mariadb:
-        image: mariadb:10
+        image: mariadb:10.11
         env:
           MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: yes
           MARIADB_DATABASE: laravel
@@ -122,7 +122,7 @@ jobs:
           - 3306:3306
         options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=3
 
-    name: MariaDB 10
+    name: MariaDB 10.11
 
     steps:
       - name: Checkout code
@@ -204,13 +204,13 @@ jobs:
         env:
           DB_CONNECTION: mariadb
 
-  pgsql_18:
+  pgsql_10:
     runs-on: ubuntu-26.04
     timeout-minutes: 10
 
     services:
       postgresql:
-        image: postgres:18
+        image: postgres:10
         env:
           POSTGRES_DB: laravel
           POSTGRES_USER: forge
@@ -219,7 +219,7 @@ jobs:
           - 5432:5432
         options: --health-cmd=pg_isready --health-interval=10s --health-timeout=5s --health-retries=3
 
-    name: PostgreSQL 18
+    name: PostgreSQL 10
 
     steps:
       - name: Checkout code
@@ -274,13 +274,13 @@ jobs:
           DB_USERNAME: forge
           DB_PASSWORD: password
 
-  pgsql_10:
+  pgsql_18:
     runs-on: ubuntu-26.04
     timeout-minutes: 10
 
     services:
       postgresql:
-        image: postgres:10
+        image: postgres:18
         env:
           POSTGRES_DB: laravel
           POSTGRES_USER: forge
@@ -289,7 +289,7 @@ jobs:
           - 5432:5432
         options: --health-cmd=pg_isready --health-interval=10s --health-timeout=5s --health-retries=3
 
-    name: PostgreSQL 10
+    name: PostgreSQL 18
 
     steps:
       - name: Checkout code
@@ -309,21 +309,21 @@ jobs:
           DB_USERNAME: forge
           DB_PASSWORD: password
 
-  mssql_2019:
+  mssql_2017:
     # Errs on Ubuntu 26.04 (likely 24.04 as well)
     runs-on: ubuntu-22.04
     timeout-minutes: 10
 
     services:
       sqlsrv:
-        image: mcr.microsoft.com/mssql/server:2019-latest
+        image: mcr.microsoft.com/mssql/server:2017-latest
         env:
           ACCEPT_EULA: Y
           SA_PASSWORD: Forge123
         ports:
           - 1433:1433
 
-    name: SQL Server 2019
+    name: SQL Server 2017
 
     steps:
       - name: Checkout code
@@ -344,21 +344,21 @@ jobs:
           DB_USERNAME: SA
           DB_PASSWORD: Forge123
 
-  mssql_2017:
+  mssql_2019:
     # Errs on Ubuntu 26.04 (likely 24.04 as well)
     runs-on: ubuntu-22.04
     timeout-minutes: 10
 
     services:
       sqlsrv:
-        image: mcr.microsoft.com/mssql/server:2017-latest
+        image: mcr.microsoft.com/mssql/server:2019-latest
         env:
           ACCEPT_EULA: Y
           SA_PASSWORD: Forge123
         ports:
           - 1433:1433
 
-    name: SQL Server 2017
+    name: SQL Server 2019
 
     steps:
       - name: Checkout code
