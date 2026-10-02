@@ -252,23 +252,23 @@ class Store implements Session
     /**
      * Get a subset of the session data.
      *
-     * @param  array  $keys
+     * @param  array<\UnitEnum|string>  $keys
      * @return array
      */
     public function only(array $keys)
     {
-        return Arr::only($this->attributes, $keys);
+        return Arr::only($this->attributes, array_map(enum_value(...), $keys));
     }
 
     /**
      * Get all the session data except for a specified array of items.
      *
-     * @param  array  $keys
+     * @param  array<\UnitEnum|string>  $keys
      * @return array
      */
     public function except(array $keys)
     {
-        return Arr::except($this->attributes, $keys);
+        return Arr::except($this->attributes, array_map(enum_value(...), $keys));
     }
 
     /**
