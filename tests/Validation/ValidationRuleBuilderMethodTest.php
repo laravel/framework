@@ -92,5 +92,4 @@ class ValidationRuleBuilderMethodTest extends TestCase
         $this->assertSame('uuid:nil', (string) Rule::uuid()->version('nil'));
         $this->assertSame('uuid:max', (string) Rule::uuid()->version('max'));
     }
-
 }
