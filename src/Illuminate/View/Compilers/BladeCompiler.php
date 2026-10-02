@@ -41,6 +41,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
         Concerns\CompilesUseStatements,
         ReflectsClosures;
 
+    const DEFAULT_ECHO_FORMAT = 'e(%s)';
+
     /**
      * All of the registered extensions.
      *
@@ -121,7 +123,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @var string
      */
-    protected $echoFormat = 'e(%s)';
+    protected $echoFormat = static::DEFAULT_ECHO_FORMAT;
 
     /**
      * Array of footer lines to be added to the template.
@@ -1021,6 +1023,24 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function precompiler(callable $precompiler)
     {
         $this->precompilers[] = $precompiler;
+    }
+
+    /**
+     * Get the path to the compiled version of a view.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function getCompiledPath($path)
+    {
+        $compiled = parent::getCompiledPath($path);
+
+        // Non-default echo formats need their own compiled file so cached views are not reused.
+        if ($this->echoFormat === static::DEFAULT_ECHO_FORMAT) {
+            return $compiled;
+        }
+
+        return Str::beforeLast($compiled, '.').'_'.hash('xxh128', $this->echoFormat).'.'.$this->compiledExtension;
     }
 
     /**
