@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Casts\AsUri;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\HasDefaultAttributes;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -3931,6 +3932,66 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('slug', $model->getRouteKeyName());
     }
 
+    public function testDefaultsMethodSetsDefaultAttributeValues()
+    {
+        $model = new EloquentModelWithDefaultsMethodStub;
+
+        $this->assertSame(['status' => 'draft', 'views' => 0], $model->getAttributes());
+        $this->assertFalse($model->isDirty());
+    }
+
+    public function testDefaultsMethodTakesPrecedenceOverAttributesProperty()
+    {
+        $model = new EloquentModelWithDefaultsMethodAndPropertyStub;
+
+        $this->assertSame(['title' => 'Untitled', 'status' => 'draft'], $model->getAttributes());
+    }
+
+    public function testDefaultsMethodValuesMayBeOverriddenOnInstantiation()
+    {
+        $model = new EloquentModelWithDefaultsMethodStub(['status' => 'published']);
+
+        $this->assertSame(['status' => 'published', 'views' => 0], $model->getAttributes());
+    }
+
+    public function testDefaultsMethodIsNotAppliedToExistingModels()
+    {
+        $model = (new EloquentModelWithDefaultsMethodStub)->newFromBuilder(['status' => 'published']);
+
+        $this->assertSame(['status' => 'published'], $model->getAttributes());
+        $this->assertFalse($model->isDirty());
+    }
+
+    public function testDefaultsMethodIsNotReappliedWhenUnserializing()
+    {
+        $model = new EloquentModelWithDefaultsMethodStub(['status' => 'published']);
+
+        $model = unserialize(serialize($model));
+
+        $this->assertSame(['status' => 'published', 'views' => 0], $model->getAttributes());
+    }
+
+    public function testDefaultsMethodIsEvaluatedForEachNewModel()
+    {
+        EloquentModelWithRuntimeDefaultsStub::$trialDays = 14;
+
+        $this->assertSame(['trial_days' => 14], (new EloquentModelWithRuntimeDefaultsStub)->getAttributes());
+
+        EloquentModelWithRuntimeDefaultsStub::$trialDays = 30;
+
+        $this->assertSame(['trial_days' => 30], (new EloquentModelWithRuntimeDefaultsStub)->getAttributes());
+    }
+
+    public function testDefaultsMethodIsNotCalledUnlessTraitIsUsed()
+    {
+        EloquentModelWithDefaultsMethodWithoutTraitStub::$called = 0;
+
+        $model = new EloquentModelWithDefaultsMethodWithoutTraitStub;
+
+        $this->assertSame(0, EloquentModelWithDefaultsMethodWithoutTraitStub::$called);
+        $this->assertSame([], $model->getAttributes());
+    }
+
     protected function newStubConnection(bool $unique = false): SQLiteConnection
     {
         $pdo = new PDO('sqlite::memory:');
@@ -5029,4 +5090,55 @@ class EloquentModelWithRouteKeyAttributeStub extends Model
 class EloquentModelInheritingRouteKeyAttributeStub extends EloquentModelWithRouteKeyAttributeStub
 {
     //
+}
+
+class EloquentModelWithDefaultsMethodStub extends Model
+{
+    use HasDefaultAttributes;
+
+    protected $guarded = [];
+
+    protected function defaults(): array
+    {
+        return ['status' => 'draft', 'views' => 0];
+    }
+}
+
+class EloquentModelWithRuntimeDefaultsStub extends Model
+{
+    use HasDefaultAttributes;
+
+    public static $trialDays = 14;
+
+    protected function defaults(): array
+    {
+        return ['trial_days' => static::$trialDays];
+    }
+}
+
+class EloquentModelWithDefaultsMethodAndPropertyStub extends Model
+{
+    use HasDefaultAttributes;
+
+    protected $attributes = [
+        'title' => 'Untitled',
+        'status' => 'pending',
+    ];
+
+    protected function defaults(): array
+    {
+        return ['status' => 'draft'];
+    }
+}
+
+class EloquentModelWithDefaultsMethodWithoutTraitStub extends Model
+{
+    public static $called = 0;
+
+    protected function defaults(): array
+    {
+        static::$called++;
+
+        return ['status' => 'draft'];
+    }
 }

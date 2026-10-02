@@ -1736,6 +1736,20 @@ trait HasAttributes
     }
 
     /**
+     * Merge the default values into the model's attributes.
+     *
+     * @return void
+     */
+    protected function mergeDefaultAttributes()
+    {
+        if (! in_array(HasDefaultAttributes::class, class_uses_recursive(static::class), true)) {
+            return;
+        }
+
+        $this->attributes = array_merge($this->attributes, $this->defaults());
+    }
+
+    /**
      * Determine whether a value is Date / DateTime castable for inbound manipulation.
      *
      * @param  string  $key
