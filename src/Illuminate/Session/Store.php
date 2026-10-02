@@ -510,12 +510,14 @@ class Store implements Session
     /**
      * Reflash a subset of the current flash data.
      *
-     * @param  mixed  $keys
+     * @param  \UnitEnum|string|array|null  $keys
      * @return void
      */
     public function keep($keys = null)
     {
-        $this->mergeNewFlashes($keys = is_array($keys) ? $keys : func_get_args());
+        $keys = array_map(enum_value(...), is_array($keys) ? $keys : func_get_args());
+
+        $this->mergeNewFlashes($keys);
 
         $this->removeFromOldFlashData($keys);
     }
