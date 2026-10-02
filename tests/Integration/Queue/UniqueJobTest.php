@@ -263,6 +263,30 @@ class UniqueJobTest extends QueueTestCase
         Queue::assertPushed(UniqueTestJob::class);
     }
 
+    public function testQueueFakeForReleasesUniqueJobLocks()
+    {
+        Queue::fakeFor(function () {
+            UniqueTestJob::dispatch();
+            Queue::assertPushed(UniqueTestJob::class);
+        });
+
+        $this->assertTrue(
+            $this->app->get(Cache::class)->lock($this->getLockKey(UniqueTestJob::class), 10)->get()
+        );
+    }
+
+    public function testQueueFakeExceptForReleasesUniqueJobLocks()
+    {
+        Queue::fakeExceptFor(function () {
+            UniqueTestJob::dispatch();
+            Queue::assertPushed(UniqueTestJob::class);
+        });
+
+        $this->assertTrue(
+            $this->app->get(Cache::class)->lock($this->getLockKey(UniqueTestJob::class), 10)->get()
+        );
+    }
+
     public function testQueueFakePreservesUniqueJobLockWithinTest()
     {
         Queue::fake();
