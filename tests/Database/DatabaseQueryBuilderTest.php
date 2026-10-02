@@ -6653,6 +6653,40 @@ SQL;
         ]), $result);
     }
 
+    public function testCursorPaginateWrapsOrderColumnsContainingParentheses()
+    {
+        $perPage = 16;
+        $columns = ['*'];
+        $cursorName = 'cursor-name';
+        $column = 'id) or 1=1 or (id';
+        $cursor = new Cursor([$column => 'bar', 'id' => 'foo']);
+        $builder = $this->getMockQueryBuilder();
+        $builder->from('foobar')->orderBy($column)->orderBy('id');
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([['id' => 1], ['id' => 2]]);
+
+        $builder->expects('get')->andReturnUsing(function () use ($builder, $results) {
+            $this->assertSame(
+                'select * from "foobar" where ("id) or 1=1 or (id" > ? or ("id) or 1=1 or (id" = ? and ("id" > ?))) order by "id) or 1=1 or (id" asc, "id" asc limit 17',
+                $builder->toSql()
+            );
+            $this->assertEquals(['bar', 'bar', 'foo'], $builder->bindings['where']);
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+    }
+
     public function testCursorPaginateWithDefaultArguments()
     {
         $perPage = 15;
@@ -7296,6 +7330,14 @@ SQL;
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('orders')->whereRowValues(['last_update'], '<', [1, 2]);
+    }
+
+    public function testWhereRowValuesInvalidOperator()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid operator passed to whereRowValues method.'));
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->whereRowValues(['last_update', 'order_number'], '< (1, 2) or 1=1 or (1, 2) <', [1, 2]);
     }
 
     public function testWhereJsonContainsMySql()

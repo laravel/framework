@@ -2287,6 +2287,10 @@ class Builder implements BuilderContract
             throw new InvalidArgumentException('The number of columns must match the number of values');
         }
 
+        if ($this->invalidOperator($operator)) {
+            throw new InvalidArgumentException('Invalid operator passed to whereRowValues method.');
+        }
+
         $type = 'RowValues';
 
         $this->wheres[] = ['type' => $type, 'columns' => $columns, 'operator' => $operator, 'values' => $values, 'boolean' => $boolean];
