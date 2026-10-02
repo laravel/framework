@@ -57,7 +57,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
     {
         $value = $this->memcached->get($this->prefix.$key);
 
-        if ($this->memcached->getResultCode() == 0) {
+        if ($this->memcached->getResultCode() === 0) {
             return $value;
         }
     }
@@ -84,7 +84,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
             $values = $this->memcached->getMulti($prefixedKeys, $null, Memcached::GET_PRESERVE_ORDER);
         }
 
-        if ($this->memcached->getResultCode() != 0) {
+        if ($this->memcached->getResultCode() !== 0) {
             return array_fill_keys($keys, null);
         }
 

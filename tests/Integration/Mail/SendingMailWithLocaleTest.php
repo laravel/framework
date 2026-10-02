@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\Assert;
+use Illuminate\Tests\Mail\Fixtures\TestMail;
 use Orchestra\Testbench\TestCase;
 
 class SendingMailWithLocaleTest extends TestCase
@@ -78,8 +79,6 @@ class SendingMailWithLocaleTest extends TestCase
         );
 
         $this->assertSame('en', Carbon::getLocale());
-
-        Carbon::setTestNow(null);
     }
 
     public function testLocaleIsSentWithModelPreferredLocale()
@@ -168,19 +167,6 @@ class SendingMailWithLocaleTest extends TestCase
         $this->assertStringContainsString('name',
             app('mailer')->getSymfonyTransport()->messages()[1]->toString()
         );
-    }
-}
-
-class TestMail extends Mailable
-{
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
-    public function build()
-    {
-        return $this->view('view');
     }
 }
 

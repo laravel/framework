@@ -6,7 +6,7 @@ use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\PruneBatchesCommand;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -16,7 +16,8 @@ class PruneBatchesCommandTest extends TestCase
     public function testAllowPruningAllUnfinishedBatches()
     {
         $container = new Application;
-        $container->instance(BatchRepository::class, $repo = m::spy(DatabaseBatchRepository::class));
+        $repo = Mockery::spy(DatabaseBatchRepository::class);
+        $container->instance(BatchRepository::class, $repo);
 
         $command = new PruneBatchesCommand;
         $command->setLaravel($container);
@@ -29,7 +30,8 @@ class PruneBatchesCommandTest extends TestCase
     public function testAllowPruningAllCancelledBatches()
     {
         $container = new Application;
-        $container->instance(BatchRepository::class, $repo = m::spy(DatabaseBatchRepository::class));
+        $repo = Mockery::spy(DatabaseBatchRepository::class);
+        $container->instance(BatchRepository::class, $repo);
 
         $command = new PruneBatchesCommand;
         $command->setLaravel($container);

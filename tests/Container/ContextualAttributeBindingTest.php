@@ -32,9 +32,11 @@ use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Http\Request;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Log\LogManager;
-use Mockery as m;
+use Mockery;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use ReflectionParameter;
 
 class ContextualAttributeBindingTest extends TestCase
 {
@@ -100,7 +102,7 @@ class ContextualAttributeBindingTest extends TestCase
         $class = $container->make(ContainerTestHasConfigValueProperty::class);
 
         $this->assertInstanceOf(ContainerTestHasConfigValueProperty::class, $class);
-        $this->assertEquals('Europe/Paris', $class->timezone);
+        $this->assertSame('Europe/Paris', $class->timezone);
     }
 
     public function testScalarDependencyCanBeResolvedFromAttributeResolveMethod()
@@ -115,7 +117,7 @@ class ContextualAttributeBindingTest extends TestCase
         $class = $container->make(ContainerTestHasConfigValueWithResolveProperty::class);
 
         $this->assertInstanceOf(ContainerTestHasConfigValueWithResolveProperty::class, $class);
-        $this->assertEquals('production', $class->env);
+        $this->assertSame('production', $class->env);
     }
 
     public function testDependencyWithAfterCallbackAttributeCanBeResolved()
@@ -124,24 +126,36 @@ class ContextualAttributeBindingTest extends TestCase
 
         $class = $container->make(ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback::class);
 
-        $this->assertEquals('Developer', $class->person->role);
+        $this->assertSame('Developer', $class->person->role);
     }
 
     public function testAuthedAttribute()
     {
         $container = new Container;
         $container->singleton('auth', function () {
-            $manager = m::mock(AuthManager::class);
-            $manager->shouldReceive('userResolver')->andReturn(fn ($guard = null) => $manager->guard($guard)->user());
-            $manager->shouldReceive('guard')->with('foo')->andReturnUsing(function () {
-                $guard = m::mock(GuardContract::class);
-                $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
+            $manager = Mockery::mock(AuthManager::class);
+            $manager->expects('userResolver')->times(4)->andReturn(fn ($guard = null) => $manager->guard($guard)->user());
+            $manager->expects('guard')->with('foo')->andReturnUsing(function () {
+                $guard = Mockery::mock(GuardContract::class);
+                $guard->expects('user')->andReturn(m:mock(AuthenticatableContract::class));
 
                 return $guard;
             });
-            $manager->shouldReceive('guard')->with('bar')->andReturnUsing(function () {
-                $guard = m::mock(GuardContract::class);
-                $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
+            $manager->expects('guard')->with('bar')->andReturnUsing(function () {
+                $guard = Mockery::mock(GuardContract::class);
+                $guard->expects('user')->andReturn(m:mock(AuthenticatableContract::class));
+
+                return $guard;
+            });
+            $manager->expects('guard')->with(AuthGuardUnitEnum::unit)->andReturnUsing(function () {
+                $guard = Mockery::mock(GuardContract::class);
+                $guard->expects('user')->andReturn(m:mock(AuthenticatableContract::class));
+
+                return $guard;
+            });
+            $manager->expects('guard')->with(AuthGuardBackedEnum::Backed)->andReturnUsing(function () {
+                $guard = Mockery::mock(GuardContract::class);
+                $guard->expects('user')->andReturn(m:mock(AuthenticatableContract::class));
 
                 return $guard;
             });
@@ -156,9 +170,13 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('cache', function () {
-            $manager = m::mock(CacheManager::class);
-            $manager->shouldReceive('store')->with('foo')->andReturn(m::mock(CacheRepository::class));
-            $manager->shouldReceive('store')->with('bar')->andReturn(m::mock(CacheRepository::class));
+            $manager = Mockery::mock(CacheManager::class);
+            $manager->expects('store')->with('foo')->andReturn(Mockery::mock(CacheRepository::class));
+            $manager->expects('store')->with('bar')->andReturn(Mockery::mock(CacheRepository::class));
+            $manager->expects('store')->with(CacheStoreUnitEnum::unit)->andReturn(Mockery::mock(CacheRepository::class));
+            $manager->expects('store')->with(CacheStoreBackedEnum::Backed)->andReturn(Mockery::mock(CacheRepository::class));
+            $manager->expects('memo')->with('foo')->andReturn(Mockery::mock(CacheRepository::class));
+            $manager->expects('memo')->with('bar')->andReturn(Mockery::mock(CacheRepository::class));
 
             return $manager;
         });
@@ -169,24 +187,21 @@ class ContextualAttributeBindingTest extends TestCase
     public function testConfigAttribute()
     {
         $container = new Container;
-        $container->singleton('config', function () {
-            $repository = m::mock(Repository::class);
-            $repository->shouldReceive('get')->with('foo', null)->andReturn('foo');
-            $repository->shouldReceive('get')->with('bar', null)->andReturn('bar');
+        $container->singleton('config', fn () => new Repository(['foo' => 'foo', 'bar' => 'bar']));
 
-            return $repository;
-        });
+        $resolved = $container->make(ConfigTest::class);
 
-        $container->make(ConfigTest::class);
+        $this->assertSame('foo', $resolved->foo);
+        $this->assertSame('bar', $resolved->bar);
     }
 
     public function testDatabaseAttribute()
     {
         $container = new Container;
         $container->singleton('db', function () {
-            $manager = m::mock(DatabaseManager::class);
-            $manager->shouldReceive('connection')->with('foo')->andReturn(m::mock(Connection::class));
-            $manager->shouldReceive('connection')->with('bar')->andReturn(m::mock(Connection::class));
+            $manager = Mockery::mock(DatabaseManager::class);
+            $manager->expects('connection')->with('foo')->andReturn(new Connection(new PDO('sqlite::memory:')));
+            $manager->expects('connection')->with('bar')->andReturn(new Connection(new PDO('sqlite::memory:')));
 
             return $manager;
         });
@@ -198,9 +213,11 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container; //
         $container->singleton('auth', function () {
-            $manager = m::mock(AuthManager::class);
-            $manager->shouldReceive('guard')->with('foo')->andReturn(m::mock(GuardContract::class));
-            $manager->shouldReceive('guard')->with('bar')->andReturn(m::mock(GuardContract::class));
+            $manager = Mockery::mock(AuthManager::class);
+            $manager->expects('guard')->with('foo')->andReturn(Mockery::mock(GuardContract::class));
+            $manager->expects('guard')->with('bar')->andReturn(Mockery::mock(GuardContract::class));
+            $manager->expects('guard')->with(AuthGuardUnitEnum::unit)->andReturn(Mockery::mock(GuardContract::class));
+            $manager->expects('guard')->with(AuthGuardBackedEnum::Backed)->andReturn(Mockery::mock(GuardContract::class));
 
             return $manager;
         });
@@ -212,9 +229,9 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('log', function () {
-            $manager = m::mock(LogManager::class);
-            $manager->shouldReceive('channel')->with('foo')->andReturn(m::mock(LoggerInterface::class));
-            $manager->shouldReceive('channel')->with('bar')->andReturn(m::mock(LoggerInterface::class));
+            $manager = Mockery::mock(LogManager::class);
+            $manager->expects('channel')->with('foo')->andReturn(Mockery::mock(LoggerInterface::class));
+            $manager->expects('channel')->with('bar')->andReturn(Mockery::mock(LoggerInterface::class));
 
             return $manager;
         });
@@ -226,9 +243,9 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('request', function () {
-            $request = m::mock(Request::class);
-            $request->shouldReceive('route')->with('foo')->andReturn(m::mock(Model::class));
-            $request->shouldReceive('route')->with('bar')->andReturn('bar');
+            $request = Mockery::mock(Request::class);
+            $request->expects('route')->with('foo')->andReturn(Mockery::mock(Model::class));
+            $request->expects('route')->with('bar')->andReturn('bar');
 
             return $request;
         });
@@ -236,18 +253,34 @@ class ContextualAttributeBindingTest extends TestCase
         $container->make(RouteParameterTest::class);
     }
 
+    public function testRouteParameterAttributeWithouthParameterName()
+    {
+        $container = new Container;
+        $container->singleton('request', function () {
+            $request = Mockery::mock(Request::class);
+            $request->expects('route')->with('foo')->andReturn(Mockery::mock(Model::class));
+            $request->expects('route')->with('bar')->andReturn('bar');
+
+            return $request;
+        });
+
+        $container->make(RouteParameterTestWithoutParameterName::class);
+    }
+
     public function testContextAttribute(): void
     {
         $container = new Container;
 
         $container->singleton(ContextRepository::class, function () {
-            $context = m::mock(ContextRepository::class);
-            $context->shouldReceive('get')->once()->with('foo', null)->andReturn('foo');
+            $context = new ContextRepository(new \Illuminate\Events\Dispatcher);
+            $context->add('foo', 'foo');
 
             return $context;
         });
 
-        $container->make(ContextTest::class);
+        $resolved = $container->make(ContextTest::class);
+
+        $this->assertSame('foo', $resolved->foo);
     }
 
     public function testContextAttributeInteractingWithHidden(): void
@@ -255,8 +288,8 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
 
         $container->singleton(ContextRepository::class, function () {
-            $context = m::mock(ContextRepository::class);
-            $context->shouldReceive('getHidden')->once()->with('bar', null)->andReturn('bar');
+            $context = Mockery::mock(ContextRepository::class);
+            $context->expects('getHidden')->with('bar', null)->andReturn('bar');
             $context->shouldNotReceive('get');
 
             return $context;
@@ -269,9 +302,11 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('filesystem', function () {
-            $manager = m::mock(FilesystemManager::class);
-            $manager->shouldReceive('disk')->with('foo')->andReturn(m::mock(Filesystem::class));
-            $manager->shouldReceive('disk')->with('bar')->andReturn(m::mock(Filesystem::class));
+            $manager = Mockery::mock(FilesystemManager::class);
+            $manager->expects('disk')->with('foo')->andReturn(Mockery::mock(Filesystem::class));
+            $manager->expects('disk')->with('bar')->andReturn(Mockery::mock(Filesystem::class));
+            $manager->expects('disk')->with(StorageDiskUnitEnum::unit)->andReturn(Mockery::mock(Filesystem::class));
+            $manager->expects('disk')->with(StorageDiskBackedEnum::Backed)->andReturn(Mockery::mock(Filesystem::class));
 
             return $manager;
         });
@@ -287,7 +322,7 @@ class ContextualAttributeBindingTest extends TestCase
             return $hasAttribute->person;
         });
 
-        $this->assertEquals('Taylor', $person->name);
+        $this->assertSame('Taylor', $person->name);
     }
 
     public function testAttributeOnAppCall()
@@ -304,7 +339,7 @@ class ContextualAttributeBindingTest extends TestCase
             return $value;
         });
 
-        $this->assertEquals('Europe/Paris', $value);
+        $this->assertSame('Europe/Paris', $value);
 
         $value = $container->call(function (#[Config('app.locale')] ?string $value) {
             return $value;
@@ -327,7 +362,7 @@ class ContextualAttributeBindingTest extends TestCase
             return $object;
         });
 
-        $this->assertEquals('Europe/Paris', $value->timezone);
+        $this->assertSame('Europe/Paris', $value->timezone);
 
         $value = $container->call(function (LocaleObject $object) {
             return $object;
@@ -349,6 +384,28 @@ class ContextualAttributeBindingTest extends TestCase
 
         $this->assertEquals([1, 2], iterator_to_array($value));
     }
+
+    public function testParameterIsPassedToContextualAttributeResolver()
+    {
+        $container = new Container;
+
+        $value = $container->make(HasParameterAwareAttribute::class);
+
+        $this->assertSame('name', $value->name);
+    }
+
+    public function testParameterIsPassedToContextualAttributeResolverOnAppCall()
+    {
+        $container = new Container;
+
+        $value = $container->call(function (
+            #[ContainerTestParameterAwareAttribute] ?string $name
+        ) {
+            return $name;
+        });
+
+        $this->assertSame('name', $value);
+    }
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -358,6 +415,36 @@ class ContainerTestAttributeThatResolvesContractImpl implements ContextualAttrib
         public readonly string $name
     ) {
     }
+}
+
+enum StorageDiskUnitEnum
+{
+    case unit;
+}
+
+enum StorageDiskBackedEnum: string
+{
+    case Backed = 'backed';
+}
+
+enum AuthGuardUnitEnum
+{
+    case unit;
+}
+
+enum AuthGuardBackedEnum: string
+{
+    case Backed = 'backed';
+}
+
+enum CacheStoreUnitEnum
+{
+    case unit;
+}
+
+enum CacheStoreBackedEnum: string
+{
+    case Backed = 'backed';
 }
 
 interface ContainerTestContract
@@ -372,29 +459,29 @@ final class ContainerTestImplB implements ContainerTestContract
 {
 }
 
-final class ContainerTestHasAttributeThatResolvesToImplA
+final readonly class ContainerTestHasAttributeThatResolvesToImplA
 {
     public function __construct(
         #[ContainerTestAttributeThatResolvesContractImpl('A')]
-        public readonly ContainerTestContract $property
+        public ContainerTestContract $property
     ) {
     }
 }
 
-final class ContainerTestHasAttributeThatResolvesToImplB
+final readonly class ContainerTestHasAttributeThatResolvesToImplB
 {
     public function __construct(
         #[ContainerTestAttributeThatResolvesContractImpl('B')]
-        public readonly ContainerTestContract $property
+        public ContainerTestContract $property
     ) {
     }
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-final class ContainerTestConfigValue implements ContextualAttribute
+final readonly class ContainerTestConfigValue implements ContextualAttribute
 {
     public function __construct(
-        public readonly string $key
+        public string $key
     ) {
     }
 }
@@ -409,10 +496,10 @@ final class ContainerTestHasConfigValueProperty
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-final class ContainerTestConfigValueWithResolve implements ContextualAttribute
+final readonly class ContainerTestConfigValueWithResolve implements ContextualAttribute
 {
     public function __construct(
-        public readonly string $key
+        public string $key
     ) {
     }
 
@@ -445,6 +532,15 @@ final class ContainerTestConfigValueWithResolveAndAfter implements ContextualAtt
     }
 }
 
+#[Attribute(Attribute::TARGET_PARAMETER)]
+final class ContainerTestParameterAwareAttribute implements ContextualAttribute
+{
+    public function resolve(self $attribute, Container $container, ReflectionParameter $parameter): string
+    {
+        return $parameter->getName();
+    }
+}
+
 final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
 {
     public function __construct(
@@ -465,107 +561,141 @@ final class ComplexDependency implements ContainerTestContract
     }
 }
 
-final class AuthedTest
+final readonly class AuthedTest
 {
-    public function __construct(#[Authenticated('foo')] AuthenticatableContract $foo, #[CurrentUser('bar')] AuthenticatableContract $bar)
+    public function __construct(
+        #[Authenticated('foo')] AuthenticatableContract $foo,
+        #[CurrentUser('bar')] AuthenticatableContract $bar,
+        #[Authenticated(AuthGuardUnitEnum::unit)] AuthenticatableContract $unit,
+        #[CurrentUser(AuthGuardBackedEnum::Backed)] AuthenticatableContract $backed,
+    ) {
+    }
+}
+
+final readonly class CacheTest
+{
+    public function __construct(
+        #[Cache('foo')] CacheRepository $foo,
+        #[Cache('bar')] CacheRepository $bar,
+        #[Cache(CacheStoreUnitEnum::unit)] CacheRepository $unit,
+        #[Cache(CacheStoreBackedEnum::Backed)] CacheRepository $backed,
+        #[Cache('foo', memo: true)] CacheRepository $fooMemoized,
+        #[Cache('bar', memo: true)] CacheRepository $barMemoized,
+    ) {
+    }
+}
+
+final readonly class ConfigTest
+{
+    public function __construct(#[Config('foo')] public string $foo, #[Config('bar')] public string $bar)
     {
     }
 }
 
-final class CacheTest
+final readonly class ContextTest
 {
-    public function __construct(#[Cache('foo')] CacheRepository $foo, #[Cache('bar')] CacheRepository $bar)
+    public function __construct(#[Context('foo')] public string $foo)
     {
     }
 }
 
-final class ConfigTest
-{
-    public function __construct(#[Config('foo')] string $foo, #[Config('bar')] string $bar)
-    {
-    }
-}
-
-final class ContextTest
-{
-    public function __construct(#[Context('foo')] string $foo)
-    {
-    }
-}
-
-final class ContextHiddenTest
+final readonly class ContextHiddenTest
 {
     public function __construct(#[Context('bar', hidden: true)] string $foo)
     {
     }
 }
 
-final class DatabaseTest
+final readonly class DatabaseTest
 {
     public function __construct(#[Database('foo')] Connection $foo, #[Database('bar')] Connection $bar)
     {
     }
 }
 
-final class GuardTest
+final readonly class GuardTest
 {
-    public function __construct(#[Auth('foo')] GuardContract $foo, #[Auth('bar')] GuardContract $bar)
-    {
+    public function __construct(
+        #[Auth('foo')] GuardContract $foo,
+        #[Auth('bar')] GuardContract $bar,
+        #[Auth(AuthGuardUnitEnum::unit)] GuardContract $unit,
+        #[Auth(AuthGuardBackedEnum::Backed)] GuardContract $backed,
+    ) {
     }
 }
 
-final class LogTest
+final readonly class LogTest
 {
     public function __construct(#[Log('foo')] LoggerInterface $foo, #[Log('bar')] LoggerInterface $bar)
     {
     }
 }
 
-final class RouteParameterTest
+final readonly class RouteParameterTest
 {
     public function __construct(#[RouteParameter('foo')] Model $foo, #[RouteParameter('bar')] string $bar)
     {
     }
 }
 
-final class StorageTest
+final readonly class RouteParameterTestWithoutParameterName
 {
-    public function __construct(#[Storage('foo')] Filesystem $foo, #[Storage('bar')] Filesystem $bar)
+    public function __construct(#[RouteParameter] Model $foo, #[RouteParameter] string $bar)
     {
     }
 }
 
-final class GiveTestSimple
+final readonly class StorageTest
+{
+    public function __construct(
+        #[Storage('foo')] Filesystem $foo,
+        #[Storage('bar')] Filesystem $bar,
+        #[Storage(StorageDiskUnitEnum::unit)] Filesystem $unit,
+        #[Storage(StorageDiskBackedEnum::Backed)] Filesystem $backed,
+    ) {
+    }
+}
+
+final readonly class GiveTestSimple
 {
     public function __construct(
         #[Give(SimpleDependency::class)]
-        public readonly ContainerTestContract $dependency
+        public ContainerTestContract $dependency
     ) {
     }
 }
 
-final class GiveTestComplex
+final readonly class GiveTestComplex
 {
     public function __construct(
         #[Give(ComplexDependency::class, ['param' => true])]
-        public readonly ContainerTestContract $dependency
+        public ContainerTestContract $dependency
     ) {
     }
 }
 
-final class TimezoneObject
+final readonly class TimezoneObject
 {
     public function __construct(
-        #[Config('app.timezone')] public readonly ?string $timezone
+        #[Config('app.timezone')] public ?string $timezone
     ) {
         //
     }
 }
 
-final class LocaleObject
+final readonly class LocaleObject
 {
     public function __construct(
-        #[Config('app.locale')] public readonly ?string $locale
+        #[Config('app.locale')] public ?string $locale
+    ) {
+        //
+    }
+}
+
+final readonly class HasParameterAwareAttribute
+{
+    public function __construct(
+        #[ContainerTestParameterAwareAttribute] public ?string $name,
     ) {
         //
     }

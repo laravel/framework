@@ -533,11 +533,15 @@ class Middleware
     /**
      * Configure where guests are redirected by the "auth" middleware.
      *
-     * @param  callable|string  $redirect
+     * @param  callable|string|null  $redirect
      * @return $this
      */
-    public function redirectGuestsTo(callable|string $redirect)
+    public function redirectGuestsTo(callable|string|null $redirect)
     {
+        if (is_null($redirect)) {
+            $redirect = fn () => null;
+        }
+
         return $this->redirectTo(guests: $redirect);
     }
 

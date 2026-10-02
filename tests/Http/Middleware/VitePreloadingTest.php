@@ -17,8 +17,6 @@ class VitePreloadingTest extends TestCase
     {
         Facade::setFacadeApplication(null);
         Facade::clearResolvedInstances();
-
-        parent::tearDown();
     }
 
     public function testItDoesNotSetLinkTagWhenNoTagsHaveBeenPreloaded()
@@ -140,6 +138,94 @@ class VitePreloadingTest extends TestCase
         $this->assertSame(
             [
                 '<https://laravel.com/first.js>; rel="modulepreload"; foo="bar", <https://laravel.com/second.js>; rel="modulepreload"; foo="bar"',
+            ],
+            $response->headers->all('Link'),
+        );
+    }
+
+    public function testFontPreloadEntriesResultInLinkHeaders()
+    {
+        $app = new Container;
+        $app->instance(Vite::class, new class extends Vite
+        {
+            protected $preloadedAssets = [
+                'https://example.com/build/assets/inter-400.woff2' => [
+                    'rel="preload"',
+                    'as="font"',
+                    'type="font/woff2"',
+                    'crossorigin="anonymous"',
+                ],
+            ];
+        });
+        Facade::setFacadeApplication($app);
+
+        $response = (new AddLinkHeadersForPreloadedAssets)->handle(new Request, function () {
+            return new Response('Hello Laravel');
+        });
+
+        $this->assertSame(
+            '<https://example.com/build/assets/inter-400.woff2>; rel="preload"; as="font"; type="font/woff2"; crossorigin="anonymous"',
+            $response->headers->get('Link'),
+        );
+    }
+
+    public function testFontPreloadsDoNotOverwriteExistingJsPreloads()
+    {
+        $app = new Container;
+        $app->instance(Vite::class, new class extends Vite
+        {
+            protected $preloadedAssets = [
+                'https://example.com/build/assets/app.js' => [
+                    'rel="modulepreload"',
+                ],
+                'https://example.com/build/assets/inter-400.woff2' => [
+                    'rel="preload"',
+                    'as="font"',
+                    'type="font/woff2"',
+                    'crossorigin="anonymous"',
+                ],
+            ];
+        });
+        Facade::setFacadeApplication($app);
+
+        $response = (new AddLinkHeadersForPreloadedAssets)->handle(new Request, function () {
+            return new Response('Hello Laravel');
+        });
+
+        $this->assertSame(
+            [
+                '<https://example.com/build/assets/app.js>; rel="modulepreload", <https://example.com/build/assets/inter-400.woff2>; rel="preload"; as="font"; type="font/woff2"; crossorigin="anonymous"',
+            ],
+            $response->headers->all('Link'),
+        );
+    }
+
+    public function testLimitAppliesToCombinedJsAndFontPreloads()
+    {
+        $app = new Container;
+        $app->instance(Vite::class, new class extends Vite
+        {
+            protected $preloadedAssets = [
+                'https://example.com/build/assets/app.js' => [
+                    'rel="modulepreload"',
+                ],
+                'https://example.com/build/assets/inter-400.woff2' => [
+                    'rel="preload"',
+                    'as="font"',
+                ],
+                'https://example.com/build/assets/inter-700.woff2' => [
+                    'rel="preload"',
+                    'as="font"',
+                ],
+            ];
+        });
+        Facade::setFacadeApplication($app);
+
+        $response = (new AddLinkHeadersForPreloadedAssets)->handle(new Request, fn () => new Response('ok'), 2);
+
+        $this->assertSame(
+            [
+                '<https://example.com/build/assets/app.js>; rel="modulepreload", <https://example.com/build/assets/inter-400.woff2>; rel="preload"; as="font"',
             ],
             $response->headers->all('Link'),
         );

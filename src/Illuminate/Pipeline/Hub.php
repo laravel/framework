@@ -5,6 +5,7 @@ namespace Illuminate\Pipeline;
 use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Hub as HubContract;
+use InvalidArgumentException;
 
 class Hub implements HubContract
 {
@@ -65,6 +66,10 @@ class Hub implements HubContract
     public function pipe($object, $pipeline = null)
     {
         $pipeline = $pipeline ?: 'default';
+
+        if (! isset($this->pipelines[$pipeline])) {
+            throw new InvalidArgumentException("Pipeline [{$pipeline}] is not defined.");
+        }
 
         return call_user_func(
             $this->pipelines[$pipeline], new Pipeline($this->container), $object

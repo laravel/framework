@@ -13,9 +13,10 @@ trait InteractsWithComposerPackages
      *
      * @param  string  $composer
      * @param  array  $packages
+     * @param  bool  $pretend
      * @return bool
      */
-    protected function requireComposerPackages(string $composer, array $packages)
+    protected function requireComposerPackages(string $composer, array $packages, bool $pretend = false)
     {
         if ($composer !== 'global') {
             $command = [$this->phpBinary(), $composer, 'require'];
@@ -23,8 +24,13 @@ trait InteractsWithComposerPackages
 
         $command = array_merge(
             $command ?? ['composer', 'require'],
+            ['--with-all-dependencies'],
             $packages,
         );
+
+        if ($pretend) {
+            $command[] = '--dry-run';
+        }
 
         return ! (new Process($command, $this->laravel->basePath(), ['COMPOSER_MEMORY_LIMIT' => '-1']))
             ->setTimeout(null)

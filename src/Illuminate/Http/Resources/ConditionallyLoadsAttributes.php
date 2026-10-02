@@ -95,9 +95,7 @@ trait ConditionallyLoadsAttributes
         }
 
         if (! array_key_exists(static::class, static::$cachedPreserveKeysAttributes)) {
-            static::$cachedPreserveKeysAttributes[static::class] = count(
-                (new ReflectionClass($this))->getAttributes(PreserveKeys::class)
-            ) > 0;
+            static::$cachedPreserveKeysAttributes[static::class] = (new ReflectionClass($this))->getAttributes(PreserveKeys::class) !== [];
         }
 
         if (static::$cachedPreserveKeysAttributes[static::class]) {
@@ -227,7 +225,7 @@ trait ConditionallyLoadsAttributes
      */
     protected function whenNull($value, $default = new MissingValue)
     {
-        $arguments = func_num_args() == 1 ? [$value] : [$value, $default];
+        $arguments = func_num_args() === 1 ? [$value] : [$value, $default];
 
         return $this->when(is_null($value), ...$arguments);
     }
@@ -241,7 +239,7 @@ trait ConditionallyLoadsAttributes
      */
     protected function whenNotNull($value, $default = new MissingValue)
     {
-        $arguments = func_num_args() == 1 ? [$value] : [$value, $default];
+        $arguments = func_num_args() === 1 ? [$value] : [$value, $default];
 
         return $this->when(! is_null($value), ...$arguments);
     }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Events;
 
+use Illuminate\Contracts\Events\ShouldBeDiscovered;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Reflector;
@@ -74,6 +75,11 @@ class DiscoverEvents
             }
 
             if (! $listener->isInstantiable()) {
+                continue;
+            }
+
+            if ($listener->implementsInterface(ShouldBeDiscovered::class) &&
+                $listener->getName()::shouldBeDiscovered() === false) {
                 continue;
             }
 

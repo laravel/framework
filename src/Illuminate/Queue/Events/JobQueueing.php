@@ -26,6 +26,8 @@ class JobQueueing
      * Get the decoded job payload.
      *
      * @return array
+     *
+     * @throws \JsonException
      */
     public function payload()
     {

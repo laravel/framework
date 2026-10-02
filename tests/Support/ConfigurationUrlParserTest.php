@@ -24,6 +24,8 @@ class ConfigurationUrlParserTest extends TestCase
             'sqlite3' => 'sqlite',
             'redis' => 'tcp',
             'rediss' => 'tls',
+            'valkey' => 'tcp',
+            'valkeys' => 'tls',
         ], ConfigurationUrlParser::getDriverAliases());
 
         ConfigurationUrlParser::addDriverAlias('some-particular-alias', 'mysql');
@@ -36,6 +38,8 @@ class ConfigurationUrlParserTest extends TestCase
             'sqlite3' => 'sqlite',
             'redis' => 'tcp',
             'rediss' => 'tls',
+            'valkey' => 'tcp',
+            'valkeys' => 'tls',
             'some-particular-alias' => 'mysql',
         ], ConfigurationUrlParser::getDriverAliases());
 
@@ -131,6 +135,55 @@ class ConfigurationUrlParserTest extends TestCase
                     'port' => 134,
                     'database' => 'baz',
                     'driver' => 'mysql',
+                ],
+            ],
+            'Microsoft SQL Server DSN strings are parsed for Microsoft SQL Server connections' => [
+                [
+                    'driver' => 'sqlsrv',
+                    'host' => 'fallback-host',
+                    'port' => 1433,
+                    'database' => 'fallback-database',
+                    'url' => 'sqlsrv:Server=127.0.0.1,1444;Database=example_database;APP={Laravel;Worker}}};ApplicationIntent=ReadOnly;Authentication=SqlPassword;ColumnEncryption=Enabled;ConnectionPooling=0;Encrypt=true;KeyStoreAuthentication=KeyVaultClientSecret;KeyStorePrincipalId=example-client-id;KeyStoreSecret=example-secret;LoginTimeout=30;MultipleActiveResultSets=false;MultiSubnetFailover=1;TransactionIsolation=READ_COMMITTED;TrustServerCertificate=true',
+                ],
+                [
+                    'driver' => 'sqlsrv',
+                    'host' => '127.0.0.1',
+                    'port' => 1444,
+                    'database' => 'example_database',
+                    'appname' => 'Laravel;Worker}',
+                    'authentication' => 'SqlPassword',
+                    'column_encryption' => 'Enabled',
+                    'pooling' => false,
+                    'encrypt' => 'true',
+                    'key_store_authentication' => 'KeyVaultClientSecret',
+                    'key_store_principal_id' => 'example-client-id',
+                    'key_store_secret' => 'example-secret',
+                    'login_timeout' => '30',
+                    'multiple_active_result_sets' => false,
+                    'multi_subnet_failover' => '1',
+                    'transaction_isolation' => 'READ_COMMITTED',
+                    'trust_server_certificate' => 'true',
+                    'readonly' => true,
+                ],
+            ],
+            'Standalone Microsoft SQL Server DSN strings are parsed' => [
+                'sqlsrv:Database=laravel;Encrypt=false;Server=localhost',
+                [
+                    'driver' => 'sqlsrv',
+                    'database' => 'laravel',
+                    'host' => 'localhost',
+                    'encrypt' => 'false',
+                ],
+            ],
+            'Microsoft SQL Server database URL using Laravel\'s database URL convention format' => [
+                'sqlsrv://username:password@host:1433/database',
+                [
+                    'driver' => 'sqlsrv',
+                    'username' => 'username',
+                    'password' => 'password',
+                    'host' => 'host',
+                    'port' => 1433,
+                    'database' => 'database',
                 ],
             ],
             'query params from URL are used as extra params' => [
@@ -427,6 +480,41 @@ class ConfigurationUrlParserTest extends TestCase
             'Redis Example with rediss scheme' => [
                 [
                     'url' => 'rediss://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111',
+                    'host' => '127.0.0.1',
+                    'password' => null,
+                    'port' => 6379,
+                    'database' => 0,
+                ],
+                [
+                    'driver' => 'tls',
+                    'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
+                    'port' => 111,
+                    'database' => 0,
+                    'username' => 'h',
+                    'password' => 'asdfqwer1234asdf',
+                ],
+            ],
+            'Valkey Example' => [
+                [
+                    // Coming directly from Heroku documentation
+                    'url' => 'valkey://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111',
+                    'host' => '127.0.0.1',
+                    'password' => null,
+                    'port' => 6379,
+                    'database' => 0,
+                ],
+                [
+                    'driver' => 'tcp',
+                    'host' => 'ec2-111-1-1-1.compute-1.amazonaws.com',
+                    'port' => 111,
+                    'database' => 0,
+                    'username' => 'h',
+                    'password' => 'asdfqwer1234asdf',
+                ],
+            ],
+            'Valkey Example with valkeys scheme' => [
+                [
+                    'url' => 'valkeys://h:asdfqwer1234asdf@ec2-111-1-1-1.compute-1.amazonaws.com:111',
                     'host' => '127.0.0.1',
                     'password' => null,
                     'port' => 6379,

@@ -28,7 +28,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     /**
      * Indicates whether there are more items in the data source.
      *
-     * @return bool
+     * @var bool
      */
     protected $hasMore;
 
@@ -70,8 +70,10 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
         $this->items = $this->items->slice(0, $this->perPage);
 
         if (! is_null($this->cursor) && $this->cursor->pointsToPreviousItems()) {
-            $this->items = $this->items->reverse()->values();
+            $this->items = $this->items->reverse();
         }
+
+        $this->items = $this->items->values();
     }
 
     /**
@@ -184,8 +186,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     /**
      * Convert the object to pretty print formatted JSON.
      *
-     * @params int $options
-     *
+     * @param  int  $options
      * @return string
      */
     public function toPrettyJson(int $options = 0)

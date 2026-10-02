@@ -1,17 +1,17 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Route;
+namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 use function Illuminate\Filesystem\join_paths;
 
-#[RequiresOperatingSystemFamily('Linux|Darwin')]
+#[RequiresOperatingSystem('Linux|Darwin')]
 #[WithConfig('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
 #[WithMigration]
 class SerializableClosureV1CacheRouteTest extends TestCase
@@ -27,19 +27,17 @@ class SerializableClosureV1CacheRouteTest extends TestCase
         ];
     }
 
-    /** {@inheritDoc} */
-    #[\Override]
     protected function setUp(): void
     {
-        $_ENV['APP_ROUTES_CACHE'] = realpath(join_paths(__DIR__, 'stubs', 'serializable-closure-v1', 'routes-v7.php'));
+        $_ENV['APP_ROUTES_CACHE'] = realpath(join_paths(dirname(__DIR__, 2), 'Routing', 'Fixtures', 'serializable-closure-v1', 'routes-v7.php'));
 
         parent::setUp();
     }
 
-    /** {@inheritDoc} */
-    #[\Override]
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         unset($_ENV['APP_ROUTES_CACHE']);
     }
 

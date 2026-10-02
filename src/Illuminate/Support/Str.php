@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
@@ -85,6 +86,19 @@ class Str
     }
 
     /**
+     * Translate the given message and get a new stringable object.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @return \Illuminate\Support\Stringable
+     */
+    public static function trans($key, $replace = [], $locale = null)
+    {
+        return new Stringable(__($key, $replace, $locale));
+    }
+
+    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $subject
@@ -140,7 +154,7 @@ class Str
      */
     public static function transliterate($string, $unknown = '?', $strict = false)
     {
-        return ASCII::to_transliterate($string, $unknown, $strict);
+        return ASCII::to_transliterate((string) $string, $unknown, $strict);
     }
 
     /**
@@ -225,11 +239,7 @@ class Str
      */
     public static function camel($value)
     {
-        if (isset(static::$camelCache[$value])) {
-            return static::$camelCache[$value];
-        }
-
-        return static::$camelCache[$value] = lcfirst(static::studly($value));
+        return static::$camelCache[$value] ?? static::$camelCache[$value] = static::lcfirst(static::studly($value));
     }
 
     /**
@@ -331,13 +341,17 @@ class Str
      */
     public static function containsAll($haystack, $needles, $ignoreCase = false)
     {
+        $any = false;
+
         foreach ($needles as $needle) {
+            $any = true;
+
             if (! static::contains($haystack, $needle, $ignoreCase)) {
                 return false;
             }
         }
 
-        return true;
+        return $any;
     }
 
     /**
@@ -364,6 +378,18 @@ class Str
     public static function convertCase(string $string, int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
     {
         return mb_convert_case($string, $mode, $encoding);
+    }
+
+    /**
+     * Get the plural form of an English word with the count prepended.
+     *
+     * @param  string  $value
+     * @param  int|array|\Countable  $count
+     * @return string
+     */
+    public static function counted($value, $count)
+    {
+        return static::plural($value, $count, prependCount: true);
     }
 
     /**
@@ -445,14 +471,14 @@ class Str
 
         $start = ltrim($matches[1]);
 
-        $start = Str::of(mb_substr($start, max(mb_strlen($start, 'UTF-8') - $radius, 0), $radius, 'UTF-8'))->ltrim()->unless(
+        $start = (new Stringable(mb_substr($start, max(mb_strlen($start, 'UTF-8') - $radius, 0), $radius, 'UTF-8')))->ltrim()->unless(
             fn ($startWithRadius) => $startWithRadius->exactly($start),
             fn ($startWithRadius) => $startWithRadius->prepend($omission),
         );
 
         $end = rtrim($matches[3]);
 
-        $end = Str::of(mb_substr($end, 0, $radius, 'UTF-8'))->rtrim()->unless(
+        $end = (new Stringable(mb_substr($end, 0, $radius, 'UTF-8')))->rtrim()->unless(
             fn ($endWithRadius) => $endWithRadius->exactly($end),
             fn ($endWithRadius) => $endWithRadius->append($omission),
         );
@@ -469,6 +495,18 @@ class Str
      */
     public static function finish($value, $cap)
     {
+        if ($cap === '') {
+            return $value;
+        }
+
+        if (! str_ends_with($value, $cap)) {
+            return $value.$cap;
+        }
+
+        if (! str_ends_with($value, $cap.$cap)) {
+            return $value;
+        }
+
         $quoted = preg_quote($cap, '/');
 
         return preg_replace('/(?:'.$quoted.')+$/u', '', $value).$cap;
@@ -610,15 +648,20 @@ class Str
             (((?:[\_\.\pL\pN-]|%[0-9A-Fa-f]{2})+:)?((?:[\_\.\pL\pN-]|%[0-9A-Fa-f]{2})+)@)?  # basic auth
             (
                 (?:
-                    (?:xn--[a-z0-9-]++\.)*+xn--[a-z0-9-]++            # a domain name using punycode
+                    (?:
+                        (?:[\pL\pN\pS\pM\-\_]++\.)+
+                        (?:
+                            (?:xn--[a-z0-9-]++)     # punycode in tld
+                            |
+                            (?:[\pL\pN\pM]++)       # no punycode in tld
+                        )
+                    )                               # a multi-level domain name
                         |
-                    (?:[\pL\pN\pS\pM\-\_]++\.)+[\pL\pN\pM]++          # a multi-level domain name
-                        |
-                    [a-z0-9\-\_]++                                    # a single-level domain name
+                    [a-z0-9\-\_]++                  # a single-level domain name
                 )\.?
-                    |                                                 # or
-                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}                    # an IP address
-                    |                                                 # or
+                    |                               # or
+                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}  # an IP address
+                    |                               # or
                 \[
                     (?:(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){6})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:::(?:(?:(?:[0-9a-f]{1,4})):){5})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){4})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,1}(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){3})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,2}(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){2})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,3}(?:(?:[0-9a-f]{1,4})))?::(?:(?:[0-9a-f]{1,4})):)(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,4}(?:(?:[0-9a-f]{1,4})))?::)(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,5}(?:(?:[0-9a-f]{1,4})))?::)(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,6}(?:(?:[0-9a-f]{1,4})))?::))))
                 \]  # an IPv6 address
@@ -786,6 +829,8 @@ class Str
      */
     public static function markdown($string, array $options = [], array $extensions = [])
     {
+        $string = (string) $string;
+
         $converter = new GithubFlavoredMarkdownConverter($options);
 
         $environment = $converter->getEnvironment();
@@ -807,6 +852,8 @@ class Str
      */
     public static function inlineMarkdown($string, array $options = [], array $extensions = [])
     {
+        $string = (string) $string;
+
         $environment = new Environment($options);
 
         $environment->addExtension(new GithubFlavoredMarkdownExtension());
@@ -852,7 +899,7 @@ class Str
 
         $start = mb_substr($string, 0, $startIndex, $encoding);
         $segmentLen = mb_strlen($segment, $encoding);
-        $end = mb_substr($string, $startIndex + $segmentLen);
+        $end = mb_substr($string, $startIndex + $segmentLen, null, $encoding);
 
         return $start.str_repeat(mb_substr($character, 0, 1, $encoding), $segmentLen).$end;
     }
@@ -922,12 +969,12 @@ class Str
     /**
      * Remove all non-numeric characters from a string.
      *
-     * @param  string  $value
-     * @return string
+     * @param  string|string[]  $value
+     * @return ($value is string ? string : string[])
      */
     public static function numbers($value)
     {
-        return preg_replace('/[^0-9]/', '', $value);
+        return preg_replace('/\D/', '', $value);
     }
 
     /**
@@ -1069,13 +1116,21 @@ class Str
             ] : null,
             'spaces' => $spaces === true ? [' '] : null,
         ]))
-            ->filter()
-            ->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)]))
-            ->flatten();
+            ->filter();
 
-        $length = $length - $password->count();
+        if ($options->isEmpty()) {
+            throw new InvalidArgumentException('At least one character pool must be enabled.');
+        }
 
-        return $password->merge($options->pipe(
+        $allCharacters = $options->flatten();
+
+        $options->shuffle()
+            ->take(max(0, $length))
+            ->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)]));
+
+        $length = max(0, $length - $password->count());
+
+        return $password->merge($allCharacters->pipe(
             fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->count() - 1)])
         ))->shuffle()->implode('');
     }
@@ -1197,7 +1252,7 @@ class Str
     public static function replaceArray($search, $replace, $subject)
     {
         if ($replace instanceof Traversable) {
-            $replace = Arr::from($replace);
+            $replace = iterator_to_array($replace);
         }
 
         $segments = explode($search, $subject);
@@ -1222,7 +1277,7 @@ class Str
     {
         try {
             return (string) $value;
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return $fallback;
         }
     }
@@ -1239,20 +1294,67 @@ class Str
     public static function replace($search, $replace, $subject, $caseSensitive = true)
     {
         if ($search instanceof Traversable) {
-            $search = Arr::from($search);
+            $search = iterator_to_array($search);
         }
 
         if ($replace instanceof Traversable) {
-            $replace = Arr::from($replace);
+            $replace = iterator_to_array($replace);
         }
 
         if ($subject instanceof Traversable) {
-            $subject = Arr::from($subject);
+            $subject = iterator_to_array($subject);
         }
 
         return $caseSensitive
             ? str_replace($search, $replace, $subject)
-            : str_ireplace($search, $replace, $subject);
+            : static::replaceWhileIgnoringCase($search, $replace, $subject);
+    }
+
+    /**
+     * Replace the given value in the given string regardless of case.
+     *
+     * @param  string|string[]  $search
+     * @param  string|string[]  $replace
+     * @param  string|string[]  $subject
+     * @return string|string[]
+     */
+    protected static function replaceWhileIgnoringCase($search, $replace, $subject)
+    {
+        if (! is_array($search) && is_array($replace)) {
+            return str_ireplace($search, $replace, $subject);
+        }
+
+        $searches = is_array($search) ? array_values($search) : [$search];
+
+        if (array_all($searches, static::isAscii(...))) {
+            return str_ireplace($search, $replace, $subject);
+        }
+
+        $replacements = is_array($replace)
+            ? array_values($replace)
+            : array_fill(0, count($searches), $replace);
+
+        foreach ([...$searches, ...$replacements, ...(array) $subject] as $value) {
+            if (! preg_match('//u', (string) $value)) {
+                return str_ireplace($search, $replace, $subject);
+            }
+        }
+
+        foreach ($searches as $index => $term) {
+            $term = (string) $term;
+
+            if ($term === '') {
+                continue;
+            }
+
+            $replacement = (string) ($replacements[$index] ?? '');
+
+            $subject = static::isAscii($term)
+                ? str_ireplace($term, $replacement, $subject)
+                : preg_replace_callback('/'.preg_quote($term, '/').'/iu', fn () => $replacement, $subject);
+        }
+
+        return $subject;
     }
 
     /**
@@ -1380,12 +1482,12 @@ class Str
     public static function remove($search, $subject, $caseSensitive = true)
     {
         if ($search instanceof Traversable) {
-            $search = Arr::from($search);
+            $search = iterator_to_array($search);
         }
 
         return $caseSensitive
             ? str_replace($search, '', $subject)
-            : str_ireplace($search, '', $subject);
+            : static::replaceWhileIgnoringCase($search, '', $subject);
     }
 
     /**
@@ -1396,7 +1498,7 @@ class Str
      */
     public static function reverse(string $value)
     {
-        return implode(array_reverse(mb_str_split($value)));
+        return implode('', array_reverse(mb_str_split($value)));
     }
 
     /**
@@ -1408,6 +1510,18 @@ class Str
      */
     public static function start($value, $prefix)
     {
+        if ($prefix === '') {
+            return $value;
+        }
+
+        if (! str_starts_with($value, $prefix)) {
+            return $prefix.$value;
+        }
+
+        if (! str_starts_with($value, $prefix.$prefix)) {
+            return $value;
+        }
+
         $quoted = preg_quote($prefix, '/');
 
         return $prefix.preg_replace('/^(?:'.$quoted.')+/u', '', $value);
@@ -1443,7 +1557,7 @@ class Str
      */
     public static function headline($value)
     {
-        $parts = mb_split('\s+', $value);
+        $parts = preg_split('/\s+/u', $value, -1, PREG_SPLIT_NO_EMPTY);
 
         $parts = count($parts) > 1
             ? array_map(static::title(...), $parts)
@@ -1452,6 +1566,24 @@ class Str
         $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
 
         return implode(' ', array_filter(explode('_', $collapsed)));
+    }
+
+    /**
+     * Get the "initials" representing each word in the provided string, optionally capitalizing.
+     *
+     * @param  string  $value
+     * @param  bool  $capitalize
+     * @return string
+     */
+    public static function initials($value, $capitalize = false)
+    {
+        $parts = preg_split('/\s+/u', $value, -1, PREG_SPLIT_NO_EMPTY);
+
+        $parts = array_map(fn ($part) => mb_substr($part, 0, 1), $parts);
+
+        $initials = implode('', $parts);
+
+        return $capitalize ? static::upper($initials) : $initials;
     }
 
     /**
@@ -1476,7 +1608,7 @@ class Str
 
         $endPunctuation = ['.', '!', '?', ':', '—', ','];
 
-        $words = mb_split('\s+', $value);
+        $words = preg_split('/\s+/u', $value, -1, PREG_SPLIT_NO_EMPTY);
         $wordCount = count($words);
 
         for ($i = 0; $i < $wordCount; $i++) {
@@ -1587,7 +1719,10 @@ class Str
         if ($charlist === null) {
             $trimDefaultCharacters = " \n\r\t\v\0";
 
-            return preg_replace('~^[\s'.self::INVISIBLE_CHARACTERS.$trimDefaultCharacters.']+|[\s'.self::INVISIBLE_CHARACTERS.$trimDefaultCharacters.']+$~u', '', $value) ?? trim($value);
+            $whitespace = '[\s'.self::INVISIBLE_CHARACTERS.$trimDefaultCharacters.']';
+
+            // The trailing match may only begin at the first character of a whitespace run, keeping this linear...
+            return preg_replace('~^'.$whitespace.'+|'.$whitespace.'(?<!'.$whitespace.$whitespace.')'.$whitespace.'*+$~u', '', $value) ?? trim($value);
         }
 
         return trim($value, $charlist);
@@ -1623,7 +1758,10 @@ class Str
         if ($charlist === null) {
             $rtrimDefaultCharacters = " \n\r\t\v\0";
 
-            return preg_replace('~[\s'.self::INVISIBLE_CHARACTERS.$rtrimDefaultCharacters.']+$~u', '', $value) ?? rtrim($value);
+            $whitespace = '[\s'.self::INVISIBLE_CHARACTERS.$rtrimDefaultCharacters.']';
+
+            // The match may only begin at the first character of a whitespace run, keeping this linear...
+            return preg_replace('~'.$whitespace.'(?<!'.$whitespace.$whitespace.')'.$whitespace.'*+$~u', '', $value) ?? rtrim($value);
         }
 
         return rtrim($value, $charlist);
@@ -1686,32 +1824,42 @@ class Str
      * Convert a value to studly caps case.
      *
      * @param  string  $value
+     * @param  bool  $normalize  When true, all-uppercase words (e.g. acronyms) are lowercased before conversion so "CBOR" becomes "Cbor" instead of "CBOR".
      * @return ($value is '' ? '' : string)
      */
-    public static function studly($value)
+    public static function studly($value, bool $normalize = false)
     {
+        if ($normalize) {
+            $value = preg_replace_callback(
+                '/(^|[-_ \s])([A-Z]+)(?=[-_ \s]|$)/u',
+                fn ($m) => $m[1].static::lower($m[2]),
+                $value
+            );
+        }
+
         $key = $value;
 
         if (isset(static::$studlyCache[$key])) {
             return static::$studlyCache[$key];
         }
 
-        $words = mb_split('\s+', static::replace(['-', '_'], ' ', $value));
+        $words = preg_split('/\s+/u', static::replace(['-', '_'], ' ', $value), -1, PREG_SPLIT_NO_EMPTY);
 
         $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 
-        return static::$studlyCache[$key] = implode($studlyWords);
+        return static::$studlyCache[$key] = implode('', $studlyWords);
     }
 
     /**
      * Convert a value to Pascal case.
      *
      * @param  string  $value
+     * @param  bool  $normalize  When true, all-uppercase words (e.g. acronyms) are lowercased before conversion so "CBOR" becomes "Cbor" instead of "CBOR".
      * @return ($value is '' ? '' : string)
      */
-    public static function pascal($value)
+    public static function pascal($value, bool $normalize = false)
     {
-        return static::studly($value);
+        return static::studly($value, $normalize);
     }
 
     /**
@@ -1757,13 +1905,48 @@ class Str
      */
     public static function substrReplace($string, $replace, $offset = 0, $length = null)
     {
-        if ($length === null) {
-            $length = static::length($string);
+        if (! is_array($string) && (is_array($offset) || is_array($length))) {
+            return substr_replace($string, $replace, $offset, $length);
         }
 
-        return mb_substr($string, 0, $offset)
-            .$replace
-            .mb_substr(mb_substr($string, $offset), $length);
+        $replaceSubstring = function ($string, $replace, $offset, $length) {
+            if ($length === null) {
+                $length = static::length($string);
+            }
+
+            return mb_substr($string, 0, $offset)
+                .$replace
+                .mb_substr(mb_substr($string, $offset), $length);
+        };
+
+        $replacements = is_array($replace) ? array_values($replace) : null;
+
+        if (! is_array($string)) {
+            return $replaceSubstring(
+                $string,
+                $replacements === null ? $replace : ($replacements[0] ?? ''),
+                $offset,
+                $length,
+            );
+        }
+
+        $offsets = is_array($offset) ? array_values($offset) : null;
+        $lengths = is_array($length) ? array_values($length) : null;
+        $result = [];
+        $position = 0;
+
+        foreach ($string as $index => $value) {
+            $result[$index] = $replaceSubstring(
+                $value,
+                $replacements === null ? $replace : ($replacements[$position] ?? ''),
+                $offsets === null ? $offset : ($offsets[$position] ?? 0),
+                $lengths === null ? $length : ($lengths[$position] ?? null),
+            );
+
+            $position++;
+        }
+
+        return $result;
     }
 
     /**
@@ -1825,7 +2008,7 @@ class Str
      */
     public static function lcfirst($string)
     {
-        return static::lower(static::substr($string, 0, 1)).static::substr($string, 1);
+        return mb_lcfirst($string, 'UTF-8');
     }
 
     /**
@@ -1836,7 +2019,7 @@ class Str
      */
     public static function ucfirst($string)
     {
-        return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
+        return mb_ucfirst($string, 'UTF-8');
     }
 
     /**
@@ -1889,7 +2072,35 @@ class Str
      */
     public static function wordWrap($string, $characters = 75, $break = "\n", $cutLongWords = false)
     {
-        return wordwrap($string, $characters, $break, $cutLongWords);
+        if (static::isAscii($string)) {
+            return wordwrap($string, $characters, $break, $cutLongWords);
+        }
+
+        if ($break === '') {
+            return wordwrap($string, $characters, $break, $cutLongWords);
+        }
+
+        $replaced = [];
+
+        $skeleton = preg_replace_callback('/[\x80-\xFF][\x80-\xBF]*|\x1A/', function ($match) use (&$replaced) {
+            $replaced[] = $match[0];
+
+            return "\x1A";
+        }, $string);
+
+        $breakToken = "\0";
+
+        while (str_contains($skeleton, $breakToken)) {
+            $breakToken .= "\0";
+        }
+
+        $index = 0;
+
+        return implode($break, array_map(function ($segment) use (&$replaced, &$index) {
+            return preg_replace_callback('/\x1A/', function () use (&$replaced, &$index) {
+                return $replaced[$index++];
+            }, $segment);
+        }, explode($breakToken, wordwrap($skeleton, $characters, $breakToken, $cutLongWords))));
     }
 
     /**

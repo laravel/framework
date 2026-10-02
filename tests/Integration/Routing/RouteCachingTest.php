@@ -8,7 +8,7 @@ class RouteCachingTest extends TestCase
 {
     public function testWildcardCatchAllRoutes()
     {
-        $this->routes(__DIR__.'/Fixtures/wildcard_catch_all_routes.php');
+        $this->routes(dirname(__DIR__, 2).'/Routing/Fixtures/wildcard_catch_all_routes.php');
 
         $this->get('/foo')->assertSee('Regular route');
         $this->get('/bar')->assertSee('Wildcard route');
@@ -16,11 +16,22 @@ class RouteCachingTest extends TestCase
 
     public function testRedirectRoutes()
     {
-        $this->routes(__DIR__.'/Fixtures/redirect_routes.php');
+        $this->routes(dirname(__DIR__, 2).'/Routing/Fixtures/redirect_routes.php');
 
         $this->post('/foo/1')->assertRedirect('/foo/1/bar');
         $this->get('/foo/1/bar')->assertSee('Redirect response');
         $this->get('/foo/1')->assertRedirect('/foo/1/bar');
+    }
+
+    public function testQueryRoutes()
+    {
+        $this->routes(dirname(__DIR__, 2).'/Routing/Fixtures/query_routes.php');
+
+        $this->call('QUERY', '/search?term=laravel', ['filter' => 'framework'])->assertExactJson([
+            'method' => 'QUERY',
+            'term' => 'laravel',
+            'filter' => 'framework',
+        ]);
     }
 
     protected function routes(string $file)

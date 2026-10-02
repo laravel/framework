@@ -2,17 +2,16 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Tests\Integration\Database\EloquentPivotWithoutTimestampTest as App;
+use Illuminate\Tests\Integration\Database\Fixtures\EloquentPivotWithoutTimestamp as App;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
-use Orchestra\Testbench\Concerns\WithFixtures;
+
+require_once __DIR__.'/Fixtures/EloquentPivotWithoutTimestamp/Models.php';
 
 #[WithConfig('auth.providers.users.model', App\User::class)]
 #[WithMigration]
 class EloquentPivotWithoutTimestampTest extends DatabaseTestCase
 {
-    use WithFixtures;
-
     protected function afterRefreshingDatabase()
     {
         App\migrate();

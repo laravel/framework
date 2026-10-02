@@ -112,7 +112,7 @@ class BatchRepositoryFake implements BatchRepository
     public function markAsFinished(string $batchId)
     {
         if (isset($this->batches[$batchId])) {
-            $this->batches[$batchId]->finishedAt = now();
+            $this->batches[$batchId]->finishedAt = CarbonImmutable::now();
         }
     }
 
@@ -143,8 +143,10 @@ class BatchRepositoryFake implements BatchRepository
     /**
      * Execute the given Closure within a storage specific transaction.
      *
-     * @param  \Closure  $callback
-     * @return mixed
+     * @template TReturn
+     *
+     * @param  (\Closure(): TReturn)  $callback
+     * @return TReturn
      */
     public function transaction(Closure $callback)
     {

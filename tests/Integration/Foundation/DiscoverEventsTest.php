@@ -9,6 +9,8 @@ use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\Event
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\AbstractListener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\ListenerInterface;
+use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\RegisteredListener;
+use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\SkippedListener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\UnionListeners\UnionListener;
 use Orchestra\Testbench\TestCase;
 use SplFileInfo;
@@ -77,11 +79,25 @@ class DiscoverEventsTest extends TestCase
         ], $events);
     }
 
+    public function testListenersCanOptOutOfDiscovery()
+    {
+        class_alias(RegisteredListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\RegisteredListener');
+        class_alias(SkippedListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\SkippedListener');
+
+        $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/ShouldBeDiscoveredListeners', getcwd());
+
+        $this->assertEquals([
+            EventOne::class => [
+                RegisteredListener::class.'@handle',
+            ],
+        ], $events);
+    }
+
     public function testNoExceptionForEmptyDirectories(): void
     {
         $events = DiscoverEvents::within([], getcwd());
 
-        $this->assertEquals([], $events);
+        $this->assertSame([], $events);
     }
 
     public function testEventsCanBeDiscoveredUsingCustomClassNameGuessing()

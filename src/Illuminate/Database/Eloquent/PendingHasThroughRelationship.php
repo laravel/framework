@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use BadMethodCallException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
@@ -47,7 +48,7 @@ class PendingHasThroughRelationship
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  string|(callable(TIntermediateModel): (\Illuminate\Database\Eloquent\Relations\HasOne<TRelatedModel, TIntermediateModel>|\Illuminate\Database\Eloquent\Relations\HasMany<TRelatedModel, TIntermediateModel>|\Illuminate\Database\Eloquent\Relations\MorphOneOrMany<TRelatedModel, TIntermediateModel>))  $callback
+     * @param  string|(callable(TIntermediateModel): (\Illuminate\Database\Eloquent\Relations\HasOne<TRelatedModel, TIntermediateModel>|\Illuminate\Database\Eloquent\Relations\HasMany<TRelatedModel, TIntermediateModel>|\Illuminate\Database\Eloquent\Relations\MorphMany<TRelatedModel, TIntermediateModel>|\Illuminate\Database\Eloquent\Relations\MorphOneOrMany<TRelatedModel, TIntermediateModel>))  $callback
      * @return (
      *     $callback is string
      *     ? \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Illuminate\Database\Eloquent\Model, TIntermediateModel, TDeclaringModel>|\Illuminate\Database\Eloquent\Relations\HasOneThrough<\Illuminate\Database\Eloquent\Model, TIntermediateModel, TDeclaringModel>
@@ -55,7 +56,7 @@ class PendingHasThroughRelationship
      *         TLocalRelationship is \Illuminate\Database\Eloquent\Relations\HasMany<TIntermediateModel, TDeclaringModel>
      *         ? \Illuminate\Database\Eloquent\Relations\HasManyThrough<TRelatedModel, TIntermediateModel, TDeclaringModel>
      *         : (
-     *              $callback is callable(TIntermediateModel): \Illuminate\Database\Eloquent\Relations\HasMany<TRelatedModel, TIntermediateModel>
+     *              $callback is callable(TIntermediateModel): (\Illuminate\Database\Eloquent\Relations\HasMany<TRelatedModel, TIntermediateModel>|\Illuminate\Database\Eloquent\Relations\MorphMany<TRelatedModel, TIntermediateModel>)
      *              ? \Illuminate\Database\Eloquent\Relations\HasManyThrough<TRelatedModel, TIntermediateModel, TDeclaringModel>
      *              : \Illuminate\Database\Eloquent\Relations\HasOneThrough<TRelatedModel, TIntermediateModel, TDeclaringModel>
      *         )
@@ -70,10 +71,11 @@ class PendingHasThroughRelationship
 
         $distantRelation = $callback($this->localRelationship->getRelated());
 
-        if ($distantRelation instanceof HasMany || $this->localRelationship instanceof HasMany) {
+        if ($distantRelation instanceof HasMany || $distantRelation instanceof MorphMany ||
+            $this->localRelationship instanceof HasMany || $this->localRelationship instanceof MorphMany) {
             $returnedRelation = $this->rootModel->hasManyThrough(
-                $distantRelation->getRelated()::class,
-                $this->localRelationship->getRelated()::class,
+                $distantRelation->getRelatedClass(),
+                $this->localRelationship->getRelatedClass(),
                 $this->localRelationship->getForeignKeyName(),
                 $distantRelation->getForeignKeyName(),
                 $this->localRelationship->getLocalKeyName(),
@@ -81,8 +83,8 @@ class PendingHasThroughRelationship
             );
         } else {
             $returnedRelation = $this->rootModel->hasOneThrough(
-                $distantRelation->getRelated()::class,
-                $this->localRelationship->getRelated()::class,
+                $distantRelation->getRelatedClass(),
+                $this->localRelationship->getRelatedClass(),
                 $this->localRelationship->getForeignKeyName(),
                 $distantRelation->getForeignKeyName(),
                 $this->localRelationship->getLocalKeyName(),
@@ -103,6 +105,8 @@ class PendingHasThroughRelationship
      * @param  string  $method
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \BadMethodCallException
      */
     public function __call($method, $parameters)
     {

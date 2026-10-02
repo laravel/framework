@@ -5,10 +5,13 @@ namespace Illuminate\Tests\Foundation;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Console\DocsCommand;
 use Illuminate\Support\Facades\Http;
+use Orchestra\Testbench\Attributes\WithConfig;
+use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
+#[WithConfig('cache.default', 'array')]
 class FoundationDocsCommandTest extends TestCase
 {
     /**
@@ -30,18 +33,10 @@ class FoundationDocsCommandTest extends TestCase
         parent::setUp();
 
         Http::preventStrayRequests()->fake([
-            'https://laravel.com/docs/8.x/index.json' => Http::response(file_get_contents(__DIR__.'/fixtures/docs.json')),
+            'https://laravel.com/docs/8.x/index.json' => Http::response(file_get_contents(__DIR__.'/Fixtures/docs.json')),
         ]);
 
         $this->app[Kernel::class]->registerCommand($this->command());
-    }
-
-    protected function tearDown(): void
-    {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY');
-        putenv('ARTISAN_DOCS_OPEN_STRATEGY');
-
-        parent::tearDown();
     }
 
     public function testItCanOpenTheLaravelDocumentation(): void
@@ -51,7 +46,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/installation')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/installation');
+        $this->assertSame('https://laravel.com/docs/8.x/installation', $this->openedUrl);
     }
 
     public function testItCanSpecifyAutocompleteInOriginalCasing(): void
@@ -61,7 +56,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/dusk');
+        $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
     public function testItCanSpecifyAutocompleteInLowerCasing(): void
@@ -71,7 +66,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/dusk');
+        $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
     public function testItMatchesSectionsThatStartWithInput()
@@ -80,7 +75,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent-collections#method-unique')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent-collections#method-unique');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent-collections#method-unique', $this->openedUrl);
     }
 
     public function testItMatchesSectionsWithFuzzyMatching()
@@ -89,7 +84,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent-collections#method-toquery')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent-collections#method-toquery');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent-collections#method-toquery', $this->openedUrl);
     }
 
     public function testItCanProvidePageToVisit(): void
@@ -98,7 +93,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent-collections')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent-collections');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent-collections', $this->openedUrl);
     }
 
     public function testItCanUseHyphensInsteadOfEscapingSpaces(): void
@@ -107,7 +102,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent-collections')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent-collections');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent-collections', $this->openedUrl);
     }
 
     public function testItHasMinimumScoreToMatch(): void
@@ -116,7 +111,7 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Unable to determine the page you are trying to visit.')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x');
+        $this->assertSame('https://laravel.com/docs/8.x', $this->openedUrl);
     }
 
     public function testItMinimumScoreAccountsForInputLength(): void
@@ -125,65 +120,58 @@ class FoundationDocsCommandTest extends TestCase
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/localization')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/localization');
+        $this->assertSame('https://laravel.com/docs/8.x/localization', $this->openedUrl);
     }
 
+    #[WithEnv('ARTISAN_DOCS_ASK_STRATEGY', __DIR__.'/Fixtures/always-dusk-ask-strategy.php')]
     public function testItCanUseCustomAskStrategy()
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/always-dusk-ask-strategy.php');
-
         $this->artisan('docs')
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/dusk');
+        $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
+    #[WithEnv('ARTISAN_DOCS_ASK_STRATEGY', __DIR__.'/Fixtures/bad-syntax-strategy.php')]
     public function testItFallsbackToAutocompleteWhenAskStrategyContainsBadSyntax(): void
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/bad-syntax-strategy.php');
-
         $this->artisan('docs')
             ->expectsQuestion('Which page would you like to open?', 'laravel dusk')
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/dusk');
+        $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
+    #[WithEnv('ARTISAN_DOCS_ASK_STRATEGY', __DIR__.'/Fixtures/bad-return-strategy.php')]
     public function testItFallsbackToAutocompleteWithBadAskStrategyReturnValue(): void
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/bad-return-strategy.php');
-
         $this->artisan('docs')
             ->expectsQuestion('Which page would you like to open?', 'laravel dusk')
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/dusk')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/dusk');
+        $this->assertSame('https://laravel.com/docs/8.x/dusk', $this->openedUrl);
     }
 
+    #[WithEnv('ARTISAN_DOCS_ASK_STRATEGY', __DIR__.'/Fixtures/process-interrupt-strategy.php')]
     public function testItCatchesAndHandlesProcessInterruptExceptionsInAskStrategies()
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/process-interrupt-strategy.php');
-
         $this->artisan('docs')->assertExitCode(130);
     }
 
+    #[WithEnv('ARTISAN_DOCS_ASK_STRATEGY', __DIR__.'/Fixtures/exception-throwing-strategy.php')]
     public function testItBubblesUpAskStrategyExceptions()
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/exception-throwing-strategy.php');
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('strategy failed');
+        $this->expectExceptionObject(new RuntimeException('strategy failed'));
 
         $this->artisan('docs');
     }
 
+    #[WithEnv('ARTISAN_DOCS_ASK_STRATEGY', __DIR__.'/Fixtures/process-failure-strategy.php')]
     public function testItBubblesUpNonProcessInterruptExceptionsInAskStrategies()
     {
-        putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/process-failure-strategy.php');
-
         $this->expectException(ProcessFailedException::class);
 
         if (PHP_OS_FAMILY === 'Windows') {
@@ -209,7 +197,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent', $this->openedUrl);
     }
 
     public function testItCanGuessTheRequestedPageWhenItIsContainedSomewhereInThePageTitle()
@@ -218,7 +206,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent', $this->openedUrl);
     }
 
     public function testItCanGuessTheWithTopAndTailMatching()
@@ -227,13 +215,13 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/eloquent-collections')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/eloquent-collections');
+        $this->assertSame('https://laravel.com/docs/8.x/eloquent-collections', $this->openedUrl);
     }
 
+    #[WithEnv('ARTISAN_DOCS_OPEN_STRATEGY', __DIR__.'/Fixtures/open-strategy.php')]
     public function testItCanSpecifyCustomOpenCommandsViaEnvVariables()
     {
         $GLOBALS['open-strategy-output-path'] = __DIR__.'/output.txt';
-        putenv('ARTISAN_DOCS_OPEN_STRATEGY='.__DIR__.'/fixtures/open-strategy.php');
         $this->app[Kernel::class]->registerCommand($this->command()->setUrlOpener(null));
 
         @unlink($GLOBALS['open-strategy-output-path']);
@@ -252,9 +240,9 @@ Working directory: expected-working-directory');
         unset($GLOBALS['open-strategy-output-path']);
     }
 
+    #[WithEnv('ARTISAN_DOCS_OPEN_STRATEGY', __DIR__.'/Fixtures/bad-syntax-strategy.php')]
     public function testItHandlesBadSyntaxInOpeners()
     {
-        putenv('ARTISAN_DOCS_OPEN_STRATEGY='.__DIR__.'/fixtures/bad-syntax-strategy.php');
         $this->app[Kernel::class]->registerCommand($this->command()->setUrlOpener(null));
 
         $this->artisan('docs installation')
@@ -262,9 +250,9 @@ Working directory: expected-working-directory');
             ->assertSuccessful();
     }
 
+    #[WithEnv('ARTISAN_DOCS_OPEN_STRATEGY', __DIR__.'/Fixtures/bad-return-strategy.php')]
     public function testItHandlesBadReturnTypesInOpeners()
     {
-        putenv('ARTISAN_DOCS_OPEN_STRATEGY='.__DIR__.'/fixtures/bad-return-strategy.php');
         $this->app[Kernel::class]->registerCommand($this->command()->setUrlOpener(null));
 
         $this->artisan('docs installation')
@@ -282,7 +270,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x?q=here%20is%20my%20search%20term%20for%20the%20laravel%20website')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x?q=here%20is%20my%20search%20term%20for%20the%20laravel%20website');
+        $this->assertSame('https://laravel.com/docs/8.x?q=here%20is%20my%20search%20term%20for%20the%20laravel%20website', $this->openedUrl);
 
         $_SERVER['argv'] = $argCache;
     }
@@ -302,7 +290,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/filesystem')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/filesystem');
+        $this->assertSame('https://laravel.com/docs/8.x/filesystem', $this->openedUrl);
     }
 
     public function testItHandlesPoorSpelling()
@@ -311,7 +299,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x/views')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x/views');
+        $this->assertSame('https://laravel.com/docs/8.x/views', $this->openedUrl);
     }
 
     public function testItHandlesNoInteractionOption()
@@ -320,7 +308,7 @@ Working directory: expected-working-directory');
             ->expectsOutputToContain('Opening the docs to: https://laravel.com/docs/8.x')
             ->assertSuccessful();
 
-        $this->assertSame($this->openedUrl, 'https://laravel.com/docs/8.x');
+        $this->assertSame('https://laravel.com/docs/8.x', $this->openedUrl);
     }
 
     public function testCanGetHelpWithoutInstantiatingDependencies()

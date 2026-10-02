@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Mail;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Queue\Middleware\RateLimited;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
@@ -40,11 +41,22 @@ class SendingQueuedMailTest extends TestCase
         Queue::connection('mail-connection')->assertPushedOn('mail-queue', SendQueuedMailable::class);
     }
 
+    public function testMailIsSentWhenForwardingQueue()
+    {
+        Queue::fake();
+
+        Queue::forward('mail-queue', 'main', 'mail-connection');
+
+        Mail::to('test@mail.com')->queue(new SendingQueuedForwardedMailTestMail);
+
+        Queue::connection('mail-connection')->assertPushedOn('mail-queue', SendQueuedMailable::class);
+    }
+
     public function testMailIsSentWithDelay()
     {
         Queue::fake();
 
-        $delay = now()->addMinutes(10);
+        $delay = Carbon::now()->addMinutes(10);
 
         Mail::to('test@mail.com')->later($delay, new SendingQueuedMailTestMail);
 
@@ -69,5 +81,20 @@ class SendingQueuedMailTestMail extends Mailable
     public function middleware()
     {
         return [new RateLimited('limiter')];
+    }
+}
+
+class SendingQueuedForwardedMailTestMail extends Mailable
+{
+    public $queue = 'mail-queue';
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        return $this->view('view');
     }
 }

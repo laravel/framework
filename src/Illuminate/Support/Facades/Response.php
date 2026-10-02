@@ -10,6 +10,7 @@ use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
  * @method static \Illuminate\Http\Response view(string|array $view, array $data = [], int $status = 200, array $headers = [])
  * @method static \Illuminate\Http\JsonResponse json(mixed $data = [], int $status = 200, array $headers = [], int $options = 0)
  * @method static \Illuminate\Http\JsonResponse jsonp(string $callback, mixed $data = [], int $status = 200, array $headers = [], int $options = 0)
+ * @method static \Illuminate\Http\Response markdown(string $content = '', int $status = 200, array $headers = [])
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse eventStream(\Closure $callback, array $headers = [], \Illuminate\Http\StreamedEvent|string|null $endStreamWith = '</stream>')
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse stream(callable|null $callback, int $status = 200, array $headers = [])
  * @method static \Symfony\Component\HttpFoundation\StreamedJsonResponse streamJson(array $data, int $status = 200, array $headers = [], int $encodingOptions = 15)

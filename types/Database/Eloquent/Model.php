@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\HasCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use User;
 
 use function PHPStan\Testing\assertType;
@@ -28,7 +29,7 @@ function test(User $user, Post $post, Comment $comment, Article $article): void
     User::addGlobalScope('ancient', function ($builder) {
         assertType('Illuminate\Database\Eloquent\Builder<User>', $builder);
 
-        $builder->where('created_at', '<', now()->subYears(2000));
+        $builder->where('created_at', '<', Carbon::now()->subYears(2000));
     });
 
     assertType('Illuminate\Database\Eloquent\Builder<User>', User::query());
@@ -48,6 +49,11 @@ function test(User $user, Post $post, Comment $comment, Article $article): void
     assertType('bool', $user->restore());
     assertType('User', $user->restoreOrCreate());
     assertType('User', $user->createOrRestore());
+
+    assertType("'foo'", User::withoutEvents(fn () => 'foo'));
+    assertType("'foo'", User::withoutBroadcasting(fn () => 'foo'));
+    assertType("'foo'", User::withoutTimestampsOn([], fn () => 'foo'));
+    assertType("'foo'", User::withoutTimestamps(fn () => 'foo'));
 }
 
 class Post extends Model

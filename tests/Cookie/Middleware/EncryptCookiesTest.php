@@ -34,8 +34,6 @@ class EncryptCookiesTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->container = new Container;
         $this->container->singleton(EncrypterContract::class, function () {
             return new Encrypter(str_repeat('a', 16));

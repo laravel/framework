@@ -33,7 +33,7 @@ class QueryException extends PDOException
     /**
      * The PDO read / write type for the executed query.
      *
-     * @var null|'read'|'write'
+     * @var null|'read'|'write'|'direct'
      */
     public $readWriteType;
 
@@ -51,10 +51,11 @@ class QueryException extends PDOException
      * @param  string  $sql
      * @param  array  $bindings
      * @param  \Throwable  $previous
-     * @param  null|'read'|'write'  $readWriteType
      * @param  array  $connectionDetails
+     * @param  null|'read'|'write'|'direct'  $readWriteType
+     * @param  bool  $maskBindings
      */
-    public function __construct($connectionName, $sql, array $bindings, Throwable $previous, array $connectionDetails = [], $readWriteType = null)
+    public function __construct($connectionName, $sql, array $bindings, Throwable $previous, array $connectionDetails = [], $readWriteType = null, $maskBindings = false)
     {
         parent::__construct('', 0, $previous);
 
@@ -64,7 +65,7 @@ class QueryException extends PDOException
         $this->connectionDetails = $connectionDetails;
         $this->readWriteType = $readWriteType;
         $this->code = $previous->getCode();
-        $this->message = $this->formatMessage($connectionName, $sql, $bindings, $previous);
+        $this->message = $this->formatMessage($connectionName, $sql, $bindings, $previous, $maskBindings);
 
         if ($previous instanceof PDOException) {
             $this->errorInfo = $previous->errorInfo;
@@ -78,13 +79,16 @@ class QueryException extends PDOException
      * @param  string  $sql
      * @param  array  $bindings
      * @param  \Throwable  $previous
+     * @param  bool  $maskBindings
      * @return string
      */
-    protected function formatMessage($connectionName, $sql, $bindings, Throwable $previous)
+    protected function formatMessage($connectionName, $sql, $bindings, Throwable $previous, $maskBindings = false)
     {
         $details = $this->formatConnectionDetails();
 
-        return $previous->getMessage().' (Connection: '.$connectionName.$details.', SQL: '.Str::replaceArray('?', $bindings, $sql).')';
+        $sql = $maskBindings ? $sql : Str::replaceArray('?', $bindings, $sql);
+
+        return $previous->getMessage().' (Connection: '.$connectionName.$details.', SQL: '.$sql.')';
     }
 
     /**

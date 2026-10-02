@@ -113,7 +113,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
 
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->contributors()->detach($user->id);
-        $this->assertEquals([], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertSame([], PivotEventsTestCollaborator::$eventsCalled);
     }
 
     public function testCustomPivotUpdateEventHasExistingAttributes()

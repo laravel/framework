@@ -65,10 +65,9 @@ class AssertTest extends TestCase
 
     public function testArraySubsetMayFailIfArrayIsNotArray(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new InvalidArgumentException(
             'Argument #1 of Illuminate\Testing\Assert::assertArraySubset() must be an array or ArrayAccess'
-        );
+        ));
 
         Assert::assertArraySubset('string', [
             'int' => 1,
@@ -79,10 +78,9 @@ class AssertTest extends TestCase
 
     public function testArraySubsetMayFailIfSubsetIsNotArray(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionObject(new InvalidArgumentException(
             'Argument #2 of Illuminate\Testing\Assert::assertArraySubset() must be an array or ArrayAccess'
-        );
+        ));
 
         Assert::assertArraySubset([
             'string' => 'string',

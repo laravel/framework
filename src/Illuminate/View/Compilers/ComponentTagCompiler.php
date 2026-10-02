@@ -250,7 +250,7 @@ class ComponentTagCompiler
 
             $parameters = [
                 'view' => $view,
-                'data' => '['.$this->attributesToString($data->all(), $escapeBound = false).']',
+                'data' => '['.$this->attributesToString($data->all(), escapeBound: false).']',
             ];
 
             $class = AnonymousComponent::class;
@@ -258,7 +258,7 @@ class ComponentTagCompiler
             $parameters = $data->all();
         }
 
-        return "##BEGIN-COMPONENT-CLASS##@component('{$class}', '{$component}', [".$this->attributesToString($parameters, $escapeBound = false).'])
+        return "##BEGIN-COMPONENT-CLASS##@component('{$class}', '{$component}', [".$this->attributesToString($parameters, escapeBound: false).'])
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\\'.$class.'::ignoredParameterNames()); ?>
 <?php endif; ?>
@@ -340,9 +340,9 @@ class ComponentTagCompiler
                     : $component;
 
                 if (! is_null($guess = match (true) {
-                    $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent) => $guess, // @phpstan-ignore variable.undefined
-                    $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent.'.index') => $guess, // @phpstan-ignore variable.undefined
-                    $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent.'.'.Str::afterLast($formattedComponent, '.')) => $guess, // @phpstan-ignore variable.undefined
+                    $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent) => $guess,
+                    $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent.'.index') => $guess,
+                    $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent.'.'.Str::afterLast($formattedComponent, '.')) => $guess,
                     default => null,
                 })) {
                     return $guess;

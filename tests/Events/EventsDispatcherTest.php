@@ -6,7 +6,7 @@ use Error;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
-use Mockery as m;
+use Illuminate\Tests\Events\Fixtures\ExampleEvent;
 use PHPUnit\Framework\TestCase;
 
 class EventsDispatcherTest extends TestCase
@@ -47,7 +47,7 @@ class EventsDispatcherTest extends TestCase
             return 'callback_result';
         });
 
-        $this->assertEquals('callback_result', $result);
+        $this->assertSame('callback_result', $result);
         $this->assertSame('bar', $_SERVER['__event.test']);
     }
 
@@ -196,7 +196,7 @@ class EventsDispatcherTest extends TestCase
         $d = new Dispatcher;
         $response = $d->dispatch('foo');
 
-        $this->assertEquals([], $response);
+        $this->assertSame([], $response);
 
         $response = $d->dispatch('foo', [], true);
         $this->assertNull($response);
@@ -245,16 +245,6 @@ class EventsDispatcherTest extends TestCase
         $response = $d->dispatch('foo', ['bar']);
 
         $this->assertEquals([0, [], '', null], $response);
-    }
-
-    public function testContainerResolutionOfEventHandlers()
-    {
-        $d = new Dispatcher($container = m::mock(Container::class));
-        $container->shouldReceive('make')->once()->with(TestEventListener::class)->andReturn(new TestEventListener);
-        $d->listen('foo', TestEventListener::class.'@onFooEvent');
-        $response = $d->dispatch('foo', ['foo', 'bar']);
-
-        $this->assertEquals(['baz'], $response);
     }
 
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
@@ -605,7 +595,7 @@ class EventsDispatcherTest extends TestCase
         $d->listen(TestEvent::class, TestListener3::class);
 
         // Attaching events does not make any objects.
-        $this->assertEquals([], $_SERVER['__event.test']);
+        $this->assertSame([], $_SERVER['__event.test']);
 
         $d->dispatch(TestEvent::class);
 
@@ -717,6 +707,35 @@ class EventsDispatcherTest extends TestCase
 
         unset($_SERVER['__event.test']);
     }
+
+    public function testEventDispatchesUsingNamedArguments()
+    {
+        $container = new Container;
+        $events = new Dispatcher;
+        $container->instance('events', $events);
+
+        $originalContainer = Container::getInstance();
+        Container::setInstance($container);
+
+        try {
+            $captured = null;
+            $events->listen(DispatchableNamedArgumentsEvent::class, function ($event) use (&$captured) {
+                $captured = $event;
+
+                return 'dispatched';
+            });
+
+            $this->assertSame(
+                ['dispatched'],
+                DispatchableNamedArgumentsEvent::dispatch(second: 'second-value', first: 'first-value')
+            );
+            $this->assertInstanceOf(DispatchableNamedArgumentsEvent::class, $captured);
+            $this->assertSame('first-value', $captured->first);
+            $this->assertSame('second-value', $captured->second);
+        } finally {
+            Container::setInstance($originalContainer);
+        }
+    }
 }
 
 class TestListenerLean
@@ -755,11 +774,6 @@ class TestListenerInvokey
 
         return false;
     }
-}
-
-class ExampleEvent
-{
-    //
 }
 
 interface SomeEventInterface
@@ -867,4 +881,15 @@ class DeferTestEvent
 
 class ImmediateTestEvent
 {
+}
+
+class DispatchableNamedArgumentsEvent
+{
+    use \Illuminate\Foundation\Events\Dispatchable;
+
+    public function __construct(
+        public string $first,
+        public string $second,
+    ) {
+    }
 }

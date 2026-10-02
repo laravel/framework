@@ -3,13 +3,14 @@
 namespace Illuminate\Tests\Console\Scheduling;
 
 use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository;
+use Illuminate\Cache\StorageStore;
 use Illuminate\Console\Scheduling\CacheEventMutex;
 use Illuminate\Console\Scheduling\CacheSchedulingMutex;
 use Illuminate\Console\Scheduling\Event;
-use Illuminate\Contracts\Cache\Factory;
-use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
+use Illuminate\Tests\Console\Fixtures\FakeCacheFactory;
 use PHPUnit\Framework\TestCase;
 
 class CacheSchedulingMutexTest extends TestCase
@@ -30,79 +31,79 @@ class CacheSchedulingMutexTest extends TestCase
     protected $time;
 
     /**
-     * @var \Illuminate\Contracts\Cache\Factory
+     * @var \Illuminate\Tests\Console\Fixtures\FakeCacheFactory
      */
     protected $cacheFactory;
 
-    /**
-     * @var \Illuminate\Contracts\Cache\Repository
-     */
-    protected $cacheRepository;
-
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->cacheFactory = m::mock(Factory::class);
-        $this->cacheRepository = m::mock(Repository::class);
-        $this->cacheFactory->shouldReceive('store')->andReturn($this->cacheRepository);
-        $this->cacheMutex = new CacheSchedulingMutex($this->cacheFactory);
+        $this->cacheMutex = new CacheSchedulingMutex($this->cacheFactory = new FakeCacheFactory);
         $this->event = new Event(new CacheEventMutex($this->cacheFactory), 'command');
         $this->time = Carbon::now();
     }
 
+    protected function storageRepository()
+    {
+        return new Repository(new StorageStore(new ArrayFilesystem, 'cache'));
+    }
+
+    protected function mutexName()
+    {
+        return $this->event->mutexName().$this->time->format('Hi');
+    }
+
     public function testMutexReceivesCorrectCreate()
     {
-        $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 3600)->andReturn(true);
+        $this->cacheFactory->repository = $this->storageRepository();
 
         $this->assertTrue($this->cacheMutex->create($this->event, $this->time));
+        $this->assertTrue($this->cacheFactory->repository->has($this->mutexName()));
     }
 
     public function testCanUseCustomConnection()
     {
-        $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheFactory->shouldReceive('store')->with('test')->andReturn($this->cacheRepository);
-        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 3600)->andReturn(true);
+        $this->cacheFactory->repository = $this->storageRepository();
         $this->cacheMutex->useStore('test');
 
         $this->assertTrue($this->cacheMutex->create($this->event, $this->time));
+        $this->assertSame('test', $this->cacheFactory->name);
     }
 
     public function testPreventsMultipleRuns()
     {
-        $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 3600)->andReturn(false);
+        $repository = $this->storageRepository();
+        $repository->add($this->mutexName(), true, 3600);
+        $this->cacheFactory->repository = $repository;
 
         $this->assertFalse($this->cacheMutex->create($this->event, $this->time));
     }
 
     public function testChecksForNonRunSchedule()
     {
-        $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheRepository->shouldReceive('has')->once()->with($this->event->mutexName().$this->time->format('Hi'))->andReturn(false);
+        $this->cacheFactory->repository = $this->storageRepository();
 
         $this->assertFalse($this->cacheMutex->exists($this->event, $this->time));
     }
 
     public function testChecksForAlreadyRunSchedule()
     {
-        $this->cacheRepository->shouldReceive('getStore')->andReturn(new \stdClass);
-        $this->cacheRepository->shouldReceive('has')->with($this->event->mutexName().$this->time->format('Hi'))->andReturn(true);
+        $repository = $this->storageRepository();
+        $repository->add($this->mutexName(), true, 3600);
+        $this->cacheFactory->repository = $repository;
 
         $this->assertTrue($this->cacheMutex->exists($this->event, $this->time));
     }
 
     public function testMutexReceivesCorrectCreateWithLockProvider()
     {
-        $this->cacheRepository->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $this->cacheFactory->repository = new Repository(new ArrayStore);
 
         $this->assertTrue($this->cacheMutex->create($this->event, $this->time));
     }
 
     public function testPreventsMultipleRunsWithLockProvider()
     {
-        $this->cacheRepository->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $this->cacheFactory->repository = new Repository(new ArrayStore);
 
         // first create the lock, so we can test that the next call fails.
         $this->cacheMutex->create($this->event, $this->time);
@@ -112,14 +113,14 @@ class CacheSchedulingMutexTest extends TestCase
 
     public function testChecksForNonRunScheduleWithLockProvider()
     {
-        $this->cacheRepository->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $this->cacheFactory->repository = new Repository(new ArrayStore);
 
         $this->assertFalse($this->cacheMutex->exists($this->event, $this->time));
     }
 
     public function testChecksForAlreadyRunScheduleWithLockProvider()
     {
-        $this->cacheRepository->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $this->cacheFactory->repository = new Repository(new ArrayStore);
 
         $this->cacheMutex->create($this->event, $this->time);
 

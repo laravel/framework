@@ -9,7 +9,7 @@ use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
 use Illuminate\Database\Schema\MariaDbBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMariaDbSchemaGrammarTest extends TestCase
@@ -17,9 +17,9 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testBasicCreateTable()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -63,9 +63,9 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAutoIncrementStartingValue()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -96,8 +96,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testEngineCreateTable()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -111,9 +111,9 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $this->assertSame("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB", $statements[0]);
 
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn('InnoDB');
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->andReturn('InnoDB');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -129,7 +129,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testCharsetCollationCreateTable()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('engine')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -144,9 +144,9 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $this->assertSame("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'", $statements[0]);
 
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -274,6 +274,16 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `geo` drop index `geo_coordinates_spatialindex`', $statements[0]);
+    }
+
+    public function testDropVectorIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->dropVectorIndex(['embeddings']);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `posts` drop index `posts_embeddings_vectorindex`', $statements[0]);
     }
 
     public function testDropForeign()
@@ -871,8 +881,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAddingDate()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(true);
-        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+        $conn->expects('isMaria')->andReturn(true);
+        $conn->expects('getServerVersion')->andReturn('10.3.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo');
@@ -885,8 +895,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAddingDateWithDefaultCurrent()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(true);
-        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+        $conn->expects('isMaria')->andReturn(true);
+        $conn->expects('getServerVersion')->andReturn('10.3.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo')->useCurrent();
@@ -899,8 +909,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAddingYear()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(true);
-        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+        $conn->expects('isMaria')->andReturn(true);
+        $conn->expects('getServerVersion')->andReturn('10.3.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year');
@@ -912,8 +922,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAddingYearWithDefaultCurrent()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(true);
-        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+        $conn->expects('isMaria')->andReturn(true);
+        $conn->expects('getServerVersion')->andReturn('10.3.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year')->useCurrent();
@@ -1166,7 +1176,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testAddingUuidOn106()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getServerVersion')->andReturn('10.6.21');
+        $conn->expects('getServerVersion')->andReturn('10.6.21');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->uuid('foo');
@@ -1380,8 +1390,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testCreateDatabase()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_foo');
-        $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_foo');
+        $connection->expects('getConfig')->once()->with('charset')->andReturn('utf8mb4_foo');
+        $connection->expects('getConfig')->once()->with('collation')->andReturn('utf8mb4_unicode_ci_foo');
 
         $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_a');
 
@@ -1391,8 +1401,8 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         );
 
         $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_bar');
-        $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_bar');
+        $connection->expects('getConfig')->once()->with('charset')->andReturn('utf8mb4_bar');
+        $connection->expects('getConfig')->once()->with('collation')->andReturn('utf8mb4_unicode_ci_bar');
 
         $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_b');
 
@@ -1405,9 +1415,9 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testCreateTableWithVirtualAsColumn()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1464,9 +1474,9 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     public function testCreateTableWithStoredAsColumn()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1554,18 +1564,17 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         ?MariaDbBuilder $builder = null,
         string $prefix = ''
     ) {
-        $connection = m::mock(Connection::class)
-            ->shouldReceive('getTablePrefix')->andReturn($prefix)
-            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
-            ->getMock();
+        $connection = Mockery::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
 
         $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return $connection
-            ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
-            ->shouldReceive('getSchemaBuilder')->andReturn($builder)
-            ->getMock();
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn($builder);
+
+        return $connection;
     }
 
     public function getGrammar(?Connection $connection = null)

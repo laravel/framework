@@ -24,7 +24,7 @@ interface Repository
     /**
      * Get all of the configuration items for the application.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function all();
 

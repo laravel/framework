@@ -34,7 +34,7 @@ class ReceiveFile
             Storage::disk($this->disk)->put($path, $request->getContent());
 
             return response()->noContent();
-        } catch (PathTraversalDetected $e) {
+        } catch (PathTraversalDetected) {
             abort(404);
         }
     }
@@ -44,6 +44,6 @@ class ReceiveFile
      */
     protected function hasValidSignature(Request $request): bool
     {
-        return $request->boolean('upload') && $request->hasValidRelativeSignature();
+        return filter_var($request->query('upload', false), FILTER_VALIDATE_BOOLEAN) && $request->hasValidRelativeSignature();
     }
 }

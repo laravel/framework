@@ -13,8 +13,6 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         tap(new DB)->addConnection([
             'driver' => 'sqlite',
             'database' => ':memory:',
@@ -23,9 +21,8 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
     protected function tearDown(): void
     {
+        Model::clearBootedModels();
         Model::unsetConnectionResolver();
-
-        parent::tearDown();
     }
 
     public function testGlobalScopeIsApplied()
@@ -41,7 +38,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScope(ActiveScope::class);
         $this->assertSame('select * from "table"', $query->toSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertSame([], $query->getBindings());
     }
 
     public function testClassNameGlobalScopeIsApplied()
@@ -68,6 +65,14 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([1], $query->getBindings());
     }
 
+    public function testGlobalScopeInParentClassAttributeIsApplied()
+    {
+        $model = new EloquentGlobalScopeInAttributeChildTestModel;
+        $query = $model->newQuery();
+        $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
+    }
+
     public function testClosureGlobalScopeIsApplied()
     {
         $model = new EloquentClosureGlobalScopesTestModel;
@@ -89,7 +94,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScope('active_scope');
         $this->assertSame('select * from "table" order by "name" asc', $query->toSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertSame([], $query->getBindings());
     }
 
     public function testGlobalScopeCanBeRemovedAfterTheQueryIsExecuted()
@@ -101,7 +106,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
         $query->withoutGlobalScope('active_scope');
         $this->assertSame('select * from "table" order by "name" asc', $query->toSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertSame([], $query->getBindings());
     }
 
     public function testAllGlobalScopesCanBeRemoved()
@@ -109,11 +114,11 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScopes();
         $this->assertSame('select * from "table"', $query->toSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertSame([], $query->getBindings());
 
         $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes();
         $this->assertSame('select * from "table"', $query->toSql());
-        $this->assertEquals([], $query->getBindings());
+        $this->assertSame([], $query->getBindings());
     }
 
     public function testAllGlobalScopesCanBeRemovedExceptSpecified()
@@ -324,4 +329,15 @@ class EloquentGlobalScopeInInheritedAttributeTestModel extends Model
     use EloquentGlobalScopeInInheritedAttributeTestTrait;
 
     protected $table = 'table';
+}
+
+#[ScopedBy(ActiveScope::class)]
+class EloquentGlobalScopeInAttributeParentTestModel extends Model
+{
+    protected $table = 'table';
+}
+
+class EloquentGlobalScopeInAttributeChildTestModel extends EloquentGlobalScopeInAttributeParentTestModel
+{
+    //
 }

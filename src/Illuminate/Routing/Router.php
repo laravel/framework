@@ -133,7 +133,7 @@ class Router implements BindingRegistrar, RegistrarContract
      *
      * @var string[]
      */
-    public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
+    public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'QUERY'];
 
     /**
      * Create a new Router instance.
@@ -218,6 +218,18 @@ class Router implements BindingRegistrar, RegistrarContract
     public function options($uri, $action = null)
     {
         return $this->addRoute('OPTIONS', $uri, $action);
+    }
+
+    /**
+     * Register a new QUERY route with the router.
+     *
+     * @param  string  $uri
+     * @param  array|string|callable|null  $action
+     * @return \Illuminate\Routing\Route
+     */
+    public function query($uri, $action = null)
+    {
+        return $this->addRoute('QUERY', $uri, $action);
     }
 
     /**
@@ -1307,13 +1319,7 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         $names = is_array($name) ? $name : func_get_args();
 
-        foreach ($names as $value) {
-            if (! $this->routes->hasNamedRoute($value)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($names, fn ($value) => $this->routes->hasNamedRoute($value));
     }
 
     /**
@@ -1368,13 +1374,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function uses(...$patterns)
     {
-        foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $this->currentRouteAction())) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($patterns, fn ($pattern) => Str::is($pattern, $this->currentRouteAction()));
     }
 
     /**

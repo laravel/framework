@@ -48,6 +48,23 @@ class UniqueUntilProcessingJobTest extends QueueTestCase
         UniqueUntilProcessingJobThatReleases::dispatch();
         $this->assertDatabaseCount('jobs', 1);
     }
+
+    public function testShouldBeUniqueUntilProcessingReleasesLockWhenLaterAttemptIsProcessed()
+    {
+        UniqueUntilProcessingJobThatReleasesOnce::dispatch();
+
+        $this->assertNotNull(DB::table('cache_locks')->first());
+
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertFalse(UniqueUntilProcessingJobThatReleasesOnce::$handled);
+        $this->assertNotNull(DB::table('cache_locks')->first());
+
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertTrue(UniqueUntilProcessingJobThatReleasesOnce::$handled);
+        $this->assertNull(DB::table('cache_locks')->first());
+    }
 }
 
 class UniqueTestJobThatDoesNotRelease implements ShouldQueue, ShouldBeUniqueUntilProcessing
@@ -85,5 +102,28 @@ class UniqueUntilProcessingJobThatReleases extends UniqueTestJobThatDoesNotRelea
     public function uniqueId()
     {
         return 100;
+    }
+}
+
+class UniqueUntilProcessingJobThatReleasesOnce extends UniqueTestJobThatDoesNotRelease
+{
+    public $tries = 2;
+
+    public function middleware()
+    {
+        return [
+            function ($job, $next) {
+                if ($job->attempts() === 1) {
+                    return $job->release();
+                }
+
+                return $next($job);
+            },
+        ];
+    }
+
+    public function uniqueId()
+    {
+        return 200;
     }
 }

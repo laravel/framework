@@ -5,8 +5,11 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Enums\IntegerStatus;
+use Illuminate\Tests\Database\Fixtures\Enums\NonBackedStatus;
+use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 
-include_once 'Enums.php';
+include_once __DIR__.'/../../Database/Fixtures/Enums/Enums.php';
 
 class QueryingWithEnumsTest extends DatabaseTestCase
 {

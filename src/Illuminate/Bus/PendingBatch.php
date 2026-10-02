@@ -94,6 +94,8 @@ class PendingBatch
      *
      * @param  object|array  $job
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected function ensureJobIsBatchable(object|array $job): void
     {
@@ -102,7 +104,7 @@ class PendingBatch
                 return;
             }
 
-            if (! (static::$batchableClasses[$job::class] ?? false) && ! in_array(Batchable::class, class_uses_recursive($job))) {
+            if (! (static::$batchableClasses[$job::class] ?? false) && ! isset(class_uses_recursive($job)[Batchable::class])) {
                 static::$batchableClasses[$job::class] = false;
 
                 throw new RuntimeException(sprintf('Attempted to batch job [%s], but it does not use the Batchable trait.', $job::class));
@@ -232,7 +234,7 @@ class PendingBatch
      *
      * Optionally, add callbacks to be executed upon each job failure.
      *
-     * @template TParam of (Closure(\Illuminate\Bus\Batch, \Throwable|null): mixed)|(callable(\Illuminate\Bus\Batch, \Throwable|null): mixed)
+     * @phpstan-type TParam (Closure(\Illuminate\Bus\Batch, \Throwable|null): mixed)|(callable(\Illuminate\Bus\Batch, \Throwable|null): mixed)
      *
      * @param  bool|TParam|array<array-key, TParam>  $param
      * @return $this

@@ -13,6 +13,8 @@ use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Arr;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
  * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
@@ -99,11 +101,11 @@ abstract class HasOneOrManyThrough extends Relation
     {
         $query = $this->getRelationQuery();
 
-        $localValue = $this->farParent[$this->localKey];
-
         $this->performJoin($query);
 
         if (static::$constraints) {
+            $localValue = $this->farParent[$this->localKey];
+
             $query->where($this->getQualifiedFirstKeyName(), '=', $localValue);
         }
     }
@@ -238,6 +240,8 @@ abstract class HasOneOrManyThrough extends Relation
      * @param  array  $attributes
      * @param  (\Closure(): array)|array  $values
      * @return TRelatedModel
+     *
+     * @throws \Illuminate\Database\UniqueConstraintViolationException
      */
     public function createOrFirst(array $attributes = [], Closure|array $values = [])
     {
@@ -403,6 +407,8 @@ abstract class HasOneOrManyThrough extends Relation
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
+            $id = array_map(enum_value(...), $id);
+
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }
@@ -440,6 +446,8 @@ abstract class HasOneOrManyThrough extends Relation
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
+            $id = array_map(enum_value(...), $id);
+
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }
@@ -591,9 +599,9 @@ abstract class HasOneOrManyThrough extends Relation
      */
     public function eachById(callable $callback, $count = 1000, $column = null, $alias = null)
     {
-        $column = $column ?? $this->getRelated()->getQualifiedKeyName();
+        $column ??= $this->getRelated()->getQualifiedKeyName();
 
-        $alias = $alias ?? $this->getRelated()->getKeyName();
+        $alias ??= $this->getRelated()->getKeyName();
 
         return $this->prepareQueryBuilder()->eachById($callback, $count, $column, $alias);
     }

@@ -4,6 +4,7 @@ namespace Illuminate\Events;
 
 use Closure;
 use Exception;
+use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
@@ -20,11 +21,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\DebounceFor;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
-use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\Attributes\UniqueFor;
@@ -33,14 +35,16 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ReadsClassAttributes;
 use Illuminate\Support\Traits\ReflectsClosures;
+use LogicException;
 use ReflectionClass;
 
 use function Illuminate\Support\enum_value;
 
 class Dispatcher implements DispatcherContract
 {
-    use Macroable, ReadsQueueAttributes, ReflectsClosures, ResolvesQueueRoutes;
+    use Macroable, ReadsClassAttributes, ReflectsClosures, ResolvesQueueRoutes;
 
     /**
      * The IoC container instance.
@@ -180,13 +184,7 @@ class Dispatcher implements DispatcherContract
      */
     public function hasWildcardListeners($eventName)
     {
-        foreach ($this->wildcards as $key => $listeners) {
-            if (Str::is($key, $eventName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->wildcards, fn ($listeners, $key) => Str::is($key, $eventName));
     }
 
     /**
@@ -245,7 +243,7 @@ class Dispatcher implements DispatcherContract
      * Resolve the subscriber instance.
      *
      * @param  object|class-string  $subscriber
-     * @return $subscriber is object ? object : mixed
+     * @return ($subscriber is object ? object : mixed)
      */
     protected function resolveSubscriber($subscriber)
     {
@@ -542,6 +540,7 @@ class Dispatcher implements DispatcherContract
         $listener = $this->container->make($class);
 
         return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
+                && ! in_array($method, ['creating', 'updating', 'saving', 'deleting', 'restoring', 'forceDeleting'])
             ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
             : [$listener, $method];
     }
@@ -563,7 +562,7 @@ class Dispatcher implements DispatcherContract
      * @param  class-string  $class
      * @return bool
      *
-     * @phpstan-assert-if-true \Illuminate\Contracts\Queue\ShouldQueue $class
+     * @phpstan-assert-if-true class-string<\Illuminate\Contracts\Queue\ShouldQueue> $class
      */
     protected function handlerShouldBeQueued($class)
     {
@@ -654,10 +653,18 @@ class Dispatcher implements DispatcherContract
      * @param  string  $method
      * @param  array  $arguments
      * @return void
+     *
+     * @throws \LogicException
      */
     protected function queueHandler($class, $method, $arguments)
     {
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
+
+        $debounceFor = $this->getAttributeValue($listener, DebounceFor::class, 'debounceFor');
+
+        if (! is_null($debounceFor) && $job->shouldBeUnique) {
+            throw new LogicException('A debounced listener cannot also implement ShouldBeUnique.');
+        }
 
         if ($job->shouldBeUnique &&
             ! (new UniqueLock($this->container->make(Cache::class)))->acquire($job)) {
@@ -678,10 +685,20 @@ class Dispatcher implements DispatcherContract
 
         $delay = method_exists($listener, 'withDelay')
             ? (isset($arguments[0]) ? $listener->withDelay($arguments[0]) : $listener->withDelay())
-            : $listener->delay ?? null;
+            : $this->getAttributeValue($listener, Delay::class, 'delay');
 
         if (is_null($queue)) {
             $queue = $this->resolveQueueFromQueueRoute($listener) ?? null;
+        }
+
+        if (! is_null($debounceFor)) {
+            $debounce = (new DebounceLock($this->container->make(Cache::class)))->acquire(
+                $job, $debounceFor, $this->getAttributeInstance($listener, DebounceFor::class)?->maxWait
+            );
+
+            $job->debounceOwner = $debounce['owner'];
+
+            $delay ??= $debounce['maxWaitExceeded'] ? 0 : $debounceFor;
         }
 
         is_null($delay)
@@ -698,6 +715,8 @@ class Dispatcher implements DispatcherContract
      * @param  string  $method
      * @param  array  $arguments
      * @return array{TListener, mixed}
+     *
+     * @throws \ReflectionException
      */
     protected function createListenerAndJob($class, $method, $arguments)
     {
@@ -756,6 +775,12 @@ class Dispatcher implements DispatcherContract
                 $job->uniqueFor = method_exists($listener, 'uniqueFor')
                     ? $listener->uniqueFor(...$data)
                     : ($this->getAttributeValue($listener, UniqueFor::class, 'uniqueFor') ?? 0);
+            }
+
+            if (! is_null($this->getAttributeValue($listener, DebounceFor::class, 'debounceFor'))) {
+                $job->debounceId = method_exists($listener, 'debounceId')
+                    ? $listener->debounceId(...$data)
+                    : ($listener->debounceId ?? null);
             }
         });
     }
@@ -831,7 +856,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Set the database transaction manager resolver implementation.
      *
-     * @param  (callable(): \Illuminate\Database\DatabaseTransactionsManager|null)  $resolver
+     * @param  (callable(): (\Illuminate\Database\DatabaseTransactionsManager|null))  $resolver
      * @return $this
      */
     public function setTransactionManagerResolver(callable $resolver)
@@ -890,7 +915,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Gets the raw, unprepared listeners.
      *
-     * @return array
+     * @return array<string, callable|array|class-string|null>
      */
     public function getRawListeners()
     {

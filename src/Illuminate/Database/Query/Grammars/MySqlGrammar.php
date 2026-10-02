@@ -42,6 +42,20 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a "where binary" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBinary(Builder $query, $where)
+    {
+        $where['operator'] = ($where['not'] ? '!=' : '=').' binary';
+
+        return $this->whereBasic($query, $where);
+    }
+
+    /**
      * Compile a "where like" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -55,6 +69,18 @@ class MySqlGrammar extends Grammar
         $where['operator'] .= $where['caseSensitive'] ? 'like binary' : 'like';
 
         return $this->whereBasic($query, $where);
+    }
+
+    /**
+     * Compile a "where null safe equals" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNullSafeEquals(Builder $query, $where)
+    {
+        return $this->wrap($where['column']).' <=> '.$this->parameter($where['value']);
     }
 
     /**

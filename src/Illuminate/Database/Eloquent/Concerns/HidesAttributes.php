@@ -30,13 +30,8 @@ trait HidesAttributes
     #[Initialize]
     public function initializeHidesAttributes()
     {
-        if (empty($this->hidden)) {
-            $this->hidden = static::resolveClassAttribute(Hidden::class, 'columns') ?? [];
-        }
-
-        if (empty($this->visible)) {
-            $this->visible = static::resolveClassAttribute(Visible::class, 'columns') ?? [];
-        }
+        $this->mergeHidden(static::resolveClassAttribute(Hidden::class, 'columns') ?? []);
+        $this->mergeVisible(static::resolveClassAttribute(Visible::class, 'columns') ?? []);
     }
 
     /**
@@ -70,6 +65,10 @@ trait HidesAttributes
      */
     public function mergeHidden(array $hidden)
     {
+        if ($hidden === []) {
+            return $this;
+        }
+
         $this->hidden = array_values(array_unique(array_merge($this->hidden, $hidden)));
 
         return $this;
@@ -106,6 +105,10 @@ trait HidesAttributes
      */
     public function mergeVisible(array $visible)
     {
+        if ($visible === []) {
+            return $this;
+        }
+
         $this->visible = array_values(array_unique(array_merge($this->visible, $visible)));
 
         return $this;

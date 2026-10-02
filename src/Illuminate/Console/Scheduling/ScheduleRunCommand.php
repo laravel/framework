@@ -113,11 +113,15 @@ class ScheduleRunCommand extends Command
 
         $events = $this->schedule->dueEvents($this->laravel);
 
-        if ($events->contains->isRepeatable()) {
-            $this->clearInterruptSignal();
-        }
+        $paused = $this->isPaused();
 
         foreach ($events as $event) {
+            if ($paused && ! $event->runsWhenPaused()) {
+                $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
+
+                continue;
+            }
+
             if (! $event->filtersPass($this->laravel)) {
                 $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
 
@@ -232,7 +236,11 @@ class ScheduleRunCommand extends Command
     {
         $hasEnteredMaintenanceMode = false;
 
-        while (Date::now()->lte($this->startedAt->endOfMinute())) {
+        $endOfMinute = $this->startedAt->copy()->endOfMinute();
+
+        while (Date::now()->lte($endOfMinute)) {
+            $paused = $this->isPaused();
+
             foreach ($events as $event) {
                 if ($this->shouldInterrupt()) {
                     return;
@@ -242,9 +250,19 @@ class ScheduleRunCommand extends Command
                     continue;
                 }
 
+                if (Date::now()->gt($endOfMinute)) {
+                    return;
+                }
+
                 $hasEnteredMaintenanceMode = $hasEnteredMaintenanceMode || $this->laravel->isDownForMaintenance();
 
                 if ($hasEnteredMaintenanceMode && ! $event->runsInMaintenanceMode()) {
+                    continue;
+                }
+
+                if ($paused && ! $event->runsWhenPaused()) {
+                    $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
+
                     continue;
                 }
 
@@ -268,22 +286,26 @@ class ScheduleRunCommand extends Command
     }
 
     /**
+     * Determine if the schedule is paused.
+     *
+     * @return bool
+     */
+    protected function isPaused()
+    {
+        if (! Schedule::$pausable) {
+            return false;
+        }
+
+        return $this->cache->get('illuminate:schedule:paused', false);
+    }
+
+    /**
      * Determine if the schedule run should be interrupted.
      *
      * @return bool
      */
     protected function shouldInterrupt()
     {
-        return $this->cache->get('illuminate:schedule:interrupt', false);
-    }
-
-    /**
-     * Ensure the interrupt signal is cleared.
-     *
-     * @return void
-     */
-    protected function clearInterruptSignal()
-    {
-        $this->cache->forget('illuminate:schedule:interrupt');
+        return $this->schedule->hasBeenInterruptedSince($this->startedAt);
     }
 }

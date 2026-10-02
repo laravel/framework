@@ -5,20 +5,24 @@ namespace Illuminate\Database\Console;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\Prohibitable;
+use Illuminate\Database\Console\Concerns\InteractsWithPooledConnections;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'db:wipe')]
 class WipeCommand extends Command
 {
-    use ConfirmableTrait, Prohibitable;
+    use ConfirmableTrait, Prohibitable, InteractsWithPooledConnections;
 
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'db:wipe';
+    protected $signature = 'db:wipe
+                    {--database= : The database connection to use}
+                    {--drop-views : Drop all tables and views}
+                    {--drop-types : Drop all tables and types (Postgres only)}
+                    {--force : Force the operation to run when in production}';
 
     /**
      * The console command description.
@@ -34,9 +38,8 @@ class WipeCommand extends Command
      */
     public function handle()
     {
-        if ($this->isProhibited() ||
-            ! $this->confirmToProceed()) {
-            return Command::FAILURE;
+        if ($this->isProhibited() || ! $this->confirmToProceed()) {
+            return self::FAILURE;
         }
 
         $database = $this->input->getOption('database');
@@ -59,7 +62,7 @@ class WipeCommand extends Command
 
         $this->flushDatabaseConnection($database);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**
@@ -70,7 +73,7 @@ class WipeCommand extends Command
      */
     protected function dropAllTables($database)
     {
-        $this->laravel['db']->connection($database)
+        $this->resolveDirectConnectionIfPossible($this->laravel['db'], $database)
             ->getSchemaBuilder()
             ->dropAllTables();
     }
@@ -83,7 +86,7 @@ class WipeCommand extends Command
      */
     protected function dropAllViews($database)
     {
-        $this->laravel['db']->connection($database)
+        $this->resolveDirectConnectionIfPossible($this->laravel['db'], $database)
             ->getSchemaBuilder()
             ->dropAllViews();
     }
@@ -96,7 +99,7 @@ class WipeCommand extends Command
      */
     protected function dropAllTypes($database)
     {
-        $this->laravel['db']->connection($database)
+        $this->resolveDirectConnectionIfPossible($this->laravel['db'], $database)
             ->getSchemaBuilder()
             ->dropAllTypes();
     }
@@ -109,21 +112,6 @@ class WipeCommand extends Command
      */
     protected function flushDatabaseConnection($database)
     {
-        $this->laravel['db']->connection($database)->disconnect();
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
-            ['drop-views', null, InputOption::VALUE_NONE, 'Drop all tables and views'],
-            ['drop-types', null, InputOption::VALUE_NONE, 'Drop all tables and types (Postgres only)'],
-            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
-        ];
+        $this->resolveDirectConnectionIfPossible($this->laravel['db'], $database)->disconnect();
     }
 }

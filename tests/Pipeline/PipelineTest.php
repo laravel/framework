@@ -210,8 +210,7 @@ class PipelineTest extends TestCase
         $this->assertSame('pipe::then::not_foo::', $result);
         $this->assertSame('::not_foo::', $_SERVER['__test.then.arg']);
 
-        unset($_SERVER['__test.then.arg']);
-        unset($_SERVER['__test.pipe.return']);
+        unset($_SERVER['__test.then.arg'], $_SERVER['__test.pipe.return']);
     }
 
     public function testPipelineUsageWithParameters()
@@ -245,8 +244,7 @@ class PipelineTest extends TestCase
 
     public function testPipelineThrowsExceptionOnResolveWithoutContainer()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('A container instance has not been passed to the Pipeline.');
+        $this->expectExceptionObject(new RuntimeException('A container instance has not been passed to the Pipeline.'));
 
         (new Pipeline)->send('data')
             ->through(PipelineTestPipeOne::class)
@@ -257,8 +255,7 @@ class PipelineTest extends TestCase
 
     public function testPipelineThrowsExceptionWhenUsingTransactionsWithoutContainer()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('A container instance has not been passed to the Pipeline.');
+        $this->expectExceptionObject(new RuntimeException('A container instance has not been passed to the Pipeline.'));
 
         (new Pipeline)->send('data')
             ->through(PipelineTestPipeOne::class)
@@ -329,7 +326,7 @@ class PipelineTest extends TestCase
                 return $piped;
             });
 
-        $this->assertSame(null, $result);
+        $this->assertNull($result);
         $this->assertSame('foo', $_SERVER['__test.pipe.one']);
         $this->assertSame('foo', $_SERVER['__test.pipe.two']);
         $this->assertSame('foo', $_SERVER['__test.pipe.finally']);
@@ -353,7 +350,7 @@ class PipelineTest extends TestCase
                 return $piped;
             });
 
-        $this->assertSame(null, $result);
+        $this->assertNull($result);
         $this->assertSame('foo', $_SERVER['__test.pipe.one']);
         $this->assertSame('foo', $_SERVER['__test.pipe.two']);
         $this->assertSame('foo', $_SERVER['__test.pipe.finally']);
@@ -396,8 +393,7 @@ class PipelineTest extends TestCase
     {
         $std = new stdClass();
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('My Exception: 1');
+        $this->expectExceptionObject(new Exception('My Exception: 1'));
 
         try {
             (new Pipeline(new Container))

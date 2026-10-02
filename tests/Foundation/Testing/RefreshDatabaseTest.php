@@ -3,11 +3,10 @@
 namespace Illuminate\Tests\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
-use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
-use Mockery as m;
+use Illuminate\Tests\Foundation\Testing\Fixtures\ConsoleKernelSpy;
 use Orchestra\Testbench\Concerns\ApplicationTestingHooks;
 use Orchestra\Testbench\Foundation\Application as Testbench;
 use PHPUnit\Framework\TestCase;
@@ -37,8 +36,6 @@ class RefreshDatabaseTest extends TestCase
         $this->tearDownTheApplicationTestingHooks();
 
         RefreshDatabaseState::$migrated = false;
-
-        parent::tearDown();
     }
 
     protected function refreshApplication()
@@ -50,50 +47,41 @@ class RefreshDatabaseTest extends TestCase
 
     public function testRefreshTestDatabaseDefault()
     {
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
-
-        $kernel->shouldReceive('call')
-            ->once()
-            ->with('migrate:fresh', [
-                '--drop-views' => false,
-                '--drop-types' => false,
-                '--seed' => false,
-            ]);
+        $kernel = new ConsoleKernelSpy;
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $this->refreshTestDatabase();
+
+        $this->assertSame([
+            ['migrate:fresh', ['--drop-views' => false, '--drop-types' => false, '--seed' => false]],
+        ], $kernel->calls);
     }
 
     public function testRefreshTestDatabaseWithDropViewsOption()
     {
         $this->dropViews = true;
 
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
-
-        $kernel->shouldReceive('call')
-            ->once()
-            ->with('migrate:fresh', [
-                '--drop-views' => true,
-                '--drop-types' => false,
-                '--seed' => false,
-            ]);
+        $kernel = new ConsoleKernelSpy;
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $this->refreshTestDatabase();
+
+        $this->assertSame([
+            ['migrate:fresh', ['--drop-views' => true, '--drop-types' => false, '--seed' => false]],
+        ], $kernel->calls);
     }
 
     public function testRefreshTestDatabaseWithDropTypesOption()
     {
         $this->dropTypes = true;
 
-        $this->app->instance(ConsoleKernelContract::class, $kernel = m::spy(ConsoleKernel::class));
-
-        $kernel->shouldReceive('call')
-            ->once()
-            ->with('migrate:fresh', [
-                '--drop-views' => false,
-                '--drop-types' => true,
-                '--seed' => false,
-            ]);
+        $kernel = new ConsoleKernelSpy;
+        $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $this->refreshTestDatabase();
+
+        $this->assertSame([
+            ['migrate:fresh', ['--drop-views' => false, '--drop-types' => true, '--seed' => false]],
+        ], $kernel->calls);
     }
 }

@@ -9,9 +9,9 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Tests\Console\Fixtures\JobToTestWithSchedule;
-use Mockery as m;
-use Mockery\MockInterface;
+use Illuminate\Tests\Console\Fixtures\FakeEventMutex;
+use Illuminate\Tests\Queue\Fixtures\JobToTestWithSchedule;
+use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -20,19 +20,14 @@ use PHPUnit\Framework\TestCase;
 final class ScheduleTest extends TestCase
 {
     private Container $container;
-    private EventMutex&MockInterface $eventMutex;
-    private SchedulingMutex&MockInterface $schedulingMutex;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->container = new Container;
         Container::setInstance($this->container);
-        $this->eventMutex = m::mock(EventMutex::class);
-        $this->container->instance(EventMutex::class, $this->eventMutex);
-        $this->schedulingMutex = m::mock(SchedulingMutex::class);
-        $this->container->instance(SchedulingMutex::class, $this->schedulingMutex);
+        $this->container->instance(EventMutex::class, new FakeEventMutex);
+        $schedulingMutex = Mockery::mock(SchedulingMutex::class);
+        $this->container->instance(SchedulingMutex::class, $schedulingMutex);
     }
 
     #[DataProvider('jobHonoursDisplayNameIfMethodExistsProvider')]
@@ -40,8 +35,8 @@ final class ScheduleTest extends TestCase
     {
         $schedule = new Schedule();
         $scheduledJob = $schedule->job($job);
-        self::assertSame($jobName, $scheduledJob->description);
-        self::assertFalse($this->container->resolved(JobToTestWithSchedule::class));
+        $this->assertSame($jobName, $scheduledJob->description);
+        $this->assertFalse($this->container->resolved(JobToTestWithSchedule::class));
     }
 
     public static function jobHonoursDisplayNameIfMethodExistsProvider(): array
@@ -64,7 +59,91 @@ final class ScheduleTest extends TestCase
     {
         $schedule = new Schedule();
         $scheduledJob = $schedule->job(JobToTestWithSchedule::class);
-        self::assertSame(JobToTestWithSchedule::class, $scheduledJob->description);
-        self::assertFalse($this->container->resolved(JobToTestWithSchedule::class));
+        $this->assertSame(JobToTestWithSchedule::class, $scheduledJob->description);
+        $this->assertFalse($this->container->resolved(JobToTestWithSchedule::class));
+    }
+
+    public function testItCanFilterEventsByEnvironments(): void
+    {
+        $schedule = new Schedule();
+        $schedule->job(JobToTestWithSchedule::class)->environments('production')->daily();
+        $schedule->command('inspire')->environments(['staging', 'production'])->everyMinute();
+        $schedule->command('foobar', ['a' => 'b'])->environments(['local', 'uat'])->everyMinute();
+        $schedule->command('foobar')->hourly();
+
+        $filteredEvents = $schedule->eventsForEnvironments(['production', 'staging']);
+
+        $this->assertCount(3, $filteredEvents);
+
+        $this->assertSame(JobToTestWithSchedule::class, $filteredEvents[0]->description);
+        $this->assertSame(['production'], $filteredEvents[0]->environments);
+        $this->assertSame('0 0 * * *', $filteredEvents[0]->expression);
+
+        $this->assertMatchesRegularExpression('/artisan.*inspire$/', $filteredEvents[1]->command);
+        $this->assertSame(['staging', 'production'], $filteredEvents[1]->environments);
+        $this->assertSame('* * * * *', $filteredEvents[1]->expression);
+
+        $this->assertMatchesRegularExpression('/artisan.*foobar$/', $filteredEvents[2]->command);
+        $this->assertSame([], $filteredEvents[2]->environments);
+        $this->assertSame('0 * * * *', $filteredEvents[2]->expression);
+    }
+
+    public function testItCanAddAttributesToEvents(): void
+    {
+        $schedule = new Schedule();
+
+        $event = $schedule->command('inspire')
+            ->withAttributes(['team' => 'platform'])
+            ->withAttributes(['labels' => ['maintenance']]);
+
+        $this->assertSame([
+            'team' => 'platform',
+            'labels' => ['maintenance'],
+        ], $event->attributes);
+    }
+
+    public function testItCanAddAttributesToPendingEvents(): void
+    {
+        $schedule = new Schedule();
+
+        $schedule->withAttributes(['team' => 'platform'])->command('inspire');
+        $schedule->command('queue:work');
+
+        $events = $schedule->events();
+
+        $this->assertSame(['team' => 'platform'], $events[0]->attributes);
+        $this->assertSame([], $events[1]->attributes);
+    }
+
+    public function testEventsDoNotRunOnOneServerByDefault(): void
+    {
+        $schedule = new Schedule();
+
+        $schedule->command('inspire')->everyMinute();
+
+        $this->assertFalse($schedule->events()[0]->onOneServer);
+    }
+
+    public function testEveryEventMayRunOnOneServer(): void
+    {
+        Schedule::alwaysOnOneServer();
+
+        try {
+            $schedule = new Schedule();
+
+            $schedule->command('inspire')->everyMinute();
+            $schedule->job(JobToTestWithSchedule::class)->daily();
+            $schedule->call(fn () => null)->name('prune')->hourly();
+            $schedule->call(fn () => null)->hourly();
+
+            [$command, $job, $closure, $unnamedClosure] = $schedule->events();
+
+            $this->assertTrue($command->onOneServer);
+            $this->assertTrue($job->onOneServer);
+            $this->assertTrue($closure->onOneServer);
+            $this->assertFalse($unnamedClosure->onOneServer);
+        } finally {
+            Schedule::alwaysOnOneServer(false);
+        }
     }
 }

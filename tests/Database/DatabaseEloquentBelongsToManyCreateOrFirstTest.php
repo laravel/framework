@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
-use Mockery as m;
+use Mockery;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -24,13 +24,6 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
     protected function setUp(): void
     {
         Carbon::setTestNow('2023-01-01 00:00:00');
-    }
-
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
     }
 
     #[DataProvider('createOrFirstValues')]
@@ -295,7 +288,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = m::mock(BelongsToMany::class)->makePartial();
+                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -368,7 +361,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = m::mock(BelongsToMany::class)->makePartial();
+                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -410,7 +403,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = m::mock(BelongsToMany::class)->makePartial();
+                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -456,6 +449,116 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
+    public function testUpdateOrCreateMethodAcceptsClosureValuesAndCreates(): void
+    {
+        $source = new class() extends BelongsToManyCreateOrFirstTestSourceModel
+        {
+            protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
+            {
+                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
+                $relation->__construct(...func_get_args());
+                $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
+                    'id' => 456,
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01T00:00:00.000000Z',
+                    'updated_at' => '2023-01-01T00:00:00.000000Z',
+                ]);
+                $instance->exists = true;
+                $instance->wasRecentlyCreated = true;
+                $instance->syncOriginal();
+                $relation
+                    ->expects('firstOrCreate')
+                    ->withArgs(function ($attributes, $values, $joining, $touch) {
+                        return $attributes === ['attr' => 'foo']
+                            && $values instanceof Closure
+                            && $joining === []
+                            && $touch === true;
+                    })
+                    ->andReturn($instance);
+
+                return $relation;
+            }
+        };
+        $source->id = 123;
+        $this->mockConnectionForModels(
+            [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
+            'SQLite',
+        );
+
+        $callCount = 0;
+        $result = $source->related()->updateOrCreate(['attr' => 'foo'], function () use (&$callCount) {
+            $callCount++;
+
+            return ['val' => 'baz'];
+        });
+
+        // Closure is forwarded to firstOrCreate which would resolve it on the create path.
+        // Because we mocked firstOrCreate above, the closure was never invoked here.
+        $this->assertSame(0, $callCount);
+        $this->assertSame('bar', $result->val);
+    }
+
+    public function testUpdateOrCreateMethodAcceptsClosureValuesAndUpdates(): void
+    {
+        $source = new class() extends BelongsToManyCreateOrFirstTestSourceModel
+        {
+            protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
+            {
+                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
+                $relation->__construct(...func_get_args());
+                $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
+                    'id' => 456,
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01T00:00:00.000000Z',
+                    'updated_at' => '2023-01-01T00:00:00.000000Z',
+                ]);
+                $instance->exists = true;
+                $instance->wasRecentlyCreated = false;
+                $instance->syncOriginal();
+                $relation
+                    ->expects('firstOrCreate')
+                    ->withArgs(function ($attributes, $values, $joining, $touch) {
+                        return $attributes === ['attr' => 'foo']
+                            && $values instanceof Closure
+                            && $joining === []
+                            && $touch === true;
+                    })
+                    ->andReturn($instance);
+
+                return $relation;
+            }
+        };
+        $source->id = 123;
+        $this->mockConnectionForModels(
+            [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
+            'SQLite',
+        );
+        $source->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $source->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $source->getConnection()
+            ->expects('update')
+            ->with(
+                'update "related_table" set "val" = ?, "updated_at" = ? where "id" = ?',
+                ['baz', '2023-01-01 00:00:00', 456],
+            )
+            ->andReturn(1);
+
+        $callCount = 0;
+        $result = $source->related()->updateOrCreate(['attr' => 'foo'], function () use (&$callCount) {
+            $callCount++;
+
+            return ['val' => 'baz'];
+        });
+
+        // On the update path firstOrCreate was mocked away, so the closure
+        // is only resolved once for the fill() call.
+        $this->assertSame(1, $callCount);
+        $this->assertSame('baz', $result->val);
+    }
+
     public static function createOrFirstValues(): array
     {
         return [
@@ -469,7 +572,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
         $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
         $processor = new $processorClass;
-        $connection = m::mock(Connection::class, ['getPostProcessor' => $processor]);
+        $connection = Mockery::mock(Connection::class, ['getPostProcessor' => $processor]);
         $grammar = new $grammarClass($connection);
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
@@ -477,7 +580,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             return new BaseBuilder($connection, $grammar, $processor);
         });
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
-        $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
+        $resolver = Mockery::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
 
         foreach ($models as $model) {
             /** @var Model $model */
@@ -485,7 +588,8 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             $class::setConnectionResolver($resolver);
         }
 
-        $connection->shouldReceive('getPdo')->andReturn($pdo = m::mock(PDO::class));
+        $pdo = Mockery::mock(PDO::class);
+        $connection->shouldReceive('getPdo')->andReturn($pdo);
 
         foreach ($lastInsertIds as $id) {
             $pdo->expects('lastInsertId')->andReturn($id);

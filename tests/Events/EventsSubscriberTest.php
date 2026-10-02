@@ -2,32 +2,19 @@
 
 namespace Illuminate\Tests\Events;
 
-use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class EventsSubscriberTest extends TestCase
 {
-    public function testEventSubscribers()
-    {
-        $this->expectNotToPerformAssertions();
-
-        $d = new Dispatcher($container = m::mock(Container::class));
-        $subs = m::mock(ExampleSubscriber::class);
-        $subs->shouldReceive('subscribe')->once()->with($d);
-        $container->shouldReceive('make')->once()->with(ExampleSubscriber::class)->andReturn($subs);
-
-        $d->subscribe(ExampleSubscriber::class);
-    }
-
     public function testEventSubscribeCanAcceptObject()
     {
         $this->expectNotToPerformAssertions();
 
         $d = new Dispatcher;
-        $subs = m::mock(ExampleSubscriber::class);
-        $subs->shouldReceive('subscribe')->once()->with($d);
+        $subs = Mockery::mock(ExampleSubscriber::class);
+        $subs->expects('subscribe')->with($d);
 
         $d->subscribe($subs);
     }

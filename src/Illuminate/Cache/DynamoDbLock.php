@@ -41,6 +41,23 @@ class DynamoDbLock extends Lock
     }
 
     /**
+     * Attempt to refresh the lock for the given number of seconds.
+     *
+     * @param  int|null  $seconds
+     * @return bool
+     */
+    public function refresh($seconds = null)
+    {
+        $seconds ??= $this->seconds;
+
+        if ($seconds <= 0) {
+            $seconds = 86400;
+        }
+
+        return $this->dynamo->refreshIfOwned($this->name, $this->owner, $seconds);
+    }
+
+    /**
      * Release the lock.
      *
      * @return bool

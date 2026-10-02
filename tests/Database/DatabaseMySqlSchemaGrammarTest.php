@@ -3,13 +3,14 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseMySqlSchemaGrammarTest extends TestCase
@@ -17,9 +18,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testBasicCreateTable()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -62,9 +63,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAutoIncrementStartingValue()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -95,8 +96,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testEngineCreateTable()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -110,9 +111,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB", $statements[0]);
 
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn('InnoDB');
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->andReturn('InnoDB');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -128,7 +129,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testCharsetCollationCreateTable()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('engine')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -143,9 +144,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'", $statements[0]);
 
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1395,8 +1396,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testCreateDatabase()
     {
         $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_foo');
-        $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_foo');
+        $connection->expects('getConfig')->once()->with('charset')->andReturn('utf8mb4_foo');
+        $connection->expects('getConfig')->once()->with('collation')->andReturn('utf8mb4_unicode_ci_foo');
 
         $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_a');
 
@@ -1406,8 +1407,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         );
 
         $connection = $this->getConnection();
-        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_bar');
-        $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_bar');
+        $connection->expects('getConfig')->once()->with('charset')->andReturn('utf8mb4_bar');
+        $connection->expects('getConfig')->once()->with('collation')->andReturn('utf8mb4_unicode_ci_bar');
 
         $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_b');
 
@@ -1420,9 +1421,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testCreateTableWithVirtualAsColumn()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1479,9 +1480,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testCreateTableWithStoredAsColumn()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
-        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
+        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1584,19 +1585,18 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         ?MySqlBuilder $builder = null,
         string $prefix = ''
     ) {
-        $connection = m::mock(Connection::class)
-            ->shouldReceive('getTablePrefix')->andReturn($prefix)
-            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
-            ->shouldReceive('isMaria')->andReturn(false)
-            ->getMock();
+        $connection = Mockery::mock(MySqlConnection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
+        $connection->shouldReceive('isMaria')->andReturn(false);
 
         $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return $connection
-            ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
-            ->shouldReceive('getSchemaBuilder')->andReturn($builder)
-            ->getMock();
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn($builder);
+
+        return $connection;
     }
 
     public function testAddingColumnWithAlgorithm()
@@ -1737,6 +1737,116 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add index `custom_idx` using btree(`name`), lock=none', $statements[0]);
+    }
+
+    public function testAddingIndexWithInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('name')->inplace();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `users_name_index`(`name`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingUniqueIndexWithInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->inplace();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add unique `users_email_unique`(`email`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingPrimaryKeyWithInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->primary('id')->inplace();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add primary key (`id`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingForeignKeyWithInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->foreign('user_id')->references('id')->on('accounts')->inplace();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add constraint `users_user_id_foreign` foreign key (`user_id`) references `accounts` (`id`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingFullTextIndexWithInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->fullText('content')->inplace();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add fulltext `users_content_fulltext`(`content`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingSpatialIndexWithInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->spatialIndex('location')->inplace();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add spatial index `users_location_spatialindex`(`location`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingIndexWithInplaceAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('name')->inplace()->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `users_name_index`(`name`), algorithm=inplace, lock=none', $statements[0]);
+    }
+
+    public function testAddingPrimaryKeyWithInplaceAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->primary('id')->inplace()->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add primary key (`id`), algorithm=inplace, lock=none', $statements[0]);
+    }
+
+    public function testAddingForeignKeyWithInplaceAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->foreign('user_id')->references('id')->on('accounts')->inplace()->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add constraint `users_user_id_foreign` foreign key (`user_id`) references `accounts` (`id`), algorithm=inplace, lock=none', $statements[0]);
+    }
+
+    public function testAddingIndexWithoutInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('name')->inplace(false);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `users_name_index`(`name`)', $statements[0]);
+    }
+
+    public function testAddingIndexWithIndexTypeAndInplaceAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('name', 'custom_idx')->algorithm('btree')->inplace()->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `custom_idx` using btree(`name`), algorithm=inplace, lock=none', $statements[0]);
     }
 
     public function getGrammar(?Connection $connection = null)

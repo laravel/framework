@@ -217,5 +217,7 @@ trait ManagesComponents
         $this->componentStack = [];
         $this->componentData = [];
         $this->currentComponentData = [];
+        $this->slots = [];
+        $this->slotStack = [];
     }
 }

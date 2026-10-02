@@ -55,7 +55,7 @@ class AfterResolvingAttributeCallbackTest extends TestCase
         $instance = $container->make(ContainerTestHasSelfConfiguringAttributeAndConstructor::class);
 
         $this->assertInstanceOf(ContainerTestHasSelfConfiguringAttributeAndConstructor::class, $instance);
-        $this->assertEquals('the-right-value', $instance->value);
+        $this->assertSame('the-right-value', $instance->value);
     }
 
     public function testCallbackIsCalledOnAppCall()
@@ -75,10 +75,10 @@ class AfterResolvingAttributeCallbackTest extends TestCase
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-final class ContainerTestOnTenant
+final readonly class ContainerTestOnTenant
 {
     public function __construct(
-        public readonly Tenant $tenant
+        public Tenant $tenant
     ) {
     }
 }
@@ -99,29 +99,29 @@ final class HasTenantImpl
     }
 }
 
-final class ContainerTestHasTenantImplPropertyWithTenantA
+final readonly class ContainerTestHasTenantImplPropertyWithTenantA
 {
     public function __construct(
         #[ContainerTestOnTenant(Tenant::TenantA)]
-        public readonly HasTenantImpl $property
+        public HasTenantImpl $property
     ) {
     }
 }
 
-final class ContainerTestHasTenantImplPropertyWithTenantB
+final readonly class ContainerTestHasTenantImplPropertyWithTenantB
 {
     public function __construct(
         #[ContainerTestOnTenant(Tenant::TenantB)]
-        public readonly HasTenantImpl $property
+        public HasTenantImpl $property
     ) {
     }
 }
 
 #[Attribute(Attribute::TARGET_CLASS)]
-final class ContainerTestConfiguresClass
+final readonly class ContainerTestConfiguresClass
 {
     public function __construct(
-        public readonly string $value
+        public string $value
     ) {
     }
 }

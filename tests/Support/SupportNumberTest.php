@@ -48,6 +48,11 @@ class SupportNumberTest extends TestCase
 
         $this->assertSame('∞', Number::format(INF));
         $this->assertSame('NaN', Number::format(NAN));
+
+        $this->assertSame('0', Number::format(-0.0));
+        $this->assertSame('0', Number::format(-0.4, precision: 0));
+        $this->assertSame('0.0', Number::format(-0.04, precision: 1));
+        $this->assertSame('-0.1', Number::format(-0.06, precision: 1));
     }
 
     #[RequiresPhpExtension('intl')]
@@ -135,6 +140,11 @@ class SupportNumberTest extends TestCase
         $this->assertSame('0.00%', Number::percentage(0, precision: 2));
         $this->assertSame('0.12%', Number::percentage(0.12345, precision: 2));
         $this->assertSame('0.1235%', Number::percentage(0.12345, precision: 4));
+
+        $this->assertSame('0%', Number::percentage(-0.4));
+        $this->assertSame('0.0%', Number::percentage(-0.04, precision: 1));
+        $this->assertSame('-0.4%', Number::percentage(-0.4, precision: 1));
+        $this->assertSame('-5%', Number::percentage(-5));
     }
 
     #[RequiresPhpExtension('intl')]
@@ -155,6 +165,11 @@ class SupportNumberTest extends TestCase
         $this->assertSame('$0', Number::currency(0, precision: 0));
         $this->assertSame('$5', Number::currency(5.00, precision: 0));
         $this->assertSame('$10', Number::currency(10.252, precision: 0));
+
+        $this->assertSame('$0.00', Number::currency(-0.001));
+        $this->assertSame('$0.00', Number::currency(0.1 + 0.2 - 0.3 - 0.0000000001));
+        $this->assertSame('$0', Number::currency(-0.4, precision: 0));
+        $this->assertSame('-$0.01', Number::currency(-0.006));
     }
 
     #[RequiresPhpExtension('intl')]
@@ -186,6 +201,16 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1 ZB', Number::fileSize(1024 ** 7));
         $this->assertSame('1 YB', Number::fileSize(1024 ** 8));
         $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
+
+        $this->assertSame('-1 B', Number::fileSize(-1));
+        $this->assertSame('-2 KB', Number::fileSize(-2048));
+        $this->assertSame('-2.00 KB', Number::fileSize(-2048, precision: 2));
+        $this->assertSame('-1.23 KB', Number::fileSize(-1264, precision: 2));
+        $this->assertSame('-5 GB', Number::fileSize(-1024 * 1024 * 1024 * 5));
+
+        $this->assertSame('∞ B', Number::fileSize(INF));
+        $this->assertSame('-∞ B', Number::fileSize(-INF));
+        $this->assertSame('NaN B', Number::fileSize(NAN));
     }
 
     public function testClamp()
@@ -251,6 +276,28 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1.1 trillion', Number::forHumans(-1100000000000, maxPrecision: 1));
         $this->assertSame('-1 quadrillion', Number::forHumans(-1000000000000000));
         $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
+
+        // A negative magnitude that rounds down to zero must not keep the sign.
+        $this->assertSame('0', Number::forHumans(-0.4));
+        $this->assertSame('0', Number::forHumans(-0.05));
+        $this->assertSame('0', Number::forHumans(-0.4999));
+        $this->assertSame('-0.40', Number::forHumans(-0.4, precision: 2));
+
+        // Values below 0.001 must not be scaled up by a negative exponent.
+        $this->assertSame('0', Number::forHumans(0.005));
+        $this->assertSame('0', Number::forHumans(0.001));
+        $this->assertSame('0', Number::forHumans(0.009));
+        $this->assertSame('0', Number::forHumans(-0.005));
+        $this->assertSame('0.005', Number::forHumans(0.005, precision: 3));
+        $this->assertSame('-0.005', Number::forHumans(-0.005, precision: 3));
+
+        $this->assertSame('999 thousand', Number::forHumans(999499));
+        $this->assertSame('1 million', Number::forHumans(999500));
+        $this->assertSame('1 million', Number::forHumans(999999));
+
+        $this->assertSame('∞', Number::forHumans(INF));
+        $this->assertSame('-∞', Number::forHumans(-INF));
+        $this->assertSame('NaN', Number::forHumans(NAN));
     }
 
     public function testSummarize()
@@ -307,6 +354,29 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1.1T', Number::abbreviate(-1100000000000, maxPrecision: 1));
         $this->assertSame('-1Q', Number::abbreviate(-1000000000000000));
         $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
+
+        // A negative magnitude that rounds down to zero must not keep the sign.
+        $this->assertSame('0', Number::abbreviate(-0.4));
+        $this->assertSame('0', Number::abbreviate(-0.05));
+
+        // Values below 0.001 must not be scaled up by a negative exponent.
+        $this->assertSame('0', Number::abbreviate(0.005));
+        $this->assertSame('0', Number::abbreviate(0.001));
+        $this->assertSame('0', Number::abbreviate(-0.005));
+        $this->assertSame('0.005', Number::abbreviate(0.005, precision: 3));
+
+        $this->assertSame('999K', Number::abbreviate(999499));
+        $this->assertSame('1M', Number::abbreviate(999500));
+        $this->assertSame('1M', Number::abbreviate(999999));
+        $this->assertSame('1B', Number::abbreviate(999500000));
+        $this->assertSame('1B', Number::abbreviate(999999999));
+
+        Number::withLocale('de', fn () => $this->assertSame('1M', Number::abbreviate(999500)));
+        Number::withLocale('fr', fn () => $this->assertSame('1M', Number::abbreviate(999500)));
+
+        $this->assertSame('∞', Number::abbreviate(INF));
+        $this->assertSame('-∞', Number::abbreviate(-INF));
+        $this->assertSame('NaN', Number::abbreviate(NAN));
     }
 
     public function testPairs()
@@ -325,6 +395,18 @@ class SupportNumberTest extends TestCase
         $this->assertSame([[0.5, 2.5], [3.0, 5.0], [5.5, 7.5], [8.0, 10.0]], Number::pairs(10, 2.5, 0.5, 0.5));
     }
 
+    public function testPairsThrowsWhenByIsZero()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Number::pairs(100, 0);
+    }
+
+    public function testPairsWithNegativeByWorksLikePositive()
+    {
+        $this->assertSame(Number::pairs(100, 10), Number::pairs(100, -10));
+    }
+
     public function testTrim()
     {
         $this->assertSame(12, Number::trim(12));
@@ -334,6 +416,9 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3, Number::trim(12.30));
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
+        $this->assertSame(INF, Number::trim(INF));
+        $this->assertSame(-INF, Number::trim(-INF));
+        $this->assertNan(Number::trim(NAN));
     }
 
     #[RequiresPhpExtension('intl')]
@@ -357,6 +442,10 @@ class SupportNumberTest extends TestCase
 
         $this->assertSame(1234, Number::parseInt('1.234', locale: 'de'));
         $this->assertSame(1234, Number::parseInt('1 234', locale: 'fr'));
+
+        $this->assertSame(3000000000, Number::parseInt('3,000,000,000'));
+        $this->assertSame(-3000000000, Number::parseInt('-3,000,000,000'));
+        $this->assertSame(PHP_INT_MAX, Number::parseInt((string) PHP_INT_MAX));
     }
 
     #[RequiresPhpExtension('intl')]

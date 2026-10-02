@@ -6,14 +6,13 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentWithCastsTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
-
         $db = new DB;
 
         $db->addConnection([
@@ -80,7 +79,7 @@ class DatabaseEloquentWithCastsTest extends TestCase
 
     public function testThrowsExceptionIfCastableAttributeWasNotRetrievedAndPreventMissingAttributesIsEnabled()
     {
-        Time::create(['time' => now()]);
+        Time::create(['time' => Carbon::now()]);
         $originalMode = Model::preventsAccessingMissingAttributes();
         Model::preventAccessingMissingAttributes();
 

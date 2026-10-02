@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Foundation\Configuration;
 
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Encryption\Encrypter;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Foundation\MaintenanceMode;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Encryption\Encrypter;
+use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -15,7 +17,7 @@ use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
-use Mockery as m;
+use Illuminate\Session\Middleware\AuthenticateSession;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -32,7 +34,9 @@ class MiddlewareTest extends TestCase
         TrimStrings::flushState();
         TrustProxies::flushState();
 
-        parent::tearDown();
+        foreach ([Authenticate::class, AuthenticateSession::class, AuthenticationException::class, RedirectIfAuthenticated::class] as $class) {
+            (new ReflectionClass($class))->getProperty('redirectToCallback')->setValue(null, null);
+        }
     }
 
     public function testConvertEmptyStringsToNull()
@@ -147,7 +151,7 @@ class MiddlewareTest extends TestCase
         ], $method->invoke($middleware));
 
         $configuration->trustProxies(at: '*');
-        $this->assertEquals('*', $method->invoke($middleware));
+        $this->assertSame('*', $method->invoke($middleware));
 
         $configuration->trustProxies(at: [
             '192.168.1.3',
@@ -198,7 +202,7 @@ class MiddlewareTest extends TestCase
 
     public function testTrustHosts()
     {
-        $app = m::mock(Application::class);
+        $app = new FoundationApplication;
         $configuration = new Middleware();
         $middleware = new class($app) extends TrustHosts
         {
@@ -232,16 +236,16 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
 
         $configuration->trustHosts(at: [], subdomains: false);
-        $this->assertEquals([], $middleware->hosts());
+        $this->assertSame([], $middleware->hosts());
 
         $configuration->trustHosts(at: static fn () => [], subdomains: false);
-        $this->assertEquals([], $middleware->hosts());
+        $this->assertSame([], $middleware->hosts());
     }
 
     public function testEncryptCookies()
     {
         $configuration = new Middleware();
-        $encrypter = m::mock(Encrypter::class);
+        $encrypter = new Encrypter(str_repeat('a', 16));
         $middleware = new EncryptCookies($encrypter);
 
         $this->assertFalse($middleware->isDisabled('aaa'));
@@ -260,11 +264,7 @@ class MiddlewareTest extends TestCase
     {
         $configuration = new Middleware();
 
-        $mode = m::mock(MaintenanceMode::class);
-        $mode->shouldReceive('active')->andReturn(true);
-        $mode->shouldReceive('date')->andReturn([]);
-        $app = m::mock(Application::class);
-        $app->shouldReceive('maintenanceMode')->andReturn($mode);
+        $app = new FoundationApplication;
         $middleware = new PreventRequestsDuringMaintenance($app);
 
         $reflection = new ReflectionClass($middleware);
@@ -285,8 +285,8 @@ class MiddlewareTest extends TestCase
     {
         $configuration = new Middleware();
         $middleware = new PreventRequestForgery(
-            m::mock(Application::class),
-            m::mock(Encrypter::class)
+            new FoundationApplication,
+            new Encrypter(str_repeat('a', 16))
         );
 
         $this->assertSame([], $middleware->getExcludedPaths());
@@ -302,5 +302,40 @@ class MiddlewareTest extends TestCase
         $reflection = new ReflectionClass(PreventRequestForgery::class);
         $this->assertTrue($reflection->getStaticPropertyValue('originOnly'));
         $this->assertTrue($reflection->getStaticPropertyValue('allowSameSite'));
+    }
+
+    public function testRedirectUsersToDoesNotOverwriteRedirectGuestsTo()
+    {
+        $middleware = new Middleware;
+
+        $middleware->redirectGuestsTo(fn () => '/login');
+        $middleware->redirectUsersTo('/dashboard');
+
+        $authenticateCallback = (new ReflectionClass(Authenticate::class))
+            ->getProperty('redirectToCallback')->getValue();
+        $sessionCallback = (new ReflectionClass(AuthenticateSession::class))
+            ->getProperty('redirectToCallback')->getValue();
+        $exceptionCallback = (new ReflectionClass(AuthenticationException::class))
+            ->getProperty('redirectToCallback')->getValue();
+        $usersCallback = (new ReflectionClass(RedirectIfAuthenticated::class))
+            ->getProperty('redirectToCallback')->getValue();
+
+        $this->assertSame('/login', $authenticateCallback(null));
+        $this->assertSame('/login', $sessionCallback(null));
+        $this->assertSame('/login', $exceptionCallback(null));
+        $this->assertSame('/dashboard', $usersCallback(null));
+    }
+
+    public function testRedirectGuestsToNullRegistersNullCallback()
+    {
+        $middleware = new Middleware;
+
+        $middleware->redirectGuestsTo(null);
+
+        $callback = (new ReflectionClass(Authenticate::class))
+            ->getProperty('redirectToCallback')->getValue();
+
+        $this->assertNotNull($callback);
+        $this->assertNull($callback(null));
     }
 }

@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Support\Collection;
 
 class NullQueue extends Queue implements QueueContract
 {
@@ -48,6 +49,109 @@ class NullQueue extends Queue implements QueueContract
     public function reservedSize($queue = null)
     {
         return 0;
+    }
+
+    /**
+     * Get the number of jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalSize()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the number of pending jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalPendingSize()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the number of delayed jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalDelayedSize()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the number of reserved jobs across every queue.
+     *
+     * @return int
+     */
+    public function totalReservedSize()
+    {
+        return 0;
+    }
+
+    /**
+     * Get the pending jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection
+     */
+    public function pendingJobs($queue = null): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * Get the delayed jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection
+     */
+    public function delayedJobs($queue = null): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * Get the reserved jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection
+     */
+    public function reservedJobs($queue = null): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * Get all pending jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allPendingJobs(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * Get all delayed jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allDelayedJobs(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * Get all reserved jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allReservedJobs(): Collection
+    {
+        return new Collection;
     }
 
     /**

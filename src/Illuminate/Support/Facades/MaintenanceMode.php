@@ -6,7 +6,7 @@ use Illuminate\Foundation\MaintenanceModeManager;
 
 /**
  * @method static string getDefaultDriver()
- * @method static mixed driver(string|null $driver = null)
+ * @method static mixed driver(\UnitEnum|string|null $driver = null)
  * @method static \Illuminate\Foundation\MaintenanceModeManager extend(string $driver, \Closure $callback)
  * @method static array getDrivers()
  * @method static \Illuminate\Contracts\Container\Container getContainer()

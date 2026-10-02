@@ -11,7 +11,7 @@ class ConsoleSupportServiceProvider extends AggregateServiceProvider implements 
     /**
      * The provider class names.
      *
-     * @var string[]
+     * @var array<int, class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected $providers = [
         ArtisanServiceProvider::class,

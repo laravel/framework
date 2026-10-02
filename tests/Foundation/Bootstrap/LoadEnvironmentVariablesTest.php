@@ -4,31 +4,36 @@ namespace Illuminate\Tests\Foundation\Bootstrap;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
-use Mockery as m;
+use Illuminate\Support\Env;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class LoadEnvironmentVariablesTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        // Testbench disables putenv and may not re-enable it.
+        Env::enablePutenv();
+    }
+
     protected function tearDown(): void
     {
         unset($_ENV['FOO'], $_SERVER['FOO']);
         putenv('FOO');
-
-        parent::tearDown();
     }
 
     protected function getAppMock($file)
     {
-        $app = m::mock(Application::class);
+        $app = Mockery::mock(Application::class);
 
-        $app->shouldReceive('configurationIsCached')
-            ->once()->with()->andReturn(false);
-        $app->shouldReceive('runningInConsole')
-            ->once()->with()->andReturn(false);
-        $app->shouldReceive('environmentPath')
-            ->once()->with()->andReturn(__DIR__.'/../fixtures');
-        $app->shouldReceive('environmentFile')
-            ->once()->with()->andReturn($file);
+        $app->expects('configurationIsCached')
+            ->with()->andReturn(false);
+        $app->expects('runningInConsole')
+            ->with()->andReturn(false);
+        $app->expects('environmentPath')
+            ->with()->andReturn(__DIR__.'/../Fixtures');
+        $app->expects('environmentFile')
+            ->with()->andReturn($file);
 
         return $app;
     }

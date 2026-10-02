@@ -10,11 +10,13 @@ class JobReleasedAfterException
      * @param  string  $connectionName  The connection name.
      * @param  \Illuminate\Contracts\Queue\Job  $job  The job instance.
      * @param  int|null  $backoff  The backoff delay.
+     * @param  \Throwable|null  $exception  The exception that caused the job to be released.
      */
     public function __construct(
         public $connectionName,
         public $job,
-        public $backoff = null
+        public $backoff = null,
+        public $exception = null,
     ) {
     }
 }

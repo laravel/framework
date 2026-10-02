@@ -6,11 +6,10 @@ use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Cache\Repository as Cache;
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
-use Mockery as m;
 
 class WithoutOverlappingJobsTest extends QueueTestCase
 {
@@ -19,16 +18,13 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         OverlappingTestJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
-
-        $job->shouldReceive('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
-        $job->shouldReceive('delete')->once();
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($command = new OverlappingTestJob),
         ]);
+
+        $this->assertTrue($job->isDeleted());
 
         $lockKey = (new WithoutOverlapping)->getLockKey($command);
 
@@ -41,11 +37,7 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         FailedOverlappingTestJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
-
-        $job->shouldReceive('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+        $job = new FakeJob;
 
         $this->expectException(Exception::class);
 
@@ -69,16 +61,13 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         $lockKey = (new WithoutOverlapping)->getLockKey($command = new OverlappingTestJob);
         $this->app->get(Cache::class)->lock($lockKey, 10)->acquire();
 
-        $job = m::mock(Job::class);
-
-        $job->shouldReceive('release')->once();
-        $job->shouldReceive('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->andReturn(true);
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($command),
         ]);
+
+        $this->assertTrue($job->isReleased());
 
         $this->assertFalse(OverlappingTestJob::$handled);
     }
@@ -91,16 +80,13 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         $lockKey = (new WithoutOverlapping)->getLockKey($command = new SkipOverlappingTestJob);
         $this->app->get(Cache::class)->lock($lockKey, 10)->acquire();
 
-        $job = m::mock(Job::class);
-
-        $job->shouldReceive('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
-        $job->shouldReceive('delete')->once();
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($command),
         ]);
+
+        $this->assertTrue($job->isDeleted());
 
         $this->assertFalse(SkipOverlappingTestJob::$handled);
     }
@@ -113,16 +99,13 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         $lockKey = (new WithoutOverlapping)->shared()->getLockKey(new OverlappingTestJobWithSharedKeyTwo);
         $this->app->get(Cache::class)->lock($lockKey, 10)->acquire();
 
-        $job = m::mock(Job::class);
-
-        $job->shouldReceive('release')->once();
-        $job->shouldReceive('hasFailed')->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->andReturn(true);
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize(new OverlappingTestJobWithSharedKeyOne),
         ]);
+
+        $this->assertTrue($job->isReleased());
 
         $this->assertFalse(OverlappingTestJob::$handled);
     }
@@ -157,7 +140,7 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         $job = new OverlappingTestJobWithDisplayName;
 
         $this->assertSame(
-            'laravel-queue-overlap:App\\Actions\\WithoutOverlappingTestAction:key',
+            'laravel-queue-overlap:'.hash('xxh128', 'App\\Actions\\WithoutOverlappingTestAction').':key',
             (new WithoutOverlapping('key'))->getLockKey($job)
         );
 
@@ -167,13 +150,33 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         );
 
         $this->assertSame(
-            'prefix:App\\Actions\\WithoutOverlappingTestAction:key',
+            'prefix:'.hash('xxh128', 'App\\Actions\\WithoutOverlappingTestAction').':key',
             (new WithoutOverlapping('key'))->withPrefix('prefix:')->getLockKey($job)
         );
 
         $this->assertSame(
             'prefix:key',
             (new WithoutOverlapping('key'))->withPrefix('prefix:')->shared()->getLockKey($job)
+        );
+
+        $this->assertSame(
+            'prefix:'.hash('xxh128', 'App\\Actions\\WithoutOverlappingTestAction').':unit',
+            (new WithoutOverlapping(UnitCategory::unit))->withPrefix('prefix:')->getLockKey($job)
+        );
+
+        $this->assertSame(
+            'prefix:unit',
+            (new WithoutOverlapping(UnitCategory::unit))->withPrefix('prefix:')->shared()->getLockKey($job)
+        );
+
+        $this->assertSame(
+            'prefix:'.hash('xxh128', 'App\\Actions\\WithoutOverlappingTestAction').':backed',
+            (new WithoutOverlapping(BackedCategory::backed))->withPrefix('prefix:')->getLockKey($job)
+        );
+
+        $this->assertSame(
+            'prefix:backed',
+            (new WithoutOverlapping(BackedCategory::backed))->withPrefix('prefix:')->shared()->getLockKey($job)
         );
     }
 }
@@ -253,4 +256,14 @@ class OverlappingTestJobWithDisplayName extends OverlappingTestJob
     {
         return 'App\\Actions\\WithoutOverlappingTestAction';
     }
+}
+
+enum UnitCategory
+{
+    case unit;
+}
+
+enum BackedCategory: string
+{
+    case backed = 'backed';
 }

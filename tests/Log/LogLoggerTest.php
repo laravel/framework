@@ -2,12 +2,10 @@
 
 namespace Illuminate\Tests\Log;
 
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Log\Logger;
-use Mockery as m;
 use Monolog\Handler\TestHandler;
 use Monolog\Level;
 use Monolog\Logger as Monolog;
@@ -18,53 +16,59 @@ class LogLoggerTest extends TestCase
 {
     public function testMethodsPassErrorAdditionsToMonolog()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class));
-        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
-        $monolog->shouldReceive('error')->once()->with('foo', []);
+        $monolog = new Monolog('test');
+        $monolog->pushHandler($handler = new TestHandler);
+        $writer = new Logger($monolog);
 
         $writer->error('foo');
+
+        $this->assertTrue($handler->hasErrorThatContains('foo'));
+        $this->assertSame([], $handler->getRecords()[0]->context);
     }
 
     public function testContextIsAddedToAllSubsequentLogs()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $monolog = new Monolog('test');
+        $monolog->pushHandler($handler = new TestHandler);
+        $writer = new Logger($monolog);
         $writer->withContext(['bar' => 'baz']);
 
-        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
-        $monolog->shouldReceive('error')->once()->with('foo', ['bar' => 'baz']);
-
         $writer->error('foo');
+
+        $this->assertSame(['bar' => 'baz'], $handler->getRecords()[0]->context);
     }
 
     public function testContextIsFlushed()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $monolog = new Monolog('test');
+        $monolog->pushHandler($handler = new TestHandler);
+        $writer = new Logger($monolog);
         $writer->withContext(['bar' => 'baz']);
         $writer->withoutContext();
 
-        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
-        $monolog->expects('error')->with('foo', []);
-
         $writer->error('foo');
+
+        $this->assertSame([], $handler->getRecords()[0]->context);
     }
 
     public function testContextKeysCanBeRemovedForSubsequentLogs()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $monolog = new Monolog('test');
+        $monolog->pushHandler($handler = new TestHandler);
+        $writer = new Logger($monolog);
         $writer->withContext(['bar' => 'baz', 'forget' => 'me']);
         $writer->withoutContext(['forget']);
 
-        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
-        $monolog->shouldReceive('error')->once()->with('foo', ['bar' => 'baz']);
-
         $writer->error('foo');
+
+        $this->assertSame(['bar' => 'baz'], $handler->getRecords()[0]->context);
     }
 
     public function testLoggerFiresEventsDispatcher()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);
-        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
-        $monolog->shouldReceive('error')->once()->with('foo', []);
+        $monolog = new Monolog('test');
+        $monolog->pushHandler(new TestHandler);
+        $writer = new Logger($monolog, $events = new Dispatcher);
 
         $events->listen(MessageLogged::class, function ($event) {
             $_SERVER['__log.level'] = $event->level;
@@ -80,16 +84,15 @@ class LogLoggerTest extends TestCase
         $this->assertSame('foo', $_SERVER['__log.message']);
         unset($_SERVER['__log.message']);
         $this->assertTrue(isset($_SERVER['__log.context']));
-        $this->assertEquals([], $_SERVER['__log.context']);
+        $this->assertSame([], $_SERVER['__log.context']);
         unset($_SERVER['__log.context']);
     }
 
     public function testListenShortcutFailsWithNoDispatcher()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Events dispatcher has not been set.');
+        $this->expectExceptionObject(new RuntimeException('Events dispatcher has not been set.'));
 
-        $writer = new Logger(m::mock(Monolog::class));
+        $writer = new Logger(new Monolog('test'));
         $writer->listen(function () {
             //
         });
@@ -97,32 +100,38 @@ class LogLoggerTest extends TestCase
 
     public function testListenShortcut()
     {
-        $writer = new Logger(m::mock(Monolog::class), $events = m::mock(DispatcherContract::class));
+        $events = new Dispatcher;
+        $writer = new Logger(new Monolog('test'), $events);
 
-        $callback = function () {
-            return 'success';
-        };
-        $events->shouldReceive('listen')->with(MessageLogged::class, $callback)->once();
+        $called = false;
+        $writer->listen(function () use (&$called) {
+            $called = true;
+        });
 
-        $writer->listen($callback);
+        $this->assertTrue($events->hasListeners(MessageLogged::class));
+
+        $events->dispatch(new MessageLogged('info', 'foo', []));
+
+        $this->assertTrue($called);
     }
 
     public function testComplexContextManipulation()
     {
-        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $monolog = new Monolog('test');
+        $monolog->pushHandler($handler = new TestHandler);
+        $writer = new Logger($monolog);
 
         $writer->withContext(['user_id' => 123, 'action' => 'login']);
         $writer->withContext(['ip' => '127.0.0.1', 'timestamp' => '1986-10-29']);
         $writer->withoutContext(['timestamp']);
 
-        $monolog->shouldReceive('isHandling')->with('info')->andReturn(true);
-        $monolog->shouldReceive('info')->once()->with('User action', [
+        $writer->info('User action');
+
+        $this->assertSame([
             'user_id' => 123,
             'action' => 'login',
             'ip' => '127.0.0.1',
-        ]);
-
-        $writer->info('User action');
+        ], $handler->getRecords()[0]->context);
     }
 
     public function testSkipsSerializationWhenLogLevelNotHandled()

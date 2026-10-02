@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Attributes\Refreshes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -24,10 +25,10 @@ use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
-use Illuminate\Tests\Integration\Database\Fixtures\Post;
-use Illuminate\Tests\Integration\Database\Fixtures\User;
+use Illuminate\Tests\Database\Fixtures\Enums\Bar;
+use Illuminate\Tests\Database\Fixtures\Models\Integration\Post;
+use Illuminate\Tests\Database\Fixtures\Models\Integration\User;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentIntegrationTest extends TestCase
@@ -69,6 +70,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->schema('default')->create('with_json', function ($table) {
             $table->increments('id');
             $table->text('json')->default(json_encode([]));
+        });
+
+        $this->schema('default')->create('generated_users', function ($table) {
+            $table->increments('id');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('name')->virtualAs("first_name || ' ' || last_name");
+            $table->integer('votes')->default(0);
         });
 
         $this->schema('second_connection')->create('test_items', function ($table) {
@@ -194,6 +203,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      */
     protected function tearDown(): void
     {
+        Model::clearBootedModels();
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
             $this->schema($connection)->drop('friends');
@@ -204,12 +214,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         Relation::morphMap([], false);
         Eloquent::unsetConnectionResolver();
+        Paginator::currentPageResolver(fn () => 1);
+        CursorPaginator::currentCursorResolver(fn () => null);
 
-        Carbon::setTestNow(null);
         Str::createUuidsNormally();
         DB::flushQueryLog();
-
-        parent::tearDown();
     }
 
     /**
@@ -263,6 +272,94 @@ class DatabaseEloquentIntegrationTest extends TestCase
         foreach ($records as $record) {
             $this->assertEquals(1, $record->id);
         }
+    }
+
+    public function testConfiguredAttributesAreRefreshedAfterInsertAndUpdate()
+    {
+        $user = EloquentTestGeneratedUser::create([
+            'first_name' => 'Taylor',
+            'last_name' => 'Otwell',
+        ]);
+
+        $this->assertSame('Taylor Otwell', $user->name);
+        $this->assertSame('Taylor Otwell', EloquentTestGeneratedUser::$createdName);
+
+        $user->update(['first_name' => 'Abigail']);
+
+        $this->assertSame('Abigail Otwell', $user->name);
+        $this->assertSame('Abigail Otwell', EloquentTestGeneratedUser::$updatedName);
+        $this->assertTrue($user->wasChanged('name'));
+    }
+
+    public function testConfiguredAttributesAreRefreshedAfterIncrementAndDecrement()
+    {
+        $user = EloquentTestGeneratedUser::create([
+            'first_name' => 'Taylor',
+            'last_name' => 'Otwell',
+            'votes' => 1,
+        ]);
+
+        $user->increment('votes', 1);
+
+        $this->assertSame(2, $user->votes);
+        $this->assertFalse($user->isDirty());
+        $this->assertSame([], $user->getDirty());
+
+        $user->save();
+
+        $user->decrement('votes', 1);
+
+        $this->assertSame(1, $user->votes);
+        $this->assertFalse($user->isDirty());
+        $this->assertSame([], $user->getDirty());
+
+        $user->save();
+
+        $user->incrementEach(['votes' => 2]);
+
+        $this->assertSame(3, $user->votes);
+        $this->assertFalse($user->isDirty());
+        $this->assertSame([], $user->getDirty());
+
+        $user->save();
+
+        $user->decrementEach(['votes' => 1]);
+
+        $this->assertSame(2, $user->votes);
+        $this->assertFalse($user->isDirty());
+        $this->assertSame([], $user->getDirty());
+
+        $user->save();
+
+        $user->increment('votes', 1, ['first_name' => 'Abigail']);
+
+        $this->assertSame(3, $user->votes);
+        $this->assertSame('Abigail', $user->first_name);
+        $this->assertSame('Abigail Otwell', $user->name);
+        $this->assertFalse($user->isDirty('name'));
+        $this->assertTrue($user->isDirty('first_name'));
+
+        $user->save();
+    }
+
+    public function testConfiguredAttributesAreExcludedWhenReplicating()
+    {
+        $user = EloquentTestGeneratedUser::create([
+            'first_name' => 'Taylor',
+            'last_name' => 'Otwell',
+        ]);
+
+        $replica = $user->replicate();
+        $replica->save();
+
+        $this->assertSame(2, $replica->id);
+        $this->assertSame('Taylor Otwell', $replica->name);
+
+        $quietReplica = $user->replicateQuietly();
+        $quietReplica->save();
+
+        $this->assertSame(3, $quietReplica->id);
+        $this->assertSame('Taylor Otwell', $quietReplica->name);
     }
 
     public function testBasicModelCollectionRetrieval()
@@ -944,6 +1041,72 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(2, $chunks);
     }
 
+    public function testLazyWithLimits()
+    {
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
+
+        DB::enableQueryLog();
+
+        $users = EloquentTestUser::query()->orderBy('id', 'asc')->limit(2)->lazy(2);
+
+        $this->assertSame(['First', 'Second'], $users->pluck('name')->all());
+        $this->assertCount(1, DB::getQueryLog());
+    }
+
+    public function testLazyWithLimitsAndOffsets()
+    {
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+            ['name' => 'Fourth', 'email' => 'fourth@example.com'],
+            ['name' => 'Fifth', 'email' => 'fifth@example.com'],
+            ['name' => 'Sixth', 'email' => 'sixth@example.com'],
+            ['name' => 'Seventh', 'email' => 'seventh@example.com'],
+        ]);
+
+        $users = EloquentTestUser::query()->orderBy('id', 'asc')->offset(2)->limit(3)->lazy(2);
+
+        $this->assertSame(['Third', 'Fourth', 'Fifth'], $users->pluck('name')->all());
+    }
+
+    public function testLazyByIdWithLimits()
+    {
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
+
+        DB::enableQueryLog();
+
+        $users = EloquentTestUser::query()->limit(2)->lazyById(2);
+
+        $this->assertSame(['First', 'Second'], $users->pluck('name')->all());
+        $this->assertCount(1, DB::getQueryLog());
+    }
+
+    public function testLazyByIdWithLimitsAndOffsets()
+    {
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+            ['name' => 'Fourth', 'email' => 'fourth@example.com'],
+            ['name' => 'Fifth', 'email' => 'fifth@example.com'],
+            ['name' => 'Sixth', 'email' => 'sixth@example.com'],
+            ['name' => 'Seventh', 'email' => 'seventh@example.com'],
+        ]);
+
+        $users = EloquentTestUser::query()->offset(2)->limit(3)->lazyById(2);
+
+        $this->assertSame(['Third', 'Fourth', 'Fifth'], $users->pluck('name')->all());
+    }
+
     public function testChunkByIdWithNonIncrementingKey()
     {
         EloquentTestNonIncrementingSecond::insert([
@@ -1024,6 +1187,64 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals([1 => 'taylorotwell@gmail.com', 2 => 'abigailotwell@gmail.com'], $keyed);
     }
 
+    public function testModelKeys()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame([1, 2], EloquentTestUser::oldest('id')->modelKeys());
+    }
+
+    public function testModelKeysWithCastPrimaryKey()
+    {
+        EloquentTestUserWithStringCastId::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame(['1', '2'], EloquentTestUserWithStringCastId::oldest('id')->modelKeys());
+    }
+
+    public function testModelKeysWithCustomPrimaryKey()
+    {
+        EloquentTestUniqueUserWithCustomKey::insert([
+            ['screen_name' => 'first', 'email' => 'taylorotwell@gmail.com'],
+            ['screen_name' => 'second', 'email' => 'abigailotwell@gmail.com'],
+        ]);
+
+        $this->assertSame(['first', 'second'], EloquentTestUniqueUserWithCustomKey::orderBy('screen_name')->modelKeys());
+    }
+
+    public function testModelKeysWithQueryConstraints()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
+
+        $this->assertSame([2, 3], EloquentTestUser::where('id', '>', 1)->oldest('id')->modelKeys());
+        $this->assertSame([1], EloquentTestUser::oldest('id')->take(1)->modelKeys());
+    }
+
+    public function testModelKeysWithRelationshipAndJoin()
+    {
+        $user1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user2 = EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $user1->posts()->create(['id' => 1, 'name' => 'First post']);
+        $user1->posts()->create(['id' => 2, 'name' => 'Second post']);
+        $user2->posts()->create(['id' => 3, 'name' => 'Third post']);
+
+        $this->assertEquals([1, 2], $user1->posts()->oldest('id')->modelKeys());
+
+        $join = EloquentTestUser::join('posts', 'users.id', '=', 'posts.user_id')->where('users.id', 1);
+
+        $this->assertEquals([1, 1], $join->modelKeys());
+    }
+
     public function testFindOrFail()
     {
         EloquentTestUser::insert([
@@ -1043,8 +1264,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFindOrFailWithSingleIdThrowsModelNotFoundException()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1'));
         $this->expectExceptionObject(
             (new ModelNotFoundException())->setModel(EloquentTestUser::class, [1]),
         );
@@ -1054,8 +1274,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFindOrFailWithMultipleIdsThrowsModelNotFoundException()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3'));
         $this->expectExceptionObject(
             (new ModelNotFoundException())->setModel(EloquentTestUser::class, [2, 3]),
         );
@@ -1066,14 +1285,42 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFindOrFailWithMultipleIdsUsingCollectionThrowsModelNotFoundException()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3'));
         $this->expectExceptionObject(
             (new ModelNotFoundException())->setModel(EloquentTestUser::class, [2, 3]),
         );
 
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::findOrFail(new Collection([1, 1, 2, 3]));
+    }
+
+    public function testBelongsToManyFindOrFailAndFindOrWithEnumIds()
+    {
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 5, 'email' => 'first@example.com']);
+        EloquentTestUser::create(['id' => 6, 'email' => 'second@example.com']);
+        $user->friends()->attach([5, 6]);
+
+        $ids = [Bar::FOO, 6, Bar::FOO, 5];
+
+        foreach ([$ids, new Collection($ids)] as $ids) {
+            $this->assertEqualsCanonicalizing([5, 6], $user->friends()->findOrFail($ids)->modelKeys());
+            $this->assertEqualsCanonicalizing([5, 6], $user->friends()->findOr($ids, fn () => $this->fail('Unexpected callback.'))->modelKeys());
+        }
+
+        $user->friends()->detach(5);
+
+        foreach ([[Bar::FOO, 6], new Collection([Bar::FOO, 6])] as $ids) {
+            $this->assertSame('missing', $user->friends()->findOr($ids, fn () => 'missing'));
+
+            try {
+                $user->friends()->findOrFail($ids);
+                $this->fail('Expected ModelNotFoundException was not thrown.');
+            } catch (ModelNotFoundException $exception) {
+                $this->assertSame(EloquentTestUser::class, $exception->getModel());
+                $this->assertSame([5, 6], $exception->getIds());
+            }
+        }
     }
 
     public function testOneToOneRelationship()
@@ -1205,7 +1452,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
         $this->assertTrue($results->first()->relationLoaded('friends'));
-        $this->assertSame($results->first()->friends->pluck('email')->unique()->toArray(), ['abigailotwell@gmail.com']);
+        $this->assertSame(['abigailotwell@gmail.com'], $results->first()->friends->pluck('email')->unique()->toArray());
     }
 
     public function testHasOnNestedSelfReferencingBelongsToManyRelationship()
@@ -1247,8 +1494,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
         $this->assertTrue($results->first()->relationLoaded('friends'));
-        $this->assertSame($results->first()->friends->pluck('email')->unique()->toArray(), ['abigailotwell@gmail.com']);
-        $this->assertSame($results->first()->friends->pluck('friends')->flatten()->pluck('email')->unique()->toArray(), ['foo@gmail.com']);
+        $this->assertSame(['abigailotwell@gmail.com'], $results->first()->friends->pluck('email')->unique()->toArray());
+        $this->assertSame(['foo@gmail.com'], $results->first()->friends->pluck('friends')->flatten()->pluck('email')->unique()->toArray());
     }
 
     public function testHasOnSelfReferencingBelongsToManyRelationshipWithWherePivot()
@@ -1321,7 +1568,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame('Child Post', $results->first()->name);
         $this->assertTrue($results->first()->relationLoaded('parentPost'));
-        $this->assertSame($results->first()->parentPost->name, 'Parent Post');
+        $this->assertSame('Parent Post', $results->first()->parentPost->name);
     }
 
     public function testHasOnNestedSelfReferencingBelongsToRelationship()
@@ -1363,9 +1610,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame('Child Post', $results->first()->name);
         $this->assertTrue($results->first()->relationLoaded('parentPost'));
-        $this->assertSame($results->first()->parentPost->name, 'Parent Post');
+        $this->assertSame('Parent Post', $results->first()->parentPost->name);
         $this->assertTrue($results->first()->parentPost->relationLoaded('parentPost'));
-        $this->assertSame($results->first()->parentPost->parentPost->name, 'Grandparent Post');
+        $this->assertSame('Grandparent Post', $results->first()->parentPost->parentPost->name);
     }
 
     public function testHasOnSelfReferencingHasManyRelationship()
@@ -1404,7 +1651,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame('Parent Post', $results->first()->name);
         $this->assertTrue($results->first()->relationLoaded('childPosts'));
-        $this->assertSame($results->first()->childPosts->pluck('name')->unique()->toArray(), ['Child Post']);
+        $this->assertSame(['Child Post'], $results->first()->childPosts->pluck('name')->unique()->toArray());
     }
 
     public function testHasOnNestedSelfReferencingHasManyRelationship()
@@ -1446,8 +1693,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertSame('Grandparent Post', $results->first()->name);
         $this->assertTrue($results->first()->relationLoaded('childPosts'));
-        $this->assertSame($results->first()->childPosts->pluck('name')->unique()->toArray(), ['Parent Post']);
-        $this->assertSame($results->first()->childPosts->pluck('childPosts')->flatten()->pluck('name')->unique()->toArray(), ['Child Post']);
+        $this->assertSame(['Parent Post'], $results->first()->childPosts->pluck('name')->unique()->toArray());
+        $this->assertSame(['Child Post'], $results->first()->childPosts->pluck('childPosts')->flatten()->pluck('name')->unique()->toArray());
     }
 
     public function testHasWithNonWhereBindings()
@@ -2144,7 +2391,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
     }
 
-    public function testTimestampsUsingOldSqlServerDateFormatFallbackToDefaultParsing()
+    public function testTimestampsUsingOldSqlServerDateFormatFallbackToDefaultParsing(): void
     {
         $model = new EloquentTestUser;
         $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
@@ -2157,8 +2404,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('2017-11-14 08:23:19.000', $model->fromDateTime($date), 'the format should trims it');
         // No longer throwing exception since Laravel 7,
         // but Date::hasFormat() can be used instead to check date formatting:
-        $this->assertTrue(Date::hasFormat('2017-11-14 08:23:19.000', $model->getDateFormat()));
-        $this->assertFalse(Date::hasFormat('2017-11-14 08:23:19.734', $model->getDateFormat()));
+        $this->assertTrue(Carbon::hasFormat('2017-11-14 08:23:19.000', $model->getDateFormat()));
+        $this->assertFalse(Carbon::hasFormat('2017-11-14 08:23:19.734', $model->getDateFormat()));
     }
 
     public function testSpecialFormats()
@@ -2588,7 +2835,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNull($users[0]->birthday);
         $this->assertInstanceOf(\DateTime::class, $users[1]->birthday);
         $this->assertInstanceOf(\DateTime::class, $users[2]->birthday);
-        $this->assertEquals('1987-11-01', $users[2]->birthday->format('Y-m-d'));
+        $this->assertSame('1987-11-01', $users[2]->birthday->format('Y-m-d'));
 
         DB::flushQueryLog();
 
@@ -2856,6 +3103,13 @@ class EloquentTestUniqueUser extends Eloquent
     protected $guarded = [];
 }
 
+class EloquentTestUniqueUserWithCustomKey extends EloquentTestUniqueUser
+{
+    protected $primaryKey = 'screen_name';
+    public $incrementing = false;
+    protected $keyType = 'string';
+}
+
 class EloquentTestPost extends Eloquent
 {
     protected $table = 'posts';
@@ -2956,6 +3210,31 @@ class EloquentTestWithJSON extends Eloquent
     protected $casts = [
         'json' => 'array',
     ];
+}
+
+#[Refreshes('name')]
+class EloquentTestGeneratedUser extends Eloquent
+{
+    public $timestamps = false;
+
+    public static $createdName;
+
+    public static $updatedName;
+
+    protected $table = 'generated_users';
+
+    protected $guarded = [];
+
+    protected function fireModelEvent($event, $halt = true)
+    {
+        if ($event === 'created') {
+            static::$createdName = $this->name;
+        } elseif ($event === 'updated') {
+            static::$updatedName = $this->name;
+        }
+
+        return parent::fireModelEvent($event, $halt);
+    }
 }
 
 class EloquentTestFriendPivot extends Pivot

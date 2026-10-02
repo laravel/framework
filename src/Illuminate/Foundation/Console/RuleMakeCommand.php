@@ -4,17 +4,19 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'make:rule')]
 class RuleMakeCommand extends GeneratorCommand
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'make:rule';
+    protected $signature = 'make:rule
+                    {name : The name of the rule}
+                    {--f|force : Create the class even if the rule already exists}
+                    {--i|implicit : Generate an implicit rule}';
 
     /**
      * The console command description.
@@ -72,18 +74,5 @@ class RuleMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Rules';
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the rule already exists'],
-            ['implicit', 'i', InputOption::VALUE_NONE, 'Generate an implicit rule'],
-        ];
     }
 }

@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Foundation\Exceptions\Renderer;
 
 use Illuminate\Foundation\Exceptions\Renderer\Frame;
-use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
@@ -11,11 +10,11 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 class FrameTest extends TestCase
 {
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     #[DataProvider('unixFileDataProvider')]
     public function test_it_normalizes_file_path_on_unix($frameData, $basePath, $expected)
     {
-        $exception = m::mock(FlattenException::class);
+        $exception = new FlattenException;
         $classMap = [];
         $frame = new Frame($exception, $classMap, $frameData, $basePath);
 
@@ -50,7 +49,7 @@ class FrameTest extends TestCase
     #[DataProvider('windowsFileDataProvider')]
     public function test_it_normalizes_file_path_on_windows($frameData, $basePath, $expected)
     {
-        $exception = m::mock(FlattenException::class);
+        $exception = new FlattenException;
         $classMap = [];
         $frame = new Frame($exception, $classMap, $frameData, $basePath);
 
@@ -81,11 +80,11 @@ class FrameTest extends TestCase
         ];
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     #[DataProvider('unixIsFromVendorDataProvider')]
     public function test_it_determines_if_frame_is_from_vendor_on_unix($frameData, $basePath, $expected)
     {
-        $exception = m::mock(FlattenException::class);
+        $exception = new FlattenException;
         $classMap = [];
         $frame = new Frame($exception, $classMap, $frameData, $basePath);
 
@@ -120,7 +119,7 @@ class FrameTest extends TestCase
     #[DataProvider('windowsIsFromVendorDataProvider')]
     public function test_it_determines_if_frame_is_from_vendor_on_windows($frameData, $basePath, $expected)
     {
-        $exception = m::mock(FlattenException::class);
+        $exception = new FlattenException;
         $classMap = [];
         $frame = new Frame($exception, $classMap, $frameData, $basePath);
 

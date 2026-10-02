@@ -9,6 +9,9 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
+use Illuminate\Queue\Events\WorkerQueuePaused;
+use Illuminate\Queue\Events\WorkerQueueResumed;
+use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
@@ -37,12 +40,13 @@ class WorkCommand extends Command
                             {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
                             {--stop-when-empty : Stop when the queue is empty}
+                            {--stop-when-empty-for=0 : Stop when no jobs have been processed for the given number of seconds}
                             {--delay=0 : The number of seconds to delay failed jobs (Deprecated)}
                             {--backoff=0 : The number of seconds to wait before retrying a job that encountered an uncaught exception}
                             {--max-jobs=0 : The number of jobs to process before stopping}
                             {--max-time=0 : The maximum number of seconds the worker should run}
                             {--force : Force the worker to run even in maintenance mode}
-                            {--memory=128 : The memory limit in megabytes}
+                            {--memory=128 : The memory limit in megabytes, or as a percentage of the PHP memory limit}
                             {--sleep=3 : The number of seconds to sleep when no job is available}
                             {--rest=0 : The number of seconds to rest between jobs}
                             {--timeout=60 : The number of seconds a child process can run}
@@ -169,6 +173,7 @@ class WorkCommand extends Command
             $this->option('max-jobs'),
             $this->option('max-time'),
             $this->option('rest'),
+            $this->option('stop-when-empty-for'),
         );
     }
 
@@ -201,6 +206,18 @@ class WorkCommand extends Command
             $this->logFailedJob($event);
         });
 
+        $this->laravel['events']->listen(WorkerQueuePaused::class, function ($event) {
+            $this->writeQueueStatus($event->queue, 'paused');
+        });
+
+        $this->laravel['events']->listen(WorkerQueueResumed::class, function ($event) {
+            $this->writeQueueStatus($event->queue, 'resumed');
+        });
+
+        $this->laravel['events']->listen(WorkerStopping::class, function ($event) {
+            $this->writeStopReason($event);
+        });
+
         static::$hasRegisteredListeners = true;
     }
 
@@ -224,6 +241,73 @@ class WorkCommand extends Command
     }
 
     /**
+     * Write the status output for a paused or resumed queue.
+     *
+     * @param  string  $queue
+     * @param  string  $status
+     * @return void
+     */
+    protected function writeQueueStatus($queue, $status)
+    {
+        if ($this->output->isQuiet() || $this->output->isSilent()) {
+            return;
+        }
+
+        if ($this->outputUsingJson()) {
+            $this->output->writeln(json_encode([
+                'level' => 'warning',
+                'queue' => $queue,
+                'status' => $status,
+                'timestamp' => $this->now()->format('Y-m-d\TH:i:s.uP'),
+            ]));
+
+            return;
+        }
+
+        $this->output->writeln(sprintf(
+            '  <fg=gray>%s</> Queue <fg=blue>%s</> %s',
+            $this->now()->format('Y-m-d H:i:s'),
+            $queue,
+            $status === 'paused'
+                ? '<fg=yellow;options=bold>PAUSED</>'
+                : '<fg=green;options=bold>RESUMED</>',
+        ));
+    }
+
+    /**
+     * Write the status output for a queue worker that is stopping.
+     *
+     * @param  \Illuminate\Queue\Events\WorkerStopping  $event
+     * @return void
+     */
+    protected function writeStopReason(WorkerStopping $event)
+    {
+        if ($this->output->isQuiet() || $this->output->isSilent() || is_null($event->reason)) {
+            return;
+        }
+
+        if ($this->outputUsingJson()) {
+            $this->output->writeln(json_encode([
+                'level' => $event->status === 0 ? 'info' : 'warning',
+                'status' => 'stopped',
+                'reason' => $event->reason->value,
+                'exit_code' => $event->status,
+                'jobs_processed' => $event->jobsProcessed,
+                'memory' => is_null($event->memoryUsage) ? null : round($event->memoryUsage, 1),
+                'timestamp' => $this->now()->format('Y-m-d\TH:i:s.uP'),
+            ]));
+
+            return;
+        }
+
+        $this->output->writeln(sprintf(
+            '  <fg=gray>%s</> Worker <fg=yellow;options=bold>STOPPED</> <fg=gray>%s</>',
+            $this->now()->format('Y-m-d H:i:s'),
+            $event->reason->description(),
+        ));
+    }
+
+    /**
      * Write the status output for the queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -243,7 +327,7 @@ class WorkCommand extends Command
                 : ''
         )));
 
-        if ($status == 'starting') {
+        if ($status === 'starting') {
             $this->latestStartedAt = microtime(true);
 
             $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
@@ -256,13 +340,14 @@ class WorkCommand extends Command
         }
 
         $runTime = $this->runTimeForHumans($this->latestStartedAt);
+        $memory = $isVerbose ? round(memory_get_usage(true) / 1024 / 1024, 1).'MB' : '';
 
         $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
-            $isVerbose ? mb_strlen($job->getJobId()) + mb_strlen($job->getConnectionName()) + mb_strlen($job->getQueue()) + 2 : 0
+            $isVerbose ? mb_strlen($job->getJobId()) + mb_strlen($job->getConnectionName()) + mb_strlen($job->getQueue()) + mb_strlen($memory) + 3 : 0
         ) - mb_strlen($runTime) - 31, 0);
 
         $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
-        $this->output->write(" <fg=gray>$runTime</>");
+        $this->output->write(" <fg=gray>{$runTime}".($memory ? " {$memory}" : '').'</>');
 
         $this->output->writeln(match ($status) {
             'success' => ' <fg=green;options=bold>DONE</>',

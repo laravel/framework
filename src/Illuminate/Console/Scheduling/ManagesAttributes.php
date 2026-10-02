@@ -4,6 +4,8 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Support\Reflector;
 
+use function Illuminate\Support\enum_value;
+
 trait ManagesAttributes
 {
     /**
@@ -49,11 +51,25 @@ trait ManagesAttributes
     public $evenInMaintenanceMode = false;
 
     /**
+     * Indicates if the command should run even when the scheduler is paused.
+     *
+     * @var bool
+     */
+    public $evenWhenPaused = false;
+
+    /**
      * Indicates if the command should not overlap itself.
      *
      * @var bool
      */
     public $withoutOverlapping = false;
+
+    /**
+     * Indicates if the mutex should be released when the process receives a termination signal.
+     *
+     * @var bool
+     */
+    public $releaseOnTerminationSignals = true;
 
     /**
      * Indicates if the command should only be allowed to run on one server for each cron expression.
@@ -98,6 +114,13 @@ trait ManagesAttributes
     public $description;
 
     /**
+     * The arbitrary attributes stored with the event.
+     *
+     * @var array<array-key, mixed>
+     */
+    public $attributes = [];
+
+    /**
      * Set which user the command should run as.
      *
      * @param  string  $user
@@ -113,12 +136,14 @@ trait ManagesAttributes
     /**
      * Limit the environments the command should run in.
      *
-     * @param  mixed  $environments
+     * @param  \UnitEnum|string|array  $environments
      * @return $this
      */
     public function environments($environments)
     {
-        $this->environments = is_array($environments) ? $environments : func_get_args();
+        $this->environments = array_map(
+            enum_value(...), is_array($environments) ? $environments : func_get_args()
+        );
 
         return $this;
     }
@@ -136,17 +161,33 @@ trait ManagesAttributes
     }
 
     /**
+     * State that the command should run even when the scheduler is paused.
+     *
+     * @return $this
+     */
+    public function evenWhenPaused()
+    {
+        $this->evenWhenPaused = true;
+
+        return $this;
+    }
+
+    /**
      * Do not allow the event to overlap each other.
+     *
      * The expiration time of the underlying cache lock may be specified in minutes.
      *
      * @param  int  $expiresAt
+     * @param  bool  $releaseOnTerminationSignals
      * @return $this
      */
-    public function withoutOverlapping($expiresAt = 1440)
+    public function withoutOverlapping($expiresAt = 1440, $releaseOnTerminationSignals = true)
     {
         $this->withoutOverlapping = true;
 
         $this->expiresAt = $expiresAt;
+
+        $this->releaseOnTerminationSignals = $releaseOnTerminationSignals;
 
         return $this->skip(function () {
             return $this->mutex->exists($this);
@@ -227,6 +268,19 @@ trait ManagesAttributes
     public function description($description)
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * Set arbitrary attributes to store with the event.
+     *
+     * @param  array<array-key, mixed>  $attributes
+     * @return $this
+     */
+    public function withAttributes($attributes)
+    {
+        $this->attributes = array_merge_recursive($this->attributes, $attributes);
 
         return $this;
     }

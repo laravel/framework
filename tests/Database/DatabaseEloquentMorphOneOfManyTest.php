@@ -51,8 +51,6 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
     {
         $this->schema()->drop('products');
         $this->schema()->drop('states');
-
-        parent::tearDown();
     }
 
     public function testEagerLoadingAppliesConstraintsToInnerJoinSubQuery()

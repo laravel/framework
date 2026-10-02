@@ -45,14 +45,12 @@ class RepositoryTest extends TestCase
                 'b.c' => 'd',
             ],
         ]);
-
-        parent::setUp();
     }
 
     public function testGetValueWhenKeyContainDot()
     {
         $this->assertSame(
-            $this->repository->get('a.b'), 'c'
+            'c', $this->repository->get('a.b')
         );
         $this->assertNull(
             $this->repository->get('a.b.c')
@@ -308,7 +306,7 @@ class RepositoryTest extends TestCase
     public function testItGetsAsArray(): void
     {
         $this->assertSame(
-            $this->repository->array('array'), ['aaa', 'zzz']
+            ['aaa', 'zzz'], $this->repository->array('array')
         );
     }
 
@@ -346,7 +344,7 @@ class RepositoryTest extends TestCase
     public function testItGetsAsInteger(): void
     {
         $this->assertSame(
-            $this->repository->integer('integer'), 1
+            1, $this->repository->integer('integer')
         );
     }
 
@@ -361,7 +359,7 @@ class RepositoryTest extends TestCase
     public function testItGetsAsFloat(): void
     {
         $this->assertSame(
-            $this->repository->float('float'), 1.1
+            1.1, $this->repository->float('float')
         );
     }
 

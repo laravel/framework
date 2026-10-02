@@ -17,7 +17,7 @@ class ScheduleTestCommandTest extends TestCase
     {
         parent::setUp();
 
-        Carbon::setTestNow(now()->startOfYear());
+        Carbon::setTestNow(Carbon::now()->startOfYear());
 
         $this->schedule = $this->app->make(Schedule::class);
     }

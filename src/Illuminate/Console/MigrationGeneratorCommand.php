@@ -53,7 +53,7 @@ abstract class MigrationGeneratorCommand extends Command
         if ($this->migrationExists($table)) {
             $this->components->error('Migration already exists.');
 
-            return 1;
+            return self::FAILURE;
         }
 
         $this->replaceMigrationPlaceholders(
@@ -62,7 +62,7 @@ abstract class MigrationGeneratorCommand extends Command
 
         $this->components->info('Migration created successfully.');
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

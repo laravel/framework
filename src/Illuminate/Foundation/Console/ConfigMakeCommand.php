@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputOption;
 
 use function Illuminate\Filesystem\join_paths;
 
@@ -17,7 +16,9 @@ class ConfigMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:config';
+    protected $signature = 'make:config
+                    {name : The name of the config}
+                    {--f|force : Create the configuration file even if it already exists}';
 
     /**
      * The console command description.
@@ -60,16 +61,6 @@ class ConfigMakeCommand extends GeneratorCommand
         return file_exists($customPath = $this->laravel->basePath($relativePath))
             ? $customPath
             : join_paths(__DIR__, $relativePath);
-    }
-
-    /**
-     * Get the console command arguments.
-     */
-    protected function getOptions(): array
-    {
-        return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the configuration file even if it already exists'],
-        ];
     }
 
     /**

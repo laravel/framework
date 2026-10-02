@@ -12,7 +12,6 @@ use Orchestra\Testbench\TestCase;
 #[WithConfig('cache.stores.array.serialize', false)]
 class FailoverStoreTest extends TestCase
 {
-    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

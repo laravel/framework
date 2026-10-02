@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ApcStore;
 use Illuminate\Cache\ApcWrapper;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class CacheApcStoreTest extends TestCase
@@ -12,7 +12,7 @@ class CacheApcStoreTest extends TestCase
     public function testGetReturnsNullWhenNotFound()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
-        $apc->expects($this->once())->method('get')->with($this->equalTo('foobar'))->willReturn(null);
+        $apc->expects($this->once())->method('get')->with('foobar')->willReturn(null);
         $store = new ApcStore($apc, 'foo');
         $this->assertNull($store->get('bar'));
     }
@@ -53,7 +53,7 @@ class CacheApcStoreTest extends TestCase
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['put'])->getMock();
         $apc->expects($this->once())
-            ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60))
+            ->method('put')->with('foo', 'bar', 60)
             ->willReturn(true);
         $store = new ApcStore($apc);
         $result = $store->put('foo', 'bar', 60);
@@ -62,20 +62,17 @@ class CacheApcStoreTest extends TestCase
 
     public function testSetMultipleMethodProperlyCallsAPC()
     {
-        $apc = m::mock(ApcWrapper::class);
+        $apc = Mockery::mock(ApcWrapper::class);
 
-        $apc->shouldReceive('put')
-            ->once()
+        $apc->expects('put')
             ->with('foo', 'bar', 60)
             ->andReturn(true);
 
-        $apc->shouldReceive('put')
-            ->once()
+        $apc->expects('put')
             ->with('baz', 'qux', 60)
             ->andReturn(true);
 
-        $apc->shouldReceive('put')
-            ->once()
+        $apc->expects('put')
             ->with('bar', 'norf', 60)
             ->andReturn(true);
 
@@ -91,7 +88,7 @@ class CacheApcStoreTest extends TestCase
     public function testIncrementMethodProperlyCallsAPC()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['increment'])->getMock();
-        $apc->expects($this->once())->method('increment')->with($this->equalTo('foo'), $this->equalTo(5));
+        $apc->expects($this->once())->method('increment')->with('foo', 5);
         $store = new ApcStore($apc);
         $store->increment('foo', 5);
     }
@@ -99,7 +96,7 @@ class CacheApcStoreTest extends TestCase
     public function testDecrementMethodProperlyCallsAPC()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['decrement'])->getMock();
-        $apc->expects($this->once())->method('decrement')->with($this->equalTo('foo'), $this->equalTo(5));
+        $apc->expects($this->once())->method('decrement')->with('foo', 5);
         $store = new ApcStore($apc);
         $store->decrement('foo', 5);
     }
@@ -108,7 +105,7 @@ class CacheApcStoreTest extends TestCase
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['put'])->getMock();
         $apc->expects($this->once())
-            ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))
+            ->method('put')->with('foo', 'bar', 0)
             ->willReturn(true);
         $store = new ApcStore($apc);
         $result = $store->forever('foo', 'bar');
@@ -118,7 +115,7 @@ class CacheApcStoreTest extends TestCase
     public function testForgetMethodProperlyCallsAPC()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['delete'])->getMock();
-        $apc->expects($this->once())->method('delete')->with($this->equalTo('foo'))->willReturn(true);
+        $apc->expects($this->once())->method('delete')->with('foo')->willReturn(true);
         $store = new ApcStore($apc);
         $result = $store->forget('foo');
         $this->assertTrue($result);
@@ -131,8 +128,8 @@ class CacheApcStoreTest extends TestCase
 
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get', 'put'])->getMock();
 
-        $apc->expects($this->once())->method('get')->with($this->equalTo($key))->willReturn('bar');
-        $apc->expects($this->once())->method('put')->with($this->equalTo($key), $this->equalTo('bar'), $this->equalTo($ttl))->willReturn(true);
+        $apc->expects($this->once())->method('get')->with($key)->willReturn('bar');
+        $apc->expects($this->once())->method('put')->with($key, 'bar', $ttl)->willReturn(true);
 
         $this->assertTrue((new ApcStore($apc))->touch($key, $ttl));
     }

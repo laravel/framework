@@ -13,7 +13,7 @@ class EloquentTransactionWithAfterCommitUsingRefreshDatabaseTest extends TestCas
     /**
      * The current database driver.
      *
-     * @return string
+     * @var string
      */
     protected $driver;
 

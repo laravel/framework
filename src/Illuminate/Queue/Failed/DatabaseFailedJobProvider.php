@@ -58,9 +58,9 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
 
         $exception = (string) mb_convert_encoding($exception, 'UTF-8');
 
-        return $this->getTable()->insertGetId(compact(
-            'connection', 'queue', 'payload', 'exception', 'failed_at'
-        ));
+        return $this->getTable()->insertGetId([
+            'connection' => $connection, 'queue' => $queue, 'payload' => $payload, 'exception' => $exception, 'failed_at' => $failed_at,
+        ]);
     }
 
     /**
@@ -111,15 +111,18 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
     }
 
     /**
-     * Flush all of the failed jobs from storage.
+     * Flush the failed jobs from storage.
      *
      * @param  int|null  $hours
+     * @param  string|null  $queue
      * @return void
      */
-    public function flush($hours = null)
+    public function flush($hours = null, $queue = null)
     {
         $this->getTable()->when($hours, function ($query, $hours) {
             $query->where('failed_at', '<=', Date::now()->subHours($hours));
+        })->when(! is_null($queue), function ($query) use ($queue) {
+            $query->where('queue', $queue);
         })->delete();
     }
 

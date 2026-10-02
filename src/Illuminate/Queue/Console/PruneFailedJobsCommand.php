@@ -39,7 +39,7 @@ class PruneFailedJobsCommand extends Command
         } else {
             $this->components->error('The ['.class_basename($failer).'] failed job storage driver does not support pruning.');
 
-            return 1;
+            return self::FAILURE;
         }
 
         $this->components->info("{$count} entries deleted.");

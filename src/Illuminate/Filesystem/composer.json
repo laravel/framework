@@ -16,6 +16,7 @@
     "require": {
         "php": "^8.3",
         "illuminate/collections": "^13.0",
+        "illuminate/conditionable": "^13.0",
         "illuminate/contracts": "^13.0",
         "illuminate/macroable": "^13.0",
         "illuminate/support": "^13.0",
@@ -26,11 +27,12 @@
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-hash": "Required to use the Filesystem class.",
         "illuminate/http": "Required for handling uploaded files (^13.0).",
+        "illuminate/image": "Required to create images from stored files (^13.0).",
         "league/flysystem": "Required to use the Flysystem local driver (^3.25.1).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^3.25.1).",
         "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^3.25.1).",
         "league/flysystem-sftp-v3": "Required to use the Flysystem SFTP driver (^3.25.1).",
-        "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
+        "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0 || ^2.0).",
         "symfony/filesystem": "Required to enable support for relative symbolic links (^7.4 || ^8.0).",
         "symfony/mime": "Required to enable support for guessing extensions (^7.4 || ^8.0)."
     },

@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
+use Illuminate\Tests\Database\Fixtures\Models\MorphEagerLoading\Video;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphEagerLoadingTest extends DatabaseTestCase
@@ -40,7 +43,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         });
 
         $user = User::create();
-        $user2 = User::forceCreate(['deleted_at' => now()]);
+        $user2 = User::forceCreate(['deleted_at' => Carbon::now()]);
 
         $post = tap((new Post)->user()->associate($user))->save();
 
@@ -98,7 +101,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 
     public function testMorphWithTrashedRelationLazyLoading()
     {
-        $deletedUser = User::forceCreate(['deleted_at' => now()]);
+        $deletedUser = User::forceCreate(['deleted_at' => Carbon::now()]);
 
         $action = new Action;
         $action->target()->associate($deletedUser)->save();
@@ -122,16 +125,6 @@ class Action extends Model
     }
 }
 
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
-    }
-}
-
 class Post extends Model
 {
     public $timestamps = false;
@@ -148,10 +141,4 @@ class User extends Model
     use SoftDeletes;
 
     public $timestamps = false;
-}
-
-class Video extends Model
-{
-    public $timestamps = false;
-    protected $primaryKey = 'video_id';
 }

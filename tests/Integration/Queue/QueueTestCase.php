@@ -13,7 +13,7 @@ abstract class QueueTestCase extends TestCase
     /**
      * The current database driver.
      *
-     * @return string
+     * @var string
      */
     protected $driver;
 
@@ -28,7 +28,6 @@ abstract class QueueTestCase extends TestCase
         $this->driver = $app['config']->get('queue.default', 'sync');
     }
 
-    #[\Override]
     protected function setUp(): void
     {
         $this->afterApplicationCreated(function () {

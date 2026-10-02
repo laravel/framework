@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -61,13 +62,12 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
 
     protected function tearDown(): void
     {
+        Eloquent::clearBootedModels();
         $this->schema()->drop('users');
         $this->schema()->drop('intermediates');
         $this->schema()->drop('logins');
         $this->schema()->drop('states');
         $this->schema()->drop('prices');
-
-        parent::tearDown();
     }
 
     public function testItGuessesRelationName(): void
@@ -156,8 +156,7 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
 
     public function testItFailsWhenUsingInvalidAggregate(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid aggregate [count] used within ofMany relation. Available aggregates: MIN, MAX');
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid aggregate [count] used within ofMany relation. Available aggregates: MIN, MAX'));
         $user = HasOneThroughOfManyTestUser::make();
         $user->latest_login_with_invalid_aggregate();
     }
@@ -634,7 +633,7 @@ class HasOneThroughOfManyTestUser extends Eloquent
             'published_at' => 'max',
             'id' => 'max',
         ], function ($q) {
-            $q->where('published_at', '<', now());
+            $q->where('published_at', '<', Carbon::now());
         });
     }
 
@@ -654,7 +653,7 @@ class HasOneThroughOfManyTestUser extends Eloquent
             'published_at' => 'max',
             'id' => 'max',
         ], function ($q) {
-            $q->where('published_at', '<', now());
+            $q->where('published_at', '<', Carbon::now());
         });
     }
 

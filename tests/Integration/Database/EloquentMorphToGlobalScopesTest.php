@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
@@ -65,16 +66,6 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
         $post = $comment->commentable()->withoutGlobalScopes()->first();
 
         $this->assertNotNull($post);
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
     }
 }
 

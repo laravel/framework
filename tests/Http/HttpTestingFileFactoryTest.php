@@ -94,13 +94,7 @@ class HttpTestingFileFactoryTest extends TestCase
     {
         $image = (new FileFactory)->image('test.bmp');
 
-        $imagePath = $image->getRealPath();
-
-        if (version_compare(PHP_VERSION, '8.3.0-dev', '>=')) {
-            $this->assertSame('image/bmp', mime_content_type($imagePath));
-        } else {
-            $this->assertSame('image/x-ms-bmp', mime_content_type($imagePath));
-        }
+        $this->assertSame('image/bmp', mime_content_type($image->getRealPath()));
     }
 
     public function testCreateWithMimeType()
@@ -150,10 +144,6 @@ class HttpTestingFileFactoryTest extends TestCase
     {
         $gdInfo = gd_info();
 
-        if (isset($gdInfo[$driver])) {
-            return $gdInfo[$driver];
-        }
-
-        return false;
+        return $gdInfo[$driver] ?? false;
     }
 }

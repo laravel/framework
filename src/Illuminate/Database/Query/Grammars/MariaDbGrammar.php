@@ -44,6 +44,27 @@ class MariaDbGrammar extends MySqlGrammar
     }
 
     /**
+     * Compile a vector distance expression for the given column.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    public function compileVectorDistanceExpression($column)
+    {
+        return "vec_distance_cosine({$this->wrap($column)}, vec_fromtext(?))";
+    }
+
+    /**
+     * Determine if the grammar supports vector distance queries.
+     *
+     * @return bool
+     */
+    public function supportsVectorDistance()
+    {
+        return true;
+    }
+
+    /**
      * Determine whether to use a legacy group limit clause for MySQL < 8.0.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

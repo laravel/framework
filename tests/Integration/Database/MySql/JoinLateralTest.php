@@ -6,11 +6,11 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
 #[RequiresPhpExtension('pdo_mysql')]
-#[RequiresOperatingSystemFamily('Linux|Darwin')]
+#[RequiresOperatingSystem('Linux|Darwin')]
 class JoinLateralTest extends MySqlTestCase
 {
     protected function afterRefreshingDatabase()
@@ -58,7 +58,7 @@ class JoinLateralTest extends MySqlTestCase
 
         if (str_contains($mySqlVersion, 'Maria')) {
             $this->markTestSkipped('Lateral joins are not supported on MariaDB'.__CLASS__);
-        } elseif ((float) $mySqlVersion < '8.0.14') {
+        } elseif (version_compare($mySqlVersion, '8.0.14', '<')) {
             $this->markTestSkipped('Lateral joins are not supported on MySQL < 8.0.14'.__CLASS__);
         }
     }

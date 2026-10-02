@@ -17,14 +17,14 @@ class KernelTest extends TestCase
     {
         $kernel = new Kernel($this->getApplication(), $this->getRouter());
 
-        $this->assertEquals([], $kernel->getMiddlewareGroups());
+        $this->assertSame([], $kernel->getMiddlewareGroups());
     }
 
     public function testGetRouteMiddleware()
     {
         $kernel = new Kernel($this->getApplication(), $this->getRouter());
 
-        $this->assertEquals([], $kernel->getRouteMiddleware());
+        $this->assertSame([], $kernel->getRouteMiddleware());
     }
 
     public function testGetMiddlewarePriority()
@@ -66,6 +66,59 @@ class KernelTest extends TestCase
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
             \Illuminate\Routing\Middleware\ValidateSignature::class,
+            \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            \Illuminate\Routing\Middleware\ThrottleRequestsWithRedis::class,
+            \Illuminate\Contracts\Session\Middleware\AuthenticatesSessions::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\Auth\Middleware\Authorize::class,
+        ], $kernel->getMiddlewarePriority());
+    }
+
+    public function testAddToMiddlewarePriorityAfterFirstMiddleware()
+    {
+        $kernel = new Kernel($this->getApplication(), $this->getRouter());
+
+        $kernel->addToMiddlewarePriorityAfter(
+            \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
+            \Illuminate\Routing\Middleware\ValidateSignature::class,
+        );
+
+        $this->assertEquals([
+            \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
+            \Illuminate\Routing\Middleware\ValidateSignature::class,
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+            \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            \Illuminate\Routing\Middleware\ThrottleRequestsWithRedis::class,
+            \Illuminate\Contracts\Session\Middleware\AuthenticatesSessions::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\Auth\Middleware\Authorize::class,
+        ], $kernel->getMiddlewarePriority());
+    }
+
+    public function testAddToMiddlewarePriorityAfterAdjacentMiddleware()
+    {
+        $kernel = new Kernel($this->getApplication(), $this->getRouter());
+
+        $kernel->addToMiddlewarePriorityAfter(
+            [
+                \Illuminate\Cookie\Middleware\EncryptCookies::class,
+                \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            ],
+            \Illuminate\Routing\Middleware\ValidateSignature::class,
+        );
+
+        $this->assertEquals([
+            \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Routing\Middleware\ValidateSignature::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class,
             \Illuminate\Routing\Middleware\ThrottleRequestsWithRedis::class,
             \Illuminate\Contracts\Session\Middleware\AuthenticatesSessions::class,

@@ -3,10 +3,13 @@
 namespace Illuminate\Redis\Connections;
 
 use Closure;
+use ErrorException;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use RedisClusterException;
 use RedisException;
+use Throwable;
 
 /**
  * @mixin \Redis
@@ -14,6 +17,70 @@ use RedisException;
 class PhpRedisConnection extends Connection implements ConnectionContract
 {
     use PacksPhpRedisValues;
+
+    /**
+     * The commands that may be safely retried after reconnecting.
+     *
+     * @var list<string>
+     */
+    protected const RETRYABLE_COMMANDS = [
+        'bitcount',
+        'bitpos',
+        'dbsize',
+        'dump',
+        'exists',
+        'geodist',
+        'geohash',
+        'geopos',
+        'geosearch',
+        'get',
+        'getbit',
+        'getrange',
+        'hexists',
+        'hget',
+        'hgetall',
+        'hkeys',
+        'hlen',
+        'hmget',
+        'hmset',
+        'hstrlen',
+        'hvals',
+        'keys',
+        'lindex',
+        'llen',
+        'lpos',
+        'lrange',
+        'mget',
+        'mset',
+        'ping',
+        'pttl',
+        'randomkey',
+        'scard',
+        'sdiff',
+        'sinter',
+        'sismember',
+        'smembers',
+        'smismember',
+        'srandmember',
+        'strlen',
+        'sunion',
+        'time',
+        'ttl',
+        'type',
+        'xinfo',
+        'xlen',
+        'xpending',
+        'xrange',
+        'xrevrange',
+        'zcard',
+        'zcount',
+        'zlexcount',
+        'zmscore',
+        'zrange',
+        'zrank',
+        'zrevrank',
+        'zscore',
+    ];
 
     /**
      * The connection creation callback.
@@ -64,9 +131,15 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function mget(array $keys)
     {
+        $result = $this->command('mget', [$keys]);
+
+        if ($result === false) {
+            return array_fill(0, count($keys), null);
+        }
+
         return array_map(function ($value) {
             return $value !== false ? $value : null;
-        }, $this->command('mget', [$keys]));
+        }, $result);
     }
 
     /**
@@ -113,7 +186,13 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $dictionary = $dictionary[0];
         }
 
-        return array_values($this->command('hmget', [$key, $dictionary]));
+        $result = $this->command('hmget', [$key, $dictionary]);
+
+        if ($result === false) {
+            return array_fill(0, count((array) $dictionary), null);
+        }
+
+        return array_values($result);
     }
 
     /**
@@ -398,11 +477,21 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function pipeline(?callable $callback = null)
     {
-        $pipeline = $this->client()->pipeline();
+        $pipeline = $this->retryOnceOnLostConnection(fn () => $this->client()->pipeline());
 
-        return is_null($callback)
-            ? $pipeline
-            : tap($pipeline, $callback)->exec();
+        if (is_null($callback)) {
+            return $pipeline;
+        }
+
+        try {
+            return tap($pipeline, $callback)->exec();
+        } catch (Throwable $e) {
+            rescue(fn () => $this->client()->discard(), null, false);
+
+            $this->rebuildClientOnLostConnection($e);
+
+            throw $e;
+        }
     }
 
     /**
@@ -413,11 +502,21 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function transaction(?callable $callback = null)
     {
-        $transaction = $this->client()->multi();
+        $transaction = $this->retryOnceOnLostConnection(fn () => $this->client()->multi());
 
-        return is_null($callback)
-            ? $transaction
-            : tap($transaction, $callback)->exec();
+        if (is_null($callback)) {
+            return $transaction;
+        }
+
+        try {
+            return tap($transaction, $callback)->exec();
+        } catch (Throwable $e) {
+            rescue(fn () => $this->client()->discard(), null, false);
+
+            $this->rebuildClientOnLostConnection($e);
+
+            throw $e;
+        }
     }
 
     /**
@@ -523,19 +622,125 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  array  $parameters
      * @return mixed
      *
+     * @throws \RedisClusterException
      * @throws \RedisException
      */
     public function command($method, array $parameters = [])
     {
-        try {
-            return parent::command($method, $parameters);
-        } catch (RedisException $e) {
-            if (Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'READONLY', 'Connection lost'])) {
-                $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
-            }
+        $retries = max(
+            $this->isRetryable($method, $parameters) ? 1 : 0,
+            (int) ($this->config['command_retries'] ?? 0),
+        );
 
-            throw $e;
+        while (true) {
+            try {
+                return parent::command($method, $parameters);
+            } catch (RedisClusterException|RedisException|ErrorException $e) {
+                if (! $this->causedByLostConnection($e)) {
+                    throw $e;
+                }
+
+                $this->rebuildClient();
+
+                if ($retries-- === 0) {
+                    throw $e;
+                }
+            }
         }
+    }
+
+    /**
+     * Determine whether the command may be safely retried.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function isRetryable($method, array $parameters)
+    {
+        $method = strtolower($method);
+
+        if ($method === 'set') {
+            return ! isset($parameters[2]);
+        }
+
+        return in_array($method, static::RETRYABLE_COMMANDS, true);
+    }
+
+    /**
+     * Run the given callback, retrying it once on a rebuilt client if the connection was lost.
+     *
+     * For operations that have not yet sent a command that could have taken effect, such as opening a pipeline or a transaction.
+     *
+     * @param  \Closure  $callback
+     * @return mixed
+     */
+    protected function retryOnceOnLostConnection(Closure $callback)
+    {
+        $retries = 1;
+
+        while (true) {
+            try {
+                return $callback();
+            } catch (RedisClusterException|RedisException|ErrorException $e) {
+                if (! $this->causedByLostConnection($e)) {
+                    throw $e;
+                }
+
+                $this->rebuildClient();
+
+                if ($retries-- === 0) {
+                    throw $e;
+                }
+            }
+        }
+    }
+
+    /**
+     * Rebuild the client if the given exception was caused by a lost connection.
+     *
+     * @param  \Throwable  $e
+     * @return void
+     */
+    protected function rebuildClientOnLostConnection(Throwable $e)
+    {
+        if ($this->causedByLostConnection($e)) {
+            $this->rebuildClient();
+        }
+    }
+
+    /**
+     * Determine if the given exception was caused by a lost connection to the Redis server.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function causedByLostConnection(Throwable $e)
+    {
+        if (! $e instanceof RedisClusterException && ! $e instanceof RedisException && ! $e instanceof ErrorException) {
+            return false;
+        }
+
+        return Str::contains($e->getMessage(), [
+            'went away',
+            'socket',
+            'Error while reading',
+            'read error on connection',
+            'READONLY',
+            'Connection lost',
+            'Error processing response from Redis node',
+            'Connection reset by peer',
+        ]);
+    }
+
+    /**
+     * Replace the underlying client with a freshly connected one.
+     *
+     * @return void
+     */
+    protected function rebuildClient()
+    {
+        $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
     }
 
     /**

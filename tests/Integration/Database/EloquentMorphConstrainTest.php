@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Comment;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphConstrainTest extends DatabaseTestCase
@@ -60,16 +61,6 @@ class EloquentMorphConstrainTest extends DatabaseTestCase
         $this->assertNull($comments[1]->commentable);
         $this->assertTrue($comments[2]->commentable->video_visible);
         $this->assertNull($comments[3]->commentable);
-    }
-}
-
-class Comment extends Model
-{
-    public $timestamps = false;
-
-    public function commentable()
-    {
-        return $this->morphTo();
     }
 }
 

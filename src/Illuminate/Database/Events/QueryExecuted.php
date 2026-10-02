@@ -42,7 +42,7 @@ class QueryExecuted
     /**
      * The PDO read / write type for the executed query.
      *
-     * @var null|'read'|'write'
+     * @var null|'read'|'write'|'direct'
      */
     public $readWriteType;
 
@@ -53,7 +53,7 @@ class QueryExecuted
      * @param  array  $bindings
      * @param  float|null  $time
      * @param  \Illuminate\Database\Connection  $connection
-     * @param  null|'read'|'write'  $readWriteType
+     * @param  null|'read'|'write'|'direct'  $readWriteType
      */
     public function __construct($sql, $bindings, $time, $connection, $readWriteType = null)
     {

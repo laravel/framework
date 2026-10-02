@@ -55,8 +55,6 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
     {
         $this->schema()->drop('test_posts');
         $this->schema()->drop('test_images');
-
-        parent::tearDown();
     }
 
     public function testMorphOneInverseRelationIsProperlySetToParentWhenLazyLoaded()

@@ -4,62 +4,77 @@ namespace Illuminate\Tests\Foundation;
 
 use Exception;
 use Illuminate\Broadcasting\FakePendingBroadcast;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository as CacheRepositoryImpl;
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
-use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class FoundationHelpersTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        $app = new Application;
+        $app['config'] = new ConfigRepository;
+    }
+
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+
+        foreach (['hot', 'mix-manifest.json', 'mix/hot', 'mix/mix-manifest.json'] as $file) {
+            @unlink(__DIR__.'/'.$file);
+        }
+
+        @rmdir(__DIR__.'/mix');
+    }
+
     public function testCache()
     {
         $app = new Application;
-        $app['cache'] = $cache = m::mock(CacheRepository::class);
+        $app['cache'] = $cache = new CacheRepositoryImpl(new ArrayStore);
 
         // 1. cache()
         $this->assertInstanceOf(CacheRepository::class, cache());
 
         // 2. cache(['foo' => 'bar'], 1);
-        $cache->shouldReceive('put')->once()->with('foo', 'bar', 1);
         cache(['foo' => 'bar'], 1);
+        $this->assertSame('bar', $cache->get('foo'));
 
         // 3. cache('foo');
-        $cache->shouldReceive('get')->once()->with('foo', null)->andReturn('bar');
         $this->assertSame('bar', cache('foo'));
 
         // 4. cache('foo', null);
-        $cache->shouldReceive('get')->once()->with('foo', null)->andReturn('bar');
         $this->assertSame('bar', cache('foo', null));
 
         // 5. cache('baz', 'default');
-        $cache->shouldReceive('get')->once()->with('baz', 'default')->andReturn('default');
         $this->assertSame('default', cache('baz', 'default'));
     }
 
     public function testEvents()
     {
         $app = new Application;
-        $app['events'] = $dispatcher = m::mock(Dispatcher::class);
+        $app['events'] = $dispatcher = new Dispatcher;
 
-        $dispatcher->shouldReceive('dispatch')->once()->with('a', 'b', 'c')->andReturn('foo');
-        $this->assertSame('foo', event('a', 'b', 'c'));
+        $dispatcher->listen('a', fn ($payload) => $payload === 'b' ? 'foo' : null);
+
+        $this->assertSame('foo', event('a', 'b', true));
     }
 
     public function testMixDoesNotIncludeHost()
     {
         $app = new Application;
-        $app['config'] = m::mock(Repository::class);
-        $app['config']->shouldReceive('get')->with('app.mix_url');
-        $app['config']->shouldReceive('get')->with('app.mix_hot_proxy_url');
+        $app['config'] = new ConfigRepository;
 
         $manifest = $this->makeManifest();
 
@@ -73,9 +88,7 @@ class FoundationHelpersTest extends TestCase
     public function testMixCachesManifestForSubsequentCalls()
     {
         $app = new Application;
-        $app['config'] = m::mock(Repository::class);
-        $app['config']->shouldReceive('get')->with('app.mix_url');
-        $app['config']->shouldReceive('get')->with('app.mix_hot_proxy_url');
+        $app['config'] = new ConfigRepository;
 
         $manifest = $this->makeManifest();
         mix('unversioned.css');
@@ -89,9 +102,7 @@ class FoundationHelpersTest extends TestCase
     public function testMixAssetMissingStartingSlashHaveItAdded()
     {
         $app = new Application;
-        $app['config'] = m::mock(Repository::class);
-        $app['config']->shouldReceive('get')->with('app.mix_url');
-        $app['config']->shouldReceive('get')->with('app.mix_hot_proxy_url');
+        $app['config'] = new ConfigRepository;
 
         $manifest = $this->makeManifest();
 
@@ -104,8 +115,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixMissingManifestThrowsException()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Mix manifest not found');
+        $this->expectExceptionObject(new Exception('Mix manifest not found'));
 
         mix('unversioned.css', 'missing');
     }
@@ -113,9 +123,7 @@ class FoundationHelpersTest extends TestCase
     public function testMixWithManifestDirectory()
     {
         $app = new Application;
-        $app['config'] = m::mock(Repository::class);
-        $app['config']->shouldReceive('get')->with('app.mix_url');
-        $app['config']->shouldReceive('get')->with('app.mix_hot_proxy_url');
+        $app['config'] = new ConfigRepository;
 
         mkdir($directory = __DIR__.'/mix');
         $manifest = $this->makeManifest('mix');
@@ -292,14 +300,16 @@ class FoundationHelpersTest extends TestCase
 
     public function testAbortReceivesCodeAsInteger()
     {
-        $app = m::mock(Application::class);
-        $app->shouldReceive('abort')
-            ->with($code = 400, $message = 'Bad request', $headers = ['X-FOO' => 'BAR'])
-            ->once();
+        Container::setInstance(new Application);
 
-        Container::setInstance($app);
-
-        abort($code, $message, $headers);
+        try {
+            abort(400, 'Bad request', ['X-FOO' => 'BAR']);
+            $this->fail('abort() should throw an HttpException.');
+        } catch (HttpException $e) {
+            $this->assertSame(400, $e->getStatusCode());
+            $this->assertSame('Bad request', $e->getMessage());
+            $this->assertSame(['X-FOO' => 'BAR'], $e->getHeaders());
+        }
     }
 
     public function testBroadcastIfReturnsFakeOnFalse()

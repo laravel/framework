@@ -44,9 +44,7 @@ class AfterQueryTest extends DatabaseTestCase
             ->afterQuery(function (Collection $users) use ($afterQueryIds) {
                 $afterQueryIds->push(...$users->pluck('id')->all());
 
-                foreach ($users as $user) {
-                    $this->assertInstanceOf(AfterQueryUser::class, $user);
-                }
+                $this->assertContainsOnlyInstancesOf(AfterQueryUser::class, $users);
             })
             ->get();
 
@@ -87,9 +85,7 @@ class AfterQueryTest extends DatabaseTestCase
             ->afterQuery(function (Collection $users) use ($afterQueryIds) {
                 $afterQueryIds->push(...$users->pluck('id')->all());
 
-                foreach ($users as $user) {
-                    $this->assertInstanceOf(AfterQueryUser::class, $user);
-                }
+                $this->assertContainsOnlyInstancesOf(AfterQueryUser::class, $users);
             })
             ->cursor();
 
@@ -177,9 +173,7 @@ class AfterQueryTest extends DatabaseTestCase
             ->afterQuery(function (Collection $posts) use ($afterQueryIds) {
                 $afterQueryIds->push(...$posts->pluck('id')->all());
 
-                foreach ($posts as $post) {
-                    $this->assertInstanceOf(AfterQueryPost::class, $post);
-                }
+                $this->assertContainsOnlyInstancesOf(AfterQueryPost::class, $posts);
             })
             ->get();
 
@@ -215,9 +209,7 @@ class AfterQueryTest extends DatabaseTestCase
             ->afterQuery(function (Collection $teamMates) use ($afterQueryIds) {
                 $afterQueryIds->push(...$teamMates->pluck('id')->all());
 
-                foreach ($teamMates as $teamMate) {
-                    $this->assertInstanceOf(AfterQueryUser::class, $teamMate);
-                }
+                $this->assertContainsOnlyInstancesOf(AfterQueryUser::class, $teamMates);
             })
             ->get();
 

@@ -244,7 +244,7 @@ class PendingProcess
      */
     public function run(array|string|null $command = null, ?callable $output = null)
     {
-        $this->command = $command ?: $this->command;
+        $this->command = $command ?? $this->command;
 
         $process = $this->toSymfonyProcess($command);
 
@@ -259,7 +259,7 @@ class PendingProcess
 
             return new ProcessResult(tap($process)->run($output));
         } catch (SymfonyTimeoutException $e) {
-            throw new ProcessTimedOutException($e, new ProcessResult($process));
+            throw ProcessTimedOutException::make($e, new ProcessResult($process));
         }
     }
 
@@ -274,7 +274,7 @@ class PendingProcess
      */
     public function start(array|string|null $command = null, ?callable $output = null)
     {
-        $this->command = $command ?: $this->command;
+        $this->command = $command ?? $this->command;
 
         $process = $this->toSymfonyProcess($command);
 
@@ -297,7 +297,7 @@ class PendingProcess
      */
     protected function toSymfonyProcess(array|string|null $command)
     {
-        $command = $command ?? $this->command;
+        $command ??= $this->command;
 
         $process = is_iterable($command)
             ? new Process($command, null, $this->environment)
@@ -370,6 +370,9 @@ class PendingProcess
      * @param  string  $command
      * @param  \Closure  $fake
      * @return mixed
+     *
+     * @throws \LogicException
+     * @throws \Throwable
      */
     protected function resolveSynchronousFake(string $command, Closure $fake)
     {

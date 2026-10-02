@@ -13,7 +13,7 @@ Laravel {{ app()->version() }}
 @endforeach
 
 @if ($exception->previousExceptions()->isNotEmpty())
-## Previous {{ Str::plural('exception', $exception->previousExceptions()->count()) }}
+## Previous {{ \Illuminate\Support\Str::plural('exception', $exception->previousExceptions()->count()) }}
 @foreach ($exception->previousExceptions() as $index => $previous)
 
 ### {{ $index + 1 }}. {{ $previous->class() }}

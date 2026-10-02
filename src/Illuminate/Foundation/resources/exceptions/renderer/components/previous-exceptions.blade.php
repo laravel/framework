@@ -5,7 +5,7 @@
         <div class="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-white/5 rounded-md w-6 h-6 flex items-center justify-center p-1">
             <x-laravel-exceptions-renderer::icons.alert class="w-2.5 h-2.5 text-blue-500 dark:text-emerald-500" />
         </div>
-        <h3 class="text-base font-semibold text-neutral-900 dark:text-white">Previous {{ Str::plural('exception', $exception->previousExceptions()->count()) }}</h3>
+        <h3 class="text-base font-semibold text-neutral-900 dark:text-white">Previous {{ \Illuminate\Support\Str::plural('exception', $exception->previousExceptions()->count()) }}</h3>
     </div>
 
     <div class="flex flex-col">

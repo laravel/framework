@@ -20,7 +20,7 @@ class ContextIntegrationTest extends TestCase
     public function test_it_can_hydrate_null()
     {
         Context::hydrate(null);
-        $this->assertEquals([], Context::all());
+        $this->assertSame([], Context::all());
     }
 
     public function test_it_handles_eloquent()
@@ -97,8 +97,7 @@ class ContextIntegrationTest extends TestCase
             'hidden' => [],
         ];
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Value is incomplete class: {"__PHP_Incomplete_Class_Name":"App\\\\MyContextClass"}');
+        $this->expectExceptionObject(new RuntimeException('Value is incomplete class: {"__PHP_Incomplete_Class_Name":"App\\\\MyContextClass"}'));
 
         Context::hydrate($dehydrated);
     }
@@ -112,8 +111,7 @@ class ContextIntegrationTest extends TestCase
             'hidden' => [],
         ];
 
-        $this->expectException(ErrorException::class);
-        $this->expectExceptionMessage('unserialize(): Error at offset 0 of 8 bytes');
+        $this->expectExceptionObject(new ErrorException('unserialize(): Error at offset 0 of 8 bytes'));
 
         Context::hydrate($dehydrated);
     }

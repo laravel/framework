@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 trait GuardsAttributes
 {
@@ -45,15 +46,15 @@ trait GuardsAttributes
     #[Initialize]
     public function initializeGuardsAttributes()
     {
-        if (empty($this->fillable)) {
-            $this->fillable = static::resolveClassAttribute(Fillable::class, 'columns') ?? [];
-        }
+        $this->mergeFillable(static::resolveClassAttribute(Fillable::class, 'columns') ?? []);
 
-        if ($this->guarded === ['*']) {
+        $default = $this instanceof Pivot ? [] : ['*'];
+
+        if ($this->guarded === $default) {
             if (static::resolveClassAttribute(Unguarded::class) !== null) {
                 $this->guarded = [];
             } else {
-                $this->guarded = static::resolveClassAttribute(Guarded::class, 'columns') ?? ['*'];
+                $this->guarded = static::resolveClassAttribute(Guarded::class, 'columns') ?? $default;
             }
         }
     }
@@ -89,6 +90,10 @@ trait GuardsAttributes
      */
     public function mergeFillable(array $fillable)
     {
+        if ($fillable === []) {
+            return $this;
+        }
+
         $this->fillable = array_values(array_unique(array_merge($this->fillable, $fillable)));
 
         return $this;

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Session;
 
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\EncryptedStore;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SessionHandlerInterface;
@@ -14,8 +14,8 @@ class EncryptedSessionStoreTest extends TestCase
     public function testSessionIsProperlyEncrypted()
     {
         $session = $this->getSession();
-        $session->getEncrypter()->shouldReceive('decrypt')->once()->with(serialize([]))->andReturn(serialize([]));
-        $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([]));
+        $session->getEncrypter()->expects('decrypt')->with(serialize([]))->andReturn(serialize([]));
+        $session->getHandler()->expects('read')->andReturn(serialize([]));
         $session->start();
         $session->put('foo', 'bar');
         $session->flash('baz', 'boom');
@@ -29,8 +29,8 @@ class EncryptedSessionStoreTest extends TestCase
                 'old' => ['baz'],
             ],
         ]);
-        $session->getEncrypter()->shouldReceive('encrypt')->once()->with($serialized)->andReturn($serialized);
-        $session->getHandler()->shouldReceive('write')->once()->with(
+        $session->getEncrypter()->expects('encrypt')->with($serialized)->andReturn($serialized);
+        $session->getHandler()->expects('write')->with(
             $this->getSessionId(),
             $serialized
         );
@@ -50,8 +50,8 @@ class EncryptedSessionStoreTest extends TestCase
     {
         return [
             $this->getSessionName(),
-            m::mock(SessionHandlerInterface::class),
-            m::mock(Encrypter::class),
+            Mockery::mock(SessionHandlerInterface::class),
+            Mockery::mock(Encrypter::class),
             $this->getSessionId(),
         ];
     }

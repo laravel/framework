@@ -18,17 +18,12 @@ class SupportCarbonTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         Carbon::setTestNow($this->now = Carbon::create(2017, 6, 27, 13, 14, 15, 'UTC'));
     }
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
         Carbon::serializeUsing(null);
-
-        parent::tearDown();
     }
 
     public function testInstance()
@@ -59,16 +54,14 @@ class SupportCarbonTest extends TestCase
 
     public function testCarbonRaisesExceptionWhenStaticMacroIsNotFound()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('nonExistingStaticMacro does not exist.');
+        $this->expectExceptionObject(new BadMethodCallException('nonExistingStaticMacro does not exist.'));
 
         Carbon::nonExistingStaticMacro();
     }
 
     public function testCarbonRaisesExceptionWhenMacroIsNotFound()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('nonExistingMacro does not exist.');
+        $this->expectExceptionObject(new BadMethodCallException('nonExistingMacro does not exist.'));
 
         Carbon::now()->nonExistingMacro();
     }
@@ -120,25 +113,43 @@ class SupportCarbonTest extends TestCase
 
     public function testCarbonIsConditionable()
     {
-        $this->assertTrue(Carbon::now()->when(null, fn (Carbon $carbon) => $carbon->addDays(1))->isToday());
-        $this->assertTrue(Carbon::now()->when(true, fn (Carbon $carbon) => $carbon->addDays(1))->isTomorrow());
+        $this->assertTrue(Carbon::now()->when(null, fn (Carbon $carbon) => $carbon->addDay())->isToday());
+        $this->assertTrue(Carbon::now()->when(true, fn (Carbon $carbon) => $carbon->addDay())->isTomorrow());
     }
 
     public function testCreateFromUid()
     {
         $ulid = Carbon::createFromId('01DXH9C4P0ED4AGJJP9CRKQ55C');
-        $this->assertEquals('2020-01-01 19:30:00.000000', $ulid->toDateTimeString('microsecond'));
+        $this->assertSame('2020-01-01 19:30:00.000000', $ulid->toDateTimeString('microsecond'));
 
         $uuidv1 = Carbon::createFromId('71513cb4-f071-11ed-a0cf-325096b39f47');
-        $this->assertEquals('2023-05-12 03:02:34.147346', $uuidv1->toDateTimeString('microsecond'));
+        $this->assertSame('2023-05-12 03:02:34.147346', $uuidv1->toDateTimeString('microsecond'));
 
         $uuidv2 = Carbon::createFromId('000003e8-f072-21ed-9200-325096b39f47');
-        $this->assertEquals('2023-05-12 03:06:33.529139', $uuidv2->toDateTimeString('microsecond'));
+        $this->assertSame('2023-05-12 03:06:33.529139', $uuidv2->toDateTimeString('microsecond'));
 
         $uuidv6 = Carbon::createFromId('1edf0746-5d1c-6ce8-88ad-e0cb4effa035');
-        $this->assertEquals('2023-05-12 03:23:43.347428', $uuidv6->toDateTimeString('microsecond'));
+        $this->assertSame('2023-05-12 03:23:43.347428', $uuidv6->toDateTimeString('microsecond'));
 
         $uuidv7 = Carbon::createFromId('01880dfa-2825-72e4-acbb-b1e4981cf8af');
-        $this->assertEquals('2023-05-12 03:21:18.117000', $uuidv7->toDateTimeString('microsecond'));
+        $this->assertSame('2023-05-12 03:21:18.117000', $uuidv7->toDateTimeString('microsecond'));
+    }
+
+    public function testPlus(): void
+    {
+        $carbon = Carbon::parse('2026-01-31');
+        $this->assertSame('2026-03-03', $carbon->plus(months: 1, overflow: true)->toDateString());
+
+        $carbon = Carbon::parse('2026-01-31');
+        $this->assertSame('2026-02-28', $carbon->plus(months: 1, overflow: false)->toDateString());
+    }
+
+    public function testMinus(): void
+    {
+        $carbon = Carbon::parse('2026-05-31');
+        $this->assertSame('2026-05-01', $carbon->minus(months: 1, overflow: true)->toDateString());
+
+        $carbon = Carbon::parse('2026-05-31');
+        $this->assertSame('2026-04-30', $carbon->minus(months: 1, overflow: false)->toDateString());
     }
 }

@@ -18,8 +18,6 @@ class HasherTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $container = Container::setInstance(new Container);
         $container->singleton('config', fn () => new Config());
 

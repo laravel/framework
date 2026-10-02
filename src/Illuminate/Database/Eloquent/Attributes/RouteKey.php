@@ -10,7 +10,8 @@ class RouteKey
     /**
      * Create a new attribute instance.
      */
-    public function __construct(public string $field)
-    {
+    public function __construct(
+        public string $key
+    ) {
     }
 }

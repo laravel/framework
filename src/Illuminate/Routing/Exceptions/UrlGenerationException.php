@@ -26,7 +26,7 @@ class UrlGenerationException extends Exception
             $route->uri()
         );
 
-        if (count($parameters) > 0) {
+        if ($parameters !== []) {
             $message .= sprintf(' [Missing %s: %s]', $parameterLabel, implode(', ', $parameters));
         }
 

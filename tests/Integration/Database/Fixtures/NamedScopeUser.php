@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database\Fixtures;
 
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Tests\Database\Fixtures\Models\Integration\User;
 
 class NamedScopeUser extends User
 {

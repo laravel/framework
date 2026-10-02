@@ -96,7 +96,7 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
      */
     public function many(array $keys)
     {
-        if (count($keys) === 0) {
+        if ($keys === []) {
             return [];
         }
 
@@ -395,7 +395,7 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
                 foreach ($tagsChunk as $tag) {
                     yield $tag;
                 }
-            } while (((string) $cursor) !== $defaultCursorValue);
+            } while (((string) $cursor) !== ((string) $defaultCursorValue));
         }))->map(fn (string $tagKey) => Str::match('/^'.preg_quote($prefix, '/').'tag:(.*):entries$/', $tagKey));
     }
 

@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Generator;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SchemaBuilderTest extends DatabaseTestCase
 {
@@ -60,43 +62,56 @@ class SchemaBuilderTest extends DatabaseTestCase
     }
 
     #[RequiresDatabase(['mysql', 'mariadb'])]
-    public function testChangeToTextColumn()
+    #[DataProvider('dataProviderChangeToTextColumn')]
+    public function testChangeToTextColumn($type): void
     {
         Schema::create('test', function (Blueprint $table) {
             $table->integer('test_column');
         });
 
-        foreach (['tinyText', 'text', 'mediumText', 'longText'] as $type) {
-            $blueprint = new Blueprint($this->getConnection(), 'test', function ($table) use ($type) {
-                $table->$type('test_column')->change();
-            });
+        $blueprint = new Blueprint($this->getConnection(), 'test', function ($table) use ($type) {
+            $table->$type('test_column')->change();
+        });
 
-            $uppercase = strtolower($type);
+        $uppercase = strtolower($type);
 
-            $expected = ["alter table `test` modify `test_column` $uppercase not null"];
+        $expected = ["alter table `test` modify `test_column` $uppercase not null"];
 
-            $this->assertEquals($expected, $blueprint->toSql());
-        }
+        $this->assertEquals($expected, $blueprint->toSql());
+    }
+
+    public static function dataProviderChangeToTextColumn(): Generator
+    {
+        yield 'tinyText' => ['tinyText'];
+        yield 'text' => ['text'];
+        yield 'mediumText' => ['mediumText'];
+        yield 'longText' => ['longText'];
     }
 
     #[RequiresDatabase(['mysql', 'mariadb'])]
-    public function testChangeTextColumnToTextColumn()
+    #[DataProvider('dataProviderChangeTextColumnToTextColumn')]
+    public function testChangeTextColumnToTextColumn($type): void
     {
         Schema::create('test', static function (Blueprint $table) {
             $table->text('test_column');
         });
 
-        foreach (['tinyText', 'mediumText', 'longText'] as $type) {
-            $blueprint = new Blueprint($this->getConnection(), 'test', function ($table) use ($type) {
-                $table->$type('test_column')->change();
-            });
+        $blueprint = new Blueprint($this->getConnection(), 'test', function ($table) use ($type) {
+            $table->$type('test_column')->change();
+        });
 
-            $lowercase = strtolower($type);
+        $lowercase = strtolower($type);
 
-            $expected = ["alter table `test` modify `test_column` $lowercase not null"];
+        $expected = ["alter table `test` modify `test_column` $lowercase not null"];
 
-            $this->assertEquals($expected, $blueprint->toSql());
-        }
+        $this->assertEquals($expected, $blueprint->toSql());
+    }
+
+    public static function dataProviderChangeTextColumnToTextColumn(): Generator
+    {
+        yield 'tinyText' => ['tinyText'];
+        yield 'mediumText' => ['mediumText'];
+        yield 'longText' => ['longText'];
     }
 
     #[RequiresDatabase(['mysql', 'mariadb'])]
@@ -372,6 +387,46 @@ class SchemaBuilderTest extends DatabaseTestCase
         ));
     }
 
+    public function testGetColumnsWithUnknownTable()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->id();
+            $table->string('bar')->nullable();
+        });
+
+        $columns = Schema::getColumns('baz');
+
+        $this->assertIsArray($columns);
+        $this->assertEmpty($columns);
+    }
+
+    public function testGetColumn()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->id();
+            $table->string('bar')->nullable();
+            $table->string('baz')->default('test');
+        });
+
+        $column = Schema::getColumn('foo', 'bar');
+
+        $this->assertEquals($column['name'], 'bar');
+        $this->assertTrue($column['nullable']);
+    }
+
+    public function testGetColumnWithUnknownColumn()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->id();
+            $table->string('bar')->nullable();
+        });
+
+        $column = Schema::getColumn('foo', 'baz');
+
+        $this->assertIsArray($column);
+        $this->assertEmpty($column);
+    }
+
     public function testGetColumnsOnView()
     {
         DB::statement('create view foo (bar) as select 1');
@@ -379,7 +434,26 @@ class SchemaBuilderTest extends DatabaseTestCase
         $columns = Schema::getColumns('foo');
 
         $this->assertCount(1, $columns);
-        $this->assertTrue($columns[0]['name'] === 'bar');
+        $this->assertSame('bar', $columns[0]['name']);
+    }
+
+    public function testGetColumnOnView()
+    {
+        DB::statement('create view foo (bar) as select 1');
+
+        $column = Schema::getColumn('foo', 'bar');
+
+        $this->assertSame('bar', $column['name']);
+    }
+
+    public function testGetColumnOnViewWithUnknonwColumn()
+    {
+        DB::statement('create view foo (bar) as select 1');
+
+        $column = Schema::getColumn('foo', 'baz');
+
+        $this->assertIsArray($column);
+        $this->assertempty($column);
     }
 
     public function testGetIndexes()
@@ -401,6 +475,17 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertTrue(Schema::hasIndex('foo', ['bar']));
         $this->assertFalse(Schema::hasIndex('foo', 'my_index', 'primary'));
         $this->assertFalse(Schema::hasIndex('foo', ['bar'], 'unique'));
+    }
+
+    public function testHasIndexNameIsCaseInsensitive()
+    {
+        Schema::create('foo', function (Blueprint $table) {
+            $table->string('bar')->index('IDX_MyIndex');
+        });
+
+        $this->assertTrue(Schema::hasIndex('foo', 'IDX_MyIndex'));
+        $this->assertTrue(Schema::hasIndex('foo', 'idx_myindex'));
+        $this->assertSame('idx_myindex', Schema::getIndexes('foo')[0]['name']);
     }
 
     public function testGetUniqueIndexes()
@@ -793,7 +878,7 @@ class SchemaBuilderTest extends DatabaseTestCase
     {
         Schema::macro('foo', fn () => 'foo');
 
-        $this->assertEquals('foo', Schema::foo());
+        $this->assertSame('foo', Schema::foo());
 
         Schema::macro('hasForeignKeyForColumn', function (string $column, string $table, string $foreignTable) {
             return collect(Schema::getForeignKeys($table))

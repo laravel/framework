@@ -38,7 +38,7 @@ trait HasUniqueIds
     /**
      * Generate a new key for the model.
      *
-     * @return string
+     * @return string|null
      */
     public function newUniqueId()
     {

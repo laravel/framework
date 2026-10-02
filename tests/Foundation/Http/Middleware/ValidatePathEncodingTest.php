@@ -16,7 +16,7 @@ class ValidatePathEncodingTest extends TestCase
     #[TestWith(['valid-path'])]
     #[TestWith(['ä'])]
     #[TestWith(['with%20space'])]
-    #[TestWith(['汉字字符集'])]
+    #[TestWith(['%E6%B1%89%E5%AD%97%E5%AD%97%E7%AC%A6%E9%9B%86'])]
     public function testValidPathsArePassing(string $path): void
     {
         $middleware = new ValidatePathEncoding;

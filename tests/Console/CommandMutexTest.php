@@ -2,11 +2,15 @@
 
 namespace Illuminate\Tests\Console;
 
+use Illuminate\Cache\Repository;
+use Illuminate\Cache\StorageStore;
+use Illuminate\Console\CacheCommandMutex;
 use Illuminate\Console\Command;
 use Illuminate\Console\CommandMutex;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Foundation\Application;
-use Mockery as m;
+use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
+use Illuminate\Tests\Console\Fixtures\FakeCacheFactory;
 use Orchestra\Testbench\Concerns\InteractsWithMockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -26,8 +30,6 @@ class CommandMutexTest extends TestCase
      */
     protected $commandMutex;
 
-    /** {@inheritdoc} */
-    #[\Override]
     protected function setUp(): void
     {
         $this->command = new class extends Command implements Isolatable
@@ -40,15 +42,15 @@ class CommandMutexTest extends TestCase
             }
         };
 
-        $this->commandMutex = m::mock(CommandMutex::class);
+        $this->commandMutex = new CacheCommandMutex(new FakeCacheFactory(
+            new Repository(new StorageStore(new ArrayFilesystem, 'cache'))
+        ));
 
         $app = new Application;
         $app->instance(CommandMutex::class, $this->commandMutex);
         $this->command->setLaravel($app);
     }
 
-    /** {@inheritdoc} */
-    #[\Override]
     protected function tearDown(): void
     {
         $this->tearDownTheTestEnvironmentUsingMockery();
@@ -56,13 +58,6 @@ class CommandMutexTest extends TestCase
 
     public function testCanRunIsolatedCommandIfNotBlocked()
     {
-        $this->commandMutex->shouldReceive('create')
-            ->andReturn(true)
-            ->once();
-        $this->commandMutex->shouldReceive('forget')
-            ->andReturn(true)
-            ->once();
-
         $this->runCommand();
 
         $this->assertEquals(1, $this->command->ran);
@@ -70,9 +65,7 @@ class CommandMutexTest extends TestCase
 
     public function testCannotRunIsolatedCommandIfBlocked()
     {
-        $this->commandMutex->shouldReceive('create')
-            ->andReturn(false)
-            ->once();
+        $this->commandMutex->create($this->command);
 
         $this->runCommand();
 
@@ -81,13 +74,6 @@ class CommandMutexTest extends TestCase
 
     public function testCanRunCommandAgainAfterOtherCommandFinished()
     {
-        $this->commandMutex->shouldReceive('create')
-            ->andReturn(true)
-            ->twice();
-        $this->commandMutex->shouldReceive('forget')
-            ->andReturn(true)
-            ->twice();
-
         $this->runCommand();
         $this->runCommand();
 
@@ -96,7 +82,7 @@ class CommandMutexTest extends TestCase
 
     public function testCanRunCommandAgainNonAutomated()
     {
-        $this->commandMutex->shouldNotHaveBeenCalled();
+        $this->commandMutex->create($this->command);
 
         $this->runCommand(false);
 

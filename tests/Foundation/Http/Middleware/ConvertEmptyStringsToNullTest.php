@@ -9,6 +9,11 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class ConvertEmptyStringsToNullTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        ConvertEmptyStringsToNull::flushState();
+    }
+
     public function testConvertsEmptyStringsToNull()
     {
         $middleware = new ConvertEmptyStringsToNull;

@@ -8,7 +8,7 @@ use Throwable;
 class AuthorizationException extends Exception
 {
     /**
-     * The response from the gate.
+     * The authorization response returned by the gate.
      *
      * @var \Illuminate\Auth\Access\Response
      */

@@ -5,33 +5,34 @@ namespace Illuminate\Tests\Database;
 use DateTime;
 use ErrorException;
 use Exception;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Database\MultipleColumnsSelectedException;
-use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Builder;
-use Mockery as m;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Testing\Fakes\EventFake;
+use Mockery;
 use PDO;
 use PDOException;
 use PDOStatement;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use stdClass;
 
 class DatabaseConnectionTest extends TestCase
 {
     public function testSettingDefaultCallsGetDefaultGrammar()
     {
         $connection = $this->getMockConnection();
-        $mock = m::mock(stdClass::class);
+        $mock = new Grammar($connection);
         $connection->expects($this->once())->method('getDefaultQueryGrammar')->willReturn($mock);
         $connection->useDefaultQueryGrammar();
         $this->assertEquals($mock, $connection->getQueryGrammar());
@@ -40,7 +41,7 @@ class DatabaseConnectionTest extends TestCase
     public function testSettingDefaultCallsGetDefaultPostProcessor()
     {
         $connection = $this->getMockConnection();
-        $mock = m::mock(stdClass::class);
+        $mock = new Processor;
         $connection->expects($this->once())->method('getDefaultPostProcessor')->willReturn($mock);
         $connection->useDefaultPostProcessor();
         $this->assertEquals($mock, $connection->getPostProcessor());
@@ -90,7 +91,7 @@ class DatabaseConnectionTest extends TestCase
         $pdo->expects($this->once())->method('prepare')->with('foo')->willReturn($statement);
         $mock = $this->getMockConnection(['prepareBindings'], $writePdo);
         $mock->setReadPdo($pdo);
-        $mock->expects($this->once())->method('prepareBindings')->with($this->equalTo(['foo' => 'bar']))->willReturn(['foo' => 'bar']);
+        $mock->expects($this->once())->method('prepareBindings')->with(['foo' => 'bar'])->willReturn(['foo' => 'bar']);
         $results = $mock->select('foo', ['foo' => 'bar']);
         $this->assertEquals(['boom'], $results);
         $log = $mock->getQueryLog();
@@ -119,7 +120,7 @@ class DatabaseConnectionTest extends TestCase
         $pdo->expects($this->once())->method('prepare')->with('CALL a_procedure(?)')->willReturn($statement);
         $mock = $this->getMockConnection(['prepareBindings'], $writePdo);
         $mock->setReadPdo($pdo);
-        $mock->expects($this->once())->method('prepareBindings')->with($this->equalTo(['foo']))->willReturn(['foo']);
+        $mock->expects($this->once())->method('prepareBindings')->with(['foo'])->willReturn(['foo']);
         $results = $mock->selectResultsets('CALL a_procedure(?)', ['foo']);
         $this->assertEquals([['boom'], ['boom']], $results);
         $log = $mock->getQueryLog();
@@ -131,7 +132,7 @@ class DatabaseConnectionTest extends TestCase
     public function testInsertCallsTheStatementMethod()
     {
         $connection = $this->getMockConnection(['statement']);
-        $connection->expects($this->once())->method('statement')->with($this->equalTo('foo'), $this->equalTo(['bar']))->willReturn('baz');
+        $connection->expects($this->once())->method('statement')->with('foo', ['bar'])->willReturn('baz');
         $results = $connection->insert('foo', ['bar']);
         $this->assertSame('baz', $results);
     }
@@ -139,7 +140,7 @@ class DatabaseConnectionTest extends TestCase
     public function testUpdateCallsTheAffectingStatementMethod()
     {
         $connection = $this->getMockConnection(['affectingStatement']);
-        $connection->expects($this->once())->method('affectingStatement')->with($this->equalTo('foo'), $this->equalTo(['bar']))->willReturn('baz');
+        $connection->expects($this->once())->method('affectingStatement')->with('foo', ['bar'])->willReturn('baz');
         $results = $connection->update('foo', ['bar']);
         $this->assertSame('baz', $results);
     }
@@ -147,7 +148,7 @@ class DatabaseConnectionTest extends TestCase
     public function testDeleteCallsTheAffectingStatementMethod()
     {
         $connection = $this->getMockConnection(['affectingStatement']);
-        $connection->expects($this->once())->method('affectingStatement')->with($this->equalTo('foo'), $this->equalTo(['bar']))->willReturn(true);
+        $connection->expects($this->once())->method('affectingStatement')->with('foo', ['bar'])->willReturn(true);
         $results = $connection->delete('foo', ['bar']);
         $this->assertTrue($results);
     }
@@ -158,9 +159,9 @@ class DatabaseConnectionTest extends TestCase
         $statement = $this->getMockBuilder('PDOStatement')->onlyMethods(['execute', 'bindValue'])->getMock();
         $statement->expects($this->once())->method('bindValue')->with(1, 'bar', 2);
         $statement->expects($this->once())->method('execute')->willReturn(true);
-        $pdo->expects($this->once())->method('prepare')->with($this->equalTo('foo'))->willReturn($statement);
+        $pdo->expects($this->once())->method('prepare')->with('foo')->willReturn($statement);
         $mock = $this->getMockConnection(['prepareBindings'], $pdo);
-        $mock->expects($this->once())->method('prepareBindings')->with($this->equalTo(['bar']))->willReturn(['bar']);
+        $mock->expects($this->once())->method('prepareBindings')->with(['bar'])->willReturn(['bar']);
         $results = $mock->statement('foo', ['bar']);
         $this->assertTrue($results);
         $log = $mock->getQueryLog();
@@ -178,7 +179,7 @@ class DatabaseConnectionTest extends TestCase
         $statement->expects($this->once())->method('rowCount')->willReturn(42);
         $pdo->expects($this->once())->method('prepare')->with('foo')->willReturn($statement);
         $mock = $this->getMockConnection(['prepareBindings'], $pdo);
-        $mock->expects($this->once())->method('prepareBindings')->with($this->equalTo(['foo' => 'bar']))->willReturn(['foo' => 'bar']);
+        $mock->expects($this->once())->method('prepareBindings')->with(['foo' => 'bar'])->willReturn(['foo' => 'bar']);
         $results = $mock->update('foo', ['foo' => 'bar']);
         $this->assertSame(42, $results);
         $log = $mock->getQueryLog();
@@ -187,10 +188,11 @@ class DatabaseConnectionTest extends TestCase
         $this->assertIsNumeric($log[0]['time']);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testTransactionLevelNotIncrementedOnTransactionException()
     {
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
-        $pdo->expects($this->once())->method('beginTransaction')->will($this->throwException(new Exception));
+        $pdo->expects($this->once())->method('beginTransaction')->willThrowException(new Exception);
         $connection = $this->getMockConnection([], $pdo);
         try {
             $connection->beginTransaction();
@@ -199,6 +201,7 @@ class DatabaseConnectionTest extends TestCase
         }
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testBeginTransactionMethodRetriesOnFailure()
     {
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
@@ -210,6 +213,7 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals(1, $connection->transactionLevel());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testBeginTransactionMethodReconnectsMissingConnection()
     {
         $connection = $this->getMockConnection();
@@ -226,7 +230,7 @@ class DatabaseConnectionTest extends TestCase
     {
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
         $pdo->expects($this->once())->method('beginTransaction');
-        $pdo->expects($this->once())->method('exec')->will($this->throwException(new Exception));
+        $pdo->expects($this->once())->method('exec')->willThrowException(new Exception);
         $connection = $this->getMockConnection(['reconnect'], $pdo);
         $queryGrammar = $this->createMock(Grammar::class);
         $queryGrammar->expects($this->once())->method('compileSavepoint')->willReturn('trans1');
@@ -242,6 +246,7 @@ class DatabaseConnectionTest extends TestCase
         }
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSwapPDOWithOpenTransactionResetsTransactionLevel()
     {
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
@@ -252,59 +257,91 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals(0, $connection->transactionLevel());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
+    public function testDisconnectClearsTransactionManagerState()
+    {
+        $connection = $this->getMockConnection(['getName']);
+        $connection->method('getName')->willReturn('default');
+        $manager = new DatabaseTransactionsManager;
+        $connection->setTransactionManager($manager);
+
+        $manager->begin('default', 1);
+        $manager->begin('default', 2);
+        $manager->stageTransactions('default', 2);
+
+        $this->assertCount(1, $manager->getCommittedTransactions());
+        $this->assertCount(1, $manager->getPendingTransactions());
+
+        $connection->disconnect();
+
+        $this->assertCount(0, $manager->getCommittedTransactions());
+        $this->assertCount(0, $manager->getPendingTransactions());
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
     public function testBeganTransactionFiresEventsIfSet()
     {
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName'], $pdo);
-        $connection->expects($this->any())->method('getName')->willReturn('name');
-        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(TransactionBeginning::class));
+        $connection->method('getName')->willReturn('name');
+        $events = new EventFake(new Dispatcher);
+        $connection->setEventDispatcher($events);
         $connection->beginTransaction();
+        $events->assertDispatched(TransactionBeginning::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCommittedFiresEventsIfSet()
     {
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName'], $pdo);
-        $connection->expects($this->any())->method('getName')->willReturn('name');
-        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitted::class));
+        $connection->method('getName')->willReturn('name');
+        $events = new EventFake(new Dispatcher);
+        $connection->setEventDispatcher($events);
         $connection->commit();
+        $events->assertDispatched(TransactionCommitted::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCommittingFiresEventsIfSet()
     {
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName', 'transactionLevel'], $pdo);
-        $connection->expects($this->any())->method('getName')->willReturn('name');
-        $connection->expects($this->any())->method('transactionLevel')->willReturn(1);
-        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitting::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitted::class));
+        $connection->method('getName')->willReturn('name');
+        $connection->method('transactionLevel')->willReturn(1);
+        $events = new EventFake(new Dispatcher);
+        $connection->setEventDispatcher($events);
         $connection->commit();
+        $events->assertDispatched(TransactionCommitting::class);
+        $events->assertDispatched(TransactionCommitted::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testRollBackedFiresEventsIfSet()
     {
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName'], $pdo);
-        $connection->expects($this->any())->method('getName')->willReturn('name');
+        $connection->method('getName')->willReturn('name');
         $connection->beginTransaction();
-        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(TransactionRolledBack::class));
+        $events = new EventFake(new Dispatcher);
+        $connection->setEventDispatcher($events);
         $connection->rollBack();
+        $events->assertDispatched(TransactionRolledBack::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testRedundantRollBackFiresNoEvent()
     {
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName'], $pdo);
-        $connection->expects($this->any())->method('getName')->willReturn('name');
-        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
-        $events->shouldNotReceive('dispatch');
+        $connection->method('getName')->willReturn('name');
+        $events = new EventFake(new Dispatcher);
+        $connection->setEventDispatcher($events);
         $connection->rollBack();
+        $events->assertNothingDispatched();
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testTransactionMethodRunsSuccessfully()
     {
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit'])->getMock();
@@ -317,20 +354,44 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals($mock, $result);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
+    public function testTransactionRetriesOnCommitDeadlockWhenPDOHasActiveTransaction()
+    {
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
+        $mock = $this->getMockConnection([], $pdo);
+
+        $pdo->expects($this->exactly(2))->method('beginTransaction');
+        $pdo->expects($this->exactly(2))->method('commit')->willReturnOnConsecutiveCalls(
+            $this->throwException(new DatabaseConnectionTestMockPDOException('Serialization failure', '40001')),
+            true,
+        );
+        $pdo->method('inTransaction')->willReturn(true);
+        $pdo->expects($this->once())->method('rollBack');
+
+        $result = $mock->transaction(function () {
+            return 'success';
+        }, 2);
+
+        $this->assertSame('success', $result);
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
     public function testTransactionRetriesOnSerializationFailure()
     {
         $this->expectException(PDOException::class);
         $this->expectExceptionMessage('Serialization failure');
 
-        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
-        $pdo->expects($this->exactly(3))->method('commit')->will($this->throwException(new DatabaseConnectionTestMockPDOException('Serialization failure', '40001')));
+        $pdo->expects($this->exactly(3))->method('commit')->willThrowException(new DatabaseConnectionTestMockPDOException('Serialization failure', '40001'));
         $pdo->expects($this->exactly(3))->method('beginTransaction');
-        $pdo->expects($this->never())->method('rollBack');
+        $pdo->method('inTransaction')->willReturn(true);
+        $pdo->expects($this->exactly(2))->method('rollBack');
         $mock->transaction(function () {
         }, 3);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testTransactionMethodRetriesOnDeadlock()
     {
         $this->expectException(QueryException::class);
@@ -347,6 +408,7 @@ class DatabaseConnectionTest extends TestCase
         }, 3);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testTransactionMethodRollsbackAndThrows()
     {
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
@@ -370,26 +432,70 @@ class DatabaseConnectionTest extends TestCase
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage('server has gone away (Connection: , Host: , Port: , Database: , SQL: foo)');
 
-        $pdo = m::mock(PDO::class);
-        $pdo->shouldReceive('beginTransaction')->once();
-        $statement = m::mock(PDOStatement::class);
-        $pdo->shouldReceive('prepare')->once()->andReturn($statement);
-        $statement->shouldReceive('execute')->once()->andThrow(new PDOException('server has gone away'));
+        $pdo = Mockery::mock(PDO::class);
+        $pdo->expects('beginTransaction');
+        $statement = Mockery::mock(PDOStatement::class);
+        $pdo->expects('prepare')->andReturn($statement);
+        $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
 
         $connection = new Connection($pdo);
         $connection->beginTransaction();
         $connection->statement('foo');
     }
 
+    public function testQueryExceptionEmbedsBindingsByDefault()
+    {
+        $connection = new Connection($this->getFailingPdo(), '', '', []);
+
+        try {
+            $connection->statement('SELECT * FROM users WHERE email = ?', ['foo@example.com']);
+
+            $this->fail('A QueryException was not thrown.');
+        } catch (QueryException $e) {
+            $this->assertStringContainsString('SQL: SELECT * FROM users WHERE email = foo@example.com', $e->getMessage());
+        }
+    }
+
+    public function testQueryExceptionMasksBindingsWhenEnabledOnTheConnection()
+    {
+        $connection = new Connection($this->getFailingPdo(), '', '', [
+            'mask_bindings_in_exception_messages' => true,
+        ]);
+
+        try {
+            $connection->statement('SELECT * FROM users WHERE email = ?', ['foo@example.com']);
+
+            $this->fail('A QueryException was not thrown.');
+        } catch (QueryException $e) {
+            $this->assertStringContainsString('SQL: SELECT * FROM users WHERE email = ?', $e->getMessage());
+            $this->assertStringNotContainsString('foo@example.com', $e->getMessage());
+            $this->assertSame(['foo@example.com'], $e->getBindings());
+        }
+    }
+
+    protected function getFailingPdo()
+    {
+        $statement = Mockery::mock(PDOStatement::class);
+        $statement->shouldReceive('bindValue')->once();
+        $statement->shouldReceive('execute')->once()->andThrow(
+            new PDOException('SQLSTATE[42S02]: Base table or view not found')
+        );
+
+        $pdo = Mockery::mock(PDO::class);
+        $pdo->shouldReceive('prepare')->once()->andReturn($statement);
+
+        return $pdo;
+    }
+
     public function testOnLostConnectionPDOIsSwappedOutsideTransaction()
     {
-        $pdo = m::mock(PDO::class);
+        $pdo = Mockery::mock(PDO::class);
 
-        $statement = m::mock(PDOStatement::class);
-        $statement->shouldReceive('execute')->once()->andThrow(new PDOException('server has gone away'));
-        $statement->shouldReceive('execute')->once()->andReturn(true);
+        $statement = Mockery::mock(PDOStatement::class);
+        $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
+        $statement->expects('execute')->andReturn(true);
 
-        $pdo->shouldReceive('prepare')->twice()->andReturn($statement);
+        $pdo->expects('prepare')->times(2)->andReturn($statement);
 
         $connection = new Connection($pdo);
 
@@ -408,7 +514,7 @@ class DatabaseConnectionTest extends TestCase
     {
         $method = (new ReflectionClass(Connection::class))->getMethod('run');
 
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $mock = $this->getMockConnection(['tryAgainIfCausedByLostConnection'], $pdo);
         $mock->expects($this->once())->method('tryAgainIfCausedByLostConnection');
 
@@ -435,42 +541,35 @@ class DatabaseConnectionTest extends TestCase
         }]);
     }
 
-    public function testFromCreatesNewQueryBuilder()
-    {
-        $conn = $this->getMockConnection();
-        $conn->setQueryGrammar(m::mock(Grammar::class));
-        $conn->setPostProcessor(m::mock(Processor::class));
-        $builder = $conn->table('users');
-        $this->assertInstanceOf(BaseBuilder::class, $builder);
-        $this->assertSame('users', $builder->from);
-    }
-
+    #[AllowMockObjectsWithoutExpectations]
     public function testPrepareBindings()
     {
-        $date = m::mock(DateTime::class);
-        $date->shouldReceive('format')->once()->with('foo')->andReturn('bar');
+        $date = Mockery::mock(DateTime::class);
+        $date->expects('format')->with('foo')->andReturn('bar');
         $bindings = ['test' => $date];
         $conn = $this->getMockConnection();
-        $grammar = m::mock(Grammar::class);
-        $grammar->shouldReceive('getDateFormat')->once()->andReturn('foo');
+        $grammar = Mockery::mock(Grammar::class);
+        $grammar->expects('getDateFormat')->andReturn('foo');
         $conn->setQueryGrammar($grammar);
         $result = $conn->prepareBindings($bindings);
         $this->assertEquals(['test' => 'bar'], $result);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testLogQueryFiresEventsIfSet()
     {
         $connection = $this->getMockConnection();
         $connection->logQuery('foo', [], time());
-        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
-        $events->shouldReceive('dispatch')->once()->with(m::type(QueryExecuted::class));
+        $events = new EventFake(new Dispatcher);
+        $connection->setEventDispatcher($events);
         $connection->logQuery('foo', [], null);
+        $events->assertDispatched(QueryExecuted::class);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testBeforeExecutingHooksCanBeRegistered()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The callback was fired');
+        $this->expectExceptionObject(new Exception('The callback was fired'));
 
         $connection = $this->getMockConnection();
         $connection->beforeExecuting(function () {
@@ -479,10 +578,10 @@ class DatabaseConnectionTest extends TestCase
         $connection->select('foo bar', ['baz']);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testBeforeStartingTransactionHooksCanBeRegistered()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The callback was fired');
+        $this->expectExceptionObject(new Exception('The callback was fired'));
 
         $connection = $this->getMockConnection();
         $connection->beforeStartingTransaction(function () {
@@ -491,6 +590,7 @@ class DatabaseConnectionTest extends TestCase
         $connection->beginTransaction();
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testPretendOnlyLogsQueries()
     {
         $connection = $this->getMockConnection();
@@ -501,6 +601,7 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals(['baz'], $queries[0]['bindings']);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSchemaBuilderCanBeCreated()
     {
         $connection = $this->getMockConnection();
@@ -531,8 +632,8 @@ class DatabaseConnectionTest extends TestCase
 
         $log = $mock->getRawQueryLog();
 
-        $this->assertEquals("select * from tbl where col = 'foo'", $log[0]['raw_query']);
-        $this->assertEquals(1.23, $log[0]['time']);
+        $this->assertSame("select * from tbl where col = 'foo'", $log[0]['raw_query']);
+        $this->assertSame(1.23, $log[0]['time']);
     }
 
     public function testQueryExceptionContainsReadConnectionDetailsWhenUsingReadPdo()
@@ -732,6 +833,117 @@ class DatabaseConnectionTest extends TestCase
             $this->assertSame('192.168.1.10', $connectionDetails['host']);
             $this->assertSame('3306', $connectionDetails['port']);
             $this->assertSame('write_db', $connectionDetails['database']);
+        }
+    }
+
+    public function testDirectPdoCanBeSetAndResolved()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO);
+        $directPdo = new DatabaseConnectionTestMockPDO;
+
+        $connection->setDirectPdo(function () use ($directPdo) {
+            return $directPdo;
+        });
+
+        $this->assertSame($directPdo, $connection->getDirectPdo());
+        $this->assertSame($directPdo, $connection->getRawDirectPdo());
+    }
+
+    public function testDirectConnectionConfigurationCanBeSet()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO);
+
+        $this->assertFalse($connection->hasDirectConnection());
+
+        $connection->setDirectPdoConfig($config = [
+            'host' => 'direct-host',
+            'database' => 'direct_db',
+        ]);
+
+        $this->assertTrue($connection->hasDirectConnection());
+        $this->assertSame($config, $connection->getDirectPdoConfig());
+    }
+
+    public function testDisconnectClearsDirectPdo()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO);
+
+        $connection->setDirectPdo(new DatabaseConnectionTestMockPDO);
+        $connection->disconnect();
+
+        $this->assertNull($connection->getRawDirectPdo());
+    }
+
+    public function testNameWithReadWriteTypeIncludesDirectType()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO, 'database', '', [
+            'name' => 'pgsql',
+        ]);
+
+        $connection->setReadWriteType('direct');
+
+        $this->assertSame('pgsql::direct', $connection->getNameWithReadWriteType());
+    }
+
+    public function testNameKeepsTheDirectRoutingType()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO, 'database', '', [
+            'name' => 'pgsql',
+        ]);
+
+        $connection->setReadWriteType('direct');
+
+        $this->assertSame('pgsql::direct', $connection->getName());
+    }
+
+    public function testNameCollapsesTheReadAndWriteRoutingTypes()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO, 'database', '', [
+            'name' => 'pgsql',
+        ]);
+
+        foreach ([null, 'read', 'write'] as $readWriteType) {
+            $connection->setReadWriteType($readWriteType);
+
+            $this->assertSame('pgsql', $connection->getName());
+        }
+    }
+
+    public function testQueryExceptionContainsDirectConnectionDetailsWhenUsingDirectConnection()
+    {
+        $directPdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)
+            ->onlyMethods(['prepare'])
+            ->getMock();
+        $directPdo->expects($this->once())
+            ->method('prepare')
+            ->willThrowException(new PDOException('Connection refused'));
+
+        $connection = new Connection($directPdo, 'write_db', '', [
+            'driver' => 'pgsql',
+            'name' => 'pgsql',
+            'host' => 'pooler-host',
+            'port' => '6432',
+            'database' => 'write_db',
+        ]);
+        $connection->useDefaultQueryGrammar();
+        $connection->useDefaultPostProcessor();
+        $connection->setReadWriteType('direct');
+        $connection->setDirectPdoConfig([
+            'host' => 'direct-host',
+            'port' => '5432',
+            'database' => 'direct_db',
+        ]);
+
+        try {
+            $connection->select('SELECT * FROM users', useReadPdo: false);
+            $this->fail('Expected QueryException was not thrown');
+        } catch (QueryException $e) {
+            $this->assertSame('direct', $e->readWriteType);
+
+            $connectionDetails = $e->getConnectionDetails();
+            $this->assertSame('direct-host', $connectionDetails['host']);
+            $this->assertSame('5432', $connectionDetails['port']);
+            $this->assertSame('direct_db', $connectionDetails['database']);
         }
     }
 

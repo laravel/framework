@@ -6,14 +6,13 @@ use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Redis\Connection;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\RateLimitedWithRedis;
 use Illuminate\Support\Str;
-use Mockery as m;
 use Orchestra\Testbench\Attributes\RequiresEnv;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -111,6 +110,50 @@ class RateLimitedWithRedisTest extends TestCase
         $this->assertJobWasReleased($nonAdminJob);
     }
 
+    public function testLimitsAreNotHitWhenAnotherLimitIsReached()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+        $testJob = new RedisRateLimitedTestJob;
+
+        $rateLimiter->for($testJob->key, function () {
+            return [
+                Limit::perHour(10)->by('global'),
+                Limit::perHour(1)->by('tenant'),
+            ];
+        });
+
+        $this->assertJobRanSuccessfully($testJob);
+        $this->assertJobWasReleased($testJob);
+        $this->assertJobWasReleased($testJob);
+
+        $redis = $this->app->make('redis')->connection();
+
+        $this->assertSame(1, (int) $redis->hget(md5($testJob->key.'global'), 'count'));
+        $this->assertSame(1, (int) $redis->hget(md5($testJob->key.'tenant'), 'count'));
+    }
+
+    public function testLimitsAreNotHitWhenAnotherLimitIsReachedAndJobIsSkipped()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+        $testJob = new RedisRateLimitedDontReleaseTestJob;
+
+        $rateLimiter->for($testJob->key, function () {
+            return [
+                Limit::perHour(10)->by('global'),
+                Limit::perHour(1)->by('tenant'),
+            ];
+        });
+
+        $this->assertJobRanSuccessfully($testJob);
+        $this->assertJobWasSkipped($testJob);
+        $this->assertJobWasSkipped($testJob);
+
+        $redis = $this->app->make('redis')->connection();
+
+        $this->assertSame(1, (int) $redis->hget(md5($testJob->key.'global'), 'count'));
+        $this->assertSame(1, (int) $redis->hget(md5($testJob->key.'tenant'), 'count'));
+    }
+
     public function testMiddlewareSerialization()
     {
         $rateLimited = new RateLimitedWithRedis('limiterName', 'default');
@@ -134,16 +177,13 @@ class RateLimitedWithRedisTest extends TestCase
         $testJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
-
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
-        $job->shouldReceive('delete')->once();
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($testJob),
         ]);
+
+        $this->assertTrue($job->isDeleted());
 
         $this->assertTrue($testJob::$handled);
     }
@@ -153,16 +193,13 @@ class RateLimitedWithRedisTest extends TestCase
         $testJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
-
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('release')->once();
-        $job->shouldReceive('isReleased')->andReturn(true);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($testJob),
         ]);
+
+        $this->assertTrue($job->isReleased());
 
         $this->assertFalse($testJob::$handled);
     }
@@ -172,16 +209,13 @@ class RateLimitedWithRedisTest extends TestCase
         $testJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
-
-        $job->shouldReceive('hasFailed')->once()->andReturn(false);
-        $job->shouldReceive('isReleased')->andReturn(false);
-        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
-        $job->shouldReceive('delete')->once();
+        $job = new FakeJob;
 
         $instance->call($job, [
             'command' => serialize($testJob),
         ]);
+
+        $this->assertTrue($job->isDeleted());
 
         $this->assertFalse($testJob::$handled);
     }

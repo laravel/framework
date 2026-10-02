@@ -907,7 +907,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '{"data":{"id":5,"title":"Test Title","reading_time":3.0}}',
             $response->baseResponse->content()
         );
@@ -925,7 +925,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '{"data":[{"id":5,"title":"Test Title","reading_time":3.0}]}',
             $response->baseResponse->content()
         );
@@ -946,7 +946,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '{"data":[{"id":5,"title":"Test Title","reading_time":3.0}],"links":{"first":"\/?page=1","last":"\/?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"\/?page=1","label":"1","page":1,"active":true},{"url":null,"label":"Next &raquo;","page":null,"active":false}],"path":"\/","per_page":15,"to":1,"total":10}}',
             $response->baseResponse->content()
         );
@@ -966,7 +966,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '{"data":{"id":5,"title":"Test Title","reading_time":3.0}}',
             $response->baseResponse->content()
         );
@@ -1448,8 +1448,7 @@ class ResourceTest extends TestCase
             new Post(['id' => 2, 'title' => 'Test title 2']),
         ]);
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('must collect');
+        $this->expectExceptionObject(new LogicException('must collect'));
 
         new PostModelCollectionResource($posts);
     }
@@ -1494,7 +1493,7 @@ class ResourceTest extends TestCase
 
     public function testKeysArePreservedInAnAnonymousCollectionIfTheResourceIsFlaggedToPreserveKeys()
     {
-        $data = Collection::make([
+        $data = (new Collection([
             [
                 'id' => 1,
                 'authorId' => 5,
@@ -1510,7 +1509,7 @@ class ResourceTest extends TestCase
                 'authorId' => 42,
                 'bookId' => 12,
             ],
-        ])->keyBy->id;
+        ]))->keyBy->id;
 
         Route::get('/', function () use ($data) {
             return ResourceWithPreservedKeys::collection($data);
@@ -1527,10 +1526,10 @@ class ResourceTest extends TestCase
 
     public function testKeysArePreservedInAnAnonymousCollectionUsingPreserveKeysMethod()
     {
-        $data = Collection::make([
+        $data = (new Collection([
             ['id' => 1, 'title' => 'Test'],
             ['id' => 2, 'title' => 'Test 2'],
-        ])->keyBy->id;
+        ]))->keyBy->id;
 
         Route::get('/', function () use ($data) {
             return JsonResource::collection($data)->preserveKeys();
@@ -1572,8 +1571,7 @@ class ResourceTest extends TestCase
         $post = new ValidatePostSize;
         $post->handle($request, fn () => null);
 
-        $this->expectException(PostTooLargeException::class);
-        $this->expectExceptionMessage('The POST data is too large.');
+        $this->expectExceptionObject(new PostTooLargeException('The POST data is too large.'));
 
         $request = new Request(server: ['CONTENT_LENGTH' => '2147483640']);
         $post = new ValidatePostSize;

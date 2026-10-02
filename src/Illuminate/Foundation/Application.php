@@ -35,6 +35,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 use function Illuminate\Filesystem\join_paths;
+use function Illuminate\Support\enum_value;
 
 class Application extends Container implements ApplicationContract, CachesConfiguration, CachesRoutes, HttpKernelInterface
 {
@@ -45,7 +46,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '13.x-dev';
+    const VERSION = '13.34.0';
 
     /**
      * The base path for the Laravel installation.
@@ -209,6 +210,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $absoluteCachePathPrefixes = ['/', '\\'];
 
     /**
+     * The application builder class.
+     *
+     * @var class-string<Configuration\ApplicationBuilder>
+     */
+    protected static string $applicationBuilder = Configuration\ApplicationBuilder::class;
+
+    /**
      * Create a new Illuminate application instance.
      *
      * @param  string|null  $basePath
@@ -238,7 +246,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             default => static::inferBasePath(),
         };
 
-        return (new Configuration\ApplicationBuilder(new static($basePath)))
+        return (new static::$applicationBuilder(new static($basePath)))
             ->withKernels()
             ->withEvents()
             ->withCommands()
@@ -317,12 +325,12 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $this['events']->listen(
             'bootstrapping: *',
-            fn ($bootstrapper) => Cloud::bootstrapperBootstrapping($this, Str::after($bootstrapper, 'bootstrapping: '))
+            fn ($bootstrapper) => CloudBootstrapper::bootstrapping($this, Str::after($bootstrapper, 'bootstrapping: '))
         );
 
         $this['events']->listen(
             'bootstrapped: *',
-            fn ($bootstrapper) => Cloud::bootstrapperBootstrapped($this, Str::after($bootstrapper, 'bootstrapped: '))
+            fn ($bootstrapper) => CloudBootstrapper::bootstrapped($this, Str::after($bootstrapper, 'bootstrapped: '))
         );
     }
 
@@ -743,15 +751,15 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get or check the current application environment.
      *
-     * @param  string|array  ...$environments
+     * @param  \UnitEnum|string|array  ...$environments
      * @return string|bool
      */
     public function environment(...$environments)
     {
-        if (count($environments) > 0) {
+        if ($environments !== []) {
             $patterns = is_array($environments[0]) ? $environments[0] : $environments;
 
-            return Str::is($patterns, $this['env']);
+            return Str::is(array_map(enum_value(...), $patterns), $this['env']);
         }
 
         return $this['env'];
@@ -1658,6 +1666,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             'filesystem.cloud' => [\Illuminate\Contracts\Filesystem\Cloud::class],
             'hash' => [\Illuminate\Hashing\HashManager::class],
             'hash.driver' => [\Illuminate\Contracts\Hashing\Hasher::class],
+            'image' => [\Illuminate\Image\ImageManager::class],
             'log' => [\Illuminate\Log\LogManager::class, \Psr\Log\LoggerInterface::class],
             'mail.manager' => [\Illuminate\Mail\MailManager::class, \Illuminate\Contracts\Mail\Factory::class],
             'mailer' => [\Illuminate\Mail\Mailer::class, \Illuminate\Contracts\Mail\Mailer::class, \Illuminate\Contracts\Mail\MailQueue::class],

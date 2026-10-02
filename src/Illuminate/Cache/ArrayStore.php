@@ -4,7 +4,6 @@ namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use RuntimeException;
@@ -175,9 +174,17 @@ class ArrayStore extends TaggableStore implements CanFlushLocks, LockProvider
      */
     public function touch($key, $seconds)
     {
-        $item = Arr::get($this->storage, $key = $this->getPrefix().$key, null);
+        $item = $this->storage[$key = $this->getPrefix().$key] ?? null;
 
         if (is_null($item)) {
+            return false;
+        }
+
+        $expiresAt = $item['expiresAt'] ?? 0;
+
+        if ($expiresAt !== 0 && (Carbon::now()->getPreciseTimestamp(3) / 1000) >= $expiresAt) {
+            $this->forget($key);
+
             return false;
         }
 

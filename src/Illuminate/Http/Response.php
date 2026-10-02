@@ -29,11 +29,15 @@ class Response extends SymfonyResponse
      */
     public function __construct($content = '', $status = 200, array $headers = [])
     {
-        $this->headers = new ResponseHeaderBag($headers);
+        if (method_exists($this, 'setHeaders')) {
+            parent::__construct('', $status, new ResponseHeaderBag($headers));
+        } else {
+            $this->headers = new ResponseHeaderBag($headers);
+            $this->setStatusCode($status);
+            $this->setProtocolVersion('1.0');
+        }
 
         $this->setContent($content);
-        $this->setStatusCode($status);
-        $this->setProtocolVersion('1.0');
     }
 
     /**

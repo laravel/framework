@@ -6,13 +6,15 @@ use ArrayIterator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
-use Illuminate\Support\Stringable;
+use Illuminate\Tests\Support\Fixtures\TestBackedEnum;
+use Illuminate\Tests\Support\Fixtures\TestEnum;
+use Illuminate\Tests\Support\Fixtures\TestStringBackedEnum;
 use InvalidArgumentException;
 use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class SupportFluentTest extends TestCase
 {
@@ -125,8 +127,7 @@ class SupportFluentTest extends TestCase
 
     public function testToJsonEncodesTheToArrayResult()
     {
-        $fluent = $this->getMockBuilder(Fluent::class)->onlyMethods(['toArray'])->getMock();
-        $fluent->expects($this->once())->method('toArray')->willReturn(['foo']);
+        $fluent = new Fluent(['foo']);
         $results = $fluent->toJson();
 
         $this->assertJsonStringEqualsJsonString(json_encode(['foo']), $results);
@@ -134,8 +135,7 @@ class SupportFluentTest extends TestCase
 
     public function testToPrettyJson()
     {
-        $fluent = $this->getMockBuilder(Fluent::class)->onlyMethods(['toArray'])->getMock();
-        $fluent->expects($this->exactly(2))->method('toArray')->willReturn(['foo' => 'bar', 'bar' => 'foo']);
+        $fluent = new Fluent(['foo' => 'bar', 'bar' => 'foo']);
         $results = $fluent->toPrettyJson();
         $expected = $fluent->toJson(JSON_PRETTY_PRINT);
 
@@ -181,8 +181,8 @@ class SupportFluentTest extends TestCase
             'empty_str' => '',
             'null' => null,
         ]);
-        $this->assertTrue($fluent->string('int') instanceof Stringable);
-        $this->assertTrue($fluent->string('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $fluent->string('int'));
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $fluent->string('unknown_key'));
         $this->assertSame('123', $fluent->string('int')->value());
         $this->assertSame('456', $fluent->string('int_str')->value());
         $this->assertSame('123.456', $fluent->string('float')->value());

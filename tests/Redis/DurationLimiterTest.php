@@ -14,16 +14,12 @@ class DurationLimiterTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->setUpRedis();
     }
 
     protected function tearDown(): void
     {
         $this->tearDownRedis();
-
-        parent::tearDown();
     }
 
     public function testItLocksTasksWhenNoSlotAvailable()
@@ -115,8 +111,8 @@ class DurationLimiterTest extends TestCase
 
         // Initially, should not have too many attempts
         $this->assertFalse($limiter->tooManyAttempts());
-        $this->assertSame(0, $limiter->decaysAt); // As per script for non-existing key
-        $this->assertGreaterThan(0, $limiter->remaining); // Remaining is positive future timestamp placeholder
+        $this->assertGreaterThanOrEqual(time() + 1, $limiter->decaysAt);
+        $this->assertSame(2, $limiter->remaining);
 
         // Use up the available slots
         $this->assertTrue($limiter->acquire());

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\EloquentCollectionLoadCountTest;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;

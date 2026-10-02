@@ -216,9 +216,13 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertEquals(['id', 'title', 'name', 'count'], $schema->getColumnListing('my_schema.table'));
         $this->assertEquals(['id', 'name', 'count', 'title'], $schema->getColumnListing('my_table'));
         $this->assertStringContainsString('default schema name', collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'name')['default']);
+        $this->assertStringContainsString('default schema name', $schema->getColumn('my_schema.table', 'name')['default']);
         $this->assertStringContainsString('default schema title', collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'title')['default']);
+        $this->assertStringContainsString('default schema title', $schema->getColumn('my_schema.table', 'title')['default']);
         $this->assertStringContainsString('default name', collect($schema->getColumns('my_table'))->firstWhere('name', 'name')['default']);
+        $this->assertStringContainsString('default name', $schema->getColumn('my_table', 'name')['default']);
         $this->assertStringContainsString('default title', collect($schema->getColumns('my_table'))->firstWhere('name', 'title')['default']);
+        $this->assertStringContainsString('default title', $schema->getColumn('my_table', 'title')['default']);
     }
 
     #[DataProvider('connectionProvider')]
@@ -526,16 +530,16 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $tableName = $connection === 'with-prefix' ? 'example_table' : 'table';
         $defaultSchema = $this->driver === 'pgsql' ? 'public' : 'laravel';
 
-        $this->assertEquals('comment on schema table',
+        $this->assertSame('comment on schema table',
             $tables->first(fn ($table) => $table['name'] === $tableName && $table['schema'] === 'my_schema')['comment']
         );
-        $this->assertEquals('comment on table',
+        $this->assertSame('comment on table',
             $tables->first(fn ($table) => $table['name'] === $tableName && $table['schema'] === $defaultSchema)['comment']
         );
-        $this->assertEquals('comment on schema column',
+        $this->assertSame('comment on schema column',
             collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'name')['comment']
         );
-        $this->assertEquals('comment on column',
+        $this->assertSame('comment on column',
             collect($schema->getColumns('table'))->firstWhere('name', 'name')['comment']
         );
     }
@@ -579,7 +583,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             'database.connections.'.$connection.'.password' => 'Passw0rd',
         ]);
 
-        $this->assertEquals('my_schema', $schema->getCurrentSchemaName());
+        $this->assertSame('my_schema', $schema->getCurrentSchemaName());
 
         $schema->create('table', function (Blueprint $table) {
             $table->id();

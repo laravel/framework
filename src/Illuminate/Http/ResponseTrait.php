@@ -142,6 +142,21 @@ trait ResponseTrait
     }
 
     /**
+     * Add multiple cookies to the response.
+     *
+     * @param  array  $cookies
+     * @return $this
+     */
+    public function withCookies(array $cookies)
+    {
+        foreach ($cookies as $cookie) {
+            $this->headers->setCookie($cookie);
+        }
+
+        return $this;
+    }
+
+    /**
      * Expire a cookie when sending the response.
      *
      * @param  \Symfony\Component\HttpFoundation\Cookie|mixed  $cookie
@@ -156,6 +171,23 @@ trait ResponseTrait
         }
 
         $this->headers->setCookie($cookie);
+
+        return $this;
+    }
+
+    /**
+     * Expire multiple cookies when sending the response.
+     *
+     * @param  array  $cookies
+     * @param  string|null  $path
+     * @param  string|null  $domain
+     * @return $this
+     */
+    public function withoutCookies(array $cookies, $path = null, $domain = null)
+    {
+        foreach ($cookies as $cookie) {
+            $this->withoutCookie($cookie, $path, $domain);
+        }
 
         return $this;
     }

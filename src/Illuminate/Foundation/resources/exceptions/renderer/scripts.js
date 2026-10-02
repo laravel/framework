@@ -8,13 +8,22 @@ import sql from '@shikijs/langs/sql';
 import darkPlus from '@shikijs/themes/dark-plus';
 import lightPlus from '@shikijs/themes/light-plus';
 
-tippy('[data-tippy-content]', {
+const tippyOptions = {
     arrow: false,
-    allowHTML: true,
     animation: 'shift-away',
     delay: [300, 0],
     duration: 200,
     theme: 'laravel',
+};
+
+tippy('[data-tippy-content]', {
+    ...tippyOptions,
+    allowHTML: false,
+});
+
+tippy('[data-tippy-html-content]', {
+    ...tippyOptions,
+    allowHTML: true,
 });
 
 window.copyToClipboard = async function (text) {

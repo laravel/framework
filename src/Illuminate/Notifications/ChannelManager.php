@@ -64,12 +64,23 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Get a channel instance.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return mixed
      */
     public function channel($name = null)
     {
         return $this->driver($name);
+    }
+
+    /**
+     * Get a driver instance.
+     *
+     * @param  \UnitEnum|string|null  $driver
+     * @return mixed
+     */
+    public function driver($driver = null)
+    {
+        return parent::driver($driver);
     }
 
     /**

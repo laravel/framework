@@ -13,8 +13,6 @@ class JsonApiResourceTest extends TestCase
     {
         JsonResource::flushState();
         JsonApiResource::flushState();
-
-        parent::tearDown();
     }
 
     public function testResponseWrapperIsHardCodedToData()
@@ -26,17 +24,27 @@ class JsonApiResourceTest extends TestCase
 
     public function testUnableToSetWrapper()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Using Illuminate\Http\Resources\JsonApi\JsonApiResource::wrap() method is not allowed.');
+        $this->expectExceptionObject(new BadMethodCallException('Using Illuminate\Http\Resources\JsonApi\JsonApiResource::wrap() method is not allowed.'));
 
         JsonApiResource::wrap('laravel');
     }
 
     public function testUnableToUnsetWrapper()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Using Illuminate\Http\Resources\JsonApi\JsonApiResource::withoutWrapping() method is not allowed.');
+        $this->expectExceptionObject(new BadMethodCallException('Using Illuminate\Http\Resources\JsonApi\JsonApiResource::withoutWrapping() method is not allowed.'));
 
         JsonApiResource::withoutWrapping();
+    }
+
+    public function testFlushStateResetsMaxRelationshipDepthToDefault()
+    {
+        $this->assertSame(5, JsonApiResource::$maxRelationshipDepth);
+
+        JsonApiResource::maxRelationshipDepth(10);
+        $this->assertSame(10, JsonApiResource::$maxRelationshipDepth);
+
+        JsonApiResource::flushState();
+
+        $this->assertSame(5, JsonApiResource::$maxRelationshipDepth);
     }
 }

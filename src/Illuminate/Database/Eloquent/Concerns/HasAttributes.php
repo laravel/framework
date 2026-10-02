@@ -14,6 +14,7 @@ use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\DateFormat;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -209,11 +210,11 @@ trait HasAttributes
             array_merge($this->casts, $this->casts()),
         );
 
-        $this->dateFormat ??= static::resolveClassAttribute(Table::class)->dateFormat ?? null;
+        $this->dateFormat ??= static::resolveClassAttribute(DateFormat::class, 'format')
+            ?? static::resolveClassAttribute(Table::class)->dateFormat
+            ?? null;
 
-        if (empty($this->appends)) {
-            $this->appends = static::resolveClassAttribute(Appends::class, 'columns') ?? [];
-        }
+        $this->mergeAppends(static::resolveClassAttribute(Appends::class, 'columns') ?? []);
     }
 
     /**
@@ -245,7 +246,7 @@ trait HasAttributes
         // as these attributes are not really in the attributes array, but are run
         // when we need to array or JSON the model for convenience to the coder.
         foreach ($this->getArrayableAppends() as $key) {
-            $attributes[$key] = $this->mutateAttributeForArray($key, null);
+            $attributes[$key] = $this->mutateAttributeForArray($key, $this->getAttributeFromArray($key));
         }
 
         return $attributes;
@@ -519,11 +520,13 @@ trait HasAttributes
         if ($this->exists &&
             ! $this->wasRecentlyCreated &&
             static::preventsAccessingMissingAttributes()) {
+            $exception = new MissingAttributeException($this, $key);
+
             if (isset(static::$missingAttributeViolationCallback)) {
-                return call_user_func(static::$missingAttributeViolationCallback, $this, $key);
+                return call_user_func(static::$missingAttributeViolationCallback, $this, $key, $exception);
             }
 
-            throw new MissingAttributeException($this, $key);
+            throw $exception;
         }
 
         return null;
@@ -607,18 +610,24 @@ trait HasAttributes
      *
      * @param  string  $key
      * @return mixed
+     *
+     * @throws \Illuminate\Database\LazyLoadingViolationException
      */
     protected function handleLazyLoadingViolation($key)
     {
+        $exception = new LazyLoadingViolationException($this, $key);
+
         if (isset(static::$lazyLoadingViolationCallback)) {
-            return call_user_func(static::$lazyLoadingViolationCallback, $this, $key);
+            return call_user_func(
+                static::$lazyLoadingViolationCallback, $this, $key, $exception
+            );
         }
 
         if (! $this->exists || $this->wasRecentlyCreated) {
             return;
         }
 
-        throw new LazyLoadingViolationException($this, $key);
+        throw $exception;
     }
 
     /**
@@ -631,7 +640,7 @@ trait HasAttributes
      */
     protected function getRelationshipFromMethod($method)
     {
-        $relation = $this->$method();
+        $relation = Relation::withConstraintsForNestedRelation(fn () => $this->$method());
 
         if (! $relation instanceof Relation) {
             if (is_null($relation)) {
@@ -803,6 +812,8 @@ trait HasAttributes
      *
      * @param  array  $casts
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function ensureCastsAreStringValues($casts)
     {
@@ -1319,6 +1330,8 @@ trait HasAttributes
      * @param  string  $expectedEnum
      * @param  \UnitEnum  $value
      * @return string|int
+     *
+     * @throws \ValueError
      */
     protected function getStorableEnumValue($expectedEnum, $value)
     {
@@ -1369,6 +1382,8 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return string
+     *
+     * @throws \Illuminate\Database\Eloquent\JsonEncodingException
      */
     protected function castAttributeAsJson($key, $value)
     {
@@ -1477,7 +1492,9 @@ trait HasAttributes
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return string
+     * @return string|null
+     *
+     * @throws \RuntimeException
      */
     protected function castAttributeAsHashedString($key, #[\SensitiveParameter] $value)
     {
@@ -1519,11 +1536,13 @@ trait HasAttributes
      * @param  float|string  $value
      * @param  int  $decimals
      * @return string
+     *
+     * @throws \Illuminate\Support\Exceptions\MathException
      */
     protected function asDecimal($value, $decimals)
     {
         try {
-            return (string) BigDecimal::of((string) $value)->toScale($decimals, RoundingMode::HALF_UP);
+            return (string) BigDecimal::of((string) $value)->toScale($decimals, RoundingMode::HalfUp);
         } catch (BrickMathException $e) {
             throw new MathException('Unable to cast value to a decimal.', previous: $e);
         }
@@ -1709,7 +1728,7 @@ trait HasAttributes
     /**
      * Get the attributes that should be cast.
      *
-     * @return array<string, string>
+     * @return array<string, Stringable|string>
      */
     protected function casts()
     {
@@ -1918,7 +1937,7 @@ trait HasAttributes
     }
 
     /**
-     * Merge the a cast class and attribute cast attribute back into the model.
+     * Merge the cast class and attribute cast attribute back into the model.
      *
      * @return void
      */
@@ -2071,7 +2090,7 @@ trait HasAttributes
     public function getOriginal($key = null, $default = null)
     {
         return (new static)->setRawAttributes(
-            $this->original, $sync = true
+            $this->original, sync: true
         )->getOriginalWithoutRewindingModel($key, $default);
     }
 
@@ -2471,6 +2490,10 @@ trait HasAttributes
      */
     public function mergeAppends(array $appends)
     {
+        if ($appends === []) {
+            return $this;
+        }
+
         $this->appends = array_values(array_unique(array_merge($this->appends, $appends)));
 
         return $this;

@@ -31,6 +31,8 @@
         "class_definition": true,
         "class_reference_name_casing": true,
         "clean_namespace": true,
+        "combine_consecutive_issets": true,
+        "combine_consecutive_unsets": true,
         "compact_nullable_type_declaration": true,
         "concat_space": true,
         "constant_case": {
@@ -174,6 +176,7 @@
         "phpdoc_single_line_var_spacing": true,
         "phpdoc_summary": true,
         "phpdoc_trim": true,
+        "phpdoc_trim_consecutive_blank_line_separation": true,
         "phpdoc_types": true,
         "phpdoc_var_without_name": true,
         "return_type_declaration": {

@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -38,8 +39,15 @@ trait HasGlobalScopes
             $attributes->push(...$trait->getAttributes(ScopedBy::class, ReflectionAttribute::IS_INSTANCEOF));
         }
 
+        $isEloquentGrandchild = is_subclass_of(static::class, Model::class)
+            && get_parent_class(static::class) !== Model::class;
+
         return $attributes->map(fn ($attribute) => $attribute->getArguments())
             ->flatten()
+            ->when($isEloquentGrandchild, function (Collection $attributes) {
+                return (new Collection(get_parent_class(static::class)::resolveGlobalScopeAttributes()))
+                    ->merge($attributes);
+            })
             ->all();
     }
 
@@ -57,7 +65,7 @@ trait HasGlobalScopes
         if (is_string($scope) && ($implementation instanceof Closure || $implementation instanceof Scope)) {
             return static::$globalScopes[static::class][$scope] = $implementation;
         } elseif ($scope instanceof Closure) {
-            return static::$globalScopes[static::class][spl_object_hash($scope)] = $scope;
+            return static::$globalScopes[static::class][spl_object_id($scope)] = $scope;
         } elseif ($scope instanceof Scope) {
             return static::$globalScopes[static::class][get_class($scope)] = $scope;
         } elseif (is_string($scope) && class_exists($scope) && is_subclass_of($scope, Scope::class)) {

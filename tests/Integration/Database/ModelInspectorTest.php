@@ -13,9 +13,9 @@ use Illuminate\Database\Eloquent\ModelInfo;
 use Illuminate\Database\Eloquent\ModelInspector;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Integration\Http\Fixtures\ModelInspectorTestModelResource;
 
 class ModelInspectorTest extends DatabaseTestCase
 {
@@ -58,7 +58,7 @@ class ModelInspectorTest extends DatabaseTestCase
     {
         $this->assertEquals(ModelInspectorTestModel::class, $modelInfo['class']);
         $this->assertEquals(Schema::getConnection()->getConfig()['name'], $modelInfo['database']);
-        $this->assertEquals('model_info_extractor_test_model', $modelInfo['table']);
+        $this->assertSame('model_info_extractor_test_model', $modelInfo['table']);
         $this->assertNull($modelInfo['policy']);
         $this->assertCount(8, $modelInfo['attributes']);
 
@@ -167,9 +167,9 @@ class ModelInspectorTest extends DatabaseTestCase
 
         $this->assertEmpty($modelInfo['events']);
         $this->assertCount(1, $modelInfo['observers']);
-        $this->assertEquals('created', $modelInfo['observers'][0]['event']);
+        $this->assertSame('created', $modelInfo['observers'][0]['event']);
         $this->assertCount(1, $modelInfo['observers'][0]['observer']);
-        $this->assertEquals("Illuminate\Tests\Integration\Database\ModelInspectorTestModelObserver@created", $modelInfo['observers'][0]['observer'][0]);
+        $this->assertSame("Illuminate\Tests\Integration\Database\ModelInspectorTestModelObserver@created", $modelInfo['observers'][0]['observer'][0]);
         $this->assertEquals(ModelInspectorTestModelEloquentCollection::class, $modelInfo['collection']);
         $this->assertEquals(ModelInspectorTestModelBuilder::class, $modelInfo['builder']);
     }
@@ -221,9 +221,5 @@ class ModelInspectorTestModelEloquentCollection extends Collection
 }
 
 class ModelInspectorTestModelBuilder extends Builder
-{
-}
-
-class ModelInspectorTestModelResource extends JsonResource
 {
 }

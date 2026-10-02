@@ -12,8 +12,12 @@ use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
+use JsonException;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * @mixin \Illuminate\Http\Client\PendingRequest
@@ -152,9 +156,30 @@ class Factory
     }
 
     /**
+     * Execute a callback while requests are created without global middleware or global options.
+     *
+     * @template TReturn
+     *
+     * @param  (\Closure(): TReturn)  $callback
+     * @return TReturn
+     */
+    public function withoutGlobalConfiguration(Closure $callback)
+    {
+        [$middleware, $options] = [$this->globalMiddleware, $this->globalOptions];
+
+        [$this->globalMiddleware, $this->globalOptions] = [[], []];
+
+        try {
+            return $callback();
+        } finally {
+            [$this->globalMiddleware, $this->globalOptions] = [$middleware, $options];
+        }
+    }
+
+    /**
      * Create a new response instance for use during stubbing.
      *
-     * @param  array|string|null  $body
+     * @param  \Psr\Http\Message\StreamInterface|array|string|resource|null  $body
      * @param  int  $status
      * @param  array  $headers
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -169,28 +194,100 @@ class Factory
     /**
      * Create a new PSR-7 response instance for use during stubbing.
      *
-     * @param  array|string|null  $body
+     * @param  \Psr\Http\Message\StreamInterface|array|string|resource|null  $body
      * @param  int  $status
-     * @param  array<string, mixed>  $headers
+     * @param  array  $headers
      * @return \GuzzleHttp\Psr7\Response
+     *
+     * @throws \InvalidArgumentException
      */
     public static function psr7Response($body = null, $status = 200, $headers = [])
     {
         if (is_array($body)) {
-            $body = json_encode($body);
+            try {
+                $body = json_encode($body, JSON_THROW_ON_ERROR);
+            } catch (JsonException $e) {
+                throw new InvalidArgumentException('HTTP fake response body could not be JSON encoded.', previous: $e);
+            }
 
             $headers['Content-Type'] = 'application/json';
         }
 
-        return new Psr7Response($status, $headers, $body);
+        if (! is_string($body) && ! is_null($body) && (! is_resource($body) || get_resource_type($body) !== 'stream') && ! $body instanceof StreamInterface) {
+            throw new InvalidArgumentException('HTTP fake response body must be a string, array, stream resource, Psr\Http\Message\StreamInterface, or null.');
+        }
+
+        return new Psr7Response($status, static::normalizeResponseHeaders($headers), $body);
+    }
+
+    /**
+     * Normalize the given fake response headers.
+     *
+     * @param  array  $headers
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected static function normalizeResponseHeaders(array $headers): array
+    {
+        foreach ($headers as $name => $value) {
+            if (is_array($value)) {
+                if ($value === []) {
+                    $headers[$name] = '';
+
+                    continue;
+                }
+
+                foreach ($value as $key => $item) {
+                    $value[$key] = match (true) {
+                        $item === null => '',
+                        is_scalar($item) => static::normalizeScalarString($item),
+                        $item instanceof Stringable => $item->toString(),
+                        default => throw new InvalidArgumentException('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
+                    };
+                }
+
+                $headers[$name] = $value;
+
+                continue;
+            }
+
+            $headers[$name] = match (true) {
+                $value === null => '',
+                is_scalar($value) => static::normalizeScalarString($value),
+                $value instanceof Stringable => $value->toString(),
+                default => throw new InvalidArgumentException('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
+            };
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Normalize a scalar to a string without triggering PHP 8.5 non-finite float warnings.
+     *
+     * @param  scalar  $value
+     * @return string
+     */
+    protected static function normalizeScalarString($value): string
+    {
+        if (is_float($value) && ! is_finite($value)) {
+            return match (true) {
+                is_nan($value) => 'NAN',
+                $value > 0 => 'INF',
+                default => '-INF',
+            };
+        }
+
+        return (string) $value;
     }
 
     /**
      * Create a new RequestException instance for use during stubbing.
      *
-     * @param  array|string|null  $body
+     * @param  \Psr\Http\Message\StreamInterface|array|string|resource|null  $body
      * @param  int  $status
-     * @param  array<string, mixed>  $headers
+     * @param  array  $headers
      * @return \Illuminate\Http\Client\RequestException
      */
     public static function failedRequest($body = null, $status = 200, $headers = [])
@@ -259,7 +356,7 @@ class Factory
                     $response = $response($request, $options);
                 }
 
-                if ($response instanceof PromiseInterface) {
+                if ($response instanceof PromiseInterface && ($options['on_stats'] ?? null) instanceof Closure) {
                     $options['on_stats'](new TransferStats(
                         $request->toPsrRequest(),
                         $response->wait(),
@@ -292,6 +389,8 @@ class Factory
      * @param  string  $url
      * @param  \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|callable|int|string|array|\Illuminate\Http\Client\ResponseSequence  $callback
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function stubUrl($url, $callback)
     {
@@ -300,11 +399,15 @@ class Factory
                 return;
             }
 
-            if (is_int($callback) && $callback >= 100 && $callback < 600) {
-                return static::response(status: $callback);
+            if (is_int($callback)) {
+                if ($callback >= 100 && $callback < 600) {
+                    return static::response(status: $callback);
+                }
+
+                throw new InvalidArgumentException('HTTP status code must be between 100 and 599.');
             }
 
-            if (is_int($callback) || is_string($callback)) {
+            if (is_string($callback)) {
                 return static::response($callback);
             }
 
@@ -393,7 +496,7 @@ class Factory
     public function assertSent($callback)
     {
         PHPUnit::assertTrue(
-            $this->recorded($callback)->count() > 0,
+            $this->recorded($callback)->isNotEmpty(),
             'An expected request was not recorded.'
         );
     }
@@ -428,8 +531,8 @@ class Factory
      */
     public function assertNotSent($callback)
     {
-        PHPUnit::assertFalse(
-            $this->recorded($callback)->count() > 0,
+        PHPUnit::assertTrue(
+            $this->recorded($callback)->isEmpty(),
             'Unexpected request was recorded.'
         );
     }

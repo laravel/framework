@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -19,8 +19,6 @@ class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;
 
-    /** {@inheritdoc} */
-    #[\Override]
     protected function setUp(): void
     {
         $this->afterApplicationCreated(function () {
@@ -108,13 +106,13 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people', 'author'])->put('name', 'Sally', 5);
         Cache::store('redis')->tags(['people', 'author'])->put('age', 30, 5);
 
-        $this->assertEquals('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
+        $this->assertSame('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
         $this->assertEquals(30, Cache::store('redis')->tags(['people', 'author'])->get('age'));
 
         Cache::store('redis')->tags(['people', 'author'])->flush();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(0, count($keyCount));
+        $this->assertCount(0, $keyCount);
     }
 
     public function testTagEntriesCanBeStoredForever()
@@ -124,13 +122,13 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people', 'author'])->forever('name', 'Sally');
         Cache::store('redis')->tags(['people', 'author'])->forever('age', 30);
 
-        $this->assertEquals('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
+        $this->assertSame('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
         $this->assertEquals(30, Cache::store('redis')->tags(['people', 'author'])->get('age'));
 
         Cache::store('redis')->tags(['people', 'author'])->flush();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(0, count($keyCount));
+        $this->assertCount(0, $keyCount);
     }
 
     public function testTagEntriesCanBeIncremented()
@@ -149,6 +147,20 @@ class RedisStoreTest extends TestCase
         $this->assertEquals(0, Cache::store('redis')->tags(['votes'])->get('person-1'));
     }
 
+    public function testTagEntriesCanBeDecrementedUsingEnumKeys()
+    {
+        Cache::store('redis')->clear();
+
+        Cache::store('redis')->tags(['votes'])->put(RedisTaggedCacheTestKey::PERSON_1, 2, 5);
+        Cache::store('redis')->tags(['votes'])->decrement(RedisTaggedCacheTestKey::PERSON_1);
+
+        $this->assertEquals(1, Cache::store('redis')->tags(['votes'])->get(RedisTaggedCacheTestKey::PERSON_1));
+
+        Cache::store('redis')->tags(['votes'])->flush();
+
+        $this->assertNull(Cache::store('redis')->tags(['votes'])->get(RedisTaggedCacheTestKey::PERSON_1));
+    }
+
     public function testIncrementedTagEntriesProperlyTurnStale()
     {
         Cache::store('redis')->clear();
@@ -162,7 +174,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['votes'])->flushStale();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(0, count($keyCount));
+        $this->assertCount(0, $keyCount);
     }
 
     public function testPastTtlTagEntriesAreNotAdded()
@@ -175,7 +187,7 @@ class RedisStoreTest extends TestCase
         $this->assertNull($value);
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(0, count($keyCount));
+        $this->assertCount(0, $keyCount);
     }
 
     public function testPutPastTtlTagEntriesProperlyTurnStale()
@@ -186,7 +198,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['votes'])->flushStale();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(0, count($keyCount));
+        $this->assertCount(0, $keyCount);
     }
 
     public function testTagsCanBeFlushedBySingleKey()
@@ -198,11 +210,11 @@ class RedisStoreTest extends TestCase
 
         Cache::store('redis')->tags(['artist'])->flush();
 
-        $this->assertEquals('Sally', Cache::store('redis')->tags(['people', 'author'])->get('person-1'));
+        $this->assertSame('Sally', Cache::store('redis')->tags(['people', 'author'])->get('person-1'));
         $this->assertNull(Cache::store('redis')->tags(['people', 'artist'])->get('person-2'));
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(3, count($keyCount)); // Sets for people, authors, and actual entry for Sally
+        $this->assertCount(3, $keyCount); // Sets for people, authors, and actual entry for Sally
     }
 
     public function testStaleEntriesCanBeFlushed()
@@ -220,7 +232,28 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people'])->flushStale();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(4, count($keyCount)); // Sets for people, authors, and artists + individual entry for Jennifer
+        $this->assertCount(4, $keyCount); // Sets for people, authors, and artists + individual entry for Jennifer
+    }
+
+    public function testTouchedTagEntriesAreNotConsideredStale()
+    {
+        Cache::store('redis')->clear();
+
+        Cache::store('redis')->tags(['people'])->put('person-1', 'Sally', 1);
+        Cache::store('redis')->tags(['people'])->touch('person-1', 5);
+
+        sleep(2);
+
+        Cache::store('redis')->tags(['people'])->flushStale();
+
+        $this->assertSame('Sally', Cache::store('redis')->tags(['people'])->get('person-1'));
+
+        Cache::store('redis')->tags(['people'])->flush();
+
+        $this->assertNull(Cache::store('redis')->tags(['people'])->get('person-1'));
+
+        $keyCount = Cache::store('redis')->connection()->keys('*');
+        $this->assertCount(0, $keyCount);
     }
 
     public function testMultipleItemsCanBeSetAndRetrieved()
@@ -240,13 +273,13 @@ class RedisStoreTest extends TestCase
             'norf' => null,
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
 
-        $this->assertEquals([], $store->many([]));
+        $this->assertSame([], $store->many([]));
     }
 
     public function testPutManyCallsPutWhenClustered()
     {
-        $store = m::mock(RedisStore::class)->makePartial();
-        $store->expects('connection')->andReturn(m::mock(PhpRedisClusterConnection::class));
+        $store = Mockery::mock(RedisStore::class)->makePartial();
+        $store->expects('connection')->andReturn(Mockery::mock(PhpRedisClusterConnection::class));
         $store->expects('put')
             ->twice()
             ->andReturn(true);
@@ -285,9 +318,9 @@ class RedisStoreTest extends TestCase
             Cache::store('redis')->tags($tags)->put("key:{$i}", "value:{$i}", 300);
         }
 
-        $this->assertEquals('value:1', Cache::store('redis')->tags($tags)->get('key:1'));
-        $this->assertEquals('value:2500', Cache::store('redis')->tags($tags)->get('key:2500'));
-        $this->assertEquals('value:5000', Cache::store('redis')->tags($tags)->get('key:5000'));
+        $this->assertSame('value:1', Cache::store('redis')->tags($tags)->get('key:1'));
+        $this->assertSame('value:2500', Cache::store('redis')->tags($tags)->get('key:2500'));
+        $this->assertSame('value:5000', Cache::store('redis')->tags($tags)->get('key:5000'));
 
         Cache::store('redis')->tags($tags)->flush();
 
@@ -368,4 +401,9 @@ class RedisStoreTest extends TestCase
 
         $store->flushLocks();
     }
+}
+
+enum RedisTaggedCacheTestKey: string
+{
+    case PERSON_1 = 'person-1';
 }

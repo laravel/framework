@@ -9,16 +9,16 @@ use Symfony\Component\Console\Attribute\AsCommand;
 class CacheTableCommand extends MigrationGeneratorCommand
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'make:cache-table';
+    protected $signature = 'make:cache-table';
 
     /**
      * The console command name aliases.
      *
-     * @var array
+     * @var string[]
      */
     protected $aliases = ['cache:table'];
 

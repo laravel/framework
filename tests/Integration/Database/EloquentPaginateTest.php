@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Database\Fixtures\Models\Guarded\Post;
 
 class EloquentPaginateTest extends DatabaseTestCase
 {
@@ -43,7 +44,7 @@ class EloquentPaginateTest extends DatabaseTestCase
 
         $query = Post::query()->distinct();
 
-        $this->assertEquals(6, $query->get()->count());
+        $this->assertCount(6, $query->get());
         $this->assertEquals(6, $query->count());
         $this->assertEquals(6, $query->paginate()->total());
     }
@@ -58,7 +59,7 @@ class EloquentPaginateTest extends DatabaseTestCase
 
         $query = Post::query()->distinct()->select('title');
 
-        $this->assertEquals(2, $query->get()->count());
+        $this->assertCount(2, $query->get());
         $this->assertEquals(6, $query->count());
         $this->assertEquals(6, $query->paginate()->total());
     }
@@ -72,7 +73,7 @@ class EloquentPaginateTest extends DatabaseTestCase
 
         $query = Post::query()->distinct('title')->select('title');
 
-        $this->assertEquals(2, $query->get()->count());
+        $this->assertCount(2, $query->get());
         $this->assertEquals(2, $query->count());
         $this->assertEquals(2, $query->paginate()->total());
     }
@@ -92,15 +93,10 @@ class EloquentPaginateTest extends DatabaseTestCase
         $query = User::query()->join('posts', 'posts.user_id', '=', 'users.id')
             ->distinct('users.id')->select('users.*');
 
-        $this->assertEquals(5, $query->get()->count());
+        $this->assertCount(5, $query->get());
         $this->assertEquals(5, $query->count());
         $this->assertEquals(5, $query->paginate()->total());
     }
-}
-
-class Post extends Model
-{
-    protected $guarded = [];
 }
 
 class User extends Model

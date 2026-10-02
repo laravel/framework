@@ -55,7 +55,7 @@ class NotPwnedVerifier implements UncompromisedVerifier
             ->contains(function ($line) use ($hash, $hashPrefix, $threshold) {
                 [$hashSuffix, $count] = explode(':', $line);
 
-                return $hashPrefix.$hashSuffix == $hash && $count > $threshold;
+                return $hashPrefix.$hashSuffix === $hash && $count > $threshold;
             });
     }
 
@@ -84,7 +84,7 @@ class NotPwnedVerifier implements UncompromisedVerifier
     {
         try {
             $response = $this->factory->withHeaders([
-                'Add-Padding' => true,
+                'Add-Padding' => 'true',
             ])->timeout($this->timeout)->get(
                 'https://api.pwnedpasswords.com/range/'.$hashPrefix
             );

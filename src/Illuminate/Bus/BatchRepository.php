@@ -85,8 +85,10 @@ interface BatchRepository
     /**
      * Execute the given Closure within a storage specific transaction.
      *
-     * @param  \Closure  $callback
-     * @return mixed
+     * @template TReturn
+     *
+     * @param  (\Closure(): TReturn)  $callback
+     * @return TReturn
      */
     public function transaction(Closure $callback);
 

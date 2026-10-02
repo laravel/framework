@@ -145,7 +145,7 @@ class BlueprintState
         return $this->foreignKeys;
     }
 
-    /*
+    /**
      * Update the blueprint's state.
      *
      * @param  \Illuminate\Support\Fluent  $command

@@ -53,8 +53,7 @@ class ExceptionsFacadeTest extends TestCase
         Exceptions::report(new RuntimeException('test 1'));
         report(new RuntimeException('test 2'));
 
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The total number of exceptions reported was 2 instead of 1.');
+        $this->expectExceptionObject(new ExpectationFailedException('The total number of exceptions reported was 2 instead of 1.'));
 
         Exceptions::assertReportedCount(1);
     }
@@ -79,8 +78,7 @@ class ExceptionsFacadeTest extends TestCase
 
     public function testFakeAssertReportedAsStringMayFail()
     {
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The expected [InvalidArgumentException] exception was not reported.');
+        $this->expectExceptionObject(new ExpectationFailedException('The expected [InvalidArgumentException] exception was not reported.'));
 
         Exceptions::fake();
 
@@ -92,8 +90,7 @@ class ExceptionsFacadeTest extends TestCase
 
     public function testFakeAssertReportedAsClosureMayFail()
     {
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The expected [InvalidArgumentException] exception was not reported.');
+        $this->expectExceptionObject(new ExpectationFailedException('The expected [InvalidArgumentException] exception was not reported.'));
 
         Exceptions::fake();
 
@@ -105,8 +102,7 @@ class ExceptionsFacadeTest extends TestCase
 
     public function testFakeAssertReportedWithFakedExceptionsMayFail()
     {
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The expected [RuntimeException] exception was not reported.');
+        $this->expectExceptionObject(new ExpectationFailedException('The expected [RuntimeException] exception was not reported.'));
 
         Exceptions::fake(InvalidArgumentException::class);
 
@@ -147,8 +143,7 @@ class ExceptionsFacadeTest extends TestCase
 
     public function testFakeAssertNotReportedMayFail()
     {
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The expected [RuntimeException] exception was reported.');
+        $this->expectExceptionObject(new ExpectationFailedException('The expected [RuntimeException] exception was reported.'));
 
         Exceptions::fake();
 
@@ -159,8 +154,7 @@ class ExceptionsFacadeTest extends TestCase
 
     public function testFakeAssertNotReportedAsClosureMayFail()
     {
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The expected [RuntimeException] exception was reported.');
+        $this->expectExceptionObject(new ExpectationFailedException('The expected [RuntimeException] exception was reported.'));
 
         Exceptions::fake();
 
@@ -197,8 +191,7 @@ class ExceptionsFacadeTest extends TestCase
 
     public function testFakeAssertNothingReportedMayFail()
     {
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The following exceptions were reported: RuntimeException, RuntimeException, InvalidArgumentException.');
+        $this->expectExceptionObject(new ExpectationFailedException('The following exceptions were reported: RuntimeException, RuntimeException, InvalidArgumentException.'));
 
         Exceptions::fake();
 
@@ -251,8 +244,7 @@ class ExceptionsFacadeTest extends TestCase
     {
         Exceptions::fake()->throwOnReport();
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Test exception');
+        $this->expectExceptionObject(new Exception('Test exception'));
 
         report(new Exception('Test exception'));
     }
@@ -286,8 +278,7 @@ class ExceptionsFacadeTest extends TestCase
             report(new Exception('Test exception'));
         });
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Test exception');
+        $this->expectExceptionObject(new Exception('Test exception'));
 
         $this->get('/');
     }
@@ -302,8 +293,7 @@ class ExceptionsFacadeTest extends TestCase
             report(new Exception('Test exception'));
         });
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Test exception');
+        $this->expectExceptionObject(new Exception('Test exception'));
 
         $this->get('/');
     }
@@ -321,8 +311,7 @@ class ExceptionsFacadeTest extends TestCase
             rescue(fn () => throw new Exception('Test exception'));
         });
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Test exception');
+        $this->expectExceptionObject(new Exception('Test exception'));
 
         $this->get('/');
     }
@@ -340,8 +329,7 @@ class ExceptionsFacadeTest extends TestCase
             rescue(fn () => throw new Exception('Test exception'));
         });
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Test exception');
+        $this->expectExceptionObject(new Exception('Test exception'));
 
         $this->get('/');
     }
@@ -378,8 +366,7 @@ class ExceptionsFacadeTest extends TestCase
 
         Exceptions::fake()->throwOnReport();
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Test exception');
+        $this->expectExceptionObject(new Exception('Test exception'));
 
         report(new Exception('Test exception'));
     }
@@ -405,8 +392,7 @@ class ExceptionsFacadeTest extends TestCase
 
         Exceptions::fake([RuntimeException::class])->throwOnReport();
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('My exception message');
+        $this->expectExceptionObject(new InvalidArgumentException('My exception message'));
 
         report(new Exception('My exception message'));
     }
@@ -415,8 +401,7 @@ class ExceptionsFacadeTest extends TestCase
     {
         Exceptions::fake();
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Test exception');
+        $this->expectExceptionObject(new Exception('Test exception'));
 
         report(new Exception('Test exception'));
 
@@ -427,8 +412,7 @@ class ExceptionsFacadeTest extends TestCase
     {
         Exceptions::fake([InvalidArgumentException::class]);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Test exception');
+        $this->expectExceptionObject(new InvalidArgumentException('Test exception'));
 
         report(new RuntimeException('Test exception'));
         report(new InvalidArgumentException('Test exception'));

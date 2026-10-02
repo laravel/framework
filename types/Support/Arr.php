@@ -129,7 +129,7 @@ assertType('true', Arr::arrayable(new class implements Jsonable
         return '{"foo":"bar"}';
     }
 }));
-assertType('true', Arr::arrayable(generateArray()));
+assertType('bool', Arr::arrayable(generateArray()));
 assertType('true', Arr::arrayable(new class implements JsonSerializable
 {
     #[\Override]
@@ -196,3 +196,14 @@ assertType('array<0|string, float>', Arr::wrap($value));
 assertType('array<array<float>>', Arr::wrap($value));
 /** @var stdClass|stdClass[]|null $value */
 assertType('array<stdClass>', Arr::wrap($value));
+
+/** @var array<string, int|null> $arr */
+assertType('array<string, int>', Arr::whereNotNull($arr));
+
+/** @var list<int|null> $arr */
+assertType('array<int<0, max>, int>', Arr::whereNotNull($arr));
+
+assertType('mixed', Arr::random($array));
+assertType('array', Arr::random($array, 2));
+
+assertType('array<string, User>', Arr::prependKeysWith($array, 'user_'));

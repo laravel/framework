@@ -52,9 +52,9 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         $provider->log('connection-1', 'queue-1', json_encode(['uuid' => 'uuid-1']), new RuntimeException());
 
         $this->assertNull($provider->find('uuid-2'));
-        $this->assertEquals('uuid-1', $provider->find('uuid-1')->id);
-        $this->assertEquals('queue-1', $provider->find('uuid-1')->queue);
-        $this->assertEquals('connection-1', $provider->find('uuid-1')->connection);
+        $this->assertSame('uuid-1', $provider->find('uuid-1')->id);
+        $this->assertSame('queue-1', $provider->find('uuid-1')->queue);
+        $this->assertSame('connection-1', $provider->find('uuid-1')->connection);
     }
 
     public function testRemovingJobsById()
@@ -187,11 +187,13 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         ]);
         $db->getConnection()->getSchemaBuilder()->create('failed_jobs', function (Blueprint $table) {
             $table->uuid();
-            $table->text('connection');
-            $table->text('queue');
+            $table->string('connection');
+            $table->string('queue');
             $table->longText('payload');
             $table->longText('exception');
             $table->timestamp('failed_at')->useCurrent();
+
+            $table->index(['connection', 'queue', 'failed_at']);
         });
 
         return new DatabaseUuidFailedJobProvider($db->getDatabaseManager(), $database, $table);

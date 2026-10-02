@@ -17,7 +17,7 @@ class MigratorEventsTest extends TestCase
     protected function migrateOptions()
     {
         return [
-            '--path' => realpath(__DIR__.'/stubs/'),
+            '--path' => realpath(__DIR__.'/Fixtures/'),
             '--realpath' => true,
         ];
     }
@@ -112,16 +112,24 @@ class MigratorEventsTest extends TestCase
         });
 
         Event::assertDispatched(MigrationStarted::class, function ($event) {
-            return $event->method === 'up' && $event->migration instanceof Migration;
+            return $event->method === 'up'
+                && $event->migration instanceof Migration
+                && $event->name === '2014_10_12_000000_create_members_table';
         });
         Event::assertDispatched(MigrationStarted::class, function ($event) {
-            return $event->method === 'down' && $event->migration instanceof Migration;
+            return $event->method === 'down'
+                && $event->migration instanceof Migration
+                && $event->name === '2014_10_12_000000_create_members_table';
         });
         Event::assertDispatched(MigrationEnded::class, function ($event) {
-            return $event->method === 'up' && $event->migration instanceof Migration;
+            return $event->method === 'up'
+                && $event->migration instanceof Migration
+                && $event->name === '2014_10_12_000000_create_members_table';
         });
         Event::assertDispatched(MigrationEnded::class, function ($event) {
-            return $event->method === 'down' && $event->migration instanceof Migration;
+            return $event->method === 'down'
+                && $event->migration instanceof Migration
+                && $event->name === '2014_10_12_000000_create_members_table';
         });
     }
 
@@ -145,7 +153,7 @@ class MigratorEventsTest extends TestCase
         Event::fake();
 
         $this->artisan('migrate', [
-            '--path' => realpath(__DIR__.'/stubs/2014_10_13_000000_skipped_migration.php'),
+            '--path' => realpath(__DIR__.'/Fixtures/2014_10_13_000000_skipped_migration.php'),
             '--realpath' => true,
         ]);
 

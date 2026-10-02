@@ -7,7 +7,6 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -20,7 +19,6 @@ class DatabaseFailedJobProviderTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->createDatabaseWithFailedJobTable()
             ->createProvider();
     }
@@ -98,19 +96,46 @@ class DatabaseFailedJobProviderTest extends TestCase
 
     public function testCanFlushFailedJobs()
     {
-        Date::setTestNow(Date::now());
+        Carbon::setTestNow($now = Carbon::now());
 
-        $this->createFailedJobsRecord(['failed_at' => Date::now()->subDays(10)]);
+        $this->createFailedJobsRecord(['failed_at' => $now->copy()->subDays(10)]);
         $this->provider->flush();
         $this->assertSame(0, $this->failedJobsTable()->count());
 
-        $this->createFailedJobsRecord(['failed_at' => Date::now()->subDays(10)]);
+        $this->createFailedJobsRecord(['failed_at' => $now->copy()->subDays(10)]);
         $this->provider->flush(15 * 24);
         $this->assertSame(1, $this->failedJobsTable()->count());
 
-        $this->createFailedJobsRecord(['failed_at' => Date::now()->subDays(10)]);
+        $this->createFailedJobsRecord(['failed_at' => $now->copy()->subDays(10)]);
         $this->provider->flush(10 * 24);
         $this->assertSame(0, $this->failedJobsTable()->count());
+    }
+
+    public function testCanFlushFailedJobsForASingleQueue()
+    {
+        $this->createFailedJobsRecord(['queue' => 'emails']);
+        $this->createFailedJobsRecord(['queue' => 'emails']);
+        $this->createFailedJobsRecord(['queue' => 'default']);
+
+        $this->provider->flush(queue: 'emails');
+
+        $this->assertSame(1, $this->failedJobsTable()->count());
+        $this->assertSame('default', $this->failedJobsTable()->first()->queue);
+    }
+
+    public function testCanFlushFailedJobsForASingleQueueByHours()
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $this->createFailedJobsRecord(['queue' => 'emails', 'failed_at' => $now->copy()->subDays(10)]);
+        $this->createFailedJobsRecord(['queue' => 'emails', 'failed_at' => $now->copy()->subDays(1)]);
+        $this->createFailedJobsRecord(['queue' => 'default', 'failed_at' => $now->copy()->subDays(10)]);
+
+        $this->provider->flush(5 * 24, 'emails');
+
+        $this->assertSame(2, $this->failedJobsTable()->count());
+        $this->assertSame(1, $this->failedJobsTable()->where('queue', 'emails')->count());
+        $this->assertSame(1, $this->failedJobsTable()->where('queue', 'default')->count());
     }
 
     public function testCanProperlyLogFailedJob()
@@ -203,11 +228,13 @@ class DatabaseFailedJobProviderTest extends TestCase
 
         $this->db->getConnection()->getSchemaBuilder()->create('failed_jobs', function (Blueprint $table) {
             $table->id();
-            $table->text('connection');
-            $table->text('queue');
+            $table->string('connection');
+            $table->string('queue');
             $table->longText('payload');
             $table->longText('exception');
             $table->timestamp('failed_at')->useCurrent();
+
+            $table->index(['connection', 'queue', 'failed_at']);
         });
 
         return $this;
@@ -233,7 +260,7 @@ class DatabaseFailedJobProviderTest extends TestCase
                 'queue' => 'default',
                 'payload' => json_encode(['uuid' => (string) Str::uuid()]),
                 'exception' => new Exception('Whoops!'),
-                'failed_at' => Date::now()->subDays(10),
+                'failed_at' => Carbon::now()->subDays(10),
             ], $overrides));
     }
 }

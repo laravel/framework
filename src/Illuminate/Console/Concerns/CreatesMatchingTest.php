@@ -41,6 +41,6 @@ trait CreatesMatchingTest
             '--pest' => $this->option('pest'),
             '--phpunit' => $this->option('phpunit'),
             '--force' => $this->hasOption('force') && $this->option('force'),
-        ]) == 0;
+        ]) === 0;
     }
 }

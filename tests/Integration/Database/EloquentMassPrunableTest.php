@@ -2,29 +2,18 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
-use Mockery as m;
 
 class EloquentMassPrunableTest extends DatabaseTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->app->singleton(Dispatcher::class, function () {
-            return m::mock(Dispatcher::class);
-        });
-
-        $this->app->alias(Dispatcher::class, 'events');
-    }
-
     protected function afterRefreshingDatabase()
     {
         collect([
@@ -44,20 +33,14 @@ class EloquentMassPrunableTest extends DatabaseTestCase
 
     public function testPrunableMethodMustBeImplemented()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
-            'Please implement',
-        );
+        $this->expectExceptionObject(new LogicException('Please implement'));
 
         MassPrunableTestModelMissingPrunableMethod::create()->pruneAll();
     }
 
     public function testPrunesRecords()
     {
-        app('events')
-            ->shouldReceive('dispatch')
-            ->times(2)
-            ->with(m::type(ModelsPruned::class));
+        Event::fake();
 
         collect(range(1, 5000))->map(function ($id) {
             return ['name' => 'foo'];
@@ -68,18 +51,16 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         $count = (new MassPrunableTestModel)->pruneAll();
 
         $this->assertEquals(1500, $count);
+        Event::assertDispatchedTimes(ModelsPruned::class, 2);
         $this->assertEquals(3500, MassPrunableTestModel::count());
     }
 
     public function testPrunesSoftDeletedRecords()
     {
-        app('events')
-            ->shouldReceive('dispatch')
-            ->times(3)
-            ->with(m::type(ModelsPruned::class));
+        Event::fake();
 
         collect(range(1, 5000))->map(function ($id) {
-            return ['deleted_at' => now()];
+            return ['deleted_at' => Carbon::now()];
         })->chunk(200)->each(function ($chunk) {
             MassPrunableSoftDeleteTestModel::insert($chunk->all());
         });
@@ -87,6 +68,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         $count = (new MassPrunableSoftDeleteTestModel)->pruneAll();
 
         $this->assertEquals(3000, $count);
+        Event::assertDispatchedTimes(ModelsPruned::class, 3);
         $this->assertEquals(0, MassPrunableSoftDeleteTestModel::count());
         $this->assertEquals(2000, MassPrunableSoftDeleteTestModel::withTrashed()->count());
     }

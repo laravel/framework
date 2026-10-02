@@ -7,7 +7,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Symfony\Component\HttpFoundation\Cookie forever(string $name, string $value, string|null $path = null, string|null $domain = null, bool|null $secure = null, bool $httpOnly = true, bool $raw = false, string|null $sameSite = null)
  * @method static \Symfony\Component\HttpFoundation\Cookie forget(string $name, string|null $path = null, string|null $domain = null)
  * @method static bool hasQueued(string $key, string|null $path = null)
- * @method static \Symfony\Component\HttpFoundation\Cookie|null queued(string $key, mixed $default = null, string|null $path = null)
+ * @method static \Symfony\Component\HttpFoundation\Cookie|mixed queued(string $key, mixed|\Closure $default = null, string|null $path = null)
  * @method static void queue(mixed ...$parameters)
  * @method static void expire(string $name, string|null $path = null, string|null $domain = null)
  * @method static void unqueue(string $name, string|null $path = null)

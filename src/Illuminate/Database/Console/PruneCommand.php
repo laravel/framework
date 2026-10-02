@@ -112,6 +112,8 @@ class PruneCommand extends Command
      * Determine the models that should be pruned.
      *
      * @return \Illuminate\Support\Collection
+     *
+     * @throws \InvalidArgumentException
      */
     protected function models()
     {
@@ -119,7 +121,7 @@ class PruneCommand extends Command
         $except = $this->option('except');
 
         if ($models && $except) {
-            throw new InvalidArgumentException('The --models and --except options cannot be combined.');
+            throw new InvalidArgumentException('The --model and --except options cannot be combined.');
         }
 
         if ($models) {

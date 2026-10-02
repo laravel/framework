@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Stringable;
 use RuntimeException;
 
 class MySqlGrammar extends Grammar
@@ -427,10 +428,11 @@ class MySqlGrammar extends Grammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('alter table %s add primary key %s(%s)%s',
+        return sprintf('alter table %s add primary key %s(%s)%s%s',
             $this->wrapTable($blueprint),
             $command->algorithm ? 'using '.$command->algorithm : '',
             $this->columnize($command->columns),
+            $command->inplace ? ', algorithm=inplace' : '',
             $command->lock ? ', lock='.$command->lock : ''
         );
     }
@@ -493,12 +495,13 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
-        return sprintf('alter table %s add %s %s%s(%s)%s',
+        return sprintf('alter table %s add %s %s%s(%s)%s%s',
             $this->wrapTable($blueprint),
             $type,
             $this->wrap($command->index),
             $command->algorithm ? ' using '.$command->algorithm : '',
             $this->columnize($command->columns),
+            $command->inplace ? ', algorithm=inplace' : '',
             $command->lock ? ', lock='.$command->lock : ''
         );
     }
@@ -626,6 +629,10 @@ class MySqlGrammar extends Grammar
     {
         $sql = parent::compileForeign($blueprint, $command);
 
+        if ($command->inplace) {
+            $sql .= ', algorithm=inplace';
+        }
+
         if ($command->lock) {
             $sql .= ', lock='.$command->lock;
         }
@@ -743,7 +750,7 @@ class MySqlGrammar extends Grammar
     public function escapeNames($names)
     {
         return array_map(
-            fn ($name) => (new Collection(explode('.', $name)))->map($this->wrapValue(...))->implode('.'),
+            fn ($name) => (new Stringable($name))->explode('.')->map($this->wrapValue(...))->implode('.'),
             $names
         );
     }

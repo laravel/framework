@@ -2,16 +2,22 @@
 
 namespace Illuminate\Tests\Http;
 
+use Carbon\CarbonInterval;
+use Carbon\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Image;
 use Illuminate\Routing\Route;
+use Illuminate\Session\NullSessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Stringable;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
+use Illuminate\Tests\Http\Fixtures\TestEnum;
+use Illuminate\Tests\Http\Fixtures\TestEnumBacked;
+use Illuminate\Tests\Http\Fixtures\TestIntegerEnumBacked;
 use InvalidArgumentException;
-use Mockery as m;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -21,7 +27,7 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-include_once 'Enums.php';
+include_once 'Fixtures/Enums.php';
 
 class HttpRequestTest extends TestCase
 {
@@ -451,6 +457,37 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($bar);
     }
 
+    public function testWhenEnumMethod()
+    {
+        $request = Request::create('/', 'GET', ['status' => 'test', 'invalid' => 'invalid', 'empty' => '']);
+
+        $status = $invalid = $empty = $missing = $default = false;
+
+        $request->whenEnum('status', TestEnumBacked::class, function ($value) use (&$status) {
+            $status = $value;
+        });
+
+        $request->whenEnum('invalid', TestEnumBacked::class, function ($value) use (&$invalid) {
+            $invalid = $value;
+        });
+
+        $request->whenEnum('empty', TestEnumBacked::class, function ($value) use (&$empty) {
+            $empty = $value;
+        });
+
+        $request->whenEnum('missing', TestEnumBacked::class, function ($value) use (&$missing) {
+            $missing = $value;
+        }, function () use (&$default) {
+            $default = true;
+        });
+
+        $this->assertSame(TestEnumBacked::test, $status);
+        $this->assertFalse($invalid);
+        $this->assertFalse($empty);
+        $this->assertFalse($missing);
+        $this->assertTrue($default);
+    }
+
     public function testMissingMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
@@ -637,8 +674,8 @@ class HttpRequestTest extends TestCase
             'empty_str' => '',
             'null' => null,
         ]);
-        $this->assertTrue($request->string('int') instanceof Stringable);
-        $this->assertTrue($request->string('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $request->string('int'));
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $request->string('unknown_key'));
         $this->assertSame('123', $request->string('int')->value());
         $this->assertSame('456', $request->string('int_str')->value());
         $this->assertSame('123.456', $request->string('float')->value());
@@ -815,6 +852,78 @@ class HttpRequestTest extends TestCase
         $request->date('date', 'invalid_format');
     }
 
+    public function testIntervalMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'as_null' => null,
+            'as_empty' => '',
+            'as_iso' => 'P1Y2M3DT4H5M6S',
+            'as_human' => '2 hours 30 minutes',
+            'as_seconds' => '90',
+            'as_minutes' => '45',
+        ]);
+
+        $this->assertNull($request->interval('as_null'));
+        $this->assertNull($request->interval('as_empty'));
+        $this->assertNull($request->interval('doesnt_exist'));
+
+        $interval = $request->interval('as_iso');
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(1, $interval->years);
+        $this->assertSame(2, $interval->months);
+        $this->assertSame(3, $interval->dayz);
+        $this->assertSame(4, $interval->hours);
+        $this->assertSame(5, $interval->minutes);
+        $this->assertSame(6, $interval->seconds);
+
+        $interval = $request->interval('as_human');
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(2, $interval->hours);
+        $this->assertSame(30, $interval->minutes);
+
+        $interval = $request->interval('as_seconds', 'second');
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(90, $interval->seconds);
+
+        $this->assertSame(90, $request->interval('as_seconds', 'minute')->minutes);
+        $this->assertSame(90, $request->interval('as_seconds', 'hour')->hours);
+        $this->assertSame(90, $request->interval('as_seconds', 'day')->dayz);
+
+        $this->assertSame(45, $request->interval('as_minutes', Unit::Minute)->minutes);
+        $this->assertSame(45, $request->interval('as_minutes', Unit::Second)->seconds);
+    }
+
+    public function testIntervalMethodWithScientificNotationFloats()
+    {
+        $request = Request::create('/', 'GET', [
+            'small_float' => '0.000053',
+            'very_small' => '0.000001',
+            'scientific' => '5.3E-5',
+            'normal_float' => '1.5',
+            'integer' => '90',
+        ]);
+
+        // Small floats that PHP would render in scientific notation (e.g. 5.3E-5)
+        $interval = $request->interval('small_float', Unit::Millisecond);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+
+        $interval = $request->interval('very_small', Unit::Second);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+
+        // Scientific notation string passed directly
+        $interval = $request->interval('scientific', Unit::Millisecond);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+
+        // Normal values should still work
+        $interval = $request->interval('normal_float', Unit::Hour);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(1, $interval->hours);
+
+        $interval = $request->interval('integer', Unit::Minute);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(90, $interval->minutes);
+    }
+
     public function testEnumMethod()
     {
         $request = Request::create('/', 'GET', [
@@ -979,15 +1088,15 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', ['developer' => ['name' => 'Taylor', 'age' => null]]);
         $this->assertEquals(['developer' => ['name' => 'Taylor']], $request->only('developer.name', 'developer.skills'));
         $this->assertEquals(['developer' => ['age' => null]], $request->only('developer.age'));
-        $this->assertEquals([], $request->only('developer.skills'));
+        $this->assertSame([], $request->only('developer.skills'));
     }
 
     public function testExceptMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
         $this->assertEquals(['name' => 'Taylor'], $request->except('age'));
-        $this->assertEquals([], $request->except('age', 'name'));
-        $this->assertEquals([], $request->except(['age', 'name']));
+        $this->assertSame([], $request->except('age', 'name'));
+        $this->assertSame([], $request->except(['age', 'name']));
     }
 
     public function testQueryMethod()
@@ -1053,6 +1162,27 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf(SymfonyUploadedFile::class, $request->file('foo'));
     }
 
+    public function testImageMethod()
+    {
+        $files = [
+            'avatar' => [
+                'size' => 500,
+                'name' => 'avatar.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'image/jpeg',
+                'error' => null,
+            ],
+        ];
+        $request = Request::create('/', 'GET', [], [], $files);
+        $this->assertInstanceOf(Image::class, $request->image('avatar'));
+    }
+
+    public function testImageMethodReturnsNullForMissingKey()
+    {
+        $request = Request::create('/', 'GET', [], [], []);
+        $this->assertNull($request->image('avatar'));
+    }
+
     public function testHasFileMethod()
     {
         $request = Request::create('/', 'GET', [], [], []);
@@ -1090,6 +1220,39 @@ class HttpRequestTest extends TestCase
         $this->assertSame('Dayle', $request->input('buddy'));
     }
 
+    public function testMergeMethodTreatsAsterisksAsLiteralKeys()
+    {
+        $request = Request::create('/', 'GET', []);
+        $request->merge(['*' => 226]);
+        $this->assertSame(226, $request->all()['*']);
+
+        $request = Request::create('/', 'GET', ['organisation_id' => 10, 'name' => 'Taylor']);
+        $request->merge(['*' => 226]);
+        $this->assertSame(10, $request->input('organisation_id'));
+        $this->assertSame('Taylor', $request->input('name'));
+        $this->assertSame(226, $request->all()['*']);
+
+        $request = Request::create('/', 'GET', ['profile' => ['name' => 'Taylor', 'email' => 'taylor@laravel.com']]);
+        $request->merge(['profile.*' => 'masked']);
+        $this->assertSame('Taylor', $request->input('profile.name'));
+        $this->assertSame('taylor@laravel.com', $request->input('profile.email'));
+        $this->assertSame('masked', $request->all()['profile']['*']);
+
+        $request = Request::create('/', 'GET', ['profile' => ['name' => 'Taylor', 'email' => 'taylor@laravel.com']]);
+        $request->merge(['profile.name' => 'Otwell']);
+        $this->assertSame('Otwell', $request->input('profile.name'));
+        $this->assertSame('taylor@laravel.com', $request->input('profile.email'));
+    }
+
+    public function testMergeMethodTreatsAsterisksAsLiteralKeysOnJsonRequests()
+    {
+        $request = Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode(['organisation_id' => 10, 'name' => 'Taylor']));
+        $request->merge(['*' => 226]);
+        $this->assertSame(10, $request->input('organisation_id'));
+        $this->assertSame('Taylor', $request->input('name'));
+        $this->assertSame(226, $request->all()['*']);
+    }
+
     public function testMergeIfMissingMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);
@@ -1113,6 +1276,15 @@ class HttpRequestTest extends TestCase
         $merge = ['user.first_name' => 'John'];
         $request->mergeIfMissing($merge);
         $this->assertSame('Taylor', $request->input('user.first_name'));
+    }
+
+    public function testMergeIfMissingMethodTreatsAsterisksAsLiteralKeys()
+    {
+        $request = Request::create('/', 'GET', ['organisation_id' => 10, 'name' => 'Taylor']);
+        $request->mergeIfMissing(['*' => 226]);
+        $this->assertSame(10, $request->input('organisation_id'));
+        $this->assertSame('Taylor', $request->input('name'));
+        $this->assertSame(226, $request->all()['*']);
     }
 
     public function testReplaceMethod()
@@ -1173,6 +1345,13 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($payload, $data);
     }
 
+    public function testJSONMethodDecodesTopLevelZero()
+    {
+        $request = Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], '0');
+
+        $this->assertSame([0], $request->json()->all());
+    }
+
     public function testJSONEmulatingPHPBuiltInServer()
     {
         $payload = ['name' => 'taylor'];
@@ -1221,6 +1400,7 @@ class HttpRequestTest extends TestCase
         );
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAllInputReturnsInputAndFiles()
     {
         $file = $this->getMockBuilder(UploadedFile::class)->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
@@ -1228,11 +1408,38 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar', 'baz' => $file, 'boom' => 'breeze'], $request->all());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAllInputReturnsNestedInputAndFiles()
     {
         $file = $this->getMockBuilder(UploadedFile::class)->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']], [], ['foo' => ['photo' => $file]]);
         $this->assertEquals(['foo' => ['bar' => 'baz', 'photo' => $file], 'boom' => 'breeze'], $request->all());
+    }
+
+    public function testAllInputPrefersInputOverFilesForCollidingKeys()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'email.txt');
+        $request = Request::create('/', 'POST', ['email' => 'taylor@laravel.com'], [], ['email' => $file]);
+
+        $this->assertSame(['email' => 'taylor@laravel.com'], $request->all());
+        $this->assertSame(['email' => 'taylor@laravel.com'], $request->only('email'));
+        $this->assertInstanceOf(UploadedFile::class, $request->file('email'));
+    }
+
+    public function testAllInputPreservesInputKeyOrderWhenFilesAreMerged()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'photo.jpg');
+        $request = Request::create('/', 'POST', [
+            'items' => [0 => ['name' => 'first'], 1 => ['name' => 'second']],
+        ], [], [
+            'items' => [1 => ['photo' => $file]],
+        ]);
+
+        $items = $request->all()['items'];
+
+        $this->assertSame([0, 1], array_keys($items));
+        $this->assertSame('second', $items[1]['name']);
+        $this->assertInstanceOf(UploadedFile::class, $items[1]['photo']);
     }
 
     public function testAllInputReturnsInputAfterReplace()
@@ -1267,7 +1474,9 @@ class HttpRequestTest extends TestCase
 
         $baseRequest = SymfonyRequest::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']], [], $invalidFiles);
 
-        Request::createFromBase($baseRequest);
+        $request = Request::createFromBase($baseRequest);
+
+        $this->assertNull($request->file('file'));
     }
 
     public function testMultipleFileUploadWithEmptyValue()
@@ -1292,8 +1501,8 @@ class HttpRequestTest extends TestCase
     public function testOldMethodCallsSession()
     {
         $request = Request::create('/');
-        $session = m::mock(Store::class);
-        $session->shouldReceive('getOldInput')->once()->with('foo', 'bar')->andReturn('boom');
+        $session = new Store('test', new NullSessionHandler);
+        $session->flashInput(['foo' => 'boom']);
         $request->setLaravelSession($session);
         $this->assertSame('boom', $request->old('foo', 'bar'));
     }
@@ -1301,8 +1510,7 @@ class HttpRequestTest extends TestCase
     public function testOldMethodCallsSessionWhenDefaultIsArray()
     {
         $request = Request::create('/');
-        $session = m::mock(Store::class);
-        $session->shouldReceive('getOldInput')->once()->with('foo', ['bar'])->andReturn(['bar']);
+        $session = new Store('test', new NullSessionHandler);
         $request->setLaravelSession($session);
         $this->assertSame(['bar'], $request->old('foo', ['bar']));
     }
@@ -1310,10 +1518,9 @@ class HttpRequestTest extends TestCase
     public function testOldMethodCanGetDefaultValueFromModelByKey()
     {
         $request = Request::create('/');
-        $model = m::mock(Price::class);
-        $model->shouldReceive('getAttribute')->once()->with('name')->andReturn('foobar');
-        $session = m::mock(Store::class);
-        $session->shouldReceive('getOldInput')->once()->with('name', 'foobar')->andReturn('foobar');
+        $model = new Price;
+        $model->name = 'foobar';
+        $session = new Store('test', new NullSessionHandler);
         $request->setLaravelSession($session);
         $this->assertSame('foobar', $request->old('name', $model));
     }
@@ -1321,10 +1528,13 @@ class HttpRequestTest extends TestCase
     public function testFlushMethodCallsSession()
     {
         $request = Request::create('/');
-        $session = m::mock(Store::class);
-        $session->shouldReceive('flashInput')->once();
+        $session = new Store('test', new NullSessionHandler);
+        $session->flashInput(['foo' => 'bar']);
+        $session->ageFlashData();
         $request->setLaravelSession($session);
         $request->flush();
+        $this->assertSame([], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testExpectsJson()
@@ -1371,6 +1581,47 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'is/not/known']);
         $this->assertSame('html', $request->format());
         $this->assertSame('foo', $request->format('foo'));
+    }
+
+    public function testWantsMarkdown()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/markdown']);
+        $this->assertTrue($request->wantsMarkdown());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/markdown; charset=utf-8']);
+        $this->assertTrue($request->wantsMarkdown());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $this->assertFalse($request->wantsMarkdown());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html']);
+        $this->assertFalse($request->wantsMarkdown());
+    }
+
+    public function testAcceptsMarkdown()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/markdown']);
+        $this->assertTrue($request->acceptsMarkdown());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html, text/markdown']);
+        $this->assertFalse($request->wantsMarkdown());
+        $this->assertTrue($request->acceptsMarkdown());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $this->assertFalse($request->acceptsMarkdown());
+    }
+
+    public function testMatchesType()
+    {
+        $this->assertTrue(Request::matchesType('application/json', 'application/json'));
+
+        $this->assertTrue(Request::matchesType('application/json', 'application/vnd.api+json'));
+        $this->assertTrue(Request::matchesType('application/xml', 'application/atom+xml'));
+
+        $this->assertFalse(Request::matchesType('application/vnd.api+json', 'application/json'));
+        $this->assertFalse(Request::matchesType('application/json', 'application/xml'));
+        $this->assertFalse(Request::matchesType('application/json', 'text/json'));
+        $this->assertFalse(Request::matchesType('json', 'application/json'));
     }
 
     public function testFormatReturnsAcceptsJson()
@@ -1555,8 +1806,7 @@ class HttpRequestTest extends TestCase
 
     public function testSessionMethod()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Session store not set on request.');
+        $this->expectExceptionObject(new RuntimeException('Session store not set on request.'));
 
         $request = Request::create('/');
         $request->session();
@@ -1568,7 +1818,7 @@ class HttpRequestTest extends TestCase
 
         $this->assertFalse($request->hasSession());
 
-        $session = m::mock(Store::class);
+        $session = new Store('test', new NullSessionHandler);
         $request->setLaravelSession($session);
 
         $this->assertTrue($request->hasSession());
@@ -1578,20 +1828,19 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/');
 
-        $laravelSession = m::mock(Store::class);
+        $laravelSession = new Store('test', new NullSessionHandler);
         $request->setLaravelSession($laravelSession);
 
         $session = $request->getSession();
         $this->assertInstanceOf(SessionInterface::class, $session);
 
-        $laravelSession->shouldReceive('start')->once()->andReturn(true);
-        $session->start();
+        $this->assertTrue($session->start());
+        $this->assertTrue($laravelSession->isStarted());
     }
 
     public function testGetSessionMethodWithoutLaravelSession()
     {
-        $this->expectException(SessionNotFoundException::class);
-        $this->expectExceptionMessage('There is currently no session available.');
+        $this->expectExceptionObject(new SessionNotFoundException('There is currently no session available.'));
 
         $request = Request::create('/');
 
@@ -1622,8 +1871,7 @@ class HttpRequestTest extends TestCase
 
     public function testFingerprintWithoutRoute()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to generate fingerprint. Route unavailable.');
+        $this->expectExceptionObject(new RuntimeException('Unable to generate fingerprint. Route unavailable.'));
 
         $request = Request::create('/', 'GET', [], [], [], []);
         $request->fingerprint();
@@ -1662,12 +1910,12 @@ class HttpRequestTest extends TestCase
         $params = ['foo' => 'bar'];
 
         $getRequest = Request::create('/', 'GET', $params, [], [], []);
-        $this->assertEquals($getRequest->request->all(), []);
+        $this->assertSame([], $getRequest->request->all());
         $this->assertEquals($getRequest->query->all(), $params);
 
         $postRequest = Request::create('/', 'POST', $params, [], [], []);
         $this->assertEquals($postRequest->request->all(), $params);
-        $this->assertEquals($postRequest->query->all(), []);
+        $this->assertSame([], $postRequest->query->all());
     }
 
     /**
@@ -1745,31 +1993,62 @@ class HttpRequestTest extends TestCase
         $this->assertEmpty($request->undefined);
     }
 
+    public function testMagicMethodsPreferInputOverFilesForCollidingKeys()
+    {
+        $file = new SymfonyUploadedFile(__FILE__, 'email.txt');
+        $request = Request::create('/', 'POST', ['email' => 'taylor@laravel.com'], [], ['email' => $file]);
+
+        $this->assertSame('taylor@laravel.com', $request->email);
+        $this->assertSame('taylor@laravel.com', $request['email']);
+    }
+
+    public function testMagicMethodsMergeNestedInputAndFilesWhilePreferringInput()
+    {
+        $avatar = new SymfonyUploadedFile(__FILE__, 'avatar.jpg');
+        $collision = new SymfonyUploadedFile(__FILE__, 'name.txt');
+        $request = Request::create('/', 'POST', [
+            'profile' => ['name' => 'Taylor'],
+        ], [], [
+            'profile' => ['name' => $collision, 'avatar' => $avatar],
+        ]);
+
+        $expected = [
+            'name' => 'Taylor',
+            'avatar' => $request->file('profile.avatar'),
+        ];
+
+        $this->assertSame($expected, $request->profile);
+        $this->assertSame(['profile' => $expected], $request->all());
+    }
+
     public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
     {
-        $session = m::mock(Store::class);
-        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor', 'email' => 'foo']);
+        $session = new Store('test', new NullSessionHandler);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);
         $request->flash();
+        $this->assertSame(['name' => 'Taylor', 'email' => 'foo'], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testHttpRequestFlashOnlyCallsFlashWithProperParameters()
     {
-        $session = m::mock(Store::class);
-        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
+        $session = new Store('test', new NullSessionHandler);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);
         $request->flashOnly(['name']);
+        $this->assertSame(['name' => 'Taylor'], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testHttpRequestFlashExceptCallsFlashWithProperParameters()
     {
-        $session = m::mock(Store::class);
-        $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
+        $session = new Store('test', new NullSessionHandler);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);
         $request->flashExcept(['email']);
+        $this->assertSame(['name' => 'Taylor'], $session->getOldInput());
+        $this->assertContains('_old_input', $session->get('_flash.new', []));
     }
 
     public function testGeneratingJsonRequestFromParentRequestUsesCorrectType()
@@ -1784,6 +2063,16 @@ class HttpRequestTest extends TestCase
 
         $this->assertInstanceOf(InputBag::class, $request->getPayload());
         $this->assertSame('world', $request->getPayload()->get('hello'));
+    }
+
+    public function testCreatingJsonRequestFromBaseDoesNotTriggerRequestPropertyDeprecation()
+    {
+        $request = Request::createFromBase(
+            SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"hello":"world"}')
+        );
+
+        $this->assertTrue($request->isJson());
+        $this->assertSame('world', $request->input('hello'));
     }
 
     public function testJsonRequestsCanMergeDataIntoJsonRequest()
@@ -1823,17 +2112,27 @@ class HttpRequestTest extends TestCase
 
         Request::create('', 'GET')->json();
 
-        $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
+        $this->assertSame(JSON_ERROR_NONE, json_last_error());
     }
 
     public function testItClampsValues()
     {
-        $request = Request::create('/', 'GET', ['per_page' => 100, 'float' => 9.24]);
+        $request = Request::create('/', 'GET', [
+            'per_page' => 100,
+            'float' => 9.24,
+            'empty' => '',
+            'null' => null,
+            'string' => 'string',
+        ]);
+
         $this->assertSame(100, $request->clamp('per_page', 100, 101));
         $this->assertSame(10, $request->clamp('per_page', -10, 10));
         $this->assertSame(25, $request->clamp('per_page_2', 25, 100, 1));
         $this->assertSame(100, $request->clamp('per_page', 1, 250, 99));
         $this->assertSame(22.4, $request->clamp('per_page', 1.11, 22.4, 2));
         $this->assertSame(9.24, $request->clamp('float', 1, 10));
+        $this->assertSame(15, $request->clamp('empty', 10, 100, 15));
+        $this->assertSame(15, $request->clamp('string', 10, 100, 15));
+        $this->assertSame(15, $request->clamp('null', 10, 100, 15));
     }
 }

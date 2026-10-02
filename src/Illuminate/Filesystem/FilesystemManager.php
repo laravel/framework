@@ -2,10 +2,13 @@
 
 namespace Illuminate\Filesystem;
 
+use Aws\Credentials\CredentialProvider;
 use Aws\S3\S3Client;
 use Closure;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\RebindsCallbacksToSelf;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter as AwsS3PortableVisibilityConverter;
@@ -20,6 +23,8 @@ use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
 use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
+use ReflectionException;
+use RuntimeException;
 
 use function Illuminate\Support\enum_value;
 
@@ -29,6 +34,8 @@ use function Illuminate\Support\enum_value;
  */
 class FilesystemManager implements FactoryContract
 {
+    use RebindsCallbacksToSelf;
+
     /**
      * The application instance.
      *
@@ -63,7 +70,7 @@ class FilesystemManager implements FactoryContract
     /**
      * Get a filesystem instance.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public function drive($name = null)
@@ -144,7 +151,7 @@ class FilesystemManager implements FactoryContract
             return $this->callCustomCreator($config);
         }
 
-        $driverMethod = 'create'.ucfirst($driver).'Driver';
+        $driverMethod = 'create'.Str::studly($driver).'Driver';
 
         if (! method_exists($this, $driverMethod)) {
             throw new InvalidArgumentException("Driver [{$driver}] is not supported.");
@@ -183,7 +190,8 @@ class FilesystemManager implements FactoryContract
             : LocalAdapter::DISALLOW_LINKS;
 
         $adapter = new LocalAdapter(
-            $config['root'], $visibility, $config['lock'] ?? LOCK_EX, $links
+            $config['root'], $visibility, $config['lock'] ?? LOCK_EX, $links,
+            lazyRootCreation: $config['lazy_root_creation'] ?? false,
         );
 
         return (new LocalFilesystemAdapter(
@@ -262,16 +270,79 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * Create a read-through filesystem driver.
+     *
+     * @param  array  $config
+     * @param  string  $name
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function createReadThroughDriver(array $config, string $name = 'read-through')
+    {
+        if (empty($config['primary'])) {
+            throw new InvalidArgumentException('Read-through disk is missing "primary" configuration option.');
+        } elseif (empty($config['fallback'])) {
+            throw new InvalidArgumentException('Read-through disk is missing "fallback" configuration option.');
+        } elseif ($config['primary'] === $config['fallback']) {
+            throw new InvalidArgumentException('Read-through disk requires distinct "primary" and "fallback" disks.');
+        } elseif ($config['primary'] === $name || $config['fallback'] === $name) {
+            throw new InvalidArgumentException("Read-through disk [{$name}] cannot reference itself.");
+        }
+
+        $primary = is_array($config['primary'])
+            ? $this->build($config['primary'])
+            : $this->disk($config['primary']);
+
+        $fallback = is_array($config['fallback'])
+            ? $this->build($config['fallback'])
+            : $this->disk($config['fallback']);
+
+        $adapter = new ReadThroughFilesystemAdapter(
+            $primary->getDriver(),
+            $fallback->getDriver(),
+            $config['throw_on_promotion_failure'] ?? false,
+            $config['copy'] ?? true,
+        );
+
+        return new ReadThroughFilesystem(
+            $this->createFlysystem($adapter, $config),
+            $primary->getAdapter(),
+            array_replace($primary->getConfig(), $config),
+            $primary,
+            $fallback,
+        );
+    }
+
+    /**
      * Format the given S3 configuration with the default options.
      *
      * @param  array  $config
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function formatS3Config(array $config)
     {
         $config += ['version' => 'latest'];
 
-        if (! empty($config['key']) && ! empty($config['secret'])) {
+        $credentials = $config['credentials'] ?? null;
+
+        $provider = is_array($credentials) ? ($credentials['provider'] ?? null) : $credentials;
+
+        if (is_string($provider)) {
+            $options = is_array($credentials) ? Arr::except($credentials, ['provider']) : [];
+
+            $provider = CredentialProvider::memoize(match ($provider) {
+                'ecs' => CredentialProvider::ecsCredentials($options),
+                'instance' => CredentialProvider::instanceProfile($options),
+                default => throw new InvalidArgumentException(
+                    "Invalid credential provider [{$provider}]."
+                ),
+            });
+        }
+
+        if ($provider) {
+            $config['credentials'] = $provider;
+        } elseif (! empty($config['key']) && ! empty($config['secret'])) {
             $config['credentials'] = Arr::only($config, ['key', 'secret']);
 
             if (! empty($config['token'])) {
@@ -439,7 +510,13 @@ class FilesystemManager implements FactoryContract
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback->bindTo($this, $this);
+        try {
+            $callback = $this->bindCallbackToSelf($callback) ?? throw new RuntimeException('Unable to bind custom driver callback');
+        } catch (ReflectionException $e) {
+            throw new RuntimeException('Unable to bind custom driver callback', previous: $e);
+        }
+
+        $this->customCreators[$driver] = $callback;
 
         return $this;
     }

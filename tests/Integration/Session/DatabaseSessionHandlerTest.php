@@ -17,7 +17,7 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $handler->setContainer($this->app);
 
         // read non-existing session id:
-        $this->assertEquals('', $handler->read('invalid_session_id'));
+        $this->assertSame('', $handler->read('invalid_session_id'));
 
         // open and close:
         $this->assertTrue($handler->open('', ''));
@@ -47,7 +47,7 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
 
         // read expired:
         Carbon::setTestNow(Carbon::now()->addMinutes(2));
-        $this->assertEquals('', $handler->read('valid_session_id_2425'));
+        $this->assertSame('', $handler->read('valid_session_id_2425'));
 
         // rewriting an expired session-id, makes it live:
         $this->assertTrue($handler->write('valid_session_id_2425', json_encode(['come' => 'alive'])));
@@ -59,18 +59,18 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $connection = $this->app['db']->connection();
 
         $handler = new DatabaseSessionHandler($connection, 'sessions', 1, $this->app);
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $handler->write('simple_id_1', 'abcd');
         $this->assertEquals(0, $handler->gc(1));
 
-        Carbon::setTestNow(Carbon::now()->addSeconds(2));
+        Carbon::setTestNow($now->addSeconds(2));
 
         $handler = new DatabaseSessionHandler($connection, 'sessions', 1, $this->app);
         $handler->write('simple_id_2', 'abcd');
         $this->assertEquals(1, $handler->gc(2));
         $this->assertEquals(1, $connection->table('sessions')->count());
 
-        Carbon::setTestNow(Carbon::now()->addSeconds(2));
+        Carbon::setTestNow($now->addSeconds(2));
 
         $this->assertEquals(1, $handler->gc(1));
         $this->assertEquals(0, $connection->table('sessions')->count());
@@ -103,7 +103,7 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
 
         // write and read:
         $this->assertTrue($handler->write('session_id', 'some data'));
-        $this->assertEquals('some data', $handler->read('session_id'));
+        $this->assertSame('some data', $handler->read('session_id'));
         $this->assertEquals(1, $connection->table('sessions')->count());
 
         $session = $connection->table('sessions')->first();

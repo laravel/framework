@@ -9,16 +9,17 @@ use SessionHandlerInterface;
 
 class ArraySessionHandlerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow(null);
-
-        parent::tearDown();
-    }
-
     public function test_it_implements_the_session_handler_interface()
     {
         $this->assertInstanceOf(SessionHandlerInterface::class, new ArraySessionHandler(10));
+    }
+
+    public function test_it_creates_session_ids()
+    {
+        $sessionId = (new ArraySessionHandler(10))->create_sid();
+
+        $this->assertIsString($sessionId);
+        $this->assertNotEmpty($sessionId);
     }
 
     public function test_it_initializes_the_session()
@@ -26,6 +27,17 @@ class ArraySessionHandlerTest extends TestCase
         $handler = new ArraySessionHandler(10);
 
         $this->assertTrue($handler->open('', ''));
+    }
+
+    public function test_it_validates_session_ids()
+    {
+        $handler = new ArraySessionHandler(10);
+
+        $this->assertFalse($handler->validateId('foo'));
+
+        $handler->write('foo', 'bar');
+
+        $this->assertTrue($handler->validateId('foo'));
     }
 
     public function test_it_closes_the_session()
@@ -48,10 +60,10 @@ class ArraySessionHandlerTest extends TestCase
     {
         $handler = new ArraySessionHandler(10);
 
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $handler->write('foo', 'bar');
 
-        Carbon::setTestNow(Carbon::now()->addMinutes(10));
+        Carbon::setTestNow($now->addMinutes(10));
         $this->assertSame('bar', $handler->read('foo'));
     }
 
@@ -59,10 +71,10 @@ class ArraySessionHandlerTest extends TestCase
     {
         $handler = new ArraySessionHandler(10);
 
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $handler->write('foo', 'bar');
 
-        Carbon::setTestNow(Carbon::now()->addMinutes(10)->addSecond());
+        Carbon::setTestNow($now->addMinutes(10)->addSecond());
         $this->assertSame('', $handler->read('foo'));
     }
 
@@ -102,16 +114,16 @@ class ArraySessionHandlerTest extends TestCase
 
         $this->assertSame(0, $handler->gc(300));
 
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $handler->write('foo', 'bar');
         $this->assertSame(0, $handler->gc(300));
         $this->assertSame('bar', $handler->read('foo'));
 
-        Carbon::setTestNow(Carbon::now()->addSecond());
+        Carbon::setTestNow($now->addSecond());
 
         $handler->write('baz', 'qux');
 
-        Carbon::setTestNow(Carbon::now()->addMinutes(5));
+        Carbon::setTestNow($now->addMinutes(5));
 
         $this->assertSame(1, $handler->gc(300));
         $this->assertSame('', $handler->read('foo'));

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 use function PHPStan\Testing\assertType;
@@ -62,6 +63,7 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->firstOrFail());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->firstOrCreate());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->create());
+    assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->createQuietly());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->createOrFirst());
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->updateOrCreate([]));
     assertType('Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}', $user->roles()->save(new Role()));
@@ -72,6 +74,7 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->saveManyQuietly($roles));
     assertType('array<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->saveManyQuietly($roles->all()));
     assertType('array<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->createMany($roles));
+    assertType('array<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->createManyQuietly($roles));
     assertType('array{attached: array, detached: array, updated: array}', $user->roles()->sync($roles));
     assertType('array{attached: array, detached: array, updated: array}', $user->roles()->syncWithoutDetaching($roles));
     assertType('array{attached: array, detached: array, updated: array}', $user->roles()->syncWithPivotValues($roles, []));
@@ -166,6 +169,18 @@ class User extends Model
         return $belongsToMany;
     }
 
+    /** @return BelongsToMany<Role, $this, Tenant> */
+    public function tenantRoles(): BelongsToMany
+    {
+        $belongsToMany = $this->belongsToMany(Role::class)->using(Tenant::class);
+        assertType('Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, $this(Illuminate\Types\Relations\User), Illuminate\Types\Relations\Tenant, \'pivot\'>', $belongsToMany);
+
+        $belongsToManyShorthand = $this->belongsToMany(Role::class, Tenant::class);
+        assertType('Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, $this(Illuminate\Types\Relations\User), Illuminate\Types\Relations\Tenant, \'pivot\'>', $belongsToManyShorthand);
+
+        return $belongsToMany;
+    }
+
     /** @return HasOne<Mechanic, $this> */
     public function mechanic(): HasOne
     {
@@ -241,6 +256,10 @@ class User extends Model
         assertType(
             'Illuminate\Database\Eloquent\Relations\HasManyThrough<Illuminate\Types\Relations\Part, Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User)>',
             $this->through($this->mechanic())->has(fn ($mechanic) => $mechanic->parts()),
+        );
+        assertType(
+            'Illuminate\Database\Eloquent\Relations\HasManyThrough<Illuminate\Types\Relations\Part, Illuminate\Types\Relations\Mechanic, $this(Illuminate\Types\Relations\User)>',
+            $this->through($this->mechanic())->has(fn ($mechanic) => $mechanic->morphMany(Part::class, 'partable')),
         );
 
         return $hasManyThrough;
@@ -350,6 +369,9 @@ class Address extends Model
 {
 }
 class Role extends Model
+{
+}
+class Tenant extends Pivot
 {
 }
 class Car extends Model

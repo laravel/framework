@@ -19,7 +19,6 @@ class PhpRedisBackoffTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->setUpRedis();
 
         $client = $this->redis['phpredis']->connection()->client();
@@ -31,8 +30,6 @@ class PhpRedisBackoffTest extends TestCase
     protected function tearDown(): void
     {
         $this->tearDownRedis();
-
-        parent::tearDown();
     }
 
     #[DataProvider('phpRedisBackoffAlgorithmsProvider')]
@@ -96,8 +93,7 @@ class PhpRedisBackoffTest extends TestCase
 
     public function testItFailsWithAnInvalidPhpRedisAlgorithm()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Algorithm [foo] is not a valid PhpRedis backoff algorithm');
+        $this->expectExceptionObject(new InvalidArgumentException('Algorithm [foo] is not a valid PhpRedis backoff algorithm'));
 
         $host = Env::get('REDIS_HOST', '127.0.0.1');
         $port = Env::get('REDIS_PORT', 6379);
