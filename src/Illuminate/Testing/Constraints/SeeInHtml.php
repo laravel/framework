@@ -59,7 +59,7 @@ class SeeInHtml extends Constraint
         $position = 0;
 
         foreach ($values as $value) {
-            if (empty($value)) {
+            if (empty($value) && $value !== '0') {
                 continue;
             }
 
