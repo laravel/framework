@@ -354,6 +354,20 @@ class BroadcastManagerTest extends TestCase
         $this->assertNotNull($hub->getProvider()->getJwt());
     }
 
+    public function testMercureResolvesARelativeUrl()
+    {
+        $hub = (new BroadcastManager($this->getApp([])))->mercure($this->mercureConfig(['url' => '/.well-known/mercure']));
+
+        $this->assertSame(config('app.url').'/.well-known/mercure', $hub->getUrl());
+    }
+
+    public function testMercureResolvesARelativePublicUrl()
+    {
+        $hub = (new BroadcastManager($this->getApp([])))->mercure($this->mercureConfig(['public_url' => '/.well-known/mercure']));
+
+        $this->assertSame(config('app.url').'/.well-known/mercure', $hub->getPublicUrl());
+    }
+
     public function testMercureRejectsANonPositiveSubscribeExpiration()
     {
         $manager = new BroadcastManager($this->getApp([
