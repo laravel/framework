@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
 use Illuminate\Filesystem\Filesystem;
+use PDOException;
 use RuntimeException;
 use Throwable;
 
@@ -62,6 +63,75 @@ class SqlServerConnection extends Connection
 
             return $result;
         }
+    }
+
+    /**
+     * Handle an exception encountered when running a transacted statement.
+     *
+     * @param  \Throwable  $e
+     * @param  int  $currentAttempt
+     * @param  int  $maxAttempts
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    protected function handleTransactionException(Throwable $e, $currentAttempt, $maxAttempts)
+    {
+        try {
+            parent::handleTransactionException($e, $currentAttempt, $maxAttempts);
+        } catch (Throwable $exception) {
+            // If SQL Server already rolled back the entire transaction, the failed savepoint rollback
+            // is only a symptom. We will re-throw the exception that actually caused the rollback.
+            if ($exception !== $e && $this->transactions === 0 && $this->causedByMissingSavepoint($exception)) {
+                throw $e;
+            }
+
+            throw $exception;
+        }
+    }
+
+    /**
+     * Handle an exception from a rollback.
+     *
+     * @param  \Throwable  $e
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    protected function handleRollBackException(Throwable $e)
+    {
+        // Some errors, such as an error raised within a trigger, a MERGE that updates the same row
+        // twice, or any error while XACT_ABORT is on, make SQL Server roll back the entire
+        // transaction instead of just the failing statement, which discards every savepoint.
+        // Laravel's transaction level must be reset so later transactions really commit.
+        if ($this->transactions > 1 && $this->causedByMissingSavepoint($e)) {
+            $this->transactions = 0;
+
+            // The driver begins a new transaction after the rollback, so we will end that one too.
+            if ($this->getPdo()->inTransaction()) {
+                $this->getPdo()->rollBack();
+            }
+
+            $this->transactionsManager?->rollback(
+                $this->getName(), $this->transactions
+            );
+        }
+
+        parent::handleRollBackException($e);
+    }
+
+    /**
+     * Determine if the given exception was caused by rolling back to a savepoint that no longer exists.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function causedByMissingSavepoint(Throwable $e)
+    {
+        // 3903: The ROLLBACK TRANSACTION request has no corresponding BEGIN TRANSACTION.
+        // 6401: Cannot roll back %.*ls. No transaction or savepoint of that name was found.
+        return $e instanceof PDOException
+            && in_array((int) ($e->errorInfo[1] ?? 0), [3903, 6401], true);
     }
 
     /**
