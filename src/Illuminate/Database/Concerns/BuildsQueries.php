@@ -4,6 +4,7 @@ namespace Illuminate\Database\Concerns;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\RecordNotFoundException;
@@ -208,7 +209,7 @@ trait BuildsQueries
                 return false;
             }
 
-            $lastId = data_get($results->last(), $alias);
+            $lastId = $this->getLastIdFromChunk($results->last(), $alias);
 
             if ($lastId === null) {
                 throw new RuntimeException("The chunkById operation was aborted because the [{$alias}] column is not present in the query result.");
@@ -386,7 +387,7 @@ trait BuildsQueries
                     return;
                 }
 
-                $lastId = $results->last()->{$alias};
+                $lastId = $this->getLastIdFromChunk($results->last(), $alias);
 
                 if ($lastId === null) {
                     throw new RuntimeException("The lazyById operation was aborted because the [{$alias}] column is not present in the query result.");
@@ -395,6 +396,20 @@ trait BuildsQueries
                 $page++;
             }
         });
+    }
+
+    /**
+     * Get the ID of the last result of a chunk to continue paging from.
+     *
+     * @param  mixed  $result
+     * @param  string  $alias
+     * @return mixed
+     */
+    protected function getLastIdFromChunk($result, $alias)
+    {
+        return $result instanceof Model
+            ? $result->getRawOriginal($alias)
+            : data_get($result, $alias);
     }
 
     /**
