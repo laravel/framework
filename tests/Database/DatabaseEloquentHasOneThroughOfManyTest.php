@@ -329,6 +329,19 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
         $this->assertTrue($user->latest_login()->is($login2));
     }
 
+    public function testIsMethodComparesTheFarParent(): void
+    {
+        $otherUser = HasOneThroughOfManyTestUser::create();
+        $user = HasOneThroughOfManyTestUser::create();
+        $login = $user->intermediates()->create()->logins()->create();
+        $otherLogin = $otherUser->intermediates()->create()->logins()->create();
+
+        $this->assertTrue($user->latest_login()->is($login));
+        $this->assertFalse($user->latest_login()->is($otherLogin));
+        $this->assertTrue($otherUser->latest_login()->is($otherLogin));
+        $this->assertFalse($otherUser->latest_login()->is($login));
+    }
+
     public function testIsNotMethod(): void
     {
         $user = HasOneThroughOfManyTestUser::factory()->hasIntermediates(2)->create();
