@@ -9,9 +9,9 @@ use RuntimeException;
 class LazyPromise implements PromiseInterface
 {
     /**
-     * The callbacks to execute after the Guzzle Promise has been built.
+     * The callbacks to execute with the Guzzle Promise once it has been built.
      *
-     * @var list<callable>
+     * @var list<(callable(\GuzzleHttp\Promise\PromiseInterface): void)>
      */
     protected array $pending = [];
 
@@ -23,12 +23,29 @@ class LazyPromise implements PromiseInterface
     protected PromiseInterface $guzzlePromise;
 
     /**
+     * The promise this promise was derived from via "then" or "otherwise".
+     *
+     * @var static
+     */
+    protected LazyPromise $root;
+
+    /**
+     * The most recently derived promise in this promise's family of chains.
+     *
+     * @var static
+     */
+    protected LazyPromise $tip;
+
+    /**
      * Create a new lazy promise instance.
      *
      * @param  (\Closure(): \GuzzleHttp\Promise\PromiseInterface)  $promiseBuilder  The callback to build a new PromiseInterface.
+     * @param  static|null  $root  The promise this promise derives from.
      */
-    public function __construct(protected Closure $promiseBuilder)
+    public function __construct(protected Closure $promiseBuilder, ?self $root = null)
     {
+        $this->root = $root ?? $this;
+        $this->tip = $this;
     }
 
     /**
@@ -44,39 +61,57 @@ class LazyPromise implements PromiseInterface
             throw new RuntimeException('Promise already built');
         }
 
-        $this->guzzlePromise = call_user_func($this->promiseBuilder);
+        $promise = call_user_func($this->promiseBuilder);
+
+        // Building a derived promise builds the promise it chains from, which
+        // resolves this promise while the builder runs, so the promise may
+        // already be resolved by the time the builder returns a value...
+        if ($this->promiseNeedsBuilt()) {
+            $this->resolveWith($promise);
+        }
+
+        // The promise of the most recently chained handler is returned so that
+        // pools and batches settle with the value of the entire chain...
+        return $this->root->tip->guzzlePromise;
+    }
+
+    /**
+     * Resolve the lazy promise with the given built promise.
+     *
+     * @param  \GuzzleHttp\Promise\PromiseInterface  $promise
+     * @return void
+     */
+    protected function resolveWith(PromiseInterface $promise): void
+    {
+        $this->guzzlePromise = $promise;
 
         foreach ($this->pending as $pendingCallback) {
-            $pendingCallback($this->guzzlePromise);
+            $pendingCallback($promise);
         }
 
         $this->pending = [];
-
-        return $this->guzzlePromise;
     }
 
     #[\Override]
     public function then(?callable $onFulfilled = null, ?callable $onRejected = null): PromiseInterface
     {
-        if ($this->promiseNeedsBuilt()) {
-            $this->pending[] = static fn (PromiseInterface $promise) => $promise->then($onFulfilled, $onRejected);
-
-            return $this;
+        if (! $this->promiseNeedsBuilt()) {
+            return $this->guzzlePromise->then($onFulfilled, $onRejected);
         }
 
-        return $this->guzzlePromise->then($onFulfilled, $onRejected);
+        $derived = new static(fn () => $this->buildPromise(), $this->root);
+
+        $this->pending[] = static fn (PromiseInterface $promise) => $derived->resolveWith(
+            $promise->then($onFulfilled, $onRejected)
+        );
+
+        return $this->root->tip = $derived;
     }
 
     #[\Override]
     public function otherwise(callable $onRejected): PromiseInterface
     {
-        if ($this->promiseNeedsBuilt()) {
-            $this->pending[] = static fn (PromiseInterface $promise) => $promise->otherwise($onRejected);
-
-            return $this;
-        }
-
-        return $this->guzzlePromise->otherwise($onRejected);
+        return $this->then(null, $onRejected);
     }
 
     #[\Override]

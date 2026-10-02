@@ -2273,6 +2273,78 @@ class HttpClientTest extends TestCase
         $this->assertSame($promise, $request->getPromise());
     }
 
+    public function testAsyncThenReturnsANewPromiseForEachHandler()
+    {
+        $this->factory->fake(['*' => $this->factory::response('hello', 200)]);
+
+        $promise1 = $this->factory->async()->get('http://foo.com');
+        $promise2 = $promise1->then(fn (Response $response) => $response->status());
+        $promise3 = $promise2->then(fn ($status) => 'one');
+
+        $this->assertNotSame($promise1, $promise2);
+        $this->assertNotSame($promise2, $promise3);
+
+        $this->assertSame(200, $promise1->wait()->status());
+        $this->assertSame(200, $promise2->wait());
+        $this->assertSame('one', $promise3->wait());
+    }
+
+    public function testAsyncDerivedPromisesCanBeWaitedOnBeforeTheirParents()
+    {
+        $this->factory->fake(['*' => $this->factory::response('hello', 200)]);
+
+        $promise1 = $this->factory->async()->get('http://foo.com');
+        $promise2 = $promise1->then(fn (Response $response) => $response->status());
+        $promise3 = $promise2->then(fn ($status) => [$status, 'one']);
+
+        $this->assertSame([200, 'one'], $promise3->wait());
+        $this->assertSame(200, $promise2->wait());
+        $this->assertSame(200, $promise1->wait()->status());
+    }
+
+    public function testAsyncThenMayBeChainedAfterThePromiseHasResolved()
+    {
+        $this->factory->fake(['*' => $this->factory::response('hello', 200)]);
+
+        $promise1 = $this->factory->async()->get('http://foo.com');
+
+        $this->assertSame(200, $promise1->wait()->status());
+
+        $promise2 = $promise1->then(fn (Response $response) => $response->body());
+
+        $this->assertNotSame($promise1, $promise2);
+        $this->assertSame('hello', $promise2->wait());
+        $this->assertSame(200, $promise1->wait()->status());
+    }
+
+    public function testAsyncOtherwiseReturnsANewPromiseAndPassesFulfillmentThrough()
+    {
+        $this->factory->fake(['*' => $this->factory::response('hello', 200)]);
+
+        $promise1 = $this->factory->async()->get('http://foo.com');
+        $promise2 = $promise1->otherwise(fn ($reason) => $reason);
+
+        $this->assertNotSame($promise1, $promise2);
+        $this->assertSame(200, $promise2->wait()->status());
+        $this->assertSame(200, $promise1->wait()->status());
+    }
+
+    public function testPoolResultsReflectHandlersChainedOntoRequestsWithoutConcurrencyLimit()
+    {
+        $this->factory->fake(['*' => $this->factory::response('hello', 200)]);
+
+        $results = $this->factory->pool(function (Pool $pool) {
+            $pool->as('first')->get('http://foo.com')->then(
+                fn (Response $response) => $response->status()
+            );
+
+            $pool->as('second')->get('http://foo.com');
+        }, null);
+
+        $this->assertSame(200, $results['first']);
+        $this->assertSame(200, $results['second']->status());
+    }
+
     public function testClientCanBeSet()
     {
         $client = $this->factory->buildClient();
