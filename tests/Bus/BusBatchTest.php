@@ -421,17 +421,112 @@ class BusBatchTest extends TestCase
         $batch->recordFailedJob('test-id', new RuntimeException('Something went wrong.'));
         $batch->recordFailedJob('test-id', new RuntimeException('Something else went wrong.'));
 
-        // While allowing failures this batch never actually completes...
         $this->assertFalse(isset($_SERVER['__then.batch']));
 
         $batch = $batch->fresh();
         $this->assertEquals(2, $batch->pendingJobs);
         $this->assertEquals(2, $batch->failedJobs);
-        $this->assertFalse($batch->finished());
+        $this->assertTrue($batch->finished());
         $this->assertFalse($batch->cancelled());
         $this->assertEquals(1, $_SERVER['__catch.count']);
         $this->assertEquals(2, $_SERVER['__progress.count']);
+        $this->assertEquals(1, $_SERVER['__finally.count']);
+        $this->assertTrue($_SERVER['__finally.batch']->finished());
         $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
+    }
+
+    #[DataProvider('batchJobFailures')]
+    public function test_batches_allowing_failures_finish_when_all_jobs_have_run(array $failures, bool $withFinallyCallback)
+    {
+        $events = new EventFake(new EventsDispatcher);
+        Container::getInstance()->instance(EventDispatcher::class, $events);
+
+        $queue = new QueueFake(Container::getInstance());
+        $batch = $this->createTestBatch($queue, true, $withFinallyCallback);
+        $batch = $batch->add(array_map(fn () => new SecondTestJob, $failures));
+
+        $failedJobIds = [];
+
+        foreach ($failures as $index => $fails) {
+            $this->assertFalse($batch->fresh()->finished());
+            $this->assertEquals(0, $_SERVER['__finally.count']);
+            $events->assertNotDispatched(BatchFinished::class);
+
+            $jobId = 'test-id-'.$index;
+
+            if ($fails) {
+                $failedJobIds[] = $jobId;
+                $batch->recordFailedJob($jobId, new RuntimeException('Something went wrong.'));
+            } else {
+                $batch->recordSuccessfulJob($jobId);
+            }
+        }
+
+        $batch = $batch->fresh();
+
+        $this->assertTrue($batch->finished());
+        $this->assertFalse($batch->cancelled());
+        $this->assertEquals(count($failedJobIds), $batch->pendingJobs);
+        $this->assertEquals(count($failedJobIds), $batch->failedJobs);
+        $this->assertSame($failedJobIds, $batch->failedJobIds);
+        $this->assertEquals(count($failures), $_SERVER['__progress.count']);
+        $this->assertEquals(1, $_SERVER['__catch.count']);
+        $this->assertEquals(0, $_SERVER['__then.count']);
+        $this->assertEquals($withFinallyCallback ? 1 : 0, $_SERVER['__finally.count']);
+
+        if ($withFinallyCallback) {
+            $this->assertTrue($_SERVER['__finally.batch']->finished());
+        }
+
+        $events->assertDispatchedOnce(BatchStarted::class);
+        $events->assertDispatchedOnce(BatchFinished::class);
+        $events->assertDispatched(BatchFinished::class, function ($event) use ($batch) {
+            return $event->batch->id === $batch->id
+                && $event->batch->finished()
+                && $event->batch->pendingJobs === $batch->pendingJobs
+                && $event->batch->failedJobs === $batch->failedJobs;
+        });
+    }
+
+    public static function batchJobFailures()
+    {
+        return [
+            'all jobs fail with finally callback' => [[true, true], true],
+            'all jobs fail without finally callback' => [[true, true], false],
+            'last job succeeds with finally callback' => [[true, false], true],
+            'last job succeeds without finally callback' => [[true, false], false],
+            'last job fails with finally callback' => [[false, true], true],
+            'last job fails without finally callback' => [[false, true], false],
+        ];
+    }
+
+    public function test_failed_jobs_can_be_retried_after_a_batch_allowing_failures_finishes()
+    {
+        $queue = new QueueFake(Container::getInstance());
+        $batch = $this->createTestBatch($queue, true);
+        $batch = $batch->add([new SecondTestJob, new SecondTestJob]);
+
+        $batch->recordFailedJob('test-id-1', new RuntimeException('Something went wrong.'));
+        $batch->recordSuccessfulJob('test-id-2');
+
+        $batch = $batch->fresh();
+
+        $this->assertTrue($batch->finished());
+        $this->assertEquals(1, $batch->pendingJobs);
+        $this->assertSame(['test-id-1'], $batch->failedJobIds);
+        $this->assertEquals(0, $_SERVER['__then.count']);
+        $this->assertEquals(1, $_SERVER['__finally.count']);
+
+        $batch->recordSuccessfulJob('test-id-1');
+
+        $batch = $batch->fresh();
+
+        $this->assertTrue($batch->finished());
+        $this->assertFalse($batch->cancelled());
+        $this->assertEquals(0, $batch->pendingJobs);
+        $this->assertSame([], $batch->failedJobIds);
+        $this->assertEquals(1, $_SERVER['__then.count']);
+        $this->assertEquals(1, $_SERVER['__finally.count']);
     }
 
     public function test_pending_batch_filters_out_falsy_jobs()
@@ -762,7 +857,7 @@ class BusBatchTest extends TestCase
         ];
     }
 
-    protected function createTestBatch($queue, $allowFailures = false)
+    protected function createTestBatch($queue, $allowFailures = false, $withFinallyCallback = true)
     {
         $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
 
@@ -780,13 +875,16 @@ class BusBatchTest extends TestCase
                 $_SERVER['__catch.exception'] = $e;
                 $_SERVER['__catch.count']++;
             })
-            ->finally(function (Batch $batch) {
-                $_SERVER['__finally.batch'] = $batch;
-                $_SERVER['__finally.count']++;
-            })
             ->allowFailures($allowFailures)
             ->onConnection('test-connection')
             ->onQueue('test-queue');
+
+        if ($withFinallyCallback) {
+            $pendingBatch->finally(function (Batch $batch) {
+                $_SERVER['__finally.batch'] = $batch;
+                $_SERVER['__finally.count']++;
+            });
+        }
 
         return $repository->store($pendingBatch);
     }

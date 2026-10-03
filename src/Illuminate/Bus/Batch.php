@@ -250,14 +250,8 @@ class Batch implements Arrayable, JsonSerializable
             $this->invokeCallbacks('progress');
         }
 
-        if ($counts->pendingJobs === 0) {
-            $this->repository->markAsFinished($this->id);
-
-            $container = Container::getInstance();
-
-            if ($container->bound(Dispatcher::class)) {
-                $container->make(Dispatcher::class)->dispatch(new BatchFinished($this->fresh() ?? $this));
-            }
+        if ($counts->pendingJobs === 0 || ($this->allowsFailures() && $counts->allJobsHaveRanExactlyOnce())) {
+            $this->markAsFinished();
         }
 
         if ($counts->pendingJobs === 0 && $this->hasThenCallbacks()) {
@@ -288,6 +282,20 @@ class Batch implements Arrayable, JsonSerializable
 
         foreach ($this->options[$type] ?? [] as $handler) {
             $this->invokeHandlerCallback($handler, $batch, $e);
+        }
+    }
+
+    /**
+     * Mark the batch as finished and dispatch the finished event.
+     */
+    protected function markAsFinished(): void
+    {
+        $this->repository->markAsFinished($this->id);
+
+        $container = Container::getInstance();
+
+        if ($container->bound(Dispatcher::class)) {
+            $container->make(Dispatcher::class)->dispatch(new BatchFinished($this->fresh() ?? $this));
         }
     }
 
@@ -375,6 +383,10 @@ class Batch implements Arrayable, JsonSerializable
 
         if ($counts->failedJobs === 1 && $this->hasCatchCallbacks()) {
             $this->invokeCallbacks('catch', $e);
+        }
+
+        if ($this->allowsFailures() && $counts->allJobsHaveRanExactlyOnce()) {
+            $this->markAsFinished();
         }
 
         if ($counts->allJobsHaveRanExactlyOnce() && $this->hasFinallyCallbacks()) {
