@@ -274,12 +274,15 @@ class WorkCommandTest extends QueueTestCase
         Queue::push(new FirstJob);
         Queue::push(new SecondJob);
 
+        $connection = config('queue.default');
+
         $this->artisan('queue:work', [
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--memory' => 1,
+            '--queue' => 'high,default',
             '--json' => true,
-        ])->expectsOutputToContain('"status":"stopped","reason":"memory","exit_code":12')
+        ])->expectsOutputToContain('"connection":"'.$connection.'","queue":"high,default","status":"stopped","reason":"memory","exit_code":12')
             ->assertExitCode(12);
     }
 }
