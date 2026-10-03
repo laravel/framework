@@ -2,10 +2,12 @@
 
 namespace Illuminate\Bus;
 
+use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
 use Throwable;
@@ -63,6 +65,7 @@ class ChainedBatch implements ShouldQueue
             is_array($job) => static::prepareNestedBatches(new Collection($job))->all(),
             $job instanceof Collection => static::prepareNestedBatches($job),
             $job instanceof PendingBatch => new ChainedBatch($job),
+            $job instanceof Closure => CallQueuedClosure::create($job),
             default => $job,
         });
     }
