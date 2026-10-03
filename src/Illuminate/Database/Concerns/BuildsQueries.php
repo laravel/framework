@@ -487,9 +487,6 @@ trait BuildsQueries
         $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
 
         if (! is_null($cursor)) {
-            // Reset the union bindings so we can add the cursor where in the correct position...
-            $this->setBindings([], 'union');
-
             $addCursorConditions = function (self $builder, $previousColumn, $originalColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
                 $unionBuilders = $builder->getUnionBuilders();
 
@@ -508,8 +505,6 @@ trait BuildsQueries
                             '=',
                             $cursor->parameter($previousColumn)
                         );
-
-                        $this->addBinding($unionBuilder->getRawBindings()['where'], 'union');
                     });
                 }
 
@@ -531,10 +526,8 @@ trait BuildsQueries
                     }
 
                     $unionBuilders->each(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
-                        $unionWheres = $unionBuilder->getRawBindings()['where'];
-
                         $originalColumn = $this->getOriginalColumnNameForCursorPagination($unionBuilder, $column);
-                        $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions, $originalColumn, $unionWheres) {
+                        $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions, $originalColumn) {
                             $unionBuilder->where(
                                 $originalColumn,
                                 $direction === 'asc' ? '>' : '<',
@@ -546,15 +539,19 @@ trait BuildsQueries
                                     $addCursorConditions($fourthBuilder, $column, $originalColumn, $i + 1);
                                 });
                             }
-
-                            $this->addBinding($unionWheres, 'union');
-                            $this->addBinding($unionBuilder->getRawBindings()['where'], 'union');
                         });
                     });
                 });
             };
 
             $addCursorConditions($this, null, null, 0);
+
+            // The cursor constraints were added to the union queries, so their bindings need to be collected again...
+            $this->setBindings([], 'union');
+
+            $this->getUnionBuilders()->each(function ($unionBuilder) {
+                $this->addBinding($unionBuilder->getBindings(), 'union');
+            });
         }
 
         $this->limit($perPage + 1);
