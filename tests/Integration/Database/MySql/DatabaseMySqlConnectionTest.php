@@ -146,6 +146,17 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
         ];
     }
 
+    public function testWhereJsonOverlapsWithPath()
+    {
+        DB::table(self::TABLE)->insert([
+            [self::JSON_COL => '{"languages":["en","de"]}'],
+            [self::JSON_COL => '{"languages":["fr"]}'],
+        ]);
+
+        $this->assertSame(1, DB::table(self::TABLE)->whereJsonOverlaps(self::JSON_COL.'->languages', ['en', 'es'])->count());
+        $this->assertSame(1, DB::table(self::TABLE)->whereJsonDoesntOverlap(self::JSON_COL.'->languages', ['en', 'es'])->count());
+    }
+
     public function testLastInsertIdIsPreserved()
     {
         if (! Schema::hasTable('auto_id_table')) {
