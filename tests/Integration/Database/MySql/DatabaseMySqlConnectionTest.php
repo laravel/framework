@@ -6,6 +6,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -146,6 +147,7 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
         ];
     }
 
+    #[RequiresDatabase('mysql', '>=8.0.17')]
     public function testWhereJsonOverlapsWithPath()
     {
         DB::table(self::TABLE)->insert([
