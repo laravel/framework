@@ -22,6 +22,7 @@ class EloquentHasManyTest extends DatabaseTestCase
             $table->id();
             $table->foreignId('eloquent_has_many_test_user_id');
             $table->string('title')->unique();
+            $table->integer('views')->default(0);
             $table->timestamps();
         });
 
@@ -85,6 +86,21 @@ class EloquentHasManyTest extends DatabaseTestCase
             $this->assertTrue($post1->is($post2));
         });
 
+        $this->assertCount(1, $user->posts()->get());
+    }
+
+    public function testIncrementOrCreate()
+    {
+        $user = EloquentHasManyTestUser::create();
+
+        $post1 = $user->posts()->incrementOrCreate(['title' => 'foo'], 'views');
+        $post2 = $user->posts()->incrementOrCreate(['title' => 'foo'], 'views');
+
+        $this->assertTrue($post1->is($post2));
+        $this->assertTrue($post1->wasRecentlyCreated);
+        $this->assertFalse($post2->wasRecentlyCreated);
+        $this->assertEquals($user->id, $post2->eloquent_has_many_test_user_id);
+        $this->assertEquals(2, $post2->fresh()->views);
         $this->assertCount(1, $user->posts()->get());
     }
 
