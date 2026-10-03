@@ -6969,6 +6969,54 @@ SQL;
         ]), $result);
     }
 
+    public function testCursorPaginateWithUnionSelectAndJoinBindings()
+    {
+        $ts = Carbon::now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['created_at' => $ts]);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'created_at')->selectRaw('? as type', ['video'])->from('videos');
+        $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw('? as type', ['news'])->from('news')->join('authors', function ($join) {
+            $join->on('authors.id', '=', 'news.author_id')->where('authors.active', true);
+        }));
+        $builder->orderBy('created_at');
+
+        $builder->expects('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
+        ]);
+
+        $builder->expects('get')->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertSame(
+                '(select "id", "created_at", ? as type from "videos" where ("created_at" > ?)) union (select "id", "created_at", ? as type from "news" inner join "authors" on "authors"."id" = "news"."author_id" and "authors"."active" = ? where ("created_at" > ?)) order by "created_at" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals(['video', $ts, 'news', true, $ts], $builder->getBindings());
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['created_at'],
+        ]), $result);
+    }
+
     public function testCursorPaginateWithMultipleUnionsAndMultipleWheres()
     {
         $ts = Carbon::now()->toDateTimeString();
