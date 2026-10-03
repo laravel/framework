@@ -301,7 +301,11 @@ class MySqlGrammar extends Grammar
     {
         [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
-        return 'json_overlaps('.$field.', '.$value.$path.')';
+        if ($path !== '') {
+            $field = 'json_extract('.$field.$path.')';
+        }
+
+        return 'json_overlaps('.$field.', '.$value.')';
     }
 
     /**
