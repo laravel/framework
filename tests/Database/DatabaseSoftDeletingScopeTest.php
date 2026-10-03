@@ -54,6 +54,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $values = ['email' => 'bar'];
         $model = Mockery::mock(Model::class);
         $givenBuilder->expects('firstOrCreate')->with($attributes, $values)->andReturn($model);
+        $model->expects('trashed')->andReturn(true);
         $model->expects('restore')->andReturn(true);
         $result = $callback($givenBuilder, $attributes, $values);
 
@@ -78,6 +79,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $values = ['email' => 'bar'];
         $model = Mockery::mock(Model::class);
         $givenBuilder->expects('createOrFirst')->with($attributes, $values)->andReturn($model);
+        $model->expects('trashed')->andReturn(true);
         $model->expects('restore')->andReturn(true);
         $result = $callback($givenBuilder, $attributes, $values);
 

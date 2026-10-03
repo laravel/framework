@@ -91,7 +91,9 @@ class SoftDeletingScope implements Scope
             $builder->withTrashed();
 
             return tap($builder->firstOrCreate($attributes, $values), function ($instance) {
-                $instance->restore();
+                if ($instance->trashed()) {
+                    $instance->restore();
+                }
             });
         });
     }
@@ -108,7 +110,9 @@ class SoftDeletingScope implements Scope
             $builder->withTrashed();
 
             return tap($builder->createOrFirst($attributes, $values), function ($instance) {
-                $instance->restore();
+                if ($instance->trashed()) {
+                    $instance->restore();
+                }
             });
         });
     }
