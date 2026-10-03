@@ -8087,6 +8087,29 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->messages()->has('users..invite_code'));
     }
 
+    public function testValidateImplicitEachWithAsterisksRequiredIfAndPercentSign()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [
+            'items' => [
+                ['unit' => '%'],
+                ['unit' => 'fixed'],
+            ],
+        ], ['items.*.max' => ['Required_if:items.*.unit,%']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('items.0.max'));
+        $this->assertFalse($v->messages()->has('items.1.max'));
+
+        $v = new Validator($trans, [
+            'items' => [
+                ['unit' => '%off'],
+            ],
+        ], ['items.*.max' => ['Required_if:items.*.unit,%off']]);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('items.0.max'));
+    }
+
     public function testValidateImplicitEachWithAsterisksRequiredUnless()
     {
         $trans = $this->getIlluminateArrayTranslator();
