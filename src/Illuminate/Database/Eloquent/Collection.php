@@ -306,7 +306,9 @@ class Collection extends BaseCollection implements QueueableCollection
             $models = $models->collapse();
         }
 
-        $this->loadMissingRelation(new static($models), $path);
+        $models->groupBy(fn ($model) => $model::class)->each(
+            fn ($models) => $this->loadMissingRelation(new static($models), $path)
+        );
     }
 
     /**
