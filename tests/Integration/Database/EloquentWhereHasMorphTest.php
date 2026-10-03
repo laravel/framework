@@ -32,6 +32,11 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
             $table->softDeletes();
         });
 
+        Schema::create('likes', function (Blueprint $table) {
+            $table->increments('id');
+            $table->morphs('likeable');
+        });
+
         $models = [];
 
         $models[] = Post::create(['title' => 'foo']);
@@ -171,6 +176,16 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         $this->assertEquals([1], $comments->pluck('id')->all());
     }
 
+    public function testWhereHasMorphWithTrashed()
+    {
+        Like::create(['likeable_type' => Post::class, 'likeable_id' => 1]);
+        Like::create(['likeable_type' => Post::class, 'likeable_id' => 3]);
+
+        $this->assertEquals([1, 2], Like::has('likeableWithTrashed')->orderBy('id')->pluck('id')->all());
+        $this->assertEquals([1, 2], Like::whereHasMorph('likeableWithTrashed', Post::class)->orderBy('id')->pluck('id')->all());
+        $this->assertEquals([1], Like::has('likeable')->pluck('id')->all());
+    }
+
     public function testHasMorph()
     {
         $comments = Comment::hasMorph('commentable', Post::class)->orderBy('id')->get();
@@ -305,6 +320,23 @@ class Comment extends Model
     public function commentableWithOwnerKey()
     {
         return $this->morphTo('commentable', null, null, 'slug');
+    }
+}
+
+class Like extends Model
+{
+    public $timestamps = false;
+
+    protected $guarded = [];
+
+    public function likeable()
+    {
+        return $this->morphTo();
+    }
+
+    public function likeableWithTrashed()
+    {
+        return $this->morphTo('likeable')->withTrashed();
     }
 }
 

@@ -315,6 +315,8 @@ trait QueriesRelationships
             );
         });
 
+        $relation->replayMacros($belongsTo->getQuery());
+
         $belongsTo->getQuery()->mergeConstraintsFrom($relation->getQuery());
 
         return $belongsTo;
