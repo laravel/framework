@@ -190,8 +190,8 @@ class CompiledRouteCollection extends AbstractRouteCollection
      * as the ones found by scanning every cached route, in which case the routes should be scanned.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  array  $allowedMethods
-     * @return array
+     * @param  string[]  $allowedMethods
+     * @return string[]
      */
     protected function alternateVerbsFromCompiledMatcher(Request $request, array $allowedMethods)
     {
