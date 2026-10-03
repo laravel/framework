@@ -331,6 +331,52 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertNull($users->find(2)->deleted_at);
     }
 
+    public function testRestoreOrCreateOnlyRestoresTrashedModels()
+    {
+        $this->assertOnlyTrashedModelsAreRestored('restoreOrCreate');
+    }
+
+    public function testCreateOrRestoreOnlyRestoresTrashedModels()
+    {
+        $this->assertOnlyTrashedModelsAreRestored('createOrRestore');
+    }
+
+    protected function assertOnlyTrashedModelsAreRestored(string $method)
+    {
+        $previousDispatcher = Eloquent::getEventDispatcher();
+
+        Eloquent::setEventDispatcher(new Dispatcher);
+
+        try {
+            $this->createUsers();
+
+            $restored = [];
+
+            SoftDeletesTestUser::restored(function ($user) use (&$restored) {
+                $restored[] = $user->email;
+            });
+
+            $taylor = SoftDeletesTestUser::$method(['email' => 'taylorotwell@gmail.com']);
+            $abigail = SoftDeletesTestUser::$method(['email' => 'abigailotwell@gmail.com']);
+            $new = SoftDeletesTestUser::$method(['email' => 'new@laravel.com']);
+
+            $this->assertFalse($taylor->trashed());
+            $this->assertFalse($abigail->trashed());
+            $this->assertTrue($new->wasRecentlyCreated);
+            $this->assertFalse($new->isDirty());
+            $this->assertSame(['taylorotwell@gmail.com'], $restored);
+            $this->assertCount(3, SoftDeletesTestUser::all());
+        } finally {
+            SoftDeletesTestUser::flushEventListeners();
+
+            if ($previousDispatcher) {
+                Eloquent::setEventDispatcher($previousDispatcher);
+            } else {
+                Eloquent::unsetEventDispatcher();
+            }
+        }
+    }
+
     public function testRestoreDoesNotFireRestoredEventWhenSavingEventCancelsSave()
     {
         $previousDispatcher = Eloquent::getEventDispatcher();
