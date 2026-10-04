@@ -391,6 +391,46 @@ class NotificationMailMessageTest extends TestCase
         ], $mailMessage->rawAttachments[0]);
     }
 
+    public function testItCanJitNameAttachments()
+    {
+        $mailMessage = new MailMessage;
+        $unnamedAttachable = new class() implements Attachable
+        {
+            public function toMailAttachment()
+            {
+                return Attachment::fromData(fn () => 'bar')->withMime('image/png');
+            }
+        };
+
+        $mailMessage->attach($unnamedAttachable, ['as' => 'foo.jpg']);
+
+        $this->assertSame([
+            'data' => 'bar',
+            'name' => 'foo.jpg',
+            'options' => [
+                'mime' => 'image/png',
+            ],
+        ], $mailMessage->rawAttachments[0]);
+    }
+
+    public function testAttachOptionsOverrideAttachmentProperties()
+    {
+        $mailMessage = new MailMessage;
+
+        $mailMessage->attach(Attachment::fromPath('/foo.jpg')->as('bar')->withMime('image/png'), [
+            'as' => 'baz.jpg',
+            'mime' => 'image/jpeg',
+        ]);
+
+        $this->assertSame([
+            'file' => '/foo.jpg',
+            'options' => [
+                'as' => 'baz.jpg',
+                'mime' => 'image/jpeg',
+            ],
+        ], $mailMessage->attachments[0]);
+    }
+
     public function testItAttachesManyFiles()
     {
         $mailMessage = new MailMessage();

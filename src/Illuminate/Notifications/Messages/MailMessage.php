@@ -270,7 +270,7 @@ class MailMessage extends SimpleMessage implements Renderable
         }
 
         if ($file instanceof Attachment) {
-            return $file->attachTo($this);
+            return $file->attachTo($this, $options);
         }
 
         $this->attachments[] = ['file' => $file, 'options' => $options];
