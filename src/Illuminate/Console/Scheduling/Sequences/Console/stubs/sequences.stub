@@ -1,0 +1,76 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('scheduled_sequences', function (Blueprint $table) {
+            $table->id();
+            $table->string('definition');
+            $table->string('entity_type');
+            $table->string('entity_id');
+            $table->index(['entity_type', 'entity_id']);
+            $table->unsignedInteger('revision')->default(1);
+            $table->string('status')->default('active');
+            $table->dateTime('starts_at');
+            $table->string('timezone')->default('UTC');
+            $table->json('offsets');
+            $table->unsignedInteger('repeat_seconds')->nullable();
+            $table->unsignedBigInteger('next_number')->default(0);
+            $table->dateTime('next_at')->nullable();
+            $table->dateTime('cancelled_at')->nullable();
+            $table->text('last_error')->nullable();
+            $table->index(['status', 'next_at']);
+            $table->timestamps();
+        });
+
+        Schema::create('scheduled_occurrences', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('sequence_id')->constrained('scheduled_sequences')->cascadeOnDelete();
+            $table->unsignedInteger('revision');
+            $table->unsignedBigInteger('number');
+            $table->unique(['sequence_id', 'revision', 'number'], 'occurrence_identity');
+            $table->dateTime('scheduled_at');
+            $table->string('status')->default('pending')->index();
+            $table->unsignedInteger('attempts')->default(0);
+            $table->uuid('claim_token')->nullable();
+            $table->dateTime('lease_until')->nullable();
+            $table->dateTime('started_at')->nullable();
+            $table->dateTime('finished_at')->nullable();
+            $table->text('last_error')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('schedule_outbox', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('occurrence_id')->unique()->constrained('scheduled_occurrences')->cascadeOnDelete();
+            $table->string('connection');
+            $table->string('queue');
+            $table->dateTime('available_at');
+            $table->uuid('claim_token')->nullable();
+            $table->dateTime('lease_until')->nullable();
+            $table->dateTime('published_at')->nullable();
+            $table->unsignedInteger('attempts')->default(0);
+            $table->text('last_error')->nullable();
+            $table->index(['published_at', 'available_at']);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('schedule_outbox');
+        Schema::dropIfExists('scheduled_occurrences');
+        Schema::dropIfExists('scheduled_sequences');
+    }
+};

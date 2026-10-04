@@ -17,6 +17,14 @@ use Illuminate\Console\Scheduling\ScheduleResumeCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Console\Scheduling\ScheduleTestCommand;
 use Illuminate\Console\Scheduling\ScheduleWorkCommand;
+use Illuminate\Console\Scheduling\Sequences\Console\CancelSequencesCommand;
+use Illuminate\Console\Scheduling\Sequences\Console\ListSequencesCommand;
+use Illuminate\Console\Scheduling\Sequences\Console\PublishSequencesCommand;
+use Illuminate\Console\Scheduling\Sequences\Console\RescheduleSequencesCommand;
+use Illuminate\Console\Scheduling\Sequences\Console\RetrySequencesCommand;
+use Illuminate\Console\Scheduling\Sequences\Console\RunSequencesCommand;
+use Illuminate\Console\Scheduling\Sequences\Console\SequencesTableCommand;
+use Illuminate\Console\Scheduling\Sequences\Console\ShowSequencesCommand;
 use Illuminate\Console\Signals;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Console\DbCommand;
@@ -181,6 +189,13 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ScheduleInterrupt' => ScheduleInterruptCommand::class,
         'SchedulePause' => SchedulePauseCommand::class,
         'ScheduleResume' => ScheduleResumeCommand::class,
+        'SequencesCancel' => CancelSequencesCommand::class,
+        'SequencesList' => ListSequencesCommand::class,
+        'SequencesPublish' => PublishSequencesCommand::class,
+        'SequencesReschedule' => RescheduleSequencesCommand::class,
+        'SequencesRetry' => RetrySequencesCommand::class,
+        'SequencesRun' => RunSequencesCommand::class,
+        'SequencesShow' => ShowSequencesCommand::class,
         'ShowModel' => ShowModelCommand::class,
         'StorageLink' => StorageLinkCommand::class,
         'StorageUnlink' => StorageUnlinkCommand::class,
@@ -236,6 +251,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'RuleMake' => RuleMakeCommand::class,
         'ScopeMake' => ScopeMakeCommand::class,
         'SeederMake' => SeederMakeCommand::class,
+        'SequencesTable' => SequencesTableCommand::class,
         'SessionTable' => SessionTableCommand::class,
         'Serve' => ServeCommand::class,
         'StubPublish' => StubPublishCommand::class,
