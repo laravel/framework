@@ -473,7 +473,7 @@ class FilesystemManager implements FactoryContract
     /**
      * Unset the given disk instances.
      *
-     * @param  array|\UnitEnum|string  $disk
+     * @param  array<\UnitEnum|string>|\UnitEnum|string  $disk
      * @return $this
      */
     public function forgetDisk($disk)
