@@ -212,6 +212,40 @@ class FilesystemManagerTest extends TestCase
         rmdir(__DIR__.'/../../my-custom-path');
     }
 
+    public function testCanSetDiskUsingEnum()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $filesystem->set(FilesystemManagerTestDisk::Local, $disk = new stdClass);
+
+        $this->assertSame($disk, $filesystem->disk('local'));
+    }
+
+    public function testCanForgetDiskUsingEnum()
+    {
+        $filesystem = $this->filesystemManagerWithLocalDisks();
+        $filesystem->set('local', $local = new stdClass);
+        $filesystem->set('backup', $backup = new stdClass);
+
+        $filesystem->forgetDisk(FilesystemManagerTestDisk::Local);
+
+        $this->assertNotSame($local, $filesystem->disk('local'));
+        $this->assertSame($backup, $filesystem->disk('backup'));
+
+        $filesystem->forgetDisk([FilesystemManagerTestDisk::Backup]);
+
+        $this->assertNotSame($backup, $filesystem->disk('backup'));
+    }
+
+    public function testCanPurgeDiskUsingEnum()
+    {
+        $filesystem = $this->filesystemManagerWithLocalDisks();
+        $filesystem->set('local', $local = new stdClass);
+
+        $filesystem->purge(FilesystemManagerTestDisk::Local);
+
+        $this->assertNotSame($local, $filesystem->disk('local'));
+    }
+
     public function testCanBuildLocalDisksThatLazilyCreateTheirRootDirectory()
     {
         $filesystem = new FilesystemManager(new Application);
@@ -802,6 +836,22 @@ class FilesystemManagerTest extends TestCase
         }));
     }
 
+    protected function filesystemManagerWithLocalDisks(): FilesystemManager
+    {
+        return new FilesystemManager(tap(new Application, function ($app) {
+            $app['config'] = [
+                'filesystems.disks.local' => [
+                    'driver' => 'local',
+                    'root' => $this->temporaryDirectory('local'),
+                ],
+                'filesystems.disks.backup' => [
+                    'driver' => 'local',
+                    'root' => $this->temporaryDirectory('backup'),
+                ],
+            ];
+        }));
+    }
+
     protected function temporaryDirectory(string $name): string
     {
         return $this->temporaryDirectories[] = sys_get_temp_dir().'/laravel-disk-'.$name.'-'.uniqid();
@@ -818,4 +868,10 @@ class CustomFilesystemDriver
     {
         return $this->driver;
     }
+}
+
+enum FilesystemManagerTestDisk: string
+{
+    case Local = 'local';
+    case Backup = 'backup';
 }
