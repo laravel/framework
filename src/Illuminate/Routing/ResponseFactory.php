@@ -164,7 +164,7 @@ class ResponseFactory implements FactoryContract
                     }
 
                     echo "event: $event\n";
-                    echo 'data: '.$message;
+                    echo $this->formatEventStreamData($message);
                     echo "\n\n";
 
                     if (ob_get_level() > 0) {
@@ -183,7 +183,7 @@ class ResponseFactory implements FactoryContract
                     }
 
                     echo "event: $endEvent\n";
-                    echo 'data: '.$endStreamWith;
+                    echo $this->formatEventStreamData($endStreamWith);
                     echo "\n\n";
 
                     if (ob_get_level() > 0) {
@@ -200,6 +200,20 @@ class ResponseFactory implements FactoryContract
             'Cache-Control' => 'no-cache',
             'X-Accel-Buffering' => 'no',
         ]));
+    }
+
+    /**
+     * Format the given data as event stream "data" lines.
+     *
+     * @param  string|int|float  $data
+     * @return string
+     */
+    protected function formatEventStreamData($data)
+    {
+        return implode("\n", array_map(
+            fn ($line) => 'data: '.$line,
+            preg_split('/\r\n|\r|\n/', (string) $data)
+        ));
     }
 
     /**
