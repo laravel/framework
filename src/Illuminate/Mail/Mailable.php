@@ -1074,7 +1074,7 @@ class Mailable implements MailableContract, Renderable
      */
     private function hasEnvelopeAttachment($attachment, $options = [])
     {
-        if (! method_exists($this, 'envelope')) {
+        if (! method_exists($this, 'attachments')) {
             return false;
         }
 
