@@ -170,6 +170,17 @@ class Schedule
     }
 
     /**
+     * Schedule the discovery and publication of due sequence occurrences.
+     *
+     * @param  int  $limit
+     * @return \Illuminate\Console\Scheduling\Event
+     */
+    public function sequences($limit = 100)
+    {
+        return $this->command('sequences:run', ['--limit' => $limit]);
+    }
+
+    /**
      * Add a new Artisan command event to the schedule.
      *
      * @param  \Symfony\Component\Console\Command\Command|string  $command

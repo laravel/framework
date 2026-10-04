@@ -34,8 +34,9 @@
         "guzzlehttp/guzzle": "Required to use the ping methods on schedules (^7.8 || ^8.0).",
         "illuminate/bus": "Required to use the scheduled job dispatcher (^13.0).",
         "illuminate/container": "Required to use the scheduler (^13.0).",
+        "illuminate/database": "Required to persist scheduled sequences (^13.0).",
         "illuminate/filesystem": "Required to use the generator command (^13.0).",
-        "illuminate/queue": "Required to use closures for scheduled jobs (^13.0)."
+        "illuminate/queue": "Required to use closures for scheduled jobs and execute scheduled sequences (^13.0)."
     },
     "minimum-stability": "dev",
     "autoload": {
