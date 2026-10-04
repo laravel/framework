@@ -36,5 +36,4 @@ abstract class SequenceTestCase extends TestCase
 
         (require __DIR__.'/../../../../../src/Illuminate/Console/Scheduling/Sequences/Console/stubs/sequences.stub')->up();
     }
-
 }
