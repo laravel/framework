@@ -7,6 +7,7 @@ use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Mail\Mailer;
@@ -853,6 +854,43 @@ class MailMailableTest extends TestCase
         $this->assertFalse($mailable->hasAttachment($unnamedAttachable, ['as' => 'foo.jpg']));
         $this->assertFalse($mailable->hasAttachment($unnamedAttachable, ['mime' => 'image/png']));
         $this->assertTrue($mailable->hasAttachment($unnamedAttachable, ['as' => 'foo.jpg', 'mime' => 'image/png']));
+    }
+
+    public function testHasAttachmentWhenMailableHasEnvelopeButNoAttachmentsMethod(): void
+    {
+        $mailable = new class extends Mailable
+        {
+            public function envelope()
+            {
+                return new Envelope(subject: 'Invoice');
+            }
+        };
+
+        $mailable->attach(Attachment::fromPath('/path/to/invoice.pdf')->as('invoice.pdf'));
+
+        $this->assertTrue($mailable->hasAttachment(Attachment::fromPath('/path/to/invoice.pdf')->as('invoice.pdf')));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('/path/to/other.pdf')));
+    }
+
+    public function testHasAttachmentWhenMailableHasAttachmentsMethodButNoEnvelope(): void
+    {
+        $mailable = new class extends Mailable
+        {
+            public function content()
+            {
+                return new Content(htmlString: '<p>Invoice</p>');
+            }
+
+            public function attachments()
+            {
+                return [
+                    Attachment::fromPath('/path/to/invoice.pdf')->as('invoice.pdf'),
+                ];
+            }
+        };
+
+        $this->assertTrue($mailable->hasAttachment(Attachment::fromPath('/path/to/invoice.pdf')->as('invoice.pdf')));
+        $this->assertFalse($mailable->hasAttachment(Attachment::fromPath('/path/to/other.pdf')));
     }
 
     public function testItCanCheckForPathBasedAttachments(): void
