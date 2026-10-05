@@ -253,6 +253,75 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c->findOrFail(new BaseCollection([1, 3]));
     }
 
+    public function testFindFindsModelByEnum()
+    {
+        $model = (new TestEloquentCollectionStringKeyModel)->forceFill(['id' => 'draft']);
+        $c = new Collection([$model]);
+
+        $this->assertSame($model, $c->find(EloquentCollectionTestStringBackedEnum::Draft));
+        $this->assertNull($c->find(EloquentCollectionTestStringBackedEnum::Done));
+
+        $intModel = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
+        $intC = new Collection([$intModel]);
+
+        $this->assertSame($intModel, $intC->find(EloquentCollectionTestIntegerBackedEnum::Pending));
+        $this->assertNull($intC->find(EloquentCollectionTestIntegerBackedEnum::Done));
+    }
+
+    public function testFindFindsManyModelsByEnum()
+    {
+        $model1 = (new TestEloquentCollectionStringKeyModel)->forceFill(['id' => 'draft']);
+        $model2 = (new TestEloquentCollectionStringKeyModel)->forceFill(['id' => 'pending']);
+
+        $c = new Collection([$model1, $model2]);
+
+        $this->assertCount(2, $c->find([EloquentCollectionTestStringBackedEnum::Draft, EloquentCollectionTestStringBackedEnum::Pending]));
+        $this->assertCount(2, $c->find(new BaseCollection([EloquentCollectionTestStringBackedEnum::Draft, EloquentCollectionTestStringBackedEnum::Pending])));
+        $this->assertCount(1, $c->find([EloquentCollectionTestStringBackedEnum::Draft, EloquentCollectionTestStringBackedEnum::Done]));
+    }
+
+    public function testFindOrFailFindsModelByEnum()
+    {
+        $model = (new TestEloquentCollectionStringKeyModel)->forceFill(['id' => 'draft']);
+        $c = new Collection([$model]);
+
+        $this->assertSame($model, $c->findOrFail(EloquentCollectionTestStringBackedEnum::Draft));
+
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\TestEloquentCollectionStringKeyModel] done'));
+
+        $c->findOrFail(EloquentCollectionTestStringBackedEnum::Done);
+    }
+
+    public function testFindOrFailFindsManyModelsByEnum()
+    {
+        $model1 = (new TestEloquentCollectionStringKeyModel)->forceFill(['id' => 'draft']);
+        $model2 = (new TestEloquentCollectionStringKeyModel)->forceFill(['id' => 'pending']);
+
+        $c = new Collection([$model1, $model2]);
+
+        $this->assertCount(2, $c->findOrFail([EloquentCollectionTestStringBackedEnum::Draft, EloquentCollectionTestStringBackedEnum::Pending]));
+        $this->assertCount(2, $c->findOrFail(new BaseCollection([EloquentCollectionTestStringBackedEnum::Draft, EloquentCollectionTestStringBackedEnum::Pending])));
+
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\TestEloquentCollectionStringKeyModel] done'));
+
+        $c->findOrFail([EloquentCollectionTestStringBackedEnum::Draft, EloquentCollectionTestStringBackedEnum::Done]);
+    }
+
+    public function testContainsWithEnum()
+    {
+        $model = (new TestEloquentCollectionStringKeyModel)->forceFill(['id' => 'draft']);
+        $c = new Collection([$model]);
+
+        $this->assertTrue($c->contains(EloquentCollectionTestStringBackedEnum::Draft));
+        $this->assertFalse($c->contains(EloquentCollectionTestStringBackedEnum::Done));
+
+        $intModel = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
+        $intC = new Collection([$intModel]);
+
+        $this->assertTrue($intC->contains(EloquentCollectionTestIntegerBackedEnum::Pending));
+        $this->assertFalse($intC->contains(EloquentCollectionTestIntegerBackedEnum::Done));
+    }
+
     public function testFindOrFailThrowsExceptionWithMessageWhenOtherModelsArePresent()
     {
         $model = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
@@ -829,6 +898,12 @@ class TestEloquentCollectionModel extends Model
     }
 }
 
+class TestEloquentCollectionStringKeyModel extends Model
+{
+    protected $keyType = 'string';
+    public $incrementing = false;
+}
+
 class EloquentTestNonIncrementingModel extends Model
 {
     public $incrementing = false;
@@ -898,4 +973,18 @@ class EloquentAppendingTestUserModel extends Model
     {
         return $this->hasMany(EloquentTestArticleModel::class, 'user_id');
     }
+}
+
+enum EloquentCollectionTestStringBackedEnum: string
+{
+    case Draft = 'draft';
+    case Pending = 'pending';
+    case Done = 'done';
+}
+
+enum EloquentCollectionTestIntegerBackedEnum: int
+{
+    case Draft = 0;
+    case Pending = 1;
+    case Done = 2;
 }

@@ -10,6 +10,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @template TKey of array-key
  * @template TModel of \Illuminate\Database\Eloquent\Model
@@ -44,8 +46,10 @@ class Collection extends BaseCollection implements QueueableCollection
                 return new static;
             }
 
-            return $this->whereIn($this->first()->getKeyName(), $key);
+            return $this->whereIn($this->first()->getKeyName(), array_map(enum_value(...), $key));
         }
+
+        $key = enum_value($key);
 
         return Arr::first($this->items, fn ($model) => $model->getKey() == $key, $default);
     }
@@ -64,8 +68,12 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $key = $key instanceof Arrayable ? $key->toArray() : $key;
 
-        if (is_array($key) && count($result) === count(array_unique($key))) {
-            return $result;
+        if (is_array($key)) {
+            $key = array_map(enum_value(...), $key);
+
+            if (count($result) === count(array_unique($key))) {
+                return $result;
+            }
         } elseif (! is_array($key) && ! is_null($result)) {
             return $result;
         }
@@ -76,7 +84,7 @@ class Collection extends BaseCollection implements QueueableCollection
             throw $exception;
         }
 
-        $ids = is_array($key) ? array_diff($key, $result->modelKeys()) : $key;
+        $ids = is_array($key) ? array_diff($key, $result->modelKeys()) : enum_value($key);
 
         $exception->setModel(get_class($model), $ids);
 
@@ -364,6 +372,8 @@ class Collection extends BaseCollection implements QueueableCollection
         if ($key instanceof Model) {
             return parent::contains(fn ($model) => $model->is($key));
         }
+
+        $key = enum_value($key);
 
         return parent::contains(fn ($model) => $model->getKey() == $key);
     }
