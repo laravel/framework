@@ -1246,6 +1246,8 @@ trait HasAttributes
     {
         [$key, $path] = explode('->', $key, 2);
 
+        $this->mergeAttributeFromCachedCasts($key);
+
         $value = $this->asJson($this->getArrayAttributeWithValue(
             $path, $key, $value
         ), $this->getJsonCastFlags($key));
