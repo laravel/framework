@@ -28,12 +28,12 @@ class DatabaseEloquentComparesRelatedModelsTest extends TestCase
     #[DataProvider('comparisons')]
     public function testIsComparesKeysTableAndConnection(string $type, mixed $parentKey, mixed $relatedKey, string $table, string $connection, bool $expected)
     {
-        [$relation, $relatedKeyAttribute] = $this->newRelation($type, $parentKey);
+        [$relation, $relatedKeyAttribute, $relatedAttributes] = $this->newRelation($type, $parentKey);
 
         $model = (new ComparesRelatedModelsStub)
             ->setTable($table)
             ->setConnection($connection)
-            ->forceFill([$relatedKeyAttribute => $relatedKey]);
+            ->forceFill([$relatedKeyAttribute => $relatedKey, ...$relatedAttributes]);
 
         $this->assertSame($expected, $relation->is($model));
         $this->assertSame(! $expected, $relation->isNot($model));
@@ -70,7 +70,7 @@ class DatabaseEloquentComparesRelatedModelsTest extends TestCase
     }
 
     /**
-     * @return array{0: \Illuminate\Database\Eloquent\Relations\Relation, 1: string}
+     * @return array{0: \Illuminate\Database\Eloquent\Relations\Relation, 1: string, 2: array<string, mixed>}
      */
     protected function newRelation(string $type, mixed $parentKey): array
     {
@@ -79,10 +79,10 @@ class DatabaseEloquentComparesRelatedModelsTest extends TestCase
         $parent = new ComparesRelatedModelsStub;
 
         return match ($type) {
-            'HasOne' => [new HasOne($builder, $parent->forceFill(['id' => $parentKey]), 'foreign_key', 'id'), 'foreign_key'],
-            'MorphOne' => [new MorphOne($builder, $parent->forceFill(['id' => $parentKey]), 'morph_type', 'morph_id', 'id'), 'morph_id'],
-            'BelongsTo' => [new BelongsTo($builder, $parent->forceFill(['foreign_key' => $parentKey]), 'foreign_key', 'id', 'relation'), 'id'],
-            'MorphTo' => [new MorphTo($builder, $parent->forceFill(['foreign_key' => $parentKey]), 'foreign_key', 'id', 'morph_type', 'relation'), 'id'],
+            'HasOne' => [new HasOne($builder, $parent->forceFill(['id' => $parentKey]), 'foreign_key', 'id'), 'foreign_key', []],
+            'MorphOne' => [new MorphOne($builder, $parent->forceFill(['id' => $parentKey]), 'morph_type', 'morph_id', 'id'), 'morph_id', ['morph_type' => $parent->getMorphClass()]],
+            'BelongsTo' => [new BelongsTo($builder, $parent->forceFill(['foreign_key' => $parentKey]), 'foreign_key', 'id', 'relation'), 'id', []],
+            'MorphTo' => [new MorphTo($builder, $parent->forceFill(['foreign_key' => $parentKey]), 'foreign_key', 'id', 'morph_type', 'relation'), 'id', []],
         };
     }
 }

@@ -117,6 +117,10 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
      */
     protected function getRelatedKeyFrom(Model $model)
     {
+        if ($model->getAttribute($this->getMorphType()) !== $this->morphClass) {
+            return null;
+        }
+
         return $model->getAttribute($this->getForeignKeyName());
     }
 }
