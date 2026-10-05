@@ -753,7 +753,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * The application must be using the AuthenticateSession middleware.
      *
      * @param  string  $password
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return void
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
@@ -763,7 +763,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return;
         }
 
-        $result = $this->rehashUserPasswordForDeviceLogout($password);
+        $this->rehashUserPasswordForDeviceLogout($password);
 
         if ($this->recaller() ||
             $this->getCookieJar()->hasQueued($this->getRecallerName())) {
@@ -771,15 +771,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         }
 
         $this->fireOtherDeviceLogoutEvent($this->user());
-
-        return $result;
     }
 
     /**
      * Rehash the current user's password for logging out other devices via AuthenticateSession.
      *
      * @param  string  $password
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return void
      *
      * @throws \InvalidArgumentException
      */
