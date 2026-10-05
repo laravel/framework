@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
+use Illuminate\Database\Eloquent\Casts\AsHtmlString;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -84,6 +85,23 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             ],
             $model->array_object_json->toArray()
         );
+    }
+
+    public function test_as_html_string_is_serialized_as_string()
+    {
+        $model = new class extends Model
+        {
+            protected $casts = ['body' => AsHtmlString::class];
+        };
+
+        $model->body = '<b>Taylor</b>';
+
+        $this->assertSame(['body' => '<b>Taylor</b>'], $model->toArray());
+        $this->assertSame('{"body":"<b>Taylor<\\/b>"}', $model->toJson());
+
+        $model->body = null;
+
+        $this->assertSame(['body' => null], $model->toArray());
     }
 
     public function test_custom_casting_using_create()
