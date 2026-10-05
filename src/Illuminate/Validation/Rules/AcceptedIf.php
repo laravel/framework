@@ -8,6 +8,9 @@ class AcceptedIf implements Stringable
 {
     protected string $anotherField;
 
+    /**
+     * @var array<int, string|int|float|bool|null>
+     */
     protected array $values;
 
     public function __construct(string $anotherField, string|int|float|bool|null|array $values)
