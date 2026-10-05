@@ -18,12 +18,10 @@ class AcceptedIf implements Stringable
 
     public function __toString(): string
     {
-        $values = array_map(static fn ($value) => match (true) {
-            is_null($value) => 'null',
-            $value === true => 'true',
-            $value === false => 'false',
-            default => (string) $value,
-        }, $this->values);
+        $values = array_map(
+            static fn ($value) => is_string($value) ? $value : json_encode($value)),
+            $this->values,
+        );
 
         return 'accepted_if:'.$this->anotherField.','.implode(',', $values);
     }
