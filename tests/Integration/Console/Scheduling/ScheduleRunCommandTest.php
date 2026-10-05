@@ -12,6 +12,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use ReflectionMethod;
 use ReflectionProperty;
 
@@ -47,6 +48,46 @@ class ScheduleRunCommandTest extends TestCase
         Event::assertDispatched(ScheduledTaskFailed::class, function ($event) use ($task) {
             return $event->task === $task &&
                    $event->exception->getMessage() === 'Scheduled command [exit 1] failed with exit code [1].';
+        });
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function test_failing_command_in_foreground_triggers_event_on_laravel_cloud()
+    {
+        $_SERVER['LARAVEL_CLOUD'] = '1';
+
+        Event::fake([
+            ScheduledTaskStarting::class,
+            ScheduledTaskFinished::class,
+            ScheduledTaskFailed::class,
+        ]);
+
+        // Create a schedule and add the command
+        $schedule = $this->app->make(Schedule::class);
+        $task = $schedule->exec('exit 3')
+            ->everyMinute();
+
+        // Make sure it will run regardless of schedule
+        $task->when(function () {
+            return true;
+        });
+
+        try {
+            // Execute the scheduler
+            $this->artisan('schedule:run');
+        } finally {
+            unset($_SERVER['LARAVEL_CLOUD']);
+        }
+
+        // Verify the event sequence
+        Event::assertDispatched(ScheduledTaskStarting::class);
+        Event::assertDispatched(ScheduledTaskFinished::class);
+        Event::assertDispatched(ScheduledTaskFailed::class, function ($event) use ($task) {
+            return $event->task === $task &&
+                   $event->exception->getMessage() === 'Scheduled command [exit 3] failed with exit code [3].';
         });
     }
 
