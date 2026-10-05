@@ -7367,12 +7367,12 @@ SQL;
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereJsonOverlaps('users.options->languages', ['en', 'fr']);
-        $this->assertSame('select * from `users` where json_overlaps(`users`.`options`, ?, \'$."languages"\')', $builder->toSql());
+        $this->assertSame('select * from `users` where json_overlaps(json_extract(`users`.`options`, \'$."languages"\'), ?)', $builder->toSql());
         $this->assertEquals(['["en","fr"]'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonOverlaps('options->languages', new Raw("'[\"en\", \"fr\"]'"));
-        $this->assertSame('select * from `users` where `id` = ? or json_overlaps(`options`, \'["en", "fr"]\', \'$."languages"\')', $builder->toSql());
+        $this->assertSame('select * from `users` where `id` = ? or json_overlaps(json_extract(`options`, \'$."languages"\'), \'["en", "fr"]\')', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
 
@@ -7442,12 +7442,12 @@ SQL;
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereJsonDoesntOverlap('options->languages', ['en', 'fr']);
-        $this->assertSame('select * from `users` where not json_overlaps(`options`, ?, \'$."languages"\')', $builder->toSql());
+        $this->assertSame('select * from `users` where not json_overlaps(json_extract(`options`, \'$."languages"\'), ?)', $builder->toSql());
         $this->assertEquals(['["en","fr"]'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntOverlap('options->languages', new Raw("'[\"en\", \"fr\"]'"));
-        $this->assertSame('select * from `users` where `id` = ? or not json_overlaps(`options`, \'["en", "fr"]\', \'$."languages"\')', $builder->toSql());
+        $this->assertSame('select * from `users` where `id` = ? or not json_overlaps(json_extract(`options`, \'$."languages"\'), \'["en", "fr"]\')', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
 

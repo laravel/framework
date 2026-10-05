@@ -6,6 +6,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -144,6 +145,18 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
             'mixed keys' => [1, 'json_col->foo[1]->baz'],
             'null value' => [1, 'json_col->bar'],
         ];
+    }
+
+    #[RequiresDatabase('mysql', '>=8.0.17')]
+    public function testWhereJsonOverlapsWithPath()
+    {
+        DB::table(self::TABLE)->insert([
+            [self::JSON_COL => '{"languages":["en","de"]}'],
+            [self::JSON_COL => '{"languages":["fr"]}'],
+        ]);
+
+        $this->assertSame(1, DB::table(self::TABLE)->whereJsonOverlaps(self::JSON_COL.'->languages', ['en', 'es'])->count());
+        $this->assertSame(1, DB::table(self::TABLE)->whereJsonDoesntOverlap(self::JSON_COL.'->languages', ['en', 'es'])->count());
     }
 
     public function testLastInsertIdIsPreserved()
