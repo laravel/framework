@@ -43,6 +43,7 @@ use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 use Illuminate\View\Component;
+use Laravel\Prompts\Prompt;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Metadata\Annotation\Parser\Registry as PHPUnitRegistry;
@@ -209,6 +210,9 @@ trait InteractsWithTestCaseLifecycle
         Migrator::withoutMigrations([]);
         Once::flush();
         PreventRequestsDuringMaintenance::flushState();
+        if (method_exists(Prompt::class, 'flushState')) {
+            Prompt::flushState();
+        }
         Queue::createPayloadUsing(null);
         RegisterProviders::flushState();
         Response::flushState();
