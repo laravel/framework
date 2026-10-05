@@ -41,7 +41,7 @@ use RuntimeException;
  * @method static bool attemptWhen(array $credentials = [], array|callable|null $callbacks = null, bool $remember = false)
  * @method static string hashPasswordForCookie(string|null $passwordHash)
  * @method static void logoutCurrentDevice()
- * @method static \Illuminate\Contracts\Auth\Authenticatable|null logoutOtherDevices(string $password)
+ * @method static void logoutOtherDevices(string $password)
  * @method static void attempting(mixed $callback)
  * @method static \Illuminate\Contracts\Auth\Authenticatable getLastAttempted()
  * @method static string getName()
