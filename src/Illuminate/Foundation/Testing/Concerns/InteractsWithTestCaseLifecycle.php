@@ -210,9 +210,7 @@ trait InteractsWithTestCaseLifecycle
         Migrator::withoutMigrations([]);
         Once::flush();
         PreventRequestsDuringMaintenance::flushState();
-        if (method_exists(Prompt::class, 'flushState')) {
-            Prompt::flushState();
-        }
+        Prompt::flushState();
         Queue::createPayloadUsing(null);
         RegisterProviders::flushState();
         Response::flushState();
