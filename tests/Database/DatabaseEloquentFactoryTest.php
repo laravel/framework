@@ -960,6 +960,24 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(3, FactoryTestPost::count());
     }
 
+    public function test_recycled_models_do_not_leak_into_later_calls_on_the_same_factory()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+
+        $user = FactoryTestUserFactory::new()->create();
+
+        $factory = FactoryTestPostFactory::new()
+            ->has(FactoryTestCommentFactory::new()->count(2), 'comments');
+
+        $factory->recycle($user)->create();
+        $post = $factory->create();
+
+        $this->assertCount(2, $post->comments);
+        $this->assertNotContains($user->id, $post->comments->pluck('user_id'));
+    }
+
     public function test_no_models_can_be_provided_to_recycle()
     {
         Factory::guessFactoryNamesUsing(function ($model) {

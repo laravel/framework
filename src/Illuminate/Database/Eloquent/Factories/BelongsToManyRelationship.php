@@ -68,14 +68,16 @@ class BelongsToManyRelationship
      * Specify the model instances to always use when creating relationships.
      *
      * @param  \Illuminate\Support\Collection  $recycle
-     * @return $this
+     * @return static
      */
     public function recycle($recycle)
     {
+        $relationship = clone $this;
+
         if ($this->factory instanceof Factory) {
-            $this->factory = $this->factory->recycle($recycle);
+            $relationship->factory = $this->factory->recycle($recycle);
         }
 
-        return $this;
+        return $relationship;
     }
 }
