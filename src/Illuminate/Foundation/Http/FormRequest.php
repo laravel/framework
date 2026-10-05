@@ -232,7 +232,11 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         $allowedKeys = array_keys($this->validationRules());
 
-        $input = $this->isJson() ? $this->json()->all() : $this->request->all();
+        if ($this->method() !== 'GET' && $this->isJson()) {
+            $input = $this->json()->all();
+        } else {
+            $input = $this->request->all();
+        }
 
         foreach ($this->dotInputKeys($input) as $inputKey) {
             if (! $this->isKnownField($inputKey, $allowedKeys)) {
