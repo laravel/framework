@@ -127,6 +127,22 @@ class MemoizedTaggedCacheTest extends TestCase
         $this->assertNull($memoized);
     }
 
+    public function test_it_can_forget_multiple_memoized_values_with_tags()
+    {
+        Cache::tags(['foo', 'bar'])->put('name.0', 'Tim', 60);
+        Cache::tags(['foo', 'bar'])->put('name.1', 'Taylor', 60);
+
+        $memoized = Cache::memo()->tags(['foo', 'bar'])->get(['name.0', 'name.1']);
+        $this->assertSame(['name.0' => 'Tim', 'name.1' => 'Taylor'], $memoized);
+
+        $this->assertTrue(Cache::memo()->tags(['foo', 'bar'])->forget(['name.0', 'name.1']));
+
+        $live = Cache::tags(['foo', 'bar'])->get(['name.0', 'name.1']);
+        $memoized = Cache::memo()->tags(['foo', 'bar'])->get(['name.0', 'name.1']);
+        $this->assertSame(['name.0' => null, 'name.1' => null], $live);
+        $this->assertSame(['name.0' => null, 'name.1' => null], $memoized);
+    }
+
     public function test_it_can_increment_and_decrement_memoized_values_with_tags()
     {
         Cache::tags(['foo', 'bar'])->put('count', 1, 60);

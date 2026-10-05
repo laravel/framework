@@ -240,11 +240,15 @@ class MemoizedTaggedCache extends TaggedCache
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @return bool
      */
     public function forget($key)
     {
+        if (is_array($key)) {
+            return $this->deleteMultiple($key);
+        }
+
         $key = enum_value($key);
 
         unset($this->cache[$this->itemKey($key)]);
