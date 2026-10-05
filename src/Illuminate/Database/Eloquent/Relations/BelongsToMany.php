@@ -772,7 +772,7 @@ class BelongsToMany extends Relation
      */
     public function incrementOrCreate(array $attributes, string $column = 'count', $default = 1, $step = 1, array $extra = [])
     {
-        return tap($this->firstOrCreate($attributes, [$column => $default]), function ($instance) use ($column, $step, $extra) {
+        return tap($this->firstOrCreate($attributes, array_merge($extra, [$column => $default])), function ($instance) use ($column, $step, $extra) {
             if (! $instance->wasRecentlyCreated) {
                 $instance->increment($column, $step, $extra);
             }
