@@ -22,7 +22,7 @@ class AcceptedIf implements Stringable
     public function __toString(): string
     {
         $values = array_map(
-            static fn ($value) => is_string($value) ? $value : json_encode($value)),
+            static fn ($value) => is_string($value) ? $value : json_encode($value),
             $this->values,
         );
 
