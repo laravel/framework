@@ -123,7 +123,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @var string
      */
-    protected $echoFormat = static::DEFAULT_ECHO_FORMAT;
+    protected $echoFormat = self::DEFAULT_ECHO_FORMAT;
 
     /**
      * Array of footer lines to be added to the template.
@@ -1036,7 +1036,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $compiled = parent::getCompiledPath($path);
 
         // Non-default echo formats need their own compiled file so cached views are not reused.
-        if ($this->echoFormat === static::DEFAULT_ECHO_FORMAT) {
+        if ($this->echoFormat === self::DEFAULT_ECHO_FORMAT) {
             return $compiled;
         }
 
