@@ -17,7 +17,7 @@ class IpAddress implements Stringable
      * Set the IP version.
      *
      * @template TVersion of int
-     * 
+     *
      * @param  TVersion  $version
      *
      * @phpstan-return  ($version is 4|6 ? static : never)
