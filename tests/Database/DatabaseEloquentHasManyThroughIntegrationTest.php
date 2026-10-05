@@ -188,6 +188,24 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         HasManyThroughTestCountry::first()->posts()->findOrFail(1);
     }
 
+    public function testFindOrNewReturnsTheRelatedModel()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $post = $country->posts()->findOrNew(5);
+
+        $this->assertTrue($post->exists);
+        $this->assertSame(5, $post->id);
+        $this->assertSame('Example2 title1', $post->title);
+
+        $post = $country->posts()->findOrNew(1);
+
+        $this->assertFalse($post->exists);
+        $this->assertInstanceOf(HasManyThroughTestPost::class, $post);
+    }
+
     public function testFindOrFailWithManyThrowsAnException()
     {
         $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1, 2'));
@@ -371,6 +389,24 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'laravel_through_key',
             ], array_keys($post->getAttributes()));
         });
+    }
+
+    public function testChunkMapReturnsCorrectModels()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $posts = $country->posts()->chunkMap(fn ($post) => [$post->id, $post->title], 2);
+
+        $this->assertEquals([
+            [3, 'Example1 title1'],
+            [4, 'Example1 title2'],
+            [5, 'Example2 title1'],
+            [6, 'Example2 title2'],
+            [7, 'Example3 title1'],
+            [8, 'Example3 title2'],
+        ], $posts->all());
     }
 
     public function testChunkById()
