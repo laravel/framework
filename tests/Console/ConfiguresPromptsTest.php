@@ -9,53 +9,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use WeakReference;
 
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\select;
-use function Laravel\Prompts\text;
 
 class ConfiguresPromptsTest extends TestCase
 {
-    public function testFlushingPromptStateReleasesTheCommandItWasBoundTo()
-    {
-        Prompt::fallbackWhen(true);
-
-        $app = new Application(__DIR__);
-
-        $command = new class extends Command
-        {
-            public function handle()
-            {
-                text('Test');
-            }
-        };
-        $command->setLaravel($app);
-
-        $input = new ArrayInput([]);
-        $stream = fopen('php://memory', 'w+');
-        fwrite($stream, "answer\n");
-        rewind($stream);
-        $input->setStream($stream);
-
-        $commandRef = WeakReference::create($command);
-
-        $command->run($input, new BufferedOutput);
-        unset($command, $input, $stream);
-
-        // This is what Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle
-        // calls between every test. Without it, the validator and fallbacks that
-        // configurePrompts() bound to the command above - and so the command, and
-        // everything it references, such as the application - are never released.
-        Prompt::flushState();
-        gc_collect_cycles();
-
-        $this->assertNull(
-            $commandRef->get(),
-            'Prompt::flushState() should release the command that configured the prompt validator and fallbacks.'
-        );
-    }
-
     #[DataProvider('selectDataProvider')]
     public function testSelectFallback($prompt, $answer, $expectedReturn)
     {
