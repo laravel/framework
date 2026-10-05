@@ -37,6 +37,11 @@ class EloquentThroughTest extends DatabaseTestCase
             $table->unsignedInteger('comment_id');
         });
 
+        Schema::create('texts', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('post_id');
+        });
+
         $post = tap(new Post(['public' => true]))->save();
         $comment = tap((new Comment)->commentable()->associate($post))->save();
         (new Like())->comment()->associate($comment)->save();
@@ -63,6 +68,17 @@ class EloquentThroughTest extends DatabaseTestCase
 
         $this->assertInstanceOf(HasManyThrough::class, $post->commentProfiles());
         $this->assertCount(2, $post->commentProfiles);
+    }
+
+    public function testMorphManyDistantRelationshipOnlyReturnsModelsOfTheIntermediateType()
+    {
+        /** @var Post $post */
+        $post = Post::first();
+        $text = $post->texts()->create();
+        $textComment = tap((new Comment)->commentable()->associate($text))->save();
+
+        $this->assertSame([$textComment->id], $post->textComments()->pluck('comments.id')->all());
+        $this->assertSame([$textComment->id], Post::with('textComments')->first()->textComments->pluck('id')->all());
     }
 }
 
@@ -113,6 +129,11 @@ class Post extends Model
     {
         return $this->hasMany(Text::class);
     }
+
+    public function textComments()
+    {
+        return $this->through('texts')->has('comments');
+    }
 }
 
 class OtherCommentable extends Model
@@ -134,6 +155,11 @@ class Text extends Model
     public function post()
     {
         return $this->belongsTo(Post::class);
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 }
 

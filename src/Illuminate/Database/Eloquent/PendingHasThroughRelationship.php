@@ -96,6 +96,10 @@ class PendingHasThroughRelationship
             $returnedRelation->where($this->localRelationship->getQualifiedMorphType(), $this->localRelationship->getMorphClass());
         }
 
+        if ($distantRelation instanceof MorphOneOrMany) {
+            $returnedRelation->where($distantRelation->getQualifiedMorphType(), $distantRelation->getMorphClass());
+        }
+
         return $returnedRelation;
     }
 
