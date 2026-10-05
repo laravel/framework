@@ -284,6 +284,29 @@ class AuthGuardTest extends TestCase
         $this->assertNotSame($sessionId, $session->getId());
     }
 
+    public function testLoginWithGenericUserWithoutPasswordDoesNotStorePasswordHash()
+    {
+        [$guard, , $session] = $this->getRealGuard();
+        $user = new GenericUser(['id' => 'foo']);
+        $warnings = [];
+
+        set_error_handler(function ($level, $message) use (&$warnings) {
+            $warnings[] = $message;
+
+            return true;
+        }, E_WARNING);
+
+        try {
+            $guard->login($user);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $warnings);
+        $this->assertSame('foo', $session->get($guard->getName()));
+        $this->assertFalse($session->has('password_hash_default'));
+    }
+
     public function testSessionGuardIsMacroable()
     {
         $guard = $this->getGuard();
