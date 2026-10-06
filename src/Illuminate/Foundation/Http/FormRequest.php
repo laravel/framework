@@ -15,6 +15,7 @@ use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use ReflectionClass;
 
@@ -233,6 +234,8 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $allowedKeys = array_keys($this->validationRules());
 
         $input = $this->isJson() ? $this->json()->all() : $this->request->all();
+
+        $input = Arr::except($input, ['_token', '_method']);
 
         foreach ($this->dotInputKeys($input) as $inputKey) {
             if (! $this->isKnownField($inputKey, $allowedKeys)) {
