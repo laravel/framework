@@ -155,9 +155,7 @@ class BroadcastEventTest extends TestCase
 
     public function testFailOnTimeoutCanBeSetWithAttribute()
     {
-        $job = new BroadcastEvent(new #[FailOnTimeout] class
-        {
-        });
+        $job = new BroadcastEvent(new TestBroadcastEventWithFailOnTimeout);
 
         $this->assertTrue($job->failOnTimeout);
     }
@@ -210,6 +208,12 @@ class TestBroadcastEvent
     {
         return ['test-channel'];
     }
+}
+
+#[FailOnTimeout]
+class TestBroadcastEventWithFailOnTimeout extends TestBroadcastEvent
+{
+    //
 }
 
 class TestBroadcastEventWithStringName extends TestBroadcastEvent
