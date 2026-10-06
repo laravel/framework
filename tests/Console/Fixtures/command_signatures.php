@@ -2988,7 +2988,7 @@ return [
                 'valueOptional' => true,
                 'isArray' => true,
                 'acceptValue' => true,
-                'default' => null,
+                'default' => [],
                 'description' => 'Filter the routes by method',
             ],
             [
@@ -2999,7 +2999,7 @@ return [
                 'valueOptional' => true,
                 'isArray' => true,
                 'acceptValue' => true,
-                'default' => null,
+                'default' => [],
                 'description' => 'Filter the routes by action',
             ],
             [
@@ -3010,7 +3010,7 @@ return [
                 'valueOptional' => true,
                 'isArray' => true,
                 'acceptValue' => true,
-                'default' => null,
+                'default' => [],
                 'description' => 'Filter the routes by name',
             ],
             [
@@ -3021,7 +3021,7 @@ return [
                 'valueOptional' => true,
                 'isArray' => true,
                 'acceptValue' => true,
-                'default' => null,
+                'default' => [],
                 'description' => 'Filter the routes by domain',
             ],
             [
@@ -3032,7 +3032,7 @@ return [
                 'valueOptional' => true,
                 'isArray' => true,
                 'acceptValue' => true,
-                'default' => null,
+                'default' => [],
                 'description' => 'Filter the routes by middleware',
             ],
             [
@@ -3043,7 +3043,7 @@ return [
                 'valueOptional' => true,
                 'isArray' => true,
                 'acceptValue' => true,
-                'default' => null,
+                'default' => [],
                 'description' => 'Only show routes matching the given path pattern',
             ],
             [
@@ -3054,7 +3054,7 @@ return [
                 'valueOptional' => true,
                 'isArray' => true,
                 'acceptValue' => true,
-                'default' => null,
+                'default' => [],
                 'description' => 'Do not display the routes matching the given path pattern',
             ],
             [
