@@ -761,6 +761,12 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
         $result = $this->rehashUserPasswordForDeviceLogout($password);
 
+        if ($passwordHash = $this->user()->getAuthPassword()) {
+            $this->session->put(
+                'password_hash_'.$this->name, $this->hashPasswordForCookie($passwordHash)
+            );
+        }
+
         if ($this->recaller() ||
             $this->getCookieJar()->hasQueued($this->getRecallerName())) {
             $this->queueRecallerCookie($this->user());

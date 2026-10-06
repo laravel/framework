@@ -14,6 +14,8 @@ use Illuminate\Auth\SessionGuard;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
@@ -220,6 +222,11 @@ class AuthenticationTest extends TestCase
 
             return true;
         });
+
+        $this->assertSame(
+            $this->app['auth']->guard()->hashPasswordForCookie($user->fresh()->getAuthPassword()),
+            $this->app['session']->get('password_hash_web')
+        );
     }
 
     public function testPasswordMustBeValidToLogOutOtherDevices()
@@ -234,6 +241,23 @@ class AuthenticationTest extends TestCase
         $this->assertEquals(1, $user->id);
 
         $this->app['auth']->logoutOtherDevices('adifferentpassword');
+    }
+
+    public function testLogoutOtherDevicesPreservesSessionWithAuthenticateSessionMiddleware()
+    {
+        $this->app['auth']->loginUsingId(1);
+
+        $this->app['auth']->logoutOtherDevices('password');
+
+        $request = Request::create('protected', 'GET');
+        $request->setLaravelSession($this->app['session']->driver());
+        $request->setUserResolver(fn () => $this->app['auth']->user());
+
+        $middleware = new AuthenticateSession($this->app['auth']);
+
+        $response = $middleware->handle($request, fn () => response('ok'));
+
+        $this->assertSame('ok', $response->getContent());
     }
 
     public function testLoggingInOutViaAttemptRemembering()
