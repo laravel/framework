@@ -6,11 +6,13 @@ use BadMethodCallException;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
+use Illuminate\Contracts\Database\Eloquent\SupportsPartialRelations;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneOrManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\RecordsNotFoundException;
@@ -1950,6 +1952,8 @@ class Builder implements BuilderContract
         return [explode(':', $name)[0], static function ($query) use ($name) {
             $query->select(array_map(static function ($column) use ($query) {
                 return $query instanceof BelongsToMany
+                    || $query instanceof HasOneOrManyThrough
+                    || ($query instanceof SupportsPartialRelations && $query->isOneOfMany())
                     ? $query->getRelated()->qualifyColumn($column)
                     : $column;
             }, explode(',', explode(':', $name)[1])));
