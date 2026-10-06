@@ -1,6 +1,69 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.34.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.35.0...13.x)
+
+## [v13.35.0](https://github.com/laravel/framework/compare/v13.34.0...v13.35.0) - 2026-10-06
+
+* [13.x] Allow fake assertions to accept an array of properties by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61770
+* [13.x] Support percentages for queue:work --memory by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61753
+* [13.x] Let long-running scheduled commands see schedule:interrupt by [@cyppe](https://github.com/cyppe) in https://github.com/laravel/framework/pull/61764
+* [13.x] Make the parallel compiled view callbacks tolerate a concurrent run by [@joshdaugherty](https://github.com/joshdaugherty) in https://github.com/laravel/framework/pull/61786
+* [13.x] Add markdown() method to the response factory by [@Ashot1995](https://github.com/Ashot1995) in https://github.com/laravel/framework/pull/61800
+* [13.x] Add `onOneServer` to the `schedule:list --json` output by [@MizouziE](https://github.com/MizouziE) in https://github.com/laravel/framework/pull/61798
+* [13.x] Add `lazy_root_creation` configuration option for `local` disks by [@ziadoz](https://github.com/ziadoz) in https://github.com/laravel/framework/pull/61799
+* [13.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/61790
+* Exception enhancements by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/61791
+* [13.x] Add Schedule::alwaysOnOneServer(); by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61789
+* [13.x] add test for notifyJobOfSignal SIGALRM by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61787
+* [13.x] Optimize Str::finish and Str::start by [@HamidRezaLS](https://github.com/HamidRezaLS) in https://github.com/laravel/framework/pull/61803
+* [13.x] Fix reference cycle from PendingRequest::throw() default callback by [@andrewnabors](https://github.com/andrewnabors) in https://github.com/laravel/framework/pull/61802
+* [13.x] Fix Memcached lock isLocked() on a free lock by [@mrjavadseydi](https://github.com/mrjavadseydi) in https://github.com/laravel/framework/pull/61801
+* [13.x] Add QUERY route method support by [@joelbutcher](https://github.com/joelbutcher) in https://github.com/laravel/framework/pull/61797
+* [13.x] Fix DatabaseRule where() and whereNot() losing false values by [@sajjadhossainshohag](https://github.com/sajjadhossainshohag) in https://github.com/laravel/framework/pull/61796
+* [13.x] Fix duration helpers truncating float values by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61825
+* [13.x] Release unique job locks in `Queue::fakeFor()` by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61824
+* [13.x] Fix `forceCreate()` ignoring `withAttributes()` by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61823
+* [13.x] Fix `has()` and `withCount()` on `HasOneThrough` one-of-many relations by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61818
+* [13.x] Accept null password in hashPasswordForCookie by [@troioi-vn](https://github.com/troioi-vn) in https://github.com/laravel/framework/pull/61817
+* [13.x] Fix `chunkById()` and `lazyById()` looping forever on models with a cast primary key by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61816
+* [13.x] Fix custom MorphPivot not touching owners on detach by [@mrjavadseydi](https://github.com/mrjavadseydi) in https://github.com/laravel/framework/pull/61812
+* [13.x] Fix collapse(), collapseWithKeys() and flatten() dropping lazy collections by [@ahmadreza-fatemikia](https://github.com/ahmadreza-fatemikia) in https://github.com/laravel/framework/pull/61811
+* [13.x] Fix DB::setDefaultConnection() storing enums in the configuration by [@ahmadreza-fatemikia](https://github.com/ahmadreza-fatemikia) in https://github.com/laravel/framework/pull/61810
+* [13.x] normalize queue in SQS bulk method by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/61828
+* [13.x] Fix `HasOneThrough::is()` comparing the wrong keys by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61827
+* [13.x] Fix inherited queue attributes being ignored when the child uses Queueable by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61826
+* [13.x] Fix JSON path updates on `AsEncryptedArrayObject` and `AsEncryptedCollection` by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61834
+* Fix root route matching with route cache when served from a subdirectory by [@Simon0Harms](https://github.com/Simon0Harms) in https://github.com/laravel/framework/pull/61794
+* Address query issues by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/61837
+* [13.x] Document enum support for disk in `copyToDisk()` and `moveToDisk()` by [@riesjart](https://github.com/riesjart) in https://github.com/laravel/framework/pull/61867
+* [13.x] Skip building a query in loadMissing() when no relations are given by [@MAboyadak](https://github.com/MAboyadak) in https://github.com/laravel/framework/pull/61869
+* [13.x] Accept enums in `FilesystemManager::set()`, `forgetDisk()` and `purge()` by [@riesjart](https://github.com/riesjart) in https://github.com/laravel/framework/pull/61868
+* [13.x] Fix parallel testing with PHPUnit 13.4 by [@lazerg](https://github.com/lazerg) in https://github.com/laravel/framework/pull/61859
+* [13.x] Fix `AsHtmlString` attributes serializing to an empty object by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61854
+* [13.x] Fix `whereJsonOverlaps()` with a JSON path on MySQL by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61853
+* [13.x] Fix reference cycle from Mailable headers() and priority() callbacks by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61863
+* [13.x] Fix `findOrNew()` and `chunkMap()` on HasManyThrough and BelongsToMany by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61855
+* [13.x] Fix `incrementOrCreate()` not setting the foreign key on relations by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61849
+* [13.x] Fix `loadMissing()` with nested relations on mixed `morphTo` models by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61845
+* [13.x] Fix Eloquent Collection findOrFail() with a collection of ids by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61844
+* [13.x] Fix `cursorPaginate()` losing union select and join bindings by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61841
+* [13.x] Fix docblocks of `logoutOtherDevices` method by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/61877
+* [13.x] Fix JSON path updates discarding unsaved changes on cast objects by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61847
+* [13.x ] `never` return type for `failedBasicResponse` method by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/61887
+* [13.x] Fix downloads crashing on filenames with no ASCII equivalent by [@jhm-ciberman](https://github.com/jhm-ciberman) in https://github.com/laravel/framework/pull/61888
+* [13.x] Qualify eager loaded columns on through and one-of-many relations by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61885
+* [13.x] Fix recycled models leaking into later calls on the same factory by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61884
+* [13.x] Fake the pwnedpasswords API in ValidationPasswordRuleTest::testMessagesOrder by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61880
+* [13.x] Fix `morphTo()->withTrashed()` being ignored by `has()` and `whereHasMorph()` by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61846
+* [13.x] Fix `incrementOrCreate()` ignoring extra attributes when creating by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61878
+* [13.x] Fix undefined array key in GenericUser::getAuthPassword() for users without a password by [@tommie1001](https://github.com/tommie1001) in https://github.com/laravel/framework/pull/61876
+* [13.x] Database test improvements by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/61819
+* [13.x] Port `defaults()` via opt-in trait by [@weshooper](https://github.com/weshooper) in https://github.com/laravel/framework/pull/61813
+* Bump source-map-js from 1.2.1 to 1.2.2 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/61889
+* [13.x] Fix `schedule:list` timezone conversion when the next runs straddle a DST change by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/61894
+* [13.x] Don't expand URL templates without URL parameters by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61893
+* [13.x] Ignore _token and _method when failing on unknown fields by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61891
+* [13.x] Fix `withCasts()` on a cloned query changing the casts of the original query by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/61883
 
 ## [v13.34.0](https://github.com/laravel/framework/compare/v13.33.0...v13.34.0) - 2026-09-29
 
