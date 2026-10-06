@@ -79,6 +79,19 @@ class NotificationSender
     }
 
     /**
+     * Set the locale to be used when sending notifications.
+     *
+     * @param  string|null  $locale
+     * @return $this
+     */
+    public function locale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
      * Send the given notification to the given notifiable entities.
      *
      * @param  \Illuminate\Support\Collection|mixed  $notifiables

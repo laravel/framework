@@ -78,6 +78,22 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
     }
 
+    public function testMailIsSentWithFacadeSelectedLocaleAfterAnotherNotificationWasSent()
+    {
+        $user = NotifiableLocalizedUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        NotificationFacade::send($user, new GreetingMailNotification);
+        NotificationFacade::locale('fr')->send($user, new GreetingMailNotification);
+
+        $messages = app('mailer')->getSymfonyTransport()->messages();
+
+        $this->assertStringContainsString('hello', $messages[0]->toString());
+        $this->assertStringContainsString('bonjour', $messages[1]->toString());
+    }
+
     public function testMailIsSentWithNotificationSelectedLocale()
     {
         $users = [
