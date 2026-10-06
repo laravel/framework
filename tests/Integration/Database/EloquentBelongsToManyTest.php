@@ -807,6 +807,21 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertCount(1, $post->tags()->get());
     }
 
+    public function testIncrementOrCreateMethodWithExtra()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag1 = $post->tags()->incrementOrCreate(['name' => 'wavez'], extra: ['type' => 'featured']);
+
+        $this->assertTrue($tag1->wasRecentlyCreated);
+        $this->assertSame('featured', $tag1->fresh()->type);
+
+        $tag2 = $post->tags()->incrementOrCreate(['name' => 'wavez'], extra: ['type' => 'pinned']);
+
+        $this->assertSame('pinned', $tag2->fresh()->type);
+        $this->assertEquals(2, $tag2->fresh()->count);
+    }
+
     public function testUpdateOrCreateMethodCreate()
     {
         $post = Post::create(['title' => Str::random()]);
