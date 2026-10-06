@@ -31,7 +31,7 @@ class ForgetFailedCommand extends Command
     {
         $missing = false;
 
-        foreach ($this->argument('id') as $id) {
+        foreach ((array) $this->argument('id') as $id) {
             if ($this->laravel['queue.failer']->forget($id)) {
                 $this->components->info("Failed job [{$id}] deleted successfully.");
             } else {
