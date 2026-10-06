@@ -187,6 +187,10 @@ class ValidationPasswordRuleTest extends TestCase
 
     public function testMessagesOrder()
     {
+        $this->fakePwnedPasswordsApi([
+            'abcabcabc!' => 1000,
+        ]);
+
         $makeRules = function () {
             return ['required', Password::min(8)->mixedCase()->numbers()];
         };
