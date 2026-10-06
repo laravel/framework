@@ -2,13 +2,18 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use Aws\Credentials\Credentials;
 use Aws\Exception\CredentialsException;
+use Closure;
 use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\AwsCredentialCache;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use League\Flysystem\UnableToReadFile;
@@ -174,9 +179,111 @@ class FilesystemManagerTest extends TestCase
         ])['credentials']);
     }
 
-    protected function s3Config(array $config): array
+    public function testS3CredentialsAreWrappedWithASharedCacheProviderWhenCachingIsEnabled()
     {
-        return (new class(new Application) extends FilesystemManager
+        foreach ([[], ['credentials' => 'instance']] as $disk) {
+            $config = $this->s3Config($disk + ['credential_cache' => ['enabled' => true]]);
+
+            $this->assertInstanceOf(Closure::class, $config['credentials']);
+            $this->assertArrayNotHasKey('credential_cache', $config);
+        }
+    }
+
+    public function testS3CredentialsAreNotWrappedWhenCachingIsDisabled()
+    {
+        $config = $this->s3Config(['credential_cache' => ['enabled' => false]]);
+
+        $this->assertArrayNotHasKey('credentials', $config);
+        $this->assertArrayNotHasKey('credential_cache', $config);
+    }
+
+    public function testS3ExplicitCredentialsAreLeftUntouchedWhenCachingIsEnabled()
+    {
+        $cache = ['credential_cache' => ['enabled' => true]];
+
+        $this->assertFalse($this->s3Config(['credentials' => false] + $cache)['credentials']);
+        $this->assertSame(['key' => 'key', 'secret' => 'secret'], $this->s3Config([
+            'key' => 'key', 'secret' => 'secret',
+        ] + $cache)['credentials']);
+    }
+
+    public function testS3CredentialsAreSharedAcrossProcessesViaTheCache()
+    {
+        $previous = getenv('AWS_CONTAINER_CREDENTIALS_RELATIVE_URI');
+        putenv('AWS_CONTAINER_CREDENTIALS_RELATIVE_URI=/credentials');
+        $repository = new Repository(new ArrayStore);
+        $requests = 0;
+
+        try {
+            $disk = [
+                'bucket' => 'bucket',
+                'region' => 'us-east-2',
+                'credentials' => [
+                    'provider' => 'ecs',
+                    'client' => function () use (&$requests) {
+                        $requests++;
+
+                        return Create::promiseFor(new Response(200, [], json_encode([
+                            'AccessKeyId' => 'container-key',
+                            'SecretAccessKey' => 'container-secret',
+                            'Token' => 'container-token',
+                            'Expiration' => gmdate('c', time() + 3600),
+                        ])));
+                    },
+                ],
+                'credential_cache' => ['enabled' => true, 'store' => 'array'],
+            ];
+
+            foreach (range(1, 2) as $process) {
+                $credentials = $this->s3Config($disk, $repository)['credentials']()->wait();
+
+                $this->assertSame('container-key', $credentials->getAccessKeyId());
+            }
+
+            $this->assertSame(1, $requests);
+        } finally {
+            putenv($previous === false ? 'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI' : 'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI='.$previous);
+        }
+    }
+
+    public function testS3DefaultProviderCredentialsAreServedFromTheSharedCache()
+    {
+        $repository = new Repository(new ArrayStore);
+
+        $repository->forever(
+            AwsCredentialCache::key('s3', null, ['us-east-2', 'bucket']),
+            new Credentials('cached-key', 'cached-secret', 'cached-token', time() + 3600),
+        );
+
+        $credentials = $this->s3Config([
+            'bucket' => 'bucket',
+            'region' => 'us-east-2',
+            'credential_cache' => ['enabled' => true, 'store' => 'array'],
+        ], $repository)['credentials']()->wait();
+
+        $this->assertSame('cached-key', $credentials->getAccessKeyId());
+        $this->assertSame('cached-token', $credentials->getSecurityToken());
+    }
+
+    protected function s3Config(array $config, ?Repository $cache = null): array
+    {
+        $app = new Application;
+
+        if ($cache) {
+            $app->instance('cache', new class($cache)
+            {
+                public function __construct(protected Repository $repository)
+                {
+                }
+
+                public function store($name = null)
+                {
+                    return $this->repository;
+                }
+            });
+        }
+
+        return (new class($app) extends FilesystemManager
         {
             public function config(array $config): array
             {

@@ -7,8 +7,8 @@ use Closure;
 use GuzzleHttp\Promise\Create;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
-use Illuminate\Queue\AwsCredentialCache;
 use Illuminate\Queue\Connectors\SqsConnector;
+use Illuminate\Support\AwsCredentialCache;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 

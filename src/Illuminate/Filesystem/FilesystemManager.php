@@ -2,13 +2,14 @@
 
 namespace Illuminate\Filesystem;
 
-use Aws\Credentials\CredentialProvider;
 use Aws\S3\S3Client;
 use Closure;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\AwsCredentialCache;
 use Illuminate\Support\RebindsCallbacksToSelf;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\ResolvesAwsCredentials;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter as AwsS3PortableVisibilityConverter;
@@ -34,7 +35,7 @@ use function Illuminate\Support\enum_value;
  */
 class FilesystemManager implements FactoryContract
 {
-    use RebindsCallbacksToSelf;
+    use RebindsCallbacksToSelf, ResolvesAwsCredentials;
 
     /**
      * The application instance.
@@ -322,35 +323,32 @@ class FilesystemManager implements FactoryContract
      */
     protected function formatS3Config(array $config)
     {
-        $config += ['version' => 'latest'];
+        $config = $this->withCredentials($config + ['version' => 'latest']);
 
-        $credentials = $config['credentials'] ?? null;
+        return Arr::except($config, ['token', 'credential_cache']);
+    }
 
-        $provider = is_array($credentials) ? ($credentials['provider'] ?? null) : $credentials;
+    /**
+     * Get the cache repository for the given store name.
+     *
+     * @param  string|null  $store
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    protected function awsCredentialCacheRepository($store)
+    {
+        return $this->app->make('cache')->store($store);
+    }
 
-        if (is_string($provider)) {
-            $options = is_array($credentials) ? Arr::except($credentials, ['provider']) : [];
-
-            $provider = CredentialProvider::memoize(match ($provider) {
-                'ecs' => CredentialProvider::ecsCredentials($options),
-                'instance' => CredentialProvider::instanceProfile($options),
-                default => throw new InvalidArgumentException(
-                    "Invalid credential provider [{$provider}]."
-                ),
-            });
-        }
-
-        if ($provider) {
-            $config['credentials'] = $provider;
-        } elseif (! empty($config['key']) && ! empty($config['secret'])) {
-            $config['credentials'] = Arr::only($config, ['key', 'secret']);
-
-            if (! empty($config['token'])) {
-                $config['credentials']['token'] = $config['token'];
-            }
-        }
-
-        return Arr::except($config, ['token']);
+    /**
+     * Get the cache key for credentials resolved by the given provider.
+     *
+     * @param  string|null  $provider
+     * @param  array  $config
+     * @return string
+     */
+    protected function awsCredentialCacheKey($provider, array $config)
+    {
+        return AwsCredentialCache::key('s3', $provider, [$config['region'] ?? '', $config['bucket'] ?? '']);
     }
 
     /**
