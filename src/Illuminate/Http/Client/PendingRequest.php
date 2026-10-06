@@ -1161,6 +1161,14 @@ class PendingRequest
     protected function parseHttpOptions(array $options)
     {
         if (isset($options[$this->bodyFormat])) {
+            if (in_array($this->bodyFormat, ['form_params', 'multipart'])) {
+                $options[$this->bodyFormat] = match (true) {
+                    $options[$this->bodyFormat] instanceof Arrayable => $options[$this->bodyFormat]->toArray(),
+                    $options[$this->bodyFormat] instanceof JsonSerializable => $options[$this->bodyFormat]->jsonSerialize(),
+                    default => $options[$this->bodyFormat],
+                };
+            }
+
             if ($this->bodyFormat === 'multipart') {
                 $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
             } elseif ($this->bodyFormat === 'body') {

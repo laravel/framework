@@ -757,6 +757,66 @@ class HttpClientTest extends TestCase
     }
 
     #[DataProvider('methodsReceivingArrayableDataProvider')]
+    public function testCanSendJsonSerializableFormData(string $method)
+    {
+        $this->factory->fake();
+
+        $this->factory->asForm()->{$method}('http://foo.com/form', new class implements JsonSerializable
+        {
+            public $internal = 'secret';
+
+            public function jsonSerialize(): mixed
+            {
+                return [
+                    'name' => 'Taylor',
+                    'title' => 'Laravel Developer',
+                ];
+            }
+        });
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form' &&
+                $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
+                $request->body() === 'name=Taylor&title=Laravel+Developer';
+        });
+    }
+
+    public function testCanSendArrayableMultipartData()
+    {
+        $this->factory->fake();
+
+        $this->factory->attach('avatar', 'contents', 'avatar.jpg')->post('http://foo.com/multipart', new Fluent([
+            'name' => 'Taylor',
+        ]));
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                str_contains($request->body(), 'name="name"') &&
+                str_contains($request->body(), 'Taylor') &&
+                str_contains($request->body(), 'filename="avatar.jpg"');
+        });
+    }
+
+    public function testCanSendJsonSerializableMultipartData()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', new class implements JsonSerializable
+        {
+            public function jsonSerialize(): mixed
+            {
+                return ['name' => 'Taylor'];
+            }
+        });
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                str_contains($request->body(), 'name="name"') &&
+                str_contains($request->body(), 'Taylor');
+        });
+    }
+
+    #[DataProvider('methodsReceivingArrayableDataProvider')]
     public function testPrefersJsonSerializableOverArrayableData(string $method)
     {
         $this->factory->fake();
