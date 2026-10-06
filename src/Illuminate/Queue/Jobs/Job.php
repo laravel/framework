@@ -323,7 +323,7 @@ abstract class Job
      */
     public function backoff()
     {
-        return $this->payload()['backoff'] ?? $this->payload()['delay'] ?? null;
+        return $this->payload()['backoff'] ?? null;
     }
 
     /**

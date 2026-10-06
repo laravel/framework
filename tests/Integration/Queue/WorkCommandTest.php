@@ -8,10 +8,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
@@ -254,6 +256,27 @@ class WorkCommandTest extends QueueTestCase
         $this->withoutMockingConsoleOutput()->artisan('queue:work', ['--once' => true]);
         Exceptions::assertNotReported(UniqueConstraintViolationException::class);
         $this->assertSame(2, substr_count(Artisan::output(), JobWillFail::class));
+    }
+
+    public function testDelayedJobIsReleasedWithWorkerBackoffAfterException()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
+
+        Exceptions::fake();
+
+        $backoff = null;
+
+        Event::listen(JobReleasedAfterException::class, function ($event) use (&$backoff) {
+            $backoff = $event->backoff;
+        });
+
+        JobWillFail::dispatch()->delay(60);
+
+        $this->travel(60)->seconds();
+
+        $this->artisan('queue:work', ['--once' => true, '--backoff' => 5, '--tries' => 2, '--memory' => 1024]);
+
+        $this->assertSame(5, $backoff);
     }
 
     public function testStopReasonIsWritten()
