@@ -42,6 +42,19 @@ final class JsonFormatterTest extends TestCase
         $this->assertSame(ContextProvidingException::class, $exceptionData['class']);
     }
 
+    public function testExceptionContextIsEnrichedOnDirectLoggingWithoutExceptionHandling()
+    {
+        $this->withoutExceptionHandling();
+
+        Log::error('fail', ['exception' => new ContextProvidingException('Something went wrong')]);
+
+        $formatted = $this->getFormattedJson();
+
+        $exceptionData = $formatted['context']['exception'];
+        $this->assertSame('bar', $exceptionData['foo']);
+        $this->assertSame(ContextProvidingException::class, $exceptionData['class']);
+    }
+
     public function testExceptionContextIsNotDuplicatedWhenGoingThroughReport()
     {
         $exception = new ContextProvidingException('Something went wrong');

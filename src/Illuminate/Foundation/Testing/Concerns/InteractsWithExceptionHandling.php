@@ -165,7 +165,7 @@ trait InteractsWithExceptionHandling
              */
             public function isReporting(Throwable $e): bool
             {
-                return false;
+                return $this->originalHandler->isReporting($e);
             }
 
             /**
@@ -175,7 +175,7 @@ trait InteractsWithExceptionHandling
              */
             public function buildContextForException(Throwable $e)
             {
-                return [];
+                return $this->originalHandler->buildContextForException($e);
             }
         };
 
