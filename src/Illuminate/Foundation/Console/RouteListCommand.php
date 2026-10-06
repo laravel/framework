@@ -27,13 +27,13 @@ class RouteListCommand extends Command
      */
     protected $signature = 'route:list
                     {--json : Output the route list as JSON}
-                    {--method= : Filter the routes by method}
-                    {--action= : Filter the routes by action}
-                    {--name= : Filter the routes by name}
-                    {--domain= : Filter the routes by domain}
-                    {--middleware= : Filter the routes by middleware}
-                    {--path= : Only show routes matching the given path pattern}
-                    {--except-path= : Do not display the routes matching the given path pattern}
+                    {--method=* : Filter the routes by method}
+                    {--action=* : Filter the routes by action}
+                    {--name=* : Filter the routes by name}
+                    {--domain=* : Filter the routes by domain}
+                    {--middleware=* : Filter the routes by middleware}
+                    {--path=* : Only show routes matching the given path pattern}
+                    {--except-path=* : Do not display the routes matching the given path pattern}
                     {--r|reverse : Reverse the ordering of the routes}
                     {--sort=uri : The column (domain, method, uri, name, action, middleware, definition) to sort by}
                     {--except-vendor : Do not display routes defined by vendor packages}
