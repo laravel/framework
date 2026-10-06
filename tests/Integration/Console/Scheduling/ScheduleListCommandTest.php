@@ -433,7 +433,7 @@ class ScheduleListCommandTest extends TestCase
         $this->assertSame(['0 0 30 10 *', '0 23 29 6 *'], array_column($data, 'expression'));
     }
 
-    public function testExpressionTimezoneConversionFallsBackAcrossDstTransition()
+    public function testExpressionTimezoneConversionAcrossDstTransitionUsesOffsetAtNextRunDate()
     {
         Carbon::setTestNow('2024-10-26 22:30:00 UTC');
 
@@ -446,7 +446,24 @@ class ScheduleListCommandTest extends TestCase
 
         $data = json_decode(Artisan::output(), true);
 
-        $this->assertSame(['0 0,2 * * *'], array_column($data, 'expression'));
+        $this->assertSame(['0 1,23 * * *'], array_column($data, 'expression'));
+    }
+
+    public function testExpressionTimezoneConversionForMonthlyEventWhoseNextRunsStraddleDstTransition()
+    {
+        // The next run (October 1st) is in BST (UTC+1), the one after (November 1st) is in GMT (UTC+0).
+        Carbon::setTestNow('2024-09-15');
+
+        $this->schedule->command('inspire')->monthlyOn(1, '09:00')->timezone('Europe/London');
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, [
+            '--timezone' => 'UTC',
+            '--json' => true,
+        ]);
+
+        $data = json_decode(Artisan::output(), true);
+
+        $this->assertSame(['0 8 1 * *'], array_column($data, 'expression'));
     }
 
     public function testDisplayScheduleCliSplitsExpressionWhenMixedCarry()
