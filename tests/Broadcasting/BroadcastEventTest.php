@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
+use Illuminate\Queue\Attributes\FailOnTimeout;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -150,6 +151,27 @@ class BroadcastEventTest extends TestCase
         $job = new BroadcastEvent($event);
 
         $this->assertFalse($job->deleteWhenMissingModels);
+    }
+
+    public function testFailOnTimeoutCanBeSetWithAttribute()
+    {
+        $job = new BroadcastEvent(new #[FailOnTimeout] class
+        {
+        });
+
+        $this->assertTrue($job->failOnTimeout);
+    }
+
+    public function testFailOnTimeoutCanBeSetWithProperty()
+    {
+        $event = new class
+        {
+            public $failOnTimeout = true;
+        };
+
+        $job = new BroadcastEvent($event);
+
+        $this->assertTrue($job->failOnTimeout);
     }
 
     public function testMiddlewareProxiesFailedHandlerFromUnderlyingEvent()
