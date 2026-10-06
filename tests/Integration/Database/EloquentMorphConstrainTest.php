@@ -79,6 +79,7 @@ class EloquentMorphConstrainTest extends DatabaseTestCase
                         'video' => fn ($query) => $query->where('video_visible', true),
                     ]);
                 }])
+                ->orderBy('id')
                 ->get();
 
             $this->assertTrue($comments[0]->commentable->post_visible);

@@ -85,6 +85,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
                 ->with(['commentable' => function (MorphTo $morphTo) {
                     $morphTo->morphWith(['post' => ['user']]);
                 }])
+                ->orderBy('id')
                 ->get();
 
             $this->assertInstanceOf(Post::class, $comments[0]->commentable);
