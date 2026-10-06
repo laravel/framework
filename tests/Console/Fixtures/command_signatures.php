@@ -3545,8 +3545,8 @@ return [
             [
                 'name' => 'id',
                 'mode' => 'required',
-                'isArray' => false,
-                'default' => null,
+                'isArray' => true,
+                'default' => [],
                 'description' => 'The ID of the failed job',
             ],
         ],
