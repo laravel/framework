@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentMorphEagerLoadingTest;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
@@ -71,6 +72,26 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
         $this->assertTrue($comments[1]->relationLoaded('commentable'));
         $this->assertInstanceOf(Video::class, $comments[1]->getRelation('commentable'));
+    }
+
+    public function testWithMorphLoadingWithMorphMap()
+    {
+        Relation::morphMap(['post' => Post::class]);
+
+        Comment::where('commentable_type', Post::class)->update(['commentable_type' => 'post']);
+
+        try {
+            $comments = Comment::query()
+                ->with(['commentable' => function (MorphTo $morphTo) {
+                    $morphTo->morphWith(['post' => ['user']]);
+                }])
+                ->get();
+
+            $this->assertInstanceOf(Post::class, $comments[0]->commentable);
+            $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
+        } finally {
+            Relation::morphMap([], false);
+        }
     }
 
     public function testWithMorphLoadingWithSingleRelation()
