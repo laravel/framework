@@ -1035,7 +1035,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $compiled = parent::getCompiledPath($path);
 
-        // Non-default echo formats need their own compiled file so cached views are not reused.
+        // Non-default echo formats need their own compiled file so cached views are not reused...
         if ($this->echoFormat === self::DEFAULT_ECHO_FORMAT) {
             return $compiled;
         }
