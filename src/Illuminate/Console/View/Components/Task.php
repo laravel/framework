@@ -57,7 +57,7 @@ class Task extends Component
 
             $this->output->writeln(
                 match ($result) {
-                    TaskResult::Failure->value => ' <fg=red;options=bold>FAIL</>',
+                    false, TaskResult::Failure->value => ' <fg=red;options=bold>FAIL</>',
                     TaskResult::Skipped->value => ' <fg=yellow;options=bold>SKIPPED</>',
                     default => ' <fg=green;options=bold>DONE</>'
                 },

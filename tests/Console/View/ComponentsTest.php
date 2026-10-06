@@ -95,6 +95,11 @@ class ComponentsTest extends TestCase
         $this->assertStringContainsString('My task', $result);
         $this->assertStringContainsString('FAIL', $result);
 
+        (new Components\Task($output))->render('My task', fn () => false);
+        $result = $output->fetch();
+        $this->assertStringContainsString('My task', $result);
+        $this->assertStringContainsString('FAIL', $result);
+
         (new Components\Task($output))->render('My task', fn () => MigrationResult::Skipped->value);
         $result = $output->fetch();
         $this->assertStringContainsString('My task', $result);
