@@ -307,7 +307,9 @@ class ResponseFactory implements FactoryContract
      */
     protected function fallbackName($name)
     {
-        return str_replace('%', '', Str::ascii($name));
+        $fallback = str_replace('%', '', Str::ascii($name));
+
+        return $fallback !== '' ? $fallback : str_repeat('_', mb_strlen($name));
     }
 
     /**
