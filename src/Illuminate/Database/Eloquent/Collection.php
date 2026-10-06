@@ -325,7 +325,9 @@ class Collection extends BaseCollection implements QueueableCollection
         $this->pluck($relation)
             ->filter()
             ->groupBy(fn ($model) => get_class($model))
-            ->each(fn ($models, $className) => static::make($models)->load($relations[$className] ?? []));
+            ->each(fn ($models, $className) => static::make($models)->load(
+                $relations[$className] ?? $relations[$models->first()->getMorphClass()] ?? []
+            ));
 
         return $this;
     }
@@ -342,7 +344,9 @@ class Collection extends BaseCollection implements QueueableCollection
         $this->pluck($relation)
             ->filter()
             ->groupBy(fn ($model) => get_class($model))
-            ->each(fn ($models, $className) => static::make($models)->loadCount($relations[$className] ?? []));
+            ->each(fn ($models, $className) => static::make($models)->loadCount(
+                $relations[$className] ?? $relations[$models->first()->getMorphClass()] ?? []
+            ));
 
         return $this;
     }
