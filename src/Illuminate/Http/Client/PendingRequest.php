@@ -1145,7 +1145,7 @@ class PendingRequest
      */
     protected function expandUrlParameters(string $url)
     {
-        if (! str_contains($url, '{')) {
+        if (empty($this->urlParameters) || ! str_contains($url, '{')) {
             return $url;
         }
 

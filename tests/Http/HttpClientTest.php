@@ -5273,6 +5273,23 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testUrlsWithBracesAreNotExpandedWithoutUrlParameters()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('https://api.test/posts?where={"status":"open"}');
+        $this->factory->get('https://api.test/files/{draft}.txt');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://api.test/posts?where=%7B%22status%22:%22open%22%7D'
+                && $request['where'] === '{"status":"open"}';
+        });
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://api.test/files/%7Bdraft%7D.txt';
+        });
+    }
+
     public function testUrlsWithTemplateExpressionsAreStillExpanded()
     {
         $this->factory->fake();
