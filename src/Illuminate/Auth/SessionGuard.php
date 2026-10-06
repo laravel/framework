@@ -359,7 +359,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return;
         }
 
-        return $this->failedBasicResponse();
+        $this->failedBasicResponse();
     }
 
     /**
@@ -376,7 +376,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $credentials = $this->basicCredentials($this->getRequest(), $field);
 
         if (! $this->once(array_merge($credentials, $extraConditions))) {
-            return $this->failedBasicResponse();
+            $this->failedBasicResponse();
         }
     }
 
@@ -414,7 +414,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Get the response for basic authentication.
      *
-     * @return void
+     * @return never
      *
      * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
      */
