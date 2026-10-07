@@ -310,6 +310,26 @@ class WorkCommandTest extends QueueTestCase
         ])->expectsOutputToContain('"status":"stopped","reason":"memory","exit_code":12')
             ->assertExitCode(12);
     }
+
+    public function testPausedQueueStatusIsWrittenAsJson()
+    {
+        $connection = config('queue.default');
+
+        Queue::pause($connection, 'high');
+
+        Queue::push(new FirstJob);
+
+        $this->artisan('queue:work', [
+            '--daemon' => true,
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+            '--queue' => 'high,default',
+            '--json' => true,
+        ])->expectsOutputToContain('"connection":"'.$connection.'","queue":"high","status":"paused"')
+            ->assertExitCode(0);
+
+        $this->assertTrue(FirstJob::$ran);
+    }
 }
 
 class FirstJob implements ShouldQueue

@@ -207,11 +207,11 @@ class WorkCommand extends Command
         });
 
         $this->laravel['events']->listen(WorkerQueuePaused::class, function ($event) {
-            $this->writeQueueStatus($event->queue, 'paused');
+            $this->writeQueueStatus($event->connectionName, $event->queue, 'paused');
         });
 
         $this->laravel['events']->listen(WorkerQueueResumed::class, function ($event) {
-            $this->writeQueueStatus($event->queue, 'resumed');
+            $this->writeQueueStatus($event->connectionName, $event->queue, 'resumed');
         });
 
         $this->laravel['events']->listen(WorkerStopping::class, function ($event) {
@@ -243,11 +243,12 @@ class WorkCommand extends Command
     /**
      * Write the status output for a paused or resumed queue.
      *
+     * @param  string  $connection
      * @param  string  $queue
      * @param  string  $status
      * @return void
      */
-    protected function writeQueueStatus($queue, $status)
+    protected function writeQueueStatus($connection, $queue, $status)
     {
         if ($this->output->isQuiet() || $this->output->isSilent()) {
             return;
@@ -256,6 +257,7 @@ class WorkCommand extends Command
         if ($this->outputUsingJson()) {
             $this->output->writeln(json_encode([
                 'level' => 'warning',
+                'connection' => $connection,
                 'queue' => $queue,
                 'status' => $status,
                 'timestamp' => $this->now()->format('Y-m-d\TH:i:s.uP'),
