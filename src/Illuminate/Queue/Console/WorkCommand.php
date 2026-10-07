@@ -291,6 +291,8 @@ class WorkCommand extends Command
         if ($this->outputUsingJson()) {
             $this->output->writeln(json_encode([
                 'level' => $event->status === 0 ? 'info' : 'warning',
+                'connection' => $event->connectionName,
+                'queue' => $event->queue,
                 'status' => 'stopped',
                 'reason' => $event->reason->value,
                 'exit_code' => $event->status,
