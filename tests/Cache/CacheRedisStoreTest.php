@@ -5,171 +5,13 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\PhpRedisConnection;
-use Illuminate\Tests\Redis\Fixtures\RedisConnectionStub;
 use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 class CacheRedisStoreTest extends TestCase
 {
-    public function testGetReturnsNullWhenNotFound()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('get')->with('prefix:foo')->returns(null);
-        $this->assertNull($redis->get('foo'));
-    }
-
-    public function testRedisValueIsReturned()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('get')->with('prefix:foo')->returns(serialize('foo'));
-        $this->assertSame('foo', $redis->get('foo'));
-    }
-
-    public function testRedisMultipleValuesAreReturned()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('mget')->with(['prefix:foo', 'prefix:fizz', 'prefix:norf', 'prefix:null'])->returns([
-            serialize('bar'),
-            serialize('buzz'),
-            serialize('quz'),
-            null,
-        ]);
-
-        $results = $redis->many(['foo', 'fizz', 'norf', 'null']);
-
-        $this->assertSame('bar', $results['foo']);
-        $this->assertSame('buzz', $results['fizz']);
-        $this->assertSame('quz', $results['norf']);
-        $this->assertNull($results['null']);
-    }
-
-    public function testRedisValueIsReturnedForNumerics()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('get')->with('prefix:foo')->returns(1);
-        $this->assertEquals(1, $redis->get('foo'));
-    }
-
-    public function testSetMethodProperlyCallsRedis()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('setex')->with('prefix:foo', 60, serialize('foo'))->returns('OK');
-        $result = $redis->put('foo', 'foo', 60);
-        $this->assertTrue($result);
-    }
-
-    public function testSetMultipleMethodProperlyCallsRedis()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('multi');
-        $connection->expects('setex')->with('prefix:foo', 60, serialize('bar'))->returns('OK');
-        $connection->expects('setex')->with('prefix:baz', 60, serialize('qux'))->returns('OK');
-        $connection->expects('setex')->with('prefix:bar', 60, serialize('norf'))->returns('OK');
-        $connection->expects('exec');
-
-        $result = $redis->putMany([
-            'foo' => 'bar',
-            'baz' => 'qux',
-            'bar' => 'norf',
-        ], 60);
-        $this->assertTrue($result);
-    }
-
-    public function testSetMethodProperlyCallsRedisForNumerics()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('setex')->with('prefix:foo', 60, 1);
-        $result = $redis->put('foo', 1, 60);
-        $this->assertFalse($result);
-    }
-
-    public function testIncrementMethodProperlyCallsRedis()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('incrby')->with('prefix:foo', 5);
-        $redis->increment('foo', 5);
-    }
-
-    public function testDecrementMethodProperlyCallsRedis()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('decrby')->with('prefix:foo', 5);
-        $redis->decrement('foo', 5);
-    }
-
-    public function testStoreItemForeverProperlyCallsRedis()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('set')->with('prefix:foo', serialize('foo'))->returns('OK');
-        $result = $redis->forever('foo', 'foo', 60);
-        $this->assertTrue($result);
-    }
-
-    public function testTouchMethodProperlyCallsRedis(): void
-    {
-        $key = 'key';
-        $ttl = 60;
-
-        $redis = $this->getRedis();
-
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('expire')->with("prefix:$key", $ttl)->returns(true);
-
-        $this->assertTrue($redis->touch($key, $ttl));
-    }
-
-    public function testForgetMethodProperlyCallsRedis()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('del')->with('prefix:foo');
-        $redis->forget('foo');
-    }
-
-    public function testFlushesCached()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('default')->returns($connection);
-        $connection->expects('flushdb')->returns('ok');
-        $result = $redis->flush();
-        $this->assertTrue($result);
-    }
-
-    public function testFlushesCachedLocks()
-    {
-        $redis = $this->getRedis();
-        $connection = Double::for(RedisConnectionStub::class);
-        $redis->getRedis()->expects('connection')->with('locks')->returns($connection);
-        $connection->expects('flushdb')->returns('ok');
-        $redis->setLockConnection('locks');
-        $result = $redis->flushLocks();
-        $this->assertTrue($result);
-    }
-
     public function testGetAndSetPrefix()
     {
         $redis = $this->getRedis();
@@ -185,9 +27,9 @@ class CacheRedisStoreTest extends TestCase
     {
         $calls = 0;
 
-        $connection = Double::for(PhpRedisConnection::class);
-        $connection->allows('_prefix')->with('')->returns('');
-        $connection->allows('zremrangebyscore');
+        $connection = Double::for(PhpRedisConnection::class)->passthru();
+        $connection->allows('command')->with('_prefix', [''])->returns('');
+        $connection->allows('command')->with('zremrangebyscore', Argument::any());
         $connection->allows('scan')->resolves(function () use (&$calls) {
             $calls++;
 

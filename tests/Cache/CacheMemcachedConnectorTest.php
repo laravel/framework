@@ -65,6 +65,10 @@ class CacheMemcachedConnectorTest extends TestCase
     #[RequiresPhpExtension('memcached')]
     public function testServersAreAddedCorrectlyWithSaslCredentials()
     {
+        if (! method_exists(Memcached::class, 'setSaslAuthData')) {
+            $this->markTestSkipped('The memcached extension was built without SASL support.');
+        }
+
         $saslCredentials = ['foo', 'bar'];
 
         $memcached = $this->memcachedMockWithAddServer();

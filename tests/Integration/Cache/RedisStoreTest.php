@@ -330,6 +330,81 @@ class RedisStoreTest extends TestCase
         $this->assertCount(0, $keyCount);
     }
 
+    public function testItStoresAndRetrievesValues(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $this->assertNull($store->get('foo'));
+
+        $this->assertTrue($store->put('foo', 'bar', 60));
+        $this->assertTrue($store->put('number', 5, 60));
+        $this->assertTrue($store->put('float', 1.5, 60));
+
+        $this->assertSame('bar', $store->get('foo'));
+        $this->assertEquals(5, $store->get('number'));
+        $this->assertEquals(1.5, $store->get('float'));
+    }
+
+    public function testItStoresAndRetrievesManyValues(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $this->assertTrue($store->putMany(['foo' => 'bar', 'fizz' => 'buzz', 'norf' => 'quz'], 60));
+
+        $this->assertSame(
+            ['foo' => 'bar', 'fizz' => 'buzz', 'norf' => 'quz', 'missing' => null],
+            $store->many(['foo', 'fizz', 'norf', 'missing'])
+        );
+    }
+
+    public function testItIncrementsAndDecrementsValues(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $store->put('count', 1, 60);
+
+        $this->assertSame(6, $store->increment('count', 5));
+        $this->assertEquals(6, $store->get('count'));
+        $this->assertSame(4, $store->decrement('count', 2));
+        $this->assertEquals(4, $store->get('count'));
+    }
+
+    public function testItStoresValuesForeverAndCanTouchThem(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+        $connection = $store->connection();
+
+        $this->assertTrue($store->forever('forever', 'value'));
+        $this->assertSame('value', $store->get('forever'));
+        $this->assertSame(-1, $connection->ttl($store->getPrefix().'forever'));
+
+        $store->put('touched', 'value', 10);
+
+        $this->assertTrue($store->touch('touched', 100));
+        $this->assertGreaterThan(10, $connection->ttl($store->getPrefix().'touched'));
+        $this->assertSame('value', $store->get('touched'));
+    }
+
+    public function testItForgetsAndFlushesValues(): void
+    {
+        $store = Cache::store('redis');
+        $store->clear();
+
+        $store->put('foo', 'bar', 60);
+        $store->put('fizz', 'buzz', 60);
+
+        $this->assertTrue($store->forget('foo'));
+        $this->assertNull($store->get('foo'));
+        $this->assertSame('buzz', $store->get('fizz'));
+
+        $this->assertTrue($store->flush());
+        $this->assertNull($store->get('fizz'));
+    }
+
     public function testLocksCanBeFlushed()
     {
         /** @var \Illuminate\Cache\RedisStore $store */

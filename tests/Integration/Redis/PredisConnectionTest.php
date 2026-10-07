@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Redis;
 use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Redis\Events\CommandExecuted;
 use Illuminate\Support\Facades\Event;
-use JMac\Testing\Double;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Predis\Client;
@@ -25,13 +24,22 @@ class PredisConnectionTest extends TestCase
         $command = 'ftSearch';
         $parameters = ['test', '*', (new SearchArguments())->dialect('3')->withScores()];
 
-        $client = Double::for(Client::class);
+        $client = new class extends Client
+        {
+            public array $received = [];
+
+            public function ftSearch(...$arguments)
+            {
+                $this->received = $arguments;
+
+                return true;
+            }
+        };
         $predis = new PredisConnection($client);
         $predis->setEventDispatcher($event);
 
-        $client->expects($command)->with(...$parameters)->returns(true);
-
         $this->assertTrue($predis->command($command, $parameters));
+        $this->assertEquals($parameters, $client->received);
 
         $event->assertDispatched(function (CommandExecuted $event) use ($command) {
             return $event->connection instanceof PredisConnection

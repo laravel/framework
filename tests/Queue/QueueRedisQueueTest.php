@@ -9,10 +9,10 @@ use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Illuminate\Tests\Redis\Fixtures\RedisConnectionStub;
 use JMac\Testing\Double;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -36,7 +36,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $container = Double::for(Container::class, override: true);
         $queue->setContainer($container->instance());
-        $connection = Double::for(RedisConnectionStub::class);
+        $connection = Double::for(PhpRedisConnection::class)->passthru();
         $redis->expects('connection')->times(minimum: 1)->returns($connection);
         $connection->expects('isCluster')->returns(false);
         $connection->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
@@ -64,7 +64,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $container = Double::for(Container::class, override: true);
         $queue->setContainer($container->instance());
-        $connection = Double::for(RedisConnectionStub::class);
+        $connection = Double::for(PhpRedisConnection::class)->passthru();
         $redis->expects('connection')->times(minimum: 1)->returns($connection);
         $connection->expects('isCluster')->returns(false);
         $connection->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
@@ -98,7 +98,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $container = Double::for(Container::class, override: true);
         $queue->setContainer($container->instance());
-        $connection = Double::for(RedisConnectionStub::class);
+        $connection = Double::for(PhpRedisConnection::class)->passthru();
         $redis->expects('connection')->times(minimum: 1)->returns($connection);
         $connection->expects('isCluster')->returns(false);
         $connection->expects('eval')->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
@@ -138,7 +138,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
 
-        $connection = Double::for(RedisConnectionStub::class);
+        $connection = Double::for(PhpRedisConnection::class)->passthru();
 
         $redis->expects('connection')->times(minimum: 1)->returns($connection);
         $connection->expects('isCluster')->returns(false);
@@ -174,7 +174,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(5);
 
-        $connection = Double::for(RedisConnectionStub::class);
+        $connection = Double::for(PhpRedisConnection::class)->passthru();
 
         $redis->expects('connection')->times(minimum: 1)->returns($connection);
         $connection->expects('isCluster')->returns(false);
@@ -195,7 +195,7 @@ class QueueRedisQueueTest extends TestCase
     public function testBulkRespectsDelayAttributeWhenPushingOntoRedis()
     {
         $redis = Double::for(Factory::class);
-        $connection = Double::for(RedisConnectionStub::class);
+        $connection = Double::for(PhpRedisConnection::class)->passthru();
         $redis->expects('connection')->returns($connection);
         $connection->expects('pipeline')->resolves(function ($callback) {
             $callback();
@@ -463,9 +463,9 @@ class QueueRedisQueueTest extends TestCase
     public function testAllQueueNamesStripsClusterBraces()
     {
         $redis = Double::for(Factory::class);
-        $connection = Double::for(RedisConnectionStub::class);
+        $connection = Double::for(PhpRedisConnection::class)->passthru();
         $redis->expects('connection')->returns($connection);
-        $connection->expects('keys')->returns(['queues:{default}', 'queues:{default}:delayed', 'queues:{emails}']);
+        $connection->expects('command')->with('keys', Argument::any())->returns(['queues:{default}', 'queues:{default}:delayed', 'queues:{emails}']);
         $queue = new TestableRedisQueue($redis, 'default');
 
         $this->assertSame(['default', 'emails'], $queue->testAllQueueNames()->all());
@@ -476,11 +476,16 @@ class QueueRedisQueueTest extends TestCase
     {
         $redis = Double::for(Factory::class);
         $connection = Double::for(PhpRedisClusterConnection::class);
-        $client = Double::for(\RedisCluster::class);
+        $client = new class
+        {
+            public function getOption($option)
+            {
+                return $option === \Redis::OPT_SCAN ? \Redis::SCAN_PREFIX : null;
+            }
+        };
 
         $redis->expects('connection')->returns($connection);
         $connection->expects('client')->returns($client);
-        $client->expects('getOption')->with(\Redis::OPT_SCAN)->returns(\Redis::SCAN_PREFIX);
         $connection->expects('scan')->with(null, ['match' => 'queues:*', 'count' => 1000])->returns([null, ['test_queues:{default}']]);
 
         $queue = new TestableRedisQueue($redis, 'default');
@@ -491,7 +496,7 @@ class QueueRedisQueueTest extends TestCase
     public function testSizeResolvesTheQueueNameFromAnEnum()
     {
         $queue = new RedisQueue($redis = Double::for(Factory::class), 'default');
-        $connection = Double::for(RedisConnectionStub::class);
+        $connection = Double::for(PhpRedisConnection::class)->passthru();
         $redis->expects('connection')->times(2)->returns($connection);
         $connection->expects('isCluster')->returns(false);
         $connection->expects('eval')->with(LuaScripts::size(), 3, 'queues:emails', 'queues:emails:delayed', 'queues:emails:reserved')->returns(5);
@@ -502,10 +507,10 @@ class QueueRedisQueueTest extends TestCase
     public function testPendingJobsResolvesTheQueueNameFromAnEnum()
     {
         $queue = new RedisQueue($redis = Double::for(Factory::class), 'default');
-        $connection = Double::for(RedisConnectionStub::class);
+        $connection = Double::for(PhpRedisConnection::class)->passthru();
         $redis->expects('connection')->times(2)->returns($connection);
         $connection->expects('isCluster')->returns(false);
-        $connection->expects('lrange')->with('queues:emails', 0, -1)->returns([
+        $connection->expects('command')->with('lrange', ['queues:emails', 0, -1])->returns([
             json_encode(['uuid' => 'uuid', 'displayName' => 'foo']),
         ]);
 

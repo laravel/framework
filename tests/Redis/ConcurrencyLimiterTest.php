@@ -15,7 +15,7 @@ class ConcurrencyLimiterTest extends TestCase
 {
     public function testAcquireUsesHashTagsOnPhpRedisClusterConnection()
     {
-        $connection = Double::for(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class)->passthru();
         $connection->expects('isCluster')->returns(true);
 
         // acquire() calls eval → command('eval', ...) with the lock script
@@ -44,7 +44,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireUsesPlainKeysOnNonClusterConnection()
     {
-        $connection = Double::for(PhpRedisConnection::class);
+        $connection = Double::for(PhpRedisConnection::class)->passthru();
         $connection->expects('isCluster')->returns(false);
 
         $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
@@ -70,17 +70,23 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireUsesHashTagsOnPredisClusterConnection()
     {
-        $connection = Double::for(PredisClusterConnection::class);
+        $connection = Double::for(PredisClusterConnection::class)->passthru();
         $connection->expects('isCluster')->returns(true);
 
-        $connection->expects('eval')->with(Argument::satisfies(fn ($s) => str_contains($s, 'mget')),
-            2,
-            '{limiter}1', '{limiter}2',
-            '{limiter}', Argument::any(), Argument::any())->returns('{limiter}1');
+        // Predis forwards eval() through __call() into command('eval', [script, numkeys, ...keys, ...argv]).
+        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+            return str_contains($args[0], 'mget')
+                && $args[1] === 2
+                && $args[2] === '{limiter}1'
+                && $args[3] === '{limiter}2'
+                && $args[4] === '{limiter}';
+        }))->returns('{limiter}1');
 
-        $connection->expects('eval')->with(Argument::satisfies(fn ($s) => str_contains($s, 'del')),
-            1,
-            '{limiter}1', Argument::any())->returns(1);
+        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+            return str_contains($args[0], 'del')
+                && $args[1] === 1
+                && $args[2] === '{limiter}1';
+        }))->returns(1);
 
         $limiter = new ConcurrencyLimiter($connection, 'limiter', 2, 60);
         $result = $limiter->block(0, function () {
@@ -92,7 +98,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testReleaseKeyMatchesAcquireKeyOnCluster()
     {
-        $connection = Double::for(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class)->passthru();
         $connection->expects('isCluster')->returns(true);
 
         // Acquire returns the slot key
@@ -114,7 +120,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireDoesNotDoubleWrapPreExistingHashTags()
     {
-        $connection = Double::for(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class)->passthru();
         $connection->expects('isCluster')->returns(true);
 
         // Name already has hash tags — should NOT be double-wrapped
@@ -140,7 +146,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireWrapsUnmatchedBraceOnCluster()
     {
-        $connection = Double::for(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class)->passthru();
         $connection->expects('isCluster')->returns(true);
 
         // Name has '{' but no '}' — not a valid hash tag, should be wrapped
@@ -166,7 +172,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireWrapsEmptyBracesOnCluster()
     {
-        $connection = Double::for(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class)->passthru();
         $connection->expects('isCluster')->returns(true);
 
         // Name has '{}' but that's an empty hash tag — should be wrapped
@@ -192,23 +198,28 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testAcquireUsesPlainKeysOnPredisNonClusterConnection()
     {
-        $connection = Double::for(PredisConnection::class);
+        $connection = Double::for(PredisConnection::class)->passthru();
         $connection->expects('isCluster')->returns(false);
 
-        $connection->expects('eval')->with(Argument::satisfies(fn ($s) => str_contains($s, 'mget')),
-            2,
-            'lock1', 'lock2',
-            'lock', Argument::any(), Argument::any())->returns('lock1');
+        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+            return str_contains($args[0], 'mget')
+                && $args[1] === 2
+                && $args[2] === 'lock1'
+                && $args[3] === 'lock2'
+                && $args[4] === 'lock';
+        }))->returns('lock1');
 
-        $connection->expects('eval')->with(Argument::satisfies(fn ($s) => str_contains($s, 'del')),
-            1,
-            'lock1', Argument::any())->returns(1);
+        $connection->expects('command')->with('eval', Argument::satisfies(function ($args) {
+            return str_contains($args[0], 'del')
+                && $args[1] === 1
+                && $args[2] === 'lock1';
+        }))->returns(1);
 
         $limiter = new ConcurrencyLimiter($connection, 'lock', 2, 60);
         $result = $limiter->block(0, function () {
-            return 'success';
+            return 'ok';
         });
 
-        $this->assertSame('success', $result);
+        $this->assertSame('ok', $result);
     }
 }

@@ -60,7 +60,7 @@ class RedisQueueTest extends TestCase
     {
         $this->queue = new RedisQueue($this->redis[$driver], $default, $connection, $retryAfter, $blockFor);
         $this->container = Double::for(Container::class, override: true);
-        $this->queue->setContainer($this->container);
+        $this->queue->setContainer($this->container->instance());
     }
 
     private function getQueueRedisKey($queue = null)
@@ -505,17 +505,15 @@ class RedisQueueTest extends TestCase
     public function testPushJobQueueingAndJobQueuedEvents($driver)
     {
         $events = Double::for(Dispatcher::class);
-        $events->expects('dispatch')->withArgs(function (JobQueueing $jobQueuing) {
-            $this->assertInstanceOf(RedisQueueIntegrationTestJob::class, $jobQueuing->job);
-
-            return true;
-        })->andReturnNull();
-        $events->expects('dispatch')->withArgs(function (JobQueued $jobQueued) {
-            $this->assertInstanceOf(RedisQueueIntegrationTestJob::class, $jobQueued->job);
-            $this->assertIsString($jobQueued->id);
-
-            return true;
-        })->andReturnNull();
+        $events->expects('dispatch')->with(Argument::satisfies(function ($event) {
+            return $event instanceof JobQueueing
+                && $event->job instanceof RedisQueueIntegrationTestJob;
+        }))->returns(null);
+        $events->expects('dispatch')->with(Argument::satisfies(function ($event) {
+            return $event instanceof JobQueued
+                && $event->job instanceof RedisQueueIntegrationTestJob
+                && is_string($event->id);
+        }))->returns(null);
 
         $container = Double::for(Container::class, override: true);
         $container->expects('bound')->with('events')->returns(true)->times(2);
