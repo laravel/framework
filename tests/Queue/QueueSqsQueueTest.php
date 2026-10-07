@@ -153,7 +153,7 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->expects('sendMessage')->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'DelaySeconds' => 5])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->later($now->addSeconds(5), $this->mockedJob, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
     }
 
     public function testDelayedPushProperlyPushesJobOntoSqs()
@@ -167,7 +167,7 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->expects('sendMessage')->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'DelaySeconds' => $this->mockedDelay])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->later($this->mockedDelay, $this->mockedJob, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
     }
 
     public function testPushProperlyPushesJobOntoSqs()
@@ -180,7 +180,7 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->expects('sendMessage')->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->push($this->mockedJob, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
     }
 
     public function testSizeProperlyReadsSqsQueueSize()
@@ -390,7 +390,7 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->expects('sendMessage')->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
     }
 
     public function testPendingDispatchProperlyPushesJobObjectOntoSqs()
@@ -410,7 +410,7 @@ class QueueSqsQueueTest extends TestCase
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
 
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
     }
 
     public function testPushProperlyPushesJobObjectOntoSqsFairQueue()
@@ -425,7 +425,7 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->expects('sendMessage')->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
     }
 
     public function testPendingDispatchProperlyPushesJobObjectOntoSqsFairQueue()
@@ -444,7 +444,7 @@ class QueueSqsQueueTest extends TestCase
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
 
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
     }
 
     public function testPushProperlyPushesJobStringOntoSqsFifoQueue()
@@ -464,7 +464,7 @@ class QueueSqsQueueTest extends TestCase
         ])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->push($this->mockedJob, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }
@@ -488,7 +488,7 @@ class QueueSqsQueueTest extends TestCase
         ])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }
@@ -512,7 +512,7 @@ class QueueSqsQueueTest extends TestCase
         ])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }
@@ -537,7 +537,7 @@ class QueueSqsQueueTest extends TestCase
         ])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }
@@ -562,7 +562,7 @@ class QueueSqsQueueTest extends TestCase
         ])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }
@@ -590,7 +590,7 @@ class QueueSqsQueueTest extends TestCase
         ])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }
@@ -614,7 +614,7 @@ class QueueSqsQueueTest extends TestCase
         ])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
     }
 
     public function testPushProperlyPushesJobObjectOntoSqsFifoQueueWithDeduplicator()
@@ -643,7 +643,7 @@ class QueueSqsQueueTest extends TestCase
         ])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
     }
 
     public function testPendingDispatchProperlyPushesJobObjectOntoSqsFifoQueue()
@@ -669,7 +669,7 @@ class QueueSqsQueueTest extends TestCase
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
 
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }
@@ -697,7 +697,7 @@ class QueueSqsQueueTest extends TestCase
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
 
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         FakeSqsJobWithDeduplication::createDeduplicationIdsNormally();
     }
@@ -734,7 +734,7 @@ class QueueSqsQueueTest extends TestCase
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
 
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         FakeSqsJobWithDeduplication::createDeduplicationIdsNormally();
     }
@@ -772,7 +772,7 @@ class QueueSqsQueueTest extends TestCase
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
 
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
     }
 
     public function testDelayedPushProperlyPushesJobStringOntoSqsFifoQueueWithoutDelay()
@@ -793,7 +793,7 @@ class QueueSqsQueueTest extends TestCase
         ])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->later($this->mockedDelay, $this->mockedJob, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }
@@ -818,7 +818,7 @@ class QueueSqsQueueTest extends TestCase
         ])->returns($this->mockedSendMessageResponseModel);
         $id = $queue->later($this->mockedDelay, $job, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }
@@ -846,7 +846,7 @@ class QueueSqsQueueTest extends TestCase
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
 
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }

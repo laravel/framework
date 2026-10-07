@@ -59,7 +59,7 @@ class CacheSpyMemoTest extends TestCase
 
         $this->assertSame('bar', $value);
 
-        $memoizedCache->shouldHaveReceived('remember')->once()->with('key', 60, Argument::type(Closure::class));
+        $memoizedCache->received('remember')->times(1)->with('key', 60, Argument::type(Closure::class));
     }
 
     public function test_cache_spy_tracks_remember_calls_on_memoized_cache()
@@ -69,7 +69,7 @@ class CacheSpyMemoTest extends TestCase
         $memoizedCache = Cache::memo();
         $memoizedCache->remember('key', 60, fn () => 'bar');
 
-        $memoizedCache->shouldHaveReceived('remember')->once()->with('key', 60, Argument::type(Closure::class));
+        $memoizedCache->received('remember')->times(1)->with('key', 60, Argument::type(Closure::class));
     }
 
     public function test_cache_spy_memo_returns_spied_repository()
@@ -82,6 +82,6 @@ class CacheSpyMemoTest extends TestCase
 
         $memoizedCache->remember('key', 60, fn () => 'bar');
 
-        $memoizedCache->shouldHaveReceived('remember')->once();
+        $memoizedCache->received('remember')->times(1);
     }
 }

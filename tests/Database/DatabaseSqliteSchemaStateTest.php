@@ -33,7 +33,7 @@ class DatabaseSqliteSchemaStateTest extends TestCase
 
         $this->assertSame('sqlite3 "${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"', $command);
 
-        $process->shouldHaveReceived('mustRun')->with(null, [
+        $process->received('mustRun')->with(null, [
             'LARAVEL_LOAD_DATABASE' => 'database/database.sqlite',
             'LARAVEL_LOAD_PATH' => 'database/schema/sqlite-schema.dump',
         ]);
@@ -53,7 +53,7 @@ class DatabaseSqliteSchemaStateTest extends TestCase
         $schemaState = new SqliteSchemaState($connection, $files);
         $schemaState->load('database/schema/sqlite-schema.dump');
 
-        $pdo->shouldHaveReceived('exec')->with('CREATE TABLE IF NOT EXISTS "migrations" ("id" integer not null primary key autoincrement, "migration" varchar not null, "batch" integer not null);');
+        $pdo->received('exec')->with('CREATE TABLE IF NOT EXISTS "migrations" ("id" integer not null primary key autoincrement, "migration" varchar not null, "batch" integer not null);');
     }
 
     public function testDumpRemovesShadowTables(): void
@@ -86,7 +86,7 @@ class DatabaseSqliteSchemaStateTest extends TestCase
             ->withMigrationTable(null)
             ->dump($connection, 'schema.sql');
 
-        $files->shouldHaveReceived('put')->with('schema.sql', <<<'SQL'
+        $files->received('put')->with('schema.sql', <<<'SQL'
             CREATE VIRTUAL TABLE posts using fts5(body)
             /* posts(body) */;
             CREATE TABLE IF NOT EXISTS "logs_data"("id" integer primary key);

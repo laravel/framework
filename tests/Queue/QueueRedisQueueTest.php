@@ -42,7 +42,7 @@ class QueueRedisQueueTest extends TestCase
 
         $id = $queue->push('foo', ['data']);
         $this->assertSame('foo', $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }
@@ -73,7 +73,7 @@ class QueueRedisQueueTest extends TestCase
 
         $id = $queue->push('foo', ['data']);
         $this->assertSame('foo', $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Queue::createPayloadUsing(null);
 
@@ -110,7 +110,7 @@ class QueueRedisQueueTest extends TestCase
 
         $id = $queue->push('foo', ['data']);
         $this->assertSame('foo', $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Queue::createPayloadUsing(null);
 
@@ -147,7 +147,7 @@ class QueueRedisQueueTest extends TestCase
 
         $id = $queue->later(1, 'foo', ['data']);
         $this->assertSame('foo', $id);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }
@@ -180,7 +180,7 @@ class QueueRedisQueueTest extends TestCase
         );
 
         $queue->later($date->addSeconds(5), 'foo', ['data']);
-        $container->shouldHaveReceived('bound')->with('events')->twice();
+        $container->received('bound')->with('events')->times(2);
 
         Str::createUuidsNormally();
     }

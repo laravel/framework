@@ -220,7 +220,7 @@ class RedisQueueTest extends TestCase
         $job = new RedisQueueIntegrationTestJob(10);
         $this->queue->later(-10, $job);
 
-        $this->container->shouldHaveReceived('bound')->with('events')->twice();
+        $this->container->received('bound')->with('events')->times(2);
 
         // Pop and check it is popped correctly
         $before = $this->currentTime();
@@ -303,7 +303,7 @@ class RedisQueueTest extends TestCase
         // Make an expired reserved job
         $failed = new RedisQueueIntegrationTestJob(-20);
         $this->queue->push($failed);
-        $this->container->shouldHaveReceived('bound')->with('events')->twice();
+        $this->container->received('bound')->with('events')->times(2);
 
         $beforeFailPop = $this->currentTime();
         $this->queue->pop();
@@ -312,7 +312,7 @@ class RedisQueueTest extends TestCase
         // Push an item into queue
         $job = new RedisQueueIntegrationTestJob(10);
         $this->queue->push($job);
-        $this->container->shouldHaveReceived('bound')->with('events')->times(4);
+        $this->container->received('bound')->with('events')->times(4);
 
         // Pop and check it is popped correctly
         $before = $this->currentTime();
@@ -353,7 +353,7 @@ class RedisQueueTest extends TestCase
         // Push an item into queue
         $job = new RedisQueueIntegrationTestJob(10);
         $this->queue->push($job);
-        $this->container->shouldHaveReceived('bound')->with('events')->twice();
+        $this->container->received('bound')->with('events')->times(2);
 
         // Pop and check it is popped correctly
         $before = $this->currentTime();

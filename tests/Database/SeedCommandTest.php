@@ -54,7 +54,7 @@ class SeedCommandTest extends TestCase
         $command->handle();
 
         $this->assertSame('sqlite', $resolver->getDefaultConnection());
-        $container->shouldHaveReceived('call')->with([$command, 'handle']);
+        $container->received('call')->with([$command, 'handle']);
     }
 
     public function testFailedSeederRestoresPreviousDefaultConnection()
@@ -133,7 +133,7 @@ class SeedCommandTest extends TestCase
 
         Assert::assertSame($dispatcher, Model::getEventDispatcher());
         $this->assertSame('sqlite', $resolver->getDefaultConnection());
-        $container->shouldHaveReceived('call')->with([$command, 'handle']);
+        $container->received('call')->with([$command, 'handle']);
     }
 
     public function testProhibitable()

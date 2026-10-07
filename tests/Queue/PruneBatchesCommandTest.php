@@ -25,7 +25,7 @@ class PruneBatchesCommandTest extends TestCase
 
         $command->run(new ArrayInput(['--unfinished' => 0]), new NullOutput());
 
-        $repo->shouldHaveReceived('pruneUnfinished')->once();
+        $repo->received('pruneUnfinished')->times(1);
     }
 
     public function testAllowPruningAllCancelledBatches()
@@ -39,6 +39,6 @@ class PruneBatchesCommandTest extends TestCase
 
         $command->run(new ArrayInput(['--cancelled' => 0]), new NullOutput());
 
-        $repo->shouldHaveReceived('pruneCancelled')->once();
+        $repo->received('pruneCancelled')->times(1);
     }
 }

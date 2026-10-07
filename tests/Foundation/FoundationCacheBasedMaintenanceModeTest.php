@@ -44,7 +44,7 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
         $manager->activate(['payload']);
 
-        $cache->shouldHaveReceived('put')->once()->with('key', ['payload']);
+        $cache->received('put')->times(1)->with('key', ['payload']);
     }
 
     public function test_it_removes_payload_from_cache()
@@ -55,6 +55,6 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
         $manager->deactivate();
 
-        $cache->shouldHaveReceived('forget')->once()->with('key');
+        $cache->received('forget')->times(1)->with('key');
     }
 }

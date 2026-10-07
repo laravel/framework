@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -19,8 +20,7 @@ class DatabaseEloquentCollectionQueueableTest extends TestCase
 
         $c->getQueueableIds();
 
-        $spy->shouldHaveReceived('getQueueableId', [])
-            ->once();
+        $spy->received('getQueueableId')->with(Argument::none())->times(1);
     }
 
     public function testSerializesModelEntitiesById()
@@ -31,8 +31,7 @@ class DatabaseEloquentCollectionQueueableTest extends TestCase
 
         $c->getQueueableIds();
 
-        $spy->shouldHaveReceived('getQueueableId', [])
-            ->once();
+        $spy->received('getQueueableId')->with(Argument::none())->times(1);
     }
 
     /**
