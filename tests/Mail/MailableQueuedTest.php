@@ -13,6 +13,8 @@ use Illuminate\Mail\Mailer;
 use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Queue\Attributes\Connection;
 use Illuminate\Queue\Attributes\Delay;
+use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
+use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -301,6 +303,22 @@ class MailableQueuedTest extends TestCase
         });
     }
 
+    public function testQueuedMailableRespectsDeleteWhenMissingModelsAndFailOnTimeoutAttributes(): void
+    {
+        $job = new SendQueuedMailable(new MailableQueueableStubWithFailureAttributes);
+
+        $this->assertTrue($job->deleteWhenMissingModels);
+        $this->assertTrue($job->failOnTimeout);
+    }
+
+    public function testQueuedMailableRespectsDeleteWhenMissingModelsAndFailOnTimeoutProperties(): void
+    {
+        $job = new SendQueuedMailable(new MailableQueueableStubWithFailureProperties);
+
+        $this->assertTrue($job->deleteWhenMissingModels);
+        $this->assertTrue($job->failOnTimeout);
+    }
+
     protected function getMocks()
     {
         return ['smtp', Mockery::mock(Factory::class), Mockery::mock(TransportInterface::class)];
@@ -388,6 +406,20 @@ class MailableQueueableStubWithDeduplication extends Mailable implements ShouldQ
 class MailableQueueableStubWithQueueAndConnectionAttributes extends MailableQueueableStub
 {
     //
+}
+
+#[DeleteWhenMissingModels]
+#[FailOnTimeout]
+class MailableQueueableStubWithFailureAttributes extends MailableQueueableStub
+{
+    //
+}
+
+class MailableQueueableStubWithFailureProperties extends MailableQueueableStub
+{
+    public $deleteWhenMissingModels = true;
+
+    public $failOnTimeout = true;
 }
 
 #[Connection('sqs')]
