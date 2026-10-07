@@ -101,6 +101,13 @@ class Router implements BindingRegistrar, RegistrarContract
     public $middlewarePriority = [];
 
     /**
+     * The before middleware callbacks.
+     *
+     * @var array
+     */
+    protected $beforeMiddlewareCallbacks = [];
+
+    /**
      * The registered route value binders.
      *
      * @var array
@@ -815,12 +822,17 @@ class Router implements BindingRegistrar, RegistrarContract
 
         $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route);
 
-        return (new Pipeline($this->container))
+        $pipeline = (new Pipeline($this->container))
             ->send($request)
-            ->through($middleware)
-            ->then(fn ($request) => $this->prepareResponse(
-                $request, $route->run()
-            ));
+            ->through($middleware);
+
+        foreach ($this->beforeMiddlewareCallbacks as $arguments) {
+            $pipeline->before(...$arguments);
+        }
+
+        return $pipeline->then(fn ($request) => $this->prepareResponse(
+            $request, $route->run()
+        ));
     }
 
     /**
@@ -1043,6 +1055,20 @@ class Router implements BindingRegistrar, RegistrarContract
     public function aliasMiddleware($name, $class)
     {
         $this->middleware[$name] = $class;
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to run before the given route middleware.
+     *
+     * @param  string|\Closure  $pipe
+     * @param  \Closure|null  $callback
+     * @return $this
+     */
+    public function beforeMiddleware($pipe, ?Closure $callback = null)
+    {
+        $this->beforeMiddlewareCallbacks[] = func_get_args();
 
         return $this;
     }

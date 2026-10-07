@@ -395,6 +395,23 @@ class RoutingRouteTest extends TestCase
         unset($_SERVER['__middleware.group']);
     }
 
+    public function testBeforeMiddlewareCallbackRunsBeforeRouteMiddleware()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['middleware' => RoutingTestMiddlewareGroupOne::class, function () {
+            return 'hello';
+        }]);
+
+        $calls = [];
+
+        $router->beforeMiddleware(RoutingTestMiddlewareGroupOne::class, function ($pipe) use (&$calls) {
+            $calls[] = get_class($pipe);
+        });
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertSame([RoutingTestMiddlewareGroupOne::class], $calls);
+    }
+
     public function testMiddlewareGroupsCannotReferenceItself()
     {
         $this->expectExceptionObject(new LogicException('[web] middleware group is referencing itself.'));

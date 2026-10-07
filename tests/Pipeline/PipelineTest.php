@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Pipeline;
 
+use Closure;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Pipeline\Pipeline;
@@ -387,6 +388,127 @@ class PipelineTest extends TestCase
 
         $this->assertSame(4, $std->value);
         $this->assertSame(4, $result->value);
+    }
+
+    public function testPipelineBeforeCallbackIsCalledBeforePipeRuns()
+    {
+        $beforeCalledWith = null;
+
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->through([PipelineTestPipeOne::class])
+            ->before(PipelineTestPipeOne::class, function ($pipe) use (&$beforeCalledWith) {
+                $beforeCalledWith = $pipe;
+                $this->assertArrayNotHasKey('__test.pipe.one', $_SERVER);
+            })
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertSame('foo', $result);
+        $this->assertInstanceOf(PipelineTestPipeOne::class, $beforeCalledWith);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelineBeforeCallbackWithoutPipeRunsBeforeEveryPipe()
+    {
+        $calls = [];
+
+        (new Pipeline(new Container))
+            ->send('foo')
+            ->through([PipelineTestPipeOne::class, PipelineTestPipeTwo::class])
+            ->before(function ($pipe) use (&$calls) {
+                $calls[] = get_class($pipe);
+            })
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertSame([PipelineTestPipeOne::class, PipelineTestPipeTwo::class], $calls);
+
+        unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelineBeforeWildcardCallbackRunsBeforeCallablePipes()
+    {
+        $calls = [];
+
+        (new Pipeline(new Container))
+            ->send('foo')
+            ->through([function ($piped, $next) {
+                return $next($piped);
+            }])
+            ->before(function ($pipe) use (&$calls) {
+                $calls[] = $pipe;
+            })
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertCount(1, $calls);
+        $this->assertInstanceOf(Closure::class, $calls[0]);
+    }
+
+    public function testPipelineBeforeCallbackReceivesThePipeParameters()
+    {
+        $beforeParameters = null;
+
+        (new Pipeline(new Container))
+            ->send('foo')
+            ->through(PipelineTestParameterPipe::class.':one,two')
+            ->before(PipelineTestParameterPipe::class, function ($pipe, ...$parameters) use (&$beforeParameters) {
+                $beforeParameters = $parameters;
+            })
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertSame(['one', 'two'], $beforeParameters);
+
+        unset($_SERVER['__test.pipe.parameters']);
+    }
+
+    public function testPipelineBeforeCallbackWithParametersOnlyRunsForMatchingParameters()
+    {
+        $calls = [];
+
+        (new Pipeline(new Container))
+            ->send('foo')
+            ->through(PipelineTestParameterPipe::class.':one,two')
+            ->before(PipelineTestParameterPipe::class.':one,two', function ($pipe, ...$parameters) use (&$calls) {
+                $calls[] = $parameters;
+            })
+            ->before(PipelineTestParameterPipe::class.':three,four', function ($pipe, ...$parameters) use (&$calls) {
+                $calls[] = $parameters;
+            })
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertSame([['one', 'two']], $calls);
+
+        unset($_SERVER['__test.pipe.parameters']);
+    }
+
+    public function testPipelineBeforeCallbackReceivesThePipeInstance()
+    {
+        $beforePipe = null;
+
+        (new Pipeline(new Container))
+            ->send('foo')
+            ->through([PipelineTestPipeOne::class])
+            ->before(PipelineTestPipeOne::class, function ($pipe) use (&$beforePipe) {
+                $beforePipe = $pipe;
+            })
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertInstanceOf(PipelineTestPipeOne::class, $beforePipe);
+
+        unset($_SERVER['__test.pipe.one']);
     }
 
     public function testPipelineFinallyWhenExceptionOccurs()

@@ -5,6 +5,7 @@ namespace Illuminate\Pipeline;
 use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
@@ -49,6 +50,13 @@ class Pipeline implements PipelineContract
      * @var \Closure|null
      */
     protected $finally;
+
+    /**
+     * The callbacks to run before specific pipes are called.
+     *
+     * @var array
+     */
+    protected $before = [];
 
     /**
      * Indicates whether to wrap the pipeline in a database transaction.
@@ -168,6 +176,26 @@ class Pipeline implements PipelineContract
     }
 
     /**
+     * Register a callback to run before the given pipe is called.
+     *
+     * @param  string|\Closure  $key
+     * @param  \Closure|null  $callback
+     * @return $this
+     */
+    public function before($key, ?Closure $callback = null)
+    {
+        if ($key instanceof Closure) {
+            $this->before['*'][] = $key;
+
+            return $this;
+        }
+
+        $this->before[$key][] = $callback;
+
+        return $this;
+    }
+
+    /**
      * Get the final piece of the Closure onion.
      *
      * @param  \Closure  $destination
@@ -195,11 +223,15 @@ class Pipeline implements PipelineContract
             return function ($passable) use ($stack, $pipe) {
                 try {
                     if (is_callable($pipe)) {
+                        $this->runBeforeCallbacks($pipe, []);
+
                         // If the pipe is a callable, then we will call it directly, but otherwise we
                         // will resolve the pipes out of the dependency container and call it with
                         // the appropriate method and arguments, returning the results back out.
                         return $pipe($passable, $stack);
                     } elseif (! is_object($pipe)) {
+                        $pipeString = $pipe;
+
                         [$name, $parameters] = $this->parsePipeString($pipe);
 
                         // If the pipe is a string we will parse the string and resolve the class out
@@ -207,8 +239,12 @@ class Pipeline implements PipelineContract
                         // execute the pipe function giving in the parameters that are required.
                         $pipe = $this->getContainer()->make($name);
 
+                        $this->runBeforeCallbacks($pipe, $parameters, $pipeString);
+
                         $parameters = array_merge([$passable, $stack], $parameters);
                     } else {
+                        $this->runBeforeCallbacks($pipe, [], $pipe::class);
+
                         // If the pipe is already an object we'll just make a callable and pass it to
                         // the pipe as-is. There is no need to do any extra parsing and formatting
                         // since the object we're given was already a fully instantiated object.
@@ -225,6 +261,37 @@ class Pipeline implements PipelineContract
                 }
             };
         };
+    }
+
+    /**
+     * Run the before callbacks registered for the given pipe.
+     *
+     * @param  mixed  $pipe
+     * @param  array  $parameters
+     * @param  string|null  $key
+     * @return void
+     */
+    protected function runBeforeCallbacks($pipe, $parameters, $key = null)
+    {
+        foreach ($this->before['*'] ?? [] as $callback) {
+            $callback($pipe, ...$parameters);
+        }
+
+        if ($key === null) {
+            return;
+        }
+
+        foreach ($this->before[$key] ?? [] as $callback) {
+            $callback($pipe, ...$parameters);
+        }
+
+        $name = Str::before($key, ':');
+
+        if ($name !== $key) {
+            foreach ($this->before[$name] ?? [] as $callback) {
+                $callback($pipe, ...$parameters);
+            }
+        }
     }
 
     /**
