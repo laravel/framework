@@ -390,9 +390,19 @@ class SupportNumberTest extends TestCase
         $this->assertSame([[1, 1001], [1001, 2001], [2001, 2500]], Number::pairs(2500, 1000, 1, 0));
         $this->assertSame([[1, 1000], [1001, 2000], [2001, 2500]], Number::pairs(2500, 1000, 1, 1));
         $this->assertSame([[0, 2.5], [2.5, 5.0], [5.0, 7.5], [7.5, 10.0]], Number::pairs(10, 2.5, 0, 0));
-        $this->assertSame([[0, 2.0], [2.5, 4.5], [5.0, 7.0], [7.5, 9.5]], Number::pairs(10, 2.5, 0, 0.5));
+        $this->assertSame([[0, 2.0], [2.5, 4.5], [5.0, 7.0], [7.5, 9.5], [10.0, 10]], Number::pairs(10, 2.5, 0, 0.5));
         $this->assertSame([[0.5, 3.0], [3.0, 5.5], [5.5, 8.0], [8.0, 10]], Number::pairs(10, 2.5, 0.5, 0));
         $this->assertSame([[0.5, 2.5], [3.0, 5.0], [5.5, 7.5], [8.0, 10.0]], Number::pairs(10, 2.5, 0.5, 0.5));
+    }
+
+    public function testPairsIncludesUpperBoundWhenItStartsANewPair()
+    {
+        $this->assertSame([[0, 9], [10, 19], [20, 20]], Number::pairs(20, 10));
+        $this->assertSame([[0, 9], [10, 19], [20, 21]], Number::pairs(21, 10));
+        $this->assertSame([[1, 3], [4, 6], [7, 9], [10, 10]], Number::pairs(10, 3, 1));
+        $this->assertSame([[0, 10], [10, 20]], Number::pairs(20, 10, 0, 0));
+        $this->assertSame([], Number::pairs(0, 10));
+        $this->assertSame([], Number::pairs(5, 10, 10));
     }
 
     public function testPairsThrowsWhenByIsZero()
