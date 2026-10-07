@@ -25,7 +25,7 @@ class MailMessage extends SimpleMessage implements Renderable
     /**
      * The view data for the message.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     public $viewData = [];
 
