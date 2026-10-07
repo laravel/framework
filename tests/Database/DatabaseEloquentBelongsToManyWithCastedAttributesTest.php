@@ -58,7 +58,8 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $related = Double::for(Model::class)->passthru();
         $builder->shouldReceive('getModel')->andReturn($related);
         $related->shouldReceive('qualifyColumn');
-        $builder->shouldReceive('join', 'where');
+        $builder->shouldReceive('join');
+        $builder->shouldReceive('where');
         $builder->shouldReceive('getQuery')->andReturn(
             Mockery::mock(QueryBuilder::class, ['getGrammar' => new Grammar(Double::for(Connection::class))])
         );
