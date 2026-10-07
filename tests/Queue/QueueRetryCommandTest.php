@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -24,9 +25,10 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class QueueRetryCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
-        m::close();
     }
 
     public function testRetriesSingleJobByPushingItsRawPayload()

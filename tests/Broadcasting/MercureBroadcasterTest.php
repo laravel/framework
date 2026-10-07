@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Broadcasting\Broadcasters\MercureBroadcaster;
@@ -29,6 +30,8 @@ use Symfony\Component\Mercure\Update;
 
 class MercureBroadcasterTest extends TestCase
 {
+    use VerifiesDoubles;
+
     /**
      * @var \Illuminate\Broadcasting\Broadcasters\MercureBroadcaster
      */
@@ -67,7 +70,6 @@ class MercureBroadcasterTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
         EncryptCookies::flushState();
 
         parent::tearDown();

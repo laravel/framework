@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Double;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
@@ -16,9 +17,10 @@ use Symfony\Component\Mime\Email;
 
 class MailResendTransportTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
-        Mockery::close();
     }
 
     public function testGetTransport(): void

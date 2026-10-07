@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Double;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Console\Command;
@@ -15,9 +16,10 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class RetryBatchCommandTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
-        Mockery::close();
     }
 
     public function testItFailsWhenTheBatchCannotBeFound()

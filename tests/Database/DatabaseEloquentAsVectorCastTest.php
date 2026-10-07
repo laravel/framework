@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolver;
@@ -17,9 +18,10 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentAsVectorCastTest extends TestCase
 {
+    use VerifiesDoubles;
+
     protected function tearDown(): void
     {
-        m::close();
 
         Model::unsetConnectionResolver();
     }
