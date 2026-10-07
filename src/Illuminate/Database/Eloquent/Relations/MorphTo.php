@@ -322,7 +322,7 @@ class MorphTo extends BelongsTo
     public function morphWith(array $with)
     {
         $this->morphableEagerLoads = array_merge(
-            $this->morphableEagerLoads, $with
+            $this->morphableEagerLoads, $this->resolveMorphTypes($with)
         );
 
         return $this;
@@ -337,7 +337,7 @@ class MorphTo extends BelongsTo
     public function morphWithCount(array $withCount)
     {
         $this->morphableEagerLoadCounts = array_merge(
-            $this->morphableEagerLoadCounts, $withCount
+            $this->morphableEagerLoadCounts, $this->resolveMorphTypes($withCount)
         );
 
         return $this;
@@ -352,10 +352,27 @@ class MorphTo extends BelongsTo
     public function constrain(array $callbacks)
     {
         $this->morphableConstraints = array_merge(
-            $this->morphableConstraints, $callbacks
+            $this->morphableConstraints, $this->resolveMorphTypes($callbacks)
         );
 
         return $this;
+    }
+
+    /**
+     * Resolve morph map aliases used as keys to their class names.
+     *
+     * @param  array  $values
+     * @return array
+     */
+    protected function resolveMorphTypes(array $values)
+    {
+        $resolved = [];
+
+        foreach ($values as $type => $value) {
+            $resolved[static::getMorphedModel($type) ?? $type] = $value;
+        }
+
+        return $resolved;
     }
 
     /**
