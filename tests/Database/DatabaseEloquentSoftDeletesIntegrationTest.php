@@ -324,6 +324,36 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertNull($users->find(2)->deleted_at);
     }
 
+    public function testRestoreIsCancelledWhenRestoringEventReturnsFalse()
+    {
+        $previousDispatcher = Eloquent::getEventDispatcher();
+
+        Eloquent::setEventDispatcher(new Dispatcher);
+
+        try {
+            $this->createUsers();
+
+            SoftDeletesTestUser::restoring(function () {
+                return false;
+            });
+
+            $user = SoftDeletesTestUser::withTrashed()->find(1);
+
+            $this->assertFalse($user->restore());
+            $this->assertNotNull($user->deleted_at);
+            $this->assertNotNull(SoftDeletesTestUser::withTrashed()->find(1)->deleted_at);
+            $this->assertNull(SoftDeletesTestUser::find(1));
+        } finally {
+            SoftDeletesTestUser::flushEventListeners();
+
+            if ($previousDispatcher) {
+                Eloquent::setEventDispatcher($previousDispatcher);
+            } else {
+                Eloquent::unsetEventDispatcher();
+            }
+        }
+    }
+
     public function testRestoreDoesNotFireRestoredEventWhenSavingEventCancelsSave()
     {
         $previousDispatcher = Eloquent::getEventDispatcher();
