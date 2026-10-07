@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
@@ -15,7 +16,7 @@ class DatabaseManagerTest extends TestCase
 {
     public function testParseConnectionNameRecognizesDirectType()
     {
-        $manager = new DatabaseManagerTestManager(new Container, Mockery::mock(ConnectionFactory::class));
+        $manager = new DatabaseManagerTestManager(new Container, Double::for(ConnectionFactory::class));
 
         $this->assertSame(['pgsql', 'direct'], $manager->parseConnectionNamePublic('pgsql::direct'));
         $this->assertSame(['pgsql', 'read'], $manager->parseConnectionNamePublic('pgsql::read'));
@@ -24,7 +25,7 @@ class DatabaseManagerTest extends TestCase
 
     public function testSetPdoForDirectTypeSetsReadAndWritePdosToDirectPdo()
     {
-        $manager = new DatabaseManagerTestManager(new Container, Mockery::mock(ConnectionFactory::class));
+        $manager = new DatabaseManagerTestManager(new Container, Double::for(ConnectionFactory::class));
         $connection = new Connection(new DatabaseManagerTestMockPDO);
         $directPdo = new DatabaseManagerTestMockPDO;
 
@@ -38,7 +39,7 @@ class DatabaseManagerTest extends TestCase
 
     public function testRefreshPdoConnectionsRefreshesDirectPdo()
     {
-        $manager = new DatabaseManagerTestManager(new Container, Mockery::mock(ConnectionFactory::class));
+        $manager = new DatabaseManagerTestManager(new Container, Double::for(ConnectionFactory::class));
         $connection = new Connection(new DatabaseManagerTestMockPDO, 'database', '', ['name' => 'pgsql']);
         $freshDirectPdo = new DatabaseManagerTestMockPDO;
         $freshConnection = new Connection(new DatabaseManagerTestMockPDO, 'database', '', ['name' => 'pgsql']);
@@ -61,7 +62,7 @@ class DatabaseManagerTest extends TestCase
         $container = new Container;
         $container->instance('config', new Repository(['database' => ['default' => 'sqlite']]));
 
-        $manager = new DatabaseManager($container, Mockery::mock(ConnectionFactory::class));
+        $manager = new DatabaseManager($container, Double::for(ConnectionFactory::class));
 
         $manager->setDefaultConnection(DatabaseManagerTestBackedConnection::Reporting);
 
@@ -78,7 +79,7 @@ class DatabaseManagerTest extends TestCase
         $container = new Container;
         $container->instance('config', new Repository(['database' => ['default' => 'sqlite']]));
 
-        $manager = new DatabaseManager($container, Mockery::mock(ConnectionFactory::class));
+        $manager = new DatabaseManager($container, Double::for(ConnectionFactory::class));
 
         $default = $manager->usingConnection(DatabaseManagerTestBackedConnection::Reporting, fn () => $manager->getDefaultConnection());
 

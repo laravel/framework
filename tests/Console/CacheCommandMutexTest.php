@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Console;
 
+use JMac\Testing\Double;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Console\CacheCommandMutex;
 use Illuminate\Console\Command;
@@ -34,8 +35,8 @@ class CacheCommandMutexTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->cacheFactory = Mockery::mock(Factory::class);
-        $this->cacheRepository = Mockery::mock(Repository::class);
+        $this->cacheFactory = Double::for(Factory::class);
+        $this->cacheRepository = Double::for(Repository::class);
         $this->mutex = new CacheCommandMutex($this->cacheFactory);
         $this->command = new class extends Command
         {

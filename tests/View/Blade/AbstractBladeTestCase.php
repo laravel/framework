@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -31,6 +32,6 @@ abstract class AbstractBladeTestCase extends TestCase
 
     protected function getFiles()
     {
-        return Mockery::mock(Filesystem::class);
+        return Double::for(Filesystem::class);
     }
 }

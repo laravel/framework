@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Foundation\Application;
@@ -69,13 +70,13 @@ class QueueClearCommandTest extends TestCase
         $container = new Application;
         $container['env'] = 'testing';
 
-        $config = Mockery::mock(Repository::class, \ArrayAccess::class);
+        $config = Double::for(Repository::class, \ArrayAccess::class);
         $config->expects('offsetGet')->with('queue.default')->andReturn('redis');
         $config->shouldReceive('get')->with('queue.connections.redis.queue', 'default')->andReturn('default');
 
         $container['config'] = $config;
 
-        $queueManager = Mockery::mock(QueueManager::class);
+        $queueManager = Double::for(QueueManager::class);
         $queueManager->expects('connection')->with('redis')->andReturn($queue);
 
         $container['queue'] = $queueManager;

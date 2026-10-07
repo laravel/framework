@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use JMac\Testing\Double;
 use Illuminate\Cache\ApcStore;
 use Illuminate\Cache\ApcWrapper;
 use Mockery;
@@ -62,7 +63,7 @@ class CacheApcStoreTest extends TestCase
 
     public function testSetMultipleMethodProperlyCallsAPC()
     {
-        $apc = Mockery::mock(ApcWrapper::class);
+        $apc = Double::for(ApcWrapper::class);
 
         $apc->expects('put')
             ->with('foo', 'bar', 60)

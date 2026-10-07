@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Foundation\Application;
@@ -16,7 +17,7 @@ class PruneBatchesCommandTest extends TestCase
     public function testAllowPruningAllUnfinishedBatches()
     {
         $container = new Application;
-        $repo = Mockery::spy(DatabaseBatchRepository::class);
+        $repo = Double::for(DatabaseBatchRepository::class);
         $container->instance(BatchRepository::class, $repo);
 
         $command = new PruneBatchesCommand;
@@ -30,7 +31,7 @@ class PruneBatchesCommandTest extends TestCase
     public function testAllowPruningAllCancelledBatches()
     {
         $container = new Application;
-        $repo = Mockery::spy(DatabaseBatchRepository::class);
+        $repo = Double::for(DatabaseBatchRepository::class);
         $container->instance(BatchRepository::class, $repo);
 
         $command = new PruneBatchesCommand;

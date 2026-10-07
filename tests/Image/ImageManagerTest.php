@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Image;
 
+use JMac\Testing\Double;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
@@ -113,7 +114,7 @@ class ImageManagerTest extends TestCase
 
     public function test_from_path_is_lazy()
     {
-        $filesystem = Mockery::mock(Filesystem::class);
+        $filesystem = Double::for(Filesystem::class);
         $filesystem->shouldNotReceive('get');
 
         $app = $this->makeApp([]);
@@ -128,12 +129,12 @@ class ImageManagerTest extends TestCase
     {
         $contents = $this->fakeImageContents();
 
-        $disk = Mockery::mock(FilesystemContract::class);
+        $disk = Double::for(FilesystemContract::class);
         $disk->expects('get')
             ->with('images/avatar.jpg')
             ->andReturn($contents);
 
-        $filesystem = Mockery::mock(FilesystemFactory::class);
+        $filesystem = Double::for(FilesystemFactory::class);
         $filesystem->expects('disk')
             ->with('public')
             ->andReturn($disk);
@@ -154,12 +155,12 @@ class ImageManagerTest extends TestCase
     {
         $contents = $this->fakeImageContents();
 
-        $disk = Mockery::mock(FilesystemContract::class);
+        $disk = Double::for(FilesystemContract::class);
         $disk->expects('get')
             ->with('images/avatar.jpg')
             ->andReturn($contents);
 
-        $filesystem = Mockery::mock(FilesystemFactory::class);
+        $filesystem = Double::for(FilesystemFactory::class);
         $filesystem->expects('disk')
             ->with('public')
             ->andReturn($disk);
@@ -178,7 +179,7 @@ class ImageManagerTest extends TestCase
 
     public function test_from_storage_is_lazy()
     {
-        $filesystem = Mockery::mock(FilesystemFactory::class);
+        $filesystem = Double::for(FilesystemFactory::class);
         $filesystem->shouldNotReceive('disk');
 
         $app = $this->makeApp([]);
@@ -536,7 +537,7 @@ class ImageManagerTest extends TestCase
 
     protected function makeApp(array $config): Application
     {
-        $app = Mockery::mock(Application::class, \ArrayAccess::class);
+        $app = Double::for(Application::class, \ArrayAccess::class);
 
         $configRepo = new Repository($config);
 

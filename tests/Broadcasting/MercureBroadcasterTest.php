@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use JMac\Testing\Double;
 use Illuminate\Broadcasting\Broadcasters\MercureBroadcaster;
 use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Broadcasting\Mercure\ChannelEncrypter;
@@ -38,7 +39,7 @@ class MercureBroadcasterTest extends TestCase
     {
         parent::setUp();
 
-        $this->hub = m::mock(HubInterface::class);
+        $this->hub = Double::for(HubInterface::class);
         $this->hub->shouldReceive('getPublicUrl')->andReturn('https://localhost/.well-known/mercure');
         $this->hub->shouldReceive('getCookieName')->andReturn('__Secure-mercure_access_token');
         $this->hub->shouldReceive('getFactory')->andReturn($this->tokenFactory());
@@ -82,7 +83,7 @@ class MercureBroadcasterTest extends TestCase
 
     public function testSettingAHubRegistersItsCookieNameAsNeverEncrypted()
     {
-        $hub = m::mock(HubInterface::class);
+        $hub = Double::for(HubInterface::class);
         $hub->shouldReceive('getCookieName')->andReturn('custom_mercure_cookie');
 
         $this->broadcaster->setHub($hub);
@@ -669,7 +670,7 @@ class MercureBroadcasterTest extends TestCase
 
     protected function broadcasterForHub(string $publicUrl)
     {
-        $hub = m::mock(HubInterface::class);
+        $hub = Double::for(HubInterface::class);
         $hub->shouldReceive('getPublicUrl')->andReturn($publicUrl);
         $hub->shouldReceive('getCookieName')->andReturn('__Secure-mercure_access_token');
         $hub->shouldReceive('getFactory')->andReturn($this->tokenFactory());

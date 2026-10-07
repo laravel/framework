@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Aws\Result;
 use Aws\Sqs\Exception\SqsException;
 use Aws\Sqs\SqsClient;
@@ -58,7 +59,7 @@ class QueueSqsQueueTest extends TestCase
     protected function setUp(): void
     {
         // Use Mockery to mock the SqsClient
-        $this->sqs = Mockery::mock(SqsClient::class);
+        $this->sqs = Double::for(SqsClient::class);
 
         $this->account = '1234567891011';
         $this->queueName = 'emails';
@@ -111,7 +112,7 @@ class QueueSqsQueueTest extends TestCase
 
     protected function createSpyContainer()
     {
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
 
         $container->shouldReceive('bound')
             ->with('queue.routes')
@@ -147,7 +148,7 @@ class QueueSqsQueueTest extends TestCase
     {
         $now = Carbon::now();
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('secondsUntil')->with($now->addSeconds(5))->willReturn(5);
@@ -161,7 +162,7 @@ class QueueSqsQueueTest extends TestCase
     public function testDelayedPushProperlyPushesJobOntoSqs()
     {
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('secondsUntil')->with($this->mockedDelay)->willReturn($this->mockedDelay);
@@ -175,7 +176,7 @@ class QueueSqsQueueTest extends TestCase
     public function testPushProperlyPushesJobOntoSqs()
     {
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
@@ -385,7 +386,7 @@ class QueueSqsQueueTest extends TestCase
         $job = new FakeSqsJob();
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($job, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
@@ -420,7 +421,7 @@ class QueueSqsQueueTest extends TestCase
         $job = (new FakeSqsJob())->onGroup($this->mockedMessageGroupId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($job, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
@@ -454,7 +455,7 @@ class QueueSqsQueueTest extends TestCase
         Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->fifoQueueName)->willReturn($this->fifoQueueUrl);
@@ -478,7 +479,7 @@ class QueueSqsQueueTest extends TestCase
         $job = (new FakeSqsJob())->onGroup($this->mockedMessageGroupId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->fifoQueueName)->willReturn($this->fifoQueueUrl);
@@ -502,7 +503,7 @@ class QueueSqsQueueTest extends TestCase
         $job = new FakeSqsJob;
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->fifoQueueName)->willReturn($this->fifoQueueUrl);
@@ -527,7 +528,7 @@ class QueueSqsQueueTest extends TestCase
         $job->expects($this->once())->method('messageGroup')->willReturn('');
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->fifoQueueName)->willReturn($this->fifoQueueUrl);
@@ -552,7 +553,7 @@ class QueueSqsQueueTest extends TestCase
         $job->expects($this->once())->method('messageGroup')->willReturn($this->mockedMessageGroupId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->fifoQueueName)->willReturn($this->fifoQueueUrl);
@@ -580,7 +581,7 @@ class QueueSqsQueueTest extends TestCase
         $job->onGroup($this->mockedMessageGroupId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->fifoQueueName)->willReturn($this->fifoQueueUrl);
@@ -604,7 +605,7 @@ class QueueSqsQueueTest extends TestCase
         $job->onGroup($this->mockedMessageGroupId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->fifoQueueName)->willReturn($this->fifoQueueUrl);
@@ -633,7 +634,7 @@ class QueueSqsQueueTest extends TestCase
         });
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->fifoQueueName)->willReturn($this->fifoQueueUrl);
@@ -782,7 +783,7 @@ class QueueSqsQueueTest extends TestCase
         Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->never())->method('secondsUntil')->with($this->mockedDelay)->willReturn($this->mockedDelay);
@@ -807,7 +808,7 @@ class QueueSqsQueueTest extends TestCase
         $job = (new FakeSqsJob())->onGroup($this->mockedMessageGroupId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->never())->method('secondsUntil')->with($this->mockedDelay)->willReturn($this->mockedDelay);
@@ -860,13 +861,13 @@ class QueueSqsQueueTest extends TestCase
         $expectedPath = 'laravel:sqs-payloads:'.$uuid;
         $expectedPointer = json_encode(['@pointer' => $expectedPath]);
 
-        $store = Mockery::mock(CacheRepository::class);
+        $store = Double::for(CacheRepository::class);
         $store->expects('put')->with($expectedPath, $largePayload);
 
-        $cache = Mockery::mock(CacheFactory::class);
+        $cache = Double::for(CacheFactory::class);
         $cache->expects('store')->with('database')->andReturn($store);
 
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('make')->with('cache')->andReturn($cache);
 
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
@@ -910,13 +911,13 @@ class QueueSqsQueueTest extends TestCase
         $expectedPath = 'laravel:sqs-payloads:'.$uuid;
         $expectedPointer = json_encode(['@pointer' => $expectedPath]);
 
-        $store = Mockery::mock(CacheRepository::class);
+        $store = Double::for(CacheRepository::class);
         $store->expects('put')->with($expectedPath, $smallPayload);
 
-        $cache = Mockery::mock(CacheFactory::class);
+        $cache = Double::for(CacheFactory::class);
         $cache->expects('store')->with('database')->andReturn($store);
 
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('make')->with('cache')->andReturn($cache);
 
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
@@ -953,10 +954,10 @@ class QueueSqsQueueTest extends TestCase
         $store = new Repository(new ArrayStore);
         $store->put('foo', 'bar');
 
-        $cache = Mockery::mock(CacheFactory::class);
+        $cache = Double::for(CacheFactory::class);
         $cache->expects('store')->with('database')->andReturn($store);
 
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('make')->with('cache')->andReturn($cache);
 
         $queue = $this->getMockBuilder(SqsQueue::class)
@@ -982,7 +983,7 @@ class QueueSqsQueueTest extends TestCase
 
     public function testClearDoesNotFlushOverflowStoreWhenFlushOnClearDisabled()
     {
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->shouldNotReceive('make');
 
         $queue = $this->getMockBuilder(SqsQueue::class)
@@ -1006,7 +1007,7 @@ class QueueSqsQueueTest extends TestCase
 
     public function testClearDoesNotFlushOverflowStoreWhenOverflowDisabled()
     {
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->shouldNotReceive('make');
 
         $queue = $this->getMockBuilder(SqsQueue::class)
@@ -1033,10 +1034,10 @@ class QueueSqsQueueTest extends TestCase
         $store = new Repository(new ArrayStore);
         $store->put('foo', 'bar');
 
-        $cache = Mockery::mock(CacheFactory::class);
+        $cache = Double::for(CacheFactory::class);
         $cache->expects('store')->with('redis')->andReturn($store);
 
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('make')->with('cache')->andReturn($cache);
 
         $queue = $this->getMockBuilder(SqsQueue::class)
@@ -1140,13 +1141,13 @@ class QueueSqsQueueTest extends TestCase
 
     public function testBulkRaisesQueueingAndQueuedEventsForEachJob()
     {
-        $events = Mockery::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+        $events = Double::for(\Illuminate\Contracts\Events\Dispatcher::class);
         $dispatched = [];
         $events->expects('dispatch')->times(4)->andReturnUsing(function ($event) use (&$dispatched) {
             $dispatched[] = $event;
         });
 
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('bound')->times(4)->with('events')->andReturn(true);
         $container->expects('bound')->with('db.transactions')->andReturn(false);
         $container->expects('offsetGet')->times(4)->with('events')->andReturn($events);
@@ -1341,7 +1342,7 @@ class QueueSqsQueueTest extends TestCase
         $job = new FakeSqsJob;
         $job->afterCommit = true;
 
-        $transactions = Mockery::mock(\Illuminate\Database\DatabaseTransactionsManager::class);
+        $transactions = Double::for(\Illuminate\Database\DatabaseTransactionsManager::class);
 
         $committed = null;
 
@@ -1349,7 +1350,7 @@ class QueueSqsQueueTest extends TestCase
             $committed = $callback;
         });
 
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('bound')->with('db.transactions')->andReturn(true);
         $container->expects('bound')->with('events')->andReturn(false);
         $container->expects('make')->with('db.transactions')->andReturn($transactions);
@@ -1389,11 +1390,11 @@ class QueueSqsQueueTest extends TestCase
         };
         $job->afterCommit = true;
 
-        $transactions = Mockery::mock(\Illuminate\Database\DatabaseTransactionsManager::class);
+        $transactions = Double::for(\Illuminate\Database\DatabaseTransactionsManager::class);
         $transactions->expects('addCallbackForRollback');
         $transactions->expects('addCallback');
 
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('bound')->with('db.transactions')->andReturn(true);
         $container->expects('make')->times(2)->with('db.transactions')->andReturn($transactions);
 
@@ -1413,13 +1414,13 @@ class QueueSqsQueueTest extends TestCase
         $job->messageGroup = 'group-1';
         $job->deduplicator = fn ($payload, $queue) => 'dedupe-'.$payload;
 
-        $store = Mockery::mock(CacheRepository::class);
+        $store = Double::for(CacheRepository::class);
         $store->expects('put')->with(Mockery::type('string'), 'original-payload');
 
-        $cache = Mockery::mock(CacheFactory::class);
+        $cache = Double::for(CacheFactory::class);
         $cache->expects('store')->with('sqs-overflow')->andReturn($store);
 
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('bound')->times(2)->andReturn(false);
         $container->expects('make')->with('cache')->andReturn($cache);
 
@@ -1449,13 +1450,13 @@ class QueueSqsQueueTest extends TestCase
 
     public function testBulkFiresQueuedEventsForSuccessfulChunksWhenAnotherChunkFails()
     {
-        $events = Mockery::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+        $events = Double::for(\Illuminate\Contracts\Events\Dispatcher::class);
         $dispatched = [];
         $events->expects('dispatch')->times(25)->andReturnUsing(function ($event) use (&$dispatched) {
             $dispatched[] = $event;
         });
 
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('bound')->times(25)->with('events')->andReturn(true);
         $container->expects('bound')->with('db.transactions')->andReturn(false);
         $container->expects('offsetGet')->times(25)->with('events')->andReturn($events);

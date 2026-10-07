@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use JMac\Testing\Double;
 use BadMethodCallException;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Console\ClearCommand;
@@ -41,9 +42,9 @@ class ClearCommandTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->cacheManager = Mockery::mock(CacheManager::class);
-        $this->files = Mockery::mock(Filesystem::class);
-        $this->cacheRepository = Mockery::mock(Repository::class);
+        $this->cacheManager = Double::for(CacheManager::class);
+        $this->files = Double::for(Filesystem::class);
+        $this->cacheRepository = Double::for(Repository::class);
         $this->command = new ClearCommandTestStub($this->cacheManager, $this->files);
 
         $app = new Application;

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -740,14 +741,14 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testRefreshForUpdateUsesLockForUpdate()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes,load]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = true;
         $model->setRawAttributes(['id' => 1, 'name' => 'Taylor'], true);
 
         $freshModel = new EloquentModelStub;
         $freshModel->setRawAttributes(['id' => 1, 'name' => 'Abigail']);
 
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $model->expects('newQueryWithoutScopes')->once()->andReturn($query);
         $query->expects('lockForUpdate')->once()->andReturnSelf();
         $query->expects('where')->once()->with('id', '=', 1)->andReturnSelf();
@@ -865,7 +866,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testUpdateProcess()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps'])->getMock();
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $query->expects('where')->with('id', '=', 1);
         $query->expects('update')->with(['name' => 'taylor'])->andReturn(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
@@ -885,7 +886,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testUpdateProcessDoesntOverrideTimestamps()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $query->expects('where')->with('id', '=', 1);
         $query->expects('update')->with(['created_at' => 'foo', 'updated_at' => 'bar'])->andReturn(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
@@ -944,7 +945,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = $this->getMockBuilder(EloquentModelEventObjectStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'fireModelEvent'])->getMock();
         $model->timestamps = false;
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $query->expects('where')->with('id', '=', 1);
         $query->expects('update')->with(['name' => 'taylor'])->andReturn(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
@@ -961,7 +962,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testUpdateUsesOldPrimaryKey()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps'])->getMock();
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $query->expects('where')->with('id', '=', 1);
         $query->expects('update')->with(['id' => 2, 'foo' => 'bar'])->andReturn(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
@@ -1211,7 +1212,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testDeleteProperlyDeletesModel()
     {
         $model = $this->getMockBuilder(Model::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'touchOwners'])->getMock();
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $query->expects('where')->with('id', '=', 1)->andReturn($query);
         $query->expects('delete');
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
@@ -1360,7 +1361,7 @@ class DatabaseEloquentModelTest extends TestCase
     #[TestWith([ConnectionNameBacked::Foo])]
     public function testConnectionEnums(string|\UnitEnum $connectionName)
     {
-        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $resolver = Double::for(ConnectionResolverInterface::class);
         EloquentModelStub::setConnectionResolver($resolver);
         $model = new EloquentModelStub;
 
@@ -1780,7 +1781,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelStub;
 
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
         $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
 
@@ -1812,7 +1813,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $model::unguard();
 
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
         $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
 
@@ -1830,7 +1831,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testUsesOverriddenHandlerWhenDiscardingAttributes()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
         $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
 
@@ -2278,7 +2279,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelObserversCanBeAttachedToModels()
     {
-        $events = Mockery::mock(Dispatcher::class);
+        $events = Double::for(Dispatcher::class);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', EloquentTestObserverStub::class.'@saved');
         $events->shouldReceive('forget');
@@ -2289,7 +2290,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelObserversCanBeAttachedToModelsWithString()
     {
-        $events = Mockery::mock(Dispatcher::class);
+        $events = Double::for(Dispatcher::class);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', EloquentTestObserverStub::class.'@saved');
         $events->shouldReceive('forget');
@@ -2300,7 +2301,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelObserversCanBeAttachedToModelsThroughAnArray()
     {
-        $events = Mockery::mock(Dispatcher::class);
+        $events = Double::for(Dispatcher::class);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', EloquentTestObserverStub::class.'@saved');
         $events->shouldReceive('forget');
@@ -2311,7 +2312,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelObserversCanBeAttachedToModelsWithStringUsingAttribute()
     {
-        $events = Mockery::mock(Dispatcher::class);
+        $events = Double::for(Dispatcher::class);
         $events->expects('dispatch')->times(2);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeStub', EloquentTestObserverStub::class.'@saved');
@@ -2322,7 +2323,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelObserversCanBeAttachedToModelsThroughAnArrayUsingAttribute()
     {
-        $events = Mockery::mock(Dispatcher::class);
+        $events = Double::for(Dispatcher::class);
         $events->expects('dispatch')->times(2);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeUsingArrayStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeUsingArrayStub', EloquentTestObserverStub::class.'@saved');
@@ -2333,7 +2334,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelObserversCanBeAttachedToModelsThroughAttributesOnParentClasses()
     {
-        $events = Mockery::mock(Dispatcher::class);
+        $events = Double::for(Dispatcher::class);
         $events->expects('dispatch')->times(2);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandchildStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelWithObserveAttributeGrandchildStub', EloquentTestObserverStub::class.'@saved');
@@ -2360,7 +2361,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelObserversCanBeAttachedToModelsThroughCallingObserveMethodOnlyOnce()
     {
-        $events = Mockery::mock(Dispatcher::class);
+        $events = Double::for(Dispatcher::class);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', EloquentTestObserverStub::class.'@saved');
         EloquentModelStub::setEventDispatcher($events);
@@ -2383,7 +2384,7 @@ class DatabaseEloquentModelTest extends TestCase
         // Boot the model before the dispatcher is set so booting events aren't dispatched.
         new EloquentModelSaveStub;
 
-        $events = Mockery::mock(Dispatcher::class);
+        $events = Double::for(Dispatcher::class);
         $events->expects('listen')->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelSaveStub', EloquentTestObserverStub::class.'@creating');
         $events->expects('listen')->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelSaveStub', EloquentTestObserverStub::class.'@saved');
         EloquentModelSaveStub::setEventDispatcher($events);
@@ -2649,13 +2650,13 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
         $query->expects('where')->times(2)->andReturn($query);
         $query->expects('increment')->times(2);
@@ -2672,13 +2673,13 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testIncrementQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
         $query->expects('where')->times(2)->andReturn($query);
         $query->expects('increment')->times(2);
@@ -2697,13 +2698,13 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testDecrementQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 4;
 
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
         $query->expects('where')->times(2)->andReturn($query);
         $query->expects('decrement')->times(2);
@@ -2722,14 +2723,14 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testIncrementEachOnExistingModelScopesQueryToModelKey()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
         $model->bar = 5;
 
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $model->expects('newQueryWithoutScopes')->andReturn($query);
         $query->expects('where')->with('id', '=', 1)->andReturn($query);
         $query->expects('incrementEach')->with(['foo' => 1, 'bar' => 2], [])->andReturn(1);
@@ -2743,14 +2744,14 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testDecrementEachOnExistingModelScopesQueryToModelKey()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 10;
         $model->bar = 5;
 
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $model->expects('newQueryWithoutScopes')->andReturn($query);
         $query->expects('where')->with('id', '=', 1)->andReturn($query);
         $query->expects('decrementEach')->with(['foo' => 3, 'bar' => 2], [])->andReturn(1);
@@ -2764,14 +2765,14 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testIncrementEachQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
         $model->bar = 5;
 
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
         $query->expects('where')->times(2)->andReturn($query);
         $query->expects('incrementEach')->times(2);
@@ -2792,14 +2793,14 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testDecrementEachQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 10;
         $model->bar = 5;
 
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $model->expects('newQueryWithoutScopes')->times(2)->andReturn($query);
         $query->expects('where')->times(2)->andReturn($query);
         $query->expects('decrementEach')->times(2);
@@ -2850,13 +2851,13 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testIncrementEachWithExtraColumnsOnExistingModel()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $model->expects('newQueryWithoutScopes')->andReturn($query);
         $query->expects('where')->with('id', '=', 1)->andReturn($query);
         $query->expects('incrementEach')->with(['foo' => 5], ['category' => 'test'])->andReturn(1);
@@ -2870,13 +2871,13 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testIncrementEachFiresModelEvents()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
         $model->foo = 1;
 
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $model->expects('newQueryWithoutScopes')->andReturn($query);
         $query->expects('where')->andReturn($query);
         $query->expects('incrementEach')->andReturn(1);
@@ -2889,7 +2890,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testIncrementEachReturnsFalseWhenUpdatingEventCancelled()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = true;
         $model->id = 1;
         $model->syncOriginalAttribute('id');
@@ -2911,10 +2912,10 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testIncrementEachOnNonExistingModelForwardsToQueryBuilder()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = false;
 
-        $query = Mockery::mock(Builder::class);
+        $query = Double::for(Builder::class);
         $model->expects('newQueryWithoutRelationships')->andReturn($query);
         $query->expects('incrementEach')->with(['foo' => 1], [])->andReturn(5);
 
@@ -2928,12 +2929,12 @@ class DatabaseEloquentModelTest extends TestCase
         $relation = $this->getMockBuilder(BelongsTo::class)->onlyMethods(['touch'])->disableOriginalConstructor()->getMock();
         $relation->expects($this->once())->method('touch');
 
-        $model = Mockery::mock(EloquentModelStub::class.'[partner]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $this->addMockConnection($model);
         $model->expects('partner')->andReturn($relation);
         $model->setTouchedRelations(['partner']);
 
-        $mockPartnerModel = Mockery::mock(EloquentModelStub::class.'[touchOwners]');
+        $mockPartnerModel = Double::for(EloquentModelStub::class)->passthru();
         $mockPartnerModel->expects('touchOwners');
         $model->setRelation('partner', $mockPartnerModel);
 
@@ -2945,7 +2946,7 @@ class DatabaseEloquentModelTest extends TestCase
         $relation = $this->getMockBuilder(BelongsTo::class)->onlyMethods(['touch'])->disableOriginalConstructor()->getMock();
         $relation->expects($this->once())->method('touch');
 
-        $model = Mockery::mock(EloquentModelStub::class.'[partner]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $this->addMockConnection($model);
         $model->expects('partner')->andReturn($relation);
         $model->setTouchedRelations(['partner']);
@@ -3241,7 +3242,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testNonExistingAttributeWithInternalMethodNameDoesntCallMethod()
     {
-        $model = Mockery::mock(EloquentModelStub::class.'[delete,getRelationValue]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->name = 'Spark';
         $model->shouldNotReceive('delete');
         $model->expects('getRelationValue')->with('belongsToStub')->andReturn('relation');
@@ -3255,7 +3256,7 @@ class DatabaseEloquentModelTest extends TestCase
         // Returns null for a Model.php method name
         $this->assertNull($model->delete);
 
-        $model = Mockery::mock(EloquentModelStub::class.'[delete]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->delete = 123;
         $this->assertEquals(123, $model->delete);
     }
@@ -3526,9 +3527,9 @@ class DatabaseEloquentModelTest extends TestCase
 
     protected function addMockConnection($model)
     {
-        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $resolver = Double::for(ConnectionResolverInterface::class);
         $model->setConnectionResolver($resolver);
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $resolver->shouldReceive('connection')->andReturn($connection);
         $grammar = new Grammar($connection);
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
@@ -3543,7 +3544,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         Carbon::setTestNow($now = Carbon::now());
 
-        $model = Mockery::mock(EloquentModelStub::class.'[save]');
+        $model = Double::for(EloquentModelStub::class)->passthru();
         $model->expects('save')->andReturn(true);
 
         $result = $model->touch(['published_at', 'verified_at']);
@@ -4306,7 +4307,7 @@ class EloquentModelSaveStub extends Model
 
     public function getConnection()
     {
-        $mock = Mockery::mock(Connection::class);
+        $mock = Double::for(Connection::class);
         $grammar = new Grammar($mock);
         $mock->shouldReceive('getQueryGrammar')->andReturn($grammar);
         $processor = new Processor;
@@ -4329,7 +4330,7 @@ class EloquentModelFindWithWritePdoStub extends Model
 {
     public function newQuery()
     {
-        $mock = Mockery::mock(Builder::class);
+        $mock = Double::for(Builder::class);
         $mock->expects('useWritePdo')->andReturnSelf();
         $mock->expects('find')->with(1)->andReturn('foo');
 
@@ -4345,9 +4346,9 @@ class EloquentModelDestroyStub extends Model
 
     public function newQuery()
     {
-        $mock = Mockery::mock(Builder::class);
+        $mock = Double::for(Builder::class);
         $mock->expects('whereIn')->with('id', [1, 2, 3])->andReturn($mock);
-        $model = Mockery::mock(Model::class);
+        $model = Double::for(Model::class);
         $mock->expects('get')->andReturn([$model]);
         $model->expects('delete');
 
@@ -4359,7 +4360,7 @@ class EloquentModelEmptyDestroyStub extends Model
 {
     public function newQuery()
     {
-        $mock = Mockery::mock(Builder::class);
+        $mock = Double::for(Builder::class);
         $mock->shouldReceive('whereIn')->never();
 
         return $mock;
@@ -4370,7 +4371,7 @@ class EloquentModelWithStub extends Model
 {
     public function newQuery()
     {
-        $mock = Mockery::mock(Builder::class);
+        $mock = Double::for(Builder::class);
         $mock->expects('with')->with(['foo', 'bar'])->andReturn('foo');
 
         return $mock;

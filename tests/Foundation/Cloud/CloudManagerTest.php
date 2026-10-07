@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Cloud;
 
+use JMac\Testing\Double;
 use Illuminate\Foundation\Cloud\CloudManager;
 use Illuminate\Foundation\Cloud\Queue as CloudQueue;
 use Illuminate\Support\Facades\Cloud;
@@ -35,7 +36,7 @@ class CloudManagerTest extends TestCase
     #[TestWith(['exports', false])]
     public function testIsManagedQueueChecksTheConfiguredManagedQueues(string $queue, bool $managed)
     {
-        $cloudQueue = Mockery::mock(CloudQueue::class);
+        $cloudQueue = Double::for(CloudQueue::class);
         $cloudQueue->shouldReceive('managedQueues')->andReturn(['emails']);
 
         $cloud = Cloud::partialMock();

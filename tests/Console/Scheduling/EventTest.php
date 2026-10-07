@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
+use JMac\Testing\Double;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Container\Container;
@@ -295,7 +296,7 @@ class EventTest extends TestCase
     public function testRunResetsSkippedBecauseOverlapping()
     {
         $container = new Container;
-        $mutex = Mockery::mock(EventMutex::class);
+        $mutex = Double::for(EventMutex::class);
         $event = new class($mutex, 'php -i') extends Event
         {
             public $executions = 0;

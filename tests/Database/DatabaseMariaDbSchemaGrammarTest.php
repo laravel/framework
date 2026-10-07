@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
@@ -1564,7 +1565,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         ?MariaDbBuilder $builder = null,
         string $prefix = ''
     ) {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
         $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
 
@@ -1584,6 +1585,6 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
     public function getBuilder()
     {
-        return mock(MariaDbBuilder::class);
+        return Double::for(MariaDbBuilder::class);
     }
 }

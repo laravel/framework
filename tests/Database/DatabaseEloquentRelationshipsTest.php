@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -438,7 +439,7 @@ class MockedConnectionModel extends Model
 {
     public function getConnection()
     {
-        $mock = Mockery::mock(Connection::class);
+        $mock = Double::for(Connection::class);
         $grammar = new Grammar($mock);
         $mock->shouldReceive('getQueryGrammar')->andReturn($grammar);
         $processor = new Processor;

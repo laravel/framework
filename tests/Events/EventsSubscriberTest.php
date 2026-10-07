@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Events;
 
+use JMac\Testing\Double;
 use Illuminate\Events\Dispatcher;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +14,7 @@ class EventsSubscriberTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $d = new Dispatcher;
-        $subs = Mockery::mock(ExampleSubscriber::class);
+        $subs = Double::for(ExampleSubscriber::class);
         $subs->expects('subscribe')->with($d);
 
         $d->subscribe($subs);

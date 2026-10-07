@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Bootstrap;
 
+use JMac\Testing\Double;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Support\Env;
@@ -24,7 +25,7 @@ class LoadEnvironmentVariablesTest extends TestCase
 
     protected function getAppMock($file)
     {
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
 
         $app->expects('configurationIsCached')
             ->with()->andReturn(false);

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
+use JMac\Testing\Double;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\Scheduling\ScheduleWorkCommand;
 use Illuminate\Console\Signals;
@@ -82,7 +83,7 @@ class ScheduleWorkCommandTest extends TestCase
 
     public function test_in_flight_executions_finish_before_the_worker_quits()
     {
-        $execution = Mockery::mock(Process::class);
+        $execution = Double::for(Process::class);
         $execution->expects('getIncrementalOutput')->times(2)->andReturn('scheduled task ran', '');
         $execution->expects('getIncrementalErrorOutput')->times(2)->andReturn('');
 

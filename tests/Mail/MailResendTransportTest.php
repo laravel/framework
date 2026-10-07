@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use JMac\Testing\Double;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Mail\MailManager;
@@ -48,8 +49,8 @@ class MailResendTransportTest extends TestCase
         $email->sender('myself@example.com');
         $email->to('me@example.com');
 
-        $client = Mockery::mock(Client::class);
-        $emailService = Mockery::mock(EmailService::class);
+        $client = Double::for(Client::class);
+        $emailService = Double::for(EmailService::class);
         $client->emails = $emailService;
 
         $emailService->expects('send')

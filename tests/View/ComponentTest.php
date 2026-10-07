@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View;
 
+use JMac\Testing\Double;
 use Closure;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
@@ -25,11 +26,11 @@ class ComponentTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->config = Mockery::mock(Config::class);
+        $this->config = Double::for(Config::class);
 
         $container = new Container;
 
-        $this->viewFactory = Mockery::mock(Factory::class);
+        $this->viewFactory = Double::for(Factory::class);
 
         $container->instance('view', $this->viewFactory);
         $container->alias('view', FactoryContract::class);
@@ -61,7 +62,7 @@ class ComponentTest extends TestCase
 
     public function testRegularViewsGetReturnedUsingViewHelper()
     {
-        $view = Mockery::mock(View::class);
+        $view = Double::for(View::class);
         $this->viewFactory->expects('make')->with('alert', [], [])->andReturn($view);
 
         $component = new TestRegularViewComponentUsingViewHelper;
@@ -105,7 +106,7 @@ class ComponentTest extends TestCase
 
     public function testRegularViewsGetReturnedUsingViewMethod()
     {
-        $view = Mockery::mock(View::class);
+        $view = Double::for(View::class);
         $this->viewFactory->expects('make')->with('alert', [], [])->andReturn($view);
 
         $component = new TestRegularViewComponentUsingViewMethod;

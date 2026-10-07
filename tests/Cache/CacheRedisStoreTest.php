@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use JMac\Testing\Double;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\PhpRedisConnection;
@@ -173,7 +174,7 @@ class CacheRedisStoreTest extends TestCase
     {
         $calls = 0;
 
-        $connection = Mockery::mock(PhpRedisConnection::class);
+        $connection = Double::for(PhpRedisConnection::class);
         $connection->allows('_prefix')->with('')->andReturn('');
         $connection->allows('zremrangebyscore');
         $connection->allows('scan')->andReturnUsing(function () use (&$calls) {
@@ -193,6 +194,6 @@ class CacheRedisStoreTest extends TestCase
 
     protected function getRedis()
     {
-        return new RedisStore(Mockery::mock(Factory::class), 'prefix:');
+        return new RedisStore(Double::for(Factory::class), 'prefix:');
     }
 }

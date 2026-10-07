@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use JMac\Testing\Double;
 use Exception;
 use Illuminate\Cache\FileStore;
 use Illuminate\Filesystem\Filesystem;
@@ -188,7 +189,7 @@ class CacheFileStoreTest extends TestCase
     #[AllowMockObjectsWithoutExpectations]
     public function testStoreItemProperlySetsPermissions()
     {
-        $files = Mockery::mock(Filesystem::class)->shouldIgnoreMissing();
+        $files = Double::for(Filesystem::class);
         $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__, 0644])->getMock();
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
@@ -208,7 +209,7 @@ class CacheFileStoreTest extends TestCase
     #[AllowMockObjectsWithoutExpectations]
     public function testStoreItemDirectoryProperlySetsPermissions()
     {
-        $files = Mockery::mock(Filesystem::class)->shouldIgnoreMissing();
+        $files = Double::for(Filesystem::class);
         $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__, 0606])->getMock();
         $hash = sha1('foo');
         $cache_parent_dir = substr($hash, 0, 2);

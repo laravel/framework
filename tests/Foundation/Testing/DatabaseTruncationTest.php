@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Testing;
 
+use JMac\Testing\Double;
 use Illuminate\Config\Repository;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -177,7 +178,7 @@ class DatabaseTruncationTest extends TestCase
     ): Connection {
         $actual = [];
 
-        $schema = Mockery::mock($builder ?? Builder::class);
+        $schema = Double::for($builder ?? Builder::class);
         $schema->expects('getTables')->with($schemas)->andReturn(
             empty($schemas)
                 ? $allTables
@@ -185,7 +186,7 @@ class DatabaseTruncationTest extends TestCase
         );
         $schema->expects('getCurrentSchemaListing')->andReturn($schemas);
 
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
         $dispatcher = new Dispatcher;
         $connection->expects('getEventDispatcher')->andReturn($dispatcher);
@@ -199,7 +200,7 @@ class DatabaseTruncationTest extends TestCase
             ->andReturnUsing(function (string $tableName) use (&$actual) {
                 $actual[] = $tableName;
 
-                $table = Mockery::mock(QueryBuilder::class);
+                $table = Double::for(QueryBuilder::class);
                 $table->expects('exists')->andReturnTrue();
                 $table->expects('truncate');
 

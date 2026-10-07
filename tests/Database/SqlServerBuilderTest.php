@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
@@ -12,7 +13,7 @@ class SqlServerBuilderTest extends TestCase
 {
     public function testCreateDatabase()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new SqlServerGrammar($connection);
 
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
@@ -26,7 +27,7 @@ class SqlServerBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new SqlServerGrammar($connection);
 
         $connection->expects('getSchemaGrammar')->andReturn($grammar);

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Session;
 
+use JMac\Testing\Double;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Session\FileSessionHandler;
 use Illuminate\Support\Carbon;
@@ -19,7 +20,7 @@ class FileSessionHandlerTest extends TestCase
     protected function setUp(): void
     {
         // Create a mock for the Filesystem class
-        $this->files = Mockery::mock(Filesystem::class);
+        $this->files = Double::for(Filesystem::class);
 
         // Initialize the FileSessionHandler with the mocked Filesystem
         $this->sessionHandler = new FileSessionHandler($this->files, '/path/to/sessions', 30);

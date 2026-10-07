@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Console\Migrations\InstallCommand;
 use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Foundation\Application;
@@ -14,7 +15,7 @@ class DatabaseMigrationInstallCommandTest extends TestCase
 {
     public function testFireCallsRepositoryToInstall()
     {
-        $repo = Mockery::mock(MigrationRepositoryInterface::class);
+        $repo = Double::for(MigrationRepositoryInterface::class);
         $command = new InstallCommand($repo);
         $command->setLaravel(new Application);
         $repo->expects('setSource')->with('foo');
@@ -26,7 +27,7 @@ class DatabaseMigrationInstallCommandTest extends TestCase
 
     public function testFireCallsRepositoryToInstallExists()
     {
-        $repo = Mockery::mock(MigrationRepositoryInterface::class);
+        $repo = Double::for(MigrationRepositoryInterface::class);
         $command = new InstallCommand($repo);
         $command->setLaravel(new Application);
         $repo->expects('setSource')->with('foo');

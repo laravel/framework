@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Testing\Concerns;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Query\Expression;
@@ -136,7 +137,7 @@ class InteractsWithDatabaseTest extends TestCase
 
     protected function castAsJson($value, $grammar)
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$grammar.'Grammar';
         $grammar = new $grammarClass($connection);
 

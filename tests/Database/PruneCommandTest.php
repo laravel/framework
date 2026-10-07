@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -249,7 +250,7 @@ class PruneCommandTest extends TestCase
 
     public function testTheCommandDispatchesEvents()
     {
-        $dispatcher = Mockery::mock(DispatcherContract::class);
+        $dispatcher = Double::for(DispatcherContract::class);
 
         $dispatcher->expects('dispatch')->withArgs(function ($event) {
             return get_class($event) === ModelPruningStarting::class &&

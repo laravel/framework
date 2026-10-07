@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Exception;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
@@ -784,7 +785,7 @@ class QueueWorkerTest extends TestCase
             }
         };
 
-        $handler = Mockery::mock(CallQueuedHandler::class);
+        $handler = Double::for(CallQueuedHandler::class);
         $handler->expects('getRunningCommand')->andReturn($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);
@@ -807,7 +808,7 @@ class QueueWorkerTest extends TestCase
             }
         };
 
-        $handler = Mockery::mock(CallQueuedHandler::class);
+        $handler = Double::for(CallQueuedHandler::class);
         $handler->expects('getRunningCommand')->andReturn($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);
@@ -839,7 +840,7 @@ class QueueWorkerTest extends TestCase
             }
         };
 
-        $handler = Mockery::mock(CallQueuedHandler::class);
+        $handler = Double::for(CallQueuedHandler::class);
         $handler->expects('getRunningCommand')->andReturn($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);
@@ -864,7 +865,7 @@ class QueueWorkerTest extends TestCase
             }
         };
 
-        $handler = Mockery::mock(CallQueuedHandler::class);
+        $handler = Double::for(CallQueuedHandler::class);
         $handler->expects('getRunningCommand')->andReturn($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);

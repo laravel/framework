@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View;
 
+use JMac\Testing\Double;
 use ErrorException;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -82,7 +83,7 @@ class ViewCompilerEngineTest extends TestCase
         $compiled = __DIR__.'/Fixtures/basic.php';
         $path = __DIR__.'/Fixtures/foo.php';
 
-        $files = Mockery::mock(Filesystem::class);
+        $files = Double::for(Filesystem::class);
         $engine = $this->getEngine($files);
 
         $files->expects('getRequire')
@@ -123,7 +124,7 @@ class ViewCompilerEngineTest extends TestCase
         $compiled = __DIR__.'/Fixtures/basic.php';
         $path = __DIR__.'/Fixtures/foo.php';
 
-        $files = Mockery::mock(Filesystem::class);
+        $files = Double::for(Filesystem::class);
         $engine = $this->getEngine($files);
 
         $files->expects('getRequire')
@@ -164,7 +165,7 @@ class ViewCompilerEngineTest extends TestCase
         $compiled = __DIR__.'/Fixtures/basic.php';
         $path = __DIR__.'/Fixtures/foo.php';
 
-        $files = Mockery::mock(Filesystem::class);
+        $files = Double::for(Filesystem::class);
         $engine = $this->getEngine($files);
 
         $files->expects('getRequire')
@@ -209,7 +210,7 @@ class ViewCompilerEngineTest extends TestCase
         $compiled = __DIR__.'/Fixtures/basic.php';
         $path = __DIR__.'/Fixtures/foo.php';
 
-        $files = Mockery::mock(Filesystem::class);
+        $files = Double::for(Filesystem::class);
         $engine = $this->getEngine($files);
 
         $files->expects('getRequire')
@@ -240,7 +241,7 @@ class ViewCompilerEngineTest extends TestCase
         $compiled = __DIR__.'/Fixtures/basic.php';
         $path = __DIR__.'/Fixtures/foo.php';
 
-        $files = Mockery::mock(Filesystem::class);
+        $files = Double::for(Filesystem::class);
         $engine = $this->getEngine($files);
 
         $files->expects('getRequire')
@@ -268,6 +269,6 @@ class ViewCompilerEngineTest extends TestCase
 
     protected function getEngine($filesystem = null)
     {
-        return new CompilerEngine(Mockery::mock(CompilerInterface::class), $filesystem ?: new Filesystem);
+        return new CompilerEngine(Double::for(CompilerInterface::class), $filesystem ?: new Filesystem);
     }
 }

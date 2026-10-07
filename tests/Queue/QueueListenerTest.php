@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Queue\Listener;
 use Illuminate\Queue\ListenerOptions;
 use Mockery;
@@ -15,9 +16,9 @@ class QueueListenerTest extends TestCase
 {
     public function testRunProcessCallsProcess()
     {
-        $process = Mockery::mock(Process::class)->makePartial();
+        $process = Double::for(Process::class)->passthru();
         $process->expects('run');
-        $listener = Mockery::mock(Listener::class)->makePartial();
+        $listener = Double::for(Listener::class)->passthru();
         $listener->expects('memoryExceeded')->with(1)->andReturn(false);
 
         $listener->runProcess($process, 1);
@@ -25,9 +26,9 @@ class QueueListenerTest extends TestCase
 
     public function testListenerStopsWhenMemoryIsExceeded()
     {
-        $process = Mockery::mock(Process::class)->makePartial();
+        $process = Double::for(Process::class)->passthru();
         $process->expects('run');
-        $listener = Mockery::mock(Listener::class)->makePartial();
+        $listener = Double::for(Listener::class)->passthru();
         $listener->expects('memoryExceeded')->with(1)->andReturn(true);
         $listener->expects('stop');
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use JMac\Testing\Double;
 use Illuminate\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
@@ -223,9 +224,9 @@ class NotificationSenderTest extends TestCase
         $notifiable = new AnonymousNotifiable;
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
-        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
-        $response = Mockery::mock(ResponseInterface::class);
+        $response = Double::for(ResponseInterface::class);
         $driver->exception = new HttpTransportException('Transport error', $response);
         $manager->expects('driver')->andReturn($driver);
         $bus = new BusFake(new BusDispatcher(new Container));
@@ -251,7 +252,7 @@ class NotificationSenderTest extends TestCase
         $notifiable = new AnonymousNotifiable;
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
-        $manager = Mockery::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
         $manager->expects('driver')->andReturn($driver);
         $bus = new BusFake(new BusDispatcher(new Container));

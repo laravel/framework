@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\Model;
@@ -27,9 +28,7 @@ class DatabaseConcernsHasAttributesTest extends TestCase
 
     public function testRelationsToArray()
     {
-        $mock = Mockery::mock(HasAttributesWithoutConstructor::class)
-            ->makePartial()
-            ->shouldAllowMockingProtectedMethods()
+        $mock = Double::for(HasAttributesWithoutConstructor::class)->passthru()
             ->expects('getArrayableRelations')->andReturn([
                 'arrayable_relation' => new Collection(['foo' => 'bar']),
                 'invalid_relation' => 'invalid',

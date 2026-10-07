@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
@@ -12,8 +13,8 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 {
     public function testDeleteSetsSoftDeletedColumn()
     {
-        $model = Mockery::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
-        $query = Mockery::mock(Builder::class);
+        $model = Double::for(DatabaseSoftDeletingTraitStub::class)->passthru();
+        $query = Double::for(Builder::class);
         $model->expects('newModelQuery')->andReturn($query);
         $query->expects('where')->with('id', '=', 1)->andReturn($query);
         $query->expects('update')->with([
@@ -32,7 +33,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
     public function testRestore()
     {
-        $model = Mockery::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
+        $model = Double::for(DatabaseSoftDeletingTraitStub::class)->passthru();
         $model->expects('fireModelEvent')->with('restoring')->andReturn(true);
         $model->expects('save');
 
@@ -43,7 +44,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
     public function testRestoreCancel()
     {
-        $model = Mockery::mock(DatabaseSoftDeletingTraitStub::class)->makePartial();
+        $model = Double::for(DatabaseSoftDeletingTraitStub::class)->passthru();
         $model->expects('fireModelEvent')->with('restoring')->andReturn(false);
         $model->shouldReceive('save')->never();
 

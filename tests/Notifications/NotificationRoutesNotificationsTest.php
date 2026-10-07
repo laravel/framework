@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Notifications\Dispatcher;
 use Illuminate\Notifications\RoutesNotifications;
@@ -21,7 +22,7 @@ class NotificationRoutesNotificationsTest extends TestCase
     public function testNotificationCanBeDispatched()
     {
         $container = new Container;
-        $factory = Mockery::mock(Dispatcher::class);
+        $factory = Double::for(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new stdClass;
@@ -34,7 +35,7 @@ class NotificationRoutesNotificationsTest extends TestCase
     public function testNotificationCanBeSentNow()
     {
         $container = new Container;
-        $factory = Mockery::mock(Dispatcher::class);
+        $factory = Double::for(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
         $instance = new stdClass;

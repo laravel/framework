@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Exception;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\InteractsWithQueue;
@@ -12,7 +13,7 @@ class InteractsWithQueueTest extends TestCase
 {
     public function testCreatesAnExceptionFromString()
     {
-        $queueJob = Mockery::mock(Job::class);
+        $queueJob = Double::for(Job::class);
         $queueJob->expects('fail')->withArgs(function ($e) {
             $this->assertInstanceOf(Exception::class, $e);
             $this->assertSame('Whoops!', $e->getMessage());

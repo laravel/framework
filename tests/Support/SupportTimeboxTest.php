@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use JMac\Testing\Double;
 use Exception;
 use Illuminate\Support\Timebox;
 use Mockery;
@@ -20,7 +21,7 @@ class SupportTimeboxTest extends TestCase
 
     public function testMakeWaitsForMicroseconds()
     {
-        $mock = Mockery::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock = Double::for(Timebox::class)->passthru();
         $mock->expects('usleep');
 
         $mock->call(function () {
@@ -31,7 +32,7 @@ class SupportTimeboxTest extends TestCase
 
     public function testMakeShouldNotSleepWhenEarlyReturnHasBeenFlagged()
     {
-        $mock = Mockery::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock = Double::for(Timebox::class)->passthru();
         $mock->call(function ($timebox) {
             $timebox->returnEarly();
         }, 10000);
@@ -41,7 +42,7 @@ class SupportTimeboxTest extends TestCase
 
     public function testMakeShouldSleepWhenDontEarlyReturnHasBeenFlagged()
     {
-        $mock = Mockery::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock = Double::for(Timebox::class)->passthru();
         $mock->expects('usleep');
 
         $mock->call(function ($timebox) {
@@ -54,7 +55,7 @@ class SupportTimeboxTest extends TestCase
 
     public function testMakeWaitsForMicrosecondsWhenExceptionIsThrown()
     {
-        $mock = Mockery::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock = Double::for(Timebox::class)->passthru();
         $mock->expects('usleep');
 
         try {
@@ -70,7 +71,7 @@ class SupportTimeboxTest extends TestCase
 
     public function testMakeShouldNotSleepWhenEarlyReturnHasBeenFlaggedAndExceptionIsThrown()
     {
-        $mock = Mockery::spy(Timebox::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock = Double::for(Timebox::class)->passthru();
 
         try {
             $this->expectExceptionObject(new Exception('Exception within Timebox callback.'));

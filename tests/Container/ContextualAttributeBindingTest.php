@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Container;
 
+use JMac\Testing\Double;
 use Attribute;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
@@ -133,29 +134,29 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('auth', function () {
-            $manager = Mockery::mock(AuthManager::class);
+            $manager = Double::for(AuthManager::class);
             $manager->expects('userResolver')->times(4)->andReturn(fn ($guard = null) => $manager->guard($guard)->user());
             $manager->expects('guard')->with('foo')->andReturnUsing(function () {
-                $guard = Mockery::mock(GuardContract::class);
-                $guard->expects('user')->andReturn(m:mock(AuthenticatableContract::class));
+                $guard = Double::for(GuardContract::class);
+                $guard->expects('user')->andReturn(m:Double::for(AuthenticatableContract::class));
 
                 return $guard;
             });
             $manager->expects('guard')->with('bar')->andReturnUsing(function () {
-                $guard = Mockery::mock(GuardContract::class);
-                $guard->expects('user')->andReturn(m:mock(AuthenticatableContract::class));
+                $guard = Double::for(GuardContract::class);
+                $guard->expects('user')->andReturn(m:Double::for(AuthenticatableContract::class));
 
                 return $guard;
             });
             $manager->expects('guard')->with(AuthGuardUnitEnum::unit)->andReturnUsing(function () {
-                $guard = Mockery::mock(GuardContract::class);
-                $guard->expects('user')->andReturn(m:mock(AuthenticatableContract::class));
+                $guard = Double::for(GuardContract::class);
+                $guard->expects('user')->andReturn(m:Double::for(AuthenticatableContract::class));
 
                 return $guard;
             });
             $manager->expects('guard')->with(AuthGuardBackedEnum::Backed)->andReturnUsing(function () {
-                $guard = Mockery::mock(GuardContract::class);
-                $guard->expects('user')->andReturn(m:mock(AuthenticatableContract::class));
+                $guard = Double::for(GuardContract::class);
+                $guard->expects('user')->andReturn(m:Double::for(AuthenticatableContract::class));
 
                 return $guard;
             });
@@ -170,13 +171,13 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('cache', function () {
-            $manager = Mockery::mock(CacheManager::class);
-            $manager->expects('store')->with('foo')->andReturn(Mockery::mock(CacheRepository::class));
-            $manager->expects('store')->with('bar')->andReturn(Mockery::mock(CacheRepository::class));
-            $manager->expects('store')->with(CacheStoreUnitEnum::unit)->andReturn(Mockery::mock(CacheRepository::class));
-            $manager->expects('store')->with(CacheStoreBackedEnum::Backed)->andReturn(Mockery::mock(CacheRepository::class));
-            $manager->expects('memo')->with('foo')->andReturn(Mockery::mock(CacheRepository::class));
-            $manager->expects('memo')->with('bar')->andReturn(Mockery::mock(CacheRepository::class));
+            $manager = Double::for(CacheManager::class);
+            $manager->expects('store')->with('foo')->andReturn(Double::for(CacheRepository::class));
+            $manager->expects('store')->with('bar')->andReturn(Double::for(CacheRepository::class));
+            $manager->expects('store')->with(CacheStoreUnitEnum::unit)->andReturn(Double::for(CacheRepository::class));
+            $manager->expects('store')->with(CacheStoreBackedEnum::Backed)->andReturn(Double::for(CacheRepository::class));
+            $manager->expects('memo')->with('foo')->andReturn(Double::for(CacheRepository::class));
+            $manager->expects('memo')->with('bar')->andReturn(Double::for(CacheRepository::class));
 
             return $manager;
         });
@@ -199,7 +200,7 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('db', function () {
-            $manager = Mockery::mock(DatabaseManager::class);
+            $manager = Double::for(DatabaseManager::class);
             $manager->expects('connection')->with('foo')->andReturn(new Connection(new PDO('sqlite::memory:')));
             $manager->expects('connection')->with('bar')->andReturn(new Connection(new PDO('sqlite::memory:')));
 
@@ -213,11 +214,11 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container; //
         $container->singleton('auth', function () {
-            $manager = Mockery::mock(AuthManager::class);
-            $manager->expects('guard')->with('foo')->andReturn(Mockery::mock(GuardContract::class));
-            $manager->expects('guard')->with('bar')->andReturn(Mockery::mock(GuardContract::class));
-            $manager->expects('guard')->with(AuthGuardUnitEnum::unit)->andReturn(Mockery::mock(GuardContract::class));
-            $manager->expects('guard')->with(AuthGuardBackedEnum::Backed)->andReturn(Mockery::mock(GuardContract::class));
+            $manager = Double::for(AuthManager::class);
+            $manager->expects('guard')->with('foo')->andReturn(Double::for(GuardContract::class));
+            $manager->expects('guard')->with('bar')->andReturn(Double::for(GuardContract::class));
+            $manager->expects('guard')->with(AuthGuardUnitEnum::unit)->andReturn(Double::for(GuardContract::class));
+            $manager->expects('guard')->with(AuthGuardBackedEnum::Backed)->andReturn(Double::for(GuardContract::class));
 
             return $manager;
         });
@@ -229,9 +230,9 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('log', function () {
-            $manager = Mockery::mock(LogManager::class);
-            $manager->expects('channel')->with('foo')->andReturn(Mockery::mock(LoggerInterface::class));
-            $manager->expects('channel')->with('bar')->andReturn(Mockery::mock(LoggerInterface::class));
+            $manager = Double::for(LogManager::class);
+            $manager->expects('channel')->with('foo')->andReturn(Double::for(LoggerInterface::class));
+            $manager->expects('channel')->with('bar')->andReturn(Double::for(LoggerInterface::class));
 
             return $manager;
         });
@@ -243,8 +244,8 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('request', function () {
-            $request = Mockery::mock(Request::class);
-            $request->expects('route')->with('foo')->andReturn(Mockery::mock(Model::class));
+            $request = Double::for(Request::class);
+            $request->expects('route')->with('foo')->andReturn(Double::for(Model::class));
             $request->expects('route')->with('bar')->andReturn('bar');
 
             return $request;
@@ -257,8 +258,8 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('request', function () {
-            $request = Mockery::mock(Request::class);
-            $request->expects('route')->with('foo')->andReturn(Mockery::mock(Model::class));
+            $request = Double::for(Request::class);
+            $request->expects('route')->with('foo')->andReturn(Double::for(Model::class));
             $request->expects('route')->with('bar')->andReturn('bar');
 
             return $request;
@@ -288,7 +289,7 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
 
         $container->singleton(ContextRepository::class, function () {
-            $context = Mockery::mock(ContextRepository::class);
+            $context = Double::for(ContextRepository::class);
             $context->expects('getHidden')->with('bar', null)->andReturn('bar');
             $context->shouldNotReceive('get');
 
@@ -302,11 +303,11 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
         $container->singleton('filesystem', function () {
-            $manager = Mockery::mock(FilesystemManager::class);
-            $manager->expects('disk')->with('foo')->andReturn(Mockery::mock(Filesystem::class));
-            $manager->expects('disk')->with('bar')->andReturn(Mockery::mock(Filesystem::class));
-            $manager->expects('disk')->with(StorageDiskUnitEnum::unit)->andReturn(Mockery::mock(Filesystem::class));
-            $manager->expects('disk')->with(StorageDiskBackedEnum::Backed)->andReturn(Mockery::mock(Filesystem::class));
+            $manager = Double::for(FilesystemManager::class);
+            $manager->expects('disk')->with('foo')->andReturn(Double::for(Filesystem::class));
+            $manager->expects('disk')->with('bar')->andReturn(Double::for(Filesystem::class));
+            $manager->expects('disk')->with(StorageDiskUnitEnum::unit)->andReturn(Double::for(Filesystem::class));
+            $manager->expects('disk')->with(StorageDiskBackedEnum::Backed)->andReturn(Double::for(Filesystem::class));
 
             return $manager;
         });

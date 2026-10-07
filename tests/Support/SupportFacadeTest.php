@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use JMac\Testing\Double;
 use ArrayAccess;
 use Illuminate\Support\Facades\Facade;
 use Mockery;
@@ -84,7 +85,7 @@ class SupportFacadeTest extends TestCase
     public function testFacadeResolvesAgainAfterClearingSpecific()
     {
         $app = new ApplicationStub;
-        $app->setAttributes(['foo' => $mock = Mockery::mock(stdClass::class)]);
+        $app->setAttributes(['foo' => $mock = Double::for(stdClass::class)]);
         $mock->expects('bar')->times(3)->andReturn('baz');
 
         // Resolve for the first time
@@ -103,7 +104,7 @@ class SupportFacadeTest extends TestCase
     public function testFacadeResolvesAgainAfterClearingAll()
     {
         $app = new ApplicationStub;
-        $app->setAttributes(['foo' => $mock = Mockery::mock(stdClass::class)]);
+        $app->setAttributes(['foo' => $mock = Double::for(stdClass::class)]);
         $mock->expects('bar')->times(2)->andReturn('baz');
 
         // Resolve for the first time

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Bus;
 
+use JMac\Testing\Double;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Config\Repository as Config;
@@ -56,7 +57,7 @@ class BusDispatcherTest extends TestCase
         $container->instance('queue.routes', new QueueRoutes);
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
-            $mock = Mockery::mock(Queue::class);
+            $mock = Double::for(Queue::class);
             $mock->expects('later')->with(10, Mockery::type(BusDispatcherTestSpecificQueueAndDelayCommand::class), '', 'foo');
 
             return $mock;
@@ -76,7 +77,7 @@ class BusDispatcherTest extends TestCase
         $dispatcher = new Dispatcher($container, function ($connection) use (&$usedConnection) {
             $usedConnection = $connection;
 
-            $mock = Mockery::mock(Queue::class);
+            $mock = Double::for(Queue::class);
             $mock->expects('later')->with(10, Mockery::type(BusDispatcherTestQueueableChildCommand::class), '', 'foo');
 
             return $mock;
@@ -137,7 +138,7 @@ class BusDispatcherTest extends TestCase
         $queueRoutes->forward('reports', 'processing', 'cloud');
         $container->instance('queue.routes', $queueRoutes);
 
-        $mock = Mockery::mock(Queue::class);
+        $mock = Double::for(Queue::class);
         $mock->expects('push')->with(Mockery::type(BusDispatcherQueueable::class), '', 'reports');
 
         $usedConnection = false;
@@ -214,7 +215,7 @@ class BusDispatcherTest extends TestCase
         $container->instance('queue.routes', new QueueRoutes);
         Container::setInstance($container);
 
-        $mock = Mockery::mock(Queue::class);
+        $mock = Double::for(Queue::class);
         $mock->expects('bulk')->with(Mockery::on(fn ($jobs) => count($jobs) === 2), '', null);
         $mock->expects('bulk')->with(Mockery::on(fn ($jobs) => count($jobs) === 1), '', 'high');
 

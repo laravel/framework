@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\BeanstalkdQueue;
@@ -100,7 +101,7 @@ class QueueBeanstalkdQueueTest extends TestCase
         $pheanstalk->expects('watch')->with(Mockery::type(TubeName::class));
         $pheanstalk->expects('listTubesWatched')->andReturn(new TubeList($tube));
 
-        $jobId = Mockery::mock(JobIdInterface::class);
+        $jobId = Double::for(JobIdInterface::class);
         $jobId->expects('getId');
         $job = new Job($jobId, '');
         $pheanstalk->expects('reserveWithTimeout')->with(0)->andReturn($job);
@@ -119,7 +120,7 @@ class QueueBeanstalkdQueueTest extends TestCase
         $pheanstalk->expects('watch')->with(Mockery::type(TubeName::class));
         $pheanstalk->expects('listTubesWatched')->andReturn(new TubeList($tube));
 
-        $jobId = Mockery::mock(JobIdInterface::class);
+        $jobId = Double::for(JobIdInterface::class);
         $jobId->expects('getId');
         $job = new Job($jobId, '');
         $pheanstalk->expects('reserveWithTimeout')->with(60)->andReturn($job);
@@ -148,12 +149,12 @@ class QueueBeanstalkdQueueTest extends TestCase
     private function setQueue($default, $timeToRun, $blockFor = 0)
     {
         $this->queue = new BeanstalkdQueue(
-            Mockery::mock(implode(',', [PheanstalkManagerInterface::class, PheanstalkPublisherInterface::class, PheanstalkSubscriberInterface::class])),
+            Double::for(implode(',', [PheanstalkManagerInterface::class, PheanstalkPublisherInterface::class, PheanstalkSubscriberInterface::class])),
             $default,
             $timeToRun,
             $blockFor
         );
-        $this->container = Mockery::spy(Container::class);
+        $this->container = Double::for(Container::class);
         $this->queue->setContainer($this->container);
     }
 }

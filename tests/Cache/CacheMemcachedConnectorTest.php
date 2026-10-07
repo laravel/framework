@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use JMac\Testing\Double;
 use Illuminate\Cache\MemcachedConnector;
 use Memcached;
 use Mockery;
@@ -83,7 +84,7 @@ class CacheMemcachedConnectorTest extends TestCase
 
     protected function memcachedMockWithAddServer($returnedVersion = [])
     {
-        $memcached = Mockery::mock(Memcached::class);
+        $memcached = Double::for(Memcached::class);
         $memcached->expects('addServer')->with($this->getHost(), $this->getPort(), $this->getWeight());
         $memcached->expects('getServerList')->andReturn([]);
 

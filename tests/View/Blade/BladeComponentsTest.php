@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use JMac\Testing\Double;
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
 use Mockery;
@@ -62,7 +63,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
     {
         $attributes = new ComponentAttributeBag(['foo' => 'baz', 'other' => 'ok']);
 
-        $component = Mockery::mock(Component::class);
+        $component = Double::for(Component::class);
         $component->shouldReceive('withName', 'test');
         $component->expects('shouldRender')->andReturn(false);
 

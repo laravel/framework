@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Application;
@@ -14,7 +15,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
 {
     public function testRollbackCommandCallsMigratorWithProperArguments()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $command = new RollbackCommand($migrator);
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
@@ -31,7 +32,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
 
     public function testRollbackCommandCallsMigratorWithStepOption()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $command = new RollbackCommand($migrator);
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
@@ -48,7 +49,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
 
     public function testRollbackCommandCanBePretended()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $command = new RollbackCommand($migrator);
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
@@ -65,7 +66,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
 
     public function testRollbackCommandCanBePretendedWithStepOption()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $command = new RollbackCommand($migrator);
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);

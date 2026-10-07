@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use JMac\Testing\Double;
 use Illuminate\Cache\MemcachedStore;
 use Illuminate\Support\Carbon;
 use Memcached;
@@ -75,7 +76,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testIncrementMethodProperlyCallsMemcache()
     {
-        $memcached = Mockery::mock(Memcached::class);
+        $memcached = Double::for(Memcached::class);
         $memcached->expects('increment')->with('foo', 5)->andReturn(5);
 
         $store = new MemcachedStore($memcached);
@@ -84,7 +85,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testDecrementMethodProperlyCallsMemcache()
     {
-        $memcached = Mockery::mock(Memcached::class);
+        $memcached = Double::for(Memcached::class);
         $memcached->expects('decrement')->with('foo', 5)->andReturn(0);
 
         $store = new MemcachedStore($memcached);

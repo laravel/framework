@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
@@ -29,14 +30,14 @@ class SeedCommandTest extends TestCase
         $output = new NullOutput;
         $outputStyle = new OutputStyle($input, $output);
 
-        $seeder = Mockery::mock(Seeder::class);
+        $seeder = Double::for(Seeder::class);
         $seeder->expects('setContainer')->andReturnSelf();
         $seeder->expects('setCommand')->andReturnSelf();
         $seeder->expects('__invoke');
 
         $resolver = new ConnectionResolver;
 
-        $container = Mockery::mock(Application::class);
+        $container = Double::for(Application::class);
         $container->expects('call');
         $container->expects('environment')->andReturn('testing');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
@@ -65,7 +66,7 @@ class SeedCommandTest extends TestCase
         $output = new NullOutput;
         $outputStyle = new OutputStyle($input, $output);
 
-        $seeder = Mockery::mock(Seeder::class);
+        $seeder = Double::for(Seeder::class);
         $seeder->expects('setContainer')->andReturnSelf();
         $seeder->expects('setCommand')->andReturnSelf();
         $seeder->expects('__invoke')->andThrow(new RuntimeException('Seeding failed.'));
@@ -73,7 +74,7 @@ class SeedCommandTest extends TestCase
         $resolver = new SeedCommandTestConnectionResolver;
         $resolver->default = 'mysql';
 
-        $container = Mockery::mock(Application::class);
+        $container = Double::for(Application::class);
         $container->expects('call');
         $container->expects('environment')->andReturn('testing');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
@@ -113,13 +114,13 @@ class SeedCommandTest extends TestCase
 
         $instance = new UserWithoutModelEventsSeeder();
 
-        $seeder = Mockery::mock($instance);
+        $seeder = Double::for($instance);
         $seeder->expects('setContainer')->andReturnSelf();
         $seeder->expects('setCommand')->andReturnSelf();
 
         $resolver = new ConnectionResolver;
 
-        $container = Mockery::mock(Application::class);
+        $container = Double::for(Application::class);
         $container->expects('call');
         $container->expects('environment')->andReturn('testing');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
@@ -154,7 +155,7 @@ class SeedCommandTest extends TestCase
 
         $resolver = new ConnectionResolver;
 
-        $container = Mockery::mock(Application::class);
+        $container = Double::for(Application::class);
         $container->expects('call');
         $container->shouldReceive('runningUnitTests')->andReturn('true');
         $container->expects('make')->with(OutputStyle::class, Mockery::any())->andReturn(

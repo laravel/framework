@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\MySqlConnection;
@@ -713,7 +714,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $grammar ??= 'MySql';
 
-        $connection = Mockery::mock($grammar === 'MySql' ? MySqlConnection::class : Connection::class);
+        $connection = Double::for($grammar === 'MySql' ? MySqlConnection::class : Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
         $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true);
 
@@ -721,7 +722,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $builderClass = 'Illuminate\Database\Schema\\'.$grammar.'Builder';
 
         $connection->shouldReceive('getSchemaGrammar')->andReturn(new $grammarClass($connection));
-        $connection->shouldReceive('getSchemaBuilder')->andReturn(Mockery::mock($builderClass));
+        $connection->shouldReceive('getSchemaBuilder')->andReturn(Double::for($builderClass));
 
         if ($grammar === 'SQLite') {
             $connection->shouldReceive('getServerVersion')->andReturn('3.35');

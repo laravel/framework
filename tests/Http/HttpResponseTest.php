@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Http;
 
+use JMac\Testing\Double;
 use BadMethodCallException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -209,7 +210,7 @@ class HttpResponseTest extends TestCase
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $session = new Store('test', new NullSessionHandler);
         $response->setSession($session);
-        $provider = Mockery::mock(MessageProvider::class);
+        $provider = Double::for(MessageProvider::class);
         $provider->expects('getMessageBag')->andReturn(new MessageBag(['name' => ['required']]));
         $response->withErrors($provider);
 

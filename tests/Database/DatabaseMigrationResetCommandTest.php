@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Closure;
 use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Migrations\Migrator;
@@ -20,7 +21,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
 
     public function testResetCommandCallsMigratorWithProperArguments()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $command = new ResetCommand($migrator);
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
@@ -38,7 +39,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
 
     public function testResetCommandCanBePretended()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $command = new ResetCommand($migrator);
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
@@ -56,7 +57,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
 
     public function testRefreshCommandExitsWhenProhibited()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $command = new ResetCommand($migrator);
 
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);

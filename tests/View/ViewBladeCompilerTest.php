@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View;
 
+use JMac\Testing\Double;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use InvalidArgumentException;
@@ -337,6 +338,6 @@ class ViewBladeCompilerTest extends TestCase
 
     protected function getFiles()
     {
-        return Mockery::mock(Filesystem::class);
+        return Double::for(Filesystem::class);
     }
 }

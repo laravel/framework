@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Http\Middleware;
 
+use JMac\Testing\Double;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -161,7 +162,7 @@ class PreventRequestForgeryTest extends TestCase
     protected function createMiddleware()
     {
         return new PreventRequestForgeryTestStub(
-            Mockery::mock(Application::class),
+            Double::for(Application::class),
             new Encrypter(str_repeat('a', 16))
         );
     }

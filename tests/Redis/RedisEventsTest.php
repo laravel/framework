@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Redis;
 
+use JMac\Testing\Double;
 use Exception;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Redis\Connections\PhpRedisConnection;
@@ -18,7 +19,7 @@ class RedisEventsTest extends TestCase
     {
         $exception = new Exception('Test exception');
 
-        $client = Mockery::mock(Redis::class);
+        $client = Double::for(Redis::class);
         $client->expects('get')->with('key')->andThrow($exception);
 
         $events = new EventFake(new Dispatcher);
@@ -44,7 +45,7 @@ class RedisEventsTest extends TestCase
     {
         $exception = new Exception('Test exception');
 
-        $client = Mockery::mock(Redis::class);
+        $client = Double::for(Redis::class);
         $client->expects('get')->with('key')->andThrow($exception);
 
         $events = new EventFake(new Dispatcher);
@@ -66,7 +67,7 @@ class RedisEventsTest extends TestCase
     {
         $exception = new Exception('Test exception');
 
-        $client = Mockery::mock(Redis::class);
+        $client = Double::for(Redis::class);
         $client->expects('get')->with('key')->andThrow($exception);
 
         $events = new EventFake(new Dispatcher);
@@ -88,7 +89,7 @@ class RedisEventsTest extends TestCase
 
     public function testListenForFailuresRegistersCallback()
     {
-        $client = Mockery::mock(Redis::class);
+        $client = Double::for(Redis::class);
 
         $events = new Dispatcher;
 

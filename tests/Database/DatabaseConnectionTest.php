@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use DateTime;
 use ErrorException;
 use Exception;
@@ -432,9 +433,9 @@ class DatabaseConnectionTest extends TestCase
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage('server has gone away (Connection: , Host: , Port: , Database: , SQL: foo)');
 
-        $pdo = Mockery::mock(PDO::class);
+        $pdo = Double::for(PDO::class);
         $pdo->expects('beginTransaction');
-        $statement = Mockery::mock(PDOStatement::class);
+        $statement = Double::for(PDOStatement::class);
         $pdo->expects('prepare')->andReturn($statement);
         $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
 
@@ -475,13 +476,13 @@ class DatabaseConnectionTest extends TestCase
 
     protected function getFailingPdo()
     {
-        $statement = Mockery::mock(PDOStatement::class);
+        $statement = Double::for(PDOStatement::class);
         $statement->shouldReceive('bindValue')->once();
         $statement->shouldReceive('execute')->once()->andThrow(
             new PDOException('SQLSTATE[42S02]: Base table or view not found')
         );
 
-        $pdo = Mockery::mock(PDO::class);
+        $pdo = Double::for(PDO::class);
         $pdo->shouldReceive('prepare')->once()->andReturn($statement);
 
         return $pdo;
@@ -489,9 +490,9 @@ class DatabaseConnectionTest extends TestCase
 
     public function testOnLostConnectionPDOIsSwappedOutsideTransaction()
     {
-        $pdo = Mockery::mock(PDO::class);
+        $pdo = Double::for(PDO::class);
 
-        $statement = Mockery::mock(PDOStatement::class);
+        $statement = Double::for(PDOStatement::class);
         $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
         $statement->expects('execute')->andReturn(true);
 
@@ -544,11 +545,11 @@ class DatabaseConnectionTest extends TestCase
     #[AllowMockObjectsWithoutExpectations]
     public function testPrepareBindings()
     {
-        $date = Mockery::mock(DateTime::class);
+        $date = Double::for(DateTime::class);
         $date->expects('format')->with('foo')->andReturn('bar');
         $bindings = ['test' => $date];
         $conn = $this->getMockConnection();
-        $grammar = Mockery::mock(Grammar::class);
+        $grammar = Double::for(Grammar::class);
         $grammar->expects('getDateFormat')->andReturn('foo');
         $conn->setQueryGrammar($grammar);
         $result = $conn->prepareBindings($bindings);

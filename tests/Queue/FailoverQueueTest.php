@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Events\Dispatcher;
@@ -21,7 +22,7 @@ class FailoverQueueTest extends TestCase
 
     public function test_push_fails_over_on_exception()
     {
-        $queue = Mockery::mock(QueueManager::class);
+        $queue = Double::for(QueueManager::class);
         $events = new Dispatcher;
         $failedOver = [];
         $events->listen(QueueFailedOver::class, function ($event) use (&$failedOver) {
@@ -32,10 +33,10 @@ class FailoverQueueTest extends TestCase
             'sync',
         ]);
 
-        $redis = Mockery::mock(Queue::class);
+        $redis = Double::for(Queue::class);
         $queue->expects('connection')->with('redis')->andReturn($redis);
 
-        $sync = Mockery::mock(Queue::class);
+        $sync = Double::for(Queue::class);
         $queue->expects('connection')->with('sync')->andReturn($sync);
 
         $redis->expects('push')->andReturnUsing(
@@ -54,10 +55,10 @@ class FailoverQueueTest extends TestCase
 
     public function test_bulk_respects_job_delays()
     {
-        $queue = Mockery::mock(QueueManager::class);
+        $queue = Double::for(QueueManager::class);
         $failover = new FailoverQueue($queue, new Dispatcher, ['sync']);
 
-        $sync = Mockery::mock(Queue::class);
+        $sync = Double::for(Queue::class);
         $queue->expects('connection')->times(3)->with('sync')->andReturn($sync);
 
         $sync->expects('later')->with(15, Mockery::type(FailoverJobWithDelayAttribute::class), '', null);

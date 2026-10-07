@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use JMac\Testing\Double;
 use Exception;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
@@ -15,13 +16,13 @@ class BroadcastEventTest extends TestCase
 {
     public function testBasicEventBroadcastParameterFormatting()
     {
-        $broadcaster = Mockery::mock(Broadcaster::class);
+        $broadcaster = Double::for(Broadcaster::class);
 
         $broadcaster->expects('broadcast')->with(
             ['test-channel'], TestBroadcastEvent::class, ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
         );
 
-        $manager = Mockery::mock(BroadcastingFactory::class);
+        $manager = Double::for(BroadcastingFactory::class);
 
         $manager->expects('connection')->with(null)->andReturn($broadcaster);
 
@@ -32,13 +33,13 @@ class BroadcastEventTest extends TestCase
 
     public function testManualParameterSpecification()
     {
-        $broadcaster = Mockery::mock(Broadcaster::class);
+        $broadcaster = Double::for(Broadcaster::class);
 
         $broadcaster->expects('broadcast')->with(
             ['test-channel'], TestBroadcastEventWithManualData::class, ['name' => 'Taylor', 'socket' => null]
         );
 
-        $manager = Mockery::mock(BroadcastingFactory::class);
+        $manager = Double::for(BroadcastingFactory::class);
 
         $manager->expects('connection')->with(null)->andReturn($broadcaster);
 
@@ -49,11 +50,11 @@ class BroadcastEventTest extends TestCase
 
     public function testSpecificBroadcasterGiven()
     {
-        $broadcaster = Mockery::mock(Broadcaster::class);
+        $broadcaster = Double::for(Broadcaster::class);
 
         $broadcaster->expects('broadcast');
 
-        $manager = Mockery::mock(BroadcastingFactory::class);
+        $manager = Double::for(BroadcastingFactory::class);
 
         $manager->expects('connection')->with('log')->andReturn($broadcaster);
 
@@ -64,7 +65,7 @@ class BroadcastEventTest extends TestCase
 
     public function testSpecificChannelsPerConnection()
     {
-        $broadcaster = Mockery::mock(Broadcaster::class);
+        $broadcaster = Double::for(Broadcaster::class);
 
         $broadcaster->expects('broadcast')->with(
             ['first-channel'], TestBroadcastEventWithChannelsPerConnection::class, ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
@@ -74,7 +75,7 @@ class BroadcastEventTest extends TestCase
             ['second-channel'], TestBroadcastEventWithChannelsPerConnection::class, ['firstName' => 'Taylor']
         );
 
-        $manager = Mockery::mock(BroadcastingFactory::class);
+        $manager = Double::for(BroadcastingFactory::class);
 
         $manager->expects('connection')->with('first_connection')->andReturn($broadcaster);
         $manager->expects('connection')->with('second_connection')->andReturn($broadcaster);
@@ -86,13 +87,13 @@ class BroadcastEventTest extends TestCase
 
     public function testBroadcastAsStringIsUsedAsEventName()
     {
-        $broadcaster = Mockery::mock(Broadcaster::class);
+        $broadcaster = Double::for(Broadcaster::class);
 
         $broadcaster->expects('broadcast')->with(
             ['test-channel'], 'custom-name', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
         );
 
-        $manager = Mockery::mock(BroadcastingFactory::class);
+        $manager = Double::for(BroadcastingFactory::class);
 
         $manager->expects('connection')->with(null)->andReturn($broadcaster);
 
@@ -103,13 +104,13 @@ class BroadcastEventTest extends TestCase
 
     public function testBroadcastAsBackedEnumResolvesToValue()
     {
-        $broadcaster = Mockery::mock(Broadcaster::class);
+        $broadcaster = Double::for(Broadcaster::class);
 
         $broadcaster->expects('broadcast')->with(
             ['test-channel'], 'custom-enum-name', ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
         );
 
-        $manager = Mockery::mock(BroadcastingFactory::class);
+        $manager = Double::for(BroadcastingFactory::class);
 
         $manager->expects('connection')->with(null)->andReturn($broadcaster);
 

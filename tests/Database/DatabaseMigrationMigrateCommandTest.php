@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Console\CommandMutex;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Events\SchemaLoaded;
@@ -20,7 +21,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 {
     public function testBasicMigrationsCallMigratorWithProperArguments()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $dispatcher = new EventsDispatcher;
         $command = new MigrateCommand($migrator, $dispatcher);
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
@@ -40,7 +41,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testMigrationsCanBeRunWithStoredSchema()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $dispatcher = new EventFake(new EventsDispatcher);
         $command = new MigrateCommand($migrator, $dispatcher);
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
@@ -48,14 +49,14 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $command->setLaravel($app);
         $migrator->expects('paths')->andReturn([]);
         $migrator->expects('hasRunAnyMigrations')->andReturn(false);
-        $connection = Mockery::mock(MySqlConnection::class);
+        $connection = Double::for(MySqlConnection::class);
         $migrator->expects('resolveConnection')->andReturn($connection);
         $connection->expects('getName')->andReturn('mysql');
         $migrator->expects('usingConnection')->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
         $migrator->expects('deleteRepository');
-        $schemaState = Mockery::mock(SchemaState::class);
+        $schemaState = Double::for(SchemaState::class);
         $connection->expects('getSchemaState')->andReturn($schemaState);
         $schemaState->expects('handleOutputUsing')->andReturnSelf();
         $schemaState->expects('load')->with(__DIR__.'/Fixtures/schema.sql');
@@ -70,7 +71,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testMigrationRepositoryCreatedWhenNecessary()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $dispatcher = new EventsDispatcher;
         $params = [$migrator, $dispatcher];
         $command = $this->getMockBuilder(MigrateCommand::class)->onlyMethods(['callSilent'])->setConstructorArgs($params)->getMock();
@@ -92,7 +93,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testTheCommandMayBePretended()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $dispatcher = new EventsDispatcher;
         $command = new MigrateCommand($migrator, $dispatcher);
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
@@ -112,7 +113,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testTheDatabaseMayBeSet()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $dispatcher = new EventsDispatcher;
         $command = new MigrateCommand($migrator, $dispatcher);
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
@@ -132,7 +133,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testStepMayBeSet()
     {
-        $migrator = Mockery::mock(Migrator::class);
+        $migrator = Double::for(Migrator::class);
         $dispatcher = new EventsDispatcher;
         $command = new MigrateCommand($migrator, $dispatcher);
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
@@ -160,7 +161,7 @@ class ApplicationDatabaseMigrationStub extends Application
 {
     public function __construct(array $data = [])
     {
-        $mutex = Mockery::mock(CommandMutex::class);
+        $mutex = Double::for(CommandMutex::class);
         $mutex->shouldReceive('create')->andReturn(true);
         $this->instance(CommandMutex::class, $mutex);
 

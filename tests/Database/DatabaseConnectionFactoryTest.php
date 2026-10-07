@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
@@ -370,7 +371,7 @@ class DatabaseConnectionFactoryTest extends TestCase
     {
         $this->expectExceptionObject(new InvalidArgumentException('Unsupported driver [foo]'));
 
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('bound')->andReturn(false);
         $factory = new ConnectionFactory($container);
         $factory->createConnector(['driver' => 'foo']);
@@ -378,7 +379,7 @@ class DatabaseConnectionFactoryTest extends TestCase
 
     public function testCustomConnectorsCanBeResolvedViaContainer()
     {
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('bound')->with('db.connector.foo')->andReturn(true);
         $container->expects('make')->with('db.connector.foo')->andReturn('connector');
         $factory = new ConnectionFactory($container);

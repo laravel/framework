@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Auth;
 
+use JMac\Testing\Double;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
@@ -449,7 +450,7 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $cookies = Mockery::mock(CookieJar::class);
+        $cookies = Double::for(CookieJar::class);
         $mock->setCookieJar($cookies);
         $user = Mockery::mock(Authenticatable::class);
         $user->expects('getRememberToken')->andReturn('a');
@@ -473,7 +474,7 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $cookies = Mockery::mock(CookieJar::class);
+        $cookies = Double::for(CookieJar::class);
         $mock->setCookieJar($cookies);
         $user = Mockery::mock(Authenticatable::class);
         $user->expects('getRememberToken')->andReturn(null);
@@ -524,7 +525,7 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $cookies = Mockery::mock(CookieJar::class);
+        $cookies = Double::for(CookieJar::class);
         $mock->setCookieJar($cookies);
         $user = new GenericUser([]);
         $mock->expects($this->once())->method('getName')->willReturn('foo');
@@ -545,7 +546,7 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
-        $cookies = Mockery::mock(CookieJar::class);
+        $cookies = Double::for(CookieJar::class);
         $mock->setCookieJar($cookies);
         $user = new GenericUser([]);
         $mock->expects($this->once())->method('getName')->willReturn('foo');
@@ -787,7 +788,7 @@ class AuthGuardTest extends TestCase
     protected function getRealGuard()
     {
         $session = new Store('test', new ArraySessionHandler(10));
-        $provider = Mockery::mock(UserProvider::class);
+        $provider = Double::for(UserProvider::class);
 
         return [new SessionGuard('default', $provider, $session, timeboxDuration: 0), $provider, $session];
     }
@@ -802,16 +803,16 @@ class AuthGuardTest extends TestCase
     protected function getMocks()
     {
         return [
-            Mockery::mock(Session::class),
-            Mockery::mock(UserProvider::class),
+            Double::for(Session::class),
+            Double::for(UserProvider::class),
             Request::create('/', 'GET'),
-            Mockery::mock(CookieJar::class),
-            Mockery::mock(Timebox::class),
+            Double::for(CookieJar::class),
+            Double::for(Timebox::class),
         ];
     }
 
     protected function getCookieJar()
     {
-        return new CookieJar(Request::create('/foo', 'GET'), Mockery::mock(Encrypter::class), ['domain' => 'foo.com', 'path' => '/', 'secure' => false, 'httpOnly' => false]);
+        return new CookieJar(Request::create('/foo', 'GET'), Double::for(Encrypter::class), ['domain' => 'foo.com', 'path' => '/', 'secure' => false, 'httpOnly' => false]);
     }
 }

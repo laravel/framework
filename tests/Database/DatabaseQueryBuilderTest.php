@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use BadMethodCallException;
 use Closure;
 use DateInterval;
@@ -5086,11 +5087,9 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpdateOrInsertMethod()
     {
         $connection = new Connection(new PDO('sqlite::memory:'));
-        $builder = Mockery::mock(Builder::class.'[where,exists,insert]', [
-            $connection,
+        $builder = Double::for(Builder::class)->passthru(new Builder($connection,
             new Grammar($connection),
-            new Processor,
-        ]);
+            new Processor));
 
         $builder->expects('where')->with(['email' => 'foo'])->andReturn(Mockery::self());
         $builder->expects('exists')->andReturn(false);
@@ -5099,11 +5098,9 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
 
         $connection = new Connection(new PDO('sqlite::memory:'));
-        $builder = Mockery::mock(Builder::class.'[where,exists,update]', [
-            $connection,
+        $builder = Double::for(Builder::class)->passthru(new Builder($connection,
             new Grammar($connection),
-            new Processor,
-        ]);
+            new Processor));
 
         $builder->expects('where')->with(['email' => 'foo'])->andReturn(Mockery::self());
         $builder->expects('exists')->andReturn(true);
@@ -5115,11 +5112,9 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpdateOrInsertMethodWorksWithEmptyUpdateValues()
     {
         $connection = new Connection(new PDO('sqlite::memory:'));
-        $builder = Mockery::spy(Builder::class.'[where,exists,update]', [
-            $connection,
+        $builder = Double::for(Builder::class)->passthru(new Builder($connection,
             new Grammar($connection),
-            new Processor,
-        ]);
+            new Processor));
 
         $builder->expects('where')->with(['email' => 'foo'])->andReturn(Mockery::self());
         $builder->expects('exists')->andReturn(true);
@@ -5954,7 +5949,7 @@ SQL;
     {
         $method = 'whereFooBarAndBazOrQux';
         $parameters = ['corge', 'waldo', 'fred'];
-        $builder = Mockery::mock(Builder::class)->makePartial();
+        $builder = Double::for(Builder::class)->passthru();
 
         $builder->expects('where')->with('foo_bar', '=', $parameters[0], 'and')->andReturnSelf();
         $builder->expects('where')->with('baz', '=', $parameters[1], 'and')->andReturnSelf();
@@ -5967,7 +5962,7 @@ SQL;
     {
         $method = 'whereIosVersionAndAndroidVersionOrOrientation';
         $parameters = ['6.1', '4.2', 'Vertical'];
-        $builder = Mockery::mock(Builder::class)->makePartial();
+        $builder = Double::for(Builder::class)->passthru();
 
         $builder->expects('where')->with('ios_version', '=', '6.1', 'and')->andReturnSelf();
         $builder->expects('where')->with('android_version', '=', '4.2', 'and')->andReturnSelf();
@@ -8054,7 +8049,7 @@ SQL;
         $connection->expects('prepareBindings')
             ->with(['foo'])
             ->andReturn(['foo']);
-        $grammar = Mockery::mock(Grammar::class, [$connection])->makePartial();
+        $grammar = Double::for(Grammar::class)->passthru(new Grammar($connection));
         $grammar->expects('substituteBindingsIntoRawSql')
             ->with('select * from "users" where "email" = ?', ['foo'])
             ->andReturn('select * from "users" where "email" = \'foo\'');
@@ -8066,7 +8061,7 @@ SQL;
 
     protected function getConnection(string $prefix = '')
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
 
@@ -8077,7 +8072,7 @@ SQL;
     {
         $connection = $this->getConnection(prefix: $prefix);
         $grammar = new Grammar($connection);
-        $processor = Mockery::mock(Processor::class);
+        $processor = Double::for(Processor::class);
 
         return new Builder($connection, $grammar, $processor);
     }
@@ -8086,7 +8081,7 @@ SQL;
     {
         $connection = $this->getConnection(prefix: $prefix);
         $grammar = new PostgresGrammar($connection);
-        $processor = Mockery::mock(Processor::class);
+        $processor = Double::for(Processor::class);
 
         return new Builder($connection, $grammar, $processor);
     }
@@ -8095,7 +8090,7 @@ SQL;
     {
         $connection = $this->getConnection(prefix: $prefix);
         $grammar = new MySqlGrammar($connection);
-        $processor = Mockery::mock(Processor::class);
+        $processor = Double::for(Processor::class);
 
         return new Builder($connection, $grammar, $processor);
     }
@@ -8104,7 +8099,7 @@ SQL;
     {
         $connection = $this->getConnection(prefix: $prefix);
         $grammar = new MariaDbGrammar($connection);
-        $processor = Mockery::mock(Processor::class);
+        $processor = Double::for(Processor::class);
 
         return new Builder($connection, $grammar, $processor);
     }
@@ -8113,7 +8108,7 @@ SQL;
     {
         $connection = $this->getConnection(prefix: $prefix);
         $grammar = new SQLiteGrammar($connection);
-        $processor = Mockery::mock(Processor::class);
+        $processor = Double::for(Processor::class);
 
         return new Builder($connection, $grammar, $processor);
     }
@@ -8122,7 +8117,7 @@ SQL;
     {
         $connection = $this->getConnection(prefix: $prefix);
         $grammar = new SqlServerGrammar($connection);
-        $processor = Mockery::mock(Processor::class);
+        $processor = Double::for(Processor::class);
 
         return new Builder($connection, $grammar, $processor);
     }
@@ -8150,10 +8145,8 @@ SQL;
      */
     protected function getMockQueryBuilder()
     {
-        return Mockery::mock(Builder::class, [
-            $connection = $this->getConnection(),
+        return Double::for(Builder::class)->passthru(new Builder($connection = $this->getConnection(),
             new Grammar($connection),
-            new Processor,
-        ])->makePartial();
+            new Processor));
     }
 }

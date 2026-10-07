@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolver;
@@ -16,8 +17,8 @@ class DatabaseMigrationRepositoryTest extends TestCase
 {
     public function testGetRanMigrationsListMigrationsByPackage()
     {
-        $query = Mockery::mock(QueryBuilder::class);
-        $connectionMock = Mockery::mock(Connection::class);
+        $query = Double::for(QueryBuilder::class);
+        $connectionMock = Double::for(Connection::class);
         $repo = $this->getRepository($connectionMock);
         $connectionMock->expects('table')->with('migrations')->andReturn($query);
         $query->expects('orderBy')->with('batch', 'asc')->andReturn($query);
@@ -30,12 +31,12 @@ class DatabaseMigrationRepositoryTest extends TestCase
 
     public function testGetLastMigrationsGetsAllMigrationsWithTheLatestBatchNumber()
     {
-        $connectionMock = Mockery::mock(Connection::class);
+        $connectionMock = Double::for(Connection::class);
         $repo = $this->getMockBuilder(DatabaseMigrationRepository::class)->onlyMethods(['getLastBatchNumber'])->setConstructorArgs([
             $this->resolver($connectionMock), 'migrations',
         ])->getMock();
         $repo->expects($this->once())->method('getLastBatchNumber')->willReturn(1);
-        $query = Mockery::mock(QueryBuilder::class);
+        $query = Double::for(QueryBuilder::class);
         $connectionMock->expects('table')->with('migrations')->andReturn($query);
         $query->expects('where')->with('batch', 1)->andReturn($query);
         $query->expects('orderBy')->with('migration', 'desc')->andReturn($query);
@@ -47,8 +48,8 @@ class DatabaseMigrationRepositoryTest extends TestCase
 
     public function testLogMethodInsertsRecordIntoMigrationTable()
     {
-        $query = Mockery::mock(QueryBuilder::class);
-        $connectionMock = Mockery::mock(Connection::class);
+        $query = Double::for(QueryBuilder::class);
+        $connectionMock = Double::for(Connection::class);
         $repo = $this->getRepository($connectionMock);
         $connectionMock->expects('table')->with('migrations')->andReturn($query);
         $query->expects('insert')->with(['migration' => 'bar', 'batch' => 1]);
@@ -59,8 +60,8 @@ class DatabaseMigrationRepositoryTest extends TestCase
 
     public function testDeleteMethodRemovesAMigrationFromTheTable()
     {
-        $query = Mockery::mock(QueryBuilder::class);
-        $connectionMock = Mockery::mock(Connection::class);
+        $query = Double::for(QueryBuilder::class);
+        $connectionMock = Double::for(Connection::class);
         $repo = $this->getRepository($connectionMock);
         $connectionMock->expects('table')->with('migrations')->andReturn($query);
         $query->expects('where')->with('migration', 'foo')->andReturn($query);
@@ -83,8 +84,8 @@ class DatabaseMigrationRepositoryTest extends TestCase
 
     public function testGetLastBatchNumberReturnsMaxBatch()
     {
-        $query = Mockery::mock(QueryBuilder::class);
-        $connectionMock = Mockery::mock(Connection::class);
+        $query = Double::for(QueryBuilder::class);
+        $connectionMock = Double::for(Connection::class);
         $repo = $this->getRepository($connectionMock);
         $connectionMock->expects('table')->with('migrations')->andReturn($query);
         $query->expects('max')->andReturn(1);
@@ -95,8 +96,8 @@ class DatabaseMigrationRepositoryTest extends TestCase
 
     public function testCreateRepositoryCreatesProperDatabaseTable()
     {
-        $schema = Mockery::mock(SchemaBuilder::class);
-        $connectionMock = Mockery::mock(Connection::class);
+        $schema = Double::for(SchemaBuilder::class);
+        $connectionMock = Double::for(Connection::class);
         $repo = $this->getRepository($connectionMock);
         $connectionMock->expects('getSchemaBuilder')->andReturn($schema);
         $schema->expects('create')->with('migrations', Mockery::type(Closure::class));
@@ -112,7 +113,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     protected function resolver($connection = null)
     {
         $resolver = new ConnectionResolver;
-        $resolver->addConnection('default', $connection ?: Mockery::mock(Connection::class));
+        $resolver->addConnection('default', $connection ?: Double::for(Connection::class));
         $resolver->setDefaultConnection('default');
 
         return $resolver;

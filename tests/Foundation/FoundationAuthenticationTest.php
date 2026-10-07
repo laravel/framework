@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use JMac\Testing\Double;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Config\Repository as ConfigRepository;
@@ -35,13 +36,13 @@ class FoundationAuthenticationTest extends TestCase
      */
     protected function mockGuard()
     {
-        $guard = Mockery::mock(Guard::class);
+        $guard = Double::for(Guard::class);
 
-        $auth = Mockery::mock(AuthManager::class);
+        $auth = Double::for(AuthManager::class);
         $auth->expects('guard')
             ->andReturn($guard);
 
-        $this->app = Mockery::mock(Application::class);
+        $this->app = Double::for(Application::class);
         $this->app->expects('make')
             ->withArgs(['auth'])
             ->andReturn($auth);
@@ -140,7 +141,7 @@ class FoundationAuthenticationTest extends TestCase
     {
         $user = new GenericUser([]);
 
-        $provider = Mockery::mock(UserProvider::class);
+        $provider = Double::for(UserProvider::class);
 
         $provider->expects('retrieveByCredentials')
             ->with($credentials)

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use JMac\Testing\Double;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\RedisTaggedCache;
 use Illuminate\Cache\RedisTagSet;
@@ -71,8 +72,8 @@ class CacheRedisTaggedCacheTest extends TestCase
 
     private function getCache(): array
     {
-        $store = Mockery::mock(RedisStore::class);
-        $tags = Mockery::mock(RedisTagSet::class);
+        $store = Double::for(RedisStore::class);
+        $tags = Double::for(RedisTagSet::class);
         $tags->allows('getNamespace')->andReturn('namespace');
         $tags->allows('getNames')->andReturn([]);
 

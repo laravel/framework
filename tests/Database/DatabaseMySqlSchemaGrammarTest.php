@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Query\Expression;
@@ -1585,7 +1586,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         ?MySqlBuilder $builder = null,
         string $prefix = ''
     ) {
-        $connection = Mockery::mock(MySqlConnection::class);
+        $connection = Double::for(MySqlConnection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
         $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
         $connection->shouldReceive('isMaria')->andReturn(false);
@@ -1856,6 +1857,6 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
     public function getBuilder()
     {
-        return mock(MySqlBuilder::class);
+        return Double::for(MySqlBuilder::class);
     }
 }

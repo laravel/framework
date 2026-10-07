@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use JMac\Testing\Double;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\LazyCollection;
@@ -322,7 +323,7 @@ class FilesystemTest extends TestCase
         file_put_contents(self::$tempDir.'/tmp6/foo.txt', '');
         mkdir(self::$tempDir.'/tmp7', 0777, true);
 
-        $files = Mockery::mock(Filesystem::class)->makePartial();
+        $files = Double::for(Filesystem::class)->passthru();
         $files->expects('deleteDirectory')->andReturn(false);
         $this->assertFalse($files->moveDirectory(self::$tempDir.'/tmp6', self::$tempDir.'/tmp7', true));
     }

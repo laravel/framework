@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Aws\DynamoDb\DynamoDbClient;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
@@ -26,7 +27,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         $exception = new Exception('Something went wrong.');
 
-        $dynamoDbClient = Mockery::mock(DynamoDbClient::class);
+        $dynamoDbClient = Double::for(DynamoDbClient::class);
 
         $dynamoDbClient->expects('putItem')->with([
             'TableName' => 'table',
@@ -51,7 +52,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
     public function testCanRetrieveAllFailedJobs()
     {
-        $dynamoDbClient = Mockery::mock(DynamoDbClient::class);
+        $dynamoDbClient = Double::for(DynamoDbClient::class);
 
         $time = time();
 
@@ -96,7 +97,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
     public function testASingleJobCanBeFound()
     {
-        $dynamoDbClient = Mockery::mock(DynamoDbClient::class);
+        $dynamoDbClient = Double::for(DynamoDbClient::class);
 
         $time = time();
 
@@ -137,7 +138,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
     public function testNullIsReturnedIfJobNotFound()
     {
-        $dynamoDbClient = Mockery::mock(DynamoDbClient::class);
+        $dynamoDbClient = Double::for(DynamoDbClient::class);
 
         $dynamoDbClient->expects('getItem')->with([
             'TableName' => 'table',
@@ -156,7 +157,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
     public function testJobsCanBeDeleted()
     {
-        $dynamoDbClient = Mockery::mock(DynamoDbClient::class);
+        $dynamoDbClient = Double::for(DynamoDbClient::class);
 
         $dynamoDbClient->expects('deleteItem')->with([
             'TableName' => 'table',

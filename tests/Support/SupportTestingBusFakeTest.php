@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use JMac\Testing\Double;
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Dispatcher as BusDispatcher;
@@ -616,7 +617,7 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testAssertDispatchedWithIgnoreClass()
     {
-        $dispatcher = Mockery::mock(QueueingDispatcher::class);
+        $dispatcher = Double::for(QueueingDispatcher::class);
 
         $job = new BusJobStub;
         $dispatcher->expects('dispatch')->with($job);
@@ -640,7 +641,7 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testDispatchedFakingOnlyGivenJobs()
     {
-        $dispatcher = Mockery::mock(QueueingDispatcher::class);
+        $dispatcher = Double::for(QueueingDispatcher::class);
 
         $job = new BusJobStub;
         $dispatcher->shouldReceive('dispatch')->never()->with($job);
@@ -672,7 +673,7 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testAssertDispatchedWithIgnoreCallback()
     {
-        $dispatcher = Mockery::mock(QueueingDispatcher::class);
+        $dispatcher = Double::for(QueueingDispatcher::class);
 
         $job = new BusJobStub;
         $dispatcher->expects('dispatch')->with($job);

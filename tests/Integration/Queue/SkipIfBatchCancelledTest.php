@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
@@ -40,7 +41,7 @@ class SkipIfBatchCancelledTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
+        $job = Double::for(Job::class);
 
         $job->expects('uuid')->andReturn('simple-test-uuid');
         $job->expects('hasFailed')->andReturn(false);

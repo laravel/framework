@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -275,8 +276,8 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testLoadMethodEagerLoadsGivenRelationships()
     {
-        $model = Mockery::mock(Model::class);
-        $builder = Mockery::mock(Builder::class);
+        $model = Double::for(Model::class);
+        $builder = Double::for(Builder::class);
         $model->expects('newQueryWithoutRelationships')->andReturn($builder);
         $builder->expects('with')->with(['bar', 'baz'])->andReturnSelf();
         $builder->expects('eagerLoadRelations')->with([$model])->andReturn(['results']);
@@ -288,7 +289,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testLoadMissingWithoutRelationsDoesNotBuildAQuery()
     {
-        $model = Mockery::mock(Model::class);
+        $model = Double::for(Model::class);
         $model->shouldNotReceive('newQueryWithoutRelationships');
         $c = new Collection([$model]);
 
@@ -705,15 +706,15 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testCanConvertCollectionOfModelsToEloquentQueryBuilder()
     {
-        $one = Mockery::mock(Model::class);
+        $one = Double::for(Model::class);
         $one->shouldReceive('getKey')->andReturn(1);
 
-        $two = Mockery::mock(Model::class);
+        $two = Double::for(Model::class);
         $two->shouldReceive('getKey')->andReturn(2);
 
         $c = new Collection([$one, $two]);
 
-        $mocBuilder = Mockery::mock(Builder::class);
+        $mocBuilder = Double::for(Builder::class);
         $one->expects('newModelQuery')->andReturn($mocBuilder);
         $mocBuilder->expects('whereKey')->with($c->modelKeys())->andReturn($mocBuilder);
         $this->assertInstanceOf(Builder::class, $c->toQuery());

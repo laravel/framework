@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Pagination;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Mockery;
@@ -16,7 +17,7 @@ class CursorPaginatorLoadMorphTest extends TestCase
             'App\\Company' => ['employees', 'calendars'],
         ];
 
-        $items = Mockery::mock(Collection::class);
+        $items = Double::for(Collection::class);
         $items->expects('loadMorph')->with('parentable', $relations);
 
         $p = (new class extends AbstractCursorPaginator {

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Http;
 
+use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -51,8 +52,7 @@ class JsonResourceTest extends TestCase
 
     public function testJsonResourceToPrettyPrint(): void
     {
-        $resource = Mockery::mock(JsonResource::class)
-            ->makePartial()
+        $resource = Double::for(JsonResource::class)->passthru()
             ->expects('jsonSerialize')->times(3)->andReturn(['foo' => 'bar', 'bar' => 'foo', 'number' => 123])
             ->getMock();
 

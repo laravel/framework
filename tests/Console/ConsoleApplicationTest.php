@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Console;
 
+use JMac\Testing\Double;
 use Composer\Autoload\ClassLoader;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
@@ -41,7 +42,7 @@ class ConsoleApplicationTest extends TestCase
     public function testAddSetsLaravelInstance()
     {
         $artisan = $this->getMockConsole(['addToParent']);
-        $command = Mockery::mock(Command::class);
+        $command = Double::for(Command::class);
         $command->expects('setLaravel')->with(Mockery::type(ApplicationContract::class));
         $artisan->expects($this->once())->method('addToParent')->with($command)->willReturn($command);
         $result = $artisan->add($command);

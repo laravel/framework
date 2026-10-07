@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Cache\ArrayStore;
@@ -59,7 +60,7 @@ class RateLimitedTest extends TestCase
 
     public function testRateLimitedJobsAreNotExecutedOnLimitReached2()
     {
-        $cache = Mockery::mock(Cache::class);
+        $cache = Double::for(Cache::class);
         $cache->expects('get')->times(3)->andReturn(0, 1, null);
         $cache->expects('add')->times(2)->andReturn(true, true);
         $cache->expects('increment')->andReturn(1);

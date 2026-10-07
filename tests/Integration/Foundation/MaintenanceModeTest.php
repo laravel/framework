@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Foundation;
 
+use JMac\Testing\Double;
 use DateTimeInterface;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
@@ -53,7 +54,7 @@ class MaintenanceModeTest extends TestCase
 
     public function testCacheMaintenanceModeAllowsRequestWhenDeactivatedWhileReadingPayload()
     {
-        $cache = Mockery::mock(Factory::class, Repository::class);
+        $cache = Double::for(Factory::class, Repository::class);
         $cache->shouldReceive('store')->with('maintenance')->andReturnSelf();
         $cache->shouldReceive('has')->with('framework:down')->andReturn(true, false);
         $cache->shouldReceive('get')->once()->with('framework:down')->andReturnNull();

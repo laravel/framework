@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 use Illuminate\Database\Seeder;
@@ -31,14 +32,14 @@ class DatabaseSeederTest extends TestCase
     public function testCallResolveTheClassAndCallsRun()
     {
         $seeder = new TestSeeder;
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $seeder->setContainer($container);
-        $output = Mockery::mock(OutputInterface::class);
+        $output = Double::for(OutputInterface::class);
         $output->expects('writeln')->times(3);
-        $command = Mockery::mock(Command::class);
+        $command = Double::for(Command::class);
         $command->expects('getOutput')->times(3)->andReturn($output);
         $seeder->setCommand($command);
-        $child = Mockery::mock(Seeder::class);
+        $child = Double::for(Seeder::class);
         $container->expects('make')->with('ClassName')->andReturn($child);
         $child->expects('setContainer')->with($container)->andReturn($child);
         $child->expects('setCommand')->with($command)->andReturn($child);
@@ -63,7 +64,7 @@ class DatabaseSeederTest extends TestCase
 
     public function testInjectDependenciesOnRunMethod()
     {
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('call');
 
         $seeder = new TestDepsSeeder;
@@ -76,7 +77,7 @@ class DatabaseSeederTest extends TestCase
 
     public function testSendParamsOnCallMethodWithDeps()
     {
-        $container = Mockery::mock(Container::class);
+        $container = Double::for(Container::class);
         $container->expects('call');
 
         $seeder = new TestDepsSeeder;

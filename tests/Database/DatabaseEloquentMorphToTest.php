@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\ClassMorphViolationException;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
@@ -211,7 +212,7 @@ class DatabaseEloquentMorphToTest extends TestCase
             }
         };
 
-        $builder = Mockery::mock(Builder::class);
+        $builder = Double::for(Builder::class);
         $related = new EloquentMorphToRelatedStub;
         $builder->expects('getModel')->andReturn($related);
 
@@ -225,7 +226,7 @@ class DatabaseEloquentMorphToTest extends TestCase
 
         $relation->addEagerConstraints([$parent]);
 
-        $result = Mockery::mock(Model::class);
+        $result = Double::for(Model::class);
         $result->expects('getKey')->andReturn($uuidObject);
 
         $relation->callMatchToMorphParents('type_1', new EloquentCollection([$result]));
@@ -258,16 +259,16 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function getRelation($parent = null, $builder = null)
     {
-        $this->builder = $builder ?: Mockery::mock(Builder::class);
+        $this->builder = $builder ?: Double::for(Builder::class);
         $this->builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
-        $this->related = Mockery::mock(Model::class);
+        $this->related = Double::for(Model::class);
         $this->related->shouldReceive('getKeyName')->andReturn('id');
         $this->related->shouldReceive('getTable')->andReturn('relation');
         $this->related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
         $parent = $parent ?: new EloquentMorphToModelStub;
 
-        return Mockery::mock(MorphTo::class.'[createModelByType]', [$this->builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
+        return Double::for(MorphTo::class)->passthru(new MorphTo($this->builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation'));
     }
 }
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Closure;
 use Exception;
 use Illuminate\Database\Connection;
@@ -693,7 +694,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $class = get_class($model);
         $class::setConnectionResolver($resolver);
 
-        $pdo = Mockery::mock(PDO::class);
+        $pdo = Double::for(PDO::class);
         $connection->shouldReceive('getPdo')->andReturn($pdo);
 
         foreach ($lastInsertIds as $id) {

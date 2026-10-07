@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Session;
 
+use JMac\Testing\Double;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
@@ -31,7 +32,7 @@ class SessionManagerTest extends TestCase
             'cache' => ['prefix' => 'cache_prefix', 'stores' => ['redis' => ['driver' => 'redis']]],
         ]));
         $app->singleton('cache', fn ($app) => new CacheManager($app));
-        $app->instance('redis', Mockery::mock(RedisFactory::class));
+        $app->instance('redis', Double::for(RedisFactory::class));
 
         $manager = new SessionManager($app);
 
@@ -46,7 +47,7 @@ class SessionManagerTest extends TestCase
             'cache' => ['prefix' => 'cache_prefix', 'stores' => ['redis' => ['driver' => 'redis']]],
         ]));
         $app->singleton('cache', fn ($app) => new CacheManager($app));
-        $app->instance('redis', Mockery::mock(RedisFactory::class));
+        $app->instance('redis', Double::for(RedisFactory::class));
 
         $manager = new SessionManager($app);
 

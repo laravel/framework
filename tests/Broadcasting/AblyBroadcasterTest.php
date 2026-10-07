@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use JMac\Testing\Double;
 use Ably\AblyRest;
 use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
 use Illuminate\Http\Request;
@@ -20,9 +21,9 @@ class AblyBroadcasterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->ably = Mockery::mock(AblyRest::class, ['abcd:efgh']);
+        $this->ably = Double::for(new AblyRest('abcd:efgh'));
 
-        $this->broadcaster = Mockery::mock(AblyBroadcaster::class, [$this->ably])->makePartial();
+        $this->broadcaster = Double::for(AblyBroadcaster::class)->passthru(new AblyBroadcaster($this->ably));
     }
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
@@ -110,14 +111,14 @@ class AblyBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithUserForChannel($channel)
     {
-        $request = Mockery::mock(Request::class);
+        $request = Double::for(Request::class);
         $request->expects('all')->times(4)->andReturn(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
 
         $request->shouldReceive('input')
             ->with('callback', false)
             ->andReturn(false);
 
-        $user = Mockery::mock('User');
+        $user = Double::for('User');
         $user->shouldReceive('getAuthIdentifierForBroadcasting')
             ->andReturn(42);
         $user->shouldReceive('getAuthIdentifier')
@@ -136,7 +137,7 @@ class AblyBroadcasterTest extends TestCase
      */
     protected function getMockRequestWithoutUserForChannel($channel)
     {
-        $request = Mockery::mock(Request::class);
+        $request = Double::for(Request::class);
         $request->expects('all')->times(4)->andReturn(['channel_name' => $channel]);
 
         $request->expects('user')

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Migrations\MigrationRepositoryInterface;
@@ -106,7 +107,7 @@ class DatabaseMigratorTest extends TestCase
     {
         $resolver = new DatabaseMigratorTestResolver;
         $migrator = $this->migrator($resolver);
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->expects('getNameWithReadWriteType')->andReturn('pgsql::direct');
 
         $migration = new class($resolver, $this)

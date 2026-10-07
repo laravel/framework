@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
@@ -48,11 +49,11 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope = new SoftDeletingScope;
         $scope->extend($builder);
         $callback = $builder->getMacro('restoreOrCreate');
-        $givenBuilder = Mockery::mock(EloquentBuilder::class);
+        $givenBuilder = Double::for(EloquentBuilder::class);
         $givenBuilder->expects('withTrashed');
         $attributes = ['name' => 'foo'];
         $values = ['email' => 'bar'];
-        $model = Mockery::mock(Model::class);
+        $model = Double::for(Model::class);
         $givenBuilder->expects('firstOrCreate')->with($attributes, $values)->andReturn($model);
         $model->expects('restore')->andReturn(true);
         $result = $callback($givenBuilder, $attributes, $values);
@@ -72,11 +73,11 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope = new SoftDeletingScope;
         $scope->extend($builder);
         $callback = $builder->getMacro('createOrRestore');
-        $givenBuilder = Mockery::mock(EloquentBuilder::class);
+        $givenBuilder = Double::for(EloquentBuilder::class);
         $givenBuilder->expects('withTrashed');
         $attributes = ['name' => 'foo'];
         $values = ['email' => 'bar'];
-        $model = Mockery::mock(Model::class);
+        $model = Double::for(Model::class);
         $givenBuilder->expects('createOrFirst')->with($attributes, $values)->andReturn($model);
         $model->expects('restore')->andReturn(true);
         $result = $callback($givenBuilder, $attributes, $values);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Closure;
 use Exception;
 use Illuminate\Database\Connection;
@@ -288,7 +289,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
+                $relation = Double::for(BelongsToMany::class)->passthru();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -361,7 +362,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
+                $relation = Double::for(BelongsToMany::class)->passthru();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -403,7 +404,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
+                $relation = Double::for(BelongsToMany::class)->passthru();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -455,7 +456,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
+                $relation = Double::for(BelongsToMany::class)->passthru();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -505,7 +506,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
+                $relation = Double::for(BelongsToMany::class)->passthru();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -588,7 +589,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             $class::setConnectionResolver($resolver);
         }
 
-        $pdo = Mockery::mock(PDO::class);
+        $pdo = Double::for(PDO::class);
         $connection->shouldReceive('getPdo')->andReturn($pdo);
 
         foreach ($lastInsertIds as $id) {

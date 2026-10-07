@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -146,9 +147,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testNestedDefaultComponentParsing()
     {
         $container = new Container;
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->andReturn('App\\');
         Container::setInstance($container);
@@ -405,7 +406,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClassNamesCanBeGuessed()
     {
         $container = new Container;
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $app->expects('getNamespace')->andReturn('App\\');
         $container->instance(Application::class, $app);
         Container::setInstance($container);
@@ -420,7 +421,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClassNamesCanBeGuessedWithNamespaces()
     {
         $container = new Container;
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
         $app->expects('getNamespace')->andReturn('App\\');
         Container::setInstance($container);
@@ -541,9 +542,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClasslessComponents()
     {
         $container = new Container;
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->andReturn('App\\');
         $factory->expects('exists')->andReturn(true);
@@ -562,9 +563,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClasslessComponentsWithIndexView()
     {
         $container = new Container;
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->andReturn('App\\');
         $factory->expects('exists')->times(2)->andReturn(false, true);
@@ -583,9 +584,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testClasslessComponentsWithComponentView()
     {
         $container = new Container;
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->andReturn('App\\');
         $factory->expects('exists')->times(3)->andReturn(false, false, true);
@@ -604,9 +605,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testPackagesClasslessComponents()
     {
         $container = new Container;
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->andReturn('App\\');
         $factory->expects('exists')->andReturn(true);
@@ -626,9 +627,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
 
         $app->expects('getNamespace')->andReturn('App\\');
@@ -640,7 +641,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         Container::setInstance($container);
 
-        $blade = Mockery::mock(BladeCompiler::class)->makePartial();
+        $blade = Double::for(BladeCompiler::class)->passthru();
 
         $blade->expects('getAnonymousComponentNamespaces')->andReturn([
             'frontend' => 'public.frontend',
@@ -662,9 +663,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
 
         $app->expects('getNamespace')->andReturn('App\\');
@@ -676,7 +677,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         Container::setInstance($container);
 
-        $blade = Mockery::mock(BladeCompiler::class)->makePartial();
+        $blade = Double::for(BladeCompiler::class)->passthru();
 
         $blade->expects('getAnonymousComponentNamespaces')->andReturn([
             'admin.auth' => 'admin.auth.components',
@@ -698,9 +699,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
 
         $app->expects('getNamespace')->andReturn('App\\');
@@ -712,7 +713,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         Container::setInstance($container);
 
-        $blade = Mockery::mock(BladeCompiler::class)->makePartial();
+        $blade = Double::for(BladeCompiler::class)->passthru();
 
         $blade->expects('getAnonymousComponentNamespaces')->andReturn([
             'admin.auth' => 'admin.auth.components',
@@ -734,9 +735,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
 
         $app->expects('getNamespace')->andReturn('App\\');
@@ -747,7 +748,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         Container::setInstance($container);
 
-        $blade = Mockery::mock(BladeCompiler::class)->makePartial();
+        $blade = Double::for(BladeCompiler::class)->passthru();
 
         $blade->expects('getAnonymousComponentPaths')->andReturn([
             ['path' => 'test-directory', 'prefix' => null, 'prefixHash' => hash('xxh128', 'test-directory')],
@@ -769,9 +770,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
 
         $app->expects('getNamespace')->andReturn('App\\');
@@ -782,7 +783,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         Container::setInstance($container);
 
-        $blade = Mockery::mock(BladeCompiler::class)->makePartial();
+        $blade = Double::for(BladeCompiler::class)->passthru();
 
         $blade->expects('getAnonymousComponentPaths')->andReturn([
             ['path' => 'test-directory', 'prefix' => null, 'prefixHash' => md5('test-directory')],
@@ -804,9 +805,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     {
         $container = new Container;
 
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
 
         $app->expects('getNamespace')->andReturn('App\\');
@@ -817,7 +818,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         Container::setInstance($container);
 
-        $blade = Mockery::mock(BladeCompiler::class)->makePartial();
+        $blade = Double::for(BladeCompiler::class)->passthru();
 
         $blade->expects('getAnonymousComponentPaths')->andReturn([
             ['path' => 'test-directory', 'prefix' => null, 'prefixHash' => hash('xxh128', 'test-directory')],
@@ -872,9 +873,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testItThrowsAnExceptionForNonExistingClass()
     {
         $container = new Container;
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $app->expects('getNamespace')->andReturn('App\\');
         $factory->expects('exists')->times(3)->andReturn(false);
@@ -888,9 +889,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testAttributesTreatedAsPropsAreRemovedFromFinalAttributes()
     {
         $container = new Container;
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $container->alias(Factory::class, 'view');
         $app->shouldReceive('getNamespace')->never()->andReturn('App\\');
@@ -900,7 +901,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $attributes = new ComponentAttributeBag(['userId' => 'bar', 'other' => 'ok']);
 
-        $component = Mockery::mock(Component::class);
+        $component = Double::for(Component::class);
         $component->expects('withName')->with('profile');
         $component->expects('shouldRender')->andReturn(true);
         $component->expects('resolveView')->andReturn('');
@@ -909,7 +910,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         Component::resolveComponentsUsing(fn () => $component);
 
-        $__env = Mockery::mock(\Illuminate\View\Factory::class);
+        $__env = Double::for(\Illuminate\View\Factory::class);
         $__env->expects('startComponent');
         $__env->expects('renderComponent');
 
@@ -927,9 +928,9 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     public function testOriginalAttributesAreRestoredAfterRenderingChildComponentWithProps()
     {
         $container = new Container;
-        $app = Mockery::mock(Application::class);
+        $app = Double::for(Application::class);
         $container->instance(Application::class, $app);
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $container->alias(Factory::class, 'view');
         $app->shouldReceive('getNamespace')->never()->andReturn('App\\');
@@ -939,14 +940,14 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $attributes = new ComponentAttributeBag(['userId' => 'bar', 'other' => 'ok']);
 
-        $containerComponent = Mockery::mock(Component::class);
+        $containerComponent = Double::for(Component::class);
         $containerComponent->expects('withName')->with('container');
         $containerComponent->expects('shouldRender')->andReturn(true);
         $containerComponent->expects('resolveView')->andReturn('');
         $containerComponent->expects('data')->andReturn([]);
         $containerComponent->expects('withAttributes');
 
-        $profileComponent = Mockery::mock(Component::class);
+        $profileComponent = Double::for(Component::class);
         $profileComponent->expects('withName')->with('profile');
         $profileComponent->expects('shouldRender')->andReturn(true);
         $profileComponent->expects('resolveView')->andReturn('');
@@ -958,7 +959,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
             TestProfileComponent::class => $profileComponent,
         });
 
-        $__env = Mockery::mock(\Illuminate\View\Factory::class);
+        $__env = Double::for(\Illuminate\View\Factory::class);
         $__env->expects('startComponent')->times(2);
         $__env->expects('renderComponent')->times(2);
 
@@ -979,7 +980,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
     protected function mockViewFactory($existsSucceeds = true)
     {
         $container = new Container;
-        $factory = Mockery::mock(Factory::class);
+        $factory = Double::for(Factory::class);
         $container->instance(Factory::class, $factory);
         $container->alias(Factory::class, 'view');
         $factory->shouldReceive('exists')->andReturn($existsSucceeds);

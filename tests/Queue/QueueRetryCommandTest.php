@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Foundation\Application;
@@ -29,8 +30,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testRetriesSingleJobByPushingItsRawPayload()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $job = $this->failedJob(id: '5', connection: 'database', queue: 'default');
 
@@ -43,8 +44,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testRetriesSingleJobByPushingItsRawPayloadWithOptions()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(SqsQueue::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(SqsQueue::class);
 
         $job = $this->failedJob(id: '5', connection: 'database', queue: 'default');
 
@@ -61,7 +62,7 @@ class QueueRetryCommandTest extends TestCase
 
     public function testDisplaysErrorWhenJobIsNotFound()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
         $failer->shouldReceive('find')->once()->with('123')->andReturn(null);
 
         $output = $this->runRetryCommand(['id' => ['123']], $failer, []);
@@ -71,8 +72,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testRetriesAllFailedJobsUsingTheProvidersIds()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $failer->shouldReceive('ids')->once()->withNoArgs()->andReturn(['1', '2']);
 
@@ -92,8 +93,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testRetriesJobsOnTheSpecifiedQueue()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $failer->shouldReceive('ids')->once()->with('emails')->andReturn(['2']);
         $failer->shouldReceive('find')->once()->with('2')->andReturn($this->failedJob(id: '2', connection: 'database', queue: 'emails'));
@@ -105,7 +106,7 @@ class QueueRetryCommandTest extends TestCase
 
     public function testDisplaysErrorWhenTheSpecifiedQueueHasNoFailedJobs()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
         $failer->shouldReceive('ids')->once()->with('emails')->andReturn([]);
 
         $output = $this->runRetryCommand(['--queue' => 'emails'], $failer, []);
@@ -116,8 +117,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testRetriesJobsWithinTheGivenIdRange()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $failer->shouldReceive('find')->once()->with(1)->andReturn($this->failedJob(id: '1', connection: 'database', queue: 'default'));
         $queue->shouldReceive('pushRaw')->once()->with($this->retriedPayload(id: '1'), 'default', []);
@@ -145,8 +146,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testItResetsAttemptsCountWhenRetryingAJob()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $job = $this->failedJob(id: '1', connection: 'database', queue: 'default', payload: ['attempts' => 5]);
 
@@ -161,8 +162,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testRefreshesTheRetryUntilTimestampWhenTheJobDefinesRetryUntil()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $job = $this->failedJob(
             id: '1',
@@ -183,8 +184,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testPassesQueueableOptionsToTheQueueWhenRetryingASingleJob()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(SqsQueue::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(SqsQueue::class);
 
         $job = $this->failedJob(id: '1', connection: 'sqs', queue: 'default');
 
@@ -201,9 +202,9 @@ class QueueRetryCommandTest extends TestCase
 
     public function testDispatchesRetryRequestedEventWhenRetryingASingleJob()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
-        $events = m::mock(Dispatcher::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
+        $events = Double::for(Dispatcher::class);
 
         $job = $this->failedJob(id: '1', connection: 'database', queue: 'default');
 
@@ -217,8 +218,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testRetriesCollectionOfJobs()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $jobs = new Collection([
             'job-1' => $this->failedJob(id: 'job-1', connection: 'database', queue: 'default'),
@@ -238,8 +239,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testRetriesALazyCollectionOfJobsAndDoesNotResolveThemAllEagerly()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $unresolvedCounts = [];
 
@@ -284,8 +285,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testItResetsAttemptsCountWhenRetryingACollectionOfJobs()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $jobs = new Collection([
             'job-1' => $this->failedJob(id: 'job-1', connection: 'database', queue: 'default', payload: ['attempts' => 5]),
@@ -302,8 +303,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testRefreshesTheRetryUntilTimestampWhenRetryingACollectionOfJobs()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $jobs = new Collection([
             'job-1' => $this->failedJob(
@@ -326,7 +327,7 @@ class QueueRetryCommandTest extends TestCase
 
     public function testDisplaysErrorWhenTheGivenIdResolvesToAnEmptyCollection()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
         $failer->shouldReceive('find')->once()->with('batch')->andReturn(new Collection);
 
         $output = $this->runRetryCommand(['id' => ['batch']], $failer, []);
@@ -338,7 +339,7 @@ class QueueRetryCommandTest extends TestCase
 
     public function testDisplaysErrorWhenTheGivenIdResolvesToAnEmptyLazyCollection()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
 
         $resolved = false;
 
@@ -359,8 +360,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testContinuesRetryingRemainingJobsAfterAJobIsNotFound()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $failer->shouldReceive('find')->once()->with('1')->andReturn(null);
 
@@ -376,8 +377,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testContinuesRetryingRemainingJobsAfterAnIdResolvesToAnEmptyCollection()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $failer->shouldReceive('find')->once()->with('batch')->andReturn(new Collection);
 
@@ -393,8 +394,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testRetriesAMixtureOfSingleJobsAndCollectionsOfJobs()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $failer->shouldReceive('find')->once()->with('batch')->andReturn(new Collection([
             'job-1' => $this->failedJob(id: 'job-1', connection: 'database', queue: 'default'),
@@ -417,8 +418,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testForgetsJobsUsingTheCollectionKeyRatherThanTheJobId()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $key = 'https://cloud.test/failed-jobs/batch-1:job-1';
 
@@ -436,8 +437,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testForgetsJobsUsingTheCollectionKeyWhenTheCollectionIsNotKeyed()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $failer->shouldReceive('find')->once()->with('batch')->andReturn(new Collection([
             $this->failedJob(id: 'job-1', connection: 'database', queue: 'default'),
@@ -455,9 +456,9 @@ class QueueRetryCommandTest extends TestCase
 
     public function testDispatchesRetryRequestedEventForEveryJobInACollection()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
-        $events = m::mock(Dispatcher::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
+        $events = Double::for(Dispatcher::class);
 
         $jobs = new Collection([
             'job-1' => $this->failedJob(id: 'job-1', connection: 'database', queue: 'default'),
@@ -483,8 +484,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testStopsRetryingWhenAJobInACollectionFailsToBePushed()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $pendingJobs = [
             'job-1' => $this->failedJob(id: 'job-1', connection: 'database', queue: 'default'),
@@ -526,9 +527,9 @@ class QueueRetryCommandTest extends TestCase
 
     public function testDispatchesTheEventBeforePushingAndForgetsTheJobAfterwards()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
-        $events = m::mock(Dispatcher::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
+        $events = Double::for(Dispatcher::class);
 
         $jobs = new Collection([
             'job-1' => $this->failedJob(id: 'job-1', connection: 'database', queue: 'default'),
@@ -557,8 +558,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testOutputsAnEntryForEveryJobInACollection()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $jobs = new Collection([
             'job-1' => $this->failedJob(id: 'job-1', connection: 'database', queue: 'default'),
@@ -581,8 +582,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testRetriesCollectionsOfJobsWhenRetryingAllFailedJobs()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $failer->shouldReceive('ids')->once()->withNoArgs()->andReturn(['batch-1', 'batch-2']);
 
@@ -605,8 +606,8 @@ class QueueRetryCommandTest extends TestCase
 
     public function testRetriesTheSameJobTwiceWhenItAppearsInTwoCollections()
     {
-        $failer = m::mock(FailedJobProviderInterface::class);
-        $queue = m::mock(QueueContract::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
+        $queue = Double::for(QueueContract::class);
 
         $failer->shouldReceive('find')->once()->with('batch-1')->andReturn(new Collection([
             'job-1' => $this->failedJob(id: 'job-1', connection: 'database', queue: 'default'),
@@ -663,7 +664,7 @@ class QueueRetryCommandTest extends TestCase
 
         $container->instance('queue.failer', $failer);
 
-        $manager = m::mock(QueueManager::class);
+        $manager = Double::for(QueueManager::class);
 
         foreach ($connections as $name => $queue) {
             $manager->shouldReceive('connection')->with($name)->andReturn($queue);
@@ -672,7 +673,7 @@ class QueueRetryCommandTest extends TestCase
         $container->instance('queue', $manager);
 
         if (is_null($events)) {
-            $events = m::mock(Dispatcher::class);
+            $events = Double::for(Dispatcher::class);
             $events->shouldReceive('dispatch');
         }
 

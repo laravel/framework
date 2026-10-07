@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Auth;
 
+use JMac\Testing\Double;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Auth\Passwords\TokenRepositoryInterface;
 use Illuminate\Contracts\Auth\CanResetPassword;
@@ -132,8 +133,8 @@ class AuthPasswordBrokerTest extends TestCase
     protected function getMocks()
     {
         return [
-            'tokens' => Mockery::mock(TokenRepositoryInterface::class),
-            'users' => Mockery::mock(UserProvider::class),
+            'tokens' => Double::for(TokenRepositoryInterface::class),
+            'users' => Double::for(UserProvider::class),
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Processors\MariaDbProcessor;
 use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
@@ -13,7 +14,7 @@ class DatabaseMariaDbSchemaBuilderTest extends TestCase
 {
     public function testHasTable()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new MariaDbGrammar($connection);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $builder = new MariaDbBuilder($connection);
@@ -25,7 +26,7 @@ class DatabaseMariaDbSchemaBuilderTest extends TestCase
 
     public function testGetColumnListing()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new MariaDbGrammar($connection);
         $processor = new MariaDbProcessor;
         $connection->expects('getSchemaGrammar')->andReturn($grammar);

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Migration;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -24,7 +25,7 @@ class MigratorTest extends TestCase
     {
         parent::setUp();
 
-        $this->output = Mockery::mock(OutputInterface::class);
+        $this->output = Double::for(OutputInterface::class);
         $this->subject = $this->app->make('migrator');
         $this->subject->setOutput($this->output);
         $this->subject->getRepository()->createRepository();

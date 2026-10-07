@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Auth;
 
+use JMac\Testing\Double;
 use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\GenericUser;
@@ -103,7 +104,7 @@ class AuthEloquentUserProviderTest extends TestCase
 
     public function testCredentialValidationFailsGracefullyWithNullPassword()
     {
-        $hasher = Mockery::mock(Hasher::class);
+        $hasher = Double::for(Hasher::class);
         $hasher->shouldReceive('check')->never();
         $provider = new EloquentUserProvider($hasher, 'foo');
         $user = Mockery::mock(Authenticatable::class);
@@ -129,7 +130,7 @@ class AuthEloquentUserProviderTest extends TestCase
 
     public function testDontRehashPasswordIfNotRequired()
     {
-        $hasher = Mockery::mock(Hasher::class);
+        $hasher = Double::for(Hasher::class);
         $hasher->expects('needsRehash')->with('hash')->andReturn(false);
         $hasher->shouldNotReceive('make');
 

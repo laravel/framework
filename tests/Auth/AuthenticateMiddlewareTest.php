@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Auth;
 
+use JMac\Testing\Double;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\EloquentUserProvider;
@@ -244,7 +245,7 @@ class AuthenticateMiddlewareTest extends TestCase
     {
         return new RequestGuard(function () use ($authenticated) {
             return $authenticated ? new stdClass : null;
-        }, new Request, Mockery::mock(EloquentUserProvider::class));
+        }, new Request, Double::for(EloquentUserProvider::class));
     }
 
     /**

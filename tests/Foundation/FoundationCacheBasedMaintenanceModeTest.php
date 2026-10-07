@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use JMac\Testing\Double;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\CacheBasedMaintenanceMode;
@@ -12,7 +13,7 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
 {
     public function test_it_determines_whether_maintenance_mode_is_active()
     {
-        $cache = Mockery::mock(Factory::class, Repository::class);
+        $cache = Double::for(Factory::class, Repository::class);
         $cache->expects('store')->times(2)->with('store-key')->andReturnSelf();
 
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
@@ -26,7 +27,7 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
 
     public function test_it_retrieves_payload_from_cache()
     {
-        $cache = Mockery::mock(Factory::class, Repository::class);
+        $cache = Double::for(Factory::class, Repository::class);
         $cache->expects('store')->with('store-key')->andReturnSelf();
 
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
@@ -37,7 +38,7 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
 
     public function test_it_stores_payload_in_cache()
     {
-        $cache = Mockery::spy(Factory::class, Repository::class);
+        $cache = Double::for(Factory::class, Repository::class);
         $cache->expects('store')->with('store-key')->andReturnSelf();
 
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
@@ -48,7 +49,7 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
 
     public function test_it_removes_payload_from_cache()
     {
-        $cache = Mockery::spy(Factory::class, Repository::class);
+        $cache = Double::for(Factory::class, Repository::class);
         $cache->expects('store')->with('store-key')->andReturnSelf();
 
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');

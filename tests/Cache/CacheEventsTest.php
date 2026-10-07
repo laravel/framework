@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use JMac\Testing\Double;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Events\CacheFlushed;
 use Illuminate\Cache\Events\CacheFlushFailed;
@@ -232,7 +233,7 @@ class CacheEventsTest extends TestCase
     public function testForgetDoesTriggerFailedEventOnFailure()
     {
         $dispatcher = $this->getDispatcher();
-        $store = Mockery::mock(Store::class);
+        $store = Double::for(Store::class);
         $store->expects('forget')->andReturn(false);
         $repository = new Repository($store);
         $repository->setEventDispatcher($dispatcher);
@@ -273,7 +274,7 @@ class CacheEventsTest extends TestCase
         $dispatcher = $this->getDispatcher();
 
         // Create a store that fails to flush
-        $failingStore = Mockery::mock(Store::class);
+        $failingStore = Double::for(Store::class);
         $failingStore->expects('flush')->andReturn(false);
 
         $repository = new Repository($failingStore, ['store' => 'array']);
@@ -291,7 +292,7 @@ class CacheEventsTest extends TestCase
         $dispatcher = $this->getDispatcher();
 
         // Create a store that fails to flush locks
-        $failingStore = Mockery::mock(ArrayStore::class);
+        $failingStore = Double::for(ArrayStore::class);
         $failingStore->expects('flushLocks')->andReturn(false);
 
         $repository = new Repository($failingStore, ['store' => 'array']);

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use JMac\Testing\Double;
 use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ItemNotFoundException;
@@ -1331,7 +1332,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 
     public function testTakeUntilTimeoutIsLazy()
     {
-        tap(Mockery::mock(LazyCollection::class.'[now]')->times(100), function ($mock) {
+        tap(Double::for(LazyCollection::class)->passthru()->times(100), function ($mock) {
             $this->assertDoesNotEnumerateCollection($mock, function ($mock) {
                 $timeout = Carbon::now();
 
@@ -1351,7 +1352,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
             });
         });
 
-        tap(Mockery::mock(LazyCollection::class.'[now]')->times(100), function ($mock) {
+        tap(Double::for(LazyCollection::class)->passthru()->times(100), function ($mock) {
             $this->assertEnumeratesCollection($mock, 1, function ($mock) {
                 $timeout = Carbon::now();
 
@@ -1372,7 +1373,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
             });
         });
 
-        tap(Mockery::mock(LazyCollection::class.'[now]')->times(100), function ($mock) {
+        tap(Double::for(LazyCollection::class)->passthru()->times(100), function ($mock) {
             $this->assertEnumeratesCollectionOnce($mock, function ($mock) {
                 $timeout = Carbon::now();
 

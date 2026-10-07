@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use JMac\Testing\Double;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Events\CacheFlushed;
 use Illuminate\Cache\Events\CacheFlushing;
@@ -27,7 +28,7 @@ class SupportFacadesEventTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->events = Mockery::mock(Dispatcher::class);
+        $this->events = Double::for(Dispatcher::class);
 
         $container = new Container;
         $container->instance('events', $this->events);

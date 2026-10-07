@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Queue\Attributes\Delay;
@@ -29,10 +30,10 @@ class QueueRedisQueueTest extends TestCase
         $time = Carbon::now();
         Carbon::setTestNow($time);
 
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
         $redis->expects('isCluster')->andReturn(false);
@@ -56,10 +57,10 @@ class QueueRedisQueueTest extends TestCase
         $time = Carbon::now();
         Carbon::setTestNow($time);
 
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
         $redis->expects('isCluster')->andReturn(false);
@@ -89,10 +90,10 @@ class QueueRedisQueueTest extends TestCase
         $time = Carbon::now();
         Carbon::setTestNow($time);
 
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
         $redis->expects('isCluster')->andReturn(false);
@@ -126,9 +127,9 @@ class QueueRedisQueueTest extends TestCase
         $time = Carbon::now();
         Carbon::setTestNow($time);
 
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
@@ -160,9 +161,9 @@ class QueueRedisQueueTest extends TestCase
 
         $time = $date = Carbon::now();
         Carbon::setTestNow($time);
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
-        $container = Mockery::spy(Container::class);
+        $container = Double::for(Container::class);
         $queue->setContainer($container);
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(5);
@@ -185,7 +186,7 @@ class QueueRedisQueueTest extends TestCase
 
     public function testBulkRespectsDelayAttributeWhenPushingOntoRedis()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $redis->expects('connection')->andReturn($redis);
         $redis->expects('pipeline')->andReturnUsing(function ($callback) {
             $callback();
@@ -201,7 +202,7 @@ class QueueRedisQueueTest extends TestCase
 
     public function testGetQueueRemainsUnchangedForNonCluster()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new RedisQueue($redis, 'default');
         $this->assertSame('queues:default', $queue->getQueue(null));
         $this->assertSame('queues:emails', $queue->getQueue('emails'));
@@ -209,7 +210,7 @@ class QueueRedisQueueTest extends TestCase
 
     public function testGetQueueRemainsUnchangedForCluster()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new RedisQueue($redis, 'default');
 
         // getQueue() should NOT add hash tags — it's unchanged
@@ -219,9 +220,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testGetRedisKeyReturnsPlainKeyForNonCluster()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
-        $connection = Mockery::mock(\Illuminate\Redis\Connections\Connection::class);
+        $connection = Double::for(\Illuminate\Redis\Connections\Connection::class);
         $connection->expects('isCluster')->andReturn(false);
         $redis->expects('connection')->andReturn($connection);
 
@@ -231,9 +232,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testGetRedisKeyWrapsWithHashTagsForPhpRedisCluster()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class);
         $connection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->andReturn($connection);
 
@@ -243,9 +244,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testGetRedisKeyWrapsWithHashTagsForPredisCluster()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
-        $connection = Mockery::mock(PredisClusterConnection::class);
+        $connection = Double::for(PredisClusterConnection::class);
         $connection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->andReturn($connection);
 
@@ -255,9 +256,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testGetRedisKeyDoesNotDoubleWrapExistingHashTags()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new TestableRedisQueue($redis, '{default}');
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class);
         $connection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->andReturn($connection);
 
@@ -267,9 +268,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testGetRedisKeySkipsWrappingWhenQueueNameContainsBraces()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class);
         $connection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->andReturn($connection);
 
@@ -279,9 +280,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testGetRedisKeyWrapsEmptyHashTagOnCluster()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class);
         $connection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->andReturn($connection);
 
@@ -291,9 +292,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testGetRedisKeyWrapsUnmatchedOpeningBrace()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class);
         $connection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->andReturn($connection);
 
@@ -303,9 +304,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testGetRedisKeyWrapsUnmatchedClosingBrace()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class);
         $connection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->andReturn($connection);
 
@@ -315,9 +316,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testGetRedisKeyWrapsEmptyFirstHashTagFollowedByValidPair()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class);
         $connection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->andReturn($connection);
 
@@ -337,13 +338,13 @@ class QueueRedisQueueTest extends TestCase
         $time = Carbon::now();
         Carbon::setTestNow($time);
 
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $container = new Container;
         $queue->setContainer($container);
 
-        $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
+        $clusterConnection = Double::for(PhpRedisClusterConnection::class);
         $clusterConnection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->times(2)->andReturn($clusterConnection);
 
@@ -371,13 +372,13 @@ class QueueRedisQueueTest extends TestCase
         $time = Carbon::now();
         Carbon::setTestNow($time);
 
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis, 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $container = new Container;
         $queue->setContainer($container);
 
-        $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
+        $clusterConnection = Double::for(PhpRedisClusterConnection::class);
         $clusterConnection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->times(2)->andReturn($clusterConnection);
 
@@ -399,9 +400,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testSizeUsesGetRedisKeyOnCluster()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new RedisQueue($redis, 'default');
-        $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
+        $clusterConnection = Double::for(PhpRedisClusterConnection::class);
         $clusterConnection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->times(2)->andReturn($clusterConnection);
 
@@ -418,9 +419,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testClearUsesGetRedisKeyOnCluster()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new RedisQueue($redis, 'default');
-        $clusterConnection = Mockery::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
+        $clusterConnection = Double::for(PhpRedisClusterConnection::class);
         $clusterConnection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->times(2)->andReturn($clusterConnection);
 
@@ -438,9 +439,9 @@ class QueueRedisQueueTest extends TestCase
 
     public function testIsClusterConnectionCachesResult()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $queue = new TestableRedisQueue($redis, 'default');
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
+        $connection = Double::for(PhpRedisClusterConnection::class);
         $connection->expects('isCluster')->andReturn(true);
         $redis->expects('connection')->andReturn($connection);
 
@@ -452,7 +453,7 @@ class QueueRedisQueueTest extends TestCase
 
     public function testAllQueueNamesStripsClusterBraces()
     {
-        $redis = Mockery::mock(Factory::class);
+        $redis = Double::for(Factory::class);
         $redis->expects('connection->keys')->andReturn(['queues:{default}', 'queues:{default}:delayed', 'queues:{emails}']);
         $queue = new TestableRedisQueue($redis, 'default');
 
@@ -462,9 +463,9 @@ class QueueRedisQueueTest extends TestCase
     #[RequiresPhpExtension('redis')]
     public function testScanningQueueNamesDoesNotDoublePrefixTheMatchPattern()
     {
-        $redis = Mockery::mock(Factory::class);
-        $connection = Mockery::mock(PhpRedisClusterConnection::class);
-        $client = Mockery::mock(\RedisCluster::class);
+        $redis = Double::for(Factory::class);
+        $connection = Double::for(PhpRedisClusterConnection::class);
+        $client = Double::for(\RedisCluster::class);
 
         $redis->expects('connection')->andReturn($connection);
         $connection->expects('client')->andReturn($client);
@@ -480,7 +481,7 @@ class QueueRedisQueueTest extends TestCase
 
     public function testSizeResolvesTheQueueNameFromAnEnum()
     {
-        $queue = new RedisQueue($redis = Mockery::mock(Factory::class), 'default');
+        $queue = new RedisQueue($redis = Double::for(Factory::class), 'default');
         $redis->expects('connection')->times(2)->andReturn($redis);
         $redis->expects('isCluster')->andReturn(false);
         $redis->expects('eval')->with(
@@ -492,7 +493,7 @@ class QueueRedisQueueTest extends TestCase
 
     public function testPendingJobsResolvesTheQueueNameFromAnEnum()
     {
-        $queue = new RedisQueue($redis = Mockery::mock(Factory::class), 'default');
+        $queue = new RedisQueue($redis = Double::for(Factory::class), 'default');
         $redis->expects('connection')->times(2)->andReturn($redis);
         $redis->expects('isCluster')->andReturn(false);
         $redis->expects('lrange')->with('queues:emails', 0, -1)->andReturn([

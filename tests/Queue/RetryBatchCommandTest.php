@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Console\Command;
 use Illuminate\Console\CommandMutex;
@@ -22,7 +23,7 @@ class RetryBatchCommandTest extends TestCase
     public function testItFailsWhenTheBatchCannotBeFound()
     {
         $container = new Application;
-        $repository = Mockery::mock(BatchRepository::class);
+        $repository = Double::for(BatchRepository::class);
         $repository->shouldReceive('find')->with('missing-batch-id')->andReturnNull();
         $container->instance(BatchRepository::class, $repository);
 
@@ -38,7 +39,7 @@ class RetryBatchCommandTest extends TestCase
     public function testItFailsWhenTheBatchHasNoFailedJobs()
     {
         $container = new Application;
-        $repository = Mockery::mock(BatchRepository::class);
+        $repository = Double::for(BatchRepository::class);
         $repository->shouldReceive('find')->with('batch-id')->andReturn(new class
         {
             public $failedJobIds = [];
@@ -61,11 +62,11 @@ class RetryBatchCommandTest extends TestCase
     public function testItCanBeRunInIsolation()
     {
         $container = new Application;
-        $repository = Mockery::mock(BatchRepository::class);
+        $repository = Double::for(BatchRepository::class);
         $repository->shouldReceive('find')->with('batch-id')->andReturnNull();
         $container->instance(BatchRepository::class, $repository);
 
-        $mutex = Mockery::mock(CommandMutex::class);
+        $mutex = Double::for(CommandMutex::class);
         $mutex->shouldReceive('create')->andReturnTrue();
         $mutex->shouldReceive('forget')->andReturnTrue();
         $container->instance(CommandMutex::class, $mutex);

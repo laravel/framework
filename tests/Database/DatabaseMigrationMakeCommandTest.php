@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Foundation\Application;
@@ -15,8 +16,8 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 {
     public function testBasicCreateDumpsAutoload()
     {
-        $creator = Mockery::mock(MigrationCreator::class);
-        $composer = Mockery::mock(Composer::class);
+        $creator = Double::for(MigrationCreator::class);
+        $composer = Double::for(Composer::class);
         $command = new MigrateMakeCommand($creator, $composer);
         $app = new Application;
         $app->useDatabasePath(__DIR__);
@@ -30,10 +31,10 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateGivesCreatorProperArguments()
     {
-        $creator = Mockery::mock(MigrationCreator::class);
+        $creator = Double::for(MigrationCreator::class);
         $command = new MigrateMakeCommand(
             $creator,
-            Mockery::mock(Composer::class)->shouldIgnoreMissing()
+            Double::for(Composer::class)
         );
         $app = new Application;
         $app->useDatabasePath(__DIR__);
@@ -47,10 +48,10 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateGivesCreatorProperArgumentsWhenNameIsStudlyCase()
     {
-        $creator = Mockery::mock(MigrationCreator::class);
+        $creator = Double::for(MigrationCreator::class);
         $command = new MigrateMakeCommand(
             $creator,
-            Mockery::mock(Composer::class)->shouldIgnoreMissing()
+            Double::for(Composer::class)
         );
         $app = new Application;
         $app->useDatabasePath(__DIR__);
@@ -64,10 +65,10 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateGivesCreatorProperArgumentsWhenTableIsSet()
     {
-        $creator = Mockery::mock(MigrationCreator::class);
+        $creator = Double::for(MigrationCreator::class);
         $command = new MigrateMakeCommand(
             $creator,
-            Mockery::mock(Composer::class)->shouldIgnoreMissing()
+            Double::for(Composer::class)
         );
         $app = new Application;
         $app->useDatabasePath(__DIR__);
@@ -81,10 +82,10 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testBasicCreateGivesCreatorProperArgumentsWhenCreateTablePatternIsFound()
     {
-        $creator = Mockery::mock(MigrationCreator::class);
+        $creator = Double::for(MigrationCreator::class);
         $command = new MigrateMakeCommand(
             $creator,
-            Mockery::mock(Composer::class)->shouldIgnoreMissing()
+            Double::for(Composer::class)
         );
         $app = new Application;
         $app->useDatabasePath(__DIR__);
@@ -98,10 +99,10 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     public function testCanSpecifyPathToCreateMigrationsIn()
     {
-        $creator = Mockery::mock(MigrationCreator::class);
+        $creator = Double::for(MigrationCreator::class);
         $command = new MigrateMakeCommand(
             $creator,
-            Mockery::mock(Composer::class)->shouldIgnoreMissing()
+            Double::for(Composer::class)
         );
         $app = new Application;
         $command->setLaravel($app);

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Console\ListFailedCommand;
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
@@ -53,7 +54,7 @@ class ListFailedCommandTest extends TestCase
     protected function runCommandWithFailedJobs(array $failedJobs, array $arguments = []): string
     {
         $container = new Application;
-        $failer = Mockery::mock(FailedJobProviderInterface::class);
+        $failer = Double::for(FailedJobProviderInterface::class);
         $container->instance('queue.failer', $failer);
 
         $failer->expects('all')->andReturn($failedJobs);

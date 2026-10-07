@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
@@ -13,7 +14,7 @@ class DatabasePostgresBuilderTest extends TestCase
 {
     public function testCreateDatabase()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new PostgresGrammar($connection);
 
         $connection->expects('getConfig')->with('charset')->andReturn('utf8');
@@ -28,7 +29,7 @@ class DatabasePostgresBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new PostgresGrammar($connection);
 
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
@@ -44,7 +45,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathMissing()
     {
         $connection = $this->getConnection();
-        $grammar = Mockery::mock(PostgresGrammar::class);
+        $grammar = Double::for(PostgresGrammar::class);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $grammar->expects('compileTableExists')->times(2)->andReturn('sql');
         $connection->expects('scalar')->times(2)->with('sql')->andReturn(1);
@@ -58,7 +59,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathFilled()
     {
         $connection = $this->getConnection();
-        $grammar = Mockery::mock(PostgresGrammar::class);
+        $grammar = Double::for(PostgresGrammar::class);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $grammar->expects('compileTableExists')->times(2)->andReturn('sql');
         $connection->expects('scalar')->times(2)->with('sql')->andReturn(1);
@@ -72,7 +73,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathFallbackFilled()
     {
         $connection = $this->getConnection();
-        $grammar = Mockery::mock(PostgresGrammar::class);
+        $grammar = Double::for(PostgresGrammar::class);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $grammar->expects('compileTableExists')->times(2)->andReturn('sql');
         $connection->expects('scalar')->times(2)->with('sql')->andReturn(1);
@@ -86,7 +87,7 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testHasTableWhenSchemaUnqualifiedAndSearchPathIsUserVariable()
     {
         $connection = $this->getConnection();
-        $grammar = Mockery::mock(PostgresGrammar::class);
+        $grammar = Double::for(PostgresGrammar::class);
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $grammar->expects('compileTableExists')->times(2)->andReturn('sql');
         $connection->expects('scalar')->times(2)->with('sql')->andReturn(1);
@@ -129,7 +130,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns(null, 'foo'))->andReturn([['name' => 'some_column']]);
         $connection->expects('getTablePrefix');
-        $processor = Mockery::mock(PostgresProcessor::class);
+        $processor = Double::for(PostgresProcessor::class);
         $connection->expects('getPostProcessor')->andReturn($processor);
         $processor->expects('processColumns')->andReturn([['name' => 'some_column']]);
         $builder = $this->getBuilder($connection);
@@ -145,7 +146,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns(null, 'foo'))->andReturn([['name' => 'some_column']]);
         $connection->expects('getTablePrefix');
-        $processor = Mockery::mock(PostgresProcessor::class);
+        $processor = Double::for(PostgresProcessor::class);
         $connection->expects('getPostProcessor')->andReturn($processor);
         $processor->expects('processColumns')->andReturn([['name' => 'some_column']]);
         $builder = $this->getBuilder($connection);
@@ -161,7 +162,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns(null, 'foo'))->andReturn([['name' => 'some_column']]);
         $connection->expects('getTablePrefix');
-        $processor = Mockery::mock(PostgresProcessor::class);
+        $processor = Double::for(PostgresProcessor::class);
         $connection->expects('getPostProcessor')->andReturn($processor);
         $processor->expects('processColumns')->andReturn([['name' => 'some_column']]);
         $builder = $this->getBuilder($connection);
@@ -177,7 +178,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
         $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns('myapp', 'foo'))->andReturn([['name' => 'some_column']]);
         $connection->expects('getTablePrefix');
-        $processor = Mockery::mock(PostgresProcessor::class);
+        $processor = Double::for(PostgresProcessor::class);
         $connection->expects('getPostProcessor')->andReturn($processor);
         $processor->expects('processColumns')->andReturn([['name' => 'some_column']]);
         $builder = $this->getBuilder($connection);
@@ -259,7 +260,7 @@ class DatabasePostgresBuilderTest extends TestCase
 
     protected function getConnection()
     {
-        return Mockery::mock(Connection::class);
+        return Double::for(Connection::class);
     }
 
     protected function getBuilder($connection)

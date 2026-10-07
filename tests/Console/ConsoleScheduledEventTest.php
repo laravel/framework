@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Console;
 
+use JMac\Testing\Double;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Carbon;
@@ -31,7 +32,7 @@ class ConsoleScheduledEventTest extends TestCase
 
     public function testBasicCronCompilation()
     {
-        $app = Mockery::mock(Application::class.'[isDownForMaintenance,environment]');
+        $app = Double::for(Application::class)->passthru();
         $app->expects('isDownForMaintenance')->times(3)->andReturn(false);
         $app->expects('environment')->times(3)->andReturn('production');
 
@@ -75,7 +76,7 @@ class ConsoleScheduledEventTest extends TestCase
 
     public function testEventIsDueCheck()
     {
-        $app = Mockery::mock(Application::class.'[isDownForMaintenance,environment]');
+        $app = Double::for(Application::class)->passthru();
         $app->expects('isDownForMaintenance')->times(2)->andReturn(false);
         $app->expects('environment')->times(2)->andReturn('production');
         Carbon::setTestNow(Carbon::create(2015, 1, 1, 0, 0, 0));

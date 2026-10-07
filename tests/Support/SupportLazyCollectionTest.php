@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use JMac\Testing\Double;
 use Carbon\CarbonInterval as Duration;
 use Illuminate\Foundation\Testing\Wormhole;
 use Illuminate\Support\Carbon;
@@ -184,7 +185,7 @@ class SupportLazyCollectionTest extends TestCase
     {
         $timeout = Carbon::now();
 
-        $mock = Mockery::mock(LazyCollection::class.'[now]');
+        $mock = Double::for(LazyCollection::class)->passthru();
 
         $timedOutWith = [];
 

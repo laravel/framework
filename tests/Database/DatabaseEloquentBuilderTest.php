@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Connection;
@@ -45,7 +46,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testFindMethod()
     {
-        $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model = $this->getMockModel();
         $builder->setModel($model);
         $model->expects('getKeyType')->andReturn('int');
@@ -58,7 +59,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testFindSoleMethod()
     {
-        $builder = Mockery::mock(Builder::class.'[sole]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model = $this->getMockModel();
         $builder->setModel($model);
         $model->expects('getKeyType')->andReturn('int');
@@ -72,7 +73,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testFindManyMethod()
     {
         // ids are not empty
-        $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model = $this->getMockModel();
         $model->expects('getKeyType')->andReturn('int');
         $builder->setModel($model);
@@ -83,7 +84,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['baz'], $result);
 
         // ids are empty array
-        $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model = $this->getMockModel();
         $model->expects('newCollection')->withNoArgs()->andReturn('emptycollection');
         $model->shouldReceive('getKeyType')->andReturn('int');
@@ -95,7 +96,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('emptycollection', $result);
 
         // ids are empty collection
-        $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model = $this->getMockModel();
         $model->expects('newCollection')->withNoArgs()->andReturn('emptycollection');
         $builder->setModel($model);
@@ -112,7 +113,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->expects('getKeyType')->andReturn('int');
         $model->expects('findOrNew')->andReturn('baz');
 
-        $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $builder->setModel($model);
         $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
         $builder->expects('first')->with(['column'])->andReturn('baz');
@@ -126,9 +127,9 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = $this->getMockModel();
         $model->expects('getKeyType')->andReturn('int');
-        $model->expects('findOrNew')->andReturn(Mockery::mock(Model::class));
+        $model->expects('findOrNew')->andReturn(Double::for(Model::class));
 
-        $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $builder->setModel($model);
         $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
         $builder->expects('first')->with(['column'])->andReturn(null);
@@ -143,7 +144,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $this->expectException(ModelNotFoundException::class);
 
-        $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model = $this->getMockModel();
         $model->expects('getKeyType')->andReturn('int');
         $builder->setModel($model);
@@ -178,7 +179,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->expects('getKey')->andReturn(1);
         $model->expects('getKeyType')->andReturn('int');
 
-        $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $builder->setModel($model);
         $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2]);
         $builder->expects('get')->with(['column'])->andReturn(new Collection([$model]));
@@ -193,7 +194,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->expects('getKey')->andReturn(1);
         $model->expects('getKeyType')->andReturn('int');
 
-        $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $builder->setModel($model);
         $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2]);
         $builder->expects('get')->with(['column'])->andReturn(new Collection([$model]));
@@ -206,7 +207,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestStub;
         $model->setAttribute($model->getKeyName(), $value);
 
-        $builder = Mockery::mock(Builder::class.'[find]', [$model->getConnection()->query()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($model->getConnection()->query()));
         $builder->setModel($model);
         $models = new Collection([$model]);
         $ids = [$id, $id, $value];
@@ -223,7 +224,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->setKeyType('string');
         $model->setAttribute($model->getKeyName(), 'existing');
 
-        $builder = Mockery::mock(Builder::class.'[find]', [$model->getConnection()->query()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($model->getConnection()->query()));
         $builder->setModel($model);
         $ids = ['existing', $id];
         $ids = $useCollection ? new BaseCollection($ids) : $ids;
@@ -248,7 +249,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testFindOrMethod()
     {
-        $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model = $this->getMockModel();
         $model->expects('getKeyType')->times(3)->andReturn('int');
         $builder->setModel($model);
@@ -265,7 +266,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testFindOrMethodWithMany()
     {
-        $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model1 = $this->getMockModel();
         $model2 = $this->getMockModel();
         $model1->expects('getKeyType')->times(3)->andReturn('int');
@@ -293,7 +294,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testFindOrMethodWithManyUsingCollection()
     {
-        $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model1 = $this->getMockModel();
         $model2 = $this->getMockModel();
         $model1->expects('getKeyType')->times(3)->andReturn('int');
@@ -323,7 +324,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $this->expectException(ModelNotFoundException::class);
 
-        $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $builder->setModel($this->getMockModel());
         $builder->expects('first')->with(['column'])->andReturn(null);
         $builder->firstOrFail(['column']);
@@ -331,7 +332,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testFindWithMany()
     {
-        $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model = $this->getMockModel();
         $model->expects('getKeyType')->andReturn('int');
         $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2]);
@@ -345,7 +346,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testFindWithManyUsingCollection()
     {
         $ids = collect([1, 2]);
-        $builder = Mockery::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model = $this->getMockModel();
         $model->expects('getKeyType')->andReturn('int');
         $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2]);
@@ -369,7 +370,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testQualifyColumn()
     {
-        $builder = new Builder(Mockery::mock(BaseBuilder::class));
+        $builder = new Builder(Double::for(BaseBuilder::class));
         $builder->expects('from')->with('foo_table');
 
         $builder->setModel(new EloquentBuilderTestStubStringPrimaryKey);
@@ -379,7 +380,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testQualifyColumns()
     {
-        $builder = new Builder(Mockery::mock(BaseBuilder::class));
+        $builder = new Builder(Double::for(BaseBuilder::class));
         $builder->expects('from')->with('foo_table');
 
         $builder->setModel(new EloquentBuilderTestStubStringPrimaryKey);
@@ -389,7 +390,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testQualifyColumnWithTableAlias()
     {
-        $query = Mockery::mock(BaseBuilder::class);
+        $query = Double::for(BaseBuilder::class);
         $query->expects('from')->with('foo_table');
         $query->from = 'foo_table as alias';
 
@@ -404,7 +405,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
     {
-        $builder = Mockery::mock(Builder::class.'[getModels,eagerLoadRelations]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $builder->expects('getModels')->with(['foo'])->andReturn(['bar']);
         $builder->expects('eagerLoadRelations')->with(['bar'])->andReturn(['bar', 'baz']);
         $builder->setModel($this->getMockModel());
@@ -416,7 +417,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testGetMethodDoesntHydrateEagerRelationsWhenNoResultsAreReturned()
     {
-        $builder = Mockery::mock(Builder::class.'[getModels,eagerLoadRelations]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $builder->expects('getModels')->with(['foo'])->andReturn([]);
         $builder->shouldReceive('eagerLoadRelations')->never();
         $builder->setModel($this->getMockModel());
@@ -428,7 +429,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testValueMethodWithModelFound()
     {
-        $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $mockModel = new stdClass;
         $mockModel->name = 'foo';
         $builder->expects('first')->with(['name'])->andReturn($mockModel);
@@ -438,7 +439,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testValueMethodWithModelNotFound()
     {
-        $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $builder->expects('first')->with(['name'])->andReturn(null);
 
         $this->assertNull($builder->value('name'));
@@ -446,7 +447,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testValueOrFailMethodWithModelFound()
     {
-        $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $mockModel = new stdClass;
         $mockModel->name = 'foo';
         $builder->expects('first')->with(['name'])->andReturn($mockModel);
@@ -458,7 +459,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $this->expectException(ModelNotFoundException::class);
 
-        $builder = Mockery::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $model = $this->getMockModel();
         $model->expects('getKeyType')->andReturn('int');
         $builder->setModel($model);
@@ -783,7 +784,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testEagerLoadRelationsLoadTopLevelRelationships()
     {
-        $builder = Mockery::mock(Builder::class.'[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $nop1 = function () {
             //
         };
@@ -812,11 +813,11 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testRelationshipEagerLoadProcess()
     {
-        $builder = Mockery::mock(Builder::class.'[getRelation]', [$this->getMockQueryBuilder()]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
         $builder->setEagerLoads(['orders' => function ($query) {
             $_SERVER['__eloquent.constrain'] = $query;
         }]);
-        $relation = Mockery::mock(Relation::class);
+        $relation = Double::for(Relation::class);
         $relation->expects('addEagerConstraints')->with(['models']);
         $relation->expects('initRelation')->with(['models'], 'orders')->andReturn(['models']);
         $relation->expects('getEager')->andReturn($eager = new Collection(['results']));
@@ -832,7 +833,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testRelationshipEagerLoadProcessForImplicitlyEmpty()
     {
         $queryBuilder = $this->getMockQueryBuilder();
-        $builder = Mockery::mock(Builder::class.'[getRelation]', [$queryBuilder]);
+        $builder = Double::for(Builder::class)->passthru(new Builder($queryBuilder));
         $builder->setEagerLoads(['parentFoo' => function ($query) {
             $_SERVER['__eloquent.constrain'] = $query;
         }]);
@@ -843,7 +844,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             new EloquentBuilderTestModelSelfRelatedStub,
             new EloquentBuilderTestModelSelfRelatedStub,
         ];
-        $relation = Mockery::mock($model->parentFoo());
+        $relation = Double::for($model->parentFoo());
 
         $builder->expects('getRelation')->with('parentFoo')->andReturn($relation);
 
@@ -856,9 +857,9 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
-        $relation = Mockery::mock(Relation::class);
+        $relation = Double::for(Relation::class);
         $builder->getModel()->expects('newInstance->orders')->andReturn($relation);
-        $relationQuery = Mockery::mock(Builder::class);
+        $relationQuery = Double::for(Builder::class);
         $relation->expects('getQuery')->andReturn($relationQuery);
         $relationQuery->expects('with')->with(['lines' => null, 'lines.details' => null]);
         $builder->setEagerLoads(['orders' => null, 'orders.lines' => null, 'orders.lines.details' => null]);
@@ -870,15 +871,15 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
-        $relation = Mockery::mock(Relation::class);
+        $relation = Double::for(Relation::class);
         $builder->getModel()->expects('newInstance->orders')->andReturn($relation);
-        $groupsRelation = Mockery::mock(Relation::class);
+        $groupsRelation = Double::for(Relation::class);
         $builder->getModel()->expects('newInstance->ordersGroups')->andReturn($groupsRelation);
 
-        $relationQuery = Mockery::mock(Builder::class);
+        $relationQuery = Double::for(Builder::class);
         $relation->shouldReceive('getQuery')->andReturn($relationQuery);
 
-        $groupRelationQuery = Mockery::mock(Builder::class);
+        $groupRelationQuery = Double::for(Builder::class);
         $groupsRelation->expects('getQuery')->andReturn($groupRelationQuery);
         $groupRelationQuery->expects('with')->with(['lines' => null, 'lines.details' => null]);
 
@@ -1005,7 +1006,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testNestedWhere()
     {
-        $nestedQuery = Mockery::mock(Builder::class);
+        $nestedQuery = Double::for(Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
         $nestedQuery->expects('getQuery')->andReturn($nestedRawQuery);
         $nestedQuery->expects('getEagerLoads')->andReturn([]);
@@ -1068,7 +1069,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testWhereNot()
     {
-        $nestedQuery = Mockery::mock(Builder::class);
+        $nestedQuery = Double::for(Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
         $nestedQuery->expects('getQuery')->andReturn($nestedRawQuery);
         $nestedQuery->expects('getEagerLoads')->andReturn([]);
@@ -1116,7 +1117,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testOrWhereNot()
     {
-        $nestedQuery = Mockery::mock(Builder::class);
+        $nestedQuery = Double::for(Builder::class);
         $nestedRawQuery = $this->getMockQueryBuilder();
         $nestedQuery->expects('getQuery')->andReturn($nestedRawQuery);
         $nestedQuery->expects('getEagerLoads')->andReturn([]);
@@ -2618,7 +2619,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
 
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
         $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
@@ -2634,7 +2635,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testUpdateWithTimestampValue()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->expects('getTablePrefix')->times(2)->andReturn('');
         $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
@@ -2650,7 +2651,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testUpdateWithQualifiedTimestampValue()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
         $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
@@ -2666,7 +2667,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testUpdateWithoutTimestamp()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->expects('getTablePrefix')->andReturn('');
         $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
@@ -2684,7 +2685,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
 
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
         $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
@@ -2702,7 +2703,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
 
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
         $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
@@ -2720,7 +2721,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
 
-        $query = Mockery::mock(BaseBuilder::class);
+        $query = Double::for(BaseBuilder::class);
         $query->expects('from')->with('foo_table')->andReturn('foo_table');
         $query->from = 'foo_table';
 
@@ -2743,7 +2744,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
 
-        $query = Mockery::mock(BaseBuilder::class);
+        $query = Double::for(BaseBuilder::class);
         $query->expects('from')->with('foo_table')->andReturn('foo_table');
         $query->from = 'foo_table';
 
@@ -2762,7 +2763,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
 
-        $query = Mockery::mock(BaseBuilder::class);
+        $query = Double::for(BaseBuilder::class);
         $query->expects('from')->with('foo_table')->andReturn('foo_table');
         $query->from = 'foo_table';
 
@@ -2781,7 +2782,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
 
-        $query = Mockery::mock(BaseBuilder::class);
+        $query = Double::for(BaseBuilder::class);
         $query->expects('from')->with('foo_table')->andReturn('foo_table');
         $query->from = 'foo_table';
 
@@ -2798,7 +2799,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testTouchWithoutUpdatedAtColumn()
     {
-        $query = Mockery::mock(BaseBuilder::class);
+        $query = Double::for(BaseBuilder::class);
         $query->expects('from')->with('table')->andReturn('table');
         $query->from = 'table';
 
@@ -2815,7 +2816,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testClone()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->expects('getTablePrefix')->times(2)->andReturn('');
         $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = new Builder($query);
@@ -2829,7 +2830,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testCloneModelMakesAFreshCopyOfTheModel()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->expects('getTablePrefix')->times(2)->andReturn('');
         $query = new BaseBuilder($connection, new Grammar($connection), new Processor);
         $builder = (new Builder($query))->setModel(new EloquentBuilderTestStub);
@@ -2857,7 +2858,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testToRawSql()
     {
-        $query = Mockery::mock(BaseBuilder::class);
+        $query = Double::for(BaseBuilder::class);
         $query->expects('toRawSql')
             ->andReturn('select * from "users" where "email" = \'foo\'');
 
@@ -2868,7 +2869,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testPassthruMethodsCallsAreNotCaseSensitive()
     {
-        $query = Mockery::mock(BaseBuilder::class);
+        $query = Double::for(BaseBuilder::class);
 
         $mockResponse = 'select 1';
         $query
@@ -2885,7 +2886,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testPassthruArrayElementsMustAllBeLowercase()
     {
-        $builder = new class(Mockery::mock(BaseBuilder::class)) extends Builder
+        $builder = new class(Double::for(BaseBuilder::class)) extends Builder
         {
             // expose protected member for test
             public function getPassthru(): array
@@ -2961,7 +2962,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testIncrementEachCallsToBaseWithUpdatedAt()
     {
-        $query = Mockery::mock(BaseBuilder::class);
+        $query = Double::for(BaseBuilder::class);
         $query->expects('from')->with('foo_table');
         $query->from = 'foo_table';
         $query->expects('incrementEach')->withArgs(function ($columns, $extra) {
@@ -2984,7 +2985,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testDecrementEachCallsToBaseWithUpdatedAt()
     {
-        $query = Mockery::mock(BaseBuilder::class);
+        $query = Double::for(BaseBuilder::class);
         $query->expects('from')->with('foo_table');
         $query->from = 'foo_table';
         $query->expects('decrementEach')->withArgs(function ($columns, $extra) {
@@ -3007,7 +3008,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testIncrementEachWithoutTimestamps()
     {
-        $query = Mockery::mock(BaseBuilder::class);
+        $query = Double::for(BaseBuilder::class);
         $query->expects('from')->with('foo_table');
         $query->expects('incrementEach')->with(['votes' => 1], [])->andReturn(1);
 
@@ -3022,7 +3023,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     protected function getMockModel()
     {
-        $model = Mockery::mock(Model::class);
+        $model = Double::for(Model::class);
         $model->shouldReceive('getKeyName')->andReturn('foo');
         $model->shouldReceive('getTable')->andReturn('foo_table');
         $model->shouldReceive('getQualifiedKeyName')->andReturn('foo_table.foo');
@@ -3101,7 +3102,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     protected function getMockQueryBuilder()
     {
-        $query = Mockery::mock(BaseBuilder::class);
+        $query = Double::for(BaseBuilder::class);
         $query->shouldReceive('from')->with('foo_table');
 
         return $query;

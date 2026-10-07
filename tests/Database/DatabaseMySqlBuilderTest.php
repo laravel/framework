@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
@@ -15,7 +16,7 @@ class DatabaseMySqlBuilderTest extends TestCase
 {
     public function testCreateDatabase(): void
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new MySqlGrammarSchema($connection);
 
         $connection->expects('getConfig')->with('charset')->andReturn('utf8mb4');
@@ -31,7 +32,7 @@ class DatabaseMySqlBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new MySqlGrammarSchema($connection);
 
         $connection->expects('getSchemaGrammar')->andReturn($grammar);
@@ -46,7 +47,7 @@ class DatabaseMySqlBuilderTest extends TestCase
 
     public function testDeleteWithJoinCompilesOrderByAndLimit(): void
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $processor = new Processor;
         $grammar = new MySqlGrammar($connection);
 

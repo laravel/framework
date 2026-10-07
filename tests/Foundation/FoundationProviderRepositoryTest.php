@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use JMac\Testing\Double;
 use Exception;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Support\DeferrableProvider;
@@ -108,9 +109,9 @@ class FoundationProviderRepositoryTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessageMatches('/^The (.*) directory must be present and writable.$/');
 
-        $files = Mockery::mock(Filesystem::class);
+        $files = Double::for(Filesystem::class);
         $files->shouldReceive('replace')->never();
-        $repo = new ProviderRepository(Mockery::mock(ApplicationContract::class), $files, __DIR__.'/cache/services.php');
+        $repo = new ProviderRepository(Double::for(ApplicationContract::class), $files, __DIR__.'/cache/services.php');
 
         $repo->writeManifest(['foo']);
     }

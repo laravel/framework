@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Auth;
 
+use JMac\Testing\Double;
 use Illuminate\Auth\DatabaseUserProvider;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -128,7 +129,7 @@ class AuthDatabaseUserProviderTest extends TestCase
     public function testCredentialValidationFailsGracefullyWithNullPassword()
     {
         $conn = new Connection(new PDO('sqlite::memory:'));
-        $hasher = Mockery::mock(Hasher::class);
+        $hasher = Double::for(Hasher::class);
         $hasher->shouldReceive('check')->never();
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = Mockery::mock(Authenticatable::class);

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Bus;
 
+use JMac\Testing\Double;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +28,7 @@ class BusPendingDispatchTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->job = Mockery::mock(stdClass::class);
+        $this->job = Double::for(stdClass::class);
         $this->pendingDispatch = new PendingDispatchWithoutDestructor($this->job);
     }
 

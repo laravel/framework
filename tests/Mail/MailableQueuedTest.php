@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use JMac\Testing\Double;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -321,7 +322,7 @@ class MailableQueuedTest extends TestCase
 
     protected function getMocks()
     {
-        return ['smtp', Mockery::mock(Factory::class), Mockery::mock(TransportInterface::class)];
+        return ['smtp', Double::for(Factory::class), Double::for(TransportInterface::class)];
     }
 }
 

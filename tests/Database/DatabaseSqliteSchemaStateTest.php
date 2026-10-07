@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Schema\SqliteSchemaState;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Filesystem\Filesystem;
@@ -15,11 +16,11 @@ class DatabaseSqliteSchemaStateTest extends TestCase
     public function testLoadSchemaToDatabase(): void
     {
         $config = ['driver' => 'sqlite', 'database' => 'database/database.sqlite', 'prefix' => '', 'foreign_key_constraints' => true, 'name' => 'sqlite'];
-        $connection = Mockery::mock(SQLiteConnection::class);
+        $connection = Double::for(SQLiteConnection::class);
         $connection->expects('getConfig')->andReturn($config);
         $connection->expects('getDatabaseName')->andReturn($config['database']);
 
-        $process = Mockery::spy(Process::class);
+        $process = Double::for(Process::class);
         $command = null;
         $processFactory = function ($givenCommand) use ($process, &$command) {
             $command = $givenCommand;
@@ -41,12 +42,12 @@ class DatabaseSqliteSchemaStateTest extends TestCase
     public function testLoadSchemaToInMemory(): void
     {
         $config = ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '', 'foreign_key_constraints' => true, 'name' => 'sqlite'];
-        $connection = Mockery::mock(SQLiteConnection::class);
+        $connection = Double::for(SQLiteConnection::class);
         $connection->expects('getDatabaseName')->andReturn($config['database']);
-        $pdo = Mockery::spy(PDO::class);
+        $pdo = Double::for(PDO::class);
         $connection->expects('getPdo')->andReturn($pdo);
 
-        $files = Mockery::mock(Filesystem::class);
+        $files = Double::for(Filesystem::class);
         $files->expects('get')->andReturn('CREATE TABLE IF NOT EXISTS "migrations" ("id" integer not null primary key autoincrement, "migration" varchar not null, "batch" integer not null);');
 
         $schemaState = new SqliteSchemaState($connection, $files);
@@ -62,7 +63,7 @@ class DatabaseSqliteSchemaStateTest extends TestCase
         $connection->statement('create table "logs_data" ("id" integer primary key)');
         $connection->statement('create virtual table temp.logs using fts5(message)');
 
-        $process = Mockery::mock(Process::class);
+        $process = Double::for(Process::class);
         $process->allows('setTimeout')->andReturnSelf();
         $process->allows('mustRun')->andReturnSelf();
         $process->allows('getOutput')->andReturn(<<<'SQL'
@@ -79,7 +80,7 @@ class DatabaseSqliteSchemaStateTest extends TestCase
 
             SQL);
 
-        $files = Mockery::spy(Filesystem::class);
+        $files = Double::for(Filesystem::class);
 
         (new SqliteSchemaState($connection, $files, fn () => $process))
             ->withMigrationTable(null)

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Bootstrap;
 
+use JMac\Testing\Double;
 use Error;
 use ErrorException;
 use Illuminate\Config\Repository as Config;
@@ -175,7 +176,7 @@ class HandleExceptionsTest extends TestCase
 
     public function testErrors()
     {
-        $logger = Mockery::mock(LogManager::class);
+        $logger = Double::for(LogManager::class);
         $this->app->instance(LogManager::class, $logger);
 
         $logger->shouldNotReceive('channel');

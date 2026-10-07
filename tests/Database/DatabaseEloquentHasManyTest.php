@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -140,13 +141,13 @@ class DatabaseEloquentHasManyTest extends TestCase
 
     protected function getRelation()
     {
-        $queryBuilder = Mockery::mock(QueryBuilder::class);
-        $builder = Mockery::mock(Builder::class, [$queryBuilder]);
+        $queryBuilder = Double::for(QueryBuilder::class);
+        $builder = Double::for(new Builder($queryBuilder));
         $builder->shouldReceive('whereNotNull')->with('table.foreign_key');
         $builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
-        $related = Mockery::mock(Model::class);
+        $related = Double::for(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
-        $parent = Mockery::mock(Model::class);
+        $parent = Double::for(Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');

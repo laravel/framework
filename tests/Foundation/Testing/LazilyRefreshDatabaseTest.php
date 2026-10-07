@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Testing;
 
+use JMac\Testing\Double;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
@@ -76,7 +77,7 @@ class LazilyRefreshDatabaseTest extends TestCase
 
     public function testDatabaseIsNotRefreshedWithoutInteraction()
     {
-        $kernel = Mockery::spy(ConsoleKernel::class);
+        $kernel = Double::for(ConsoleKernel::class);
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
         $kernel->shouldReceive('call')

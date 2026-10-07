@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Bus\Queueable;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -221,7 +222,7 @@ class WorkCommandTest extends QueueTestCase
 
         Worker::$restartable = false;
 
-        $cache = Mockery::mock(Repository::class);
+        $cache = Double::for(Repository::class);
         $cache->shouldNotReceive('get')->with('illuminate:queue:restart');
         $cache->expects('get')->with('illuminate:queues:paused')->andReturn(null);
         $cache->expects('many')->andReturn([]);
@@ -248,7 +249,7 @@ class WorkCommandTest extends QueueTestCase
 
         Worker::$pausable = false;
 
-        $cache = Mockery::mock(Repository::class);
+        $cache = Double::for(Repository::class);
 
         $cache->expects('get')->times(2)->with('illuminate:queue:restart')->andReturn(null);
         $cache->shouldNotReceive('many');

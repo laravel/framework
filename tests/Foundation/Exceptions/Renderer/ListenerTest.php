@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Exceptions\Renderer;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
@@ -51,7 +52,7 @@ class ListenerTest extends TestCase
     {
         $listener = new Listener();
 
-        $connection = Mockery::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $connection->expects('getName')->times(150)->andReturn('testing');
         $connection->expects('prepareBindings')->times(100)->andReturnUsing(fn ($b) => $b);
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use JMac\Testing\Double;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Http\Request;
 use Mockery;
@@ -19,8 +20,8 @@ class PusherBroadcasterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->pusher = Mockery::mock('Pusher\Pusher');
-        $this->broadcaster = Mockery::mock(PusherBroadcaster::class, [$this->pusher])->makePartial();
+        $this->pusher = Double::for('Pusher\Pusher');
+        $this->broadcaster = Double::for(PusherBroadcaster::class)->passthru(new PusherBroadcaster($this->pusher));
     }
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
@@ -173,7 +174,7 @@ class PusherBroadcasterTest extends TestCase
     {
         $request = Request::create('/', 'POST', ['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
 
-        $user = Mockery::mock('User');
+        $user = Double::for('User');
         $user->shouldReceive('getAuthIdentifierForBroadcasting')
             ->andReturn(42);
         $user->shouldReceive('getAuthIdentifier')

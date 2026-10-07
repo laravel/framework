@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Session;
 
+use JMac\Testing\Double;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Session\CookieSessionHandler;
 use Illuminate\Session\Store;
@@ -420,7 +421,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->handlerNeedsRequest());
         $session->getHandler()->shouldReceive('setRequest')->never();
 
-        $session = new Store('test', Mockery::mock(new CookieSessionHandler(new CookieJar, 60, false)));
+        $session = new Store('test', Double::for(new CookieSessionHandler(new CookieJar, 60, false)));
         $this->assertTrue($session->handlerNeedsRequest());
         $session->getHandler()->expects('setRequest');
         $request = new Request;
@@ -842,7 +843,7 @@ class SessionStoreTest extends TestCase
     {
         return [
             $this->getSessionName(),
-            Mockery::mock(SessionHandlerInterface::class),
+            Double::for(SessionHandlerInterface::class),
             $this->getSessionId(),
             $serialization,
         ];

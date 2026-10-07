@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Console;
 
+use JMac\Testing\Double;
 use Illuminate\Console\Attributes\Aliases;
 use Illuminate\Console\Attributes\Help;
 use Illuminate\Console\Attributes\Hidden;
@@ -40,7 +41,7 @@ class CommandTest extends TestCase
             }
         };
 
-        $application = Mockery::mock(FoundationApplication::class);
+        $application = Double::for(FoundationApplication::class);
         $command->setLaravel($application);
 
         $input = new ArrayInput([]);
@@ -50,7 +51,7 @@ class CommandTest extends TestCase
         $application->expects('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(new Factory($outputStyle));
 
         $application->expects('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command, $application) {
-            $commandCalled = Mockery::mock(Command::class);
+            $commandCalled = Double::for(Command::class);
 
             $application->expects('make')->with(Command::class)->andReturn($commandCalled);
 
@@ -189,7 +190,7 @@ class CommandTest extends TestCase
 
     public function testTheOutputSetterOverwrite()
     {
-        $output = Mockery::mock(OutputStyle::class);
+        $output = Double::for(OutputStyle::class);
         $output->expects('writeln')->withArgs(function (...$args) {
             return $args[0] === '<info>foo</info>';
         });

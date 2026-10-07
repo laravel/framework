@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use JMac\Testing\Double;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
@@ -101,7 +102,7 @@ class CallQueuedHandlerTest extends TestCase
 
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
+        $job = Double::for(Job::class);
         $job->expects('payload')->andReturn(['deleteWhenMissingModels' => true]);
         $job->expects('resolveQueuedJobClass')->andReturn(CallQueuedHandlerExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
@@ -121,7 +122,7 @@ class CallQueuedHandlerTest extends TestCase
 
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = Mockery::mock(Job::class);
+        $job = Double::for(Job::class);
         $job->expects('payload')->andReturn(['deleteWhenMissingModels' => true]);
         $job->expects('resolveQueuedJobClass')->andReturn(CallQueuedHandlerAttributeExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
@@ -141,16 +142,16 @@ class CallQueuedHandlerTest extends TestCase
 
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $batch = Mockery::mock(Batch::class);
+        $batch = Double::for(Batch::class);
         $batch->expects('recordSuccessfulJob')->with('job-uuid');
 
-        $repository = Mockery::mock(BatchRepository::class);
+        $repository = Double::for(BatchRepository::class);
         $repository->expects('find')->with('test-batch-id')->andReturn($batch);
         $this->app->instance(BatchRepository::class, $repository);
 
         $serialized = serialize((new CallQueuedHandlerBatchableExceptionThrower)->withBatchId('test-batch-id'));
 
-        $job = Mockery::mock(Job::class);
+        $job = Double::for(Job::class);
         $job->expects('resolveQueuedJobClass')->andReturn(CallQueuedHandlerBatchableExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
         $job->expects('delete');

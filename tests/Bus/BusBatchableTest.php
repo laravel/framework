@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Bus;
 
+use JMac\Testing\Double;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Container\Container;
@@ -23,7 +24,7 @@ class BusBatchableTest extends TestCase
 
         Container::setInstance($container = new Container);
 
-        $repository = Mockery::mock(BatchRepository::class);
+        $repository = Double::for(BatchRepository::class);
         $repository->expects('find')->with('test-batch-id')->andReturn('test-batch');
         $container->instance(BatchRepository::class, $repository);
 

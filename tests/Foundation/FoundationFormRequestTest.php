@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use JMac\Testing\Double;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
@@ -773,7 +774,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createValidationFactory($container)
     {
-        $translator = Mockery::mock(Translator::class);
+        $translator = Double::for(Translator::class);
         $translator->shouldReceive('get')->zeroOrMoreTimes()->andReturn('error');
         $translator->shouldReceive('choice')->zeroOrMoreTimes()->andReturn('error');
 
@@ -805,7 +806,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createMockRedirector($request)
     {
-        $redirector = $this->mocks['redirector'] = Mockery::mock(Redirector::class);
+        $redirector = $this->mocks['redirector'] = Double::for(Redirector::class);
 
         $redirector->shouldReceive('getUrlGenerator')->zeroOrMoreTimes()
             ->andReturn($generator = $this->createMockUrlGenerator());
@@ -826,7 +827,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createMockUrlGenerator()
     {
-        return $this->mocks['generator'] = Mockery::mock(UrlGenerator::class);
+        return $this->mocks['generator'] = Double::for(UrlGenerator::class);
     }
 
     /**
@@ -836,7 +837,7 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createMockRedirectResponse()
     {
-        return $this->mocks['redirect'] = Mockery::mock(RedirectResponse::class);
+        return $this->mocks['redirect'] = Double::for(RedirectResponse::class);
     }
 }
 

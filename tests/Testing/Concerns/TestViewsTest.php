@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Testing\Concerns;
 
+use JMac\Testing\Double;
 use ErrorException;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
@@ -88,7 +89,7 @@ class TestViewsTest extends TestCase
     public function testSwitchToCompiledViewPathUpdatesCompilerCachePath()
     {
         $container = Container::getInstance();
-        $compiler = new BladeCompiler(Mockery::mock(Filesystem::class), '/original/path');
+        $compiler = new BladeCompiler(Double::for(Filesystem::class), '/original/path');
 
         $container->instance('blade.compiler', $compiler);
 

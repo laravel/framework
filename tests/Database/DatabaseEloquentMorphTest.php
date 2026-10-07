@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
@@ -123,13 +124,13 @@ class DatabaseEloquentMorphTest extends TestCase
 
     protected function getOneRelation()
     {
-        $queryBuilder = Mockery::mock(QueryBuilder::class);
-        $builder = Mockery::mock(Builder::class, [$queryBuilder]);
+        $queryBuilder = Double::for(QueryBuilder::class);
+        $builder = Double::for(new Builder($queryBuilder));
         $builder->expects('whereNotNull')->with('table.morph_id');
         $builder->expects('where')->with('table.morph_id', '=', 1);
         $related = new EloquentMorphResetModelStub;
         $builder->shouldReceive('getModel')->andReturn($related);
-        $parent = Mockery::mock(Model::class);
+        $parent = Double::for(Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
         $builder->expects('where')->with('table.morph_type', get_class($parent));
@@ -139,12 +140,12 @@ class DatabaseEloquentMorphTest extends TestCase
 
     protected function getManyRelation()
     {
-        $builder = Mockery::mock(Builder::class);
+        $builder = Double::for(Builder::class);
         $builder->expects('whereNotNull')->with('table.morph_id');
         $builder->expects('where')->with('table.morph_id', '=', 1);
         $related = new EloquentMorphResetModelStub;
         $builder->shouldReceive('getModel')->andReturn($related);
-        $parent = Mockery::mock(Model::class);
+        $parent = Double::for(Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
         $builder->expects('where')->with('table.morph_type', get_class($parent));
@@ -160,12 +161,12 @@ class DatabaseEloquentMorphTest extends TestCase
             $alias => EloquentModelNamespacedStub::class,
         ]);
 
-        $builder = Mockery::mock(Builder::class);
+        $builder = Double::for(Builder::class);
         $builder->expects('whereNotNull')->with('table.morph_id');
         $builder->expects('where')->with('table.morph_id', '=', 1);
         $related = new EloquentMorphResetModelStub;
         $builder->shouldReceive('getModel')->andReturn($related);
-        $parent = Mockery::mock(EloquentModelNamespacedStub::class);
+        $parent = Double::for(EloquentModelNamespacedStub::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $parent->shouldReceive('getMorphClass')->andReturn($alias);
         $builder->expects('where')->with('table.morph_type', $alias);

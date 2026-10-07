@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -97,7 +98,7 @@ class DatabaseEloquentHasOneTest extends TestCase
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
-        $model = Mockery::mock(Model::class);
+        $model = Double::for(Model::class);
         $model->expects('setRelation')->with('foo', null);
         $models = $relation->initRelation([$model], 'foo');
 
@@ -178,12 +179,12 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     protected function getRelation()
     {
-        $this->builder = Mockery::mock(Builder::class);
+        $this->builder = Double::for(Builder::class);
         $this->builder->shouldReceive('whereNotNull')->with('table.foreign_key');
         $this->builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
-        $this->related = Mockery::mock(Model::class);
+        $this->related = Double::for(Model::class);
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
-        $this->parent = Mockery::mock(Model::class);
+        $this->parent = Double::for(Model::class);
         $this->parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $this->parent->shouldReceive('getAttribute')->with('username')->andReturn('taylor');
         $this->parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');

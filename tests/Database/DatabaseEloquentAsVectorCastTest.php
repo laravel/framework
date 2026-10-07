@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Double;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\Eloquent\Casts\AsVector;
@@ -139,7 +140,7 @@ class DatabaseEloquentAsVectorCastTest extends TestCase
 
     protected function useGrammar(string $grammar)
     {
-        $connection = m::mock(Connection::class);
+        $connection = Double::for(Connection::class);
         $grammar = new $grammar($connection);
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
 
