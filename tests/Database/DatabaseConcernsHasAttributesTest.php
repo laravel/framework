@@ -27,13 +27,12 @@ class DatabaseConcernsHasAttributesTest extends TestCase
 
     public function testRelationsToArray()
     {
-        $mock = Double::for(HasAttributesWithoutConstructor::class)->passthru()
-            ->expects('getArrayableRelations')->andReturn([
-                'arrayable_relation' => new Collection(['foo' => 'bar']),
-                'invalid_relation' => 'invalid',
-                'null_relation' => null,
-            ])
-            ->getMock();
+        $mock = Double::for(HasAttributesWithoutConstructor::class)->passthru();
+        $mock->expects('getArrayableRelations')->returns([
+            'arrayable_relation' => new Collection(['foo' => 'bar']),
+            'invalid_relation' => 'invalid',
+            'null_relation' => null,
+        ]);
 
         $this->assertEquals([
             'arrayable_relation' => ['foo' => 'bar'],

@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Cache;
 use BadMethodCallException;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Console\ClearCommand;
-use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Cache\Repository;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
@@ -33,7 +33,7 @@ class ClearCommandTest extends TestCase
     private $files;
 
     /**
-     * @var \Illuminate\Contracts\Cache\Repository|DoubleInterface
+     * @var ClearCommandTestRepository|DoubleInterface
      */
     private $cacheRepository;
 
@@ -44,7 +44,7 @@ class ClearCommandTest extends TestCase
     {
         $this->cacheManager = Double::for(CacheManager::class);
         $this->files = Double::for(Filesystem::class);
-        $this->cacheRepository = Double::for(Repository::class);
+        $this->cacheRepository = Double::for(ClearCommandTestRepository::class);
         $this->command = new ClearCommandTestStub($this->cacheManager, $this->files);
 
         $app = new Application;
@@ -193,5 +193,13 @@ class ClearCommandTestStub extends ClearCommand
     public function call($command, array $arguments = [])
     {
         return 0;
+    }
+}
+
+class ClearCommandTestRepository extends Repository
+{
+    public function flush()
+    {
+        //
     }
 }

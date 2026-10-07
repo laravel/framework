@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Notifications\Messages\DatabaseMessage;
@@ -18,7 +19,8 @@ class NotificationDatabaseChannelTest extends TestCase
         $notification->id = 1;
         $notifiable = Double::for(AnonymousNotifiable::class);
 
-        $notifiable->expects('routeNotificationFor->create')->with([
+        $notifiable->expects('routeNotificationFor')->returns($relation = Double::for(HasMany::class));
+        $relation->expects('create')->with([
             'id' => 1,
             'type' => get_class($notification),
             'data' => ['invoice_id' => 1],
@@ -35,7 +37,8 @@ class NotificationDatabaseChannelTest extends TestCase
         $notification->id = 1;
         $notifiable = Double::for(AnonymousNotifiable::class);
 
-        $notifiable->expects('routeNotificationFor->create')->with([
+        $notifiable->expects('routeNotificationFor')->returns($relation = Double::for(HasMany::class));
+        $relation->expects('create')->with([
             'id' => 1,
             'type' => get_class($notification),
             'data' => ['invoice_id' => 1],
@@ -49,20 +52,25 @@ class NotificationDatabaseChannelTest extends TestCase
 
     public function testCustomizeTypeIsSentToDatabase()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $notification = new NotificationDatabaseChannelCustomizeTypeTestNotification;
         $notification->id = 1;
         $notifiable = Double::for(AnonymousNotifiable::class);
 
-        $notifiable->expects('routeNotificationFor->create')->with([
+        $notifiable->expects('routeNotificationFor')->returns($relation = Double::for(HasMany::class));
+        $relation->expects('create')->with([
             'id' => 1,
             'type' => 'MONTHLY',
             'data' => ['invoice_id' => 1],
-            'read_at' => Carbon::now()->toDateTimeString(),
+            'read_at' => Carbon::now(),
             'something' => 'else',
         ]);
 
         $channel = new ExtendedDatabaseChannel;
         $channel->send($notifiable, $notification);
+
+        Carbon::setTestNow();
     }
 }
 

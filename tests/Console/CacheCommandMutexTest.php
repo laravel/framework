@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class CacheCommandMutexTest extends TestCase
@@ -120,12 +121,8 @@ class CacheCommandMutexTest extends TestCase
         $this->mockUsingCacheStore();
 
         $this->cacheRepository->expects('add')
-            ->withArgs(function ($key) {
-                $this->assertSame('framework'.DIRECTORY_SEPARATOR.'command-command-name', $key);
-
-                return true;
-            })
-            ->andReturn(true);
+            ->with('framework'.DIRECTORY_SEPARATOR.'command-command-name', Argument::remaining())
+            ->returns(true);
 
         $this->mutex->create($this->command);
     }
@@ -145,12 +142,8 @@ class CacheCommandMutexTest extends TestCase
         $this->mockUsingCacheStore();
 
         $this->cacheRepository->expects('add')
-            ->withArgs(function ($key) {
-                $this->assertSame('framework'.DIRECTORY_SEPARATOR.'command-command-name-isolated', $key);
-
-                return true;
-            })
-            ->andReturn(true);
+            ->with('framework'.DIRECTORY_SEPARATOR.'command-command-name-isolated', Argument::remaining())
+            ->returns(true);
 
         $this->mutex->create($command);
     }

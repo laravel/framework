@@ -27,7 +27,7 @@ class BusPendingDispatchTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->job = Double::for(stdClass::class);
+        $this->job = Double::for(PendingDispatchTestJob::class);
         $this->pendingDispatch = new PendingDispatchWithoutDestructor($this->job);
     }
 
@@ -132,5 +132,58 @@ class BusPendingDispatchTest extends TestCase
         $this->job->expects('delay')->with(300);
 
         $this->pendingDispatch->unless(false, fn ($pendingDispatch) => $pendingDispatch->delay(300));
+    }
+}
+
+class PendingDispatchTestJob
+{
+    public function onConnection(...$arguments)
+    {
+        //
+    }
+
+    public function onQueue(...$arguments)
+    {
+        //
+    }
+
+    public function allOnConnection(...$arguments)
+    {
+        //
+    }
+
+    public function allOnQueue(...$arguments)
+    {
+        //
+    }
+
+    public function delay(...$arguments)
+    {
+        //
+    }
+
+    public function withoutDelay(...$arguments)
+    {
+        //
+    }
+
+    public function afterCommit(...$arguments)
+    {
+        //
+    }
+
+    public function beforeCommit(...$arguments)
+    {
+        //
+    }
+
+    public function chain(...$arguments)
+    {
+        //
+    }
+
+    public function appendToChain(...$arguments)
+    {
+        //
     }
 }

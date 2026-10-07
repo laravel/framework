@@ -67,10 +67,10 @@ class SupportTestingQueueFakeTest extends TestCase
     {
         $job = new JobStub;
 
-        $manager = Double::for(QueueManager::class);
+        $manager = Double::for(QueueManagerStub::class);
         $manager->expects('push')->with(Argument::satisfies(function ($passedJob) use ($job) {
             return $passedJob === $job;
-        }));
+        }), Argument::remaining());
 
         $fake = new QueueFake(new Application, JobToFakeStub::class, $manager);
 
@@ -443,10 +443,10 @@ class SupportTestingQueueFakeTest extends TestCase
     {
         $job = new JobStub;
 
-        $manager = Double::for(QueueManager::class);
+        $manager = Double::for(QueueManagerStub::class);
         $manager->expects('push')->with(Argument::satisfies(function ($passedJob) use ($job) {
             return $passedJob === $job;
-        }));
+        }), Argument::remaining());
 
         $fake = (new QueueFake(new Application, [], $manager))->except(JobStub::class);
 
@@ -510,7 +510,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $job = new JobStub;
         $steps = [];
 
-        $manager = Double::for(QueueManager::class);
+        $manager = Double::for(QueueManagerStub::class);
         $manager->expects('push')->with(Argument::all(function ($passedJob, $passedData, $passedQueue) use ($job) {
             return $passedJob === $job && $passedData === ['foo' => 'bar'] && $passedQueue === 'redis';
         }));
@@ -966,5 +966,13 @@ class JobWithSerialization
     public function __unserialize(array $data): void
     {
         $this->value = $data['value'].'-unserialized';
+    }
+}
+
+class QueueManagerStub extends QueueManager
+{
+    public function push($job, $data = '', $queue = null)
+    {
+        //
     }
 }

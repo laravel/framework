@@ -65,6 +65,21 @@ class DatabaseSoftDeletingTraitStub
         //
     }
 
+    public function newModelQuery()
+    {
+        //
+    }
+
+    public function syncOriginalAttributes($attributes)
+    {
+        //
+    }
+
+    public function usesTimestamps()
+    {
+        return true;
+    }
+
     public function getKey()
     {
         return 1;

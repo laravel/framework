@@ -48,6 +48,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Carbon;
@@ -58,6 +59,7 @@ use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
+use Illuminate\Tests\Database\Fixtures\EloquentBuilderStub;
 use Illuminate\Tests\Database\Fixtures\Enums\StringStatus;
 use Illuminate\Tests\Database\Fixtures\TestCast;
 use Illuminate\Tests\Database\Fixtures\TestValueObject;
@@ -748,7 +750,7 @@ class DatabaseEloquentModelTest extends TestCase
         $freshModel = new EloquentModelStub;
         $freshModel->setRawAttributes(['id' => 1, 'name' => 'Abigail']);
 
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $model->expects('newQueryWithoutScopes')->returns($query);
         $query->expects('lockForUpdate')->returns($query);
         $query->expects('where')->with('id', '=', 1)->returns($query);
@@ -866,7 +868,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testUpdateProcess()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps'])->getMock();
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $query->expects('where')->with('id', '=', 1);
         $query->expects('update')->with(['name' => 'taylor'])->returns(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
@@ -886,7 +888,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testUpdateProcessDoesntOverrideTimestamps()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $query->expects('where')->with('id', '=', 1);
         $query->expects('update')->with(['created_at' => 'foo', 'updated_at' => 'bar'])->returns(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
@@ -945,7 +947,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = $this->getMockBuilder(EloquentModelEventObjectStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'fireModelEvent'])->getMock();
         $model->timestamps = false;
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $query->expects('where')->with('id', '=', 1);
         $query->expects('update')->with(['name' => 'taylor'])->returns(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
@@ -962,7 +964,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testUpdateUsesOldPrimaryKey()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps'])->getMock();
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $query->expects('where')->with('id', '=', 1);
         $query->expects('update')->with(['id' => 2, 'foo' => 'bar'])->returns(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
@@ -1212,7 +1214,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testDeleteProperlyDeletesModel()
     {
         $model = $this->getMockBuilder(Model::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'touchOwners'])->getMock();
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $query->expects('where')->with('id', '=', 1)->returns($query);
         $query->expects('delete');
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
@@ -1783,7 +1785,9 @@ class DatabaseEloquentModelTest extends TestCase
 
         $connection = Double::for(Connection::class);
         EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
-        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
+        $schemaBuilder = Double::for(SchemaBuilder::class);
+        $schemaBuilder->allows('getColumnListing')->returns(['name', 'age', 'foo']);
+        $connection->allows('getSchemaBuilder')->returns($schemaBuilder);
 
         $model->guard(['name', 'age']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'foo' => 'bar']);
@@ -1815,7 +1819,9 @@ class DatabaseEloquentModelTest extends TestCase
 
         $connection = Double::for(Connection::class);
         EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
-        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
+        $schemaBuilder = Double::for(SchemaBuilder::class);
+        $schemaBuilder->allows('getColumnListing')->returns(['name', 'age', 'foo']);
+        $connection->allows('getSchemaBuilder')->returns($schemaBuilder);
 
         $model->guard([]);
         $model->fillable(['name']);
@@ -1833,7 +1839,9 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $connection = Double::for(Connection::class);
         EloquentModelStub::setConnectionResolver($this->newResolver(['default' => $connection]));
-        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
+        $schemaBuilder = Double::for(SchemaBuilder::class);
+        $schemaBuilder->allows('getColumnListing')->returns(['name', 'age', 'foo']);
+        $connection->allows('getSchemaBuilder')->returns($schemaBuilder);
 
         Model::preventSilentlyDiscardingAttributes();
 
@@ -2656,7 +2664,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $model->expects('newQueryWithoutScopes')->times(2)->returns($query);
         $query->expects('where')->times(2)->returns($query);
         $query->expects('increment')->times(2);
@@ -2679,7 +2687,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $model->expects('newQueryWithoutScopes')->times(2)->returns($query);
         $query->expects('where')->times(2)->returns($query);
         $query->expects('increment')->times(2);
@@ -2704,7 +2712,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 4;
 
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $model->expects('newQueryWithoutScopes')->times(2)->returns($query);
         $query->expects('where')->times(2)->returns($query);
         $query->expects('decrement')->times(2);
@@ -2730,7 +2738,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 2;
         $model->bar = 5;
 
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $model->expects('newQueryWithoutScopes')->returns($query);
         $query->expects('where')->with('id', '=', 1)->returns($query);
         $query->expects('incrementEach')->with(['foo' => 1, 'bar' => 2], [])->returns(1);
@@ -2751,7 +2759,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 10;
         $model->bar = 5;
 
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $model->expects('newQueryWithoutScopes')->returns($query);
         $query->expects('where')->with('id', '=', 1)->returns($query);
         $query->expects('decrementEach')->with(['foo' => 3, 'bar' => 2], [])->returns(1);
@@ -2772,7 +2780,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 2;
         $model->bar = 5;
 
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $model->expects('newQueryWithoutScopes')->times(2)->returns($query);
         $query->expects('where')->times(2)->returns($query);
         $query->expects('incrementEach')->times(2);
@@ -2800,7 +2808,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->foo = 10;
         $model->bar = 5;
 
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $model->expects('newQueryWithoutScopes')->times(2)->returns($query);
         $query->expects('where')->times(2)->returns($query);
         $query->expects('decrementEach')->times(2);
@@ -2857,7 +2865,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 2;
 
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $model->expects('newQueryWithoutScopes')->returns($query);
         $query->expects('where')->with('id', '=', 1)->returns($query);
         $query->expects('incrementEach')->with(['foo' => 5], ['category' => 'test'])->returns(1);
@@ -2877,7 +2885,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginalAttribute('id');
         $model->foo = 1;
 
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $model->expects('newQueryWithoutScopes')->returns($query);
         $query->expects('where')->returns($query);
         $query->expects('incrementEach')->returns(1);
@@ -2915,7 +2923,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = Double::for(EloquentModelStub::class)->passthru();
         $model->exists = false;
 
-        $query = Double::for(Builder::class);
+        $query = Double::for(EloquentBuilderStub::class);
         $model->expects('newQueryWithoutRelationships')->returns($query);
         $query->expects('incrementEach')->with(['foo' => 1], [])->returns(5);
 
@@ -4330,7 +4338,7 @@ class EloquentModelFindWithWritePdoStub extends Model
 {
     public function newQuery()
     {
-        $mock = Double::for(Builder::class);
+        $mock = Double::for(EloquentBuilderStub::class);
         $mock->expects('useWritePdo')->returns($mock);
         $mock->expects('find')->with(1)->returns('foo');
 
@@ -4346,7 +4354,7 @@ class EloquentModelDestroyStub extends Model
 
     public function newQuery()
     {
-        $mock = Double::for(Builder::class);
+        $mock = Double::for(EloquentBuilderStub::class);
         $mock->expects('whereIn')->with('id', [1, 2, 3])->returns($mock);
         $model = Double::for(Model::class);
         $mock->expects('get')->returns([$model]);
@@ -4360,7 +4368,7 @@ class EloquentModelEmptyDestroyStub extends Model
 {
     public function newQuery()
     {
-        $mock = Double::for(Builder::class);
+        $mock = Double::for(EloquentBuilderStub::class);
         $mock->expects('whereIn')->never();
 
         return $mock;
@@ -4371,7 +4379,7 @@ class EloquentModelWithStub extends Model
 {
     public function newQuery()
     {
-        $mock = Double::for(Builder::class);
+        $mock = Double::for(EloquentBuilderStub::class);
         $mock->expects('with')->with(['foo', 'bar'])->returns('foo');
 
         return $mock;

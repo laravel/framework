@@ -494,7 +494,7 @@ class ViewFactoryTest extends TestCase
         $dispatcher = Double::for(DispatcherContract::class);
         $factory->setDispatcher($dispatcher);
 
-        $dispatcher->shouldReceive('listen', Argument::any())->once();
+        $dispatcher->expects('listen');
 
         $view->expects('name')->returns('name');
 

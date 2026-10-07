@@ -12,7 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\ThrottlesExceptionsWithRedis;
 use Illuminate\Support\Str;
-use JMac\Testing\Matching\Argument;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use RuntimeException;
@@ -115,7 +115,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $this->spy(ExceptionHandler::class)
             ->expects('report')
             ->times(2)
-            ->with(Argument::type(RuntimeException::class));
+            ->with(Mockery::type(RuntimeException::class));
 
         $job = new class
         {

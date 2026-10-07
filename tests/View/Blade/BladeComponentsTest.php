@@ -62,7 +62,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
     {
         $attributes = new ComponentAttributeBag(['foo' => 'baz', 'other' => 'ok']);
 
-        $component = Double::for(Component::class);
+        $component = Double::for(BladeComponentsTestComponent::class);
         $component->allows('withName');
         $component->allows('test');
         $component->expects('shouldRender')->returns(false);
@@ -82,5 +82,13 @@ class ComponentStub extends Component
     public function render()
     {
         return '';
+    }
+}
+
+abstract class BladeComponentsTestComponent extends Component
+{
+    public function test()
+    {
+        //
     }
 }

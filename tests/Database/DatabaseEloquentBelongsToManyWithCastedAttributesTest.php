@@ -3,12 +3,12 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Tests\Database\Fixtures\EloquentBuilderStub;
 use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
 
@@ -19,7 +19,6 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $relation = $this->getRelation();
         $model1 = Double::for(Model::class)->passthru();
         $model1->allows('getAttribute')->with('parent_key')->returns(1);
-        $model1->shouldReceive('getAttribute')->with('foo')->passthru();
         $model1->allows('hasGetMutator')->returns(false);
         $model1->allows('hasAttributeMutator')->returns(false);
         $model1->allows('hasRelationAutoloadCallback')->returns(false);
@@ -27,7 +26,6 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
 
         $model2 = Double::for(Model::class)->passthru();
         $model2->allows('getAttribute')->with('parent_key')->returns(2);
-        $model2->shouldReceive('getAttribute')->with('foo')->passthru();
         $model2->allows('hasGetMutator')->returns(false);
         $model2->allows('hasAttributeMutator')->returns(false);
         $model2->allows('hasRelationAutoloadCallback')->returns(false);
@@ -53,7 +51,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
 
     protected function getRelation()
     {
-        $builder = Double::for(Builder::class);
+        $builder = Double::for(EloquentBuilderStub::class);
         $related = Double::for(Model::class)->passthru();
         $builder->allows('getModel')->returns($related);
         $related->allows('qualifyColumn');

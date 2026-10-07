@@ -10,7 +10,6 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Hashing\BcryptHasher;
 use JMac\Testing\Double;
-use Mockery;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
@@ -132,8 +131,8 @@ class AuthDatabaseUserProviderTest extends TestCase
         $hasher = Double::for(Hasher::class);
         $hasher->expects('check')->never();
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getAuthPassword')->andReturn(null);
+        $user = Double::for(Authenticatable::class);
+        $user->expects('getAuthPassword')->returns(null);
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
         $this->assertFalse($result);

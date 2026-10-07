@@ -84,7 +84,7 @@ class SupportFacadeTest extends TestCase
     public function testFacadeResolvesAgainAfterClearingSpecific()
     {
         $app = new ApplicationStub;
-        $app->setAttributes(['foo' => $mock = Double::for(stdClass::class)]);
+        $app->setAttributes(['foo' => $mock = Double::for(FacadeTestService::class)]);
         $mock->expects('bar')->times(3)->returns('baz');
 
         // Resolve for the first time
@@ -103,7 +103,7 @@ class SupportFacadeTest extends TestCase
     public function testFacadeResolvesAgainAfterClearingAll()
     {
         $app = new ApplicationStub;
-        $app->setAttributes(['foo' => $mock = Double::for(stdClass::class)]);
+        $app->setAttributes(['foo' => $mock = Double::for(FacadeTestService::class)]);
         $mock->expects('bar')->times(2)->returns('baz');
 
         // Resolve for the first time
@@ -156,5 +156,13 @@ class ApplicationStub implements ArrayAccess
     public function offsetUnset($key): void
     {
         unset($this->attributes[$key]);
+    }
+}
+
+class FacadeTestService
+{
+    public function bar()
+    {
+        //
     }
 }

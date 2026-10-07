@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\InteractsWithQueue;
 use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
 
 class InteractsWithQueueTest extends TestCase
@@ -13,12 +14,12 @@ class InteractsWithQueueTest extends TestCase
     public function testCreatesAnExceptionFromString()
     {
         $queueJob = Double::for(Job::class);
-        $queueJob->expects('fail')->withArgs(function ($e) {
+        $queueJob->expects('fail')->with(Argument::satisfies(function ($e) {
             $this->assertInstanceOf(Exception::class, $e);
             $this->assertSame('Whoops!', $e->getMessage());
 
             return true;
-        });
+        }));
 
         $job = new class
         {

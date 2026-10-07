@@ -699,10 +699,10 @@ class BusBatchTest extends TestCase
 
         $repository->store($pendingBatch);
 
-        $builder->shouldHaveReceived('insert')
-            ->withArgs(function ($argument) use ($pendingBatch) {
+        $builder->received('insert')
+            ->with(Argument::satisfies(function ($argument) use ($pendingBatch) {
                 return unserialize(base64_decode($argument['options'])) === $pendingBatch->options;
-            });
+            }));
 
         $builder->received('first');
     }
@@ -714,8 +714,13 @@ class BusBatchTest extends TestCase
 
         $connection = Double::for(PostgresConnection::class);
 
-        $connection->expects('table->useWritePdo->where->first')
-            ->andReturn($m = (object) [
+        $builder = Double::for(Builder::class);
+
+        $connection->expects('table')->returns($builder);
+        $builder->expects('useWritePdo')->returns($builder);
+        $builder->expects('where')->returns($builder);
+        $builder->expects('first')
+            ->returns($m = (object) [
                 'id' => '',
                 'name' => '',
                 'total_jobs' => '',
@@ -731,7 +736,7 @@ class BusBatchTest extends TestCase
         $batch = (new DatabaseBatchRepository($factory, $connection, 'job_batches'));
 
         $factory->expects('make')
-            ->withSomeOfArgs($batch, '', '', '', '', '', '', $options);
+            ->with($batch, Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any(), $options, Argument::remaining());
 
         $batch->find('1');
     }

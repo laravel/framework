@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Tests\Database\Fixtures\EloquentBuilderStub;
 use JMac\Testing\Double;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -139,7 +140,7 @@ class DatabaseEloquentMorphTest extends TestCase
 
     protected function getManyRelation()
     {
-        $builder = Double::for(Builder::class);
+        $builder = Double::for(EloquentBuilderStub::class);
         $builder->expects('whereNotNull')->with('table.morph_id');
         $builder->expects('where')->with('table.morph_id', '=', 1);
         $related = new EloquentMorphResetModelStub;
@@ -160,7 +161,7 @@ class DatabaseEloquentMorphTest extends TestCase
             $alias => EloquentModelNamespacedStub::class,
         ]);
 
-        $builder = Double::for(Builder::class);
+        $builder = Double::for(EloquentBuilderStub::class);
         $builder->expects('whereNotNull')->with('table.morph_id');
         $builder->expects('where')->with('table.morph_id', '=', 1);
         $related = new EloquentMorphResetModelStub;

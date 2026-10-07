@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Tests\Database\Fixtures\EloquentBuilderStub;
 use JMac\Testing\Double;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
@@ -43,7 +43,7 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         $parent->allows('getUpdatedAtColumn')->returns('updated_at');
         $parent->allows('getAttribute')->with('id')->returns(1);
 
-        $builder = Double::for(Builder::class);
+        $builder = Double::for(EloquentBuilderStub::class);
         $related = Double::for(Model::class);
         $builder->allows('getModel')->returns($related);
 

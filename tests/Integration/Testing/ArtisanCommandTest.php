@@ -348,6 +348,7 @@ class ArtisanCommandTest extends TestCase
      */
     protected function verifyMockeryExpectationsNow(): void
     {
+        Mockery::close();
     }
 
     /**
@@ -363,6 +364,7 @@ class ArtisanCommandTest extends TestCase
             $callback();
         } finally {
             try {
+                Mockery::close();
             } catch (InvalidCountException) {
                 // Ignore mock exception from PendingCommand::expectsOutput().
             }

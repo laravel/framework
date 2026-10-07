@@ -11,6 +11,7 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Tests\Database\Fixtures\EloquentBuilderStub;
 use JMac\Testing\Double;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -48,7 +49,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope = new SoftDeletingScope;
         $scope->extend($builder);
         $callback = $builder->getMacro('restoreOrCreate');
-        $givenBuilder = Double::for(EloquentBuilder::class);
+        $givenBuilder = Double::for(EloquentBuilderStub::class);
         $givenBuilder->expects('withTrashed');
         $attributes = ['name' => 'foo'];
         $values = ['email' => 'bar'];
@@ -72,7 +73,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope = new SoftDeletingScope;
         $scope->extend($builder);
         $callback = $builder->getMacro('createOrRestore');
-        $givenBuilder = Double::for(EloquentBuilder::class);
+        $givenBuilder = Double::for(EloquentBuilderStub::class);
         $givenBuilder->expects('withTrashed');
         $attributes = ['name' => 'foo'];
         $values = ['email' => 'bar'];

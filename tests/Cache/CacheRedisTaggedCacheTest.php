@@ -16,18 +16,24 @@ class CacheRedisTaggedCacheTest extends TestCase
     {
         [$cache, $store, $tags, $itemKey] = $this->getCache();
 
+        $calls = [];
+
         $store->expects($storeMethod)
             ->with($itemKey, ...$storeArguments)
-            ->once()
-            ->globally()->ordered()
-            ->andReturn($result);
+            ->resolves(function () use (&$calls, $result) {
+                $calls[] = 'store';
+
+                return $result;
+            });
 
         $tags->expects('addEntry')
             ->with($itemKey, ...$tagArguments)
-            ->once()
-            ->globally()->ordered();
+            ->resolves(function () use (&$calls) {
+                $calls[] = 'tags';
+            });
 
         $this->assertSame($result, $cache->{$method}('key', ...$arguments));
+        $this->assertSame(['store', 'tags'], $calls);
     }
 
     public static function successfulWrites(): array

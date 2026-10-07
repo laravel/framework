@@ -31,7 +31,7 @@ class SupportTestingMailFakeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mailManager = Double::for(MailManager::class);
+        $this->mailManager = Double::for(MailManagerStub::class);
         $this->mailManager->expects('getDefaultDriver')->returns('smtp');
         $this->fake = new MailFake($this->mailManager);
         $this->mailable = new MailableStub;
@@ -575,5 +575,13 @@ class LocalizedRecipientStub implements HasLocalePreference
     public function preferredLocale()
     {
         return 'au';
+    }
+}
+
+class MailManagerStub extends MailManager
+{
+    public function foo()
+    {
+        //
     }
 }

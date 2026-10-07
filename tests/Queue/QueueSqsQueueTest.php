@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Queue;
 
 use Aws\Result;
 use Aws\Sqs\Exception\SqsException;
-use Aws\Sqs\SqsClient;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
@@ -27,6 +26,7 @@ use Illuminate\Tests\Queue\Fixtures\FakeSqsJob;
 use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithDeduplication;
 use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithDelayAttribute;
 use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithMessageGroup;
+use Illuminate\Tests\Queue\Fixtures\SqsClientStub;
 use JMac\Testing\Double;
 use JMac\Testing\Matching\Argument;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -60,7 +60,7 @@ class QueueSqsQueueTest extends TestCase
     protected function setUp(): void
     {
         // Use Mockery to mock the SqsClient
-        $this->sqs = Double::for(SqsClient::class);
+        $this->sqs = Double::for(SqsClientStub::class);
 
         $this->account = '1234567891011';
         $this->queueName = 'emails';
@@ -118,7 +118,7 @@ class QueueSqsQueueTest extends TestCase
         $container->allows('bound')->with('queue.routes')->returns(true);
         $container->allows('offsetGet')->with('queue.routes')->returns(new QueueRoutes());
 
-        return $container->instance();
+        return $container;
     }
 
     public function testPopProperlyPopsJobOffOfSqs()
@@ -399,12 +399,13 @@ class QueueSqsQueueTest extends TestCase
         $pendingDispatch = FakeSqsJob::dispatch();
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
-        $queue->setContainer($container = $this->createSpyContainer());
+        $container = $this->createSpyContainer();
+        $queue->setContainer($container->instance());
         $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->queueName, '')->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->queueUrl);
         $this->sqs->expects('sendMessage')->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->returns($this->mockedSendMessageResponseModel);
 
-        $dispatcher = new Dispatcher($container, fn () => $queue);
+        $dispatcher = new Dispatcher($container->instance(), fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
 
         // Destroy object to trigger dispatch.
@@ -433,12 +434,13 @@ class QueueSqsQueueTest extends TestCase
         $pendingDispatch = FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
-        $queue->setContainer($container = $this->createSpyContainer());
+        $container = $this->createSpyContainer();
+        $queue->setContainer($container->instance());
         $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->queueName, '')->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->queueUrl);
         $this->sqs->expects('sendMessage')->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId])->returns($this->mockedSendMessageResponseModel);
 
-        $dispatcher = new Dispatcher($container, fn () => $queue);
+        $dispatcher = new Dispatcher($container->instance(), fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
 
         // Destroy object to trigger dispatch.
@@ -653,7 +655,8 @@ class QueueSqsQueueTest extends TestCase
         $pendingDispatch = FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $queue->setContainer($container = $this->createSpyContainer());
+        $container = $this->createSpyContainer();
+        $queue->setContainer($container->instance());
         $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->fifoQueueName, '')->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->fifoQueueUrl);
         $this->sqs->expects('sendMessage')->with([
@@ -663,7 +666,7 @@ class QueueSqsQueueTest extends TestCase
             'MessageDeduplicationId' => $this->mockedDeduplicationId,
         ])->returns($this->mockedSendMessageResponseModel);
 
-        $dispatcher = new Dispatcher($container, fn () => $queue);
+        $dispatcher = new Dispatcher($container->instance(), fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
 
         // Destroy object to trigger dispatch.
@@ -681,7 +684,8 @@ class QueueSqsQueueTest extends TestCase
         $pendingDispatch = FakeSqsJobWithDeduplication::dispatch()->onGroup($this->mockedMessageGroupId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $queue->setContainer($container = $this->createSpyContainer());
+        $container = $this->createSpyContainer();
+        $queue->setContainer($container->instance());
         $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->fifoQueueName, '')->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->fifoQueueUrl);
         $this->sqs->expects('sendMessage')->with([
@@ -691,7 +695,7 @@ class QueueSqsQueueTest extends TestCase
             'MessageDeduplicationId' => $this->mockedDeduplicationId,
         ])->returns($this->mockedSendMessageResponseModel);
 
-        $dispatcher = new Dispatcher($container, fn () => $queue);
+        $dispatcher = new Dispatcher($container->instance(), fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
 
         // Destroy object to trigger dispatch.
@@ -718,7 +722,8 @@ class QueueSqsQueueTest extends TestCase
         });
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $queue->setContainer($container = $this->createSpyContainer());
+        $container = $this->createSpyContainer();
+        $queue->setContainer($container->instance());
         $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->fifoQueueName, '')->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->fifoQueueUrl);
         $this->sqs->expects('sendMessage')->with([
@@ -728,7 +733,7 @@ class QueueSqsQueueTest extends TestCase
             'MessageDeduplicationId' => $this->mockedDeduplicationId,
         ])->returns($this->mockedSendMessageResponseModel);
 
-        $dispatcher = new Dispatcher($container, fn () => $queue);
+        $dispatcher = new Dispatcher($container->instance(), fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
 
         // Destroy object to trigger dispatch.
@@ -749,9 +754,10 @@ class QueueSqsQueueTest extends TestCase
         });
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $queue->setContainer($container = $this->createSpyContainer());
+        $container = $this->createSpyContainer();
+        $queue->setContainer($container->instance());
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->fifoQueueUrl);
-        $this->sqs->expects('sendMessage')->withArgs(function ($args) {
+        $this->sqs->expects('sendMessage')->with(Argument::satisfies(function ($args) {
             $this->assertIsArray($args);
             $this->assertEqualsCanonicalizing(['QueueUrl', 'MessageBody', 'MessageGroupId', 'MessageDeduplicationId'], array_keys($args));
             $this->assertEquals($this->fifoQueueUrl, $args['QueueUrl']);
@@ -764,9 +770,9 @@ class QueueSqsQueueTest extends TestCase
             $this->assertInstanceOf(SerializableClosure::class, $command->deduplicator);
 
             return true;
-        })->andReturn($this->mockedSendMessageResponseModel);
+        }))->returns($this->mockedSendMessageResponseModel);
 
-        $dispatcher = new Dispatcher($container, fn () => $queue);
+        $dispatcher = new Dispatcher($container->instance(), fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
 
         // Destroy object to trigger dispatch.
@@ -830,7 +836,8 @@ class QueueSqsQueueTest extends TestCase
         $pendingDispatch = FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId)->delay($this->mockedDelay);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
-        $queue->setContainer($container = $this->createSpyContainer());
+        $container = $this->createSpyContainer();
+        $queue->setContainer($container->instance());
         $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->fifoQueueName, '')->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->fifoQueueUrl);
         $this->sqs->expects('sendMessage')->with([
@@ -840,7 +847,7 @@ class QueueSqsQueueTest extends TestCase
             'MessageDeduplicationId' => $this->mockedDeduplicationId,
         ])->returns($this->mockedSendMessageResponseModel);
 
-        $dispatcher = new Dispatcher($container, fn () => $queue);
+        $dispatcher = new Dispatcher($container->instance(), fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
 
         // Destroy object to trigger dispatch.

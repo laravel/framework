@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Tests\Database\Fixtures\EloquentBuilderStub;
 use JMac\Testing\Double;
 use JMac\Testing\DoubleInterface;
 use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
@@ -114,7 +115,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $parent->allows('getMorphClass')->returns(get_class($parent));
         $parent->allows('getAttribute')->with('id')->returns(1);
 
-        $builder = Double::for(Builder::class);
+        $builder = Double::for(EloquentBuilderStub::class);
         $related = Double::for(Model::class);
         $builder->allows('getModel')->returns($related);
 

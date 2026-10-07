@@ -33,11 +33,11 @@ class ViewTest extends TestCase
     public function testRenderProperlyRendersView()
     {
         $view = $this->getView(['foo' => 'bar']);
-        $view->getFactory()->expects('incrementRender')->inOrder();
-        $view->getFactory()->expects('callComposer')->inOrder()->with($view);
+        $view->getFactory()->expects('incrementRender')->ordered();
+        $view->getFactory()->expects('callComposer')->ordered()->with($view);
         $view->getFactory()->expects('getShared')->returns(['shared' => 'foo']);
-        $view->getEngine()->expects('get')->with('path', ['foo' => 'bar', 'shared' => 'foo'])->returns('contents');
-        $view->getFactory()->expects('decrementRender')->inOrder();
+        $view->getEngine()->expects('get')->with('path', ['shared' => 'foo', 'foo' => 'bar'])->returns('contents');
+        $view->getFactory()->expects('decrementRender')->ordered();
         $view->getFactory()->expects('flushStateIfDoneRendering');
 
         $callback = function (View $rendered, $contents) use ($view) {
@@ -90,7 +90,7 @@ class ViewTest extends TestCase
         $view->getFactory()->expects('incrementRender')->times(2);
         $view->getFactory()->expects('callComposer')->times(2)->with($view);
         $view->getFactory()->expects('getShared')->times(2)->returns(['shared' => 'foo']);
-        $view->getEngine()->expects('get')->times(2)->with('path', ['foo' => 'bar', 'shared' => 'foo'])->returns('contents');
+        $view->getEngine()->expects('get')->times(2)->with('path', ['shared' => 'foo', 'foo' => 'bar'])->returns('contents');
         $view->getFactory()->expects('decrementRender')->times(2);
         $view->getFactory()->expects('flushStateIfDoneRendering')->times(2);
 
@@ -182,11 +182,11 @@ class ViewTest extends TestCase
     public function testViewGatherDataWithRenderable()
     {
         $view = $this->getView();
-        $view->getFactory()->expects('incrementRender')->inOrder();
-        $view->getFactory()->expects('callComposer')->inOrder()->with($view);
+        $view->getFactory()->expects('incrementRender')->ordered();
+        $view->getFactory()->expects('callComposer')->ordered()->with($view);
         $view->getFactory()->expects('getShared')->returns(['shared' => 'foo']);
         $view->getEngine()->expects('get')->returns('contents');
-        $view->getFactory()->expects('decrementRender')->inOrder();
+        $view->getFactory()->expects('decrementRender')->ordered();
         $view->getFactory()->expects('flushStateIfDoneRendering');
 
         $view->renderable = Double::for(Renderable::class);
@@ -197,11 +197,11 @@ class ViewTest extends TestCase
     public function testViewRenderSections()
     {
         $view = $this->getView();
-        $view->getFactory()->expects('incrementRender')->inOrder();
-        $view->getFactory()->expects('callComposer')->inOrder()->with($view);
+        $view->getFactory()->expects('incrementRender')->ordered();
+        $view->getFactory()->expects('callComposer')->ordered()->with($view);
         $view->getFactory()->expects('getShared')->returns(['shared' => 'foo']);
         $view->getEngine()->expects('get')->returns('contents');
-        $view->getFactory()->expects('decrementRender')->inOrder();
+        $view->getFactory()->expects('decrementRender')->ordered();
         $view->getFactory()->expects('flushStateIfDoneRendering');
 
         $view->getFactory()->expects('getSections')->returns(['foo', 'bar']);

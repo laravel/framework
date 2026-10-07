@@ -235,7 +235,6 @@ class CacheRepositoryTest extends TestCase
     public function testAddWithStoreFailureReturnsFalse()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->expects('add')->never();
         $repo->getStore()->expects('get')->returns(null);
         $repo->getStore()->expects('put')->returns(false);
         $this->assertFalse($repo->add('foo', 'bar', 60));
@@ -290,7 +289,8 @@ class CacheRepositoryTest extends TestCase
     public function testAddWithDatetimeInPastOrZeroSecondsReturnsImmediately()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('add', 'get', 'put')->never();
+        $repo->getStore()->expects('get')->never();
+        $repo->getStore()->expects('put')->never();
         $result = $repo->add('foo', 'bar', Carbon::now()->subMinutes(10));
         $this->assertFalse($result);
         $result = $repo->add('foo', 'bar', Carbon::now());

@@ -51,9 +51,8 @@ class JsonResourceTest extends TestCase
 
     public function testJsonResourceToPrettyPrint(): void
     {
-        $resource = Double::for(JsonResource::class)->passthru()
-            ->expects('jsonSerialize')->times(3)->andReturn(['foo' => 'bar', 'bar' => 'foo', 'number' => 123])
-            ->getMock();
+        $resource = Double::for(JsonResource::class)->passthru();
+        $resource->expects('jsonSerialize')->times(3)->returns(['foo' => 'bar', 'bar' => 'foo', 'number' => 123]);
 
         $results = $resource->toPrettyJson();
         $expected = $resource->toJson(JSON_PRETTY_PRINT);

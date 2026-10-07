@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Facade;
 use JMac\Testing\Double;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class InteractsWithDatabaseTest extends TestCase
@@ -146,9 +147,11 @@ class InteractsWithDatabaseTest extends TestCase
             return new Expression($value);
         });
 
-        $connection->shouldReceive('getPdo->quote')->andReturnUsing(function ($value) {
+        $pdo = Double::for(PDO::class);
+        $pdo->allows('quote')->resolves(function ($value) {
             return "'".$value."'";
         });
+        $connection->allows('getPdo')->returns($pdo);
 
         $resolver = new ConnectionResolver(['default' => $connection]);
         $resolver->setDefaultConnection('default');

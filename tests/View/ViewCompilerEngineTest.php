@@ -143,15 +143,14 @@ class ViewCompilerEngineTest extends TestCase
         $files = Double::for(Filesystem::class);
         $engine = $this->getEngine($files);
 
-        $files->expects('getRequire')->with($compiled, [])->returns('compiled-content');
+        $requires = 0;
+        $files->expects('getRequire')->times(3)->with($compiled, [])->resolves(function () use (&$requires, $path) {
+            if ($requires++ === 0) {
+                return 'compiled-content';
+            }
 
-        $files->expects('getRequire')->with($compiled, [])->throws(new FileNotFoundException(
-            "File does not exist at path {$path}."
-        ));
-
-        $files->expects('getRequire')->with($compiled, [])->throws(new FileNotFoundException(
-            "File does not exist at path {$path}."
-        ));
+            throw new FileNotFoundException("File does not exist at path {$path}.");
+        });
 
         $engine->getCompiler()->expects('getCompiledPath')->times(3)->with($path)->returns($compiled);
 

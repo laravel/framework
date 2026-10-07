@@ -64,7 +64,7 @@ class ConsoleApplicationTest extends TestCase
     {
         $artisan = $this->getMockConsole(['addToParent']);
         $command = new SymfonyCommand('foo');
-        $artisan->getLaravel()->expects('make')->with('foo')->returns(new SymfonyCommand('foo'));
+        $this->laravel->expects('make')->with('foo')->returns(new SymfonyCommand('foo'));
         $artisan->expects($this->once())->method('addToParent')->with($command)->willReturn($command);
         $result = $artisan->resolve('foo');
 
@@ -300,9 +300,11 @@ class ConsoleApplicationTest extends TestCase
         }
     }
 
+    protected $laravel;
+
     protected function getMockConsole(array $methods)
     {
-        $app = Double::for(ApplicationContract::class, override: true);
+        $app = $this->laravel = Double::for(ApplicationContract::class, override: true);
         $app->allows('version')->returns('6.0');
         $events = new EventsDispatcher;
 

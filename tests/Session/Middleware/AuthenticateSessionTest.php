@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Session\Middleware;
 
 use BadMethodCallException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Http\Request;
 use Illuminate\Session\ArraySessionHandler;
@@ -19,7 +20,7 @@ class AuthenticateSessionTest extends TestCase
         $request = new Request;
         $next = fn () => 'next-1';
 
-        $authFactory = Double::for(AuthFactory::class);
+        $authFactory = Double::for(AuthenticateSessionTestAuth::class);
         $authFactory->expects('viaRemember')->never();
 
         $middleware = new AuthenticateSession($authFactory);
@@ -34,7 +35,7 @@ class AuthenticateSessionTest extends TestCase
         // set session:
         $request->setLaravelSession(new Store('name', new ArraySessionHandler(1)));
 
-        $authFactory = Double::for(AuthFactory::class);
+        $authFactory = Double::for(AuthenticateSessionTestAuth::class);
         $authFactory->expects('viaRemember')->never();
 
         $next = fn () => 'next-2';
@@ -60,7 +61,7 @@ class AuthenticateSessionTest extends TestCase
         // set a password-less user:
         $request->setUserResolver(fn () => $user);
 
-        $authFactory = Double::for(AuthFactory::class);
+        $authFactory = Double::for(AuthenticateSessionTestAuth::class);
         $authFactory->expects('viaRemember')->never();
 
         $next = fn () => 'next-3';
@@ -86,7 +87,7 @@ class AuthenticateSessionTest extends TestCase
         $session = new Store('name', new ArraySessionHandler(1));
         $request->setLaravelSession($session);
 
-        $authFactory = Double::for(AuthFactory::class);
+        $authFactory = Double::for(AuthenticateSessionTestAuth::class);
         $authFactory->expects('viaRemember')->returns(false);
         $authFactory->expects('getDefaultDriver')->times(3)->returns('web');
         $authFactory->expects('user')->returns(null);
@@ -119,7 +120,7 @@ class AuthenticateSessionTest extends TestCase
         // set session:
         $request->setLaravelSession($session);
 
-        $authFactory = Double::for(AuthFactory::class);
+        $authFactory = Double::for(AuthenticateSessionTestAuth::class);
         $authFactory->expects('viaRemember')->returns(true);
         $authFactory->expects('getRecallerName')->returns('recaller-name');
         $authFactory->expects('logoutCurrentDevice')->returns(null);
@@ -167,7 +168,7 @@ class AuthenticateSessionTest extends TestCase
         // set session:
         $request->setLaravelSession($session);
 
-        $authFactory = Double::for(AuthFactory::class);
+        $authFactory = Double::for(AuthenticateSessionTestAuth::class);
         $authFactory->expects('viaRemember')->returns(true);
         $authFactory->expects('getRecallerName')->returns('recaller-name');
         $authFactory->expects('logoutCurrentDevice');
@@ -211,7 +212,7 @@ class AuthenticateSessionTest extends TestCase
         // set session on the request:
         $request->setLaravelSession($session);
 
-        $authFactory = Double::for(AuthFactory::class);
+        $authFactory = Double::for(AuthenticateSessionTestAuth::class);
         $authFactory->expects('viaRemember')->returns(true);
         $authFactory->expects('getRecallerName')->returns('recaller-name');
         $authFactory->expects('logoutCurrentDevice')->returns(null);
@@ -255,7 +256,7 @@ class AuthenticateSessionTest extends TestCase
         // set session on the request:
         $request->setLaravelSession($session);
 
-        $authFactory = Double::for(AuthFactory::class);
+        $authFactory = Double::for(AuthenticateSessionTestAuth::class);
         $authFactory->expects('viaRemember')->returns(false);
         $authFactory->expects('getRecallerName')->never();
         $authFactory->expects('logoutCurrentDevice')->never();
@@ -296,7 +297,7 @@ class AuthenticateSessionTest extends TestCase
         $session->put('password_hash_web', 'my-pass-(*&^%$#!@');
         $request->setLaravelSession($session);
 
-        $authFactory = Double::for(AuthFactory::class);
+        $authFactory = Double::for(AuthenticateSessionTestAuth::class);
         $authFactory->expects('viaRemember')->returns(true);
         $authFactory->expects('getRecallerName')->returns('recaller-name');
         $authFactory->expects('getDefaultDriver')->times(3)->returns('web');
@@ -336,13 +337,13 @@ class AuthenticateSessionTest extends TestCase
         $session->put('password_hash_web', 'my-pass-(*&^%$#!@');
         $request->setLaravelSession($session);
 
-        $authFactory = Double::for(AuthFactory::class);
+        $authFactory = Double::for(AuthenticateSessionTestAuth::class);
         $authFactory->expects('viaRemember')->returns(true);
         $authFactory->expects('getRecallerName')->returns('recaller-name');
         $authFactory->expects('getDefaultDriver')->times(3)->returns('web');
         $authFactory->expects('user')->returns($user);
         // For legacy guards without hashPasswordForCookie method, we use fallback to raw hash
-        $authFactory->expects('hashPasswordForCookie')->times(3)->andThrowExceptions([new BadMethodCallException]);
+        $authFactory->expects('hashPasswordForCookie')->times(3)->throws(new BadMethodCallException);
 
         $middleware = new AuthenticateSession($authFactory);
         $response = $middleware->handle($request, fn () => 'next-9');
@@ -353,5 +354,23 @@ class AuthenticateSessionTest extends TestCase
         $this->assertSame('my-pass-(*&^%$#!@', $session->get('password_hash_web'));
         $this->assertSame('1', $session->get('a'));
         $this->assertSame('2', $session->get('b'));
+    }
+}
+
+abstract class AuthenticateSessionTestAuth extends SessionGuard implements AuthFactory
+{
+    public function guard($name = null)
+    {
+        //
+    }
+
+    public function shouldUse($name)
+    {
+        //
+    }
+
+    public function getDefaultDriver()
+    {
+        //
     }
 }

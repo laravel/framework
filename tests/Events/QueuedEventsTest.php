@@ -382,7 +382,7 @@ class QueuedEventsTest extends TestCase
         $d = new Dispatcher($container);
 
         $fakeQueue = new QueueFake($container);
-        $cache = Double::for(Cache::class);
+        $cache = Double::for(Cache::class, LockProvider::class);
         $lock = Double::for(Lock::class);
 
         $container->instance(Cache::class, $cache);
@@ -413,7 +413,7 @@ class QueuedEventsTest extends TestCase
         $d = new Dispatcher($container);
 
         $fakeQueue = new QueueFake($container);
-        $cache = Double::for(Cache::class);
+        $cache = Double::for(Cache::class, LockProvider::class);
         $lock = Double::for(Lock::class);
 
         $container->instance(Cache::class, $cache);
@@ -437,7 +437,7 @@ class QueuedEventsTest extends TestCase
         $d = new Dispatcher($container);
 
         $fakeQueue = new QueueFake($container);
-        $cache = Double::for(Cache::class);
+        $cache = Double::for(Cache::class, LockProvider::class);
         $lock = Double::for(Lock::class);
 
         $container->instance(Cache::class, $cache);
@@ -466,7 +466,7 @@ class QueuedEventsTest extends TestCase
         $d = new Dispatcher($container);
 
         $fakeQueue = new QueueFake($container);
-        $cache = Double::for(Cache::class);
+        $cache = Double::for(Cache::class, LockProvider::class);
         $lock = Double::for(Lock::class);
 
         $container->instance(Cache::class, $cache);
@@ -507,7 +507,7 @@ class QueuedEventsTest extends TestCase
         $d = new Dispatcher($container);
 
         $fakeQueue = new QueueFake($container);
-        $cache = Double::for(Cache::class);
+        $cache = Double::for(Cache::class, LockProvider::class);
         $lock = Double::for(Lock::class);
 
         $container->instance(Cache::class, $cache);
@@ -535,8 +535,8 @@ class QueuedEventsTest extends TestCase
         $d = new Dispatcher($container);
 
         $fakeQueue = new QueueFake($container);
-        $defaultCache = Double::for(Cache::class);
-        $uniqueCache = Double::for(Cache::class);
+        $defaultCache = Double::for(Cache::class, LockProvider::class);
+        $uniqueCache = Double::for(Cache::class, LockProvider::class);
         $lock = Double::for(Lock::class);
 
         $container->instance(Cache::class, $defaultCache);
@@ -565,7 +565,7 @@ class QueuedEventsTest extends TestCase
     public function testUniqueLockIsReleasedOnProcessingWithListenerClassName()
     {
         $container = new Container;
-        $cache = Double::for(Cache::class);
+        $cache = Double::for(Cache::class, LockProvider::class);
         $lock = Double::for(Lock::class);
 
         $container->instance(Cache::class, $cache);
@@ -592,7 +592,7 @@ class QueuedEventsTest extends TestCase
     public function testUniqueUntilProcessingLockIsReleasedBeforeHandling()
     {
         $container = new Container;
-        $cache = Double::for(Cache::class);
+        $cache = Double::for(Cache::class, LockProvider::class);
         $lock = Double::for(Lock::class);
 
         $container->instance(Cache::class, $cache);
@@ -692,8 +692,8 @@ class QueuedEventsTest extends TestCase
         $container->instance(Cache::class, $cache);
 
         $factory->expects('connection')->times(2)->with(null)->returns($queue);
-        $queue->expects('laterOn')->with(null, 30, Argument::type(CallQueuedListener::class))->inOrder();
-        $queue->expects('laterOn')->with(null, 0, Argument::type(CallQueuedListener::class))->inOrder();
+        $queue->expects('laterOn')->with(null, 30, Argument::type(CallQueuedListener::class))->ordered();
+        $queue->expects('laterOn')->with(null, 0, Argument::type(CallQueuedListener::class))->ordered();
 
         $d->setQueueResolver(function () use ($factory) {
             return $factory;
@@ -746,7 +746,7 @@ class QueuedEventsTest extends TestCase
         $d = new Dispatcher($container);
 
         $fakeQueue = new QueueFake($container);
-        $cache = Double::for(Cache::class);
+        $cache = Double::for(Cache::class, LockProvider::class);
 
         $cache->expects('put')->never();
         $cache->expects('lock')->never();

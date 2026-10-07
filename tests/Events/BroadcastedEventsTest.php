@@ -12,6 +12,7 @@ use Illuminate\Tests\Events\Fixtures\ExampleEvent;
 use JMac\Testing\Double;
 use JMac\Testing\Matching\Argument;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class BroadcastedEventsTest extends TestCase
 {
@@ -170,7 +171,7 @@ class BroadcastedEventsTest extends TestCase
         Container::setInstance($container);
 
         try {
-            $pendingBroadcast = Double::for(PendingBroadcast::class);
+            $pendingBroadcast = new PendingBroadcastWithoutDestructor(new Dispatcher, new stdClass);
 
             $broadcast->expects('event')->with(Argument::satisfies(function ($event) {
                 $this->assertInstanceOf(BroadcastableNamedArgumentsEvent::class, $event);
@@ -187,6 +188,14 @@ class BroadcastedEventsTest extends TestCase
         } finally {
             Container::setInstance($originalContainer);
         }
+    }
+}
+
+class PendingBroadcastWithoutDestructor extends PendingBroadcast
+{
+    public function __destruct()
+    {
+        // Prevent the event from being dispatched
     }
 }
 

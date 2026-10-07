@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Tests\Database\Concerns\RestoresConnectionResolver;
 use JMac\Testing\Double;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class AuthEloquentUserProviderTest extends TestCase
@@ -107,8 +106,8 @@ class AuthEloquentUserProviderTest extends TestCase
         $hasher = Double::for(Hasher::class);
         $hasher->expects('check')->never();
         $provider = new EloquentUserProvider($hasher, 'foo');
-        $user = Mockery::mock(Authenticatable::class);
-        $user->expects('getAuthPassword')->andReturn(null);
+        $user = Double::for(Authenticatable::class);
+        $user->expects('getAuthPassword')->returns(null);
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
         $this->assertFalse($result);

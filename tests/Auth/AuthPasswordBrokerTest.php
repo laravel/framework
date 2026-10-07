@@ -10,7 +10,6 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Arr;
 use JMac\Testing\Double;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
@@ -56,7 +55,7 @@ class AuthPasswordBrokerTest extends TestCase
     public function testBrokerCreatesTokenAndRedirectsWithoutError()
     {
         $broker = $this->getBroker($mocks = $this->getMocks());
-        $user = Mockery::mock(CanResetPassword::class);
+        $user = Double::for(CanResetPassword::class);
         $mocks['users']->expects('retrieveByCredentials')->with(['foo'])->returns($user);
         $mocks['tokens']->expects('recentlyCreatedToken')->with($user)->returns(false);
         $mocks['tokens']->expects('create')->with($user)->returns('token');

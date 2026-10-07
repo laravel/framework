@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Tests\Database\Fixtures\EloquentBuilderStub;
 use JMac\Testing\Double;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -178,7 +179,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     protected function getRelation()
     {
-        $this->builder = Double::for(Builder::class);
+        $this->builder = Double::for(EloquentBuilderStub::class);
         $this->builder->allows('whereNotNull')->with('table.foreign_key');
         $this->builder->allows('where')->with('table.foreign_key', '=', 1);
         $this->related = Double::for(Model::class);
