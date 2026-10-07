@@ -5,10 +5,13 @@ namespace Illuminate\Tests\Session;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Session\CookieSessionHandler;
 use Illuminate\Session\Store;
+use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
+use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SessionHandlerInterface;
@@ -829,6 +832,359 @@ class SessionStoreTest extends TestCase
         });
 
         $this->assertSame('macroable', $this->getSession()->foo());
+    }
+
+    public function testItGetsAsString()
+    {
+        $session = $this->getSession();
+        $session->put('foo', 'bar');
+
+        $this->assertSame('bar', $session->string('foo'));
+    }
+
+    public function testItGetsAsStringWithDefault()
+    {
+        $this->assertSame('default', $this->getSession()->string('foo', 'default'));
+    }
+
+    public function testItGetsAsInteger()
+    {
+        $session = $this->getSession();
+        $session->put('foo', 123);
+
+        $this->assertSame(123, $session->integer('foo'));
+    }
+
+    public function testItGetsAsIntegerWithDefault()
+    {
+        $this->assertSame(456, $this->getSession()->integer('foo', 456));
+    }
+
+    public function testItGetsAsIntegerFromNumericString()
+    {
+        $session = $this->getSession();
+        $session->put('foo', '123');
+
+        $this->assertSame(123, $session->integer('foo'));
+    }
+
+    public function testItGetsAsIntegerAfterIncrement()
+    {
+        $session = $this->getSession();
+        $session->increment('foo');
+        $session->increment('foo');
+
+        $this->assertSame(2, $session->integer('foo'));
+    }
+
+    public function testItGetsAsFloat()
+    {
+        $session = $this->getSession();
+        $session->put('foo', 1.5);
+
+        $this->assertSame(1.5, $session->float('foo'));
+    }
+
+    public function testItGetsAsFloatWithDefault()
+    {
+        $this->assertSame(2.5, $this->getSession()->float('foo', 2.5));
+    }
+
+    public function testItGetsAsFloatFromNumericString()
+    {
+        $session = $this->getSession();
+        $session->put('foo', '1.5');
+
+        $this->assertSame(1.5, $session->float('foo'));
+    }
+
+    public function testItGetsAsFloatFromInteger()
+    {
+        $session = $this->getSession();
+        $session->put('foo', 2);
+
+        $this->assertSame(2.0, $session->float('foo'));
+    }
+
+    public function testItGetsAsBoolean()
+    {
+        $session = $this->getSession();
+        $session->put('foo', true);
+
+        $this->assertTrue($session->boolean('foo'));
+    }
+
+    public function testItGetsAsBooleanFalse()
+    {
+        $session = $this->getSession();
+        $session->put('foo', false);
+
+        $this->assertFalse($session->boolean('foo', true));
+    }
+
+    public function testItGetsAsBooleanWithDefault()
+    {
+        $this->assertFalse($this->getSession()->boolean('foo', false));
+    }
+
+    public function testItGetsAsArray()
+    {
+        $session = $this->getSession();
+        $session->put('foo', ['bar', 'baz']);
+
+        $this->assertSame(['bar', 'baz'], $session->array('foo'));
+    }
+
+    public function testItGetsAsArrayWithDefault()
+    {
+        $this->assertSame(['default'], $this->getSession()->array('foo', ['default']));
+    }
+
+    public function testItGetsAsEmptyArray()
+    {
+        $session = $this->getSession();
+        $session->put('foo', []);
+
+        $this->assertSame([], $session->array('foo', ['default']));
+    }
+
+    public function testItGetsAsCollection()
+    {
+        $session = $this->getSession();
+        $session->put('foo', ['a', 'b']);
+
+        $collection = $session->collection('foo');
+
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertSame(['a', 'b'], $collection->all());
+    }
+
+    public function testTypedGettersSupportDotNotation()
+    {
+        $session = $this->getSession();
+        $session->put('user.age', 30);
+
+        $this->assertSame(30, $session->integer('user.age'));
+    }
+
+    public function testTypedGettersSupportEnumKeys()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'taylor');
+
+        $this->assertSame('taylor', $session->string(SessionTestKey::User));
+    }
+
+    public function testTypedGettersSupportClosureDefaults()
+    {
+        $this->assertSame('lazy', $this->getSession()->string('foo', fn () => 'lazy'));
+    }
+
+    public function testTypedGettersWorkWithFlashData()
+    {
+        $session = $this->getSession();
+        $session->flash('status', 'saved');
+
+        $this->assertSame('saved', $session->string('status'));
+    }
+
+    public function testGetStillReturnsRawValueWithoutCoercion()
+    {
+        $session = $this->getSession();
+        $session->put('foo', '123');
+
+        $this->assertSame(123, $session->integer('foo'));
+        $this->assertSame('123', $session->get('foo'));
+    }
+
+    #[DataProvider('serializationProvider')]
+    public function testTypedGettersSurviveSerializationRoundTrip($serialization)
+    {
+        $session = $this->getSession($serialization);
+        $session->getHandler()->allows('read')->andReturn('');
+        $session->start();
+        $session->put([
+            'string' => 'bar',
+            'integer' => 123,
+            'float' => 2.0,
+            'boolean' => true,
+            'array' => ['a' => 1],
+        ]);
+
+        $payload = null;
+        $session->getHandler()->expects('write')->withArgs(function ($id, $data) use (&$payload) {
+            $payload = $data;
+
+            return true;
+        })->andReturn(true);
+        $session->save();
+
+        $restored = $this->getSession($serialization);
+        $restored->getHandler()->expects('read')->with($this->getSessionId())->andReturn($payload);
+        $restored->start();
+
+        $this->assertSame('bar', $restored->string('string'));
+        $this->assertSame(123, $restored->integer('integer'));
+        $this->assertSame(2.0, $restored->float('float'));
+        $this->assertTrue($restored->boolean('boolean'));
+        $this->assertSame(['a' => 1], $restored->array('array'));
+    }
+
+    public static function serializationProvider()
+    {
+        return [
+            'php' => ['php'],
+            'json' => ['json'],
+        ];
+    }
+
+    public function testItThrowsExceptionWhenGettingNonStringAsString()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Session value for key [foo] must be a string, integer given.'));
+
+        $session = $this->getSession();
+        $session->put('foo', 123);
+        $session->string('foo');
+    }
+
+    public function testItThrowsExceptionWhenGettingNonIntegerAsInteger()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Session value for key [foo] must be an integer, string given.'));
+
+        $session = $this->getSession();
+        $session->put('foo', 'bar');
+        $session->integer('foo');
+    }
+
+    public function testItThrowsExceptionWhenGettingFloatStringAsInteger()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Session value for key [foo] must be an integer, string given.'));
+
+        $session = $this->getSession();
+        $session->put('foo', '1.5');
+        $session->integer('foo');
+    }
+
+    public function testItThrowsExceptionWhenGettingFloatAsInteger()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Session value for key [foo] must be an integer, double given.'));
+
+        $session = $this->getSession();
+        $session->put('foo', 1.5);
+        $session->integer('foo');
+    }
+
+    public function testItThrowsExceptionWhenGettingNonFloatAsFloat()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Session value for key [foo] must be a float, string given.'));
+
+        $session = $this->getSession();
+        $session->put('foo', 'bar');
+        $session->float('foo');
+    }
+
+    public function testItThrowsExceptionWhenGettingStringAsBoolean()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Session value for key [foo] must be a boolean, string given.'));
+
+        $session = $this->getSession();
+        $session->put('foo', 'true');
+        $session->boolean('foo');
+    }
+
+    public function testItThrowsExceptionWhenGettingIntegerAsBoolean()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Session value for key [foo] must be a boolean, integer given.'));
+
+        $session = $this->getSession();
+        $session->put('foo', 1);
+        $session->boolean('foo');
+    }
+
+    public function testItThrowsExceptionWhenGettingNonArrayAsArray()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Session value for key [foo] must be an array, string given.'));
+
+        $session = $this->getSession();
+        $session->put('foo', 'bar');
+        $session->array('foo');
+    }
+
+    public function testItThrowsExceptionWhenGettingNonArrayAsCollection()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Session value for key [foo] must be an array, string given.'));
+
+        $session = $this->getSession();
+        $session->put('foo', 'bar');
+        $session->collection('foo');
+    }
+
+    #[DataProvider('typedGetterMethodProvider')]
+    public function testItThrowsExceptionWhenKeyIsMissingWithoutDefault($method, $type)
+    {
+        $this->expectExceptionObject(new InvalidArgumentException("Session value for key [foo] must be {$type}, NULL given."));
+
+        $this->getSession()->{$method}('foo');
+    }
+
+    #[DataProvider('typedGetterMethodProvider')]
+    public function testItThrowsExceptionWhenNullIsStored($method, $type)
+    {
+        $this->expectExceptionObject(new InvalidArgumentException("Session value for key [foo] must be {$type}, NULL given."));
+
+        $session = $this->getSession();
+        $session->put('foo', null);
+        $session->{$method}('foo');
+    }
+
+    public static function typedGetterMethodProvider()
+    {
+        return [
+            ['string', 'a string'],
+            ['integer', 'an integer'],
+            ['float', 'a float'],
+            ['boolean', 'a boolean'],
+            ['array', 'an array'],
+            ['collection', 'an array'],
+        ];
+    }
+
+    public function testExceptionMessageUsesEnumBackingValue()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Session value for key [user] must be a string, integer given.'));
+
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 123);
+        $session->string(SessionTestKey::User);
+    }
+
+    public function testItThrowsExceptionWhenDefaultIsWrongType()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('Session value for key [foo] must be an integer, string given.'));
+
+        $this->getSession()->integer('foo', 'nope');
+    }
+
+    #[DataProvider('typedGetterTypeMismatchProvider')]
+    public function testTypedGettersThrowOnTypeMismatch($method, $value, $message)
+    {
+        $this->expectExceptionObject(new InvalidArgumentException($message));
+
+        $session = $this->getSession();
+        $session->put('foo', $value);
+        $session->{$method}('foo');
+    }
+
+    public static function typedGetterTypeMismatchProvider()
+    {
+        return [
+            ['string', 123, 'Session value for key [foo] must be a string, integer given.'],
+            ['integer', 'bar', 'Session value for key [foo] must be an integer, string given.'],
+            ['float', 'bar', 'Session value for key [foo] must be a float, string given.'],
+            ['boolean', 'bar', 'Session value for key [foo] must be a boolean, string given.'],
+            ['array', 'bar', 'Session value for key [foo] must be an array, string given.'],
+            ['collection', 'bar', 'Session value for key [foo] must be an array, string given.'],
+        ];
     }
 
     public function getSession($serialization = 'php')

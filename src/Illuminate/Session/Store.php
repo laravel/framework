@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Uri;
 use Illuminate\Support\ViewErrorBag;
+use InvalidArgumentException;
 use RuntimeException;
 use SessionHandlerInterface;
 use stdClass;
@@ -345,6 +346,144 @@ class Store implements Session
     public function pull($key, $default = null)
     {
         return Arr::pull($this->attributes, enum_value($key), $default);
+    }
+
+    /**
+     * Get a string item from the session.
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  (\Closure():(string|null))|string|null  $default
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function string($key, $default = null): string
+    {
+        $key = enum_value($key);
+
+        $value = $this->get($key, $default);
+
+        if (! is_string($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Session value for key [%s] must be a string, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get an integer item from the session.
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  (\Closure():(int|null))|int|null  $default
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function integer($key, $default = null): int
+    {
+        $key = enum_value($key);
+
+        $value = $this->get($key, $default);
+
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_INT) !== false) {
+            return (int) $value;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf('Session value for key [%s] must be an integer, %s given.', $key, gettype($value))
+        );
+    }
+
+    /**
+     * Get a float item from the session.
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  (\Closure():(float|null))|float|null  $default
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function float($key, $default = null): float
+    {
+        $key = enum_value($key);
+
+        $value = $this->get($key, $default);
+
+        if (is_float($value)) {
+            return $value;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_FLOAT) !== false) {
+            return (float) $value;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf('Session value for key [%s] must be a float, %s given.', $key, gettype($value))
+        );
+    }
+
+    /**
+     * Get a boolean item from the session.
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  (\Closure():(bool|null))|bool|null  $default
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function boolean($key, $default = null): bool
+    {
+        $key = enum_value($key);
+
+        $value = $this->get($key, $default);
+
+        if (! is_bool($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Session value for key [%s] must be a boolean, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get an array item from the session.
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
+     * @return array<array-key, mixed>
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function array($key, $default = null): array
+    {
+        $key = enum_value($key);
+
+        $value = $this->get($key, $default);
+
+        if (! is_array($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Session value for key [%s] must be an array, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get an array item from the session as a collection.
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
+     * @return \Illuminate\Support\Collection<array-key, mixed>
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function collection($key, $default = null): Collection
+    {
+        return new Collection($this->array($key, $default));
     }
 
     /**
