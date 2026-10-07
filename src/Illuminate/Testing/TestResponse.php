@@ -64,7 +64,7 @@ class TestResponse implements ArrayAccess
     /**
      * The streamed content of the response.
      *
-     * @var string
+     * @var string|null
      */
     protected $streamedContent;
 
