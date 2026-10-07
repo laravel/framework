@@ -1006,14 +1006,14 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         string $prefix = ''
     ) {
         $connection = Double::for(Connection::class);
-        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
-        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
+        $connection->allows('getTablePrefix')->returns($prefix);
+        $connection->allows('getConfig')->with('prefix_indexes')->returns(null);
 
         $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-        $connection->shouldReceive('getSchemaBuilder')->andReturn($builder);
+        $connection->allows('getSchemaGrammar')->returns($grammar);
+        $connection->allows('getSchemaBuilder')->returns($builder);
 
         return $connection;
     }

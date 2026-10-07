@@ -15,10 +15,8 @@ class PhpRedisClusterConnectionTest extends TestCase
     public function testItScansStartingFromTheFirstMaster()
     {
         $client = Double::for(\RedisCluster::class);
-        $client->expects('_masters')->andReturn([['127.0.0.1', '6379']]);
-        $client->expects('scan')
-            ->with(0, ['127.0.0.1', '6379'], '*', 10)
-            ->andReturn(['key']);
+        $client->expects('_masters')->returns([['127.0.0.1', '6379']]);
+        $client->expects('scan')->with(0, ['127.0.0.1', '6379'], '*', 10)->returns(['key']);
 
         $connection = new PhpRedisClusterConnection($client);
         $this->assertEquals([0, ['key']], $connection->scan(0));
@@ -27,9 +25,7 @@ class PhpRedisClusterConnectionTest extends TestCase
     public function testItScansUsingOptionNode()
     {
         $client = Double::for(\RedisCluster::class);
-        $client->expects('scan')
-            ->with(0, 'option-node', '*', 10)
-            ->andReturn(['key']);
+        $client->expects('scan')->with(0, 'option-node', '*', 10)->returns(['key']);
 
         $connection = new PhpRedisClusterConnection($client);
         $this->assertEquals([0, ['key']], $connection->scan(0, ['node' => 'option-node']));
@@ -38,8 +34,8 @@ class PhpRedisClusterConnectionTest extends TestCase
     public function testItThrowsExceptionWithoutNodes()
     {
         $client = Double::for(\RedisCluster::class);
-        $client->expects('_masters')->andReturn([]);
-        $client->shouldNotReceive('scan');
+        $client->expects('_masters')->returns([]);
+        $client->expects('scan')->never();
 
         $this->expectExceptionObject(new InvalidArgumentException('No master nodes found in the cluster.'));
 
@@ -50,10 +46,8 @@ class PhpRedisClusterConnectionTest extends TestCase
     public function testItReturnsFalseWhenCursorIsZeroAndResultIsEmpty()
     {
         $client = Double::for(\RedisCluster::class);
-        $client->expects('_masters')->andReturn([['127.0.0.1', '6379']]);
-        $client->expects('scan')
-            ->with(0, ['127.0.0.1', '6379'], '*', 10)
-            ->andReturn(false);
+        $client->expects('_masters')->returns([['127.0.0.1', '6379']]);
+        $client->expects('scan')->with(0, ['127.0.0.1', '6379'], '*', 10)->returns(false);
 
         $connection = new PhpRedisClusterConnection($client);
         $this->assertFalse($connection->scan(0));
@@ -62,7 +56,7 @@ class PhpRedisClusterConnectionTest extends TestCase
     public function testItFlushesAllMasterNodes()
     {
         $client = Double::for(\RedisCluster::class);
-        $client->expects('_masters')->andReturn([
+        $client->expects('_masters')->returns([
             ['127.0.0.1', '6379'],
             ['127.0.0.2', '6379'],
         ]);
@@ -76,7 +70,7 @@ class PhpRedisClusterConnectionTest extends TestCase
     public function testItFlushesAllMasterNodesAsync()
     {
         $client = Double::for(\RedisCluster::class);
-        $client->expects('_masters')->andReturn([
+        $client->expects('_masters')->returns([
             ['127.0.0.1', '6379'],
             ['127.0.0.2', '6379'],
         ]);
@@ -92,10 +86,10 @@ class PhpRedisClusterConnectionTest extends TestCase
         $masters = [['127.0.0.1', '6379'], ['127.0.0.2', '6379'], ['127.0.0.3', '6379']];
 
         $client = Double::for(\RedisCluster::class);
-        $client->allows('_masters')->andReturn($masters);
-        $client->expects('scan')->with(0, $masters[0], '*', 10)->andReturn(['a']);
-        $client->expects('scan')->with(0, $masters[1], '*', 10)->andReturn(['b']);
-        $client->expects('scan')->with(0, $masters[2], '*', 10)->andReturn(['c']);
+        $client->allows('_masters')->returns($masters);
+        $client->expects('scan')->with(0, $masters[0], '*', 10)->returns(['a']);
+        $client->expects('scan')->with(0, $masters[1], '*', 10)->returns(['b']);
+        $client->expects('scan')->with(0, $masters[2], '*', 10)->returns(['c']);
 
         $connection = new PhpRedisClusterConnection($client);
 
@@ -113,17 +107,13 @@ class PhpRedisClusterConnectionTest extends TestCase
         $masters = [['127.0.0.1', '6379']];
 
         $client = Double::for(\RedisCluster::class);
-        $client->allows('_masters')->andReturn($masters);
-        $client->expects('scan')
-            ->with(0, $masters[0], '*', 10)
-            ->andReturnUsing(function (&$cursor) {
+        $client->allows('_masters')->returns($masters);
+        $client->expects('scan')->with(0, $masters[0], '*', 10)->resolves(function (&$cursor) {
                 $cursor = 42;
 
                 return ['first'];
             });
-        $client->expects('scan')
-            ->with(42, $masters[0], '*', 10)
-            ->andReturnUsing(function (&$cursor) {
+        $client->expects('scan')->with(42, $masters[0], '*', 10)->resolves(function (&$cursor) {
                 $cursor = 0;
 
                 return ['last'];
@@ -143,9 +133,9 @@ class PhpRedisClusterConnectionTest extends TestCase
         $masters = [['127.0.0.1', '6379'], ['127.0.0.2', '6379']];
 
         $client = Double::for(\RedisCluster::class);
-        $client->allows('_masters')->andReturn($masters);
-        $client->expects('scan')->with(0, $masters[0], '*', 10)->andReturn([]);
-        $client->expects('scan')->with(0, $masters[1], '*', 10)->andReturn(['key']);
+        $client->allows('_masters')->returns($masters);
+        $client->expects('scan')->with(0, $masters[0], '*', 10)->returns([]);
+        $client->expects('scan')->with(0, $masters[1], '*', 10)->returns(['key']);
 
         $connection = new PhpRedisClusterConnection($client);
         $this->assertEquals([0, ['key']], $connection->scan(0));
@@ -157,17 +147,13 @@ class PhpRedisClusterConnectionTest extends TestCase
         $largeCursor = '18446744073709551615';
 
         $client = Double::for(\RedisCluster::class);
-        $client->allows('_masters')->andReturn([$master]);
-        $client->expects('scan')
-            ->with(null, $master, '*', 10)
-            ->andReturnUsing(function (&$cursor) use ($largeCursor) {
+        $client->allows('_masters')->returns([$master]);
+        $client->expects('scan')->with(null, $master, '*', 10)->resolves(function (&$cursor) use ($largeCursor) {
                 $cursor = $largeCursor;
 
                 return ['first'];
             });
-        $client->expects('scan')
-            ->with($largeCursor, $master, '*', 10)
-            ->andReturnUsing(function (&$cursor) {
+        $client->expects('scan')->with($largeCursor, $master, '*', 10)->resolves(function (&$cursor) {
                 $cursor = '0';
 
                 return ['last'];
@@ -185,9 +171,9 @@ class PhpRedisClusterConnectionTest extends TestCase
         $masters = [['127.0.0.1', '6379'], ['127.0.0.2', '6379']];
 
         $client = Double::for(\RedisCluster::class);
-        $client->expects('_masters')->twice()->andReturn($masters, array_reverse($masters));
-        $client->expects('scan')->with(0, $masters[0], '*', 10)->andReturn(['a']);
-        $client->expects('scan')->with(0, $masters[1], '*', 10)->andReturn(['b']);
+        $client->expects('_masters')->times(2)->returns($masters, array_reverse($masters));
+        $client->expects('scan')->with(0, $masters[0], '*', 10)->returns(['a']);
+        $client->expects('scan')->with(0, $masters[1], '*', 10)->returns(['b']);
 
         $connection = new PhpRedisClusterConnection($client);
 
@@ -201,15 +187,13 @@ class PhpRedisClusterConnectionTest extends TestCase
         $masters = [['127.0.0.1', '6379'], ['127.0.0.2', '6379']];
 
         $client = Double::for(\RedisCluster::class);
-        $client->expects('_masters')->twice()->andReturn($masters, [$masters[1]]);
-        $client->expects('scan')
-            ->with(0, $masters[0], '*', 10)
-            ->andReturnUsing(function (&$cursor) {
+        $client->expects('_masters')->times(2)->returns($masters, [$masters[1]]);
+        $client->expects('scan')->with(0, $masters[0], '*', 10)->resolves(function (&$cursor) {
                 $cursor = 42;
 
                 return ['a'];
             });
-        $client->expects('scan')->with(0, $masters[1], '*', 10)->andReturn(['b']);
+        $client->expects('scan')->with(0, $masters[1], '*', 10)->returns(['b']);
 
         $connection = new PhpRedisClusterConnection($client);
 

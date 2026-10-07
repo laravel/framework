@@ -108,7 +108,7 @@ class DatabaseMigratorTest extends TestCase
         $resolver = new DatabaseMigratorTestResolver;
         $migrator = $this->migrator($resolver);
         $connection = Double::for(Connection::class);
-        $connection->expects('getNameWithReadWriteType')->andReturn('pgsql::direct');
+        $connection->expects('getNameWithReadWriteType')->returns('pgsql::direct');
 
         $migration = new class($resolver, $this)
         {

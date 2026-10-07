@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Exception;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
@@ -62,7 +63,7 @@ class BroadcasterTest extends TestCase
         $container = new Container;
         Container::setInstance($container);
         $binder = Double::for(BindingRegistrar::class);
-        $binder->expects('getBindingCallback')->times(2)->with('model')->andReturn(function () {
+        $binder->expects('getBindingCallback')->times(2)->with('model')->returns(function () {
             return 'bound';
         });
         $container->instance(BindingRegistrar::class, $binder);
@@ -87,7 +88,7 @@ class BroadcasterTest extends TestCase
         $binder = Double::for(BindingRegistrar::class);
         $callback = RouteBinding::forModel($container, BroadcasterTestEloquentModelStub::class);
 
-        $binder->expects('getBindingCallback')->times(2)->with('model')->andReturn($callback);
+        $binder->expects('getBindingCallback')->times(2)->with('model')->returns($callback);
         $container->instance(BindingRegistrar::class, $binder);
         $callback = function ($user, $model) {
             //
@@ -197,9 +198,7 @@ class BroadcasterTest extends TestCase
         });
 
         $request = Double::for(Request::class);
-        $request->expects('user')
-            ->withNoArgs()
-            ->andReturn(new DummyUser);
+        $request->expects('user')->with(Argument::none())->returns(new DummyUser);
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -214,9 +213,7 @@ class BroadcasterTest extends TestCase
         }, ['guards' => 'myguard']);
 
         $request = Double::for(Request::class);
-        $request->expects('user')
-            ->with('myguard')
-            ->andReturn(new DummyUser);
+        $request->expects('user')->with('myguard')->returns(new DummyUser);
 
         $this->assertInstanceOf(
             DummyUser::class,
@@ -234,9 +231,7 @@ class BroadcasterTest extends TestCase
         }, ['guards' => ['myguard2', 'myguard1']]);
 
         $request = Double::for(Request::class);
-        $request->expects('user')
-            ->with('myguard1')
-            ->andReturn(null);
+        $request->expects('user')->with('myguard1')->returns(null);
         $request->expects('user')
             ->times(2)
             ->with('myguard2')
@@ -261,11 +256,8 @@ class BroadcasterTest extends TestCase
         }, ['guards' => 'myguard']);
 
         $request = Double::for(Request::class);
-        $request->expects('user')
-            ->with('myguard')
-            ->andReturn(null);
-        $request->shouldNotReceive('user')
-            ->withNoArgs();
+        $request->expects('user')->with('myguard')->returns(null);
+        $request->expects('user')->with(Argument::none())->never();
 
         $this->broadcaster->retrieveUser($request, 'somechannel');
     }
@@ -277,14 +269,9 @@ class BroadcasterTest extends TestCase
         }, ['guards' => ['myguard1', 'myguard2']]);
 
         $request = Double::for(Request::class);
-        $request->expects('user')
-            ->with('myguard1')
-            ->andReturn(null);
-        $request->expects('user')
-            ->with('myguard2')
-            ->andReturn(null);
-        $request->shouldNotReceive('user')
-            ->withNoArgs();
+        $request->expects('user')->with('myguard1')->returns(null);
+        $request->expects('user')->with('myguard2')->returns(null);
+        $request->expects('user')->with(Argument::none())->never();
 
         $this->broadcaster->retrieveUser($request, 'somechannel');
     }

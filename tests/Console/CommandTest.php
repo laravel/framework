@@ -47,13 +47,13 @@ class CommandTest extends TestCase
         $input = new ArrayInput([]);
         $output = new NullOutput;
         $outputStyle = new OutputStyle($input, $output);
-        $application->expects('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
-        $application->expects('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(new Factory($outputStyle));
+        $application->expects('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->returns($outputStyle);
+        $application->expects('make')->with(Factory::class, ['output' => $outputStyle])->returns(new Factory($outputStyle));
 
-        $application->expects('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command, $application) {
+        $application->expects('call')->with([$command, 'handle'])->resolves(function () use ($command, $application) {
             $commandCalled = Double::for(Command::class);
 
-            $application->expects('make')->with(Command::class)->andReturn($commandCalled);
+            $application->expects('make')->with(Command::class)->returns($commandCalled);
 
             $commandCalled->expects('setApplication')->with(null);
             $commandCalled->expects('setLaravel')->with($application);
@@ -61,7 +61,7 @@ class CommandTest extends TestCase
 
             $command->call(Command::class);
         });
-        $application->shouldReceive('runningUnitTests')->andReturn(true);
+        $application->allows('runningUnitTests')->returns(true);
 
         $command->run($input, $output);
     }

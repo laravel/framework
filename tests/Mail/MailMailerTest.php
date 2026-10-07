@@ -328,8 +328,8 @@ class MailMailerTest extends TestCase
 
         foreach ($rendered as $contents) {
             $view = Double::for(View::class);
-            $view->expects('render')->andReturn($contents);
-            $factory->expects('make')->andReturn($view);
+            $view->expects('render')->returns($contents);
+            $factory->expects('make')->returns($view);
         }
 
         return $factory;

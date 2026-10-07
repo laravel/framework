@@ -14,32 +14,32 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
     public function test_it_determines_whether_maintenance_mode_is_active()
     {
         $cache = Double::for(Factory::class, Repository::class);
-        $cache->expects('store')->times(2)->with('store-key')->andReturnSelf();
+        $cache->expects('store')->times(2)->with('store-key')->returns($cache);
 
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
 
-        $cache->expects('has')->with('key')->andReturnFalse();
+        $cache->expects('has')->with('key')->returns(false);
         $this->assertFalse($manager->active());
 
-        $cache->expects('has')->with('key')->andReturnTrue();
+        $cache->expects('has')->with('key')->returns(true);
         $this->assertTrue($manager->active());
     }
 
     public function test_it_retrieves_payload_from_cache()
     {
         $cache = Double::for(Factory::class, Repository::class);
-        $cache->expects('store')->with('store-key')->andReturnSelf();
+        $cache->expects('store')->with('store-key')->returns($cache);
 
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
 
-        $cache->expects('get')->with('key')->andReturn(['payload']);
+        $cache->expects('get')->with('key')->returns(['payload']);
         $this->assertSame(['payload'], $manager->data());
     }
 
     public function test_it_stores_payload_in_cache()
     {
         $cache = Double::for(Factory::class, Repository::class);
-        $cache->expects('store')->with('store-key')->andReturnSelf();
+        $cache->expects('store')->with('store-key')->returns($cache);
 
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
         $manager->activate(['payload']);
@@ -50,7 +50,7 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
     public function test_it_removes_payload_from_cache()
     {
         $cache = Double::for(Factory::class, Repository::class);
-        $cache->expects('store')->with('store-key')->andReturnSelf();
+        $cache->expects('store')->with('store-key')->returns($cache);
 
         $manager = new CacheBasedMaintenanceMode($cache, 'store-key', 'key');
         $manager->deactivate();

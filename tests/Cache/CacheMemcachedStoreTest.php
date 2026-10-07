@@ -77,7 +77,7 @@ class CacheMemcachedStoreTest extends TestCase
     public function testIncrementMethodProperlyCallsMemcache()
     {
         $memcached = Double::for(Memcached::class);
-        $memcached->expects('increment')->with('foo', 5)->andReturn(5);
+        $memcached->expects('increment')->with('foo', 5)->returns(5);
 
         $store = new MemcachedStore($memcached);
         $store->increment('foo', 5);
@@ -86,7 +86,7 @@ class CacheMemcachedStoreTest extends TestCase
     public function testDecrementMethodProperlyCallsMemcache()
     {
         $memcached = Double::for(Memcached::class);
-        $memcached->expects('decrement')->with('foo', 5)->andReturn(0);
+        $memcached->expects('decrement')->with('foo', 5)->returns(0);
 
         $store = new MemcachedStore($memcached);
         $store->decrement('foo', 5);

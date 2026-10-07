@@ -61,11 +61,11 @@ class RateLimitedTest extends TestCase
     public function testRateLimitedJobsAreNotExecutedOnLimitReached2()
     {
         $cache = Double::for(Cache::class);
-        $cache->expects('get')->times(3)->andReturn(0, 1, null);
-        $cache->expects('add')->times(2)->andReturn(true, true);
-        $cache->expects('increment')->andReturn(1);
-        $cache->expects('has')->andReturn(true);
-        $cache->expects('getStore')->times(3)->andReturn(new ArrayStore);
+        $cache->expects('get')->times(3)->returns(0, 1, null);
+        $cache->expects('add')->times(2)->returns(true, true);
+        $cache->expects('increment')->returns(1);
+        $cache->expects('has')->returns(true);
+        $cache->expects('getStore')->times(3)->returns(new ArrayStore);
 
         $rateLimiter = new RateLimiter($cache);
         $this->app->instance(RateLimiter::class, $rateLimiter);

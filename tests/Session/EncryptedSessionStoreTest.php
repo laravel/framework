@@ -15,8 +15,8 @@ class EncryptedSessionStoreTest extends TestCase
     public function testSessionIsProperlyEncrypted()
     {
         $session = $this->getSession();
-        $session->getEncrypter()->expects('decrypt')->with(serialize([]))->andReturn(serialize([]));
-        $session->getHandler()->expects('read')->andReturn(serialize([]));
+        $session->getEncrypter()->expects('decrypt')->with(serialize([]))->returns(serialize([]));
+        $session->getHandler()->expects('read')->returns(serialize([]));
         $session->start();
         $session->put('foo', 'bar');
         $session->flash('baz', 'boom');
@@ -30,7 +30,7 @@ class EncryptedSessionStoreTest extends TestCase
                 'old' => ['baz'],
             ],
         ]);
-        $session->getEncrypter()->expects('encrypt')->with($serialized)->andReturn($serialized);
+        $session->getEncrypter()->expects('encrypt')->with($serialized)->returns($serialized);
         $session->getHandler()->expects('write')->with(
             $this->getSessionId(),
             $serialized

@@ -38,8 +38,8 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $resetCommand = Double::for(ResetCommand::class);
         $migrateCommand = Double::for(MigrateCommand::class);
 
-        $console->expects('find')->with('migrate:reset')->andReturn($resetCommand);
-        $console->expects('find')->with('migrate')->andReturn($migrateCommand);
+        $console->expects('find')->with('migrate:reset')->returns($resetCommand);
+        $console->expects('find')->with('migrate')->returns($migrateCommand);
         $dispatcher->expects('dispatch')->with(Mockery::type(DatabaseRefreshed::class));
 
         $quote = DIRECTORY_SEPARATOR === '\\' ? '"' : "'";
@@ -64,8 +64,8 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $rollbackCommand = Double::for(RollbackCommand::class);
         $migrateCommand = Double::for(MigrateCommand::class);
 
-        $console->expects('find')->with('migrate:rollback')->andReturn($rollbackCommand);
-        $console->expects('find')->with('migrate')->andReturn($migrateCommand);
+        $console->expects('find')->with('migrate:rollback')->returns($rollbackCommand);
+        $console->expects('find')->with('migrate')->returns($migrateCommand);
         $dispatcher->expects('dispatch')->with(Mockery::type(DatabaseRefreshed::class));
 
         $quote = DIRECTORY_SEPARATOR === '\\' ? '"' : "'";
@@ -94,7 +94,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $this->assertSame(1, $code);
 
         $console->shouldNotHaveReceived('find');
-        $dispatcher->shouldNotReceive('dispatch');
+        $dispatcher->expects('dispatch')->never();
     }
 
     protected function runCommand($command, $input = [])

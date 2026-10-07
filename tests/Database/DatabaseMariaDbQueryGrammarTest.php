@@ -13,7 +13,7 @@ class DatabaseMariaDbQueryGrammarTest extends TestCase
     public function testToRawSql()
     {
         $connection = Double::for(Connection::class);
-        $connection->expects('escape')->with('foo', false)->andReturn("'foo'");
+        $connection->expects('escape')->with('foo', false)->returns("'foo'");
         $grammar = new MariaDbGrammar($connection);
 
         $query = $grammar->substituteBindingsIntoRawSql(

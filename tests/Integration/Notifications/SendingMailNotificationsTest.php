@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailer;
@@ -245,7 +246,7 @@ class SendingMailNotificationsTest extends TestCase
     private function expectMailerSend(callable $viewAssertion, callable $messageExpectations): void
     {
         $mailer = Double::for(Mailer::class);
-        $mailer->expects('send')->withArgs(function ($view, $data, $callback) use ($viewAssertion, $messageExpectations) {
+        $mailer->expects('send')->with(Argument::all(function ($view, $data, $callback) use ($viewAssertion, $messageExpectations) {
             $viewAssertion($view);
 
             $message = Double::for(Message::class);
@@ -253,10 +254,10 @@ class SendingMailNotificationsTest extends TestCase
             $callback($message);
 
             return true;
-        });
+        }));
 
         $factory = Double::for(MailFactory::class);
-        $factory->expects('mailer')->andReturn($mailer);
+        $factory->expects('mailer')->returns($mailer);
 
         $this->app->instance(MailFactory::class, $factory);
     }

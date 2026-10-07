@@ -194,14 +194,9 @@ class SupportLazyCollectionTest extends TestCase
             ->tap(function ($collection) use ($mock, $timeout) {
                 tap($collection)
                     ->mockery_init($mock->mockery_getContainer())
-                    ->shouldAllowMockingProtectedMethods()
-                    ->expects('now')
-                    ->times(3)
-                    ->andReturn(
-                        (clone $timeout)->sub(2, 'minute')->getTimestamp(),
+                    ->shouldAllowMockingProtectedMethods()->expects('now')->times(3)->returns((clone $timeout)->sub(2, 'minute')->getTimestamp(),
                         (clone $timeout)->sub(1, 'minute')->getTimestamp(),
-                        $timeout->getTimestamp()
-                    );
+                        $timeout->getTimestamp());
             })
             ->takeUntilTimeout($timeout, function ($value, $key) use (&$timedOutWith) {
                 $timedOutWith = [$value, $key];

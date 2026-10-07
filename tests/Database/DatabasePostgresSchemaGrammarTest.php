@@ -90,7 +90,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCreateTableWithAutoIncrementStartingValue()
     {
         $connection = $this->getConnection();
-        $connection->getSchemaBuilder()->shouldReceive('parseSchemaAndTable')->andReturn([null, 'users']);
+        $connection->getSchemaBuilder()->allows('parseSchemaAndTable')->returns([null, 'users']);
 
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->create();
@@ -196,7 +196,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testDropPrimary()
     {
         $connection = $this->getConnection();
-        $connection->getSchemaBuilder()->shouldReceive('parseSchemaAndTable')->andReturn([null, 'users']);
+        $connection->getSchemaBuilder()->allows('parseSchemaAndTable')->returns([null, 'users']);
 
         $blueprint = new Blueprint($connection, 'users');
         $blueprint->dropPrimary();
@@ -1267,7 +1267,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCreateDatabase()
     {
         $connection = $this->getConnection();
-        $connection->expects('getConfig')->once()->with('charset')->andReturn('utf8_foo');
+        $connection->expects('getConfig')->with('charset')->returns('utf8_foo');
         $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_a');
 
         $this->assertSame(
@@ -1276,7 +1276,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         );
 
         $connection = $this->getConnection();
-        $connection->expects('getConfig')->once()->with('charset')->andReturn('utf8_bar');
+        $connection->expects('getConfig')->with('charset')->returns('utf8_bar');
         $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_b');
 
         $this->assertSame(
@@ -1358,7 +1358,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCompileColumns()
     {
         $connection = $this->getConnection();
-        $connection->expects('getServerVersion')->andReturn('12.0.0');
+        $connection->expects('getServerVersion')->returns('12.0.0');
 
         $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
 
@@ -1370,7 +1370,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testCompileColumnsOnLegacyServer()
     {
         $connection = $this->getConnection();
-        $connection->expects('getServerVersion')->andReturn('8.0.2');
+        $connection->expects('getServerVersion')->returns('8.0.2');
 
         $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
 
@@ -1399,14 +1399,14 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         string $prefix = ''
     ) {
         $connection = Double::for(Connection::class);
-        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
-        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
+        $connection->allows('getTablePrefix')->returns($prefix);
+        $connection->allows('getConfig')->with('prefix_indexes')->returns(null);
 
         $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-        $connection->shouldReceive('getSchemaBuilder')->andReturn($builder);
+        $connection->allows('getSchemaGrammar')->returns($grammar);
+        $connection->allows('getSchemaBuilder')->returns($builder);
 
         return $connection;
     }

@@ -64,7 +64,7 @@ class ConsoleApplicationTest extends TestCase
     {
         $artisan = $this->getMockConsole(['addToParent']);
         $command = new SymfonyCommand('foo');
-        $artisan->getLaravel()->expects('make')->with('foo')->andReturn(new SymfonyCommand('foo'));
+        $artisan->getLaravel()->expects('make')->with('foo')->returns(new SymfonyCommand('foo'));
         $artisan->expects($this->once())->method('addToParent')->with($command)->willReturn($command);
         $result = $artisan->resolve('foo');
 

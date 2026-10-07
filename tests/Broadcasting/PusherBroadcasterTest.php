@@ -111,8 +111,7 @@ class PusherBroadcasterTest extends TestCase
             'auth' => 'abcd:efgh',
         ];
 
-        $this->pusher->expects('socket_auth')
-            ->andReturn(json_encode($data));
+        $this->pusher->expects('socket_auth')->returns(json_encode($data));
 
         $this->assertEquals(
             $data,
@@ -132,8 +131,7 @@ class PusherBroadcasterTest extends TestCase
             ],
         ];
 
-        $this->pusher->expects('presence_auth')
-            ->andReturn(json_encode($data));
+        $this->pusher->expects('presence_auth')->returns(json_encode($data));
 
         $this->assertEquals(
             $data,
@@ -143,9 +141,7 @@ class PusherBroadcasterTest extends TestCase
 
     public function testUserAuthenticationForPusher()
     {
-        $this->pusher
-            ->expects('getSettings')
-            ->andReturn([
+        $this->pusher->expects('getSettings')->returns([
                 'auth_key' => '278d425bdf160c739803',
                 'secret' => '7ad3773142a6692b25b8',
             ]);
@@ -175,10 +171,8 @@ class PusherBroadcasterTest extends TestCase
         $request = Request::create('/', 'POST', ['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
 
         $user = Double::for('User');
-        $user->shouldReceive('getAuthIdentifierForBroadcasting')
-            ->andReturn(42);
-        $user->shouldReceive('getAuthIdentifier')
-            ->andReturn(42);
+        $user->allows('getAuthIdentifierForBroadcasting')->returns(42);
+        $user->allows('getAuthIdentifier')->returns(42);
 
         $request->setUserResolver(fn () => $user);
 

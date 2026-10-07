@@ -38,8 +38,8 @@ class AuthGuardTest extends TestCase
 
         $user = new GenericUser(['id' => 10, 'password' => 'secret']);
         $credentials = ['email' => 'foo@bar.com', 'password' => 'secret'];
-        $provider->expects('retrieveByCredentials')->with($credentials)->andReturn($user);
-        $provider->expects('validateCredentials')->with($user, $credentials)->andReturn(true);
+        $provider->expects('retrieveByCredentials')->with($credentials)->returns($user);
+        $provider->expects('validateCredentials')->with($user, $credentials)->returns(true);
         $provider->expects('rehashPasswordIfRequired')->with($user, $credentials);
         $guard->setRequest(Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']));
 
@@ -54,7 +54,7 @@ class AuthGuardTest extends TestCase
 
         $user = new GenericUser(['id' => 10, 'password' => 'secret']);
         $guard->setUser($user);
-        $provider->shouldNotReceive('retrieveByCredentials');
+        $provider->expects('retrieveByCredentials')->never();
         $guard->setRequest(Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']));
 
         $this->assertNull($guard->basic('email'));
@@ -69,9 +69,9 @@ class AuthGuardTest extends TestCase
 
         $user = new GenericUser(['id' => 10, 'password' => 'secret']);
         $credentials = ['email' => 'foo@bar.com', 'password' => 'secret'];
-        $provider->expects('retrieveByCredentials')->with($credentials)->andReturn($user);
-        $provider->expects('validateCredentials')->with($user, $credentials)->andReturn(false);
-        $provider->shouldNotReceive('rehashPasswordIfRequired');
+        $provider->expects('retrieveByCredentials')->with($credentials)->returns($user);
+        $provider->expects('validateCredentials')->with($user, $credentials)->returns(false);
+        $provider->expects('rehashPasswordIfRequired')->never();
         $guard->setRequest(Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']));
 
         $guard->basic('email');
@@ -83,8 +83,8 @@ class AuthGuardTest extends TestCase
 
         $user = new GenericUser(['id' => 10, 'password' => 'secret']);
         $credentials = ['email' => 'foo@bar.com', 'password' => 'secret', 'active' => 1];
-        $provider->expects('retrieveByCredentials')->with($credentials)->andReturn($user);
-        $provider->expects('validateCredentials')->with($user, $credentials)->andReturn(true);
+        $provider->expects('retrieveByCredentials')->with($credentials)->returns($user);
+        $provider->expects('validateCredentials')->with($user, $credentials)->returns(true);
         $provider->expects('rehashPasswordIfRequired')->with($user, $credentials);
         $guard->setRequest(Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']));
 
@@ -99,8 +99,8 @@ class AuthGuardTest extends TestCase
 
         $user = new GenericUser(['id' => 10, 'password' => 'secret']);
         $credentials = ['email' => 'foo@bar.com', 'password' => 'secret', 'active' => 1, 'type' => [1, 2, 3]];
-        $provider->expects('retrieveByCredentials')->with($credentials)->andReturn($user);
-        $provider->expects('validateCredentials')->with($user, $credentials)->andReturn(true);
+        $provider->expects('retrieveByCredentials')->with($credentials)->returns($user);
+        $provider->expects('validateCredentials')->with($user, $credentials)->returns(true);
         $provider->expects('rehashPasswordIfRequired')->with($user, $credentials);
         $guard->setRequest(Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']));
 
@@ -115,11 +115,11 @@ class AuthGuardTest extends TestCase
         $events = new EventFake(new Dispatcher);
         $guard->setDispatcher($events);
         $timebox = $guard->getTimebox();
-        $timebox->expects('call')->andReturnUsing(function ($callback) use ($timebox) {
+        $timebox->expects('call')->resolves(function ($callback) use ($timebox) {
             return $callback($timebox);
         });
         $guard->getProvider()->expects('retrieveByCredentials')->with(['foo']);
-        $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
+        $guard->getProvider()->expects('rehashPasswordIfRequired')->never();
         $guard->attempt(['foo']);
 
         $events->assertDispatchedOnce(Attempting::class);
@@ -137,8 +137,8 @@ class AuthGuardTest extends TestCase
             return $callback($timebox->expects('returnEarly')->getMock());
         });
         $user = $this->createStub(Authenticatable::class);
-        $guard->getProvider()->expects('retrieveByCredentials')->andReturn($user);
-        $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->andReturn(true);
+        $guard->getProvider()->expects('retrieveByCredentials')->returns($user);
+        $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->returns(true);
         $guard->getProvider()->expects('rehashPasswordIfRequired')->with($user, ['foo']);
         $guard->expects($this->once())->method('login')->with($user);
         $this->assertTrue($guard->attempt(['foo']));
@@ -153,11 +153,11 @@ class AuthGuardTest extends TestCase
         $events = new EventFake(new Dispatcher);
         $mock->setDispatcher($events);
         $timebox = $mock->getTimebox();
-        $timebox->expects('call')->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
+        $timebox->expects('call')->resolves(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox);
         });
-        $mock->getProvider()->expects('retrieveByCredentials')->andReturn(null);
-        $mock->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
+        $mock->getProvider()->expects('retrieveByCredentials')->returns(null);
+        $mock->getProvider()->expects('rehashPasswordIfRequired')->never();
         $this->assertFalse($mock->attempt(['foo']));
 
         $events->assertDispatchedOnce(Attempting::class);
@@ -180,9 +180,9 @@ class AuthGuardTest extends TestCase
         $user->expects('getAuthPassword')->andReturn(null);
         $mock->getSession()->expects('put')->with('foo', 'bar');
         $session->expects('regenerate');
-        $mock->getProvider()->expects('retrieveByCredentials')->times(3)->with(['foo'])->andReturn($user);
-        $mock->getProvider()->expects('validateCredentials')->times(2)->andReturnTrue();
-        $mock->getProvider()->expects('validateCredentials')->andReturnFalse();
+        $mock->getProvider()->expects('retrieveByCredentials')->times(3)->with(['foo'])->returns($user);
+        $mock->getProvider()->expects('validateCredentials')->times(2)->returns(true);
+        $mock->getProvider()->expects('validateCredentials')->returns(false);
         $mock->getProvider()->expects('rehashPasswordIfRequired')->with($user, ['foo']);
 
         $this->assertTrue($mock->attemptWhen(['foo'], function ($user, $guard) {
@@ -224,8 +224,8 @@ class AuthGuardTest extends TestCase
             return $callback($timebox->expects('returnEarly')->getMock());
         });
         $user = $this->createStub(Authenticatable::class);
-        $guard->getProvider()->expects('retrieveByCredentials')->andReturn($user);
-        $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->andReturn(true);
+        $guard->getProvider()->expects('retrieveByCredentials')->returns($user);
+        $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->returns(true);
         $guard->getProvider()->expects('rehashPasswordIfRequired')->with($user, ['foo']);
         $guard->expects($this->once())->method('login')->with($user);
         $this->assertTrue($guard->attempt(['foo']));
@@ -246,9 +246,9 @@ class AuthGuardTest extends TestCase
             return $callback($timebox->expects('returnEarly')->getMock());
         });
         $user = $this->createStub(Authenticatable::class);
-        $guard->getProvider()->expects('retrieveByCredentials')->andReturn($user);
-        $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->andReturn(true);
-        $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
+        $guard->getProvider()->expects('retrieveByCredentials')->returns($user);
+        $guard->getProvider()->expects('validateCredentials')->with($user, ['foo'])->returns(true);
+        $guard->getProvider()->expects('rehashPasswordIfRequired')->never();
         $guard->expects($this->once())->method('login')->with($user);
         $this->assertTrue($guard->attempt(['foo']));
 
@@ -345,11 +345,11 @@ class AuthGuardTest extends TestCase
         $events = new EventFake(new Dispatcher);
         $guard->setDispatcher($events);
         $timebox = $guard->getTimebox();
-        $timebox->expects('call')->andReturnUsing(function ($callback, $microseconds) use ($timebox) {
+        $timebox->expects('call')->resolves(function ($callback, $microseconds) use ($timebox) {
             return $callback($timebox);
         });
-        $guard->getProvider()->expects('retrieveByCredentials')->with(['foo'])->andReturn(null);
-        $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
+        $guard->getProvider()->expects('retrieveByCredentials')->with(['foo'])->returns(null);
+        $guard->getProvider()->expects('rehashPasswordIfRequired')->never();
         $guard->attempt(['foo']);
 
         $events->assertDispatchedOnce(Attempting::class);
@@ -398,7 +398,7 @@ class AuthGuardTest extends TestCase
     public function testHasUserReturnsFalseWhenUserIsNull()
     {
         $guard = $this->getGuard();
-        $guard->getSession()->shouldNotReceive('get');
+        $guard->getSession()->expects('get')->never();
 
         $this->assertFalse($guard->hasUser());
     }
@@ -440,7 +440,7 @@ class AuthGuardTest extends TestCase
         [$guard, $provider, $session] = $this->getRealGuard();
         $session->put($guard->getName(), 1);
         $user = new GenericUser([]);
-        $provider->expects('retrieveById')->with(1)->andReturn($user);
+        $provider->expects('retrieveById')->with(1)->returns($user);
 
         $this->assertSame($user, $guard->user());
         $this->assertSame($user, $guard->getUser());
@@ -461,7 +461,7 @@ class AuthGuardTest extends TestCase
         $provider->expects('updateRememberToken');
 
         $cookie = new Cookie('bar');
-        $cookies->expects('forget')->with('bar')->andReturn($cookie);
+        $cookies->expects('forget')->with('bar')->returns($cookie);
         $cookies->expects('queue')->with($cookie);
         $cookies->expects('unqueue')->with($recallerName);
         $mock->getSession()->expects('remove')->with('foo');
@@ -515,7 +515,7 @@ class AuthGuardTest extends TestCase
 
         $user->expects('getRememberToken')->andReturn(null);
         $user->shouldNotReceive('setRememberToken');
-        $provider->shouldNotReceive('updateRememberToken');
+        $provider->expects('updateRememberToken')->never();
 
         $mock->setUser($user);
         $mock->logout();
@@ -533,7 +533,7 @@ class AuthGuardTest extends TestCase
         $mock->expects($this->once())->method('recaller')->willReturn('non-null-cookie');
 
         $cookie = new Cookie('bar');
-        $cookies->expects('forget')->with('bar')->andReturn($cookie);
+        $cookies->expects('forget')->with('bar')->returns($cookie);
         $cookies->expects('queue')->with($cookie);
         $cookies->expects('unqueue')->with($recallerName);
         $mock->getSession()->expects('remove')->with('foo');
@@ -583,7 +583,7 @@ class AuthGuardTest extends TestCase
         $guard->setCookieJar($cookie);
         $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
         $expectedHash = hash_hmac('sha256', 'bar', 'base-key-for-password-hash-mac');
-        $cookie->expects('make')->with($guard->getRecallerName(), 'foo|recaller|'.$expectedHash, 576000)->andReturn($foreverCookie);
+        $cookie->expects('make')->with($guard->getRecallerName(), 'foo|recaller|'.$expectedHash, 576000)->returns($foreverCookie);
         $cookie->expects('queue')->with($foreverCookie);
         $guard->getSession()->expects('put')->with($guard->getName(), 'foo');
         $guard->getSession()->expects('put')->with('password_hash_default', $expectedHash);
@@ -593,7 +593,7 @@ class AuthGuardTest extends TestCase
         $user->expects('getAuthPassword')->times(2)->andReturn('bar');
         $user->expects('getRememberToken')->times(2)->andReturn('recaller');
         $user->shouldReceive('setRememberToken')->never();
-        $provider->shouldReceive('updateRememberToken')->never();
+        $provider->expects('updateRememberToken')->never();
         $guard->login($user, true);
     }
 
@@ -605,7 +605,7 @@ class AuthGuardTest extends TestCase
         $guard->setCookieJar($cookie);
         $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
         $expectedHash = hash_hmac('sha256', 'bar', 'base-key-for-password-hash-mac');
-        $cookie->expects('make')->with($guard->getRecallerName(), 'foo|recaller|'.$expectedHash, 5000)->andReturn($foreverCookie);
+        $cookie->expects('make')->with($guard->getRecallerName(), 'foo|recaller|'.$expectedHash, 5000)->returns($foreverCookie);
         $cookie->expects('queue')->with($foreverCookie);
         $guard->getSession()->expects('put')->with($guard->getName(), 'foo');
         $guard->getSession()->expects('put')->with('password_hash_default', $expectedHash);
@@ -615,7 +615,7 @@ class AuthGuardTest extends TestCase
         $user->expects('getAuthPassword')->times(2)->andReturn('bar');
         $user->expects('getRememberToken')->times(2)->andReturn('recaller');
         $user->shouldReceive('setRememberToken')->never();
-        $provider->shouldReceive('updateRememberToken')->never();
+        $provider->expects('updateRememberToken')->never();
         $guard->login($user, true);
     }
 
@@ -625,7 +625,7 @@ class AuthGuardTest extends TestCase
         $guard = new SessionGuard('default', $provider, $session, $request);
         $guard->setCookieJar($cookie);
         $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
-        $cookie->expects('make')->andReturn($foreverCookie);
+        $cookie->expects('make')->returns($foreverCookie);
         $cookie->expects('queue')->with($foreverCookie);
         $guard->getSession()->expects('put')->with($guard->getName(), 'foo');
         $guard->getSession()->expects('put')->with(
@@ -647,7 +647,7 @@ class AuthGuardTest extends TestCase
         [$guard, $provider, $session] = $this->getRealGuard();
 
         $user = new GenericUser(['id' => 10, 'password' => 'secret']);
-        $provider->expects('retrieveById')->with(10)->andReturn($user);
+        $provider->expects('retrieveById')->with(10)->returns($user);
 
         $this->assertSame($user, $guard->loginUsingId(10));
         $this->assertSame($user, $guard->user());
@@ -658,7 +658,7 @@ class AuthGuardTest extends TestCase
     {
         [$guard, $provider, $session] = $this->getRealGuard();
 
-        $provider->expects('retrieveById')->with(11)->andReturn(null);
+        $provider->expects('retrieveById')->with(11)->returns(null);
 
         $this->assertFalse($guard->loginUsingId(11));
         $this->assertNull($guard->user());
@@ -670,7 +670,7 @@ class AuthGuardTest extends TestCase
         [$guard, $provider, $session] = $this->getRealGuard();
 
         $user = new GenericUser(['id' => 10, 'password' => 'secret']);
-        $provider->expects('retrieveById')->with(10)->andReturn($user);
+        $provider->expects('retrieveById')->with(10)->returns($user);
 
         $this->assertSame($user, $guard->onceUsingId(10));
         $this->assertSame($user, $guard->user());
@@ -681,7 +681,7 @@ class AuthGuardTest extends TestCase
     {
         [$guard, $provider] = $this->getRealGuard();
 
-        $provider->expects('retrieveById')->with(11)->andReturn(null);
+        $provider->expects('retrieveById')->with(11)->returns(null);
 
         $this->assertFalse($guard->onceUsingId(11));
         $this->assertNull($guard->user());
@@ -693,7 +693,7 @@ class AuthGuardTest extends TestCase
         $sessionId = $session->getId();
         $guard->setRequest(Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller|baz']));
         $user = Mockery::mock(Authenticatable::class);
-        $provider->expects('retrieveByToken')->with('id', 'recaller')->andReturn($user);
+        $provider->expects('retrieveByToken')->with('id', 'recaller')->returns($user);
         $user->expects('getAuthIdentifier')->andReturn('bar');
         $user->expects('getAuthPassword')->andReturn('baz');
 
@@ -709,8 +709,8 @@ class AuthGuardTest extends TestCase
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $request = Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller|baz']);
         $guard = new SessionGuard('default', $provider, $session, $request);
-        $guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
-        $guard->getProvider()->shouldReceive('retrieveByToken')->once()->with('id', 'recaller')->andReturn(null);
+        $guard->getSession()->expects('get')->with($guard->getName())->returns(null);
+        $guard->getProvider()->expects('retrieveByToken')->with('id', 'recaller')->returns(null);
         $this->assertNull($guard->user());
         $this->assertFalse($guard->viaRemember());
     }
@@ -721,9 +721,9 @@ class AuthGuardTest extends TestCase
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $request = Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller|baz']);
         $guard = new SessionGuard('default', $provider, $session, $request);
-        $guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
+        $guard->getSession()->expects('get')->with($guard->getName())->returns(null);
         $user = Mockery::mock(Authenticatable::class);
-        $guard->getProvider()->shouldReceive('retrieveByToken')->once()->with('id', 'recaller')->andReturn($user);
+        $guard->getProvider()->expects('retrieveByToken')->with('id', 'recaller')->returns($user);
         $user->shouldReceive('getAuthPassword')->once()->andReturn(null);
         $this->assertNull($guard->user());
     }
@@ -754,8 +754,8 @@ class AuthGuardTest extends TestCase
         [$guard, $provider, $session] = $this->getRealGuard();
 
         $user = new GenericUser(['id' => 10, 'password' => 'secret']);
-        $provider->expects('retrieveByCredentials')->with(['foo'])->andReturn($user);
-        $provider->expects('validateCredentials')->with($user, ['foo'])->andReturn(true);
+        $provider->expects('retrieveByCredentials')->with(['foo'])->returns($user);
+        $provider->expects('validateCredentials')->with($user, ['foo'])->returns(true);
         $provider->expects('rehashPasswordIfRequired')->with($user, ['foo']);
 
         $this->assertTrue($guard->once(['foo']));
@@ -768,9 +768,9 @@ class AuthGuardTest extends TestCase
         [$guard, $provider] = $this->getRealGuard();
 
         $user = new GenericUser(['id' => 10, 'password' => 'secret']);
-        $provider->expects('retrieveByCredentials')->with(['foo'])->andReturn($user);
-        $provider->expects('validateCredentials')->with($user, ['foo'])->andReturn(false);
-        $provider->shouldNotReceive('rehashPasswordIfRequired');
+        $provider->expects('retrieveByCredentials')->with(['foo'])->returns($user);
+        $provider->expects('validateCredentials')->with($user, ['foo'])->returns(false);
+        $provider->expects('rehashPasswordIfRequired')->never();
 
         $this->assertFalse($guard->once(['foo']));
         $this->assertNull($guard->user());

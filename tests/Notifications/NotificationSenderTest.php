@@ -228,7 +228,7 @@ class NotificationSenderTest extends TestCase
         $driver = new ChannelSpy;
         $response = Double::for(ResponseInterface::class);
         $driver->exception = new HttpTransportException('Transport error', $response);
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
         $bus = new BusFake(new BusDispatcher(new Container));
 
         $events = new EventDispatcher;
@@ -254,7 +254,7 @@ class NotificationSenderTest extends TestCase
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
         $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
         $bus = new BusFake(new BusDispatcher(new Container));
 
         $events = new EventFake(new EventDispatcher);

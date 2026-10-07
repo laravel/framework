@@ -71,13 +71,13 @@ class QueueClearCommandTest extends TestCase
         $container['env'] = 'testing';
 
         $config = Double::for(Repository::class, \ArrayAccess::class);
-        $config->expects('offsetGet')->with('queue.default')->andReturn('redis');
-        $config->shouldReceive('get')->with('queue.connections.redis.queue', 'default')->andReturn('default');
+        $config->expects('offsetGet')->with('queue.default')->returns('redis');
+        $config->allows('get')->with('queue.connections.redis.queue', 'default')->returns('default');
 
         $container['config'] = $config;
 
         $queueManager = Double::for(QueueManager::class);
-        $queueManager->expects('connection')->with('redis')->andReturn($queue);
+        $queueManager->expects('connection')->with('redis')->returns($queue);
 
         $container['queue'] = $queueManager;
 

@@ -58,7 +58,7 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $model = new EloquentHasManyModelStub;
-        $relation->getRelated()->expects('newCollection')->andReturnUsing(function ($array = []) {
+        $relation->getRelated()->expects('newCollection')->resolves(function ($array = []) {
             return new Collection($array);
         });
         $models = $relation->initRelation([$model], 'foo');
@@ -114,7 +114,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $model3 = new EloquentHasManyModelStub;
         $model3->id = 3;
 
-        $relation->getRelated()->expects('newCollection')->times(2)->andReturnUsing(function ($array) {
+        $relation->getRelated()->expects('newCollection')->times(2)->resolves(function ($array) {
             return new Collection($array);
         });
         $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2, $result3]), 'foo');
@@ -143,14 +143,14 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $queryBuilder = Double::for(QueryBuilder::class);
         $builder = Double::for(new Builder($queryBuilder));
-        $builder->shouldReceive('whereNotNull')->with('table.foreign_key');
-        $builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
+        $builder->allows('whereNotNull')->with('table.foreign_key');
+        $builder->allows('where')->with('table.foreign_key', '=', 1);
         $related = Double::for(Model::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $builder->allows('getModel')->returns($related);
         $parent = Double::for(Model::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
-        $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+        $parent->allows('getAttribute')->with('id')->returns(1);
+        $parent->allows('getCreatedAtColumn')->returns('created_at');
+        $parent->allows('getUpdatedAtColumn')->returns('updated_at');
 
         return new HasMany($builder, $parent, 'table.foreign_key', 'id');
     }

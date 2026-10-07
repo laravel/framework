@@ -55,9 +55,9 @@ class MaintenanceModeTest extends TestCase
     public function testCacheMaintenanceModeAllowsRequestWhenDeactivatedWhileReadingPayload()
     {
         $cache = Double::for(Factory::class, Repository::class);
-        $cache->shouldReceive('store')->with('maintenance')->andReturnSelf();
-        $cache->shouldReceive('has')->with('framework:down')->andReturn(true, false);
-        $cache->shouldReceive('get')->once()->with('framework:down')->andReturnNull();
+        $cache->allows('store')->with('maintenance')->returns($cache);
+        $cache->allows('has')->with('framework:down')->returns(true, false);
+        $cache->expects('get')->with('framework:down')->returns(null);
 
         $this->app->instance(MaintenanceMode::class, new CacheBasedMaintenanceMode(
             $cache, 'maintenance', 'framework:down'

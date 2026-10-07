@@ -24,7 +24,7 @@ class RetryBatchCommandTest extends TestCase
     {
         $container = new Application;
         $repository = Double::for(BatchRepository::class);
-        $repository->shouldReceive('find')->with('missing-batch-id')->andReturnNull();
+        $repository->allows('find')->with('missing-batch-id')->returns(null);
         $container->instance(BatchRepository::class, $repository);
 
         $command = new RetryBatchCommand;
@@ -40,7 +40,7 @@ class RetryBatchCommandTest extends TestCase
     {
         $container = new Application;
         $repository = Double::for(BatchRepository::class);
-        $repository->shouldReceive('find')->with('batch-id')->andReturn(new class
+        $repository->allows('find')->with('batch-id')->returns(new class
         {
             public $failedJobIds = [];
         });
@@ -63,12 +63,12 @@ class RetryBatchCommandTest extends TestCase
     {
         $container = new Application;
         $repository = Double::for(BatchRepository::class);
-        $repository->shouldReceive('find')->with('batch-id')->andReturnNull();
+        $repository->allows('find')->with('batch-id')->returns(null);
         $container->instance(BatchRepository::class, $repository);
 
         $mutex = Double::for(CommandMutex::class);
-        $mutex->shouldReceive('create')->andReturnTrue();
-        $mutex->shouldReceive('forget')->andReturnTrue();
+        $mutex->allows('create')->returns(true);
+        $mutex->allows('forget')->returns(true);
         $container->instance(CommandMutex::class, $mutex);
 
         $command = new RetryBatchCommand;

@@ -19,9 +19,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testBasicCreateTable()
     {
         $conn = $this->getConnection();
-        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
-        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->expects('getConfig')->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->returns('utf8');
+        $conn->expects('getConfig')->with('collation')->returns('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -34,7 +34,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
 
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->andReturn(null);
+        $conn->allows('getConfig')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->increments('id');
@@ -49,7 +49,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         ], $statements);
 
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->andReturn(null);
+        $conn->allows('getConfig')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -64,9 +64,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAutoIncrementStartingValue()
     {
         $conn = $this->getConnection();
-        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
-        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->expects('getConfig')->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->returns('utf8');
+        $conn->expects('getConfig')->with('collation')->returns('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -97,8 +97,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testEngineCreateTable()
     {
         $conn = $this->getConnection();
-        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
-        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('charset')->returns('utf8');
+        $conn->expects('getConfig')->with('collation')->returns('utf8_unicode_ci');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -112,9 +112,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB", $statements[0]);
 
         $conn = $this->getConnection();
-        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
-        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->expects('getConfig')->with('engine')->andReturn('InnoDB');
+        $conn->expects('getConfig')->with('charset')->returns('utf8');
+        $conn->expects('getConfig')->with('collation')->returns('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->returns('InnoDB');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -130,7 +130,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testCharsetCollationCreateTable()
     {
         $conn = $this->getConnection();
-        $conn->expects('getConfig')->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('engine')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -145,9 +145,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'", $statements[0]);
 
         $conn = $this->getConnection();
-        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
-        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->expects('getConfig')->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->returns('utf8');
+        $conn->expects('getConfig')->with('collation')->returns('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -163,7 +163,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testBasicCreateTableWithPrefix()
     {
         $conn = $this->getConnection(prefix: 'prefix_');
-        $conn->shouldReceive('getConfig')->andReturn(null);
+        $conn->allows('getConfig')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -179,7 +179,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testCreateTemporaryTable()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->andReturn(null);
+        $conn->allows('getConfig')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -872,8 +872,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingDate()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(false);
-        $conn->shouldReceive('getServerVersion')->andReturn('8.0.13');
+        $conn->allows('isMaria')->returns(false);
+        $conn->allows('getServerVersion')->returns('8.0.13');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo');
@@ -886,8 +886,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingDateWithDefaultCurrent()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(false);
-        $conn->shouldReceive('getServerVersion')->andReturn('8.0.13');
+        $conn->allows('isMaria')->returns(false);
+        $conn->allows('getServerVersion')->returns('8.0.13');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo')->useCurrent();
@@ -900,8 +900,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingDateWithDefaultCurrentOn57()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(false);
-        $conn->shouldReceive('getServerVersion')->andReturn('5.7');
+        $conn->allows('isMaria')->returns(false);
+        $conn->allows('getServerVersion')->returns('5.7');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo')->useCurrent();
@@ -914,8 +914,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingYear()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(false);
-        $conn->shouldReceive('getServerVersion')->andReturn('8.0.13');
+        $conn->allows('isMaria')->returns(false);
+        $conn->allows('getServerVersion')->returns('8.0.13');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year');
@@ -927,8 +927,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingYearWithDefaultCurrent()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(false);
-        $conn->shouldReceive('getServerVersion')->andReturn('8.0.13');
+        $conn->allows('isMaria')->returns(false);
+        $conn->allows('getServerVersion')->returns('8.0.13');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year')->useCurrent();
@@ -941,8 +941,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingYearWithDefaultCurrentOn57()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('isMaria')->andReturn(false);
-        $conn->shouldReceive('getServerVersion')->andReturn('5.7');
+        $conn->allows('isMaria')->returns(false);
+        $conn->allows('getServerVersion')->returns('5.7');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year')->useCurrent();
@@ -1397,8 +1397,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testCreateDatabase()
     {
         $connection = $this->getConnection();
-        $connection->expects('getConfig')->once()->with('charset')->andReturn('utf8mb4_foo');
-        $connection->expects('getConfig')->once()->with('collation')->andReturn('utf8mb4_unicode_ci_foo');
+        $connection->expects('getConfig')->with('charset')->returns('utf8mb4_foo');
+        $connection->expects('getConfig')->with('collation')->returns('utf8mb4_unicode_ci_foo');
 
         $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_a');
 
@@ -1408,8 +1408,8 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         );
 
         $connection = $this->getConnection();
-        $connection->expects('getConfig')->once()->with('charset')->andReturn('utf8mb4_bar');
-        $connection->expects('getConfig')->once()->with('collation')->andReturn('utf8mb4_unicode_ci_bar');
+        $connection->expects('getConfig')->with('charset')->returns('utf8mb4_bar');
+        $connection->expects('getConfig')->with('collation')->returns('utf8mb4_unicode_ci_bar');
 
         $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_b');
 
@@ -1422,9 +1422,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testCreateTableWithVirtualAsColumn()
     {
         $conn = $this->getConnection();
-        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
-        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->expects('getConfig')->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->returns('utf8');
+        $conn->expects('getConfig')->with('collation')->returns('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1437,7 +1437,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("create table `users` (`my_column` varchar(255) not null, `my_other_column` varchar(255) as (my_column)) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
 
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->andReturn(null);
+        $conn->allows('getConfig')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1450,7 +1450,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\"'))))", $statements[0]);
 
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->andReturn(null);
+        $conn->allows('getConfig')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1466,7 +1466,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testCreateTableWithVirtualAsColumnWhenJsonColumnHasArrayKey()
     {
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->andReturn(null);
+        $conn->allows('getConfig')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1481,9 +1481,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testCreateTableWithStoredAsColumn()
     {
         $conn = $this->getConnection();
-        $conn->expects('getConfig')->with('charset')->andReturn('utf8');
-        $conn->expects('getConfig')->with('collation')->andReturn('utf8_unicode_ci');
-        $conn->expects('getConfig')->with('engine')->andReturn(null);
+        $conn->expects('getConfig')->with('charset')->returns('utf8');
+        $conn->expects('getConfig')->with('collation')->returns('utf8_unicode_ci');
+        $conn->expects('getConfig')->with('engine')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1496,7 +1496,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("create table `users` (`my_column` varchar(255) not null, `my_other_column` varchar(255) as (my_column) stored) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
 
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->andReturn(null);
+        $conn->allows('getConfig')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1509,7 +1509,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\"'))) stored)", $statements[0]);
 
         $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->andReturn(null);
+        $conn->allows('getConfig')->returns(null);
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -1587,15 +1587,15 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         string $prefix = ''
     ) {
         $connection = Double::for(MySqlConnection::class);
-        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
-        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null);
-        $connection->shouldReceive('isMaria')->andReturn(false);
+        $connection->allows('getTablePrefix')->returns($prefix);
+        $connection->allows('getConfig')->with('prefix_indexes')->returns(null);
+        $connection->allows('isMaria')->returns(false);
 
         $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-        $connection->shouldReceive('getSchemaBuilder')->andReturn($builder);
+        $connection->allows('getSchemaGrammar')->returns($grammar);
+        $connection->allows('getSchemaBuilder')->returns($builder);
 
         return $connection;
     }

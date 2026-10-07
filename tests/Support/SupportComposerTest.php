@@ -63,7 +63,7 @@ class SupportComposerTest extends TestCase
         $directory = __DIR__;
 
         $files = Double::for(Filesystem::class);
-        $files->expects('exists')->with($directory.'/composer.phar')->andReturn($customComposerPhar);
+        $files->expects('exists')->with($directory.'/composer.phar')->returns($customComposerPhar);
 
         $process = Double::for(Process::class);
         $process->expects('run');

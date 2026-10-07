@@ -193,11 +193,11 @@ class CacheFileStoreTest extends TestCase
         $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__, 0644])->getMock();
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects('put')->times(3)->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash, Mockery::any(), Mockery::any()])->andReturnUsing(function ($name, $value) {
+        $files->expects('put')->times(3)->with(__DIR__.'/'.$cache_dir.'/'.$hash, Mockery::any(), Mockery::any())->resolves(function ($name, $value) {
             return strlen($value);
         });
-        $files->expects('chmod')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash])->andReturnValues(['0600', '0644'])->times(3);
-        $files->expects('chmod')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash, 0644])->andReturn([true]);
+        $files->expects('chmod')->with(__DIR__.'/'.$cache_dir.'/'.$hash)->returns('0600', '0644')->times(3);
+        $files->expects('chmod')->with(__DIR__.'/'.$cache_dir.'/'.$hash, 0644)->returns([true]);
         $result = $store->put('foo', 'foo', 10);
         $this->assertTrue($result);
         $result = $store->put('foo', 'bar', 10);
@@ -215,16 +215,16 @@ class CacheFileStoreTest extends TestCase
         $cache_parent_dir = substr($hash, 0, 2);
         $cache_dir = $cache_parent_dir.'/'.substr($hash, 2, 2);
 
-        $files->expects('put')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash, Mockery::any(), Mockery::any()])->andReturnUsing(function ($name, $value) {
+        $files->expects('put')->with(__DIR__.'/'.$cache_dir.'/'.$hash, Mockery::any(), Mockery::any())->resolves(function ($name, $value) {
             return strlen($value);
         });
 
-        $files->expects('exists')->withArgs([__DIR__.'/'.$cache_dir])->andReturn(false);
-        $files->expects('makeDirectory')->withArgs([__DIR__.'/'.$cache_dir, 0777, true, true]);
-        $files->expects('chmod')->withArgs([__DIR__.'/'.$cache_parent_dir])->andReturn(['0600']);
-        $files->expects('chmod')->withArgs([__DIR__.'/'.$cache_parent_dir, 0606])->andReturn([true]);
-        $files->expects('chmod')->withArgs([__DIR__.'/'.$cache_dir])->andReturn(['0600']);
-        $files->expects('chmod')->withArgs([__DIR__.'/'.$cache_dir, 0606])->andReturn([true]);
+        $files->expects('exists')->with(__DIR__.'/'.$cache_dir)->returns(false);
+        $files->expects('makeDirectory')->with(__DIR__.'/'.$cache_dir, 0777, true, true);
+        $files->expects('chmod')->with(__DIR__.'/'.$cache_parent_dir)->returns(['0600']);
+        $files->expects('chmod')->with(__DIR__.'/'.$cache_parent_dir, 0606)->returns([true]);
+        $files->expects('chmod')->with(__DIR__.'/'.$cache_dir)->returns(['0600']);
+        $files->expects('chmod')->with(__DIR__.'/'.$cache_dir, 0606)->returns([true]);
 
         $result = $store->put('foo', 'foo', 10);
         $this->assertTrue($result);

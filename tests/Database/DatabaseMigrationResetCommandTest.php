@@ -26,12 +26,12 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $migrator->expects('paths')->andReturn([]);
-        $migrator->expects('usingConnection')->with(null, Mockery::type(Closure::class))->andReturnUsing(function ($connection, $callback) {
+        $migrator->expects('paths')->returns([]);
+        $migrator->expects('usingConnection')->with(null, Mockery::type(Closure::class))->resolves(function ($connection, $callback) {
             $callback();
         });
-        $migrator->expects('repositoryExists')->andReturn(true);
-        $migrator->expects('setOutput')->andReturn($migrator);
+        $migrator->expects('repositoryExists')->returns(true);
+        $migrator->expects('setOutput')->returns($migrator);
         $migrator->expects('reset')->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], false);
 
         $this->runCommand($command);
@@ -44,12 +44,12 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $migrator->expects('paths')->andReturn([]);
-        $migrator->expects('usingConnection')->with('foo', Mockery::type(Closure::class))->andReturnUsing(function ($connection, $callback) {
+        $migrator->expects('paths')->returns([]);
+        $migrator->expects('usingConnection')->with('foo', Mockery::type(Closure::class))->resolves(function ($connection, $callback) {
             $callback();
         });
-        $migrator->expects('repositoryExists')->andReturn(true);
-        $migrator->expects('setOutput')->andReturn($migrator);
+        $migrator->expects('repositoryExists')->returns(true);
+        $migrator->expects('setOutput')->returns($migrator);
         $migrator->expects('reset')->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], true);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);

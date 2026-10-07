@@ -18,9 +18,9 @@ class DatabaseProcessorTest extends TestCase
         $pdo->expects($this->once())->method('lastInsertId')->with('id')->willReturn('1');
         $connection = Double::for(Connection::class);
         $connection->expects('insert')->with('sql', ['foo']);
-        $connection->expects('getPdo')->andReturn($pdo);
+        $connection->expects('getPdo')->returns($pdo);
         $builder = Double::for(Builder::class);
-        $builder->expects('getConnection')->twice()->andReturn($connection);
+        $builder->expects('getConnection')->times(2)->returns($connection);
         $processor = new Processor;
         $result = $processor->processInsertGetId($builder, 'sql', ['foo'], 'id');
         $this->assertSame(1, $result);

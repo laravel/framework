@@ -86,7 +86,7 @@ class SupportFacadeTest extends TestCase
     {
         $app = new ApplicationStub;
         $app->setAttributes(['foo' => $mock = Double::for(stdClass::class)]);
-        $mock->expects('bar')->times(3)->andReturn('baz');
+        $mock->expects('bar')->times(3)->returns('baz');
 
         // Resolve for the first time
         FacadeStub::setFacadeApplication($app);
@@ -105,7 +105,7 @@ class SupportFacadeTest extends TestCase
     {
         $app = new ApplicationStub;
         $app->setAttributes(['foo' => $mock = Double::for(stdClass::class)]);
-        $mock->expects('bar')->times(2)->andReturn('baz');
+        $mock->expects('bar')->times(2)->returns('baz');
 
         // Resolve for the first time
         FacadeStub::setFacadeApplication($app);

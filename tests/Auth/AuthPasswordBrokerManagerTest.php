@@ -19,7 +19,7 @@ class AuthPasswordBrokerManagerTest extends TestCase
         $broker = Double::for(PasswordBroker::class);
 
         $manager = Double::for(PasswordBrokerManager::class)->passthru(new PasswordBrokerManager($app));
-        $manager->expects('resolve')->with('users')->andReturn($broker);
+        $manager->expects('resolve')->with('users')->returns($broker);
 
         $result1 = $manager->broker(PasswordBrokerName::Users);
         $result2 = $manager->broker('users');

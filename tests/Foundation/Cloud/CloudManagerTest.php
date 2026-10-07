@@ -37,11 +37,11 @@ class CloudManagerTest extends TestCase
     public function testIsManagedQueueChecksTheConfiguredManagedQueues(string $queue, bool $managed)
     {
         $cloudQueue = Double::for(CloudQueue::class);
-        $cloudQueue->shouldReceive('managedQueues')->andReturn(['emails']);
+        $cloudQueue->allows('managedQueues')->returns(['emails']);
 
         $cloud = Cloud::partialMock();
-        $cloud->shouldReceive('usesManagedQueues')->andReturn(true);
-        $cloud->shouldReceive('queue')->andReturn($cloudQueue);
+        $cloud->allows('usesManagedQueues')->returns(true);
+        $cloud->allows('queue')->returns($cloudQueue);
 
         $this->assertSame($managed, Cloud::isManagedQueue($queue));
     }

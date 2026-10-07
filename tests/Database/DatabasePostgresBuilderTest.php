@@ -17,11 +17,9 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection = Double::for(Connection::class);
         $grammar = new PostgresGrammar($connection);
 
-        $connection->expects('getConfig')->with('charset')->andReturn('utf8');
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('statement')->with(
-            'create database "my_temporary_database" encoding "utf8"'
-        )->andReturn(true);
+        $connection->expects('getConfig')->with('charset')->returns('utf8');
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('statement')->with('create database "my_temporary_database" encoding "utf8"')->returns(true);
 
         $builder = $this->getBuilder($connection);
         $builder->createDatabase('my_temporary_database');
@@ -32,10 +30,8 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection = Double::for(Connection::class);
         $grammar = new PostgresGrammar($connection);
 
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('statement')->with(
-            'drop database if exists "my_database_a"'
-        )->andReturn(true);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('statement')->with('drop database if exists "my_database_a"')->returns(true);
 
         $builder = $this->getBuilder($connection);
 
@@ -46,9 +42,9 @@ class DatabasePostgresBuilderTest extends TestCase
     {
         $connection = $this->getConnection();
         $grammar = Double::for(PostgresGrammar::class);
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $grammar->expects('compileTableExists')->times(2)->andReturn('sql');
-        $connection->expects('scalar')->times(2)->with('sql')->andReturn(1);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $grammar->expects('compileTableExists')->times(2)->returns('sql');
+        $connection->expects('scalar')->times(2)->with('sql')->returns(1);
         $connection->expects('getTablePrefix')->times(2);
         $builder = $this->getBuilder($connection);
 
@@ -60,9 +56,9 @@ class DatabasePostgresBuilderTest extends TestCase
     {
         $connection = $this->getConnection();
         $grammar = Double::for(PostgresGrammar::class);
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $grammar->expects('compileTableExists')->times(2)->andReturn('sql');
-        $connection->expects('scalar')->times(2)->with('sql')->andReturn(1);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $grammar->expects('compileTableExists')->times(2)->returns('sql');
+        $connection->expects('scalar')->times(2)->with('sql')->returns(1);
         $connection->expects('getTablePrefix')->times(2);
         $builder = $this->getBuilder($connection);
 
@@ -74,9 +70,9 @@ class DatabasePostgresBuilderTest extends TestCase
     {
         $connection = $this->getConnection();
         $grammar = Double::for(PostgresGrammar::class);
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $grammar->expects('compileTableExists')->times(2)->andReturn('sql');
-        $connection->expects('scalar')->times(2)->with('sql')->andReturn(1);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $grammar->expects('compileTableExists')->times(2)->returns('sql');
+        $connection->expects('scalar')->times(2)->with('sql')->returns(1);
         $connection->expects('getTablePrefix')->times(2);
         $builder = $this->getBuilder($connection);
 
@@ -88,9 +84,9 @@ class DatabasePostgresBuilderTest extends TestCase
     {
         $connection = $this->getConnection();
         $grammar = Double::for(PostgresGrammar::class);
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $grammar->expects('compileTableExists')->times(2)->andReturn('sql');
-        $connection->expects('scalar')->times(2)->with('sql')->andReturn(1);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $grammar->expects('compileTableExists')->times(2)->returns('sql');
+        $connection->expects('scalar')->times(2)->with('sql')->returns(1);
         $connection->expects('getTablePrefix')->times(2);
         $builder = $this->getBuilder($connection);
 
@@ -102,8 +98,8 @@ class DatabasePostgresBuilderTest extends TestCase
     {
         $connection = $this->getConnection();
         $grammar = new PostgresGrammar($connection);
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('scalar')->with($grammar->compileTableExists('myapp', 'foo'))->andReturn(1);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('scalar')->with($grammar->compileTableExists('myapp', 'foo'))->returns(1);
         $connection->expects('getTablePrefix');
         $builder = $this->getBuilder($connection);
 
@@ -116,7 +112,7 @@ class DatabasePostgresBuilderTest extends TestCase
 
         $connection = $this->getConnection();
         $grammar = new PostgresGrammar($connection);
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
         $builder = $this->getBuilder($connection);
 
         $builder->hasTable('mydatabase.myapp.foo');
@@ -126,13 +122,13 @@ class DatabasePostgresBuilderTest extends TestCase
     {
         $connection = $this->getConnection();
         $grammar = new PostgresGrammar($connection);
-        $connection->shouldReceive('getServerVersion')->andReturn('12.0.0');
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns(null, 'foo'))->andReturn([['name' => 'some_column']]);
+        $connection->allows('getServerVersion')->returns('12.0.0');
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns(null, 'foo'))->returns([['name' => 'some_column']]);
         $connection->expects('getTablePrefix');
         $processor = Double::for(PostgresProcessor::class);
-        $connection->expects('getPostProcessor')->andReturn($processor);
-        $processor->expects('processColumns')->andReturn([['name' => 'some_column']]);
+        $connection->expects('getPostProcessor')->returns($processor);
+        $processor->expects('processColumns')->returns([['name' => 'some_column']]);
         $builder = $this->getBuilder($connection);
 
         $this->assertSame(['some_column'], $builder->getColumnListing('foo'));
@@ -142,13 +138,13 @@ class DatabasePostgresBuilderTest extends TestCase
     {
         $connection = $this->getConnection();
         $grammar = new PostgresGrammar($connection);
-        $connection->shouldReceive('getServerVersion')->andReturn('12.0.0');
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns(null, 'foo'))->andReturn([['name' => 'some_column']]);
+        $connection->allows('getServerVersion')->returns('12.0.0');
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns(null, 'foo'))->returns([['name' => 'some_column']]);
         $connection->expects('getTablePrefix');
         $processor = Double::for(PostgresProcessor::class);
-        $connection->expects('getPostProcessor')->andReturn($processor);
-        $processor->expects('processColumns')->andReturn([['name' => 'some_column']]);
+        $connection->expects('getPostProcessor')->returns($processor);
+        $processor->expects('processColumns')->returns([['name' => 'some_column']]);
         $builder = $this->getBuilder($connection);
 
         $this->assertSame(['some_column'], $builder->getColumnListing('foo'));
@@ -158,13 +154,13 @@ class DatabasePostgresBuilderTest extends TestCase
     {
         $connection = $this->getConnection();
         $grammar = new PostgresGrammar($connection);
-        $connection->shouldReceive('getServerVersion')->andReturn('12.0.0');
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns(null, 'foo'))->andReturn([['name' => 'some_column']]);
+        $connection->allows('getServerVersion')->returns('12.0.0');
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns(null, 'foo'))->returns([['name' => 'some_column']]);
         $connection->expects('getTablePrefix');
         $processor = Double::for(PostgresProcessor::class);
-        $connection->expects('getPostProcessor')->andReturn($processor);
-        $processor->expects('processColumns')->andReturn([['name' => 'some_column']]);
+        $connection->expects('getPostProcessor')->returns($processor);
+        $processor->expects('processColumns')->returns([['name' => 'some_column']]);
         $builder = $this->getBuilder($connection);
 
         $this->assertSame(['some_column'], $builder->getColumnListing('foo'));
@@ -174,13 +170,13 @@ class DatabasePostgresBuilderTest extends TestCase
     {
         $connection = $this->getConnection();
         $grammar = new PostgresGrammar($connection);
-        $connection->shouldReceive('getServerVersion')->andReturn('12.0.0');
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns('myapp', 'foo'))->andReturn([['name' => 'some_column']]);
+        $connection->allows('getServerVersion')->returns('12.0.0');
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns('myapp', 'foo'))->returns([['name' => 'some_column']]);
         $connection->expects('getTablePrefix');
         $processor = Double::for(PostgresProcessor::class);
-        $connection->expects('getPostProcessor')->andReturn($processor);
-        $processor->expects('processColumns')->andReturn([['name' => 'some_column']]);
+        $connection->expects('getPostProcessor')->returns($processor);
+        $processor->expects('processColumns')->returns([['name' => 'some_column']]);
         $builder = $this->getBuilder($connection);
 
         $this->assertSame(['some_column'], $builder->getColumnListing('myapp.foo'));
@@ -192,7 +188,7 @@ class DatabasePostgresBuilderTest extends TestCase
 
         $connection = $this->getConnection();
         $grammar = new PostgresGrammar($connection);
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
         $builder = $this->getBuilder($connection);
 
         $builder->getColumnListing('mydatabase.myapp.foo');
@@ -201,14 +197,13 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testDropAllTablesWhenSearchPathIsString()
     {
         $connection = $this->getConnection();
-        $connection->expects('getConfig')->with('search_path')->andReturn('public');
-        $connection->expects('getConfig')->with('dont_drop')->andReturn(['foo']);
+        $connection->expects('getConfig')->with('search_path')->returns('public');
+        $connection->expects('getConfig')->with('dont_drop')->returns(['foo']);
         $grammar = new PostgresGrammar($connection);
         $processor = new PostgresProcessor;
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('getPostProcessor')->andReturn($processor);
-        $connection->expects('selectFromWriteConnection')->with($grammar->compileTables(['public']))
-            ->andReturn([(object) ['name' => 'users', 'schema' => 'public']]);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('getPostProcessor')->returns($processor);
+        $connection->expects('selectFromWriteConnection')->with($grammar->compileTables(['public']))->returns([(object) ['name' => 'users', 'schema' => 'public']]);
         $connection->expects('statement')->with('drop table "public"."users" cascade');
         $builder = $this->getBuilder($connection);
 
@@ -218,16 +213,14 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testDropAllTablesWhenSearchPathIsStringOfMany()
     {
         $connection = $this->getConnection();
-        $connection->expects('getConfig')->with('username')->andReturn('foouser');
-        $connection->expects('getConfig')->with('search_path')->andReturn('"$user", public, foo_bar-Baz.Áüõß');
-        $connection->expects('getConfig')->with('dont_drop')->andReturn(['foo']);
+        $connection->expects('getConfig')->with('username')->returns('foouser');
+        $connection->expects('getConfig')->with('search_path')->returns('"$user", public, foo_bar-Baz.Áüõß');
+        $connection->expects('getConfig')->with('dont_drop')->returns(['foo']);
         $grammar = new PostgresGrammar($connection);
         $processor = new PostgresProcessor;
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('getPostProcessor')->andReturn($processor);
-        $connection->expects('selectFromWriteConnection')
-            ->with($grammar->compileTables(['foouser', 'public', 'foo_bar-Baz.Áüõß']))
-            ->andReturn([(object) ['name' => 'users', 'schema' => 'foouser']]);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('getPostProcessor')->returns($processor);
+        $connection->expects('selectFromWriteConnection')->with($grammar->compileTables(['foouser', 'public', 'foo_bar-Baz.Áüõß']))->returns([(object) ['name' => 'users', 'schema' => 'foouser']]);
         $connection->expects('statement')->with('drop table "foouser"."users" cascade');
         $builder = $this->getBuilder($connection);
 
@@ -237,21 +230,19 @@ class DatabasePostgresBuilderTest extends TestCase
     public function testDropAllTablesWhenSearchPathIsArrayOfMany()
     {
         $connection = $this->getConnection();
-        $connection->expects('getConfig')->with('username')->andReturn('foouser');
-        $connection->expects('getConfig')->with('search_path')->andReturn([
+        $connection->expects('getConfig')->with('username')->returns('foouser');
+        $connection->expects('getConfig')->with('search_path')->returns([
             '$user',
             '"dev"',
             "'test'",
             'spaced schema',
         ]);
-        $connection->expects('getConfig')->with('dont_drop')->andReturn(['foo']);
+        $connection->expects('getConfig')->with('dont_drop')->returns(['foo']);
         $grammar = new PostgresGrammar($connection);
         $processor = new PostgresProcessor;
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('getPostProcessor')->andReturn($processor);
-        $connection->expects('selectFromWriteConnection')
-            ->with($grammar->compileTables(['foouser', 'dev', 'test', 'spaced schema']))
-            ->andReturn([(object) ['name' => 'users', 'schema' => 'foouser']]);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('getPostProcessor')->returns($processor);
+        $connection->expects('selectFromWriteConnection')->with($grammar->compileTables(['foouser', 'dev', 'test', 'spaced schema']))->returns([(object) ['name' => 'users', 'schema' => 'foouser']]);
         $connection->expects('statement')->with('drop table "foouser"."users" cascade');
         $builder = $this->getBuilder($connection);
 

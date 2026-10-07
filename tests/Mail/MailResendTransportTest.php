@@ -53,8 +53,7 @@ class MailResendTransportTest extends TestCase
         $emailService = Double::for(EmailService::class);
         $client->emails = $emailService;
 
-        $emailService->expects('send')
-            ->andReturn(ResendEmail::from([
+        $emailService->expects('send')->returns(ResendEmail::from([
                 'id' => 'resend_id_test',
                 'from' => 'myself@example.com',
                 'to' => 'me@example.com',

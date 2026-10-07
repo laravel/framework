@@ -17,8 +17,8 @@ class DatabaseSqliteSchemaStateTest extends TestCase
     {
         $config = ['driver' => 'sqlite', 'database' => 'database/database.sqlite', 'prefix' => '', 'foreign_key_constraints' => true, 'name' => 'sqlite'];
         $connection = Double::for(SQLiteConnection::class);
-        $connection->expects('getConfig')->andReturn($config);
-        $connection->expects('getDatabaseName')->andReturn($config['database']);
+        $connection->expects('getConfig')->returns($config);
+        $connection->expects('getDatabaseName')->returns($config['database']);
 
         $process = Double::for(Process::class);
         $command = null;
@@ -43,12 +43,12 @@ class DatabaseSqliteSchemaStateTest extends TestCase
     {
         $config = ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '', 'foreign_key_constraints' => true, 'name' => 'sqlite'];
         $connection = Double::for(SQLiteConnection::class);
-        $connection->expects('getDatabaseName')->andReturn($config['database']);
+        $connection->expects('getDatabaseName')->returns($config['database']);
         $pdo = Double::for(PDO::class);
-        $connection->expects('getPdo')->andReturn($pdo);
+        $connection->expects('getPdo')->returns($pdo);
 
         $files = Double::for(Filesystem::class);
-        $files->expects('get')->andReturn('CREATE TABLE IF NOT EXISTS "migrations" ("id" integer not null primary key autoincrement, "migration" varchar not null, "batch" integer not null);');
+        $files->expects('get')->returns('CREATE TABLE IF NOT EXISTS "migrations" ("id" integer not null primary key autoincrement, "migration" varchar not null, "batch" integer not null);');
 
         $schemaState = new SqliteSchemaState($connection, $files);
         $schemaState->load('database/schema/sqlite-schema.dump');
@@ -64,9 +64,9 @@ class DatabaseSqliteSchemaStateTest extends TestCase
         $connection->statement('create virtual table temp.logs using fts5(message)');
 
         $process = Double::for(Process::class);
-        $process->allows('setTimeout')->andReturnSelf();
-        $process->allows('mustRun')->andReturnSelf();
-        $process->allows('getOutput')->andReturn(<<<'SQL'
+        $process->allows('setTimeout')->returns($process);
+        $process->allows('mustRun')->returns($process);
+        $process->allows('getOutput')->returns(<<<'SQL'
             CREATE VIRTUAL TABLE posts using fts5(body)
             /* posts(body) */;
             CREATE TABLE IF NOT EXISTS 'posts_data'(id INTEGER PRIMARY KEY, block BLOB);

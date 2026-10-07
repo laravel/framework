@@ -153,7 +153,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $logger = Double::for(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('log');
+        $logger->expects('log')->never();
 
         $this->handler->ignore(RuntimeException::class);
 
@@ -164,11 +164,11 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $reporter = Double::for(ReportingService::class);
         $this->container->instance(ReportingService::class, $reporter);
-        $reporter->expects('send')->withArgs(['Exception message']);
+        $reporter->expects('send')->with('Exception message');
 
         $logger = Double::for(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('log');
+        $logger->expects('log')->never();
 
         $this->handler->report(new ReportableException('Exception message'));
     }
@@ -176,11 +176,11 @@ class FoundationExceptionsHandlerTest extends TestCase
     public function testHandlerReportsExceptionUsingCallableClass()
     {
         $reporter = Double::for(ReportingService::class);
-        $reporter->expects('send')->withArgs(['Exception message']);
+        $reporter->expects('send')->with('Exception message');
 
         $logger = Double::for(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('log');
+        $logger->expects('log')->never();
 
         $this->handler->reportable(new CustomReporter($reporter));
 
@@ -204,7 +204,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testShouldReturnJsonWhen()
     {
-        $this->request->shouldReceive('expectsJson')->never();
+        $this->request->expects('expectsJson')->never();
         $exception = new Exception('My custom error message');
 
         $request = $this->request;
@@ -379,18 +379,16 @@ class FoundationExceptionsHandlerTest extends TestCase
             $redirector = Double::for(Redirector::class);
 
             $responder = Double::for(RedirectResponse::class);
-            $redirector->expects('to')
-                ->andReturn($responder);
+            $redirector->expects('to')->returns($responder);
 
             $responder->expects('withInput')->with(Mockery::on(
                 function ($argument) use (&$argumentActual) {
                     $argumentActual = $argument;
 
                     return true;
-                }))->andReturn($responder);
+                }))->returns($responder);
 
-            $responder->expects('withErrors')
-                ->andReturn($responder);
+            $responder->expects('withErrors')->returns($responder);
 
             return $redirector;
         });
@@ -400,7 +398,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $request = Request::create('/', 'POST', $argumentExpected, [], ['photo' => $file]);
 
         $validator = Double::for(Validator::class);
-        $validator->expects('errors')->times(2)->andReturn(new MessageBag(['error' => 'My custom validation exception']));
+        $validator->expects('errors')->times(2)->returns(new MessageBag(['error' => 'My custom validation exception']));
 
         $validationException = new ValidationException($validator);
         $validationException->redirectTo = '/';
@@ -412,8 +410,8 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testSuspiciousOperationReturns400WithoutReporting()
     {
-        $this->config->expects('get')->with('app.debug', null)->andReturn(true);
-        $this->request->expects('expectsJson')->andReturn(true);
+        $this->config->expects('get')->with('app.debug', null)->returns(true);
+        $this->request->expects('expectsJson')->returns(true);
 
         $response = $this->handler->render($this->request, new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
 
@@ -422,15 +420,15 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $logger = Double::for(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('log');
+        $logger->expects('log')->never();
 
         $this->handler->report(new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
     }
 
     public function testRecordsNotFoundReturns404WithoutReporting()
     {
-        $this->config->expects('get')->with('app.debug', null)->andReturn(true);
-        $this->request->expects('expectsJson')->andReturn(true);
+        $this->config->expects('get')->with('app.debug', null)->returns(true);
+        $this->request->expects('expectsJson')->returns(true);
 
         $response = $this->handler->render($this->request, new RecordsNotFoundException);
 
@@ -439,7 +437,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $logger = Double::for(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('log');
+        $logger->expects('log')->never();
 
         $this->handler->report(new RecordsNotFoundException);
     }

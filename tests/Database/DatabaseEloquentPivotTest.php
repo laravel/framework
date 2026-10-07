@@ -18,13 +18,13 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testPropertiesAreSetCorrectly()
     {
         $parent = Double::for(Model::class)->passthru();
-        $parent->expects('getConnectionName')->times(1)->andReturn('connection');
+        $parent->expects('getConnectionName')->times(1)->returns('connection');
         $resolver = Double::for(ConnectionResolverInterface::class);
         $parent->setConnectionResolver($resolver);
         $connection = Double::for(Connection::class);
-        $resolver->expects('connection')->times(1)->andReturn($connection);
+        $resolver->expects('connection')->times(1)->returns($connection);
         $grammar = new Grammar($connection);
-        $connection->expects('getQueryGrammar')->times(1)->andReturn($grammar);
+        $connection->expects('getQueryGrammar')->times(1)->returns($grammar);
         $processor = new Processor;
         $parent->setDateFormat('Y-m-d H:i:s');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
@@ -48,7 +48,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testFromRawAttributesDoesNotDoubleMutate()
     {
         $parent = Double::for(Model::class)->passthru();
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent->expects('getConnectionName')->returns('connection');
 
         $pivot = DatabaseEloquentPivotTestJsonCastStub::fromRawAttributes($parent, ['foo' => json_encode(['name' => 'Taylor'])], 'table', true);
 
@@ -58,7 +58,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testFromRawAttributesDoesNotMutate()
     {
         $parent = Double::for(Model::class)->passthru();
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent->expects('getConnectionName')->returns('connection');
 
         $pivot = DatabaseEloquentPivotTestMutatorStub::fromRawAttributes($parent, ['foo' => 'bar'], 'table', true);
 
@@ -68,7 +68,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testPropertiesUnchangedAreNotDirty()
     {
         $parent = Double::for(Model::class)->passthru();
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent->expects('getConnectionName')->returns('connection');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
 
         $this->assertSame([], $pivot->getDirty());
@@ -77,7 +77,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testPropertiesChangedAreDirty()
     {
         $parent = Double::for(Model::class)->passthru();
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent->expects('getConnectionName')->returns('connection');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
         $pivot->shimy = 'changed';
 
@@ -87,7 +87,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testTimestampPropertyIsSetIfCreatedAtInAttributes()
     {
         $parent = Double::for(Model::class)->passthru();
-        $parent->expects('getConnectionName')->times(2)->andReturn('connection');
+        $parent->expects('getConnectionName')->times(2)->returns('connection');
         $pivot = DatabaseEloquentPivotTestDateStub::fromAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
         $this->assertTrue($pivot->timestamps);
 
@@ -98,7 +98,7 @@ class DatabaseEloquentPivotTest extends TestCase
     public function testTimestampPropertyIsTrueWhenCreatingFromRawAttributes()
     {
         $parent = Double::for(Model::class)->passthru();
-        $parent->expects('getConnectionName')->andReturn('connection');
+        $parent->expects('getConnectionName')->returns('connection');
         $pivot = Pivot::fromRawAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
         $this->assertTrue($pivot->timestamps);
     }
@@ -120,8 +120,8 @@ class DatabaseEloquentPivotTest extends TestCase
         $pivot->foreign = 'foreign.value';
         $pivot->other = 'other.value';
         $query = Double::for(Builder::class);
-        $query->expects('where')->with(['foreign' => 'foreign.value', 'other' => 'other.value'])->andReturn($query);
-        $query->expects('delete')->andReturn(true);
+        $query->expects('where')->with(['foreign' => 'foreign.value', 'other' => 'other.value'])->returns($query);
+        $query->expects('delete')->returns(true);
         $pivot->expects($this->once())->method('newQueryWithoutRelationships')->willReturn($query);
 
         $rowsAffected = $pivot->delete();

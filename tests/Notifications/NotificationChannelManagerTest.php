@@ -48,7 +48,7 @@ class NotificationChannelManagerTest extends TestCase
         Container::setInstance($container);
         $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
 
         $manager->send($notifiable = new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
 
@@ -103,7 +103,7 @@ class NotificationChannelManagerTest extends TestCase
         Container::setInstance($container);
         $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotificationWithTwoChannels);
 
@@ -122,7 +122,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Dispatcher::class, $events);
         Container::setInstance($container);
         $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
-        $manager->shouldNotReceive('driver');
+        $manager->expects('driver')->never();
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestCancelledNotification);
 
@@ -141,7 +141,7 @@ class NotificationChannelManagerTest extends TestCase
         Container::setInstance($container);
         $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotCancelledNotification);
 
@@ -164,7 +164,7 @@ class NotificationChannelManagerTest extends TestCase
         $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
         $driver->exception = new Exception();
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
 
         $manager->send(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
 
@@ -196,7 +196,7 @@ class NotificationChannelManagerTest extends TestCase
                 throw new Exception();
             }
         };
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
         $failed = 0;
         $events->listen(NotificationFailed::class, function () use (&$failed) {
             $failed++;
@@ -521,7 +521,7 @@ class NotificationChannelManagerTest extends TestCase
         Container::setInstance($container);
         $manager = Double::for(ChannelManager::class)->passthru(new ChannelManager($container));
         $driver = new ChannelSpy;
-        $manager->expects('driver')->andReturn($driver);
+        $manager->expects('driver')->returns($driver);
         $driver->response = $response = new stdClass;
 
         $manager->send($notifiable = new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerWithAfterSendingMethodNotification);

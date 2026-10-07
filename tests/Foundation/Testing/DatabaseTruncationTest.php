@@ -179,29 +179,26 @@ class DatabaseTruncationTest extends TestCase
         $actual = [];
 
         $schema = Double::for($builder ?? Builder::class);
-        $schema->expects('getTables')->with($schemas)->andReturn(
-            empty($schemas)
+        $schema->expects('getTables')->with($schemas)->returns(empty($schemas)
                 ? $allTables
-                : array_filter($allTables, fn ($table) => in_array($table['schema'], $schemas))
-        );
-        $schema->expects('getCurrentSchemaListing')->andReturn($schemas);
+                : array_filter($allTables, fn ($table) => in_array($table['schema'], $schemas)));
+        $schema->expects('getCurrentSchemaListing')->returns($schemas);
 
         $connection = Double::for(Connection::class);
-        $connection->shouldReceive('getTablePrefix')->andReturn($prefix);
+        $connection->allows('getTablePrefix')->returns($prefix);
         $dispatcher = new Dispatcher;
-        $connection->expects('getEventDispatcher')->andReturn($dispatcher);
+        $connection->expects('getEventDispatcher')->returns($dispatcher);
         $connection->expects('unsetEventDispatcher');
         $connection->expects('setEventDispatcher')->with($dispatcher);
-        $connection->expects('getSchemaBuilder')->andReturn($schema);
-        $connection->shouldReceive('withoutTablePrefix')->andReturnUsing(function ($callback) use ($connection) {
+        $connection->expects('getSchemaBuilder')->returns($schema);
+        $connection->allows('withoutTablePrefix')->resolves(function ($callback) use ($connection) {
             $callback($connection);
         });
-        $connection->shouldReceive('table')
-            ->andReturnUsing(function (string $tableName) use (&$actual) {
+        $connection->allows('table')->resolves(function (string $tableName) use (&$actual) {
                 $actual[] = $tableName;
 
                 $table = Double::for(QueryBuilder::class);
-                $table->expects('exists')->andReturnTrue();
+                $table->expects('exists')->returns(true);
                 $table->expects('truncate');
 
                 return $table;

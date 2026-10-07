@@ -80,8 +80,7 @@ class LazilyRefreshDatabaseTest extends TestCase
         $kernel = Double::for(ConsoleKernel::class);
         $this->app->instance(ConsoleKernelContract::class, $kernel);
 
-        $kernel->shouldReceive('call')
-            ->never();
+        $kernel->expects('call')->never();
 
         $this->refreshDatabase();
 

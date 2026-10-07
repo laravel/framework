@@ -436,8 +436,8 @@ class DatabaseConnectionTest extends TestCase
         $pdo = Double::for(PDO::class);
         $pdo->expects('beginTransaction');
         $statement = Double::for(PDOStatement::class);
-        $pdo->expects('prepare')->andReturn($statement);
-        $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
+        $pdo->expects('prepare')->returns($statement);
+        $statement->expects('execute')->throws(new PDOException('server has gone away'));
 
         $connection = new Connection($pdo);
         $connection->beginTransaction();
@@ -477,13 +477,11 @@ class DatabaseConnectionTest extends TestCase
     protected function getFailingPdo()
     {
         $statement = Double::for(PDOStatement::class);
-        $statement->shouldReceive('bindValue')->once();
-        $statement->shouldReceive('execute')->once()->andThrow(
-            new PDOException('SQLSTATE[42S02]: Base table or view not found')
-        );
+        $statement->expects('bindValue');
+        $statement->expects('execute')->throws(new PDOException('SQLSTATE[42S02]: Base table or view not found'));
 
         $pdo = Double::for(PDO::class);
-        $pdo->shouldReceive('prepare')->once()->andReturn($statement);
+        $pdo->expects('prepare')->returns($statement);
 
         return $pdo;
     }
@@ -493,10 +491,10 @@ class DatabaseConnectionTest extends TestCase
         $pdo = Double::for(PDO::class);
 
         $statement = Double::for(PDOStatement::class);
-        $statement->expects('execute')->andThrow(new PDOException('server has gone away'));
-        $statement->expects('execute')->andReturn(true);
+        $statement->expects('execute')->throws(new PDOException('server has gone away'));
+        $statement->expects('execute')->returns(true);
 
-        $pdo->expects('prepare')->times(2)->andReturn($statement);
+        $pdo->expects('prepare')->times(2)->returns($statement);
 
         $connection = new Connection($pdo);
 
@@ -546,11 +544,11 @@ class DatabaseConnectionTest extends TestCase
     public function testPrepareBindings()
     {
         $date = Double::for(DateTime::class);
-        $date->expects('format')->with('foo')->andReturn('bar');
+        $date->expects('format')->with('foo')->returns('bar');
         $bindings = ['test' => $date];
         $conn = $this->getMockConnection();
         $grammar = Double::for(Grammar::class);
-        $grammar->expects('getDateFormat')->andReturn('foo');
+        $grammar->expects('getDateFormat')->returns('foo');
         $conn->setQueryGrammar($grammar);
         $result = $conn->prepareBindings($bindings);
         $this->assertEquals(['test' => 'bar'], $result);

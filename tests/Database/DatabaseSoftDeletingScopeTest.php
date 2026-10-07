@@ -54,8 +54,8 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $attributes = ['name' => 'foo'];
         $values = ['email' => 'bar'];
         $model = Double::for(Model::class);
-        $givenBuilder->expects('firstOrCreate')->with($attributes, $values)->andReturn($model);
-        $model->expects('restore')->andReturn(true);
+        $givenBuilder->expects('firstOrCreate')->with($attributes, $values)->returns($model);
+        $model->expects('restore')->returns(true);
         $result = $callback($givenBuilder, $attributes, $values);
 
         $this->assertEquals($model, $result);
@@ -78,8 +78,8 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $attributes = ['name' => 'foo'];
         $values = ['email' => 'bar'];
         $model = Double::for(Model::class);
-        $givenBuilder->expects('createOrFirst')->with($attributes, $values)->andReturn($model);
-        $model->expects('restore')->andReturn(true);
+        $givenBuilder->expects('createOrFirst')->with($attributes, $values)->returns($model);
+        $model->expects('restore')->returns(true);
         $result = $callback($givenBuilder, $attributes, $values);
 
         $this->assertEquals($model, $result);

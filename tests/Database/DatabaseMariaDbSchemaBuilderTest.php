@@ -16,10 +16,10 @@ class DatabaseMariaDbSchemaBuilderTest extends TestCase
     {
         $connection = Double::for(Connection::class);
         $grammar = new MariaDbGrammar($connection);
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
         $builder = new MariaDbBuilder($connection);
-        $connection->expects('getTablePrefix')->andReturn('prefix_');
-        $connection->expects('scalar')->with($grammar->compileTableExists(null, 'prefix_table'))->andReturn(1);
+        $connection->expects('getTablePrefix')->returns('prefix_');
+        $connection->expects('scalar')->with($grammar->compileTableExists(null, 'prefix_table'))->returns(1);
 
         $this->assertTrue($builder->hasTable('table'));
     }
@@ -29,12 +29,11 @@ class DatabaseMariaDbSchemaBuilderTest extends TestCase
         $connection = Double::for(Connection::class);
         $grammar = new MariaDbGrammar($connection);
         $processor = new MariaDbProcessor;
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('getPostProcessor')->andReturn($processor);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('getPostProcessor')->returns($processor);
         $builder = new MariaDbBuilder($connection);
-        $connection->expects('getTablePrefix')->andReturn('prefix_');
-        $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns(null, 'prefix_table'))
-            ->andReturn([(object) ['name' => 'column', 'type_name' => 'int', 'type' => 'int', 'collation' => null, 'nullable' => 'YES', 'default' => null, 'comment' => null, 'expression' => null, 'extra' => '']]);
+        $connection->expects('getTablePrefix')->returns('prefix_');
+        $connection->expects('selectFromWriteConnection')->with($grammar->compileColumns(null, 'prefix_table'))->returns([(object) ['name' => 'column', 'type_name' => 'int', 'type' => 'int', 'collation' => null, 'nullable' => 'YES', 'default' => null, 'comment' => null, 'expression' => null, 'extra' => '']]);
 
         $this->assertEquals(['column'], $builder->getColumnListing('table'));
     }

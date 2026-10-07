@@ -53,8 +53,8 @@ class ListenerTest extends TestCase
         $listener = new Listener();
 
         $connection = Double::for(Connection::class);
-        $connection->expects('getName')->times(150)->andReturn('testing');
-        $connection->expects('prepareBindings')->times(100)->andReturnUsing(fn ($b) => $b);
+        $connection->expects('getName')->times(150)->returns('testing');
+        $connection->expects('prepareBindings')->times(100)->resolves(fn ($b) => $b);
 
         for ($i = 0; $i < 150; $i++) {
             $listener->onQueryExecuted(

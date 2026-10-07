@@ -36,9 +36,7 @@ class TestDatabasesTest extends TestCase
     {
         DB::expects('purge');
 
-        config()->expects('get')
-            ->with('database.connections.mysql.url', false)
-            ->andReturn(false);
+        config()->expects('get')->with('database.connections.mysql.url', false)->returns(false);
 
         config()->expects('set')
             ->with('database.connections.mysql.database', 'my_database_test_1');
@@ -51,9 +49,7 @@ class TestDatabasesTest extends TestCase
     {
         DB::expects('purge');
 
-        config()->expects('get')
-            ->with('database.connections.mysql.url', false)
-            ->andReturn($url);
+        config()->expects('get')->with('database.connections.mysql.url', false)->returns($url);
 
         config()->expects('set')
             ->with('database.connections.mysql.url', $testUrl);

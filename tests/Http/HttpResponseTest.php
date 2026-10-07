@@ -211,7 +211,7 @@ class HttpResponseTest extends TestCase
         $session = new Store('test', new NullSessionHandler);
         $response->setSession($session);
         $provider = Double::for(MessageProvider::class);
-        $provider->expects('getMessageBag')->andReturn(new MessageBag(['name' => ['required']]));
+        $provider->expects('getMessageBag')->returns(new MessageBag(['name' => ['required']]));
         $response->withErrors($provider);
 
         $this->assertContains('errors', $session->get('_flash.new', []));

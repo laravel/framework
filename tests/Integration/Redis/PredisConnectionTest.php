@@ -30,7 +30,7 @@ class PredisConnectionTest extends TestCase
         $predis = new PredisConnection($client);
         $predis->setEventDispatcher($event);
 
-        $client->expects($command)->with(...$parameters)->andReturnTrue();
+        $client->expects($command)->with(...$parameters)->returns(true);
 
         $this->assertTrue($predis->command($command, $parameters));
 

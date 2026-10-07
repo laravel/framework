@@ -223,9 +223,9 @@ class WorkCommandTest extends QueueTestCase
         Worker::$restartable = false;
 
         $cache = Double::for(Repository::class);
-        $cache->shouldNotReceive('get')->with('illuminate:queue:restart');
-        $cache->expects('get')->with('illuminate:queues:paused')->andReturn(null);
-        $cache->expects('many')->andReturn([]);
+        $cache->expects('get')->with('illuminate:queue:restart')->never();
+        $cache->expects('get')->with('illuminate:queues:paused')->returns(null);
+        $cache->expects('many')->returns([]);
 
         Cache::expects('driver')->times(2)->andReturn($cache);
         Cache::expects('store')->andReturn($cache);
@@ -251,8 +251,8 @@ class WorkCommandTest extends QueueTestCase
 
         $cache = Double::for(Repository::class);
 
-        $cache->expects('get')->times(2)->with('illuminate:queue:restart')->andReturn(null);
-        $cache->shouldNotReceive('many');
+        $cache->expects('get')->times(2)->with('illuminate:queue:restart')->returns(null);
+        $cache->expects('many')->never();
 
         Cache::expects('driver')->times(2)->andReturn($cache);
         Cache::shouldNotReceive('store');

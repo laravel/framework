@@ -280,10 +280,8 @@ class RedisStoreTest extends TestCase
     public function testPutManyCallsPutWhenClustered()
     {
         $store = Double::for(RedisStore::class)->passthru();
-        $store->expects('connection')->andReturn(Double::for(PhpRedisClusterConnection::class));
-        $store->expects('put')
-            ->twice()
-            ->andReturn(true);
+        $store->expects('connection')->returns(Double::for(PhpRedisClusterConnection::class));
+        $store->expects('put')->times(2)->returns(true);
 
         $store->putMany([
             'foo' => 'bar',

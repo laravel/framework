@@ -24,9 +24,9 @@ class QueueBeanstalkdJobTest extends TestCase
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
-        $job->getPheanstalkJob()->expects('getData')->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
+        $job->getPheanstalkJob()->expects('getData')->returns(json_encode(['job' => 'foo', 'data' => ['data']]));
         $handler = Double::for(stdClass::class);
-        $job->getContainer()->expects('make')->with('foo')->andReturn($handler);
+        $job->getContainer()->expects('make')->with('foo')->returns($handler);
         $handler->expects('fire')->with($job, ['data']);
 
         $job->fire();
@@ -35,17 +35,17 @@ class QueueBeanstalkdJobTest extends TestCase
     public function testFailProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
-        $job->getPheanstalkJob()->expects('getData')->once()->andReturn(json_encode(['job' => 'foo', 'uuid' => 'test-uuid', 'data' => ['data']]));
+        $job->getPheanstalkJob()->expects('getData')->returns(json_encode(['job' => 'foo', 'uuid' => 'test-uuid', 'data' => ['data']]));
         $handler = Double::for(BeanstalkdJobTestFailedTest::class);
-        $job->getContainer()->expects('make')->with('foo')->andReturn($handler);
-        $job->getPheanstalk()->expects('delete')->with($job->getPheanstalkJob())->andReturnSelf();
+        $job->getContainer()->expects('make')->with('foo')->returns($handler);
+        $job->getPheanstalk()->expects('delete')->with($job->getPheanstalkJob())->returns($job->getPheanstalk());
         $handler->expects('failed')->with(['data'], Mockery::type(Exception::class), 'test-uuid', Mockery::type(Job::class));
         $events = new EventsDispatcher;
         $failed = [];
         $events->listen(JobFailed::class, function ($event) use (&$failed) {
             $failed[] = $event;
         });
-        $job->getContainer()->expects('make')->with(Dispatcher::class)->andReturn($events);
+        $job->getContainer()->expects('make')->with(Dispatcher::class)->returns($events);
 
         $job->fail($exception = new Exception);
 

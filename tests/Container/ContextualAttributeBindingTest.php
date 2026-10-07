@@ -135,28 +135,28 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('auth', function () {
             $manager = Double::for(AuthManager::class);
-            $manager->expects('userResolver')->times(4)->andReturn(fn ($guard = null) => $manager->guard($guard)->user());
-            $manager->expects('guard')->with('foo')->andReturnUsing(function () {
+            $manager->expects('userResolver')->times(4)->returns(fn ($guard = null) => $manager->guard($guard)->user());
+            $manager->expects('guard')->with('foo')->resolves(function () {
                 $guard = Double::for(GuardContract::class);
-                $guard->expects('user')->andReturn(m:Double::for(AuthenticatableContract::class));
+                $guard->expects('user')->returns(m:Double::for(AuthenticatableContract::class));
 
                 return $guard;
             });
-            $manager->expects('guard')->with('bar')->andReturnUsing(function () {
+            $manager->expects('guard')->with('bar')->resolves(function () {
                 $guard = Double::for(GuardContract::class);
-                $guard->expects('user')->andReturn(m:Double::for(AuthenticatableContract::class));
+                $guard->expects('user')->returns(m:Double::for(AuthenticatableContract::class));
 
                 return $guard;
             });
-            $manager->expects('guard')->with(AuthGuardUnitEnum::unit)->andReturnUsing(function () {
+            $manager->expects('guard')->with(AuthGuardUnitEnum::unit)->resolves(function () {
                 $guard = Double::for(GuardContract::class);
-                $guard->expects('user')->andReturn(m:Double::for(AuthenticatableContract::class));
+                $guard->expects('user')->returns(m:Double::for(AuthenticatableContract::class));
 
                 return $guard;
             });
-            $manager->expects('guard')->with(AuthGuardBackedEnum::Backed)->andReturnUsing(function () {
+            $manager->expects('guard')->with(AuthGuardBackedEnum::Backed)->resolves(function () {
                 $guard = Double::for(GuardContract::class);
-                $guard->expects('user')->andReturn(m:Double::for(AuthenticatableContract::class));
+                $guard->expects('user')->returns(m:Double::for(AuthenticatableContract::class));
 
                 return $guard;
             });
@@ -172,12 +172,12 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('cache', function () {
             $manager = Double::for(CacheManager::class);
-            $manager->expects('store')->with('foo')->andReturn(Double::for(CacheRepository::class));
-            $manager->expects('store')->with('bar')->andReturn(Double::for(CacheRepository::class));
-            $manager->expects('store')->with(CacheStoreUnitEnum::unit)->andReturn(Double::for(CacheRepository::class));
-            $manager->expects('store')->with(CacheStoreBackedEnum::Backed)->andReturn(Double::for(CacheRepository::class));
-            $manager->expects('memo')->with('foo')->andReturn(Double::for(CacheRepository::class));
-            $manager->expects('memo')->with('bar')->andReturn(Double::for(CacheRepository::class));
+            $manager->expects('store')->with('foo')->returns(Double::for(CacheRepository::class));
+            $manager->expects('store')->with('bar')->returns(Double::for(CacheRepository::class));
+            $manager->expects('store')->with(CacheStoreUnitEnum::unit)->returns(Double::for(CacheRepository::class));
+            $manager->expects('store')->with(CacheStoreBackedEnum::Backed)->returns(Double::for(CacheRepository::class));
+            $manager->expects('memo')->with('foo')->returns(Double::for(CacheRepository::class));
+            $manager->expects('memo')->with('bar')->returns(Double::for(CacheRepository::class));
 
             return $manager;
         });
@@ -201,8 +201,8 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('db', function () {
             $manager = Double::for(DatabaseManager::class);
-            $manager->expects('connection')->with('foo')->andReturn(new Connection(new PDO('sqlite::memory:')));
-            $manager->expects('connection')->with('bar')->andReturn(new Connection(new PDO('sqlite::memory:')));
+            $manager->expects('connection')->with('foo')->returns(new Connection(new PDO('sqlite::memory:')));
+            $manager->expects('connection')->with('bar')->returns(new Connection(new PDO('sqlite::memory:')));
 
             return $manager;
         });
@@ -215,10 +215,10 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container; //
         $container->singleton('auth', function () {
             $manager = Double::for(AuthManager::class);
-            $manager->expects('guard')->with('foo')->andReturn(Double::for(GuardContract::class));
-            $manager->expects('guard')->with('bar')->andReturn(Double::for(GuardContract::class));
-            $manager->expects('guard')->with(AuthGuardUnitEnum::unit)->andReturn(Double::for(GuardContract::class));
-            $manager->expects('guard')->with(AuthGuardBackedEnum::Backed)->andReturn(Double::for(GuardContract::class));
+            $manager->expects('guard')->with('foo')->returns(Double::for(GuardContract::class));
+            $manager->expects('guard')->with('bar')->returns(Double::for(GuardContract::class));
+            $manager->expects('guard')->with(AuthGuardUnitEnum::unit)->returns(Double::for(GuardContract::class));
+            $manager->expects('guard')->with(AuthGuardBackedEnum::Backed)->returns(Double::for(GuardContract::class));
 
             return $manager;
         });
@@ -231,8 +231,8 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('log', function () {
             $manager = Double::for(LogManager::class);
-            $manager->expects('channel')->with('foo')->andReturn(Double::for(LoggerInterface::class));
-            $manager->expects('channel')->with('bar')->andReturn(Double::for(LoggerInterface::class));
+            $manager->expects('channel')->with('foo')->returns(Double::for(LoggerInterface::class));
+            $manager->expects('channel')->with('bar')->returns(Double::for(LoggerInterface::class));
 
             return $manager;
         });
@@ -245,8 +245,8 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('request', function () {
             $request = Double::for(Request::class);
-            $request->expects('route')->with('foo')->andReturn(Double::for(Model::class));
-            $request->expects('route')->with('bar')->andReturn('bar');
+            $request->expects('route')->with('foo')->returns(Double::for(Model::class));
+            $request->expects('route')->with('bar')->returns('bar');
 
             return $request;
         });
@@ -259,8 +259,8 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('request', function () {
             $request = Double::for(Request::class);
-            $request->expects('route')->with('foo')->andReturn(Double::for(Model::class));
-            $request->expects('route')->with('bar')->andReturn('bar');
+            $request->expects('route')->with('foo')->returns(Double::for(Model::class));
+            $request->expects('route')->with('bar')->returns('bar');
 
             return $request;
         });
@@ -290,8 +290,8 @@ class ContextualAttributeBindingTest extends TestCase
 
         $container->singleton(ContextRepository::class, function () {
             $context = Double::for(ContextRepository::class);
-            $context->expects('getHidden')->with('bar', null)->andReturn('bar');
-            $context->shouldNotReceive('get');
+            $context->expects('getHidden')->with('bar', null)->returns('bar');
+            $context->expects('get')->never();
 
             return $context;
         });
@@ -304,10 +304,10 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('filesystem', function () {
             $manager = Double::for(FilesystemManager::class);
-            $manager->expects('disk')->with('foo')->andReturn(Double::for(Filesystem::class));
-            $manager->expects('disk')->with('bar')->andReturn(Double::for(Filesystem::class));
-            $manager->expects('disk')->with(StorageDiskUnitEnum::unit)->andReturn(Double::for(Filesystem::class));
-            $manager->expects('disk')->with(StorageDiskBackedEnum::Backed)->andReturn(Double::for(Filesystem::class));
+            $manager->expects('disk')->with('foo')->returns(Double::for(Filesystem::class));
+            $manager->expects('disk')->with('bar')->returns(Double::for(Filesystem::class));
+            $manager->expects('disk')->with(StorageDiskUnitEnum::unit)->returns(Double::for(Filesystem::class));
+            $manager->expects('disk')->with(StorageDiskBackedEnum::Backed)->returns(Double::for(Filesystem::class));
 
             return $manager;
         });

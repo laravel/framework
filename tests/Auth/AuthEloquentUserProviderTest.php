@@ -105,7 +105,7 @@ class AuthEloquentUserProviderTest extends TestCase
     public function testCredentialValidationFailsGracefullyWithNullPassword()
     {
         $hasher = Double::for(Hasher::class);
-        $hasher->shouldReceive('check')->never();
+        $hasher->expects('check')->never();
         $provider = new EloquentUserProvider($hasher, 'foo');
         $user = Mockery::mock(Authenticatable::class);
         $user->expects('getAuthPassword')->andReturn(null);
@@ -131,8 +131,8 @@ class AuthEloquentUserProviderTest extends TestCase
     public function testDontRehashPasswordIfNotRequired()
     {
         $hasher = Double::for(Hasher::class);
-        $hasher->expects('needsRehash')->with('hash')->andReturn(false);
-        $hasher->shouldNotReceive('make');
+        $hasher->expects('needsRehash')->with('hash')->returns(false);
+        $hasher->expects('make')->never();
 
         $provider = $this->newProvider($hasher);
         $user = EloquentProviderUserStub::find(3);

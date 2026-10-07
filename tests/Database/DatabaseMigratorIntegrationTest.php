@@ -60,9 +60,9 @@ class DatabaseMigratorIntegrationTest extends TestCase
         );
 
         $output = Double::for(OutputStyle::class);
-        $output->shouldReceive('write');
-        $output->shouldReceive('writeln');
-        $output->shouldReceive('newLinesWritten');
+        $output->allows('write');
+        $output->allows('writeln');
+        $output->allows('newLinesWritten');
 
         $this->migrator->setOutput($output);
 

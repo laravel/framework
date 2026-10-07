@@ -110,7 +110,7 @@ class FoundationProviderRepositoryTest extends TestCase
         $this->expectExceptionMessageMatches('/^The (.*) directory must be present and writable.$/');
 
         $files = Double::for(Filesystem::class);
-        $files->shouldReceive('replace')->never();
+        $files->expects('replace')->never();
         $repo = new ProviderRepository(Double::for(ApplicationContract::class), $files, __DIR__.'/cache/services.php');
 
         $repo->writeManifest(['foo']);

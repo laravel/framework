@@ -24,7 +24,7 @@ class BroadcastEventTest extends TestCase
 
         $manager = Double::for(BroadcastingFactory::class);
 
-        $manager->expects('connection')->with(null)->andReturn($broadcaster);
+        $manager->expects('connection')->with(null)->returns($broadcaster);
 
         $event = new TestBroadcastEvent;
 
@@ -41,7 +41,7 @@ class BroadcastEventTest extends TestCase
 
         $manager = Double::for(BroadcastingFactory::class);
 
-        $manager->expects('connection')->with(null)->andReturn($broadcaster);
+        $manager->expects('connection')->with(null)->returns($broadcaster);
 
         $event = new TestBroadcastEventWithManualData;
 
@@ -56,7 +56,7 @@ class BroadcastEventTest extends TestCase
 
         $manager = Double::for(BroadcastingFactory::class);
 
-        $manager->expects('connection')->with('log')->andReturn($broadcaster);
+        $manager->expects('connection')->with('log')->returns($broadcaster);
 
         $event = new TestBroadcastEventWithSpecificBroadcaster;
 
@@ -77,8 +77,8 @@ class BroadcastEventTest extends TestCase
 
         $manager = Double::for(BroadcastingFactory::class);
 
-        $manager->expects('connection')->with('first_connection')->andReturn($broadcaster);
-        $manager->expects('connection')->with('second_connection')->andReturn($broadcaster);
+        $manager->expects('connection')->with('first_connection')->returns($broadcaster);
+        $manager->expects('connection')->with('second_connection')->returns($broadcaster);
 
         $event = new TestBroadcastEventWithChannelsPerConnection;
 
@@ -95,7 +95,7 @@ class BroadcastEventTest extends TestCase
 
         $manager = Double::for(BroadcastingFactory::class);
 
-        $manager->expects('connection')->with(null)->andReturn($broadcaster);
+        $manager->expects('connection')->with(null)->returns($broadcaster);
 
         $event = new TestBroadcastEventWithStringName;
 
@@ -112,7 +112,7 @@ class BroadcastEventTest extends TestCase
 
         $manager = Double::for(BroadcastingFactory::class);
 
-        $manager->expects('connection')->with(null)->andReturn($broadcaster);
+        $manager->expects('connection')->with(null)->returns($broadcaster);
 
         $event = new TestBroadcastEventWithEnumName;
 

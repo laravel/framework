@@ -16,12 +16,10 @@ class DatabaseMariaDbBuilderTest extends TestCase
         $connection = Double::for(Connection::class);
         $grammar = new MariaDbGrammar($connection);
 
-        $connection->expects('getConfig')->with('charset')->andReturn('utf8mb4');
-        $connection->expects('getConfig')->with('collation')->andReturn('utf8mb4_unicode_ci');
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('statement')->with(
-            'create database `my_temporary_database` default character set `utf8mb4` default collate `utf8mb4_unicode_ci`'
-        )->andReturn(true);
+        $connection->expects('getConfig')->with('charset')->returns('utf8mb4');
+        $connection->expects('getConfig')->with('collation')->returns('utf8mb4_unicode_ci');
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('statement')->with('create database `my_temporary_database` default character set `utf8mb4` default collate `utf8mb4_unicode_ci`')->returns(true);
 
         $builder = new MariaDbBuilder($connection);
         $builder->createDatabase('my_temporary_database');
@@ -32,10 +30,8 @@ class DatabaseMariaDbBuilderTest extends TestCase
         $connection = Double::for(Connection::class);
         $grammar = new MariaDbGrammar($connection);
 
-        $connection->expects('getSchemaGrammar')->andReturn($grammar);
-        $connection->expects('statement')->with(
-            'drop database if exists `my_database_a`'
-        )->andReturn(true);
+        $connection->expects('getSchemaGrammar')->returns($grammar);
+        $connection->expects('statement')->with('drop database if exists `my_database_a`')->returns(true);
 
         $builder = new MariaDbBuilder($connection);
 

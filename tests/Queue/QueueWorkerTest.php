@@ -786,7 +786,7 @@ class QueueWorkerTest extends TestCase
         };
 
         $handler = Double::for(CallQueuedHandler::class);
-        $handler->expects('getRunningCommand')->andReturn($interruptible);
+        $handler->expects('getRunningCommand')->returns($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);
         $job = new WorkerFakeJob;
@@ -809,7 +809,7 @@ class QueueWorkerTest extends TestCase
         };
 
         $handler = Double::for(CallQueuedHandler::class);
-        $handler->expects('getRunningCommand')->andReturn($interruptible);
+        $handler->expects('getRunningCommand')->returns($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);
         $job = new WorkerFakeJob;
@@ -841,7 +841,7 @@ class QueueWorkerTest extends TestCase
         };
 
         $handler = Double::for(CallQueuedHandler::class);
-        $handler->expects('getRunningCommand')->andReturn($interruptible);
+        $handler->expects('getRunningCommand')->returns($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);
         $job = new WorkerFakeJob;
@@ -866,7 +866,7 @@ class QueueWorkerTest extends TestCase
         };
 
         $handler = Double::for(CallQueuedHandler::class);
-        $handler->expects('getRunningCommand')->andReturn($interruptible);
+        $handler->expects('getRunningCommand')->returns($interruptible);
 
         $worker = $this->getWorker('default', ['queue' => []]);
         $job = new WorkerFakeJob;

@@ -27,11 +27,11 @@ class DatabaseEloquentHasOneTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault();
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentHasOneModelStub;
 
-        $this->related->expects('newInstance')->andReturn($newModel);
+        $this->related->expects('newInstance')->returns($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
 
@@ -44,11 +44,11 @@ class DatabaseEloquentHasOneTest extends TestCase
             $newModel->username = 'taylor';
         });
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentHasOneModelStub;
 
-        $this->related->expects('newInstance')->andReturn($newModel);
+        $this->related->expects('newInstance')->returns($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
 
@@ -63,11 +63,11 @@ class DatabaseEloquentHasOneTest extends TestCase
             $newModel->username = $parentModel->username;
         });
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentHasOneModelStub;
 
-        $this->related->expects('newInstance')->andReturn($newModel);
+        $this->related->expects('newInstance')->returns($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
 
@@ -82,11 +82,11 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $relation = $this->getRelation()->withDefault($attributes);
 
-        $this->builder->expects('first')->andReturnNull();
+        $this->builder->expects('first')->returns(null);
 
         $newModel = new EloquentHasOneModelStub;
 
-        $this->related->expects('newInstance')->andReturn($newModel);
+        $this->related->expects('newInstance')->returns($newModel);
 
         $this->assertSame($newModel, $relation->getResults());
 
@@ -180,16 +180,16 @@ class DatabaseEloquentHasOneTest extends TestCase
     protected function getRelation()
     {
         $this->builder = Double::for(Builder::class);
-        $this->builder->shouldReceive('whereNotNull')->with('table.foreign_key');
-        $this->builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
+        $this->builder->allows('whereNotNull')->with('table.foreign_key');
+        $this->builder->allows('where')->with('table.foreign_key', '=', 1);
         $this->related = Double::for(Model::class);
-        $this->builder->shouldReceive('getModel')->andReturn($this->related);
+        $this->builder->allows('getModel')->returns($this->related);
         $this->parent = Double::for(Model::class);
-        $this->parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $this->parent->shouldReceive('getAttribute')->with('username')->andReturn('taylor');
-        $this->parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
-        $this->parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-        $this->parent->shouldReceive('newQueryWithoutScopes')->andReturn($this->builder);
+        $this->parent->allows('getAttribute')->with('id')->returns(1);
+        $this->parent->allows('getAttribute')->with('username')->returns('taylor');
+        $this->parent->allows('getCreatedAtColumn')->returns('created_at');
+        $this->parent->allows('getUpdatedAtColumn')->returns('updated_at');
+        $this->parent->allows('newQueryWithoutScopes')->returns($this->builder);
 
         return new HasOne($this->builder, $this->parent, 'table.foreign_key', 'id');
     }

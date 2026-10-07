@@ -99,12 +99,12 @@ class QueueBeanstalkdQueueTest extends TestCase
 
         $pheanstalk = $this->queue->getPheanstalk();
         $pheanstalk->expects('watch')->with(Mockery::type(TubeName::class));
-        $pheanstalk->expects('listTubesWatched')->andReturn(new TubeList($tube));
+        $pheanstalk->expects('listTubesWatched')->returns(new TubeList($tube));
 
         $jobId = Double::for(JobIdInterface::class);
         $jobId->expects('getId');
         $job = new Job($jobId, '');
-        $pheanstalk->expects('reserveWithTimeout')->with(0)->andReturn($job);
+        $pheanstalk->expects('reserveWithTimeout')->with(0)->returns($job);
 
         $result = $this->queue->pop();
 
@@ -118,12 +118,12 @@ class QueueBeanstalkdQueueTest extends TestCase
 
         $pheanstalk = $this->queue->getPheanstalk();
         $pheanstalk->expects('watch')->with(Mockery::type(TubeName::class));
-        $pheanstalk->expects('listTubesWatched')->andReturn(new TubeList($tube));
+        $pheanstalk->expects('listTubesWatched')->returns(new TubeList($tube));
 
         $jobId = Double::for(JobIdInterface::class);
         $jobId->expects('getId');
         $job = new Job($jobId, '');
-        $pheanstalk->expects('reserveWithTimeout')->with(60)->andReturn($job);
+        $pheanstalk->expects('reserveWithTimeout')->with(60)->returns($job);
 
         $result = $this->queue->pop();
 
@@ -135,7 +135,7 @@ class QueueBeanstalkdQueueTest extends TestCase
         $this->setQueue('default', 60);
 
         $pheanstalk = $this->queue->getPheanstalk();
-        $pheanstalk->expects('useTube')->with(Mockery::type(TubeName::class))->andReturn($pheanstalk);
+        $pheanstalk->expects('useTube')->with(Mockery::type(TubeName::class))->returns($pheanstalk);
         $pheanstalk->expects('delete')->with(Mockery::type(JobIdInterface::class));
 
         $this->queue->deleteMessage('default', 1);

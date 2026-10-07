@@ -238,7 +238,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             public function newModelQuery()
             {
                 return Mockery::spy(parent::newModelQuery(), function (MockInterface $mock) {
-                    $mock->expects('forceDelete')->andThrow(new Exception());
+                    $mock->expects('forceDelete')->throws(new Exception());
                 });
             }
         };

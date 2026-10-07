@@ -54,21 +54,21 @@ class TranslationTranslatorTest extends TestCase
         $this->assertFalse($t->hasForLocale('foo', 'bar'));
 
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'foo', '*')->andReturn(['foo' => 'bar']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'foo', '*')->returns(['foo' => 'bar']);
         $this->assertTrue($t->hasForLocale('foo'));
 
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'foo', '*')->andReturn([]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'foo', '*')->returns([]);
         $this->assertFalse($t->hasForLocale('foo'));
     }
 
     public function testGetMethodProperlyLoadsAndRetrievesItem()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo']]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->returns(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo']]);
         $this->assertEquals(['tree bar', 'breeze bar'], $t->get('foo::bar.qux', ['foo' => 'bar'], 'en'));
         $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo', $t->get('foo::bar.foo'));
@@ -77,8 +77,8 @@ class TranslationTranslatorTest extends TestCase
     public function testGetMethodProperlyLoadsAndRetrievesArrayItem()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo', 'beep' => ['rock' => 'tree :foo']]]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->returns(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo', 'beep' => ['rock' => 'tree :foo']]]);
         $this->assertEquals(['foo' => 'foo', 'baz' => 'breeze bar', 'qux' => ['tree bar', 'breeze bar', 'beep' => ['rock' => 'tree bar']]], $t->get('foo::bar', ['foo' => 'bar'], 'en'));
         $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo', $t->get('foo::bar.foo'));
@@ -87,16 +87,16 @@ class TranslationTranslatorTest extends TestCase
     public function testStringMethodProperlyLoadsAndRetrievesStringItem()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->andReturn(['baz' => 'breeze :foo']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->returns(['baz' => 'breeze :foo']);
         $this->assertSame('breeze bar', $t->string('foo::bar.baz', ['foo' => 'bar'], 'en'));
     }
 
     public function testStringMethodThrowsExceptionForArrayItem()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->andReturn(['baz' => ['breeze']]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->returns(['baz' => ['breeze']]);
         $this->expectExceptionObject(new InvalidArgumentException('Translation value for key [foo::bar.baz] must be a string, array given.'));
 
         $t->string('foo::bar.baz', [], 'en');
@@ -105,16 +105,16 @@ class TranslationTranslatorTest extends TestCase
     public function testArrayMethodProperlyLoadsAndRetrievesArrayItem()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->andReturn(['baz' => ['breeze :foo']]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->returns(['baz' => ['breeze :foo']]);
         $this->assertSame(['breeze bar'], $t->array('foo::bar.baz', ['foo' => 'bar'], 'en'));
     }
 
     public function testArrayMethodThrowsExceptionForStringItem()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->andReturn(['baz' => 'breeze']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->returns(['baz' => 'breeze']);
         $this->expectExceptionObject(new InvalidArgumentException('Translation value for key [foo::bar.baz] must be an array, string given.'));
 
         $t->array('foo::bar.baz', [], 'en');
@@ -123,9 +123,9 @@ class TranslationTranslatorTest extends TestCase
     public function testGetMethodForNonExistingReturnsSameKey()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo']]);
-        $t->getLoader()->expects('load')->with('en', 'unknown', 'foo')->andReturn([]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->returns(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo']]);
+        $t->getLoader()->expects('load')->with('en', 'unknown', 'foo')->returns([]);
         $this->assertSame('foo::unknown', $t->get('foo::unknown', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo::bar.unknown', $t->get('foo::bar.unknown', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo::unknown.bar', $t->get('foo::unknown.bar'));
@@ -134,8 +134,8 @@ class TranslationTranslatorTest extends TestCase
     public function testTransMethodProperlyLoadsAndRetrievesItemWithHTMLInTheMessage()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'foo', '*')->andReturn(['bar' => 'breeze <p>test</p>']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'foo', '*')->returns(['bar' => 'breeze <p>test</p>']);
         $this->assertSame('breeze <p>test</p>', $t->get('foo.bar', [], 'en'));
     }
 
@@ -143,8 +143,8 @@ class TranslationTranslatorTest extends TestCase
     public function testGetMethodProperlyLoadsAndRetrievesItemWithCapitalization()
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods([])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :0 :Foo :BAR']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->returns(['foo' => 'foo', 'baz' => 'breeze :0 :Foo :BAR']);
         $this->assertSame('breeze john Bar FOO', $t->get('foo::bar.baz', ['john', 'foo' => 'bar', 'bar' => 'foo'], 'en'));
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
@@ -152,8 +152,8 @@ class TranslationTranslatorTest extends TestCase
     public function testGetMethodProperlyLoadsAndRetrievesItemWithLongestReplacementsFirst()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo :foobar']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->returns(['foo' => 'foo', 'baz' => 'breeze :foo :foobar']);
         $this->assertSame('breeze bar taylor', $t->get('foo::bar.baz', ['foo' => 'bar', 'foobar' => 'taylor'], 'en'));
         $this->assertSame('breeze foo bar baz taylor', $t->get('foo::bar.baz', ['foo' => 'foo bar baz', 'foobar' => 'taylor'], 'en'));
         $this->assertSame('foo', $t->get('foo::bar.foo'));
@@ -163,9 +163,9 @@ class TranslationTranslatorTest extends TestCase
     {
         $t = new Translator($this->getLoader(), 'en');
         $t->setFallback('lv');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->andReturn([]);
-        $t->getLoader()->expects('load')->with('lv', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'bar', 'foo')->returns([]);
+        $t->getLoader()->expects('load')->with('lv', 'bar', 'foo')->returns(['foo' => 'foo', 'baz' => 'breeze :foo']);
         $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
@@ -174,7 +174,7 @@ class TranslationTranslatorTest extends TestCase
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['getLine'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->setFallback('en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
 
         $t->expects($this->once())->method('getLine')->with('*', 'messages', 'en', 'test', [])->willReturn(null);
 
@@ -184,8 +184,8 @@ class TranslationTranslatorTest extends TestCase
     public function testGetMethodProperlyLoadsAndRetrievesItemForGlobalNamespace()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'foo', '*')->andReturn(['bar' => 'breeze :foo']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'foo', '*')->returns(['bar' => 'breeze :foo']);
         $this->assertSame('breeze bar', $t->get('foo.bar', ['foo' => 'bar']));
     }
 
@@ -195,7 +195,7 @@ class TranslationTranslatorTest extends TestCase
         $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
         $t->expects($this->once())->method('localeForChoice')->with('foo', null)->willReturn('en');
         $selector = Double::for(MessageSelector::class);
-        $selector->expects('choose')->with('line', 10, 'en')->andReturn('choiced');
+        $selector->expects('choose')->with('line', 10, 'en')->returns('choiced');
         $t->setSelector($selector);
 
         $t->choice('foo', 10, ['replace']);
@@ -207,7 +207,7 @@ class TranslationTranslatorTest extends TestCase
         $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
         $t->expects($this->once())->method('localeForChoice')->with('foo', null)->willReturn('en');
         $selector = Double::for(MessageSelector::class);
-        $selector->expects('choose')->with('line', 1.2, 'en')->andReturn('choiced');
+        $selector->expects('choose')->with('line', 1.2, 'en')->returns('choiced');
         $t->setSelector($selector);
 
         $t->choice('foo', 1.2, ['replace']);
@@ -216,7 +216,7 @@ class TranslationTranslatorTest extends TestCase
     public function testChoiceMethodProperlyCountsCollectionsAndLoadsAndRetrievesItem()
     {
         $selector = Double::for(MessageSelector::class);
-        $selector->expects('choose')->times(2)->with('line', 3, 'en')->andReturn('choiced');
+        $selector->expects('choose')->times(2)->with('line', 3, 'en')->returns('choiced');
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get', 'localeForChoice'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->exactly(2))->method('get')->with('foo', [], 'en')->willReturn('line');
         $t->expects($this->exactly(2))->method('localeForChoice')->with('foo', null)->willReturn('en');
@@ -236,7 +236,7 @@ class TranslationTranslatorTest extends TestCase
         $t->expects($this->once())->method('get')->with('foo', [], 'en')->willReturn('line');
         $t->expects($this->once())->method('hasForLocale')->with('foo', 'cs')->willReturn(false);
         $selector = Double::for(MessageSelector::class);
-        $selector->expects('choose')->with('line', 10, 'en')->andReturn('choiced');
+        $selector->expects('choose')->with('line', 10, 'en')->returns('choiced');
         $t->setSelector($selector);
 
         $t->choice('foo', 10, ['replace']);
@@ -248,7 +248,7 @@ class TranslationTranslatorTest extends TestCase
         $t->expects($this->once())->method('get')->with(':count foos', [], 'en')->willReturn('{1} :count foos|[2,*] :count foos');
         $t->expects($this->once())->method('localeForChoice')->with(':count foos', null)->willReturn('en');
         $selector = Double::for(MessageSelector::class);
-        $selector->expects('choose')->with('{1} :count foos|[2,*] :count foos', 1234, 'en')->andReturn(':count foos');
+        $selector->expects('choose')->with('{1} :count foos|[2,*] :count foos', 1234, 'en')->returns(':count foos');
         $t->setSelector($selector);
 
         $this->assertSame('1,234 foos', $t->choice(':count foos', 1234, ['count' => '1,234']));
@@ -257,85 +257,82 @@ class TranslationTranslatorTest extends TestCase
     public function testGetJson()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn(['foo' => 'one']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns(['foo' => 'one']);
         $this->assertSame('one', $t->get('foo'));
     }
 
     public function testGetJsonReplaces()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn(['foo :i:c :u' => 'bar :i:c :u']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns(['foo :i:c :u' => 'bar :i:c :u']);
         $this->assertSame('bar onetwo three', $t->get('foo :i:c :u', ['i' => 'one', 'c' => 'two', 'u' => 'three']));
     }
 
     public function testGetJsonHasAtomicReplacements()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn(['Hello :foo!' => 'Hello :foo!']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns(['Hello :foo!' => 'Hello :foo!']);
         $this->assertSame('Hello baz:bar!', $t->get('Hello :foo!', ['foo' => 'baz:bar', 'bar' => 'abcdef']));
     }
 
     public function testGetJsonReplacesForAssociativeInput()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn(['foo :i :c' => 'bar :i :c']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns(['foo :i :c' => 'bar :i :c']);
         $this->assertSame('bar eye see', $t->get('foo :i :c', ['i' => 'eye', 'c' => 'see']));
     }
 
     public function testGetJsonPreservesOrder()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn(['to :name I give :greeting' => ':greeting :name']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns(['to :name I give :greeting' => ':greeting :name']);
         $this->assertSame('Greetings David', $t->get('to :name I give :greeting', ['name' => 'David', 'greeting' => 'Greetings']));
     }
 
     public function testGetJsonForNonExistingJsonKeyLooksForRegularKeys()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'foo', '*')->andReturn(['bar' => 'one']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'foo', '*')->returns(['bar' => 'one']);
         $this->assertSame('one', $t->get('foo.bar'));
     }
 
     public function testGetJsonForNonExistingJsonKeyLooksForRegularKeysAndReplace()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'foo', '*')->andReturn(['bar' => 'one :message']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'foo', '*')->returns(['bar' => 'one :message']);
         $this->assertSame('one two', $t->get('foo.bar', ['message' => 'two']));
     }
 
     public function testGetJsonForNonExistingReturnsSameKey()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'Foo that bar', '*')->andReturn([]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'Foo that bar', '*')->returns([]);
         $this->assertSame('Foo that bar', $t->get('Foo that bar'));
     }
 
     public function testGetJsonForNonExistingReturnsSameKeyAndReplaces()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'foo :message', '*')->andReturn([]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'foo :message', '*')->returns([]);
         $this->assertSame('foo baz', $t->get('foo :message', ['message' => 'baz']));
     }
 
     public function testEmptyFallbacks()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'foo :message', '*')->andReturn([]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'foo :message', '*')->returns([]);
         $this->assertSame('foo ', $t->get('foo :message', ['message' => null]));
     }
 
     public function testGetJsonReplacesWithStringable()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()
-            ->expects('load')
-            ->with('en', '*', '*')
-            ->andReturn(['test' => 'the date is :date']);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns(['test' => 'the date is :date']);
 
         $date = Carbon::createFromTimestamp(0);
 
@@ -356,10 +353,7 @@ class TranslationTranslatorTest extends TestCase
     public function testGetJsonReplacesWithEnums()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->getLoader()
-            ->expects('load')
-            ->with('en', '*', '*')
-            ->andReturn([
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([
                 'string_backed_enum' => 'Laravel 12 was released in :month 2025',
                 'int_backed_enum' => 'Stay tuned for Laravel v:version',
                 'unit_enum' => ':person gets excited about every new Laravel release',
@@ -385,8 +379,8 @@ class TranslationTranslatorTest extends TestCase
     {
         $t = new Translator($this->getLoader(), 'en');
 
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'We have some nice <docs-link>documentation</docs-link>', '*')->andReturn([]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'We have some nice <docs-link>documentation</docs-link>', '*')->returns([]);
 
         $this->assertSame(
             'We have some nice <a href="https://laravel.com/docs">documentation</a>',
@@ -403,8 +397,8 @@ class TranslationTranslatorTest extends TestCase
     {
         $t = new Translator($this->getLoader(), 'en');
 
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', '<bold-this>bold</bold-this> something else <bold-this>also bold</bold-this>', '*')->andReturn([]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', '<bold-this>bold</bold-this> something else <bold-this>also bold</bold-this>', '*')->returns([]);
 
         $this->assertSame(
             '<b>bold</b> something else <b>also bold</b>',
@@ -425,9 +419,9 @@ class TranslationTranslatorTest extends TestCase
 
             return ['en', 'lz'];
         });
-        $t->getLoader()->expects('load')->with('en', '*', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('en', 'foo', '*')->andReturn([]);
-        $t->getLoader()->expects('load')->with('lz', 'foo', '*')->andReturn([]);
+        $t->getLoader()->expects('load')->with('en', '*', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('en', 'foo', '*')->returns([]);
+        $t->getLoader()->expects('load')->with('lz', 'foo', '*')->returns([]);
         $this->assertSame('foo', $t->get('foo'));
     }
 

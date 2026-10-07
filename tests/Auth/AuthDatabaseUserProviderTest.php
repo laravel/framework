@@ -130,7 +130,7 @@ class AuthDatabaseUserProviderTest extends TestCase
     {
         $conn = new Connection(new PDO('sqlite::memory:'));
         $hasher = Double::for(Hasher::class);
-        $hasher->shouldReceive('check')->never();
+        $hasher->expects('check')->never();
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = Mockery::mock(Authenticatable::class);
         $user->expects('getAuthPassword')->andReturn(null);

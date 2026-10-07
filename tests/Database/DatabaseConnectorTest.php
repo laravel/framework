@@ -31,8 +31,8 @@ class DatabaseConnectorTest extends TestCase
         $connection = Double::for(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
-        $connection->expects('exec')->with('use `bar`;')->andReturn(true);
-        $connection->expects('exec')->with("SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';")->andReturn(true);
+        $connection->expects('exec')->with('use `bar`;')->returns(true);
+        $connection->expects('exec')->with("SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';")->returns(true);
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -56,9 +56,9 @@ class DatabaseConnectorTest extends TestCase
         $connection = Double::for(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
-        $connection->expects('exec')->with('use `bar`;')->andReturn(true);
-        $connection->expects('exec')->with('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;')->andReturn(true);
-        $connection->expects('exec')->with("SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';")->andReturn(true);
+        $connection->expects('exec')->with('use `bar`;')->returns(true);
+        $connection->expects('exec')->with('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;')->returns(true);
+        $connection->expects('exec')->with("SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';")->returns(true);
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -73,8 +73,8 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Double::for(PDOStatement::class);
-        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
-        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $connection->allows('prepare')->returns($statement);
+        $statement->allows('execute');
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -94,7 +94,7 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Double::for(PDOStatement::class);
-        $connection->expects('prepare')->with($expectedSql)->andReturn($statement);
+        $connection->expects('prepare')->with($expectedSql)->returns($statement);
         $statement->expects('execute');
         $result = $connector->connect($config);
 
@@ -180,7 +180,7 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Double::for(PDOStatement::class);
-        $connection->expects('prepare')->with('set search_path to "public", "user"')->andReturn($statement);
+        $connection->expects('prepare')->with('set search_path to "public", "user"')->returns($statement);
         $statement->expects('execute');
         $result = $connector->connect($config);
 
@@ -196,8 +196,8 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Double::for(PDOStatement::class);
-        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
-        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $connection->allows('prepare')->returns($statement);
+        $statement->allows('execute');
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -212,8 +212,8 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Double::for(PDOStatement::class);
-        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
-        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $connection->allows('prepare')->returns($statement);
+        $statement->allows('execute');
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -228,8 +228,8 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Double::for(PDOStatement::class);
-        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
-        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $connection->allows('prepare')->returns($statement);
+        $statement->allows('execute');
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -244,8 +244,8 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Double::for(PDOStatement::class);
-        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
-        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $connection->allows('prepare')->returns($statement);
+        $statement->allows('execute');
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -260,8 +260,8 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Double::for(PDOStatement::class);
-        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
-        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $connection->allows('prepare')->returns($statement);
+        $statement->allows('execute');
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -276,8 +276,8 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Double::for(PDOStatement::class);
-        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
-        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $connection->allows('prepare')->returns($statement);
+        $statement->allows('execute');
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -292,8 +292,8 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Double::for(PDOStatement::class);
-        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
-        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $connection->allows('prepare')->returns($statement);
+        $statement->allows('execute');
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -308,8 +308,8 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Double::for(PDOStatement::class);
-        $connection->shouldReceive('prepare')->zeroOrMoreTimes()->andReturn($statement);
-        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $connection->allows('prepare')->returns($statement);
+        $statement->allows('execute');
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -324,9 +324,9 @@ class DatabaseConnectorTest extends TestCase
         $connector->expects($this->once())->method('getOptions')->with($config)->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($dsn, $config, ['options'])->willReturn($connection);
         $statement = Double::for(PDOStatement::class);
-        $connection->expects('prepare')->with('set session characteristics as transaction isolation level SERIALIZABLE')->andReturn($statement);
-        $statement->shouldReceive('execute')->zeroOrMoreTimes();
-        $connection->shouldReceive('exec')->zeroOrMoreTimes();
+        $connection->expects('prepare')->with('set session characteristics as transaction isolation level SERIALIZABLE')->returns($statement);
+        $statement->allows('execute');
+        $connection->allows('exec');
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);

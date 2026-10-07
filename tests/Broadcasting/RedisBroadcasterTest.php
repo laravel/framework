@@ -161,10 +161,8 @@ class RedisBroadcasterTest extends TestCase
         $request = Request::create('/', 'POST', ['channel_name' => $channel]);
 
         $user = Double::for('User');
-        $user->shouldReceive('getAuthIdentifierForBroadcasting')
-            ->andReturn(42);
-        $user->shouldReceive('getAuthIdentifier')
-            ->andReturn(42);
+        $user->allows('getAuthIdentifierForBroadcasting')->returns(42);
+        $user->allows('getAuthIdentifier')->returns(42);
 
         $request->setUserResolver(fn () => $user);
 

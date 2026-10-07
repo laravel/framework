@@ -29,9 +29,9 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         $relation->withPivotValue(['is_admin' => 1]);
 
         $query = Double::for(QueryBuilder::class);
-        $query->expects('from')->with('club_user')->andReturn($query);
-        $query->expects('insert')->with([['club_id' => 1, 'user_id' => 1, 'is_admin' => 1]])->andReturn(true);
-        $relation->getQuery()->getQuery()->expects('newQuery')->andReturn($query);
+        $query->expects('from')->with('club_user')->returns($query);
+        $query->expects('insert')->with([['club_id' => 1, 'user_id' => 1, 'is_admin' => 1]])->returns(true);
+        $relation->getQuery()->getQuery()->expects('newQuery')->returns($query);
 
         $relation->attach(1);
     }
@@ -39,26 +39,26 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
     public function getRelationArguments()
     {
         $parent = Double::for(Model::class);
-        $parent->shouldReceive('getKey')->andReturn(1);
-        $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
-        $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $parent->allows('getKey')->returns(1);
+        $parent->allows('getCreatedAtColumn')->returns('created_at');
+        $parent->allows('getUpdatedAtColumn')->returns('updated_at');
+        $parent->allows('getAttribute')->with('id')->returns(1);
 
         $builder = Double::for(Builder::class);
         $related = Double::for(Model::class);
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $builder->allows('getModel')->returns($related);
 
-        $related->shouldReceive('getTable')->andReturn('users');
-        $related->shouldReceive('getKeyName')->andReturn('id');
-        $related->shouldReceive('qualifyColumn')->with('id')->andReturn('users.id');
+        $related->allows('getTable')->returns('users');
+        $related->allows('getKeyName')->returns('id');
+        $related->allows('qualifyColumn')->with('id')->returns('users.id');
 
         $builder->expects('join')->with('club_user', 'users.id', '=', 'club_user.user_id');
         $builder->expects('where')->with('club_user.club_id', '=', 1);
         $builder->expects('where')->with('club_user.is_admin', '=', 1, 'and');
 
         $mockQueryBuilder = Double::for(QueryBuilder::class);
-        $builder->shouldReceive('getQuery')->andReturn($mockQueryBuilder);
-        $mockQueryBuilder->shouldReceive('getGrammar')->andReturn(new Grammar(Double::for(Connection::class)));
+        $builder->allows('getQuery')->returns($mockQueryBuilder);
+        $mockQueryBuilder->allows('getGrammar')->returns(new Grammar(Double::for(Connection::class)));
 
         return [
             $builder,

@@ -20,7 +20,7 @@ class DatabaseMigrationInstallCommandTest extends TestCase
         $command->setLaravel(new Application);
         $repo->expects('setSource')->with('foo');
         $repo->expects('createRepository');
-        $repo->expects('repositoryExists')->andReturn(false);
+        $repo->expects('repositoryExists')->returns(false);
 
         $this->runCommand($command, ['--database' => 'foo']);
     }
@@ -31,7 +31,7 @@ class DatabaseMigrationInstallCommandTest extends TestCase
         $command = new InstallCommand($repo);
         $command->setLaravel(new Application);
         $repo->expects('setSource')->with('foo');
-        $repo->expects('repositoryExists')->andReturn(true);
+        $repo->expects('repositoryExists')->returns(true);
 
         $this->runCommand($command, ['--database' => 'foo']);
     }

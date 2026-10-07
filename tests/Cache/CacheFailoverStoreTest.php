@@ -30,8 +30,8 @@ class CacheFailoverStoreTest extends TestCase
         $storeB->lock('lock-b', 60)->get();
 
         $cache = Double::for(CacheManager::class);
-        $cache->expects('store')->with('store-a')->andReturn(new Repository($storeA));
-        $cache->expects('store')->with('store-b')->andReturn(new Repository($storeB));
+        $cache->expects('store')->with('store-a')->returns(new Repository($storeA));
+        $cache->expects('store')->with('store-b')->returns(new Repository($storeB));
 
         $failover = new FailoverStore($cache, new Dispatcher, ['store-a', 'store-b']);
 

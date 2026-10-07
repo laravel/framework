@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Contracts\Database\ModelIdentifier;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -21,11 +22,11 @@ class NotificationSendQueuedNotificationTest extends TestCase
         $notification = new TestNotification;
         $job = new SendQueuedNotifications('notifiables', $notification);
         $manager = Double::for(ChannelManager::class);
-        $manager->expects('sendNow')->withArgs(function ($notifiables, $notification, $channels) {
+        $manager->expects('sendNow')->with(Argument::all(function ($notifiables, $notification, $channels) {
             return $notifiables instanceof Collection && $notifiables->toArray() === ['notifiables']
                 && $notification instanceof TestNotification
                 && $channels === null;
-        });
+        }));
         $job->handle($manager);
     }
 

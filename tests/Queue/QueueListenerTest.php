@@ -19,7 +19,7 @@ class QueueListenerTest extends TestCase
         $process = Double::for(Process::class)->passthru();
         $process->expects('run');
         $listener = Double::for(Listener::class)->passthru();
-        $listener->expects('memoryExceeded')->with(1)->andReturn(false);
+        $listener->expects('memoryExceeded')->with(1)->returns(false);
 
         $listener->runProcess($process, 1);
     }
@@ -29,7 +29,7 @@ class QueueListenerTest extends TestCase
         $process = Double::for(Process::class)->passthru();
         $process->expects('run');
         $listener = Double::for(Listener::class)->passthru();
-        $listener->expects('memoryExceeded')->with(1)->andReturn(true);
+        $listener->expects('memoryExceeded')->with(1)->returns(true);
         $listener->expects('stop');
 
         $listener->runProcess($process, 1);

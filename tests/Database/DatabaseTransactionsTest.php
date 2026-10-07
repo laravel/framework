@@ -165,7 +165,7 @@ class DatabaseTransactionsTest extends TestCase
         $transactionManager = Double::for(new DatabaseTransactionsManager);
         $transactionManager->expects('begin')->with('default', 1);
         $transactionManager->expects('rollback')->with('default', 0);
-        $transactionManager->shouldNotReceive('commit');
+        $transactionManager->expects('commit')->never();
 
         $this->connection()->setTransactionManager($transactionManager);
 
@@ -214,7 +214,7 @@ class DatabaseTransactionsTest extends TestCase
         $transactionManager->expects('begin')->with('default', 2);
         $transactionManager->expects('rollback')->with('default', 1);
         $transactionManager->expects('rollback')->with('default', 0);
-        $transactionManager->shouldNotReceive('commit');
+        $transactionManager->expects('commit')->never();
 
         $this->connection()->setTransactionManager($transactionManager);
 

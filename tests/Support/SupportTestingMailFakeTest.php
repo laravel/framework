@@ -32,8 +32,7 @@ class SupportTestingMailFakeTest extends TestCase
     protected function setUp(): void
     {
         $this->mailManager = Mockery::mock(MailManager::class, function ($mock) {
-            $mock->expects('getDefaultDriver')
-                ->andReturn('smtp');
+            $mock->expects('getDefaultDriver')->returns('smtp');
         });
         $this->fake = new MailFake($this->mailManager);
         $this->mailable = new MailableStub;
@@ -422,7 +421,7 @@ class SupportTestingMailFakeTest extends TestCase
 
     public function testMissingMethodsAreForwarded()
     {
-        $this->mailManager->expects('foo')->andReturn('bar');
+        $this->mailManager->expects('foo')->returns('bar');
 
         $this->assertSame('bar', $this->fake->foo());
     }

@@ -37,12 +37,12 @@ class DatabaseSeederTest extends TestCase
         $output = Double::for(OutputInterface::class);
         $output->expects('writeln')->times(3);
         $command = Double::for(Command::class);
-        $command->expects('getOutput')->times(3)->andReturn($output);
+        $command->expects('getOutput')->times(3)->returns($output);
         $seeder->setCommand($command);
         $child = Double::for(Seeder::class);
-        $container->expects('make')->with('ClassName')->andReturn($child);
-        $child->expects('setContainer')->with($container)->andReturn($child);
-        $child->expects('setCommand')->with($command)->andReturn($child);
+        $container->expects('make')->with('ClassName')->returns($child);
+        $child->expects('setContainer')->with($container)->returns($child);
+        $child->expects('setCommand')->with($command)->returns($child);
         $child->expects('__invoke');
 
         $seeder->call('ClassName');

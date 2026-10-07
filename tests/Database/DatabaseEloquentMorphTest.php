@@ -129,10 +129,10 @@ class DatabaseEloquentMorphTest extends TestCase
         $builder->expects('whereNotNull')->with('table.morph_id');
         $builder->expects('where')->with('table.morph_id', '=', 1);
         $related = new EloquentMorphResetModelStub;
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $builder->allows('getModel')->returns($related);
         $parent = Double::for(Model::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
+        $parent->allows('getAttribute')->with('id')->returns(1);
+        $parent->allows('getMorphClass')->returns(get_class($parent));
         $builder->expects('where')->with('table.morph_type', get_class($parent));
 
         return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
@@ -144,10 +144,10 @@ class DatabaseEloquentMorphTest extends TestCase
         $builder->expects('whereNotNull')->with('table.morph_id');
         $builder->expects('where')->with('table.morph_id', '=', 1);
         $related = new EloquentMorphResetModelStub;
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $builder->allows('getModel')->returns($related);
         $parent = Double::for(Model::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
+        $parent->allows('getAttribute')->with('id')->returns(1);
+        $parent->allows('getMorphClass')->returns(get_class($parent));
         $builder->expects('where')->with('table.morph_type', get_class($parent));
 
         return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
@@ -165,10 +165,10 @@ class DatabaseEloquentMorphTest extends TestCase
         $builder->expects('whereNotNull')->with('table.morph_id');
         $builder->expects('where')->with('table.morph_id', '=', 1);
         $related = new EloquentMorphResetModelStub;
-        $builder->shouldReceive('getModel')->andReturn($related);
+        $builder->allows('getModel')->returns($related);
         $parent = Double::for(EloquentModelNamespacedStub::class);
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $parent->shouldReceive('getMorphClass')->andReturn($alias);
+        $parent->allows('getAttribute')->with('id')->returns(1);
+        $parent->allows('getMorphClass')->returns($alias);
         $builder->expects('where')->with('table.morph_type', $alias);
 
         return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');

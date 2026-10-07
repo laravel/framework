@@ -33,7 +33,7 @@ class QueuePauseResumeTest extends TestCase
     {
         // Mock the cache facade to return our cache repository
         $cacheMock = Double::for(CacheFactory::class);
-        $cacheMock->shouldReceive('store')->andReturn($cache);
+        $cacheMock->allows('store')->returns($cache);
 
         $app = [
             'config' => [

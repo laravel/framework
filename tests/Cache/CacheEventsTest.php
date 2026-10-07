@@ -234,7 +234,7 @@ class CacheEventsTest extends TestCase
     {
         $dispatcher = $this->getDispatcher();
         $store = Double::for(Store::class);
-        $store->expects('forget')->andReturn(false);
+        $store->expects('forget')->returns(false);
         $repository = new Repository($store);
         $repository->setEventDispatcher($dispatcher);
 
@@ -275,7 +275,7 @@ class CacheEventsTest extends TestCase
 
         // Create a store that fails to flush
         $failingStore = Double::for(Store::class);
-        $failingStore->expects('flush')->andReturn(false);
+        $failingStore->expects('flush')->returns(false);
 
         $repository = new Repository($failingStore, ['store' => 'array']);
         $repository->setEventDispatcher($dispatcher);
@@ -293,7 +293,7 @@ class CacheEventsTest extends TestCase
 
         // Create a store that fails to flush locks
         $failingStore = Double::for(ArrayStore::class);
-        $failingStore->expects('flushLocks')->andReturn(false);
+        $failingStore->expects('flushLocks')->returns(false);
 
         $repository = new Repository($failingStore, ['store' => 'array']);
         $repository->setEventDispatcher($dispatcher);

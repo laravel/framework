@@ -141,9 +141,9 @@ class InteractsWithDatabaseTest extends TestCase
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$grammar.'Grammar';
         $grammar = new $grammarClass($connection);
 
-        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
+        $connection->allows('getQueryGrammar')->returns($grammar);
 
-        $connection->shouldReceive('raw')->andReturnUsing(function ($value) {
+        $connection->allows('raw')->resolves(function ($value) {
             return new Expression($value);
         });
 

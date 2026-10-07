@@ -179,8 +179,8 @@ class HandleExceptionsTest extends TestCase
         $logger = Double::for(LogManager::class);
         $this->app->instance(LogManager::class, $logger);
 
-        $logger->shouldNotReceive('channel');
-        $logger->shouldNotReceive('warning');
+        $logger->expects('channel')->never();
+        $logger->expects('warning')->never();
 
         $this->expectExceptionObject(new ErrorException('Something went wrong'));
 

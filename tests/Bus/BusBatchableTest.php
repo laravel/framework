@@ -25,7 +25,7 @@ class BusBatchableTest extends TestCase
         Container::setInstance($container = new Container);
 
         $repository = Double::for(BatchRepository::class);
-        $repository->expects('find')->with('test-batch-id')->andReturn('test-batch');
+        $repository->expects('find')->with('test-batch-id')->returns('test-batch');
         $container->instance(BatchRepository::class, $repository);
 
         $this->assertSame('test-batch', $class->batch());

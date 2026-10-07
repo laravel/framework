@@ -187,10 +187,10 @@ class DatabaseQueryExceptionTest extends TestCase
 
         $grammar = new Grammar($connection);
 
-        $connection->shouldReceive('getName')->andReturn('default');
-        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
-        $connection->shouldReceive('escape')->with(1, false)->andReturn(1);
-        $connection->shouldReceive('escape')->with('br', false)->andReturn("'br'");
+        $connection->allows('getName')->returns('default');
+        $connection->allows('getQueryGrammar')->returns($grammar);
+        $connection->allows('escape')->with(1, false)->returns(1);
+        $connection->allows('escape')->with('br', false)->returns("'br'");
 
         return $connection;
     }

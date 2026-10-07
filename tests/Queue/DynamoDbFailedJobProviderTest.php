@@ -64,7 +64,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 ':application' => ['S' => 'application'],
             ],
             'ScanIndexForward' => false,
-        ])->andReturn([
+        ])->returns([
             'Items' => [
                 [
                     'application' => ['S' => 'application'],
@@ -107,7 +107,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 'application' => ['S' => 'application'],
                 'uuid' => ['S' => 'id'],
             ],
-        ])->andReturn([
+        ])->returns([
             'Item' => [
                 'application' => ['S' => 'application'],
                 'uuid' => ['S' => 'uuid'],
@@ -146,7 +146,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 'application' => ['S' => 'application'],
                 'uuid' => ['S' => 'id'],
             ],
-        ])->andReturn([]);
+        ])->returns([]);
 
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
 
@@ -165,7 +165,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
                 'application' => ['S' => 'application'],
                 'uuid' => ['S' => 'id'],
             ],
-        ])->andReturn([]);
+        ])->returns([]);
 
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
 

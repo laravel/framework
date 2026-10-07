@@ -278,9 +278,9 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $model = Double::for(Model::class);
         $builder = Double::for(Builder::class);
-        $model->expects('newQueryWithoutRelationships')->andReturn($builder);
-        $builder->expects('with')->with(['bar', 'baz'])->andReturnSelf();
-        $builder->expects('eagerLoadRelations')->with([$model])->andReturn(['results']);
+        $model->expects('newQueryWithoutRelationships')->returns($builder);
+        $builder->expects('with')->with(['bar', 'baz'])->returns($builder);
+        $builder->expects('eagerLoadRelations')->with([$model])->returns(['results']);
         $c = new Collection([$model]);
         $c->load('bar', 'baz');
 
@@ -290,7 +290,7 @@ class DatabaseEloquentCollectionTest extends TestCase
     public function testLoadMissingWithoutRelationsDoesNotBuildAQuery()
     {
         $model = Double::for(Model::class);
-        $model->shouldNotReceive('newQueryWithoutRelationships');
+        $model->expects('newQueryWithoutRelationships')->never();
         $c = new Collection([$model]);
 
         $this->assertSame($c, $c->loadMissing([]));
@@ -707,16 +707,16 @@ class DatabaseEloquentCollectionTest extends TestCase
     public function testCanConvertCollectionOfModelsToEloquentQueryBuilder()
     {
         $one = Double::for(Model::class);
-        $one->shouldReceive('getKey')->andReturn(1);
+        $one->allows('getKey')->returns(1);
 
         $two = Double::for(Model::class);
-        $two->shouldReceive('getKey')->andReturn(2);
+        $two->allows('getKey')->returns(2);
 
         $c = new Collection([$one, $two]);
 
         $mocBuilder = Double::for(Builder::class);
-        $one->expects('newModelQuery')->andReturn($mocBuilder);
-        $mocBuilder->expects('whereKey')->with($c->modelKeys())->andReturn($mocBuilder);
+        $one->expects('newModelQuery')->returns($mocBuilder);
+        $mocBuilder->expects('whereKey')->with($c->modelKeys())->returns($mocBuilder);
         $this->assertInstanceOf(Builder::class, $c->toQuery());
     }
 

@@ -62,15 +62,13 @@ class MailSesV2TransportTest extends TestCase
 
         $client = Double::for(SesV2Client::class);
         $sesResult = new Result(['MessageId' => 'ses-message-id']);
-        $client->expects('sendEmail')
-            ->with(Mockery::on(function ($arg) {
+        $client->expects('sendEmail')->with(Mockery::on(function ($arg) {
                 return $arg['Source'] === 'myself@example.com' &&
                     $arg['Destination']['ToAddresses'] === ['me@example.com', 'you@example.com'] &&
                     $arg['ListManagementOptions'] === ['ContactListName' => 'TestList', 'TopicName' => 'TestTopic'] &&
                     $arg['EmailTags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']] &&
                     str_contains($arg['Content']['Raw']['Data'], 'Reply-To: Taylor Otwell <taylor@example.com>');
-            }))
-            ->andReturn($sesResult);
+            }))->returns($sesResult);
 
         (new SesV2Transport($client))->send($message);
     }
@@ -86,11 +84,9 @@ class MailSesV2TransportTest extends TestCase
 
         $client = Double::for(SesV2Client::class);
         $sesResult = new Result(['MessageId' => 'ses-message-id']);
-        $client->expects('sendEmail')
-            ->with(Mockery::on(function ($arg) {
+        $client->expects('sendEmail')->with(Mockery::on(function ($arg) {
                 return $arg['TenantName'] === 'my-tenant';
-            }))
-            ->andReturn($sesResult);
+            }))->returns($sesResult);
 
         (new SesV2Transport($client))->send($message);
     }
@@ -105,11 +101,9 @@ class MailSesV2TransportTest extends TestCase
 
         $client = Double::for(SesV2Client::class);
         $sesResult = new Result(['MessageId' => 'ses-message-id']);
-        $client->expects('sendEmail')
-            ->with(Mockery::on(function ($arg) {
+        $client->expects('sendEmail')->with(Mockery::on(function ($arg) {
                 return ! array_key_exists('TenantName', $arg);
-            }))
-            ->andReturn($sesResult);
+            }))->returns($sesResult);
 
         (new SesV2Transport($client))->send($message);
     }
@@ -123,8 +117,7 @@ class MailSesV2TransportTest extends TestCase
         $message->to('me@example.com');
 
         $client = Double::for(SesV2Client::class);
-        $client->expects('sendEmail')
-            ->andThrow(new AwsException('Email address is not verified.', new Command('sendRawEmail')));
+        $client->expects('sendEmail')->throws(new AwsException('Email address is not verified.', new Command('sendRawEmail')));
 
         $this->expectException(TransportException::class);
 

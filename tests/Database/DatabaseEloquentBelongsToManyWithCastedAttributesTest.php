@@ -19,20 +19,20 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
     {
         $relation = $this->getRelation();
         $model1 = Double::for(Model::class)->passthru();
-        $model1->shouldReceive('getAttribute')->with('parent_key')->andReturn(1);
+        $model1->allows('getAttribute')->with('parent_key')->returns(1);
         $model1->shouldReceive('getAttribute')->with('foo')->passthru();
-        $model1->shouldReceive('hasGetMutator')->andReturn(false);
-        $model1->shouldReceive('hasAttributeMutator')->andReturn(false);
-        $model1->shouldReceive('hasRelationAutoloadCallback')->andReturn(false);
-        $model1->shouldReceive('getCasts')->andReturn([]);
+        $model1->allows('hasGetMutator')->returns(false);
+        $model1->allows('hasAttributeMutator')->returns(false);
+        $model1->allows('hasRelationAutoloadCallback')->returns(false);
+        $model1->allows('getCasts')->returns([]);
 
         $model2 = Double::for(Model::class)->passthru();
-        $model2->shouldReceive('getAttribute')->with('parent_key')->andReturn(2);
+        $model2->allows('getAttribute')->with('parent_key')->returns(2);
         $model2->shouldReceive('getAttribute')->with('foo')->passthru();
-        $model2->shouldReceive('hasGetMutator')->andReturn(false);
-        $model2->shouldReceive('hasAttributeMutator')->andReturn(false);
-        $model2->shouldReceive('hasRelationAutoloadCallback')->andReturn(false);
-        $model2->shouldReceive('getCasts')->andReturn([]);
+        $model2->allows('hasGetMutator')->returns(false);
+        $model2->allows('hasAttributeMutator')->returns(false);
+        $model2->allows('hasRelationAutoloadCallback')->returns(false);
+        $model2->allows('getCasts')->returns([]);
 
         $result1 = (object) [
             'pivot' => (object) [
@@ -56,13 +56,11 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
     {
         $builder = Double::for(Builder::class);
         $related = Double::for(Model::class)->passthru();
-        $builder->shouldReceive('getModel')->andReturn($related);
-        $related->shouldReceive('qualifyColumn');
-        $builder->shouldReceive('join');
-        $builder->shouldReceive('where');
-        $builder->shouldReceive('getQuery')->andReturn(
-            Mockery::mock(QueryBuilder::class, ['getGrammar' => new Grammar(Double::for(Connection::class))])
-        );
+        $builder->allows('getModel')->returns($related);
+        $related->allows('qualifyColumn');
+        $builder->allows('join');
+        $builder->allows('where');
+        $builder->allows('getQuery')->returns(Mockery::mock(QueryBuilder::class, ['getGrammar' => new Grammar(Double::for(Connection::class))]));
 
         return new BelongsToMany(
             $builder,

@@ -65,17 +65,11 @@ class CacheApcStoreTest extends TestCase
     {
         $apc = Double::for(ApcWrapper::class);
 
-        $apc->expects('put')
-            ->with('foo', 'bar', 60)
-            ->andReturn(true);
+        $apc->expects('put')->with('foo', 'bar', 60)->returns(true);
 
-        $apc->expects('put')
-            ->with('baz', 'qux', 60)
-            ->andReturn(true);
+        $apc->expects('put')->with('baz', 'qux', 60)->returns(true);
 
-        $apc->expects('put')
-            ->with('bar', 'norf', 60)
-            ->andReturn(true);
+        $apc->expects('put')->with('bar', 'norf', 60)->returns(true);
 
         $store = new ApcStore($apc);
         $result = $store->putMany([

@@ -48,10 +48,7 @@ class CacheRedisTaggedCacheTest extends TestCase
     {
         [$cache, $store, $tags, $itemKey] = $this->getCache();
 
-        $store->expects($storeMethod)
-            ->with($itemKey, ...$storeArguments)
-            ->once()
-            ->andReturn(false);
+        $store->expects($storeMethod)->with($itemKey, ...$storeArguments)->returns(false);
 
         $tags->expects('addEntry')->never();
 
@@ -74,8 +71,8 @@ class CacheRedisTaggedCacheTest extends TestCase
     {
         $store = Double::for(RedisStore::class);
         $tags = Double::for(RedisTagSet::class);
-        $tags->allows('getNamespace')->andReturn('namespace');
-        $tags->allows('getNames')->andReturn([]);
+        $tags->allows('getNamespace')->returns('namespace');
+        $tags->allows('getNames')->returns([]);
 
         return [
             new RedisTaggedCache($store, $tags),

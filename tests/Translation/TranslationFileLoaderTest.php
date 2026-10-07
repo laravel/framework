@@ -16,11 +16,11 @@ class TranslationFileLoaderTest extends TestCase
         $loader = new FileLoader($files, __DIR__);
         $loader->addPath(__DIR__.'/another');
 
-        $files->expects('exists')->with(__DIR__.'/en/messages.php')->andReturn(true);
-        $files->expects('getRequire')->with(__DIR__.'/en/messages.php')->andReturn(['foo' => 'bar']);
+        $files->expects('exists')->with(__DIR__.'/en/messages.php')->returns(true);
+        $files->expects('getRequire')->with(__DIR__.'/en/messages.php')->returns(['foo' => 'bar']);
 
-        $files->expects('exists')->with(__DIR__.'/another/en/messages.php')->andReturn(true);
-        $files->expects('getRequire')->with(__DIR__.'/another/en/messages.php')->andReturn(['baz' => 'backagesplash']);
+        $files->expects('exists')->with(__DIR__.'/another/en/messages.php')->returns(true);
+        $files->expects('getRequire')->with(__DIR__.'/another/en/messages.php')->returns(['baz' => 'backagesplash']);
 
         $this->assertEquals(['foo' => 'bar', 'baz' => 'backagesplash'], $loader->load('en', 'messages'));
     }
@@ -28,8 +28,8 @@ class TranslationFileLoaderTest extends TestCase
     public function testLoadMethodIgnoresLocalesAndGroupsContainingPathTraversal()
     {
         $files = Double::for(Filesystem::class);
-        $files->shouldNotReceive('exists');
-        $files->shouldNotReceive('getRequire');
+        $files->expects('exists')->never();
+        $files->expects('getRequire')->never();
         $loader = new FileLoader($files, __DIR__);
         $loader->addNamespace('namespace', __DIR__.'/namespace');
 
@@ -48,8 +48,8 @@ class TranslationFileLoaderTest extends TestCase
         $files = Double::for(Filesystem::class);
         $loader = new FileLoader($files, __DIR__);
 
-        $files->expects('exists')->with(__DIR__.'/en/admin/messages.php')->andReturn(true);
-        $files->expects('getRequire')->with(__DIR__.'/en/admin/messages.php')->andReturn(['foo' => 'bar']);
+        $files->expects('exists')->with(__DIR__.'/en/admin/messages.php')->returns(true);
+        $files->expects('getRequire')->with(__DIR__.'/en/admin/messages.php')->returns(['foo' => 'bar']);
 
         $this->assertEquals(['foo' => 'bar'], $loader->load('en', 'admin/messages'));
     }
@@ -60,10 +60,10 @@ class TranslationFileLoaderTest extends TestCase
         $loader = new FileLoader($files, __DIR__);
         $loader->addPath(__DIR__.'/missing');
 
-        $files->expects('exists')->with(__DIR__.'/en/messages.php')->andReturn(true);
-        $files->expects('getRequire')->with(__DIR__.'/en/messages.php')->andReturn(['foo' => 'bar']);
+        $files->expects('exists')->with(__DIR__.'/en/messages.php')->returns(true);
+        $files->expects('getRequire')->with(__DIR__.'/en/messages.php')->returns(['foo' => 'bar']);
 
-        $files->expects('exists')->with(__DIR__.'/missing/en/messages.php')->andReturn(false);
+        $files->expects('exists')->with(__DIR__.'/missing/en/messages.php')->returns(false);
 
         $this->assertEquals(['foo' => 'bar'], $loader->load('en', 'messages'));
     }
@@ -74,11 +74,11 @@ class TranslationFileLoaderTest extends TestCase
         $loader = new FileLoader($files, __DIR__);
         $loader->addPath(__DIR__.'/another');
 
-        $files->expects('exists')->with(__DIR__.'/en/messages.php')->andReturn(true);
-        $files->expects('getRequire')->with(__DIR__.'/en/messages.php')->andReturn(['foo' => 'bar']);
+        $files->expects('exists')->with(__DIR__.'/en/messages.php')->returns(true);
+        $files->expects('getRequire')->with(__DIR__.'/en/messages.php')->returns(['foo' => 'bar']);
 
-        $files->expects('exists')->with(__DIR__.'/another/en/messages.php')->andReturn(true);
-        $files->expects('getRequire')->with(__DIR__.'/another/en/messages.php')->andReturn(['foo' => 'baz']);
+        $files->expects('exists')->with(__DIR__.'/another/en/messages.php')->returns(true);
+        $files->expects('getRequire')->with(__DIR__.'/another/en/messages.php')->returns(['foo' => 'baz']);
 
         $this->assertEquals(['foo' => 'baz'], $loader->load('en', 'messages'));
     }
@@ -90,14 +90,14 @@ class TranslationFileLoaderTest extends TestCase
         $loader->addPath(__DIR__.'/another');
         $loader->addPath(__DIR__.'/yet-another');
 
-        $files->expects('exists')->with(__DIR__.'/en/messages.php')->andReturn(true);
-        $files->expects('getRequire')->with(__DIR__.'/en/messages.php')->andReturn(['foo' => 'bar']);
+        $files->expects('exists')->with(__DIR__.'/en/messages.php')->returns(true);
+        $files->expects('getRequire')->with(__DIR__.'/en/messages.php')->returns(['foo' => 'bar']);
 
-        $files->expects('exists')->with(__DIR__.'/another/en/messages.php')->andReturn(true);
-        $files->expects('getRequire')->with(__DIR__.'/another/en/messages.php')->andReturn(['baz' => 'backagesplash']);
+        $files->expects('exists')->with(__DIR__.'/another/en/messages.php')->returns(true);
+        $files->expects('getRequire')->with(__DIR__.'/another/en/messages.php')->returns(['baz' => 'backagesplash']);
 
-        $files->expects('exists')->with(__DIR__.'/yet-another/en/messages.php')->andReturn(true);
-        $files->expects('getRequire')->with(__DIR__.'/yet-another/en/messages.php')->andReturn(['qux' => 'quux']);
+        $files->expects('exists')->with(__DIR__.'/yet-another/en/messages.php')->returns(true);
+        $files->expects('getRequire')->with(__DIR__.'/yet-another/en/messages.php')->returns(['qux' => 'quux']);
 
         $this->assertEquals(['foo' => 'bar', 'baz' => 'backagesplash', 'qux' => 'quux'], $loader->load('en', 'messages'));
     }
@@ -106,8 +106,8 @@ class TranslationFileLoaderTest extends TestCase
     {
         $files = Double::for(Filesystem::class);
         $loader = new FileLoader($files, __DIR__);
-        $files->expects('exists')->with(__DIR__.'/en/foo.php')->andReturn(true);
-        $files->expects('getRequire')->with(__DIR__.'/en/foo.php')->andReturn(['messages']);
+        $files->expects('exists')->with(__DIR__.'/en/foo.php')->returns(true);
+        $files->expects('getRequire')->with(__DIR__.'/en/foo.php')->returns(['messages']);
 
         $this->assertEquals(['messages'], $loader->load('en', 'foo', null));
     }
@@ -115,10 +115,10 @@ class TranslationFileLoaderTest extends TestCase
     public function testLoadMethodWithoutNamespacesProperlyCallsLoaderWithMultiplePaths()
     {
         $files = Double::for(Filesystem::class);
-        $files->expects('exists')->with(__DIR__.'/en/foo.php')->andReturn(true);
-        $files->expects('exists')->with(__DIR__.'/second/en/foo.php')->andReturn(true);
-        $files->expects('getRequire')->with(__DIR__.'/en/foo.php')->andReturn(['messages' => 'first']);
-        $files->expects('getRequire')->with(__DIR__.'/second/en/foo.php')->andReturn(['messages' => 'second']);
+        $files->expects('exists')->with(__DIR__.'/en/foo.php')->returns(true);
+        $files->expects('exists')->with(__DIR__.'/second/en/foo.php')->returns(true);
+        $files->expects('getRequire')->with(__DIR__.'/en/foo.php')->returns(['messages' => 'first']);
+        $files->expects('getRequire')->with(__DIR__.'/second/en/foo.php')->returns(['messages' => 'second']);
         $loader = new FileLoader($files, [__DIR__, __DIR__.'/second']);
 
         $this->assertEquals(['messages' => 'second'], $loader->load('en', 'foo', null));
@@ -127,9 +127,9 @@ class TranslationFileLoaderTest extends TestCase
     public function testLoadMethodWithNamespacesProperlyCallsLoader()
     {
         $files = Double::for(Filesystem::class);
-        $files->expects('exists')->with('bar/en/foo.php')->andReturn(true);
-        $files->expects('exists')->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(false);
-        $files->expects('getRequire')->with('bar/en/foo.php')->andReturn(['foo' => 'bar']);
+        $files->expects('exists')->with('bar/en/foo.php')->returns(true);
+        $files->expects('exists')->with(__DIR__.'/vendor/namespace/en/foo.php')->returns(false);
+        $files->expects('getRequire')->with('bar/en/foo.php')->returns(['foo' => 'bar']);
         $loader = new FileLoader($files, __DIR__);
         $loader->addNamespace('namespace', 'bar');
 
@@ -139,10 +139,10 @@ class TranslationFileLoaderTest extends TestCase
     public function testLoadMethodWithNamespacesProperlyCallsLoaderWithMultiplePaths()
     {
         $files = Double::for(Filesystem::class);
-        $files->expects('exists')->with('test-namespace-dir/en/foo.php')->andReturn(true);
-        $files->expects('exists')->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(false);
-        $files->expects('exists')->with(__DIR__.'/second/vendor/namespace/en/foo.php')->andReturn(false);
-        $files->expects('getRequire')->with('test-namespace-dir/en/foo.php')->andReturn(['foo' => 'bar']);
+        $files->expects('exists')->with('test-namespace-dir/en/foo.php')->returns(true);
+        $files->expects('exists')->with(__DIR__.'/vendor/namespace/en/foo.php')->returns(false);
+        $files->expects('exists')->with(__DIR__.'/second/vendor/namespace/en/foo.php')->returns(false);
+        $files->expects('getRequire')->with('test-namespace-dir/en/foo.php')->returns(['foo' => 'bar']);
         $loader = new FileLoader($files, [__DIR__, __DIR__.'/second']);
         $loader->addNamespace('namespace', 'test-namespace-dir');
 
@@ -152,10 +152,10 @@ class TranslationFileLoaderTest extends TestCase
     public function testLoadMethodWithNamespacesProperlyCallsLoaderAndLoadsLocalOverrides()
     {
         $files = Double::for(Filesystem::class);
-        $files->expects('exists')->with('bar/en/foo.php')->andReturn(true);
-        $files->expects('exists')->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(true);
-        $files->expects('getRequire')->with('bar/en/foo.php')->andReturn(['foo' => 'bar']);
-        $files->expects('getRequire')->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(['foo' => 'override', 'baz' => 'boom']);
+        $files->expects('exists')->with('bar/en/foo.php')->returns(true);
+        $files->expects('exists')->with(__DIR__.'/vendor/namespace/en/foo.php')->returns(true);
+        $files->expects('getRequire')->with('bar/en/foo.php')->returns(['foo' => 'bar']);
+        $files->expects('getRequire')->with(__DIR__.'/vendor/namespace/en/foo.php')->returns(['foo' => 'override', 'baz' => 'boom']);
         $loader = new FileLoader($files, __DIR__);
         $loader->addNamespace('namespace', 'bar');
 
@@ -165,12 +165,12 @@ class TranslationFileLoaderTest extends TestCase
     public function testLoadMethodWithNamespacesProperlyCallsLoaderAndLoadsLocalOverridesWithMultiplePaths()
     {
         $files = Double::for(Filesystem::class);
-        $files->expects('exists')->with('test-namespace-dir/en/foo.php')->andReturn(true);
-        $files->expects('exists')->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(true);
-        $files->expects('exists')->with(__DIR__.'/second/vendor/namespace/en/foo.php')->andReturn(true);
-        $files->expects('getRequire')->with('test-namespace-dir/en/foo.php')->andReturn(['foo' => 'bar']);
-        $files->expects('getRequire')->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(['foo' => 'override', 'baz' => 'boom']);
-        $files->expects('getRequire')->with(__DIR__.'/second/vendor/namespace/en/foo.php')->andReturn(['foo' => 'override-2', 'baz' => 'boom-2']);
+        $files->expects('exists')->with('test-namespace-dir/en/foo.php')->returns(true);
+        $files->expects('exists')->with(__DIR__.'/vendor/namespace/en/foo.php')->returns(true);
+        $files->expects('exists')->with(__DIR__.'/second/vendor/namespace/en/foo.php')->returns(true);
+        $files->expects('getRequire')->with('test-namespace-dir/en/foo.php')->returns(['foo' => 'bar']);
+        $files->expects('getRequire')->with(__DIR__.'/vendor/namespace/en/foo.php')->returns(['foo' => 'override', 'baz' => 'boom']);
+        $files->expects('getRequire')->with(__DIR__.'/second/vendor/namespace/en/foo.php')->returns(['foo' => 'override-2', 'baz' => 'boom-2']);
         $loader = new FileLoader($files, [__DIR__, __DIR__.'/second']);
         $loader->addNamespace('namespace', 'test-namespace-dir');
 
@@ -180,12 +180,12 @@ class TranslationFileLoaderTest extends TestCase
     public function testLoadMethodWithNamespacesProperlyCallsLoaderAndLoadsLocalOverridesWithMultiplePathsWithMissingKey()
     {
         $files = Double::for(Filesystem::class);
-        $files->expects('exists')->with('test-namespace-dir/en/foo.php')->andReturn(true);
-        $files->expects('exists')->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(true);
-        $files->expects('exists')->with(__DIR__.'/second/vendor/namespace/en/foo.php')->andReturn(true);
-        $files->expects('getRequire')->with('test-namespace-dir/en/foo.php')->andReturn(['foo' => 'bar']);
-        $files->expects('getRequire')->with(__DIR__.'/vendor/namespace/en/foo.php')->andReturn(['foo' => 'override', 'baz' => 'boom']);
-        $files->expects('getRequire')->with(__DIR__.'/second/vendor/namespace/en/foo.php')->andReturn(['baz' => 'boom-2']);
+        $files->expects('exists')->with('test-namespace-dir/en/foo.php')->returns(true);
+        $files->expects('exists')->with(__DIR__.'/vendor/namespace/en/foo.php')->returns(true);
+        $files->expects('exists')->with(__DIR__.'/second/vendor/namespace/en/foo.php')->returns(true);
+        $files->expects('getRequire')->with('test-namespace-dir/en/foo.php')->returns(['foo' => 'bar']);
+        $files->expects('getRequire')->with(__DIR__.'/vendor/namespace/en/foo.php')->returns(['foo' => 'override', 'baz' => 'boom']);
+        $files->expects('getRequire')->with(__DIR__.'/second/vendor/namespace/en/foo.php')->returns(['baz' => 'boom-2']);
         $loader = new FileLoader($files, [__DIR__, __DIR__.'/second']);
         $loader->addNamespace('namespace', 'test-namespace-dir');
 
@@ -195,8 +195,8 @@ class TranslationFileLoaderTest extends TestCase
     public function testEmptyArraysReturnedWhenFilesDontExist()
     {
         $files = Double::for(Filesystem::class);
-        $files->expects('exists')->with(__DIR__.'/en/foo.php')->andReturn(false);
-        $files->shouldReceive('getRequire')->never();
+        $files->expects('exists')->with(__DIR__.'/en/foo.php')->returns(false);
+        $files->expects('getRequire')->never();
         $loader = new FileLoader($files, __DIR__);
 
         $this->assertSame([], $loader->load('en', 'foo', null));
@@ -205,7 +205,7 @@ class TranslationFileLoaderTest extends TestCase
     public function testEmptyArraysReturnedWhenFilesDontExistForNamespacedItems()
     {
         $files = Double::for(Filesystem::class);
-        $files->shouldReceive('getRequire')->never();
+        $files->expects('getRequire')->never();
         $loader = new FileLoader($files, __DIR__);
 
         $this->assertSame([], $loader->load('en', 'foo', 'bar'));
@@ -214,8 +214,8 @@ class TranslationFileLoaderTest extends TestCase
     public function testLoadMethodForJSONProperlyCallsLoader()
     {
         $files = Double::for(Filesystem::class);
-        $files->expects('exists')->with(__DIR__.'/en.json')->andReturn(true);
-        $files->expects('get')->with(__DIR__.'/en.json')->andReturn('{"foo":"bar"}');
+        $files->expects('exists')->with(__DIR__.'/en.json')->returns(true);
+        $files->expects('get')->with(__DIR__.'/en.json')->returns('{"foo":"bar"}');
         $loader = new FileLoader($files, __DIR__);
 
         $this->assertEquals(['foo' => 'bar'], $loader->load('en', '*', '*'));
@@ -227,10 +227,10 @@ class TranslationFileLoaderTest extends TestCase
         $loader = new FileLoader($files, __DIR__);
         $loader->addJsonPath(__DIR__.'/another');
 
-        $files->expects('exists')->with(__DIR__.'/en.json')->andReturn(true);
-        $files->expects('exists')->with(__DIR__.'/another/en.json')->andReturn(true);
-        $files->expects('get')->with(__DIR__.'/en.json')->andReturn('{"foo":"bar"}');
-        $files->expects('get')->with(__DIR__.'/another/en.json')->andReturn('{"foo":"backagebar", "baz": "backagesplash"}');
+        $files->expects('exists')->with(__DIR__.'/en.json')->returns(true);
+        $files->expects('exists')->with(__DIR__.'/another/en.json')->returns(true);
+        $files->expects('get')->with(__DIR__.'/en.json')->returns('{"foo":"bar"}');
+        $files->expects('get')->with(__DIR__.'/another/en.json')->returns('{"foo":"backagebar", "baz": "backagesplash"}');
 
         $this->assertEquals(['foo' => 'bar', 'baz' => 'backagesplash'], $loader->load('en', '*', '*'));
     }
@@ -242,8 +242,8 @@ class TranslationFileLoaderTest extends TestCase
         $loader->addJsonPath(__DIR__.'/invalid');
 
         $invalidJsonString = '.{"foo":"cricket", "baz": "football"}';
-        $files->expects('exists')->with(__DIR__.'/invalid/en.json')->andReturn(true);
-        $files->expects('get')->with(__DIR__.'/invalid/en.json')->andReturn($invalidJsonString);
+        $files->expects('exists')->with(__DIR__.'/invalid/en.json')->returns(true);
+        $files->expects('get')->with(__DIR__.'/invalid/en.json')->returns($invalidJsonString);
 
         $this->expectException(\RuntimeException::class);
         $loader->load('en', '*', '*');

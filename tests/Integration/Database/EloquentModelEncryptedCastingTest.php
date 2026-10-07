@@ -42,12 +42,8 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testStringsAreCastable()
     {
-        $this->encrypter->expects('encrypt')
-            ->with('this is a secret string', false)
-            ->andReturn('encrypted-secret-string');
-        $this->encrypter->expects('decrypt')
-            ->with('encrypted-secret-string', false)
-            ->andReturn('this is a secret string');
+        $this->encrypter->expects('encrypt')->with('this is a secret string', false)->returns('encrypted-secret-string');
+        $this->encrypter->expects('decrypt')->with('encrypted-secret-string', false)->returns('this is a secret string');
 
         /** @var \Illuminate\Tests\Integration\Database\EncryptedCast $subject */
         $subject = EncryptedCast::create([
@@ -63,12 +59,8 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testArraysAreCastable()
     {
-        $this->encrypter->expects('encrypt')
-            ->with('{"key1":"value1"}', false)
-            ->andReturn('encrypted-secret-array-string');
-        $this->encrypter->expects('decrypt')
-            ->with('encrypted-secret-array-string', false)
-            ->andReturn('{"key1":"value1"}');
+        $this->encrypter->expects('encrypt')->with('{"key1":"value1"}', false)->returns('encrypted-secret-array-string');
+        $this->encrypter->expects('decrypt')->with('encrypted-secret-array-string', false)->returns('{"key1":"value1"}');
 
         /** @var \Illuminate\Tests\Integration\Database\EncryptedCast $subject */
         $subject = EncryptedCast::create([
@@ -84,12 +76,8 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testJsonIsCastable()
     {
-        $this->encrypter->expects('encrypt')
-            ->with('{"key1":"value1"}', false)
-            ->andReturn('encrypted-secret-json-string');
-        $this->encrypter->expects('decrypt')
-            ->with('encrypted-secret-json-string', false)
-            ->andReturn('{"key1":"value1"}');
+        $this->encrypter->expects('encrypt')->with('{"key1":"value1"}', false)->returns('encrypted-secret-json-string');
+        $this->encrypter->expects('decrypt')->with('encrypted-secret-json-string', false)->returns('{"key1":"value1"}');
 
         /** @var \Illuminate\Tests\Integration\Database\EncryptedCast $subject */
         $subject = EncryptedCast::create([
@@ -105,18 +93,10 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testJsonAttributeIsCastable()
     {
-        $this->encrypter->expects('encrypt')
-            ->with('{"key1":"value1"}', false)
-            ->andReturn('encrypted-secret-json-string');
-        $this->encrypter->expects('decrypt')
-            ->with('encrypted-secret-json-string', false)
-            ->andReturn('{"key1":"value1"}');
-        $this->encrypter->expects('encrypt')
-            ->with('{"key1":"value1","key2":"value2"}', false)
-            ->andReturn('encrypted-secret-json-string2');
-        $this->encrypter->expects('decrypt')
-            ->with('encrypted-secret-json-string2', false)
-            ->andReturn('{"key1":"value1","key2":"value2"}');
+        $this->encrypter->expects('encrypt')->with('{"key1":"value1"}', false)->returns('encrypted-secret-json-string');
+        $this->encrypter->expects('decrypt')->with('encrypted-secret-json-string', false)->returns('{"key1":"value1"}');
+        $this->encrypter->expects('encrypt')->with('{"key1":"value1","key2":"value2"}', false)->returns('encrypted-secret-json-string2');
+        $this->encrypter->expects('decrypt')->with('encrypted-secret-json-string2', false)->returns('{"key1":"value1","key2":"value2"}');
 
         $subject = new EncryptedCast([
             'secret_json' => ['key1' => 'value1'],
@@ -138,13 +118,8 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         $object = new stdClass;
         $object->key1 = 'value1';
 
-        $this->encrypter->expects('encrypt')
-            ->with('{"key1":"value1"}', false)
-            ->andReturn('encrypted-secret-object-string');
-        $this->encrypter->expects('decrypt')
-            ->twice()
-            ->with('encrypted-secret-object-string', false)
-            ->andReturn('{"key1":"value1"}');
+        $this->encrypter->expects('encrypt')->with('{"key1":"value1"}', false)->returns('encrypted-secret-object-string');
+        $this->encrypter->expects('decrypt')->times(2)->with('encrypted-secret-object-string', false)->returns('{"key1":"value1"}');
 
         /** @var \Illuminate\Tests\Integration\Database\EncryptedCast $object */
         $object = EncryptedCast::create([
@@ -161,13 +136,8 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testCollectionIsCastable()
     {
-        $this->encrypter->expects('encrypt')
-            ->with('{"key1":"value1"}', false)
-            ->andReturn('encrypted-secret-collection-string');
-        $this->encrypter->expects('decrypt')
-            ->twice()
-            ->with('encrypted-secret-collection-string', false)
-            ->andReturn('{"key1":"value1"}');
+        $this->encrypter->expects('encrypt')->with('{"key1":"value1"}', false)->returns('encrypted-secret-collection-string');
+        $this->encrypter->expects('decrypt')->times(2)->with('encrypted-secret-collection-string', false)->returns('{"key1":"value1"}');
 
         /** @var \Illuminate\Tests\Integration\Database\EncryptedCast $subject */
         $subject = EncryptedCast::create([
@@ -184,18 +154,9 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testAsEncryptedCollection()
     {
-        $this->encrypter->expects('encryptString')
-            ->twice()
-            ->with('{"key1":"value1"}')
-            ->andReturn('encrypted-secret-collection-string-1');
-        $this->encrypter->expects('encryptString')
-            ->times(9)
-            ->with('{"key1":"value1","key2":"value2"}')
-            ->andReturn('encrypted-secret-collection-string-2');
-        $this->encrypter->expects('decryptString')
-            ->once()
-            ->with('encrypted-secret-collection-string-2')
-            ->andReturn('{"key1":"value1","key2":"value2"}');
+        $this->encrypter->expects('encryptString')->times(2)->with('{"key1":"value1"}')->returns('encrypted-secret-collection-string-1');
+        $this->encrypter->expects('encryptString')->times(9)->with('{"key1":"value1","key2":"value2"}')->returns('encrypted-secret-collection-string-2');
+        $this->encrypter->expects('decryptString')->with('encrypted-secret-collection-string-2')->returns('{"key1":"value1","key2":"value2"}');
 
         $subject = new EncryptedCast;
 
@@ -234,18 +195,9 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testAsEncryptedCollectionMap()
     {
-        $this->encrypter->expects('encryptString')
-            ->twice()
-            ->with('[{"key1":"value1"}]')
-            ->andReturn('encrypted-secret-collection-string-1');
-        $this->encrypter->expects('encryptString')
-            ->times(11)
-            ->with('[{"key1":"value1"},{"key2":"value2"}]')
-            ->andReturn('encrypted-secret-collection-string-2');
-        $this->encrypter->expects('decryptString')
-            ->once()
-            ->with('encrypted-secret-collection-string-2')
-            ->andReturn('[{"key1":"value1"},{"key2":"value2"}]');
+        $this->encrypter->expects('encryptString')->times(2)->with('[{"key1":"value1"}]')->returns('encrypted-secret-collection-string-1');
+        $this->encrypter->expects('encryptString')->times(11)->with('[{"key1":"value1"},{"key2":"value2"}]')->returns('encrypted-secret-collection-string-2');
+        $this->encrypter->expects('decryptString')->with('encrypted-secret-collection-string-2')->returns('[{"key1":"value1"},{"key2":"value2"}]');
 
         $subject = new EncryptedCast;
 
@@ -286,22 +238,10 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testAsEncryptedArrayObject()
     {
-        $this->encrypter->expects('encryptString')
-            ->once()
-            ->with('{"key1":"value1"}')
-            ->andReturn('encrypted-secret-array-string-1');
-        $this->encrypter->expects('decryptString')
-            ->once()
-            ->with('encrypted-secret-array-string-1')
-            ->andReturn('{"key1":"value1"}');
-        $this->encrypter->expects('encryptString')
-            ->times(9)
-            ->with('{"key1":"value1","key2":"value2"}')
-            ->andReturn('encrypted-secret-array-string-2');
-        $this->encrypter->expects('decryptString')
-            ->once()
-            ->with('encrypted-secret-array-string-2')
-            ->andReturn('{"key1":"value1","key2":"value2"}');
+        $this->encrypter->expects('encryptString')->with('{"key1":"value1"}')->returns('encrypted-secret-array-string-1');
+        $this->encrypter->expects('decryptString')->with('encrypted-secret-array-string-1')->returns('{"key1":"value1"}');
+        $this->encrypter->expects('encryptString')->times(9)->with('{"key1":"value1","key2":"value2"}')->returns('encrypted-secret-array-string-2');
+        $this->encrypter->expects('decryptString')->with('encrypted-secret-array-string-2')->returns('{"key1":"value1","key2":"value2"}');
 
         $subject = new EncryptedCast;
 
@@ -340,18 +280,10 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testAsEncryptedArrayObjectJsonAttributeIsCastable()
     {
-        $this->encrypter->allows('encryptString')
-            ->with('{"key1":"value1"}')
-            ->andReturn('encrypted-secret-array-string-1');
-        $this->encrypter->allows('decryptString')
-            ->with('encrypted-secret-array-string-1')
-            ->andReturn('{"key1":"value1"}');
-        $this->encrypter->allows('encryptString')
-            ->with('{"key1":"value1","key2":"value2"}')
-            ->andReturn('encrypted-secret-array-string-2');
-        $this->encrypter->allows('decryptString')
-            ->with('encrypted-secret-array-string-2')
-            ->andReturn('{"key1":"value1","key2":"value2"}');
+        $this->encrypter->allows('encryptString')->with('{"key1":"value1"}')->returns('encrypted-secret-array-string-1');
+        $this->encrypter->allows('decryptString')->with('encrypted-secret-array-string-1')->returns('{"key1":"value1"}');
+        $this->encrypter->allows('encryptString')->with('{"key1":"value1","key2":"value2"}')->returns('encrypted-secret-array-string-2');
+        $this->encrypter->allows('decryptString')->with('encrypted-secret-array-string-2')->returns('{"key1":"value1","key2":"value2"}');
 
         $subject = new EncryptedCast;
 
@@ -370,18 +302,10 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testAsEncryptedCollectionJsonAttributeIsCastable()
     {
-        $this->encrypter->allows('encryptString')
-            ->with('{"key1":"value1"}')
-            ->andReturn('encrypted-secret-collection-string-1');
-        $this->encrypter->allows('decryptString')
-            ->with('encrypted-secret-collection-string-1')
-            ->andReturn('{"key1":"value1"}');
-        $this->encrypter->allows('encryptString')
-            ->with('{"key1":"value1","key2":"value2"}')
-            ->andReturn('encrypted-secret-collection-string-2');
-        $this->encrypter->allows('decryptString')
-            ->with('encrypted-secret-collection-string-2')
-            ->andReturn('{"key1":"value1","key2":"value2"}');
+        $this->encrypter->allows('encryptString')->with('{"key1":"value1"}')->returns('encrypted-secret-collection-string-1');
+        $this->encrypter->allows('decryptString')->with('encrypted-secret-collection-string-1')->returns('{"key1":"value1"}');
+        $this->encrypter->allows('encryptString')->with('{"key1":"value1","key2":"value2"}')->returns('encrypted-secret-collection-string-2');
+        $this->encrypter->allows('decryptString')->with('encrypted-secret-collection-string-2')->returns('{"key1":"value1","key2":"value2"}');
 
         $subject = new EncryptedCast;
 
@@ -412,12 +336,8 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             ->never();
         $this->encrypter->expects('decrypt')
             ->never();
-        $customEncrypter->expects('encrypt')
-            ->with('this is a secret string', false)
-            ->andReturn('encrypted-secret-string');
-        $customEncrypter->expects('decrypt')
-            ->with('encrypted-secret-string', false)
-            ->andReturn('this is a secret string');
+        $customEncrypter->expects('encrypt')->with('this is a secret string', false)->returns('encrypted-secret-string');
+        $customEncrypter->expects('decrypt')->with('encrypted-secret-string', false)->returns('this is a secret string');
 
         /** @var \Illuminate\Tests\Integration\Database\EncryptedCast $subject */
         $subject = EncryptedCast::create([

@@ -75,7 +75,7 @@ class FilesystemAdapterTest extends TestCase
         $this->filesystem->write('file.txt', 'Hello World');
 
         $files = Double::for(FilesystemAdapter::class)->passthru(new FilesystemAdapter($this->filesystem, $this->adapter));
-        $files->shouldReceive('mimeType')->never();
+        $files->expects('mimeType')->never();
 
         $files->response('file.txt', null, [
             'Content-Type' => 'text/x-custom',
@@ -87,7 +87,7 @@ class FilesystemAdapterTest extends TestCase
         $this->filesystem->write('file.txt', 'Hello World');
 
         $files = Double::for(FilesystemAdapter::class)->passthru(new FilesystemAdapter($this->filesystem, $this->adapter));
-        $files->shouldReceive('size')->never();
+        $files->expects('size')->never();
 
         $files->response('file.txt', null, [
             'Content-Length' => 11,
@@ -99,7 +99,7 @@ class FilesystemAdapterTest extends TestCase
         $this->filesystem->write('file.txt', 'Hello World');
 
         $files = Double::for(FilesystemAdapter::class)->passthru(new FilesystemAdapter($this->filesystem, $this->adapter));
-        $files->shouldReceive('fallbackName')->never();
+        $files->expects('fallbackName')->never();
 
         $files->response('file.txt', null, [
             'Content-Disposition' => 'attachment',

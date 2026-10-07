@@ -16,7 +16,7 @@ class QueueRedisJobTest extends TestCase
     {
         $job = $this->getJob();
         $handler = Double::for(stdClass::class);
-        $job->getContainer()->expects('make')->with('foo')->andReturn($handler);
+        $job->getContainer()->expects('make')->with('foo')->returns($handler);
         $handler->expects('fire')->with($job, ['data']);
 
         $job->fire();

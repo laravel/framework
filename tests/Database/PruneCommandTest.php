@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
@@ -252,16 +253,16 @@ class PruneCommandTest extends TestCase
     {
         $dispatcher = Double::for(DispatcherContract::class);
 
-        $dispatcher->expects('dispatch')->withArgs(function ($event) {
+        $dispatcher->expects('dispatch')->with(Argument::satisfies(function ($event) {
             return get_class($event) === ModelPruningStarting::class &&
                 $event->models === [Fixtures\Pruning\Models\PrunableTestModelWithPrunableRecords::class];
-        });
+        }));
         $dispatcher->expects('listen')->with(ModelsPruned::class, Mockery::type(Closure::class));
         $dispatcher->expects('dispatch')->times(2)->with(Mockery::type(ModelsPruned::class));
-        $dispatcher->expects('dispatch')->withArgs(function ($event) {
+        $dispatcher->expects('dispatch')->with(Argument::satisfies(function ($event) {
             return get_class($event) === ModelPruningFinished::class &&
                 $event->models === [Fixtures\Pruning\Models\PrunableTestModelWithPrunableRecords::class];
-        });
+        }));
         $dispatcher->expects('forget')->with(ModelsPruned::class);
 
         Application::getInstance()->instance(DispatcherContract::class, $dispatcher);

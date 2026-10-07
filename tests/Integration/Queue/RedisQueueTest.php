@@ -517,8 +517,8 @@ class RedisQueueTest extends TestCase
         })->andReturnNull();
 
         $container = Double::for(Container::class);
-        $container->expects('bound')->with('events')->andReturn(true)->times(2);
-        $container->expects('offsetGet')->with('events')->andReturn($events)->times(2);
+        $container->expects('bound')->with('events')->returns(true)->times(2);
+        $container->expects('offsetGet')->with('events')->returns($events)->times(2);
 
         $default = config('queue.connections.redis.queue', 'default');
         $queue = new RedisQueue($this->redis[$driver], $default);
@@ -534,12 +534,12 @@ class RedisQueueTest extends TestCase
     public function testBulkJobQueuedEvent($driver)
     {
         $events = Double::for(Dispatcher::class);
-        $events->expects('dispatch')->with(Mockery::type(JobQueueing::class))->andReturnNull()->times(3);
-        $events->expects('dispatch')->with(Mockery::type(JobQueued::class))->andReturnNull()->times(3);
+        $events->expects('dispatch')->with(Mockery::type(JobQueueing::class))->returns(null)->times(3);
+        $events->expects('dispatch')->with(Mockery::type(JobQueued::class))->returns(null)->times(3);
 
         $container = Double::for(Container::class);
-        $container->expects('bound')->with('events')->andReturn(true)->times(6);
-        $container->expects('offsetGet')->with('events')->andReturn($events)->times(6);
+        $container->expects('bound')->with('events')->returns(true)->times(6);
+        $container->expects('offsetGet')->with('events')->returns($events)->times(6);
 
         $default = config('queue.connections.redis.queue', 'default');
         $queue = new RedisQueue($this->redis[$driver], $default);
