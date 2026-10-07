@@ -488,6 +488,21 @@ class PhpRedisConnectorTest extends TestCase
     }
 
     #[RequiresPhpExtension('redis')]
+    public function testConnectionRebuildsItsClientWhenNoClusterNodeIsReachable()
+    {
+        $failedClient = $this->createMock(\Redis::class);
+        $failedClient->expects($this->once())->method('get')->with('foo')->willThrowException(new \RedisClusterException("Can't communicate with any node in the cluster"));
+
+        $healthyClient = $this->createMock(\Redis::class);
+        $healthyClient->expects($this->once())->method('get')->with('foo')->willReturn('bar');
+
+        $connection = new PhpRedisConnection($failedClient, fn () => $healthyClient);
+
+        $this->assertSame('bar', $connection->command('get', ['foo']));
+        $this->assertSame($healthyClient, $connection->client());
+    }
+
+    #[RequiresPhpExtension('redis')]
     public function testPipelineIsReopenedOnARebuiltClientWhenTheConnectionWasLost()
     {
         $failedClient = $this->createMock(\Redis::class);
