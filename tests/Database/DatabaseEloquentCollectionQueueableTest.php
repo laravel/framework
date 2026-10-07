@@ -19,8 +19,7 @@ class DatabaseEloquentCollectionQueueableTest extends TestCase
 
         $c->getQueueableIds();
 
-        $spy->shouldHaveReceived()
-            ->getQueueableId()
+        $spy->shouldHaveReceived('getQueueableId', [])
             ->once();
     }
 
@@ -32,8 +31,7 @@ class DatabaseEloquentCollectionQueueableTest extends TestCase
 
         $c->getQueueableIds();
 
-        $spy->shouldHaveReceived()
-            ->getQueueableId()
+        $spy->shouldHaveReceived('getQueueableId', [])
             ->once();
     }
 
