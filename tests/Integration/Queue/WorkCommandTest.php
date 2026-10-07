@@ -12,6 +12,7 @@ use Illuminate\Queue\Worker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
@@ -30,6 +31,7 @@ class WorkCommandTest extends QueueTestCase
             FirstJob::$ran = false;
             SecondJob::$ran = false;
             ThirdJob::$ran = false;
+            Worker::$flushStickyConnections = false;
         });
 
         parent::setUp();
@@ -107,6 +109,32 @@ class WorkCommandTest extends QueueTestCase
         $this->assertSame(0, Queue::size());
         $this->assertTrue(FirstJob::$ran);
         $this->assertTrue(SecondJob::$ran);
+    }
+
+    public function testWorkerDoesNotFlushStickyConnectionsByDefault()
+    {
+        Queue::push(new WritingJob);
+
+        $this->artisan('queue:work', [
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+        ])->assertExitCode(0);
+
+        $this->assertTrue(DB::connection()->hasModifiedRecords());
+    }
+
+    public function testWorkerCanFlushStickyConnections()
+    {
+        Worker::$flushStickyConnections = true;
+
+        Queue::push(new WritingJob);
+
+        $this->artisan('queue:work', [
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+        ])->assertExitCode(0);
+
+        $this->assertFalse(DB::connection()->hasModifiedRecords());
     }
 
     public function testMemoryExceeded()
@@ -319,6 +347,20 @@ class ThirdJob implements ShouldQueue
         sleep(1);
 
         static::$ran = true;
+    }
+}
+
+class WritingJob implements ShouldQueue
+{
+    use Dispatchable, Queueable;
+
+    public function handle()
+    {
+        DB::table('users')->insert([
+            'name' => 'BigT',
+            'email' => 'bigt@laravel.com',
+            'password' => 'secret',
+        ]);
     }
 }
 
