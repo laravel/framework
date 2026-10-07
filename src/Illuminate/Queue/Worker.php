@@ -200,6 +200,13 @@ class Worker
     public static $pausable = true;
 
     /**
+     * Indicates if the "sticky" state of the database connections should be flushed between jobs.
+     *
+     * @var bool
+     */
+    public static $flushStickyConnections = false;
+
+    /**
      * Create a new queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
