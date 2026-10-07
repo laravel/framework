@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Factory as QueueContract;
+use Illuminate\Contracts\Queue\Queue as QueueInterface;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Testing\Fakes\QueueFake;
@@ -17,7 +18,7 @@ class SupportFacadesQueueTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->queueManager = Double::for(Factory::class);
+        $this->queueManager = Double::for(QueueContract::class, QueueInterface::class);
 
         $container = new Container;
         $container->instance('queue', $this->queueManager);

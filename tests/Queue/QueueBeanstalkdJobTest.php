@@ -11,22 +11,21 @@ use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Queue\Jobs\Job;
 use JMac\Testing\Double;
 use JMac\Testing\Matching\Argument;
-use Pheanstalk\Contract\JobIdInterface;
 use Pheanstalk\Contract\PheanstalkManagerInterface;
 use Pheanstalk\Contract\PheanstalkPublisherInterface;
 use Pheanstalk\Contract\PheanstalkSubscriberInterface;
 use Pheanstalk\Pheanstalk;
+use Pheanstalk\Values\Job as PheanstalkJob;
+use Pheanstalk\Values\JobId;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class QueueBeanstalkdJobTest extends TestCase
 {
     public function testFireProperlyCallsTheJobHandler()
     {
-        $job = $this->getJob();
-        $job->getPheanstalkJob()->expects('getData')->returns(json_encode(['job' => 'foo', 'data' => ['data']]));
-        $handler = Double::for(stdClass::class);
-        $job->getContainer()->expects('make')->with('foo')->returns($handler);
+        $job = $this->getJob(json_encode(['job' => 'foo', 'data' => ['data']]));
+        $handler = Double::for(BeanstalkdJobTestHandler::class);
+        $job->getContainer()->instance('foo', $handler);
         $handler->expects('fire')->with($job, ['data']);
 
         $job->fire();
@@ -34,10 +33,9 @@ class QueueBeanstalkdJobTest extends TestCase
 
     public function testFailProperlyCallsTheJobHandler()
     {
-        $job = $this->getJob();
-        $job->getPheanstalkJob()->expects('getData')->returns(json_encode(['job' => 'foo', 'uuid' => 'test-uuid', 'data' => ['data']]));
+        $job = $this->getJob(json_encode(['job' => 'foo', 'uuid' => 'test-uuid', 'data' => ['data']]));
         $handler = Double::for(BeanstalkdJobTestFailedTest::class);
-        $job->getContainer()->expects('make')->with('foo')->returns($handler);
+        $job->getContainer()->instance('foo', $handler);
         $job->getPheanstalk()->expects('delete')->with($job->getPheanstalkJob())->returns($job->getPheanstalk());
         $handler->expects('failed')->with(['data'], Argument::type(Exception::class), 'test-uuid', Argument::type(Job::class));
         $events = new EventsDispatcher;
@@ -45,7 +43,7 @@ class QueueBeanstalkdJobTest extends TestCase
         $events->listen(JobFailed::class, function ($event) use (&$failed) {
             $failed[] = $event;
         });
-        $job->getContainer()->expects('make')->with(Dispatcher::class)->returns($events);
+        $job->getContainer()->instance(Dispatcher::class, $events);
 
         $job->fail($exception = new Exception);
 
@@ -78,15 +76,23 @@ class QueueBeanstalkdJobTest extends TestCase
         $job->bury();
     }
 
-    protected function getJob()
+    protected function getJob(string $data = '')
     {
         return new BeanstalkdJob(
-            Double::for(Container::class),
-            Double::for(implode(',', [PheanstalkManagerInterface::class, PheanstalkPublisherInterface::class, PheanstalkSubscriberInterface::class])),
-            Double::for(JobIdInterface::class),
+            new Container,
+            Double::for(PheanstalkManagerInterface::class, PheanstalkPublisherInterface::class, PheanstalkSubscriberInterface::class),
+            new PheanstalkJob(new JobId(1), $data),
             'connection-name',
             'default'
         );
+    }
+}
+
+class BeanstalkdJobTestHandler
+{
+    public function fire($job, array $data)
+    {
+        //
     }
 }
 

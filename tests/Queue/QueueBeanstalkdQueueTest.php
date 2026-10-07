@@ -150,13 +150,13 @@ class QueueBeanstalkdQueueTest extends TestCase
     private function setQueue($default, $timeToRun, $blockFor = 0)
     {
         $this->queue = new BeanstalkdQueue(
-            Double::for(implode(',', [PheanstalkManagerInterface::class, PheanstalkPublisherInterface::class, PheanstalkSubscriberInterface::class])),
+            Double::for(PheanstalkManagerInterface::class, PheanstalkPublisherInterface::class, PheanstalkSubscriberInterface::class),
             $default,
             $timeToRun,
             $blockFor
         );
         $this->container = Double::for(Container::class, override: true);
-        $this->queue->setContainer($this->container);
+        $this->queue->setContainer($this->container->instance());
     }
 }
 

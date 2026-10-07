@@ -7,15 +7,14 @@ use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
 use JMac\Testing\Double;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class QueueRedisJobTest extends TestCase
 {
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
-        $handler = Double::for(stdClass::class);
-        $job->getContainer()->expects('make')->with('foo')->returns($handler);
+        $handler = Double::for(RedisJobTestHandler::class);
+        $job->getContainer()->instance('foo', $handler);
         $handler->expects('fire')->with($job, ['data']);
 
         $job->fire();
@@ -42,12 +41,20 @@ class QueueRedisJobTest extends TestCase
     protected function getJob()
     {
         return new RedisJob(
-            Double::for(Container::class),
+            new Container,
             Double::for(RedisQueue::class),
             json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 1]),
             json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2]),
             'connection-name',
             'default'
         );
+    }
+}
+
+class RedisJobTestHandler
+{
+    public function fire($job, array $data)
+    {
+        //
     }
 }
