@@ -50,7 +50,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $builder->setModel($model);
         $model->expects('getKeyType')->returns('int');
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
+        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar', 'and');
         $builder->expects('first')->with(['column'])->returns('baz');
 
         $result = $builder->find('bar', ['column']);
@@ -63,7 +63,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $builder->setModel($model);
         $model->expects('getKeyType')->returns('int');
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
+        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar', 'and');
         $builder->expects('sole')->with(['column'])->returns('baz');
 
         $result = $builder->findSole('bar', ['column']);
@@ -107,39 +107,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('emptycollection', $result);
     }
 
-    public function testFindOrNewMethodModelFound()
-    {
-        $model = $this->getMockModel();
-        $model->expects('getKeyType')->returns('int');
-        $model->expects('findOrNew')->returns('baz');
-
-        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
-        $builder->setModel($model);
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
-        $builder->expects('first')->with(['column'])->returns('baz');
-
-        $expected = $model->findOrNew('bar', ['column']);
-        $result = $builder->find('bar', ['column']);
-        $this->assertEquals($expected, $result);
-    }
-
-    public function testFindOrNewMethodModelNotFound()
-    {
-        $model = $this->getMockModel();
-        $model->expects('getKeyType')->returns('int');
-        $model->expects('findOrNew')->returns(Double::for(Model::class));
-
-        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
-        $builder->setModel($model);
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
-        $builder->expects('first')->with(['column'])->returns(null);
-
-        $result = $model->findOrNew('bar', ['column']);
-        $findResult = $builder->find('bar', ['column']);
-        $this->assertNull($findResult);
-        $this->assertInstanceOf(Model::class, $result);
-    }
-
     public function testFindOrFailMethodThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -148,7 +115,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $model->expects('getKeyType')->returns('int');
         $builder->setModel($model);
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
+        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar', 'and');
         $builder->expects('first')->with(['column'])->returns(null);
         $builder->findOrFail('bar', ['column']);
     }
@@ -245,79 +212,6 @@ class DatabaseEloquentBuilderTest extends TestCase
             yield [Bar::FOO, 5, $useCollection];
             yield [EloquentBuilderTestBackedEnum::Bar, 'bar', $useCollection];
         }
-    }
-
-    public function testFindOrMethod()
-    {
-        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
-        $model = $this->getMockModel();
-        $model->expects('getKeyType')->times(3)->returns('int');
-        $builder->setModel($model);
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 1)->times(2);
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 2);
-        $builder->expects('first')->returns($model);
-        $builder->expects('first')->with(['column'])->returns($model);
-        $builder->expects('first')->returns(null);
-
-        $this->assertSame($model, $builder->findOr(1, fn () => 'callback result'));
-        $this->assertSame($model, $builder->findOr(1, ['column'], fn () => 'callback result'));
-        $this->assertSame('callback result', $builder->findOr(2, fn () => 'callback result'));
-    }
-
-    public function testFindOrMethodWithMany()
-    {
-        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
-        $model1 = $this->getMockModel();
-        $model2 = $this->getMockModel();
-        $model1->expects('getKeyType')->times(3)->returns('int');
-        $model2->allows('getKeyType')->returns('int');
-        $builder->setModel($model1);
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2])->times(2);
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2, 3]);
-        $builder->expects('get')->returns(new Collection([$model1, $model2]));
-        $builder->expects('get')->with(['column'])->returns(new Collection([$model1, $model2]));
-        $builder->expects('get')->returns(null);
-
-        $result = $builder->findOr([1, 2], fn () => 'callback result');
-        $this->assertInstanceOf(Collection::class, $result);
-        $this->assertSame($model1, $result[0]);
-        $this->assertSame($model2, $result[1]);
-
-        $result = $builder->findOr([1, 2], ['column'], fn () => 'callback result');
-        $this->assertInstanceOf(Collection::class, $result);
-        $this->assertSame($model1, $result[0]);
-        $this->assertSame($model2, $result[1]);
-
-        $result = $builder->findOr([1, 2, 3], fn () => 'callback result');
-        $this->assertSame('callback result', $result);
-    }
-
-    public function testFindOrMethodWithManyUsingCollection()
-    {
-        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
-        $model1 = $this->getMockModel();
-        $model2 = $this->getMockModel();
-        $model1->expects('getKeyType')->times(3)->returns('int');
-        $model2->allows('getKeyType')->returns('int');
-        $builder->setModel($model1);
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2])->times(2);
-        $builder->getQuery()->expects('whereIntegerInRaw')->with('foo_table.foo', [1, 2, 3]);
-        $builder->expects('get')->returns(new Collection([$model1, $model2]));
-        $builder->expects('get')->with(['column'])->returns(new Collection([$model1, $model2]));
-        $builder->expects('get')->returns(null);
-
-        $result = $builder->findOr(new Collection([1, 2]), fn () => 'callback result');
-        $this->assertInstanceOf(Collection::class, $result);
-        $this->assertSame($model1, $result[0]);
-        $this->assertSame($model2, $result[1]);
-
-        $result = $builder->findOr(new Collection([1, 2]), ['column'], fn () => 'callback result');
-        $this->assertInstanceOf(Collection::class, $result);
-        $this->assertSame($model1, $result[0]);
-        $this->assertSame($model2, $result[1]);
-
-        $result = $builder->findOr(new Collection([1, 2, 3]), fn () => 'callback result');
-        $this->assertSame('callback result', $result);
     }
 
     public function testFirstOrFailMethodThrowsModelNotFoundException()
@@ -463,7 +357,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $model->expects('getKeyType')->returns('int');
         $builder->setModel($model);
-        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar');
+        $builder->getQuery()->expects('where')->with('foo_table.foo', '=', 'bar', 'and');
         $builder->expects('first')->with(['column'])->returns(null);
         $builder->whereKey('bar')->valueOrFail('column');
     }
@@ -651,7 +545,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testPluckReturnsTheMutatedAttributesOfAModel()
     {
         $builder = $this->getBuilder();
-        $builder->getQuery()->expects('pluck')->with('name', '')->returns(new BaseCollection(['bar', 'baz']));
+        $builder->getQuery()->expects('pluck')->with('name', null)->returns(new BaseCollection(['bar', 'baz']));
         $builder->setModel($this->getMockModel());
         $builder->getModel()->expects('hasAnyGetMutator')->with('name')->returns(true);
         $builder->getModel()->expects('newFromBuilder')->with(['name' => 'bar'])->returns(new EloquentBuilderTestPluckStub(['name' => 'bar']));
@@ -663,7 +557,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testPluckReturnsTheCastedAttributesOfAModel()
     {
         $builder = $this->getBuilder();
-        $builder->getQuery()->expects('pluck')->with('name', '')->returns(new BaseCollection(['bar', 'baz']));
+        $builder->getQuery()->expects('pluck')->with('name', null)->returns(new BaseCollection(['bar', 'baz']));
         $builder->setModel($this->getMockModel());
         $builder->getModel()->expects('hasAnyGetMutator')->with('name')->returns(false);
         $builder->getModel()->expects('hasCast')->with('name')->returns(true);
@@ -676,7 +570,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testPluckReturnsTheDateAttributesOfAModel()
     {
         $builder = $this->getBuilder();
-        $builder->getQuery()->expects('pluck')->with('created_at', '')->returns(new BaseCollection(['2010-01-01 00:00:00', '2011-01-01 00:00:00']));
+        $builder->getQuery()->expects('pluck')->with('created_at', null)->returns(new BaseCollection(['2010-01-01 00:00:00', '2011-01-01 00:00:00']));
         $builder->setModel($this->getMockModel());
         $builder->getModel()->expects('hasAnyGetMutator')->with('created_at')->returns(false);
         $builder->getModel()->expects('hasCast')->with('created_at')->returns(false);
@@ -693,7 +587,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->expects('qualifyColumn')->times(2)->with('name')->returns('foo_table.name');
 
         $builder = $this->getBuilder();
-        $builder->getQuery()->expects('pluck')->with($model->qualifyColumn('name'), '')->returns(new BaseCollection(['bar', 'baz']));
+        $builder->getQuery()->expects('pluck')->with($model->qualifyColumn('name'), null)->returns(new BaseCollection(['bar', 'baz']));
         $builder->setModel($model);
         $builder->getModel()->expects('hasAnyGetMutator')->with('name')->returns(true);
         $builder->getModel()->expects('newFromBuilder')->with(['name' => 'bar'])->returns(new EloquentBuilderTestPluckStub(['name' => 'bar']));
@@ -708,7 +602,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->expects('qualifyColumn')->times(2)->with('name')->returns('foo_table.name');
 
         $builder = $this->getBuilder();
-        $builder->getQuery()->expects('pluck')->with($model->qualifyColumn('name'), '')->returns(new BaseCollection(['bar', 'baz']));
+        $builder->getQuery()->expects('pluck')->with($model->qualifyColumn('name'), null)->returns(new BaseCollection(['bar', 'baz']));
         $builder->setModel($model);
         $builder->getModel()->expects('hasAnyGetMutator')->with('name')->returns(false);
         $builder->getModel()->expects('hasCast')->with('name')->returns(true);
@@ -724,7 +618,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->expects('qualifyColumn')->times(2)->with('created_at')->returns('foo_table.created_at');
 
         $builder = $this->getBuilder();
-        $builder->getQuery()->expects('pluck')->with($model->qualifyColumn('created_at'), '')->returns(new BaseCollection(['2010-01-01 00:00:00', '2011-01-01 00:00:00']));
+        $builder->getQuery()->expects('pluck')->with($model->qualifyColumn('created_at'), null)->returns(new BaseCollection(['2010-01-01 00:00:00', '2011-01-01 00:00:00']));
         $builder->setModel($model);
         $builder->getModel()->expects('hasAnyGetMutator')->with('created_at')->returns(false);
         $builder->getModel()->expects('hasCast')->with('created_at')->returns(false);
@@ -738,7 +632,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testPluckWithoutModelGetterJustReturnsTheAttributesFoundInDatabase()
     {
         $builder = $this->getBuilder();
-        $builder->getQuery()->expects('pluck')->with('name', '')->returns(new BaseCollection(['bar', 'baz']));
+        $builder->getQuery()->expects('pluck')->with('name', null)->returns(new BaseCollection(['bar', 'baz']));
         $builder->setModel($this->getMockModel());
         $builder->getModel()->expects('hasAnyGetMutator')->with('name')->returns(false);
         $builder->getModel()->expects('hasCast')->with('name')->returns(false);
@@ -784,7 +678,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testEagerLoadRelationsLoadTopLevelRelationships()
     {
-        $builder = Double::for(Builder::class)->passthru(new Builder($this->getMockQueryBuilder()));
+        $builder = new EloquentBuilderEagerLoadSpy($this->getMockQueryBuilder());
         $nop1 = function () {
             //
         };
@@ -792,10 +686,11 @@ class DatabaseEloquentBuilderTest extends TestCase
             //
         };
         $builder->setEagerLoads(['foo' => $nop1, 'foo.bar' => $nop2]);
-        $builder->shouldAllowMockingProtectedMethods()->expects('eagerLoadRelation')->with(['models'], 'foo', $nop1)->returns(['foo']);
 
         $results = $builder->eagerLoadRelations(['models']);
+
         $this->assertEquals(['foo'], $results);
+        $this->assertSame([[['models'], 'foo', $nop1]], $builder->eagerLoaded);
     }
 
     public function testEagerLoadRelationsCanBeFlushed()
@@ -832,71 +727,59 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testRelationshipEagerLoadProcessForImplicitlyEmpty()
     {
-        $queryBuilder = $this->getMockQueryBuilder();
-        $builder = Double::for(Builder::class)->passthru(new Builder($queryBuilder));
-        $builder->setEagerLoads(['parentFoo' => function ($query) {
-            $_SERVER['__eloquent.constrain'] = $query;
-        }]);
         $model = new EloquentBuilderTestModelSelfRelatedStub;
         $this->mockConnectionForModel($model, 'SQLite');
+        $constrained = null;
 
         $models = [
             new EloquentBuilderTestModelSelfRelatedStub,
             new EloquentBuilderTestModelSelfRelatedStub,
         ];
-        $relation = Double::for($model->parentFoo());
 
-        $builder->expects('getRelation')->with('parentFoo')->returns($relation);
+        $model->newQuery()->with(['parentFoo' => function ($query) use (&$constrained) {
+            $constrained = $query;
+        }])->eagerLoadRelations($models);
 
-        $results = $builder->eagerLoadRelations($models);
-
-        unset($_SERVER['__eloquent.constrain']);
+        $this->assertNotNull($constrained);
+        $this->assertTrue($models[0]->relationLoaded('parentFoo'));
+        $this->assertNull($models[0]->parentFoo);
+        $this->assertNull($models[1]->parentFoo);
     }
 
     public function testGetRelationProperlySetsNestedRelationships()
     {
-        $builder = $this->getBuilder();
-        $builder->setModel($this->getMockModel());
-        $relation = Double::for(Relation::class);
-        $builder->getModel()->expects('newInstance->orders')->andReturn($relation);
-        $relationQuery = Double::for(Builder::class);
-        $relation->expects('getQuery')->returns($relationQuery);
-        $relationQuery->expects('with')->with(['lines' => null, 'lines.details' => null]);
-        $builder->setEagerLoads(['orders' => null, 'orders.lines' => null, 'orders.lines.details' => null]);
+        $model = new EloquentBuilderTestModelSelfRelatedStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $builder = $model->newQuery();
+        $builder->setEagerLoads(['childFoos' => null, 'childFoos.parentFoo' => null, 'childFoos.parentFoo.childFoo' => null]);
 
-        $builder->getRelation('orders');
+        $relation = $builder->getRelation('childFoos');
+
+        $this->assertSame(['parentFoo', 'parentFoo.childFoo'], array_keys($relation->getQuery()->getEagerLoads()));
     }
 
     public function testGetRelationProperlySetsNestedRelationshipsWithSimilarNames()
     {
-        $builder = $this->getBuilder();
-        $builder->setModel($this->getMockModel());
-        $relation = Double::for(Relation::class);
-        $builder->getModel()->expects('newInstance->orders')->andReturn($relation);
-        $groupsRelation = Double::for(Relation::class);
-        $builder->getModel()->expects('newInstance->ordersGroups')->andReturn($groupsRelation);
+        $model = new EloquentBuilderTestModelSelfRelatedStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $builder = $model->newQuery();
+        $builder->setEagerLoads(['childFoo' => null, 'childFoos' => null, 'childFoos.parentFoo' => null, 'childFoos.parentFoo.childFoo' => null]);
 
-        $relationQuery = Double::for(Builder::class);
-        $relation->allows('getQuery')->returns($relationQuery);
+        $relation = $builder->getRelation('childFoo');
+        $groupsRelation = $builder->getRelation('childFoos');
 
-        $groupRelationQuery = Double::for(Builder::class);
-        $groupsRelation->expects('getQuery')->returns($groupRelationQuery);
-        $groupRelationQuery->expects('with')->with(['lines' => null, 'lines.details' => null]);
-
-        $builder->setEagerLoads(['orders' => null, 'ordersGroups' => null, 'ordersGroups.lines' => null, 'ordersGroups.lines.details' => null]);
-
-        $builder->getRelation('orders');
-        $builder->getRelation('ordersGroups');
+        $this->assertSame([], array_keys($relation->getQuery()->getEagerLoads()));
+        $this->assertSame(['parentFoo', 'parentFoo.childFoo'], array_keys($groupsRelation->getQuery()->getEagerLoads()));
     }
 
     public function testGetRelationThrowsException()
     {
         $this->expectException(RelationNotFoundException::class);
 
-        $builder = $this->getBuilder();
-        $builder->setModel($this->getMockModel());
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, 'SQLite');
 
-        $builder->getRelation('invalid');
+        $model->newQuery()->getRelation('invalid');
     }
 
     public function testEagerLoadParsingSetsProperRelationships()
@@ -963,10 +846,15 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testQueryPassThru()
     {
-        $builder = $this->getBuilder();
-        $builder->getQuery()->expects('foobar')->returns('foo');
+        BaseBuilder::macro('foobar', fn () => 'foo');
 
-        $this->assertInstanceOf(Builder::class, $builder->foobar());
+        try {
+            $builder = $this->getBuilder();
+
+            $this->assertInstanceOf(Builder::class, $builder->foobar());
+        } finally {
+            BaseBuilder::flushMacros();
+        }
 
         $builder = $this->getBuilder();
         $builder->getQuery()->expects('insert')->with(['bar'])->returns('foo');
@@ -1002,27 +890,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->expects('raw')->with('bar')->returns('foo');
 
         $this->assertSame('foo', $builder->raw('bar'));
-    }
-
-    public function testNestedWhere()
-    {
-        $nestedQuery = Double::for(Builder::class);
-        $nestedRawQuery = $this->getMockQueryBuilder();
-        $nestedQuery->expects('getQuery')->returns($nestedRawQuery);
-        $nestedQuery->expects('getEagerLoads')->returns([]);
-        $nestedQuery->expects('removedScopes')->returns([]);
-        $model = $this->getMockModel()->makePartial();
-        $model->expects('newQueryWithoutRelationships')->returns($nestedQuery);
-        $builder = $this->getBuilder();
-        $builder->getQuery()->allows('from');
-        $builder->setModel($model);
-        $builder->getQuery()->expects('addNestedWhereQuery')->with($nestedRawQuery, 'and');
-        $nestedQuery->expects('foo');
-
-        $result = $builder->where(function ($query) {
-            $query->foo();
-        });
-        $this->assertEquals($builder, $result);
     }
 
     public function testRealNestedWhereWithScopes()
@@ -1067,25 +934,16 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $query->getBindings());
     }
 
-    public function testWhereNot()
+    public function testWhereNotWithClosure()
     {
-        $nestedQuery = Double::for(Builder::class);
-        $nestedRawQuery = $this->getMockQueryBuilder();
-        $nestedQuery->expects('getQuery')->returns($nestedRawQuery);
-        $nestedQuery->expects('getEagerLoads')->returns([]);
-        $nestedQuery->expects('removedScopes')->returns([]);
-        $model = $this->getMockModel()->makePartial();
-        $model->expects('newQueryWithoutRelationships')->returns($nestedQuery);
-        $builder = $this->getBuilder();
-        $builder->getQuery()->allows('from');
-        $builder->setModel($model);
-        $builder->getQuery()->expects('addNestedWhereQuery')->with($nestedRawQuery, 'and not');
-        $nestedQuery->expects('foo');
-
-        $result = $builder->whereNot(function ($query) {
-            $query->foo();
+        $model = new EloquentBuilderTestStub();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->whereNot(function ($query) {
+            $query->where('baz', '>', 9000);
         });
-        $this->assertEquals($builder, $result);
+
+        $this->assertSame('select * from "table" where not ("baz" > ?)', $query->toSql());
+        $this->assertEquals([9000], $query->getBindings());
     }
 
     public function testSimpleOrWhereNot()
@@ -1115,25 +973,16 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals([3, 1, 2], $query->getBindings());
     }
 
-    public function testOrWhereNot()
+    public function testOrWhereNotWithClosure()
     {
-        $nestedQuery = Double::for(Builder::class);
-        $nestedRawQuery = $this->getMockQueryBuilder();
-        $nestedQuery->expects('getQuery')->returns($nestedRawQuery);
-        $nestedQuery->expects('getEagerLoads')->returns([]);
-        $nestedQuery->expects('removedScopes')->returns([]);
-        $model = $this->getMockModel()->makePartial();
-        $model->expects('newQueryWithoutRelationships')->returns($nestedQuery);
-        $builder = $this->getBuilder();
-        $builder->getQuery()->allows('from');
-        $builder->setModel($model);
-        $builder->getQuery()->expects('addNestedWhereQuery')->with($nestedRawQuery, 'or not');
-        $nestedQuery->expects('foo');
-
-        $result = $builder->orWhereNot(function ($query) {
-            $query->foo();
+        $model = new EloquentBuilderTestStub();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->where('foo', 'bar')->orWhereNot(function ($query) {
+            $query->where('baz', '>', 9000);
         });
-        $this->assertEquals($builder, $result);
+
+        $this->assertSame('select * from "table" where "foo" = ? or not ("baz" > ?)', $query->toSql());
+        $this->assertEquals(['bar', 9000], $query->getBindings());
     }
 
     public function testRealQueryDynamicScopesWithNamedArguments()
@@ -2724,8 +2573,8 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($model);
 
         $query->expects('upsert')->with([
-            ['email' => 'foo', 'name' => 'bar', 'updated_at' => $now, 'created_at' => $now],
-            ['name' => 'bar2', 'email' => 'foo2', 'updated_at' => $now, 'created_at' => $now],
+            ['updated_at' => $now, 'created_at' => $now, 'email' => 'foo', 'name' => 'bar'],
+            ['updated_at' => $now, 'created_at' => $now, 'name' => 'bar2', 'email' => 'foo2'],
         ], ['email'], ['email', 'name', 'updated_at'])->returns(2);
 
         $result = $builder->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
@@ -2745,7 +2594,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestStubStringPrimaryKey;
         $builder->setModel($model);
 
-        $query->expects('update')->with(['updated_at' => $now])->returns(2);
+        $query->expects('update')->with(['updated_at' => Carbon::now()])->returns(2);
 
         $result = $builder->touch();
 
@@ -2764,7 +2613,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestStubStringPrimaryKey;
         $builder->setModel($model);
 
-        $query->expects('update')->with(['published_at' => $now])->returns(2);
+        $query->expects('update')->with(['published_at' => Carbon::now()])->returns(2);
 
         $result = $builder->touch('published_at');
 
@@ -2783,7 +2632,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestStubStringPrimaryKey;
         $builder->setModel($model);
 
-        $query->expects('update')->with(['published_at' => $now, 'verified_at' => $now])->returns(2);
+        $query->expects('update')->with(['published_at' => Carbon::now(), 'verified_at' => Carbon::now()])->returns(2);
 
         $result = $builder->touch(['published_at', 'verified_at']);
 
@@ -3278,6 +3127,18 @@ class EloquentBuilderTestModelOtherFarRelatedStub extends Model
     public function baz()
     {
         return $this->belongsTo(EloquentBuilderTestModelCloseRelatedStub::class);
+    }
+}
+
+class EloquentBuilderEagerLoadSpy extends Builder
+{
+    public array $eagerLoaded = [];
+
+    protected function eagerLoadRelation(array $models, $name, Closure $constraints)
+    {
+        $this->eagerLoaded[] = [$models, $name, $constraints];
+
+        return ['foo'];
     }
 }
 

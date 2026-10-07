@@ -23,6 +23,7 @@ use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\RecordNotFoundException;
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
@@ -60,15 +61,10 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testBasicSelectWithGetColumns()
     {
         $builder = $this->getBuilder();
+        $queries = [];
         $builder->getProcessor()->expects('processSelect')->times(3);
-        $builder->getConnection()->expects('select')->resolves(function ($sql) {
-            $this->assertSame('select * from "users"', $sql);
-        });
-        $builder->getConnection()->expects('select')->resolves(function ($sql) {
-            $this->assertSame('select "foo", "bar" from "users"', $sql);
-        });
-        $builder->getConnection()->expects('select')->resolves(function ($sql) {
-            $this->assertSame('select "baz" from "users"', $sql);
+        $builder->getConnection()->expects('select')->times(3)->resolves(function ($sql) use (&$queries) {
+            $queries[] = $sql;
         });
 
         $builder->from('users')->get();
@@ -79,6 +75,12 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder->from('users')->get('baz');
         $this->assertNull($builder->columns);
+
+        $this->assertSame([
+            'select * from "users"',
+            'select "foo", "bar" from "users"',
+            'select "baz" from "users"',
+        ], $queries);
 
         $this->assertSame('select * from "users"', $builder->toSql());
         $this->assertNull($builder->columns);
@@ -4081,13 +4083,17 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMockQueryBuilder();
         $data = new stdClass;
-        $builder->expects('first')->returns($data);
-        $builder->expects('first')->with(['column'])->returns($data);
-        $builder->expects('first')->returns(null);
+        $columns = [];
+        $builder->expects('first')->times(3)->resolves(function ($requested) use (&$columns, $data) {
+            $columns[] = $requested;
+
+            return count($columns) === 3 ? null : $data;
+        });
 
         $this->assertSame($data, $builder->findOr(1, fn () => 'callback result'));
         $this->assertSame($data, $builder->findOr(1, ['column'], fn () => 'callback result'));
         $this->assertSame('callback result', $builder->findOr(1, fn () => 'callback result'));
+        $this->assertSame([['*'], ['column'], ['*']], $columns);
     }
 
     public function testFirstMethodReturnsFirstResult()
@@ -5224,7 +5230,9 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->truncate();
 
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->expects('getSchemaBuilder->parseSchemaAndTable')->andReturn([null, 'users']);
+        $schemaBuilder = Double::for(SchemaBuilder::class);
+        $schemaBuilder->expects('parseSchemaAndTable')->returns([null, 'users']);
+        $builder->getConnection()->expects('getSchemaBuilder')->returns($schemaBuilder);
         $builder->from('users');
         $this->assertEquals([
             'delete from sqlite_sequence where name = ?' => ['users'],
@@ -5240,7 +5248,9 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->truncate();
 
         $builder = $this->getSQLiteBuilder(prefix: 'prefix_');
-        $builder->getConnection()->expects('getSchemaBuilder->parseSchemaAndTable')->andReturn([null, 'users']);
+        $schemaBuilder = Double::for(SchemaBuilder::class);
+        $schemaBuilder->expects('parseSchemaAndTable')->returns([null, 'users']);
+        $builder->getConnection()->expects('getSchemaBuilder')->returns($schemaBuilder);
         $builder->from('users');
         $this->assertEquals([
             'delete from sqlite_sequence where name = ?' => ['prefix_users'],
@@ -5256,7 +5266,9 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('my_schema.users')->truncate();
 
         $builder = $this->getSQLiteBuilder(prefix: 'prefix_');
-        $builder->getConnection()->expects('getSchemaBuilder->parseSchemaAndTable')->andReturn(['my_schema', 'users']);
+        $schemaBuilder = Double::for(SchemaBuilder::class);
+        $schemaBuilder->expects('parseSchemaAndTable')->returns(['my_schema', 'users']);
+        $builder->getConnection()->expects('getSchemaBuilder')->returns($schemaBuilder);
         $builder->from('my_schema.users');
         $this->assertEquals([
             'delete from "my_schema".sqlite_sequence where name = ?' => ['prefix_users'],
@@ -6306,7 +6318,7 @@ SQL;
         $chunk1 = collect([['someIdField' => 1], ['someIdField' => 2]]);
         $chunk2 = collect([['someIdField' => 10], ['someIdField' => 11]]);
         $chunk3 = collect([]);
-        $builder->expects('forPageAfterId')->with(2, 0, 'someIdField')->returns($builder);
+        $builder->expects('forPageAfterId')->with(2, null, 'someIdField')->returns($builder);
         $builder->expects('forPageAfterId')->with(2, 2, 'someIdField')->returns($builder);
         $builder->expects('forPageAfterId')->with(2, 11, 'someIdField')->returns($builder);
         $builder->expects('get')->times(3)->returns($chunk1, $chunk2, $chunk3);
@@ -6328,7 +6340,7 @@ SQL;
         $chunk1 = collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
         $chunk2 = collect([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
         $chunk3 = collect([]);
-        $builder->expects('forPageAfterId')->with(2, 0, 'someIdField')->returns($builder);
+        $builder->expects('forPageAfterId')->with(2, null, 'someIdField')->returns($builder);
         $builder->expects('forPageAfterId')->with(2, 2, 'someIdField')->returns($builder);
         $builder->expects('forPageAfterId')->with(2, 11, 'someIdField')->returns($builder);
         $builder->expects('get')->times(3)->returns($chunk1, $chunk2, $chunk3);
@@ -6349,7 +6361,7 @@ SQL;
 
         $chunk1 = collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
         $chunk2 = collect([(object) ['someIdField' => 10]]);
-        $builder->expects('forPageAfterId')->with(2, 0, 'someIdField')->returns($builder);
+        $builder->expects('forPageAfterId')->with(2, null, 'someIdField')->returns($builder);
         $builder->expects('forPageAfterId')->with(2, 2, 'someIdField')->returns($builder);
         $builder->expects('get')->times(2)->returns($chunk1, $chunk2);
 
@@ -6382,7 +6394,7 @@ SQL;
 
         $chunk1 = collect([(object) ['table_id' => 1], (object) ['table_id' => 10]]);
         $chunk2 = collect([]);
-        $builder->expects('forPageAfterId')->with(2, 0, 'table.id')->returns($builder);
+        $builder->expects('forPageAfterId')->with(2, null, 'table.id')->returns($builder);
         $builder->expects('forPageAfterId')->with(2, 10, 'table.id')->returns($builder);
         $builder->expects('get')->times(2)->returns($chunk1, $chunk2);
 
@@ -6402,7 +6414,7 @@ SQL;
 
         $chunk1 = collect([(object) ['someIdField' => 10], (object) ['someIdField' => 1]]);
         $chunk2 = collect([]);
-        $builder->expects('forPageBeforeId')->with(2, 0, 'someIdField')->returns($builder);
+        $builder->expects('forPageBeforeId')->with(2, null, 'someIdField')->returns($builder);
         $builder->expects('forPageBeforeId')->with(2, 1, 'someIdField')->returns($builder);
         $builder->expects('get')->times(2)->returns($chunk1, $chunk2);
 
@@ -6941,14 +6953,10 @@ SQL;
         $columns = ['test'];
         $cursorName = 'cursor-name';
         $cursor = new Cursor(['created_at' => $ts]);
-        $builder = $this->getMockQueryBuilder();
+        $builder = $this->getQueryBuilderWithCapturedGet();
         $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
         $builder->orderBy('created_at');
-
-        $builder->expects('newQuery')->resolves(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -6957,7 +6965,7 @@ SQL;
             ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
         ]);
 
-        $builder->expects('get')->resolves(function () use ($builder, $results, $ts) {
+        $builder->onGet(function () use ($builder, $results, $ts) {
             $this->assertSame(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where ("created_at" > ?)) order by "created_at" asc limit 17',
                 $builder->toSql());
@@ -6988,16 +6996,12 @@ SQL;
         $columns = ['test'];
         $cursorName = 'cursor-name';
         $cursor = new Cursor(['created_at' => $ts]);
-        $builder = $this->getMockQueryBuilder();
+        $builder = $this->getQueryBuilderWithCapturedGet();
         $builder->select('id', 'created_at')->selectRaw('? as type', ['video'])->from('videos');
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw('? as type', ['news'])->from('news')->join('authors', function ($join) {
             $join->on('authors.id', '=', 'news.author_id')->where('authors.active', true);
         }));
         $builder->orderBy('created_at');
-
-        $builder->expects('newQuery')->resolves(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -7006,7 +7010,7 @@ SQL;
             ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
         ]);
 
-        $builder->expects('get')->resolves(function () use ($builder, $results, $ts) {
+        $builder->onGet(function () use ($builder, $results, $ts) {
             $this->assertSame(
                 '(select "id", "created_at", ? as type from "videos" where ("created_at" > ?)) union (select "id", "created_at", ? as type from "news" inner join "authors" on "authors"."id" = "news"."author_id" and "authors"."active" = ? where ("created_at" > ?)) order by "created_at" asc limit 17',
                 $builder->toSql());
@@ -7036,15 +7040,11 @@ SQL;
         $columns = ['test'];
         $cursorName = 'cursor-name';
         $cursor = new Cursor(['created_at' => $ts]);
-        $builder = $this->getMockQueryBuilder();
+        $builder = $this->getQueryBuilderWithCapturedGet();
         $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news')->where('extra', 'first'));
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'podcast' as type")->from('podcasts')->where('extra', 'second'));
         $builder->orderBy('created_at');
-
-        $builder->expects('newQuery')->resolves(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -7054,7 +7054,7 @@ SQL;
             ['id' => 3, 'created_at' => Carbon::now(), 'type' => 'podcasts'],
         ]);
 
-        $builder->expects('get')->resolves(function () use ($builder, $results, $ts) {
+        $builder->onGet(function () use ($builder, $results, $ts) {
             $this->assertSame(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where "extra" = ? and ("created_at" > ?)) union (select "id", "created_at", \'podcast\' as type from "podcasts" where "extra" = ? and ("created_at" > ?)) order by "created_at" asc limit 17',
                 $builder->toSql());
@@ -7085,15 +7085,11 @@ SQL;
         $columns = ['id', 'created_at', 'type'];
         $cursorName = 'cursor-name';
         $cursor = new Cursor(['id' => 1, 'created_at' => $ts, 'type' => 'news']);
-        $builder = $this->getMockQueryBuilder();
+        $builder = $this->getQueryBuilderWithCapturedGet();
         $builder->select('id', 'start_time as created_at', 'type')->from('videos')->where('extra', 'first');
         $builder->union($this->getBuilder()->select('id', 'created_at', 'type')->from('news')->where('extra', 'second'));
         $builder->union($this->getBuilder()->select('id', 'created_at', 'type')->from('podcasts')->where('extra', 'third'));
         $builder->orderBy('id')->orderByDesc('created_at')->orderBy('type');
-
-        $builder->expects('newQuery')->resolves(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -7104,7 +7100,7 @@ SQL;
             ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'podcast'],
         ]);
 
-        $builder->expects('get')->resolves(function () use ($builder, $results, $ts) {
+        $builder->onGet(function () use ($builder, $results, $ts) {
             $this->assertSame(
                 '(select "id", "start_time" as "created_at", "type" from "videos" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) union (select "id", "created_at", "type" from "news" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) union (select "id", "created_at", "type" from "podcasts" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) order by "id" asc, "created_at" desc, "type" asc limit 17',
                 $builder->toSql());
@@ -7135,14 +7131,10 @@ SQL;
         $columns = ['test'];
         $cursorName = 'cursor-name';
         $cursor = new Cursor(['created_at' => $ts]);
-        $builder = $this->getMockQueryBuilder();
+        $builder = $this->getQueryBuilderWithCapturedGet();
         $builder->select('id', 'is_published', 'start_time as created_at')->selectRaw("'video' as type")->where('is_published', true)->from('videos');
         $builder->union($this->getBuilder()->select('id', 'is_published', 'created_at')->selectRaw("'news' as type")->where('is_published', true)->from('news'));
         $builder->orderByRaw('case when (id = 3 and type="news" then 0 else 1 end)')->orderBy('created_at');
-
-        $builder->expects('newQuery')->resolves(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -7151,7 +7143,7 @@ SQL;
             ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news', 'is_published' => true],
         ]);
 
-        $builder->expects('get')->resolves(function () use ($builder, $results, $ts) {
+        $builder->onGet(function () use ($builder, $results, $ts) {
             $this->assertSame(
                 '(select "id", "is_published", "start_time" as "created_at", \'video\' as type from "videos" where "is_published" = ? and ("start_time" > ?)) union (select "id", "is_published", "created_at", \'news\' as type from "news" where "is_published" = ? and ("created_at" > ?)) order by case when (id = 3 and type="news" then 0 else 1 end), "created_at" asc limit 17',
                 $builder->toSql());
@@ -7182,14 +7174,10 @@ SQL;
         $columns = ['test'];
         $cursorName = 'cursor-name';
         $cursor = new Cursor(['created_at' => $ts], false);
-        $builder = $this->getMockQueryBuilder();
+        $builder = $this->getQueryBuilderWithCapturedGet();
         $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
         $builder->orderBy('created_at');
-
-        $builder->expects('newQuery')->resolves(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -7198,7 +7186,7 @@ SQL;
             ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
         ]);
 
-        $builder->expects('get')->resolves(function () use ($builder, $results, $ts) {
+        $builder->onGet(function () use ($builder, $results, $ts) {
             $this->assertSame(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ?)) union (select "id", "created_at", \'news\' as type from "news" where ("created_at" < ?)) order by "created_at" desc limit 17',
                 $builder->toSql());
@@ -7229,14 +7217,10 @@ SQL;
         $columns = ['test'];
         $cursorName = 'cursor-name';
         $cursor = new Cursor(['created_at' => $ts, 'id' => 1]);
-        $builder = $this->getMockQueryBuilder();
+        $builder = $this->getQueryBuilderWithCapturedGet();
         $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
         $builder->orderByDesc('created_at')->orderBy('id');
-
-        $builder->expects('newQuery')->resolves(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -7245,7 +7229,7 @@ SQL;
             ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
         ]);
 
-        $builder->expects('get')->resolves(function () use ($builder, $results, $ts) {
+        $builder->onGet(function () use ($builder, $results, $ts) {
             $this->assertSame(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) union (select "id", "created_at", \'news\' as type from "news" where ("created_at" < ? or ("created_at" = ? and ("id" > ?)))) order by "created_at" desc, "id" asc limit 17',
                 $builder->toSql());
@@ -7276,15 +7260,11 @@ SQL;
         $columns = ['test'];
         $cursorName = 'cursor-name';
         $cursor = new Cursor(['created_at' => $ts]);
-        $builder = $this->getMockQueryBuilder();
+        $builder = $this->getQueryBuilderWithCapturedGet();
         $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
         $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
         $builder->union($this->getBuilder()->select('id', 'init_at as created_at')->selectRaw("'podcast' as type")->from('podcasts'));
         $builder->orderBy('created_at');
-
-        $builder->expects('newQuery')->resolves(function () use ($builder) {
-            return new Builder($builder->connection, $builder->grammar, $builder->processor);
-        });
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
@@ -7294,7 +7274,7 @@ SQL;
             ['id' => 3, 'created_at' => Carbon::now(), 'type' => 'podcast'],
         ]);
 
-        $builder->expects('get')->resolves(function () use ($builder, $results, $ts) {
+        $builder->onGet(function () use ($builder, $results, $ts) {
             $this->assertSame(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where ("created_at" > ?)) union (select "id", "init_at" as "created_at", \'podcast\' as type from "podcasts" where ("init_at" > ?)) order by "created_at" asc limit 17',
                 $builder->toSql());
@@ -8121,10 +8101,34 @@ SQL;
     /**
      * @return MockInterface|\Illuminate\Database\Query\Builder
      */
+    protected function getQueryBuilderWithCapturedGet()
+    {
+        return new QueryBuilderTestGetStub(
+            $connection = $this->getConnection(),
+            new Grammar($connection),
+            new Processor
+        );
+    }
+
     protected function getMockQueryBuilder()
     {
         return Double::for(Builder::class)->passthru(new Builder($connection = $this->getConnection(),
             new Grammar($connection),
             new Processor));
+    }
+}
+
+class QueryBuilderTestGetStub extends Builder
+{
+    protected $getCallback;
+
+    public function onGet(Closure $callback)
+    {
+        $this->getCallback = $callback;
+    }
+
+    public function get($columns = ['*'])
+    {
+        return ($this->getCallback)($columns);
     }
 }

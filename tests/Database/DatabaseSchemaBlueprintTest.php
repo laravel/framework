@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Database\MariaDbConnection;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
@@ -198,7 +199,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $getSql = function ($grammar) {
             $connection = $this->getConnection($grammar);
             $connection->allows('getServerVersion')->returns('8.0.4');
-            $connection->allows('isMaria')->returns(false);
+
+            if ($grammar === 'MySql') {
+                $connection->allows('isMaria')->returns(false);
+            }
 
             return (new Blueprint($connection, 'users', function ($table) {
                 $table->renameColumn('foo', 'bar');
@@ -713,7 +717,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $grammar ??= 'MySql';
 
-        $connection = Double::for($grammar === 'MySql' ? MySqlConnection::class : Connection::class);
+        $connection = Double::for(match ($grammar) {
+            'MySql' => MySqlConnection::class,
+            'MariaDb' => MariaDbConnection::class,
+            default => Connection::class,
+        });
         $connection->allows('getTablePrefix')->returns($prefix);
         $connection->allows('getConfig')->with('prefix_indexes')->returns(true);
 
