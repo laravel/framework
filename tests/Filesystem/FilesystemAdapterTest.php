@@ -359,9 +359,10 @@ class FilesystemAdapterTest extends TestCase
 
         $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
 
-        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
-            'disk' => new FilesystemAdapter($backupFilesystem, $backupAdapter),
-        ]));
+        $filesystemFactory3 = Double::for(FilesystemFactory::class);
+        $filesystemFactory3->allows('disk')->returns(new FilesystemAdapter($backupFilesystem, $backupAdapter));
+
+        Container::getInstance()->instance(FilesystemFactory::class, $filesystemFactory3);
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $filesystemAdapter->copyToDisk('backup', 'file.txt');
@@ -376,9 +377,10 @@ class FilesystemAdapterTest extends TestCase
 
         $backupFilesystem = new Filesystem($backupAdapter = new LocalFilesystemAdapter($this->tempDir.'/backup'));
 
-        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
-            'disk' => new FilesystemAdapter($backupFilesystem, $backupAdapter),
-        ]));
+        $filesystemFactory2 = Double::for(FilesystemFactory::class);
+        $filesystemFactory2->allows('disk')->returns(new FilesystemAdapter($backupFilesystem, $backupAdapter));
+
+        Container::getInstance()->instance(FilesystemFactory::class, $filesystemFactory2);
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $filesystemAdapter->moveToDisk('backup', 'file.txt', 'copy.txt');
@@ -393,9 +395,10 @@ class FilesystemAdapterTest extends TestCase
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
-        Container::getInstance()->instance(FilesystemFactory::class, Mockery::mock(FilesystemFactory::class, [
-            'disk' => $filesystemAdapter,
-        ]));
+        $filesystemFactory = Double::for(FilesystemFactory::class);
+        $filesystemFactory->allows('disk')->returns($filesystemAdapter);
+
+        Container::getInstance()->instance(FilesystemFactory::class, $filesystemFactory);
 
         $this->expectException(InvalidArgumentException::class);
 

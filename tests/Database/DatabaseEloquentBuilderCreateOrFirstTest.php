@@ -548,7 +548,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
         $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
         $processor = new $processorClass;
-        $connection = Mockery::mock(Connection::class, ['getPostProcessor' => $processor]);
+        $connection = Double::for(Connection::class);
+        $connection->allows('getPostProcessor')->returns($processor);
         $grammar = new $grammarClass($connection);
         $connection->allows('getQueryGrammar')->returns($grammar);
         $connection->allows('getTablePrefix')->returns('');
@@ -556,7 +557,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
             return new Builder($connection, $grammar, $processor);
         });
         $connection->allows('getDatabaseName')->returns('database');
-        $resolver = Mockery::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
+        $resolver = Double::for(ConnectionResolverInterface::class);
+        $resolver->allows('connection')->returns($connection);
 
         $class = get_class($model);
         $class::setConnectionResolver($resolver);

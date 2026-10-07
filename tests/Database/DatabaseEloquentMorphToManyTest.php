@@ -128,7 +128,10 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $builder->expects('where')->with('taggables.taggable_type', get_class($parent));
 
         $grammar = new Grammar(Double::for(Connection::class));
-        $builder->allows('getQuery')->returns(Mockery::mock(QueryBuilder::class, ['getGrammar' => $grammar]));
+        $queryBuilder = Double::for(QueryBuilder::class);
+        $queryBuilder->allows('getGrammar')->returns($grammar);
+
+        $builder->allows('getQuery')->returns($queryBuilder);
 
         return [
             $builder,

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use JMac\Testing\Double;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
@@ -31,9 +32,8 @@ class SupportTestingMailFakeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mailManager = Mockery::mock(MailManager::class, function ($mock) {
-            $mock->expects('getDefaultDriver')->returns('smtp');
-        });
+        $this->mailManager = Double::for(MailManager::class);
+        $this->mailManager->expects('getDefaultDriver')->returns('smtp');
         $this->fake = new MailFake($this->mailManager);
         $this->mailable = new MailableStub;
     }

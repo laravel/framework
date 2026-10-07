@@ -2929,7 +2929,8 @@ class DatabaseEloquentBuilderTest extends TestCase
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
         $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
         $processor = new $processorClass;
-        $connection = Mockery::mock(Connection::class, ['getPostProcessor' => $processor]);
+        $connection = Double::for(Connection::class);
+        $connection->allows('getPostProcessor')->returns($processor);
         $grammar = new $grammarClass($connection);
         $connection->allows('getQueryGrammar')->returns($grammar);
         $connection->allows('getTablePrefix')->returns('');

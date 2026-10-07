@@ -302,7 +302,8 @@ class ConsoleApplicationTest extends TestCase
 
     protected function getMockConsole(array $methods)
     {
-        $app = Mockery::mock(ApplicationContract::class, ['version' => '6.0']);
+        $app = Double::for(ApplicationContract::class);
+        $app->allows('version')->returns('6.0');
         $events = new EventsDispatcher;
 
         return $this->getMockBuilder(Application::class)->onlyMethods($methods)->setConstructorArgs([
