@@ -200,7 +200,7 @@ class Worker
     public static $pausable = true;
 
     /**
-     * Indicates if the "sticky" state of the database connections should be flushed between jobs.
+     * Indicates if the worker should flush sticky database connections between jobs.
      *
      * @var bool
      */
