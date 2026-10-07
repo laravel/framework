@@ -4,7 +4,6 @@ namespace Illuminate\Tests\View\Blade;
 
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
-use JMac\Testing\Double;
 
 class BladeComponentsTest extends AbstractBladeTestCase
 {
@@ -62,10 +61,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
     {
         $attributes = new ComponentAttributeBag(['foo' => 'baz', 'other' => 'ok']);
 
-        $component = Double::for(BladeComponentsTestComponent::class);
-        $component->allows('withName');
-        $component->allows('test');
-        $component->expects('shouldRender')->returns(false);
+        $component = new BladeComponentsTestComponent;
 
         Component::resolveComponentsUsing(fn () => $component);
 
@@ -85,8 +81,18 @@ class ComponentStub extends Component
     }
 }
 
-abstract class BladeComponentsTestComponent extends Component
+class BladeComponentsTestComponent extends Component
 {
+    public function render()
+    {
+        return '';
+    }
+
+    public function shouldRender()
+    {
+        return false;
+    }
+
     public function test()
     {
         //

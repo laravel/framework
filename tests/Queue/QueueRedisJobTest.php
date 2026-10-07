@@ -13,11 +13,12 @@ class QueueRedisJobTest extends TestCase
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
-        $handler = Double::for(RedisJobTestHandler::class);
+        $handler = new RedisJobTestHandler;
         $job->getContainer()->instance('foo', $handler);
-        $handler->expects('fire')->with($job, ['data']);
 
         $job->fire();
+
+        $this->assertSame([[$job, ['data']]], $handler->fired);
     }
 
     public function testDeleteRemovesTheJobFromRedis()
@@ -53,8 +54,10 @@ class QueueRedisJobTest extends TestCase
 
 class RedisJobTestHandler
 {
+    public array $fired = [];
+
     public function fire($job, array $data)
     {
-        //
+        $this->fired[] = [$job, $data];
     }
 }

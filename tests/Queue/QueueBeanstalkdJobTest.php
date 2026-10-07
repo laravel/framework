@@ -10,7 +10,6 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
 use Illuminate\Queue\Jobs\Job;
 use JMac\Testing\Double;
-use JMac\Testing\Matching\Argument;
 use Pheanstalk\Contract\PheanstalkManagerInterface;
 use Pheanstalk\Contract\PheanstalkPublisherInterface;
 use Pheanstalk\Contract\PheanstalkSubscriberInterface;
@@ -24,20 +23,20 @@ class QueueBeanstalkdJobTest extends TestCase
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob(json_encode(['job' => 'foo', 'data' => ['data']]));
-        $handler = Double::for(BeanstalkdJobTestHandler::class);
+        $handler = new BeanstalkdJobTestHandler;
         $job->getContainer()->instance('foo', $handler);
-        $handler->expects('fire')->with($job, ['data']);
 
         $job->fire();
+
+        $this->assertSame([[$job, ['data']]], $handler->fired);
     }
 
     public function testFailProperlyCallsTheJobHandler()
     {
         $job = $this->getJob(json_encode(['job' => 'foo', 'uuid' => 'test-uuid', 'data' => ['data']]));
-        $handler = Double::for(BeanstalkdJobTestFailedTest::class);
+        $handler = new BeanstalkdJobTestFailedTest;
         $job->getContainer()->instance('foo', $handler);
         $job->getPheanstalk()->expects('delete')->with($job->getPheanstalkJob())->returns($job->getPheanstalk());
-        $handler->expects('failed')->with(['data'], Argument::type(Exception::class), 'test-uuid', Argument::type(Job::class));
         $events = new EventsDispatcher;
         $failed = [];
         $events->listen(JobFailed::class, function ($event) use (&$failed) {
@@ -46,6 +45,12 @@ class QueueBeanstalkdJobTest extends TestCase
         $job->getContainer()->instance(Dispatcher::class, $events);
 
         $job->fail($exception = new Exception);
+
+        $this->assertCount(1, $handler->failed);
+        $this->assertSame(['data'], $handler->failed[0][0]);
+        $this->assertSame($exception, $handler->failed[0][1]);
+        $this->assertSame('test-uuid', $handler->failed[0][2]);
+        $this->assertInstanceOf(Job::class, $handler->failed[0][3]);
 
         $this->assertCount(1, $failed);
         $this->assertSame($job, $failed[0]->job);
@@ -90,16 +95,20 @@ class QueueBeanstalkdJobTest extends TestCase
 
 class BeanstalkdJobTestHandler
 {
+    public array $fired = [];
+
     public function fire($job, array $data)
     {
-        //
+        $this->fired[] = [$job, $data];
     }
 }
 
 class BeanstalkdJobTestFailedTest
 {
-    public function failed(array $data)
+    public array $failed = [];
+
+    public function failed(array $data, $exception = null, $uuid = null, $job = null)
     {
-        //
+        $this->failed[] = [$data, $exception, $uuid, $job];
     }
 }

@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Aws\MockHandler;
+use Aws\Result;
+use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Jobs\SqsJob;
-use Illuminate\Tests\Queue\Fixtures\SqsClientStub;
 use JMac\Testing\Double;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -23,6 +25,7 @@ class QueueSqsJobTest extends TestCase
     protected $releaseDelay;
     protected $queueUrl;
     protected $mockedSqsClient;
+    protected $handler;
     protected $mockedContainer;
     protected $mockedJob;
     protected $mockedData;
@@ -45,8 +48,14 @@ class QueueSqsJobTest extends TestCase
         // This is how the modified getQueue builds the queueUrl
         $this->queueUrl = $this->baseUrl.'/'.$this->account.'/'.$this->queueName;
 
-        // Get a mock of the SqsClient
-        $this->mockedSqsClient = Double::for(SqsClientStub::class)->passthru();
+        // A real SqsClient that never leaves the process
+        $this->handler = new MockHandler;
+        $this->mockedSqsClient = new SqsClient([
+            'region' => $this->region,
+            'version' => 'latest',
+            'credentials' => ['key' => $this->key, 'secret' => $this->secret],
+            'handler' => $this->handler,
+        ]);
 
         // Use Mockery to mock the IoC Container
         $this->mockedContainer = Double::for(Container::class, override: true);
@@ -69,27 +78,37 @@ class QueueSqsJobTest extends TestCase
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
-        $handler = Double::for(SqsJobTestHandler::class);
+        $handler = new SqsJobTestHandler;
         $this->mockedContainer->expects('make')->with('foo')->returns($handler);
-        $handler->expects('fire')->with($job, ['data']);
         $job->fire();
+
+        $this->assertSame([[$job, ['data']]], $handler->fired);
     }
 
     public function testDeleteRemovesTheJobFromSqs()
     {
-        $this->mockedSqsClient = Double::for(SqsClientStub::class)->passthru();
+        $this->handler->append(new Result([]));
         $job = $this->getJob();
-        $job->getSqs()->expects('deleteMessage')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle]);
         $job->delete();
+
+        $command = $this->handler->getLastCommand();
+        $this->assertSame('DeleteMessage', $command->getName());
+        $this->assertSame($this->queueUrl, $command['QueueUrl']);
+        $this->assertSame($this->mockedReceiptHandle, $command['ReceiptHandle']);
     }
 
     public function testReleaseProperlyReleasesTheJobOntoSqs()
     {
-        $this->mockedSqsClient = Double::for(SqsClientStub::class)->passthru();
+        $this->handler->append(new Result([]));
         $job = $this->getJob();
-        $job->getSqs()->expects('changeMessageVisibility')->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle, 'VisibilityTimeout' => $this->releaseDelay]);
         $job->release($this->releaseDelay);
         $this->assertTrue($job->isReleased());
+
+        $command = $this->handler->getLastCommand();
+        $this->assertSame('ChangeMessageVisibility', $command->getName());
+        $this->assertSame($this->queueUrl, $command['QueueUrl']);
+        $this->assertSame($this->mockedReceiptHandle, $command['ReceiptHandle']);
+        $this->assertSame($this->releaseDelay, $command['VisibilityTimeout']);
     }
 
     public function testGetRawBodyResolvesPointerFromCache()
@@ -183,8 +202,8 @@ class QueueSqsJobTest extends TestCase
         $jobData = $this->mockedJobData;
         $jobData['Body'] = $pointerBody;
 
-        $sqsClient = Double::for(SqsClientStub::class)->passthru();
-        $sqsClient->expects('deleteMessage');
+        $this->handler->append(new Result([]));
+        $sqsClient = $this->mockedSqsClient;
 
         $job = new SqsJob($container->instance(), $sqsClient, $jobData, 'connection-name', $this->queueUrl, [
             'enabled' => true,
@@ -203,8 +222,8 @@ class QueueSqsJobTest extends TestCase
         $jobData = $this->mockedJobData;
         $jobData['Body'] = $pointerBody;
 
-        $sqsClient = Double::for(SqsClientStub::class)->passthru();
-        $sqsClient->expects('deleteMessage');
+        $this->handler->append(new Result([]));
+        $sqsClient = $this->mockedSqsClient;
 
         $job = new SqsJob($this->mockedContainer->instance(), $sqsClient, $jobData, 'connection-name', $this->queueUrl, [
             'enabled' => true,
@@ -217,8 +236,8 @@ class QueueSqsJobTest extends TestCase
 
     public function testDeleteDoesNotCleanUpWhenNoPointer()
     {
-        $sqsClient = Double::for(SqsClientStub::class)->passthru();
-        $sqsClient->expects('deleteMessage');
+        $this->handler->append(new Result([]));
+        $sqsClient = $this->mockedSqsClient;
 
         $job = new SqsJob($this->mockedContainer->instance(), $sqsClient, $this->mockedJobData, 'connection-name', $this->queueUrl, [
             'enabled' => true,
@@ -243,8 +262,10 @@ class QueueSqsJobTest extends TestCase
 
 class SqsJobTestHandler
 {
+    public array $fired = [];
+
     public function fire($job, array $data)
     {
-        //
+        $this->fired[] = [$job, $data];
     }
 }
