@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use ArrayAccess;
 use BadMethodCallException;
@@ -79,7 +80,7 @@ class ViewTest extends TestCase
             'path',
             []));
 
-        $view->expects('render')->with(Mockery::type(Closure::class))->returns($sections = ['foo' => 'bar']);
+        $view->expects('render')->with(Argument::type(Closure::class))->returns($sections = ['foo' => 'bar']);
 
         $this->assertEquals($sections, $view->renderSections());
     }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Aws\Command;
 use Aws\Exception\AwsException;
@@ -62,7 +63,7 @@ class MailSesV2TransportTest extends TestCase
 
         $client = Double::for(SesV2Client::class);
         $sesResult = new Result(['MessageId' => 'ses-message-id']);
-        $client->expects('sendEmail')->with(Mockery::on(function ($arg) {
+        $client->expects('sendEmail')->with(Argument::satisfies(function ($arg) {
                 return $arg['Source'] === 'myself@example.com' &&
                     $arg['Destination']['ToAddresses'] === ['me@example.com', 'you@example.com'] &&
                     $arg['ListManagementOptions'] === ['ContactListName' => 'TestList', 'TopicName' => 'TestTopic'] &&
@@ -84,7 +85,7 @@ class MailSesV2TransportTest extends TestCase
 
         $client = Double::for(SesV2Client::class);
         $sesResult = new Result(['MessageId' => 'ses-message-id']);
-        $client->expects('sendEmail')->with(Mockery::on(function ($arg) {
+        $client->expects('sendEmail')->with(Argument::satisfies(function ($arg) {
                 return $arg['TenantName'] === 'my-tenant';
             }))->returns($sesResult);
 
@@ -101,7 +102,7 @@ class MailSesV2TransportTest extends TestCase
 
         $client = Double::for(SesV2Client::class);
         $sesResult = new Result(['MessageId' => 'ses-message-id']);
-        $client->expects('sendEmail')->with(Mockery::on(function ($arg) {
+        $client->expects('sendEmail')->with(Argument::satisfies(function ($arg) {
                 return ! array_key_exists('TenantName', $arg);
             }))->returns($sesResult);
 

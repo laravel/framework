@@ -51,7 +51,7 @@ class QueueRetryCommandTest extends TestCase
         $job = $this->failedJob(id: '5', connection: 'database', queue: 'default');
 
         $failer->expects('find')->with('5')->returns($job);
-        $queue->expects('getQueueableOptions')->with(m::type(QueueRetryCommandTestJob::class), 'default', $job->payload)->returns(['MySpecialOption' => 'option-1']);
+        $queue->expects('getQueueableOptions')->with(Argument::type(QueueRetryCommandTestJob::class), 'default', $job->payload)->returns(['MySpecialOption' => 'option-1']);
         $queue->expects('pushRaw')->with($this->retriedPayload(id: '5'), 'default', ['MySpecialOption' => 'option-1']);
         $failer->expects('forget')->with('5');
 
@@ -150,7 +150,7 @@ class QueueRetryCommandTest extends TestCase
         $job = $this->failedJob(id: '1', connection: 'database', queue: 'default', payload: ['attempts' => 5]);
 
         $failer->expects('find')->with('1')->returns($job);
-        $queue->expects('pushRaw')->with(m::on(function ($payload) {
+        $queue->expects('pushRaw')->with(Argument::satisfies(function ($payload) {
             return json_decode($payload, true)['attempts'] === 0;
         }), 'default', []);
         $failer->expects('forget')->with('1');
@@ -172,7 +172,7 @@ class QueueRetryCommandTest extends TestCase
         );
 
         $failer->expects('find')->with('1')->returns($job);
-        $queue->expects('pushRaw')->with(m::on(function ($payload) {
+        $queue->expects('pushRaw')->with(Argument::satisfies(function ($payload) {
             return json_decode($payload, true)['retryUntil'] === 1234567890;
         }), 'default', []);
         $failer->expects('forget')->with('1');
@@ -188,8 +188,8 @@ class QueueRetryCommandTest extends TestCase
         $job = $this->failedJob(id: '1', connection: 'sqs', queue: 'default');
 
         $failer->expects('find')->with('1')->returns($job);
-        $queue->expects('getQueueableOptions')->with(m::type(QueueRetryCommandTestJob::class), 'default', $job->payload)->returns(['MySpecialOption' => 'option-1']);
-        $queue->expects('pushRaw')->with(m::type('string'), 'default', ['MySpecialOption' => 'option-1']);
+        $queue->expects('getQueueableOptions')->with(Argument::type(QueueRetryCommandTestJob::class), 'default', $job->payload)->returns(['MySpecialOption' => 'option-1']);
+        $queue->expects('pushRaw')->with(Argument::type('string'), 'default', ['MySpecialOption' => 'option-1']);
         $failer->expects('forget')->with('1');
 
         $this->runRetryCommand(['id' => ['1']], $failer, ['sqs' => $queue]);
@@ -204,7 +204,7 @@ class QueueRetryCommandTest extends TestCase
         $job = $this->failedJob(id: '1', connection: 'database', queue: 'default');
 
         $failer->expects('find')->with('1')->returns($job);
-        $events->expects('dispatch')->with(m::type(JobRetryRequested::class));
+        $events->expects('dispatch')->with(Argument::type(JobRetryRequested::class));
         $queue->expects('pushRaw');
         $failer->expects('forget')->with('1');
 
@@ -288,7 +288,7 @@ class QueueRetryCommandTest extends TestCase
         ]);
 
         $failer->expects('find')->with('batch')->returns($jobs);
-        $queue->expects('pushRaw')->with(m::on(function ($payload) {
+        $queue->expects('pushRaw')->with(Argument::satisfies(function ($payload) {
             return json_decode($payload, true)['attempts'] === 0;
         }), 'default', []);
         $failer->expects('forget')->with('job-1');
@@ -312,7 +312,7 @@ class QueueRetryCommandTest extends TestCase
         ]);
 
         $failer->expects('find')->with('batch')->returns($jobs);
-        $queue->expects('pushRaw')->with(m::on(function ($payload) {
+        $queue->expects('pushRaw')->with(Argument::satisfies(function ($payload) {
             return json_decode($payload, true)['retryUntil'] === 1234567890;
         }), 'default', []);
         $failer->expects('forget')->with('job-1');
@@ -464,7 +464,7 @@ class QueueRetryCommandTest extends TestCase
 
         $dispatched = [];
 
-        $events->expects('dispatch')->times(2)->with(m::type(JobRetryRequested::class))->resolves(function ($event) use (&$dispatched) {
+        $events->expects('dispatch')->times(2)->with(Argument::type(JobRetryRequested::class))->resolves(function ($event) use (&$dispatched) {
             $dispatched[] = $event->job->id;
         });
 
@@ -534,7 +534,7 @@ class QueueRetryCommandTest extends TestCase
 
         $sequence = [];
 
-        $events->expects('dispatch')->with(m::type(JobRetryRequested::class))->resolves(function () use (&$sequence) {
+        $events->expects('dispatch')->with(Argument::type(JobRetryRequested::class))->resolves(function () use (&$sequence) {
             $sequence[] = 'dispatch';
         });
 

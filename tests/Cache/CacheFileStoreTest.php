@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Exception;
 use Illuminate\Cache\FileStore;
@@ -193,7 +194,7 @@ class CacheFileStoreTest extends TestCase
         $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__, 0644])->getMock();
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects('put')->times(3)->with(__DIR__.'/'.$cache_dir.'/'.$hash, Mockery::any(), Mockery::any())->resolves(function ($name, $value) {
+        $files->expects('put')->times(3)->with(__DIR__.'/'.$cache_dir.'/'.$hash, Argument::any(), Argument::any())->resolves(function ($name, $value) {
             return strlen($value);
         });
         $files->expects('chmod')->with(__DIR__.'/'.$cache_dir.'/'.$hash)->returns('0600', '0644')->times(3);
@@ -215,7 +216,7 @@ class CacheFileStoreTest extends TestCase
         $cache_parent_dir = substr($hash, 0, 2);
         $cache_dir = $cache_parent_dir.'/'.substr($hash, 2, 2);
 
-        $files->expects('put')->with(__DIR__.'/'.$cache_dir.'/'.$hash, Mockery::any(), Mockery::any())->resolves(function ($name, $value) {
+        $files->expects('put')->with(__DIR__.'/'.$cache_dir.'/'.$hash, Argument::any(), Argument::any())->resolves(function ($name, $value) {
             return strlen($value);
         });
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Closure;
 use Exception;
@@ -381,8 +382,7 @@ class FoundationExceptionsHandlerTest extends TestCase
             $responder = Double::for(RedirectResponse::class);
             $redirector->expects('to')->returns($responder);
 
-            $responder->expects('withInput')->with(Mockery::on(
-                function ($argument) use (&$argumentActual) {
+            $responder->expects('withInput')->with(Argument::satisfies(function ($argument) use (&$argumentActual) {
                     $argumentActual = $argument;
 
                     return true;

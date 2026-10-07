@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Attributes\Delay;
@@ -45,8 +46,8 @@ class QueueBeanstalkdQueueTest extends TestCase
 
         $this->setQueue('default', 60);
         $pheanstalk = $this->queue->getPheanstalk();
-        $pheanstalk->expects('useTube')->with(Mockery::type(TubeName::class));
-        $pheanstalk->expects('useTube')->with(Mockery::type(TubeName::class));
+        $pheanstalk->expects('useTube')->with(Argument::type(TubeName::class));
+        $pheanstalk->expects('useTube')->with(Argument::type(TubeName::class));
         $pheanstalk->expects('put')->times(2)->with(json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => null]), 1024, 0, 60);
 
         $this->queue->push('foo', ['data'], 'stack');
@@ -70,8 +71,8 @@ class QueueBeanstalkdQueueTest extends TestCase
 
         $this->setQueue('default', 60);
         $pheanstalk = $this->queue->getPheanstalk();
-        $pheanstalk->expects('useTube')->with(Mockery::type(TubeName::class));
-        $pheanstalk->expects('useTube')->with(Mockery::type(TubeName::class));
+        $pheanstalk->expects('useTube')->with(Argument::type(TubeName::class));
+        $pheanstalk->expects('useTube')->with(Argument::type(TubeName::class));
         $pheanstalk->expects('put')->times(2)->with(json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => 5]), Pheanstalk::DEFAULT_PRIORITY, 5, Pheanstalk::DEFAULT_TTR);
 
         $this->queue->later(5, 'foo', ['data'], 'stack');
@@ -86,8 +87,8 @@ class QueueBeanstalkdQueueTest extends TestCase
     {
         $this->setQueue('default', 60);
         $pheanstalk = $this->queue->getPheanstalk();
-        $pheanstalk->expects('useTube')->with(Mockery::type(TubeName::class));
-        $pheanstalk->expects('put')->with(Mockery::type('string'), Pheanstalk::DEFAULT_PRIORITY, 15, Pheanstalk::DEFAULT_TTR);
+        $pheanstalk->expects('useTube')->with(Argument::type(TubeName::class));
+        $pheanstalk->expects('put')->with(Argument::type('string'), Pheanstalk::DEFAULT_PRIORITY, 15, Pheanstalk::DEFAULT_TTR);
 
         $this->queue->bulk([new BeanstalkdJobWithDelayAttribute], ['data']);
     }
@@ -98,7 +99,7 @@ class QueueBeanstalkdQueueTest extends TestCase
         $tube = new TubeName('default');
 
         $pheanstalk = $this->queue->getPheanstalk();
-        $pheanstalk->expects('watch')->with(Mockery::type(TubeName::class));
+        $pheanstalk->expects('watch')->with(Argument::type(TubeName::class));
         $pheanstalk->expects('listTubesWatched')->returns(new TubeList($tube));
 
         $jobId = Double::for(JobIdInterface::class);
@@ -117,7 +118,7 @@ class QueueBeanstalkdQueueTest extends TestCase
         $tube = new TubeName('default');
 
         $pheanstalk = $this->queue->getPheanstalk();
-        $pheanstalk->expects('watch')->with(Mockery::type(TubeName::class));
+        $pheanstalk->expects('watch')->with(Argument::type(TubeName::class));
         $pheanstalk->expects('listTubesWatched')->returns(new TubeList($tube));
 
         $jobId = Double::for(JobIdInterface::class);
@@ -135,8 +136,8 @@ class QueueBeanstalkdQueueTest extends TestCase
         $this->setQueue('default', 60);
 
         $pheanstalk = $this->queue->getPheanstalk();
-        $pheanstalk->expects('useTube')->with(Mockery::type(TubeName::class))->returns($pheanstalk);
-        $pheanstalk->expects('delete')->with(Mockery::type(JobIdInterface::class));
+        $pheanstalk->expects('useTube')->with(Argument::type(TubeName::class))->returns($pheanstalk);
+        $pheanstalk->expects('delete')->with(Argument::type(JobIdInterface::class));
 
         $this->queue->deleteMessage('default', 1);
     }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Bus;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Batch;
@@ -149,7 +150,7 @@ class BusBatchTest extends TestCase
         $connection = Double::for(QueueContract::class);
         $queue->expects('connection')->with('test-connection')->returns($connection);
 
-        $connection->expects('bulk')->with(Mockery::on(function ($args) use ($job, $secondJob) {
+        $connection->expects('bulk')->with(Argument::satisfies(function ($args) use ($job, $secondJob) {
             return
                 $args[0] == $job &&
                 $args[1] == $secondJob &&
@@ -605,7 +606,7 @@ class BusBatchTest extends TestCase
         $connection = Double::for(QueueContract::class);
         $queue->expects('connection')->with('test-connection')->returns($connection);
 
-        $connection->expects('bulk')->with(Mockery::on(function ($args) use ($chainHeadJob, $secondJob, $thirdJob) {
+        $connection->expects('bulk')->with(Argument::satisfies(function ($args) use ($chainHeadJob, $secondJob, $thirdJob) {
             return
                 $args[0] == $chainHeadJob
                 && serialize($secondJob) == $args[0]->chained[0]
@@ -643,7 +644,7 @@ class BusBatchTest extends TestCase
         $connection = Double::for(QueueContract::class);
         $queue->expects('connection')->with('test-connection')->returns($connection);
 
-        $connection->expects('bulk')->with(Mockery::on(function ($args) {
+        $connection->expects('bulk')->with(Argument::satisfies(function ($args) {
             return true;
         }), '', null);
 

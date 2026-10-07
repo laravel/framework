@@ -1070,7 +1070,7 @@ class QueueSqsQueueTest extends TestCase
 
         $captured = null;
 
-        $this->sqs->expects('sendMessageBatch')->with(Mockery::on(function ($args) use (&$captured) {
+        $this->sqs->expects('sendMessageBatch')->with(Argument::satisfies(function ($args) use (&$captured) {
             $captured = $args;
 
             return true;
@@ -1100,7 +1100,7 @@ class QueueSqsQueueTest extends TestCase
 
         $batchSizes = [];
 
-        $this->sqs->expects('sendMessageBatch')->times(2)->with(Mockery::on(function ($args) use (&$batchSizes) {
+        $this->sqs->expects('sendMessageBatch')->times(2)->with(Argument::satisfies(function ($args) use (&$batchSizes) {
             $batchSizes[] = count($args['Entries']);
 
             return true;
@@ -1125,7 +1125,7 @@ class QueueSqsQueueTest extends TestCase
 
         $batchSizes = [];
 
-        $this->sqs->expects('sendMessageBatch')->times(2)->with(Mockery::on(function ($args) use (&$batchSizes) {
+        $this->sqs->expects('sendMessageBatch')->times(2)->with(Argument::satisfies(function ($args) use (&$batchSizes) {
             $batchSizes[] = count($args['Entries']);
 
             return true;
@@ -1217,7 +1217,7 @@ class QueueSqsQueueTest extends TestCase
 
         $captured = null;
 
-        $this->sqs->expects('sendMessageBatch')->with(Mockery::on(function ($args) use (&$captured) {
+        $this->sqs->expects('sendMessageBatch')->with(Argument::satisfies(function ($args) use (&$captured) {
             $captured = $args;
 
             return true;
@@ -1242,7 +1242,7 @@ class QueueSqsQueueTest extends TestCase
 
         $captured = null;
 
-        $this->sqs->expects('sendMessageBatch')->with(Mockery::on(function ($args) use (&$captured) {
+        $this->sqs->expects('sendMessageBatch')->with(Argument::satisfies(function ($args) use (&$captured) {
             $captured = $args;
 
             return true;
@@ -1300,7 +1300,7 @@ class QueueSqsQueueTest extends TestCase
 
         $captured = [];
 
-        $this->sqs->expects('sendMessageBatch')->times(2)->with(Mockery::on(function ($args) use (&$captured) {
+        $this->sqs->expects('sendMessageBatch')->times(2)->with(Argument::satisfies(function ($args) use (&$captured) {
             $captured[] = $args;
 
             return true;
@@ -1410,7 +1410,7 @@ class QueueSqsQueueTest extends TestCase
         $job->deduplicator = fn ($payload, $queue) => 'dedupe-'.$payload;
 
         $store = Double::for(CacheRepository::class);
-        $store->expects('put')->with(Mockery::type('string'), 'original-payload');
+        $store->expects('put')->with(Argument::type('string'), 'original-payload');
 
         $cache = Double::for(CacheFactory::class);
         $cache->expects('store')->with('sqs-overflow')->returns($store);
@@ -1429,7 +1429,7 @@ class QueueSqsQueueTest extends TestCase
 
         $captured = null;
 
-        $this->sqs->expects('sendMessageBatch')->with(Mockery::on(function ($args) use (&$captured) {
+        $this->sqs->expects('sendMessageBatch')->with(Argument::satisfies(function ($args) use (&$captured) {
             $captured = $args;
 
             return true;

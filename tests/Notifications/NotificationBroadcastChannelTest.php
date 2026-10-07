@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -22,7 +23,7 @@ class NotificationBroadcastChannelTest extends TestCase
         $notifiable = new stdClass;
 
         $events = Double::for(Dispatcher::class);
-        $events->expects('dispatch')->with(Mockery::type(BroadcastNotificationCreated::class));
+        $events->expects('dispatch')->with(Argument::type(BroadcastNotificationCreated::class));
         $channel = new BroadcastChannel($events);
         $channel->send($notifiable, $notification);
     }
@@ -79,7 +80,7 @@ class NotificationBroadcastChannelTest extends TestCase
         $notifiable = new stdClass;
 
         $events = Double::for(Dispatcher::class);
-        $events->expects('dispatch')->with(Mockery::on(function ($event) {
+        $events->expects('dispatch')->with(Argument::satisfies(function ($event) {
             return $event->connection === 'sync';
         }));
         $channel = new BroadcastChannel($events);

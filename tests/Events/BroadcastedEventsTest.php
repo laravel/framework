@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Events;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Broadcasting\PendingBroadcast;
@@ -172,7 +173,7 @@ class BroadcastedEventsTest extends TestCase
         try {
             $pendingBroadcast = Double::for(PendingBroadcast::class);
 
-            $broadcast->expects('event')->with(Mockery::on(function ($event) {
+            $broadcast->expects('event')->with(Argument::satisfies(function ($event) {
                     $this->assertInstanceOf(BroadcastableNamedArgumentsEvent::class, $event);
                     $this->assertSame('first-value', $event->first);
                     $this->assertSame('second-value', $event->second);

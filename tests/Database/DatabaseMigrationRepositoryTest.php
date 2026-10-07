@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Closure;
 use Illuminate\Database\Connection;
@@ -100,7 +101,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $connectionMock = Double::for(Connection::class);
         $repo = $this->getRepository($connectionMock);
         $connectionMock->expects('getSchemaBuilder')->returns($schema);
-        $schema->expects('create')->with('migrations', Mockery::type(Closure::class));
+        $schema->expects('create')->with('migrations', Argument::type(Closure::class));
 
         $repo->createRepository();
     }

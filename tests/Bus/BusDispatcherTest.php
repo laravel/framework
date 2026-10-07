@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Bus;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
@@ -58,7 +59,7 @@ class BusDispatcherTest extends TestCase
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = Double::for(Queue::class);
-            $mock->expects('later')->with(10, Mockery::type(BusDispatcherTestSpecificQueueAndDelayCommand::class), '', 'foo');
+            $mock->expects('later')->with(10, Argument::type(BusDispatcherTestSpecificQueueAndDelayCommand::class), '', 'foo');
 
             return $mock;
         });
@@ -78,7 +79,7 @@ class BusDispatcherTest extends TestCase
             $usedConnection = $connection;
 
             $mock = Double::for(Queue::class);
-            $mock->expects('later')->with(10, Mockery::type(BusDispatcherTestQueueableChildCommand::class), '', 'foo');
+            $mock->expects('later')->with(10, Argument::type(BusDispatcherTestQueueableChildCommand::class), '', 'foo');
 
             return $mock;
         });
@@ -139,7 +140,7 @@ class BusDispatcherTest extends TestCase
         $container->instance('queue.routes', $queueRoutes);
 
         $mock = Double::for(Queue::class);
-        $mock->expects('push')->with(Mockery::type(BusDispatcherQueueable::class), '', 'reports');
+        $mock->expects('push')->with(Argument::type(BusDispatcherQueueable::class), '', 'reports');
 
         $usedConnection = false;
 
@@ -216,8 +217,8 @@ class BusDispatcherTest extends TestCase
         Container::setInstance($container);
 
         $mock = Double::for(Queue::class);
-        $mock->expects('bulk')->with(Mockery::on(fn ($jobs) => count($jobs) === 2), '', null);
-        $mock->expects('bulk')->with(Mockery::on(fn ($jobs) => count($jobs) === 1), '', 'high');
+        $mock->expects('bulk')->with(Argument::satisfies(fn ($jobs) => count($jobs) === 2), '', null);
+        $mock->expects('bulk')->with(Argument::satisfies(fn ($jobs) => count($jobs) === 1), '', 'high');
 
         $dispatcher = new Dispatcher($container, fn () => $mock);
 

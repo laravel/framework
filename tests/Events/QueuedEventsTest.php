@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Events;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\Dispatcher as BusDispatcher;
@@ -89,7 +90,7 @@ class QueuedEventsTest extends TestCase
 
         $factory->expects('connection')->with('some_other_connection')->returns($queue);
 
-        $queue->expects('pushOn')->with(null, Mockery::type(CallQueuedListener::class));
+        $queue->expects('pushOn')->with(null, Argument::type(CallQueuedListener::class));
 
         $d->setQueueResolver(function () use ($factory) {
             return $factory;
@@ -107,7 +108,7 @@ class QueuedEventsTest extends TestCase
 
         $factory->expects('connection')->with(null)->returns($queue);
 
-        $queue->expects('laterOn')->with(null, 20, Mockery::type(CallQueuedListener::class));
+        $queue->expects('laterOn')->with(null, 20, Argument::type(CallQueuedListener::class));
 
         $d->setQueueResolver(function () use ($factory) {
             return $factory;
@@ -217,7 +218,7 @@ class QueuedEventsTest extends TestCase
 
         $factory->expects('connection')->with(null)->returns($queue);
 
-        $queue->expects('laterOn')->with(null, 60, Mockery::type(CallQueuedListener::class));
+        $queue->expects('laterOn')->with(null, 60, Argument::type(CallQueuedListener::class));
 
         $d->setQueueResolver(function () use ($factory) {
             return $factory;
@@ -662,7 +663,7 @@ class QueuedEventsTest extends TestCase
         $container->instance(Cache::class, $cache);
 
         $factory->expects('connection')->with(null)->returns($queue);
-        $queue->expects('laterOn')->with(null, 20, Mockery::on(function ($job) use ($cache) {
+        $queue->expects('laterOn')->with(null, 20, Argument::satisfies(function ($job) use ($cache) {
             $expectedKey = 'laravel_debounced_job:'.hash('xxh128', TestDispatcherDebouncedHandlerWithDelay::class).':event-123';
 
             return $job instanceof CallQueuedListener
@@ -692,8 +693,8 @@ class QueuedEventsTest extends TestCase
         $container->instance(Cache::class, $cache);
 
         $factory->expects('connection')->times(2)->with(null)->returns($queue);
-        $queue->expects('laterOn')->with(null, 30, Mockery::type(CallQueuedListener::class))->inOrder();
-        $queue->expects('laterOn')->with(null, 0, Mockery::type(CallQueuedListener::class))->inOrder();
+        $queue->expects('laterOn')->with(null, 30, Argument::type(CallQueuedListener::class))->inOrder();
+        $queue->expects('laterOn')->with(null, 0, Argument::type(CallQueuedListener::class))->inOrder();
 
         $d->setQueueResolver(function () use ($factory) {
             return $factory;

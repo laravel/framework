@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Redis;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -557,7 +558,7 @@ class RedisConnectionTest extends TestCase
             $events = Double::for(Dispatcher::class);
             $redis->setEventDispatcher($events);
 
-            $events->expects('dispatch')->with(Mockery::on(function ($event) {
+            $events->expects('dispatch')->with(Argument::satisfies(function ($event) {
                 $this->assertSame('get', $event->command);
                 $this->assertEquals(['foobar'], $event->parameters);
                 $this->assertSame('default', $event->connectionName);

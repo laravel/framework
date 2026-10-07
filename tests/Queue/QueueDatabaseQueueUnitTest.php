@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Bus\Batchable;
 use Illuminate\Container\Container;
@@ -335,7 +336,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database->expects('table')->with('table')->returns($query);
         $query->expects('where')->with('queue', 'default')->returns($query);
         $query->expects('whereNull')->with('reserved_at')->returns($query);
-        $query->expects('where')->with('available_at', '<=', Mockery::any())->returns($query);
+        $query->expects('where')->with('available_at', '<=', Argument::any())->returns($query);
         $query->expects('get')->returns(collect([(object) ['id' => 1, 'queue' => 'default', 'payload' => $payload, 'attempts' => 0, 'reserved_at' => null]]));
 
         $jobs = $queue->pendingJobs();
@@ -362,7 +363,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database->expects('table')->with('table')->returns($query);
         $query->expects('where')->with('queue', 'default')->returns($query);
         $query->expects('whereNull')->with('reserved_at')->returns($query);
-        $query->expects('where')->with('available_at', '>', Mockery::any())->returns($query);
+        $query->expects('where')->with('available_at', '>', Argument::any())->returns($query);
         $query->expects('get')->returns(collect([(object) ['id' => 2, 'queue' => 'default', 'payload' => $payload, 'attempts' => 0, 'reserved_at' => null]]));
 
         $jobs = $queue->delayedJobs();
@@ -415,7 +416,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query = Double::for(QueryBuilder::class);
         $database->expects('table')->with('table')->returns($query);
         $query->expects('whereNull')->with('reserved_at')->returns($query);
-        $query->expects('where')->with('available_at', '<=', Mockery::any())->returns($query);
+        $query->expects('where')->with('available_at', '<=', Argument::any())->returns($query);
         $query->expects('get')->returns(collect([
             (object) ['id' => 1, 'queue' => 'default', 'payload' => $payload1, 'attempts' => 0, 'reserved_at' => null],
             (object) ['id' => 2, 'queue' => 'emails', 'payload' => $payload2, 'attempts' => 0, 'reserved_at' => null],
@@ -448,7 +449,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query = Double::for(QueryBuilder::class);
         $database->expects('table')->with('table')->returns($query);
         $query->expects('whereNull')->with('reserved_at')->returns($query);
-        $query->expects('where')->with('available_at', '>', Mockery::any())->returns($query);
+        $query->expects('where')->with('available_at', '>', Argument::any())->returns($query);
         $query->expects('get')->returns(collect([
             (object) ['id' => 1, 'queue' => 'default', 'payload' => $payload1, 'attempts' => 0, 'reserved_at' => null],
             (object) ['id' => 2, 'queue' => 'emails', 'payload' => $payload2, 'attempts' => 0, 'reserved_at' => null],
@@ -524,7 +525,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query = Double::for(QueryBuilder::class);
         $database->expects('table')->with('table')->returns($query);
         $query->expects('whereNull')->with('reserved_at')->returns($query);
-        $query->expects('where')->with('available_at', '<=', Mockery::any())->returns($query);
+        $query->expects('where')->with('available_at', '<=', Argument::any())->returns($query);
         $query->expects('count')->returns(2);
 
         $this->assertSame(2, $queue->totalPendingSize());
@@ -539,7 +540,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query = Double::for(QueryBuilder::class);
         $database->expects('table')->with('table')->returns($query);
         $query->expects('whereNull')->with('reserved_at')->returns($query);
-        $query->expects('where')->with('available_at', '>', Mockery::any())->returns($query);
+        $query->expects('where')->with('available_at', '>', Argument::any())->returns($query);
         $query->expects('count')->returns(3);
 
         $this->assertSame(3, $queue->totalDelayedSize());

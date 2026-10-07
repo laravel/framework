@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Broadcasting\Broadcasters\MercureBroadcaster;
 use Illuminate\Broadcasting\BroadcastException;
@@ -234,7 +235,7 @@ class MercureBroadcasterTest extends TestCase
 
     public function testBroadcastPublishesOneUnprivatedUpdateWhenEveryChannelIsPublic()
     {
-        $this->hub->expects('publish')->with(m::on(function (Update $update) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
             $data = json_decode($update->getData(), true);
 
             return $update->getTopics() === ['https://laravel.alt/echo/channel/news', 'https://laravel.alt/echo/channel/weather']
@@ -248,7 +249,7 @@ class MercureBroadcasterTest extends TestCase
     public function testBroadcastPublishesOnePrivateUpdatePerGuardedChannel()
     {
         foreach (['private-room.1', 'presence-room.2'] as $channel) {
-            $this->hub->expects('publish')->with(m::on(function (Update $update) use ($channel) {
+            $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) use ($channel) {
                 $data = json_decode($update->getData(), true);
 
                 return $update->getTopics() === ['https://laravel.alt/echo/channel/'.$channel]
@@ -262,7 +263,7 @@ class MercureBroadcasterTest extends TestCase
 
     public function testBroadcastStripsTheSocketKeyFromThePayloadAndEmbedsItInTheEnvelope()
     {
-        $this->hub->expects('publish')->with(m::on(function (Update $update) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
             $data = json_decode($update->getData(), true);
 
             return $data['socket'] === 'abcd.1234' && $data['payload'] === ['text' => 'hi'];
@@ -273,7 +274,7 @@ class MercureBroadcasterTest extends TestCase
 
     public function testBroadcastOmitsTheSocketKeyFromTheEnvelopeWhenAbsent()
     {
-        $this->hub->expects('publish')->with(m::on(function (Update $update) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
             return ! array_key_exists('socket', json_decode($update->getData(), true));
         }));
 
@@ -282,11 +283,11 @@ class MercureBroadcasterTest extends TestCase
 
     public function testBroadcastSplitsAMixedBatchIntoTwoUpdates()
     {
-        $this->hub->expects('publish')->with(m::on(function (Update $update) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
             return $update->getTopics() === ['https://laravel.alt/echo/channel/news'] && ! $update->isPrivate();
         }));
 
-        $this->hub->expects('publish')->with(m::on(function (Update $update) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
             return $update->getTopics() === ['https://laravel.alt/echo/channel/private-room.1'] && $update->isPrivate();
         }));
 
@@ -295,7 +296,7 @@ class MercureBroadcasterTest extends TestCase
 
     public function testTopicsEncodeChannelNamesIntoASinglePathSegment()
     {
-        $this->hub->expects('publish')->with(m::on(function (Update $update) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) {
             return $update->getTopics() === ['https://laravel.alt/echo/channel/order%2F1%20%2A%27%28%29%21'];
         }));
 
@@ -503,15 +504,11 @@ class MercureBroadcasterTest extends TestCase
     {
         $broadcaster = $this->encryptedBroadcaster();
 
-        $this->hub->expects('publish')->with(m::on(
-            fn (Update $update) => $update->getTopics() === ['https://laravel.alt/echo/channel/news'] && ! $update->isPrivate()
-        ));
-        $this->hub->expects('publish')->with(m::on(
-            fn (Update $update) => $update->getTopics() === ['https://laravel.alt/echo/channel/private-room.1'] && $update->isPrivate()
-        ));
+        $this->hub->expects('publish')->with(Argument::satisfies(fn (Update $update) => $update->getTopics() === ['https://laravel.alt/echo/channel/news'] && ! $update->isPrivate()));
+        $this->hub->expects('publish')->with(Argument::satisfies(fn (Update $update) => $update->getTopics() === ['https://laravel.alt/echo/channel/private-room.1'] && $update->isPrivate()));
 
         foreach (['private-encrypted-a', 'private-encrypted-b'] as $channel) {
-            $this->hub->expects('publish')->with(m::on(function (Update $update) use ($channel) {
+            $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) use ($channel) {
                 $data = json_decode($update->getData(), true);
 
                 return $update->getTopics() === ['https://laravel.alt/echo/channel/'.$channel]
@@ -530,7 +527,7 @@ class MercureBroadcasterTest extends TestCase
         $broadcaster = $this->encryptedBroadcaster();
 
         $captured = null;
-        $this->hub->expects('publish')->with(m::on(function (Update $update) use (&$captured) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) use (&$captured) {
             $captured = $update;
 
             return true;
@@ -554,7 +551,7 @@ class MercureBroadcasterTest extends TestCase
         $broadcaster = $this->encryptedBroadcaster();
 
         $captured = null;
-        $this->hub->expects('publish')->with(m::on(function (Update $update) use (&$captured) {
+        $this->hub->expects('publish')->with(Argument::satisfies(function (Update $update) use (&$captured) {
             $captured = $update;
 
             return true;
@@ -659,9 +656,7 @@ class MercureBroadcasterTest extends TestCase
         $this->assertSame([['match' => 'https://app.example.com/broadcasting/channel/private-room.1']], $details[0]['topics']);
         $this->assertSame([['match' => 'https://app.example.com/broadcasting/whisper/private-room.1']], $details[1]['topics']);
 
-        $this->hub->expects('publish')->with(m::on(
-            fn (Update $update) => $update->getTopics() === ['https://app.example.com/broadcasting/channel/news']
-        ));
+        $this->hub->expects('publish')->with(Argument::satisfies(fn (Update $update) => $update->getTopics() === ['https://app.example.com/broadcasting/channel/news']));
 
         $broadcaster->broadcast(['news'], 'Tick');
     }

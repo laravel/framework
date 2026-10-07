@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
@@ -59,8 +60,8 @@ class FailoverQueueTest extends TestCase
         $sync = Double::for(Queue::class);
         $queue->expects('connection')->times(3)->with('sync')->returns($sync);
 
-        $sync->expects('later')->with(15, Mockery::type(FailoverJobWithDelayAttribute::class), '', null);
-        $sync->expects('later')->with(30, Mockery::type(FailoverJobWithDelayProperty::class), '', null);
+        $sync->expects('later')->with(15, Argument::type(FailoverJobWithDelayAttribute::class), '', null);
+        $sync->expects('later')->with(30, Argument::type(FailoverJobWithDelayProperty::class), '', null);
         $sync->expects('push')->with('regular-job', '', null);
 
         $failover->bulk([new FailoverJobWithDelayAttribute, new FailoverJobWithDelayProperty, 'regular-job']);

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
@@ -40,11 +41,11 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 
         $console->expects('find')->with('migrate:reset')->returns($resetCommand);
         $console->expects('find')->with('migrate')->returns($migrateCommand);
-        $dispatcher->expects('dispatch')->with(Mockery::type(DatabaseRefreshed::class));
+        $dispatcher->expects('dispatch')->with(Argument::type(DatabaseRefreshed::class));
 
         $quote = DIRECTORY_SEPARATOR === '\\' ? '"' : "'";
-        $resetCommand->expects('run')->with(new InputMatcher("--force=1 {$quote}migrate:reset{$quote}"), Mockery::any());
-        $migrateCommand->expects('run')->with(new InputMatcher('--force=1 migrate'), Mockery::any());
+        $resetCommand->expects('run')->with(new InputMatcher("--force=1 {$quote}migrate:reset{$quote}"), Argument::any());
+        $migrateCommand->expects('run')->with(new InputMatcher('--force=1 migrate'), Argument::any());
 
         $this->runCommand($command);
     }
@@ -66,11 +67,11 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 
         $console->expects('find')->with('migrate:rollback')->returns($rollbackCommand);
         $console->expects('find')->with('migrate')->returns($migrateCommand);
-        $dispatcher->expects('dispatch')->with(Mockery::type(DatabaseRefreshed::class));
+        $dispatcher->expects('dispatch')->with(Argument::type(DatabaseRefreshed::class));
 
         $quote = DIRECTORY_SEPARATOR === '\\' ? '"' : "'";
-        $rollbackCommand->expects('run')->with(new InputMatcher("--step=2 --force=1 {$quote}migrate:rollback{$quote}"), Mockery::any());
-        $migrateCommand->expects('run')->with(new InputMatcher('--force=1 migrate'), Mockery::any());
+        $rollbackCommand->expects('run')->with(new InputMatcher("--step=2 --force=1 {$quote}migrate:rollback{$quote}"), Argument::any());
+        $migrateCommand->expects('run')->with(new InputMatcher('--force=1 migrate'), Argument::any());
 
         $this->runCommand($command, ['--step' => 2]);
     }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Redis\Factory;
@@ -349,7 +350,7 @@ class QueueRedisQueueTest extends TestCase
         $redis->expects('connection')->times(2)->returns($clusterConnection);
 
         // command() is called by eval() — assert it receives hash-tagged keys
-        $clusterConnection->expects('command')->with('eval', Mockery::on(function ($args) {
+        $clusterConnection->expects('command')->with('eval', Argument::satisfies(function ($args) {
             return $args[0] === LuaScripts::push()
                 && $args[2] === 2
                 && $args[1][0] === 'queues:{default}'
@@ -406,7 +407,7 @@ class QueueRedisQueueTest extends TestCase
         $clusterConnection->expects('isCluster')->returns(true);
         $redis->expects('connection')->times(2)->returns($clusterConnection);
 
-        $clusterConnection->expects('command')->with('eval', Mockery::on(function ($args) {
+        $clusterConnection->expects('command')->with('eval', Argument::satisfies(function ($args) {
             return $args[0] === LuaScripts::size()
                 && $args[2] === 3
                 && $args[1][0] === 'queues:{default}'
@@ -425,7 +426,7 @@ class QueueRedisQueueTest extends TestCase
         $clusterConnection->expects('isCluster')->returns(true);
         $redis->expects('connection')->times(2)->returns($clusterConnection);
 
-        $clusterConnection->expects('command')->with('eval', Mockery::on(function ($args) {
+        $clusterConnection->expects('command')->with('eval', Argument::satisfies(function ($args) {
             return $args[0] === LuaScripts::clear()
                 && $args[2] === 4
                 && $args[1][0] === 'queues:{default}'

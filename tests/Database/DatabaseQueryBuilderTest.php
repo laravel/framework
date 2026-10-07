@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use BadMethodCallException;
 use Closure;
@@ -6028,12 +6029,12 @@ SQL;
     {
         $builder = $this->getMySqlBuilderWithProcessor();
         $builder->getConnection()->expects('select')
-            ->with(Mockery::any(), Mockery::any(), false, []);
+            ->with(Argument::any(), Argument::any(), false, []);
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock()->get();
 
         $builder = $this->getMySqlBuilderWithProcessor();
         $builder->getConnection()->expects('select')
-            ->with(Mockery::any(), Mockery::any(), false, []);
+            ->with(Argument::any(), Argument::any(), false, []);
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false)->get();
     }
 
