@@ -3,18 +3,16 @@
 namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
-use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\QueryException;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
-use Mockery;
-use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
@@ -231,26 +229,21 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
     public function testForceDeleteDoesntUpdateExistsPropertyIfFailed()
     {
-        $user = new class() extends SoftDeletesTestUser
-        {
-            public $exists = true;
+        $this->createUsers();
+        $this->connection()->statement('create trigger prevent_user_delete before delete on users begin select raise(abort, \'blocked\'); end');
 
-            public function newModelQuery()
-            {
-                return Mockery::spy(parent::newModelQuery(), function (MockInterface $mock) {
-                    $mock->expects('forceDelete')->andThrow(new Exception());
-                });
-            }
-        };
+        $user = SoftDeletesTestUser::find(2);
 
         $this->assertTrue($user->exists);
 
         try {
             $user->forceDelete();
-        } catch (Exception) {
+            $this->fail('Expected the delete to fail.');
+        } catch (QueryException) {
         }
 
         $this->assertTrue($user->exists);
+        $this->assertNotNull(SoftDeletesTestUser::find(2));
     }
 
     public function testForceDestroyFullyDeletesRecord()
@@ -426,6 +419,38 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertSame('foo@bar.com', $result->email);
         $this->assertCount(2, SoftDeletesTestUser::all());
         $this->assertCount(3, SoftDeletesTestUser::withTrashed()->get());
+    }
+
+    public function testRestoreOrCreateRestoresATrashedRecordOrCreatesANewOne()
+    {
+        $this->createUsers();
+
+        $restored = SoftDeletesTestUser::restoreOrCreate(['email' => 'taylorotwell@gmail.com']);
+
+        $this->assertSame(1, $restored->id);
+        $this->assertFalse($restored->trashed());
+        $this->assertCount(2, SoftDeletesTestUser::all());
+
+        $created = SoftDeletesTestUser::restoreOrCreate(['email' => 'foo@bar.com']);
+
+        $this->assertTrue($created->wasRecentlyCreated);
+        $this->assertCount(3, SoftDeletesTestUser::all());
+    }
+
+    public function testCreateOrRestoreRestoresATrashedRecordOrCreatesANewOne()
+    {
+        $this->createUsers();
+
+        $restored = SoftDeletesTestUser::createOrRestore(['email' => 'taylorotwell@gmail.com']);
+
+        $this->assertSame(1, $restored->id);
+        $this->assertFalse($restored->trashed());
+        $this->assertCount(2, SoftDeletesTestUser::all());
+
+        $created = SoftDeletesTestUser::createOrRestore(['email' => 'foo@bar.com']);
+
+        $this->assertTrue($created->wasRecentlyCreated);
+        $this->assertCount(3, SoftDeletesTestUser::all());
     }
 
     public function testCreateOrFirst()

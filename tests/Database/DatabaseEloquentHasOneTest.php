@@ -10,99 +10,20 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
-use Illuminate\Tests\Database\Fixtures\EloquentBuilderStub;
-use JMac\Testing\Double;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasOneTest extends TestCase
 {
-    protected $builder;
-
-    protected $related;
-
-    protected $parent;
-
-    public function testHasOneWithDefault()
-    {
-        $relation = $this->getRelation()->withDefault();
-
-        $this->builder->expects('first')->returns(null);
-
-        $newModel = new EloquentHasOneModelStub;
-
-        $this->related->expects('newInstance')->returns($newModel);
-
-        $this->assertSame($newModel, $relation->getResults());
-
-        $this->assertSame(1, $newModel->getAttribute('foreign_key'));
-    }
-
-    public function testHasOneWithDynamicDefault()
-    {
-        $relation = $this->getRelation()->withDefault(function ($newModel) {
-            $newModel->username = 'taylor';
-        });
-
-        $this->builder->expects('first')->returns(null);
-
-        $newModel = new EloquentHasOneModelStub;
-
-        $this->related->expects('newInstance')->returns($newModel);
-
-        $this->assertSame($newModel, $relation->getResults());
-
-        $this->assertSame('taylor', $newModel->username);
-
-        $this->assertSame(1, $newModel->getAttribute('foreign_key'));
-    }
-
-    public function testHasOneWithDynamicDefaultUseParentModel()
-    {
-        $relation = $this->getRelation()->withDefault(function ($newModel, $parentModel) {
-            $newModel->username = $parentModel->username;
-        });
-
-        $this->builder->expects('first')->returns(null);
-
-        $newModel = new EloquentHasOneModelStub;
-
-        $this->related->expects('newInstance')->returns($newModel);
-
-        $this->assertSame($newModel, $relation->getResults());
-
-        $this->assertSame('taylor', $newModel->username);
-
-        $this->assertSame(1, $newModel->getAttribute('foreign_key'));
-    }
-
-    public function testHasOneWithArrayDefault()
-    {
-        $attributes = ['username' => 'taylor'];
-
-        $relation = $this->getRelation()->withDefault($attributes);
-
-        $this->builder->expects('first')->returns(null);
-
-        $newModel = new EloquentHasOneModelStub;
-
-        $this->related->expects('newInstance')->returns($newModel);
-
-        $this->assertSame($newModel, $relation->getResults());
-
-        $this->assertSame('taylor', $newModel->username);
-
-        $this->assertSame(1, $newModel->getAttribute('foreign_key'));
-    }
-
     public function testRelationIsProperlyInitialized()
     {
-        $relation = $this->getRelation();
-        $model = Double::for(Model::class);
-        $model->expects('setRelation')->with('foo', null);
+        $relation = $this->getRelationWithRealQuery();
+        $model = new EloquentHasOneModelStub;
         $models = $relation->initRelation([$model], 'foo');
 
-        $this->assertEquals([$model], $models);
+        $this->assertSame([$model], $models);
+        $this->assertTrue($model->relationLoaded('foo'));
+        $this->assertNull($model->getRelation('foo'));
     }
 
     public function testEagerConstraintsAreProperlyAdded()
@@ -120,7 +41,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     public function testModelsAreProperlyMatchedToParents()
     {
-        $relation = $this->getRelation();
+        $relation = $this->getRelationWithRealQuery();
 
         $result1 = new EloquentHasOneModelStub;
         $result1->foreign_key = 1;
@@ -175,23 +96,6 @@ class DatabaseEloquentHasOneTest extends TestCase
         $parent->id = 1;
 
         return new HasOne($this->newBuilder(), $parent, 'table.foreign_key', 'id');
-    }
-
-    protected function getRelation()
-    {
-        $this->builder = Double::for(EloquentBuilderStub::class);
-        $this->builder->allows('whereNotNull')->with('table.foreign_key');
-        $this->builder->allows('where')->with('table.foreign_key', '=', 1);
-        $this->related = Double::for(Model::class);
-        $this->builder->allows('getModel')->returns($this->related);
-        $this->parent = Double::for(Model::class);
-        $this->parent->allows('getAttribute')->with('id')->returns(1);
-        $this->parent->allows('getAttribute')->with('username')->returns('taylor');
-        $this->parent->allows('getCreatedAtColumn')->returns('created_at');
-        $this->parent->allows('getUpdatedAtColumn')->returns('updated_at');
-        $this->parent->allows('newQueryWithoutScopes')->returns($this->builder);
-
-        return new HasOne($this->builder, $this->parent, 'table.foreign_key', 'id');
     }
 }
 

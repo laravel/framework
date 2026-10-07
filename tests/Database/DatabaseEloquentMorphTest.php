@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -12,8 +11,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
-use Illuminate\Tests\Database\Fixtures\EloquentBuilderStub;
-use JMac\Testing\Double;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
@@ -74,43 +71,6 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertSame([EloquentMorphResetModelStub::class, 1, EloquentMorphResetModelStub::class], $relation->getBindings());
     }
 
-    public function testMorphRelationUpsertFillsForeignKey()
-    {
-        $relation = $this->getManyRelation();
-
-        $relation->getQuery()->expects('upsert')->with(
-            [
-                ['email' => 'foo3', 'name' => 'bar', $relation->getMorphType() => $relation->getMorphClass(), $relation->getForeignKeyName() => $relation->getParentKey()],
-            ],
-            ['email'],
-            ['name']
-        );
-
-        $relation->upsert(
-            ['email' => 'foo3', 'name' => 'bar'],
-            ['email'],
-            ['name']
-        );
-
-        $relation->getQuery()->expects('upsert')->with(
-            [
-                ['email' => 'foo3', 'name' => 'bar', $relation->getMorphType() => $relation->getMorphClass(), $relation->getForeignKeyName() => $relation->getParentKey()],
-                ['name' => 'bar2', 'email' => 'foo2', $relation->getMorphType() => $relation->getMorphClass(), $relation->getForeignKeyName() => $relation->getParentKey()],
-            ],
-            ['email'],
-            ['name']
-        );
-
-        $relation->upsert(
-            [
-                ['email' => 'foo3', 'name' => 'bar'],
-                ['name' => 'bar2', 'email' => 'foo2'],
-            ],
-            ['email'],
-            ['name']
-        );
-    }
-
     protected function getRelationWithRealQuery(string $relation, ?Model $parent = null)
     {
         $connection = new Connection(new PDO('sqlite::memory:'));
@@ -120,58 +80,6 @@ class DatabaseEloquentMorphTest extends TestCase
         $parent->id = 1;
 
         return new $relation($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
-    }
-
-    protected function getOneRelation()
-    {
-        $queryBuilder = Double::for(QueryBuilder::class);
-        $builder = Double::for(new Builder($queryBuilder));
-        $builder->expects('whereNotNull')->with('table.morph_id');
-        $builder->expects('where')->with('table.morph_id', '=', 1);
-        $related = new EloquentMorphResetModelStub;
-        $builder->allows('getModel')->returns($related);
-        $parent = Double::for(Model::class);
-        $parent->allows('getAttribute')->with('id')->returns(1);
-        $parent->allows('getMorphClass')->returns(get_class($parent));
-        $builder->expects('where')->with('table.morph_type', get_class($parent));
-
-        return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
-    }
-
-    protected function getManyRelation()
-    {
-        $builder = Double::for(EloquentBuilderStub::class);
-        $builder->expects('whereNotNull')->with('table.morph_id');
-        $builder->expects('where')->with('table.morph_id', '=', 1);
-        $related = new EloquentMorphResetModelStub;
-        $builder->allows('getModel')->returns($related);
-        $parent = Double::for(Model::class);
-        $parent->allows('getAttribute')->with('id')->returns(1);
-        $parent->allows('getMorphClass')->returns(get_class($parent));
-        $builder->expects('where')->with('table.morph_type', get_class($parent));
-
-        return new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
-    }
-
-    protected function getNamespacedRelation($alias)
-    {
-        require_once __DIR__.'/Fixtures/EloquentModelNamespacedStub.php';
-
-        Relation::morphMap([
-            $alias => EloquentModelNamespacedStub::class,
-        ]);
-
-        $builder = Double::for(EloquentBuilderStub::class);
-        $builder->expects('whereNotNull')->with('table.morph_id');
-        $builder->expects('where')->with('table.morph_id', '=', 1);
-        $related = new EloquentMorphResetModelStub;
-        $builder->allows('getModel')->returns($related);
-        $parent = Double::for(EloquentModelNamespacedStub::class);
-        $parent->allows('getAttribute')->with('id')->returns(1);
-        $parent->allows('getMorphClass')->returns($alias);
-        $builder->expects('where')->with('table.morph_type', $alias);
-
-        return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
     }
 }
 
